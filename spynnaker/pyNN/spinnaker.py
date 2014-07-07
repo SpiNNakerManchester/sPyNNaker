@@ -42,9 +42,12 @@ class Spinnaker(VisualiserCreationUtility, object):
         self._live_spike_recorder = None
         self._multi_cast_vertex = None
         self._txrx = None
+        #visualiser objects
         self._visualiser = None
         self._wait_for_run = False
         self._visualiser_port = None
+        self._visualiser_vertices = None
+
         #main objects
         self._graph = Graph(label=graph_label)
         self.sub_graph = None
@@ -306,7 +309,10 @@ class Spinnaker(VisualiserCreationUtility, object):
         #create the edge and add
             pass
 
-
+    def add_visualiser_vertex(self, visualiser_vertex_to_add):
+        if self._visualiser_vertices is None:
+            self._visualiser_vertices = list()
+        self._visualiser_vertices.append(visualiser_vertex_to_add)
 
 
 

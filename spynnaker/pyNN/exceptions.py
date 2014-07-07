@@ -11,3 +11,11 @@ class ConfigurationException(SpynnakerException):
 
     :raise None: does not raise any known exceptions"""
     pass
+
+
+class MemReadException(SpynnakerException):
+    """raised when the pynn front end fails to read a certain memory region
+
+    :raise None: does not raise any known exceptions
+    """
+    pass

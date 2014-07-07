@@ -8,6 +8,7 @@ from spynnaker.pyNN.utilities.timer import Timer
 from visualiser import visualiser_constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
 
 import logging
 logger = logging.getLogger(__name__)
@@ -46,23 +47,23 @@ class Population(object):
             raise Exception("Spatial structure is unsupported for Populations.")
 
         # Create a graph vertex for the population and add it to PACMAN
-        self.vertex = cellclass(size, label=label, **cellparams)
+        self._vertex = cellclass(size, label=label, **cellparams)
         self._controller = controller
 
         #check if the vertex is a cmd sender, if so store for future
-        if self.vertex.requires_multi_cast_source():
+        if self._vertex.requires_multi_cast_source():
             if multi_cast_vertex is None:
                 multi_cast_vertex = MultiCastSource()
                 self._controller.add_vertex(multi_cast_vertex)
-            edge = Edge(multi_cast_vertex, self.vertex)
+            edge = Edge(multi_cast_vertex, self._vertex)
             self._controller.add_edge(edge)
 
-        self.parameters = PyNNParametersSurrogate(self.vertex)
-        self._controller.add_vertex(self.vertex)
+        self._parameters = PyNNParametersSurrogate(self._vertex)
+        self._controller.add_vertex(self._vertex)
 
         #add any dependant edges and verts if needed
         dependant_verts, dependant_edges = \
-            self.vertex.get_dependant_vertexes_edges()
+            self._vertex.get_dependant_vertexes_edges()
 
         if dependant_verts is not None:
             for dependant_vert in dependant_verts:
@@ -73,10 +74,10 @@ class Population(object):
                 self._controller.add_edge(dependant_edge)
 
         #initlise common stuff
-        self.size = size
-        self.record_spike_file = None
-        self.record_v_file = None
-        self.record_g_syn_file = None
+        self._size = size
+        self._record_spike_file = None
+        self._record_v_file = None
+        self._record_g_syn_file = None
 
     def __add__(self, other):
         """
@@ -148,7 +149,7 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        spikes = self.vertex.get_spikes(self._controller, compatible_output)
+        spikes = self._vertex.get_spikes(self._controller, compatible_output)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
         return spikes
@@ -169,8 +170,8 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        gsyn = self.vertex.get_gsyn(self._controller, gather=gather,
-                                    compatible_output=compatible_output)
+        gsyn = self._vertex.get_gsyn(self._controller, gather=gather,
+                                     compatible_output=compatible_output)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
         return gsyn
@@ -189,8 +190,8 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        v = self.vertex.get_v(self._controller, gather=gather, 
-                              compatible_output=compatible_output)
+        v = self._vertex.get_v(self._controller, gather=gather,
+                               compatible_output=compatible_output)
 
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
@@ -217,7 +218,8 @@ class Population(object):
         this population.
 
         """
-        initialize_attr = getattr(self.vertex, "initialize_%s" % variable, None)
+        initialize_attr = \
+            getattr(self._vertex, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
             raise Exception("Vertex does not support initialization of "
                             "parameter {%s}".format(variable))
@@ -251,7 +253,7 @@ class Population(object):
         """
         Returns the total number of cells in the population.
         """
-        return self.size
+        return self._size
 
     @property
     def local_size(self):
@@ -289,7 +291,7 @@ class Population(object):
 
         """
         new_entry_for_vinit = {'v_init': distribution}
-        self.parameters.update(new_entry_for_vinit)
+        self._parameters.update(new_entry_for_vinit)
 
     def record(self, to_file=None, focus=None,
                visualiser_mode=visualiser_constants.RASTER,
@@ -304,25 +306,24 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering spike time recording.
         """
-        record_attr = getattr(self.vertex, "record", None)
+        record_attr = getattr(self._vertex, "record", None)
         if record_attr is None or not callable(record_attr):
             raise Exception("Vertex does not support recording of spikes")
 
         # Tell the vertex to record spikes
-        self.vertex.record(
-            focus=focus, visualiser_mode=visualiser_mode,
-            visualiser_2d_dimension=visualiser_2d_dimension,
-            visualiser_raster_seperate=visualiser_raster_seperate,
-            visualiser_no_colours=visualiser_no_colours,
-            visualiser_average_period_tics=visualiser_average_period_tics,
-            visualiser_longer_period_tics=visualiser_longer_period_tics,
-            visualiser_update_screen_in_tics=visualiser_update_screen_in_tics,
-            visualiser_reset_counters=visualiser_reset_counters,
-            visualiser_reset_counter_period=visualiser_reset_counter_period)
-        self.record_spike_file = to_file
+        self._vertex.record(focus=focus)
+        if conf.config.getboolean("Visualiser", "enable"):
+            visualiser_vertex = VisualiserVertex(
+                visualiser_mode, visualiser_2d_dimension,
+                visualiser_raster_seperate, visualiser_no_colours,
+                visualiser_average_period_tics, visualiser_longer_period_tics,
+                visualiser_update_screen_in_tics, visualiser_reset_counters,
+                visualiser_reset_counter_period, self._vertex)
+            self._controller.add_visualiser_vertex(visualiser_vertex)
+        self._record_spike_file = to_file
 
         # add an edge to the monitor
-        self._controller.add_edge_to_recorder_vertex(self.vertex)
+        self._controller.add_edge_to_recorder_vertex(self._vertex)
 
     def record_gsyn(self, to_file=None):
         """
@@ -330,12 +331,12 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering gsyn value recording.
         """
-        if (not hasattr(self.vertex, "record_gsyn")
-                or not callable(self.vertex.record_gsyn)):
+        if (not hasattr(self._vertex, "record_gsyn")
+                or not callable(self._vertex.record_gsyn)):
             raise Exception("Vertex does not support recording of gsyn")
 
-        self.vertex.record_gsyn()
-        self.record_g_syn_file = to_file
+        self._vertex.record_gsyn()
+        self._record_g_syn_file = to_file
 
     def record_v(self, to_file=None):
         """
@@ -343,12 +344,12 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering potential recording.
         """
-        if (not hasattr(self.vertex, "record_v")
-                or not callable(self.vertex.record_v)):
+        if (not hasattr(self._vertex, "record_v")
+                or not callable(self._vertex.record_v)):
             raise Exception("Vertex does not support recording of potential")
 
-        self.vertex.record_v()
-        self.record_v_file = to_file
+        self._vertex.record_v()
+        self._record_v_file = to_file
 
     @property
     def positions(self):
@@ -365,9 +366,9 @@ class Population(object):
         spikes = self.getSpikes(compatible_output=True)
         if spikes is not None:
             first_id = 0
-            num_neurons = self.vertex.atoms
-            dimensions = self.vertex.atoms
-            last_id = self.vertex.atoms - 1
+            num_neurons = self._vertex.atoms
+            dimensions = self._vertex.atoms
+            last_id = self._vertex.atoms - 1
             utility_calls.check_directory_exists(filename)
             spike_file = open(filename, "w")
             spike_file.write("# first_id = %d\n" % first_id)
@@ -386,8 +387,8 @@ class Population(object):
         time_step = (self._controller.dao.machineTimeStep*1.0)/1000.0
         gsyn = self.get_gsyn(gather, compatible_output=True)
         first_id = 0
-        num_neurons = self.vertex.atoms
-        dimensions = self.vertex.atoms
+        num_neurons = self._vertex.atoms
+        dimensions = self._vertex.atoms
         file_handle = open(filename, "w")
         file_handle.write("# first_id = %d\n" % first_id)
         file_handle.write("# n = %d\n" % num_neurons)
@@ -410,8 +411,8 @@ class Population(object):
         utility_calls.check_directory_exists(filename)
         file_handle = open(filename, "w")
         first_id = 0
-        num_neurons = self.vertex.atoms
-        dimensions = self.vertex.atoms
+        num_neurons = self._vertex.atoms
+        dimensions = self._vertex.atoms
         file_handle.write("# first_id = %d\n" % first_id)
         file_handle.write("# n = %d\n" % num_neurons)
         file_handle.write("# dt = %f\n" % time_step)
@@ -484,21 +485,21 @@ class Population(object):
             if value is None:
                 raise Exception("Error: No value given in set() function for "
                                 "population parameter. Exiting.")
-            self.parameters[parameter] = value
+            self._parameters[parameter] = value
             return
         if type(parameter) is not dict:
                 raise Exception("Error: invalid parameter type for "
                                 "set() function for population parameter."
                                 " Exiting.")
         # Add a dictionary-structured set of new parameters to the current set:
-        self.parameters.update(parameter)
+        self._parameters.update(parameter)
 
     def set_constraint(self, constraint):
         """
         Apply a constraint to a population that restricts the processor
         onto which its sub-populations will be placed.
         """
-        self.vertex.add_constraint(constraint)
+        self._vertex.add_constraint(constraint)
 
     @property
     def structure(self):

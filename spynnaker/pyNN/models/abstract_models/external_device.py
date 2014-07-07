@@ -1,22 +1,19 @@
-from pacman103.front.common.component_vertex import ComponentVertex
-from pacman103.core import exceptions
-from pacman103.lib.lib_map import VertexConstraints
-from pacman103.lib import data_spec_constants
+from spynnaker.pyNN.models.abstract_models.component_vertex \
+    import ComponentVertex
+from pacman.structures.constraints.basic_placer_constraint \
+    import BasicPlacerConstraint
 
-import os
 
 class ExternalDevice(ComponentVertex):
-    def __init__( self, n_neurons, virtual_chip_coords,
-                  connected_node_coords, connected_node_edge, label=None):
-        super(ExternalDevice , self ).__init__(n_neurons=n_neurons, label=label,
-                                               virtual=True)
+    def __init__(self, n_neurons, virtual_chip_coords,
+                 connected_node_coords, connected_node_edge, label=None):
+        ComponentVertex.__init__(self, n_neurons=n_neurons, label=label)
         self.virtual_chip_coords = virtual_chip_coords
         self.connected_chip_coords = connected_node_coords
         self.connected_chip_edge = connected_node_edge
-        placementConstraint = VertexConstraints(x=None, y=None)
-        placementConstraint.x = virtual_chip_coords['x']
-        placementConstraint.y = virtual_chip_coords['y']
-        self.constraints = placementConstraint
+        placement_constraint = BasicPlacerConstraint(virtual_chip_coords['x'],
+                                                     virtual_chip_coords['y'])
+        self.add_constraint(placement_constraint)
 
     @property
     def model_name(self):
@@ -33,5 +30,6 @@ class ExternalDevice(ComponentVertex):
     def requires_retina_page(self):
         return False
 
-    def split_into_subvertex_count(self):
+    @staticmethod
+    def split_into_subvertex_count():
         return 1

@@ -13,9 +13,10 @@ class VisualiserCreationUtility(object):
     def __init__(self, spinnaker):
         self._spinnaker = spinnaker
 
-    def _create_visualiser_interface(self, has_board, transciever, graph,
-                                     machine, placements, router_tables,
-                                     sim_run_time, machine_time_step):
+    def _create_visualiser_interface(self, has_board, transciever,
+                                     visualiser_vertices, machine, placements,
+                                     router_tables, sim_run_time,
+                                     machine_time_step):
         # Start visuliser if requested
         visualiser = None
         #TODO need to make this mapping for the topological pages ABS
@@ -33,7 +34,7 @@ class VisualiserCreationUtility(object):
                                        router_tables)
             visualiser.add_page(machine_page, machine_page.label)
             #add configuration page
-            config_page = ConfigPage(dict(), graph.vertices, visualiser,
+            config_page = ConfigPage(dict(), visualiser_vertices, visualiser,
                                      transciever, has_board, sim_run_time,
                                      machine_time_step,
                                      coord_to_low_atom_mapper)
