@@ -1,13 +1,14 @@
 __author__ = 'stokesa6'
 #pacman imports
-from pacman.structures.graph.graph import Graph
-from pacman.operations.partitioner import partition_algorithms
-from pacman.operations.placer import placer_algorithms
-from pacman.operations.router import router_algorithms
-from pacman.operations.pruner import pruner_algorithms
-from pacman.operations.routing_info_allocator \
-    import routing_info_allocation_algorithms
-from pacman.structures.machine.machine import Machine
+from pacman.model.graph.graph import Graph
+from pacman.operations import partition_algorithms
+from pacman.operations import placer_algorithms
+from pacman.operations import router_algorithms
+from pacman.operations import pruner_algorithms
+from pacman.operations import routing_info_allocator_algorithms
+
+#machine imports
+from spinn_machine.machine import Machine
 
 #internal imports
 from spynnaker.pyNN import exceptions
@@ -23,7 +24,8 @@ from spynnaker.pyNN.models.abstract_models.population import Population
 from spynnaker.pyNN.models.abstract_models.projection import Projection
 
 #spinnman inports
-from spinnman.interfaces.transceiver import Transceiver
+from spinnman.transceiver import Transceiver
+from spinnman.transceiver import create_transceiver_from_hostname
 
 import logging
 import math
@@ -73,7 +75,7 @@ class Spinnaker(VisualiserCreationUtility, object):
             conf.get_valid_components(placer_algorithms, "Placer")
 
         self._key_allocator_algorithms_list = \
-            conf.get_valid_components(routing_info_allocation_algorithms,
+            conf.get_valid_components(routing_info_allocator_algorithms,
                                       "KeyAllocator")
 
         self._routing_algorithms_list = \
@@ -239,8 +241,7 @@ class Spinnaker(VisualiserCreationUtility, object):
         has_board = conf.config.getboolean("Machine", "have_board")
 
         if has_board:
-            self._txrx = \
-                Transceiver.create_transceiver_from_hostname(self._hostname)
+            self._txrx = create_transceiver_from_hostname(self._hostname)
         self._machine = Machine(self._txrx.get_machine_chip_details())
 
         self._visualiser = \
