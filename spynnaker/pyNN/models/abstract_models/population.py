@@ -2,7 +2,7 @@ from spynnaker.pyNN.models.utility_models.multicastsource \
     import MultiCastSource
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
-from pacman.structures.graph.edge import Edge
+from pacman.model.graph.edge import Edge
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
 from visualiser import visualiser_constants

@@ -1,7 +1,6 @@
 __author__ = 'stokesa6'
-from pacman103.front.common.external_device import ExternalDevice
-from pacman103.lib import data_spec_constants, data_spec_gen
-from pacman103.core.utilities import packet_conversions
+from spynnaker.pyNN.models.abstract_models.external_device import ExternalDevice
+from spynnaker.pyNN.utilities.core.utilities import packet_conversions
 from pacman103.lib import lib_map
 from pacman103.core import exceptions
 import os
@@ -16,9 +15,6 @@ class ExternalFPGARetinaDevice(ExternalDevice):
     MODE_64 = "64"
     MODE_32 = "32"
     MODE_16 = "16"
-
-    core_app_identifier = \
-        data_spec_constants.EXTERNAL_FPGA_RETINA_DEVICE_CORE_APPLICATION_ID
 
     def __init__( self, mode, virtual_chip_coords,
                   connected_chip_coords, connected_chip_edge, polarity,
@@ -132,14 +128,17 @@ class ExternalFPGARetinaDevice(ExternalDevice):
         '''
         return True
 
+    @staticmethod
     def get_packet_retina_coords(self, details, mode):
         return packet_conversions.get_x_from_fpga_retina(details, mode), \
                packet_conversions.get_y_from_fpga_retina(details, mode), \
-               packet_conversions.get_spike_value_from_fpga_retina(details, mode)
+               packet_conversions.get_spike_value_from_fpga_retina(details,
+                                                                   mode)
 
 
     def split_into_subvertex_count(self):
-        if (self.atoms >> 11) <= 0: # if the keys dont touce p, then just 1 subvert is needed
+        if (self.atoms >> 11) <= 0:  # if the keys dont touce p,
+                                     # then just 1 subvert is needed
             return 1
         else:
             return self.atoms >> 11 # keys available for neuron id

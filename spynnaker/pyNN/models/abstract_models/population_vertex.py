@@ -1,4 +1,5 @@
-from pacman103.front.common.randomDistributions import RandomDistribution
+from spynnaker.pyNN.models.neural_properties.randomDistributions import \
+    RandomDistribution
 from pacman103.front.common.component_vertex import ComponentVertex
 from pacman103.front.common import enums
 
@@ -18,18 +19,7 @@ import ctypes
 import logging
 logger = logging.getLogger(__name__)
 
-REGIONS = enums.enum1(
-    'SYSTEM',
-    'NEURON_PARAMS',
-    'SYNAPSE_PARAMS',
-    'ROW_LEN_TRANSLATION',
-    'MASTER_POP_TABLE',
-    'SYNAPTIC_MATRIX',
-    'STDP_PARAMS',
-    'SPIKE_HISTORY',
-    'POTENTIAL_HISTORY',
-    'GSYN_HISTORY',
-)
+
 
 # Some constants
 SETUP_SIZE = 16 # Single word of info with flags, etc.

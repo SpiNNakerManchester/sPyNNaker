@@ -1,6 +1,7 @@
 """
-COMMENT ME
+file containing constants used by the front end to determine memory locations
 """
+from spynnaker.pyNN.utilities import enums
 
 SDRAM_BASE_ADDR = 0x70000000
 APP_START_ADDR = 0x404000
@@ -37,3 +38,16 @@ spike_offset = int("200000", 16)
 
 sizeofshort = 2 # bytes
 sizeofint = 4 # bytes
+
+REGIONS = enums.enum1(
+    'SYSTEM',
+    'NEURON_PARAMS',
+    'SYNAPSE_PARAMS',
+    'ROW_LEN_TRANSLATION',
+    'MASTER_POP_TABLE',
+    'SYNAPTIC_MATRIX',
+    'STDP_PARAMS',
+    'SPIKE_HISTORY',
+    'POTENTIAL_HISTORY',
+    'GSYN_HISTORY',
+)

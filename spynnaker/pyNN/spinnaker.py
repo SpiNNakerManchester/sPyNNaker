@@ -9,6 +9,7 @@ from pacman.operations.routing_info_allocator \
     import routing_info_allocation_algorithms
 from pacman.structures.machine.machine import Machine
 
+
 #internal imports
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import conf
