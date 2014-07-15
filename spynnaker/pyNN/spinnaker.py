@@ -299,7 +299,6 @@ class Spinnaker(VisualiserCreationUtility, object):
                           connector, source, target, synapse_dynamics, label,
                           rng)
         self.add_edge(edge)
-
         pass
 
     def add_edge_to_recorder_vertex(self, vertex_to_record_from):
