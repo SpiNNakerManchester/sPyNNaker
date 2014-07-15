@@ -5,8 +5,8 @@ from pacman103.front.common.exp_population_vertex import ExponentialPopulationVe
 from pacman103.front.common.if_properties import IF_Properties
 from pacman103.front.common.neuron_parameter import NeuronParameter
 
-class IF_ConductanceExponentialPopulation( ExponentialPopulationVertex,
-                                           IF_Properties):
+class IF_ConductanceExponentialPopulation(ExponentialPopulationVertex,
+                                          IF_Properties):
     core_app_identifier = data_spec_constants.IF_CURR_EXP_CORE_APPLICATION_ID
 
     def __init__( self, n_neurons, constraints = None, label = None,

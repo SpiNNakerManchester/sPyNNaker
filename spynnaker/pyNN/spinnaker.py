@@ -10,6 +10,7 @@ from pacman.operations import routing_info_allocator_algorithms
 #machine imports
 from spinn_machine.machine import Machine
 
+
 #internal imports
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import conf
