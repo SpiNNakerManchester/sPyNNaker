@@ -1,13 +1,13 @@
-from pacman.structures.graph.vertex import Vertex
+from pacman.model.graph.vertex import Vertex
 import logging
 import numpy
 import struct
 #from spinnman.interfaces.transceiver_tools import scamp_constants
-from pacman.utilities import packet_conversions
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import conf
-from spynnaker.pyNN.utilities.memory_constants \
+from spynnaker.pyNN.utilities.utility_calls \
     import get_app_data_base_address_offset, get_region_base_address_offset
+from spynnaker.pyNN.utilities import constants
 logger = logging.getLogger(__name__)
 
 RECORDING_BASE_BYTES = 4
@@ -23,7 +23,7 @@ class ComponentVertex(Vertex):
         
         self._record = False
         self.focus_level = None
-        self._app_mask = packet_conversions.get_default_mask()
+        self._app_mask = constants.DEFAULT_MASK
         
         # Store a delay vertex here if required
         self._delay_vertex = None
@@ -120,13 +120,11 @@ class ComponentVertex(Vertex):
             (x, y, p) = placement.processor.get_coordinates()
             logger.debug("Reading spikes from chip {%d}, {%d}, core {%d}, "
                          "lo_atom {%d}".format(x, y, p, subvertex.lo_atom))
-            controller.txrx.select(x, y)
             
             # Get the App Data for the core
             app_data_base_address_offset = get_app_data_base_address_offset(p)
             app_data_base_address_buf = \
-                controller.txrx.memory_calls.read_mem(
-                    app_data_base_address_offset, scamp_constants.TYPE_WORD, 4)
+                controller.txrx.read_mem(x, y, app_data_base_address_offset, 4)
             app_data_base_address = \
                 struct.unpack("<I", app_data_base_address_buf)[0]
             
@@ -135,17 +133,16 @@ class ComponentVertex(Vertex):
                 get_region_base_address_offset(app_data_base_address,
                                                spike_recording_region)
             spike_region_base_address_buf = \
-                controller.txrx.memory_calls.read_mem(
-                    spike_region_base_address_offset,
-                    scamp_constants.TYPE_WORD, 4)
+                controller.txrx.read_mem(x, y, spike_region_base_address_offset,
+                                         4)
             spike_region_base_address = \
                 struct.unpack("<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
             
             # Read the spike data size
             number_of_bytes_written_buf =\
-                controller.txrx.memory_calls.read_mem(spike_region_base_address,
-                                                      scamp_constants.TYPE_WORD,
+                controller.txrx.memory_calls.read_mem(x, y,
+                                                      spike_region_base_address,
                                                       4)
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
@@ -171,7 +168,7 @@ class ComponentVertex(Vertex):
                                  hex(spike_region_base_address)))
             spike_data =\
                 controller.txrx.memory_calls.read_mem(
-                    spike_region_base_address + 4, scamp_constants.TYPE_WORD,
+                    x, y, spike_region_base_address + 4,
                     number_of_bytes_written)
             
             # Extract number of spike bytes from subvertex

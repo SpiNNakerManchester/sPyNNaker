@@ -4,12 +4,7 @@ from pacman.model.graph.graph import Graph
 from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
-from pacman.operations import pruner_algorithms
 from pacman.operations import routing_info_allocator_algorithms
-
-#machine imports
-from spinn_machine.machine import Machine
-
 
 #internal imports
 from spynnaker.pyNN import exceptions
@@ -25,7 +20,6 @@ from spynnaker.pyNN.models.abstract_models.population import Population
 from spynnaker.pyNN.models.abstract_models.projection import Projection
 
 #spinnman inports
-from spinnman.transceiver import Transceiver
 from spinnman.transceiver import create_transceiver_from_hostname
 
 import logging
@@ -34,7 +28,7 @@ import math
 logger = logging.getLogger(__name__)
 
 
-class Spinnaker(VisualiserCreationUtility, object):
+class Spinnaker(object):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
                  max_delay=None, graph_label=None):
@@ -81,9 +75,6 @@ class Spinnaker(VisualiserCreationUtility, object):
 
         self._routing_algorithms_list = \
             conf.get_valid_components(router_algorithms, "Routing")
-
-        self._pruner_algorithms_list = \
-            conf.get_valid_components(pruner_algorithms, "Pruner")
 
         #loading and running config params
         self._do_load = True
@@ -194,7 +185,7 @@ class Spinnaker(VisualiserCreationUtility, object):
                     self._set_visulaiser_port(port)
 
     def run(self, run_time):
-        self._setup_spinnman_interfaces()
+        self._setup_interfaces()
         do_timing = conf.config.getboolean("Reports", "outputTimesForSections")
         if do_timing:
             timer = Timer()
@@ -236,14 +227,14 @@ class Spinnaker(VisualiserCreationUtility, object):
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
-    def _setup_spinnman_interfaces(self):
+    def _setup_interfaces(self):
         """Set up the interfaces for communicating with the SpiNNaker board
         """
         has_board = conf.config.getboolean("Machine", "have_board")
 
         if has_board:
             self._txrx = create_transceiver_from_hostname(self._hostname)
-        self._machine = Machine(self._txrx.get_machine_chip_details())
+        self._machine = self._txrx.get_machine_details()
 
         self._visualiser = \
             self._create_visualiser_interface(

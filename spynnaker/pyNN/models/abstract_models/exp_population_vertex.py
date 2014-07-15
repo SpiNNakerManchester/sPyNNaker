@@ -1,6 +1,6 @@
 from spynnaker.pyNN.models.abstract_models.population_vertex \
     import PopulationVertex
-from spynnaker.pyNN.utilities.memory_constants import REGIONS
+from spynnaker.pyNN.utilities.constants import REGIONS
 import numpy
 
 NUM_SYNAPSE_PARAMS = 4  # tau_syn_E and tau_syn_I, and initial multipiers
