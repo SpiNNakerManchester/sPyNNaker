@@ -113,7 +113,7 @@ class ChipPage(AbstractPage):
             route = int(chip_router_table[router_key][0].route)
             core_id = "({%d}, {%d}, {%d})".format((key >> 24 & 0xFF),
                                                   (key >> 16 & 0xFF),
-                                                  (key >> 11 & 0xFF)+1)
+                                                  (key >> 11 & 0xFF) + 1)
             route_txt = self._expand_route_value(route)
             key_label = gtk.Label("{}".format(self.uint32_to_hex_string(key)))
             mask_label = gtk.Label("{}".format(self.uint32_to_hex_string(mask)))
@@ -217,7 +217,7 @@ class ChipPage(AbstractPage):
                     button.set_sensitive(False)
                     y = int(math.floor(count / 4))
                     x = int(count - (y * 4))
-                    self._core_table.attach(button, x, x+1, y, y+1)
+                    self._core_table.attach(button, x, x + 1, y, y + 1)
                     self.core_buttons[core_ids[count]] = button
                     count += 1
         else:
@@ -246,7 +246,7 @@ class ChipPage(AbstractPage):
                 button.set_sensitive(False)
                 y = int(math.floor(core_id / 4))
                 x = int(core_id - (y * 4))
-                self._core_table.attach(button, x, x+1, y, y+1)
+                self._core_table.attach(button, x, x + 1, y, y + 1)
                 self.core_buttons[core_id] = button
 
     def update_table(self, option):

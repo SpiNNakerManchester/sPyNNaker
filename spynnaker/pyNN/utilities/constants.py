@@ -1,7 +1,33 @@
 """
 Utilities for accessing the location of memory regions on the board
 """
+from spynnaker.pyNN.utilities import enums
 
+# Some constants
+SETUP_SIZE = 16  # Single word of info with flags, etc.
+                 # plus the lengths of each of the output buffer
+                 # regions in bytes
+
+NO_PARAMS = 10
+PARAMS_HEADER_SIZE = 3  # Number of 32-bit words in header of params block
+PARAMS_BASE_SIZE = 4 * (PARAMS_HEADER_SIZE + NO_PARAMS)
+
+RECORD_SPIKE_BIT = 1 << 0
+RECORD_STATE_BIT = 1 << 1
+RECORD_GSYN_BIT = 1 << 2
+
+# From neuron common-typedefs.h
+SYNAPSE_INDEX_BITS = 8
+MAX_NEURON_SIZE = (1 << SYNAPSE_INDEX_BITS)
+OUT_SPIKE_SIZE = (MAX_NEURON_SIZE >> 5)  # The size of each output spike line
+OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * 4  # The number of bytes for each spike line
+V_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
+GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
+
+INFINITE_SIMULATION = 4294967295
+
+#natively supported delays for all models
+MAX_SUPPORTED_DELAY_TICS = 16
 
 #From spinnaker.h
 SYSRAM_BASE = 0xe5000000
@@ -54,3 +80,16 @@ VCPU_OFFSETS = {"r": 0,  # uint r[8]; //!< 0 - r0-r7
                 "user2": 120,  # uint user2; //!< 120 - User word 2
                 "user3": 124,  # uint user3; //!< 124 - User word 3
                 }
+
+REGIONS = enums.enum1(
+    'SYSTEM',
+    'NEURON_PARAMS',
+    'SYNAPSE_PARAMS',
+    'ROW_LEN_TRANSLATION',
+    'MASTER_POP_TABLE',
+    'SYNAPTIC_MATRIX',
+    'STDP_PARAMS',
+    'SPIKE_HISTORY',
+    'POTENTIAL_HISTORY',
+    'GSYN_HISTORY',
+)

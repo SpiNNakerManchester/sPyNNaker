@@ -34,8 +34,8 @@ class Population(object):
     :returns a list of vertexes and edges
     """
 
-    def __init__(self, size, cellclass, cellparams, controller,
-                 multi_cast_vertex=None, structure=None, label=None):
+    def __init__(self, size, cellclass, cellparams, controller, label,
+                 multi_cast_vertex=None, structure=None):
         """
         Instantiates a :py:object:`Population`.
         """
@@ -47,7 +47,7 @@ class Population(object):
             raise Exception("Spatial structure is unsupported for Populations.")
 
         # Create a graph vertex for the population and add it to PACMAN
-        self._vertex = cellclass(size, label=label, **cellparams)
+        self._vertex = cellclass(size, label, **cellparams)
         self._controller = controller
 
         #check if the vertex is a cmd sender, if so store for future

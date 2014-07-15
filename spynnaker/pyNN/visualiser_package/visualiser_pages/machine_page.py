@@ -80,8 +80,8 @@ class MachinePage(AbstractPage):
                     #check if button represents a valid chip
                     self._check_button_state(button, x, y)
                     #attach button to table
-                    self._machine_table.attach(button, column_x, column_x+1,
-                                               column_y, column_y+1)
+                    self._machine_table.attach(button, column_x, column_x + 1,
+                                               column_y, column_y + 1)
                     #create right click menu
                     menu = self._create_right_click_menu()
                     #add the coords into the hash so we
@@ -95,8 +95,8 @@ class MachinePage(AbstractPage):
                         core_table.show()
 
                         self._machine_table.attach(core_table, column_x,
-                                                   column_x+1, column_y,
-                                                   column_y+1)
+                                                   column_x + 1, column_y,
+                                                   column_y + 1)
                         core_ids = [4, 12, 13, 5, 0, 8, 9, 1, 16, None, None,
                                     17, 6, 14, 15, 7, 2, 10, 11, 3]
                         count = 0
@@ -109,8 +109,8 @@ class MachinePage(AbstractPage):
                                 button.set_sensitive(False)
                                 y = int(math.floor(count / 4))
                                 x = int(count - (y * 4))
-                                core_table.attach(button, x, x+1, y, y+1)
-                                key = x+y+core_ids[count]
+                                core_table.attach(button, x, x + 1, y, y + 1)
+                                key = x + y + core_ids[count]
                                 self._button_mapping[key] = {'x': x, 'y': y,
                                                              'b': button}
                                 button.connect("enter-notify-event",
@@ -148,7 +148,7 @@ class MachinePage(AbstractPage):
     # handles the response from the right clicked menu
     def _menuitem_response(self, menu_type):
         chip_coords = self._button_mapping[self._current_button_right_clicked]
-        self._chips_with_views[chip_coords[0]+chip_coords[1]] = ChipPage
+        self._chips_with_views[chip_coords[0] + chip_coords[1]] = ChipPage
         chip = self._machine.get_chip_at_location(chip_coords)
         if menu_type == "win":
             ChipPage(chip, self._placements.get_placment_by_chip(chip_coords),
@@ -168,7 +168,7 @@ class MachinePage(AbstractPage):
             return True
         if event.type == gtk.gdk.BUTTON_PRESS and event.button == 1:
             chip_coords = self._button_mapping[widget]
-            self._chips_with_views[chip_coords[0]+chip_coords[1]] = ChipPage
+            self._chips_with_views[chip_coords[0] + chip_coords[1]] = ChipPage
             ChipPage(self._machine.get_chip_at_location({'x': chip_coords[0],
                                                          'y': chip_coords[1]}),
                      self._placements.get_placment_by_chip(chip_coords),
@@ -214,17 +214,22 @@ class MachinePage(AbstractPage):
                         if connection is not None:
                             if index == 0:  # E, W
                                 self._machine_table.attach(gtk.Label("-"),
-                                                           column_x, column_x+1,
-                                                           column_y, column_y+1)
+                                                           column_x,
+                                                           column_x + 1,
+                                                           column_y,
+                                                           column_y + 1)
                             if index == 1:  # ne sw
                                 self._machine_table.attach(gtk.Label("/"),
-                                                           column_x, column_x+1,
-                                                           column_y-2,
-                                                           column_y-1)
+                                                           column_x,
+                                                           column_x + 1,
+                                                           column_y - 2,
+                                                           column_y - 1)
                             if index == 2:  # N s
                                 self._machine_table.attach(gtk.Label("|"),
-                                                           column_x-1, column_x,
-                                                           column_y-1, column_y)
+                                                           column_x - 1,
+                                                           column_x,
+                                                           column_y - 1,
+                                                           column_y)
 
                         index += 1
         self._machine_table.show_all()

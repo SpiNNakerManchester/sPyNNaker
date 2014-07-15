@@ -1,6 +1,7 @@
 __author__ = 'stokesa6'
 #pacman imports
 from pacman.model.graph.graph import Graph
+from pacman.model.graph.edge import Edge
 from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
@@ -32,7 +33,6 @@ class Spinnaker(object):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
                  max_delay=None, graph_label=None):
-        VisualiserCreationUtility.__init__(self, self)
         self._hostname = host_name
         self._time_scale_factor = None
         #specific utility vertexes
@@ -44,11 +44,13 @@ class Spinnaker(object):
         self._wait_for_run = False
         self._visualiser_port = None
         self._visualiser_vertices = None
+        self._visualiser_creation_utility = VisualiserCreationUtility()
 
         #main objects
         self._graph = Graph(label=graph_label)
         self.sub_graph = None
         self._machine = None
+        self._no_machine_time_steps = None
         self._placements = None
         self._router_tables = None
         self._routing_infos = None
@@ -182,10 +184,23 @@ class Spinnaker(object):
                 #takes the same port for the visualiser if being used
                 if conf.config.getboolean("Visualiser", "enable") and \
                    conf.config.getboolean("Visualiser", "have_board"):
-                    self._set_visulaiser_port(port)
+                    self._visualiser_creation_utility.set_visulaiser_port(port)
+
+        self._vertex_count = 0
+        self._edge_count = 0
 
     def run(self, run_time):
         self._setup_interfaces()
+        #calcualte number of machien time steps
+        if run_time is not None:
+            self._no_machine_time_steps =\
+                int((run_time * 1000.0) / self.machine_time_step)
+        else:
+            self._no_machine_time_steps = None
+            logger.warn("You have set a runtime that will never end, this may"
+                        "cause the neural models to fail to partition "
+                        "correctly")
+
         do_timing = conf.config.getboolean("Reports", "outputTimesForSections")
         if do_timing:
             timer = Timer()
@@ -237,10 +252,10 @@ class Spinnaker(object):
         self._machine = self._txrx.get_machine_details()
 
         self._visualiser = \
-            self._create_visualiser_interface(
-                has_board, self._txrx, self._graph, self._machine,
-                self._placements, self._router_tables, self._runtime,
-                self._machine_time_step)
+            self._visualiser_creation_utility.create_visualiser_interface(
+                has_board, self._txrx, self._graph, self._visualiser_vertices,
+                self._machine, self.sub_graph, self._placements,
+                self._router_tables, self._runtime, self._machine_time_step)
 
     @property
     def app_id(self):
@@ -281,12 +296,18 @@ class Spinnaker(object):
         pass
 
     def create_population(self, size, cellclass, cellparams, structure, label):
+        if label is None:
+            label = "Population {}".format(self._vertex_count)
+            self._vertex_count += 1
         vertex = Population(size, cellclass, cellparams, structure, label)
         self.add_vertex(vertex)
 
     def create_projection(self, presynaptic_population, postsynaptic_population,
                           connector, source, target, synapse_dynamics, label,
                           rng):
+        if label is None:
+            label = "Projection {}".format(self._edge_count)
+            self._edge_count += 1
         edge = Projection(presynaptic_population, postsynaptic_population,
                           connector, source, target, synapse_dynamics, label,
                           rng)
@@ -299,13 +320,11 @@ class Spinnaker(object):
             self._live_spike_recorder = LiveSpikeRecorder()
             self.add_vertex(self._live_spike_recorder)
         #create the edge and add
-            pass
+        edge = Edge(vertex_to_record_from, self._live_spike_recorder,
+                    "recorder_edge")
+        self.add_edge(edge)
 
     def add_visualiser_vertex(self, visualiser_vertex_to_add):
         if self._visualiser_vertices is None:
             self._visualiser_vertices = list()
         self._visualiser_vertices.append(visualiser_vertex_to_add)
-
-
-
-

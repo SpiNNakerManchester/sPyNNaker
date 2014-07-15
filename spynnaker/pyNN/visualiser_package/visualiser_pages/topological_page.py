@@ -1,5 +1,5 @@
 __author__ = 'stokesa6'
-from pacman.utilities import packet_conversions
+from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.visualiser_package.visualiser_pages.\
     abstract_live_spike_page import AbstractLiveSpikePage
 import math
@@ -116,7 +116,7 @@ class TopologicalPage(AbstractLiveSpikePage):
                 width = self._rectangle_size['x']
                 height = self._rectangle_size['y']
                 colour = self._initial_value
-                y_pos = max_y_pos-self._legend_size['y']-y_pos
+                y_pos = max_y_pos - self._legend_size['y'] - y_pos
                 key = "{}:{}".format(int(x), int(y))
                 self._objects_to_draw[key] = {'x': int(x_pos),
                                               'y': int(y_pos),
@@ -304,17 +304,17 @@ class TopologicalPage(AbstractLiveSpikePage):
                 r = 1
                 value -= 255
             else:
-                r = ((1.0/255.0) * value)
+                r = ((1.0 / 255.0) * value)
                 value = 0
 
             if value > 255:
                 g = 1
                 value -= 255
             else:
-                g = ((1.0/255.0) * value)
+                g = ((1.0 / 255.0) * value)
                 value = 0
 
-            b = (1.0/255.0 * value)
+            b = (1.0 / 255.0 * value)
             self._exposure_bar_mapping[orignal_value] = {'r': r, 'g': g, 'b': b}
             if orignal_value % self._placement_fudge == 0:
                 cr.set_source_rgb(r, g, b)
@@ -372,7 +372,7 @@ class TopologicalPage(AbstractLiveSpikePage):
                     height = self._rectangle_size['y']
                     object_key = "{}:{}".format(x, y)
                     colour = self._objects_to_draw[object_key]['c']
-                    y_pos = max_y_pos-self._legend_size['y']-y_pos
+                    y_pos = max_y_pos - self._legend_size['y'] - y_pos
                     object_key = "{}:{}".format(int(x), int(y))
                     self._objects_to_draw[object_key] = {'x': int(x_pos),
                                                          'y': int(y_pos),
@@ -465,7 +465,7 @@ class TopologicalPage(AbstractLiveSpikePage):
         p = packet_conversions.get_p_from_key(spike_word)
         lo_atom = self.lo_atom_mapping["{}:{}:{}".format(x, y, p)]
         real_neuron_id = lo_atom + neuron_id
-        x_coord = math.floor(real_neuron_id/self._y_dim)
+        x_coord = math.floor(real_neuron_id / self._y_dim)
         y_coord = real_neuron_id - (x_coord * self._y_dim)
         return x_coord, y_coord, 1
 

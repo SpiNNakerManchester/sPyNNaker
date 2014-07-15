@@ -1,34 +1,33 @@
-from spynnaker.pyNN.models.abstract_models.population_vertex \
-    import PopulationVertex
 from spynnaker.pyNN.utilities.constants import REGIONS
+from spynnaker.pyNN.utilities import utility_calls
 import numpy
+from abc import ABCMeta
+from six import add_metaclass
 
 NUM_SYNAPSE_PARAMS = 4  # tau_syn_E and tau_syn_I, and initial multipiers
 
 
-class ExponentialPopulationVertex(PopulationVertex):
+def get_n_synapse_type_bits():
+    """
+    Return the number of bits used to identify the synapse in the synaptic
+    row
+    """
+    return 1
+
+
+@add_metaclass(ABCMeta)
+class ExponentialPopulationVertex(object):
     """
     This represents a population.py with two exponentially decaying synapses,
     one for excitatory connections and one for inhibitory connections
     """
     
-    def __init__(self, n_neurons, n_params, binary, constraints=None,
-                 label=None, tau_syn_e=5.0, tau_syn_i=5.0):
-        
-        # Instantiate the parent class
-        PopulationVertex.__init__(self, n_neurons=n_neurons, n_params=n_params,
-                                  binary=binary, constraints=constraints,
-                                  label=label)
-        self.tau_syn_e = self.convert_param(tau_syn_e, n_neurons)
-        self.tau_syn_i = self.convert_param(tau_syn_i, n_neurons)
+    def __init__(self, n_neurons, tau_syn_e=5.0, tau_syn_i=5.0):
 
-    @staticmethod
-    def get_n_synapse_type_bits():
-        """
-        Return the number of bits used to identify the synapse in the synaptic
-        row
-        """
-        return 1
+        self.tau_syn_e = utility_calls.convert_param_to_numpy(tau_syn_e,
+                                                              n_neurons)
+        self.tau_syn_i = utility_calls.convert_param_to_numpy(tau_syn_i,
+                                                              n_neurons)
 
     @staticmethod
     def get_synapse_parameter_size(lo_atom, hi_atom):
@@ -51,7 +50,7 @@ class ExponentialPopulationVertex(PopulationVertex):
         # Set the focus to the memory region 3 (synapse parameters):
         spec.switchWriteFocus(region=REGIONS.SYNAPSE_PARAMS)
         spec.comment("\nWriting Synapse Parameters for "
-                     "{} Neurons:\n".format(self.atoms))
+                     "{} Neurons:\n".format(subvertex.n_atoms))
         
         decay_ex = numpy.exp(float(-machine_time_step) /
                              (1000.0 * self.tau_syn_e))
