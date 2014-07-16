@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 import unittest
-import pacman103
-import pacman103.front.pynn.models as models
+import spynnaker.pyNN as pynn
 import numpy, pylab
-import boot
 
-import pacman103.front.pynn as pynn
 populations = list()
 cell_params_lif = dict()
 class TestingPopulation(unittest.TestCase):

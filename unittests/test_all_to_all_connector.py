@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import unittest
-import pacman103
-import pacman103.front.pynn as pynn
-import pacman103.front.pynn.connectors as connectors
+import spynnaker.pyNN as pynn
 from pprint import pprint as pp
 #Setup
 pynn.setup(timestep=1, min_delay=1, max_delay=10.0)
@@ -30,7 +28,7 @@ class TestingAllToAllConnector(unittest.TestCase):
         weight = 2
         delay = 1
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.AllToAllConnector(weight,delay)
+        one_to_one_c = pynn.AllToAllConnector(weight,delay)
         #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
@@ -45,7 +43,8 @@ class TestingAllToAllConnector(unittest.TestCase):
             weight = 2
             delay = 1
             zp = pynn.Population(0,pynn.IF_curr_exp,cell_params_lif,label="Zero pop")
-            one_to_one_c = connectors.AllToAllConnector(weight,delay)
+            onep=pynn.Population(5,pynn.IF_curr_exp,cell_params_lif,label="One pop")
+            one_to_one_c = pynn.AllToAllConnector(weight,delay)
             synapse_type = onep.vertex.get_synapse_id('excitatory')
             number_of_neurons = 10
             onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
@@ -57,7 +56,8 @@ class TestingAllToAllConnector(unittest.TestCase):
             weight = 2
             delay = 1
             zp = pynn.Population(-1,pynn.IF_curr_exp,cell_params_lif,label="Zero pop")
-            one_to_one_c = connectors.AllToAllConnector(weight,delay)
+            onep=pynn.Population(1,pynn.IF_curr_exp,cell_params_lif,label="One pop")
+            one_to_one_c = pynn.AllToAllConnector(weight,delay)
             synapse_type = onep.vertex.get_synapse_id('excitatory')
             number_of_neurons = 10
             onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
@@ -72,7 +72,7 @@ class TestingAllToAllConnector(unittest.TestCase):
         twop=pynn.Population(number_of_neurons + 5,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
         weight = 2
         delay = 1
-        one_to_one_c = connectors.AllToAllConnector(weight,delay)
+        one_to_one_c = pynn.AllToAllConnector(weight,delay)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,twop.vertex,1,0)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)
@@ -89,7 +89,7 @@ class TestingAllToAllConnector(unittest.TestCase):
             weight = 2
             delay = 1
             synapse_type = onep.vertex.get_synapse_id('excitatory')
-            one_to_one_c = connectors.AllToAll(weight,delay,allow_self_connections = False)
+            one_to_one_c = pynn.AllToAll(weight,delay,allow_self_connections = False)
             synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
             pp(synaptic_list.get_rows())
 if __name__=="__main__":

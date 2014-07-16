@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 import unittest
-import pacman103
-
-import pacman103.core.exceptions as exc
-import pacman103.front.pynn as pynn
+import spynnaker.pyNN.exceptions as exc
+import spynnaker.pyNN as pynn
 
 projections = list()
 populations = list()

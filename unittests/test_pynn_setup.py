@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import unittest
-import pacman103
+import spynnaker.pyNN as pynn
 
-import pacman103.front.pynn as pynn
 populations = list()
 class PyNNTests(unittest.TestCase):
     """

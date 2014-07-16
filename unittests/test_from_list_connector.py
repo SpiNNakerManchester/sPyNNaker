@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import unittest
-import pacman103.front.pynn as pynn
-import pacman103.front.pynn.connectors as connectors
-from pprint import pprint as pp
+import spynnaker.pyNN as pynn
 #Setup
 pynn.setup(timestep=1, min_delay=1, max_delay=10.0)
 nNeurons = 10
@@ -32,7 +30,7 @@ class TestingFromListConnector(unittest.TestCase):
                 connection_list.append((i,j,weight,delay))
 
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.FromListConnector(connection_list)
+        one_to_one_c = pynn.FromListConnector(connection_list)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)
@@ -51,7 +49,7 @@ class TestingFromListConnector(unittest.TestCase):
         connection_list= list()
         for i in range(number_of_neurons):
             connection_list.append((i,i,weight,delay))
-        one_to_one_c = connectors.FromListConnector(connection_list)
+        one_to_one_c = pynn.FromListConnector(connection_list)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,twop.vertex,1,0)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)
@@ -70,7 +68,7 @@ class TestingFromListConnector(unittest.TestCase):
             connection_list= list()
             for i in range(number_of_neurons + 5):
                 connection_list.append((i,i,weight,delay))
-            one_to_one_c = connectors.FromListConnector(connection_list)
+            one_to_one_c = pynn.FromListConnector(connection_list)
             synaptic_list = one_to_one_c.generate_synapse_list(twop.vertex,onep.vertex,1,0)
             #pp(synaptic_list.get_rows())
             #self.assertEqual(synaptic_list.get_max_weight(),weight)
@@ -91,7 +89,7 @@ class TestingFromListConnector(unittest.TestCase):
                 connection_list.append((i,j,weight,delay))
 
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.FromListConnector(connection_list, safe = False)
+        one_to_one_c = pynn.FromListConnector(connection_list, safe = False)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)
@@ -113,7 +111,7 @@ class TestingFromListConnector(unittest.TestCase):
                 connection_list.append((i,j,weight,delay))
 
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.FromListConnector(connection_list, verbose = True)
+        one_to_one_c = pynn.FromListConnector(connection_list, verbose = True)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)
@@ -134,7 +132,7 @@ class TestingFromListConnector(unittest.TestCase):
                 connection_list.append((i,j,weight,delay))
 
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.FromListConnector(connection_list, safe = False, verbose= True)
+        one_to_one_c = pynn.FromListConnector(connection_list, safe = False, verbose= True)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import unittest
-import pacman103
-import pacman103.front.pynn as pynn
-import pacman103.front.pynn.connectors as connectors
+import spynnaker.pyNN as pynn
 from pprint import pprint as pp
 #Setup
 pynn.setup(timestep=1, min_delay=1, max_delay=10.0)
@@ -30,7 +28,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
         weight = 2
         delay = 1
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.FixedProbabilityConnector(0.5,weight,delay)
+        one_to_one_c = pynn.FixedProbabilityConnector(0.5,weight,delay)
         #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         pp(synaptic_list.get_rows())
@@ -43,7 +41,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
         weight = 2
         delay = 1
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.FixedProbabilityConnector(0,weight,delay)
+        one_to_one_c = pynn.FixedProbabilityConnector(0,weight,delay)
         #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         pp(synaptic_list.get_rows())
@@ -56,7 +54,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
         weight = 2
         delay = 1
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.FixedProbabilityConnector(1,weight,delay)
+        one_to_one_c = pynn.FixedProbabilityConnector(1,weight,delay)
         #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         pp(synaptic_list.get_rows())
@@ -74,14 +72,14 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
             weight = 2
             delay = 1
             synapse_type = onep.vertex.get_synapse_id('excitatory')
-            one_to_one_c = connectors.FixedProbabilityConnector(2,weight,delay)
+            one_to_one_c = pynn.FixedProbabilityConnector(2,weight,delay)
 
     def test_synapse_list_generation_for_null_populations(self):
         print("--------------------ZERO POPULATION--------------------")
         weight = 2
         delay = 1
         zp = pynn.Population(0,pynn.IF_curr_exp,cell_params_lif,label="Zero pop")
-        one_to_one_c = connectors.FixedProbabilityConnector(0.1,weight,delay)
+        one_to_one_c = pynn.FixedProbabilityConnector(0.1,weight,delay)
         number_of_neurons = 10
         onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
         zero_synaptic_list = one_to_one_c.generate_synapse_list(zp.vertex,onep.vertex,1,0)
@@ -96,7 +94,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
             weight = 2
             delay = 1
             synapse_type = onep.vertex.get_synapse_id('excitatory')
-            one_to_one_c = connectors.FixedProbabilityConnector(-0.5,weight,delay)
+            one_to_one_c = pynn.FixedProbabilityConnector(-0.5,weight,delay)
 
     def test_synapse_list_generation_for_different_sized_populations(self):
         print "-----------------10% PROBABILITY--------------------"
@@ -105,7 +103,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
         twop=pynn.Population(number_of_neurons + 5,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
         weight = 2
         delay = 1
-        one_to_one_c = connectors.FixedProbabilityConnector(0.1,weight,delay)
+        one_to_one_c = pynn.FixedProbabilityConnector(0.1,weight,delay)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,twop.vertex,1,0)
         pp(synaptic_list.get_rows())
 
@@ -119,7 +117,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
             weight = 2
             delay = 1
             synapse_type = onep.vertex.get_synapse_id('excitatory')
-            one_to_one_c = connectors.FixedProbabilityConnector(1,weight,delay,allow_self_connections = False)
+            one_to_one_c = pynn.FixedProbabilityConnector(1,weight,delay,allow_self_connections = False)
             synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
             pp(synaptic_list.get_rows())
 
