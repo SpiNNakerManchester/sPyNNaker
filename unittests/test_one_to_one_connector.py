@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 import unittest
-import pacman103
-import pacman103.front.pynn as pynn
-import pacman103.front.pynn.connectors as connectors
-from pprint import pprint as pp
+import spynnaker.pyNN as pynn
 #Setup
 pynn.setup(timestep=1, min_delay=1, max_delay=10.0)
 nNeurons = 10
@@ -29,7 +26,7 @@ class TestingOneToOneConnector(unittest.TestCase):
         weight = 2
         delay = 1
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.OneToOneConnector(weight,delay)
+        one_to_one_c = pynn.OneToOneConnector(weight,delay)
         #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
@@ -42,7 +39,7 @@ class TestingOneToOneConnector(unittest.TestCase):
         weight = 2
         delay = 1
         zp = pynn.Population(0,pynn.IF_curr_exp,cell_params_lif,label="Zero pop")
-        one_to_one_c = connectors.OneToOneConnector(weight,delay)
+        one_to_one_c = pynn.OneToOneConnector(weight,delay)
         number_of_neurons = 10
         onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
         zero_synaptic_list = one_to_one_c.generate_synapse_list(zp.vertex,onep.vertex,1,0)
@@ -61,7 +58,7 @@ class TestingOneToOneConnector(unittest.TestCase):
         twop=pynn.Population(number_of_neurons + 5,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
         weight = 2
         delay = 1
-        one_to_one_c = connectors.OneToOneConnector(weight,delay)
+        one_to_one_c = pynn.OneToOneConnector(weight,delay)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,twop.vertex,1,0)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)

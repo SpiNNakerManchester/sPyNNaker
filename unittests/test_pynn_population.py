@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 import unittest
-import pacman103
-import pacman103.front.pynn.models as models
+import spynnaker.pyNN as pynn
+import spynnaker.pyNN.models as models
 import numpy, pylab
-import boot
 
-import pacman103.front.pynn as pynn
 populations = list()
 cell_params_lif = dict()
 class TestingPopulation(unittest.TestCase):
@@ -125,17 +123,6 @@ class TestingPopulation(unittest.TestCase):
         self.assertEqual(populations[1].__len__(),10)
         self.assertEqual(populations[0].size, 1)
         self.assertEqual(populations[1].size,10)
-
-    def test_population_size(self):
-        """
-        Size of populations
-        """
-        print "Testing populations sizes"
-        self.assertEqual(populations[0].__len__(),1)
-        self.assertEqual(populations[1].__len__(),10)
-        self.assertEqual(populations[0].size, 1)
-        self.assertEqual(populations[1].size,10)
-        
         
     def test_negative_size(self):
         global populations

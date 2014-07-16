@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import unittest
-import pacman103.front.pynn.connectors as connectors
-import pacman103.front.pynn as pynn
+import spynnaker.pyNN as pynn
 from pprint import pprint as pp
 populations = list()
 cell_params_lif = {
@@ -39,7 +38,7 @@ class MultapseConnectorTest(unittest.TestCase):
         weight = 2
         delay = 1
         synapse_type = onep.vertex.get_synapse_id('excitatory')
-        one_to_one_c = connectors.MultapseConnector(1,weight,delay)
+        one_to_one_c = pynn.MultapseConnector(1,weight,delay)
         #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
         synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
         pp(synaptic_list.get_rows())

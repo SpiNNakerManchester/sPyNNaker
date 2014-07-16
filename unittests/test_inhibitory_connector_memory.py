@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 import unittest
-import pacman103
 
-import pacman103.core.exceptions as exc
-import pacman103.front.pynn as p
+import spynnaker.pyNN as p
 import visualiser.visualiser_modes as modes
 import numpy, pylab
 

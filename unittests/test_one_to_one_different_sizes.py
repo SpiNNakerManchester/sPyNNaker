@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 import unittest
-import pacman103
-import pacman103.front.pynn as pynn
 import visualiser.visualiser_modes as modes
 import pylab, numpy
-from pacman103.front.common.synaptic_list import SynapticList
-from pacman103.front.common.synapse_row_info import SynapseRowInfo
-import pacman103.front.pynn.connectors as connectors
+import spynnaker.pyNN as pynn
 #Setup
 pynn.setup(timestep=1, min_delay=1, max_delay=10.0)
 nNeurons = 10

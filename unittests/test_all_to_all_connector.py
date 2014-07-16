@@ -43,6 +43,7 @@ class TestingAllToAllConnector(unittest.TestCase):
             weight = 2
             delay = 1
             zp = pynn.Population(0,pynn.IF_curr_exp,cell_params_lif,label="Zero pop")
+            onep=pynn.Population(5,pynn.IF_curr_exp,cell_params_lif,label="One pop")
             one_to_one_c = pynn.AllToAllConnector(weight,delay)
             synapse_type = onep.vertex.get_synapse_id('excitatory')
             number_of_neurons = 10
@@ -55,6 +56,7 @@ class TestingAllToAllConnector(unittest.TestCase):
             weight = 2
             delay = 1
             zp = pynn.Population(-1,pynn.IF_curr_exp,cell_params_lif,label="Zero pop")
+            onep=pynn.Population(1,pynn.IF_curr_exp,cell_params_lif,label="One pop")
             one_to_one_c = pynn.AllToAllConnector(weight,delay)
             synapse_type = onep.vertex.get_synapse_id('excitatory')
             number_of_neurons = 10
