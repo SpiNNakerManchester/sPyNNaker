@@ -50,7 +50,7 @@ class TestingOneToOneConnectorForDifferentSizes(unittest.TestCase):
 
         v = p1.get_v(compatible_output=True)
         gsyn = p1.get_gsyn(compatible_output=True)
-        spikes = p1.getSpikes(compatible_output=True)
+        spikes = p1.get_spikes(compatible_output=True)
 
         if spikes != None:
             print spikes

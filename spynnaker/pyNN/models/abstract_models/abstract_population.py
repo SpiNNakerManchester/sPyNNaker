@@ -2,13 +2,15 @@ from spynnaker.pyNN.models.utility_models.multicastsource \
     import MultiCastSource
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
-from pacman.model.graph.edge import Edge
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
-from visualiser import visualiser_constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
+
+from visualiser import visualiser_constants
+
+from pacman.model.graph.edge import Edge
 
 import logging
 logger = logging.getLogger(__name__)
@@ -160,6 +162,7 @@ class Population(object):
         """
         raise NotImplementedError
 
+    # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
         """
         Return a 3-column numpy array containing cell ids and synaptic 
@@ -170,12 +173,13 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        gsyn = self._vertex.get_gsyn(self._controller, gather=gather,
+        gsyn = self._vertex.get_gsyn(self._controller,
                                      compatible_output=compatible_output)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
         return gsyn
 
+    # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
         """
         Return a 3-column numpy array containing cell ids, time, and Vm for 
@@ -190,7 +194,7 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        v = self._vertex.get_v(self._controller, gather=gather,
+        v = self._vertex.get_v(self._controller,
                                compatible_output=compatible_output)
 
         if conf.config.getboolean("Reports", "outputTimesForSections"):
@@ -384,7 +388,7 @@ class Population(object):
         Write conductance information from the population to a given file.
 
         """
-        time_step = (self._controller.dao.machineTimeStep*1.0)/1000.0
+        time_step = (self._controller.dao.machineTimeStep * 1.0) / 1000.0
         gsyn = self.get_gsyn(gather, compatible_output=True)
         first_id = 0
         num_neurons = self._vertex.atoms
@@ -394,7 +398,7 @@ class Population(object):
         file_handle.write("# n = %d\n" % num_neurons)
         file_handle.write("# dt = %f\n" % time_step)
         file_handle.write("# dimensions = [%d]\n" % dimensions)
-        file_handle.write("# last_id = {%d}\n".format(num_neurons-1))
+        file_handle.write("# last_id = {%d}\n".format(num_neurons - 1))
         utility_calls.check_directory_exists(filename)
         file_handle = open(filename, "w")
         for (neuronId, time, value) in gsyn:
@@ -406,7 +410,7 @@ class Population(object):
         Write membrane potential information from the population to a given
         file.
         """
-        time_step = (self._controller.dao.machineTimeStep*1.0)/1000.0
+        time_step = (self._controller.dao.machineTimeStep * 1.0) / 1000.0
         v = self.get_v(gather, compatible_output=True)
         utility_calls.check_directory_exists(filename)
         file_handle = open(filename, "w")
@@ -417,7 +421,7 @@ class Population(object):
         file_handle.write("# n = %d\n" % num_neurons)
         file_handle.write("# dt = %f\n" % time_step)
         file_handle.write("# dimensions = [%d]\n" % dimensions)
-        file_handle.write("# last_id = %d\n" % (num_neurons-1))
+        file_handle.write("# last_id = %d\n" % (num_neurons - 1))
         for (neuronId, time, value) in v:
             file_handle.write("%f\t%d\n" % (value, neuronId))
         file_handle.close()
@@ -455,7 +459,7 @@ class Population(object):
                 self._set_string_value_pair(key, kargs[key])
         else:
             for element in range(0, len(args), 2):
-                self._set_string_value_pair(args[element], args[element+1])
+                self._set_string_value_pair(args[element], args[element + 1])
 
     def _set_cell_initial_value(self, cell_id, variable, value):
         """

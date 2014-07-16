@@ -17,8 +17,8 @@ from spynnaker.pyNN.models.utility_models.live_spike_recorder\
     import LiveSpikeRecorder
 from spynnaker.pyNN.visualiser_package.visualiser_creation_utility \
     import VisualiserCreationUtility
-from spynnaker.pyNN.models.abstract_models.population import Population
-from spynnaker.pyNN.models.abstract_models.projection import Projection
+from spynnaker.pyNN.models.abstract_models.abstract_population import Population
+from spynnaker.pyNN.models.abstract_models.abstract_projection import Projection
 
 #spinnman inports
 from spinnman.transceiver import create_transceiver_from_hostname
@@ -56,6 +56,7 @@ class Spinnaker(object):
         self._routing_infos = None
         self._pruner_infos = None
         self._runtime = None
+        self._has_ran = False
 
         self._app_id = conf.config.getint("Machine", "appID")
         self._machine_time_step = conf.config.getint("Machine",

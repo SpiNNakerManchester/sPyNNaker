@@ -32,14 +32,16 @@ class PartitionableVertex(Vertex):
         """
         Gets the SDRAM requirements for a range of atoms
         """
+
+        # noinspection PyTypeChecker
         return (constants.SETUP_SIZE +
                 self.get_neuron_params_size(lo_atom, hi_atom)
-                + self.getSynapseParameterSize(lo_atom, hi_atom)
-                + self.getSTDPParameterSize(lo_atom, hi_atom, self.in_edges)
+                + self.get_synapse_parameter_size(lo_atom, hi_atom)
+                + self.get_stdp_parameter_size(lo_atom, hi_atom, self.in_edges)
                 + SynapticManager.ROW_LEN_TABLE_SIZE
                 + SynapticManager.MASTER_POPULATION_TABLE_SIZE
-                + self.getSynapticBlocksMemorySize(lo_atom, hi_atom,
-                                                   self.in_edges)
+                + self.get_synaptic_blocks_memory_size(lo_atom, hi_atom,
+                                                       self.in_edges)
                 + self.get_spike_buffer_size(lo_atom, hi_atom,
                                              no_machine_time_steps)
                 + self.get_v_buffer_size(lo_atom, hi_atom,
@@ -58,6 +60,24 @@ class PartitionableVertex(Vertex):
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         """
         Gets the CPU requirements for a range of atoms
+        """
+
+    @abstractmethod
+    def get_synapse_parameter_size(self, lo_atom, hi_atom):
+        """
+        Gets the size of the synapse parameters for a given set of atoms
+        """
+
+    @abstractmethod
+    def get_synaptic_blocks_memory_size(self, lo_atom, hi_atom, in_edges):
+        """
+        Gets the memory size of the synapse blocks for a given set of atoms
+        """
+
+    @abstractmethod
+    def get_stdp_parameter_size(self, lo_atom, hi_atom, in_edges):
+        """
+        Gets the size of the stdp parameters for a given set of atoms
         """
 
     def get_resources_used_by_atoms(self, lo_atom, hi_atom,
@@ -116,4 +136,3 @@ class PartitionableVertex(Vertex):
             constants.GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON
         return self.get_recording_region_size(no_machine_time_steps,
                                               size_per_time_step)
-

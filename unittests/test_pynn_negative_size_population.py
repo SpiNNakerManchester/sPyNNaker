@@ -85,7 +85,7 @@ class TestingPopulation(unittest.TestCase):
         delay = 5
         populations[3].record()
         pynn.run(1000)
-        spikes = populations[3].getSpikes(compatible_output=True)
+        spikes = populations[3].get_spikes(compatible_output=True)
         print spikes
         pynn.end()
         print "-----///////////NEGATIVE SIZE POPULATION SIMULATION W/O PROJECTIONS------------------"

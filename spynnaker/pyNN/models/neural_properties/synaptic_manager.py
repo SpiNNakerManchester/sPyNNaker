@@ -120,7 +120,7 @@ class SynapticManager(object):
         nextBlockStartAddr = writePtr
         return blockStartAddr, nextBlockStartAddr
     
-    def getExactSynapticBlockMemorySize(self, subvertex):
+    def get_exact_synaptic_block_memory_size(self, subvertex):
         memorySize = 0
         
         # Go through the subedges and add up the memory
@@ -157,7 +157,7 @@ class SynapticManager(object):
                 allSynBlockSz = synBlockSz * numRows
                 
                 # TODO: Fix this to be more accurate!
-                # May require modification to the master population.py table
+                # May require modification to the master abstract_population.py table
                 n_atoms = in_edge.prevertex.get_maximum_atoms_per_core()
                 if in_edge.prevertex.custom_max_atoms_per_core != None:
                     n_atoms = in_edge.prevertex.custom_max_atoms_per_core
@@ -202,7 +202,7 @@ class SynapticManager(object):
         """
         raise NotImplementedError()
 
-    def writeSynapseParameters(self, spec, machineTimeStep, subvertex):
+    def write_synapse_parameters(self, spec, machineTimeStep, subvertex):
         raise NotImplementedError
 
 
@@ -239,7 +239,7 @@ class SynapticManager(object):
         # smallest row that is big enough for our row of data
         return bestIndex, minimumValidRowLength
 
-    def getSynapseParameterSize(self, lo_atom, hi_atom):
+    def get_synapse_parameter_size(self, lo_atom, hi_atom):
         raise NotImplementedError
 
     def get_synapse_targets(self):
@@ -259,13 +259,13 @@ class SynapticManager(object):
             return 1
         return None
 
-    def getSTDPParameterSize(self, lo_atom, hi_atom, in_edges):
+    def get_stdp_parameter_size(self, lo_atom, hi_atom, in_edges):
         self._check_synapse_dynamics(in_edges)
         if self._stdp_mechanism is not None:
             return self._stdp_mechanism.get_params_size(self, lo_atom, hi_atom)
         return 0
 
-    def writeRowLengthTranslationTable(self, spec, ROW_LEN_TRANSLATION):
+    def write_row_length_translation_table(self, spec, ROW_LEN_TRANSLATION):
         """
         Generate Row Length Translation Table (region 4):
         """
@@ -281,7 +281,7 @@ class SynapticManager(object):
         for entry in SynapticManager.ROW_LEN_TABLE_ENTRIES:
             spec.write(data = entry)
 
-    def writeSTDPParameters(self, spec, machineTimeStep, subvertex,
+    def write_stdp_parameters(self, spec, machineTimeStep, subvertex,
                             weight_scale, STDP_PARAMS):
         if self._stdp_mechanism is not None:
             self._stdp_mechanism.write_plastic_params(spec, STDP_PARAMS,
@@ -296,18 +296,18 @@ class SynapticManager(object):
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
-    def writeSynapticMatrixAndMasterPopulationTable(self, spec, subvertex,
+    def write_synaptic_matrix_and_master_population_table(self, spec, subvertex,
                                                     allSynBlockSz,weight_scale,
                                                     MASTER_POP_TABLE,
                                                     SYNAPTIC_MATRIX):
         """
-        Simultaneously generates both the master population.py table and the
+        Simultaneously generates both the master abstract_population.py table and the
         synatic matrix.
 
         Master Population Table (MPT):
         Table of 1152 entries (one per numbered core on a 48-node board
         arranged in an 8 x 8 grid) giving offset pointer to synapse rows
-        for that source population.py.
+        for that source abstract_population.py.
 
         Synaptic Matrix:
         One block for each projection in the network (sub_edge in the graph).
@@ -403,13 +403,13 @@ class SynapticManager(object):
         # its routing key for p (also due to unknown reasons). As the c code
         # compenstates for it, we also need to
         p = packet_conversions.get_p_from_key(key)
-        # Calculate the index into the master population.py table for
+        # Calculate the index into the master abstract_population.py table for
         # a projection from the given core:
         tableSlotAddr = \
             packet_conversions.get_mpt_sb_mem_addrs_from_coords(x, y, p)
         # What is the write address in the table for this index?
 
-        spec.comment("\nUpdate entry in master population.py table for incoming"
+        spec.comment("\nUpdate entry in master abstract_population.py table for incoming"
                 + " connection from {}, {}, {}:\n".format(x, y, p))
 
         # Process start address (align to 1K boundary then shift right by 10 and

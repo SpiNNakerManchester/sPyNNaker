@@ -37,7 +37,7 @@ INFINITE_SIMULATION = 4294967295
 class SpikeSourcePoisson(ComponentVertex):
     """
     This class represents a Poisson Spike source object, which can represent
-    a population.py of virtual neurons each with its own parameters.
+    a abstract_population.py of virtual neurons each with its own parameters.
     """
     core_app_identifier = data_spec_constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
 
@@ -222,7 +222,7 @@ class SpikeSourcePoisson(ComponentVertex):
             Bit 0: Record spike history
         """
 
-        # What recording commands wereset for the parent population.py?
+        # What recording commands wereset for the parent abstract_population.py?
         recordingInfo = 0
         if (spikeHistoryRegionSz > 0) and (self._record):
             recordingInfo |= RECORD_SPIKE_BIT

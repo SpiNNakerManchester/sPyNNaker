@@ -115,7 +115,7 @@ class ComponentVertex(object):
         
         spikes = numpy.zeros((0, 2))
         
-        # Find all the sub-vertices that this population.py exists on
+        # Find all the sub-vertices that this abstract_population.py exists on
         subvertices = sub_graph.get_subvertices_from_vertex(self)
         for subvertex in subvertices:
             placement = placements.get_subvertex_placement(subvertex)

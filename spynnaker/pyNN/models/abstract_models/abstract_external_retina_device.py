@@ -1,4 +1,4 @@
-from spynnaker.pyNN.models.abstract_models.external_device import ExternalDevice
+from spynnaker.pyNN.models.abstract_models.abstract_external_device import ExternalDevice
 
 
 class AbstractExternalRetinaDevice(ExternalDevice):

@@ -1,4 +1,4 @@
-from spynnaker.pyNN.models.abstract_models.population_vertex \
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import PopulationVertex
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.delay_extension\
@@ -48,7 +48,7 @@ class Projection(object):
             if not target in targets:
                 raise exceptions.ConfigurationException(
                     "Target {} is not available in the post-synaptic "
-                    "population.py (choices are {})".format(target, targets))
+                    "abstract_population.py (choices are {})".format(target, targets))
             synapse_type = postsynaptic_population.vertex.get_synapse_id(target)
         else:
             raise exceptions.ConfigurationException(
@@ -166,7 +166,7 @@ class Projection(object):
             presynaptic_population.vertex.delay_vertex = delay_vertex
             #spinnaker.add_vertex(self.delay_vertex)
 
-        # Create a connection from the source population.py to the delay vertex
+        # Create a connection from the source abstract_population.py to the delay vertex
         new_label = "{%s}_to_DE".format(label)
         remaining_edge = DelayAfferentEdge(presynaptic_population.vertex,
                                            delay_vertex, label=new_label)
@@ -179,7 +179,7 @@ class Projection(object):
                                                        max_delay_for_projection)
 
         # Create a special DelayEdge from the delay vertex to the outgoing
-        # population.py, with the same set of connections
+        # abstract_population.py, with the same set of connections
         delay_label = "DE to {%s}".format(label)
         num_blocks = int(math.ceil(float(max_delay_for_projection)
                                    / float(max_delay_per_neuron))) - 1

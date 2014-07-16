@@ -1,4 +1,4 @@
-from spynnaker.pyNN.models.abstract_models.virtual_vertex \
+from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex \
     import VirtualVertex
 from abc import ABCMeta
 from six import add_metaclass

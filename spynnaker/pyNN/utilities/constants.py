@@ -1,7 +1,7 @@
 """
 Utilities for accessing the location of memory regions on the board
 """
-from spynnaker.pyNN.utilities import enums
+from enum import Enum
 
 # Some constants
 SETUP_SIZE = 16  # Single word of info with flags, etc.
@@ -93,3 +93,5 @@ REGIONS = enums.enum1(
     'POTENTIAL_HISTORY',
     'GSYN_HISTORY',
 )
+
+edges = enum0('EAST', 'NORTH_EAST', 'NORTH', 'WEST', 'SOUTH_WEST', 'SOUTH')

@@ -118,7 +118,7 @@ class LiveSpikeRecorder( ComponentVertex ):
             Bit 5: Output neuron potential
             Bit 6: Output spike rate
         """
-        # What recording commands we reset for the parent population.py?
+        # What recording commands we reset for the parent abstract_population.py?
         recordingInfo = subvertex.vertex.flags
         recordingInfo = recordingInfo | 0xBEEF0000        
         # Write this to the system region (to be picked up by the simulation):

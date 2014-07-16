@@ -56,7 +56,7 @@ class TestProjection(unittest.TestCase):
 
         v = populations[1].get_v(compatible_output=True)
         gsyn = populations[1].get_gsyn(compatible_output=True)
-        spikes = populations[1].getSpikes(compatible_output=True)
+        spikes = populations[1].get_spikes(compatible_output=True)
 
         if spikes != None:
             print spikes

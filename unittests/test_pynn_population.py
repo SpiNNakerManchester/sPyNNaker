@@ -112,7 +112,7 @@ class TestingPopulation(unittest.TestCase):
         connectionList.append(pynn.Projection(initial_spike,populations[3],pynn.AllToAllConnector(weight_to_spike,delay)))
         connectionList.append(pynn.Projection(populations[3],populations[3],pynn.OneToOneConnector(weight_to_spike,delay)))
         pynn.run(1000)
-        spikes = populations[3].getSpikes(compatible_output=True)
+        spikes = populations[3].get_spikes(compatible_output=True)
         print spikes
         pynn.end()
 
@@ -171,7 +171,7 @@ class TestingPopulation(unittest.TestCase):
         pynn.run(20)
 
         spikes = None
-        spikes = populations[0].getSpikes(compatible_output=True)
+        spikes = populations[0].get_spikes(compatible_output=True)
         print spikes
         pynn.end()
         #This test has to be rewritten as I know this works

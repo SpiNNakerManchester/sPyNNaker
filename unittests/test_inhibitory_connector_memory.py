@@ -69,7 +69,7 @@ class TestInhibitoryProjection(unittest.TestCase):
 
         v = p_mem.get_v(compatible_output=True)
         gsyn = p_mem.get_gsyn(compatible_output=True)
-        spikes = p_mem.getSpikes(compatible_output=True)
+        spikes = p_mem.get_spikes(compatible_output=True)
 
         if spikes != None:
             print spikes

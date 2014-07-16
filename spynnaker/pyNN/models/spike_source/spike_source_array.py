@@ -297,7 +297,7 @@ class SpikeSourceArray(ComponentVertex):
             Bit 5: Output neuron potential
             Bit 6: Output spike rate
         """
-        # What recording commands were set for the parent population.py?
+        # What recording commands were set for the parent abstract_population.py?
         recordingInfo = 0
         if (spikeHistoryRegionSz > 0) and (self._record):
             recordingInfo |= RECORD_SPIKE_BIT
@@ -329,7 +329,7 @@ class SpikeSourceArray(ComponentVertex):
         spec.write(data = populationIdentity)
  
         # Word 1 is the total number of 'neurons' (i.e. spike sources) in
-        # the population.py:
+        # the abstract_population.py:
         spec.write(data = numNeurons)
 
         # Word 2 is the total number of entries in this table of indices:

@@ -18,7 +18,7 @@ def get_n_synapse_type_bits():
 @add_metaclass(ABCMeta)
 class ExponentialPopulationVertex(object):
     """
-    This represents a population.py with two exponentially decaying synapses,
+    This represents a abstract_population.py with two exponentially decaying synapses,
     one for excitatory connections and one for inhibitory connections
     """
     
