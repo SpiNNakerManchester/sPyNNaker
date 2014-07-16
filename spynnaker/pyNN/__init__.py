@@ -1,4 +1,3 @@
-__author__ = 'stokesa6'
 """
 The :py:mod:`spynnaker.pynn` package contains the frontend specifications
 and implementation for the PyNN High-level API
@@ -84,7 +83,6 @@ from spynnaker.pyNN.models.neural_projections.connectors.from_file \
     import FromFileConnector
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
     import SmallWorldConnector
-
 
 
 #traditional logger

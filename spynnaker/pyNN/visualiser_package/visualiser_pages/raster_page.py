@@ -23,7 +23,7 @@ class RasterPage(AbstractLiveSpikePage):
             self._vertex_in_question.append(current_vertex)
         else:
             self._vertex_in_question = sorted(vertex_in_question,
-                                             key=lambda vertex: vertex.label)
+                                              key=lambda vertex: vertex.label)
 
         #creates a collection of offsets for y plot
         self._off_sets = list()
@@ -150,7 +150,7 @@ class RasterPage(AbstractLiveSpikePage):
             for index in range(len(self._vertex_in_question)):
                 true_index = (index * 2)
                 self._plot.set_data(self._data_stores[true_index],
-                                   self._data_stores[true_index+1])
+                                    self._data_stores[true_index+1])
             self._page.add(self._plot)
             self._page.show_all()
         self._page.queue_draw()
@@ -179,13 +179,13 @@ class RasterPage(AbstractLiveSpikePage):
                                              details['coords'][2] + 1,
                                              details['neuron_id'], vert.label))
                     self._update_data_store_with_spike(subvert,
-                                                      details['neuron_id'],
-                                                      details['time_in_ticks'])
+                                                       details['neuron_id'],
+                                                       details['time_in_ticks'])
         if self._do_fading:
             self._remove_stale_values(details['time_in_ticks'])
 
     def _update_data_store_with_spike(self, subvertex, local_neuron_id,
-                                     time_in_tics):
+                                      time_in_tics):
         """
         modifies the data given and places data into data_store
         """

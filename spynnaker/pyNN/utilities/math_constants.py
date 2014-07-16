@@ -1,5 +1,5 @@
 """
-COMMENT ME
+random math constants
 """
 
 # Scaling factors for FP arithmetic, see Xin Jin et al. (2008)

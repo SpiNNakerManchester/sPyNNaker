@@ -33,9 +33,9 @@ class Projection(object):
     _projection_count = 0
 
     # noinspection PyUnusedLocal
-    def __init__(self, presynaptic_population, postsynaptic_population,
+    def __init__(self, presynaptic_population, postsynaptic_population, label,
                  connector, spinnaker_control, source=None, target='excitatory',
-                 synapse_dynamics=None, label=None, rng=None):
+                 synapse_dynamics=None, rng=None):
         """
         Instantiates a :py:object:`Projection`.
         """

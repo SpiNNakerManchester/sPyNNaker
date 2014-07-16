@@ -2,6 +2,7 @@
 class to contain visulaiser paramters for a given vertex
 """
 
+
 class VisualiserVertex(object):
 
     def __init__(self, visualiser_mode, visualiser_2d_dimensions,
@@ -64,5 +65,3 @@ class VisualiserVertex(object):
     @property
     def vertex(self):
         return self._vertex
-
-

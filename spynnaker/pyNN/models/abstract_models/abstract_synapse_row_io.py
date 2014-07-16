@@ -1,4 +1,3 @@
-
 class AbstractSynapseRowIo(object):
     
     def get_n_words(self, synapse_row, lo_atom=None, hi_atom=None):

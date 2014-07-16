@@ -1,4 +1,5 @@
-__author__ = 'stokesa6'
+
+
 class SpynnakerException(Exception):
     """Superclass of all exceptions from the pynn module.
 

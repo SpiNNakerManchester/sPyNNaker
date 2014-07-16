@@ -1,8 +1,6 @@
 __author__ = 'stokesa6'
 import logging
-
 import gtk
-
 from spynnaker.pyNN.visualiser_package.visualiser_pages.raster_page \
     import RasterPage
 from spynnaker.pyNN.visualiser_package.visualiser_pages.topological_page\
@@ -23,9 +21,9 @@ class ConfigPage(AbstractPage):
     INDIVIDUAL_RASTER_TEXT = "add as an individual raster plot"
     MERGED_RASTER_TEXT = "add to combination raster plot"
 
-    def __init__(self,  vertex_mapper, vertices, container, transciever,
-                 has_board, sim_runtime, machine_time_step,
-                 subgraph, placements):
+    def __init__(self,  vertex_mapper, vertices, visualiser_set_vertexes,
+                 container, transciever, has_board, sim_runtime,
+                 machine_time_step, subgraph, placements):
         AbstractPage.__init__(self)
         self._vertex_mapper = vertex_mapper
         self._drop_box_mapper = dict()
@@ -43,11 +41,7 @@ class ConfigPage(AbstractPage):
         self._placements = placements
 
         #get vertexes which are set to record
-        self._vertexes_in_question = list()
-        for vertex in vertices:
-            if ((hasattr(vertex.vertex, 'is_set_to_record_spikes') and
-               vertex.is_set_to_record_spikes)):
-                self._vertexes_in_question.append(vertex)
+        self._vertexes_in_question = visualiser_set_vertexes
 
         #set a table layout for the data
         self._table = gtk.Table(4, len(self._vertexes_in_question)+1, True)

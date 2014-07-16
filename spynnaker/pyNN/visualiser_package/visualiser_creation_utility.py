@@ -12,10 +12,10 @@ class VisualiserCreationUtility(object):
     def __init__(self):
         pass
 
-    def _create_visualiser_interface(self, has_board, transciever,
-                                     visualiser_vertices, machine, placements,
-                                     router_tables, sim_run_time,
-                                     machine_time_step):
+    def create_visualiser_interface(self, has_board, transciever, graph,
+                                    visualiser_vertices, machine, subgraph,
+                                    placements, router_tables, sim_run_time,
+                                    machine_time_step):
         # Start visuliser if requested
         visualiser = None
         coord_to_low_atom_mapper = None
@@ -31,10 +31,10 @@ class VisualiserCreationUtility(object):
                                        router_tables)
             visualiser.add_page(machine_page, machine_page.label)
             #add configuration page
-            config_page = ConfigPage(dict(), visualiser_vertices, visualiser,
-                                     transciever, has_board, sim_run_time,
-                                     machine_time_step,
-                                     coord_to_low_atom_mapper)
+            config_page = ConfigPage(dict(), visualiser_vertices, graph,
+                                     visualiser, transciever, has_board,
+                                     sim_run_time, machine_time_step, subgraph,
+                                     placements)
             visualiser.add_page(config_page, config_page.label)
 
             if wait_for_run:  # add run now button if required
@@ -46,5 +46,5 @@ class VisualiserCreationUtility(object):
     def _run_item_selected(self):
         pass
 
-    def _set_visulaiser_port(self, port):
+    def set_visulaiser_port(self, port):
         pass

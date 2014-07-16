@@ -1,32 +1,34 @@
 from pacman.model.graph.vertex import Vertex
+from abc import ABCMeta
+from six import add_metaclass
 import logging
 import numpy
 import struct
-#from spinnman.interfaces.transceiver_tools import scamp_constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import conf
 from spynnaker.pyNN.utilities.utility_calls \
     import get_app_data_base_address_offset, get_region_base_address_offset
+from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 logger = logging.getLogger(__name__)
 
-RECORDING_BASE_BYTES = 4
+RECORDING_ENTRY_BYTE_SIZE = 4
 
 
-class ComponentVertex(Vertex):
+@add_metaclass(ABCMeta)
+class ComponentVertex(object):
     """
     Underlying Vertex model for Neural Applications.
     """
     
-    def __init__(self, n_neurons, constraints=None, label=None):
-        Vertex.__init__(self, n_neurons, constraints=constraints, label=label)
-        
+    def __init__(self, label):
         self._record = False
         self.focus_level = None
         self._app_mask = constants.DEFAULT_MASK
         
         # Store a delay vertex here if required
         self._delay_vertex = None
+        self._label = label
         
     @property
     def delay_vertex(self):
@@ -60,8 +62,8 @@ class ComponentVertex(Vertex):
         if no_machine_time_steps is None:
             raise Exception("This model cannot record this parameter"
                             + " without a fixed run time")
-        return RECORDING_BASE_BYTES + (no_machine_time_steps *
-                                       bytes_per_timestep)
+        return RECORDING_ENTRY_BYTE_SIZE + (no_machine_time_steps *
+                                            bytes_per_timestep)
 
     def get_commands(self, no_tics):
         """
@@ -109,7 +111,7 @@ class ComponentVertex(Vertex):
         recorded cells.   This is read directly from the memory for the board.
         """
         
-        logger.info("Getting spikes for {%s}".format(self.label))
+        logger.info("Getting spikes for {%s}".format(self._label))
         
         spikes = numpy.zeros((0, 2))
         
