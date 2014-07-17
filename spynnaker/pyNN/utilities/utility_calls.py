@@ -31,14 +31,6 @@ def check_delay(delay):
     raise NotImplementedError
 
 
-def _get_vcp_item_offset(core, item):
-    return SV_VCPU + (SIZEOF_VCPU * core) + VCPU_OFFSETS[item]
-
-
-def get_app_data_base_address_offset(core):
-    return _get_vcp_item_offset(core, "user0")
-
-
 def get_region_base_address_offset(app_data_base_address, region):
     return app_data_base_address + 16 + region * 4
 

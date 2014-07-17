@@ -36,7 +36,7 @@ class Population(object):
     :returns a list of vertexes and edges
     """
 
-    def __init__(self, size, cellclass, cellparams, controller, label,
+    def __init__(self, size, cellclass, cellparams, spinnaker, label,
                  multi_cast_vertex=None, structure=None):
         """
         Instantiates a :py:object:`Population`.
@@ -50,18 +50,18 @@ class Population(object):
 
         # Create a graph vertex for the population and add it to PACMAN
         self._vertex = cellclass(size, label, **cellparams)
-        self._controller = controller
+        self._spinnaker = spinnaker
 
         #check if the vertex is a cmd sender, if so store for future
         if self._vertex.requires_multi_cast_source():
             if multi_cast_vertex is None:
                 multi_cast_vertex = MultiCastSource()
-                self._controller.add_vertex(multi_cast_vertex)
+                self._spinnaker.add_vertex(multi_cast_vertex)
             edge = Edge(multi_cast_vertex, self._vertex)
-            self._controller.add_edge(edge)
+            self._spinnaker.add_edge(edge)
 
         self._parameters = PyNNParametersSurrogate(self._vertex)
-        self._controller.add_vertex(self._vertex)
+        self._spinnaker.add_vertex(self._vertex)
 
         #add any dependant edges and verts if needed
         dependant_verts, dependant_edges = \
@@ -69,11 +69,11 @@ class Population(object):
 
         if dependant_verts is not None:
             for dependant_vert in dependant_verts:
-                self._controller.add_vertex(dependant_vert)
+                self._spinnaker.add_vertex(dependant_vert)
 
         if dependant_edges is not None:
             for dependant_edge in dependant_edges:
-                self._controller.add_edge(dependant_edge)
+                self._spinnaker.add_edge(dependant_edge)
 
         #initlise common stuff
         self._size = size
@@ -151,7 +151,7 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        spikes = self._vertex.get_spikes(self._controller, compatible_output)
+        spikes = self._vertex.get_spikes(self._spinnaker, compatible_output)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
         return spikes
@@ -173,7 +173,7 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        gsyn = self._vertex.get_gsyn(self._controller,
+        gsyn = self._vertex.get_gsyn(self._spinnaker,
                                      compatible_output=compatible_output)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
@@ -194,7 +194,7 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        v = self._vertex.get_v(self._controller,
+        v = self._vertex.get_v(self._spinnaker,
                                compatible_output=compatible_output)
 
         if conf.config.getboolean("Reports", "outputTimesForSections"):
@@ -323,11 +323,11 @@ class Population(object):
                 visualiser_average_period_tics, visualiser_longer_period_tics,
                 visualiser_update_screen_in_tics, visualiser_reset_counters,
                 visualiser_reset_counter_period, self._vertex)
-            self._controller.add_visualiser_vertex(visualiser_vertex)
+            self._spinnaker.add_visualiser_vertex(visualiser_vertex)
         self._record_spike_file = to_file
 
         # add an edge to the monitor
-        self._controller.add_edge_to_recorder_vertex(self._vertex)
+        self._spinnaker.add_edge_to_recorder_vertex(self._vertex)
 
     def record_gsyn(self, to_file=None):
         """
@@ -388,7 +388,7 @@ class Population(object):
         Write conductance information from the population to a given file.
 
         """
-        time_step = (self._controller.dao.machineTimeStep * 1.0) / 1000.0
+        time_step = (self._spinnaker.dao.machineTimeStep * 1.0) / 1000.0
         gsyn = self.get_gsyn(gather, compatible_output=True)
         first_id = 0
         num_neurons = self._vertex.atoms
@@ -410,7 +410,7 @@ class Population(object):
         Write membrane potential information from the population to a given
         file.
         """
-        time_step = (self._controller.dao.machineTimeStep * 1.0) / 1000.0
+        time_step = (self._spinnaker.dao.machineTimeStep * 1.0) / 1000.0
         v = self.get_v(gather, compatible_output=True)
         utility_calls.check_directory_exists(filename)
         file_handle = open(filename, "w")

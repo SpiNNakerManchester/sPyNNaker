@@ -4,7 +4,7 @@ from abc import abstractmethod
 from six import add_metaclass
 
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_properties.synaptic_manager import \
+from spynnaker.pyNN.models.neural_properties.abstract_synaptic_manager import \
     SynapticManager
 
 from pacman.model.graph.vertex import Vertex

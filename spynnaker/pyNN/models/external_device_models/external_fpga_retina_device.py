@@ -1,14 +1,12 @@
 __author__ = 'stokesa6'
-from spynnaker.pyNN.models.abstract_models.abstract_external_device import ExternalDevice
+from spynnaker.pyNN.models.external_device_models.\
+    abstract_external_retina_device import AbstractExternalRetinaDevice
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN import exceptions
 
 
-class ExternalFPGARetinaDevice(ExternalDevice):
+class ExternalFPGARetinaDevice(AbstractExternalRetinaDevice):
 
-    UP_POLARITY = "UP"
-    DOWN_POLARITY = "DOWN"
-    MERGED_POLARITY = "MERGED"
     MODE_128 = "128"
     MODE_64 = "64"
     MODE_32 = "32"
@@ -44,16 +42,12 @@ class ExternalFPGARetinaDevice(ExternalDevice):
         else:
             raise exceptions.ConfigurationException("the FPGA retina does not "
                                                     "recongise this mode")
-        super(ExternalFPGARetinaDevice, self).__init__(n_neurons,
-                                                       virtual_chip_coords,
-                                                       connected_chip_coords,
-                                                       connected_chip_edge,
-                                                       label=label)
-        self.polarity = polarity
-        if self.polarity == ExternalFPGARetinaDevice.UP_POLARITY:
-            self.constraints.p = 8
-        else:
-            self.constraints.p = 0
+
+        AbstractExternalRetinaDevice.__init__(self, n_neurons,
+                                              virtual_chip_coords,
+                                              connected_chip_coords,
+                                              connected_chip_edge,
+                                              label=label)
 
     def get_commands(self, last_runtime_tic):
         """
@@ -108,12 +102,6 @@ class ExternalFPGARetinaDevice(ExternalDevice):
                 "UP, DOWN or None. Other values result in the Model not "
                 "knowing how to initlise its key and mask.")
 
-    def requires_multi_cast_source(self):
-        """
-        overloded method to add a mulit-cast soruce
-        """
-        return True
-
     @property
     def model_name(self):
         """
@@ -127,13 +115,6 @@ class ExternalFPGARetinaDevice(ExternalDevice):
             packet_conversions.get_y_from_fpga_retina(details, mode), \
             packet_conversions.get_spike_value_from_fpga_retina(details,
                                                                 mode)
-
-    def split_into_subvertex_count(self):
-        if (self.atoms >> 11) <= 0:  # if the keys dont touce p,
-                                     # then just 1 subvert is needed
-            return 1
-        else:
-            return self.atoms >> 11  # keys available for neuron id
 
 
 def requires_retina_page():

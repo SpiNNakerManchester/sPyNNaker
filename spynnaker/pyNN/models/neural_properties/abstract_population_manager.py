@@ -6,22 +6,25 @@ from data_specification.file_data_writer import FileDataWriter
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_properties.synaptic_manager import \
+from spynnaker.pyNN.models.neural_properties.abstract_synaptic_manager import \
     SynapticManager
-from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex import \
+from spynnaker.pyNN.models.neural_properties.abstract_partitionable_vertex import \
     PartitionableVertex
 
+from abc import ABCMeta
+from six import add_metaclass
+from abc import abstractmethod
 
 import os
 import math
 import ctypes
 import tempfile
-import numpy
 import logging
+import numpy
 
 logger = logging.getLogger(__name__)
 
-
+@add_metaclass(ABCMeta)
 class PopulationManager(SynapticManager, PartitionableVertex):
 
     def __init__(self, record, binary, n_neurons, label, constraints):
@@ -38,14 +41,17 @@ class PopulationManager(SynapticManager, PartitionableVertex):
     def record_gsyn(self):
         self._record_gsyn = True
 
+    @abstractmethod
     def get_parameters(self, machine_time_step):
-        raise NotImplementedError
+        """
+        method to return whatever params a model has
+        """
 
-    def reserve_memory_regions(self, spec, setup_sz, neuron_params_sz,
-                               synapse_params_sz, row_len_trans_sz,
-                               master_pop_table_sz, all_syn_block_sz,
-                               spike_hist_buff_sz, potential_hist_buff_sz,
-                               gsyn_hist_buff_sz, stdp_params_sz):
+    def reserve_population_based_memory_regions(
+            self, spec, setup_sz, neuron_params_sz, synapse_params_sz,
+            row_len_trans_sz, master_pop_table_sz, all_syn_block_sz,
+            spike_hist_buff_sz, potential_hist_buff_sz, gsyn_hist_buff_sz,
+            stdp_params_sz):
         """
         Reserve SDRAM space for memory areas:
         1) Area for information on what data to record
@@ -64,48 +70,44 @@ class PopulationManager(SynapticManager, PartitionableVertex):
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        spec.reserveMemRegion(region=constants.REGIONS.SYSTEM,
-                              size=setup_sz,
-                              label='setup')
-        spec.reserveMemRegion(region=constants.REGIONS.NEURON_PARAMS,
-                              size=neuron_params_sz,
-                              label='NeuronParams')
-        spec.reserveMemRegion(region=constants.REGIONS.SYNAPSE_PARAMS,
-                              size=synapse_params_sz,
-                              label='SynapseParams')
-        spec.reserveMemRegion(region=constants.REGIONS.ROW_LEN_TRANSLATION,
-                              size=row_len_trans_sz,
-                              label='RowLenTable')
-        spec.reserveMemRegion(region=constants.REGIONS.MASTER_POP_TABLE,
-                              size=master_pop_table_sz,
-                              label='MasterPopTable')
-        spec.reserveMemRegion(region=constants.REGIONS.SYNAPTIC_MATRIX,
-                              size=all_syn_block_sz,
-                              label='SynBlocks')
+        spec.reserve_memory_region(region=constants.REGIONS.SYSTEM,
+                                   size=setup_sz, label='setup')
+        spec.reserve_memory_region(region=constants.REGIONS.NEURON_PARAMS,
+                                   size=neuron_params_sz, label='NeuronParams')
+        spec.reserve_memory_region(region=constants.REGIONS.SYNAPSE_PARAMS,
+                                   size=synapse_params_sz,
+                                   label='SynapseParams')
+        spec.reserve_memory_region(region=constants.REGIONS.ROW_LEN_TRANSLATION,
+                                   size=row_len_trans_sz, label='RowLenTable')
+        spec.reserve_memory_region(region=constants.REGIONS.MASTER_POP_TABLE,
+                                   size=master_pop_table_sz,
+                                   label='MasterPopTable')
+        spec.reserve_memory_region(region=constants.REGIONS.SYNAPTIC_MATRIX,
+                                   size=all_syn_block_sz, label='SynBlocks')
 
         if self._record:
-            spec.reserveMemRegion(region=constants.REGIONS.SPIKE_HISTORY,
-                                  size=spike_hist_buff_sz,
-                                  label='spikeHistBuffer',
-                                  leaveUnfilled=True)
+            spec.reserve_memory_region(region=constants.REGIONS.SPIKE_HISTORY,
+                                       size=spike_hist_buff_sz,
+                                       label='spikeHistBuffer',
+                                       leaveUnfilled=True)
         if self._record_v:
-            spec.reserveMemRegion(region=constants.REGIONS.POTENTIAL_HISTORY,
-                                  size=potential_hist_buff_sz,
-                                  label='potHistBuffer',
-                                  leaveUnfilled=True)
+            spec.reserve_memory_region(region=constants.REGIONS.POTENTIAL_HISTORY,
+                                       size=potential_hist_buff_sz,
+                                       label='potHistBuffer',
+                                       leaveUnfilled=True)
         if self._record_gsyn:
-            spec.reserveMemRegion(region=constants.REGIONS.GSYN_HISTORY,
-                                  size=gsyn_hist_buff_sz,
-                                  label='gsynHistBuffer',
-                                  leaveUnfilled=True)
+            spec.reserve_memory_region(region=constants.REGIONS.GSYN_HISTORY,
+                                       size=gsyn_hist_buff_sz,
+                                       label='gsynHistBuffer',
+                                       leaveUnfilled=True)
         if stdp_params_sz != 0:
-            spec.reserveMemRegion(region=constants.REGIONS.STDP_PARAMS,
-                                  size=stdp_params_sz,
-                                  label='stdpParams')
+            spec.reserve_memory_region(region=constants.REGIONS.STDP_PARAMS,
+                                       size=stdp_params_sz,
+                                       label='stdpParams')
 
     def write_setup_info(self, spec, spike_history_region_sz,
                          neuron_potential_region_sz, gsyn_region_sz,
-                         timer_period):
+                         timer_period, executable_constant):
         """
         Write information used to control the simulation and gathering of
         results.Currently, this means the flag word used to signal whether
@@ -134,12 +136,13 @@ class PopulationManager(SynapticManager, PartitionableVertex):
         recording_info |= 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
-        spec.switchWriteFocus(region=constants.REGIONS.SYSTEM)
-        spec.write(data=timer_period)
-        spec.write(data=recording_info)
-        spec.write(data=spike_history_region_sz)
-        spec.write(data=neuron_potential_region_sz)
-        spec.write(data=gsyn_region_sz)
+        spec.switch_write_focus(region=constants.REGIONS.SYSTEM)
+        spec.write_value(data=executable_constant)
+        spec.write_value(data=timer_period)
+        spec.write_value(data=recording_info)
+        spec.write_value(data=spike_history_region_sz)
+        spec.write_value(data=neuron_potential_region_sz)
+        spec.write_value(data=gsyn_region_sz)
 
     def write_neuron_parameters(self, spec, machine_time_step, processor,
                                 subvertex, ring_buffer_to_input_left_shift):
@@ -147,32 +150,36 @@ class PopulationManager(SynapticManager, PartitionableVertex):
                      "Neurons:\n".format(subvertex.n_atoms))
 
         # Set the focus to the memory region 2 (neuron parameters):
-        spec.switchWriteFocus(region=constants.REGIONS.NEURON_PARAMS)
+        spec.switch_write_focus(region=constants.REGIONS.NEURON_PARAMS)
 
         # Write header info to the memory region:
         # Write Key info for this core:
         chip_x, chip_y, chip_p = processor.get_coordinates()
         population_identity = \
             packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
-        spec.write(data=population_identity)
+        spec.write_value(data=population_identity)
 
         # Write the number of neurons in the block:
-        spec.write(data=subvertex.n_atoms)
+        spec.write_value(data=subvertex.n_atoms)
 
         # Write the number of parameters per neuron (struct size in words):
         params = self.get_parameters(machine_time_step)
-        spec.write(data=len(params))
+
+        # noinspection PyTypeChecker
+        spec.write_value(data=len(params))
 
         # Write machine time step: (Integer, expressed in microseconds)
-        spec.write(data=machine_time_step)
+        spec.write_value(data=machine_time_step)
 
         # Write ring_buffer_to_input_left_shift
-        spec.write(data=ring_buffer_to_input_left_shift)
+        spec.write_value(data=ring_buffer_to_input_left_shift)
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
         for atom in range(0, subvertex.n_atoms):
             # Process the parameters
+
+            # noinspection PyTypeChecker
             for param in params:
                 value = param.get_value()
                 if hasattr(value, "__len__"):
@@ -186,12 +193,7 @@ class PopulationManager(SynapticManager, PartitionableVertex):
 
                 value = value * scale
 
-                if datatype == 's1615':
-                    value = spec.doubleToS1615(value)
-                elif datatype == 'uint32':
-                    value = ctypes.c_uint32(value).value
-
-                spec.write(data=value, sizeof=datatype)
+                spec.write_value(data=value, data_type=datatype)
         # End the loop over the neurons:
 
     @staticmethod
@@ -223,7 +225,7 @@ class PopulationManager(SynapticManager, PartitionableVertex):
         return max_weight_power
 
     def generate_data_spec(self, processor, subvertex, machine_time_step,
-                           run_time):
+                           run_time, executable_constant):
         """
         Model-specific construction of the data blocks necessary to build a group
         of IF_curr_exp neurons resident on a single core.
@@ -278,7 +280,7 @@ class PopulationManager(SynapticManager, PartitionableVertex):
         self.write_random_distribution_declarations(spec)
 
         # Construct the data images needed for the Neuron:
-        self.reserve_memory_regions(
+        self.reserve_population_based_memory_regions(
             spec, constants.SETUP_SIZE, neuron_params_sz, synapse_params_sz,
             SynapticManager.ROW_LEN_TABLE_SIZE,
             SynapticManager.MASTER_POPULATION_TABLE_SIZE, all_syn_block_sz,
@@ -286,7 +288,8 @@ class PopulationManager(SynapticManager, PartitionableVertex):
             stdp_region_sz)
 
         self.write_setup_info(spec, spike_hist_buff_sz, potential_hist_buff_sz,
-                              gsyn_hist_buff_sz, machine_time_step)
+                              gsyn_hist_buff_sz, machine_time_step,
+                              executable_constant)
 
         ring_buffer_shift = self.get_ring_buffer_to_input_left_shift(subvertex)
         weight_scale = self.get_weight_scale(ring_buffer_shift)

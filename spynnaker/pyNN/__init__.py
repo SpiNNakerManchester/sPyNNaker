@@ -27,7 +27,7 @@ from spynnaker.pyNN.models.external_device_models.external_fpga_retina_device \
     import ExternalFPGARetinaDevice
 from spynnaker.pyNN.models.external_device_models.external_motor_device \
     import ExternalMotorDevice
-from spynnaker.pyNN.models.external_device_models.external_retina_device \
+from spynnaker.pyNN.models.external_device_models.abstract_external_retina_device \
     import ExternalRetinaDevice
 
 # neural models

@@ -16,10 +16,5 @@ class ExternalDevice(VirtualVertex):
     def model_name(self):
         return "ExternalDevice:{}".format(self.label)
 
-    def get_resources_for_atoms(self, lo_atom, hi_atom, no_machine_time_steps,
-                                machine_time_step_us, partition_data_object):
-        raise NotImplementedError
-
-    @property
-    def requires_retina_page(self):
-        return False
+    def add_constraints_to_subverts(self, subverts):
+        pass

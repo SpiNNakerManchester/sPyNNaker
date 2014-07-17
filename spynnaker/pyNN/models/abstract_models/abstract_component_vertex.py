@@ -1,15 +1,19 @@
-from pacman.model.graph.vertex import Vertex
 from abc import ABCMeta
 from six import add_metaclass
-import logging
-import numpy
-import struct
+
+
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import conf
 from spynnaker.pyNN.utilities.utility_calls \
-    import get_app_data_base_address_offset, get_region_base_address_offset
+    import get_region_base_address_offset
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
+
+
+import logging
+import numpy
+import struct
+
 logger = logging.getLogger(__name__)
 
 RECORDING_ENTRY_BYTE_SIZE = 4
@@ -103,7 +107,7 @@ class ComponentVertex(object):
         """
         return self._record
 
-    def _get_spikes(self, controller, compatible_output, spike_recording_region,
+    def _get_spikes(self, spinnaker, compatible_output, spike_recording_region,
                     sub_vertex_out_spike_bytes_function, runtime, sub_graph,
                     placements):
         """
@@ -124,28 +128,23 @@ class ComponentVertex(object):
                          "lo_atom {%d}".format(x, y, p, subvertex.lo_atom))
             
             # Get the App Data for the core
-            app_data_base_address_offset = get_app_data_base_address_offset(p)
-            app_data_base_address_buf = \
-                controller.txrx.read_mem(x, y, app_data_base_address_offset, 4)
             app_data_base_address = \
-                struct.unpack("<I", app_data_base_address_buf)[0]
+                spinnaker.txrx.get_cpu_information(x, y, p).user[0]
             
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
                 get_region_base_address_offset(app_data_base_address,
                                                spike_recording_region)
             spike_region_base_address_buf = \
-                controller.txrx.read_mem(x, y, spike_region_base_address_offset,
-                                         4)
+                spinnaker.txrx.read_memory(
+                    x, y, spike_region_base_address_offset, 4)
             spike_region_base_address = \
                 struct.unpack("<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
             
             # Read the spike data size
             number_of_bytes_written_buf =\
-                controller.txrx.memory_calls.read_mem(x, y,
-                                                      spike_region_base_address,
-                                                      4)
+                spinnaker.txrx.read_memory(x, y, spike_region_base_address, 4)
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
 
@@ -169,9 +168,8 @@ class ComponentVertex(object):
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
             spike_data =\
-                controller.txrx.memory_calls.read_mem(
-                    x, y, spike_region_base_address + 4,
-                    number_of_bytes_written)
+                spinnaker.txrx.read_memory(x, y, spike_region_base_address + 4,
+                                           number_of_bytes_written)
             
             # Extract number of spike bytes from subvertex
             out_spike_bytes = sub_vertex_out_spike_bytes_function(subvertex)
@@ -185,7 +183,7 @@ class ComponentVertex(object):
             for tick in range(0, number_of_time_steps_written):
                 
                 # Convert tick to ms
-                time = tick * (controller.dao.machineTimeStep / 1000.0)
+                time = tick * (spinnaker.dao.machineTimeStep / 1000.0)
                 
                 # Get offset into file data that the bit vector representing 
                 # the state at this tick begins at

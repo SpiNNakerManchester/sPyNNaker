@@ -9,12 +9,13 @@ from pacman.model.constraints.partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
     ComponentVertex
-from spynnaker.pyNN.models.abstract_models.abstract_population_manager import \
+from spynnaker.pyNN.models.neural_properties.abstract_population_manager import \
     PopulationManager
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.utility_calls import \
-    get_app_data_base_address_offset, get_region_base_address_offset
+    get_region_base_address_offset
 from spynnaker.pyNN.utilities import constants
+
 
 logger = logging.getLogger(__name__)
 
@@ -66,24 +67,22 @@ class PopulationVertex(ComponentVertex, PopulationManager):
             (x, y, p) = subvertex.placement.processor.get_coordinates()
             
             # Get the App Data for the core
-            app_data_base_address_offset = get_app_data_base_address_offset(p)
-            app_data_base_address_buf = spinnaker.txrx.read_memory(
-                x, y, app_data_base_address_offset, 4)
             app_data_base_address = \
-                struct.unpack("<I", app_data_base_address_buf)[0]
+                spinnaker.txrx.get_cpu_information(x, y, p).user[0]
             
             # Get the position of the value buffer
             v_region_base_address_offset = \
                 get_region_base_address_offset(app_data_base_address, region)
-            v_region_base_address_buf = spinnaker.txrx.read_memory(
-                x, y, v_region_base_address_offset, 4)
+            v_region_base_address_buf = \
+                spinnaker.txrx.read_memory(x, y, v_region_base_address_offset,
+                                           4)
             v_region_base_address = \
                 struct.unpack("<I", v_region_base_address_buf)[0]
             v_region_base_address += app_data_base_address
             
             # Read the size
-            number_of_bytes_written_buf = spinnaker.txrx.read_memory(
-                x, y, v_region_base_address, 4)
+            number_of_bytes_written_buf = \
+                spinnaker.txrx.read_memory(x, y, v_region_base_address, 4)
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
                     
