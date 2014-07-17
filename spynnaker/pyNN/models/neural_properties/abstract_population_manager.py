@@ -17,7 +17,6 @@ from abc import abstractmethod
 
 import os
 import math
-import ctypes
 import tempfile
 import logging
 import numpy
@@ -231,19 +230,7 @@ class PopulationManager(SynapticManager, PartitionableVertex):
         of IF_curr_exp neurons resident on a single core.
         """
         # Create new DataSpec for this processor:
-        x, y, p = processor.get_coordinates()
-        hostname = processor.chip.machine.hostname
-        has_binary_folder_set = \
-            config.has_option("SpecGeneration", "Binary_folder")
-        if not has_binary_folder_set:
-            binary_folder = tempfile.gettempdir()
-            config.set("SpecGeneration", "Binary_folder", binary_folder)
-        else:
-            binary_folder = config.get("SpecGeneration", "Binary_folder")
-
-        binary_file_name = \
-            binary_folder + os.sep + "{%s}_dataSpec_{%d}_{%d}_{%d}.dat"\
-                                     .format(hostname, x, y, p)
+        binary_file_name = self.get_binary_file_name(processor)
 
         data_writer = FileDataWriter(binary_file_name)
 
@@ -346,3 +333,20 @@ class PopulationManager(SynapticManager, PartitionableVertex):
         # Return list of target cores, executables, files to load and
         # memory writes to perform:
         return binary_name, list(), memory_write_targets
+
+    @staticmethod
+    def get_binary_file_name(processor):
+        x, y, p = processor.get_coordinates()
+        hostname = processor.chip.machine.hostname
+        has_binary_folder_set = \
+            config.has_option("SpecGeneration", "Binary_folder")
+        if not has_binary_folder_set:
+            binary_folder = tempfile.gettempdir()
+            config.set("SpecGeneration", "Binary_folder", binary_folder)
+        else:
+            binary_folder = config.get("SpecGeneration", "Binary_folder")
+
+        binary_file_name = \
+            binary_folder + os.sep + "{%s}_dataSpec_{%d}_{%d}_{%d}.dat"\
+                                     .format(hostname, x, y, p)
+        return binary_file_name

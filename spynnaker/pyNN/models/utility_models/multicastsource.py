@@ -1,82 +1,101 @@
-__author__ = 'stokesa6'
-from pacman103.front.common.component_vertex import ComponentVertex
-from pacman103.lib import data_spec_constants, data_spec_gen, lib_map
-from pacman103.core import exceptions
+from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
+    ComponentVertex
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
+
+
+from pacman.model.constraints.partitioner_maximum_size_constraint \
+    import PartitionerMaximumSizeConstraint
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
+from pacman.model.resources.sdram_resource import SDRAMResource
+
+
+from data_specification.data_specification_generator import \
+    DataSpecificationGenerator
+from data_specification.file_data_writer import FileDataWriter
+
+
 import os
 
 INFINITE_SIMULATION = 4294967295
 
 
-class MultiCastSource(ComponentVertex):
+class MultiCastSource(ComponentVertex, AbstractDataSpecableVertex):
 
     SYSTEM_REGION = 1
     COMMANDS = 2
 
-    core_app_identifier = \
-        data_spec_constants.EXTERNAL_RETINA_SETUP_DEVICE_CORE_APPLICATION_ID
+    CORE_APP_IDENTIFER = constants.MULTICASE_SOURCE_CORE_APPLICATION_ID
 
-    '''
-    constructor that depends upon the Component vertex
-    '''
     def __init__(self):
-        super(MultiCastSource, self).__init__(n_neurons = 1, label="CmdSender")
+        """
+        constructor that depends upon the Component vertex
+        """
+        ComponentVertex.__init__(self, "multi_cast_source_sender")
+        AbstractDataSpecableVertex.__init__(self, 1, "multi_cast_source_sender")
         self.writes = None
         self.memory_requirements = 0
         self.edge_map = None
+        self.add_constraint(PartitionerMaximumSizeConstraint(1))
 
-    """
+    def generate_data_spec(self, processor, subvertex, machine_time_step,
+                           run_time):
+        """
         Model-specific construction of the data blocks necessary to build a
         single external retina device.
-    """
-    def generateDataSpec(self, processor, subvertex, dao):
+        """
         #check that all keys for a subedge are the same when masked
         self.check_sub_edge_key_mask_consistancy(self.edge_map, self._app_mask)
+        binary_file_name = self.get_binary_file_name(processor)
 
         # Create new DataSpec for this processor:
-        spec = data_spec_gen.DataSpec(processor=processor, dao=dao)
-        spec.initialise(self.core_app_identifier, dao) # User specified identifier
+        data_writer = FileDataWriter(binary_file_name)
+        spec = DataSpecificationGenerator(data_writer)
+
+        simulation_time_in_ticks = constants.INFINITE_SIMULATION
+        if run_time is not None:
+            simulation_time_in_ticks = int((run_time * 1000.0) /
+                                           machine_time_step)
+
+        self.write_basic_setup_info(spec, machine_time_step,
+                                    simulation_time_in_ticks,
+                                    MultiCastSource.CORE_APP_IDENTIFER)
 
         spec.comment("\n*** Spec for multi case source ***\n\n")
 
-        # Load the expected executable to the list of load targets for this core
-        # and the load addresses:
-        x, y, p = processor.get_coordinates()
-        executable_target = None
-        file_path = os.path.join(dao.get_common_binaries_directory(),
-                                 'multicast_source.aplx')
-        executable_target = lib_map.ExecutableTarget(file_path, x, y, p)
-        memory_write_targets = list()
+         # Rebuild executable name
+        common_binary_path = os.path.join(config.get("SpecGeneration",
+                                                     "common_binary_folder"))
 
-        simulationTimeInTicks = INFINITE_SIMULATION
-        if dao.run_time is not None:
-            simulationTimeInTicks = int((dao.run_time * 1000.0) 
-                    /  dao.machineTimeStep)
-        user1Addr = 0xe5007000 + 128 * p + 116 # User1 location reserved for core p
-        memory_write_targets.append(lib_map.MemWriteTarget(x, y, p, user1Addr,
-                                                           simulationTimeInTicks))
+        binary_name = os.path.join(common_binary_path,
+                                   'multicast_source.aplx')
 
         #reserve regions
         self.reserve_memory_regions(spec, self.memory_requirements)
         
         #write system region
-        spec.switchWriteFocus(region = self.SYSTEM_REGION)
-        spec.write(data = 0xBEEF0000)
-        spec.write(data = 0)
-        spec.write(data = 0)
-        spec.write(data = 0)
+        spec.switch_write_focus(region=self.SYSTEM_REGION)
+        spec.write_value(data=0xBEEF0000)
+        spec.write_value(data=0)
+        spec.write_value(data=0)
+        spec.write_value(data=0)
 
         #write commands to memory
-        spec.switchWriteFocus(region=self.COMMANDS)
+        spec.switch_write_focus(region=self.COMMANDS)
         for write_command in self.writes:
-            spec.write(data=write_command)
+            spec.write_value(data=write_command)
 
         # End-of-Spec:
-        spec.endSpec()
-        spec.closeSpecFile()
-        load_targets = list()
+        spec.end_specification()
+        data_writer.close()
 
         # Return list of executables, load files:
-        return executable_target, load_targets, memory_write_targets
+        return binary_name, list(), list()
 
     def calculate_memory_requirements(self, no_tics):
         #go through the vertexes at the end of the outgoing edges and ask them
@@ -88,7 +107,8 @@ class MultiCastSource(ComponentVertex):
         self.memory_requirements = 0
         #temporary holder
         commands_in_same_time_slot = list()
-        self.memory_requirements += 12 # 3 ints holding coutners of cp, cnp and t
+        self.memory_requirements += 12  # 3 ints holding coutners of cp,
+                                        # cnp and t
         for start_command in commands:
             # if first command, inltiise counter
             if len(commands_in_same_time_slot) == 0:
@@ -100,14 +120,18 @@ class MultiCastSource(ComponentVertex):
                 # if the next mesage has the same time tic, add to list
                 if commands_in_same_time_slot[0]['t'] == start_command['t']:
                     commands_in_same_time_slot.append(start_command)
-                    self.memory_requirements += self.size_of_message(start_command)
-                else:#if not, then send all preivous messages to region and restart count
+                    self.memory_requirements += \
+                        self.size_of_message(start_command)
+                else:  # if not, then send all preivous messages to
+                       # region and restart count
                     self.deal_with_command_block(commands_in_same_time_slot)
                     #reset message tracker
                     commands_in_same_time_slot = list()
                     commands_in_same_time_slot.append(start_command)
-                    self.memory_requirements += 12 # 3 ints holding coutners of cp, cnp and t
-                    self.memory_requirements += self.size_of_message(start_command)
+                    self.memory_requirements += 12  # 3 ints holding coutners of
+                                                    # cp, cnp and t
+                    self.memory_requirements += \
+                        self.size_of_message(start_command)
                     self.writes.append(start_command['t'])
         # write the last command block left from the loop
         self.deal_with_command_block(commands_in_same_time_slot)
@@ -115,39 +139,10 @@ class MultiCastSource(ComponentVertex):
         self.writes.insert(0, self.memory_requirements)
         self.memory_requirements += 4
 
-
-    '''
-    check that all keys for a subedge are the same when masked
-    '''
-    def check_sub_edge_key_mask_consistancy(self, edge_map, app_mask):
-        for subedge in edge_map.keys():
-            combo = None
-            commands = edge_map[subedge]
-            if commands is not None:
-                for command in commands:
-                    if combo is None:
-                        combo = command['key'] & app_mask
-                    else:
-                        new_combo = command['key'] & app_mask
-                        if combo != new_combo:
-                            raise exceptions.RallocException("The keys going down a "
-                                                             "speicifc subedge are not"
-                                                             " consistant")
-
-    '''
-    iterates though a collection of commands and counts how many have payloads
-    '''
-    def calcaulate_no_payload_messages(self, messages):
-        count = 0
-        for message in messages:
-            if message['payload'] is not None:
-                count += 1
-        return count
-
-    '''
-    collects all the commands from its out going edges
-    '''
     def collect_commands(self, no_tics):
+        """
+        collects all the commands from its out going edges
+        """
         commands = list()
         edge_map = dict()
         for outgoing_edge in self.out_edges:
@@ -160,10 +155,10 @@ class MultiCastSource(ComponentVertex):
                 edge_map[outgoing_edge] = None
         return commands, edge_map
 
-    '''
-    writes a command block and keeps memory tracker
-    '''
     def deal_with_command_block(self, commands_in_same_time_slot):
+        """
+        writes a command block and keeps memory tracker
+        """
         #sort by cp
         commands_in_same_time_slot = \
             sorted(commands_in_same_time_slot, key=lambda tup: tup['cp'])
@@ -196,31 +191,16 @@ class MultiCastSource(ComponentVertex):
         if no_payload_messages == 0:
             self.writes.append(no_payload_messages)
 
-    '''
-    overloaded
-    '''
-    def generate_routing_info( self, subedge ):
+    def generate_routing_info(self, subedge):
+        """
+        overloaded from component vertex
+        """
         if self.edge_map[subedge.edge] is not None:
             return self.edge_map[subedge.edge][0]['key'], 0xFFFFFC00
         else:
             # if the subedge doesnt have any predefined messages to send,
             # then treat them with the subedge routing key
             return subedge.key, self._app_mask
-
-
-
-    '''
-    returns the expected size of the command message
-    '''
-    def size_of_message(self, start_command):
-        count = 0
-        if start_command['payload'] is None:
-            count += 4
-        else:
-            count += 8
-        if start_command['repeat'] > 0:
-            count += 4
-        return count
 
     def reserve_memory_regions(self, spec, command_size):
         """
@@ -232,30 +212,76 @@ class MultiCastSource(ComponentVertex):
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        spec.reserveMemRegion(region=self.SYSTEM_REGION,
-                              size=16,
-                              label='setup')
+        spec.reserve_memory_region(region=self.SYSTEM_REGION,
+                                   size=16,
+                                   label='setup')
         if command_size > 0:
-            spec.reserveMemRegion(region=self.COMMANDS,
-                                  size=command_size,
-                                  label='commands')
+            spec.reserve_memory_region(region=self.COMMANDS,
+                                       size=command_size,
+                                       label='commands')
 
-    def get_maximum_atoms_per_core(self):
-        '''
-        return the maximum number of atoms needed for the multi-cast source
-        '''
-        return 1
+    @staticmethod
+    def size_of_message(start_command):
+        """
+        returns the expected size of the command message
+        """
+        count = 0
+        if start_command['payload'] is None:
+            count += 4
+        else:
+            count += 8
+        if start_command['repeat'] > 0:
+            count += 4
+        return count
 
+    @staticmethod
+    def calcaulate_no_payload_messages(messages):
+        """
+        iterates though a collection of commands and counts how many have payloads
+        """
+        count = 0
+        for message in messages:
+            if message['payload'] is not None:
+                count += 1
+        return count
 
+    @staticmethod
+    def check_sub_edge_key_mask_consistancy(edge_map, app_mask):
+        """
+        check that all keys for a subedge are the same when masked
+        """
+        for subedge in edge_map.keys():
+            combo = None
+            commands = edge_map[subedge]
+            if commands is not None:
+                for command in commands:
+                    if combo is None:
+                        combo = command['key'] & app_mask
+                    else:
+                        new_combo = command['key'] & app_mask
+                        if combo != new_combo:
+                            raise exceptions.RallocException(
+                                "The keys going down a speicifc subedge are not"
+                                " consistant")
+
+    @property
     def model_name(self):
-        '''return the name of the model
-        '''
+        """
+        return the name of the model
+        """
         return "multi_cast_source"
 
-    def get_resources_for_atoms(self, lo_atom, hi_atom, no_machine_time_steps,
-                                machine_time_step_us, partition_data_object):
-        '''return the resources of the multi-cast source
-        '''
+    #abstract methods from vertex
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom,
+                                    number_of_machine_time_steps):
+        """
+        return the resources of the multi-cast source
+        """
         if self.writes is None:
-            self.calculate_memory_requirements(no_machine_time_steps)
-        return lib_map.Resources(0, 0, self.memory_requirements)
+            self.calculate_memory_requirements(number_of_machine_time_steps)
+
+        resources = list()
+        resources.append(CPUCyclesPerTickResource(0))
+        resources.append(DTCMResource(0))
+        resources.append(SDRAMResource(self.memory_requirements))
+        return resources

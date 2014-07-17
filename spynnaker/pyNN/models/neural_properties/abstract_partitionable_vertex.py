@@ -6,8 +6,9 @@ from six import add_metaclass
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.abstract_synaptic_manager import \
     SynapticManager
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
 
-from pacman.model.graph.vertex import Vertex
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
@@ -15,10 +16,11 @@ from pacman.model.resources.sdram_resource import SDRAMResource
 
 
 @add_metaclass(ABCMeta)
-class PartitionableVertex(Vertex):
+class PartitionableVertex(AbstractDataSpecableVertex):
 
     def __init__(self, n_atoms, label, constraints=None):
-        Vertex.__init__(self, n_atoms, label, constraints=constraints)
+        AbstractDataSpecableVertex.__init__(self, n_atoms, label,
+                                            constraints=constraints)
 
     def get_neuron_params_size(self, lo_atom, hi_atom):
         """

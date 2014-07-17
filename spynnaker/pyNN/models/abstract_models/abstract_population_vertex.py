@@ -68,7 +68,7 @@ class PopulationVertex(ComponentVertex, PopulationManager):
             
             # Get the App Data for the core
             app_data_base_address = \
-                spinnaker.txrx.get_cpu_information(x, y, p).user[0]
+                spinnaker.txrx.get_cpu_information_from_core(x, y, p).user[0]
             
             # Get the position of the value buffer
             v_region_base_address_offset = \

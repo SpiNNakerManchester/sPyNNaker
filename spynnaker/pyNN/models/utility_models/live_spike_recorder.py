@@ -1,93 +1,81 @@
-from pacman103.front.common.component_vertex import ComponentVertex
-from pacman103.lib import lib_map
-from pacman103.lib import data_spec_gen, data_spec_constants
-from pacman103.core import exceptions
+from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
+    ComponentVertex
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
 
 
-import os
+from pacman.model.constraints.placer_chip_and_core_constraint \
+    import PlacerChipAndCoreConstraint
+from pacman.model.constraints.partitioner_maximum_size_constraint \
+    import PartitionerMaximumSizeConstraint
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
+from pacman.model.resources.sdram_resource import SDRAMResource
+
+from data_specification.data_specification_generator import \
+    DataSpecificationGenerator
+from data_specification.file_data_writer import FileDataWriter
+
 
 INFINITE_SIMULATION = 4294967295
 
 
-class LiveSpikeRecorder( ComponentVertex ):
-    core_app_identifier = data_spec_constants.APP_MONITOR_CORE_APPLICATION_ID
-    SYSTEM_REGION  = 1
+class LiveSpikeRecorder(ComponentVertex, AbstractDataSpecableVertex):
+    CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
+    SYSTEM_REGION = 1
 
     """
-    A Vertex for the Monitor application
+    A Vertex for the Monitoring application spikes and forwarding them to
+    the host
 
     """
-    
     def __init__(self):
         """
         Creates a new AppMonitor Object.
         """
-        super( LiveSpikeRecorder, self ).__init__(
-            n_neurons = 1,
-            constraints = lib_map.VertexConstraints(x = 0, y = 0),
-            label = "Monitor"
-        )
-
+        ComponentVertex.__init__(self, "Monitor")
+        AbstractDataSpecableVertex.__init__(self, 1, "Monitor")
+        self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
+        self.add_constraint(PartitionerMaximumSizeConstraint(1))
 
     @property
     def model_name(self):
         return "AppMonitor"
 
-    def get_maximum_atoms_per_core(self):
-        return 1
-    
-    def get_resources_for_atoms(self, lo_atom, hi_atom, no_machine_time_steps, 
-            machine_time_step_us, partition_data_object):
-        return lib_map.Resources(0, 0, 0)
-
-    def generateDataSpec(self, processor, subvertex, dao):
+    def generate_data_spec(self, processor, subvertex, machine_time_step,
+                           run_time):
         """
         Model-specific construction of the data blocks necessary to build a
         single Application Monitor on one core.
         """
         # Create new DataSpec for this processor:
-        spec = data_spec_gen.DataSpec(processor, dao)
-        spec.initialise(self.core_app_identifier, dao) # User specified identifier
+        binary_file_name = self.get_binary_file_name(processor)
+        data_writer = FileDataWriter(binary_file_name)
+        spec = DataSpecificationGenerator(data_writer)
 
         spec.comment("\n*** Spec for AppMonitor Instance ***\n\n")
 
-        # Load the expected executable to the list of load targets for this core
-        # and the load addresses:
-        x, y, p = processor.get_coordinates()
-        executableTarget = lib_map.ExecutableTarget(
-                dao.get_common_binaries_directory() + os.sep
-                     + 'monitor.aplx', x, y, p)
-        
         # Calculate the size of the tables to be reserved in SDRAM:
-        setupSz           = 16  # Single word of info with flags, etc.
-                                # plus the lengths of each of the output buffer
-                                # regions in bytes
+        setup_sz = 16  # Single word of info with flags, etc.
+                      # plus the lengths of each of the output buffer
+                      # regions in bytes
 
         # Declare random number generators and distributions:
         #self.writeRandomDistributionDeclarations(spec, dao)
         # Construct the data images needed for the Neuron:
-        self.reserveMemoryRegions(spec, setupSz)
-        self.writeSetupInfo(spec, subvertex)
+        self.reserve_memory_regions(spec, setup_sz)
+        self.writeSetupInfo(spec, subvertex, machine_time_step, run_time)
 
         # End-of-Spec:
-        spec.endSpec()
-        spec.closeSpecFile() 
-
-        # No memory writes required for this Data Spec:
-        memoryWriteTargets = list()
-        simulationTimeInTicks = INFINITE_SIMULATION
-        if dao.run_time is not None:
-            simulationTimeInTicks = int((dao.run_time * 1000.0) 
-                    /  dao.machineTimeStep)
-        user1Addr = 0xe5007000 + 128 * p + 116 # User1 location reserved for core p
-        memoryWriteTargets.append(lib_map.MemWriteTarget(x, y, p, user1Addr,
-                                                         simulationTimeInTicks))
-        loadTargets = list()
+        spec.end_specification()
+        data_writer.close()
 
         # Return list of executables, load files:
-        return  executableTarget, loadTargets, memoryWriteTargets
+        return binary_file_name, list(), list()
     
-    def reserveMemoryRegions(self, spec, setupSz):
+    def reserve_memory_regions(self, spec, setup_sz):
         """
         Reserve SDRAM space for memory areas:
         1) Area for information on what data to record
@@ -96,17 +84,18 @@ class LiveSpikeRecorder( ComponentVertex ):
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        spec.reserveMemRegion(region = self.SYSTEM_REGION,              \
-                                size = setupSz,                    \
-                               label = 'setup')
+        spec.reserveMemRegion(region=self.SYSTEM_REGION,
+                              size=setup_sz,
+                              label='setup')
         return
 
-    def writeSetupInfo(self, spec, subvertex):
+    def write_setup_info(self, spec, subvertex, machine_time_step, run_time):
         """
-        Write information used to control the simulationand gathering of results.
-        Currently, this means the flag word used to signal whether information on
-        neuron firing and neuron potential is either stored locally in a buffer or
-        passed out of the simulation for storage/display as the simulation proceeds.
+        Write information used to control the simulationand gathering of
+        results. Currently, this means the flag word used to signal whether
+        information on neuron firing and neuron potential is either stored
+        locally in a buffer or passed out of the simulation for storage/display
+        as the simulation proceeds.
 
         The format of the information is as follows:
         Word 0: Flags selecting data to be gathered during simulation.
@@ -118,11 +107,26 @@ class LiveSpikeRecorder( ComponentVertex ):
             Bit 5: Output neuron potential
             Bit 6: Output spike rate
         """
-        # What recording commands we reset for the parent abstract_population.py?
-        recordingInfo = subvertex.vertex.flags
-        recordingInfo = recordingInfo | 0xBEEF0000        
+        simulation_time_in_ticks = constants.INFINITE_SIMULATION
+        if run_time is not None:
+            simulation_time_in_ticks = \
+                int((run_time * 1000.0) / machine_time_step)
+        self.write_basic_setup_info(spec, machine_time_step,
+                                    simulation_time_in_ticks,
+                                    LiveSpikeRecorder.CORE_APP_IDENTIFIER)
+        # What recording commands we reset for the parent abstract_population.py
+        recording_info = subvertex.vertex.flags
+        recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
-        spec.switchWriteFocus(region = self.SYSTEM_REGION)
-        spec.write(data = recordingInfo)
+        spec.switchWriteFocus(region=self.SYSTEM_REGION)
+        spec.write(data=recording_info)
         return
 
+    #inhirrted from vertex
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom,
+                                    number_of_machine_time_steps):
+        resources = list()
+        resources.append(CPUCyclesPerTickResource(0))
+        resources.append(DTCMResource(0))
+        resources.append(SDRAMResource(0))
+        return resources

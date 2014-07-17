@@ -20,3 +20,12 @@ class MemReadException(SpynnakerException):
     :raise None: does not raise any known exceptions
     """
     pass
+
+
+class RallocException(SpynnakerException):
+    """rasied when the pynn front end detects that a routing error has occured
+    (during multicast soruce)
+
+    :raise None: does not raise any known exceptions
+    """
+    pass

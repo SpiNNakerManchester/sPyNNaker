@@ -1,5 +1,7 @@
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex \
     import ComponentVertex
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
+    AbstractDataSpecableVertex
 from spynnaker.pyNN.models.external_device_models.external_motor_device import \
     ExternalMotorDevice
 from spynnaker.pyNN.utilities import packet_conversions
@@ -8,7 +10,6 @@ from spynnaker.pyNN.utilities.conf import config
 
 
 from pacman.model.graph.edge import Edge
-from pacman.model.graph.vertex import Vertex
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
@@ -21,12 +22,11 @@ from data_specification.file_data_writer import FileDataWriter
 
 
 import os
-import tempfile
 
 INFINITE_SIMULATION = 4294967295
 
 
-class RobotMotorControl(ComponentVertex, Vertex):
+class RobotMotorControl(ComponentVertex, AbstractDataSpecableVertex):
 
     PARAMS = 2
     SYSTEM_SIZE = 16
@@ -42,7 +42,7 @@ class RobotMotorControl(ComponentVertex, Vertex):
         constructor that depends upon the Component vertex
         """
         ComponentVertex.__init__(self, label)
-        Vertex.__init(6, label, constraints=None)
+        AbstractDataSpecableVertex.__init(6, label, constraints=None)
         self._binary = "robot_motor_control.aplx"
 
         self.virtual_chip_coords = virtual_chip_coords
@@ -76,30 +76,20 @@ class RobotMotorControl(ComponentVertex, Vertex):
         single external retina device.
         """
         # Create new DataSpec for this processor:
-        x, y, p = processor.get_coordinates()
-        hostname = processor.chip.machine.hostname
-        has_binary_folder_set = \
-            config.has_option("SpecGeneration", "Binary_folder")
-        if not has_binary_folder_set:
-            binary_folder = tempfile.gettempdir()
-            config.set("SpecGeneration", "Binary_folder", binary_folder)
-        else:
-            binary_folder = config.get("SpecGeneration", "Binary_folder")
-
-        binary_file_name = \
-            binary_folder + os.sep + "{%s}_dataSpec_{%d}_{%d}_{%d}.dat"\
-                                     .format(hostname, x, y, p)
+        binary_file_name = self.get_binary_file_name(processor)
 
         data_writer = FileDataWriter(binary_file_name)
 
         spec = DataSpecificationGenerator(data_writer)
-        self.write_setup_info(spec, machine_time_step)
+
+        simulation_time_in_ticks = constants.INFINITE_SIMULATION
+        if run_time is not None:
+            simulation_time_in_ticks = \
+                int((run_time * 1000.0) / machine_time_step)
+        self.write_setup_info(spec, machine_time_step, simulation_time_in_ticks,
+                              RobotMotorControl.CORE_APP_IDENTIFIER)
 
         spec.comment("\n*** Spec for robot motor control ***\n\n")
-
-        # Load the expected executable to the list of load targets for this core
-        # and the load addresses:
-        x, y, p = processor.get_coordinates()
 
          # Rebuild executable name
         common_binary_path = os.path.join(config.get("SpecGeneration",
@@ -107,17 +97,6 @@ class RobotMotorControl(ComponentVertex, Vertex):
 
         binary_name = os.path.join(common_binary_path,
                                    'robot_motor_control.aplx')
-
-        # No memory writes required for this Data Spec:
-        memory_write_targets = list()
-        simulation_time_in_ticks = constants.INFINITE_SIMULATION
-        if run_time is not None:
-            simulation_time_in_ticks = \
-                int((run_time * 1000.0) / machine_time_step)
-        user1_addr = \
-            0xe5007000 + 128 * p + 116  # User1 location reserved for core p
-        memory_write_targets.append({'address': user1_addr,
-                                     'data': simulation_time_in_ticks})
 
         #reserve regions
         self.reserve_memory_regions(spec)
@@ -152,15 +131,7 @@ class RobotMotorControl(ComponentVertex, Vertex):
         data_writer.close()
 
         # Return list of executables, load files:
-        return binary_name, list(), memory_write_targets
-
-    @staticmethod
-    def write_setup_info(spec, timer_period):
-
-        # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(region=constants.REGIONS.SYSTEM)
-        spec.write_value(data=RobotMotorControl.CORE_APP_IDENTIFIER)
-        spec.write_value(data=timer_period)
+        return binary_name, list(), list()
 
     def reserve_memory_regions(self, spec):
         """
