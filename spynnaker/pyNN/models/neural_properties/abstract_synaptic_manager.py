@@ -157,7 +157,7 @@ class SynapticManager(object):
                 allSynBlockSz = synBlockSz * numRows
                 
                 # TODO: Fix this to be more accurate!
-                # May require modification to the master abstract_population.py table
+                # May require modification to the master pynn_population.py table
                 n_atoms = in_edge.prevertex.get_maximum_atoms_per_core()
                 if in_edge.prevertex.custom_max_atoms_per_core != None:
                     n_atoms = in_edge.prevertex.custom_max_atoms_per_core
@@ -301,13 +301,13 @@ class SynapticManager(object):
                                                     MASTER_POP_TABLE,
                                                     SYNAPTIC_MATRIX):
         """
-        Simultaneously generates both the master abstract_population.py table and the
+        Simultaneously generates both the master pynn_population.py table and the
         synatic matrix.
 
         Master Population Table (MPT):
         Table of 1152 entries (one per numbered core on a 48-node board
         arranged in an 8 x 8 grid) giving offset pointer to synapse rows
-        for that source abstract_population.py.
+        for that source pynn_population.py.
 
         Synaptic Matrix:
         One block for each projection in the network (sub_edge in the graph).
@@ -403,13 +403,13 @@ class SynapticManager(object):
         # its routing key for p (also due to unknown reasons). As the c code
         # compenstates for it, we also need to
         p = packet_conversions.get_p_from_key(key)
-        # Calculate the index into the master abstract_population.py table for
+        # Calculate the index into the master pynn_population.py table for
         # a projection from the given core:
         tableSlotAddr = \
             packet_conversions.get_mpt_sb_mem_addrs_from_coords(x, y, p)
         # What is the write address in the table for this index?
 
-        spec.comment("\nUpdate entry in master abstract_population.py table for incoming"
+        spec.comment("\nUpdate entry in master pynn_population.py table for incoming"
                 + " connection from {}, {}, {}:\n".format(x, y, p))
 
         # Process start address (align to 1K boundary then shift right by 10 and

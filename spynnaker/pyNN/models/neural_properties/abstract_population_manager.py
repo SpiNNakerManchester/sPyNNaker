@@ -1,34 +1,33 @@
+from abc import ABCMeta
+from abc import abstractmethod
+import os
+import math
+import tempfile
+import logging
+
+from six import add_metaclass
+import numpy
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from data_specification.file_data_writer import FileDataWriter
-
-
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.abstract_synaptic_manager import \
     SynapticManager
-from spynnaker.pyNN.models.neural_properties.abstract_partitionable_vertex import \
-    PartitionableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_partitionable_population_vertex import \
+    AbstractPartitionablePopulationVertex
 
-from abc import ABCMeta
-from six import add_metaclass
-from abc import abstractmethod
-
-import os
-import math
-import tempfile
-import logging
-import numpy
 
 logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
-class PopulationManager(SynapticManager, PartitionableVertex):
+class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
 
     def __init__(self, record, binary, n_neurons, label, constraints):
         SynapticManager.__init__(self)
-        PartitionableVertex.__init__(self, n_neurons, label, constraints)
+        AbstractPartitionablePopulationVertex.__init__(self, n_neurons, label, constraints)
         self._record = record
         self._record_v = False
         self._record_gsyn = False
@@ -124,7 +123,7 @@ class PopulationManager(SynapticManager, PartitionableVertex):
             Bit 5: Output neuron potential
             Bit 6: Output spike rate
         """
-        # What recording commands were set for the parent abstract_population.py?
+        # What recording commands were set for the parent pynn_population.py?
         recording_info = 0
         if spike_history_region_sz > 0 and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT

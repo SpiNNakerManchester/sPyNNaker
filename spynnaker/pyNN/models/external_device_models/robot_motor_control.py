@@ -35,14 +35,16 @@ class RobotMotorControl(ComponentVertex, AbstractDataSpecableVertex):
     CORE_APP_IDENTIFIER = constants.ROBOT_MOTER_CONTROL_CORE_APPLICATION_ID
 
     def __init__(self, virtual_chip_coords, connected_chip_coords,
-                 connected_chip_edge, speed=30, sample_time=4096,
+                 connected_chip_edge,
+                 speed=30, sample_time=4096,
                  update_time=512, delay_time=5, delta_threshold=23,
                  continue_if_not_different=True, label="RobotMotorControl"):
         """
         constructor that depends upon the Component vertex
         """
         ComponentVertex.__init__(self, label)
-        AbstractDataSpecableVertex.__init(6, label, constraints=None)
+        AbstractDataSpecableVertex.__init(n_atoms=6, label=label,
+                                          constraints=None)
         self._binary = "robot_motor_control.aplx"
 
         self.virtual_chip_coords = virtual_chip_coords
@@ -69,8 +71,7 @@ class RobotMotorControl(ComponentVertex, AbstractDataSpecableVertex):
         virtual_edges.append(self.out_going_edge)
         return virtual_vertexes, virtual_edges
 
-    def generate_data_spec(self, processor, subvertex, machine_time_step,
-                           run_time):
+    def generate_data_spec(self, processor, subvertex):
         """
         Model-specific construction of the data blocks necessary to build a
         single external retina device.
@@ -79,15 +80,9 @@ class RobotMotorControl(ComponentVertex, AbstractDataSpecableVertex):
         binary_file_name = self.get_binary_file_name(processor)
 
         data_writer = FileDataWriter(binary_file_name)
-
         spec = DataSpecificationGenerator(data_writer)
 
-        simulation_time_in_ticks = constants.INFINITE_SIMULATION
-        if run_time is not None:
-            simulation_time_in_ticks = \
-                int((run_time * 1000.0) / machine_time_step)
-        self.write_setup_info(spec, machine_time_step, simulation_time_in_ticks,
-                              RobotMotorControl.CORE_APP_IDENTIFIER)
+        self._write_basic_setup_info(spec, RobotMotorControl.CORE_APP_IDENTIFER)
 
         spec.comment("\n*** Spec for robot motor control ***\n\n")
 
@@ -155,8 +150,7 @@ class RobotMotorControl(ComponentVertex, AbstractDataSpecableVertex):
     def model_name(self):
         return "Robot Motor Control"
 
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom,
-                                    no_machine_time_steps):
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
         resources = list()
         # noinspection PyTypeChecker
         resources.append(CPUCyclesPerTickResource(0))

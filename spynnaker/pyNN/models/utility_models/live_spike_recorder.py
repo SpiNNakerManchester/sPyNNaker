@@ -36,7 +36,8 @@ class LiveSpikeRecorder(ComponentVertex, AbstractDataSpecableVertex):
         Creates a new AppMonitor Object.
         """
         ComponentVertex.__init__(self, "Monitor")
-        AbstractDataSpecableVertex.__init__(self, 1, "Monitor")
+        AbstractDataSpecableVertex.__init__(self, n_atoms=1,
+                                            label="Monitor")
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
         self.add_constraint(PartitionerMaximumSizeConstraint(1))
 
@@ -44,8 +45,7 @@ class LiveSpikeRecorder(ComponentVertex, AbstractDataSpecableVertex):
     def model_name(self):
         return "AppMonitor"
 
-    def generate_data_spec(self, processor, subvertex, machine_time_step,
-                           run_time):
+    def generate_data_spec(self, processor, subvertex):
         """
         Model-specific construction of the data blocks necessary to build a
         single Application Monitor on one core.
@@ -66,7 +66,7 @@ class LiveSpikeRecorder(ComponentVertex, AbstractDataSpecableVertex):
         #self.writeRandomDistributionDeclarations(spec, dao)
         # Construct the data images needed for the Neuron:
         self.reserve_memory_regions(spec, setup_sz)
-        self.writeSetupInfo(spec, subvertex, machine_time_step, run_time)
+        self.writeSetupInfo(spec, subvertex)
 
         # End-of-Spec:
         spec.end_specification()
@@ -89,7 +89,7 @@ class LiveSpikeRecorder(ComponentVertex, AbstractDataSpecableVertex):
                               label='setup')
         return
 
-    def write_setup_info(self, spec, subvertex, machine_time_step, run_time):
+    def write_setup_info(self, spec, subvertex):
         """
         Write information used to control the simulationand gathering of
         results. Currently, this means the flag word used to signal whether
@@ -107,14 +107,9 @@ class LiveSpikeRecorder(ComponentVertex, AbstractDataSpecableVertex):
             Bit 5: Output neuron potential
             Bit 6: Output spike rate
         """
-        simulation_time_in_ticks = constants.INFINITE_SIMULATION
-        if run_time is not None:
-            simulation_time_in_ticks = \
-                int((run_time * 1000.0) / machine_time_step)
-        self.write_basic_setup_info(spec, machine_time_step,
-                                    simulation_time_in_ticks,
-                                    LiveSpikeRecorder.CORE_APP_IDENTIFIER)
-        # What recording commands we reset for the parent abstract_population.py
+        self._write_basic_setup_info(spec,
+                                     LiveSpikeRecorder.CORE_APP_IDENTIFIER)
+        # What recording commands we reset for the parent pynn_population.py
         recording_info = subvertex.vertex.flags
         recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
@@ -123,8 +118,7 @@ class LiveSpikeRecorder(ComponentVertex, AbstractDataSpecableVertex):
         return
 
     #inhirrted from vertex
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom,
-                                    number_of_machine_time_steps):
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
         resources = list()
         resources.append(CPUCyclesPerTickResource(0))
         resources.append(DTCMResource(0))

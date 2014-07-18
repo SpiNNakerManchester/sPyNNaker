@@ -1,3 +1,6 @@
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
+    AbstractDataSpecableVertex
+
 __author__ = 'stokesa6'
 #pacman imports
 from pacman.model.graph.graph import Graph
@@ -17,8 +20,8 @@ from spynnaker.pyNN.models.utility_models.live_spike_recorder\
     import LiveSpikeRecorder
 from spynnaker.pyNN.visualiser_package.visualiser_creation_utility \
     import VisualiserCreationUtility
-from spynnaker.pyNN.models.abstract_models.abstract_population import Population
-from spynnaker.pyNN.models.abstract_models.abstract_projection import Projection
+from spynnaker.pyNN.models.pynn_population import Population
+from spynnaker.pyNN.models.pynn_projection import Projection
 
 #spinnman inports
 from spinnman.transceiver import create_transceiver_from_hostname
@@ -187,7 +190,6 @@ class Spinnaker(object):
                    conf.config.getboolean("Visualiser", "have_board"):
                     self._visualiser_creation_utility.set_visulaiser_port(port)
 
-        self._vertex_count = 0
         self._edge_count = 0
 
     def run(self, run_time):
@@ -196,6 +198,13 @@ class Spinnaker(object):
         if run_time is not None:
             self._no_machine_time_steps =\
                 int((run_time * 1000.0) / self.machine_time_step)
+            ceiled_machine_time_steps = \
+                math.ceil((run_time * 1000.0) / self.machine_time_step)
+            if self._no_machine_time_steps != ceiled_machine_time_steps:
+                raise exceptions.ConfigurationException(
+                    "The runtime and machine time step combination result in "
+                    "a factional number of machine runable time steps and "
+                    "therefore spinnaker cannot determine how many to run for")
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may"
@@ -297,11 +306,9 @@ class Spinnaker(object):
         pass
 
     def create_population(self, size, cellclass, cellparams, structure, label):
-        if label is None:
-            label = "Population {}".format(self._vertex_count)
-            self._vertex_count += 1
-        vertex = Population(size, cellclass, cellparams, structure, label)
-        self.add_vertex(vertex)
+        population = Population(size, cellclass, cellparams, structure, label,
+                                self._machine_time_step, self._runtime)
+        self.add_vertex(population)
 
     def create_projection(self, presynaptic_population, postsynaptic_population,
                           connector, source, target, synapse_dynamics, label,

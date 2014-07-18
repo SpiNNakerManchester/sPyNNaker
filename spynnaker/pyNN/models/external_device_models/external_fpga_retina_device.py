@@ -56,8 +56,8 @@ class ExternalFPGARetinaDevice(AbstractExternalRetinaDevice):
         commands = list()
 
         mgmt_key = \
-            self.virtual_chip_coords['x'] << 24 | \
-            self.virtual_chip_coords['y'] + 1 << 16 | 0xffff
+            self._virtual_chip_coords['x'] << 24 | \
+            self._virtual_chip_coords['y'] + 1 << 16 | 0xffff
 
         mgmt_payload = 1
         command = {'t': 0, "cp": 1, 'key': mgmt_key, 'payload': mgmt_payload,
@@ -65,8 +65,8 @@ class ExternalFPGARetinaDevice(AbstractExternalRetinaDevice):
         commands.append(command)
 
         mgmt_key = \
-            self.virtual_chip_coords['x'] << 24 | \
-            self.virtual_chip_coords['y'] + 1 << 16 | 0xfffe
+            self._virtual_chip_coords['x'] << 24 | \
+            self._virtual_chip_coords['y'] + 1 << 16 | 0xfffe
         mgmt_payload = 0
         command = {'t': last_runtime_tic, "cp": 1, 'key': mgmt_key,
                    'payload': mgmt_payload, 'repeat': 5, 'delay': 100}
@@ -79,21 +79,21 @@ class ExternalFPGARetinaDevice(AbstractExternalRetinaDevice):
         """
         if self.polarity is None:
             key = \
-                self.virtual_chip_coords['x'] << 24 | \
-                self.virtual_chip_coords['y'] << 16
+                self._virtual_chip_coords['x'] << 24 | \
+                self._virtual_chip_coords['y'] << 16
             mask = 0xffff0000
             return key, mask
         elif self.polarity == ExternalFPGARetinaDevice.UP_POLARITY:
             key = \
-                self.virtual_chip_coords['x'] << 24 | \
-                self.virtual_chip_coords['y'] << 16 | \
+                self._virtual_chip_coords['x'] << 24 | \
+                self._virtual_chip_coords['y'] << 16 | \
                 1 << 14
             mask = 0xffffC000
             return key, mask
         elif self.polarity == ExternalFPGARetinaDevice.DOWN_POLARITY:
             key = \
-                self.virtual_chip_coords['x'] << 24 | \
-                self.virtual_chip_coords['y'] << 16
+                self._virtual_chip_coords['x'] << 24 | \
+                self._virtual_chip_coords['y'] << 16
             mask = 0xffffC000
             return key, mask
         else:

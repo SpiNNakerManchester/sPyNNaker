@@ -54,8 +54,8 @@ class ExternalRetinaDevice(AbstractExternalRetinaDevice):
 
         for subvert in ordered_subverts:
             constraint = \
-                PlacerChipAndCoreConstraint(self.virtual_chip_coords['x'],
-                                            self.virtual_chip_coords['y'],
+                PlacerChipAndCoreConstraint(self._virtual_chip_coords['x'],
+                                            self._virtual_chip_coords['y'],
                                             start_point)
             subvert.add_constraint(constraint)
             start_point += 1
@@ -68,12 +68,12 @@ class ExternalRetinaDevice(AbstractExternalRetinaDevice):
 
         #change the retina key it transmits with (based off if its right or left
         if self.position == self.RIGHT_RETINA:
-            mgmt_key = (self.virtual_chip_coords['x'] << 24 |
-                        self.virtual_chip_coords['y'] << 16 |
+            mgmt_key = (self._virtual_chip_coords['x'] << 24 |
+                        self._virtual_chip_coords['y'] << 16 |
                         self.MANAGEMENT_BIT | self.RIGHT_RETINA_KEY_SET)
         else:
-            mgmt_key = (self.virtual_chip_coords['x'] << 24 |
-                        self.virtual_chip_coords['y'] << 16 |
+            mgmt_key = (self._virtual_chip_coords['x'] << 24 |
+                        self._virtual_chip_coords['y'] << 16 |
                         self.MANAGEMENT_BIT | self.LEFT_RETINA_KEY_SET)
 
         #to ensure populations receive the correct packets, this needs to be
@@ -89,12 +89,12 @@ class ExternalRetinaDevice(AbstractExternalRetinaDevice):
 
         #make retina enabled (dependant on if its a left or right retina
         if self.position == self.RIGHT_RETINA:
-            mgmt_key = (self.virtual_chip_coords['x'] << 24 |
-                        self.virtual_chip_coords['y'] << 16 |
+            mgmt_key = (self._virtual_chip_coords['x'] << 24 |
+                        self._virtual_chip_coords['y'] << 16 |
                         self.MANAGEMENT_BIT | self.RIGHT_RETINA_ENABLE)  # enable
         else:
-            mgmt_key = (self.virtual_chip_coords['x'] << 24 |
-                        self.virtual_chip_coords['y'] << 16 |
+            mgmt_key = (self._virtual_chip_coords['x'] << 24 |
+                        self._virtual_chip_coords['y'] << 16 |
                         self.MANAGEMENT_BIT | self.LEFT_RETINA_ENABLE)  # enable
         mgmt_payload = 1
         command = {'t': 0, "cp": 1, 'key': mgmt_key, 'payload': mgmt_payload,
@@ -103,12 +103,12 @@ class ExternalRetinaDevice(AbstractExternalRetinaDevice):
 
         # disable retina
         if self.position == self.RIGHT_RETINA:
-            mgmt_key = (self.virtual_chip_coords['x'] << 24 |
-                        self.virtual_chip_coords['y'] << 16 |
+            mgmt_key = (self._virtual_chip_coords['x'] << 24 |
+                        self._virtual_chip_coords['y'] << 16 |
                         self.MANAGEMENT_BIT | self.RIGHT_RETINA_DISABLE)
         else:
-            mgmt_key = (self.virtual_chip_coords['x'] << 24 |
-                        self.virtual_chip_coords['y'] << 16 |
+            mgmt_key = (self._virtual_chip_coords['x'] << 24 |
+                        self._virtual_chip_coords['y'] << 16 |
                         self.MANAGEMENT_BIT | self.LEFT_RETINA_DISABLE)
         mgmt_payload = 0
         command = {'t': last_runtime_tic, "cp": 1, 'key': mgmt_key,

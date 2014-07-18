@@ -36,8 +36,23 @@ class PopulationVertex(ComponentVertex, PopulationManager):
         max_atom_per_core_constraint = \
             PartitionerMaximumSizeConstraint(max_atoms_per_core)
         self.add_constraint(max_atom_per_core_constraint)
-
+        self._delay_vertex = None
         self._n_params = n_params
+
+    def get_partition_dependent_vertices(self):
+        if self._delay_vertex is not None:
+            vals = list()
+            vals.append(self._delay_vertex)
+            return vals
+        return None
+
+    @property
+    def delay_vertex(self):
+        return self._delay_vertex
+
+    @delay_vertex.setter
+    def delay_vertex(self, delay_vertex):
+        self._delay_vertex = delay_vertex
     
     def get_spikes(self, spinnaker, runtime, compatible_output=False):
         if not spinnaker.has_ran:
@@ -62,7 +77,7 @@ class PopulationVertex(ComponentVertex, PopulationManager):
                 "retrieved")
         value = numpy.zeros((0, 3))
         
-        # Find all the sub-vertices that this abstract_population.py exists on
+        # Find all the sub-vertices that this pynn_population.py exists on
         for subvertex in self.subvertices:
             (x, y, p) = subvertex.placement.processor.get_coordinates()
             

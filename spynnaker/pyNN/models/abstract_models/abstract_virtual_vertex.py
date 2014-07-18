@@ -19,9 +19,9 @@ class VirtualVertex(Vertex, ComponentVertex):
         ComponentVertex.__init__(self, label)
         Vertex.__init__(self, n_neurons, label)
         #set up virtual data structures
-        self.virtual_chip_coords = virtual_chip_coords
-        self.connected_chip_coords = connected_node_coords
-        self.connected_chip_edge = connected_node_edge
+        self._virtual_chip_coords = virtual_chip_coords
+        self._connected_chip_coords = connected_node_coords
+        self._connected_chip_edge = connected_node_edge
         placement_constaint = \
             PlacerChipAndCoreConstraint(virtual_chip_coords['x'],
                                         virtual_chip_coords['y'])

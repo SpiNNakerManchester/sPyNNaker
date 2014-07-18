@@ -10,8 +10,8 @@ from spynnaker.pyNN.models.neural_properties.randomDistributions \
 class OneToOneConnector(AbstractConnector):
     """
     Where the pre- and postsynaptic populations have the same size, connect 
-    cell i in the presynaptic abstract_population.py to cell i in the postsynaptic
-    abstract_population.py for all i.
+    cell i in the presynaptic pynn_population.py to cell i in the postsynaptic
+    pynn_population.py for all i.
 
     :param weights:
         may either be a float, a !RandomDistribution object, a list/

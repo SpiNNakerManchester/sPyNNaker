@@ -1,13 +1,21 @@
+from spynnaker.pyNN.models.spike_source.abstract_spike_source import \
+    AbstractSpikeSource
+from spynnaker.pyNN.utilities import packet_conversions
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.neural_properties.randomDistributions import \
+    generateParameter
+from spynnaker.pyNN.utilities.conf import config
+
+
+from data_specification.data_specification_generator import \
+    DataSpecificationGenerator
+from data_specification.file_data_writer import FileDataWriter
+
+
+from math import exp, ceil
 import os
 import numpy
-from pacman103.core.utilities import packet_conversions
-from pacman103.lib import lib_map, data_spec_gen, data_spec_constants
-from pacman103.front.common.component_vertex import ComponentVertex
-from pacman103.front.common.randomDistributions import generateParameter
-from math import exp, ceil
-from pacman103.core import exceptions
-from pacman103.core.spinnman.scp import scamp
-import struct
+from enum import Enum
 
 import logging
 logger = logging.getLogger(__name__)
@@ -19,9 +27,10 @@ logger = logging.getLogger(__name__)
 DsgVersionMaj = 0
 DsgVersionMin = 1
 
-SYSTEM_REGION              = 1
-POISSON_PARAMS_REGION      = 2
-SPIKE_HISTORY_REGION       = 3
+SPIKE_SOURCE_REGIONS = Enum('SYSTEM_REGION',
+                            'POISSON_PARAMS_REGION',
+                            'SPIKE_HISTORY_REGION')
+
 
 SLOW_RATE_PER_TICK_CUTOFF = 0.25
 
@@ -30,32 +39,28 @@ PARAMS_BASE_WORDS = 3
 PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
-RECORD_SPIKE_BIT = 1<<0
+RECORD_SPIKE_BIT = 1 << 0
 
 INFINITE_SIMULATION = 4294967295
 
-class SpikeSourcePoisson(ComponentVertex):
+
+class SpikeSourcePoisson(AbstractSpikeSource):
     """
     This class represents a Poisson Spike source object, which can represent
-    a abstract_population.py of virtual neurons each with its own parameters.
+    a pynn_population.py of virtual neurons each with its own parameters.
     """
-    core_app_identifier = data_spec_constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
+    CORE_APP_IDENTIFIER = constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
 
     def __init__(self, atoms, contraints=None, label="SpikeSourcePoisson",
-            rate = 1, start = 0, duration = 10000, seed=None):
+                 rate=1, start=0, duration=10000, seed=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
-        super( SpikeSourcePoisson, self ).__init__(
-            n_neurons = atoms,
-            constraints = contraints,
-            label = label
-        )
-        
-        self.rate = rate
-        self.start = start
-        self.duration = duration
-        self.seed = seed
+        AbstractSpikeSource.__init__(self, atoms, label, contraints)
+        self._rate = rate
+        self._start = start
+        self._duration = duration
+        self._seed = seed
 
     @property
     def model_name(self):
@@ -64,134 +69,30 @@ class SpikeSourcePoisson(ComponentVertex):
         """
         return "SpikeSourcePoisson"
     
-    def getSpikeBufferSize(self, lo_atom, hi_atom, no_machine_time_steps):
+    def get_spike_buffer_size(self, lo_atom, hi_atom):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
         """
-        if self._record == False:
+        if not self._record:
             return 0
         
-        if no_machine_time_steps is None:
+        if self._no_machine_time_steps is None:
             return 0
         
-        OUT_SPIKE_BYTES = int(ceil((hi_atom - lo_atom + 1) / 32.0)) * 4
-        return self.get_recording_region_size(no_machine_time_steps,
-                OUT_SPIKE_BYTES)
-    
-    def getParamsBytes(self, lo_atom, hi_atom):
+        bytes_per_time_step = int(ceil((hi_atom - lo_atom + 1) / 32.0)) * 4
+        return self.get_recording_region_size(bytes_per_time_step)
+
+    @staticmethod
+    def get_params_bytes(lo_atom, hi_atom):
         """
         Gets the size of the possion parameters in bytes
         """
         return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS 
                 + (((hi_atom - lo_atom) + 1) * PARAMS_WORDS_PER_NEURON)) * 4
 
-    def get_cpu(self, lo_atom, hi_atom):
-        '''
-        buffer method for cpu calculations for a collection of atoms
-        '''
-        # TODO needs to be correct from here
-        no_atoms = hi_atom - lo_atom + 1
-        return 128 * no_atoms
-
-    def get_DTCM(self, lo_atom, hi_atom):
-        '''
-        buffer method for dtcm calculations for a collection of atoms
-        '''
-        # TODO needs to be correct from here
-        no_atoms = hi_atom - lo_atom + 1
-        return (44 + (16 * 4)) * no_atoms
-
-    def get_SDRAM(self, lo_atom, hi_atom, no_machine_time_steps):
-        '''
-        buffer method for sdram calculations for a collection of atoms
-        '''
-        # TODO needs to be correct from here
-        poissonParamsSz      = self.getParamsBytes(lo_atom, hi_atom)
-        spikeHistBuffSz     = self.getSpikeBufferSize(lo_atom, hi_atom, 
-                no_machine_time_steps)
-        return SETUP_SZ + poissonParamsSz + spikeHistBuffSz
-
-    def get_resources_for_atoms(self, lo_atom, hi_atom, no_machine_time_steps,
-                                machine_time_step_us, partition_data_object):
-        '''
-        returns the seperate resource requirements for a range of atoms
-        in a resource object with a assumption object that tracks any
-        assumptions made by the model when estimating resource requirement
-        '''
-        cpu_cycles = self.get_cpu(lo_atom, hi_atom)
-        dtcm_requirement = self.get_DTCM(lo_atom, hi_atom)
-        sdram_requirment = self.get_SDRAM(lo_atom, hi_atom, 
-                no_machine_time_steps)
-        return lib_map.Resources(cpu_cycles, dtcm_requirement, sdram_requirment)
-        
-    def get_maximum_atoms_per_core(self):
-        '''
-        returns the maxiumum number of atoms that a core can support
-        for this model
-        '''
-        return 256
-
-    def generateDataSpec(self, processor, subvertex, dao):
-        """
-        Model-specific construction of the data blocks necessary to build a
-        single SpikeSourcePoisson on one core.
-        """
-        # Get simulation information:
-        machineTimeStep  = dao.machineTimeStep
-        # Create new DataSpec for this processor:
-        spec = data_spec_gen.DataSpec(processor, dao)
-        spec.initialise(self.core_app_identifier, dao)  # User-specified identifier
-
-        spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
-
-        # Load the expected executable to the list of load targets for this core
-        # and the load addresses:
-        x, y, p = processor.get_coordinates()
-        executableTarget = \
-            lib_map.ExecutableTarget(dao.get_common_binaries_directory() +
-                                     os.sep + 'spike_source_poisson.aplx',x,
-                                     y, p)
-        
-        # Get parameters about the group of neurons living on this core:
-        # How many are there?:
-        no_machine_time_steps = int((dao.run_time * 1000.0) / dao.machineTimeStep)
-        x,y,p               = processor.get_coordinates()
-        poissonParamsSz      = self.getParamsBytes(subvertex.lo_atom, 
-                subvertex.hi_atom)
-        spikeHistBuffSz     = self.getSpikeBufferSize(subvertex.lo_atom, 
-                subvertex.hi_atom, no_machine_time_steps)
-        
-        # Reserve SDRAM space for memory areas:
-        self.reserveMemoryRegions(spec, SETUP_SZ, poissonParamsSz,
-                                                 spikeHistBuffSz)
-
-        # Write region 1 (system information on buffer size, etc);
-        self.writeSetupInfo(spec, subvertex, spikeHistBuffSz)
-
-        self.writePoissonParameters(spec, machineTimeStep, processor,
-                                          subvertex.n_atoms)
-
-        # End-of-Spec:
-        spec.endSpec()
-        spec.closeSpecFile() 
-
-        # No memory writes or loads required for this Data Spec:
-        memoryWriteTargets = list()
-
-        simulationTimeInTicks = INFINITE_SIMULATION
-        if dao.run_time is not None:
-            simulationTimeInTicks = int((dao.run_time * 1000.0) 
-                    /  dao.machineTimeStep)
-        user1Addr = 0xe5007000 + 128 * p + 116 # User1 location reserved for core p
-        memoryWriteTargets.append(lib_map.MemWriteTarget(x, y, p, user1Addr,
-                                                         simulationTimeInTicks))
-        loadTargets = list()
-
-        # Return list of executables, load files:
-        return  executableTarget, loadTargets, memoryWriteTargets
-
-    def reserveMemoryRegions(self, spec, setupSz, poissonParamsSz, \
-                                                  spikeHistBuffSz):
+    @staticmethod
+    def reserve_memory_regions(spec, setup_sz, poisson_params_sz,
+                               spike_hist_buff_sz):
         """
         Reserve memory regions for poisson source parameters
         and output buffer.
@@ -199,18 +100,19 @@ class SpikeSourcePoisson(ComponentVertex):
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        spec.reserveMemRegion(region = SYSTEM_REGION,              \
-                                size = setupSz,                    \
-                               label = 'setup')
-        spec.reserveMemRegion(region = POISSON_PARAMS_REGION,       \
-                                size = poissonParamsSz,             \
-                               label = 'PoissonParams')
-        if spikeHistBuffSz > 0:
-            spec.reserveMemRegion(region = SPIKE_HISTORY_REGION,    \
-                size = spikeHistBuffSz,  label = 'spikeHistBuffer',     \
-                leaveUnfilled = True)
+        spec.reserve_memory_region(region=SpikeSourcePoisson.SYSTEM_REGION,
+                                   size=setup_sz,
+                                   label='setup')
+        spec.reserve_memory_region(
+            region=SpikeSourcePoisson.POISSON_PARAMS_REGION,
+            size=poisson_params_sz, label='PoissonParams')
+        if spike_hist_buff_sz > 0:
+            spec.reserve_memory_regionm(
+                region=SpikeSourcePoisson.SPIKE_HISTORY_REGION,
+                size=spike_hist_buff_sz, label='spikeHistBuffer',
+                leaveUnfilled=True)
 
-    def writeSetupInfo(self, spec, subvertex, spikeHistoryRegionSz):
+    def write_setup_info(self, spec, spike_history_region_sz):
         """
         Write information used to control the simulationand gathering of results.
         Currently, this means the flag word used to signal whether information on
@@ -222,70 +124,71 @@ class SpikeSourcePoisson(ComponentVertex):
             Bit 0: Record spike history
         """
 
-        # What recording commands wereset for the parent abstract_population.py?
-        recordingInfo = 0
-        if (spikeHistoryRegionSz > 0) and (self._record):
-            recordingInfo |= RECORD_SPIKE_BIT
-        recordingInfo = recordingInfo | 0xBEEF0000
+        # What recording commands wereset for the parent pynn_population.py?
+        recording_info = 0
+        if (spike_history_region_sz > 0) and self._record:
+            recording_info |= RECORD_SPIKE_BIT
+        recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
-        spec.switchWriteFocus(region = SYSTEM_REGION)
-        spec.write(data = recordingInfo)
-        spec.write(data = spikeHistoryRegionSz)
-        spec.write(data = 0)
-        spec.write(data = 0)
+        spec.switchWriteFocus(region=SpikeSourcePoisson.SYSTEM_REGION)
+        spec.write_value(data=recording_info)
+        spec.write_value(data=spike_history_region_sz)
+        spec.write_value(data=0)
+        spec.write_value(data=0)
 
-    def writePoissonParameters(self, spec, machineTimeStep, processor, 
-            numNeurons):
+    def write_poisson_parameters(self, spec, processor, num_neurons):
         """
         Generate Neuron Parameter data for Poisson spike sources (region 2):
         """
-        spec.comment("\nWriting Neuron Parameters for %d poisson sources:\n"
-                % numNeurons)
+        spec.comment("\nWriting Neuron Parameters for {%d} poisson sources:\n"
+                     .format(num_neurons))
 
         # Set the focus to the memory region 2 (neuron parameters):
-        spec.switchWriteFocus(region = POISSON_PARAMS_REGION)
+        spec.\
+            switch_write_focus(region=SpikeSourcePoisson.SPOISSON_PARAMS_REGION)
 
         # Write header info to the memory region:
         
         # Write Key info for this core:
-        chipX, chipY, chipP = processor.get_coordinates()
-        populationIdentity = \
-            packet_conversions.get_key_from_coords(chipX, chipY, chipP)
-        spec.write(data = populationIdentity)
+        chip_x, chip_y, chip_p = processor.get_coordinates()
+        population_identity = \
+            packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
+        spec.write_value(data=population_identity)
         
         # Write the random seed (4 words), generated randomly!
-        if self.seed == None:
-            spec.write(data = numpy.random.randint(0x7FFFFFFF))
-            spec.write(data = numpy.random.randint(0x7FFFFFFF))
-            spec.write(data = numpy.random.randint(0x7FFFFFFF))
-            spec.write(data = numpy.random.randint(0x7FFFFFFF))
+        if self._seed is None:
+            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
+            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
+            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
+            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
         else:
-            spec.write(data = self.seed[0])
-            spec.write(data = self.seed[1])
-            spec.write(data = self.seed[2])
-            spec.write(data = self.seed[3])
+            spec.write_value(data=self._seed[0])
+            spec.write_value(data=self._seed[1])
+            spec.write_value(data=self._seed[2])
+            spec.write_value(data=self._seed[3])
         
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
         slow_sources = list()
         fast_sources = list()
-        for i in range(0, numNeurons):
+        for i in range(0, num_neurons):
             
             # Get the parameter values for source i:
-            rateVal     = generateParameter(self.rate, i)
-            startVal    = generateParameter(self.start, i)
-            endVal      = generateParameter(self.duration, i) + startVal
+            rate_val = generateParameter(self._rate, i)
+            start_val = generateParameter(self._start, i)
+            end_val = generateParameter(self._duration, i) + start_val
             
             # Decide if it is a fast or slow source and 
-            spikesPerTick = (float(rateVal) * (machineTimeStep / 1000000.0))
-            if spikesPerTick <= SLOW_RATE_PER_TICK_CUTOFF:
-                slow_sources.append([i, rateVal, startVal, endVal])
+            spikes_per_tick = \
+                (float(rate_val) * (self._machine_time_step / 1000000.0))
+            if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
+                slow_sources.append([i, rate_val, start_val, end_val])
             else:
-                fast_sources.append([i, spikesPerTick, startVal, endVal])
+                fast_sources.append([i, spikes_per_tick, start_val, end_val])
                 
         # Write the numbers of each type of source
-        spec.write(data = len(slow_sources))
-        spec.write(data = len(fast_sources))
+        spec.write_value(data=len(slow_sources))
+        spec.write_value(data=len(fast_sources))
 
         # Now write one struct for each slow source as follows 
         #
@@ -298,16 +201,17 @@ class SpikeSourcePoisson(ComponentVertex):
         #     accum mean_isi_ticks;
         #     accum time_to_spike_ticks;
         #   } slow_spike_source_t;
-        for (neuronId, rateVal, startVal, endVal) in slow_sources:
-            isiValScaled = int(float(1000000.0 / (rateVal * machineTimeStep)) 
-                    * 32768.0)
-            startScaled   = int(startVal  * 1000.0 / machineTimeStep)
-            endScaled     = int(endVal    * 1000.0 / machineTimeStep)
-            spec.write(data = neuronId,       sizeof='uint32')
-            spec.write(data = startScaled,    sizeof='uint32')
-            spec.write(data = endScaled,      sizeof='uint32')
-            spec.write(data = isiValScaled,   sizeof='s1615')
-            spec.write(data = 0x0,            sizeof='uint32')
+        for (neuron_id, rate_val, start_val, end_val) in slow_sources:
+            isi_val_scaled = int(float(1000000.0 / 
+                                       (rate_val * self._machine_time_step)) 
+                                 * 32768.0)
+            start_scaled = int(start_val * 1000.0 / self._machine_time_step)
+            end_scaled = int(end_val * 1000.0 / self._machine_time_step)
+            spec.write_value(data=neuron_id, sizeof='uint32')
+            spec.write_value(data=start_scaled, sizeof='uint32')
+            spec.write_value(data=end_scaled, sizeof='uint32')
+            spec.write_value(data=isi_val_scaled, sizeof='s1615')
+            spec.write_value(data=0x0, sizeof='uint32')
         
         # Now write 
         #   typedef struct fast_spike_source_t
@@ -318,24 +222,88 @@ class SpikeSourcePoisson(ComponentVertex):
         #     
         #     unsigned long fract exp_minus_lambda;
         #   } fast_spike_source_t;
-        for (neuronId, spikesPerTick, startVal, endVal) in fast_sources:
-            exp_minus_lamda = exp(-1.0 * spikesPerTick)
+        for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
+            exp_minus_lamda = exp(-1.0 * spikes_per_tick)
             exp_minus_lamda_scaled = int(exp_minus_lamda * float(0xFFFFFFFF))
-            startScaled   = int(startVal  * 1000.0 / machineTimeStep)
-            endScaled     = int(endVal    * 1000.0 / machineTimeStep)
-            spec.write(data = neuronId,       sizeof='uint32')
-            spec.write(data = startScaled,    sizeof='uint32')
-            spec.write(data = endScaled,      sizeof='uint32')
-            spec.write(data = exp_minus_lamda_scaled,   sizeof='u032')
+            start_scaled = int(start_val * 1000.0 / self._machine_time_step)
+            end_scaled = int(end_val * 1000.0 / self._machine_time_step)
+            spec.write_value(data=neuron_id, sizeof='uint32')
+            spec.write_value(data=start_scaled, sizeof='uint32')
+            spec.write_value(data=end_scaled, sizeof='uint32')
+            spec.write_value(data=exp_minus_lamda_scaled, sizeof='u032')
         return
     
-    def getSpikes(self, controller, runtime, compatible_output=False):
+    def get_spikes(self, controller, compatible_output=False):
         # Spike sources store spike vectors optimally so calculate min words to represent
-        subVertexOutSpikeBytesFunction = lambda subvertex : int(ceil(subvertex.n_atoms / 32.0)) * 4
+        sub_vertex_out_spike_bytes_function = \
+            lambda subvertex: int(ceil(subvertex.n_atoms / 32.0)) * 4
         
         # Use standard behaviour to read spikes
-        return self._getSpikes(controller, compatible_output,
-                               SPIKE_HISTORY_REGION, subVertexOutSpikeBytesFunction, runtime)
+        return self._get_spikes(controller, compatible_output,
+                                SpikeSourcePoisson.SPIKE_HISTORY_REGION,
+                                sub_vertex_out_spike_bytes_function)
 
+    #inhirrtted from partionable vertex
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
+        """
+        method for calculating sdram usage
+        """
+        poisson_params_sz = self.get_params_bytes(lo_atom, hi_atom)
+        spike_hist_buff_sz = self.get_spike_buffer_size(lo_atom, hi_atom)
+        return SETUP_SZ + poisson_params_sz + spike_hist_buff_sz
 
+    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
+        """
+        method for caulculating dtcm usage for a coltection of atoms
+        """
+        no_atoms = hi_atom - lo_atom + 1
+        return (44 + (16 * 4)) * no_atoms
 
+    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+        """
+        Gets the CPU requirements for a range of atoms
+        """
+        no_atoms = hi_atom - lo_atom + 1
+        return 128 * no_atoms
+
+    #inhirrted from dataspecable vertex
+
+    def generate_data_spec(self, processor, subvertex):
+        """
+        Model-specific construction of the data blocks necessary to build a
+        single SpikeSourcePoisson on one core.
+        """
+        binary_file_name = self.get_binary_file_name(processor)
+
+        # Create new DataSpec for this processor:
+        data_writer = FileDataWriter(binary_file_name)
+        spec = DataSpecificationGenerator(data_writer)
+
+        spike_hist_buff_sz = self.get_spike_buffer_size(subvertex.lo_atom,
+                                                        subvertex.hi_atom)
+        self.write_setup_info(spec, spike_hist_buff_sz)
+
+        spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
+
+        # Rebuild executable name
+        common_binary_path = os.path.join(config.get("SpecGeneration",
+                                                     "common_binary_folder"))
+
+        binary_name = os.path.join(common_binary_path,
+                                   'spike_source_poisson.aplx')
+
+        poisson_params_sz = self.get_params_bytes(subvertex.lo_atom,
+                                                  subvertex.hi_atom)
+
+        # Reserve SDRAM space for memory areas:
+        self.reserve_memory_regions(spec, SETUP_SZ, poisson_params_sz,
+                                    spike_hist_buff_sz)
+
+        self.write_poisson_parameters(spec, processor, subvertex.n_atoms)
+
+        # End-of-Spec:
+        spec.end_specification()
+        data_writer.close()
+
+        # Return list of executables, load files:
+        return  binary_name, list(), list()

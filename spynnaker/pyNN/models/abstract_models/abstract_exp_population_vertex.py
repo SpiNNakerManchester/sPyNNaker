@@ -18,16 +18,16 @@ def get_n_synapse_type_bits():
 @add_metaclass(ABCMeta)
 class ExponentialPopulationVertex(object):
     """
-    This represents a abstract_population.py with two exponentially decaying synapses,
+    This represents a pynn_population.py with two exponentially decaying synapses,
     one for excitatory connections and one for inhibitory connections
     """
     
     def __init__(self, n_neurons, tau_syn_e=5.0, tau_syn_i=5.0):
 
-        self.tau_syn_e = utility_calls.convert_param_to_numpy(tau_syn_e,
-                                                              n_neurons)
-        self.tau_syn_i = utility_calls.convert_param_to_numpy(tau_syn_i,
-                                                              n_neurons)
+        self._tau_syn_e = utility_calls.convert_param_to_numpy(tau_syn_e,
+                                                               n_neurons)
+        self._tau_syn_i = utility_calls.convert_param_to_numpy(tau_syn_i,
+                                                               n_neurons)
 
     @staticmethod
     def get_synapse_parameter_size(lo_atom, hi_atom):
@@ -53,14 +53,14 @@ class ExponentialPopulationVertex(object):
                      "{} Neurons:\n".format(subvertex.n_atoms))
         
         decay_ex = numpy.exp(float(-machine_time_step) /
-                             (1000.0 * self.tau_syn_e))
+                             (1000.0 * self._tau_syn_e))
         
-        init_ex = self.tau_syn_e * (1.0 - decay_ex)
+        init_ex = self._tau_syn_e * (1.0 - decay_ex)
 
         decay_in = numpy.exp(float(-machine_time_step) /
-                             (1000.0 * self.tau_syn_i))
+                             (1000.0 * self._tau_syn_i))
         
-        init_in = self.tau_syn_i * (1.0 - decay_in)
+        init_in = self._tau_syn_i * (1.0 - decay_in)
 
         # noinspection PyNoneFunctionAssignment
         rescaled_decay_ex = \

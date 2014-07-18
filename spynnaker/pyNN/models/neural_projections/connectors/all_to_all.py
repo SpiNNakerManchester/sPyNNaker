@@ -10,8 +10,8 @@ import numpy
 
 class AllToAllConnector(AbstractConnector):
     """
-    Connects all cells in the presynaptic abstract_population.py to all cells in the
-    postsynaptic abstract_population.py.
+    Connects all cells in the presynaptic pynn_population.py to all cells in the
+    postsynaptic pynn_population.py.
 
     :param `bool` allow_self_connections: 
         if the connector is used to connect a

@@ -38,8 +38,8 @@ class AbstractExternalRetinaDevice(ExternalDevice):
 
         for subvert in ordered_subverts:
             constraint = \
-                PlacerChipAndCoreConstraint(self.virtual_chip_coords['x'],
-                                            self.virtual_chip_coords['y'],
+                PlacerChipAndCoreConstraint(self._virtual_chip_coords['x'],
+                                            self._virtual_chip_coords['y'],
                                             start_point)
             subvert.add_constraint(constraint)
             start_point += 1

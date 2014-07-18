@@ -27,27 +27,9 @@ class ComponentVertex(object):
     
     def __init__(self, label):
         self._record = False
-        self.focus_level = None
+        self._focus_level = None
         self._app_mask = constants.DEFAULT_MASK
-        
-        # Store a delay vertex here if required
-        self._delay_vertex = None
         self._label = label
-        
-    @property
-    def delay_vertex(self):
-        return self._delay_vertex
-    
-    @delay_vertex.setter
-    def delay_vertex(self, delay_vertex):
-        self._delay_vertex = delay_vertex
-        
-    def get_partition_dependent_vertices(self):
-        if self._delay_vertex is not None:
-            vals = list()
-            vals.append(self._delay_vertex)
-            return vals
-        return None
     
     def record(self, focus=None):
         """
@@ -56,30 +38,23 @@ class ComponentVertex(object):
         """
         self._record = True
         # set the focus level and stuff for the vis
-        self.focus_level = focus  # None, False, True
+        self._focus_level = focus  # None, False, True
 
-    @staticmethod
-    def get_recording_region_size(no_machine_time_steps, bytes_per_timestep):
+    def get_recording_region_size(self, bytes_per_timestep):
         """
         Gets the size of a recording region in bytes
         """
-        if no_machine_time_steps is None:
+        if self._no_machine_time_steps is None:
             raise Exception("This model cannot record this parameter"
                             + " without a fixed run time")
-        return RECORDING_ENTRY_BYTE_SIZE + (no_machine_time_steps *
+        return RECORDING_ENTRY_BYTE_SIZE + (self._no_machine_time_steps *
                                             bytes_per_timestep)
 
     def get_commands(self, no_tics):
-        """
-        method for any mc packets that need to be sent by the multicast_source
-        """
-        raise NotImplementedError
+        return list()  # most compoennts do not require a mcs
 
     def requires_multi_cast_source(self):
-        """
-        requires a multi_cast source
-        """
-        raise NotImplementedError
+        return False  # most compoennts do not require a mcs
 
     def generate_routing_info(self, subedge):
         """
@@ -98,7 +73,7 @@ class ComponentVertex(object):
         """
         method that allows models to add dependant vertexes and edges
         """
-        raise NotImplementedError
+        return list()  # most components do not require dependants
 
     @property
     def is_set_to_record_spikes(self):
@@ -108,8 +83,7 @@ class ComponentVertex(object):
         return self._record
 
     def _get_spikes(self, spinnaker, compatible_output, spike_recording_region,
-                    sub_vertex_out_spike_bytes_function, runtime, sub_graph,
-                    placements):
+                    sub_vertex_out_spike_bytes_function):
         """
         Return a 2-column numpy array containing cell ids and spike times for 
         recorded cells.   This is read directly from the memory for the board.
@@ -118,8 +92,10 @@ class ComponentVertex(object):
         logger.info("Getting spikes for {%s}".format(self._label))
         
         spikes = numpy.zeros((0, 2))
+        sub_graph = spinnaker.sub_graph
+        placements = spinnaker.placements
         
-        # Find all the sub-vertices that this abstract_population.py exists on
+        # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = sub_graph.get_subvertices_from_vertex(self)
         for subvertex in subvertices:
             placement = placements.get_subvertex_placement(subvertex)
@@ -151,11 +127,8 @@ class ComponentVertex(object):
             #check that the number of spikes written is smaller or the same as
             #  the size of the memory region we allocated for spikes
             out_spike_bytes = sub_vertex_out_spike_bytes_function(subvertex)
-            machine_time_step = conf.config.getint("Machine", "machineTimeStep")
-            no_machine_time_steps = int((runtime * 1000.0) / machine_time_step)
             size_of_region = \
-                self.get_recording_region_size(out_spike_bytes,
-                                               no_machine_time_steps)
+                self.get_recording_region_size(out_spike_bytes)
 
             if number_of_bytes_written > size_of_region:
                 raise exceptions.MemReadException("the amount of memory written"
