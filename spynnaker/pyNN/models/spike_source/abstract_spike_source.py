@@ -1,25 +1,29 @@
-from enum import Enum
-
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
-    ComponentVertex
+    AbstractComponentVertex
 from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex import AbstractPartitionableVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 
+from enum import Enum
 
-class AbstractSpikeSource(ComponentVertex, AbstractPartitionableVertex):
+
+class AbstractSpikeSource(AbstractComponentVertex, AbstractPartitionableVertex):
 
     RECORD_SPIKE_BIT = 1 << 0
 
-    REGIONS = Enum('SYSTEM_REGION', 'BLOCK_INDEX_REGION',
-                   'SPIKE_DATA_REGION', 'SPIKE_HISTORY_REGION')
+    _SPIKE_SOURCE_REGIONS = Enum(
+        'SYSTEM_REGION',
+        'BLOCK_INDEX_REGION',
+        'SPIKE_DATA_REGION',
+        'SPIKE_HISTORY_REGION'
+    )
 
     def __init__(self, label, n_neurons, constraints):
         AbstractPartitionableVertex.__init__(self, n_atoms=n_neurons,
                                              label=label,
                                              constraints=constraints)
-        ComponentVertex.__init__(self, label)
+        AbstractComponentVertex.__init__(self, label)
         max_constraint = PartitionerMaximumSizeConstraint(256)
         self.add_constraint(max_constraint)
 
@@ -40,10 +44,10 @@ class AbstractSpikeSource(ComponentVertex, AbstractPartitionableVertex):
         # pynn_population.py?
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
-            recording_info |= AbstractSpikeSource.RECORD_SPIKE_BIT
+            recording_info |= self._SPIKE_SOURCE_REGIONS.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
-        spec.switchWriteFocus(region=AbstractSpikeSource.SYSTEM_REGION)
+        spec.switchWriteFocus(region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION)
         spec.write(data=recording_info)
         spec.write(data=spike_history_region_sz)
         spec.write(data=0)

@@ -1,5 +1,5 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
-    import PopulationVertex
+    import AbstractPopulationVertex
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.delay_extension\
     import DelayExtension
@@ -42,7 +42,7 @@ class Projection(object):
         self._spinnaker = spinnaker_control
         self._projection_edge = None
         self._delay_edge = None
-        if issubclass(type(postsynaptic_population.vertex), PopulationVertex):
+        if issubclass(type(postsynaptic_population.vertex), AbstractPopulationVertex):
             # Check that the "target" is an acceptable value
             targets = postsynaptic_population.vertex.get_synapse_targets()
             if not target in targets:

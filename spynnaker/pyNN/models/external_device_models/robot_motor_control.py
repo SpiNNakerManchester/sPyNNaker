@@ -1,5 +1,5 @@
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex \
-    import ComponentVertex
+    import AbstractComponentVertex
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
     AbstractDataSpecableVertex
 from spynnaker.pyNN.models.external_device_models.external_motor_device import \
@@ -26,7 +26,7 @@ import os
 INFINITE_SIMULATION = 4294967295
 
 
-class RobotMotorControl(ComponentVertex, AbstractDataSpecableVertex):
+class RobotMotorControl(AbstractComponentVertex, AbstractDataSpecableVertex):
 
     PARAMS = 2
     SYSTEM_SIZE = 16
@@ -42,7 +42,7 @@ class RobotMotorControl(ComponentVertex, AbstractDataSpecableVertex):
         """
         constructor that depends upon the Component vertex
         """
-        ComponentVertex.__init__(self, label)
+        AbstractComponentVertex.__init__(self, label)
         AbstractDataSpecableVertex.__init(n_atoms=6, label=label,
                                           constraints=None)
         self._binary = "robot_motor_control.aplx"

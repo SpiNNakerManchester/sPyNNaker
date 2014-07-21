@@ -1,4 +1,4 @@
-from spynnaker.pyNN.utilities.constants import REGIONS
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.utilities import utility_calls
 import numpy
 from abc import ABCMeta
@@ -16,7 +16,7 @@ def get_n_synapse_type_bits():
 
 
 @add_metaclass(ABCMeta)
-class ExponentialPopulationVertex(object):
+class AbstractExponentialPopulationVertex(object):
     """
     This represents a pynn_population.py with two exponentially decaying synapses,
     one for excitatory connections and one for inhibitory connections
@@ -48,7 +48,7 @@ class ExponentialPopulationVertex(object):
         """
         
         # Set the focus to the memory region 3 (synapse parameters):
-        spec.switchWriteFocus(region=REGIONS.SYNAPSE_PARAMS)
+        spec.switchWriteFocus(region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS)
         spec.comment("\nWriting Synapse Parameters for "
                      "{} Neurons:\n".format(subvertex.n_atoms))
         

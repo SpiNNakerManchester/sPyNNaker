@@ -4,7 +4,7 @@ from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import generateParameterArray
+    import generate_parameter_array
 import numpy
 
 
@@ -49,9 +49,9 @@ class FixedProbabilityConnector(AbstractConnector):
             n_present = numpy.sum(present)
             
             ids = numpy.where(present)[0]
-            delays = (generateParameterArray(self._delays, n_present, present)
+            delays = (generate_parameter_array(self._delays, n_present, present)
                       * delay_scale)
-            weights = generateParameterArray(self._weights, n_present, present)
+            weights = generate_parameter_array(self._weights, n_present, present)
             synapse_types = (numpy.ones(len(ids), dtype='uint32') 
                              * synapse_type)
             

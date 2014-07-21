@@ -1,14 +1,10 @@
-'''
-Created on 9 Apr 2014
-
-@author: zzalsar4
-'''
 import numpy as np
+
 
 class SynapseRowInfo(object):
     
-    def __init__(self, target_indices, weights, delays_in_ticks, 
-            synapse_types):
+    def __init__(self, target_indices, weights, delays_in_ticks,
+                 synapse_types):
         """
         Creates a row of synapses
         """
@@ -17,20 +13,20 @@ class SynapseRowInfo(object):
         self.delays = np.asarray(delays_in_ticks, dtype='uint32')
         self.synapse_types = np.asarray(synapse_types, dtype='uint32')
         
-        try:
+        if hasattr(self.delays, '__iter__'):
             iter(self.delays)
-        except:
+        else:
             self.delays = np.array([self.delays])
         
-        try:
+        if hasattr(self.weights, '__iter__'):
             iter(self.weights)
-        except:
+        else:
             self.weights = np.array([self.weights])
             
     def __str__(self):
-        return "[Indices: {}, Weights: {}, Delays: {}, Types: {}]".format(
-                self.target_indices, self.weights, 
-                self.delays, self.synapse_types)
+        return "[Indices: {}, Weights: {}, Delays: {}, Types: {}]"\
+            .format(self.target_indices, self.weights, self.delays,
+                    self.synapse_types)
     
     def __repr__(self):
         return self.__str__()
@@ -54,18 +50,18 @@ class SynapseRowInfo(object):
             np.append(self.delays, row.delays + min_delay)
             np.append(self.synapse_types, row.synapse_types)
         
-            sortIndices = np.lexsort((self.target_indices, self.weights, 
-                    self.delays, self.synapse_types))
-            self.target_indices = self.target_indices[sortIndices]
-            self.weights = self.weights[sortIndices]
-            self.delays = self.delays[sortIndices]
-            self.synapse_types = self.synapse_types[sortIndices]
+            sort_indices = np.lexsort((self.target_indices, self.weights,
+                                       self.delays, self.synapse_types))
+            self.target_indices = self.target_indices[sort_indices]
+            self.weights = self.weights[sort_indices]
+            self.delays = self.delays[sort_indices]
+            self.synapse_types = self.synapse_types[sort_indices]
         
     def get_n_connections(self, lo_atom=None, hi_atom=None):
         """
         Returns the number of connections in the row
         """
-        if (lo_atom == None) or (hi_atom == None):
+        if lo_atom is None or hi_atom is None:
             return self.target_indices.size
         
         mask = ((self.target_indices >= lo_atom) 
@@ -95,8 +91,9 @@ class SynapseRowInfo(object):
         """
         mask = ((self.target_indices >= lo_atom)
                 & (self.target_indices <= hi_atom))
-        return type(self)(self.target_indices[mask] - lo_atom, 
-                self.weights[mask], self.delays[mask], self.synapse_types[mask])
+        return type(self)(self.target_indices[mask] - lo_atom,
+                          self.weights[mask], self.delays[mask],
+                          self.synapse_types[mask])
         
     def get_sub_row_by_delay(self, lo_delay, hi_delay):
         """
@@ -104,9 +101,9 @@ class SynapseRowInfo(object):
         between lo_delay and hi_delay (inclusive) are considered
         """
         mask = ((self.delays >= lo_delay) & (self.delays <= hi_delay))
-        return type(self)(self.target_indices[mask], 
-                self.weights[mask], self.delays[mask] - lo_delay,
-                self.synapse_types[mask])
+        return type(self)(self.target_indices[mask], self.weights[mask],
+                          self.delays[mask] - lo_delay,
+                          self.synapse_types[mask])
         
     def get_max_weight(self):
         """

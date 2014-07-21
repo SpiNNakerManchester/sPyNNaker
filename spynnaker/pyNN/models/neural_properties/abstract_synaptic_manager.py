@@ -1,6 +1,11 @@
 __author__ = 'stokesa6'
-import numpy, math, logging, struct
-from pacman103.front.common.projection_edge import ProjectionEdge
+import numpy
+import math
+import logging
+import struct
+
+from spynnaker.pyNN.models.neural_projections.projection_edge \
+    import ProjectionEdge
 from pacman103.front.common.projection_subedge import ProjectionSubedge
 from pacman103.front.common.synaptic_list import SynapticList
 from pacman103.front.common.fixed_synapse_row_io import FixedSynapseRowIO
@@ -13,6 +18,7 @@ from pacman103.core.utilities.memory_utils import getAppDataBaseAddressOffset,\
                                                   getRegionBaseAddressOffset
 
 logger = logging.getLogger(__name__)
+
 
 class SynapticManager(object):
 
@@ -159,7 +165,7 @@ class SynapticManager(object):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master pynn_population.py table
                 n_atoms = in_edge.prevertex.get_maximum_atoms_per_core()
-                if in_edge.prevertex.custom_max_atoms_per_core != None:
+                if in_edge.prevertex.custom_max_atoms_per_core is not None:
                     n_atoms = in_edge.prevertex.custom_max_atoms_per_core
                 if in_edge.prevertex.atoms < n_atoms:
                     n_atoms = in_edge.prevertex.atoms
@@ -183,7 +189,7 @@ class SynapticManager(object):
                     and in_edge.synapse_dynamics is not None):
                 if in_edge.synapse_dynamics.fast is not None:
                     raise exceptions.PacmanException(
-                            "Fast synapse dynamics are not supported")
+                        "Fast synapse dynamics are not supported")
                 elif in_edge.synapse_dynamics.slow is not None:
                     if self._stdp_mechanism is None:
                         self._stdp_mechanism = in_edge.synapse_dynamics.slow
@@ -191,9 +197,8 @@ class SynapticManager(object):
                         if not (self._stdp_mechanism
                                 == in_edge.synapse_dynamics.slow):
                             raise exceptions.PacmanException(
-                                    "Different STDP mechanisms on the same"
-                                    + " vertex are not supported")
-
+                                "Different STDP mechanisms on the same"
+                                + " vertex are not supported")
 
     def get_n_synapse_type_bits(self):
         """
@@ -202,9 +207,8 @@ class SynapticManager(object):
         """
         raise NotImplementedError()
 
-    def write_synapse_parameters(self, spec, machineTimeStep, subvertex):
+    def write_synapse_parameters(self, spec, subvertex):
         raise NotImplementedError
-
 
     def selectMinimumRowLength(self, longestActualRow):
         """
@@ -281,7 +285,7 @@ class SynapticManager(object):
         for entry in SynapticManager.ROW_LEN_TABLE_ENTRIES:
             spec.write(data = entry)
 
-    def write_stdp_parameters(self, spec, machineTimeStep, subvertex,
+    def write_stdp_parameters(self, spec, subvertex,
                             weight_scale, STDP_PARAMS):
         if self._stdp_mechanism is not None:
             self._stdp_mechanism.write_plastic_params(spec, STDP_PARAMS,

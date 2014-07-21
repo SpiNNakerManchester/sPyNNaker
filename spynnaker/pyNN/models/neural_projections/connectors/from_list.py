@@ -6,7 +6,7 @@ from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import generateParameter
+    import generate_parameter
 import logging
 
 logger = logging.getLogger(__name__)
@@ -59,10 +59,10 @@ class FromListConnector(AbstractConnector):
         
         for i in range(0, len(self._conn_list)):
             conn = self._conn_list[i]
-            pre_atom = generateParameter(conn[0], i)
-            post_atom = generateParameter(conn[1], i)
-            weight = generateParameter(conn[2], i)
-            delay = generateParameter(conn[3], i) * delay_scale
+            pre_atom = generate_parameter(conn[0], i)
+            post_atom = generate_parameter(conn[1], i)
+            weight = generate_parameter(conn[2], i)
+            delay = generate_parameter(conn[3], i) * delay_scale
             id_lists[pre_atom].append(post_atom)
             weight_lists[pre_atom].append(weight)
             delay_lists[pre_atom].append(delay)

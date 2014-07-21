@@ -1,86 +1,65 @@
-import math
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
+    AbstractPopulationVertex
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models.abstract_duel_exponential_vertex \
+    import AbstractDualExponentialVertex
+from spynnaker.pyNN.models.neural_properties.integrate_and_fire_properties \
+    import IntegrateAndFireProperties
+from spynnaker.pyNN.models.neural_properties.neural_parameter \
+    import NeuronParameter
 
-from pacman103.lib import data_spec_constants
-from pacman103.front.common.dual_exp_population_vertex import DualExponentialPopulationVertex
-from pacman103.front.common.if_properties import IF_Properties
-from pacman103.front.common.neuron_parameter import NeuronParameter
+class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
+                                         IntegrateAndFireProperties,
+                                         AbstractPopulationVertex):
+    CORE_APP_IDENTIFIER = constants.IF_CURRENT_EXP_CORE_APPLICATION_ID
 
-class IF_CurrentDualExponentialPopulation(DualExponentialPopulationVertex,
-                                          IF_Properties):
-    core_app_identifier = data_spec_constants.IF_CURR_EXP_CORE_APPLICATION_ID
-
-    def __init__( self, n_neurons, constraints = None, label = None,
-                  tau_m = 20.0, cm = 1.0, 
-                  v_rest = -65.0, v_reset = -65.0, v_thresh = -50.0,
-                  tau_syn_E = 5.0, tau_syn_E2 = 5.0, tau_syn_I = 5.0, 
-                  tau_refrac = 0.1, i_offset = 0, v_init = None):
-        # Instantiate the parent class
-        super( IF_CurrentDualExponentialPopulation, self ).__init__(
-            n_neurons = n_neurons,
-            n_params = 10,
-            binary = "IF_curr_exp_dual.aplx",
-            constraints = constraints,
-            label = label,
-            tau_syn_E = tau_syn_E,
-            tau_syn_E2 = tau_syn_E2,
-            tau_syn_I = tau_syn_I
-        )
-
-        # Save the parameters
-        self.tau_m = self.convert_param(tau_m, n_neurons)
-        self.cm = self.convert_param(cm, n_neurons)
-        self.v_rest = self.convert_param(v_rest, n_neurons)
-        self.v_reset = self.convert_param(v_reset, n_neurons)
-        self.v_thresh = self.convert_param(v_thresh, n_neurons)
-        self.tau_refrac = self.convert_param(tau_refrac, n_neurons)
-        self.i_offset = self.convert_param(i_offset, n_neurons)
-        self.v_init = self.convert_param(v_rest, n_neurons)
-        if v_init is not None:
-            self.v_init = self.convert_param(v_init, n_neurons)
-        self.ringbuffer_saturation_scaling = 32 # Max accumulated ringbuffer value
-                                                # in 'weight units' used to scale
-                                                # weight value to a fraction
+    # noinspection PyPep8Naming
+    def __init__(self, n_neurons, constraints=None, label=None,
+                 tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0, 
+                 v_thresh=-50.0, tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, 
+                 tau_refrac=0.1, i_offset=0, v_init=None):
+        
+        # Instantiate the parent classes
+        AbstractDualExponentialVertex.__init__(self, n_neurons=n_neurons,
+                                               tau_syn_E=tau_syn_E,
+                                               tau_syn_E2=tau_syn_E2,
+                                               tau_syn_I=tau_syn_I)
+        IntegrateAndFireProperties.__init__(self, atoms=n_neurons, cm=cm,
+                                            tau_m=tau_m, i_offset=i_offset,
+                                            v_init=v_init, v_reset=v_reset,
+                                            v_rest=v_rest, v_thresh=v_thresh,
+                                            tau_refrac=tau_refrac)
+        AbstractPopulationVertex.__init__(self, n_neurons=n_neurons,
+                                          n_params=10, label=label,
+                                          max_atoms_per_core=256,
+                                          binary="IF_curr_exp_dual.aplx",
+                                          constraints=constraints)
 
     @property
-    def refract_timer( self ):
-        return 0
-
-    @property
-    def t_refract( self ):
-        return self.tau_refrac
-
-    @property
-    def model_name( self ):
+    def model_name(self):
         return "IF_curr_dual_exp"
     
-    def getCPU(self, lo_atom, hi_atom):
+    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         """
         Gets the CPU requirements for a range of atoms
         """
         return 782 * ((hi_atom - lo_atom) + 1)
-    
-    def get_maximum_atoms_per_core(self):
-        '''
-        returns the maxiumum number of atoms that a core can support
-        for this model
-        '''
-        return 256
 
-    def get_parameters(self, machineTimeStep):
+    def get_parameters(self):
         """
         Generate Neuron Parameter data (region 2):
         """
         
         # Get the parameters
         return [
-            NeuronParameter(self.v_thresh,                    's1615',   1.0 ),
-            NeuronParameter(self.v_reset,                     's1615',   1.0 ),
-            NeuronParameter(self.v_rest,                      's1615',   1.0 ),
-            NeuronParameter(self.r_membrane(machineTimeStep), 's1615',   1.0 ),
-            NeuronParameter(self.v_init,                      's1615',   1.0 ),
-            NeuronParameter(self.ioffset(machineTimeStep),    's1615',   1.0 ),
-            NeuronParameter(self.exp_tc(machineTimeStep),     's1615',   1.0 ),
-            NeuronParameter(self.one_over_tauRC,              's1615',   1.0 ),
-            NeuronParameter(self.refract_timer,               'uint32',  1.0 ),
-            NeuronParameter(self.t_refract,                   'uint32', 10.0 ),
+            NeuronParameter(self.v_thresh, 's1615'),
+            NeuronParameter(self.v_reset, 's1615'),
+            NeuronParameter(self.v_rest, 's1615'),
+            NeuronParameter(self.r_membrane(self._machine_time_step), 's1615'),
+            NeuronParameter(self.v_init, 's1615'),
+            NeuronParameter(self.ioffset(self._machine_time_step), 's1615'),
+            NeuronParameter(self.exp_tc(self._machine_time_step), 's1615'),
+            NeuronParameter(self.one_over_tauRC, 's1615'),
+            NeuronParameter(self.refract_timer, 'uint32'),
+            NeuronParameter(self.scaled_t_refract(), 'uint32')
         ]

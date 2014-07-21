@@ -1,5 +1,5 @@
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
-    ComponentVertex
+    AbstractComponentVertex
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
@@ -25,7 +25,7 @@ import os
 INFINITE_SIMULATION = 4294967295
 
 
-class MultiCastSource(ComponentVertex, AbstractDataSpecableVertex):
+class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex):
 
     SYSTEM_REGION = 1
     COMMANDS = 2
@@ -36,7 +36,7 @@ class MultiCastSource(ComponentVertex, AbstractDataSpecableVertex):
         """
         constructor that depends upon the Component vertex
         """
-        ComponentVertex.__init__(self, "multi_cast_source_sender")
+        AbstractComponentVertex.__init__(self, "multi_cast_source_sender")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="multi_cast_source_sender")
         self._writes = None

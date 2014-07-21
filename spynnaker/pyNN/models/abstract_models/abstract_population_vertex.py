@@ -8,20 +8,19 @@ import numpy
 from pacman.model.constraints.partitioner_maximum_size_constraint import \
     PartitionerMaximumSizeConstraint
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
-    ComponentVertex
-from spynnaker.pyNN.models.neural_properties.abstract_population_manager import \
-    PopulationManager
+    AbstractComponentVertex
+from spynnaker.pyNN.models.neural_properties.abstract_population_manager \
+    import PopulationManager
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.utility_calls import \
     get_region_base_address_offset
 from spynnaker.pyNN.utilities import constants
 
-
 logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class PopulationVertex(ComponentVertex, PopulationManager):
+class AbstractPopulationVertex(AbstractComponentVertex, PopulationManager):
     """
     Underlying Vertex model for Neural Populations.
     """
@@ -29,7 +28,7 @@ class PopulationVertex(ComponentVertex, PopulationManager):
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
                  constraints=None):
 
-        ComponentVertex.__init__(self, label)
+        AbstractComponentVertex.__init__(self, label)
         PopulationManager.__init__(self, False, binary, n_neurons, label,
                                    constraints)
         #add the max atom per core constraint
@@ -60,13 +59,14 @@ class PopulationVertex(ComponentVertex, PopulationManager):
                 "The simulation has not yet ran,therefore spikes cannot be "
                 "retrieved")
 
-        # Spike sources store spike vectors optimally so calculate min words to represent
+        # Spike sources store spike vectors optimally
+        # so calculate min words to represent
         sub_vertex_out_spike_bytes_function = \
             lambda subvertex: constants.OUT_SPIKE_BYTES
         
         # Use standard behaviour to read spikes
         return self._getSpikes(spinnaker, compatible_output,
-                               constants.REGIONS.SPIKE_HISTORY,
+                               constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY,
                                sub_vertex_out_spike_bytes_function, runtime)
     
     def get_neuron_parameter(self, region, compatible_output, spinnaker,
@@ -171,9 +171,9 @@ class PopulationVertex(ComponentVertex, PopulationManager):
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore v cannot be "
                 "retrieved")
-        return self.get_neuron_parameter(constants.REGIONS.POTENTIAL_HISTORY,
-                                         compatible_output, spinnaker,
-                                         machine_time_step)
+        return self.get_neuron_parameter(
+            constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY,
+            compatible_output, spinnaker, machine_time_step)
 
     def get_gsyn(self, spinnaker, machine_time_step, compatible_output=False):
         """
@@ -188,17 +188,16 @@ class PopulationVertex(ComponentVertex, PopulationManager):
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore gsyn cannot be "
                 "retrieved")
-        return self.get_neuron_parameter(constants.REGIONS.GSYN_HISTORY,
-                                         compatible_output, spinnaker,
-                                         machine_time_step)
+        return self.get_neuron_parameter(
+            constants.POPULATION_BASED_REGIONS.GSYN_HISTORY, compatible_output,
+            spinnaker, machine_time_step)
 
     def get_synaptic_data(self, spinnaker, presubvertex, pre_n_atoms,
                           postsubvertex, synapse_io):
         """
         helper method to add other data for get weights via syanptic manager
         """
-        return _retrieve_synaptic_data(self, spinnaker, presubvertex,
-                                       pre_n_atoms, postsubvertex,
-                                       constants.REGIONS.MASTER_POP_TABLE,
-                                       synapse_io,
-                                       constants.REGIONS.SYNAPTIC_MATRIX)
+        return _retrieve_synaptic_data(
+            self, spinnaker, presubvertex, pre_n_atoms, postsubvertex,
+            constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE, synapse_io,
+            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX)

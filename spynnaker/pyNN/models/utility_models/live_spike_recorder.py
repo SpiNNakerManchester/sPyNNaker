@@ -1,5 +1,5 @@
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
-    ComponentVertex
+    AbstractComponentVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -22,7 +22,7 @@ from data_specification.file_data_writer import FileDataWriter
 INFINITE_SIMULATION = 4294967295
 
 
-class LiveSpikeRecorder(ComponentVertex, AbstractDataSpecableVertex):
+class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex):
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
     SYSTEM_REGION = 1
 
@@ -35,7 +35,7 @@ class LiveSpikeRecorder(ComponentVertex, AbstractDataSpecableVertex):
         """
         Creates a new AppMonitor Object.
         """
-        ComponentVertex.__init__(self, "Monitor")
+        AbstractComponentVertex.__init__(self, "Monitor")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="Monitor")
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))

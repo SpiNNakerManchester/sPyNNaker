@@ -3,7 +3,7 @@ from spynnaker.pyNN.models.spike_source.abstract_spike_source import \
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions import \
-    generateParameter
+    generate_parameter
 from spynnaker.pyNN.utilities.conf import config
 
 
@@ -13,9 +13,9 @@ from data_specification.file_data_writer import FileDataWriter
 
 
 from math import exp, ceil
+from enum import Enum
 import os
 import numpy
-from enum import Enum
 
 import logging
 logger = logging.getLogger(__name__)
@@ -26,11 +26,6 @@ logger = logging.getLogger(__name__)
 # Version string for this DSG:
 DsgVersionMaj = 0
 DsgVersionMin = 1
-
-SPIKE_SOURCE_REGIONS = Enum('SYSTEM_REGION',
-                            'POISSON_PARAMS_REGION',
-                            'SPIKE_HISTORY_REGION')
-
 
 SLOW_RATE_PER_TICK_CUTOFF = 0.25
 
@@ -50,6 +45,11 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     a pynn_population.py of virtual neurons each with its own parameters.
     """
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
+    _POISSON_SPIKE_SOURCE_REGIONS = Enum(
+        'SYSTEM_REGION',
+        'POISSON_PARAMS_REGION',
+        'SPIKE_HISTORY_REGION'
+    )
 
     def __init__(self, atoms, contraints=None, label="SpikeSourcePoisson",
                  rate=1, start=0, duration=10000, seed=None):
@@ -90,8 +90,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS 
                 + (((hi_atom - lo_atom) + 1) * PARAMS_WORDS_PER_NEURON)) * 4
 
-    @staticmethod
-    def reserve_memory_regions(spec, setup_sz, poisson_params_sz,
+    def reserve_memory_regions(self, spec, setup_sz, poisson_params_sz,
                                spike_hist_buff_sz):
         """
         Reserve memory regions for poisson source parameters
@@ -100,15 +99,16 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        spec.reserve_memory_region(region=SpikeSourcePoisson.SYSTEM_REGION,
-                                   size=setup_sz,
-                                   label='setup')
         spec.reserve_memory_region(
-            region=SpikeSourcePoisson.POISSON_PARAMS_REGION,
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION,
+            size=setup_sz, label='setup')
+        spec.reserve_memory_region(
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION,
             size=poisson_params_sz, label='PoissonParams')
         if spike_hist_buff_sz > 0:
             spec.reserve_memory_regionm(
-                region=SpikeSourcePoisson.SPIKE_HISTORY_REGION,
+                region=
+                self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
                 leaveUnfilled=True)
 
@@ -130,7 +130,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             recording_info |= RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
-        spec.switchWriteFocus(region=SpikeSourcePoisson.SYSTEM_REGION)
+        spec.switchWriteFocus(
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=0)
@@ -145,7 +146,9 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         # Set the focus to the memory region 2 (neuron parameters):
         spec.\
-            switch_write_focus(region=SpikeSourcePoisson.SPOISSON_PARAMS_REGION)
+            switch_write_focus(
+                region=
+                self._POISSON_SPIKE_SOURCE_REGIONS.SPOISSON_PARAMS_REGION)
 
         # Write header info to the memory region:
         
@@ -174,9 +177,9 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         for i in range(0, num_neurons):
             
             # Get the parameter values for source i:
-            rate_val = generateParameter(self._rate, i)
-            start_val = generateParameter(self._start, i)
-            end_val = generateParameter(self._duration, i) + start_val
+            rate_val = generate_parameter(self._rate, i)
+            start_val = generate_parameter(self._start, i)
+            end_val = generate_parameter(self._duration, i) + start_val
             
             # Decide if it is a fast or slow source and 
             spikes_per_tick = \
@@ -239,9 +242,10 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             lambda subvertex: int(ceil(subvertex.n_atoms / 32.0)) * 4
         
         # Use standard behaviour to read spikes
-        return self._get_spikes(controller, compatible_output,
-                                SpikeSourcePoisson.SPIKE_HISTORY_REGION,
-                                sub_vertex_out_spike_bytes_function)
+        return self._get_spikes(
+            controller, compatible_output,
+            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+            sub_vertex_out_spike_bytes_function)
 
     #inhirrtted from partionable vertex
     def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):

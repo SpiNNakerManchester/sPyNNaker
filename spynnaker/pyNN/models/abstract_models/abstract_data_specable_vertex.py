@@ -21,7 +21,7 @@ class AbstractDataSpecableVertex(Vertex):
 
         # Write this to the system region (to be picked up by the simulation):
         simulation_time_in_ticks = constants.INFINITE_SIMULATION
-        spec.switch_write_focus(region=constants.REGIONS.SYSTEM)
+        spec.switch_write_focus(region=constants.POPULATION_BASED_REGIONS.SYSTEM)
         spec.write_value(data=core_app_identifier)
         spec.write_value(data=self._machine_time_step)
         spec.write_value(data=self._no_machine_time_steps)

@@ -1,5 +1,5 @@
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
-    ComponentVertex
+    AbstractComponentVertex
 from pacman.model.graph.vertex import Vertex
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
@@ -12,11 +12,11 @@ from six import add_metaclass
 
 
 @add_metaclass(ABCMeta)
-class VirtualVertex(Vertex, ComponentVertex):
+class AbstractVirtualVertex(Vertex, AbstractComponentVertex):
 
     def __init__(self, n_neurons, virtual_chip_coords, connected_node_coords,
                  connected_node_edge, label):
-        ComponentVertex.__init__(self, label)
+        AbstractComponentVertex.__init__(self, label)
         Vertex.__init__(self, n_neurons, label)
         #set up virtual data structures
         self._virtual_chip_coords = virtual_chip_coords

@@ -4,7 +4,7 @@ from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import generateParameter
+    import generate_parameter
 import random
 
 
@@ -55,8 +55,8 @@ class MultapseConnector(AbstractConnector):
         for _ in range(0, self._num_synapses):
             source = int(random.random() * num_incoming_axons)
             target = int(random.random() * num_target_neurons)
-            weight = generateParameter(self._weights, target)
-            delay = generateParameter(self._weights, target) * delay_scale
+            weight = generate_parameter(self._weights, target)
+            delay = generate_parameter(self._weights, target) * delay_scale
             id_lists[source].append(target)
             weight_lists[source].append(weight)
             delay_lists[source].append(delay)

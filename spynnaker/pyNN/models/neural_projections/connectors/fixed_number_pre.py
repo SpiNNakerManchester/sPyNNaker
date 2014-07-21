@@ -4,7 +4,7 @@ from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import generateParameterArray
+    import generate_parameter_array
 import numpy
 import random
 
@@ -62,10 +62,10 @@ class FixedNumberPreConnector(AbstractConnector):
             n_present = postvertex.atoms
             
             id_lists[pre_atom] = numpy.where(present)[0]
-            weight_lists[pre_atom] = generateParameterArray(self._weights,
+            weight_lists[pre_atom] = generate_parameter_array(self._weights,
                                                             n_present, present)
             delay_lists[pre_atom] =\
-                (generateParameterArray(self._delays, n_present, present)
+                (generate_parameter_array(self._delays, n_present, present)
                  * delay_scale)
             type_lists[pre_atom] = synapse_type
         

@@ -4,7 +4,7 @@ from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import generateParameter
+    import generate_parameter
 
 
 class OneToOneConnector(AbstractConnector):
@@ -33,8 +33,8 @@ class OneToOneConnector(AbstractConnector):
                               synapse_type):
         connection_list = list()
         for pre_atom in range(0, prevertex.atoms):
-            delay = generateParameter(self._delays, pre_atom) * delay_scale
-            weight = generateParameter(self._weights, pre_atom)
+            delay = generate_parameter(self._delays, pre_atom) * delay_scale
+            weight = generate_parameter(self._weights, pre_atom)
             connection_list.append(SynapseRowInfo([pre_atom], [weight],
                                    [delay], [synapse_type]))
                     

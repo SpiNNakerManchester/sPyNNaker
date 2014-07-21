@@ -20,7 +20,7 @@ RECORDING_ENTRY_BYTE_SIZE = 4
 
 
 @add_metaclass(ABCMeta)
-class ComponentVertex(object):
+class AbstractComponentVertex(object):
     """
     Underlying Vertex model for Neural Applications.
     """

@@ -32,13 +32,13 @@ from spynnaker.pyNN.models.external_device_models.abstract_external_retina_devic
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
-    import IF_ConductanceExponentialPopulation as IF_cond_exp
+    import IFConductanceExponentialPopulation as IF_cond_exp
 from spynnaker.pyNN.models.neural_models.if_curr_dual_exp \
-    import IF_CurrentDualExponentialPopulation as IF_curr_dual_exp
+    import IFCurrentDualExponentialPopulation as IF_curr_dual_exp
 from spynnaker.pyNN.models.neural_models.if_curr_exp \
-    import IF_CurrentExponentialPopulation as IF_curr_exp
+    import IFCurrentExponentialPopulation as IF_curr_exp
 from spynnaker.pyNN.models.neural_models.izk_curr_exp \
-    import Izhikevich_CurrentExponentialPopulation as IZK_curr_exp
+    import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
 
 #neural projections
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
