@@ -26,6 +26,22 @@ GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
 
 INFINITE_SIMULATION = 4294967295
 
+#from synaptic manager
+SYNAPTIC_ROW_HEADER_WORDS = 2 + 1   # Words - 2 for row lenth and number of
+                                        #  rows and 1 for plastic region size
+                                        # (which might be 0)
+
+ROW_LEN_TABLE_ENTRIES = [0, 1, 8, 16, 32, 64, 128, 256]
+ROW_LEN_TABLE_SIZE = 4 * len(ROW_LEN_TABLE_ENTRIES)
+
+X_CHIPS = 8
+Y_CHIPS = 8
+CORES_PER_CHIP = 18
+MASTER_POPULATION_ENTRIES = (X_CHIPS * Y_CHIPS * CORES_PER_CHIP)
+MASTER_POPULATION_TABLE_SIZE = 2 * MASTER_POPULATION_ENTRIES  # 2 bytes per
+                                                              # entry
+
+
 #natively supported delays for all models
 MAX_SUPPORTED_DELAY_TICS = 16
 

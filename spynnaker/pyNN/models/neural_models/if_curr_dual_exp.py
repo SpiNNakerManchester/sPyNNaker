@@ -8,6 +8,7 @@ from spynnaker.pyNN.models.neural_properties.integrate_and_fire_properties \
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 
+
 class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                                          IntegrateAndFireProperties,
                                          AbstractPopulationVertex):

@@ -1,47 +1,36 @@
-__author__ = 'stokesa6'
+from spynnaker.pyNN.models.neural_projections.projection_edge \
+    import ProjectionEdge
+from spynnaker.pyNN.models.neural_projections.projection_subedge \
+    import ProjectionSubedge
+from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+    fixed_synapse_row_io import FixedSynapseRowIO
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+    weight_based_plastic_synapse_row_io import WeightBasedPlasticSynapseRowIo
+from spynnaker.pyNN.utilities import packet_conversions
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.utility_calls \
+    import get_region_base_address_offset
+
+
 import numpy
 import math
 import logging
 import struct
-
-from spynnaker.pyNN.models.neural_projections.projection_edge \
-    import ProjectionEdge
-from pacman103.front.common.projection_subedge import ProjectionSubedge
-from pacman103.front.common.synaptic_list import SynapticList
-from pacman103.front.common.fixed_synapse_row_io import FixedSynapseRowIO
-from pacman103.front.pynn.synapse_dynamics.\
-    weight_based_plastic_synapse_row_io import WeightBasedPlasticSynapseRowIo
-from pacman103.core.utilities import packet_conversions
-from pacman103.core import exceptions
-from pacman103.core.spinnman.scp import scamp
-from pacman103.core.utilities.memory_utils import getAppDataBaseAddressOffset,\
-                                                  getRegionBaseAddressOffset
 
 logger = logging.getLogger(__name__)
 
 
 class SynapticManager(object):
 
-    SYNAPTIC_ROW_HEADER_WORDS = 2 + 1   # Words - 2 for row lenth and number of rows and
-                                    # 1 for plastic region size (which might be 0)
-
-    ROW_LEN_TABLE_ENTRIES = [0, 1, 8, 16, 32, 64, 128, 256]
-    ROW_LEN_TABLE_SIZE    = 4 * len(ROW_LEN_TABLE_ENTRIES)
-
-    X_CHIPS = 8
-    Y_CHIPS = 8
-    CORES_PER_CHIP = 18
-    MASTER_POPULATION_ENTRIES = (X_CHIPS * Y_CHIPS * CORES_PER_CHIP)
-    MASTER_POPULATION_TABLE_SIZE = 2 * MASTER_POPULATION_ENTRIES # 2 bytes per entry
-
-
-
     def __init__(self):
         self._stdp_checked = False
         self._stdp_mechanism = None
 
-    def writeSynapseRowInfo(self, sublist, rowIO, spec, currentWritePtr,
-            fixedRowLength, region, weight_scale, n_synapse_type_bits):
+    def write_synapse_row_info(self, sublist, row_io, spec, current_write_ptr,
+                               fixed_row_length, region, weight_scale,
+                               n_synapse_type_bits):
         """
         Write this synaptic block to the designated synaptic matrix region at
         its current write pointer.
@@ -51,26 +40,26 @@ class SynapticManager(object):
         spec.switchWriteFocus(region)
 
         # Align the write pointer to the next 1Kbyte boundary using padding:
-        writePtr = currentWritePtr
-        if (writePtr & 0x3FF) != 0:
+        write_ptr = current_write_ptr
+        if (write_ptr & 0x3FF) != 0:
 
             # Ptr not aligned. Align it:
-            writePtr = (writePtr & 0xFFFFFC00) + 0x400
+            write_ptr = (write_ptr & 0xFFFFFC00) + 0x400
 
             # Pad out data file with the added alignment bytes:
-            numPaddingBytes = writePtr - currentWritePtr
-            spec.moveToReg(destReg = 15, data = numPaddingBytes)
-            spec.write(data = 0xDD, repeatReg = 15, sizeof='uint8')
+            num_padding_bytes = write_ptr - current_write_ptr
+            spec.moveToReg(destReg=15, data=num_padding_bytes)
+            spec.write(data=0xDD, repeatReg=15, sizeof='uint8')
 
         # Remember this aligned address, it's where this block will start:
-        blockStartAddr = writePtr
+        blockStartAddr = write_ptr
         # Write the synaptic block, tracking the word count:
         synapticRows = sublist.get_rows()
 
         rowNo = 0
         for row in synapticRows:
             wordsWritten = 0
-            plastic_region = rowIO.get_packed_plastic_region(row, weight_scale,
+            plastic_region = row_io.get_packed_plastic_region(row, weight_scale,
                     n_synapse_type_bits)
 
             # Write the size of the plastic region
@@ -83,11 +72,11 @@ class SynapticManager(object):
             wordsWritten += len(plastic_region)
 
             fixed_fixed_region = numpy.asarray(
-                    rowIO.get_packed_fixed_fixed_region(row, weight_scale,
+                    row_io.get_packed_fixed_fixed_region(row, weight_scale,
                                                         n_synapse_type_bits),
                                                         dtype="uint32")
             fixed_plastic_region = numpy.asarray(
-                    rowIO.get_packed_fixed_plastic_region(row, weight_scale,
+                    row_io.get_packed_fixed_plastic_region(row, weight_scale,
                                                           n_synapse_type_bits),
                                                           dtype="uint16")
 
@@ -112,18 +101,18 @@ class SynapticManager(object):
             spec.write_array(data = fixed_plastic_region_words)
             wordsWritten += len(fixed_plastic_region_words)
 
-            writePtr += (4 * wordsWritten)
+            write_ptr += (4 * wordsWritten)
 
             # Write padding (if required):
-            padding = ((fixedRowLength + self.SYNAPTIC_ROW_HEADER_WORDS) - wordsWritten)
+            padding = ((fixed_row_length + self.SYNAPTIC_ROW_HEADER_WORDS) - wordsWritten)
             if padding != 0:
                 spec.write(data=0xBBCCDDEE, repeats=padding, sizeof='uint32')
-                writePtr += 4 * padding
+                write_ptr += 4 * padding
 
             rowNo += 1
 
         # The current write pointer is where the next block could start:
-        nextBlockStartAddr = writePtr
+        nextBlockStartAddr = write_ptr
         return blockStartAddr, nextBlockStartAddr
     
     def get_exact_synaptic_block_memory_size(self, subvertex):
@@ -145,7 +134,7 @@ class SynapticManager(object):
             memorySize += allSynBlockSz
         return memorySize    
     
-    def getSynapticBlocksMemorySize(self, lo_atom, hi_atom, in_edges):
+    def get_synaptic_blocks_memory_size(self, lo_atom, hi_atom, in_edges):
         self._check_synapse_dynamics(in_edges)
         memorySize = 0
         
@@ -371,7 +360,7 @@ class SynapticManager(object):
 
                 # Write the synaptic block for the sublist
                 (block_start_addr, next_block_start_addr) = \
-                    self.writeSynapseRowInfo(sublist, rowIO, spec,
+                    self.write_synapse_row_info(sublist, rowIO, spec,
                             next_block_start_addr, row_length,
                             SYNAPTIC_MATRIX, weight_scale,
                             n_synapse_type_bits)

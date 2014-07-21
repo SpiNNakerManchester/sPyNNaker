@@ -9,9 +9,9 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 
 
-class IzhikevichCurrentExponentialPopulation(AbstractIzhikevichVertex,
-                                             AbstractExponentialPopulationVertex,
-                                             AbstractPopulationVertex):
+class IzhikevichCurrentExponentialPopulation(
+        AbstractIzhikevichVertex, AbstractExponentialPopulationVertex,
+        AbstractPopulationVertex):
 
     CORE_APP_IDENTIFIER = constants.IZK_CURRENT_EXP_CORE_APPLICATION_ID
 

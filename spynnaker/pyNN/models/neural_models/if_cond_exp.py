@@ -12,6 +12,7 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
 from spynnaker.pyNN.models.abstract_models.abstract_conductive_vertex \
     import AbstractConductiveVertex
 
+
 class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
                                          AbstractConductiveVertex,
                                          IntegrateAndFireProperties,
