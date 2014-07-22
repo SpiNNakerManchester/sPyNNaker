@@ -44,7 +44,7 @@ class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex):
         self._edge_map = None
         self.add_constraint(PartitionerMaximumSizeConstraint(1))
 
-    def generate_data_spec(self, processor, subvertex):
+    def generate_data_spec(self, processor, subvertex, sub_graph, routing_info):
         """
         Model-specific construction of the data blocks necessary to build a
         single external retina device.

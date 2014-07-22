@@ -26,7 +26,7 @@ class AbstractDataSpecableVertex(Vertex):
         spec.write_value(data=self._no_machine_time_steps)
 
     @abstractmethod
-    def generate_data_spec(self, processor, subvertex):
+    def generate_data_spec(self, processor, subvertex, sub_graph, routing_info):
         """
         method to determine how to generate their data spec for a non neural
         application

@@ -1,5 +1,3 @@
-import math
-
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex

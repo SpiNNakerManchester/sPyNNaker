@@ -73,4 +73,3 @@ class FromListConnector(AbstractConnector):
                            for i in range(0, prevertex.atoms)]
         
         return SynapticList(connection_list)
-

@@ -1,13 +1,16 @@
 """
 utility class contianing simple helper methods
 """
-import os
-from spynnaker.pyNN.utilities.constants import \
-    SV_VCPU, SIZEOF_VCPU, VCPU_OFFSETS
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import RandomDistribution
 from spynnaker.pyNN import exceptions
 import numpy
+import math
+import os
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def check_directory_exists(filename):
@@ -33,6 +36,35 @@ def check_delay(delay):
 
 def get_region_base_address_offset(app_data_base_address, region):
     return app_data_base_address + 16 + region * 4
+
+
+def get_ring_buffer_to_input_left_shift(subvertex, sub_graph):
+    in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
+    total_exc_weights = numpy.zeros(subvertex.n_atoms)
+    total_inh_weights = numpy.zeros(subvertex.n_atoms)
+    for subedge in in_sub_edges:
+        sublist = subedge.get_synapse_sublist()
+        sublist.sum_weights(total_exc_weights, total_inh_weights)
+
+    max_weight = max((max(total_exc_weights), max(total_inh_weights)))
+    max_weight_log_2 = 0
+    if max_weight > 0:
+        max_weight_log_2 = math.log(max_weight, 2)
+
+    # Currently, we can only cope with positive left shifts, so the minimum
+    # scaling will be no shift i.e. a max weight of 0nA
+    if max_weight_log_2 < 0:
+        max_weight_log_2 = 0
+
+    max_weight_power = int(math.ceil(max_weight_log_2))
+
+    logger.debug("Max weight is {}, Max power is {}"
+                 .format(max_weight, max_weight_power))
+
+    # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
+    # but we ignore the "-1" to allow a bit of overhead in the above
+    # calculation in case a couple of extra spikes come in
+    return max_weight_power
 
 
 @staticmethod

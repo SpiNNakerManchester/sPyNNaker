@@ -207,7 +207,7 @@ class Projection(object):
         """Return the `i`th connection within the Projection."""
         raise NotImplementedError
 
-    def _retrieve_synaptic_data(self):
+    def _retrieve_synaptic_data(self, subgraph):
         if self._read_synapse_list is None:
             synapse_list = None
             delay_synapse_list = None
@@ -215,7 +215,7 @@ class Projection(object):
                 synapse_list = \
                     self._projection_edge.get_synaptic_data(
                         self._spinnaker,
-                        DelayExtension.MAX_SUPPORTED_DELAY_TICS)
+                        DelayExtension.MAX_SUPPORTED_DELAY_TICS, subgraph)
             if self._delay_edge is not None:
                 delay_synapse_list = self._delay_edge.get_synaptic_data(
                     self._spinnaker, DelayExtension.MAX_SUPPORTED_DELAY_TICS)
@@ -253,7 +253,7 @@ class Projection(object):
             timer = Timer()
             timer.start_timing()
         if self._read_synapse_list is None:
-            self._retrieve_synaptic_data()
+            self._retrieve_synaptic_data(self._spinnaker.subgraph)
         synapse_list = self._read_synapse_list
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()

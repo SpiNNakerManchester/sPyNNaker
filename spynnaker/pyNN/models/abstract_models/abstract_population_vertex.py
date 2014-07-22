@@ -197,7 +197,7 @@ class AbstractPopulationVertex(AbstractComponentVertex, PopulationManager):
         """
         helper method to add other data for get weights via syanptic manager
         """
-        return _retrieve_synaptic_data(
-            self, spinnaker, presubvertex, pre_n_atoms, postsubvertex,
+        return self._get_synaptic_data(
+            spinnaker, presubvertex, pre_n_atoms, postsubvertex,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE, synapse_io,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX)

@@ -1,60 +1,41 @@
+
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import packet_conversions
+from spynnaker.pyNN.models.abstract_models.abstract_component_vertex \
+    import AbstractComponentVertex
+from spynnaker.pyNN.models.neural_projections.delay_projection_edge import \
+    DelayProjectionEdge
+
+from math import ceil
+from enum import Enum
+import copy
 import os
 import math
-
-from pacman103.lib import lib_map, data_spec_gen, data_spec_constants
-from pacman103.front.common.component_vertex import ComponentVertex
-from pacman103.front.common.delay_projection_edge import DelayProjectionEdge
-
-from pacman103.core.utilities import packet_conversions
-from pacman103.front.common import enums
-import copy
-from math import ceil
-
 import logging
+
+
 logger = logging.getLogger(__name__)
 
-SETUP_SIZE = 16 # Single word of info with flags, etc.
-                # plus the lengths of each of the output buffer
-                # regions in bytes
-
-REGIONS = enums.enum1(
+_DELAY_EXTENSION_REGIONS = Enum(
     'SYSTEM',
     'DELAY_PARAMS',
     'SPIKE_HISTORY'
 )
 
-RECORD_SPIKE_BIT = 1<<0
-RECORD_STATE_BIT = 1<<1
-RECORD_GSYN_BIT  = 1<<2
 
-SETUP_SZ = 16
-BITS_PER_WORD = 32.0
-BLOCK_INDEX_HEADER_WORDS = 3
-BLOCK_INDEX_ROW_WORDS = 2
-
-# Version string for this DSG:
-DsgVersionMaj = 0
-DsgVersionMin = 1
-
-#MAX_DELAY_BLOCKS = 7
-MAX_DELAY_BLOCKS = 8
-MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
-
-
-INFINITE_SIMULATION = 4294967295
-
-class DelayExtension(ComponentVertex):
+class DelayExtension(AbstractComponentVertex):
     """
     Instance of this class provide delays to incoming spikes in multiples
     of the maximum delays of a neuron (typically 16 or 32)
     """
-    core_app_identifier = data_spec_constants.DELAY_EXTENSION_CORE_APPLICATION_ID
+    CORE_APP_IDENTIFIER = constants.DELAY_EXTENSION_CORE_APPLICATION_ID
     
     def __init__(self, n_neurons, max_delay_per_neuron, 
-            constraints=None, label="DelayExtension"):
+                 constraints=None, label="DelayExtension"):
         """
         Creates a new DelayExtension Object.
         """
+
         super( DelayExtension, self ).__init__(
             n_neurons = n_neurons,
             constraints = constraints,

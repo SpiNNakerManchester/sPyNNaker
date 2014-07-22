@@ -8,7 +8,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
-
+# noinspection Py
 @add_metaclass(ABCMeta)
 class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                                             AbstractPartitionableVertex):

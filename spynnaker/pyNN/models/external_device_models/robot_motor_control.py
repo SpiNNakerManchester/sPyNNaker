@@ -69,7 +69,7 @@ class RobotMotorControl(AbstractComponentVertex, AbstractDataSpecableVertex):
         virtual_edges.append(self.out_going_edge)
         return virtual_vertexes, virtual_edges
 
-    def generate_data_spec(self, processor, subvertex):
+    def generate_data_spec(self, processor, subvertex, subgraph, routing_info):
         """
         Model-specific construction of the data blocks necessary to build a
         single external retina device.

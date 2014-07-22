@@ -45,3 +45,21 @@ class SynapticBlockGenerationException(ConfigurationException):
     :raise None: does not raise any known exceptions
     """
     pass
+
+
+class SynapticBlockReadException(ConfigurationException):
+    """raised when the synaptic manager fails to read a synaptic block or
+        convert it into readable values
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
+
+
+class SynapticMaxIncomingAtomsSupportException(ConfigurationException):
+    """raised when a synatpic sublist exceeds the max atoms possible to be
+    supported
+
+    :raise None: does not raise any known exceptions
+    """
+    pass

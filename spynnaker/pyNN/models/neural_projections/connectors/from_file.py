@@ -1,14 +1,17 @@
-__author__ = 'stokesa6'
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.models.neural_properties.synapse_row_info \
-    import SynapseRowInfo
-from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import generate_parameter_array
+from spynnaker.pyNN import exceptions
 
 
 class FromFileConnector(AbstractConnector):
 
+    def generate_synapse_list(self, prevertex, postvertex, delay_scale,
+                              synapse_type):
+        raise exceptions.SpynnakerException("This connector is currently not "
+                                            "supported by the tool chain....."
+                                            "watch this space")
+
     def __init__(self):
-        pass
+        raise exceptions.SpynnakerException("This connector is currently not "
+                                            "supported by the tool chain....."
+                                            "watch this space")

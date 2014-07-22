@@ -1,12 +1,10 @@
 from abc import ABCMeta
 from abc import abstractmethod
 import os
-import math
 import tempfile
 import logging
 
 from six import add_metaclass
-import numpy
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
@@ -14,6 +12,7 @@ from data_specification.file_data_writer import FileDataWriter
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties.abstract_synaptic_manager import \
     SynapticManager
 from spynnaker.pyNN.models.abstract_models.\
@@ -202,35 +201,7 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
                 spec.write_value(data=value, data_type=datatype)
         # End the loop over the neurons:
 
-    @staticmethod
-    def get_ring_buffer_to_input_left_shift(subvertex):
-        total_exc_weights = numpy.zeros(subvertex.n_atoms)
-        total_inh_weights = numpy.zeros(subvertex.n_atoms)
-        for subedge in subvertex.in_subedges:
-            sublist = subedge.get_synapse_sublist()
-            sublist.sum_weights(total_exc_weights, total_inh_weights)
-
-        max_weight = max((max(total_exc_weights), max(total_inh_weights)))
-        max_weight_log_2 = 0
-        if max_weight > 0:
-            max_weight_log_2 = math.log(max_weight, 2)
-
-        # Currently, we can only cope with positive left shifts, so the minimum
-        # scaling will be no shift i.e. a max weight of 0nA
-        if max_weight_log_2 < 0:
-            max_weight_log_2 = 0
-
-        max_weight_power = int(math.ceil(max_weight_log_2))
-
-        logger.debug("Max weight is {}, Max power is {}"
-                     .format(max_weight, max_weight_power))
-
-        # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
-        # but we ignore the "-1" to allow a bit of overhead in the above
-        # calculation in case a couple of extra spikes come in
-        return max_weight_power
-
-    def generate_data_spec(self, processor, subvertex):
+    def generate_data_spec(self, processor, subvertex, subgraph, routing_info):
         """
         Model-specific construction of the data blocks necessary to
         build a group of IF_curr_exp neurons resident on a single core.
@@ -275,7 +246,10 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
         self.write_setup_info(spec, spike_hist_buff_sz, potential_hist_buff_sz,
                               gsyn_hist_buff_sz, self._executable_constant)
 
-        ring_buffer_shift = self.get_ring_buffer_to_input_left_shift(subvertex)
+        ring_buffer_shift = \
+            utility_calls.get_ring_buffer_to_input_left_shift(
+                subvertex, subgraph
+            )
         weight_scale = self.get_weight_scale(ring_buffer_shift)
         logger.debug("Weight scale is {}".format(weight_scale))
 
@@ -294,7 +268,7 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
         self.write_synaptic_matrix_and_master_population_table(
             spec, subvertex, all_syn_block_sz, weight_scale,
             self.POPULATION_BASED_REGIONS.MASTER_POP_TABLE,
-            self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX)
+            self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX, routing_info)
 
         for subedge in subvertex.in_subedges:
             subedge.free_sublist()

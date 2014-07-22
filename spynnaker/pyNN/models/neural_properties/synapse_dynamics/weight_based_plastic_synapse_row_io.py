@@ -96,9 +96,7 @@ class WeightBasedPlasticSynapseRowIo(AbstractSynapseRowIo):
                                        dtype='uint32')
         return plastic_region
 
-    # noinspection PyMethodOverriding
-    @staticmethod
-    def create_row_info_from_elements(p_p_entries, f_f_entries,
+    def create_row_info_from_elements(self, p_p_entries, f_f_entries,
                                       f_p_entries, bits_reserved_for_type,
                                       weight_scale):
         """
@@ -124,10 +122,12 @@ class WeightBasedPlasticSynapseRowIo(AbstractSynapseRowIo):
         #counter/index ABS and AGR
         for index in range(len(f_p_entries)):
             if index % 2 == 0:
-                weights.append((p_p_entries[int(index / 2)] >> 16)
+                weights.append((p_p_entries[self.num_header_words +
+                                            int(index / 2)] & 0xFFFF)
                                / weight_scale)  # drops delay, type and id
             else:
-                weights.append((p_p_entries[int(index / 2)] & 0xFFFF)
+                weights.append((p_p_entries[self.num_header_words +
+                                            int(index / 2)] >> 16)
                                / weight_scale)
 
         #read in each element

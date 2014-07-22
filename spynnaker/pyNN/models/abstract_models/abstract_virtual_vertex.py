@@ -31,8 +31,7 @@ class AbstractVirtualVertex(Vertex, AbstractComponentVertex):
     def model_name(self):
         return "VirtualVertex:{}".format(self.label)
 
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom,
-                                    no_machine_time_steps):
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
         resources = list()
         resources.append(CPUCyclesPerTickResource(0))
         resources.append(DTCMResource(0))

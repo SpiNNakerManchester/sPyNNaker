@@ -20,8 +20,6 @@ class AbstractSynapseRowIo(object):
         Gets the fixed part of the fixed region as an array of 32-bit words
         """
 
-
-
     @abstractmethod
     def get_packed_fixed_plastic_region(self, synapse_row, weight_scale,
                                         n_synapse_type_bits):

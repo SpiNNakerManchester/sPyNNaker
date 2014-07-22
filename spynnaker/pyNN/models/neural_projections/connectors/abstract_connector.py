@@ -1,8 +1,13 @@
+from abc import ABCMeta
+from six import add_metaclass
+from abc import abstractmethod
+
+@add_metaclass(ABCMeta)
 class AbstractConnector(object):
     """
     Abstract class which connectors extend
     """
-        
+    @abstractmethod
     def generate_synapse_list(self, prevertex, postvertex, delay_scale, 
                               synapse_type):
         """
@@ -10,5 +15,3 @@ class AbstractConnector(object):
         connectivity.  Note that this doesn't actually have to store the
         explicit information, as long as it produces the correct information!
         """
-        raise NotImplementedError
-

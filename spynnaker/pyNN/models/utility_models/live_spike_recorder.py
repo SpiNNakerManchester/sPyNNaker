@@ -45,7 +45,7 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex):
     def model_name(self):
         return "AppMonitor"
 
-    def generate_data_spec(self, processor, subvertex):
+    def generate_data_spec(self, processor, subvertex, sub_graph, routing_info):
         """
         Model-specific construction of the data blocks necessary to build a
         single Application Monitor on one core.

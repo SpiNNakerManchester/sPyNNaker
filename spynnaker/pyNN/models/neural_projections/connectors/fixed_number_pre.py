@@ -63,7 +63,8 @@ class FixedNumberPreConnector(AbstractConnector):
             
             id_lists[pre_atom] = numpy.where(present)[0]
             weight_lists[pre_atom] = generate_parameter_array(self._weights,
-                                                            n_present, present)
+                                                              n_present,
+                                                              present)
             delay_lists[pre_atom] =\
                 (generate_parameter_array(self._delays, n_present, present)
                  * delay_scale)
