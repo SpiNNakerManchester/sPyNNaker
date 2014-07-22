@@ -3,7 +3,6 @@ from six import add_metaclass
 
 
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN import conf
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import packet_conversions
@@ -15,9 +14,6 @@ import numpy
 import struct
 
 logger = logging.getLogger(__name__)
-
-RECORDING_ENTRY_BYTE_SIZE = 4
-
 
 @add_metaclass(ABCMeta)
 class AbstractComponentVertex(object):
@@ -47,8 +43,8 @@ class AbstractComponentVertex(object):
         if self._no_machine_time_steps is None:
             raise Exception("This model cannot record this parameter"
                             + " without a fixed run time")
-        return RECORDING_ENTRY_BYTE_SIZE + (self._no_machine_time_steps *
-                                            bytes_per_timestep)
+        return (constants.RECORDING_ENTRY_BYTE_SIZE +
+                (self._no_machine_time_steps * bytes_per_timestep))
 
     def get_commands(self, no_tics):
         return list()  # most compoennts do not require a mcs

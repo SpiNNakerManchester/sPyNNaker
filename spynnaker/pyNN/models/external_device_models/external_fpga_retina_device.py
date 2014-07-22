@@ -1,4 +1,3 @@
-__author__ = 'stokesa6'
 from spynnaker.pyNN.models.external_device_models.\
     abstract_external_retina_device import AbstractExternalRetinaDevice
 from spynnaker.pyNN.utilities import packet_conversions
@@ -43,11 +42,11 @@ class ExternalFPGARetinaDevice(AbstractExternalRetinaDevice):
             raise exceptions.ConfigurationException("the FPGA retina does not "
                                                     "recongise this mode")
 
-        AbstractExternalRetinaDevice.__init__(self, n_neurons,
-                                              virtual_chip_coords,
-                                              connected_chip_coords,
-                                              connected_chip_edge,
-                                              label=label)
+        AbstractExternalRetinaDevice.__init__(
+            self, n_neurons=n_neurons, virtual_chip_coords=virtual_chip_coords,
+            connected_node_coords=connected_chip_coords,
+            connected_node_edge=connected_chip_edge, label=label,
+            polarity=polarity)
 
     def get_commands(self, last_runtime_tic):
         """

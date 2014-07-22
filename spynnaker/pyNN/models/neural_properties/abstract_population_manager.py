@@ -267,8 +267,8 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
         # Construct the data images needed for the Neuron:
         self.reserve_population_based_memory_regions(
             spec, constants.SETUP_SIZE, neuron_params_sz, synapse_params_sz,
-            SynapticManager.ROW_LEN_TABLE_SIZE,
-            SynapticManager.MASTER_POPULATION_TABLE_SIZE, all_syn_block_sz,
+            constants.ROW_LEN_TABLE_SIZE,
+            constants.MASTER_POPULATION_TABLE_SIZE, all_syn_block_sz,
             spike_hist_buff_sz, potential_hist_buff_sz, gsyn_hist_buff_sz,
             stdp_region_sz)
 
@@ -285,7 +285,7 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
         self.write_synapse_parameters(spec, subvertex)
 
         self.write_stdp_parameters(
-            spec, subvertex, weight_scale, 
+            spec, subvertex, weight_scale, self._machine_time_step,
             self.POPULATION_BASED_REGIONS.STDP_PARAMS)
 
         self.write_row_length_translation_table(

@@ -29,3 +29,19 @@ class RallocException(SpynnakerException):
     :raise None: does not raise any known exceptions
     """
     pass
+
+
+class SynapticConfigurationException(ConfigurationException):
+    """raised when the synaptic manager fails to handle a synaptic dynamic
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
+
+
+class SynapticBlockGenerationException(ConfigurationException):
+    """raised when the synaptic manager fails to generate a synaptic block
+
+    :raise None: does not raise any known exceptions
+    """
+    pass

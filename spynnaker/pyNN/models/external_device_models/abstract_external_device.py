@@ -8,9 +8,9 @@ from six import add_metaclass
 class ExternalDevice(AbstractVirtualVertex):
     def __init__(self, n_neurons, virtual_chip_coords, connected_node_coords,
                  connected_node_edge, label):
-        AbstractVirtualVertex.__init__(self, n_neurons, virtual_chip_coords,
-                               connected_node_coords, connected_node_edge,
-                               label)
+        AbstractVirtualVertex.__init__(
+            self, n_neurons, virtual_chip_coords, connected_node_coords,
+            connected_node_edge, label)
 
     @property
     def model_name(self):

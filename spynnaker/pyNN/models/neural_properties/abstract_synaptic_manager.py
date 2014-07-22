@@ -28,7 +28,8 @@ class SynapticManager(object):
         self._stdp_checked = False
         self._stdp_mechanism = None
 
-    def write_synapse_row_info(self, sublist, row_io, spec, current_write_ptr,
+    @staticmethod
+    def write_synapse_row_info(sublist, row_io, spec, current_write_ptr,
                                fixed_row_length, region, weight_scale,
                                n_synapse_type_bits):
         """
@@ -48,108 +49,112 @@ class SynapticManager(object):
 
             # Pad out data file with the added alignment bytes:
             num_padding_bytes = write_ptr - current_write_ptr
-            spec.moveToReg(destReg=15, data=num_padding_bytes)
-            spec.write(data=0xDD, repeatReg=15, sizeof='uint8')
+            spec.set_register_value(register_id=15, data=num_padding_bytes)
+            spec.write_value(data=0xDD, repeatReg=15, sizeof='uint8')
 
         # Remember this aligned address, it's where this block will start:
-        blockStartAddr = write_ptr
+        block_start_addr = write_ptr
         # Write the synaptic block, tracking the word count:
-        synapticRows = sublist.get_rows()
+        synaptic_rows = sublist.get_rows()
 
-        rowNo = 0
-        for row in synapticRows:
-            wordsWritten = 0
-            plastic_region = row_io.get_packed_plastic_region(row, weight_scale,
-                    n_synapse_type_bits)
+        row_no = 0
+        for row in synaptic_rows:
+            words_written = 0
+            plastic_region = \
+                row_io.get_packed_plastic_region(row, weight_scale,
+                                                 n_synapse_type_bits)
 
             # Write the size of the plastic region
-            spec.comment("\nWriting plastic region for row {}".format(rowNo))
-            spec.write(data = len(plastic_region), sizeof = "uint32")
-            wordsWritten += 1
+            spec.comment("\nWriting plastic region for row {}".format(row_no))
+            spec.write_value(data=len(plastic_region), sizeof="uint32")
+            words_written += 1
 
             # Write the plastic region
-            spec.write_array(data = plastic_region)
-            wordsWritten += len(plastic_region)
+            spec.write_array(data=plastic_region)
+            words_written += len(plastic_region)
 
             fixed_fixed_region = numpy.asarray(
-                    row_io.get_packed_fixed_fixed_region(row, weight_scale,
-                                                        n_synapse_type_bits),
-                                                        dtype="uint32")
+                row_io.get_packed_fixed_fixed_region(row, weight_scale,
+                                                     n_synapse_type_bits),
+                dtype="uint32")
             fixed_plastic_region = numpy.asarray(
-                    row_io.get_packed_fixed_plastic_region(row, weight_scale,
-                                                          n_synapse_type_bits),
-                                                          dtype="uint16")
+                row_io.get_packed_fixed_plastic_region(row, weight_scale,
+                                                       n_synapse_type_bits),
+                dtype="uint16")
 
             # Write the size of the fixed parts
-            spec.comment("\nWriting fixed region for row {}".format(rowNo))
-            spec.write(data = len(fixed_fixed_region), sizeof = "uint32")
-            spec.write(data = len(fixed_plastic_region), sizeof = "uint32")
-            wordsWritten += 2
+            spec.comment("\nWriting fixed region for row {}".format(row_no))
+            spec.write_value(data=len(fixed_fixed_region), sizeof="uint32")
+            spec.write_value(data=len(fixed_plastic_region), sizeof="uint32")
+            words_written += 2
 
             # Write the fixed fixed region
-            spec.write_array(data = fixed_fixed_region)
-            wordsWritten += len(fixed_fixed_region)
+            spec.write_array(data=fixed_fixed_region)
+            words_written += len(fixed_fixed_region)
 
-            # As everything needs to be word aligned, add extra zero to fixed_plastic
-            # Region if it has an odd number of entries and build uint32 view of it
+            # As everything needs to be word aligned, add extra zero to
+            # fixed_plastic Region if it has an odd number of entries and build
+            # uint32 view of it
             if (len(fixed_plastic_region) % 2) != 0:
-                fixed_plastic_region = numpy.asarray(numpy.append(
-                        fixed_plastic_region, 0), dtype='uint16')
+                fixed_plastic_region = \
+                    numpy.asarray(numpy.append(fixed_plastic_region, 0),
+                                  dtype='uint16')
             # does indeed return something (due to c fancy stuff in numpi) ABS
-            fixed_plastic_region_words = fixed_plastic_region.view(dtype="uint32")
 
-            spec.write_array(data = fixed_plastic_region_words)
-            wordsWritten += len(fixed_plastic_region_words)
+            # noinspection PyNoneFunctionAssignment
+            fixed_plastic_region_words = \
+                fixed_plastic_region.view(dtype="uint32")
 
-            write_ptr += (4 * wordsWritten)
+            spec.write_array(data=fixed_plastic_region_words)
+
+            # noinspection PyTypeChecker
+            words_written += len(fixed_plastic_region_words)
+
+            write_ptr += (4 * words_written)
 
             # Write padding (if required):
-            padding = ((fixed_row_length + self.SYNAPTIC_ROW_HEADER_WORDS) - wordsWritten)
+            padding = ((fixed_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)
+                       - words_written)
             if padding != 0:
                 spec.write(data=0xBBCCDDEE, repeats=padding, sizeof='uint32')
                 write_ptr += 4 * padding
 
-            rowNo += 1
+            row_no += 1
 
         # The current write pointer is where the next block could start:
-        nextBlockStartAddr = write_ptr
-        return blockStartAddr, nextBlockStartAddr
+        next_block_start_addr = write_ptr
+        return block_start_addr, next_block_start_addr
     
     def get_exact_synaptic_block_memory_size(self, subvertex):
-        memorySize = 0
+        memory_size = 0
         
         # Go through the subedges and add up the memory
         for subedge in subvertex.in_subedges:
-            if (memorySize & 0x3FF) != 0:
-                memorySize = (memorySize & 0xFFFFFC00) + 0x400
+            if (memory_size & 0x3FF) != 0:
+                memory_size = (memory_size & 0xFFFFFC00) + 0x400
             
             sublist = subedge.get_synapse_sublist()
-            max_n_words = max([subedge.edge.synapse_row_io.get_n_words(
-                        synapse_row) 
+            max_n_words = \
+                max([subedge.edge.synapse_row_io.get_n_words(synapse_row)
                     for synapse_row in sublist.get_rows()])
-            rowLength = self.selectMinimumRowLength(max_n_words)[1]
-            numRows = sublist.get_n_rows()
-            synBlockSz = 4 * (self.SYNAPTIC_ROW_HEADER_WORDS + rowLength)
-            allSynBlockSz = synBlockSz * numRows
-            memorySize += allSynBlockSz
-        return memorySize    
+            all_syn_block_sz = \
+                self._calculate_all_synaptic_block_size(sublist,
+                                                        max_n_words)
+            memory_size += all_syn_block_sz
+        return memory_size
     
     def get_synaptic_blocks_memory_size(self, lo_atom, hi_atom, in_edges):
         self._check_synapse_dynamics(in_edges)
-        memorySize = 0
+        memory_size = 0
         
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionEdge):
                 
                 # Get maximum row length in this edge 
-                maxRowLength = in_edge.get_max_n_words(lo_atom, hi_atom)
-                numRows = in_edge.get_n_rows()
-                    
-                # Gets smallest possible (i.e. supported by row length 
-                # Table structure) that can contain maxRowLength
-                rowLength = self.selectMinimumRowLength(maxRowLength)[1]
-                synBlockSz = 4 * (self.SYNAPTIC_ROW_HEADER_WORDS + rowLength)
-                allSynBlockSz = synBlockSz * numRows
+                max_n_words = in_edge.get_max_n_words(lo_atom, hi_atom)
+                all_syn_block_sz = \
+                    self._calculate_all_synaptic_block_size(in_edge,
+                                                            max_n_words)
                 
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master pynn_population.py table
@@ -160,14 +165,25 @@ class SynapticManager(object):
                     n_atoms = in_edge.prevertex.atoms
                 if n_atoms > 100:
                     n_atoms = 100
+
+                num_rows = in_edge.get_n_rows()
+                extra_mem = math.ceil(float(num_rows) / float(n_atoms)) * 1024
+                if extra_mem == 0:
+                    extra_mem = 1024
+                all_syn_block_sz += extra_mem
+                memory_size += all_syn_block_sz
                 
-                extraMem = math.ceil(float(numRows) / float(n_atoms)) * 1024
-                if extraMem == 0:
-                    extraMem = 1024
-                allSynBlockSz += extraMem
-                memorySize += allSynBlockSz 
-                
-        return memorySize
+        return memory_size
+
+    def _calculate_all_synaptic_block_size(self, synaptic_sub_list,
+                                           max_n_words):
+        # Gets smallest possible (i.e. supported by row length
+        # Table structure) that can contain max_row_length
+        row_length = self.select_minimum_row_length(max_n_words)[1]
+        num_rows = synaptic_sub_list.get_n_rows()
+        syn_block_sz = \
+            4 * (constants.SYNAPTIC_ROW_HEADER_WORDS + row_length)
+        return syn_block_sz * num_rows
 
     def _check_synapse_dynamics(self, in_edges):
         if self._stdp_checked:
@@ -177,7 +193,7 @@ class SynapticManager(object):
             if (isinstance(in_edge, ProjectionEdge)
                     and in_edge.synapse_dynamics is not None):
                 if in_edge.synapse_dynamics.fast is not None:
-                    raise exceptions.PacmanException(
+                    raise exceptions.SynapticConfigurationException(
                         "Fast synapse dynamics are not supported")
                 elif in_edge.synapse_dynamics.slow is not None:
                     if self._stdp_mechanism is None:
@@ -185,7 +201,7 @@ class SynapticManager(object):
                     else:
                         if not (self._stdp_mechanism
                                 == in_edge.synapse_dynamics.slow):
-                            raise exceptions.PacmanException(
+                            raise exceptions.SynapticConfigurationException(
                                 "Different STDP mechanisms on the same"
                                 + " vertex are not supported")
 
@@ -199,7 +215,8 @@ class SynapticManager(object):
     def write_synapse_parameters(self, spec, subvertex):
         raise NotImplementedError
 
-    def selectMinimumRowLength(self, longestActualRow):
+    @staticmethod
+    def select_minimum_row_length(longest_actual_row):
         """
         Given a new synaptic block the list of valid row lengths supported,
         return the index and value of the minimum valid length that can fit
@@ -207,41 +224,43 @@ class SynapticManager(object):
         """
 
         # Can even the largest valid entry accommodate the given synaptic row?
-        if longestActualRow > SynapticManager.ROW_LEN_TABLE_ENTRIES[-1]:
-            raise Exception(
+        if longest_actual_row > constants.ROW_LEN_TABLE_ENTRIES[-1]:
+            raise exceptions.SynapticBlockGenerationException(
                 """\
                 Synaptic block generation.
                 Row table entry calculator: Max row length too long.
                 Wanted length %d, but max length permitted is %d.
                 Try adjusting table entries in row length translation table.
-                """ % (longestActualRow,
-                       SynapticManager.ROW_LEN_TABLE_ENTRIES[-1])
+                """ % (longest_actual_row,
+                       constants.ROW_LEN_TABLE_ENTRIES[-1])
             )
 
         # Search up the list until we find one entry big enough:
-        bestIndex = None
-        minimumValidRowLength = None
-        for i in range(len(SynapticManager.ROW_LEN_TABLE_ENTRIES)):
-            if longestActualRow <= SynapticManager.ROW_LEN_TABLE_ENTRIES[i]:
+        best_index = None
+        minimum_valid_row_length = None
+        for i in range(len(constants.ROW_LEN_TABLE_ENTRIES)):
+            if longest_actual_row <= constants.ROW_LEN_TABLE_ENTRIES[i]:
                 # This row length is big enough. Choose it and exit:
-                bestIndex = i
-                minimumValidRowLength = SynapticManager.ROW_LEN_TABLE_ENTRIES[i]
+                best_index = i
+                minimum_valid_row_length = constants.ROW_LEN_TABLE_ENTRIES[i]
                 break
 
-        # Variable bestIndex now contains the table entry corresponding to the
+        # Variable best_index now contains the table entry corresponding to the
         # smallest row that is big enough for our row of data
-        return bestIndex, minimumValidRowLength
+        return best_index, minimum_valid_row_length
 
     def get_synapse_parameter_size(self, lo_atom, hi_atom):
         raise NotImplementedError
 
-    def get_synapse_targets(self):
+    @staticmethod
+    def get_synapse_targets():
         """
         Gets the supported names of the synapse targets
         """
-        return ("excitatory", "inhibitory")
+        return "excitatory", "inhibitory"
 
-    def get_synapse_id(self, target_name):
+    @staticmethod
+    def get_synapse_id(target_name):
         """
         Returns the numeric identifier of a synapse, given its name.  This
         is used by the neuron models.
@@ -258,27 +277,28 @@ class SynapticManager(object):
             return self._stdp_mechanism.get_params_size(self, lo_atom, hi_atom)
         return 0
 
-    def write_row_length_translation_table(self, spec, ROW_LEN_TRANSLATION):
+    @staticmethod
+    def write_row_length_translation_table(spec, row_length_trnaslation_region):
         """
         Generate Row Length Translation Table (region 4):
         """
         spec.comment("\nWriting Row Length Translation Table:\n")
 
         # Switch focus of writes to the memory region to hold the table:
-        spec.switchWriteFocus(region = ROW_LEN_TRANSLATION)
+        spec.switch_write_focus(region=row_length_trnaslation_region)
 
         # The table is a list of eight 32-bit words, that provide a row length
         # when given its encoding (3-bit value used as an index into the
         # table).
         # Set the focus to memory region 3 (row length translation):
-        for entry in SynapticManager.ROW_LEN_TABLE_ENTRIES:
-            spec.write(data = entry)
+        for entry in constants.ROW_LEN_TABLE_ENTRIES:
+            spec.write_value(data=entry)
 
-    def write_stdp_parameters(self, spec, subvertex,
-                            weight_scale, STDP_PARAMS):
+    def write_stdp_parameters(self, spec, subvertex, weight_scale,
+                              machine_time_step, stdp_params):
         if self._stdp_mechanism is not None:
-            self._stdp_mechanism.write_plastic_params(spec, STDP_PARAMS,
-                    machineTimeStep, subvertex, weight_scale)
+            self._stdp_mechanism.write_plastic_params(
+                spec, stdp_params, machine_time_step, subvertex, weight_scale)
 
 
     def get_weight_scale(self, ring_buffer_to_input_left_shift):
@@ -354,7 +374,7 @@ class SynapticManager(object):
                         for row in sublist.get_rows()])
                 # Get an entry in the row length table for this length
                 row_index, row_length = \
-                    self.selectMinimumRowLength(max_row_length)
+                    self.select_minimum_row_length(max_row_length)
                 if max_row_length == 0 or row_length == 0:
                     print ""
 

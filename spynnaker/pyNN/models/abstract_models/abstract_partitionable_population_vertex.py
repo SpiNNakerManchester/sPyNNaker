@@ -3,8 +3,6 @@ from abc import abstractmethod
 from six import add_metaclass
 
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_properties.abstract_synaptic_manager import \
-    SynapticManager
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
@@ -19,7 +17,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         AbstractDataSpecableVertex.__init__(self, n_atoms, label,
                                             constraints=constraints)
         AbstractPartitionableVertex.__init__(self, n_atoms, label,
-                                            constraints=constraints)
+                                             constraints=constraints)
 
     def get_neuron_params_size(self, lo_atom, hi_atom):
         """
@@ -38,8 +36,8 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                 self.get_neuron_params_size(lo_atom, hi_atom)
                 + self.get_synapse_parameter_size(lo_atom, hi_atom)
                 + self.get_stdp_parameter_size(lo_atom, hi_atom, self.in_edges)
-                + SynapticManager.ROW_LEN_TABLE_SIZE
-                + SynapticManager.MASTER_POPULATION_TABLE_SIZE
+                + constants.ROW_LEN_TABLE_SIZE
+                + constants.MASTER_POPULATION_TABLE_SIZE
                 + self.get_synaptic_blocks_memory_size(lo_atom, hi_atom,
                                                        self.in_edges)
                 + self.get_spike_buffer_size(lo_atom, hi_atom)
