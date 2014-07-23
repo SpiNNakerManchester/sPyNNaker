@@ -507,12 +507,22 @@ class Population(object):
         # Add a dictionary-structured set of new parameters to the current set:
         self._parameters.update(parameter)
 
+    #NONE PYNN API CALL
     def set_constraint(self, constraint):
         """
         Apply a constraint to a population that restricts the processor
         onto which its sub-populations will be placed.
         """
         self._vertex.add_constraint(constraint)
+
+    #NONE PYNN API CALL
+    def set_model_based_max_atoms_per_core(self, new_value):
+        if hasattr(self._vertex, "set_model_max_atoms_per_core"):
+            self._vertex.set_model_max_atoms_per_core(new_value)
+        else:
+            raise exceptions.ConfigurationException(
+                "This population does not support its max_atoms_per_core "
+                "variable being adjusted by the end user. Sorry")
 
     @property
     def structure(self):

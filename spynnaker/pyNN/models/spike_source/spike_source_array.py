@@ -37,6 +37,7 @@ INFINITE_SIMULATION = 4294967295
 class SpikeSourceArray(AbstractSpikeSource):
 
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID
+    _model_based_max_atoms_per_core = 256
     
     def __init__(self, atoms, spike_times, constraints=None,
                  label="SpikeSourceArray"):
@@ -44,7 +45,9 @@ class SpikeSourceArray(AbstractSpikeSource):
         Creates a new SpikeSourceArray Object.
         """
         AbstractSpikeSource.__init__(self, label=label, n_neurons=atoms,
-                                     constraints=constraints)
+                                     constraints=constraints,
+                                     max_atoms_per_core=SpikeSourceArray.
+                                     _model_based_max_atoms_per_core)
         self._spike_times = spike_times
 
     @property
@@ -53,6 +56,11 @@ class SpikeSourceArray(AbstractSpikeSource):
         Return a string representing a label for this class.
         """
         return "SpikeSourceArray"
+
+    @staticmethod
+    def set_model_max_atoms_per_core(new_value):
+        SpikeSourceArray.\
+            _model_based_max_atoms_per_core = new_value
     
     def get_spikes_per_timestep(self, lo_atom, hi_atom):
         """

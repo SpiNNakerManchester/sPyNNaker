@@ -14,6 +14,7 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
                                      AbstractPopulationVertex):
 
     CORE_APP_IDENTIFIER = constants.IF_CURRENT_EXP_CORE_APPLICATION_ID
+    _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, constraints=None, label=None,
@@ -29,15 +30,20 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
                                             v_init=v_init, v_reset=v_reset,
                                             v_rest=v_rest, v_thresh=v_thresh,
                                             tau_refrac=tau_refrac)
-        AbstractPopulationVertex.__init__(self, n_neurons=n_neurons,
-                                          n_params=10, label=label,
-                                          max_atoms_per_core=256,
-                                          binary="IF_curr_exp.aplx",
-                                          constraints=constraints)
+        AbstractPopulationVertex.__init__(
+            self, n_neurons=n_neurons, n_params=10, label=label,
+            binary="IF_curr_exp.aplx", constraints=constraints,
+            max_atoms_per_core=
+            IFCurrentExponentialPopulation._model_based_max_atoms_per_core)
 
     @property
     def model_name(self):
         return "IF_curr_exp"
+
+    @staticmethod
+    def set_model_max_atoms_per_core(new_value):
+        IFCurrentExponentialPopulation.\
+            _model_based_max_atoms_per_core = new_value
 
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         return 782 * ((hi_atom - lo_atom) + 1)

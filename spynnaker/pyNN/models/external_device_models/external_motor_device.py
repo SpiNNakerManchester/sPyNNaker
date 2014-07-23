@@ -14,9 +14,9 @@ class ExternalMotorDevice(ExternalDevice):
                                                   virtual_chip_coords,
                                                   connected_chip_coords,
                                                   connected_chip_edge,
-                                                  label=label)
+                                                  label=label,
+                                                  max_atoms_per_core=1)
         self.neuron_controlled = neuron_controlled
-        self._add_max_atoms_per_core_constraint()
 
     @property
     def model_name(self):
@@ -24,6 +24,3 @@ class ExternalMotorDevice(ExternalDevice):
 
     def get_commands(self, last_runtime_tic):
         return list()
-
-    def _add_max_atoms_per_core_constraint(self):
-        self.add_constraint(PartitionerMaximumSizeConstraint(1))

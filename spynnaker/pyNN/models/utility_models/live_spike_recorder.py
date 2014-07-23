@@ -1,5 +1,7 @@
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
     AbstractComponentVertex
+from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -22,7 +24,8 @@ from data_specification.file_data_writer import FileDataWriter
 INFINITE_SIMULATION = 4294967295
 
 
-class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex):
+class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex,
+                        AbstractPartitionableVertex):
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
     SYSTEM_REGION = 1
 
@@ -31,6 +34,7 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex):
     the host
 
     """
+
     def __init__(self):
         """
         Creates a new AppMonitor Object.
@@ -38,8 +42,9 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex):
         AbstractComponentVertex.__init__(self, "Monitor")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="Monitor")
+        AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
+                                             max_atoms_per_core=1)
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
-        self.add_constraint(PartitionerMaximumSizeConstraint(1))
 
     @property
     def model_name(self):
@@ -117,10 +122,12 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex):
         spec.write(data=recording_info)
         return
 
-    #inhirrted from vertex
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
-        resources = list()
-        resources.append(CPUCyclesPerTickResource(0))
-        resources.append(DTCMResource(0))
-        resources.append(SDRAMResource(0))
-        return resources
+    #inhirrted from partitionable vertex
+    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+        return CPUCyclesPerTickResource(0)
+
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
+        return SDRAMResource(0)
+
+    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
+        return DTCMResource(0)

@@ -26,10 +26,12 @@ logger = logging.getLogger(__name__)
 @add_metaclass(ABCMeta)
 class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
 
-    def __init__(self, record, binary, n_neurons, label, constraints):
+    def __init__(self, record, binary, n_neurons, label, constraints,
+                 max_atoms_per_core):
         SynapticManager.__init__(self)
-        AbstractPartitionablePopulationVertex.__init__(self, n_neurons,
-                                                       label, constraints)
+        AbstractPartitionablePopulationVertex.__init__(
+            self, n_atoms=n_neurons, label=label, constraints=constraints,
+            max_atoms_per_core=max_atoms_per_core)
         self._record = record
         self._record_v = False
         self._record_gsyn = False

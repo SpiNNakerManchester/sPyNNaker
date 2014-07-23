@@ -114,10 +114,3 @@ class ExternalFPGARetinaDevice(AbstractExternalRetinaDevice):
             packet_conversions.get_y_from_fpga_retina(details, mode), \
             packet_conversions.get_spike_value_from_fpga_retina(details,
                                                                 mode)
-
-
-def requires_retina_page():
-    """
-    used by the visuliser to determine if a retina page should be used
-    """
-    return True

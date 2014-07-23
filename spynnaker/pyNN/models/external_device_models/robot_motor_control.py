@@ -14,6 +14,8 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.constraints.partitioner_maximum_size_constraint \
+    import PartitionerMaximumSizeConstraint
 
 
 from data_specification.data_specification_generator import \
@@ -29,6 +31,7 @@ class RobotMotorControl(AbstractComponentVertex, AbstractDataSpecableVertex):
     PARAMS = 2
     SYSTEM_SIZE = 16
     PARAMS_SIZE = 7 * 4
+    _N_ATOMS = 6
 
     CORE_APP_IDENTIFIER = constants.ROBOT_MOTER_CONTROL_CORE_APPLICATION_ID
 
@@ -41,8 +44,11 @@ class RobotMotorControl(AbstractComponentVertex, AbstractDataSpecableVertex):
         constructor that depends upon the Component vertex
         """
         AbstractComponentVertex.__init__(self, label)
-        AbstractDataSpecableVertex.__init(n_atoms=6, label=label,
-                                          constraints=None)
+        AbstractDataSpecableVertex.__init(n_atoms=RobotMotorControl._N_ATOMS,
+                                          label=label, constraints=None)
+        max_constraint = \
+            PartitionerMaximumSizeConstraint(RobotMotorControl._N_ATOMS)
+        self.add_constraint(max_constraint)
         self._binary = "robot_motor_control.aplx"
 
         self.virtual_chip_coords = virtual_chip_coords

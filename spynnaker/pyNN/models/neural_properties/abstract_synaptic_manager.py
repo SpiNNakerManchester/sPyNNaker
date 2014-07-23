@@ -9,6 +9,8 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex\
+    import AbstractPartitionableVertex
 
 
 from spinnman import exceptions as spinnman_exceptions
@@ -18,6 +20,7 @@ import numpy
 import math
 import logging
 import struct
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -159,13 +162,12 @@ class SynapticManager(object):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master pynn_population.py
                 # table
-                n_atoms = in_edge._pre_vertex.get_maximum_atoms_per_core()
-                if in_edge._pre_vertex.custom_max_atoms_per_core is not None:
-                    n_atoms = in_edge._pre_vertex.custom_max_atoms_per_core
+                n_atoms = sys.maxint
+                if issubclass(type(AbstractPartitionableVertex),
+                              in_edge._pre_vertex):
+                    n_atoms = in_edge._pre_vertex.get_maximum_atoms_per_core()
                 if in_edge._pre_vertex.atoms < n_atoms:
                     n_atoms = in_edge._pre_vertex.atoms
-                if n_atoms > 100:
-                    n_atoms = 100
 
                 num_rows = in_edge.get_n_rows()
                 extra_mem = math.ceil(float(num_rows) / float(n_atoms)) * 1024

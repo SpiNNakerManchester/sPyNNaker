@@ -130,7 +130,7 @@ class Projection(object):
             spinnaker_control.add_edge(self._projection_edge)
 
     def _add_delay_extension(self, num_src_neurons, max_delay_for_projection,
-                             max_delay_per_neuron,  original_synapse_list, 
+                             max_delay_per_neuron, original_synapse_list,
                              presynaptic_population, postsynaptic_population, 
                              label, synapse_dynamics):
         """
@@ -160,13 +160,14 @@ class Projection(object):
         if delay_vertex is None:
             source_name = presynaptic_population.vertex.label
             delay_name = "{%s}_delayed".format(source_name)
-            delay_vertex = DelayExtensionVertex(num_src_neurons,
-                                          max_delay_per_neuron, 
-                                          label=delay_name)
+            delay_vertex = DelayExtensionVertex(
+                n_neurons=num_src_neurons, source_vertex=presynaptic_population,
+                max_delay_per_neuron=max_delay_per_neuron, label=delay_name)
             presynaptic_population.vertex.delay_vertex = delay_vertex
             #spinnaker.add_vertex(self.delay_vertex)
 
-        # Create a connection from the source pynn_population.py to the delay vertex
+        # Create a connection from the source pynn_population.py to the
+        # delay vertex
         new_label = "{%s}_to_DE".format(label)
         remaining_edge = DelayAfferentEdge(presynaptic_population.vertex,
                                            delay_vertex, label=new_label)
@@ -268,8 +269,8 @@ class Projection(object):
                         dtype=float))
             return delays
 
-        delays = numpy.zeros((self._projection_edge.prevertex.atoms,
-                              self._projection_edge.postvertex.atoms))
+        delays = numpy.zeros((self._projection_edge.pre_vertex.atoms,
+                              self._projection_edge.post_vertex.atoms))
         rows = synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]
@@ -306,7 +307,7 @@ class Projection(object):
             timer = Timer()
             timer.start_timing()
         if self._read_synapse_list is None:
-            self._retrieve_synaptic_data()
+            self._retrieve_synaptic_data(self._spinnaker.subgraph)
         synapse_list = self._read_synapse_list
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
@@ -317,8 +318,8 @@ class Projection(object):
                 weights.extend(row.weights)
             return weights
 
-        weights = numpy.zeros((self._projection_edge.prevertex.atoms,
-                               self._projection_edge.postvertex.atoms))
+        weights = numpy.zeros((self._projection_edge.pre_vertex.atoms,
+                               self._projection_edge.post_vertex.atoms))
         rows = synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]

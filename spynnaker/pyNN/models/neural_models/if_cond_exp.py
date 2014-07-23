@@ -16,6 +16,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
                                          IntegrateAndFireProperties,
                                          AbstractPopulationVertex):
     CORE_APP_IDENTIFIER = constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID
+    _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, constraints=None, label=None, tau_m=20,
@@ -34,15 +35,20 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
                                             v_rest=v_rest, v_thresh=v_thresh,
                                             tau_refrac=tau_refrac)
 
-        AbstractPopulationVertex.__init__(self, n_neurons=n_neurons,
-                                          n_params=10, label=label,
-                                          max_atoms_per_core=256,
-                                          binary="IF_cond_exp.aplx",
-                                          constraints=constraints)
+        AbstractPopulationVertex.__init__(
+            self, n_neurons=n_neurons, n_params=10, label=label,
+            max_atoms_per_core=
+            IFConductanceExponentialPopulation._model_based_max_atoms_per_core,
+            binary="IF_cond_exp.aplx", constraints=constraints)
 
     @property
     def model_name(self):
         return "IF_curr_exp"
+
+    @staticmethod
+    def set_model_max_atoms_per_core(new_value):
+        IFConductanceExponentialPopulation.\
+            _model_based_max_atoms_per_core = new_value
     
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         """

@@ -19,10 +19,10 @@ class AbstractSpikeSource(AbstractComponentVertex, AbstractPartitionableVertex):
         'SPIKE_HISTORY_REGION'
     )
 
-    def __init__(self, label, n_neurons, constraints):
-        AbstractPartitionableVertex.__init__(self, n_atoms=n_neurons,
-                                             label=label,
-                                             constraints=constraints)
+    def __init__(self, label, n_neurons, constraints, max_atoms_per_core):
+        AbstractPartitionableVertex.__init__(
+            self, n_atoms=n_neurons, label=label, constraints=constraints,
+            max_atoms_per_core=max_atoms_per_core)
         AbstractComponentVertex.__init__(self, label)
         max_constraint = PartitionerMaximumSizeConstraint(256)
         self.add_constraint(max_constraint)

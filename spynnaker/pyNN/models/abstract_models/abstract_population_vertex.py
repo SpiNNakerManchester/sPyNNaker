@@ -30,11 +30,7 @@ class AbstractPopulationVertex(AbstractComponentVertex, PopulationManager):
 
         AbstractComponentVertex.__init__(self, label)
         PopulationManager.__init__(self, False, binary, n_neurons, label,
-                                   constraints)
-        #add the max atom per core constraint
-        max_atom_per_core_constraint = \
-            PartitionerMaximumSizeConstraint(max_atoms_per_core)
-        self.add_constraint(max_atom_per_core_constraint)
+                                   constraints, max_atoms_per_core)
         self._delay_vertex = None
         self._n_params = n_params
 

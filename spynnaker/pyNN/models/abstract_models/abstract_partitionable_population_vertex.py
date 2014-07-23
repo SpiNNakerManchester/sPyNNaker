@@ -8,16 +8,17 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
-# noinspection Py
+
 @add_metaclass(ABCMeta)
 class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                                             AbstractPartitionableVertex):
 
-    def __init__(self, n_atoms, label, constraints=None):
+    def __init__(self, n_atoms, label, max_atoms_per_core, constraints=None):
         AbstractDataSpecableVertex.__init__(self, n_atoms, label,
                                             constraints=constraints)
-        AbstractPartitionableVertex.__init__(self, n_atoms, label,
-                                             constraints=constraints)
+        AbstractPartitionableVertex.__init__(
+            self, n_atoms, label, constraints=constraints,
+            max_atoms_per_core=max_atoms_per_core)
 
     def get_neuron_params_size(self, lo_atom, hi_atom):
         """

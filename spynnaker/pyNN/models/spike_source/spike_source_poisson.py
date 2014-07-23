@@ -50,13 +50,16 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         'POISSON_PARAMS_REGION',
         'SPIKE_HISTORY_REGION'
     )
+    _model_based_max_atoms_per_core = 256
 
     def __init__(self, atoms, contraints=None, label="SpikeSourcePoisson",
                  rate=1, start=0, duration=10000, seed=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
-        AbstractSpikeSource.__init__(self, atoms, label, contraints)
+        AbstractSpikeSource.__init__(self, atoms, label, contraints,
+                                     max_atoms_per_core=SpikeSourcePoisson.
+                                     _model_based_max_atoms_per_core)
         self._rate = rate
         self._start = start
         self._duration = duration
@@ -68,6 +71,11 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         Return a string representing a label for this class.
         """
         return "SpikeSourcePoisson"
+
+    @staticmethod
+    def set_model_max_atoms_per_core(new_value):
+        SpikeSourcePoisson.\
+            _model_based_max_atoms_per_core = new_value
     
     def get_spike_buffer_size(self, lo_atom, hi_atom):
         """

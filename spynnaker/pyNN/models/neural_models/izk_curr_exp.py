@@ -14,6 +14,7 @@ class IzhikevichCurrentExponentialPopulation(
         AbstractPopulationVertex):
 
     CORE_APP_IDENTIFIER = constants.IZK_CURRENT_EXP_CORE_APPLICATION_ID
+    _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, constraints=None, label=None, a=0.02, c=-65.0,
@@ -27,16 +28,21 @@ class IzhikevichCurrentExponentialPopulation(
         AbstractIzhikevichVertex.__init__(self, n_neurons, a=a, c=c, b=b, d=d,
                                           i_offset=i_offset, u_init=u_init,
                                           v_init=v_init)
-        AbstractPopulationVertex.__init__(self, n_neurons=n_neurons,
-                                          n_params=10, label=label,
-                                          max_atoms_per_core=256,
-                                          binary="IZK_curr_exp.aplx",
-                                          constraints=constraints)
+        AbstractPopulationVertex.__init__(
+            self, n_neurons=n_neurons, n_params=10, label=label,
+            binary="IZK_curr_exp.aplx", constraints=constraints,
+            max_atoms_per_core=IzhikevichCurrentExponentialPopulation.
+            _model_based_max_atoms_per_core)
 
     @property
     def model_name(self):
         return "IZK_curr_exp"
-    
+
+    @staticmethod
+    def set_model_max_atoms_per_core(new_value):
+        IzhikevichCurrentExponentialPopulation.\
+            _model_based_max_atoms_per_core = new_value
+
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         """
         Gets the CPU requirements for a range of atoms

@@ -1,6 +1,8 @@
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
     AbstractComponentVertex
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
@@ -25,7 +27,8 @@ import os
 INFINITE_SIMULATION = 4294967295
 
 
-class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex):
+class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex,
+                      AbstractPartitionableVertex):
 
     SYSTEM_REGION = 1
     COMMANDS = 2
@@ -39,10 +42,13 @@ class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex):
         AbstractComponentVertex.__init__(self, "multi_cast_source_sender")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="multi_cast_source_sender")
+        AbstractPartitionableVertex.__init__(
+            self, label="multi_cast_source_sender", n_atoms=1,
+            max_atoms_per_core=1)
+
         self._writes = None
         self._memory_requirements = 0
         self._edge_map = None
-        self.add_constraint(PartitionerMaximumSizeConstraint(1))
 
     def generate_data_spec(self, processor, subvertex, sub_graph, routing_info):
         """
@@ -264,16 +270,12 @@ class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex):
         """
         return "multi_cast_source"
 
-    #abstract methods from vertex
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
-        """
-        return the resources of the multi-cast source
-        """
-        if self._writes is None:
-            self.calculate_memory_requirements(self._no_machine_time_steps)
+    #inhirrted from partitionable vertex
+    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+        return CPUCyclesPerTickResource(0)
 
-        resources = list()
-        resources.append(CPUCyclesPerTickResource(0))
-        resources.append(DTCMResource(0))
-        resources.append(SDRAMResource(self._memory_requirements))
-        return resources
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
+        return SDRAMResource(self._memory_requirements)
+
+    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
+        return DTCMResource(0)

@@ -14,6 +14,8 @@ from spynnaker.pyNN.utilities.conf import config
 
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+    import PartitionerSameSizeAsVertexConstraint
 
 
 from data_specification.data_specification_generator import \
@@ -50,7 +52,7 @@ class DelayExtensionVertex(AbstractComponentVertex,
 
     CORE_APP_IDENTIFIER = constants.DELAY_EXTENSION_CORE_APPLICATION_ID
     
-    def __init__(self, n_neurons, max_delay_per_neuron, 
+    def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  constraints=None, label="DelayExtension"):
         """
         Creates a new DelayExtension Object.
@@ -62,8 +64,12 @@ class DelayExtensionVertex(AbstractComponentVertex,
         AbstractComponentVertex.__init__(self, label=label)
 
         self._max_delay_per_neuron = max_delay_per_neuron
+        self._source_vertex = source_vertex
+        joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
         max_constraint = PartitionerMaximumSizeConstraint(256)
         self.add_constraint(max_constraint)
+        self.add_constraint(joint_constrant)
+
 
     @property
     def model_name(self):
