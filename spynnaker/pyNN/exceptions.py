@@ -63,3 +63,12 @@ class SynapticMaxIncomingAtomsSupportException(ConfigurationException):
     :raise None: does not raise any known exceptions
     """
     pass
+
+
+class DelayExtensionException(ConfigurationException):
+    """raised when a delay extension vertex is given a subedge that is not from
+    a delay DelayAfferentEdge
+
+    :raise None: does not raise any known exceptions
+    """
+    pass

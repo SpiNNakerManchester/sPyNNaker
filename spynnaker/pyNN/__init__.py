@@ -43,8 +43,8 @@ from spynnaker.pyNN.models.neural_models.izk_curr_exp \
 #neural projections
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
     import DelayAfferentEdge
-from spynnaker.pyNN.models.neural_projections.delay_extension\
-    import DelayExtension
+from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
+    import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
     import DelayProjectionEdge
 from spynnaker.pyNN.models.neural_projections.delay_projection_subedge \

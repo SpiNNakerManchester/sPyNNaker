@@ -14,8 +14,8 @@ from pacman.operations import routing_info_allocator_algorithms
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
-from spynnaker.pyNN.models.neural_projections.delay_extension\
-    import DelayExtension
+from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
+    import DelayExtensionVertex
 from spynnaker.pyNN.models.utility_models.live_spike_recorder\
     import LiveSpikeRecorder
 from spynnaker.pyNN.visualiser_package.visualiser_creation_utility \
@@ -115,10 +115,10 @@ class Spinnaker(object):
                 "current machine time step".format(1.0 * timestep))
     
         natively_supported_delay_for_models = \
-            DelayExtension.MAX_SUPPORTED_DELAY_TICS
+            DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS
         delay_extention_max_supported_delay = \
-            DelayExtension.MAX_DELAY_BLOCKS \
-            * DelayExtension.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
+            DelayExtensionVertex.MAX_DELAY_BLOCKS \
+            * DelayExtensionVertex.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
     
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \

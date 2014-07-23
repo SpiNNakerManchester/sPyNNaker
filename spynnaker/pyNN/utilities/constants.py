@@ -11,12 +11,14 @@ SETUP_SIZE = 16  # Single word of info with flags, etc.
 NO_PARAMS = 10
 PARAMS_HEADER_SIZE = 3  # Number of 32-bit words in header of params block
 PARAMS_BASE_SIZE = 4 * (PARAMS_HEADER_SIZE + NO_PARAMS)
+BLOCK_INDEX_HEADER_WORDS = 3
+BLOCK_INDEX_ROW_WORDS = 2
 
 RECORD_SPIKE_BIT = 1 << 0
 RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
 RECORDING_ENTRY_BYTE_SIZE = 4
-
+BITS_PER_WORD = 32.0
 
 # From neuron common-typedefs.h
 SYNAPSE_INDEX_BITS = 8
@@ -47,13 +49,6 @@ NA_TO_PA_SCALE = 1000.0
 WEIGHT_FLOAT_TO_FIXED_SCALE = 16.0
 SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
 ####
-
-# How large are the time-stamps stored with each event
-_TIME_STAMP_BYTES = 4
-
-# How large are the pre_synaptic_trace_entry_t structures
-_ALL_TO_ALL_EVENT_BYTES = 2
-_NEAREST_PAIR_EVENT_BYTES = 0
 
 #natively supported delays for all models
 MAX_SUPPORTED_DELAY_TICS = 16

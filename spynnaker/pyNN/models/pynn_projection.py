@@ -1,8 +1,8 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.neural_projections.delay_extension\
-    import DelayExtension
+from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
+    import DelayExtensionVertex
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.models.neural_projections.projection_edge \
     import ProjectionEdge
@@ -88,11 +88,11 @@ class Projection(object):
         # delays in the models
         min_delay, max_delay = synapse_list.get_min_max_delay()
         natively_supported_delay_for_models = \
-            DelayExtension.MAX_SUPPORTED_DELAY_TICS
+            DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS
 
         delay_extention_max_supported_delay = \
-            DelayExtension.MAX_DELAY_BLOCKS * \
-            DelayExtension.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
+            DelayExtensionVertex.MAX_DELAY_BLOCKS * \
+            DelayExtensionVertex.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
 
         if max_delay > (natively_supported_delay_for_models 
                         + delay_extention_max_supported_delay):
@@ -160,7 +160,7 @@ class Projection(object):
         if delay_vertex is None:
             source_name = presynaptic_population.vertex.label
             delay_name = "{%s}_delayed".format(source_name)
-            delay_vertex = DelayExtension(num_src_neurons,
+            delay_vertex = DelayExtensionVertex(num_src_neurons,
                                           max_delay_per_neuron, 
                                           label=delay_name)
             presynaptic_population.vertex.delay_vertex = delay_vertex
@@ -215,10 +215,10 @@ class Projection(object):
                 synapse_list = \
                     self._projection_edge.get_synaptic_data(
                         self._spinnaker,
-                        DelayExtension.MAX_SUPPORTED_DELAY_TICS, subgraph)
+                        DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS, subgraph)
             if self._delay_edge is not None:
                 delay_synapse_list = self._delay_edge.get_synaptic_data(
-                    self._spinnaker, DelayExtension.MAX_SUPPORTED_DELAY_TICS)
+                    self._spinnaker, DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS)
 
             # If there is both a delay and a non-delay list, merge them
             if synapse_list is not None and delay_synapse_list is not None:
