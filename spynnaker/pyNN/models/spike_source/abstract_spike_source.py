@@ -16,11 +16,11 @@ class AbstractSpikeSource(AbstractComponentVertex, AbstractPartitionableVertex,
     RECORD_SPIKE_BIT = 1 << 0
 
     _SPIKE_SOURCE_REGIONS = Enum(
-        'SYSTEM_REGION',
-        'BLOCK_INDEX_REGION',
-        'SPIKE_DATA_REGION',
-        'SPIKE_HISTORY_REGION'
-    )
+        value="_SPIKE_SOURCE_REGIONS",
+        names=[('SYSTEM_REGION', 0),
+               ('BLOCK_INDEX_REGION', 1),
+               ('SPIKE_DATA_REGION', 2),
+               ('SPIKE_HISTORY_REGION', 3)])
 
     def __init__(self, label, n_neurons, constraints, max_atoms_per_core):
         AbstractPartitionableVertex.__init__(

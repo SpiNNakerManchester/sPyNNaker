@@ -1,4 +1,3 @@
-__author__ = 'stokesa6'
 import logging
 import gtk
 from spynnaker.pyNN.visualiser_package.visualiser_pages.raster_page \

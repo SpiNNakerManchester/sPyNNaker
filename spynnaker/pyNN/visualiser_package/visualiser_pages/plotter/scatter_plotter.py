@@ -1,5 +1,6 @@
 __author__ = 'stokesa6'
-from neural_spinnaker.visualiser_pages.plotter.plotter import Plotter as Plot
+from spynnaker.pyNN.visualiser_package.visualiser_pages.plotter.plotter\
+    import Plot
 from pycha import scatter
 
 

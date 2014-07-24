@@ -1,5 +1,4 @@
 from __builtin__ import sorted
-__author__ = 'stokesa6'
 import gtk
 from spynnaker.pyNN.visualiser_package.visualiser_pages.plotter.\
     scatter_plotter import ScatterplotChart

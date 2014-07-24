@@ -1,4 +1,3 @@
-__author__ = 'stokesa6'
 import gtk
 import math
 import logging

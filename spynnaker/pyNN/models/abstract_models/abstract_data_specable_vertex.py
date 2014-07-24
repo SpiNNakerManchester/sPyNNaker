@@ -95,3 +95,20 @@ class AbstractDataSpecableVertex(Vertex):
                                              processor_chip_y,
                                              processor_id)
         return binary_file_name
+
+    @staticmethod
+    def get_application_data_file_name(processor_chip_x, processor_chip_y,
+                                       processor_id, hostname):
+        has_binary_folder_set = \
+            config.has_option("SpecGeneration", "Binary_folder")
+        if not has_binary_folder_set:
+            binary_folder = tempfile.gettempdir()
+            config.set("SpecGeneration", "Binary_folder", binary_folder)
+        else:
+            binary_folder = config.get("SpecGeneration", "Binary_folder")
+
+        binary_file_name = \
+            binary_folder + os.sep + "{%s}_appData_{%d}_{%d}_{%d}.dat"\
+                                     .format(hostname, processor_chip_x,
+                                             processor_chip_y,
+                                             processor_id)

@@ -1,4 +1,3 @@
-__author__ = 'stokesa6'
 from visualiser.visualiser_thread import VisualiserThread
 from spynnaker.pyNN.visualiser_package.visualiser_pages.machine_page \
     import MachinePage

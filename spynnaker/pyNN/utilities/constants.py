@@ -66,24 +66,30 @@ MULTICASE_SOURCE_CORE_APPLICATION_ID = 0xAC6
 IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID = 0xAC7
 IZK_CURRENT_EXP_CORE_APPLICATION_ID = 0xAC8
 
-edges = Enum(
-    'EAST',
-    'NORTH_EAST',
-    'NORTH',
-    'WEST',
-    'SOUTH_WEST',
-    'SOUTH'
-)
+EDGES = Enum(
+    value="EDGES",
+    names=[("EAST", 0),
+           ("NORTH_EAST", 1),
+           ("NORTH", 2),
+           ("WEST", 3),
+           ("SOUTH_WEST", 4),
+           ("SOUTH", 5)])
+
 
 POPULATION_BASED_REGIONS = Enum(
-        'SYSTEM',
-        'NEURON_PARAMS',
-        'SYNAPSE_PARAMS',
-        'ROW_LEN_TRANSLATION',
-        'MASTER_POP_TABLE',
-        'SYNAPTIC_MATRIX',
-        'STDP_PARAMS',
-        'SPIKE_HISTORY',
-        'POTENTIAL_HISTORY',
-        'GSYN_HISTORY'
-    )
+    value="POPULATION_BASED_REGIONS",
+    names=[('SYSTEM', 0),
+           ('NEURON_PARAMS', 1),
+           ('SYNAPSE_PARAMS', 2),
+           ('ROW_LEN_TRANSLATION', 3),
+           ('MASTER_POP_TABLE', 4),
+           ('SYNAPTIC_MATRIX', 5),
+           ('STDP_PARAMS', 6),
+           ('SPIKE_HISTORY', 7),
+           ('POTENTIAL_HISTORY', 8),
+           ('GSYN_HISTORY', 9)])
+
+VISUALISER_MODES = Enum(
+    value="VISUALISER_MODES",
+    names=[("RASTER", 0),
+           ("TOPOLOGICAL", 1)])

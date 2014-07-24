@@ -1,4 +1,3 @@
-__author__ = 'stokesa6'
 from visualiser.abstract_page import AbstractPage
 
 

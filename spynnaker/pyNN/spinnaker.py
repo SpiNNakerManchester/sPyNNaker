@@ -31,6 +31,12 @@ from spynnaker.pyNN.models.pynn_projection import Projection
 from spinnman.transceiver import create_transceiver_from_hostname
 from spinnman.model.iptag import IPTag
 
+#data spec import
+from data_specification.file_data_reader import FileDataReader
+from data_specification.file_data_writer import FileDataWriter
+from data_specification.data_specification_executor\
+    import DataSpecificationExecutor
+
 import logging
 import math
 
@@ -375,7 +381,36 @@ class Spinnaker(object):
                                                             'p': placement.p})
         return executable_targets
 
-    def execute_data_specification_execution(self, host_based_execution):
+    def execute_data_specification_execution(self, host_based_execution,
+                                             hostname):
+        if host_based_execution:
+            self._execute_host_based_data_specificiation_execution(hostname)
+        else:
+            self._chip_based_data_specificiation_execution(hostname)
+
+    def _chip_based_data_specificiation_execution(self, hostname):
+        raise NotImplementedError
+
+    def _execute_host_based_data_specificiation_execution(self, hostname):
+        for placement in self._placements():
+            associated_vertex =\
+                self._sub_graph.get_vertex_from_subvertex(placement.subvertex)
+            # if the vertex can generate a DSG, call it
+            if issubclass(associated_vertex, AbstractDataSpecableVertex):
+                data_spec_file_path = \
+                    associated_vertex.get_binary_file_name(
+                        placement.x, placement.y, placement.p, hostname
+                    )
+                app_data_file_path = \
+                    associated_vertex.get_application_data_file_name(
+                        placement.x, placement.y, placement.p, hostname
+                    )
+                data_spec_reader = FileDataReader(data_spec_file_path)
+                data_writer = FileDataWriter(app_data_file_path)
+                host_based_data_spec_exeuctor = DataSpecificationExecutor(
+                    data_spec_reader, data_writer)
+                bytes_used_by_spec = host_based_data_spec_exeuctor.execute()
+
 
 
     def start_visualiser(self):

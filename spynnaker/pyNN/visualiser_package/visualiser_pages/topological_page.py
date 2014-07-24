@@ -1,4 +1,3 @@
-__author__ = 'stokesa6'
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.visualiser_package.visualiser_pages.\
     abstract_live_spike_page import AbstractLiveSpikePage
