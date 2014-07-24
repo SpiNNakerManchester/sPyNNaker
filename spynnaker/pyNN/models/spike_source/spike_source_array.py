@@ -293,14 +293,17 @@ class SpikeSourceArray(AbstractSpikeSource):
             spinnaker, compatible_output,
             self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
             sub_vertex_out_spike_bytes_function)
-    #inhirrted from dataspecable vertex
 
-    def generate_data_spec(self, processor, subvertex):
+    #inhirrted from dataspecable vertex
+    def generate_data_spec(self, processor_chip_x, processor_chip_y,
+                           processor_id, subvertex, subgraph,
+                           routing_info, hostname, graph_subgraph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
         """
-        binary_file_name = self.get_binary_file_name(processor)
+        binary_file_name = self.get_binary_file_name(
+            processor_chip_x, processor_chip_y, processor_id, hostname)
 
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)
@@ -310,16 +313,6 @@ class SpikeSourceArray(AbstractSpikeSource):
         self.write_setup_info(spec, spike_history_region_sz)
 
         spec.comment("\n*** Spec for SpikeSourceArray Instance ***\n\n")
-
-        # Define lists to hold information on files to load and memory to write
-        # in support of this application:
-
-        # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'spike_source_array.aplx')
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
@@ -345,8 +338,14 @@ class SpikeSourceArray(AbstractSpikeSource):
         spec.end_specification()
         data_writer.close()
 
-        # Return list of executables, load files:
-        return binary_name, list(), list()
+    def get_binary_name(self):
+        # Rebuild executable name
+        common_binary_path = os.path.join(config.get("SpecGeneration",
+                                                     "common_binary_folder"))
+
+        binary_name = os.path.join(common_binary_path,
+                                   'spike_source_array.aplx')
+        return binary_name
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):

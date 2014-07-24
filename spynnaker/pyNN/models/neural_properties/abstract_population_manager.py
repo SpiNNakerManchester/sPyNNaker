@@ -150,8 +150,9 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
         spec.write_value(data=neuron_potential_region_sz)
         spec.write_value(data=gsyn_region_sz)
 
-    def write_neuron_parameters(self, spec, processor,
-                                subvertex, ring_buffer_to_input_left_shift):
+    def write_neuron_parameters(
+            self, spec, processor_chip_x, processor_chip_y, processor_id,
+            subvertex, ring_buffer_to_input_left_shift):
         spec.comment("\nWriting Neuron Parameters for {%d} "
                      "Neurons:\n".format(subvertex.n_atoms))
 
@@ -161,9 +162,10 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
 
         # Write header info to the memory region:
         # Write Key info for this core:
-        chip_x, chip_y, chip_p = processor.get_coordinates()
         population_identity = \
-            packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
+            packet_conversions.get_key_from_coords(processor_chip_x,
+                                                   processor_chip_y,
+                                                   processor_id)
         spec.write_value(data=population_identity)
 
         # Write the number of neurons in the block:
@@ -203,13 +205,16 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
                 spec.write_value(data=value, data_type=datatype)
         # End the loop over the neurons:
 
-    def generate_data_spec(self, processor, subvertex, subgraph, routing_info):
+    def generate_data_spec(self, processor_chip_x, processor_chip_y,
+                           processor_id, subvertex, subgraph,
+                           routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to
         build a group of IF_curr_exp neurons resident on a single core.
         """
         # Create new DataSpec for this processor:
-        binary_file_name = self.get_binary_file_name(processor)
+        binary_file_name = self.get_binary_file_name(
+            processor_chip_x, processor_chip_y, processor_id, hostname)
 
         data_writer = FileDataWriter(binary_file_name)
 
@@ -255,8 +260,9 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
         weight_scale = self.get_weight_scale(ring_buffer_shift)
         logger.debug("Weight scale is {}".format(weight_scale))
 
-        self.write_neuron_parameters(spec, processor, subvertex,
-                                     ring_buffer_shift)
+        self.write_neuron_parameters(
+            spec, processor_chip_x, processor_chip_y, processor_id, subvertex,
+            ring_buffer_shift)
 
         self.write_synapse_parameters(spec, subvertex)
 
@@ -279,6 +285,9 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
         spec.end_specification()
         data_writer.close()
 
+    #inhirrited from data specable vertex
+    @staticmethod
+    def get_binary_name(self):
          # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)
 
@@ -293,23 +302,4 @@ class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
                                               "common_binary_folder"),
                                    binary_title + binary_extension)
 
-        # Return list of target cores, executables, files to load and
-        # memory writes to perform:
-        return binary_name, list(), list()
-
-    @staticmethod
-    def get_binary_file_name(processor):
-        x, y, p = processor.get_coordinates()
-        hostname = processor.chip.machine.hostname
-        has_binary_folder_set = \
-            config.has_option("SpecGeneration", "Binary_folder")
-        if not has_binary_folder_set:
-            binary_folder = tempfile.gettempdir()
-            config.set("SpecGeneration", "Binary_folder", binary_folder)
-        else:
-            binary_folder = config.get("SpecGeneration", "Binary_folder")
-
-        binary_file_name = \
-            binary_folder + os.sep + "{%s}_dataSpec_{%d}_{%d}_{%d}.dat"\
-                                     .format(hostname, x, y, p)
-        return binary_file_name
+        return binary_name

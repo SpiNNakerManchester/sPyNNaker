@@ -75,13 +75,16 @@ class RobotMotorControl(AbstractComponentVertex, AbstractDataSpecableVertex):
         virtual_edges.append(self.out_going_edge)
         return virtual_vertexes, virtual_edges
 
-    def generate_data_spec(self, processor, subvertex, subgraph, routing_info):
+    def generate_data_spec(self, processor_chip_x, processor_chip_y,
+                           processor_id, subvertex, subgraph,
+                           routing_info, hostname, graph_subgraph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
         single external retina device.
         """
         # Create new DataSpec for this processor:
-        binary_file_name = self.get_binary_file_name(processor)
+        binary_file_name = self.get_binary_file_name(
+            processor_chip_x, processor_chip_y, processor_id, hostname)
 
         data_writer = FileDataWriter(binary_file_name)
         spec = DataSpecificationGenerator(data_writer)
@@ -89,13 +92,6 @@ class RobotMotorControl(AbstractComponentVertex, AbstractDataSpecableVertex):
         self._write_basic_setup_info(spec, RobotMotorControl.CORE_APP_IDENTIFER)
 
         spec.comment("\n*** Spec for robot motor control ***\n\n")
-
-         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'robot_motor_control.aplx')
 
         #reserve regions
         self.reserve_memory_regions(spec)
@@ -129,8 +125,16 @@ class RobotMotorControl(AbstractComponentVertex, AbstractDataSpecableVertex):
         spec.end_specification()
         data_writer.close()
 
-        # Return list of executables, load files:
-        return binary_name, list(), list()
+    #inhirrited from data specable vertex
+    @staticmethod
+    def get_binary_name(self):
+        common_binary_path = os.path.join(config.get("SpecGeneration",
+                                                     "common_binary_folder"))
+
+        binary_name = os.path.join(common_binary_path,
+                                   'robot_motor_control.aplx')
+
+        return binary_name
 
     def reserve_memory_regions(self, spec):
         """

@@ -9,8 +9,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 
 from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
-from pacman.model.constraints.partitioner_maximum_size_constraint \
-    import PartitionerMaximumSizeConstraint
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
@@ -50,13 +48,16 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex,
     def model_name(self):
         return "AppMonitor"
 
-    def generate_data_spec(self, processor, subvertex, sub_graph, routing_info):
+    def generate_data_spec(self,  processor_chip_x, processor_chip_y,
+                           processor_id, subvertex, sub_graph,
+                           routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
         single Application Monitor on one core.
         """
         # Create new DataSpec for this processor:
-        binary_file_name = self.get_binary_file_name(processor)
+        binary_file_name = self.get_binary_file_name(
+            processor_chip_x, processor_chip_y, processor_id, hostname)
         data_writer = FileDataWriter(binary_file_name)
         spec = DataSpecificationGenerator(data_writer)
 

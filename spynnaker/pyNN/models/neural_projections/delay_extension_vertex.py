@@ -106,12 +106,15 @@ class DelayExtensionVertex(AbstractComponentVertex,
         return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps
                 * constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
-    def generate_data_spec(self, processor, subvertex, sub_graph, routing_info):
+    def generate_data_spec(self, processor_chip_x, processor_chip_y,
+                           processor_id, subvertex, sub_graph,
+                           routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
         """
-        binary_file_name = self.get_binary_file_name(processor)
+        binary_file_name = self.get_binary_file_name(
+            processor_chip_x, processor_chip_y, processor_id, hostname)
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)
         spec = DataSpecificationGenerator(data_writer)
@@ -133,8 +136,8 @@ class DelayExtensionVertex(AbstractComponentVertex,
         delay_params_header_words = 3
         n_atoms = subvertex.hi_atom - subvertex.lo_atom + 1
         block_len_words = int(ceil(n_atoms / 32.0))
-        num_delay_blocks, delay_blocks = self.get_delay_blocks(subvertex, 
-                                                               sub_graph)
+        num_delay_blocks, delay_blocks = self.get_delay_blocks(
+            subvertex, sub_graph, graph_sub_graph_mapper)
         delay_params_sz = 4 * (delay_params_header_words 
                                + (num_delay_blocks * block_len_words))
         
@@ -148,8 +151,9 @@ class DelayExtensionVertex(AbstractComponentVertex,
             region=_DELAY_EXTENSION_REGIONS.DELAY_PARAMS, 
             size=delay_params_sz, label='delay_params')
 
-        self.write_delay_parameters(spec, processor, subvertex, 
-                                    num_delay_blocks, delay_blocks) 
+        self.write_delay_parameters(
+            spec, processor_chip_x, processor_chip_y, processor_id, subvertex,
+            num_delay_blocks, delay_blocks)
 
         # End-of-Spec:
         spec.end_specification()
@@ -173,7 +177,7 @@ class DelayExtensionVertex(AbstractComponentVertex,
         spec.write_value(data=0)
         spec.write_value(data=0)
         
-    def get_delay_blocks(self, subvertex, sub_graph):
+    def get_delay_blocks(self, subvertex, sub_graph, graph_subgraph_mapper):
         # Create empty list of words to fill in with delay data:
         num_words_per_row = int(ceil(subvertex.n_atoms / 32.0))
         one_block = [0] * num_words_per_row
@@ -181,8 +185,9 @@ class DelayExtensionVertex(AbstractComponentVertex,
         num_delay_blocks = 0
         
         for subedge in sub_graph.outgoing_subedges_from_subvertex(subvertex):
-            if not isinstance(sub_graph.get_edge_from_subedge(subedge),
-                              DelayProjectionEdge):
+            subedge_assocated_edge = \
+                graph_subgraph_mapper.get_edge_from_subedge(subedge)
+            if not isinstance(subedge_assocated_edge, DelayProjectionEdge):
                 raise exceptions.DelayExtensionException(
                     "One of the incoming subedges is not a subedge of a"
                     " DelayAfferentEdge")
@@ -223,7 +228,8 @@ class DelayExtensionVertex(AbstractComponentVertex,
         return num_delay_blocks, delay_block
 
     @staticmethod
-    def write_delay_parameters(spec, processor, subvertex, num_delay_blocks,
+    def write_delay_parameters(spec, processor_chip_x, processor_chip_y,
+                               processor_id, subvertex, num_delay_blocks,
                                delay_block):
         """
         Generate Delay Parameter data (region 2):
@@ -238,9 +244,10 @@ class DelayExtensionVertex(AbstractComponentVertex,
 
         # Write header info to the memory region:
         # Write Key info for this core:
-        chip_x, chip_y, chip_p = processor.get_coordinates()
         population_identity = \
-            packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
+            packet_conversions.get_key_from_coords(processor_chip_x,
+                                                   processor_chip_y,
+                                                   processor_id)
         spec.write_value(data=population_identity)
 
         # Write the number of neurons in the block:

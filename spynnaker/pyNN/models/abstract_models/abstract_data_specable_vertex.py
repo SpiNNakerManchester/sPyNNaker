@@ -1,10 +1,14 @@
 from pacman.model.graph.vertex import Vertex
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
+
+import tempfile
+import os
 
 
 @add_metaclass(ABCMeta)
@@ -26,10 +30,18 @@ class AbstractDataSpecableVertex(Vertex):
         spec.write_value(data=self._no_machine_time_steps)
 
     @abstractmethod
-    def generate_data_spec(self, processor, subvertex, sub_graph, routing_info):
+    def generate_data_spec(self, processor_chip_x, processor_chip_y,
+                           processor_id, subvertex, sub_graph, routing_info,
+                           hostname, graph_subgraph_mapper):
         """
         method to determine how to generate their data spec for a non neural
         application
+        """
+
+    @abstractmethod
+    def get_binary_name(self):
+        """
+        method to return the binary name for a given dataspecable vertex
         """
 
     @property
@@ -66,4 +78,20 @@ class AbstractDataSpecableVertex(Vertex):
                 "cannot set the runtime of a given model once it has"
                 "already been set")
 
+    @staticmethod
+    def get_binary_file_name(processor_chip_x, processor_chip_y,
+                             processor_id, hostname):
+        has_binary_folder_set = \
+            config.has_option("SpecGeneration", "Binary_folder")
+        if not has_binary_folder_set:
+            binary_folder = tempfile.gettempdir()
+            config.set("SpecGeneration", "Binary_folder", binary_folder)
+        else:
+            binary_folder = config.get("SpecGeneration", "Binary_folder")
 
+        binary_file_name = \
+            binary_folder + os.sep + "{%s}_dataSpec_{%d}_{%d}_{%d}.dat"\
+                                     .format(hostname, processor_chip_x,
+                                             processor_chip_y,
+                                             processor_id)
+        return binary_file_name

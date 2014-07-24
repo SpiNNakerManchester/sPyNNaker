@@ -1,7 +1,3 @@
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
-    AbstractDataSpecableVertex
-
-__author__ = 'stokesa6'
 #pacman imports
 from pacman.model.graph.graph import Graph
 from pacman.model.graph.edge import Edge
@@ -9,10 +5,16 @@ from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
+from pacman.operations.partitioner import Partitioner
+from pacman.operations.placer import Placer
+from pacman.operations.router import Router
+from pacman.operations.routing_info_allocator import RoutingInfoAllocator
+from pacman import reports as pacman_reports
 
 #internal imports
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.utilities.report_states import ReportState
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
     import DelayExtensionVertex
@@ -20,11 +22,14 @@ from spynnaker.pyNN.models.utility_models.live_spike_recorder\
     import LiveSpikeRecorder
 from spynnaker.pyNN.visualiser_package.visualiser_creation_utility \
     import VisualiserCreationUtility
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 
 #spinnman inports
 from spinnman.transceiver import create_transceiver_from_hostname
+from spinnman.model.iptag import IPTag
 
 import logging
 import math
@@ -51,7 +56,8 @@ class Spinnaker(object):
 
         #main objects
         self._graph = Graph(label=graph_label)
-        self.sub_graph = None
+        self._sub_graph = None
+        self._graph_subgraph_mapper = None
         self._machine = None
         self._no_machine_time_steps = None
         self._placements = None
@@ -60,6 +66,14 @@ class Spinnaker(object):
         self._pruner_infos = None
         self._runtime = None
         self._has_ran = False
+        self._reports_enabled = None
+
+        #report object
+        if conf.config.getboolean("Reports", "reportsEnabled"):
+            self._reports_enabled = ReportState()
+
+        #communication objects
+        self._iptags = list()
 
         self._app_id = conf.config.getint("Machine", "appID")
         self._machine_time_step = conf.config.getint("Machine",
@@ -69,18 +83,27 @@ class Spinnaker(object):
             self._writeTextSpecs = conf.config.getboolean("Reports",
                                                           "writeTextSpecs")
         #algorithum lists
-        self._partitioner_algorithms_list = \
+        partitioner_algorithms_list = \
             conf.get_valid_components(partition_algorithms, "Partitioner")
+        self._partitioner_algorithum = \
+            partitioner_algorithms_list[conf.config.get("Routing", "algorithm")]
 
-        self._placer_algorithms_list = \
+        placer_algorithms_list = \
             conf.get_valid_components(placer_algorithms, "Placer")
+        self._placer_algorithum = \
+            placer_algorithms_list[conf.config.get("Placer", "algorithm")]
 
-        self._key_allocator_algorithms_list = \
+        key_allocator_algorithms_list = \
             conf.get_valid_components(routing_info_allocator_algorithms,
                                       "KeyAllocator")
+        self._key_allocator_algorithum = \
+            key_allocator_algorithms_list[conf.config.get("KeyAllocator",
+                                                          "algorithm")]
 
-        self._routing_algorithms_list = \
+        routing_algorithms_list = \
             conf.get_valid_components(router_algorithms, "Routing")
+        self._routing_algorithm = \
+            routing_algorithms_list[conf.config.get("Routing", "algorithm")]
 
         #loading and running config params
         self._do_load = True
@@ -184,7 +207,7 @@ class Spinnaker(object):
 
                 # Set up the forwarding so that monitored spikes are sent to the
                 # requested location
-                self._set_tag_output(tag, port, hostname, 10)
+                self._set_tag_output(tag, port, hostname)
                 #takes the same port for the visualiser if being used
                 if conf.config.getboolean("Visualiser", "enable") and \
                    conf.config.getboolean("Visualiser", "have_board"):
@@ -229,7 +252,14 @@ class Spinnaker(object):
             timer.start_timing()
         logger.info("*** Generating Output *** ")
         logger.debug("")
-        self.generate_output()
+        executable_targets = self.generate_data_specifications()
+        if do_timing:
+            timer.take_sample()
+
+        if do_timing:
+            timer.start_timing()
+        self.execute_data_specification_execution(
+            conf.config.getboolean("SpecExecution", "specExecOnHost"))
         if do_timing:
             timer.take_sample()
 
@@ -248,7 +278,7 @@ class Spinnaker(object):
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
-                self._run()
+                self._run(executable_targets)
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
@@ -264,7 +294,7 @@ class Spinnaker(object):
         self._visualiser = \
             self._visualiser_creation_utility.create_visualiser_interface(
                 has_board, self._txrx, self._graph, self._visualiser_vertices,
-                self._machine, self.sub_graph, self._placements,
+                self._machine, self._sub_graph, self._placements,
                 self._router_tables, self._runtime, self._machine_time_step)
 
     @property
@@ -275,6 +305,10 @@ class Spinnaker(object):
     def machine_time_step(self):
         return self._machine_time_step
 
+    @property
+    def sub_graph(self):
+        return self._sub_graph
+
     def set_app_id(self, value):
         self._app_id = value
 
@@ -282,10 +316,67 @@ class Spinnaker(object):
         self._runtime = value
 
     def map_model(self):
-        pass
+        """
+        executes the pacman compilation stack
+        """
 
-    def generate_output(self):
-        pass
+        #execute partitioner
+        partitoner = Partitioner(self._partitioner_algorithum)
+        self._sub_graph, self._graph_subgraph_mapper = \
+            partitoner.run(self._graph, self._machine)
+        if (self._reports_enabled is not None and
+                self._reports_enabled.partitioner_report):
+            pacman_reports.partitioner_report()
+
+        #execute placer
+        placer = Placer(self._placer_algorithum)
+        self._placements = placer.run(self._sub_graph, self._machine)
+        if (self._reports_enabled is not None and
+                self._reports_enabled.placer_report):
+            pacman_reports.placer_report()
+
+        #execute key allocator
+        key_allocator = RoutingInfoAllocator(self._key_allocator_algorithum)
+        self._routing_infos = key_allocator.run(self._graph_subgraph_mapper,
+                                                self._placements)
+        if (self._reports_enabled is not None and
+                self._reports_enabled.routing_info_report):
+            pacman_reports.routing_info_report()
+
+        #execute router
+        router = Router(self._routing_algorithm)
+        self._router_tables = router.run(self._routing_infos, self._placements,
+                                         self._machine)
+        if (self._reports_enabled is not None and
+                self._reports_enabled.router_report):
+            pacman_reports.router_report()
+
+    def generate_data_specifications(self):
+        #iterate though subvertexes and call generate_data_spec for each vertex
+        executable_targets = dict()
+
+        for placement in self._placements():
+            associated_vertex =\
+                self._sub_graph.get_vertex_from_subvertex(placement.subvertex)
+            # if the vertex can generate a DSG, call it
+            if issubclass(associated_vertex, AbstractDataSpecableVertex):
+                associated_vertex.generate_data_spec(
+                    placement.x, placement.y, placement.p, placement.subvertex,
+                    self._sub_graph, self._routing_infos)
+
+                binary_name = associated_vertex.get_binary_name()
+                if binary_name in executable_targets.keys():
+                    executable_targets[binary_name].append({'x': placement.x,
+                                                            'y': placement.y,
+                                                            'p': placement.p})
+                else:
+                    executable_targets[binary_name] = list({'x': placement.x,
+                                                            'y': placement.y,
+                                                            'p': placement.p})
+        return executable_targets
+
+    def execute_data_specification_execution(self, host_based_execution):
+
 
     def start_visualiser(self):
         pass
@@ -293,17 +384,17 @@ class Spinnaker(object):
     def stop(self):
         pass
 
-    def _run(self):
+    def _run(self, executable_targets):
         pass
 
-    def _set_tag_output(self, tag, port, hostname, position):
-        pass
+    def _set_tag_output(self, tag, port, hostname):
+        self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
 
     def add_vertex(self, vertex_to_add):
-        pass
+        self._graph.add_vertex(vertex_to_add)
 
     def add_edge(self, edge_to_add):
-        pass
+        self._graph.add_edge(edge_to_add)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         population = Population(size, cellclass, cellparams, structure, label,

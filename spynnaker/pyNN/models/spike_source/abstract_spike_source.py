@@ -1,5 +1,7 @@
 from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
     AbstractComponentVertex
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
+    AbstractDataSpecableVertex
 from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex import AbstractPartitionableVertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
@@ -8,7 +10,8 @@ from pacman.model.constraints.partitioner_maximum_size_constraint \
 from enum import Enum
 
 
-class AbstractSpikeSource(AbstractComponentVertex, AbstractPartitionableVertex):
+class AbstractSpikeSource(AbstractComponentVertex, AbstractPartitionableVertex,
+                          AbstractDataSpecableVertex):
 
     RECORD_SPIKE_BIT = 1 << 0
 

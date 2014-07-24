@@ -9,8 +9,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 
 
-from pacman.model.constraints.partitioner_maximum_size_constraint \
-    import PartitionerMaximumSizeConstraint
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
@@ -50,14 +48,18 @@ class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex,
         self._memory_requirements = 0
         self._edge_map = None
 
-    def generate_data_spec(self, processor, subvertex, sub_graph, routing_info):
+    def generate_data_spec(self, processor_chip_x, processor_chip_y,
+                           processor_id, subvertex, sub_graph,
+                           routing_info, hostname, graph_subgraph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
         single external retina device.
         """
         #check that all keys for a subedge are the same when masked
         self.check_sub_edge_key_mask_consistancy(self._edge_map, self._app_mask)
-        binary_file_name = self.get_binary_file_name(processor)
+        binary_file_name = self.get_binary_file_name(processor_chip_x,
+                                                     processor_chip_y,
+                                                     processor_id, hostname)
 
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)

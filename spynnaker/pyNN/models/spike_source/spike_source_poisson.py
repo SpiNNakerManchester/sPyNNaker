@@ -145,7 +145,9 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         spec.write_value(data=0)
         spec.write_value(data=0)
 
-    def write_poisson_parameters(self, spec, processor, num_neurons):
+    def write_poisson_parameters(
+            self, spec, processor_chip_x, processor_chip_y, processor_id,
+            num_neurons):
         """
         Generate Neuron Parameter data for Poisson spike sources (region 2):
         """
@@ -161,9 +163,10 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         # Write header info to the memory region:
         
         # Write Key info for this core:
-        chip_x, chip_y, chip_p = processor.get_coordinates()
         population_identity = \
-            packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
+            packet_conversions.get_key_from_coords(processor_chip_x,
+                                                   processor_chip_y,
+                                                   processor_id)
         spec.write_value(data=population_identity)
         
         # Write the random seed (4 words), generated randomly!
@@ -280,12 +283,15 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
     #inhirrted from dataspecable vertex
 
-    def generate_data_spec(self, processor, subvertex):
+    def generate_data_spec(self, processor_chip_x, processor_chip_y,
+                           processor_id, subvertex, subgraph, routing_info,
+                           hostname, graph_subgraph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSourcePoisson on one core.
         """
-        binary_file_name = self.get_binary_file_name(processor)
+        binary_file_name = self.get_binary_file_name(
+            processor_chip_x, processor_chip_y, processor_id, hostname)
 
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)
@@ -297,13 +303,6 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
-        # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'spike_source_poisson.aplx')
-
         poisson_params_sz = self.get_params_bytes(subvertex.lo_atom,
                                                   subvertex.hi_atom)
 
@@ -311,11 +310,19 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         self.reserve_memory_regions(spec, SETUP_SZ, poisson_params_sz,
                                     spike_hist_buff_sz)
 
-        self.write_poisson_parameters(spec, processor, subvertex.n_atoms)
+        self.write_poisson_parameters(spec, processor_chip_x, processor_chip_y,
+                                      processor_id, subvertex.n_atoms)
 
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
 
-        # Return list of executables, load files:
-        return  binary_name, list(), list()
+    def get_binary_name(self):
+        # Rebuild executable name
+        common_binary_path = os.path.join(config.get("SpecGeneration",
+                                                     "common_binary_folder"))
+
+        binary_name = os.path.join(common_binary_path,
+                                   'spike_source_poisson.aplx')
+
+        return binary_name
