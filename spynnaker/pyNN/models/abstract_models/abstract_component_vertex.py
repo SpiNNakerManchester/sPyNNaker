@@ -69,7 +69,7 @@ class AbstractComponentVertex(object):
         """
         method that allows models to add dependant vertexes and edges
         """
-        return list()  # most components do not require dependants
+        return list(), list()  # most components do not require dependants
 
     @property
     def is_set_to_record_spikes(self):

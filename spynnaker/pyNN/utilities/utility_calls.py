@@ -67,7 +67,6 @@ def get_ring_buffer_to_input_left_shift(subvertex, sub_graph):
     return max_weight_power
 
 
-@staticmethod
 def convert_param_to_numpy(param, no_atoms):
         """
         converts parameters into numpy arrays as needed

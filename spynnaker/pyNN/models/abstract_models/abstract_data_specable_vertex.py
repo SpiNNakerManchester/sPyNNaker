@@ -15,7 +15,7 @@ import os
 class AbstractDataSpecableVertex(Vertex):
 
     def __init__(self, n_atoms, label, constraints=None):
-        Vertex.__init__(n_atoms, label, constraints)
+        Vertex.__init__(self, n_atoms, label, constraints)
         self._machine_time_step = None
         self._application_runtime = None
         self._no_machine_time_steps = None

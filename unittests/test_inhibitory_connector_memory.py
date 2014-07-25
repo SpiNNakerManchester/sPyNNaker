@@ -2,7 +2,7 @@
 import unittest
 
 import spynnaker.pyNN as p
-import visualiser.visualiser_modes as modes
+from spynnaker.pyNN.utilities.constants import VISUALISER_MODES as modes
 import numpy, pylab
 
 class TestInhibitoryProjection(unittest.TestCase):

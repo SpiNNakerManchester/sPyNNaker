@@ -16,8 +16,7 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.report_states import ReportState
 from spynnaker.pyNN.utilities.timer import Timer
-from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
-    import DelayExtensionVertex
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.utility_models.live_spike_recorder\
     import LiveSpikeRecorder
 from spynnaker.pyNN.visualiser_package.visualiser_creation_utility \
@@ -26,6 +25,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
+from spynnaker.pyNN import overrided_pacman_functions
 
 #spinnman inports
 from spinnman.transceiver import create_transceiver_from_hostname
@@ -92,16 +92,24 @@ class Spinnaker(object):
         partitioner_algorithms_list = \
             conf.get_valid_components(partition_algorithms, "Partitioner")
         self._partitioner_algorithum = \
-            partitioner_algorithms_list[conf.config.get("Routing", "algorithm")]
+            partitioner_algorithms_list[conf.config.get("Partitioner",
+                                                        "algorithm")]
 
         placer_algorithms_list = \
             conf.get_valid_components(placer_algorithms, "Placer")
         self._placer_algorithum = \
             placer_algorithms_list[conf.config.get("Placer", "algorithm")]
 
+        #get common key allocator algorithms
         key_allocator_algorithms_list = \
             conf.get_valid_components(routing_info_allocator_algorithms,
-                                      "KeyAllocator")
+                                      "RoutingInfoAllocator")
+        #get pynn specific key allocator
+        pynn_overloaded_allocator = \
+            conf.get_valid_components(overrided_pacman_functions,
+                                      "RoutingInfoAllocator")
+        key_allocator_algorithms_list.update(pynn_overloaded_allocator)
+
         self._key_allocator_algorithum = \
             key_allocator_algorithms_list[conf.config.get("KeyAllocator",
                                                           "algorithm")]
@@ -144,10 +152,10 @@ class Spinnaker(object):
                 "current machine time step".format(1.0 * timestep))
     
         natively_supported_delay_for_models = \
-            DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS
+            constants.MAX_SUPPORTED_DELAY_TICS
         delay_extention_max_supported_delay = \
-            DelayExtensionVertex.MAX_DELAY_BLOCKS \
-            * DelayExtensionVertex.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
+            constants.MAX_DELAY_BLOCKS \
+            * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
     
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
@@ -159,7 +167,8 @@ class Spinnaker(object):
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(0.144 * timestep))
         if min_delay is not None:
-            conf.config.add_section("Model")
+            if not conf.config.has_section("Model"):
+                conf.config.add_section("Model")
             conf.config.set("Model", "min_delay", (min_delay * 1000) / timestep)
     
         if max_delay is not None:
@@ -187,13 +196,13 @@ class Spinnaker(object):
                             "timescaleFactor value in your .pacman.cfg"
                             .format(self._time_scale_factor))
                 
-        logger.info("Setting time scale factor to {%d}."
+        logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
 
         logger.info("Setting appID to %d." % self._app_id)
     
         #get the machien time step
-        logger.info("Setting machine time step to {%d} micro-seconds."
+        logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
         if conf.config.has_option("Recording", "send_live_spikes"):
@@ -265,7 +274,8 @@ class Spinnaker(object):
         if do_timing:
             timer.start_timing()
         self.execute_data_specification_execution(
-            conf.config.getboolean("SpecExecution", "specExecOnHost"))
+            conf.config.getboolean("SpecExecution", "specExecOnHost"),
+            self._hostname)
         if do_timing:
             timer.take_sample()
 
@@ -314,6 +324,10 @@ class Spinnaker(object):
     @property
     def sub_graph(self):
         return self._sub_graph
+
+    @property
+    def graph(self):
+        return self._graph
 
     def set_app_id(self, value):
         self._app_id = value
@@ -432,9 +446,12 @@ class Spinnaker(object):
         self._graph.add_edge(edge_to_add)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
-        population = Population(size, cellclass, cellparams, structure, label,
-                                self._machine_time_step, self._runtime)
-        self.add_vertex(population)
+
+        population = Population(
+            size=size, cellclass=cellclass, cellparams=cellparams,
+            structure=structure, label=label, runtime=self._runtime,
+            machine_time_step=self._machine_time_step, spinnaker=self)
+        return population
 
     def create_projection(self, presynaptic_population, postsynaptic_population,
                           connector, source, target, synapse_dynamics, label,
@@ -442,11 +459,11 @@ class Spinnaker(object):
         if label is None:
             label = "Projection {}".format(self._edge_count)
             self._edge_count += 1
-        edge = Projection(presynaptic_population, postsynaptic_population,
-                          connector, source, target, synapse_dynamics, label,
-                          rng)
-        self.add_edge(edge)
-        pass
+        edge = Projection(
+            presynaptic_population=presynaptic_population, label=label,
+            postsynaptic_population=postsynaptic_population, rng=rng,
+            connector=connector, source=source, target=target,
+            synapse_dynamics=synapse_dynamics, spinnaker_control=self)
 
     def add_edge_to_recorder_vertex(self, vertex_to_record_from):
         #check to see if it needs to be created in the frist place

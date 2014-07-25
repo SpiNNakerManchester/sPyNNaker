@@ -1,5 +1,7 @@
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
-    AbstractDataSpecableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
+    AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.multicastsource \
     import MultiCastSource
 from spynnaker.pyNN.utilities.parameters_surrogate\
@@ -52,7 +54,8 @@ class Population(object):
             raise Exception("Spatial structure is unsupported for Populations.")
 
         # Create a graph vertex for the population and add it to PACMAN
-        self._vertex = cellclass(size, label, **cellparams)
+        cellparams['label'] = label
+        self._vertex = cellclass(size, **cellparams)
         if issubclass(type(cellclass), AbstractDataSpecableVertex):
             if self._vertex.machine_time_step is None:
                 self._vertex.set_machien_time_step(machine_time_step)
@@ -534,3 +537,7 @@ class Population(object):
         value_array, which must have the same dimensions as the Population.
         """
         raise NotImplementedError
+
+    @property
+    def _get_vertex(self):
+        return self._vertex
