@@ -1,0 +1,47 @@
+DIRS = ../../..
+BUILDDIR = build
+DEBUG = PRODUCTION_CODE
+DEBUGFLAGS := 
+
+#-------------------------------------------------------------------------------
+
+# Set to 1 to use spin1-api-harness rather than test-harness
+HARNESS = 1
+CFLAGS += -Wall -Wextra -Ofast -D$(DEBUG) $(DEBUGFLAGS)
+
+# If spin1-api harness should be used, set compile-time define
+ifeq ($(HARNESS), 1)
+	CFLAGS += -DSPIN1_API_HARNESS
+endif
+
+
+#-------------------------------------------------------------------------------
+
+# Build the application
+
+# List of objects making up the application. If there are other files
+# in the application, add their object file names to this variable.
+
+OBJECTS = ../../../common/spikes.o ../../../common/out_spikes.o ../../../common/configuration.o ../../../common/recording.o \
+	../../c_main.o ../../synapses.o  ../../neuron.o $(MODEL_OBJS)
+
+ifeq ($(HARNESS), 1)
+	OBJECTS += ../../spin1-api-harness.o ../../../common/spin1-api-configuration.o ../../spin-neuron-configuration.o
+else
+	OBJECTS += ../../test-harness.o 
+endif
+
+# Include common make file stuff
+include ../../../Makefile.depend
+
+$(BUILDDIR)/neuron/neuron.o: ../../neuron.c
+	-mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -include $(NEURON_MODEL_H) -include $(SYNAPSE_SHAPING_H) -o $@ $<
+
+$(BUILDDIR)/neuron/synapses.o: ../../synapses.c
+	-mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -include $(SYNAPSE_SHAPING_H) -o $@ $<
+
+$(BUILDDIR)/neuron/spin1-api-harness.o: ../../spin1-api-harness.c
+	-mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -include $(SYNAPSE_SHAPING_H) -o $@ $<
