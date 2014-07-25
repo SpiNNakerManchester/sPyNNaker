@@ -30,6 +30,8 @@ from spynnaker.pyNN import overrided_pacman_functions
 #spinnman inports
 from spinnman.transceiver import create_transceiver_from_hostname
 from spinnman.model.iptag import IPTag
+from spinnman.connections.scp_listener import SCPListener
+from spinnman.messages.scp.scp_signal import SCPSignal
 
 #data spec import
 from data_specification.file_data_reader import FileDataReader
@@ -279,7 +281,8 @@ class Spinnaker(object):
         if do_timing:
             timer.take_sample()
 
-        self.start_visualiser()
+        if conf.config.getboolean("Visualiser", "enable"):
+            self.start_visualiser()
 
         if do_timing:
             timer.start_timing()
@@ -409,6 +412,7 @@ class Spinnaker(object):
         raise NotImplementedError
 
     def _execute_host_based_data_specificiation_execution(self, hostname):
+        space_based_memory_tracker = dict()
         for placement in self._placements():
             associated_vertex =\
                 self._sub_graph.get_vertex_from_subvertex(placement.subvertex)
@@ -424,17 +428,34 @@ class Spinnaker(object):
                     )
                 data_spec_reader = FileDataReader(data_spec_file_path)
                 data_writer = FileDataWriter(app_data_file_path)
+
+                #locate current memory requirement
+                current_memory_requirement = constants.SDRAM_AVILABLE_BYTES
+                key = "{}:{}".format(placement.x, placement.y)
+                if key in space_based_memory_tracker.keys():
+                    current_memory_requirement = space_based_memory_tracker[key]
+
                 host_based_data_spec_exeuctor = DataSpecificationExecutor(
-                    data_spec_reader, data_writer)
+                    data_spec_reader, data_writer,
+                    constants.SDRAM_AVILABLE_BYTES - current_memory_requirement)
+
                 bytes_used_by_spec = host_based_data_spec_exeuctor.execute()
+                if key in space_based_memory_tracker.keys():
+
 
 
 
     def start_visualiser(self):
-        pass
+        """starts the port listener and ties it to the visualiser pages as
+         required
+        """
+        #create a scp listener
+        scp_message_listener = SCPListener()
 
     def stop(self):
-        pass
+        self._txrx.send_signal(self, self._app_id, SCPSignal.STOP)
+        self._visualiser.stop()
+
 
     def _run(self, executable_targets):
         pass
