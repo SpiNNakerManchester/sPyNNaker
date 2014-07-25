@@ -12,8 +12,6 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
 
 
-from pacman.model.constraints.partitioner_maximum_size_constraint \
-    import PartitionerMaximumSizeConstraint
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 
@@ -38,8 +36,6 @@ _DELAY_EXTENSION_REGIONS = Enum(
     'DELAY_PARAMS',
     'SPIKE_HISTORY'
 )
-_MAX_DELAY_BLOCKS = 8
-_SETUP_SZ = 16
 
 
 class DelayExtensionVertex(AbstractComponentVertex, 
@@ -60,16 +56,14 @@ class DelayExtensionVertex(AbstractComponentVertex,
 
         AbstractPartitionableVertex.__init__(self, n_atoms=n_neurons,
                                              constraints=constraints,
-                                             label=label)
+                                             label=label,
+                                             max_atoms_per_core=256)
         AbstractComponentVertex.__init__(self, label=label)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._source_vertex = source_vertex
         joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
-        max_constraint = PartitionerMaximumSizeConstraint(256)
-        self.add_constraint(max_constraint)
         self.add_constraint(joint_constrant)
-
 
     @property
     def model_name(self):
@@ -145,7 +139,7 @@ class DelayExtensionVertex(AbstractComponentVertex,
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         spec.reserve_memory_region(region=_DELAY_EXTENSION_REGIONS.SYSTEM,
-                                   size=_SETUP_SZ, label='setup')
+                                   size=constants.SETUP_SIZE, label='setup')
 
         spec.reserve_memory_region(
             region=_DELAY_EXTENSION_REGIONS.DELAY_PARAMS, 
@@ -201,7 +195,7 @@ class DelayExtensionVertex(AbstractComponentVertex,
                 subedge.edge.synapse_list.create_atom_sublist(
                     subvertex.lo_atom, subvertex.hi_atom, dest.lo_atom,
                     dest.hi_atom)
-            for b in range(_MAX_DELAY_BLOCKS):
+            for b in range(constants.MAX_DELAY_BLOCKS):
                 min_delay = (b * self._max_delay_per_neuron) + 1
                 max_delay = min_delay + self._max_delay_per_neuron
                 delay_list = synapse_list.get_delay_sublist(min_delay,

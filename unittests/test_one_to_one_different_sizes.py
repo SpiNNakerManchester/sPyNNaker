@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import unittest
-import visualiser.visualiser_modes as modes
+from spynnaker.pyNN.utilities.constants import VISUALISER_MODES as modes
 import pylab, numpy
 import spynnaker.pyNN as pynn
 #Setup
