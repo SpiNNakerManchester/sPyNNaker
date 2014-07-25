@@ -22,8 +22,8 @@ class MachinePage(AbstractPage):
         self._button_mapping = dict()
         self._chips_with_views = dict()
         self._machine_table = None
-        self._x_dim = machine.dimensions['x']
-        self._y_dim = machine.dimensions['y']
+        self._x_dim = machine.max_chip_x + 1
+        self._y_dim = machine.max_chip_y + 1
         self._placements = placements
         self._router_tables = router_tables
         self._machine = machine

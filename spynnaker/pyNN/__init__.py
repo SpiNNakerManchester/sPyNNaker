@@ -13,6 +13,7 @@ from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
+from spynnaker.pyNN.utilities.constants import VISUALISER_MODES as modes
 
 #pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker

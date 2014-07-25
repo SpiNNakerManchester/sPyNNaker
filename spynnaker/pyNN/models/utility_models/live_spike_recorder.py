@@ -5,6 +5,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+from spynnaker.pyNN.utilities.conf import config
 
 
 from pacman.model.constraints.placer_chip_and_core_constraint \
@@ -14,12 +15,13 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
 
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from data_specification.file_data_writer import FileDataWriter
 
 
-INFINITE_SIMULATION = 4294967295
+import os
 
 
 class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex,
@@ -32,7 +34,6 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex,
     the host
 
     """
-
     def __init__(self):
         """
         Creates a new AppMonitor Object.
@@ -122,6 +123,15 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex,
         spec.switchWriteFocus(region=self.SYSTEM_REGION)
         spec.write(data=recording_info)
         return
+
+    def get_binary_name(self):
+         # Rebuild executable name
+        common_binary_path = os.path.join(config.get("SpecGeneration",
+                                                     "common_binary_folder"))
+
+        binary_name = os.path.join(common_binary_path,
+                                   'live_spike_recorder.aplx')
+        return binary_name
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):

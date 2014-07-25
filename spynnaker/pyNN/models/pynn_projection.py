@@ -4,6 +4,7 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
     import DelayExtensionVertex
 from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_projections.projection_edge \
     import ProjectionEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
@@ -42,14 +43,18 @@ class Projection(object):
         self._spinnaker = spinnaker_control
         self._projection_edge = None
         self._delay_edge = None
-        if issubclass(type(postsynaptic_population.vertex), AbstractPopulationVertex):
+
+        if isinstance(postsynaptic_population._get_vertex,
+                      AbstractPopulationVertex):
             # Check that the "target" is an acceptable value
-            targets = postsynaptic_population.vertex.get_synapse_targets()
+            targets = postsynaptic_population._get_vertex.get_synapse_targets()
             if not target in targets:
                 raise exceptions.ConfigurationException(
                     "Target {} is not available in the post-synaptic "
-                    "pynn_population.py (choices are {})".format(target, targets))
-            synapse_type = postsynaptic_population.vertex.get_synapse_id(target)
+                    "pynn_population.py (choices are {})"
+                    .format(target, targets))
+            synapse_type = \
+                postsynaptic_population._get_vertex.get_synapse_id(target)
         else:
             raise exceptions.ConfigurationException(
                 "postsynaptic_population is not a supposal reciever of"
@@ -58,17 +63,19 @@ class Projection(object):
         # Check that the edge doesn't already exist elsewhere
         # This would be a possible place for a merge at some point,
         # but this needs more thought
-        for edge in spinnaker_control.dao.get_edges():
-            if (edge.prevertex == presynaptic_population.vertex
-               and edge.postvertex == postsynaptic_population.vertex):
+        graph_edges = self._spinnaker.graph.edges
+        for edge in graph_edges:
+            if (edge.pre_vertex == presynaptic_population._get_vertex
+               and edge.post_vertex == postsynaptic_population._get_vertex):
                     raise exceptions.ConfigurationException(
                         "More than one connection between the same pair of"
                         " vertices is not currently supported")
 
         synapse_list = \
             connector.generate_synapse_list(
-                presynaptic_population.vertex, postsynaptic_population.vertex,
-                1000.0 / spinnaker_control.dao.machineTimeStep, synapse_type)
+                presynaptic_population._get_vertex,
+                postsynaptic_population._get_vertex,
+                1000.0 / spinnaker_control.machine_time_step, synapse_type)
         self._read_synapse_list = None
 
         # If there are some negative weights
@@ -88,11 +95,11 @@ class Projection(object):
         # delays in the models
         min_delay, max_delay = synapse_list.get_min_max_delay()
         natively_supported_delay_for_models = \
-            DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS
+            constants.MAX_SUPPORTED_DELAY_TICS
 
         delay_extention_max_supported_delay = \
-            DelayExtensionVertex.MAX_DELAY_BLOCKS * \
-            DelayExtensionVertex.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
+            constants.MAX_DELAY_BLOCKS * \
+            constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
 
         if max_delay > (natively_supported_delay_for_models 
                         + delay_extention_max_supported_delay):
@@ -122,9 +129,9 @@ class Projection(object):
         else:
             self._projection_edge = \
                 ProjectionEdge(
-                    presynaptic_population.vertex, 
-                    postsynaptic_population.vertex, 
-                    spinnaker_control.machineTimeStep,
+                    presynaptic_population._get_vertex,
+                    postsynaptic_population._get_vertex,
+                    spinnaker_control.machine_time_step,
                     synapse_list=synapse_list,
                     synapse_dynamics=synapse_dynamics, label=label)
             spinnaker_control.add_edge(self._projection_edge)
