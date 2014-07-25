@@ -1,0 +1,162 @@
+# Set to 1 for GNU tools, 0 for ARM
+GNU = 1
+
+# Prefix for GNU tool binaries
+GP  = arm-none-eabi
+
+# Convert the objs into the correct format to work here
+SPINN_NEURAL_MODELLING_DIR = $(DIRS)
+ABSOBJS = $(abspath $(OBJECTS))
+ABSDIR = $(abspath $(SPINN_NEURAL_MODELLING_DIR))
+RELOBJS:= $(ABSOBJS:$(ABSDIR)/%.o=%.o)
+OBJECTS:= $(RELOBJS:%.o=$(BUILDDIR)/%.o)
+
+# If SPINN_DIRS is not defined, this is an error!
+ifndef SPINN_DIRS
+    $(error SPINN_DIRS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinnaker package folder))
+endif
+
+# If SPINN_COMMON_LIBS is not defined, this is an error!
+ifndef SPINN_COMMON_LIBS
+    $(error SPINN_COMMON_LIBS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinn_common lib folder))
+endif
+
+# If SPINN_COMMON_INCLUDE is not defined, this is an error!
+ifndef SPINN_COMMON_INCLUDE
+    $(error SPINN_COMMON_INCLUDE is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinn_common lib folder))
+endif
+
+ifndef APP_OUTPUT_DIR
+    $(error APP_OUTPUT_DIR is not set.  Please define APP_OUTPUT_DIR (possibly by running "source setup" in the spinnaker package folder))
+endif
+
+LIB_DIR = $(SPINN_DIRS)/lib
+INC_DIR = $(SPINN_DIRS)/include
+TOOLS_DIR = $(SPINN_DIRS)/tools
+
+
+#-------------------------------------------------------------------------------
+
+# Set up the various compile/link options for GNU and ARM tools
+
+# GNU tool setup
+
+ifeq ($(GNU),1)
+  AS = $(GP)-as --defsym GNU=1 -mthumb-interwork -march=armv5te
+
+  CA = $(GP)-gcc -mthumb-interwork -march=armv5te -std=gnu99 \
+	-I $(INC_DIR) -I $(SPINN_COMMON_INCLUDE) -c
+
+  CT = $(CA) -mthumb -DTHUMB
+
+ifeq ($(LIB),1)
+  CFLAGS += -fdata-sections -ffunction-sections -static
+endif
+
+SPINN_LIBS += $(LIB_DIR)/libspin1_api.a
+SPINN_LIBS += $(SPINN_COMMON_LIBS)/libspinn_common.a
+
+  SCRIPT = $(LIB_DIR)/sark.lnk
+
+  LD = $(GP)-gcc -T$(SCRIPT) -Wl,-e,cpu_reset -Wl,-static -fdata-sections -ffunction-sections -Wl,--gc-sections -Wl,--use-blx -nostartfiles -static
+
+  AR = $(GP)-ar -rcs
+  OC = $(GP)-objcopy
+  OD = $(GP)-objdump -dxt > $(APP).txt
+  NM = $(GP)-nm
+
+# ARM tool setup
+
+else
+  AS = armasm --keep --cpu=5te --apcs /interwork
+
+  CA = armcc -c --c99 --cpu=5te --apcs /interwork --min_array_alignment=4 \
+	-I $(INC_DIR)
+
+  CT = $(CA) --thumb -DTHUMB
+
+ifeq ($(LIB),1)
+  CFLAGS += --split_sections
+endif
+
+ifeq ($(API),1)
+  SPINN_LIBS += $(LIB_DIR)/spin1_api.a
+else
+  SPINN_LIBS += $(LIB_DIR)/sark.a
+endif
+
+  SCRIPT = $(LIB_DIR)/sark.sct
+
+  LD = armlink --scatter=$(SCRIPT) --remove --entry cpu_reset
+
+  AR = armar -rcs
+  OC = fromelf
+  OD = fromelf -cds --output $(APP).txt
+  NM = nm
+
+endif
+
+ifeq ($(THUMB),1)
+  CC = $(CT)
+else
+  CC = $(CA)
+endif
+
+CAT = cat
+RM  = rm -f
+LS  = ls -l
+
+
+# Primary target is an APLX file - built from the ELF
+
+#  1) Create a binary file which is the concatenation of RO and RW sections
+#  2) Make an APLX header from the ELF file with "mkaplx" and concatenate
+#     that with the binary to make the APLX file
+#  3) Remove temporary files and "ls" the APLX file
+
+$(APP_OUTPUT_DIR)/$(APP).aplx: $(APP).elf
+ifeq ($(GNU),1)
+	$(OC) -O binary -j RO_DATA $(APP).elf RO_DATA.bin
+	$(OC) -O binary -j RW_DATA $(APP).elf RW_DATA.bin
+	$(TOOLS_DIR)/mkbin RO_DATA.bin RW_DATA.bin > $(APP).bin
+else
+	$(OC) --bin --output $(APP).bin $(APP).elf
+endif
+	$(TOOLS_DIR)/mkaplx -nm $(NM) $(APP).elf | $(CAT) - $(APP).bin > $(APP_OUTPUT_DIR)/$(APP).aplx
+	$(RM) $(APP).bin RO_DATA.bin RW_DATA.bin
+	$(LS) $(APP_OUTPUT_DIR)/$(APP).aplx
+
+# Build the ELF file
+
+#  1) Make a "sark_build.c" file containing app. name and build time
+#     with "mkbuild" and compile it
+#  2) Link application object(s), build file and library to make the ELF
+#  3) Tidy up temporaries and create a list file
+
+$(APP).elf: $(OBJECTS) $(SCRIPT) $(SPINN_LIBS) 
+	$(TOOLS_DIR)/mkbuild $(APP) > sark_build.c
+	$(CC) sark_build.c
+	$(LD) $(LFLAGS) $(OBJECTS) sark_build.o $(SPINN_LIBS) $(LIBRARIES) -o $(APP).elf
+	$(RM) sark_build.c sark_build.o
+	$(OD) $(APP).elf
+
+
+# Build the main object file. If there are other files in the
+# application, place their build dependencies below this one.
+
+$(APP).o: $(APP).c $(INC_DIR)/spinnaker.h $(INC_DIR)/sark.h \
+	  $(INC_DIR)/spin1_api.h
+	$(CC) $(CFLAGS) $(APP).c
+
+$(BUILDDIR)/%.o: $(SPINN_NEURAL_MODELLING_DIR)/%.c
+	-mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -o $@ $<
+
+# Tidy and cleaning dependencies
+
+tidy:
+	$(RM) $(OBJECTS) $(APP).elf $(APP).txt
+clean:
+	$(RM) $(OBJECTS) $(APP).elf $(APP).txt $(APP_OUTPUT_DIR)/$(APP).aplx
+
+#-------------------------------------------------------------------------------
