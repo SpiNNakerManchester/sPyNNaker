@@ -130,15 +130,14 @@ class MachinePage(AbstractPage):
         return (machine_x * 2) + 1
 
     # creates the menu used in right clicks
-    @staticmethod
-    def _create_right_click_menu():
+    def _create_right_click_menu(self):
         menu = gtk.Menu()
         menu.show()
         tab_menu_item = gtk.MenuItem("chip view in new tab")
         tab_menu_item.show()
-        tab_menu_item.connect("activate", "tab")
+        tab_menu_item.connect("activate", self._menuitem_response)
         window_menu_item = gtk.MenuItem("chip view in new window")
-        window_menu_item.connect("activate", "win")
+        window_menu_item.connect("activate", self._button_press)
         window_menu_item.show()
         menu.append(tab_menu_item)
         menu.append(window_menu_item)
@@ -178,7 +177,7 @@ class MachinePage(AbstractPage):
     #checks the state of the chip being repsented in the dao, if not real, then
     #turn to blakc and disable the button
     def _check_button_state(self, button, x, y):
-        if self._machine.does_chip_exist_at_xy(x, y):
+        if self._machine.is_chip_at(x, y):
             button.show()
         else:
             color_map = button.get_colormap()
@@ -192,17 +191,17 @@ class MachinePage(AbstractPage):
 
     #handles edge placement in the table
     def _add_edges(self):
-        x_dim = self._machine.dimenions('x')
-        y_dim = self._machine.dimenions('y')
+        x_dim = self._machine.max_chip_x + 1
+        y_dim = self._machine.max_chip_y + 1
         adjustments = ({'x': 1, 'y': 0}, {'x': 1, 'y': 1}, {'x': 1, 'y': 0},
                        {'x': -1, 'y': 0}, {'x': -1, 'y': -1}, {'x': 0, 'y': -1})
                          #E        NE      N        W        SW       S
         for x in range(x_dim):
             for y in range(y_dim):
-                if self._machine.chip_exists_at_xy(x, y):
+                if self._machine.get_chip_at(x, y):
                     index = 0
-                    chip = self._machine.get_chip(x, y)
-                    for connection in chip.router.neighbourlist:
+                    chip = self._machine.get_chip_at(x, y)
+                    for connection in chip.router.links:
                         #calculate edge position
                         column_y = \
                             self._correct_y_pos(y, self._y_dim) + \

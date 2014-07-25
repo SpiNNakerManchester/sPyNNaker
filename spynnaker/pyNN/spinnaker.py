@@ -302,16 +302,19 @@ class Spinnaker(object):
         """Set up the interfaces for communicating with the SpiNNaker board
         """
         has_board = conf.config.getboolean("Machine", "have_board")
+        requires_visualiser = conf.config.getboolean("Visualiser", "enable")
 
         if has_board:
             self._txrx = create_transceiver_from_hostname(self._hostname)
         self._machine = self._txrx.get_machine_details()
 
-        self._visualiser = \
-            self._visualiser_creation_utility.create_visualiser_interface(
-                has_board, self._txrx, self._graph, self._visualiser_vertices,
-                self._machine, self._sub_graph, self._placements,
-                self._router_tables, self._runtime, self._machine_time_step)
+        if requires_visualiser:
+            self._visualiser = \
+                self._visualiser_creation_utility.create_visualiser_interface(
+                    has_board, self._txrx, self._graph,
+                    self._visualiser_vertices, self._machine, self._sub_graph,
+                    self._placements, self._router_tables, self._runtime,
+                    self._machine_time_step)
 
     @property
     def app_id(self):

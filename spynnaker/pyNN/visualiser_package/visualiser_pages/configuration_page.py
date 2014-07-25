@@ -20,7 +20,7 @@ class ConfigPage(AbstractPage):
     INDIVIDUAL_RASTER_TEXT = "add as an individual raster plot"
     MERGED_RASTER_TEXT = "add to combination raster plot"
 
-    def __init__(self,  vertex_mapper, vertices, visualiser_set_vertexes,
+    def __init__(self, vertex_mapper, visualiser_vertexes, graph,
                  container, transciever, has_board, sim_runtime,
                  machine_time_step, subgraph, placements):
         AbstractPage.__init__(self)
@@ -40,10 +40,11 @@ class ConfigPage(AbstractPage):
         self._placements = placements
 
         #get vertexes which are set to record
-        self._vertexes_in_question = visualiser_set_vertexes
+        self._visual_vertexes = visualiser_vertexes
+        self._graph = graph
 
         #set a table layout for the data
-        self._table = gtk.Table(4, len(self._vertexes_in_question)+1, True)
+        self._table = gtk.Table(4, len(self._visual_vertexes) + 1, True)
         self._table.set_col_spacings(0)
         self._table.set_row_spacings(0)
         self._config_page.add(self._table)
@@ -70,9 +71,9 @@ class ConfigPage(AbstractPage):
         """
         #go though the vertexes and create a label and a dropbox box
         position = 0
-        for vertex in self._vertexes_in_question:
+        for vertex in self._visual_vertexes:
             self._table.attach(gtk.Label(vertex.vertex.label), 0, 1,
-                               position, position+1)
+                               position, position + 1)
             self._handle_first_tier_combos(vertex, position)
             position += 1
 

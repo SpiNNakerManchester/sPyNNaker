@@ -1,7 +1,5 @@
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
-    AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.multicastsource \
     import MultiCastSource
 from spynnaker.pyNN.utilities.parameters_surrogate\
