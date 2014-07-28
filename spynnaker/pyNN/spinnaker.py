@@ -11,6 +11,7 @@ from pacman.operations.router import Router
 from pacman.operations.routing_info_allocator import RoutingInfoAllocator
 from pacman import reports as pacman_reports
 from pacman.progress_bar import ProgressBar
+from pacman import constants as pacman_constants
 
 #internal imports
 from spynnaker.pyNN import exceptions
@@ -459,7 +460,7 @@ class Spinnaker(object):
                 data_writer = FileDataWriter(app_data_file_path)
 
                 #locate current memory requirement
-                current_memory_avilable = constants.SDRAM_AVILABLE_BYTES
+                current_memory_avilable = pacman_constants.SDRAM_AVILABLE_BYTES
                 key = "{}:{}".format(placement.x, placement.y)
                 if key in space_based_memory_tracker.keys():
                     current_memory_avilable = space_based_memory_tracker[key]
@@ -467,7 +468,8 @@ class Spinnaker(object):
                 #generate data spec exeuctor
                 host_based_data_spec_exeuctor = DataSpecificationExecutor(
                     data_spec_reader, data_writer,
-                    constants.SDRAM_AVILABLE_BYTES - current_memory_avilable)
+                    pacman_constants.SDRAM_AVILABLE_BYTES -
+                    current_memory_avilable)
 
                 #update memory calc and run data spec executor
                 bytes_used_by_spec = host_based_data_spec_exeuctor.execute()
@@ -476,7 +478,7 @@ class Spinnaker(object):
                 key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
                 processor_to_app_data_base_address[key] = \
                     {'start_address':
-                        ((constants.SDRAM_AVILABLE_BYTES
+                        ((pacman_constants.SDRAM_AVILABLE_BYTES
                           - current_memory_avilable)
                          + constants.SDRAM_BASE_ADDR),
                      'memory_used': bytes_used_by_spec}

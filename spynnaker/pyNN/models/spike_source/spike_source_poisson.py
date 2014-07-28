@@ -20,23 +20,10 @@ import numpy
 import logging
 logger = logging.getLogger(__name__)
 
-# Identifier for this application (may contain institution 
-# and specific application information - format to be decided):
-
-# Version string for this DSG:
-DsgVersionMaj = 0
-DsgVersionMin = 1
-
 SLOW_RATE_PER_TICK_CUTOFF = 0.25
-
-SETUP_SZ = 16
 PARAMS_BASE_WORDS = 3
 PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
-
-RECORD_SPIKE_BIT = 1 << 0
-
-INFINITE_SIMULATION = 4294967295
 
 
 class SpikeSourcePoisson(AbstractSpikeSource):
@@ -95,7 +82,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         """
         Gets the size of the possion parameters in bytes
         """
-        return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS 
+        return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS
                 + (((hi_atom - lo_atom) + 1) * PARAMS_WORDS_PER_NEURON)) * 4
 
     def reserve_memory_regions(self, spec, setup_sz, poisson_params_sz,
@@ -135,7 +122,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         # What recording commands wereset for the parent pynn_population.py?
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
-            recording_info |= RECORD_SPIKE_BIT
+            recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
         spec.switchWriteFocus(
@@ -265,7 +252,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         """
         poisson_params_sz = self.get_params_bytes(lo_atom, hi_atom)
         spike_hist_buff_sz = self.get_spike_buffer_size(lo_atom, hi_atom)
-        return SETUP_SZ + poisson_params_sz + spike_hist_buff_sz
+        return constants.SETUP_SIZE + poisson_params_sz + spike_hist_buff_sz
 
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
         """
@@ -307,8 +294,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
                                                   subvertex.hi_atom)
 
         # Reserve SDRAM space for memory areas:
-        self.reserve_memory_regions(spec, SETUP_SZ, poisson_params_sz,
-                                    spike_hist_buff_sz)
+        self.reserve_memory_regions(
+            spec, constants.SETUP_SIZE, poisson_params_sz, spike_hist_buff_sz)
 
         self.write_poisson_parameters(spec, processor_chip_x, processor_chip_y,
                                       processor_id, subvertex.n_atoms)

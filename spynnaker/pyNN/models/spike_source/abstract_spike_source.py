@@ -13,8 +13,6 @@ from enum import Enum
 class AbstractSpikeSource(AbstractComponentVertex, AbstractPartitionableVertex,
                           AbstractDataSpecableVertex):
 
-    RECORD_SPIKE_BIT = 1 << 0
-
     _SPIKE_SOURCE_REGIONS = Enum(
         value="_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),

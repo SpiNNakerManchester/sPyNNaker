@@ -9,6 +9,7 @@ from pacman.model.resources.sdram_resource import SDRAMResource
 from pacman.model.graph.vertex import Vertex
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
+from pacman.model.resources.resource_container import ResourceContainer
 
 import sys
 
@@ -50,15 +51,10 @@ class AbstractPartitionableVertex(Vertex):
         cpu_cycles = self.get_cpu_usage_for_atoms(lo_atom, hi_atom)
         dtcm_requirement = self.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
         sdram_requirment = self.get_sdram_usage_for_atoms(lo_atom, hi_atom)
-        resources = list()
         # noinspection PyTypeChecker
-        resources.append(CPUCyclesPerTickResource(cpu_cycles))
-
-        # noinspection PyTypeChecker
-        resources.append(DTCMResource(dtcm_requirement))
-
-        # noinspection PyTypeChecker
-        resources.append(SDRAMResource(sdram_requirment))
+        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
+                                      dtcm=DTCMResource(dtcm_requirement),
+                                      sdram=SDRAMResource(sdram_requirment))
         return resources
 
     def get_max_atoms_per_core(self):

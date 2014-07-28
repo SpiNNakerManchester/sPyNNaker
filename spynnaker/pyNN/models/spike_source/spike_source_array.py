@@ -17,22 +17,6 @@ import math
 
 logger = logging.getLogger(__name__)
 
-# Identifier for this application (may contain institution 
-# and specific application information - format to be decided):
-
-RECORD_SPIKE_BIT = 1 << 0
-
-SETUP_SZ = 16
-BITS_PER_WORD = 32.0
-BLOCK_INDEX_HEADER_WORDS = 3
-BLOCK_INDEX_ROW_WORDS = 2
-
-# Version string for this DSG:
-DsgVersionMaj = 0
-DsgVersionMin = 1
-
-INFINITE_SIMULATION = 4294967295
-
 
 class SpikeSourceArray(AbstractSpikeSource):
 
@@ -98,7 +82,7 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     @staticmethod
     def get_spike_block_row_length(n_atoms):
-        return int(math.ceil(n_atoms / BITS_PER_WORD))
+        return int(math.ceil(n_atoms / constants.BITS_PER_WORD))
 
     @staticmethod
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
@@ -119,8 +103,8 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     @staticmethod
     def get_block_index_bytes(no_active_timesteps):
-        return (BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps 
-                * BLOCK_INDEX_ROW_WORDS)) * 4
+        return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps
+                * constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
     def process_spike_array_info(self, subvertex):
         """
@@ -211,7 +195,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         self._write_basic_setup_info(spec, SpikeSourceArray.CORE_APP_IDENTIFIER)
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
-            recording_info |= RECORD_SPIKE_BIT
+            recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
@@ -328,7 +312,8 @@ class SpikeSourceArray(AbstractSpikeSource):
         block_index_region_size = self.get_block_index_bytes(len(table_entries))
 
         # Create the data regions for the spike source array:
-        self.reserve_memory_regions(spec, SETUP_SZ, block_index_region_size,
+        self.reserve_memory_regions(spec, constants.SETUP_SIZE,
+                                    block_index_region_size,
                                     spike_region_size, spike_history_region_sz)
         self.write_block_index_region(spec, subvertex, num_neurons, 
                                       table_entries)
@@ -362,7 +347,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         block_index_region_size = \
             self.get_block_index_bytes(no_active_timesteps)
         spike_history_region_sz = self.get_spike_buffer_size(lo_atom, hi_atom)
-        return (SETUP_SZ + spike_region_sz + block_index_region_size
+        return (constants.SETUP_SIZE + spike_region_sz + block_index_region_size
                 + spike_history_region_sz)
 
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):

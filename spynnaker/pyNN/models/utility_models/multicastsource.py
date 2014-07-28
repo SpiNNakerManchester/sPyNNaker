@@ -22,8 +22,6 @@ from data_specification.file_data_writer import FileDataWriter
 
 import os
 
-INFINITE_SIMULATION = 4294967295
-
 
 class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex,
                       AbstractPartitionableVertex):
