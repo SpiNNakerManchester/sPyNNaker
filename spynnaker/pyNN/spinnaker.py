@@ -36,6 +36,7 @@ from spinnman.data.file_data_reader import FileDataReader \
     as SpinnmanFileDataReader
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
+from spinnman.model.cpu_state import CPUState
 
 
 #data spec import
@@ -515,9 +516,8 @@ class Spinnaker(object):
                 total_processors += 1
 
         #check that the right number of processors are in sync0
-        processors_ready = self._txrx.send_signal(self._app_id,
-                                                  SCPSignal.SIGNAL_COUNT,
-                                                  SCPSignal.PROCESSOR_SYNC0)
+        processors_ready = self._txrx.get_core_state_count(self._app_id,
+                                                           CPUState.SYNC0)
 
         if processors_ready != total_processors:
             raise exceptions.ExecutableFailedToStartException(
@@ -529,9 +529,8 @@ class Spinnaker(object):
 
         #check all apps have gone into run state
         logger.info("Checking that the application has started")
-        processors_running = self._txrx.send_signal(self._app_id,
-                                                    SCPSignal.SIGNAL_COUNT,
-                                                    SCPSignal.PROCESSOR_RUN)
+        processors_running = self._txrx.get_core_state_count(self._app_id,
+                                                             CPUState.RUNNING)
         if processors_running < total_processors:
             raise exceptions.ExecutableFailedToStartException(
                 "Only {} of {} processors started".format(processors_running,
@@ -544,20 +543,17 @@ class Spinnaker(object):
             processors_not_finished = processors_ready
             while processors_not_finished != 0:
                 processors_not_finished = \
-                    self._txrx.send_signal(self._app_id,
-                                           SCPSignal.SIGNAL_COUNT,
-                                           SCPSignal.PROCESSOR_RUN)
-                processors_rte = self._txrx.send_signal(self._app_id,
-                                                        SCPSignal.SIGNAL_COUNT,
-                                                        SCPSignal.PROCESSOR_RTE)
+                    self._txrx.send_signal(self._app_id, CPUState.RUNNING)
+                processors_rte = \
+                    self._txrx.get_core_state_count(self._app_id,
+                                                    CPUState.RUN_TIME_EXCEPTION)
                 if processors_rte > 0:
                     raise exceptions.ExecutableFailedToStopException(
                         "{} cores have gone into a run time error state."
                         .format(processors_rte))
 
-            processors_exited = self._txrx.send_signal(self._app_id,
-                                                       SCPSignal.SIGNAL_COUNT,
-                                                       SCPSignal.PROCESSOR_EXIT)
+            processors_exited =\
+                self._txrx.get_core_state_count(self._app_id, CPUState.FINSHED)
 
             if processors_exited < total_processors:
                 raise exceptions.ExecutableFailedToStopException(
