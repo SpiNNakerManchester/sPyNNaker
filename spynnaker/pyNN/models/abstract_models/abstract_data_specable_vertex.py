@@ -112,3 +112,7 @@ class AbstractDataSpecableVertex(Vertex):
                                      .format(hostname, processor_chip_x,
                                              processor_chip_y,
                                              processor_id)
+
+    @staticmethod
+    def get_mem_write_base_address(processor_id):
+        return 0xe5007000 + 128 * processor_id + 112

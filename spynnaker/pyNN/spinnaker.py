@@ -10,6 +10,7 @@ from pacman.operations.placer import Placer
 from pacman.operations.router import Router
 from pacman.operations.routing_info_allocator import RoutingInfoAllocator
 from pacman import reports as pacman_reports
+from pacman.progress_bar import ProgressBar
 
 #internal imports
 from spynnaker.pyNN import exceptions
@@ -30,17 +31,24 @@ from spynnaker.pyNN import overrided_pacman_functions
 #spinnman inports
 from spinnman.transceiver import create_transceiver_from_hostname
 from spinnman.model.iptag import IPTag
-from spinnman.connections.scp_listener import SCPListener
 from spinnman.messages.scp.scp_signal import SCPSignal
+from spinnman.data.file_data_reader import FileDataReader \
+    as SpinnmanFileDataReader
+from spinnman.model.core_subsets import CoreSubsets
+from spinnman.model.core_subset import CoreSubset
+
 
 #data spec import
-from data_specification.file_data_reader import FileDataReader
+from data_specification.file_data_reader import FileDataReader \
+    as DataSpecFileDataReader
 from data_specification.file_data_writer import FileDataWriter
 from data_specification.data_specification_executor\
     import DataSpecificationExecutor
 
 import logging
 import math
+import time
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +68,7 @@ class Spinnaker(object):
         self._wait_for_run = False
         self._visualiser_port = None
         self._visualiser_vertices = None
+        self._visualiser_vertex_to_page_mapping = None
         self._visualiser_creation_utility = VisualiserCreationUtility()
 
         #main objects
@@ -265,6 +274,7 @@ class Spinnaker(object):
         if do_timing:
             timer.take_sample()
 
+        #execute data spec generation
         if do_timing:
             timer.start_timing()
         logger.info("*** Generating Output *** ")
@@ -273,31 +283,37 @@ class Spinnaker(object):
         if do_timing:
             timer.take_sample()
 
+        #execute data spec execution
         if do_timing:
             timer.start_timing()
-        self.execute_data_specification_execution(
-            conf.config.getboolean("SpecExecution", "specExecOnHost"),
-            self._hostname)
+        processor_to_app_data_base_address = \
+            self.execute_data_specification_execution(
+                conf.config.getboolean("SpecExecution", "specExecOnHost"),
+                self._hostname)
+
+        #engage vis if requested
         if do_timing:
             timer.take_sample()
-
         if conf.config.getboolean("Visualiser", "enable"):
             self.start_visualiser()
 
-        if do_timing:
-            timer.start_timing()
         if conf.config.getboolean("Execute", "run_simulation"):
+            if do_timing:
+                timer.start_timing()
             if self._do_load is True:
                 logger.info("*** Loading data ***")
-                #TODO need to convert this into spinnman calls and use spinnman objects
-                _controller.load_targets()
-                _controller.load_write_mem()
+                self._load_application_data(self._placements,
+                                            self._graph_subgraph_mapper,
+                                            processor_to_app_data_base_address)
+                logger.info("*** Loading executables ***")
+                self._load_executable_images(executable_targets)
             if do_timing:
                 timer.take_sample()
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
                 self._run(executable_targets)
+                self._has_ran = True
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
@@ -312,7 +328,7 @@ class Spinnaker(object):
         self._machine = self._txrx.get_machine_details()
 
         if requires_visualiser:
-            self._visualiser = \
+            self._visualiser, self._visualiser_vertex_to_page_mapping = \
                 self._visualiser_creation_utility.create_visualiser_interface(
                     has_board, self._txrx, self._graph,
                     self._visualiser_vertices, self._machine, self._sub_graph,
@@ -381,6 +397,9 @@ class Spinnaker(object):
         #iterate though subvertexes and call generate_data_spec for each vertex
         executable_targets = dict()
 
+        #create a progress bar for end users
+        progress_bar = ProgressBar(len(self._placements()))
+
         for placement in self._placements():
             associated_vertex =\
                 self._sub_graph.get_vertex_from_subvertex(placement.subvertex)
@@ -392,27 +411,36 @@ class Spinnaker(object):
 
                 binary_name = associated_vertex.get_binary_name()
                 if binary_name in executable_targets.keys():
-                    executable_targets[binary_name].append({'x': placement.x,
-                                                            'y': placement.y,
-                                                            'p': placement.p})
+                    executable_targets[binary_name].add_processor(placement.x,
+                                                                  placement.y,
+                                                                  placement.p)
                 else:
-                    executable_targets[binary_name] = list({'x': placement.x,
-                                                            'y': placement.y,
-                                                            'p': placement.p})
+                    initial_core_subset = CoreSubset(placement.x, placement.y,
+                                                     placement.p)
+                    executable_targets[binary_name] = \
+                        CoreSubsets(initial_core_subset)
+            #update the progress bar
+            progress_bar.update()
+        #finish the progress bar
+        progress_bar.end()
         return executable_targets
 
     def execute_data_specification_execution(self, host_based_execution,
                                              hostname):
         if host_based_execution:
-            self._execute_host_based_data_specificiation_execution(hostname)
+            return self.host_based_data_specificiation_execution(hostname)
         else:
-            self._chip_based_data_specificiation_execution(hostname)
+            return self._chip_based_data_specificiation_execution(hostname)
 
     def _chip_based_data_specificiation_execution(self, hostname):
         raise NotImplementedError
 
-    def _execute_host_based_data_specificiation_execution(self, hostname):
+    def host_based_data_specificiation_execution(self, hostname):
         space_based_memory_tracker = dict()
+        processor_to_app_data_base_address = dict()
+         #create a progress bar for end users
+        progress_bar = ProgressBar(len(self._placements()))
+
         for placement in self._placements():
             associated_vertex =\
                 self._sub_graph.get_vertex_from_subvertex(placement.subvertex)
@@ -426,39 +454,120 @@ class Spinnaker(object):
                     associated_vertex.get_application_data_file_name(
                         placement.x, placement.y, placement.p, hostname
                     )
-                data_spec_reader = FileDataReader(data_spec_file_path)
+                data_spec_reader = DataSpecFileDataReader(data_spec_file_path)
                 data_writer = FileDataWriter(app_data_file_path)
 
                 #locate current memory requirement
-                current_memory_requirement = constants.SDRAM_AVILABLE_BYTES
+                current_memory_avilable = constants.SDRAM_AVILABLE_BYTES
                 key = "{}:{}".format(placement.x, placement.y)
                 if key in space_based_memory_tracker.keys():
-                    current_memory_requirement = space_based_memory_tracker[key]
+                    current_memory_avilable = space_based_memory_tracker[key]
 
+                #generate data spec exeuctor
                 host_based_data_spec_exeuctor = DataSpecificationExecutor(
                     data_spec_reader, data_writer,
-                    constants.SDRAM_AVILABLE_BYTES - current_memory_requirement)
+                    constants.SDRAM_AVILABLE_BYTES - current_memory_avilable)
 
+                #update memory calc and run data spec executor
                 bytes_used_by_spec = host_based_data_spec_exeuctor.execute()
+
+                #update base address mapper
+                key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
+                processor_to_app_data_base_address[key] = \
+                    {'start_address':
+                        ((constants.SDRAM_AVILABLE_BYTES
+                          - current_memory_avilable)
+                         + constants.SDRAM_BASE_ADDR),
+                     'memory_used': bytes_used_by_spec}
+
                 if key in space_based_memory_tracker.keys():
-
-
-
+                    space_based_memory_tracker[key] = \
+                        current_memory_avilable + bytes_used_by_spec
+                else:
+                    space_based_memory_tracker[key] = bytes_used_by_spec
+            #update the progress bar
+            progress_bar.update()
+        #close the progress bar
+        progress_bar.end()
+        return processor_to_app_data_base_address
 
     def start_visualiser(self):
         """starts the port listener and ties it to the visualiser pages as
          required
         """
-        #create a scp listener
-        scp_message_listener = SCPListener()
+       #register a listener at the trasnciever for each visualised vertex
+        for vertex in self._visualiser_vertices:
+            associated_page = self._visualiser_vertex_to_page_mapping[vertex]
+            if associated_page is not None:
+                self._txrx.register_listener(associated_page.recieved_spike(),
+                                             self._hostname)
+        self._visualiser.start()
 
     def stop(self):
         self._txrx.send_signal(self, self._app_id, SCPSignal.STOP)
         self._visualiser.stop()
 
-
     def _run(self, executable_targets):
-        pass
+        #deduce how many processors this application uses up
+        total_processors = 0
+        for executable_target in executable_targets:
+            for _ in executable_target:
+                total_processors += 1
+
+        #check that the right number of processors are in sync0
+        processors_ready = self._txrx.send_signal(self._app_id,
+                                                  SCPSignal.SIGNAL_COUNT,
+                                                  SCPSignal.PROCESSOR_SYNC0)
+
+        if processors_ready != total_processors:
+            raise exceptions.ExecutableFailedToStartException(
+                "Only {} processors out of {} have sucessfully reached sync0")
+
+        # if correct, start applications
+        logger.info("Starting application")
+        self._txrx.send_signal(self._app_id, SCPSignal.SIGNAL_SYNC0)
+
+        #check all apps have gone into run state
+        logger.info("Checking that the application has started")
+        processors_running = self._txrx.send_signal(self._app_id,
+                                                    SCPSignal.SIGNAL_COUNT,
+                                                    SCPSignal.PROCESSOR_RUN)
+        if processors_running < total_processors:
+            raise exceptions.ExecutableFailedToStartException(
+                "Only {} of {} processors started".format(processors_running,
+                                                          total_processors))
+
+        #if not running for infinity, check that applications stop correctly
+        if self._runtime is not None:
+            logger.info("Application started - waiting for it to stop")
+            time.sleep(self._runtime / 1000.0)
+            processors_not_finished = processors_ready
+            while processors_not_finished != 0:
+                processors_not_finished = \
+                    self._txrx.send_signal(self._app_id,
+                                           SCPSignal.SIGNAL_COUNT,
+                                           SCPSignal.PROCESSOR_RUN)
+                processors_rte = self._txrx.send_signal(self._app_id,
+                                                        SCPSignal.SIGNAL_COUNT,
+                                                        SCPSignal.PROCESSOR_RTE)
+                if processors_rte > 0:
+                    raise exceptions.ExecutableFailedToStopException(
+                        "{} cores have gone into a run time error state."
+                        .format(processors_rte))
+
+            processors_exited = self._txrx.send_signal(self._app_id,
+                                                       SCPSignal.SIGNAL_COUNT,
+                                                       SCPSignal.PROCESSOR_EXIT)
+
+            if processors_exited < total_processors:
+                raise exceptions.ExecutableFailedToStopException(
+                    "{} of the processors failed to exit successfully"
+                    .format(total_processors - processors_exited)
+                )
+
+            logger.info("Application has run to completion")
+        else:
+            logger.info("Application is set to run forever - PACMAN is exiting")
 
     def _set_tag_output(self, tag, port, hostname):
         self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
@@ -471,11 +580,10 @@ class Spinnaker(object):
 
     def create_population(self, size, cellclass, cellparams, structure, label):
 
-        population = Population(
+        return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, runtime=self._runtime,
             machine_time_step=self._machine_time_step, spinnaker=self)
-        return population
 
     def create_projection(self, presynaptic_population, postsynaptic_population,
                           connector, source, target, synapse_dynamics, label,
@@ -483,7 +591,7 @@ class Spinnaker(object):
         if label is None:
             label = "Projection {}".format(self._edge_count)
             self._edge_count += 1
-        edge = Projection(
+        return Projection(
             presynaptic_population=presynaptic_population, label=label,
             postsynaptic_population=postsynaptic_population, rng=rng,
             connector=connector, source=source, target=target,
@@ -503,3 +611,51 @@ class Spinnaker(object):
         if self._visualiser_vertices is None:
             self._visualiser_vertices = list()
         self._visualiser_vertices.append(visualiser_vertex_to_add)
+
+    def _load_application_data(self, placements, vertex_to_subvertex_mapper,
+                               processor_to_app_data_base_address):
+        #go through the placements and see if theres any application data to load
+        for placement in placements:
+            associated_vertex = \
+                vertex_to_subvertex_mapper.get_vertex_from_subvertex(
+                    placement.subvertex)
+            if isinstance(AbstractDataSpecableVertex, associated_vertex):
+                key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
+                start_address = \
+                    processor_to_app_data_base_address[key]['start_address']
+                memory_used = \
+                    processor_to_app_data_base_address[key]['memory_used']
+                file_path_for_application_data = \
+                    associated_vertex.get_application_data_file_name(
+                        placement.x, placement.y, placement.p, self._hostname)
+                application_data_file_reader = \
+                    SpinnmanFileDataReader(file_path_for_application_data)
+                self._txrx.write_memory(placement.x, placement.y, start_address,
+                                        application_data_file_reader,
+                                        memory_used)
+
+    def _load_executable_images(self, executable_targets):
+        """
+        go through the exeuctable targets and load each binary to everywhere and
+        then set each given core to sync0 that require it
+        """
+        for exectuable_target_key in executable_targets.keys():
+            file_reader = SpinnmanFileDataReader(exectuable_target_key)
+            core_subset = executable_targets[exectuable_target_key]
+
+            ''' for some reason, we have to hand the size of a binary. The only
+            logical way to do this is to read the exe and determine the length
+            . TODO this needs to change so that the trasnciever figures this out
+            itself'''
+
+            # TODO FIX THIS CHUNK
+            statinfo = os.stat(exectuable_target_key)
+            file_to_read_in = open(exectuable_target_key, 'rb')
+            buf = file_to_read_in.read(statinfo.st_size)
+            size = (len(buf))
+
+            self._txrx.execute_flood(core_subset, file_reader, self._app_id,
+                                     size)
+
+
+

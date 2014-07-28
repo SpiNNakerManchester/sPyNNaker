@@ -72,3 +72,23 @@ class DelayExtensionException(ConfigurationException):
     :raise None: does not raise any known exceptions
     """
     pass
+
+
+class ExecutableFailedToStartException(SpynnakerException):
+    """ raised when the messgaes from the trnasicever state that some or all the
+    application images pushed to the board have failed to start when asked
+
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
+
+
+class ExecutableFailedToStopException(SpynnakerException):
+    """ raised when the messgaes from the trnasicever state that some or all the
+    application images pushed to the board have failed to stop when expected
+
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
