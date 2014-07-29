@@ -1,7 +1,9 @@
-from spynnaker.pyNN.models.abstract_models.abstract_component_vertex \
-    import AbstractComponentVertex
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
+    import AbstractRecordableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
     AbstractDataSpecableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
+    AbstractRouterableVertex
 from spynnaker.pyNN.models.external_device_models.external_motor_device import \
     ExternalMotorDevice
 from spynnaker.pyNN.utilities import packet_conversions
@@ -26,7 +28,8 @@ from data_specification.file_data_writer import FileDataWriter
 import os
 
 
-class RobotMotorControl(AbstractComponentVertex, AbstractDataSpecableVertex):
+class RobotMotorControl(AbstractRecordableVertex, AbstractDataSpecableVertex,
+                        AbstractRouterableVertex):
 
     PARAMS = 2
     SYSTEM_SIZE = 16
@@ -43,9 +46,11 @@ class RobotMotorControl(AbstractComponentVertex, AbstractDataSpecableVertex):
         """
         constructor that depends upon the Component vertex
         """
-        AbstractComponentVertex.__init__(self, label)
+        AbstractRecordableVertex.__init__(self, label)
         AbstractDataSpecableVertex.__init(n_atoms=RobotMotorControl._N_ATOMS,
                                           label=label, constraints=None)
+        AbstractRouterableVertex.__init__(self)
+
         max_constraint = \
             PartitionerMaximumSizeConstraint(RobotMotorControl._N_ATOMS)
         self.add_constraint(max_constraint)

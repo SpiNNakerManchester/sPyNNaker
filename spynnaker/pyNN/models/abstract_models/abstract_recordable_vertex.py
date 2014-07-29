@@ -5,7 +5,6 @@ from six import add_metaclass
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
-from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 
 
@@ -16,7 +15,7 @@ import struct
 logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
-class AbstractComponentVertex(object):
+class AbstractRecordableVertex(object):
     """
     Underlying Vertex model for Neural Applications.
     """
@@ -26,7 +25,25 @@ class AbstractComponentVertex(object):
         self._focus_level = None
         self._app_mask = constants.DEFAULT_MASK
         self._label = label
-    
+        self._no_machine_time_steps = None
+        self._machine_time_step = None
+
+    def set_no_machine_time_step(self, no_machine_time_steps):
+        if self._no_machine_time_steps is None:
+            self._no_machine_time_steps = no_machine_time_steps
+        else:
+            raise exceptions.ConfigurationException(
+                "cannot set the number of machine time steps of a given"
+                " model once it has already been set")
+
+    def set_machine_time_step(self, machine_time_step):
+        if self._machine_time_step is None:
+            self._machine_time_step = machine_time_step
+        else:
+            raise exceptions.ConfigurationException(
+                "cannot set the machine time step of a given"
+                " model once it has already been set")
+
     def record(self, focus=None):
         """
         method that sets the vertex to be recordable, as well as data on how the
@@ -45,31 +62,6 @@ class AbstractComponentVertex(object):
                             + " without a fixed run time")
         return (constants.RECORDING_ENTRY_BYTE_SIZE +
                 (self._no_machine_time_steps * bytes_per_timestep))
-
-    def get_commands(self, no_tics):
-        return list()  # most compoennts do not require a mcs
-
-    def requires_multi_cast_source(self):
-        return False  # most compoennts do not require a mcs
-
-    def generate_routing_info(self, subedge):
-        """
-        For the given subedge generate the key and mask for routing.
-
-        :param subedge: The subedge for which to generate the key and mask.
-        :returns: A tuple containing the key and mask.
-        """
-        x, y, p = subedge.presubvertex.placement.processor.get_coordinates()
-
-        key = packet_conversions.get_key_from_coords(x, y, p)
-        #bodge to deal with external perrifables
-        return key, self._app_mask
-
-    def get_dependant_vertexes_edges(self):
-        """
-        method that allows models to add dependant vertexes and edges
-        """
-        return list(), list()  # most components do not require dependants
 
     @property
     def is_set_to_record_spikes(self):
@@ -152,7 +144,7 @@ class AbstractComponentVertex(object):
             for tick in range(0, number_of_time_steps_written):
                 
                 # Convert tick to ms
-                time = tick * (spinnaker.dao.machineTimeStep / 1000.0)
+                time = tick * (self._machine_time_step / 1000.0)
                 
                 # Get offset into file data that the bit vector representing 
                 # the state at this tick begins at

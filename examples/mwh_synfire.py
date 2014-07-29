@@ -61,7 +61,7 @@ populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record(visualiser_mode=p.modes.RASTER)
 
-run_time = (560)
+run_time = 560
 print "Running for {} ms".format(run_time)
 p.run(run_time)
 '''

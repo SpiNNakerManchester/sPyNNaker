@@ -5,10 +5,10 @@ import logging
 from six import add_metaclass
 import numpy
 
-from pacman.model.constraints.partitioner_maximum_size_constraint import \
-    PartitionerMaximumSizeConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
-    AbstractComponentVertex
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
+    AbstractRouterableVertex
 from spynnaker.pyNN.models.neural_properties.abstract_population_manager \
     import PopulationManager
 from spynnaker.pyNN import exceptions
@@ -20,7 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationVertex(AbstractComponentVertex, PopulationManager):
+class AbstractPopulationVertex(AbstractRecordableVertex, PopulationManager,
+                               AbstractRouterableVertex):
     """
     Underlying Vertex model for Neural Populations.
     """
@@ -28,9 +29,10 @@ class AbstractPopulationVertex(AbstractComponentVertex, PopulationManager):
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
                  constraints=None):
 
-        AbstractComponentVertex.__init__(self, label)
+        AbstractRecordableVertex.__init__(self, label)
         PopulationManager.__init__(self, False, binary, n_neurons, label,
                                    constraints, max_atoms_per_core)
+        AbstractRouterableVertex.__init__(self)
         self._delay_vertex = None
         self._n_params = n_params
 

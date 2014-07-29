@@ -1,9 +1,11 @@
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
     AbstractDataSpecableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
+    AbstractRouterableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import packet_conversions
-from spynnaker.pyNN.models.abstract_models.abstract_component_vertex \
-    import AbstractComponentVertex
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
+    import AbstractRecordableVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge import \
     DelayProjectionEdge
 from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
@@ -38,9 +40,10 @@ _DELAY_EXTENSION_REGIONS = Enum(
 )
 
 
-class DelayExtensionVertex(AbstractComponentVertex, 
+class DelayExtensionVertex(AbstractRecordableVertex,
                            AbstractPartitionableVertex,
-                           AbstractDataSpecableVertex):
+                           AbstractDataSpecableVertex,
+                           AbstractRouterableVertex):
     """
     Instance of this class provide delays to incoming spikes in multiples
     of the maximum delays of a neuron (typically 16 or 32)
@@ -58,7 +61,8 @@ class DelayExtensionVertex(AbstractComponentVertex,
                                              constraints=constraints,
                                              label=label,
                                              max_atoms_per_core=256)
-        AbstractComponentVertex.__init__(self, label=label)
+        AbstractRecordableVertex.__init__(self, label=label)
+        AbstractRouterableVertex.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._source_vertex = source_vertex

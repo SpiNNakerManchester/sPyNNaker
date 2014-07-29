@@ -12,6 +12,9 @@ from pacman.model.constraints.partitioner_maximum_size_constraint \
 from pacman.model.resources.resource_container import ResourceContainer
 
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
@@ -25,7 +28,7 @@ class AbstractPartitionableVertex(Vertex):
         self.add_constraint(max_atom_per_core_constraint)
 
     @abstractmethod
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
         """
         method for calculating sdram usage
         """
@@ -42,7 +45,7 @@ class AbstractPartitionableVertex(Vertex):
         Gets the CPU requirements for a range of atoms
         """
 
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom, vertex_in_edges):
         """
         returns the seperate resource requirements for a range of atoms
         in a resource object with a assumption object that tracks any
@@ -50,7 +53,8 @@ class AbstractPartitionableVertex(Vertex):
         """
         cpu_cycles = self.get_cpu_usage_for_atoms(lo_atom, hi_atom)
         dtcm_requirement = self.get_dtcm_usage_for_atoms(lo_atom, hi_atom)
-        sdram_requirment = self.get_sdram_usage_for_atoms(lo_atom, hi_atom)
+        sdram_requirment = \
+            self.get_sdram_usage_for_atoms(lo_atom, hi_atom, vertex_in_edges)
         # noinspection PyTypeChecker
         resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
                                       dtcm=DTCMResource(dtcm_requirement),

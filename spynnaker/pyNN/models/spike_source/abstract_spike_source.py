@@ -1,17 +1,17 @@
-from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
-    AbstractComponentVertex
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
     AbstractDataSpecableVertex
 from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex import AbstractPartitionableVertex
-from pacman.model.constraints.partitioner_maximum_size_constraint \
-    import PartitionerMaximumSizeConstraint
 
 from enum import Enum
+from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
+    AbstractRouterableVertex
 
 
-class AbstractSpikeSource(AbstractComponentVertex, AbstractPartitionableVertex,
-                          AbstractDataSpecableVertex):
+class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
+                          AbstractDataSpecableVertex, AbstractRouterableVertex):
 
     _SPIKE_SOURCE_REGIONS = Enum(
         value="_SPIKE_SOURCE_REGIONS",
@@ -24,9 +24,10 @@ class AbstractSpikeSource(AbstractComponentVertex, AbstractPartitionableVertex,
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
-        AbstractComponentVertex.__init__(self, label)
-        max_constraint = PartitionerMaximumSizeConstraint(256)
-        self.add_constraint(max_constraint)
+        AbstractRecordableVertex.__init__(self, label)
+        AbstractDataSpecableVertex.__init__(self, label=label,
+                                            n_atoms=n_neurons)
+        AbstractRouterableVertex.__init__(self)
 
     def _write_setup_info(self, spec, spike_history_region_sz):
         """

@@ -337,7 +337,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         n_atoms = (hi_atom - lo_atom) + 1
         return 128 * n_atoms
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
         spike_dict = self.get_spikes_per_timestep(lo_atom, hi_atom)
         no_active_timesteps = len(spike_dict.keys())
         spike_block_row_length = self.get_spike_block_row_length(

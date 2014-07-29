@@ -246,7 +246,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             sub_vertex_out_spike_bytes_function)
 
     #inhirrtted from partionable vertex
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
         """
         method for calculating sdram usage
         """

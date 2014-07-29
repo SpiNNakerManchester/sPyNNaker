@@ -1,7 +1,9 @@
-from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
-    AbstractComponentVertex
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
+    AbstractRouterableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -10,11 +12,6 @@ from spynnaker.pyNN.utilities.conf import config
 
 from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.sdram_resource import SDRAMResource
-
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
@@ -24,8 +21,8 @@ from data_specification.file_data_writer import FileDataWriter
 import os
 
 
-class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex,
-                        AbstractPartitionableVertex):
+class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
+                        AbstractPartitionableVertex, AbstractRouterableVertex):
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
     SYSTEM_REGION = 1
 
@@ -38,18 +35,19 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex,
         """
         Creates a new AppMonitor Object.
         """
-        AbstractComponentVertex.__init__(self, "Monitor")
+        AbstractRecordableVertex.__init__(self, "Monitor")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="Monitor")
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
                                              max_atoms_per_core=1)
+        AbstractRouterableVertex.__init__(self)
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
 
     @property
     def model_name(self):
         return "AppMonitor"
 
-    def generate_data_spec(self,  processor_chip_x, processor_chip_y,
+    def generate_data_spec(self, processor_chip_x, processor_chip_y,
                            processor_id, subvertex, sub_graph,
                            routing_info, hostname, graph_sub_graph_mapper):
         """
@@ -78,9 +76,6 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex,
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
-
-        # Return list of executables, load files:
-        return binary_file_name, list(), list()
     
     def reserve_memory_regions(self, spec, setup_sz):
         """
@@ -135,10 +130,10 @@ class LiveSpikeRecorder(AbstractComponentVertex, AbstractDataSpecableVertex,
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
-        return CPUCyclesPerTickResource(0)
+        return 0
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
-        return SDRAMResource(0)
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+        return 0
 
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
-        return DTCMResource(0)
+        return 0

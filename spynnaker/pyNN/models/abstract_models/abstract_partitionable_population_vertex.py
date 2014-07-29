@@ -27,7 +27,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         return constants.PARAMS_BASE_SIZE + (4 * ((hi_atom - lo_atom) + 1)
                                              * self._n_params)
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, in_edges):
         """
         Gets the SDRAM requirements for a range of atoms
         """
@@ -36,11 +36,11 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         return (constants.SETUP_SIZE +
                 self.get_neuron_params_size(lo_atom, hi_atom)
                 + self.get_synapse_parameter_size(lo_atom, hi_atom)
-                + self.get_stdp_parameter_size(lo_atom, hi_atom, self.in_edges)
+                + self.get_stdp_parameter_size(lo_atom, hi_atom, in_edges)
                 + constants.ROW_LEN_TABLE_SIZE
                 + constants.MASTER_POPULATION_TABLE_SIZE
                 + self.get_synaptic_blocks_memory_size(lo_atom, hi_atom,
-                                                       self.in_edges)
+                                                       in_edges)
                 + self.get_spike_buffer_size(lo_atom, hi_atom)
                 + self.get_v_buffer_size(lo_atom, hi_atom)
                 + self.get_g_syn_buffer_size(lo_atom, hi_atom))
@@ -80,8 +80,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         if self._no_machine_time_steps is None:
             return 0
 
-        return self.get_recording_region_size(self._no_machine_time_steps,
-                                              constants.OUT_SPIKE_BYTES)
+        return self.get_recording_region_size(constants.OUT_SPIKE_BYTES)
 
     def get_v_buffer_size(self, lo_atom, hi_atom):
         """
@@ -92,8 +91,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         size_per_time_step = \
             ((hi_atom - lo_atom) + 1) *\
             constants.V_BUFFER_SIZE_PER_TICK_PER_NEURON
-        return self.get_recording_region_size(self._no_machine_time_steps,
-                                              size_per_time_step)
+        return self.get_recording_region_size(size_per_time_step)
 
     def get_g_syn_buffer_size(self, lo_atom, hi_atom):
         """
@@ -105,5 +103,4 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         size_per_time_step = \
             ((hi_atom - lo_atom) + 1) * \
             constants.GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON
-        return self.get_recording_region_size(self._no_machine_time_steps,
-                                              size_per_time_step)
+        return self.get_recording_region_size(size_per_time_step)
