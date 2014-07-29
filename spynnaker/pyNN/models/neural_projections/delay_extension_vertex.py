@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
-    AbstractDataSpecableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
     AbstractRouterableVertex
 from spynnaker.pyNN.utilities import constants
@@ -121,13 +121,6 @@ class DelayExtensionVertex(AbstractRecordableVertex,
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
         
-        # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'delay_extension.aplx')
-        
         # ###################################################################
         # Reserve SDRAM space for memory areas:
 
@@ -156,9 +149,6 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
-
-        # Return list of executables, load files:
-        return binary_name, list(), list()
 
     def write_setup_info(self, spec, spike_history_region_sz):
         """
@@ -263,10 +253,19 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         n_atoms = (hi_atom - lo_atom) + 1
         return 128 * n_atoms
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
          # TODO: Fill this in
         return 0
 
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
         n_atoms = (hi_atom - lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms
+
+    def get_binary_name(self):
+         # Rebuild executable name
+        common_binary_path = os.path.join(config.get("SpecGeneration",
+                                                     "common_binary_folder"))
+
+        binary_name = os.path.join(common_binary_path,
+                                   'delay_extension.aplx')
+        return binary_name
