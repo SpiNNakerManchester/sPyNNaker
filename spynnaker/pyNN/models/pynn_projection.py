@@ -35,8 +35,8 @@ class Projection(object):
 
     # noinspection PyUnusedLocal
     def __init__(self, presynaptic_population, postsynaptic_population, label,
-                 connector, spinnaker_control, source=None, target='excitatory',
-                 synapse_dynamics=None, rng=None):
+                 connector, spinnaker_control, machine_time_step, source=None,
+                 target='excitatory', synapse_dynamics=None, rng=None):
         """
         Instantiates a :py:object:`Projection`.
         """
@@ -75,7 +75,7 @@ class Projection(object):
             connector.generate_synapse_list(
                 presynaptic_population._get_vertex,
                 postsynaptic_population._get_vertex,
-                1000.0 / spinnaker_control.machine_time_step, synapse_type)
+                1000.0 / machine_time_step, synapse_type)
         self._read_synapse_list = None
 
         # If there are some negative weights
@@ -130,8 +130,7 @@ class Projection(object):
             self._projection_edge = \
                 ProjectionEdge(
                     presynaptic_population._get_vertex,
-                    postsynaptic_population._get_vertex,
-                    spinnaker_control.machine_time_step,
+                    postsynaptic_population._get_vertex, machine_time_step,
                     synapse_list=synapse_list,
                     synapse_dynamics=synapse_dynamics, label=label)
             spinnaker_control.add_edge(self._projection_edge)

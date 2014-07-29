@@ -5,16 +5,14 @@ from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
-from pacman.operations.partitioner import Partitioner
-from pacman.operations.placer import Placer
-from pacman.operations.router import Router
-from pacman.operations.routing_info_allocator import RoutingInfoAllocator
 from pacman import reports as pacman_reports
 from pacman.progress_bar import ProgressBar
 from pacman import constants as pacman_constants
 
 #internal imports
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.report_states import ReportState
 from spynnaker.pyNN.utilities.timer import Timer
@@ -159,6 +157,8 @@ class Spinnaker(object):
         if timestep is not None:
             timestep *= 1000  # convert into ms from microseconds
             conf.config.set("Machine", "machineTimeStep", timestep)
+            self._machine_time_step = timestep
+
         if min_delay is not None and float(min_delay * 1000) < 1.0 * timestep:
             raise exceptions.ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
@@ -248,9 +248,9 @@ class Spinnaker(object):
         #calcualte number of machien time steps
         if run_time is not None:
             self._no_machine_time_steps =\
-                int((run_time * 1000.0) / self.machine_time_step)
+                int((run_time * 1000.0) / self._machine_time_step)
             ceiled_machine_time_steps = \
-                math.ceil((run_time * 1000.0) / self.machine_time_step)
+                math.ceil((run_time * 1000.0) / self._machine_time_step)
             if self._no_machine_time_steps != ceiled_machine_time_steps:
                 raise exceptions.ConfigurationException(
                     "The runtime and machine time step combination result in "
@@ -267,6 +267,17 @@ class Spinnaker(object):
             timer = Timer()
         else:
             timer = None
+
+        #update models with new no_machine_time_step
+        for vertex in self._graph.vertices:
+            if isinstance(vertex, AbstractDataSpecableVertex):
+                vertex.set_application_runtime(self._runtime)
+                vertex.set_machine_time_step(self._machine_time_step)
+                vertex.set_no_machine_time_steps(self._no_machine_time_steps)
+            if isinstance(vertex, AbstractRecordableVertex) and not \
+                    isinstance(vertex, AbstractDataSpecableVertex):
+                vertex.set_no_machine_time_step(self._no_machine_time_steps)
+                vertex.set_machine_time_step(self._machine_time_step)
 
         self.set_runtime(run_time)
         logger.info("*** Running Mapper *** ")
@@ -314,7 +325,7 @@ class Spinnaker(object):
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
-                self._run(executable_targets)
+                self._start_execution_on_machine(executable_targets)
                 self._has_ran = True
         else:
             logger.info("*** No simulation requested: Stopping. ***")
@@ -365,22 +376,23 @@ class Spinnaker(object):
         """
 
         #execute partitioner
-        partitoner = Partitioner(self._partitioner_algorithum)
+        partitoner = self._partitioner_algorithum(self._machine_time_step,
+                                                  self._no_machine_time_steps)
         self._sub_graph, self._graph_subgraph_mapper = \
-            partitoner.run(self._graph, self._machine)
+            partitoner.partition(self._graph, self._machine)
         if (self._reports_enabled is not None and
                 self._reports_enabled.partitioner_report):
             pacman_reports.partitioner_report()
 
         #execute placer
-        placer = Placer(self._placer_algorithum)
+        placer = self._placer_algorithum()
         self._placements = placer.run(self._sub_graph, self._machine)
         if (self._reports_enabled is not None and
                 self._reports_enabled.placer_report):
             pacman_reports.placer_report()
 
         #execute key allocator
-        key_allocator = RoutingInfoAllocator(self._key_allocator_algorithum)
+        key_allocator = self._key_allocator_algorithum()
         self._routing_infos = key_allocator.run(self._graph_subgraph_mapper,
                                                 self._placements)
         if (self._reports_enabled is not None and
@@ -388,7 +400,7 @@ class Spinnaker(object):
             pacman_reports.routing_info_report()
 
         #execute router
-        router = Router(self._routing_algorithm)
+        router = self._routing_algorithm()
         self._router_tables = router.run(self._routing_infos, self._placements,
                                          self._machine)
         if (self._reports_enabled is not None and
@@ -510,7 +522,7 @@ class Spinnaker(object):
         self._txrx.send_signal(self, self._app_id, SCPSignal.STOP)
         self._visualiser.stop()
 
-    def _run(self, executable_targets):
+    def _start_execution_on_machine(self, executable_targets):
         #deduce how many processors this application uses up
         total_processors = 0
         for executable_target in executable_targets:
@@ -577,11 +589,10 @@ class Spinnaker(object):
         self._graph.add_edge(edge_to_add)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
-
         return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
-            structure=structure, label=label, runtime=self._runtime,
-            machine_time_step=self._machine_time_step, spinnaker=self)
+            structure=structure, label=label, spinnaker=self,
+            multi_cast_vertex=self._multi_cast_vertex)
 
     def create_projection(self, presynaptic_population, postsynaptic_population,
                           connector, source, target, synapse_dynamics, label,
@@ -593,7 +604,8 @@ class Spinnaker(object):
             presynaptic_population=presynaptic_population, label=label,
             postsynaptic_population=postsynaptic_population, rng=rng,
             connector=connector, source=source, target=target,
-            synapse_dynamics=synapse_dynamics, spinnaker_control=self)
+            synapse_dynamics=synapse_dynamics, spinnaker_control=self,
+            machine_time_step=self._machine_time_step)
 
     def add_edge_to_recorder_vertex(self, vertex_to_record_from):
         #check to see if it needs to be created in the frist place

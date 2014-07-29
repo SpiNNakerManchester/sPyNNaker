@@ -1,19 +1,14 @@
-from spynnaker.pyNN.models.abstract_models.abstract_component_vertex import \
-    AbstractComponentVertex
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
+    AbstractRouterableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-
-
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.sdram_resource import SDRAMResource
-
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
@@ -23,8 +18,8 @@ from data_specification.file_data_writer import FileDataWriter
 import os
 
 
-class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex,
-                      AbstractPartitionableVertex):
+class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
+                      AbstractPartitionableVertex, AbstractRouterableVertex):
 
     SYSTEM_REGION = 1
     COMMANDS = 2
@@ -35,12 +30,13 @@ class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex,
         """
         constructor that depends upon the Component vertex
         """
-        AbstractComponentVertex.__init__(self, "multi_cast_source_sender")
+        AbstractRecordableVertex.__init__(self, "multi_cast_source_sender")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="multi_cast_source_sender")
         AbstractPartitionableVertex.__init__(
             self, label="multi_cast_source_sender", n_atoms=1,
             max_atoms_per_core=1)
+        AbstractRouterableVertex.__init__(self)
 
         self._writes = None
         self._memory_requirements = 0
@@ -67,13 +63,6 @@ class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex,
 
         spec.comment("\n*** Spec for multi case source ***\n\n")
 
-         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'multicast_source.aplx')
-
         #reserve regions
         self.reserve_memory_regions(spec, self._memory_requirements)
         
@@ -92,9 +81,6 @@ class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex,
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
-
-        # Return list of executables, load files:
-        return binary_name, list(), list()
 
     def calculate_memory_requirements(self, no_tics):
         #go through the vertexes at the end of the outgoing edges and ask them
@@ -272,10 +258,19 @@ class MultiCastSource(AbstractComponentVertex, AbstractDataSpecableVertex,
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
-        return CPUCyclesPerTickResource(0)
+        return 0
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom):
-        return SDRAMResource(self._memory_requirements)
+    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+        return self._memory_requirements
 
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
-        return DTCMResource(0)
+        return 0
+
+    def get_binary_name(self):
+        # Rebuild executable name
+        common_binary_path = os.path.join(config.get("SpecGeneration",
+                                                     "common_binary_folder"))
+
+        binary_name = os.path.join(common_binary_path,
+                                   'multicast_source.aplx')
+        return binary_name

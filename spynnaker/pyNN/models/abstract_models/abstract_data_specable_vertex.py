@@ -49,17 +49,16 @@ class AbstractDataSpecableVertex(Vertex):
         return self._machine_time_step
 
     @property
+    def no_machine_time_steps(self):
+        return self._no_machine_time_steps
+
+    @property
     def application_run_time(self):
         return self._application_runtime
 
     def set_machine_time_step(self, new_machine_time_step):
         if self._machine_time_step is None:
             self._machine_time_step = new_machine_time_step
-            if (self._no_machine_time_steps is None and
-               self._application_runtime is not None):
-                self._no_machine_time_steps = \
-                    int((self._application_runtime * 1000.0) /
-                        self._machine_time_step)
         else:
             raise exceptions.ConfigurationException(
                 "cannot set the machine time step of a given model once it has"
@@ -68,15 +67,20 @@ class AbstractDataSpecableVertex(Vertex):
     def set_application_runtime(self, new_runtime):
         if self._application_runtime is None:
             self._application_runtime = new_runtime
-            if (self._no_machine_time_steps is None and
-               self._application_runtime is not None):
-                self._no_machine_time_steps = \
-                    int((self._application_runtime * 1000.0) /
-                        self._machine_time_step)
         else:
             raise exceptions.ConfigurationException(
                 "cannot set the runtime of a given model once it has"
                 "already been set")
+
+    def set_no_machine_time_steps(self, new_no_machine_time_steps):
+        if self._no_machine_time_steps is None:
+            self._no_machine_time_steps = new_no_machine_time_steps
+        else:
+            raise exceptions.ConfigurationException(
+                "cannot set the number of machine time steps of a given"
+                " model once it has already been set")
+
+
 
     @staticmethod
     def get_binary_file_name(processor_chip_x, processor_chip_y,

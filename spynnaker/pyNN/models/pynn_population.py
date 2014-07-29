@@ -1,5 +1,3 @@
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.utility_models.multicastsource \
     import MultiCastSource
 from spynnaker.pyNN.utilities.parameters_surrogate\
@@ -39,7 +37,6 @@ class Population(object):
     """
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
-                 machine_time_step, runtime,
                  multi_cast_vertex=None, structure=None):
         """
         Instantiates a :py:object:`Population`.
@@ -54,11 +51,6 @@ class Population(object):
         # Create a graph vertex for the population and add it to PACMAN
         cellparams['label'] = label
         self._vertex = cellclass(size, **cellparams)
-        if issubclass(type(cellclass), AbstractDataSpecableVertex):
-            if self._vertex.machine_time_step is None:
-                self._vertex.set_machien_time_step(machine_time_step)
-            if self._vertex.application_runtime is None:
-                self._vertex.set_application_runtime(runtime)
 
         self._spinnaker = spinnaker
 
