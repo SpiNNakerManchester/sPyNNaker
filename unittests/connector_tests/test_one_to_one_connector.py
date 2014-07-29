@@ -25,32 +25,15 @@ class TestingOneToOneConnector(unittest.TestCase):
         twop=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
         weight = 2
         delay = 1
-        synapse_type = onep.vertex.get_synapse_id('excitatory')
+        synapse_type = onep._vertex.get_synapse_id('excitatory')
         one_to_one_c = pynn.OneToOneConnector(weight,delay)
-        #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
-        synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
+        #def generate_synapse_list(self, pre_vertex, post_vertex, delay_scale, synapse_type)
+        synaptic_list = one_to_one_c.generate_synapse_list(onep._vertex,onep._vertex,1,synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)
         #pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(),number_of_neurons)
         self.assertEqual(synaptic_list.get_min_max_delay(),(delay,delay))
-
-    def test_synapse_list_generation_for_null_populations(self):
-        weight = 2
-        delay = 1
-        zp = pynn.Population(0,pynn.IF_curr_exp,cell_params_lif,label="Zero pop")
-        one_to_one_c = pynn.OneToOneConnector(weight,delay)
-        number_of_neurons = 10
-        onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
-        zero_synaptic_list = one_to_one_c.generate_synapse_list(zp.vertex,onep.vertex,1,0)
-        #pp(zero_synaptic_list.get_rows())
-        """
-        self.assertEqual(zero_synaptic_list.get_max_weight(),weight)
-        self.assertEqual(zero_synaptic_list.get_min_weight(),weight)
-
-        self.assertEqual(zero_synaptic_list.get_n_rows(),number_of_neurons)
-        self.assertEqual(zero_synaptic_list.get_min_max_delay(),(delay,delay))
-        """
 
     def test_synapse_list_generation_for_different_sized_populations(self):
         number_of_neurons = 10
@@ -59,7 +42,7 @@ class TestingOneToOneConnector(unittest.TestCase):
         weight = 2
         delay = 1
         one_to_one_c = pynn.OneToOneConnector(weight,delay)
-        synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,twop.vertex,1,0)
+        synaptic_list = one_to_one_c.generate_synapse_list(onep._vertex,twop._vertex,1,0)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)
         self.assertEqual(synaptic_list.get_n_rows(),number_of_neurons)
@@ -69,6 +52,14 @@ class TestingOneToOneConnector(unittest.TestCase):
         number_of_neurons = 10
         onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
         twop=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
+
+    def test_one_to_one_connector_populations_of_different_sizes(self):
+        with self.assertRaises(Exception):
+            weight = 2
+            delay = 5
+            p1 = pynn.Population(10,pynn.IF_curr_exp,cell_params_lif,label="pop 1")
+            p2 = pynn.Population(5, pynn.IF_curr_exp, cell_params_lif,label="pop 2")
+            pr_12 = pynn.Projection(p1,p2,pynn.OneToOneConnector(weight,delay))
 
 if __name__=="__main__":
     unittest.main()
