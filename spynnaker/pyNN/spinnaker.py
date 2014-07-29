@@ -6,8 +6,13 @@ from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
 from pacman import reports as pacman_reports
+from pacman.operations.partitioner import Partitioner
 from pacman.progress_bar import ProgressBar
-from pacman import constants as pacman_constants
+
+
+#spinnmachine imports
+from spinn_machine.sdram import SDRAM
+
 
 #internal imports
 from spynnaker.pyNN import exceptions
@@ -57,12 +62,17 @@ class Spinnaker(object):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
                  max_delay=None, graph_label=None):
+
+        #machine specific bits
         self._hostname = host_name
         self._time_scale_factor = None
+        self._machine_time_step = None
+
         #specific utility vertexes
         self._live_spike_recorder = None
         self._multi_cast_vertex = None
         self._txrx = None
+
         #visualiser objects
         self._visualiser = None
         self._wait_for_run = False
@@ -83,23 +93,109 @@ class Spinnaker(object):
         self._pruner_infos = None
         self._runtime = None
         self._has_ran = False
-        self._reports_enabled = None
+        self._reports_states = None
+        self._iptags = None
+        self._app_id = None
 
-        #report object
-        if conf.config.getboolean("Reports", "reportsEnabled"):
-            self._reports_enabled = ReportState()
+        #pacman mapping objects
+        self._partitioner_algorithum = None
+        self._placer_algorithum = None
+        self._key_allocator_algorithum = None
+        self._routing_algorithm = None
+        self._report_default_directory = None
+        self._writeTextSpecs = None
 
-        #communication objects
-        self._iptags = list()
+        #exeuctable params
+        self._do_load = None
+        self._do_run = None
 
-        self._app_id = conf.config.getint("Machine", "appID")
-        self._machine_time_step = conf.config.getint("Machine",
-                                                     "machineTimeStep")
+        self._set_up_main_objects()
+        self._set_up_pacman_algorthums_listings()
+        self._set_up_machine_specifics(timestep, min_delay, max_delay,
+                                       host_name)
+        self._set_up_executable_specifics()
+        self._set_up_recording_specifics()
+        self._set_up_report_specifics()
+
+        logger.info("Setting time scale factor to {}."
+                    .format(self._time_scale_factor))
+
+        logger.info("Setting appID to %d." % self._app_id)
+    
+        #get the machien time step
+        logger.info("Setting machine time step to {} micro-seconds."
+                    .format(self._machine_time_step))
+        self._edge_count = 0
+
+    def _set_up_report_specifics(self):
         self._writeTextSpecs = False
         if conf.config.getboolean("Reports", "reportsEnabled"):
             self._writeTextSpecs = conf.config.getboolean("Reports",
                                                           "writeTextSpecs")
-        #algorithum lists
+        #determine common report folder
+        config_param = conf.config.get("Reports", "defaultReportFilePath")
+        if config_param == "DEFAULT":
+            components = \
+                os.path.abspath(overrided_pacman_functions.__file__).\
+                split(os.sep)
+            directory = \
+                os.path.abspath(os.path.join(
+                    os.sep, *components[1:components.index("pacman103")]))
+
+            #global reports folder
+            self._report_default_directory = os.path.join(directory, 'reports')
+            if not os.path.exists(self._report_default_directory):
+                os.makedirs(self._report_default_directory)
+        else:
+            self._report_default_directory = config_param
+            if not os.path.exists(self._report_default_directory):
+                os.makedirs(self._report_default_directory)
+
+    def _set_up_recording_specifics(self):
+        if conf.config.has_option("Recording", "send_live_spikes"):
+            if conf.config.getboolean("Recording", "send_live_spikes"):
+                port = None
+                if conf.config.has_option("Recording", "live_spike_port"):
+                    port = conf.config.getint("Recording", "live_spike_port")
+                hostname = "localhost"
+                if conf.config.has_option("Recording", "live_spike_host"):
+                    hostname = conf.config.get("Recording", "live_spike_host")
+                tag = None
+                if conf.config.has_option("Recording", "live_spike_tag"):
+                    tag = conf.config.getint("Recording", "live_spike_tag")
+                if tag is None:
+                    raise exceptions.ConfigurationException(
+                        "Target tag for live spikes has not been set")
+
+                # Set up the forwarding so that monitored spikes are sent to the
+                # requested location
+                self._set_tag_output(tag, port, hostname)
+                #takes the same port for the visualiser if being used
+                if conf.config.getboolean("Visualiser", "enable") and \
+                   conf.config.getboolean("Visualiser", "have_board"):
+                    self._visualiser_creation_utility.set_visulaiser_port(port)
+
+    def _set_up_main_objects(self):
+        #report object
+        if conf.config.getboolean("Reports", "reportsEnabled"):
+            self._reports_states = ReportState()
+
+        #communication objects
+        self._iptags = list()
+        self._app_id = conf.config.getint("Machine", "appID")
+
+    def _set_up_executable_specifics(self):
+        #loading and running config params
+        self._do_load = True
+        if conf.config.has_option("Execute", "load"):
+            self._do_load = conf.config.getboolean("Execute", "load")
+
+        self._do_run = True
+        if conf.config.has_option("Execute", "run"):
+            self._do_run = conf.config.getboolean("Execute", "run")
+
+    def _set_up_pacman_algorthums_listings(self):
+         #algorithum lists
         partitioner_algorithms_list = \
             conf.get_valid_components(partition_algorithms, "Partitioner")
         self._partitioner_algorithum = \
@@ -130,29 +226,10 @@ class Spinnaker(object):
         self._routing_algorithm = \
             routing_algorithms_list[conf.config.get("Routing", "algorithm")]
 
-        #loading and running config params
-        self._do_load = True
-        if conf.config.has_option("Execute", "load"):
-            self._do_load = conf.config.getboolean("Execute", "load")
-
-        self._do_run = True
-        if conf.config.has_option("Execute", "run"):
-            self._do_run = conf.config.getboolean("Execute", "run")
-
-        #central stuff
-        if host_name is not None:
-            self._hostname = host_name
-            logger.warn("The machine name from PYNN setup is overriding the "
-                        "machine name defined in the pacman.cfg file")
-        elif conf.config.has_option("Machine", "machineName"):
-            self._hostname = conf.config.get("Machine", "machineName")
-        else:
-            raise Exception("A SpiNNaker machine must be specified in "
-                            "pacman.cfg.")
-        if self._hostname == 'None':
-            raise Exception("A SpiNNaker machine must be specified in "
-                            "pacman.cfg.")
-
+    def _set_up_machine_specifics(self, timestep, min_delay, max_delay,
+                                  hostname):
+        self._machine_time_step = conf.config.getint("Machine",
+                                                     "machineTimeStep")
         #deal with params allowed via the setup optimals
         if timestep is not None:
             timestep *= 1000  # convert into ms from microseconds
@@ -163,17 +240,17 @@ class Spinnaker(object):
             raise exceptions.ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(1.0 * timestep))
-    
+
         natively_supported_delay_for_models = \
             constants.MAX_SUPPORTED_DELAY_TICS
         delay_extention_max_supported_delay = \
             constants.MAX_DELAY_BLOCKS \
             * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
-    
+
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extention_max_supported_delay
-    
+
         if max_delay is not None\
            and float(max_delay * 1000) > max_delay_tics_supported * timestep:
             raise exceptions.ConfigurationException(
@@ -183,12 +260,12 @@ class Spinnaker(object):
             if not conf.config.has_section("Model"):
                 conf.config.add_section("Model")
             conf.config.set("Model", "min_delay", (min_delay * 1000) / timestep)
-    
+
         if max_delay is not None:
             if not conf.config.has_section("Model"):
                 conf.config.add_section("Model")
             conf.config.set("Model", "max_delay", (max_delay * 1000) / timestep)
-    
+
         if (conf.config.has_option("Machine", "timeScaleFactor")
                 and conf.config.get("Machine", "timeScaleFactor") != "None"):
             self._time_scale_factor = conf.config.getint("Machine",
@@ -208,40 +285,18 @@ class Spinnaker(object):
                             "automatic behaviour, please enter a "
                             "timescaleFactor value in your .pacman.cfg"
                             .format(self._time_scale_factor))
-                
-        logger.info("Setting time scale factor to {}."
-                    .format(self._time_scale_factor))
-
-        logger.info("Setting appID to %d." % self._app_id)
-    
-        #get the machien time step
-        logger.info("Setting machine time step to {} micro-seconds."
-                    .format(self._machine_time_step))
-
-        if conf.config.has_option("Recording", "send_live_spikes"):
-            if conf.config.getboolean("Recording", "send_live_spikes"):
-                port = None
-                if conf.config.has_option("Recording", "live_spike_port"):
-                    port = conf.config.getint("Recording", "live_spike_port")
-                hostname = "localhost"
-                if conf.config.has_option("Recording", "live_spike_host"):
-                    hostname = conf.config.get("Recording", "live_spike_host")
-                tag = None
-                if conf.config.has_option("Recording", "live_spike_tag"):
-                    tag = conf.config.getint("Recording", "live_spike_tag")
-                if tag is None:
-                    raise exceptions.ConfigurationException(
-                        "Target tag for live spikes has not been set")
-
-                # Set up the forwarding so that monitored spikes are sent to the
-                # requested location
-                self._set_tag_output(tag, port, hostname)
-                #takes the same port for the visualiser if being used
-                if conf.config.getboolean("Visualiser", "enable") and \
-                   conf.config.getboolean("Visualiser", "have_board"):
-                    self._visualiser_creation_utility.set_visulaiser_port(port)
-
-        self._edge_count = 0
+        if hostname is not None:
+            self._hostname = hostname
+            logger.warn("The machine name from PYNN setup is overriding the "
+                        "machine name defined in the pacman.cfg file")
+        elif conf.config.has_option("Machine", "machineName"):
+            self._hostname = conf.config.get("Machine", "machineName")
+        else:
+            raise Exception("A SpiNNaker machine must be specified in "
+                            "pacman.cfg.")
+        if self._hostname == 'None':
+            raise Exception("A SpiNNaker machine must be specified in "
+                            "pacman.cfg.")
 
     def run(self, run_time):
         self._setup_interfaces()
@@ -374,37 +429,40 @@ class Spinnaker(object):
         """
         executes the pacman compilation stack
         """
+        pacman_report_state = \
+            self._reports_states.generate_pacman_report_states()
 
         #execute partitioner
-        partitoner = self._partitioner_algorithum(self._machine_time_step,
-                                                  self._no_machine_time_steps)
+        partitioner = Partitioner(
+            partition_algorithm=self._partitioner_algorithum,
+            machine_time_step=self._machine_time_step,
+            no_machine_time_steps=self._no_machine_time_steps,
+            report_folder=self._report_default_directory,
+            report_states=pacman_report_state, hostname=self._hostname)
         self._sub_graph, self._graph_subgraph_mapper = \
-            partitoner.partition(self._graph, self._machine)
-        if (self._reports_enabled is not None and
-                self._reports_enabled.partitioner_report):
-            pacman_reports.partitioner_report()
+            partitioner.run(self._graph, self._machine)
 
         #execute placer
         placer = self._placer_algorithum()
         self._placements = placer.run(self._sub_graph, self._machine)
-        if (self._reports_enabled is not None and
-                self._reports_enabled.placer_report):
+        if (self._reports_states is not None and
+                self._reports_states.placer_report):
             pacman_reports.placer_report()
 
         #execute key allocator
         key_allocator = self._key_allocator_algorithum()
         self._routing_infos = key_allocator.run(self._graph_subgraph_mapper,
                                                 self._placements)
-        if (self._reports_enabled is not None and
-                self._reports_enabled.routing_info_report):
+        if (self._reports_states is not None and
+                self._reports_states.routing_info_report):
             pacman_reports.routing_info_report()
 
         #execute router
         router = self._routing_algorithm()
         self._router_tables = router.run(self._routing_infos, self._placements,
                                          self._machine)
-        if (self._reports_enabled is not None and
-                self._reports_enabled.router_report):
+        if (self._reports_states is not None and
+                self._reports_states.router_report):
             pacman_reports.router_report()
 
     def generate_data_specifications(self):
@@ -472,7 +530,7 @@ class Spinnaker(object):
                 data_writer = FileDataWriter(app_data_file_path)
 
                 #locate current memory requirement
-                current_memory_avilable = pacman_constants.SDRAM_AVILABLE_BYTES
+                current_memory_avilable = SDRAM.DEFAULT_SDRAM_BYTES
                 key = "{}:{}".format(placement.x, placement.y)
                 if key in space_based_memory_tracker.keys():
                     current_memory_avilable = space_based_memory_tracker[key]
@@ -480,8 +538,7 @@ class Spinnaker(object):
                 #generate data spec exeuctor
                 host_based_data_spec_exeuctor = DataSpecificationExecutor(
                     data_spec_reader, data_writer,
-                    pacman_constants.SDRAM_AVILABLE_BYTES -
-                    current_memory_avilable)
+                    SDRAM.DEFAULT_SDRAM_BYTES - current_memory_avilable)
 
                 #update memory calc and run data spec executor
                 bytes_used_by_spec = host_based_data_spec_exeuctor.execute()
@@ -490,8 +547,7 @@ class Spinnaker(object):
                 key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
                 processor_to_app_data_base_address[key] = \
                     {'start_address':
-                        ((pacman_constants.SDRAM_AVILABLE_BYTES
-                          - current_memory_avilable)
+                        ((SDRAM.DEFAULT_SDRAM_BYTES - current_memory_avilable)
                          + constants.SDRAM_BASE_ADDR),
                      'memory_used': bytes_used_by_spec}
 

@@ -1,5 +1,6 @@
 from spynnaker.pyNN.utilities.conf import config
 
+from pacman.report_states import ReportState as PacmanReportState
 
 class ReportState(object):
 
@@ -48,4 +49,9 @@ class ReportState(object):
     @property
     def write_reload_steps(self):
         return self._write_reload_steps
+
+    def generate_pacman_report_states(self):
+        return PacmanReportState(
+            self._partitioner_report, self._placer_report, self._router_report,
+            self._router_dat_based_report, self._routing_info_report)
 

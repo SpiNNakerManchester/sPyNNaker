@@ -1,3 +1,11 @@
+from math import ceil
+import copy
+import os
+import math
+import logging
+
+from enum import Enum
+
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
@@ -8,27 +16,15 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
     import AbstractRecordableVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge import \
     DelayProjectionEdge
-from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
+from pacman.model.graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
-
-
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-
-
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from data_specification.file_data_writer import FileDataWriter
-
-
-from math import ceil
-from enum import Enum
-import copy
-import os
-import math
-import logging
 
 
 logger = logging.getLogger(__name__)

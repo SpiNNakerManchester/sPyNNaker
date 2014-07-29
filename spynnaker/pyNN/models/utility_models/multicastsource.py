@@ -1,7 +1,9 @@
+import os
+
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
+from pacman.model.graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
     AbstractRouterableVertex
@@ -9,13 +11,9 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from data_specification.file_data_writer import FileDataWriter
-
-
-import os
 
 
 class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,

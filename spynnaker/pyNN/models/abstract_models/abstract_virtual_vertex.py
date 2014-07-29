@@ -1,19 +1,17 @@
+from abc import ABCMeta
+
+from six import add_metaclass
+
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex \
+from pacman.model.graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-
-
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-
-
-from abc import ABCMeta
-from six import add_metaclass
 from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
     AbstractRouterableVertex
 

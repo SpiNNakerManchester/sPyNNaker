@@ -3,7 +3,7 @@ import numpy
 from spynnaker.pyNN.utilities import utility_calls
 
 
-class IntegrateAndFireProperties(object):
+class AbstractIntegrateAndFireProperties(object):
     
     def __init__(self, v_init, tau_m, cm, i_offset, atoms, v_rest, v_reset,
                  v_thresh, tau_refrac, t_refract_scale=10):

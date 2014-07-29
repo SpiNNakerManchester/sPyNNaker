@@ -1,9 +1,6 @@
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
-    import AbstractRecordableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
-    AbstractDataSpecableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
-    AbstractRouterableVertex
+from spinn_machine.processor import Processor
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
+    AbstractPopulationVertex
 from spynnaker.pyNN.models.external_device_models.external_motor_device import \
     ExternalMotorDevice
 from spynnaker.pyNN.utilities import packet_conversions
@@ -28,8 +25,7 @@ from data_specification.file_data_writer import FileDataWriter
 import os
 
 
-class RobotMotorControl(AbstractRecordableVertex, AbstractDataSpecableVertex,
-                        AbstractRouterableVertex):
+class RobotMotorControl(AbstractPopulationVertex):
 
     PARAMS = 2
     SYSTEM_SIZE = 16
@@ -46,10 +42,9 @@ class RobotMotorControl(AbstractRecordableVertex, AbstractDataSpecableVertex,
         """
         constructor that depends upon the Component vertex
         """
-        AbstractRecordableVertex.__init__(self, label)
-        AbstractDataSpecableVertex.__init(n_atoms=RobotMotorControl._N_ATOMS,
-                                          label=label, constraints=None)
-        AbstractRouterableVertex.__init__(self)
+        AbstractPopulationVertex.__init__(
+            self, binary="robot_motor_control.aplx", label=label, n_neurons=6,
+            max_atoms_per_core=6, n_params=3)
 
         max_constraint = \
             PartitionerMaximumSizeConstraint(RobotMotorControl._N_ATOMS)
@@ -163,7 +158,7 @@ class RobotMotorControl(AbstractRecordableVertex, AbstractDataSpecableVertex,
     def model_name(self):
         return "Robot Motor Control"
 
-    def get_resources_used_by_atoms(self, lo_atom, hi_atom):
+    def get_resources_used_by_atoms(self, lo_atom, hi_atom, vertex_in_edges):
         resources = list()
         # noinspection PyTypeChecker
         resources.append(CPUCyclesPerTickResource(0))
@@ -178,3 +173,9 @@ class RobotMotorControl(AbstractRecordableVertex, AbstractDataSpecableVertex,
         x, y, p = subedge.postsubvertex.placement.processor.get_coordinates()
         key = packet_conversions.get_key_from_coords(x, y, p)
         return key, 0xffff0000
+
+    def get_parameters(self):
+        raise NotImplementedError
+
+    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+        return (hi_atom - lo_atom) * (Processor.CPU_AVAILABLE / self._n_atoms)

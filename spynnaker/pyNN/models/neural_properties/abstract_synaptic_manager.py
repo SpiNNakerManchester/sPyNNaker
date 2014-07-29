@@ -1,3 +1,10 @@
+import math
+import logging
+import struct
+import sys
+
+import numpy
+
 from spynnaker.pyNN.models.neural_projections.projection_edge \
     import ProjectionEdge
 from spynnaker.pyNN.models.neural_projections.projection_subedge \
@@ -9,18 +16,10 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.abstract_models.abstract_partitionable_vertex\
+from pacman.model.graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-
-
 from spinnman import exceptions as spinnman_exceptions
 
-
-import numpy
-import math
-import logging
-import struct
-import sys
 
 logger = logging.getLogger(__name__)
 

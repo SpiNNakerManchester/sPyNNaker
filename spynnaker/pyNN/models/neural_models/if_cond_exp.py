@@ -3,8 +3,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.neural_properties.integrate_and_fire_properties \
-    import IntegrateAndFireProperties
+from spynnaker.pyNN.models.neural_properties.abstract_integrate_and_fire_properties \
+    import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.abstract_models.abstract_conductive_vertex \
@@ -13,7 +13,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_conductive_vertex \
 
 class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
                                          AbstractConductiveVertex,
-                                         IntegrateAndFireProperties,
+                                         AbstractIntegrateAndFireProperties,
                                          AbstractPopulationVertex):
     CORE_APP_IDENTIFIER = constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
@@ -29,7 +29,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
         AbstractExponentialPopulationVertex.__init__(self, n_neurons=n_neurons,
                                                      tau_syn_e=tau_syn_E,
                                                      tau_syn_i=tau_syn_I)
-        IntegrateAndFireProperties.__init__(self, atoms=n_neurons, cm=cm,
+        AbstractIntegrateAndFireProperties.__init__(self, atoms=n_neurons, cm=cm,
                                             tau_m=tau_m, i_offset=i_offset,
                                             v_init=v_init, v_reset=v_reset,
                                             v_rest=v_rest, v_thresh=v_thresh,

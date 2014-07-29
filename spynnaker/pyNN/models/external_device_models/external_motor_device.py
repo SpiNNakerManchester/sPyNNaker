@@ -1,7 +1,5 @@
 from spynnaker.pyNN.models.external_device_models.abstract_external_device \
     import ExternalDevice
-from pacman.model.constraints.partitioner_maximum_size_constraint\
-    import PartitionerMaximumSizeConstraint
 
 
 class ExternalMotorDevice(ExternalDevice):
