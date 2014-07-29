@@ -17,19 +17,16 @@ cell_params_lif = {
 pynn.setup(timestep=1,min_delay = 1, max_delay = 10)
 populations.append(pynn.Population(5,pynn.IF_curr_exp,cell_params_lif,label="First normal pop" ))
 populations.append(pynn.Population(10,pynn.IF_curr_exp,cell_params_lif,label="Second normal pop" ))
-populations.append(pynn.Population(0,pynn.IF_curr_exp,cell_params_lif,label="Zero pop" ))
-populations.append(pynn.Population(-1,pynn.IF_curr_exp,cell_params_lif,label="First negative pop" ))
-populations.append(pynn.Population(-5,pynn.IF_curr_exp,cell_params_lif,label="Second negative pop" ))
 weight , delay = 5, 5
 projections= list()
 class MultapseConnectorTest(unittest.TestCase):
     def test_a(self):
         projections.append(pynn.Projection(populations[0],populations[1],pynn.MultapseConnector(
-            numSynapses=5, weights= weight, delays= delay )))
+            num_synapses=5, weights= weight, delays= delay )))
 
     def test_nasty(self):
         projections.append(pynn.Projection(populations[0],populations[1],pynn.MultapseConnector(
-            numSynapses=10,weights= weight,delays= delay)))
+            num_synapses=10,weights= weight,delays= delay)))
 
     def test_generate_synaptic_list(self):
         number_of_neurons = 5
@@ -37,10 +34,10 @@ class MultapseConnectorTest(unittest.TestCase):
         twop=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
         weight = 2
         delay = 1
-        synapse_type = onep.vertex.get_synapse_id('excitatory')
+        synapse_type = onep._vertex.get_synapse_id('excitatory')
         one_to_one_c = pynn.MultapseConnector(1,weight,delay)
         #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
-        synaptic_list = one_to_one_c.generate_synapse_list(onep.vertex,onep.vertex,1,synapse_type)
+        synaptic_list = one_to_one_c.generate_synapse_list(onep._vertex,onep._vertex,1,synapse_type)
         pp(synaptic_list.get_rows())
 
 
