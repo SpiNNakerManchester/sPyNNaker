@@ -11,7 +11,7 @@ class DelayAfferentEdge(Edge):
         """
         Filters a subedge of this edge if the edge is not a one-to-one edge
         """
-        if ((subedge.presubvertex.lo_atom != subedge.postsubvertex.lo_atom) or
-           (subedge.presubvertex.hi_atom != subedge.postsubvertex.hi_atom)):
+        if (subedge.presubvertex.lo_atom != subedge.postsubvertex.lo_atom) or \
+           (subedge.presubvertex.hi_atom != subedge.postsubvertex.hi_atom):
             return True
         return False
