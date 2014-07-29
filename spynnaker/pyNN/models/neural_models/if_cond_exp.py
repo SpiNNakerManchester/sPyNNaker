@@ -43,7 +43,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
 
     @property
     def model_name(self):
-        return "IF_curr_exp"
+        return "IF_cond_exp"
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
