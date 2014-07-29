@@ -74,12 +74,12 @@ class IzhikevichCurrentExponentialPopulation(
         #     REAL         this_h;  
         # } neuron_t;
         return [
-            NeuronParameter(self.a, 's1615'),
-            NeuronParameter(self.b, 's1615'),
-            NeuronParameter(self.c, 's1615'),
-            NeuronParameter(self.d, 's1615'),
-            NeuronParameter(self.v_init, 's1615'),
-            NeuronParameter(self.u_init, 's1615'),
+            NeuronParameter(self._a, 's1615'),
+            NeuronParameter(self._b, 's1615'),
+            NeuronParameter(self._c, 's1615'),
+            NeuronParameter(self._d, 's1615'),
+            NeuronParameter(self._v_init, 's1615'),
+            NeuronParameter(self._u_init, 's1615'),
             NeuronParameter(self.ioffset(self._machine_time_step), 's1615'),
             NeuronParameter(0, 's1615')
         ]
