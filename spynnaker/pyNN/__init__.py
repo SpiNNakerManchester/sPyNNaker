@@ -64,7 +64,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson\
 #connections
 from spynnaker.pyNN.models.neural_projections.connectors.all_to_all\
     import AllToAllConnector
-from spynnaker.pyNN.models.neural_projections.connectors.fixed_number_pre \
+from spynnaker.pyNN.models.neural_projections.connectors.fixed_number_pre_connector \
     import FixedNumberPreConnector
 from spynnaker.pyNN.models.neural_projections.connectors.fixed_probability \
     import FixedProbabilityConnector
