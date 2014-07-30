@@ -5,7 +5,6 @@ from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
-from pacman import reports as pacman_reports
 from pacman.operations.partitioner import Partitioner
 from pacman.progress_bar import ProgressBar
 
@@ -301,6 +300,11 @@ class Spinnaker(object):
 
     def run(self, run_time):
         self._setup_interfaces()
+
+        if self._reports_states is not None:
+            reports.network_specification_report(self._report_default_directory,
+                                                 self._graph, self._hostname)
+
         #calcualte number of machien time steps
         if run_time is not None:
             self._no_machine_time_steps =\
@@ -446,25 +450,16 @@ class Spinnaker(object):
         #execute placer
         placer = self._placer_algorithum()
         self._placements = placer.run(self._sub_graph, self._machine)
-        if (self._reports_states is not None and
-                self._reports_states.placer_report):
-            pacman_reports.placer_report()
 
         #execute key allocator
         key_allocator = self._key_allocator_algorithum()
         self._routing_infos = key_allocator.run(self._graph_subgraph_mapper,
                                                 self._placements)
-        if (self._reports_states is not None and
-                self._reports_states.routing_info_report):
-            pacman_reports.routing_info_report()
 
         #execute router
         router = self._routing_algorithm()
         self._router_tables = router.run(self._routing_infos, self._placements,
                                          self._machine)
-        if (self._reports_states is not None and
-                self._reports_states.router_report):
-            pacman_reports.router_report()
 
     def generate_data_specifications(self):
         #iterate though subvertexes and call generate_data_spec for each vertex
@@ -723,6 +718,3 @@ class Spinnaker(object):
 
             self._txrx.execute_flood(core_subset, file_reader, self._app_id,
                                      size)
-
-
-
