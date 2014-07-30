@@ -140,7 +140,7 @@ class Spinnaker(object):
                 split(os.sep)
             directory = \
                 os.path.abspath(os.path.join(
-                    os.sep, *components[1:components.index("pacman103")]))
+                    os.sep, *components[1:components.index("PyNN.SpiNNaker")]))
 
             #global reports folder
             self._report_default_directory = os.path.join(directory, 'reports')
