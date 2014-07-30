@@ -280,7 +280,7 @@ class Projection(object):
         rows = synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]
-            for i in range(len(row.target_indices)):
+            for i in xrange(len(row.target_indices)):
                 post_atom = row.target_indices[i]
                 delay = (float(row.delays[i])
                          * (float(self._spinnaker.machineTimeStep) / 1000.0))
@@ -329,9 +329,9 @@ class Projection(object):
         rows = synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]
-            for i in range(len(row.target_indices)):
+            for i in xrange(len(row.target_indices)):
                 post_atom = row.target_indices[i]
-                weight = row.delays[i]
+                weight = row.weights[i]
                 weights[pre_atom][post_atom] = weight
         return weights
 

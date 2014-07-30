@@ -26,11 +26,10 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                                                tau_syn_E=tau_syn_E,
                                                tau_syn_E2=tau_syn_E2,
                                                tau_syn_I=tau_syn_I)
-        AbstractIntegrateAndFireProperties.__init__(self, atoms=n_neurons, cm=cm,
-                                            tau_m=tau_m, i_offset=i_offset,
-                                            v_init=v_init, v_reset=v_reset,
-                                            v_rest=v_rest, v_thresh=v_thresh,
-                                            tau_refrac=tau_refrac)
+        AbstractIntegrateAndFireProperties.__init__(
+            self, atoms=n_neurons, cm=cm, tau_m=tau_m, i_offset=i_offset,
+            v_init=v_init, v_reset=v_reset, v_rest=v_rest, v_thresh=v_thresh,
+            tau_refrac=tau_refrac)
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, n_params=10, label=label,
             binary="IF_curr_exp_dual.aplx", constraints=constraints,

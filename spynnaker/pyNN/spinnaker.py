@@ -31,6 +31,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overrided_pacman_functions
+from spynnaker.pyNN import reports
 
 #spinnman inports
 from spinnman.transceiver import create_transceiver_from_hostname
@@ -140,7 +141,7 @@ class Spinnaker(object):
                 split(os.sep)
             directory = \
                 os.path.abspath(os.path.join(
-                    os.sep, *components[1:components.index("pacman103")]))
+                    os.sep, *components[1:components.index("sPyNNaker")]))
 
             #global reports folder
             self._report_default_directory = os.path.join(directory, 'reports')
@@ -300,6 +301,12 @@ class Spinnaker(object):
 
     def run(self, run_time):
         self._setup_interfaces()
+
+        #set up application structure report if needed
+        if self._reports_states is not None:
+            reports.network_specification_report(
+                self._report_default_directory, self._graph, self._hostname)
+
         #calcualte number of machien time steps
         if run_time is not None:
             self._no_machine_time_steps =\
