@@ -136,19 +136,19 @@ class Spinnaker(object):
         #determine common report folder
         config_param = conf.config.get("Reports", "defaultReportFilePath")
         if config_param == "DEFAULT":
-            components = \
-                os.path.abspath(overrided_pacman_functions.__file__).\
-                split(os.sep)
+            exceptions_path = \
+                os.path.abspath(exceptions.__file__)
             directory = \
-                os.path.abspath(os.path.join(
-                    os.sep, *components[1:components.index("sPyNNaker")]))
+                os.path.abspath(os.path.join(exceptions_path,
+                                             os.pardir, os.pardir, os.pardir))
 
             #global reports folder
             self._report_default_directory = os.path.join(directory, 'reports')
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
         else:
-            self._report_default_directory = config_param
+            self._report_default_directory = \
+                os.path.join(config_param, 'reports')
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
 
@@ -173,7 +173,7 @@ class Spinnaker(object):
                 self._set_tag_output(tag, port, hostname)
                 #takes the same port for the visualiser if being used
                 if conf.config.getboolean("Visualiser", "enable") and \
-                   conf.config.getboolean("Visualiser", "have_board"):
+                   conf.config.getboolean("Machine", "have_board"):
                     self._visualiser_creation_utility.set_visulaiser_port(port)
 
     def _set_up_main_objects(self):
@@ -301,12 +301,6 @@ class Spinnaker(object):
 
     def run(self, run_time):
         self._setup_interfaces()
-
-        #set up application structure report if needed
-        if self._reports_states is not None:
-            reports.network_specification_report(
-                self._report_default_directory, self._graph, self._hostname)
-
         #calcualte number of machien time steps
         if run_time is not None:
             self._no_machine_time_steps =\
