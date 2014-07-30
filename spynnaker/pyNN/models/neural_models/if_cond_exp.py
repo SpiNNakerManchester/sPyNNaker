@@ -100,16 +100,16 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
         #                              need more? Jan 2014
         #    int32_t T_refract;      // refractory time of neuron [ms/10]
         return [
-            NeuronParameter(self.v_thresh, 's1615'),
-            NeuronParameter(self.v_reset, 's1615'),
-            NeuronParameter(self.v_rest, 's1615'),
+            NeuronParameter(self._v_thresh, 's1615'),
+            NeuronParameter(self._v_reset, 's1615'),
+            NeuronParameter(self._v_rest, 's1615'),
             NeuronParameter(self.r_membrane(self._machine_time_step), 's1615'),
-            NeuronParameter(self.e_rev_E, 's1615'),
-            NeuronParameter(self.e_rev_I, 's1615'),
-            NeuronParameter(self.v_init, 's1615'),
+            NeuronParameter(self._e_rev_e, 's1615'),
+            NeuronParameter(self._e_rev_i, 's1615'),
+            NeuronParameter(self._v_init, 's1615'),
             NeuronParameter(self.ioffset(self._machine_time_step), 's1615'),
             NeuronParameter(self.exp_tc(self._machine_time_step), 's1615'),
-            NeuronParameter(self.one_over_tauRC, 's1615'),
+            NeuronParameter(self.one_over_tau_rc, 's1615'),
             NeuronParameter(self.refract_timer, 'uint32'),
             NeuronParameter(self.scaled_t_refract(), 'uint32'),
         ]
