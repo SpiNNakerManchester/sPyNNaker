@@ -7,6 +7,7 @@ from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import generate_parameter_array
 import numpy
 import random
+from spynnaker.pyNN.exceptions import ConfigurationException
 
 
 class FixedNumberPreConnector(AbstractConnector):
@@ -53,7 +54,11 @@ class FixedNumberPreConnector(AbstractConnector):
             weight_lists.append(list())
             delay_lists.append(list())
             type_lists.append(list())
-        
+
+        if not 0 <= self._n_pre <= prevertex.n_atoms:
+            raise ConfigurationException("Sample size has to be a number less "
+                                         "than the size of the population but"
+                                         "greater than zero")
         pre_synaptic_neurons = random.sample(range(0, prevertex.n_atoms), 
                                              self._n_pre)
  
