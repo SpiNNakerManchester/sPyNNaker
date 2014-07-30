@@ -6,7 +6,7 @@ from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
 from pacman.operations.partitioner import Partitioner
-from pacman.progress_bar import ProgressBar
+from pacman.utilities.progress_bar import ProgressBar
 
 
 #spinnmachine imports
@@ -715,10 +715,10 @@ class Spinnaker(object):
             file_reader = SpinnmanFileDataReader(exectuable_target_key)
             core_subset = executable_targets[exectuable_target_key]
 
-            ''' for some reason, we have to hand the size of a binary. The only
-            logical way to do this is to read the exe and determine the length
-            . TODO this needs to change so that the trasnciever figures this out
-            itself'''
+            # for some reason, we have to hand the size of a binary. The only
+            #logical way to do this is to read the exe and determine the length
+            #. TODO this needs to change so that the trasnciever figures this out
+            #itself
 
             # TODO FIX THIS CHUNK
             statinfo = os.stat(exectuable_target_key)
