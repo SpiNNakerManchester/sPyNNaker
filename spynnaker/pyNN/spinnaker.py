@@ -146,7 +146,8 @@ class Spinnaker(object):
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
         else:
-            self._report_default_directory = config_param
+            self._report_default_directory = \
+                os.path.join(config_param, 'reports')
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
 
