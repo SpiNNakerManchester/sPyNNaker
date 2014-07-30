@@ -172,7 +172,7 @@ class Spinnaker(object):
                 self._set_tag_output(tag, port, hostname)
                 #takes the same port for the visualiser if being used
                 if conf.config.getboolean("Visualiser", "enable") and \
-                   conf.config.getboolean("Visualiser", "have_board"):
+                   conf.config.getboolean("Machine", "have_board"):
                     self._visualiser_creation_utility.set_visulaiser_port(port)
 
     def _set_up_main_objects(self):
