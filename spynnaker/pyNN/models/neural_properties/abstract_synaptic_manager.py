@@ -165,8 +165,8 @@ class SynapticManager(object):
                 if issubclass(type(AbstractPartitionableVertex),
                               in_edge._pre_vertex):
                     n_atoms = in_edge._pre_vertex.get_maximum_atoms_per_core()
-                if in_edge._pre_vertex.atoms < n_atoms:
-                    n_atoms = in_edge._pre_vertex.atoms
+                if in_edge._pre_vertex.n_atoms < n_atoms:
+                    n_atoms = in_edge._pre_vertex.n_atoms
 
                 num_rows = in_edge.get_n_rows()
                 extra_mem = math.ceil(float(num_rows) / float(n_atoms)) * 1024

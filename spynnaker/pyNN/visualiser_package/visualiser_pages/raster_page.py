@@ -46,7 +46,7 @@ class RasterPage(AbstractLiveSpikePage):
             tuple_data = [(-1, -1), (-1, -1)]
             self._data_stores.append(tuple_data)
             self._off_sets.append(current_off_set)
-            current_off_set += current_vertex.atoms + 15
+            current_off_set += current_vertex.n_atoms + 15
 
         #records the maxiumum neuron value
         self._max_y_value = current_off_set
@@ -72,7 +72,7 @@ class RasterPage(AbstractLiveSpikePage):
         self._off_sets.append(self._max_y_value)
 
         #records the maxiumum neuron value
-        self._max_y_value += vertex_to_add.atoms + 15
+        self._max_y_value += vertex_to_add.n_atoms + 15
         self.redraw(self._last_timer_tic)
 
     def remove_vertex(self, vertex_to_remove):
@@ -82,7 +82,7 @@ class RasterPage(AbstractLiveSpikePage):
         value = self._off_sets.pop(index)
         for elements in range(index, len(self._off_sets)):
             self._off_sets[index] -= value
-        self._max_y_value -= (vertex_to_remove.atoms + 15)
+        self._max_y_value -= (vertex_to_remove.n_atoms + 15)
 
     def _generate_plot(self, current_time_tics, initial):
         current_time = ((current_time_tics * self._machine_time_step) / 1000.0)
@@ -105,8 +105,8 @@ class RasterPage(AbstractLiveSpikePage):
             index = self._vertex_in_question.index(vertex)
             offset = self._off_sets[index]
             yticks[offset] = "%s - %d" % (vertex.label, 0)
-            counter = offset + vertex.atoms
-            yticks[counter] = "%d" % vertex.atoms
+            counter = offset + vertex.n_atoms
+            yticks[counter] = "%d" % vertex.n_atoms
             if i % 2 == 0:
                 colours.append("#ff0000")
             else:

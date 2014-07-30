@@ -120,7 +120,7 @@ class Projection(object):
             Projection._projection_count += 1
 
         if max_delay > natively_supported_delay_for_models:
-            source_sz = presynaptic_population.vertex.atoms
+            source_sz = presynaptic_population.vertex.n_atoms
             self._add_delay_extension(
                 source_sz, max_delay, natively_supported_delay_for_models,
                 synapse_list, presynaptic_population, postsynaptic_population, 
@@ -275,8 +275,8 @@ class Projection(object):
                         dtype=float))
             return delays
 
-        delays = numpy.zeros((self._projection_edge.pre_vertex.atoms,
-                              self._projection_edge.post_vertex.atoms))
+        delays = numpy.zeros((self._projection_edge.pre_vertex.n_atoms,
+                              self._projection_edge.post_vertex.n_atoms))
         rows = synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]
@@ -324,8 +324,8 @@ class Projection(object):
                 weights.extend(row.weights)
             return weights
 
-        weights = numpy.zeros((self._projection_edge.pre_vertex.atoms,
-                               self._projection_edge.post_vertex.atoms))
+        weights = numpy.zeros((self._projection_edge.pre_vertex.n_atoms,
+                               self._projection_edge.post_vertex.n_atoms))
         rows = synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]

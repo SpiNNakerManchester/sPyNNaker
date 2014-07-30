@@ -34,14 +34,9 @@ def network_specification_report(report_folder, graph, hostname):
         f_network_specification.write("Vertex {}, size: {}\n"
                                       .format(label, size))
         f_network_specification.write("Model: {}\n".format(model))
-        if constraints.x is not None:
-            if constraints.p is not None:
-                constraint_str = "(x: {}, y: {}, p: {})"\
-                    .format(constraints.x, constraints.y, constraints.p)
-            else:
-                constraint_str = "(x: {}, y: {})"\
-                    .format(constraints.x, constraints.y)
-            f_network_specification.write("  Placement constraint: {}\n"
+        for constraint in constraints:
+            constraint_str = constraint.label
+            f_network_specification.write("constraint: {}\n"
                                           .format(constraint_str))
         #if params is None or len(params.keys()) == 0:
         #    f_network_specification.write("  Parameters: None\n\n")

@@ -48,7 +48,8 @@ class AllToAllConnector(AbstractConnector):
             ids = numpy.where(present)[0]
             delays = (generate_parameter_array(self._delays, n_present, present)
                       * delay_scale)
-            weights = generate_parameter_array(self._weights, n_present, present)
+            weights = \
+                generate_parameter_array(self._weights, n_present, present)
             synapse_types = (numpy.ones(len(ids), dtype='uint32')
                              * synapse_type)
             

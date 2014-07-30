@@ -397,7 +397,13 @@ class Spinnaker(object):
         requires_visualiser = conf.config.getboolean("Visualiser", "enable")
 
         if has_board:
-            self._txrx = create_transceiver_from_hostname(self._hostname)
+            if self._reports_states is None:
+                self._txrx = create_transceiver_from_hostname(
+                    hostname=self._hostname, generate_reports=False)
+            else:
+                self._txrx = create_transceiver_from_hostname(
+                    hostname=self._hostname, generate_reports=True,
+                    default_report_directory=self._report_default_directory)
         self._machine = self._txrx.get_machine_details()
 
         if requires_visualiser:
@@ -466,7 +472,8 @@ class Spinnaker(object):
         executable_targets = dict()
 
         #create a progress bar for end users
-        progress_bar = ProgressBar(len(self._placements()))
+        progress_bar = ProgressBar(len(self._placements()),
+                                   "on generating data specifications")
 
         for placement in self._placements():
             associated_vertex =\
@@ -507,7 +514,9 @@ class Spinnaker(object):
         space_based_memory_tracker = dict()
         processor_to_app_data_base_address = dict()
          #create a progress bar for end users
-        progress_bar = ProgressBar(len(self._placements()))
+        progress_bar = ProgressBar(len(self._placements()),
+                                   "on executing data specifications on the "
+                                   "host machine")
 
         for placement in self._placements():
             associated_vertex =\

@@ -372,9 +372,9 @@ class Population(object):
         spikes = self.getSpikes(compatible_output=True)
         if spikes is not None:
             first_id = 0
-            num_neurons = self._vertex.atoms
-            dimensions = self._vertex.atoms
-            last_id = self._vertex.atoms - 1
+            num_neurons = self._vertex.n_atoms
+            dimensions = self._vertex.n_atoms
+            last_id = self._vertex.n_atoms - 1
             utility_calls.check_directory_exists(filename)
             spike_file = open(filename, "w")
             spike_file.write("# first_id = %d\n" % first_id)
@@ -393,8 +393,8 @@ class Population(object):
         time_step = (self._spinnaker.dao.machineTimeStep * 1.0) / 1000.0
         gsyn = self.get_gsyn(gather, compatible_output=True)
         first_id = 0
-        num_neurons = self._vertex.atoms
-        dimensions = self._vertex.atoms
+        num_neurons = self._vertex.n_atoms
+        dimensions = self._vertex.n_atoms
         file_handle = open(filename, "w")
         file_handle.write("# first_id = %d\n" % first_id)
         file_handle.write("# n = %d\n" % num_neurons)
@@ -417,8 +417,8 @@ class Population(object):
         utility_calls.check_directory_exists(filename)
         file_handle = open(filename, "w")
         first_id = 0
-        num_neurons = self._vertex.atoms
-        dimensions = self._vertex.atoms
+        num_neurons = self._vertex.n_atoms
+        dimensions = self._vertex.n_atoms
         file_handle.write("# first_id = %d\n" % first_id)
         file_handle.write("# n = %d\n" % num_neurons)
         file_handle.write("# dt = %f\n" % time_step)

@@ -13,8 +13,8 @@ class PyNNParametersSurrogate(object):
 
     :param obj: The object for which to act as surrogate.
     """
-    def __init__(self, obj):
-        self._obj = obj
+    def __init__(self, vertex_to_surrogate):
+        self.vertex = vertex_to_surrogate
 
     def update(self, updates):
         """Update the parameters with the given values."""
@@ -24,17 +24,17 @@ class PyNNParametersSurrogate(object):
     def __getitem__( self, key ):
         """Will attempt to get the given parameter from the object."""
         # See if the object we're acting as surrogate for has this parameter
-        if not hasattr(self._obj, key):
+        if not hasattr(self.vertex, key):
             raise Exception("Object '%s' does not have parameter '%s'." %
-                            (self._obj, key))
+                            (self.vertex, key))
 
         # Now return the value of that parameter
-        return getattr(self._obj, key)
+        return getattr(self.vertex, key)
 
     def __setitem__(self, key, value):
         # See if the object we're acting as surrogate for has this parameter
-        if not hasattr(self._obj, key):
+        if not hasattr(self.vertex, key):
             raise Exception("Object '%s' does not have parameter '%s'." %
-                            (self._obj, key))
-        value = self._obj.convert_param(value,  self._obj.atoms)
-        setattr(self._obj, key, value)
+                            (self.vertex, key))
+        value = self.vertex.convert_param(value, self.vertex.n_atoms)
+        setattr(self.vertex, key, value)

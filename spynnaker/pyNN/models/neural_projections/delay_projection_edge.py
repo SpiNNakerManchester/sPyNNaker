@@ -43,8 +43,8 @@ class DelayProjectionEdge(ProjectionEdge):
         n_atoms = self._pre_vertex.get_maximum_atoms_per_core()
         if self._pre_vertex.custom_max_atoms_per_core is not None:
             n_atoms = self._pre_vertex.custom_max_atoms_per_core
-        if self._pre_vertex.atoms < n_atoms:
-            n_atoms = self._pre_vertex.atoms
+        if self._pre_vertex.n_atoms < n_atoms:
+            n_atoms = self._pre_vertex.n_atoms
         if n_atoms > 100:
             n_atoms = 100
         return ((self._synapse_list.get_n_rows() / n_atoms) *

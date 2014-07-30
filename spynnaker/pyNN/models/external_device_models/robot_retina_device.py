@@ -24,15 +24,12 @@ class ExternalRetinaDevice(AbstractExternalRetinaDevice):
                  polarity=AbstractExternalRetinaDevice.MERGED_POLARITY):
 
         if self.polarity == ExternalRetinaDevice.MERGED_POLARITY:
-            self.atoms = 128 * 128 * 2
+            n_atoms = 128 * 128 * 2
         else:
-            self.atoms = 128 * 128
-        super(ExternalRetinaDevice, self).__init__(self.atoms,
-                                                   virtual_chip_coords,
-                                                   connected_chip_coords,
-                                                   connected_chip_edge,
-                                                   polarity,
-                                                   label=label)
+            n_atoms = 128 * 128
+        AbstractExternalRetinaDevice.__init__(
+            self, n_atoms, virtual_chip_coords, connected_chip_coords,
+            connected_chip_edge, polarity, label=label)
         self.position = position
 
         if (self.position != self.RIGHT_RETINA and

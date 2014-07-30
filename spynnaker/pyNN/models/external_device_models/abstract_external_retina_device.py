@@ -47,8 +47,8 @@ class AbstractExternalRetinaDevice(ExternalDevice):
             start_point += 1
 
     def _get_max_atoms_per_core(self):
-        if (self.atoms >> 11) <= 0:  # if the keys dont touce p,
+        if (self.n_atoms >> 11) <= 0:  # if the keys dont touce p,
                                      # then just 1 subvert is needed
             return 1
         else:
-            return self.atoms >> 11
+            return self.n_atoms >> 11
