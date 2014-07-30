@@ -58,7 +58,11 @@ class FixedNumberPreConnector(AbstractConnector):
                                              self._n_pre)
  
         for pre_atom in pre_synaptic_neurons:
+
             present = numpy.ones(postvertex.n_atoms, dtype=numpy.uint32)
+            if not self._allow_self_connections and prevertex == postvertex:
+                present[pre_atom] = 0
+
             n_present = postvertex.n_atoms
             
             id_lists[pre_atom] = numpy.where(present)[0]
