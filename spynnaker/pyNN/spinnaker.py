@@ -135,12 +135,11 @@ class Spinnaker(object):
         #determine common report folder
         config_param = conf.config.get("Reports", "defaultReportFilePath")
         if config_param == "DEFAULT":
-            components = \
-                os.path.abspath(overrided_pacman_functions.__file__).\
-                split(os.sep)
+            exceptions_path = \
+                os.path.abspath(exceptions.__file__)
             directory = \
-                os.path.abspath(os.path.join(
-                    os.sep, *components[1:components.index("PyNN.SpiNNaker")]))
+                os.path.abspath(os.path.join(exceptions_path,
+                                             os.pardir, os.pardir, os.pardir))
 
             #global reports folder
             self._report_default_directory = os.path.join(directory, 'reports')
