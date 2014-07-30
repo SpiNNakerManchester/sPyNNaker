@@ -449,7 +449,8 @@ class Spinnaker(object):
             machine_time_step=self._machine_time_step,
             no_machine_time_steps=self._no_machine_time_steps,
             report_folder=self._report_default_directory,
-            report_states=pacman_report_state, hostname=self._hostname)
+            report_states=pacman_report_state, hostname=self._hostname,
+            placer_alogrithm=self._placer_algorithum)
         self._sub_graph, self._graph_subgraph_mapper = \
             partitioner.run(self._graph, self._machine)
 
