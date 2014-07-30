@@ -7,5 +7,3 @@ class SeedInfo(object):
         self._parent_seed = 0
         self._seed_stream = dict()
         self._seed_stream_indices = list()
-    
-    
