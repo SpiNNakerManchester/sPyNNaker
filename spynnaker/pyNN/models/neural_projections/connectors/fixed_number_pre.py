@@ -48,18 +48,18 @@ class FixedNumberPreConnector(AbstractConnector):
         weight_lists = list()
         delay_lists = list()
         type_lists = list()
-        for _ in range(0, prevertex.atoms):
+        for _ in range(0, prevertex.n_atoms):
             id_lists.append(list())
             weight_lists.append(list())
             delay_lists.append(list())
             type_lists.append(list())
         
-        pre_synaptic_neurons = random.sample(range(0, prevertex.atoms), 
+        pre_synaptic_neurons = random.sample(range(0, prevertex.n_atoms), 
                                              self._n_pre)
  
         for pre_atom in pre_synaptic_neurons:
-            present = numpy.ones(postvertex.atoms, dtype=numpy.uint32)
-            n_present = postvertex.atoms
+            present = numpy.ones(postvertex.n_atoms, dtype=numpy.uint32)
+            n_present = postvertex.n_atoms
             
             id_lists[pre_atom] = numpy.where(present)[0]
             weight_lists[pre_atom] = generate_parameter_array(self._weights,
@@ -72,6 +72,6 @@ class FixedNumberPreConnector(AbstractConnector):
         
         connection_list = [SynapseRowInfo(id_lists[i], weight_lists[i], 
                                           delay_lists[i], type_lists[i])
-                           for i in range(0, prevertex.atoms)]
+                           for i in range(0, prevertex.n_atoms)]
         
         return SynapticList(connection_list)

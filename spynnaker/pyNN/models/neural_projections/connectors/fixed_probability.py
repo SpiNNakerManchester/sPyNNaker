@@ -44,8 +44,8 @@ class FixedProbabilityConnector(AbstractConnector):
     def generate_synapse_list(self, prevertex, postvertex, delay_scale,
                               synapse_type):
         rows = list()
-        for _ in range(0, prevertex.atoms):
-            present = numpy.random.rand(postvertex.atoms) <= self._p_connect
+        for _ in range(0, prevertex.n_atoms):
+            present = numpy.random.rand(postvertex.n_atoms) <= self._p_connect
             n_present = numpy.sum(present)
             
             ids = numpy.where(present)[0]

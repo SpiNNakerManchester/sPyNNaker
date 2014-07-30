@@ -51,7 +51,7 @@ class FromListConnector(AbstractConnector):
         delay_lists = list()
         type_lists = list()
         
-        for _ in range(0, prevertex.atoms):
+        for _ in range(0, prevertex.n_atoms):
             id_lists.append(list())
             weight_lists.append(list())
             delay_lists.append(list())
@@ -70,6 +70,6 @@ class FromListConnector(AbstractConnector):
             
         connection_list = [SynapseRowInfo(id_lists[i], weight_lists[i], 
                            delay_lists[i], type_lists[i])
-                           for i in range(0, prevertex.atoms)]
+                           for i in range(0, prevertex.n_atoms)]
         
         return SynapticList(connection_list)
