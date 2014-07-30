@@ -43,14 +43,14 @@ class MultapseConnector(AbstractConnector):
         weight_lists = list()
         delay_lists = list()
         type_lists = list()
-        for _ in range(0, prevertex.atoms):
+        for _ in range(0, prevertex.n_atoms):
             id_lists.append(list())
             weight_lists.append(list())
             delay_lists.append(list())
             type_lists.append(list())
             
-        num_incoming_axons = prevertex.atoms
-        num_target_neurons = postvertex.atoms
+        num_incoming_axons = prevertex.n_atoms
+        num_target_neurons = postvertex.n_atoms
         
         for _ in range(0, self._num_synapses):
             source = int(random.random() * num_incoming_axons)
@@ -64,6 +64,6 @@ class MultapseConnector(AbstractConnector):
             
         connection_list = [SynapseRowInfo(id_lists[i], weight_lists[i], 
                            delay_lists[i], type_lists[i])
-                           for i in range(0, prevertex.atoms)]
+                           for i in range(0, prevertex.n_atoms)]
         
         return SynapticList(connection_list)
