@@ -423,6 +423,10 @@ class Spinnaker(object):
         return self._machine_time_step
 
     @property
+    def get_multi_cast_source(self):
+        return self._multi_cast_vertex
+
+    @property
     def sub_graph(self):
         return self._sub_graph
 

@@ -4,6 +4,9 @@ import logging
 
 from six import add_metaclass
 import numpy
+from pacman.model.constraints.\
+    partitioner_same_size_as_vertex_constraint import \
+    PartitionerSameSizeAsVertexConstraint
 
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
@@ -37,21 +40,20 @@ class AbstractPopulationVertex(AbstractRecordableVertex, PopulationManager,
         self._delay_vertex = None
         self._n_params = n_params
 
-    def get_partition_dependent_vertices(self):
-        if self._delay_vertex is not None:
-            vals = list()
-            vals.append(self._delay_vertex)
-            return vals
-        return None
-
     @property
     def delay_vertex(self):
         return self._delay_vertex
 
     @delay_vertex.setter
     def delay_vertex(self, delay_vertex):
-        self._delay_vertex = delay_vertex
-    
+        if self._delay_vertex is not None:
+            self._delay_vertex = delay_vertex
+            self.add_constraint(
+                PartitionerSameSizeAsVertexConstraint(self._delay_vertex))
+        else:
+            raise exceptions.ConfigurationException(
+                "cannot set a vertex's delay vertex once its already been set")
+
     def get_spikes(self, spinnaker, runtime, compatible_output=False):
         if not spinnaker.has_ran:
             raise exceptions.SpynnakerException(

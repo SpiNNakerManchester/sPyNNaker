@@ -1,3 +1,7 @@
+from pacman.model.constraints.vertex_has_dependent_constraint import \
+    VertexHasDependentConstraint
+from pacman.model.constraints.vertex_requires_multi_cast_source_constraint import \
+    VertexRequiresMultiCastSourceConstraint
 from spynnaker.pyNN.models.utility_models.multicastsource \
     import MultiCastSource
 from spynnaker.pyNN.utilities.parameters_surrogate\
@@ -11,6 +15,7 @@ from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
 from visualiser import visualiser_constants
 
 from pacman.model.graph.edge import Edge
+from pacman.utilities import utility_calls as pacman_utility_calls
 
 import logging
 logger = logging.getLogger(__name__)
@@ -55,27 +60,36 @@ class Population(object):
         self._spinnaker = spinnaker
 
         #check if the vertex is a cmd sender, if so store for future
-        if self._vertex.requires_multi_cast_source():
+        require_multi_cast_source_constraints = \
+            pacman_utility_calls.locate_constrants_of_type(
+                self._vertex.constraints,
+                VertexRequiresMultiCastSourceConstraint)
+
+        for require_multi_cast_source_constraint \
+                in require_multi_cast_source_constraints:
             if multi_cast_vertex is None:
                 multi_cast_vertex = MultiCastSource()
                 self._spinnaker.add_vertex(multi_cast_vertex)
+            multi_cast_vertex = self._spinnaker.get_multi_cast_source()
             edge = Edge(multi_cast_vertex, self._vertex)
+            multi_cast_vertex.add_commands(
+                require_multi_cast_source_constraint.commands, edge)
             self._spinnaker.add_edge(edge)
 
         self._parameters = PyNNParametersSurrogate(self._vertex)
         self._spinnaker.add_vertex(self._vertex)
 
         #add any dependant edges and verts if needed
-        dependant_verts, dependant_edges = \
-            self._vertex.get_dependant_vertexes_edges()
+        dependant_vertex_constraints = \
+            pacman_utility_calls.locate_constrants_of_type(
+                self._vertex.constraints, VertexHasDependentConstraint)
 
-        if dependant_verts is not None:
-            for dependant_vert in dependant_verts:
-                self._spinnaker.add_vertex(dependant_vert)
-
-        if dependant_edges is not None:
-            for dependant_edge in dependant_edges:
-                self._spinnaker.add_edge(dependant_edge)
+        for dependant_vertex_constrant in dependant_vertex_constraints:
+            dependant_vertex = dependant_vertex_constrant.vertex
+            self._spinnaker.add_vertex(dependant_vertex)
+            dependant_edge = Edge(pre_vertex=self._vertex,
+                                  post_vertex=dependant_vertex)
+            self._spinnaker.add_edge(dependant_edge)
 
         #initlise common stuff
         self._size = size

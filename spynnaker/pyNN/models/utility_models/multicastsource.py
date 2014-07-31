@@ -38,7 +38,8 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
 
         self._writes = None
         self._memory_requirements = 0
-        self._edge_map = None
+        self._edge_map = dict()
+        self._commands = list()
 
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
                            processor_id, subvertex, sub_graph,
@@ -81,10 +82,8 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         data_writer.close()
 
     def calculate_memory_requirements(self, no_tics):
-        #go through the vertexes at the end of the outgoing edges and ask them
-        commands, self._edge_map = self.collect_commands(no_tics)
         #sorts commands by timer tic
-        commands = sorted(commands, key=lambda tup: tup['t'])
+        commands = sorted(self._commands, key=lambda tup: tup['t'])
         #calculate size of region and the order of writes
         self._writes = list()
         self._memory_requirements = 0
@@ -122,21 +121,9 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         self._writes.insert(0, self._memory_requirements)
         self._memory_requirements += 4
 
-    def collect_commands(self, no_tics):
-        """
-        collects all the commands from its out going edges
-        """
-        commands = list()
-        edge_map = dict()
-        for outgoing_edge in self.out_edges:
-            destination_vertex = outgoing_edge.postvertex
-            dv_commands = destination_vertex.get_commands(no_tics)
-            if dv_commands is not None:
-                edge_map[outgoing_edge] = dv_commands
-                commands += dv_commands
-            else:
-                edge_map[outgoing_edge] = None
-        return commands, edge_map
+    def add_commands(self, commands, edge):
+        self._edge_map[edge] = commands
+        self._commands += commands
 
     def deal_with_command_block(self, commands_in_same_time_slot):
         """
