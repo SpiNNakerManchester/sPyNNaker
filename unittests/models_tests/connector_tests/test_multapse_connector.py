@@ -21,23 +21,22 @@ weight , delay = 5, 5
 projections= list()
 class MultapseConnectorTest(unittest.TestCase):
     def test_a(self):
-        projections.append(pynn.Projection(populations[0],populations[1],pynn.MultapseConnector(
-            num_synapses=5, weights= weight, delays= delay )))
+        pynn.Projection(populations[0],populations[1],pynn.MultapseConnector(
+            num_synapses=5, weights= weight, delays= delay ))
 
     def test_nasty(self):
-        projections.append(pynn.Projection(populations[0],populations[1],pynn.MultapseConnector(
-            num_synapses=10,weights= weight,delays= delay)))
+        pynn.Projection(populations[0],populations[0],pynn.MultapseConnector(
+            num_synapses=10,weights= weight,delays= delay))
 
     def test_generate_synaptic_list(self):
         number_of_neurons = 5
-        onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
-        twop=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
+        first_population=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
+        second_population=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
         weight = 2
         delay = 1
-        synapse_type = onep._vertex.get_synapse_id('excitatory')
-        one_to_one_c = pynn.MultapseConnector(1,weight,delay)
-        #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
-        synaptic_list = one_to_one_c.generate_synapse_list(onep._vertex,onep._vertex,1,synapse_type)
+        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        connection = pynn.MultapseConnector(1,weight,delay)
+        synaptic_list = connection.generate_synapse_list(first_population._vertex,first_population._vertex,1,synapse_type)
         pp(synaptic_list.get_rows())
 
 

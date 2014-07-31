@@ -27,27 +27,28 @@ class TestCFGs(unittest.TestCase):
             os.path.abspath(os.path.join(exceptions_path,
                                          os.pardir, os.pardir, os.pardir))
 
+        pid = os.getpid()
+        flag = False
         if 'reports' in os.listdir(directory):
-            os.rmdir(os.path.join(directory,'reports'))
+            os.rename(os.path.join(directory,'reports'),os.path.join(directory,'reports_' + str(pid)))
+            flag = True
+        try:
+            spinn._set_up_report_specifics()
+            if 'reports' not in os.listdir(directory):
+                raise AssertionError("File reports should be in the default location")
+            else:
+                os.rmdir(os.path.join(directory,'reports'))
+        finally:
+            if flag:
+                os.rename(os.path.join(directory,'reports_' + str(pid)), os.path.join(directory,'reports'))
 
-        spinn._set_up_report_specifics()
-        if 'reports' not in os.listdir(directory):
-            raise AssertionError("File reports should be in the default location")
+
 
     def test_reports_creation_custom_location(self):
         current_path = os.path.abspath(os.curdir)
         conf.config.set("Reports", "defaultReportFilePath", current_path)
         conf.config.set("Reports", "reportsEnabled", "True")
         spinn = Spinnaker(timestep=1, min_delay=1, max_delay=10)
-        exceptions_path = \
-                os.path.abspath(exceptions.__file__)
-        directory = \
-            os.path.abspath(os.path.join(exceptions_path,
-                                         os.pardir, os.pardir, os.pardir))
-
-
-        if 'reports' in os.listdir(directory):
-            os.rmdir(os.path.join(directory,'reports'))
 
         if 'reports' in os.listdir(current_path):
             os.rmdir(os.path.join(current_path,'reports'))

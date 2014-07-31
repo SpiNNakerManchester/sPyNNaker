@@ -2,6 +2,7 @@
 import unittest
 import spynnaker.pyNN as pynn
 from pprint import pprint as pp
+from spynnaker.pyNN.exceptions import ConfigurationException
 #Setup
 pynn.setup(timestep=1, min_delay=1, max_delay=10.0)
 nNeurons = 10
@@ -22,14 +23,14 @@ spike_array = {'spike_times':[0]}
 class TestingAllToAllConnector(unittest.TestCase):
     def test_generate_synapse_list(self):
         number_of_neurons = 5
-        onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
-        twop=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
+        first_population=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
+        second_population=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
         weight = 2
         delay = 1
-        synapse_type = onep._vertex.get_synapse_id('excitatory')
-        one_to_one_c = pynn.AllToAllConnector(weight,delay)
+        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        connection = pynn.AllToAllConnector(weight,delay)
         #def generate_synapse_list(self, prevertex, postvertex, delay_scale, synapse_type)
-        synaptic_list = one_to_one_c.generate_synapse_list(onep._vertex,onep._vertex,1,synapse_type)
+        synaptic_list = connection.generate_synapse_list(first_population._vertex,first_population._vertex,1,synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)
         #pp(synaptic_list.get_rows())
@@ -37,39 +38,26 @@ class TestingAllToAllConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_min_max_delay(),(delay,delay))
 
     def test_synapse_list_generation_for_null_populations(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(ConfigurationException):
             weight = 2
             delay = 1
             zp = pynn.Population(0,pynn.IF_curr_exp,cell_params_lif,label="Zero pop")
-            onep=pynn.Population(5,pynn.IF_curr_exp,cell_params_lif,label="One pop")
-            one_to_one_c = pynn.AllToAllConnector(weight,delay)
-            synapse_type = onep._vertex.get_synapse_id('excitatory')
+            first_population=pynn.Population(5,pynn.IF_curr_exp,cell_params_lif,label="One pop")
+            connection = pynn.AllToAllConnector(weight,delay)
+            synapse_type = first_population._vertex.get_synapse_id('excitatory')
             number_of_neurons = 10
-            onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
-            zero_synaptic_list = one_to_one_c.generate_synapse_list(zp._vertex,onep._vertex,1,synapse_type)
-
-    def test_synapse_list_generation_for_negative_size_populations(self):
-        with self.assertRaises(Exception):
-            weight = 2
-            delay = 1
-            zp = pynn.Population(-1,pynn.IF_curr_exp,cell_params_lif,label="Zero pop")
-            onep=pynn.Population(1,pynn.IF_curr_exp,cell_params_lif,label="One pop")
-            one_to_one_c = pynn.AllToAllConnector(weight,delay)
-            synapse_type = onep._vertex.get_synapse_id('excitatory')
-            number_of_neurons = 10
-            onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
-            zero_synaptic_list = one_to_one_c.generate_synapse_list(zp._vertex,onep._vertex,1,synapse_type)
-            pp(zero_synaptic_list.get_rows())
+            first_population=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
+            zero_synaptic_list = connection.generate_synapse_list(zp._vertex,first_population._vertex,1,synapse_type)
 
 
     def test_synapse_list_generation_for_different_sized_populations(self):
         number_of_neurons = 10
-        onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
-        twop=pynn.Population(number_of_neurons + 5,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
+        first_population=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
+        second_population=pynn.Population(number_of_neurons + 5,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
         weight = 2
         delay = 1
-        one_to_one_c = pynn.AllToAllConnector(weight,delay)
-        synaptic_list = one_to_one_c.generate_synapse_list(onep._vertex,twop._vertex,1,0)
+        connection = pynn.AllToAllConnector(weight,delay)
+        synaptic_list = connection.generate_synapse_list(first_population._vertex,second_population._vertex,1,0)
         self.assertEqual(synaptic_list.get_max_weight(),weight)
         self.assertEqual(synaptic_list.get_min_weight(),weight)
         self.assertEqual(synaptic_list.get_n_rows(),number_of_neurons)
@@ -77,15 +65,14 @@ class TestingAllToAllConnector(unittest.TestCase):
 
 
     def test_allow_self_connections(self):
-        with self.assertRaises(Exception):
-            number_of_neurons = 5
-            onep=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
-            twop=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
-            weight = 2
-            delay = 1
-            synapse_type = onep._vertex.get_synapse_id('excitatory')
-            one_to_one_c = pynn.AllToAll(weight,delay,allow_self_connections = False)
-            synaptic_list = one_to_one_c.generate_synapse_list(onep._vertex,onep._vertex,1,synapse_type)
-            pp(synaptic_list.get_rows())
+        number_of_neurons = 5
+        first_population=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label="One pop")
+        second_population=pynn.Population(number_of_neurons,pynn.IF_curr_exp,cell_params_lif,label= "Second pop")
+        weight = 2
+        delay = 1
+        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        connection = pynn.AllToAllConnector(weight,delay,allow_self_connections = False)
+        synaptic_list = connection.generate_synapse_list(first_population._vertex,first_population._vertex,1,synapse_type)
+        pp(synaptic_list.get_rows())
 if __name__=="__main__":
     unittest.main()
