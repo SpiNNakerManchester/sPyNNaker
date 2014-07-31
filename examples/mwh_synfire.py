@@ -59,7 +59,7 @@ projections.append(p.Projection(populations[1], populations[0], p.FromListConnec
 '''
 populations[0].record_v()
 populations[0].record_gsyn()
-populations[0].record(visualiser_mode=p.modes.RASTER)
+populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER)
 
 run_time = 560
 print "Running for {} ms".format(run_time)

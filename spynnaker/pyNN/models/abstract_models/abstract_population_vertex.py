@@ -9,12 +9,13 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
     AbstractRouterableVertex
-from spynnaker.pyNN.models.neural_properties.abstract_population_manager \
+from spynnaker.pyNN.models.abstract_models.abstract_population_manager \
     import PopulationManager
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.utility_calls import \
     get_region_base_address_offset
 from spynnaker.pyNN.utilities import constants
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 from spynnaker.pyNN.utilities.conf import config
 
-from pacman.report_states import ReportState as PacmanReportState
+from pacman.utilities.report_states import ReportState as PacmanReportState
 
 class ReportState(object):
 

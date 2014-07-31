@@ -13,23 +13,11 @@ from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
-from spynnaker.pyNN.utilities.constants import VISUALISER_MODES as modes
+from spynnaker.pyNN.utilities.constants import VISUALISER_MODES
 
 #pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
-
-#external models
-from spynnaker.pyNN.models.external_device_models.robot_motor_control \
-    import RobotMotorControl
-from spynnaker.pyNN.models.external_device_models.external_cochlea_device \
-    import ExternalCochleaDevice
-from spynnaker.pyNN.models.external_device_models.external_fpga_retina_device \
-    import ExternalFPGARetinaDevice
-from spynnaker.pyNN.models.external_device_models.external_motor_device \
-    import ExternalMotorDevice
-from spynnaker.pyNN.models.external_device_models.\
-    abstract_external_retina_device import AbstractExternalRetinaDevice
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -64,8 +52,8 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson\
 #connections
 from spynnaker.pyNN.models.neural_projections.connectors.all_to_all\
     import AllToAllConnector
-from spynnaker.pyNN.models.neural_projections.connectors.fixed_number_pre_connector \
-    import FixedNumberPreConnector
+from spynnaker.pyNN.models.neural_projections.connectors.\
+    fixed_number_pre_connector import FixedNumberPreConnector
 from spynnaker.pyNN.models.neural_projections.connectors.fixed_probability \
     import FixedProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.from_list \

@@ -1,7 +1,6 @@
 from abc import ABCMeta
 from abc import abstractmethod
 import os
-import tempfile
 import logging
 
 from six import add_metaclass
@@ -13,7 +12,7 @@ from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_properties.abstract_synaptic_manager import \
+from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
     SynapticManager
 from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex import \
