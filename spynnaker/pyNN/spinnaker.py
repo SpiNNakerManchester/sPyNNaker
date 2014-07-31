@@ -419,6 +419,10 @@ class Spinnaker(object):
         return self._app_id
 
     @property
+    def has_ran(self):
+        return self._has_ran
+
+    @property
     def machine_time_step(self):
         return self._machine_time_step
 

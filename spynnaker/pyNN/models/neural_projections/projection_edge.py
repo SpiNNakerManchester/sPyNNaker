@@ -6,7 +6,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
-
+from spynnaker.pyNN.utilities.conf import config
 import logging
 logger = logging.getLogger(__name__)
 
@@ -76,35 +76,40 @@ class ProjectionEdge(Edge):
         """
         return self._synapse_row_io
 
-    def get_synaptic_data(self, controller, min_delay, sub_graph):
+    def get_synaptic_data(self, spinnaker):
         """
         Get synaptic data for all connections in this Projection.
         """
         logger.info("Reading synapse data for edge between {} and {}"
                     .format(self._pre_vertex.label, self._post_vertex.label))
-        sorted_subedges = \
-            sorted(sub_graph.get_subedges_from_edge(self),
-                   key=lambda sub_edge:
-                   (sub_edge.presubvertex.lo_atom,
-                    sub_edge.postsubvertex.lo_atom))
-        
-        synaptic_list = list()
-        last_pre_lo_atom = None
-        for subedge in sorted_subedges:
-            if subedge.pruneable:
-                rows = [SynapseRowInfo([], [], [], []) 
-                        for _ in range(subedge.presubvertex.n_atoms)]
-            else:
-                rows =\
-                    subedge.get_synaptic_data(controller, min_delay).get_rows()
-            if (last_pre_lo_atom is None) or \
-                    (last_pre_lo_atom != subedge.presubvertex.lo_atom):
-                synaptic_list.extend(rows)
-                last_pre_lo_atom = subedge.presubvertex.lo_atom
-            else:
-                for i in range(len(rows)):
-                    row = rows[i]
-                    synaptic_list[i + last_pre_lo_atom]\
-                        .append(row, lo_atom=subedge.postsubvertex.lo_atom)
+        sub_graph = spinnaker.sub_graph
+        min_delay = config.get("Model", "min_delay")
+        if sub_graph is None:
+            return self._synapse_list
+        else:
+            sorted_subedges = \
+                sorted(sub_graph.get_subedges_from_edge(self),
+                       key=lambda sub_edge:
+                       (sub_edge.presubvertex.lo_atom,
+                        sub_edge.postsubvertex.lo_atom))
 
-        return SynapticList(synaptic_list)
+            synaptic_list = list()
+            last_pre_lo_atom = None
+            for subedge in sorted_subedges:
+                if subedge.pruneable:
+                    rows = [SynapseRowInfo([], [], [], [])
+                            for _ in range(subedge.presubvertex.n_atoms)]
+                else:
+                    rows =\
+                        subedge.get_synaptic_data(spinnaker, min_delay).get_rows()
+                if (last_pre_lo_atom is None) or \
+                        (last_pre_lo_atom != subedge.presubvertex.lo_atom):
+                    synaptic_list.extend(rows)
+                    last_pre_lo_atom = subedge.presubvertex.lo_atom
+                else:
+                    for i in range(len(rows)):
+                        row = rows[i]
+                        synaptic_list[i + last_pre_lo_atom]\
+                            .append(row, lo_atom=subedge.postsubvertex.lo_atom)
+
+            return SynapticList(synaptic_list)

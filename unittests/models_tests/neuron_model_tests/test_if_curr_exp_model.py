@@ -17,9 +17,9 @@ class TestIFCurrExpModel(unittest.TestCase):
         nNeurons = 10
         if_curr_exp = IFCurrentExponentialPopulation(
             nNeurons, None, None, cell_params_lif['tau_m'], cell_params_lif['cm']
-            , cell_params_lif['v_rest'], cell_params_lif['v_reset'], cell_params_lif['v_thresh']
-            , cell_params_lif['tau_syn_E'], cell_params_lif['tau_syn_I'], cell_params_lif['tau_refrac']
-            , cell_params_lif['i_offset'])
+            , cell_params_lif['v_rest'], v_reset=cell_params_lif['v_reset'], v_thresh=cell_params_lif['v_thresh']
+            , tau_syn_E=cell_params_lif['tau_syn_E'], tau_syn_I=cell_params_lif['tau_syn_I'], tau_refrac=cell_params_lif['tau_refrac']
+            , i_offset=cell_params_lif['i_offset'])
         self.assertEqual(if_curr_exp.model_name,"IF_curr_exp")
         if_curr_exp.set_machine_time_step(1)
         self.assertEqual(len(if_curr_exp.get_parameters()),10)
@@ -34,6 +34,12 @@ class TestIFCurrExpModel(unittest.TestCase):
         self.assertEqual(if_curr_exp._i_offset,cell_params_lif['i_offset'])
         self.assertEqual(if_curr_exp._cm,cell_params_lif['cm'])
 
+
+    def test_delay_vertex(self):
+        pass
+
+    def test_get_spikes(self):
+        pass
 
 
 

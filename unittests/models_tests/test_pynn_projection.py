@@ -129,8 +129,8 @@ class TestProjection(unittest.TestCase):
 
         for i in range(4):
             for j in range(4):
-                self.assertEqual(projections[i + j].presyn , projection_details[i + j]['presyn'])
-                self.assertEqual(projections[i + j].postsyn , projection_details[i + j]['postsyn'])
+                self.assertEqual(projections[i + j]._projection_edge._pre_vertex , projection_details[i + j]['presyn']._vertex)
+                self.assertEqual(projections[i + j]._projection_edge._post_vertex , projection_details[i + j]['postsyn']._vertex)
                 #self.assertEqual(projections[i].connector , projection_details[i]['connector'])
 
     def test_inhibitory_connector(self):

@@ -222,7 +222,7 @@ class Projection(object):
                 synapse_list = \
                     self._projection_edge.get_synaptic_data(
                         self._spinnaker,
-                        DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS, subgraph)
+                        constants.MAX_SUPPORTED_DELAY_TICS, subgraph)
             if self._delay_edge is not None:
                 delay_synapse_list = self._delay_edge.get_synaptic_data(
                     self._spinnaker, DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS)
@@ -260,7 +260,7 @@ class Projection(object):
             timer = Timer()
             timer.start_timing()
         if self._read_synapse_list is None:
-            self._retrieve_synaptic_data(self._spinnaker.subgraph)
+            self._retrieve_synaptic_data(self._spinnaker._sub_graph)
         synapse_list = self._read_synapse_list
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
@@ -312,9 +312,12 @@ class Projection(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        if self._read_synapse_list is None:
-            self._retrieve_synaptic_data(self._spinnaker.subgraph)
-        synapse_list = self._read_synapse_list
+        if self._read_synapse_list is None and self._spinnaker.has_ran:
+            self._retrieve_synaptic_data(self._spinnaker._sub_graph)
+            synapse_list = self._read_synapse_list
+        else:
+            synapse_list = \
+                self._projection_edge.get_synaptic_data(self._spinnaker)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
 

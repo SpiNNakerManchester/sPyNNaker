@@ -41,9 +41,13 @@ class AllToAllConnector(AbstractConnector):
                               synapse_type):
         
         connection_list = list()
-        for _ in range(0, prevertex.n_atoms):
+        for pre_atom in range(0, prevertex.n_atoms):
             present = numpy.ones(postvertex.n_atoms, dtype=numpy.uint32)
-            n_present = postvertex.n_atoms
+            if not self._allow_self_connections and prevertex == postvertex:
+                present[pre_atom] = 0
+                n_present = postvertex.n_atoms - 1
+            else:
+                n_present = postvertex.n_atoms
             
             ids = numpy.where(present)[0]
             delays = (generate_parameter_array(self._delays, n_present, present)
