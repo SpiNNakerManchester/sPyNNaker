@@ -260,7 +260,7 @@ class Projection(object):
             timer = Timer()
             timer.start_timing()
         if self._read_synapse_list is None:
-            self._retrieve_synaptic_data(self._spinnaker.subgraph)
+            self._retrieve_synaptic_data(self._spinnaker._sub_graph)
         synapse_list = self._read_synapse_list
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
@@ -313,7 +313,7 @@ class Projection(object):
             timer = Timer()
             timer.start_timing()
         if self._read_synapse_list is None:
-            self._retrieve_synaptic_data(self._spinnaker.subgraph)
+            self._retrieve_synaptic_data(self._spinnaker._sub_graph)
         synapse_list = self._read_synapse_list
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
