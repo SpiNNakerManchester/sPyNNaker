@@ -482,15 +482,19 @@ class Spinnaker(object):
 
         #execute key allocator
         key_allocator = RoutingInfoAllocator(
-            machine=self._machine, report_states=pacman_report_state,
-            report_folder=self._report_default_directory, graph=self._graph,
-            hostname=self._hostname, placer_algorithm=self._placer_algorithum)
-            self._key_allocator_algorithum()
+            report_states=pacman_report_state, hostname=self._hostname,
+            report_folder=self._report_default_directory, machine=self._machine,
+            graph_to_sub_graph_mapper=self._graph_subgraph_mapper,
+            routing_info_allocator_algorithm=self._key_allocator_algorithum)
         self._routing_infos = key_allocator.run(self._graph_subgraph_mapper,
                                                 self._placements)
 
         #execute router
-        router = self._routing_algorithm()
+        router = Router(machine=self._machine, placements=self._placements,
+                        report_folder=self._report_default_directory,
+                        report_states=self._reports_states,
+                        subgraph=self._sub_graph,
+                        routing_infos=self._routing_infos)
         self._router_tables = router.run(self._routing_infos, self._placements,
                                          self._machine)
 
