@@ -6,6 +6,9 @@ from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
 from pacman.operations.partitioner import Partitioner
+from pacman.operations.placer import Placer
+from pacman.operations.router import Router
+from pacman.operations.routing_info_allocator import RoutingInfoAllocator
 from pacman.utilities.progress_bar import ProgressBar
 
 
@@ -463,8 +466,12 @@ class Spinnaker(object):
             partitioner.run(self._graph, self._machine)
 
         #execute placer
-        placer = self._placer_algorithum()
-        self._placements = placer.run(self._sub_graph, self._machine)
+        placer = Placer(
+            machine=self._machine, report_states=pacman_report_state,
+            report_folder=self._report_default_directory, graph=self._graph,
+            hostname=self._hostname, placer_algorithm=self._placer_algorithum)
+        self._placements = \
+            placer.run(self._sub_graph, self._graph_subgraph_mapper)
 
         #execute key allocator
         key_allocator = self._key_allocator_algorithum()
