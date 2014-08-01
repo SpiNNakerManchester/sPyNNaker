@@ -31,6 +31,14 @@ class RallocException(SpynnakerException):
     pass
 
 
+class PrunedException(SpynnakerException):
+    """rasied during the pynn's front end pruning of uninportant subedges when\
+     a subedge cannot be detemrined if it is prunable or not
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
+
 class SynapticConfigurationException(ConfigurationException):
     """raised when the synaptic manager fails to handle a synaptic dynamic
 

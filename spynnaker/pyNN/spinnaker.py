@@ -7,8 +7,8 @@ from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
 from pacman.operations.partitioner import Partitioner
 from pacman.operations.placer import Placer
-from pacman.operations.router import Router
 from pacman.operations.routing_info_allocator import RoutingInfoAllocator
+from pacman.operations.router import Router
 from pacman.utilities.progress_bar import ProgressBar
 
 
@@ -33,6 +33,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overrided_pacman_functions
+from spynnaker.pyNN.overrided_pacman_functions.subgraph_subedge_pruning import \
+    SubgraphSubedgePruning
 from spynnaker.pyNN import reports
 
 #spinnman inports
@@ -473,8 +475,17 @@ class Spinnaker(object):
         self._placements = \
             placer.run(self._sub_graph, self._graph_subgraph_mapper)
 
+        #execute pynn subedge pruning
+        pruner = SubgraphSubedgePruning()
+        self._sub_graph, self._graph_subgraph_mapper = \
+            pruner.run(self._sub_graph, self._graph_subgraph_mapper)
+
         #execute key allocator
-        key_allocator = self._key_allocator_algorithum()
+        key_allocator = RoutingInfoAllocator(
+            machine=self._machine, report_states=pacman_report_state,
+            report_folder=self._report_default_directory, graph=self._graph,
+            hostname=self._hostname, placer_algorithm=self._placer_algorithum)
+            self._key_allocator_algorithum()
         self._routing_infos = key_allocator.run(self._graph_subgraph_mapper,
                                                 self._placements)
 

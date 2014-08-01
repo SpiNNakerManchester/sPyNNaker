@@ -32,3 +32,12 @@ class ProjectionSubedge(Subedge):
         Indicates that the list will not be needed again
         """
         self._synapse_sublist = None
+
+    def is_connected(self):
+        """determines if theres an actual connection in this subedge in temrs of
+        synaptic data
+
+        """
+        return self._synapse_sublist.is_connected(
+            self._pre_subvertex.lo_atom, self._pre_subvertex.hi_atom,
+            self._post_subvertex.lo_atom, self.post_subvertex.hi_atom)
