@@ -12,20 +12,17 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
     CPUCyclesPerTickResource
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.sdram_resource import SDRAMResource
-from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
-    AbstractRouterableVertex
 
 
 @add_metaclass(ABCMeta)
 class AbstractVirtualVertex(AbstractPartitionableVertex,
-                            AbstractRecordableVertex, AbstractRouterableVertex):
+                            AbstractRecordableVertex):
 
     def __init__(self, n_neurons, virtual_chip_coords, connected_node_coords,
                  connected_node_edge, label, max_atoms_per_core):
         AbstractRecordableVertex.__init__(self, label)
         AbstractPartitionableVertex.__init__(self, n_neurons, label,
                                              max_atoms_per_core)
-        AbstractRouterableVertex.__init__(self)
         #set up virtual data structures
         self._virtual_chip_coords = virtual_chip_coords
         self._connected_chip_coords = connected_node_coords

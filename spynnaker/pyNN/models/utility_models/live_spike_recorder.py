@@ -4,8 +4,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 from pacman.model.graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
-    AbstractRouterableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -18,7 +16,7 @@ from data_specification.file_data_writer import FileDataWriter
 
 
 class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
-                        AbstractPartitionableVertex, AbstractRouterableVertex):
+                        AbstractPartitionableVertex):
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
     SYSTEM_REGION = 1
 
@@ -36,7 +34,6 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
                                             label="Monitor")
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
                                              max_atoms_per_core=1)
-        AbstractRouterableVertex.__init__(self)
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
 
     @property

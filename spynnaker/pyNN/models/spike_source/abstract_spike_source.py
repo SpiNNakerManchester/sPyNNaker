@@ -6,12 +6,10 @@ from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex import AbstractPartitionableVertex
 
 from enum import Enum
-from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
-    AbstractRouterableVertex
 
 
 class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
-                          AbstractDataSpecableVertex, AbstractRouterableVertex):
+                          AbstractDataSpecableVertex):
 
     _SPIKE_SOURCE_REGIONS = Enum(
         value="_SPIKE_SOURCE_REGIONS",
@@ -27,7 +25,6 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
         AbstractRecordableVertex.__init__(self, label)
         AbstractDataSpecableVertex.__init__(self, label=label,
                                             n_atoms=n_neurons)
-        AbstractRouterableVertex.__init__(self)
 
     def _write_setup_info(self, spec, spike_history_region_sz):
         """

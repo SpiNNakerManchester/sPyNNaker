@@ -5,19 +5,23 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
 from spynnaker.pyNN import exceptions
 from pacman.model.graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
-    AbstractRouterableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+
+
+from pacman.model.constraints.key_allocator_routing_constraint \
+    import KeyAllocatorRoutingConstraint
+
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from data_specification.file_data_writer import FileDataWriter
 
 
 class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
-                      AbstractPartitionableVertex, AbstractRouterableVertex):
+                      AbstractPartitionableVertex):
 
     SYSTEM_REGION = 1
     COMMANDS = 2
@@ -34,12 +38,15 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         AbstractPartitionableVertex.__init__(
             self, label="multi_cast_source_sender", n_atoms=1,
             max_atoms_per_core=1)
-        AbstractRouterableVertex.__init__(self)
 
         self._writes = None
         self._memory_requirements = 0
         self._edge_map = dict()
         self._commands = list()
+
+        routing_key_constraint =\
+            KeyAllocatorRoutingConstraint(self.generate_routing_info)
+        self.add_constraint(routing_key_constraint)
 
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
                            processor_id, subvertex, sub_graph,
@@ -110,8 +117,8 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
                     #reset message tracker
                     commands_in_same_time_slot = list()
                     commands_in_same_time_slot.append(start_command)
-                    self._memory_requirements += 12  # 3 ints holding coutners of
-                                                    # cp, cnp and t
+                    self._memory_requirements += 12  # 3 ints holding coutners
+                                                     #  of cp, cnp and t
                     self._memory_requirements += \
                         self.size_of_message(start_command)
                     self._writes.append(start_command['t'])
@@ -207,7 +214,8 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
     @staticmethod
     def calcaulate_no_payload_messages(messages):
         """
-        iterates though a collection of commands and counts how many have payloads
+        iterates though a collection of commands and counts how many have
+         payloads
         """
         count = 0
         for message in messages:
