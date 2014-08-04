@@ -2,6 +2,7 @@ from pacman.model.graph.edge import Edge
 from pacman.model.subgraph.subgraph import Subgraph
 from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper \
     import GraphSubgraphMapper
+from pacman.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.projection_subedge \
     import ProjectionSubedge
@@ -18,12 +19,19 @@ class SubgraphSubedgePruning(object):
         new_sub_graph = Subgraph()
         new_graph_subgraph_mapper = GraphSubgraphMapper()
 
+        #create progress bar
+        progress_bar = \
+            ProgressBar(len(subgraph.subvertices) + len(subgraph.subedges),
+                        "on checking which subedges are prunable given "
+                        "heursitics")
+
         #add the subverts directly, as they wont be pruned.
         for subvert in subgraph.subvertices:
             new_sub_graph.add_subvertex(subvert)
             associated_vertex =\
                 graph_to_sub_graph_mapper.get_vertex_from_subvertex(subvert)
             new_graph_subgraph_mapper.add_subvertex(subvert, associated_vertex)
+            progress_bar.update()
 
         #start checkign though subedges to decide which ones need pruning....
         for subedge in subgraph.subedges:
@@ -32,6 +40,8 @@ class SubgraphSubedgePruning(object):
                 associated_edge = \
                     graph_to_sub_graph_mapper.get_edge_from_subedge(subedge)
                 graph_to_sub_graph_mapper.add_subedge(subedge, associated_edge)
+                progress_bar.update()
+        progress_bar.end()
         #returned the pruned subgraph and graph_to_sub_graph_mapper
         return new_sub_graph, new_graph_subgraph_mapper
 
