@@ -73,6 +73,16 @@ from spynnaker.pyNN.models.neural_projections.connectors.from_file \
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
     import SmallWorldConnector
 
+#constraints
+from pacman.model.constraints.partitioner_maximum_size_constraint \
+    import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.partitioner_same_size_as_vertex_constraint import\
+    PartitionerSameSizeAsVertexConstraint
+from pacman.model.constraints.placer_chip_and_core_constraint \
+    import PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_subvertex_same_chip_constraint \
+    import PlacerSubvertexSameChipConstraint
+
 
 #traditional logger
 logger = logging.getLogger(__name__)
