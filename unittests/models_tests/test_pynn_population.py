@@ -67,14 +67,23 @@ class TestingPopulation(unittest.TestCase):
 
     def test_population_size(self):
         populations = list()
-        populations.append(pynn.Population(1,pynn.IF_curr_exp,cell_params_lif, label="One population"))
-        populations.append(pynn.Population(10,pynn.IF_curr_exp,cell_params_lif, label="Two population"))
+        populations.append(pynn.Population(1,pynn.IF_curr_exp,cell_params_lif,
+                                           label="One population"))
+        populations.append(pynn.Population(10,pynn.IF_curr_exp,cell_params_lif,
+                                           label="Two population"))
         self.assertEqual(populations[0]._size, 1)
         self.assertEqual(populations[1]._size,10)
 
     def test_get_spikes_from_virtual_spinnaker(self):
         self.assertEqual(True,False)
 
+    def test_set_constraint_to_population(self):
+        pop = pynn.Population(10,pynn.IF_curr_exp,cell_params_lif,
+                              label="Constrained population")
+        placer_constraint = pynn.PlacerChipAndCoreConstraint(x=1, y=0)
+        pop.set_constraint(placer_constraint)
+        constraints = pop._get_vertex.constraints
+        self.assertIn(placer_constraint, constraints)
 
 if __name__=="__main__":
     unittest.main()

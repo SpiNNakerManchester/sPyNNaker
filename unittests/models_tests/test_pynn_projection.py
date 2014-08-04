@@ -141,45 +141,43 @@ class TestProjection(unittest.TestCase):
         
         s12_2 = pynn.Projection(p1,p2,pynn.OneToOneConnector(weight_to_spike,delay),target='inhibitory')
         s21 = pynn.Projection(p2,p1,pynn.OneToOneConnector(weight_to_spike,delay),target='excitatory')
-        
 
     def test_one_to_one_connector_from_low_to_high(self):
-        try:
+        with self.assertRaises(exc.ConfigurationException):
             weight_to_spike,delay = 2, 5
             first_population = pynn.Population(no_neurons,pynn.IF_curr_exp,cell_params_lif,label="LIF Pop")
             different_population = pynn.Population(20,pynn.IF_curr_exp,cell_params_lif,label="A random sized population")
             pynn.Projection(first_population,different_population,pynn.OneToOneConnector(weight_to_spike,delay))
             raise EnvironmentError(" OneToOneConnector between 2 different sized populations should have failed ")
-        except Exception as e:
-            self.assertIsInstance(e,exc.ConfigurationException)
 
     def test_one_to_one_connector_from_high_to_low(self):
-        try:
+        with self.assertRaises(exc.ConfigurationException):
             weight_to_spike,delay = 2, 5
             second_population = pynn.Population(no_neurons,pynn.IF_curr_exp,cell_params_lif,label="LIF Pop")
             different_population = pynn.Population(20,pynn.IF_curr_exp,cell_params_lif,label="A random sized population")
             pynn.Projection(different_population,second_population,pynn.OneToOneConnector(weight_to_spike,delay))
-            raise EnvironmentError(" OneToOneConnector between 2 different sized populations should have failed ")
-        except Exception as e:
-            self.assertIsInstance(e,exc.ConfigurationException)
-            
-    def test_all_to_all_connector(self):
-        pass
 
-    def test_all_to_all_connector_from_zero(self):
-        pass
+    def test_multiple_connections_between_same_vertices(self):
+        with self.assertRaises(exc.ConfigurationException):
+            p1 = pynn.Population(no_neurons,pynn.IF_curr_exp,cell_params_lif,label="LIF Pop")
+            p2 = pynn.Population(no_neurons,pynn.IF_curr_exp,cell_params_lif,label="LIF Pop")
+            pynn.Projection(p1,p2,pynn.OneToOneConnector(1, 1))
+            pynn.Projection(p1,p2,pynn.OneToOneConnector(1, 1))
+
+    def test_all_to_all_connector(self):
+        self.assertEqual(True,False)
 
     def test_fixed_probability_connector(self):
-        pass
+        self.assertEqual(True,False)
 
     def test_fixed_number_pre_connector(self):
-        pass
+        self.assertEqual(True,False)
 
     def test_from_list_connector(self):
-        pass
+        self.assertEqual(True,False)
 
     def test_from_file_connector(self):
-        pass
+        self.assertEqual(True,False)
 
 if __name__=="__main__":
     unittest.main()
