@@ -63,7 +63,7 @@ class Population(object):
 
         #check if the vertex is a cmd sender, if so store for future
         require_multi_cast_source_constraints = \
-            pacman_utility_calls.locate_constrants_of_type(
+            pacman_utility_calls.locate_constraints_of_type(
                 self._vertex.constraints,
                 VertexRequiresMultiCastSourceConstraint)
 
@@ -83,7 +83,7 @@ class Population(object):
 
         #add any dependant edges and verts if needed
         dependant_vertex_constraints = \
-            pacman_utility_calls.locate_constrants_of_type(
+            pacman_utility_calls.locate_constraints_of_type(
                 self._vertex.constraints, VertexHasDependentConstraint)
 
         for dependant_vertex_constrant in dependant_vertex_constraints:

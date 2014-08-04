@@ -10,7 +10,7 @@ class PyNNRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
         self._graph_subgraph_mapper = graph_subgraph_mapper
         self._used_masks = dict()
         
-    #inhirrted from AbstractRoutingInfoAllocatorAlgorithm
+    #Inherited from AbstractRoutingInfoAllocatorAlgorithm
     def allocate_routing_info(self, sub_graph, placements):
         
         for subvert in sub_graph.subvertices:
@@ -30,7 +30,7 @@ class PyNNRoutingInfoAllocator(AbstractRoutingInfoAllocatorAlgorithm):
 
     def check_masks(self, new_mask, key):
         """
-        updates the used mask store based on if its alresady been used
+        updates the used mask store based on if its already been used
         """
         if new_mask not in self._used_masks:
             self._used_masks[new_mask] = list()
