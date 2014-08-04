@@ -1,5 +1,5 @@
 import numpy, pylab, random, sys
-import pacman103.front.pynn as sim
+import spynnaker.pyNN as sim
 
 # SpiNNaker setup
 sim.setup(timestep=1.0, min_delay=1.0, max_delay=10.0)

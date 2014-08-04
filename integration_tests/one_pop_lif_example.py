@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import pacman103.front.pynn as p
+import spynnaker.pyNN as p
 import numpy, pylab
 
 

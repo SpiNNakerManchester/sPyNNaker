@@ -1,4 +1,4 @@
-import pacman103.front.pynn as p
+import spynnaker.pyNN as p
 from visualiser import visualiser_modes
 import numpy as np
 

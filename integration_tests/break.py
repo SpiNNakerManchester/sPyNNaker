@@ -17,7 +17,7 @@ $Id: IF_cond_exp.py 917 2011-01-31 15:23:34Z apdavison $
 from pyNN.utility import get_script_args
 from pyNN.errors import RecordingError
 
-import pacman103.front.pynn as p
+import spynnaker.pyNN as p
 
 p.setup(timestep=1.0,min_delay=1.0,max_delay=10.0, db_name='if_cond.sqlite')
 

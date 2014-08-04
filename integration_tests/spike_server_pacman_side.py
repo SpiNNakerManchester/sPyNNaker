@@ -4,7 +4,7 @@ retina example that just feeds data from retina to vis
 """
 
 #!/usr/bin/python
-import pacman103.front.pynn as p
+import spynnaker.pyNN as p
 import numpy, pylab
 
 #set up pacman103

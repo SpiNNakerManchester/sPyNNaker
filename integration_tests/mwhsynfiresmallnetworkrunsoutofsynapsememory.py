@@ -2,7 +2,7 @@
 Synfirechain-like example
 """
 #!/usr/bin/python
-import pacman103.front.pynn as p
+import spynnaker.pyNN as p
 import visualiser.visualiser_modes as modes
 import numpy, pylab
 

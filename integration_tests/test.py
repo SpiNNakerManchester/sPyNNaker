@@ -2,11 +2,11 @@
 Synfirechain-like example
 """
 #!/usr/bin/python
-import pacman103.front.pynn as p
+import spynnaker.pyNN as p
 #import pyNN.nest as p
 import numpy, pylab
 
-p.setup()
+p.setup(timestep=1, min_delay=1, max_delay=15)
 
 nNeurons = 1 # number of neurons in each population
 nSources = 1 # Number of Poisson sources
@@ -28,7 +28,7 @@ poisson_params = {'rate': 100, 'start':0, 'duration' : 100000000}
 poisson_params2 = {'rate': 10, 'start':0, 'duration' : 100000000}
 populations.append(p.Population(nNeurons, p.IF_curr_exp, neuron_parameters, label='pop_1'))
 populations.append(p.Population(nNeurons, p.IF_curr_exp, neuron_parameters, label='pop_2'))
-populations[1].set_mapping_constraint({"x": 1, "y": 0})
+populations[1].set_constraint(p.PlacerChipAndCoreConstraint(x=1,y=0))#{"x": 1, "y": 0})
 #populations.append(p.Population(nSources, p.SpikeSourcePoisson, poisson_params, label='pois_1'))
 #populations.append(p.Population(nSources, p.SpikeSourcePoisson, poisson_params2, label='pois_2'))
 

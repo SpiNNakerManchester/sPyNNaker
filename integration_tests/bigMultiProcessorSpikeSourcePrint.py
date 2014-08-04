@@ -2,7 +2,7 @@
 Synfirechain-like example
 """
 #!/usr/bin/python
-import pacman103.front.pynn as p
+import spynnaker.pyNN as p
 import numpy, pylab
 cell_params_lif = {'cm'        : 0.25, # nF
                      'i_offset'  : 0.0,
