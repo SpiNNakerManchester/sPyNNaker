@@ -19,6 +19,7 @@ from pacman.model.graph.edge import Edge
 from pacman.utilities import utility_calls as pacman_utility_calls
 
 import logging
+import inspect
 logger = logging.getLogger(__name__)
 
 
@@ -521,7 +522,18 @@ class Population(object):
         Apply a constraint to a population that restricts the processor
         onto which its sub-populations will be placed.
         """
-        if type(constraint) in AbstractConstraint.__subclasses__():
+        #find all constraints!
+        subclass_list = list()
+        current_subclass_list = AbstractConstraint.__subclasses__()
+        while len(current_subclass_list) != 0:
+            current_class = current_subclass_list[0]
+            if not inspect.isabstract(current_class):
+                subclass_list.append(current_class)
+            current_subclass_list.remove(current_class)
+            for new_found_class in current_class.__subclasses__():
+                current_subclass_list.append(new_found_class)
+
+        if type(constraint) in subclass_list:
             self._vertex.add_constraint(constraint)
         else:
             raise exceptions.ConfigurationException(
