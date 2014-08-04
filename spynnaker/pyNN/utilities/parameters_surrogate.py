@@ -2,6 +2,7 @@
 This class is provided so that the PyNN front-end for PACMAN can succesfully
 emulate PyNN calls whilst retaining a sane Python class structure.
 """
+from spynnaker.pyNN.utilities.utility_calls import convert_param_to_numpy
 
 
 class PyNNParametersSurrogate(object):
@@ -36,5 +37,5 @@ class PyNNParametersSurrogate(object):
         if not hasattr(self.vertex, key):
             raise Exception("Object '%s' does not have parameter '%s'." %
                             (self.vertex, key))
-        value = self.vertex.convert_param(value, self.vertex.n_atoms)
+        value = convert_param_to_numpy(value, self.vertex.n_atoms)
         setattr(self.vertex, key, value)
