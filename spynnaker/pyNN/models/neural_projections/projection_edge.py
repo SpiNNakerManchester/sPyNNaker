@@ -37,7 +37,7 @@ class ProjectionEdge(Edge):
         """
         Creates a subedge from this edge
         """
-        return ProjectionSubedge(self, presubvertex, postsubvertex, self)
+        return ProjectionSubedge(presubvertex, postsubvertex, self)
         
     def filter_sub_edge(self, subedge):
         """
@@ -76,12 +76,19 @@ class ProjectionEdge(Edge):
         """
         return self._synapse_row_io
 
-    def get_synaptic_data(self, spinnaker):
+    def get_synaptic_data(self, spinnaker=None):
         """
         Get synaptic data for all connections in this Projection.
+        if spinnaker == None, then just return the one stored in memory via
+         self._synapse_list
         """
         logger.info("Reading synapse data for edge between {} and {}"
                     .format(self._pre_vertex.label, self._post_vertex.label))
+
+        #if theres no spinnaker, assume your looking at the internal one here.
+        if spinnaker is None:
+            return self._synapse_list
+
         sub_graph = spinnaker.sub_graph
         min_delay = config.get("Model", "min_delay")
         if sub_graph is None:
@@ -101,7 +108,8 @@ class ProjectionEdge(Edge):
                             for _ in range(subedge.presubvertex.n_atoms)]
                 else:
                     rows =\
-                        subedge.get_synaptic_data(spinnaker, min_delay).get_rows()
+                        subedge.get_synaptic_data(spinnaker,
+                                                  min_delay).get_rows()
                 if (last_pre_lo_atom is None) or \
                         (last_pre_lo_atom != subedge.presubvertex.lo_atom):
                     synaptic_list.extend(rows)

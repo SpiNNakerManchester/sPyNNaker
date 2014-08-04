@@ -18,6 +18,7 @@ import math
 logger = logging.getLogger(__name__)
 
 
+# noinspection PyProtectedMember
 class Projection(object):
     """
     A container for all the connections of a given type (same synapse type
@@ -214,18 +215,18 @@ class Projection(object):
         """Return the `i`th connection within the Projection."""
         raise NotImplementedError
 
-    def _retrieve_synaptic_data(self, subgraph):
+    def _retrieve_synaptic_data(self):
         if self._read_synapse_list is None:
             synapse_list = None
             delay_synapse_list = None
             if self._projection_edge is not None:
                 synapse_list = \
-                    self._projection_edge.get_synaptic_data(
-                        self._spinnaker,
-                        constants.MAX_SUPPORTED_DELAY_TICS, subgraph)
+                    self._projection_edge.get_synaptic_data(self._spinnaker)
             if self._delay_edge is not None:
-                delay_synapse_list = self._delay_edge.get_synaptic_data(
-                    self._spinnaker, DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS)
+                delay_synapse_list = \
+                    self._delay_edge.get_synaptic_data(
+                        self._spinnaker,
+                        DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS)
 
             # If there is both a delay and a non-delay list, merge them
             if synapse_list is not None and delay_synapse_list is not None:
@@ -260,7 +261,7 @@ class Projection(object):
             timer = Timer()
             timer.start_timing()
         if self._read_synapse_list is None:
-            self._retrieve_synaptic_data(self._spinnaker._sub_graph)
+            self._retrieve_synaptic_data()
         synapse_list = self._read_synapse_list
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
@@ -313,7 +314,7 @@ class Projection(object):
             timer = Timer()
             timer.start_timing()
         if self._read_synapse_list is None and self._spinnaker.has_ran:
-            self._retrieve_synaptic_data(self._spinnaker._sub_graph)
+            self._retrieve_synaptic_data()
             synapse_list = self._read_synapse_list
         else:
             synapse_list = \
