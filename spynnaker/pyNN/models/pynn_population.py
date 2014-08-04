@@ -1,3 +1,4 @@
+from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint import \
@@ -520,7 +521,12 @@ class Population(object):
         Apply a constraint to a population that restricts the processor
         onto which its sub-populations will be placed.
         """
-        self._vertex.add_constraint(constraint)
+        if type(constraint) in AbstractConstraint.__subclasses__():
+            self._vertex.add_constraint(constraint)
+        else:
+            raise exceptions.ConfigurationException(
+                "the constraint entered is not a recongised constraint. "
+                "try again")
 
     #NONE PYNN API CALL
     def set_model_based_max_atoms_per_core(self, new_value):
