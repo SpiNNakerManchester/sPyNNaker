@@ -486,7 +486,7 @@ class Spinnaker(object):
             report_folder=self._report_default_directory, machine=self._machine,
             graph_to_sub_graph_mapper=self._graph_subgraph_mapper,
             routing_info_allocator_algorithm=self._key_allocator_algorithum)
-        self._routing_infos = key_allocator.run(self._graph_subgraph_mapper,
+        self._routing_infos = key_allocator.run(self._sub_graph,
                                                 self._placements)
 
         #execute router

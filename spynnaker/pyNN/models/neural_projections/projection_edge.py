@@ -113,3 +113,7 @@ class ProjectionEdge(Edge):
                             .append(row, lo_atom=subedge.postsubvertex.lo_atom)
 
             return SynapticList(synaptic_list)
+
+    @property
+    def synapse_dynamics(self):
+        return self._synapse_dynamics

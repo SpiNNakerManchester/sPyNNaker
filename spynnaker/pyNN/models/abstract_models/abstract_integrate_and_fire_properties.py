@@ -41,6 +41,26 @@ class AbstractIntegrateAndFireProperties(object):
         return self._tau_refrac * self._t_refract_scale
 
     @property
+    def cm(self):
+        return self._cm
+
+    @property
+    def tau_m(self):
+        return self._tau_m
+
+    @property
+    def i_offset(self):
+        return self._i_offset
+
+    @property
+    def v_rest(self):
+        return self._v_reset
+
+    @property
+    def v_thresh(self):
+        return self._v_thresh
+
+    @property
     def one_over_tau_rc(self):
         return 1.0 / self._tau_m
 

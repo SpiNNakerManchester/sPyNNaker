@@ -162,11 +162,12 @@ class SynapticManager(object):
                 # May require modification to the master pynn_population.py
                 # table
                 n_atoms = sys.maxint
-                if issubclass(type(AbstractPartitionableVertex),
-                              in_edge._pre_vertex):
-                    n_atoms = in_edge._pre_vertex.get_maximum_atoms_per_core()
-                if in_edge._pre_vertex.n_atoms < n_atoms:
-                    n_atoms = in_edge._pre_vertex.n_atoms
+                edge_pre_vertex = in_edge.pre_vertex
+                if edge_pre_vertex in \
+                        AbstractPartitionableVertex.__subclasses__():
+                    n_atoms = in_edge.pre_vertex.get_maximum_atoms_per_core()
+                if in_edge.pre_vertex.n_atoms < n_atoms:
+                    n_atoms = in_edge.pre_vertex.n_atoms
 
                 num_rows = in_edge.get_n_rows()
                 extra_mem = math.ceil(float(num_rows) / float(n_atoms)) * 1024
@@ -194,10 +195,10 @@ class SynapticManager(object):
         for in_edge in in_edges:
             if (isinstance(in_edge, ProjectionEdge)
                     and in_edge.synapse_dynamics is not None):
-                if in_edge._synapse_dynamics.fast is not None:
+                if in_edge.synapse_dynamics.fast is not None:
                     raise exceptions.SynapticConfigurationException(
                         "Fast synapse dynamics are not supported")
-                elif in_edge._synapse_dynamics.slow is not None:
+                elif in_edge.synapse_dynamics.slow is not None:
                     if self._stdp_mechanism is None:
                         self._stdp_mechanism = in_edge._synapse_dynamics.slow
                     else:

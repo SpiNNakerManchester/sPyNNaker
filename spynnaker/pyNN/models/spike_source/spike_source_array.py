@@ -59,7 +59,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         spike_dict = dict()
         if isinstance(self._spike_times, list):
             # This is in SpiNNaker 'list of lists' format:
-            for neuron in range(lo_atom, hi_atom + 1):
+            for neuron in range(lo_atom, hi_atom):
                 for timeStamp in self._spike_times[neuron]:
                     time_stamp_in_ticks = \
                         int((timeStamp * 1000.0) / self._machine_time_step)
@@ -69,7 +69,7 @@ class SpikeSourceArray(AbstractSpikeSource):
                         spike_dict[time_stamp_in_ticks].append(neuron)
         else:
             # This is in official PyNN format, all neurons use the same list:
-            neuron_list = range(lo_atom, hi_atom + 1)
+            neuron_list = range(lo_atom, hi_atom)
             for timeStamp in self._spike_times:
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)

@@ -20,7 +20,7 @@ class AbstractRouterableVertex(object):
         :param subedge: The subedge for which to generate the key and mask.
         :returns: A tuple containing the key and mask.
         """
-        x, y, p = subedge.presubvertex.placement.processor.get_coordinates()
+        x, y, p = subedge._pre_subvertex.placement.processor.get_coordinates()
 
         key = packet_conversions.get_key_from_coords(x, y, p)
         #bodge to deal with external perrifables
