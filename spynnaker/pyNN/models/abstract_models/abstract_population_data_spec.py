@@ -23,7 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class PopulationManager(SynapticManager, AbstractPartitionablePopulationVertex):
+class AbstractPopulationDataSpec(SynapticManager,
+                                 AbstractPartitionablePopulationVertex):
 
     def __init__(self, record, binary, n_neurons, label, constraints,
                  max_atoms_per_core):

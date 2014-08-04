@@ -10,10 +10,8 @@ from pacman.model.constraints.\
 
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_routerable_vertex import \
-    AbstractRouterableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_population_manager \
-    import PopulationManager
+from spynnaker.pyNN.models.abstract_models.abstract_population_data_spec \
+    import AbstractPopulationDataSpec
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.utility_calls import \
     get_region_base_address_offset
@@ -24,8 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationVertex(AbstractRecordableVertex, PopulationManager,
-                               AbstractRouterableVertex):
+class AbstractPopulationVertex(AbstractRecordableVertex,
+                               AbstractPopulationDataSpec):
     """
     Underlying Vertex model for Neural Populations.
     """
@@ -34,9 +32,9 @@ class AbstractPopulationVertex(AbstractRecordableVertex, PopulationManager,
                  constraints=None):
 
         AbstractRecordableVertex.__init__(self, label)
-        PopulationManager.__init__(self, False, binary, n_neurons, label,
-                                   constraints, max_atoms_per_core)
-        AbstractRouterableVertex.__init__(self)
+        AbstractPopulationDataSpec.__init__(self, False, binary, n_neurons,
+                                            label, constraints,
+                                            max_atoms_per_core)
         self._delay_vertex = None
         self._n_params = n_params
 
