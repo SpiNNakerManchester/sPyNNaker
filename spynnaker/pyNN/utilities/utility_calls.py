@@ -1,5 +1,5 @@
 """
-utility class contianing simple helper methods
+utility class containing simple helper methods
 """
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import RandomDistribution

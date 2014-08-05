@@ -36,8 +36,8 @@ for possible_pacman_file in legacy_pacmans:
         raise exceptions.ConfigurationException(
             "The configuration tools discovered a pacman.cfg in path \n{}\n"
             "as well as a non-default spynnaker.cfg. Spynnaker does not support"
-            " intergration of pacman.cfg and spynnaker.cfg. Please remove or "
-            "merge these files. Recommedaation is to rename the merged file to "
+            " integration of pacman.cfg and spynnaker.cfg. Please remove or "
+            "merge these files. Recommendation is to rename the merged file to "
             "spynnaker.cfg")
 
 with open(default) as f:
