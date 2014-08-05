@@ -11,7 +11,7 @@ class VisualiserCreationUtility(object):
     def __init__(self):
         pass
 
-    def create_visualiser_interface(self, has_board, transciever, graph,
+    def create_visualiser_interface(self, has_board, transceiver, graph,
                                     visualiser_vertices, machine, subgraph,
                                     placements, router_tables, sim_run_time,
                                     machine_time_step):
@@ -33,7 +33,7 @@ class VisualiserCreationUtility(object):
             #add configuration page
             config_page = ConfigPage(visualiser_vertex_to_page_mapping,
                                      visualiser_vertices, graph, visualiser,
-                                     transciever, has_board, sim_run_time,
+                                     transceiver, has_board, sim_run_time,
                                      machine_time_step, subgraph, placements)
             visualiser.add_page(config_page, config_page.label)
 

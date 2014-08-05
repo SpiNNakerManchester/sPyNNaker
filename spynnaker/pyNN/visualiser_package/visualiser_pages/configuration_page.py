@@ -132,7 +132,7 @@ class ConfigPage(AbstractPage):
             selected = model[index][0]
 
             if selected == self.TOPOLOGICAL_TEXT:
-                data['v'].visualiser_raster_seperate = None
+                data['v'].visualiser_raster_separate = None
                 data['v'].visualiser_mode = visualiser_modes.TOPOLOGICAL
                 text_box = gtk.Entry()
                 if (data['v'].visualiser_2d_dimensions is not None and
@@ -172,7 +172,7 @@ class ConfigPage(AbstractPage):
                 liststore.append([self.INDIVIDUAL_RASTER_TEXT])
                 liststore.append([self.MERGED_RASTER_TEXT])
                 liststore.append([self.NOT_SET_TEXT])
-                raster_mode = data['v'].visualiser_raster_seperate
+                raster_mode = data['v'].visualiser_raster_separate
                 if raster_mode is None:
                     self._raster_combo_box_selection[data['p']] = 2
                     combo_box.set_active(2)
@@ -202,7 +202,7 @@ class ConfigPage(AbstractPage):
                                    data['p']+1)
             else:
                 data['v'].visualiser_2d_dimensions = {'x': None, 'y': None}
-                data['v'].visualiser_raster_seperate = None
+                data['v'].visualiser_raster_separate = None
                 data['v'].visualiser_mode = None
                 label = gtk.Label("")
                 data['v'].visualiser_2d_dimensions = {'x': None, 'y': None}

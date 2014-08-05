@@ -11,7 +11,7 @@ class VisualiserVertex(object):
                  visualiser_update_screen_in_tics,
                  visualiser_reset_counters,
                  visualiser_reset_counter_period,
-                 visualiser_raster_seperate, vertex):
+                 visualiser_raster_separate, vertex):
         self._visualiser_mode = visualiser_mode
         #topological views
         self._visualiser_2d_dimensions = visualiser_2d_dimensions
@@ -23,7 +23,7 @@ class VisualiserVertex(object):
         self._visualiser_reset_counters = visualiser_reset_counters
         self._visualiser_reset_counter_period = visualiser_reset_counter_period
         #raster views
-        self._visualiser_raster_seperate = visualiser_raster_seperate
+        self._visualiser_raster_separate = visualiser_raster_separate
         self._vertex = vertex
 
     @property
@@ -36,7 +36,7 @@ class VisualiserVertex(object):
 
     @property
     def visualiser_no_colours(self):
-        return self.visualiser_no_colours
+        return self._visualiser_no_colours
 
     @property
     def visualiser_average_period_tics(self):
@@ -44,7 +44,7 @@ class VisualiserVertex(object):
 
     @property
     def visualiser_longer_period_tics(self):
-        return self._visualiser_average_period_tics
+        return self._visualiser_longer_period_tics
 
     @property
     def visualiser_update_screen_in_tics(self):
@@ -59,8 +59,8 @@ class VisualiserVertex(object):
         return self._visualiser_reset_counter_period
 
     @property
-    def visualiser_raster_seperate(self):
-        return self._visualiser_raster_seperate
+    def visualiser_raster_separate(self):
+        return self._visualiser_raster_separate
 
     @property
     def vertex(self):
