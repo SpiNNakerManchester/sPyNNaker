@@ -411,13 +411,13 @@ class Population(object):
         first_id = 0
         num_neurons = self._vertex.n_atoms
         dimensions = self._vertex.n_atoms
+        utility_calls.check_directory_exists_and_create_if_not(filename)
         file_handle = open(filename, "w")
         file_handle.write("# first_id = %d\n" % first_id)
         file_handle.write("# n = %d\n" % num_neurons)
         file_handle.write("# dt = %f\n" % time_step)
         file_handle.write("# dimensions = [%d]\n" % dimensions)
         file_handle.write("# last_id = {%d}\n".format(num_neurons - 1))
-        utility_calls.check_directory_exists_and_create_if_not(filename)
         file_handle = open(filename, "w")
         for (neuronId, time, value) in gsyn:
             file_handle.write("%f\t%d\t%f\n" % (time, neuronId, value))
