@@ -7,6 +7,8 @@ from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import constants
 
+from pacman.utilities import constants as pacman_constants
+
 
 import logging
 import numpy
@@ -23,7 +25,7 @@ class AbstractRecordableVertex(object):
     def __init__(self, label):
         self._record = False
         self._focus_level = None
-        self._app_mask = constants.DEFAULT_MASK
+        self._app_mask = pacman_constants.DEFAULT_MASK
         self._label = label
         self._no_machine_time_steps = None
         self._machine_time_step = None

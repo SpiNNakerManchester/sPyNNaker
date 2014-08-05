@@ -59,6 +59,8 @@ import logging
 import math
 import time
 import os
+import datetime
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -139,6 +141,7 @@ class Spinnaker(object):
                                                           "writeTextSpecs")
         #determine common report folder
         config_param = conf.config.get("Reports", "defaultReportFilePath")
+        created_folder = False
         if config_param == "DEFAULT":
             exceptions_path = \
                 os.path.abspath(exceptions.__file__)
@@ -150,11 +153,61 @@ class Spinnaker(object):
             self._report_default_directory = os.path.join(directory, 'reports')
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
+                created_folder = True
         else:
             self._report_default_directory = \
                 os.path.join(config_param, 'reports')
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
+
+        #clear and clean out folders considered not useful anymore
+        if not created_folder:
+            self._move_report_and_binary_files()
+
+        #handle timing app folder and cleaning of report folder from last run
+        app_folder_name = os.path.join(self._report_default_directory, "latest")
+        if not os.path.exists(app_folder_name):
+                os.makedirs(app_folder_name)
+        #store timestamp in latest/time_stamp
+        time_of_run_file_name = os.path.join(app_folder_name, "time_stamp")
+        writer = open(time_of_run_file_name, "w")
+
+        # determine the time slot for later
+        this_run_time = datetime.datetime.now()
+        this_run_time_string_repenstation = \
+            str(this_run_time.date()) + "-" + str(this_run_time.hour) + "-" + \
+            str(this_run_time.minute) + "-" + str(this_run_time.second)
+        writer.writelines("app_{}_{}".format(self._app_id,
+                                             this_run_time_string_repenstation))
+        writer.flush()
+        writer.close()
+        self._report_default_directory = app_folder_name
+
+    def _move_report_and_binary_files(self):
+        app_folder_name = os.path.join(self._report_default_directory, "latest")
+        app_name_file = os.path.join(app_folder_name, "time_stamp")
+        time_stamp_in = open(app_name_file, "r")
+        time_stamp_in_string = time_stamp_in.readline()
+        time_stamp_in.close()
+        new_app_folder = os.path.join(self._report_default_directory,
+                                      time_stamp_in_string)
+        os.makedirs(new_app_folder)
+        list_of_files = os.listdir(app_folder_name)
+        for file_to_move in list_of_files:
+            file_path = os.path.join(app_folder_name, file_to_move)
+            shutil.move(file_path, new_app_folder)
+        files_in_report_folder = os.listdir(self._report_default_directory)
+        # while theres more than the valid max, remove the oldest one
+        while (len(files_in_report_folder) >
+                conf.config.getint("Reports", "max_reports_kept")):
+            files_in_report_folder.sort(
+                cmp, key=lambda temp_file:
+                os.path.getmtime(os.path.join(self._report_default_directory,
+                                              temp_file)))
+            oldest_file = files_in_report_folder[0]
+            shutil.rmtree(
+                os.path.join(self._report_default_directory, oldest_file))
+            files_in_report_folder.remove(oldest_file)
 
     def _set_up_recording_specifics(self):
         if conf.config.has_option("Recording", "send_live_spikes"):
@@ -493,8 +546,9 @@ class Spinnaker(object):
         router = Router(machine=self._machine, placements=self._placements,
                         report_folder=self._report_default_directory,
                         report_states=self._reports_states,
-                        subgraph=self._sub_graph,
-                        routing_infos=self._routing_infos)
+                        subgraph=self._sub_graph, graph=self._graph,
+                        routing_infos=self._routing_infos,
+                        graph_to_subgraph_mappings=self._graph_subgraph_mapper)
         self._router_tables = router.run(self._routing_infos, self._placements,
                                          self._machine)
 
@@ -716,7 +770,8 @@ class Spinnaker(object):
 
     def _load_application_data(self, placements, vertex_to_subvertex_mapper,
                                processor_to_app_data_base_address):
-        #go through the placements and see if theres any application data to load
+        #go through the placements and see if theres any application data to
+        # load
         for placement in placements:
             associated_vertex = \
                 vertex_to_subvertex_mapper.get_vertex_from_subvertex(

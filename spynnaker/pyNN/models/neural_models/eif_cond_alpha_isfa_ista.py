@@ -16,6 +16,8 @@ class EIFConductanceAlphaPopulation(AbstractExponentialPopulationVertex,
                                     AbstractConductiveVertex,
                                     AbstractIntegrateAndFireProperties,
                                     AbstractPopulationVertex):
+
+    # noinspection PyPep8Naming
     def __init__(self, n_neurons, constraints=None, label=None, tau_m=9.3667,
                  cm=0.281, v_rest=-70.6, v_reset=-70.6, v_thresh=-50.4,
                  tau_syn_E=5.0, tau_syn_I=0.5, tau_refrac=0.1, i_offset=0.0,

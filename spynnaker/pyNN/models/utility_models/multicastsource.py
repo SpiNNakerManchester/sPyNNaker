@@ -40,7 +40,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
             max_atoms_per_core=1)
 
         self._writes = None
-        self._memory_requirements = 0
+        self._memory_requirements = None
         self._edge_map = dict()
         self._commands = list()
 
@@ -88,7 +88,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         spec.end_specification()
         data_writer.close()
 
-    def calculate_memory_requirements(self, no_tics):
+    def calculate_memory_requirements(self):
         #sorts commands by timer tic
         commands = sorted(self._commands, key=lambda tup: tup['t'])
         #calculate size of region and the order of writes

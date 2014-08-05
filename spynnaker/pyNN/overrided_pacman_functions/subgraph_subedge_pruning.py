@@ -39,7 +39,7 @@ class SubgraphSubedgePruning(object):
                 new_sub_graph.add_subedge(subedge)
                 associated_edge = \
                     graph_to_sub_graph_mapper.get_edge_from_subedge(subedge)
-                graph_to_sub_graph_mapper.add_subedge(subedge, associated_edge)
+                new_graph_subgraph_mapper.add_subedge(subedge, associated_edge)
                 progress_bar.update()
         progress_bar.end()
         #returned the pruned subgraph and graph_to_sub_graph_mapper

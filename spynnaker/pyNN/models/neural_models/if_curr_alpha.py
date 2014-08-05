@@ -12,6 +12,7 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
 
 class IFCurrentAlphaPopulation(AbstractIntegrateAndFireProperties,
                                AbstractPopulationVertex):
+    # noinspection PyPep8Naming
     def __init__(self, n_neurons, constraints=None, label=None, tau_m=20,
                  cm=1.0, v_rest=-65.0, v_reset=-65.0, v_thresh=-50.0,
                  tau_syn_E=0.5, tau_syn_I=0.5, tau_refrac=0.1, i_offset=0,
