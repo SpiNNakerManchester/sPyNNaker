@@ -50,6 +50,10 @@ class ReportState(object):
     def write_reload_steps(self):
         return self._write_reload_steps
 
+    @property
+    def generate_time_recordings_for_performance_measurements(self):
+        return self._generate_time_recordings_for_performance_measurements
+
     def generate_pacman_report_states(self):
         return PacmanReportState(
             self._partitioner_report, self._placer_report, self._router_report,
