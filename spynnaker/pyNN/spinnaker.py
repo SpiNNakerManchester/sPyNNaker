@@ -105,9 +105,9 @@ class Spinnaker(object):
         self._app_id = None
 
         #pacman mapping objects
-        self._partitioner_algorithum = None
-        self._placer_algorithum = None
-        self._key_allocator_algorithum = None
+        self._partitioner_algorithm = None
+        self._placer_algorithm = None
+        self._key_allocator_algorithm = None
         self._routing_algorithm = None
         self._report_default_directory = None
         self._writeTextSpecs = None
@@ -117,7 +117,7 @@ class Spinnaker(object):
         self._do_run = None
 
         self._set_up_main_objects()
-        self._set_up_pacman_algorthums_listings()
+        self._set_up_pacman_algorthms_listings()
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
         self._set_up_executable_specifics()
@@ -252,17 +252,17 @@ class Spinnaker(object):
         if conf.config.has_option("Execute", "run"):
             self._do_run = conf.config.getboolean("Execute", "run")
 
-    def _set_up_pacman_algorthums_listings(self):
+    def _set_up_pacman_algorthms_listings(self):
          #algorithum lists
         partitioner_algorithms_list = \
             conf.get_valid_components(partition_algorithms, "Partitioner")
-        self._partitioner_algorithum = \
+        self._partitioner_algorithm = \
             partitioner_algorithms_list[conf.config.get("Partitioner",
                                                         "algorithm")]
 
         placer_algorithms_list = \
             conf.get_valid_components(placer_algorithms, "Placer")
-        self._placer_algorithum = \
+        self._placer_algorithm = \
             placer_algorithms_list[conf.config.get("Placer", "algorithm")]
 
         #get common key allocator algorithms
@@ -275,7 +275,7 @@ class Spinnaker(object):
                                       "RoutingInfoAllocator")
         key_allocator_algorithms_list.update(pynn_overloaded_allocator)
 
-        self._key_allocator_algorithum = \
+        self._key_allocator_algorithm = \
             key_allocator_algorithms_list[conf.config.get("KeyAllocator",
                                                           "algorithm")]
 
@@ -511,12 +511,12 @@ class Spinnaker(object):
 
         #execute partitioner
         partitioner = Partitioner(
-            partition_algorithm=self._partitioner_algorithum,
+            partition_algorithm=self._partitioner_algorithm,
             machine_time_step=self._machine_time_step,
             no_machine_time_steps=self._no_machine_time_steps,
             report_folder=self._report_default_directory,
             report_states=pacman_report_state, hostname=self._hostname,
-            placer_alogrithm=self._placer_algorithum)
+            placer_algorithm=self._placer_algorithm)
         self._sub_graph, self._graph_subgraph_mapper = \
             partitioner.run(self._graph, self._machine)
 
@@ -524,7 +524,7 @@ class Spinnaker(object):
         placer = Placer(
             machine=self._machine, report_states=pacman_report_state,
             report_folder=self._report_default_directory, graph=self._graph,
-            hostname=self._hostname, placer_algorithm=self._placer_algorithum)
+            hostname=self._hostname, placer_algorithm=self._placer_algorithm)
         self._placements = \
             placer.run(self._sub_graph, self._graph_subgraph_mapper)
 
@@ -538,7 +538,7 @@ class Spinnaker(object):
             report_states=pacman_report_state, hostname=self._hostname,
             report_folder=self._report_default_directory, machine=self._machine,
             graph_to_sub_graph_mapper=self._graph_subgraph_mapper,
-            routing_info_allocator_algorithm=self._key_allocator_algorithum)
+            routing_info_allocator_algorithm=self._key_allocator_algorithm)
         self._routing_infos = key_allocator.run(self._sub_graph,
                                                 self._placements)
 
