@@ -1,5 +1,5 @@
 """
-This class is provided so that the PyNN front-end for PACMAN can succesfully
+This class is provided so that the PyNN front-end for PACMAN can successfully
 emulate PyNN calls whilst retaining a sane Python class structure.
 """
 from spynnaker.pyNN.utilities import utility_calls
@@ -12,7 +12,7 @@ class PyNNParametersSurrogate(object):
     redirect the request to the appropriate class, attempting to set a 
     parameter will do likewise.
 
-    :param obj: The object for which to act as surrogate.
+    :param vertex_to_surrogate: The object for which to act as surrogate.
     """
     def __init__(self, vertex_to_surrogate):
         self.vertex = vertex_to_surrogate

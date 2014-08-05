@@ -2,6 +2,7 @@ from spynnaker.pyNN.utilities.conf import config
 
 from pacman.utilities.report_states import ReportState as PacmanReportState
 
+
 class ReportState(object):
 
     def __init__(self):
