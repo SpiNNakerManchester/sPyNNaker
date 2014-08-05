@@ -1,4 +1,6 @@
 #pacman imports
+from pacman.model.constraints.vertex_requires_virtual_chip_in_machine_constraint import \
+    VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.graph.graph import Graph
 from pacman.model.graph.edge import Edge
 from pacman.operations import partition_algorithms
@@ -10,10 +12,15 @@ from pacman.operations.placer import Placer
 from pacman.operations.routing_info_allocator import RoutingInfoAllocator
 from pacman.operations.router import Router
 from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities import utility_calls
 
 
 #spinnmachine imports
 from spinn_machine.sdram import SDRAM
+from spinn_machine.router import Router as MachineRouter
+from spinn_machine.link import Link
+from spinn_machine.processor import Processor
+from spinn_machine.chip import Chip
 
 
 #internal imports
@@ -59,6 +66,7 @@ import logging
 import math
 import time
 import os
+import sys
 import datetime
 import shutil
 
@@ -116,13 +124,14 @@ class Spinnaker(object):
         #exeuctable params
         self._do_load = None
         self._do_run = None
-
-        self._set_up_main_objects()
-        self._set_up_pacman_algorthms_listings()
+        if self._app_id is None:
+            self._set_up_main_objects()
+            self._set_up_pacman_algorthms_listings()
+            self._set_up_executable_specifics()
+            self._set_up_recording_specifics()
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
-        self._set_up_executable_specifics()
-        self._set_up_recording_specifics()
+
         self._set_up_report_specifics()
         self._set_up_output_application_data_specifics()
 
@@ -578,6 +587,9 @@ class Spinnaker(object):
         self._sub_graph, self._graph_subgraph_mapper = \
             partitioner.run(self._graph, self._machine)
 
+        self._check_if_theres_any_pre_placement_constraints_to_satisify(
+            self._sub_graph)
+
         #execute placer
         placer = Placer(
             machine=self._machine, report_states=pacman_report_state,
@@ -871,3 +883,75 @@ class Spinnaker(object):
 
             self._txrx.execute_flood(core_subset, file_reader, self._app_id,
                                      size)
+
+    def _check_if_theres_any_pre_placement_constraints_to_satisify(self,
+                                                                   subgraph):
+        for subvert in subgraph.subvertices:
+            virtual_chip_constraints = \
+                utility_calls.locate_constraints_of_type(
+                    subvert.constraints,
+                    VertexRequiresVirtualChipInMachineConstraint)
+            if len(virtual_chip_constraints) > 0:
+                for virutal_chip_constrant in virtual_chip_constraints:
+                    #check if the virtual chip doesnt already exist
+                    if (self._machine.get_chip_at(
+                            virutal_chip_constrant.virtual_chip_coords['x'],
+                            virutal_chip_constrant.virtual_chip_coords['y'])
+                            is None):
+                        virutal_chip = \
+                            self._create_virtual_chip(virutal_chip_constrant)
+                        self._machine.add_chip(virutal_chip)
+
+
+    def _create_virtual_chip(self, virtual_chip_constraint):
+        sdram_object = SDRAM()
+        #creates the two links
+        to_virtual_chip_link = Link(
+            destination_x=virtual_chip_constraint.virtual_chip_coords['x'],
+            destination_y=virtual_chip_constraint.virtual_chip_coords['y'],
+            source_x=virtual_chip_constraint.connected_to_chip_coords['x'],
+            source_y=virtual_chip_constraint.connected_to_chip_coords['y'],
+            multicast_default_from=
+            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
+            multicast_default_to=
+            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
+            source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
+
+        from_virtual_chip_link = Link(
+            destination_x=virtual_chip_constraint.connected_to_chip_coords['x'],
+            destination_y=virtual_chip_constraint.connected_to_chip_coords['y'],
+            source_x=virtual_chip_constraint.virtual_chip_coords['x'],
+            source_y=virtual_chip_constraint.virtual_chip_coords['y'],
+            multicast_default_from=
+            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
+            multicast_default_to=
+            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
+            source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
+
+        #create the router
+        links = list().append(from_virtual_chip_link)
+        router_object = MachineRouter(
+            links=links, emergency_routing_enabled=False,
+            clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
+            n_available_multicast_entries=sys.maxint)
+
+        #create the processors
+        processors = list()
+        for virtual_core_id in range(0, 128):
+            processors.append(Processor(virtual_core_id,
+                                        Processor.CPU_AVAILABLE,
+                                        virtual_core_id == 0))
+        #connect the real chip with the virtual one
+        connected_chip = self._machine.get_chip_at(
+            virtual_chip_constraint.connected_to_chip_coords['x'],
+            virtual_chip_constraint.connected_to_chip_coords['y'])
+        connected_chip.router.add_link(to_virtual_chip_link)
+        #return new v chip
+        return Chip(
+            processors=processors, router=router_object, sdram=sdram_object,
+            x=virtual_chip_constraint.virtual_chip_coords['x'],
+            y=virtual_chip_constraint.virtual_chip_coords['y'])
+
+
+
+
