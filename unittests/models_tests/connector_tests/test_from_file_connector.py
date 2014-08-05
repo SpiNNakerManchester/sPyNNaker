@@ -2,7 +2,8 @@
 import unittest
 import spynnaker.pyNN as pyNN
 from pprint import pprint as pp
-pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
+if pyNN._spinnaker is None:
+    pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
 nNeurons = 10
 cell_params_lif = {'cm': 0.25,
                    'i_offset': 0.0,
