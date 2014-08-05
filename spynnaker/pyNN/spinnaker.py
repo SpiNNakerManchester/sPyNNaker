@@ -110,6 +110,7 @@ class Spinnaker(object):
         self._key_allocator_algorithm = None
         self._routing_algorithm = None
         self._report_default_directory = None
+        self.this_run_time_string_repenstation = None
         self._writeTextSpecs = None
 
         #exeuctable params
@@ -123,6 +124,7 @@ class Spinnaker(object):
         self._set_up_executable_specifics()
         self._set_up_recording_specifics()
         self._set_up_report_specifics()
+        self._set_up_output_application_data_specifics()
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -133,6 +135,62 @@ class Spinnaker(object):
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
         self._edge_count = 0
+
+    def _set_up_output_application_data_specifics(self):
+        where_to_write_application_data_files = \
+            conf.config.get("Reports", "defaultApplicationDataFilePath")
+        created_folder = False
+        if where_to_write_application_data_files == "DEFAULT":
+            exceptions_path = \
+                os.path.abspath(exceptions.__file__)
+            directory = \
+                os.path.abspath(os.path.join(exceptions_path,
+                                             os.pardir, os.pardir, os.pardir))
+            #global folder
+            application_generated_data_file_folder = \
+                os.path.join(directory, 'application_generated_data_files')
+            if not os.path.exists(application_generated_data_file_folder):
+                os.makedirs(application_generated_data_file_folder)
+                created_folder = True
+
+            if not created_folder:
+                self._move_report_and_binary_files(
+                    conf.config.getint("Reports",
+                                       "max_application_binaries_kept"),
+                    application_generated_data_file_folder)
+
+            #add time stamped folder for this run
+            this_run_time_folder = \
+                os.path.join(application_generated_data_file_folder, "latest")
+            if not os.path.exists(this_run_time_folder):
+                os.makedirs(this_run_time_folder)
+
+            #store timestamp in latest/time_stamp
+            time_of_run_file_name = os.path.join(this_run_time_folder,
+                                                 "time_stamp")
+            writer = open(time_of_run_file_name, "w")
+            writer.writelines("app_{}_{}"
+                              .format(self._app_id,
+                                      self.this_run_time_string_repenstation))
+            writer.flush()
+            writer.close()
+
+            conf.config.add_section("SpecGeneration")
+            conf.config.set("SpecGeneration", "Binary_folder",
+                            this_run_time_folder)
+        elif where_to_write_application_data_files == "TEMP":
+            pass  # just dont set the config param, code downstairs
+            #  from here will create temp folders if needed
+        else:
+            #add time stamped folder for this run
+            this_run_time_folder = \
+                os.path.join(where_to_write_application_data_files,
+                             self.this_run_time_string_repenstation)
+            if not os.path.exists(this_run_time_folder):
+                os.makedirs(this_run_time_folder)
+            conf.config.add_section("SpecGeneration")
+            conf.config.set("SpecGeneration", "Binary_folder",
+                            this_run_time_folder)
 
     def _set_up_report_specifics(self):
         self._writeTextSpecs = False
@@ -162,7 +220,9 @@ class Spinnaker(object):
 
         #clear and clean out folders considered not useful anymore
         if not created_folder:
-            self._move_report_and_binary_files()
+            self._move_report_and_binary_files(
+                conf.config.getint("Reports", "max_reports_kept"),
+                self._report_default_directory)
 
         #handle timing app folder and cleaning of report folder from last run
         app_folder_name = os.path.join(self._report_default_directory, "latest")
@@ -174,39 +234,37 @@ class Spinnaker(object):
 
         # determine the time slot for later
         this_run_time = datetime.datetime.now()
-        this_run_time_string_repenstation = \
+        self.this_run_time_string_repenstation = \
             str(this_run_time.date()) + "-" + str(this_run_time.hour) + "-" + \
             str(this_run_time.minute) + "-" + str(this_run_time.second)
-        writer.writelines("app_{}_{}".format(self._app_id,
-                                             this_run_time_string_repenstation))
+        writer.writelines("app_{}_{}"
+                          .format(self._app_id,
+                                  self.this_run_time_string_repenstation))
         writer.flush()
         writer.close()
         self._report_default_directory = app_folder_name
 
-    def _move_report_and_binary_files(self):
-        app_folder_name = os.path.join(self._report_default_directory, "latest")
+    @staticmethod
+    def _move_report_and_binary_files(max_to_keep, starting_directory):
+        app_folder_name = os.path.join(starting_directory, "latest")
         app_name_file = os.path.join(app_folder_name, "time_stamp")
         time_stamp_in = open(app_name_file, "r")
         time_stamp_in_string = time_stamp_in.readline()
         time_stamp_in.close()
-        new_app_folder = os.path.join(self._report_default_directory,
-                                      time_stamp_in_string)
+        new_app_folder = os.path.join(starting_directory, time_stamp_in_string)
         os.makedirs(new_app_folder)
         list_of_files = os.listdir(app_folder_name)
         for file_to_move in list_of_files:
             file_path = os.path.join(app_folder_name, file_to_move)
             shutil.move(file_path, new_app_folder)
-        files_in_report_folder = os.listdir(self._report_default_directory)
+        files_in_report_folder = os.listdir(starting_directory)
         # while theres more than the valid max, remove the oldest one
-        while (len(files_in_report_folder) >
-                conf.config.getint("Reports", "max_reports_kept")):
+        while len(files_in_report_folder) > max_to_keep:
             files_in_report_folder.sort(
                 cmp, key=lambda temp_file:
-                os.path.getmtime(os.path.join(self._report_default_directory,
-                                              temp_file)))
+                os.path.getmtime(os.path.join(starting_directory, temp_file)))
             oldest_file = files_in_report_folder[0]
-            shutil.rmtree(
-                os.path.join(self._report_default_directory, oldest_file))
+            shutil.rmtree(os.path.join(starting_directory, oldest_file))
             files_in_report_folder.remove(oldest_file)
 
     def _set_up_recording_specifics(self):

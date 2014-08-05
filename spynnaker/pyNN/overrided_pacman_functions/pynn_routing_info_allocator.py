@@ -11,7 +11,7 @@ class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
     
     def __init__(self, graph_subgraph_mapper):
         BasicRoutingInfoAllocator.__init__(self, graph_subgraph_mapper)
-        self._supported_constrants.append(KeyAllocatorRoutingConstraint)
+        self._supported_constraints.append(KeyAllocatorRoutingConstraint)
 
     #inhirrted from AbstractRoutingInfoAllocatorAlgorithm
     def _allocate_subedge_key_mask(self, out_going_subedge, placement):
