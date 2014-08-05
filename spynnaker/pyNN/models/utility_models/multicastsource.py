@@ -26,7 +26,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
     SYSTEM_REGION = 1
     COMMANDS = 2
 
-    CORE_APP_IDENTIFER = constants.MULTICASE_SOURCE_CORE_APPLICATION_ID
+    CORE_APP_IDENTIFER = constants.MULTICAST_SOURCE_CORE_APPLICATION_ID
 
     def __init__(self):
         """
