@@ -14,7 +14,8 @@ cell_params_lif = {
     'v_rest': -65.0,
     'v_thresh': -50.0
 }
-pyNN.setup(timestep=1, min_delay=1, max_delay=10)
+if pyNN._spinnaker is None:
+    pyNN.setup(timestep=1, min_delay=1, max_delay=10)
 populations.append(pyNN.Population(5, pyNN.IF_curr_exp, cell_params_lif,
                                    label="First normal pop"))
 populations.append(pyNN.Population(10, pyNN.IF_curr_exp, cell_params_lif,
