@@ -51,7 +51,7 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID, 0xAC2)
         self.assertEqual(constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID, 0xAC3)
         self.assertEqual(constants.DELAY_EXTENSION_CORE_APPLICATION_ID, 0xAC4)
-        self.assertEqual(constants.ROBOT_MOTOR_CONTROL_CORE_APPLICATION_ID, 0xAC5)
+        self.assertEqual(constants.MUNICH_MOTOR_CONTROL_CORE_APPLICATION_ID, 0xAC5)
         self.assertEqual(constants.MULTICAST_SOURCE_CORE_APPLICATION_ID, 0xAC6)
         self.assertEqual(constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID, 0xAC7)
         self.assertEqual(constants.IZK_CURRENT_EXP_CORE_APPLICATION_ID, 0xAC8)
