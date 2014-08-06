@@ -39,8 +39,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
-from spynnaker.pyNN import overrided_pacman_functions
-from spynnaker.pyNN.overrided_pacman_functions.subgraph_subedge_pruning import \
+from spynnaker.pyNN import overridden_pacman_functions
+from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning import \
     SubgraphSubedgePruning
 from spynnaker.pyNN import reports
 
@@ -338,7 +338,7 @@ class Spinnaker(object):
                                       "RoutingInfoAllocator")
         #get pynn specific key allocator
         pynn_overloaded_allocator = \
-            conf.get_valid_components(overrided_pacman_functions,
+            conf.get_valid_components(overridden_pacman_functions,
                                       "RoutingInfoAllocator")
         key_allocator_algorithms_list.update(pynn_overloaded_allocator)
 

@@ -7,7 +7,7 @@ from pacman.model.graph.vertex import Vertex
 
 from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper \
     import GraphSubgraphMapper
-from spynnaker.pyNN.overrided_pacman_functions.pynn_routing_info_allocator \
+from spynnaker.pyNN.overridden_pacman_functions.pynn_routing_info_allocator \
     import PyNNRoutingInfoAllocator
 from pacman.model.placements.placement import Placement
 from pacman.model.placements.placements import Placements
