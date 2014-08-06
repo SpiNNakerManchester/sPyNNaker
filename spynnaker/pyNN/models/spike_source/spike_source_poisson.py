@@ -44,7 +44,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         """
         Creates a new SpikeSourcePoisson Object.
         """
-        AbstractSpikeSource.__init__(self, atoms, label, contraints,
+        AbstractSpikeSource.__init__(self, label, atoms, contraints,
                                      max_atoms_per_core=SpikeSourcePoisson.
                                      _model_based_max_atoms_per_core)
         self._rate = rate
