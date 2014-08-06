@@ -129,11 +129,10 @@ class Spinnaker(object):
             self._set_up_pacman_algorthms_listings()
             self._set_up_executable_specifics()
             self._set_up_recording_specifics()
+            self._set_up_report_specifics()
+        self._set_up_output_application_data_specifics()
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
-
-        self._set_up_report_specifics()
-        self._set_up_output_application_data_specifics()
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -184,7 +183,8 @@ class Spinnaker(object):
             writer.flush()
             writer.close()
 
-            conf.config.add_section("SpecGeneration")
+            if not conf.config.has_section("SpecGeneration"):
+                conf.config.add_section("SpecGeneration")
             conf.config.set("SpecGeneration", "Binary_folder",
                             this_run_time_folder)
         elif where_to_write_application_data_files == "TEMP":

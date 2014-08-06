@@ -73,6 +73,9 @@ from spynnaker.pyNN.models.neural_projections.connectors.from_file \
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
     import SmallWorldConnector
 
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
+    import STDPMechanism
+
 #constraints
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
