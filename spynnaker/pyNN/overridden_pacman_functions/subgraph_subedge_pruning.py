@@ -23,7 +23,7 @@ class SubgraphSubedgePruning(object):
         progress_bar = \
             ProgressBar(len(subgraph.subvertices) + len(subgraph.subedges),
                         "on checking which subedges are prunable given "
-                        "heursitics")
+                        "heuristics")
 
         #add the subverts directly, as they wont be pruned.
         for subvert in subgraph.subvertices:
@@ -33,7 +33,7 @@ class SubgraphSubedgePruning(object):
             new_graph_subgraph_mapper.add_subvertex(subvert, associated_vertex)
             progress_bar.update()
 
-        #start checkign though subedges to decide which ones need pruning....
+        #start checking subedges to decide which ones need pruning....
         for subedge in subgraph.subedges:
             if not self._is_prunable(subedge, graph_to_sub_graph_mapper):
                 new_sub_graph.add_subedge(subedge)
