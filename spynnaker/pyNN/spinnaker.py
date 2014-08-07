@@ -583,7 +583,8 @@ class Spinnaker(object):
             no_machine_time_steps=self._no_machine_time_steps,
             report_folder=self._report_default_directory,
             report_states=pacman_report_state, hostname=self._hostname,
-            placer_algorithm=self._placer_algorithm)
+            placer_algorithm=self._placer_algorithm, machine=self._machine,
+            graph=self._graph)
         self._sub_graph, self._graph_subgraph_mapper = \
             partitioner.run(self._graph, self._machine)
 
@@ -902,7 +903,6 @@ class Spinnaker(object):
                             self._create_virtual_chip(virutal_chip_constrant)
                         self._machine.add_chip(virutal_chip)
 
-
     def _create_virtual_chip(self, virtual_chip_constraint):
         sdram_object = SDRAM()
         #creates the two links
@@ -951,7 +951,3 @@ class Spinnaker(object):
             processors=processors, router=router_object, sdram=sdram_object,
             x=virtual_chip_constraint.virtual_chip_coords['x'],
             y=virtual_chip_constraint.virtual_chip_coords['y'])
-
-
-
-
