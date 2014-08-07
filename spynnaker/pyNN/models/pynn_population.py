@@ -57,9 +57,11 @@ class Population(object):
 
         # Create a graph vertex for the population and add it to PACMAN
         cellparams['label'] = label
-        self._vertex = cellclass(size, **cellparams)
-
+        cellparams['n_neurons'] = size
+        self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
+
+        self._spinnaker.add_vertex(self._vertex)
 
         #check if the vertex is a cmd sender, if so store for future
         require_multi_cast_source_constraints = \
@@ -72,14 +74,13 @@ class Population(object):
             if multi_cast_vertex is None:
                 multi_cast_vertex = MultiCastSource()
                 self._spinnaker.add_vertex(multi_cast_vertex)
-            multi_cast_vertex = self._spinnaker.get_multi_cast_source()
+            multi_cast_vertex = self._spinnaker.get_multi_cast_source
             edge = Edge(multi_cast_vertex, self._vertex)
             multi_cast_vertex.add_commands(
                 require_multi_cast_source_constraint.commands, edge)
             self._spinnaker.add_edge(edge)
 
         self._parameters = PyNNParametersSurrogate(self._vertex)
-        self._spinnaker.add_vertex(self._vertex)
 
         #add any dependant edges and verts if needed
         dependant_vertex_constraints = \
@@ -523,17 +524,8 @@ class Population(object):
         onto which its sub-populations will be placed.
         """
         #find all constraints!
-        subclass_list = list()
-        current_subclass_list = AbstractConstraint.__subclasses__()
-        while len(current_subclass_list) != 0:
-            current_class = current_subclass_list[0]
-            #todo make this work so it doesnt just return false all the bloody time!!!!
-            if not inspect.isabstract(current_class):
-                subclass_list.append(current_class)
-            current_subclass_list.remove(current_class)
-            for new_found_class in current_class.__subclasses__():
-                current_subclass_list.append(new_found_class)
-
+        subclass_list =\
+            utility_calls.locate_all_subclasses_of(AbstractConstraint)
         if type(constraint) in subclass_list:
             self._vertex.add_constraint(constraint)
         else:
