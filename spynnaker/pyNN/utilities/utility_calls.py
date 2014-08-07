@@ -8,6 +8,7 @@ import numpy
 import math
 import os
 import logging
+import inspect
 
 
 logger = logging.getLogger(__name__)
@@ -81,3 +82,18 @@ def convert_param_to_numpy(param, no_atoms):
                                                     " of atoms in the vertex ")
         else:
             return numpy.array(param, dtype=float)
+
+
+def locate_all_subclasses_of(class_to_find_subclasses_of):
+    #find all constraints!
+    subclass_list = list()
+    current_subclass_list = class_to_find_subclasses_of.__subclasses__()
+    while len(current_subclass_list) != 0:
+        current_class = current_subclass_list[0]
+        #todo make this work so it doesnt just return false all the bloody time!!!!
+        if not inspect.isabstract(current_class):
+            subclass_list.append(current_class)
+        current_subclass_list.remove(current_class)
+        for new_found_class in current_class.__subclasses__():
+            current_subclass_list.append(new_found_class)
+    return subclass_list

@@ -12,7 +12,7 @@ from pacman.operations.placer import Placer
 from pacman.operations.routing_info_allocator import RoutingInfoAllocator
 from pacman.operations.router import Router
 from pacman.utilities.progress_bar import ProgressBar
-from pacman.utilities import utility_calls
+from pacman.utilities import utility_calls as pacman_utility_calls
 
 
 #spinnmachine imports
@@ -27,6 +27,7 @@ from spinn_machine.chip import Chip
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
+from spynnaker.pyNN.models.utility_models.multicastsource import MultiCastSource
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.report_states import ReportState
 from spynnaker.pyNN.utilities.timer import Timer
@@ -43,6 +44,7 @@ from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning import \
     SubgraphSubedgePruning
 from spynnaker.pyNN import reports
+from spynnaker.pyNN.utilities import utility_calls as spynnaker_utility_calls
 
 #spinnman inports
 from spinnman.transceiver import create_transceiver_from_hostname
@@ -628,14 +630,18 @@ class Spinnaker(object):
         executable_targets = dict()
 
         #create a progress bar for end users
-        progress_bar = ProgressBar(len(self._placements()),
+        progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
 
-        for placement in self._placements():
+        for placement in self._placements.placements:
             associated_vertex =\
-                self._sub_graph.get_vertex_from_subvertex(placement.subvertex)
+                self._graph_subgraph_mapper.\
+                get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
-            if issubclass(associated_vertex, AbstractDataSpecableVertex):
+            subclass_list = \
+                spynnaker_utility_calls.\
+                locate_all_subclasses_of(AbstractDataSpecableVertex)
+            if associated_vertex in subclass_list:
                 associated_vertex.generate_data_spec(
                     placement.x, placement.y, placement.p, placement.subvertex,
                     self._sub_graph, self._routing_infos)
@@ -670,15 +676,17 @@ class Spinnaker(object):
         space_based_memory_tracker = dict()
         processor_to_app_data_base_address = dict()
          #create a progress bar for end users
-        progress_bar = ProgressBar(len(self._placements()),
+        progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on executing data specifications on the "
                                    "host machine")
 
-        for placement in self._placements():
-            associated_vertex =\
-                self._sub_graph.get_vertex_from_subvertex(placement.subvertex)
+        for placement in self._placements.placements:
+            associated_vertex = self._graph_subgraph_mapper.\
+                get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
-            if issubclass(associated_vertex, AbstractDataSpecableVertex):
+            subclass_list = spynnaker_utility_calls.\
+                locate_all_subclasses_of(AbstractDataSpecableVertex)
+            if associated_vertex in subclass_list:
                 data_spec_file_path = \
                     associated_vertex.get_binary_file_name(
                         placement.x, placement.y, placement.p, hostname
@@ -800,6 +808,8 @@ class Spinnaker(object):
         self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
 
     def add_vertex(self, vertex_to_add):
+        if type(vertex_to_add) == type(MultiCastSource()):
+            self._multi_cast_vertex = vertex_to_add
         self._graph.add_vertex(vertex_to_add)
 
     def add_edge(self, edge_to_add):
@@ -843,11 +853,14 @@ class Spinnaker(object):
                                processor_to_app_data_base_address):
         #go through the placements and see if theres any application data to
         # load
-        for placement in placements:
+        for placement in placements.placements:
             associated_vertex = \
                 vertex_to_subvertex_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
-            if isinstance(AbstractDataSpecableVertex, associated_vertex):
+
+            subclass_list = spynnaker_utility_calls.\
+                locate_all_subclasses_of(AbstractDataSpecableVertex)
+            if associated_vertex in subclass_list:
                 key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
                 start_address = \
                     processor_to_app_data_base_address[key]['start_address']
@@ -889,7 +902,7 @@ class Spinnaker(object):
                                                                    subgraph):
         for subvert in subgraph.subvertices:
             virtual_chip_constraints = \
-                utility_calls.locate_constraints_of_type(
+                pacman_utility_calls.locate_constraints_of_type(
                     subvert.constraints,
                     VertexRequiresVirtualChipInMachineConstraint)
             if len(virtual_chip_constraints) > 0:
