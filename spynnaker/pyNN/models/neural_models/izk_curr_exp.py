@@ -33,6 +33,8 @@ class IzhikevichCurrentExponentialPopulation(
             binary="IZK_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=IzhikevichCurrentExponentialPopulation.
             _model_based_max_atoms_per_core)
+        self._executable_constant = \
+            IzhikevichCurrentExponentialPopulation.CORE_APP_IDENTIFIER
 
     @property
     def model_name(self):

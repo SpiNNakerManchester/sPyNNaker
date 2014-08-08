@@ -18,7 +18,7 @@ from data_specification.file_data_writer import FileDataWriter
 class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
                         AbstractPartitionableVertex):
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
-    SYSTEM_REGION = 1
+    SYSTEM_REGION = 0
 
     """
     A Vertex for the Monitoring application spikes and forwarding them to
@@ -41,7 +41,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
         return "AppMonitor"
 
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, sub_graph,
+                           processor_id, subvertex, sub_graph, graph,
                            routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
@@ -64,7 +64,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
         #self.writeRandomDistributionDeclarations(spec, dao)
         # Construct the data images needed for the Neuron:
         self.reserve_memory_regions(spec, setup_sz)
-        self.writeSetupInfo(spec, subvertex)
+        self.write_setup_info(spec, subvertex, graph_sub_graph_mapper)
 
         # End-of-Spec:
         spec.end_specification()
@@ -79,12 +79,12 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        spec.reserveMemRegion(region=self.SYSTEM_REGION,
-                              size=setup_sz,
-                              label='setup')
+        spec.reserve_memory_region(region=self.SYSTEM_REGION,
+                                   size=setup_sz,
+                                   label='setup')
         return
 
-    def write_setup_info(self, spec, subvertex):
+    def write_setup_info(self, spec, subvertex, graph_sub_graph_mapper):
         """
         Write information used to control the simulationand gathering of
         results. Currently, this means the flag word used to signal whether
@@ -105,11 +105,10 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
         self._write_basic_setup_info(spec,
                                      LiveSpikeRecorder.CORE_APP_IDENTIFIER)
         # What recording commands we reset for the parent pynn_population.py
-        recording_info = subvertex.vertex.flags
-        recording_info |= 0xBEEF0000
+        recording_info = 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
-        spec.switchWriteFocus(region=self.SYSTEM_REGION)
-        spec.write(data=recording_info)
+        spec.switch_write_focus(region=self.SYSTEM_REGION)
+        spec.write_value(data=recording_info)
         return
 
     def get_binary_name(self):

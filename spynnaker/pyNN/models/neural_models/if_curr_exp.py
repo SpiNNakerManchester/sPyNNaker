@@ -34,6 +34,8 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             binary="IF_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=
             IFCurrentExponentialPopulation._model_based_max_atoms_per_core)
+        self._executable_constant = \
+            IFCurrentExponentialPopulation.CORE_APP_IDENTIFIER
 
     @property
     def model_name(self):

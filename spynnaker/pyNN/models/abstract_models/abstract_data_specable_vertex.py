@@ -24,15 +24,15 @@ class AbstractDataSpecableVertex(Vertex):
 
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
-            region=constants.POPULATION_BASED_REGIONS.SYSTEM)
+            region=constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_value(data=core_app_identifier)
         spec.write_value(data=self._machine_time_step)
         spec.write_value(data=self._no_machine_time_steps)
 
     @abstractmethod
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, sub_graph, routing_info,
-                           hostname, graph_subgraph_mapper):
+                           processor_id, subvertex, sub_graph, graph,
+                           routing_info, hostname, graph_subgraph_mapper):
         """
         method to determine how to generate their data spec for a non neural
         application
@@ -94,7 +94,7 @@ class AbstractDataSpecableVertex(Vertex):
             binary_folder = config.get("SpecGeneration", "Binary_folder")
 
         binary_file_name = \
-            binary_folder + os.sep + "{%s}_dataSpec_{%d}_{%d}_{%d}.dat"\
+            binary_folder + os.sep + "{}_dataSpec_{}_{}_{}.dat"\
                                      .format(hostname, processor_chip_x,
                                              processor_chip_y,
                                              processor_id)
@@ -112,7 +112,7 @@ class AbstractDataSpecableVertex(Vertex):
             binary_folder = config.get("SpecGeneration", "Binary_folder")
 
         binary_file_name = \
-            binary_folder + os.sep + "{%s}_appData_{%d}_{%d}_{%d}.dat"\
+            binary_folder + os.sep + "{}_appData_{}_{}_{}.dat"\
                                      .format(hostname, processor_chip_x,
                                              processor_chip_y,
                                              processor_id)

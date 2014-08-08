@@ -127,11 +127,12 @@ class SynapticManager(object):
         next_block_start_addr = write_ptr
         return block_start_addr, next_block_start_addr
     
-    def get_exact_synaptic_block_memory_size(self, subvertex):
+    def get_exact_synaptic_block_memory_size(self, subvertex,
+                                             subvertex_in_edges):
         memory_size = 0
         
         # Go through the subedges and add up the memory
-        for subedge in subvertex.in_subedges:
+        for subedge in subvertex_in_edges:
             if (memory_size & 0x3FF) != 0:
                 memory_size = (memory_size & 0xFFFFFC00) + 0x400
             

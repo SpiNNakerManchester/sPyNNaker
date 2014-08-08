@@ -73,42 +73,44 @@ class AbstractPopulationDataSpec(SynapticManager,
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        spec.reserve_memory_region(region=self.POPULATION_BASED_REGIONS.SYSTEM,
-                                   size=setup_sz, label='setup')
         spec.reserve_memory_region(
-            region=self.POPULATION_BASED_REGIONS.NEURON_PARAMS,
+            region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
+            size=setup_sz, label='setup')
+        spec.reserve_memory_region(
+            region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
             size=neuron_params_sz, label='NeuronParams')
         spec.reserve_memory_region(
-            region=self.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS,
+            region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=synapse_params_sz, label='SynapseParams')
         spec.reserve_memory_region(
-            region=self.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION,
+            region=constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value,
             size=row_len_trans_sz, label='RowLenTable')
         spec.reserve_memory_region(
-            region=self.POPULATION_BASED_REGIONS.MASTER_POP_TABLE,
+            region=constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             size=master_pop_table_sz, label='MasterPopTable')
         spec.reserve_memory_region(
-            region=self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX,
+            region=constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             size=all_syn_block_sz, label='SynBlocks')
 
         if self._record:
             spec.reserve_memory_region(
-                region=self.POPULATION_BASED_REGIONS.SPIKE_HISTORY,
+                region=constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
-                leaveUnfilled=True)
+                empty=True)
         if self._record_v:
             spec.reserve_memory_region(
-                region=self.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY,
+                region=
+                constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
                 size=potential_hist_buff_sz, label='potHistBuffer',
-                leaveUnfilled=True)
+                empty=True)
         if self._record_gsyn:
             spec.reserve_memory_region(
-                region=self.POPULATION_BASED_REGIONS.GSYN_HISTORY,
+                region=constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
                 size=gsyn_hist_buff_sz, label='gsynHistBuffer',
-                leaveUnfilled=True)
+                empty=True)
         if stdp_params_sz != 0:
             spec.reserve_memory_region(
-                region=self.POPULATION_BASED_REGIONS.STDP_PARAMS,
+                region=constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value,
                 size=stdp_params_sz, label='stdpParams')
 
     def write_setup_info(self, spec, spike_history_region_sz,
@@ -142,7 +144,8 @@ class AbstractPopulationDataSpec(SynapticManager,
         recording_info |= 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(region=self.POPULATION_BASED_REGIONS.SYSTEM)
+        spec.switch_write_focus(
+            region=constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_value(data=executable_constant)
         spec.write_value(data=self._machine_time_step)
         spec.write_value(data=recording_info)
@@ -153,12 +156,12 @@ class AbstractPopulationDataSpec(SynapticManager,
     def write_neuron_parameters(
             self, spec, processor_chip_x, processor_chip_y, processor_id,
             subvertex, ring_buffer_to_input_left_shift):
-        spec.comment("\nWriting Neuron Parameters for {%d} "
+        spec.comment("\nWriting Neuron Parameters for {} "
                      "Neurons:\n".format(subvertex.n_atoms))
 
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
-            region=self.POPULATION_BASED_REGIONS.NEURON_PARAMS)
+            region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write header info to the memory region:
         # Write Key info for this core:
@@ -206,7 +209,7 @@ class AbstractPopulationDataSpec(SynapticManager,
         # End the loop over the neurons:
 
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, subgraph,
+                           processor_id, subvertex, subgraph, graph,
                            routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to
@@ -220,7 +223,7 @@ class AbstractPopulationDataSpec(SynapticManager,
 
         spec = DataSpecificationGenerator(data_writer)
 
-        spec.comment("\n*** Spec for block of {%s} neurons ***\n"
+        spec.comment("\n*** Spec for block of {} neurons ***\n"
                      .format(self.model_name))
 
         # Calculate the size of the tables to be reserved in SDRAM:
@@ -228,19 +231,26 @@ class AbstractPopulationDataSpec(SynapticManager,
                                                        subvertex.hi_atom)
         synapse_params_sz = self.get_synapse_parameter_size(subvertex.lo_atom,
                                                             subvertex.hi_atom)
-        all_syn_block_sz = self.get_exact_synaptic_block_memory_size(subvertex)
+
+        subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        all_syn_block_sz = \
+            self.get_exact_synaptic_block_memory_size(subvertex,
+                                                      subvert_in_edges)
+
         spike_hist_buff_sz = self.get_spike_buffer_size(subvertex.lo_atom,
                                                         subvertex.hi_atom)
         potential_hist_buff_sz = self.get_v_buffer_size(subvertex.lo_atom,
                                                         subvertex.hi_atom)
         gsyn_hist_buff_sz = self.get_g_syn_buffer_size(subvertex.lo_atom,
                                                        subvertex.hi_atom)
+        vertex_in_edges = graph.incoming_edges_to_vertex(self)
         stdp_region_sz = self.get_stdp_parameter_size(subvertex.lo_atom,
                                                       subvertex.hi_atom,
-                                                      self.in_edges)
+                                                      vertex_in_edges)
 
         # Declare random number generators and distributions:
-        self.write_random_distribution_declarations(spec)
+        #TODO add random distrubtion stuff
+        #self.write_random_distribution_declarations(spec)
 
         # Construct the data images needed for the Neuron:
         self.reserve_population_based_memory_regions(

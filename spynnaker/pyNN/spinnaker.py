@@ -44,7 +44,6 @@ from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning import \
     SubgraphSubedgePruning
 from spynnaker.pyNN import reports
-from spynnaker.pyNN.utilities import utility_calls as spynnaker_utility_calls
 
 #spinnman inports
 from spinnman.transceiver import create_transceiver_from_hostname
@@ -320,6 +319,16 @@ class Spinnaker(object):
         self._do_run = True
         if conf.config.has_option("Execute", "run"):
             self._do_run = conf.config.getboolean("Execute", "run")
+
+        #sort out the executable folder location
+        binary_path = os.path.abspath(exceptions.__file__)
+        binary_path = os.path.abspath(os.path.join(binary_path,
+                                      os.pardir, os.pardir, os.pardir))
+        binary_path = os.path.join(binary_path, "executable_binaries")
+
+        if not conf.config.has_section("SpecGeneration"):
+            conf.config.add_section("SpecGeneration")
+        conf.config.set("SpecGeneration", "common_binary_folder", binary_path)
 
     def _set_up_pacman_algorthms_listings(self):
          #algorithum lists
@@ -640,10 +649,11 @@ class Spinnaker(object):
             subclass_list = \
                 pacman_utility_calls.\
                 locate_all_subclasses_of(AbstractDataSpecableVertex)
-            if associated_vertex in subclass_list:
+            if type(associated_vertex) in subclass_list:
                 associated_vertex.generate_data_spec(
                     placement.x, placement.y, placement.p, placement.subvertex,
-                    self._sub_graph, self._routing_infos)
+                    self._sub_graph, self._graph, self._routing_infos,
+                    self._hostname, self._graph_subgraph_mapper)
 
                 binary_name = associated_vertex.get_binary_name()
                 if binary_name in executable_targets.keys():
@@ -651,10 +661,12 @@ class Spinnaker(object):
                                                                   placement.y,
                                                                   placement.p)
                 else:
+                    processors = [placement.p]
                     initial_core_subset = CoreSubset(placement.x, placement.y,
-                                                     placement.p)
+                                                     processors)
+                    list_of_core_subsets = [initial_core_subset]
                     executable_targets[binary_name] = \
-                        CoreSubsets(initial_core_subset)
+                        CoreSubsets(list_of_core_subsets)
             #update the progress bar
             progress_bar.update()
         #finish the progress bar

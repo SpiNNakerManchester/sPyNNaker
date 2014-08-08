@@ -82,7 +82,7 @@ class ProjectionEdge(Edge):
         if spinnaker == None, then just return the one stored in memory via
          self._synapse_list
         """
-        logger.info("Reading synapse data for edge between {} and {}"
+        logger.debug("Reading synapse data for edge between {} and {}"
                     .format(self._pre_vertex.label, self._post_vertex.label))
 
         #if theres no spinnaker, assume your looking at the internal one here.

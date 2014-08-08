@@ -39,6 +39,8 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
             max_atoms_per_core=
             IFConductanceExponentialPopulation._model_based_max_atoms_per_core,
             binary="IF_cond_exp.aplx", constraints=constraints)
+        self._executable_constant = \
+            IFConductanceExponentialPopulation.CORE_APP_IDENTIFIER
 
     @property
     def model_name(self):
