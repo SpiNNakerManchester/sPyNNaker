@@ -88,7 +88,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         spec.end_specification()
         data_writer.close()
 
-    def calculate_memory_requirements(self):
+    def _calculate_memory_requirements(self):
         #sorts commands by timer tic
         commands = sorted(self._commands, key=lambda tup: tup['t'])
         #calculate size of region and the order of writes
@@ -254,6 +254,8 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         return 0
 
     def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+        if self._memory_requirements is None:
+            self._calculate_memory_requirements()
         return self._memory_requirements
 
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
