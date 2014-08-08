@@ -275,15 +275,16 @@ class AbstractPopulationDataSpec(SynapticManager,
 
         self.write_stdp_parameters(
             spec, subvertex, weight_scale, self._machine_time_step,
-            self.POPULATION_BASED_REGIONS.STDP_PARAMS)
+            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value)
 
         self.write_row_length_translation_table(
-            spec, self.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION)
+            spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)
 
         self.write_synaptic_matrix_and_master_population_table(
             spec, subvertex, all_syn_block_sz, weight_scale,
-            self.POPULATION_BASED_REGIONS.MASTER_POP_TABLE,
-            self.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX, routing_info)
+            constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
+            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            routing_info)
 
         for subedge in subvertex.in_subedges:
             subedge.free_sublist()
