@@ -201,9 +201,6 @@ class AbstractPopulationDataSpec(SynapticManager,
                         value = value[0]
 
                 datatype = param.get_dataspec_datatype()
-                scale = param.get_scale()
-
-                value = value * scale
 
                 spec.write_value(data=value, data_type=datatype)
         # End the loop over the neurons:

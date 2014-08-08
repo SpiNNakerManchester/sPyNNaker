@@ -10,12 +10,14 @@ class AbstractDualExponentialVertex(object):
     one for excitatory connections and one for inhibitory connections
     """
     # noinspection PyPep8Naming
-    def __init__(self, n_neurons, tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0):
+    def __init__(self, n_neurons, machine_time_step, tau_syn_E=5.0,
+                 tau_syn_E2=5.0, tau_syn_I=5.0):
 
         # Instantiate the parent class
         self._tau_syn_E = tau_syn_E
         self._tau_syn_E2 = tau_syn_E2
         self._tau_syn_I = tau_syn_I
+        self._machine_time_step = machine_time_step
         self._atoms = n_neurons
 
     @staticmethod
@@ -54,7 +56,7 @@ class AbstractDualExponentialVertex(object):
         """
         return NUM_SYNAPSE_PARAMS * 4 * ((hi_atom - lo_atom) + 1)
 
-    def write_synapse_parameters(self, spec, machine_time_step, subvertex):
+    def write_synapse_parameters(self, spec, subvertex):
         """
         Write vectors of synapse parameters, one per neuron
         There is one parameter for each synapse, which is the decay constant for
@@ -70,11 +72,11 @@ class AbstractDualExponentialVertex(object):
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS)
         spec.comment("\nWriting Synapse Parameters for {%d} Neurons:\n"
                      .format(self._atoms))
-        decay_ex = math.exp(-float(machine_time_step)
+        decay_ex = math.exp(-float(self._machine_time_step)
                             / (1000.0 * float(self._tau_syn_E)))
-        decay_ex2 = math.exp(-float(machine_time_step)
+        decay_ex2 = math.exp(-float(self._machine_time_step)
                              / (1000.0 * float(self._tau_syn_E2)))
-        decay_in = math.exp(-float(machine_time_step)
+        decay_in = math.exp(-float(self._machine_time_step)
                             / (1000.0 * float(self._tau_syn_I)))
 
         rescaled_decay_ex = int(decay_ex * pow(2, 32))

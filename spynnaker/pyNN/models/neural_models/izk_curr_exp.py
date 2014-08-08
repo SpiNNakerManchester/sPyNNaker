@@ -17,14 +17,14 @@ class IzhikevichCurrentExponentialPopulation(
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
-    def __init__(self, n_neurons, constraints=None, label=None, a=0.02, c=-65.0,
-                 b=0.2, d=2.0, i_offset=0, u_init=-14.0, v_init=-70.0,
-                 tau_syn_E=5.0, tau_syn_I=5.0):
+    def __init__(self, n_neurons, machine_time_step, constraints=None,
+                 label=None, a=0.02, c=-65.0, b=0.2, d=2.0, i_offset=0,
+                 u_init=-14.0, v_init=-70.0, tau_syn_E=5.0, tau_syn_I=5.0):
 
         # Instantiate the parent classes
-        AbstractExponentialPopulationVertex.__init__(self, n_neurons=n_neurons,
-                                                     tau_syn_e=tau_syn_E,
-                                                     tau_syn_i=tau_syn_I)
+        AbstractExponentialPopulationVertex.__init__(
+            self, n_neurons=n_neurons, tau_syn_e=tau_syn_E,
+            tau_syn_i=tau_syn_I, machine_time_step=machine_time_step)
         AbstractIzhikevichVertex.__init__(self, n_neurons, a=a, c=c, b=b, d=d,
                                           i_offset=i_offset, u_init=u_init,
                                           v_init=v_init)

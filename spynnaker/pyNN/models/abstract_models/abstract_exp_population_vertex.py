@@ -22,12 +22,14 @@ class AbstractExponentialPopulationVertex(object):
     one for excitatory connections and one for inhibitory connections
     """
     
-    def __init__(self, n_neurons, tau_syn_e=5.0, tau_syn_i=5.0):
+    def __init__(self, n_neurons, machine_time_step,
+                 tau_syn_e=5.0, tau_syn_i=5.0):
 
         self._tau_syn_e = utility_calls.convert_param_to_numpy(tau_syn_e,
                                                                n_neurons)
         self._tau_syn_i = utility_calls.convert_param_to_numpy(tau_syn_i,
                                                                n_neurons)
+        self._machine_time_step = machine_time_step
 
     @staticmethod
     def get_synapse_parameter_size(lo_atom, hi_atom):
@@ -36,7 +38,7 @@ class AbstractExponentialPopulationVertex(object):
         """
         return NUM_SYNAPSE_PARAMS * 4 * ((hi_atom - lo_atom) + 1)
         
-    def write_synapse_parameters(self, spec, machine_time_step, subvertex):
+    def write_synapse_parameters(self, spec, subvertex):
         """
         Write vectors of synapse parameters, one per neuron
         There is one parameter for each synapse, which is the decay constant for
@@ -48,16 +50,17 @@ class AbstractExponentialPopulationVertex(object):
         """
         
         # Set the focus to the memory region 3 (synapse parameters):
-        spec.switchWriteFocus(region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS)
+        spec.switch_write_focus(
+            region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
         spec.comment("\nWriting Synapse Parameters for "
                      "{} Neurons:\n".format(subvertex.n_atoms))
         
-        decay_ex = numpy.exp(float(-machine_time_step) /
+        decay_ex = numpy.exp(float(-self._machine_time_step) /
                              (1000.0 * self._tau_syn_e))
         
         init_ex = self._tau_syn_e * (1.0 - decay_ex)
 
-        decay_in = numpy.exp(float(-machine_time_step) /
+        decay_in = numpy.exp(float(-self._machine_time_step) /
                              (1000.0 * self._tau_syn_i))
         
         init_in = self._tau_syn_i * (1.0 - decay_in)
@@ -82,23 +85,23 @@ class AbstractExponentialPopulationVertex(object):
         for atom in range(0, subvertex.n_atoms):
             # noinspection PyTypeChecker
             if len(rescaled_decay_ex) > 1:
-                spec.write(data=rescaled_decay_ex[atom])
+                spec.write_value(data=rescaled_decay_ex[atom])
             else:
-                spec.write(data=rescaled_decay_ex[0])
+                spec.write_value(data=rescaled_decay_ex[0])
             # noinspection PyTypeChecker
             if len(rescaled_init_ex) > 1:
-                spec.write(data=rescaled_init_ex[atom])
+                spec.write_value(data=rescaled_init_ex[atom])
             else:
-                spec.write(data=rescaled_init_ex[0])
+                spec.write_value(data=rescaled_init_ex[0])
         
         for atom in range(0, subvertex.n_atoms):
             # noinspection PyTypeChecker
             if len(rescaled_decay_in) > 1:
-                spec.write(data=rescaled_decay_in[atom])
+                spec.write_value(data=rescaled_decay_in[atom])
             else:
-                spec.write(data=rescaled_decay_in[0])
+                spec.write_value(data=rescaled_decay_in[0])
             # noinspection PyTypeChecker
             if len(rescaled_init_in) > 1:
-                spec.write(data=rescaled_init_in[atom])
+                spec.write_value(data=rescaled_init_in[atom])
             else:
-                spec.write(data=rescaled_init_in[0])
+                spec.write_value(data=rescaled_init_in[0])

@@ -58,6 +58,7 @@ class Population(object):
         # Create a graph vertex for the population and add it to PACMAN
         cellparams['label'] = label
         cellparams['n_neurons'] = size
+        cellparams['machine_time_step'] = spinnaker.machine_time_step
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
 
