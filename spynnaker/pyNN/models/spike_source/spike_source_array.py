@@ -23,12 +23,12 @@ class SpikeSourceArray(AbstractSpikeSource):
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
     
-    def __init__(self, atoms, spike_times, constraints=None,
+    def __init__(self, n_neurons, spike_times, constraints=None,
                  label="SpikeSourceArray"):
         """
         Creates a new SpikeSourceArray Object.
         """
-        AbstractSpikeSource.__init__(self, label=label, n_neurons=atoms,
+        AbstractSpikeSource.__init__(self, label=label, n_neurons=n_neurons,
                                      constraints=constraints,
                                      max_atoms_per_core=SpikeSourceArray.
                                      _model_based_max_atoms_per_core)

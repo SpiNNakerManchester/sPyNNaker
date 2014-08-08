@@ -6,7 +6,7 @@ import os, time
 class TestUtilityCalls(unittest.TestCase):
     def test_check_directory_exists(self):
         time.sleep(1)
-        utility_calls.check_directory_exists(os.path.dirname(
+        utility_calls.check_directory_exists_and_create_if_not(os.path.dirname(
             os.path.realpath(__file__)))
         self.assertTrue(os.path.exists(os.path.dirname(
             os.path.realpath(__file__))))
@@ -21,7 +21,7 @@ class TestUtilityCalls(unittest.TestCase):
             os.rmdir(test_file)
             print "File existed. Deleting..."
 
-        utility_calls.check_directory_exists(test_file)
+        utility_calls.check_directory_exists_and_create_if_not(test_file)
 
         if os.path.exists(test_file):
             os.rmdir(test_file)
