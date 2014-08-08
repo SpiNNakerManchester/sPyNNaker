@@ -578,6 +578,8 @@ class Spinnaker(object):
         pacman_report_state = \
             self._reports_states.generate_pacman_report_states()
 
+        self._check_if_theres_any_pre_placement_constraints_to_satisify()
+        
         #execute partitioner
         partitioner = Partitioner(
             partition_algorithm=self._partitioner_algorithm,
@@ -589,9 +591,6 @@ class Spinnaker(object):
             graph=self._graph)
         self._sub_graph, self._graph_subgraph_mapper = \
             partitioner.run(self._graph, self._machine)
-
-        self._check_if_theres_any_pre_placement_constraints_to_satisify(
-            self._sub_graph)
 
         #execute placer
         placer = Placer(
@@ -639,7 +638,7 @@ class Spinnaker(object):
                 get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
             subclass_list = \
-                spynnaker_utility_calls.\
+                pacman_utility_calls.\
                 locate_all_subclasses_of(AbstractDataSpecableVertex)
             if associated_vertex in subclass_list:
                 associated_vertex.generate_data_spec(
@@ -684,7 +683,7 @@ class Spinnaker(object):
             associated_vertex = self._graph_subgraph_mapper.\
                 get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
-            subclass_list = spynnaker_utility_calls.\
+            subclass_list = pacman_utility_calls.\
                 locate_all_subclasses_of(AbstractDataSpecableVertex)
             if associated_vertex in subclass_list:
                 data_spec_file_path = \
@@ -744,8 +743,9 @@ class Spinnaker(object):
         self._visualiser.start()
 
     def stop(self):
-        self._txrx.send_signal(self, self._app_id, SCPSignal.STOP)
-        self._visualiser.stop()
+        self._txrx.send_signal(self._app_id, SCPSignal.STOP)
+        if conf.config.getboolean("Visualiser", "enable"):
+            self._visualiser.stop()
 
     def _start_execution_on_machine(self, executable_targets):
         #deduce how many processors this application uses up
@@ -764,7 +764,7 @@ class Spinnaker(object):
 
         # if correct, start applications
         logger.info("Starting application")
-        self._txrx.send_signal(self._app_id, SCPSignal.SIGNAL_SYNC0)
+        self._txrx.send_signal(self._app_id, SCPSignal.SYNC0)
 
         #check all apps have gone into run state
         logger.info("Checking that the application has started")
@@ -858,7 +858,7 @@ class Spinnaker(object):
                 vertex_to_subvertex_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
 
-            subclass_list = spynnaker_utility_calls.\
+            subclass_list = pacman_utility_calls.\
                 locate_all_subclasses_of(AbstractDataSpecableVertex)
             if associated_vertex in subclass_list:
                 key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
@@ -898,12 +898,11 @@ class Spinnaker(object):
             self._txrx.execute_flood(core_subset, file_reader, self._app_id,
                                      size)
 
-    def _check_if_theres_any_pre_placement_constraints_to_satisify(self,
-                                                                   subgraph):
-        for subvert in subgraph.subvertices:
+    def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
+        for vertex in self._graph.vertices:
             virtual_chip_constraints = \
                 pacman_utility_calls.locate_constraints_of_type(
-                    subvert.constraints,
+                    vertex.constraints,
                     VertexRequiresVirtualChipInMachineConstraint)
             if len(virtual_chip_constraints) > 0:
                 for virutal_chip_constrant in virtual_chip_constraints:
@@ -942,7 +941,7 @@ class Spinnaker(object):
             source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
 
         #create the router
-        links = list().append(from_virtual_chip_link)
+        links = [from_virtual_chip_link]
         router_object = MachineRouter(
             links=links, emergency_routing_enabled=False,
             clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
@@ -963,4 +962,4 @@ class Spinnaker(object):
         return Chip(
             processors=processors, router=router_object, sdram=sdram_object,
             x=virtual_chip_constraint.virtual_chip_coords['x'],
-            y=virtual_chip_constraint.virtual_chip_coords['y'])
+            y=virtual_chip_constraint.virtual_chip_coords['y'], virtual=True)

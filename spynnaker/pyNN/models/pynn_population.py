@@ -1,8 +1,11 @@
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
-from pacman.model.constraints.vertex_requires_multi_cast_source_constraint import \
-    VertexRequiresMultiCastSourceConstraint
+from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
+    import VertexRequiresMultiCastSourceConstraint
+from pacman.model.graph.edge import Edge
+from pacman.utilities import utility_calls as pacman_utility_calls
+
 from spynnaker.pyNN.models.utility_models.multicastsource \
     import MultiCastSource
 from spynnaker.pyNN.utilities.parameters_surrogate\
@@ -15,11 +18,8 @@ from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
 
 from visualiser import visualiser_constants
 
-from pacman.model.graph.edge import Edge
-from pacman.utilities import utility_calls as pacman_utility_calls
 
 import logging
-import inspect
 logger = logging.getLogger(__name__)
 
 
@@ -525,7 +525,7 @@ class Population(object):
         """
         #find all constraints!
         subclass_list =\
-            utility_calls.locate_all_subclasses_of(AbstractConstraint)
+            pacman_utility_calls.locate_all_subclasses_of(AbstractConstraint)
         if type(constraint) in subclass_list:
             self._vertex.add_constraint(constraint)
         else:
