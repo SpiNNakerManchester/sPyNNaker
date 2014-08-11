@@ -54,6 +54,7 @@ from spinnman.data.file_data_reader import FileDataReader \
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 from spinnman.model.cpu_state import CPUState
+from spinnman import reports as spinnman_reports
 
 
 #data spec import
@@ -70,6 +71,8 @@ import os
 import sys
 import datetime
 import shutil
+import pickle
+import ntpath
 
 logger = logging.getLogger(__name__)
 
@@ -322,9 +325,8 @@ class Spinnaker(object):
 
         #sort out the executable folder location
         binary_path = os.path.abspath(exceptions.__file__)
-        binary_path = os.path.abspath(os.path.join(binary_path,
-                                      os.pardir, os.pardir, os.pardir))
-        binary_path = os.path.join(binary_path, "executable_binaries")
+        binary_path = os.path.abspath(os.path.join(binary_path, os.pardir))
+        binary_path = os.path.join(binary_path, "model_binaries")
 
         if not conf.config.has_section("SpecGeneration"):
             conf.config.add_section("SpecGeneration")
@@ -509,6 +511,7 @@ class Spinnaker(object):
         if conf.config.getboolean("Execute", "run_simulation"):
             if do_timing:
                 timer.start_timing()
+
             if self._do_load is True:
                 logger.info("*** Loading data ***")
                 self._load_application_data(self._placements,
@@ -655,7 +658,7 @@ class Spinnaker(object):
                     self._sub_graph, self._graph, self._routing_infos,
                     self._hostname, self._graph_subgraph_mapper)
 
-                binary_name = associated_vertex.get_binary_name()
+                binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():
                     executable_targets[binary_name].add_processor(placement.x,
                                                                   placement.y,
@@ -699,7 +702,7 @@ class Spinnaker(object):
                 locate_all_subclasses_of(AbstractDataSpecableVertex)
             if associated_vertex in subclass_list:
                 data_spec_file_path = \
-                    associated_vertex.get_binary_file_name(
+                    associated_vertex.get_data_spec_file_name(
                         placement.x, placement.y, placement.p, hostname
                     )
                 app_data_file_path = \
@@ -762,8 +765,10 @@ class Spinnaker(object):
     def _start_execution_on_machine(self, executable_targets):
         #deduce how many processors this application uses up
         total_processors = 0
-        for executable_target in executable_targets:
-            for _ in executable_target:
+        executable_keys = executable_targets.keys()
+        for executable_target in executable_keys:
+            core_subset = executable_targets[executable_target]
+            for core in core_subset:
                 total_processors += 1
 
         #check that the right number of processors are in sync0
@@ -772,7 +777,8 @@ class Spinnaker(object):
 
         if processors_ready != total_processors:
             raise exceptions.ExecutableFailedToStartException(
-                "Only {} processors out of {} have sucessfully reached sync0")
+                "Only {} processors out of {} have sucessfully reached sync0"
+                .format(processors_ready, total_processors))
 
         # if correct, start applications
         logger.info("Starting application")
@@ -794,7 +800,8 @@ class Spinnaker(object):
             processors_not_finished = processors_ready
             while processors_not_finished != 0:
                 processors_not_finished = \
-                    self._txrx.send_signal(self._app_id, CPUState.RUNNING)
+                    self._txrx.get_core_state_count(self._app_id,
+                                                    CPUState.RUNNING)
                 processors_rte = \
                     self._txrx.get_core_state_count(self._app_id,
                                                     CPUState.RUN_TIME_EXCEPTION)
@@ -815,6 +822,8 @@ class Spinnaker(object):
             logger.info("Application has run to completion")
         else:
             logger.info("Application is set to run forever - PACMAN is exiting")
+
+
 
     def _set_tag_output(self, tag, port, hostname):
         self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
@@ -863,6 +872,13 @@ class Spinnaker(object):
 
     def _load_application_data(self, placements, vertex_to_subvertex_mapper,
                                processor_to_app_data_base_address):
+
+        #if doing reload, start script
+        if self._reports_states.transciever_report:
+            spinnman_reports.start_transceiver_rerun_script(
+                conf.config.get("SpecGeneration", "Binary_folder"),
+                self._hostname)
+
         #go through the placements and see if theres any application data to
         # load
         for placement in placements.placements:
@@ -887,6 +903,23 @@ class Spinnaker(object):
                                         application_data_file_reader,
                                         memory_used)
 
+                #add lines to rerun_script if requested
+                if self._reports_states.transciever_report:
+                    lines = list()
+                    lines.append("application_data_file_reader = "
+                                 "SpinnmanFileDataReader({})"
+                                 .format(ntpath.basename(
+                                 file_path_for_application_data)))
+
+                    lines.append("self._txrx.write_memory({}, {}, {}, "
+                                 "application_data_file_reader, {})"
+                                 .format(
+                                 placement.x, placement.y, start_address,
+                                 memory_used))
+                    spinnman_reports.append_to_rerun_script(
+                        conf.config.get("SpecGeneration", "Binary_folder"),
+                        lines)
+
     def _load_executable_images(self, executable_targets):
         """
         go through the exeuctable targets and load each binary to everywhere and
@@ -909,6 +942,23 @@ class Spinnaker(object):
 
             self._txrx.execute_flood(core_subset, file_reader, self._app_id,
                                      size)
+
+            if self._reports_states.transciever_report:
+                pickled_point = os.path.join(conf.config.get("SpecGeneration",
+                                             "Binary_folder"),
+                                             "picked_executables_mappings")
+                pickle.dump(executable_targets, open(pickled_point, 'wb'))
+                lines = list()
+
+                lines.append("executable_targets = pickle.load(open( \"{}\", "
+                             "\"rb\"))".format(ntpath.basename(pickled_point)))
+                lines.append("core_subset = executable_targets[{}]"
+                             .format(exectuable_target_key))
+                lines.append("file_reader = SpinnmanFileDataReader({})"
+                             .format(exectuable_target_key))
+                lines.append("self._txrx.execute_flood(core_subset, file_reader"
+                             ", {}, {}".format(self._app_id, size))
+
 
     def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
         for vertex in self._graph.vertices:
