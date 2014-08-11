@@ -1,6 +1,7 @@
 import unittest
 from spynnaker.pyNN.models.neural_models.if_cond_exp import IFConductanceExponentialPopulation
 
+
 class TestIFCurrExpModel(unittest.TestCase):
 
     def test_new_if_cond_exp_model(self):
@@ -33,9 +34,8 @@ class TestIFCurrExpModel(unittest.TestCase):
         }
         nNeurons = 10
         if_cond_exp = IFConductanceExponentialPopulation(
-            nNeurons)
+            nNeurons, 1000)
         self.assertEqual(if_cond_exp.model_name,"IF_cond_exp")
-        if_cond_exp.set_machine_time_step(1)
         self.assertEqual(len(if_cond_exp.get_parameters()),12)
         self.assertEqual(if_cond_exp._v_thresh,cell_params_lif['v_thresh'])
         self.assertEqual(if_cond_exp._v_reset,[cell_params_lif['v_reset']])
