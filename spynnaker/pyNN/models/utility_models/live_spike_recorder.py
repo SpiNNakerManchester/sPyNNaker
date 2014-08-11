@@ -25,13 +25,14 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
     the host
 
     """
-    def __init__(self):
+    def __init__(self, machine_time_step):
         """
         Creates a new AppMonitor Object.
         """
         AbstractRecordableVertex.__init__(self, "Monitor")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
-                                            label="Monitor")
+                                            label="Monitor",
+                                            machine_time_step=machine_time_step)
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
                                              max_atoms_per_core=1)
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
