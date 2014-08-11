@@ -536,11 +536,17 @@ class Spinnaker(object):
         if has_board:
             if self._reports_states is None:
                 self._txrx = create_transceiver_from_hostname(
-                    hostname=self._hostname, generate_reports=False)
+                    hostname=self._hostname, generate_reports=False,
+                    discover=False)
             else:
                 self._txrx = create_transceiver_from_hostname(
                     hostname=self._hostname, generate_reports=True,
-                    default_report_directory=self._report_default_directory)
+                    default_report_directory=self._report_default_directory,
+                    discover=False)
+            #do autoboot if possible
+            self._txrx.ensure_board_is_ready(int(conf.config.get("Machine",
+                                                                 "version")))
+            self._txrx.discover_connections()
         self._machine = self._txrx.get_machine_details()
 
         if requires_visualiser:
@@ -766,7 +772,7 @@ class Spinnaker(object):
         executable_keys = executable_targets.keys()
         for executable_target in executable_keys:
             core_subset = executable_targets[executable_target]
-            for core in core_subset:
+            for _ in core_subset:
                 total_processors += 1
 
         #check that the right number of processors are in sync0
@@ -821,6 +827,17 @@ class Spinnaker(object):
         else:
             logger.info("Application is set to run forever - PACMAN is exiting")
 
+        if self._reports_states.transciever_report:
+            commands = list()
+            commands.append("txrx.get_core_state_count({}, CPUState.SYNC0)"
+                            .format(self._app_id))
+            commands.append("txrx.send_signal({}, SCPSignal.SYNC0"
+                            .format(self._app_id))
+            spinnman_reports.append_to_rerun_script(
+                conf.config.get("SpecGeneration", "Binary_folder"),
+                commands)
+
+
 
 
     def _set_tag_output(self, tag, port, hostname):
@@ -856,7 +873,8 @@ class Spinnaker(object):
     def add_edge_to_recorder_vertex(self, vertex_to_record_from):
         #check to see if it needs to be created in the frist place
         if self._live_spike_recorder is None:
-            self._live_spike_recorder = LiveSpikeRecorder()
+            self._live_spike_recorder = \
+                LiveSpikeRecorder(self.machine_time_step)
             self.add_vertex(self._live_spike_recorder)
         #create the edge and add
         edge = Edge(vertex_to_record_from, self._live_spike_recorder,
@@ -905,11 +923,11 @@ class Spinnaker(object):
                 if self._reports_states.transciever_report:
                     lines = list()
                     lines.append("application_data_file_reader = "
-                                 "SpinnmanFileDataReader({})"
+                                 "SpinnmanFileDataReader(\"{}\")"
                                  .format(ntpath.basename(
                                  file_path_for_application_data)))
 
-                    lines.append("self._txrx.write_memory({}, {}, {}, "
+                    lines.append("txrx.write_memory({}, {}, {}, "
                                  "application_data_file_reader, {})"
                                  .format(
                                  placement.x, placement.y, start_address,
@@ -923,6 +941,18 @@ class Spinnaker(object):
         go through the exeuctable targets and load each binary to everywhere and
         then set each given core to sync0 that require it
         """
+        if self._reports_states.transciever_report:
+            pickled_point = os.path.join(conf.config.get("SpecGeneration",
+                                                         "Binary_folder"),
+                                         "picked_executables_mappings")
+            pickle.dump(executable_targets, open(pickled_point, 'wb'))
+            lines = list()
+            lines.append("executable_targets = pickle.load(open(\"{}\", "
+                         "\"rb\"))".format(ntpath.basename(pickled_point)))
+            spinnman_reports.append_to_rerun_script(conf.config.get(
+                "SpecGeneration", "Binary_folder"), lines)
+
+
         for exectuable_target_key in executable_targets.keys():
             file_reader = SpinnmanFileDataReader(exectuable_target_key)
             core_subset = executable_targets[exectuable_target_key]
@@ -942,21 +972,15 @@ class Spinnaker(object):
                                      size)
 
             if self._reports_states.transciever_report:
-                pickled_point = os.path.join(conf.config.get("SpecGeneration",
-                                             "Binary_folder"),
-                                             "picked_executables_mappings")
-                pickle.dump(executable_targets, open(pickled_point, 'wb'))
                 lines = list()
-
-                lines.append("executable_targets = pickle.load(open( \"{}\", "
-                             "\"rb\"))".format(ntpath.basename(pickled_point)))
-                lines.append("core_subset = executable_targets[{}]"
+                lines.append("core_subset = executable_targets[\"{}\"]"
                              .format(exectuable_target_key))
-                lines.append("file_reader = SpinnmanFileDataReader({})"
+                lines.append("file_reader = SpinnmanFileDataReader(\"{}\")"
                              .format(exectuable_target_key))
-                lines.append("self._txrx.execute_flood(core_subset, file_reader"
-                             ", {}, {}".format(self._app_id, size))
-
+                lines.append("txrx.execute_flood(core_subset, file_reader"
+                             ", {}, {})".format(self._app_id, size))
+                spinnman_reports.append_to_rerun_script(conf.config.get(
+                    "SpecGeneration", "Binary_folder"), lines)
 
     def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
         for vertex in self._graph.vertices:
