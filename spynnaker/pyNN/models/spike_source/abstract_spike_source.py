@@ -18,13 +18,15 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
                ('SPIKE_DATA_REGION', 2),
                ('SPIKE_HISTORY_REGION', 3)])
 
-    def __init__(self, label, n_neurons, constraints, max_atoms_per_core):
+    def __init__(self, label, n_neurons, constraints, max_atoms_per_core,
+                 machine_time_step):
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
         AbstractRecordableVertex.__init__(self, label)
         AbstractDataSpecableVertex.__init__(self, label=label,
-                                            n_atoms=n_neurons)
+                                            n_atoms=n_neurons,
+                                            machine_time_step=machine_time_step)
 
     def _write_setup_info(self, spec, spike_history_region_sz):
         """

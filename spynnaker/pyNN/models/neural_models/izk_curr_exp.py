@@ -32,7 +32,8 @@ class IzhikevichCurrentExponentialPopulation(
             self, n_neurons=n_neurons, n_params=10, label=label,
             binary="IZK_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=IzhikevichCurrentExponentialPopulation.
-            _model_based_max_atoms_per_core)
+            _model_based_max_atoms_per_core,
+            machine_time_step=machine_time_step)
         self._executable_constant = \
             IzhikevichCurrentExponentialPopulation.CORE_APP_IDENTIFIER
 
