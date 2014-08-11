@@ -1,5 +1,9 @@
 import unittest
 from spynnaker.pyNN.models.neural_models.if_curr_dual_exp import IFCurrentDualExponentialPopulation
+import spynnaker.pyNN as pyNN
+if not pyNN:
+    pyNN.setup(1,1,15)
+
 
 class TestIFCurrDualExpModel(unittest.TestCase):
 
@@ -17,12 +21,8 @@ class TestIFCurrDualExpModel(unittest.TestCase):
                      }
         nNeurons = 10
         if_curr_dual_exp = IFCurrentDualExponentialPopulation(
-            nNeurons, None, None, cell_params_lif['tau_m'], cell_params_lif['cm']
-            , cell_params_lif['v_rest'], cell_params_lif['v_reset'], cell_params_lif['v_thresh']
-            , cell_params_lif['tau_syn_E'], cell_params_lif['tau_syn_E2'], cell_params_lif['tau_syn_I'], cell_params_lif['tau_refrac']
-            , cell_params_lif['i_offset'])
+            nNeurons, 1, None, None, **cell_params_lif)
         self.assertEqual(if_curr_dual_exp.model_name,"IF_curr_dual_exp")
-        if_curr_dual_exp.set_machine_time_step(1)
         self.assertEqual(len(if_curr_dual_exp.get_parameters()),10)
         self.assertEqual(if_curr_dual_exp._v_thresh,cell_params_lif['v_thresh'])
         self.assertEqual(if_curr_dual_exp._v_reset,cell_params_lif['v_reset'])

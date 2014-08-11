@@ -1,7 +1,7 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_duel_exponential_vertex \
+from spynnaker.pyNN.models.abstract_models.abstract_dual_exponential_vertex \
     import AbstractDualExponentialVertex
 from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
@@ -36,7 +36,8 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
             self, n_neurons=n_neurons, n_params=10, label=label,
             binary="IF_curr_exp_dual.aplx", constraints=constraints,
             max_atoms_per_core=
-            IFCurrentDualExponentialPopulation._model_based_max_atoms_per_core)
+            IFCurrentDualExponentialPopulation._model_based_max_atoms_per_core,
+            machine_time_step=machine_time_step)
         self._executable_constant = \
             IFCurrentDualExponentialPopulation.CORE_APP_IDENTIFIER
 

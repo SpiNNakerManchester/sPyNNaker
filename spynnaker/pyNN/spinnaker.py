@@ -470,12 +470,10 @@ class Spinnaker(object):
         for vertex in self._graph.vertices:
             if isinstance(vertex, AbstractDataSpecableVertex):
                 vertex.set_application_runtime(self._runtime)
-                vertex.set_machine_time_step(self._machine_time_step)
                 vertex.set_no_machine_time_steps(self._no_machine_time_steps)
             if isinstance(vertex, AbstractRecordableVertex) and not \
                     isinstance(vertex, AbstractDataSpecableVertex):
                 vertex.set_no_machine_time_step(self._no_machine_time_steps)
-                vertex.set_machine_time_step(self._machine_time_step)
 
         self.set_runtime(run_time)
         logger.info("*** Running Mapper *** ")
@@ -829,7 +827,7 @@ class Spinnaker(object):
         self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
 
     def add_vertex(self, vertex_to_add):
-        if type(vertex_to_add) == type(MultiCastSource()):
+        if type(vertex_to_add) == type(MultiCastSource(self._machine_time_step)):
             self._multi_cast_vertex = vertex_to_add
         self._graph.add_vertex(vertex_to_add)
 

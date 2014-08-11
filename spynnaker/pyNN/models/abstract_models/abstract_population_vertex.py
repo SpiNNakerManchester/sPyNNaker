@@ -29,12 +29,13 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
     """
     
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
-                 constraints=None):
+                 machine_time_step, constraints=None):
 
         AbstractRecordableVertex.__init__(self, label)
-        AbstractPopulationDataSpec.__init__(self, False, binary, n_neurons,
-                                            label, constraints,
-                                            max_atoms_per_core)
+        AbstractPopulationDataSpec.__init__(
+            self, False, binary, n_neurons, label, constraints,
+            machine_time_step=machine_time_step,
+            max_atoms_per_core=max_atoms_per_core)
         self._delay_vertex = None
         self._n_params = n_params
 

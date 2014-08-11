@@ -14,9 +14,9 @@ import os
 @add_metaclass(ABCMeta)
 class AbstractDataSpecableVertex(Vertex):
 
-    def __init__(self, n_atoms, label, constraints=None):
+    def __init__(self, n_atoms, label, machine_time_step, constraints=None):
         Vertex.__init__(self, n_atoms, label, constraints)
-        self._machine_time_step = None
+        self._machine_time_step = machine_time_step
         self._application_runtime = None
         self._no_machine_time_steps = None
 
@@ -55,14 +55,6 @@ class AbstractDataSpecableVertex(Vertex):
     @property
     def application_run_time(self):
         return self._application_runtime
-
-    def set_machine_time_step(self, new_machine_time_step):
-        if self._machine_time_step is None:
-            self._machine_time_step = new_machine_time_step
-        else:
-            raise exceptions.ConfigurationException(
-                "cannot set the machine time step of a given model once it has"
-                "already been set")
 
     def set_application_runtime(self, new_runtime):
         if self._application_runtime is None:

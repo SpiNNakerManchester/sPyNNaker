@@ -39,12 +39,14 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     )
     _model_based_max_atoms_per_core = 256
 
-    def __init__(self, n_neurons, contraints=None, label="SpikeSourcePoisson",
-                 rate=1, start=0, duration=10000, seed=None):
+    def __init__(self, n_neurons, machine_time_step, contraints=None,
+                 label="SpikeSourcePoisson", rate=1, start=0, duration=10000,
+                 seed=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
         AbstractSpikeSource.__init__(self, label, n_neurons, contraints,
+                                     machine_time_step = machine_time_step,
                                      max_atoms_per_core=SpikeSourcePoisson.
                                      _model_based_max_atoms_per_core)
         self._rate = rate

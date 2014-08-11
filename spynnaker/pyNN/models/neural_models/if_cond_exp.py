@@ -38,7 +38,8 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
             self, n_neurons=n_neurons, n_params=10, label=label,
             max_atoms_per_core=
             IFConductanceExponentialPopulation._model_based_max_atoms_per_core,
-            binary="IF_cond_exp.aplx", constraints=constraints)
+            binary="IF_cond_exp.aplx", constraints=constraints,
+            machine_time_step=machine_time_step)
         self._executable_constant = \
             IFConductanceExponentialPopulation.CORE_APP_IDENTIFIER
 

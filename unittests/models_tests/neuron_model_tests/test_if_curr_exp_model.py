@@ -1,6 +1,7 @@
 import unittest
 from spynnaker.pyNN.models.neural_models.if_curr_exp import IFCurrentExponentialPopulation
 
+
 class TestIFCurrExpModel(unittest.TestCase):
 
     def test_new_if_curr_exp_model(self):
@@ -16,12 +17,8 @@ class TestIFCurrExpModel(unittest.TestCase):
                      }
         nNeurons = 10
         if_curr_exp = IFCurrentExponentialPopulation(
-            nNeurons, None, None, cell_params_lif['tau_m'], cell_params_lif['cm']
-            , cell_params_lif['v_rest'], v_reset=cell_params_lif['v_reset'], v_thresh=cell_params_lif['v_thresh']
-            , tau_syn_E=cell_params_lif['tau_syn_E'], tau_syn_I=cell_params_lif['tau_syn_I'], tau_refrac=cell_params_lif['tau_refrac']
-            , i_offset=cell_params_lif['i_offset'])
+            nNeurons, 1, None, None, **cell_params_lif)
         self.assertEqual(if_curr_exp.model_name,"IF_curr_exp")
-        if_curr_exp.set_machine_time_step(1)
         self.assertEqual(len(if_curr_exp.get_parameters()),10)
         self.assertEqual(if_curr_exp._v_thresh,cell_params_lif['v_thresh'])
         self.assertEqual(if_curr_exp._v_reset,cell_params_lif['v_reset'])

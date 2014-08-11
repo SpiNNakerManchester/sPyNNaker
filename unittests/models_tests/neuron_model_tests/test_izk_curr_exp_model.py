@@ -1,6 +1,7 @@
 import unittest
 from spynnaker.pyNN.models.neural_models.izk_curr_exp import IzhikevichCurrentExponentialPopulation
 
+
 class TestIZKCurrExpModel(unittest.TestCase):
 
     def test_new_izk_curr_exp_model(self):
@@ -16,10 +17,9 @@ class TestIZKCurrExpModel(unittest.TestCase):
                      }
         nNeurons = 10
         izk_curr_exp = IzhikevichCurrentExponentialPopulation(
-            nNeurons)
+            nNeurons, 1000)
 
         self.assertEqual(izk_curr_exp.model_name,"IZK_curr_exp")
-        izk_curr_exp.set_machine_time_step(1)
         self.assertEqual(len(izk_curr_exp.get_parameters()), 8)
         self.assertEqual(izk_curr_exp._a, 0.02)
         self.assertEqual(izk_curr_exp._b,0.2)

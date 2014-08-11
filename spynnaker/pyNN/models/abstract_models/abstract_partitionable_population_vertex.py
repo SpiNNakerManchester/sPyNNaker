@@ -14,8 +14,10 @@ from pacman.model.graph.abstract_partitionable_vertex \
 class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                                             AbstractPartitionableVertex):
 
-    def __init__(self, n_atoms, label, max_atoms_per_core, constraints=None):
+    def __init__(self, n_atoms, label, max_atoms_per_core, machine_time_step,
+                 constraints=None):
         AbstractDataSpecableVertex.__init__(self, n_atoms, label,
+                                            machine_time_step=machine_time_step,
                                             constraints=constraints)
         AbstractPartitionableVertex.__init__(
             self, n_atoms, label, constraints=constraints,
