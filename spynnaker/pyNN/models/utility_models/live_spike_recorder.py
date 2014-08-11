@@ -48,7 +48,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
         single Application Monitor on one core.
         """
         # Create new DataSpec for this processor:
-        binary_file_name = self.get_binary_file_name(
+        binary_file_name = self.get_data_spec_file_name(
             processor_chip_x, processor_chip_y, processor_id, hostname)
         data_writer = FileDataWriter(binary_file_name)
         spec = DataSpecificationGenerator(data_writer)
@@ -111,7 +111,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
         spec.write_value(data=recording_info)
         return
 
-    def get_binary_name(self):
+    def get_binary_file_name(self):
          # Rebuild executable name
         common_binary_path = os.path.join(config.get("SpecGeneration",
                                                      "common_binary_folder"))

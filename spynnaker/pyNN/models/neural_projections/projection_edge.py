@@ -83,7 +83,7 @@ class ProjectionEdge(Edge):
          self._synapse_list
         """
         logger.debug("Reading synapse data for edge between {} and {}"
-                    .format(self._pre_vertex.label, self._post_vertex.label))
+                     .format(self._pre_vertex.label, self._post_vertex.label))
 
         #if theres no spinnaker, assume your looking at the internal one here.
         if spinnaker is None:

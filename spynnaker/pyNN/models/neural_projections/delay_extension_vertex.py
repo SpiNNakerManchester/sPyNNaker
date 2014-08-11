@@ -103,7 +103,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
         """
-        binary_file_name = self.get_binary_file_name(
+        binary_file_name = self.get_data_spec_file_name(
             processor_chip_x, processor_chip_y, processor_id, hostname)
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)
@@ -253,7 +253,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         n_atoms = (hi_atom - lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms
 
-    def get_binary_name(self):
+    def get_binary_file_name(self):
          # Rebuild executable name
         common_binary_path = os.path.join(config.get("SpecGeneration",
                                                      "common_binary_folder"))

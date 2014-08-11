@@ -58,7 +58,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         """
         #check that all keys for a subedge are the same when masked
         self.check_sub_edge_key_mask_consistancy(self._edge_map, self._app_mask)
-        binary_file_name = self.get_binary_file_name(processor_chip_x,
+        binary_file_name = self.get_data_spec_file_name(processor_chip_x,
                                                      processor_chip_y,
                                                      processor_id, hostname)
 
@@ -262,7 +262,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
     def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
         return 0
 
-    def get_binary_name(self):
+    def get_binary_file_name(self):
         # Rebuild executable name
         common_binary_path = os.path.join(config.get("SpecGeneration",
                                                      "common_binary_folder"))

@@ -1,10 +1,3 @@
-from abc import ABCMeta
-from abc import abstractmethod
-import os
-import logging
-
-from six import add_metaclass
-
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from data_specification.file_data_writer import FileDataWriter
@@ -13,22 +6,27 @@ from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
-    SynapticManager
+    AbstractSynapticManager
 from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex import \
     AbstractPartitionablePopulationVertex
 
+import os
+import logging
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
 
 logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationDataSpec(SynapticManager,
+class AbstractPopulationDataSpec(AbstractSynapticManager,
                                  AbstractPartitionablePopulationVertex):
 
     def __init__(self, record, binary, n_neurons, label, constraints,
                  max_atoms_per_core, machine_time_step):
-        SynapticManager.__init__(self)
+        AbstractSynapticManager.__init__(self)
         AbstractPartitionablePopulationVertex.__init__(
             self, n_atoms=n_neurons, label=label,
             machine_time_step=machine_time_step, constraints=constraints,
@@ -214,7 +212,7 @@ class AbstractPopulationDataSpec(SynapticManager,
         build a group of IF_curr_exp neurons resident on a single core.
         """
         # Create new DataSpec for this processor:
-        binary_file_name = self.get_binary_file_name(
+        binary_file_name = self.get_data_spec_file_name(
             processor_chip_x, processor_chip_y, processor_id, hostname)
 
         data_writer = FileDataWriter(binary_file_name)
@@ -285,9 +283,10 @@ class AbstractPopulationDataSpec(SynapticManager,
             spec, subvertex, all_syn_block_sz, weight_scale,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            routing_info)
+            routing_info, graph_sub_graph_mapper, subgraph)
 
-        for subedge in subvertex.in_subedges:
+        in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        for subedge in in_subedges:
             subedge.free_sublist()
 
         # End the writing of this specification:
@@ -295,8 +294,7 @@ class AbstractPopulationDataSpec(SynapticManager,
         data_writer.close()
 
     #inhirrited from data specable vertex
-    @staticmethod
-    def get_binary_name(self):
+    def get_binary_file_name(self):
          # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)
 

@@ -287,7 +287,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
         """
-        binary_file_name = self.get_binary_file_name(
+        binary_file_name = self.get_data_spec_file_name(
             processor_chip_x, processor_chip_y, processor_id, hostname)
 
         # Create new DataSpec for this processor:
@@ -324,7 +324,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         spec.end_specification()
         data_writer.close()
 
-    def get_binary_name(self):
+    def get_binary_file_name(self):
         # Rebuild executable name
         common_binary_path = os.path.join(config.get("SpecGeneration",
                                                      "common_binary_folder"))

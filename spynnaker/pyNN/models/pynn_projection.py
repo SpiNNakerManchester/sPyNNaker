@@ -254,8 +254,9 @@ class Projection(object):
         non-existent connections).
         """
         if not gather:
-            logger.warn("the gather param has no meaning for spinnaker when "
-                        "set to false")
+            exceptions.ConfigurationException(
+                "the gather param has no meaning for spinnaker when set to "
+                "false")
         timer = None
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
@@ -298,7 +299,7 @@ class Projection(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getWeights(self, list_format='list'):
+    def getWeights(self, list_format='list', gather=True):
         """
         Get synaptic weights for all connections in this Projection.
         (pyNN gather parameter not supported from the signiture
@@ -309,6 +310,11 @@ class Projection(object):
         non-existent connections). Note that for the array format, if there is
         more than connection between two cells, the summed weight will be given.
         """
+        if not gather:
+            exceptions.ConfigurationException(
+                "the gather param has no meaning for spinnaker when set to "
+                "false")
+
         timer = None
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()

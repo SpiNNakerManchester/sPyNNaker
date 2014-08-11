@@ -6,15 +6,6 @@ from six import add_metaclass
 
 NUM_SYNAPSE_PARAMS = 4  # tau_syn_E and tau_syn_I, and initial multipiers
 
-
-def get_n_synapse_type_bits():
-    """
-    Return the number of bits used to identify the synapse in the synaptic
-    row
-    """
-    return 1
-
-
 @add_metaclass(ABCMeta)
 class AbstractExponentialPopulationVertex(object):
     """
@@ -37,6 +28,14 @@ class AbstractExponentialPopulationVertex(object):
         Gets the size of the synapse parameters for a range of neurons
         """
         return NUM_SYNAPSE_PARAMS * 4 * ((hi_atom - lo_atom) + 1)
+
+    @staticmethod
+    def get_n_synapse_type_bits():
+        """
+        Return the number of bits used to identify the synapse in the synaptic
+        row
+        """
+        return 1
         
     def write_synapse_parameters(self, spec, subvertex):
         """

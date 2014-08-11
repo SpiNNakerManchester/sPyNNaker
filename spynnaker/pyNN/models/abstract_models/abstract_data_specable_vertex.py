@@ -39,7 +39,7 @@ class AbstractDataSpecableVertex(Vertex):
         """
 
     @abstractmethod
-    def get_binary_name(self):
+    def get_binary_file_name(self):
         """
         method to return the binary name for a given dataspecable vertex
         """
@@ -75,8 +75,8 @@ class AbstractDataSpecableVertex(Vertex):
 
 
     @staticmethod
-    def get_binary_file_name(processor_chip_x, processor_chip_y,
-                             processor_id, hostname):
+    def get_data_spec_file_name(processor_chip_x, processor_chip_y,
+                                processor_id, hostname):
         has_binary_folder_set = \
             config.has_option("SpecGeneration", "Binary_folder")
         if not has_binary_folder_set:

@@ -2,8 +2,11 @@ import math
 import logging
 import struct
 import sys
-
 import numpy
+
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
 
 from spynnaker.pyNN.models.neural_projections.projection_edge \
     import ProjectionEdge
@@ -18,13 +21,17 @@ from spynnaker.pyNN.utilities.utility_calls \
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+
+#spinnman imports
 from spinnman import exceptions as spinnman_exceptions
 
+#dsg imports
+from data_specification.enums.data_type import DataType
 
 logger = logging.getLogger(__name__)
 
-
-class SynapticManager(object):
+@add_metaclass(ABCMeta)
+class AbstractSynapticManager(object):
 
     def __init__(self):
         self._stdp_checked = False
@@ -201,23 +208,26 @@ class SynapticManager(object):
                         "Fast synapse dynamics are not supported")
                 elif in_edge.synapse_dynamics.slow is not None:
                     if self._stdp_mechanism is None:
-                        self._stdp_mechanism = in_edge._synapse_dynamics.slow
+                        self._stdp_mechanism = in_edge.synapse_dynamics.slow
                     else:
                         if not (self._stdp_mechanism
-                                == in_edge._synapse_dynamics.slow):
+                                == in_edge.synapse_dynamics.slow):
                             raise exceptions.SynapticConfigurationException(
                                 "Different STDP mechanisms on the same"
                                 + " vertex are not supported")
 
+    @abstractmethod
     def get_n_synapse_type_bits(self):
         """
         Return the number of bits used to identify the synapse in the synaptic
         row
         """
-        raise NotImplementedError()
 
+    @abstractmethod
     def write_synapse_parameters(self, spec, subvertex):
-        raise NotImplementedError
+        """forced method for dealing with writing synapse params
+
+        """
 
     @staticmethod
     def select_minimum_row_length(longest_actual_row):
@@ -315,7 +325,8 @@ class SynapticManager(object):
 
     def write_synaptic_matrix_and_master_population_table(
             self, spec, subvertex, all_syn_block_sz, weight_scale,
-            master_pop_table_region, synaptic_matrix_region, routing_info):
+            master_pop_table_region, synaptic_matrix_region, routing_info,
+            graph_to_subgraph_mapper, subgraph):
         """
         Simultaneously generates both the master pynn_population.py table and
         the synatic matrix.
@@ -340,7 +351,8 @@ class SynapticManager(object):
         my_repeat_reg = 4
         spec.set_register_value(register_id=my_repeat_reg,
                                 data=constants.MASTER_POPULATION_ENTRIES)
-        spec.write_value(data=0, repeatReg=my_repeat_reg, sizeof='uint16')
+        spec.write_value(data=0, repeats_register=my_repeat_reg,
+                         data_type=DataType.UINT16)
 
         # Track writes inside the synaptic matrix region:
         next_block_start_addr = 0
@@ -348,7 +360,8 @@ class SynapticManager(object):
 
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
-        for subedge in subvertex.in_subedges:
+        in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        for subedge in in_subedges:
 
             # Only deal with incoming projection subedges
             if not subedge.pruneable and isinstance(subedge, ProjectionSubedge):
@@ -360,7 +373,9 @@ class SynapticManager(object):
                              .format(x, y, p))
 
                 sublist = subedge.get_synapse_sublist()
-                row_io = subedge._associated_edge.get_synapse_row_io()
+                associated_edge = \
+                    graph_to_subgraph_mapper.get_edge_from_subedge(subedge)
+                row_io = associated_edge.get_synapse_row_io()
                 if logger.isEnabledFor("debug"):
                     logger.debug("Writing subedge from {} ({}-{}) to {} ({}-{})"
                                  .format(subedge.pre_subvertex.label,

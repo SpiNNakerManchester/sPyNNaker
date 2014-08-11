@@ -22,6 +22,8 @@ class ReportState(object):
             config.getboolean("Reports", "writeReloadSteps")
         self._generate_time_recordings_for_performance_measurements = \
             config.getboolean("Reports", "outputTimesForSections")
+        self._transciever_report = \
+            config.getboolean("Reports", "writeTransceiverReport")
 
     @property
     def partitioner_report(self):
@@ -50,6 +52,10 @@ class ReportState(object):
     @property
     def write_reload_steps(self):
         return self._write_reload_steps
+
+    @property
+    def transciever_report(self):
+        return self._transciever_report
 
     @property
     def generate_time_recordings_for_performance_measurements(self):
