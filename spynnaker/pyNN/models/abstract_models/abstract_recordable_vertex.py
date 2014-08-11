@@ -38,14 +38,6 @@ class AbstractRecordableVertex(object):
                 "cannot set the number of machine time steps of a given"
                 " model once it has already been set")
 
-    def set_machine_time_step(self, machine_time_step):
-        if self._machine_time_step is None:
-            self._machine_time_step = machine_time_step
-        else:
-            raise exceptions.ConfigurationException(
-                "cannot set the machine time step of a given"
-                " model once it has already been set")
-
     def record(self, focus=None):
         """
         method that sets the vertex to be recordable, as well as data on how the
