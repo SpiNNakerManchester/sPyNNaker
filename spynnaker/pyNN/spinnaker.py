@@ -142,7 +142,7 @@ class Spinnaker(object):
                     .format(self._time_scale_factor))
 
         logger.info("Setting appID to %d." % self._app_id)
-    
+
         #get the machien time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
@@ -595,7 +595,7 @@ class Spinnaker(object):
             self._reports_states.generate_pacman_report_states()
 
         self._check_if_theres_any_pre_placement_constraints_to_satisify()
-        
+
         #execute partitioner
         partitioner = Partitioner(
             partition_algorithm=self._partitioner_algorithm,
@@ -653,10 +653,7 @@ class Spinnaker(object):
                 self._graph_subgraph_mapper.\
                 get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
-            subclass_list = \
-                pacman_utility_calls.\
-                locate_all_subclasses_of(AbstractDataSpecableVertex)
-            if type(associated_vertex) in subclass_list:
+            if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 associated_vertex.generate_data_spec(
                     placement.x, placement.y, placement.p, placement.subvertex,
                     self._sub_graph, self._graph, self._routing_infos,
@@ -702,9 +699,7 @@ class Spinnaker(object):
             associated_vertex = self._graph_subgraph_mapper.\
                 get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
-            subclass_list = pacman_utility_calls.\
-                locate_all_subclasses_of(AbstractDataSpecableVertex)
-            if associated_vertex in subclass_list:
+            if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 data_spec_file_path = \
                     associated_vertex.get_data_spec_file_name(
                         placement.x, placement.y, placement.p, hostname
@@ -901,10 +896,7 @@ class Spinnaker(object):
             associated_vertex = \
                 vertex_to_subvertex_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
-
-            subclass_list = pacman_utility_calls.\
-                locate_all_subclasses_of(AbstractDataSpecableVertex)
-            if associated_vertex in subclass_list:
+            if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
                 start_address = \
                     processor_to_app_data_base_address[key]['start_address']
@@ -951,7 +943,6 @@ class Spinnaker(object):
                          "\"rb\"))".format(ntpath.basename(pickled_point)))
             spinnman_reports.append_to_rerun_script(conf.config.get(
                 "SpecGeneration", "Binary_folder"), lines)
-
 
         for exectuable_target_key in executable_targets.keys():
             file_reader = SpinnmanFileDataReader(exectuable_target_key)

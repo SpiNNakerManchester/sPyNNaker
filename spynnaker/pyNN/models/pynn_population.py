@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class Population(object):
     """
-    A collection neuron of the same types. It encapsulates a type of 
+    A collection neuron of the same types. It encapsulates a type of
     :class:`pacman103.lib.graph.Vertex`
     used with Spiking Neural Networks, comprising n cells (atoms)
     of the same :py:mod:`pacman103.front.pynn.models` type.
@@ -185,7 +185,7 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids and synaptic 
+        Return a 3-column numpy array containing cell ids and synaptic
         conductances for recorded cells.
 
         """
@@ -202,7 +202,7 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids, time, and Vm for 
+        Return a 3-column numpy array containing cell ids, time, and Vm for
         recorded cells.
 
         :param bool gather:
@@ -524,10 +524,7 @@ class Population(object):
         Apply a constraint to a population that restricts the processor
         onto which its sub-populations will be placed.
         """
-        #find all constraints!
-        subclass_list =\
-            pacman_utility_calls.locate_all_subclasses_of(AbstractConstraint)
-        if type(constraint) in subclass_list:
+        if isinstance(constraint, AbstractConstraint):
             self._vertex.add_constraint(constraint)
         else:
             raise exceptions.ConfigurationException(
