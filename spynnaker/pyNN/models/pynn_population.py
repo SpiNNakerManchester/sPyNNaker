@@ -73,7 +73,8 @@ class Population(object):
         for require_multi_cast_source_constraint \
                 in require_multi_cast_source_constraints:
             if multi_cast_vertex is None:
-                multi_cast_vertex = MultiCastSource()
+                multi_cast_vertex = MultiCastSource(
+                    self._spinnaker.machine_time_step)
                 self._spinnaker.add_vertex(multi_cast_vertex)
             multi_cast_vertex = self._spinnaker.get_multi_cast_source
             edge = Edge(multi_cast_vertex, self._vertex)

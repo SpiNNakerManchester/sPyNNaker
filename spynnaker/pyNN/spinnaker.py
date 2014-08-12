@@ -466,15 +466,6 @@ class Spinnaker(object):
         else:
             timer = None
 
-        #update models with new no_machine_time_step
-        for vertex in self._graph.vertices:
-            if isinstance(vertex, AbstractDataSpecableVertex):
-                vertex.set_application_runtime(self._runtime)
-                vertex.set_no_machine_time_steps(self._no_machine_time_steps)
-            if isinstance(vertex, AbstractRecordableVertex) and not \
-                    isinstance(vertex, AbstractDataSpecableVertex):
-                vertex.set_no_machine_time_step(self._no_machine_time_steps)
-
         self.set_runtime(run_time)
         logger.info("*** Running Mapper *** ")
         if do_timing:
