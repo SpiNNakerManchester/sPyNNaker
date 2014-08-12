@@ -29,7 +29,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
         """
         Creates a new AppMonitor Object.
         """
-        AbstractRecordableVertex.__init__(self, "Monitor")
+        AbstractRecordableVertex.__init__(self, machine_time_step, "Monitor")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="Monitor",
                                             machine_time_step=machine_time_step)

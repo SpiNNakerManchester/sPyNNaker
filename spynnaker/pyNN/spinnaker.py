@@ -2,7 +2,7 @@
 from pacman.model.constraints.vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+from pacman.model.partitionable_graph.edge import Edge
 from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
@@ -465,15 +465,6 @@ class Spinnaker(object):
             timer = Timer()
         else:
             timer = None
-
-        #update models with new no_machine_time_step
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractDataSpecableVertex):
-                vertex.set_application_runtime(self._runtime)
-                vertex.set_no_machine_time_steps(self._no_machine_time_steps)
-            if isinstance(vertex, AbstractRecordableVertex) and not \
-                    isinstance(vertex, AbstractDataSpecableVertex):
-                vertex.set_no_machine_time_step(self._no_machine_time_steps)
 
         self.set_runtime(run_time)
         logger.info("*** Running Mapper *** ")

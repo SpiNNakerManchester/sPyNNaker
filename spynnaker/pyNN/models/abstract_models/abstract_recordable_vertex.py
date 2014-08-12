@@ -22,12 +22,12 @@ class AbstractRecordableVertex(object):
     Underlying AbstractConstrainedVertex model for Neural Applications.
     """
     
-    def __init__(self, label):
+    def __init__(self, machine_time_step, label):
         self._record = False
         self._focus_level = None
         self._app_mask = pacman_constants.DEFAULT_MASK
         self._label = label
-        self._no_machine_time_steps = None
+        self._no_machine_time_steps = machine_time_step
         self._machine_time_step = None
 
     def set_no_machine_time_step(self, no_machine_time_steps):
@@ -37,6 +37,10 @@ class AbstractRecordableVertex(object):
             raise exceptions.ConfigurationException(
                 "cannot set the number of machine time steps of a given"
                 " model once it has already been set")
+
+    @property
+    def machine_time_step(self):
+        return self._machine_time_step
 
     def record(self, focus=None):
         """
