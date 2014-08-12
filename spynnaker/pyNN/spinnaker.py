@@ -1,7 +1,8 @@
 #pacman imports
 from pacman.model.constraints.vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
 from pacman.operations.partitioner import Partitioner
 from pacman.operations.placer import Placer
 from pacman.operations.routing_info_allocator import RoutingInfoAllocator
@@ -88,7 +89,7 @@ class Spinnaker(SpynnakerConfiguration):
 
         logger.info("Setting appID to %d." % self._app_id)
     
-        #get the machien time step
+        #get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
         self._edge_count = 0
