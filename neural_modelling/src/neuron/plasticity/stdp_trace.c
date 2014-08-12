@@ -105,7 +105,7 @@ void initialise_plasticity_buffers()
 static inline weight_t* plastic_weights(address_t plastic)
 {
   const uint32_t pre_synaptic_event_history_size_words = sizeof(pre_synaptic_event_history_t) / sizeof(uint32_t);
-  COMPILE_TIME_ASSERT(pre_synaptic_event_history_size_words * sizeof(uint32_t) == sizeof(pre_synaptic_event_history_t), pre_synaptic_event_history_t_should_be_word_padded)
+  static_assert(pre_synaptic_event_history_size_words * sizeof(uint32_t) == sizeof(pre_synaptic_event_history_t), pre_synaptic_event_history_t_should_be_word_padded);
 
   return (weight_t*)(&plastic[pre_synaptic_event_history_size_words]);
 }

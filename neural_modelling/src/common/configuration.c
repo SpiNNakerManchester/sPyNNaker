@@ -40,6 +40,7 @@
 // Globals
 uint32_t system_word = 0;
 uint32_t timer_period = 0;
+uint32_t simulation_ticks = 0;
 
 bool system_header_filled (uint32_t* address, uint32_t* version, uint32_t flags)
 {
@@ -65,13 +66,14 @@ bool system_data_filled (address_t address, uint32_t flags,
   log_info("system_data_filled: starting");
 
   timer_period = address[1];
+  simulation_ticks = address[2];
 
   // Read recording region sizes
-  system_word = address[2];
-  *spike_history_recording_region_size = address[3];
-  *neuron_potentials_recording_region_size = address[4];
-  *neuron_gsyns_recording_region_size = address[5];
-
+  system_word = address[3];
+  *spike_history_recording_region_size = address[4];
+  *neuron_potentials_recording_region_size = address[5];
+  *neuron_gsyns_recording_region_size = address[6];
+  log_info("\ttimer period = %u, simulation ticks = %u", timer_period, simulation_ticks);
   log_info("\tsystem word = %08x, spike history recording region size = %u, neuron potential recording region size = %u, neuron gsyn recording region size = %u", system_word,
            *spike_history_recording_region_size, *neuron_potentials_recording_region_size, *neuron_gsyns_recording_region_size);
 
@@ -145,7 +147,7 @@ bool equal_vector (uint32_t n, uint32_t* x, uint32_t flags)
 }
 
 address_t region_start (uint32_t n, address_t address)
-{ return (configuration_reader_offset(address, 4+n)); }
+{ return (configuration_reader_offset(address, 2+n)); }
 
 address_t configuration_reader_offset(address_t address, uint32_t offset)
 { return (& address[address[offset] >> 2]); }
