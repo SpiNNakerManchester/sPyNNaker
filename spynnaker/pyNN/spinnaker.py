@@ -2,7 +2,7 @@
 from pacman.model.constraints.vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
-from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
@@ -877,7 +877,7 @@ class Spinnaker(object):
                 LiveSpikeRecorder(self.machine_time_step)
             self.add_vertex(self._live_spike_recorder)
         #create the edge and add
-        edge = Edge(vertex_to_record_from, self._live_spike_recorder,
+        edge = PartitionableEdge(vertex_to_record_from, self._live_spike_recorder,
                     "recorder_edge")
         self.add_edge(edge)
 

@@ -9,7 +9,7 @@ from abc import abstractmethod
 from six import add_metaclass
 
 from spynnaker.pyNN.models.neural_projections.projection_edge \
-    import ProjectionEdge
+    import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_subedge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
@@ -158,7 +158,7 @@ class AbstractSynapticManager(object):
         memory_size = 0
         
         for in_edge in in_edges:
-            if isinstance(in_edge, ProjectionEdge):
+            if isinstance(in_edge, ProjectionPartitionableEdge):
                 
                 # Get maximum row length in this edge 
                 max_n_words = in_edge.get_max_n_words(lo_atom, hi_atom)
@@ -201,7 +201,7 @@ class AbstractSynapticManager(object):
             return True
         self._stdp_checked = True
         for in_edge in in_edges:
-            if (isinstance(in_edge, ProjectionEdge)
+            if (isinstance(in_edge, ProjectionPartitionableEdge)
                     and in_edge.synapse_dynamics is not None):
                 if in_edge.synapse_dynamics.fast is not None:
                     raise exceptions.SynapticConfigurationException(

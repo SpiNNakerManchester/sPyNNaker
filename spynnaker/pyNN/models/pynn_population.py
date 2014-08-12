@@ -3,7 +3,7 @@ from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
-from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from pacman.utilities import utility_calls as pacman_utility_calls
 
 from spynnaker.pyNN.models.utility_models.multicastsource \
@@ -76,7 +76,7 @@ class Population(object):
                 multi_cast_vertex = MultiCastSource()
                 self._spinnaker.add_vertex(multi_cast_vertex)
             multi_cast_vertex = self._spinnaker.get_multi_cast_source
-            edge = Edge(multi_cast_vertex, self._vertex)
+            edge = PartitionableEdge(multi_cast_vertex, self._vertex)
             multi_cast_vertex.add_commands(
                 require_multi_cast_source_constraint.commands, edge)
             self._spinnaker.add_edge(edge)
@@ -91,7 +91,7 @@ class Population(object):
         for dependant_vertex_constrant in dependant_vertex_constraints:
             dependant_vertex = dependant_vertex_constrant.vertex
             self._spinnaker.add_vertex(dependant_vertex)
-            dependant_edge = Edge(pre_vertex=self._vertex,
+            dependant_edge = PartitionableEdge(pre_vertex=self._vertex,
                                   post_vertex=dependant_vertex)
             self._spinnaker.add_edge(dependant_edge)
 
