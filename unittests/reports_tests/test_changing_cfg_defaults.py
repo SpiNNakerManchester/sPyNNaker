@@ -3,7 +3,7 @@ from spynnaker.pyNN.spinnaker import Spinnaker
 import os
 from spynnaker.pyNN.utilities import conf
 import spynnaker.pyNN.exceptions as exceptions
-
+import time
 
 class TestCFGs(unittest.TestCase):
     def setUp(self):
@@ -17,6 +17,7 @@ class TestCFGs(unittest.TestCase):
 
 
     def test_reports_creation_default(self):
+        time.sleep(3)
         spinn = Spinnaker(timestep=1, min_delay=1, max_delay=10)
 
         conf.config.set("Reports", "defaultReportFilePath", "DEFAULT")
@@ -45,6 +46,7 @@ class TestCFGs(unittest.TestCase):
 
 
     def test_reports_creation_custom_location(self):
+        time.sleep(3)
         current_path = os.path.abspath(os.curdir)
         conf.config.set("Reports", "defaultReportFilePath", current_path)
         conf.config.set("Reports", "reportsEnabled", "True")
@@ -59,6 +61,7 @@ class TestCFGs(unittest.TestCase):
             raise AssertionError("File reports should be in the new location")
 
     def test_set_up_main_objects(self):
+        time.sleep(3)
         spinn = Spinnaker(timestep=1, min_delay=1, max_delay=10)
         self.assertEqual(spinn._app_id, conf.config.getint("Machine", "appID"))
 

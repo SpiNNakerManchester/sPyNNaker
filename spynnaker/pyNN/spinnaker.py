@@ -135,7 +135,7 @@ class Spinnaker(object):
             self._set_up_executable_specifics()
             self._set_up_recording_specifics()
             self._set_up_report_specifics()
-        self._set_up_output_application_data_specifics()
+            self._set_up_output_application_data_specifics()
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
 
@@ -233,7 +233,8 @@ class Spinnaker(object):
                 os.makedirs(self._report_default_directory)
 
         #clear and clean out folders considered not useful anymore
-        if not created_folder:
+        if not created_folder \
+                and len(os.listdir(self._report_default_directory)) > 0:
             self._move_report_and_binary_files(
                 conf.config.getint("Reports", "max_reports_kept"),
                 self._report_default_directory)
