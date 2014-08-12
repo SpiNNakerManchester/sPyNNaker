@@ -1,4 +1,4 @@
-from pacman.model.graph.edge import Edge
+from pacman.model.partitionable_graph.edge import Edge
 
 
 class DelayAfferentEdge(Edge):

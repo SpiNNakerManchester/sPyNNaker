@@ -1,7 +1,7 @@
 import unittest
 from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
 import spynnaker.pyNN.utilities.constants as constant
-from pacman.model.graph.vertex import Vertex
+from pacman.model.partitionable_graph.vertex import Vertex
 
 
 class TestVisualiserVertex(unittest.TestCase):

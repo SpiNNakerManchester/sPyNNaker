@@ -1,5 +1,5 @@
 import unittest
-from pacman.model.graph.edge import Edge
+from pacman.model.partitionable_graph.edge import Edge
 
 class TestDelayAfferentEdge(unittest.TestCase):
     def test_filter_subedge(self):

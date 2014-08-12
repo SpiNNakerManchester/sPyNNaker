@@ -3,7 +3,7 @@ from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
-from pacman.model.graph.edge import Edge
+from pacman.model.partitionable_graph.edge import Edge
 from pacman.utilities import utility_calls as pacman_utility_calls
 
 from spynnaker.pyNN.models.utility_models.multicastsource \
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class Population(object):
     """
     A collection neuron of the same types. It encapsulates a type of 
-    :class:`pacman103.lib.graph.Vertex`
+    :class:`pacman103.lib.partitionable_graph.Vertex`
     used with Spiking Neural Networks, comprising n cells (atoms)
     of the same :py:mod:`pacman103.front.pynn.models` type.
 
@@ -55,7 +55,7 @@ class Population(object):
         if structure:
             raise Exception("Spatial structure is unsupported for Populations.")
 
-        # Create a graph vertex for the population and add it to PACMAN
+        # Create a partitionable_graph vertex for the population and add it to PACMAN
         cellparams['label'] = label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step

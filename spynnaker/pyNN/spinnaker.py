@@ -1,8 +1,8 @@
 #pacman imports
 from pacman.model.constraints.vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
-from pacman.model.graph.graph import Graph
-from pacman.model.graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
+from pacman.model.partitionable_graph.edge import Edge
 from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
@@ -101,7 +101,7 @@ class Spinnaker(object):
         self._visualiser_creation_utility = VisualiserCreationUtility()
 
         #main objects
-        self._graph = Graph(label=graph_label)
+        self._graph = PartitionableGraph(label=graph_label)
         self._sub_graph = None
         self._graph_subgraph_mapper = None
         self._machine = None

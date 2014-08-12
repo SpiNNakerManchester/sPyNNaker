@@ -14,7 +14,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
     import AbstractRecordableVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge import \
     DelayProjectionEdge
-from pacman.model.graph.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config

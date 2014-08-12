@@ -1,4 +1,4 @@
-from pacman.model.graph.vertex import Vertex
+from pacman.model.partitionable_graph.vertex import Vertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions

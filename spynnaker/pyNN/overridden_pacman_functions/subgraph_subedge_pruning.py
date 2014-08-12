@@ -1,11 +1,11 @@
-from pacman.model.graph.edge import Edge
-from pacman.model.subgraph.subgraph import Subgraph
+from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper \
     import GraphSubgraphMapper
 from pacman.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.projection_subedge \
-    import ProjectionSubedge
+    import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge import \
     DelayAfferentEdge
 
@@ -16,7 +16,7 @@ class SubgraphSubedgePruning(object):
         pass
 
     def run(self, subgraph, graph_to_sub_graph_mapper):
-        new_sub_graph = Subgraph()
+        new_sub_graph = PartitionedGraph()
         new_graph_subgraph_mapper = GraphSubgraphMapper()
 
         #create progress bar
@@ -42,14 +42,14 @@ class SubgraphSubedgePruning(object):
                 new_graph_subgraph_mapper.add_subedge(subedge, associated_edge)
                 progress_bar.update()
         progress_bar.end()
-        #returned the pruned subgraph and graph_to_sub_graph_mapper
+        #returned the pruned partitioned_graph and graph_to_sub_graph_mapper
         return new_sub_graph, new_graph_subgraph_mapper
 
     @staticmethod
     def _is_prunable(subedge, graph_to_sub_graph_mapper):
         associated_edge = \
             graph_to_sub_graph_mapper.get_edge_from_subedge(subedge)
-        if isinstance(subedge, ProjectionSubedge):
+        if isinstance(subedge, ProjectionPartitionedEdge):
             return subedge.is_connected()
         elif isinstance(associated_edge, DelayAfferentEdge):
             return (subedge.pre_subvertex.lo_atom
