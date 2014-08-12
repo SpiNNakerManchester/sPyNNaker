@@ -2,7 +2,8 @@
 from pacman.model.constraints.vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
 from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
@@ -41,8 +42,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
-from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning import \
-    SubgraphSubedgePruning
+from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning \
+    import SubgraphSubedgePruning
 from spynnaker.pyNN import reports
 
 #spinnman inports
@@ -143,7 +144,7 @@ class Spinnaker(object):
 
         logger.info("Setting appID to %d." % self._app_id)
     
-        #get the machien time step
+        #get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
         self._edge_count = 0
@@ -192,7 +193,7 @@ class Spinnaker(object):
             conf.config.set("SpecGeneration", "Binary_folder",
                             this_run_time_folder)
         elif where_to_write_application_data_files == "TEMP":
-            pass  # just dont set the config param, code downstairs
+            pass  # just don't set the config param, code downstairs
             #  from here will create temp folders if needed
         else:
             #add time stamped folder for this run
