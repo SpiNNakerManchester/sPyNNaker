@@ -87,7 +87,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
 
     def write_setup_info(self, spec, subvertex, graph_sub_graph_mapper):
         """
-        Write information used to control the simulationand gathering of
+        Write information used to control the simulation and gathering of
         results. Currently, this means the flag word used to signal whether
         information on neuron firing and neuron potential is either stored
         locally in a buffer or passed out of the simulation for storage/display
@@ -121,7 +121,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
                                    'live_spike_recorder.aplx')
         return binary_name
 
-    #inhirrted from partitionable vertex
+    #inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         return 0
 
