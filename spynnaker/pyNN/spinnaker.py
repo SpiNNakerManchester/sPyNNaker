@@ -103,7 +103,7 @@ class Spinnaker(object):
         #main objects
         self._partitionable_graph = PartitionableGraph(label=graph_label)
         self._partitioned_graph = None
-        self._graph_subgraph_mapper = None
+        self._graph_mapper = None
         self._machine = None
         self._no_machine_time_steps = None
         self._placements = None
@@ -513,7 +513,7 @@ class Spinnaker(object):
             if self._do_load is True:
                 logger.info("*** Loading data ***")
                 self._load_application_data(self._placements,
-                                            self._graph_subgraph_mapper,
+                                            self._graph_mapper,
                                             processor_to_app_data_base_address)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets)
@@ -578,7 +578,7 @@ class Spinnaker(object):
         return self._partitioned_graph
 
     @property
-    def graph(self):
+    def partitionable_graph(self):
         return self._partitionable_graph
 
     def set_app_id(self, value):
@@ -604,7 +604,7 @@ class Spinnaker(object):
             report_folder=self._report_default_directory,
             report_states=pacman_report_state, hostname=self._hostname,
             placer_algorithm=self._placer_algorithm, machine=self._machine)
-        self._partitioned_graph, self._graph_subgraph_mapper = \
+        self._partitioned_graph, self._graph_mapper = \
             partitioner.run(self._partitionable_graph)
 
         #execute placer
@@ -614,18 +614,18 @@ class Spinnaker(object):
             partitonable_graph=self._partitionable_graph,
             hostname=self._hostname, placer_algorithm=self._placer_algorithm)
         self._placements = \
-            placer.run(self._partitioned_graph, self._graph_subgraph_mapper)
+            placer.run(self._partitioned_graph, self._graph_mapper)
 
         #execute pynn subedge pruning
         pruner = SubgraphSubedgePruning()
-        self._partitioned_graph, self._graph_subgraph_mapper = \
-            pruner.run(self._partitioned_graph, self._graph_subgraph_mapper)
+        self._partitioned_graph, self._graph_mapper = \
+            pruner.run(self._partitioned_graph, self._graph_mapper)
 
         #execute key allocator
         key_allocator = RoutingInfoAllocator(
             report_states=pacman_report_state, hostname=self._hostname,
             report_folder=self._report_default_directory, machine=self._machine,
-            graph_to_sub_graph_mapper=self._graph_subgraph_mapper,
+            graph_mapper=self._graph_mapper,
             routing_info_allocator_algorithm=self._key_allocator_algorithm)
         self._routing_infos = key_allocator.run(self._partitioned_graph,
                                                 self._placements)
@@ -634,10 +634,10 @@ class Spinnaker(object):
         router = Router(report_folder=self._report_default_directory,
                         report_states=self._reports_states,
                         partitionable_graph=self._partitionable_graph,
-                        graph_to_subgraph_mappings=self._graph_subgraph_mapper)
+                        graph_mappings=self._graph_mapper)
         self._router_tables = router.run(
             self._routing_infos, self._placements, self._machine,
-            self._partitionable_graph)
+            self._partitioned_graph)
 
     def generate_data_specifications(self):
         #iterate though subvertexes and call generate_data_spec for each vertex
@@ -649,8 +649,8 @@ class Spinnaker(object):
 
         for placement in self._placements.placements:
             associated_vertex =\
-                self._graph_subgraph_mapper.\
-                get_vertex_from_subvertex(placement.subvertex)
+                self._graph_mapper.get_vertex_from_subvertex(
+                    placement.subvertex)
             # if the vertex can generate a DSG, call it
             subclass_list = \
                 pacman_utility_calls.\
@@ -658,8 +658,8 @@ class Spinnaker(object):
             if type(associated_vertex) in subclass_list:
                 associated_vertex.generate_data_spec(
                     placement.x, placement.y, placement.p, placement.subvertex,
-                    self._partitioned_graph, self._partitionable_graph, self._routing_infos,
-                    self._hostname, self._graph_subgraph_mapper)
+                    self._partitioned_graph, self._partitionable_graph,
+                    self._routing_infos, self._hostname, self._graph_mapper)
 
                 binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():
@@ -698,7 +698,7 @@ class Spinnaker(object):
                                    "host machine")
 
         for placement in self._placements.placements:
-            associated_vertex = self._graph_subgraph_mapper.\
+            associated_vertex = self._graph_mapper.\
                 get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
             subclass_list = pacman_utility_calls.\

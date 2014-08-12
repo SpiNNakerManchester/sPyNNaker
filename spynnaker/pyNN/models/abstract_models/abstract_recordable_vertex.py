@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 @add_metaclass(ABCMeta)
 class AbstractRecordableVertex(object):
     """
-    Underlying Vertex model for Neural Applications.
+    Underlying AbstractConstrainedVertex model for Neural Applications.
     """
     
     def __init__(self, label):

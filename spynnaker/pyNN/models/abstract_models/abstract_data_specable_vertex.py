@@ -1,4 +1,4 @@
-from pacman.model.partitionable_graph.vertex import Vertex
+from pacman.model.partitionable_graph.abstract_constrained_vertex import AbstractConstrainedVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
@@ -12,10 +12,10 @@ import os
 
 
 @add_metaclass(ABCMeta)
-class AbstractDataSpecableVertex(Vertex):
+class AbstractDataSpecableVertex(AbstractConstrainedVertex):
 
     def __init__(self, n_atoms, label, machine_time_step, constraints=None):
-        Vertex.__init__(self, n_atoms, label, constraints)
+        AbstractConstrainedVertex.__init__(self, n_atoms, label, constraints)
         self._machine_time_step = machine_time_step
         self._application_runtime = None
         self._no_machine_time_steps = None

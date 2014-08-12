@@ -3,10 +3,10 @@ from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
-from pacman.model.partitionable_graph.vertex import Vertex
+from pacman.model.partitionable_graph.abstract_constrained_vertex import AbstractConstrainedVertex
 
-from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper \
-    import GraphSubgraphMapper
+from pacman.model.graph_mapper.graph_mapper \
+    import GraphMapper
 from spynnaker.pyNN.overridden_pacman_functions.pynn_routing_info_allocator \
     import PyNNRoutingInfoAllocator
 from pacman.model.placements.placement import Placement
@@ -23,7 +23,7 @@ class TestPyNNRoutingInfoAllocator(unittest.TestCase):
         self.assertEqual(ria.get_key_mask_combo(0xf1f2,0xffff),0xf1f2)
 
     def test_add_subgraph_and_placement(self):
-        gsm = GraphSubgraphMapper()
+        gsm = GraphMapper()
         ria = PyNNRoutingInfoAllocator(gsm)
         subvertices = list()
         subedges = list()
@@ -51,10 +51,10 @@ class TestPyNNRoutingInfoAllocator(unittest.TestCase):
         for i in range(5,10):
             subedges.append(PartitionedEdge(subvertices[5],subvertices[(i+1)%10]))
         subgraph = PartitionedGraph(None, subvertices, subedges)
-        gsm = GraphSubgraphMapper()
-        gsm.add_subvertices(subvertices[0:3],Vertex(30,"First vertex"))
-        gsm.add_subvertices(subvertices[3:6],Vertex(60,"Second vertex"))
-        gsm.add_subvertices(subvertices[6:10],Vertex(100,"Third vertex"))
+        gsm = GraphMapper()
+        gsm.add_subvertices(subvertices[0:3],AbstractConstrainedVertex(30,"First vertex"))
+        gsm.add_subvertices(subvertices[3:6],AbstractConstrainedVertex(60,"Second vertex"))
+        gsm.add_subvertices(subvertices[6:10],AbstractConstrainedVertex(100,"Third vertex"))
         ria = PyNNRoutingInfoAllocator(gsm)
         subv = PartitionedVertex(0,100)
         pl = Placement(subv,0,0,1)

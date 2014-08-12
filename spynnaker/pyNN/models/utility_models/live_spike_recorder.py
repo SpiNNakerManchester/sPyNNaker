@@ -21,7 +21,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
     SYSTEM_REGION = 0
 
     """
-    A Vertex for the Monitoring application spikes and forwarding them to
+    A AbstractConstrainedVertex for the Monitoring application spikes and forwarding them to
     the host
 
     """

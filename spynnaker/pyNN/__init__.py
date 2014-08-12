@@ -191,12 +191,12 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     if not inspect.isclass(neuron_type):
         neuron_type = globals()[neuron_type]
         if neuron_type is None:
-            raise Exception("Unknown Vertex Type {}".format(neuron_type))
+            raise Exception("Unknown AbstractConstrainedVertex Type {}".format(neuron_type))
 
     if hasattr(neuron_type, "set_model_max_atoms_per_core"):
         neuron_type.set_model_max_atoms_per_core = max_permitted
     else:
-        raise Exception("{} is not a Vertex type".format(neuron_type))
+        raise Exception("{} is not a AbstractConstrainedVertex type".format(neuron_type))
 
 
 # noinspection PyPep8Naming

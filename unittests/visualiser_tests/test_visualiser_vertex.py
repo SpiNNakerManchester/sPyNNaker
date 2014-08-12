@@ -1,7 +1,7 @@
 import unittest
 from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
 import spynnaker.pyNN.utilities.constants as constant
-from pacman.model.partitionable_graph.vertex import Vertex
+from pacman.model.partitionable_graph.abstract_constrained_vertex import AbstractConstrainedVertex
 
 
 class TestVisualiserVertex(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestVisualiserVertex(unittest.TestCase):
         self._visualiser_reset_counter_period = 50
         #raster views
         self._visualiser_raster_separate = 14
-        self._vertex = Vertex(10,"Test vertex")
+        self._vertex = AbstractConstrainedVertex(10,"Test vertex")
         self.visualiser_vertex = VisualiserVertex(
             self._visualiser_mode,
             self._visualiser_2d_dimensions,

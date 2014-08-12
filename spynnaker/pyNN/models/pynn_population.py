@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class Population(object):
     """
     A collection neuron of the same types. It encapsulates a type of 
-    :class:`pacman103.lib.partitionable_graph.Vertex`
+    :class:`pacman103.lib.partitionable_graph.AbstractConstrainedVertex`
     used with Spiking Neural Networks, comprising n cells (atoms)
     of the same :py:mod:`pacman103.front.pynn.models` type.
 
@@ -245,7 +245,7 @@ class Population(object):
         initialize_attr = \
             getattr(self._vertex, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialization of "
+            raise Exception("AbstractConstrainedVertex does not support initialization of "
                             "parameter {%s}".format(variable))
 
         initialize_attr(value)
@@ -332,7 +332,7 @@ class Population(object):
         """
         record_attr = getattr(self._vertex, "record", None)
         if record_attr is None or not callable(record_attr):
-            raise Exception("Vertex does not support recording of spikes")
+            raise Exception("AbstractConstrainedVertex does not support recording of spikes")
 
         # Tell the vertex to record spikes
         self._vertex.record(focus=focus)
@@ -357,7 +357,7 @@ class Population(object):
         """
         if (not hasattr(self._vertex, "record_gsyn")
                 or not callable(self._vertex.record_gsyn)):
-            raise Exception("Vertex does not support recording of gsyn")
+            raise Exception("AbstractConstrainedVertex does not support recording of gsyn")
 
         self._vertex.record_gsyn()
         self._record_g_syn_file = to_file
@@ -370,7 +370,7 @@ class Population(object):
         """
         if (not hasattr(self._vertex, "record_v")
                 or not callable(self._vertex.record_v)):
-            raise Exception("Vertex does not support recording of potential")
+            raise Exception("AbstractConstrainedVertex does not support recording of potential")
 
         self._vertex.record_v()
         self._record_v_file = to_file

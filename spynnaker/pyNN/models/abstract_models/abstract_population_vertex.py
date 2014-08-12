@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class AbstractPopulationVertex(AbstractRecordableVertex,
                                AbstractPopulationDataSpec):
     """
-    Underlying Vertex model for Neural Populations.
+    Underlying AbstractConstrainedVertex model for Neural Populations.
     """
     
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,

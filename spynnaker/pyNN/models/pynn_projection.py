@@ -64,7 +64,7 @@ class Projection(object):
         # Check that the edge doesn't already exist elsewhere
         # This would be a possible place for a merge at some point,
         # but this needs more thought
-        graph_edges = self._spinnaker.graph.edges
+        graph_edges = self._spinnaker.partitionable_graph.edges
         for edge in graph_edges:
             if (edge.pre_vertex == presynaptic_population._get_vertex
                and edge.post_vertex == postsynaptic_population._get_vertex):
