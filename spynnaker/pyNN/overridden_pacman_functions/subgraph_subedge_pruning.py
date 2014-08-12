@@ -1,4 +1,4 @@
-from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.graph_subgraph_mapper.graph_subgraph_mapper \
     import GraphSubgraphMapper
@@ -7,7 +7,7 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.projection_subedge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge import \
-    DelayAfferentEdge
+    DelayAfferentPartitionableEdge
 
 
 class SubgraphSubedgePruning(object):
@@ -51,12 +51,12 @@ class SubgraphSubedgePruning(object):
             graph_to_sub_graph_mapper.get_edge_from_subedge(subedge)
         if isinstance(subedge, ProjectionPartitionedEdge):
             return subedge.is_connected()
-        elif isinstance(associated_edge, DelayAfferentEdge):
+        elif isinstance(associated_edge, DelayAfferentPartitionableEdge):
             return (subedge.pre_subvertex.lo_atom
                     != subedge.post_subvertex.lo_atom or
                     subedge.pre_subvertex.hi_atom
                     != subedge.post_subvertex.hi_atom)
-        elif isinstance(associated_edge, Edge):
+        elif isinstance(associated_edge, PartitionableEdge):
             return False
         else:
             raise exceptions.PrunedException(

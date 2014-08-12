@@ -1,5 +1,5 @@
 from spynnaker.pyNN.models.neural_projections.projection_edge import \
-    ProjectionEdge
+    ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_projection_subedge import \
     DelayProjectionSubedge
 
@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DelayProjectionEdge(ProjectionEdge):
+class DelayProjectionEdge(ProjectionPartitionableEdge):
 
     _DELAY_PAGE_SIZE = 256
     
@@ -15,7 +15,7 @@ class DelayProjectionEdge(ProjectionEdge):
                  num_delay_stages, max_delay_per_neuron,
                  connector=None, synapse_list=None, synapse_dynamics=None,
                  label=None):
-        ProjectionEdge.__init__(
+        ProjectionPartitionableEdge.__init__(
             self, prevertex, postvertex, machine_time_step, connector=connector,
             synapse_list=synapse_list, synapse_dynamics=synapse_dynamics,
             label=label)

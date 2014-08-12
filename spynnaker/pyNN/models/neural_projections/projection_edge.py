@@ -1,4 +1,4 @@
-from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_subedge import \
     ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
@@ -11,12 +11,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ProjectionEdge(Edge):
+class ProjectionPartitionableEdge(PartitionableEdge):
     
     def __init__(self, prevertex, postvertex, machine_time_step,
                  connector=None, synapse_list=None, synapse_dynamics=None,
                  label=None):
-        Edge.__init__(self, prevertex, postvertex, label=label)
+        PartitionableEdge.__init__(self, prevertex, postvertex, label=label)
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
         self._synapse_list = synapse_list

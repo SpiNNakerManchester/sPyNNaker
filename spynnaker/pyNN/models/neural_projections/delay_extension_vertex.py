@@ -170,7 +170,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
             if not isinstance(subedge_assocated_edge, DelayProjectionEdge):
                 raise exceptions.DelayExtensionException(
                     "One of the incoming subedges is not a subedge of a"
-                    " DelayAfferentEdge")
+                    " DelayAfferentPartitionableEdge")
 
             if subedge.pruneable:
                 continue

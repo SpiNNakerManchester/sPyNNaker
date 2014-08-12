@@ -101,8 +101,8 @@ class Spinnaker(object):
         self._visualiser_creation_utility = VisualiserCreationUtility()
 
         #main objects
-        self._graph = PartitionableGraph(label=graph_label)
-        self._sub_graph = None
+        self._partitionable_graph = PartitionableGraph(label=graph_label)
+        self._partitioned_graph = None
         self._graph_subgraph_mapper = None
         self._machine = None
         self._no_machine_time_steps = None
@@ -441,7 +441,7 @@ class Spinnaker(object):
 
         if self._reports_states is not None:
             reports.network_specification_report(self._report_default_directory,
-                                                 self._graph, self._hostname)
+                                                 self._partitionable_graph, self._hostname)
 
         #calcualte number of machien time steps
         if run_time is not None:
@@ -543,8 +543,8 @@ class Spinnaker(object):
         if requires_visualiser:
             self._visualiser, self._visualiser_vertex_to_page_mapping = \
                 self._visualiser_creation_utility.create_visualiser_interface(
-                    has_board, self._txrx, self._graph,
-                    self._visualiser_vertices, self._machine, self._sub_graph,
+                    has_board, self._txrx, self._partitionable_graph,
+                    self._visualiser_vertices, self._machine, self._partitioned_graph,
                     self._placements, self._router_tables, self._runtime,
                     self._machine_time_step)
 
@@ -566,11 +566,11 @@ class Spinnaker(object):
 
     @property
     def sub_graph(self):
-        return self._sub_graph
+        return self._partitioned_graph
 
     @property
     def graph(self):
-        return self._graph
+        return self._partitionable_graph
 
     def set_app_id(self, value):
         self._app_id = value
@@ -594,23 +594,23 @@ class Spinnaker(object):
             no_machine_time_steps=self._no_machine_time_steps,
             report_folder=self._report_default_directory,
             report_states=pacman_report_state, hostname=self._hostname,
-            placer_algorithm=self._placer_algorithm, machine=self._machine,
-            graph=self._graph)
-        self._sub_graph, self._graph_subgraph_mapper = \
-            partitioner.run(self._graph, self._machine)
+            placer_algorithm=self._placer_algorithm, machine=self._machine)
+        self._partitioned_graph, self._graph_subgraph_mapper = \
+            partitioner.run(self._partitionable_graph)
 
         #execute placer
         placer = Placer(
             machine=self._machine, report_states=pacman_report_state,
-            report_folder=self._report_default_directory, graph=self._graph,
+            report_folder=self._report_default_directory,
+            partitonable_graph=self._partitionable_graph,
             hostname=self._hostname, placer_algorithm=self._placer_algorithm)
         self._placements = \
-            placer.run(self._sub_graph, self._graph_subgraph_mapper)
+            placer.run(self._partitioned_graph, self._graph_subgraph_mapper)
 
         #execute pynn subedge pruning
         pruner = SubgraphSubedgePruning()
-        self._sub_graph, self._graph_subgraph_mapper = \
-            pruner.run(self._sub_graph, self._graph_subgraph_mapper)
+        self._partitioned_graph, self._graph_subgraph_mapper = \
+            pruner.run(self._partitioned_graph, self._graph_subgraph_mapper)
 
         #execute key allocator
         key_allocator = RoutingInfoAllocator(
@@ -618,18 +618,17 @@ class Spinnaker(object):
             report_folder=self._report_default_directory, machine=self._machine,
             graph_to_sub_graph_mapper=self._graph_subgraph_mapper,
             routing_info_allocator_algorithm=self._key_allocator_algorithm)
-        self._routing_infos = key_allocator.run(self._sub_graph,
+        self._routing_infos = key_allocator.run(self._partitioned_graph,
                                                 self._placements)
 
         #execute router
-        router = Router(machine=self._machine, placements=self._placements,
-                        report_folder=self._report_default_directory,
+        router = Router(report_folder=self._report_default_directory,
                         report_states=self._reports_states,
-                        subgraph=self._sub_graph, graph=self._graph,
-                        routing_infos=self._routing_infos,
+                        partitionable_graph=self._partitionable_graph,
                         graph_to_subgraph_mappings=self._graph_subgraph_mapper)
-        self._router_tables = router.run(self._routing_infos, self._placements,
-                                         self._machine)
+        self._router_tables = router.run(
+            self._routing_infos, self._placements, self._machine,
+            self._partitionable_graph)
 
     def generate_data_specifications(self):
         #iterate though subvertexes and call generate_data_spec for each vertex
@@ -650,7 +649,7 @@ class Spinnaker(object):
             if type(associated_vertex) in subclass_list:
                 associated_vertex.generate_data_spec(
                     placement.x, placement.y, placement.p, placement.subvertex,
-                    self._sub_graph, self._graph, self._routing_infos,
+                    self._partitioned_graph, self._partitionable_graph, self._routing_infos,
                     self._hostname, self._graph_subgraph_mapper)
 
                 binary_name = associated_vertex.get_binary_file_name()
@@ -828,19 +827,16 @@ class Spinnaker(object):
                 conf.config.get("SpecGeneration", "Binary_folder"),
                 commands)
 
-
-
-
     def _set_tag_output(self, tag, port, hostname):
         self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
 
     def add_vertex(self, vertex_to_add):
         if type(vertex_to_add) == type(MultiCastSource(self._machine_time_step)):
             self._multi_cast_vertex = vertex_to_add
-        self._graph.add_vertex(vertex_to_add)
+        self._partitionable_graph.add_vertex(vertex_to_add)
 
     def add_edge(self, edge_to_add):
-        self._graph.add_edge(edge_to_add)
+        self._partitionable_graph.add_edge(edge_to_add)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(
@@ -868,8 +864,8 @@ class Spinnaker(object):
                 LiveSpikeRecorder(self.machine_time_step)
             self.add_vertex(self._live_spike_recorder)
         #create the edge and add
-        edge = Edge(vertex_to_record_from, self._live_spike_recorder,
-                    "recorder_edge")
+        edge = PartitionableEdge(vertex_to_record_from,
+                                 self._live_spike_recorder, "recorder_edge")
         self.add_edge(edge)
 
     def add_visualiser_vertex(self, visualiser_vertex_to_add):
@@ -943,7 +939,6 @@ class Spinnaker(object):
             spinnman_reports.append_to_rerun_script(conf.config.get(
                 "SpecGeneration", "Binary_folder"), lines)
 
-
         for exectuable_target_key in executable_targets.keys():
             file_reader = SpinnmanFileDataReader(exectuable_target_key)
             core_subset = executable_targets[exectuable_target_key]
@@ -974,7 +969,7 @@ class Spinnaker(object):
                     "SpecGeneration", "Binary_folder"), lines)
 
     def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
-        for vertex in self._graph.vertices:
+        for vertex in self._partitionable_graph.vertices:
             virtual_chip_constraints = \
                 pacman_utility_calls.locate_constraints_of_type(
                     vertex.constraints,

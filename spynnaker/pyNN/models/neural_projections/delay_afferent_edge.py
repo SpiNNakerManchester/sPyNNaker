@@ -1,10 +1,10 @@
-from pacman.model.partitionable_graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 
 
-class DelayAfferentEdge(Edge):
+class DelayAfferentPartitionableEdge(PartitionableEdge):
     
     def __init__(self, prevertex, delayvertex, label=None):
-        Edge.__init__(self, prevertex, delayvertex, label=label)
+        PartitionableEdge.__init__(self, prevertex, delayvertex, label=label)
 
     @staticmethod
     def filter_sub_edge(subedge):
