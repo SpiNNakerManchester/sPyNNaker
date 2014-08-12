@@ -16,7 +16,7 @@ import struct
 
 logger = logging.getLogger(__name__)
 
-@add_metaclass(ABCMeta)
+
 class AbstractRecordableVertex(object):
     """
     Underlying AbstractConstrainedVertex model for Neural Applications.
@@ -27,8 +27,8 @@ class AbstractRecordableVertex(object):
         self._focus_level = None
         self._app_mask = pacman_constants.DEFAULT_MASK
         self._label = label
-        self._no_machine_time_steps = machine_time_step
-        self._machine_time_step = None
+        self._no_machine_time_steps = None
+        self._machine_time_step = machine_time_step
 
     def set_no_machine_time_step(self, no_machine_time_steps):
         if self._no_machine_time_steps is None:

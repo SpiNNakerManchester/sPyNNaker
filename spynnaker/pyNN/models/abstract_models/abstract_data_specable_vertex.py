@@ -1,4 +1,6 @@
 from pacman.model.partitionable_graph.abstract_constrained_vertex import AbstractConstrainedVertex
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
@@ -27,7 +29,8 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_value(data=core_app_identifier)
         spec.write_value(data=self._machine_time_step)
-        spec.write_value(data=self._no_machine_time_steps)
+        if isinstance(self, AbstractRecordableVertex):
+            spec.write_value(data=self._no_machine_time_steps)
 
     @abstractmethod
     def generate_data_spec(self, processor_chip_x, processor_chip_y,

@@ -454,6 +454,9 @@ class Spinnaker(object):
                     "The runtime and machine time step combination result in "
                     "a factional number of machine runable time steps and "
                     "therefore spinnaker cannot determine how many to run for")
+            for vertex in self._partitionable_graph.vertices:
+                if isinstance(vertex, AbstractRecordableVertex):
+                    vertex.set_no_machine_time_step(self._no_machine_time_steps)
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may"
