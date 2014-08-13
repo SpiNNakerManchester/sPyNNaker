@@ -319,10 +319,7 @@ class Spinnaker(SpynnakerConfiguration):
                 self._graph_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
             # if the vertex can generate a DSG, call it
-            subclass_list = \
-                pacman_utility_calls.\
-                locate_all_subclasses_of(AbstractDataSpecableVertex)
-            if type(associated_vertex) in subclass_list:
+            if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 associated_vertex.generate_data_spec(
                     placement.x, placement.y, placement.p, placement.subvertex,
                     self._partitioned_graph, self._partitionable_graph,
@@ -368,9 +365,7 @@ class Spinnaker(SpynnakerConfiguration):
             associated_vertex = self._graph_mapper.\
                 get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
-            subclass_list = pacman_utility_calls.\
-                locate_all_subclasses_of(AbstractDataSpecableVertex)
-            if associated_vertex in subclass_list:
+            if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 data_spec_file_path = \
                     associated_vertex.get_data_spec_file_name(
                         placement.x, placement.y, placement.p, hostname
@@ -562,9 +557,7 @@ class Spinnaker(SpynnakerConfiguration):
                 vertex_to_subvertex_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
 
-            subclass_list = pacman_utility_calls.\
-                locate_all_subclasses_of(AbstractDataSpecableVertex)
-            if associated_vertex in subclass_list:
+            if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
                 start_address = \
                     processor_to_app_data_base_address[key]['start_address']
