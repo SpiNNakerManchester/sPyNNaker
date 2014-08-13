@@ -106,11 +106,12 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
         else:
             binary_folder = config.get("SpecGeneration", "Binary_folder")
 
-        binary_file_name = \
+        application_data_file_name = \
             binary_folder + os.sep + "{}_appData_{}_{}_{}.dat"\
                                      .format(hostname, processor_chip_x,
                                              processor_chip_y,
                                              processor_id)
+        return application_data_file_name
 
     @staticmethod
     def get_mem_write_base_address(processor_id):
