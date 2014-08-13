@@ -1,6 +1,6 @@
-from pacman.model.graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_subedge import \
-    ProjectionSubedge
+    ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
@@ -11,12 +11,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ProjectionEdge(Edge):
+class ProjectionPartitionableEdge(PartitionableEdge):
     
     def __init__(self, prevertex, postvertex, machine_time_step,
                  connector=None, synapse_list=None, synapse_dynamics=None,
                  label=None):
-        Edge.__init__(self, prevertex, postvertex, label=label)
+        PartitionableEdge.__init__(self, prevertex, postvertex, label=label)
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
         self._synapse_list = synapse_list
@@ -37,7 +37,7 @@ class ProjectionEdge(Edge):
         """
         Creates a subedge from this edge
         """
-        return ProjectionSubedge(presubvertex, postsubvertex, self)
+        return ProjectionPartitionedEdge(presubvertex, postsubvertex, self)
         
     def filter_sub_edge(self, subedge):
         """

@@ -3,7 +3,7 @@ from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
-from pacman.model.graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from pacman.utilities import utility_calls as pacman_utility_calls
 
 from spynnaker.pyNN.models.utility_models.multicastsource \
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class Population(object):
     """
     A collection neuron of the same types. It encapsulates a type of
-    :class:`pacman103.lib.graph.Vertex`
+    :class:`pacman103.lib.partitionable_graph.AbstractConstrainedVertex`
     used with Spiking Neural Networks, comprising n cells (atoms)
     of the same :py:mod:`pacman103.front.pynn.models` type.
 
@@ -55,7 +55,7 @@ class Population(object):
         if structure:
             raise Exception("Spatial structure is unsupported for Populations.")
 
-        # Create a graph vertex for the population and add it to PACMAN
+        # Create a partitionable_graph vertex for the population and add it to PACMAN
         cellparams['label'] = label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
@@ -73,10 +73,11 @@ class Population(object):
         for require_multi_cast_source_constraint \
                 in require_multi_cast_source_constraints:
             if multi_cast_vertex is None:
-                multi_cast_vertex = MultiCastSource()
+                multi_cast_vertex = MultiCastSource(
+                    self._spinnaker.machine_time_step)
                 self._spinnaker.add_vertex(multi_cast_vertex)
             multi_cast_vertex = self._spinnaker.get_multi_cast_source
-            edge = Edge(multi_cast_vertex, self._vertex)
+            edge = PartitionableEdge(multi_cast_vertex, self._vertex)
             multi_cast_vertex.add_commands(
                 require_multi_cast_source_constraint.commands, edge)
             self._spinnaker.add_edge(edge)
@@ -91,7 +92,7 @@ class Population(object):
         for dependant_vertex_constrant in dependant_vertex_constraints:
             dependant_vertex = dependant_vertex_constrant.vertex
             self._spinnaker.add_vertex(dependant_vertex)
-            dependant_edge = Edge(pre_vertex=self._vertex,
+            dependant_edge = PartitionableEdge(pre_vertex=self._vertex,
                                   post_vertex=dependant_vertex)
             self._spinnaker.add_edge(dependant_edge)
 
@@ -245,7 +246,7 @@ class Population(object):
         initialize_attr = \
             getattr(self._vertex, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialization of "
+            raise Exception("AbstractConstrainedVertex does not support initialization of "
                             "parameter {%s}".format(variable))
 
         initialize_attr(value)
@@ -332,7 +333,7 @@ class Population(object):
         """
         record_attr = getattr(self._vertex, "record", None)
         if record_attr is None or not callable(record_attr):
-            raise Exception("Vertex does not support recording of spikes")
+            raise Exception("AbstractConstrainedVertex does not support recording of spikes")
 
         # Tell the vertex to record spikes
         self._vertex.record(focus=focus)
@@ -357,7 +358,7 @@ class Population(object):
         """
         if (not hasattr(self._vertex, "record_gsyn")
                 or not callable(self._vertex.record_gsyn)):
-            raise Exception("Vertex does not support recording of gsyn")
+            raise Exception("AbstractConstrainedVertex does not support recording of gsyn")
 
         self._vertex.record_gsyn()
         self._record_g_syn_file = to_file
@@ -370,7 +371,7 @@ class Population(object):
         """
         if (not hasattr(self._vertex, "record_v")
                 or not callable(self._vertex.record_v)):
-            raise Exception("Vertex does not support recording of potential")
+            raise Exception("AbstractConstrainedVertex does not support recording of potential")
 
         self._vertex.record_v()
         self._record_v_file = to_file

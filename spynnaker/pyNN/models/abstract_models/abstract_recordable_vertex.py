@@ -16,19 +16,19 @@ import struct
 
 logger = logging.getLogger(__name__)
 
-@add_metaclass(ABCMeta)
+
 class AbstractRecordableVertex(object):
     """
-    Underlying Vertex model for Neural Applications.
+    Underlying AbstractConstrainedVertex model for Neural Applications.
     """
     
-    def __init__(self, label):
+    def __init__(self, machine_time_step, label):
         self._record = False
         self._focus_level = None
         self._app_mask = pacman_constants.DEFAULT_MASK
         self._label = label
         self._no_machine_time_steps = None
-        self._machine_time_step = None
+        self._machine_time_step = machine_time_step
 
     def set_no_machine_time_step(self, no_machine_time_steps):
         if self._no_machine_time_steps is None:
@@ -37,6 +37,10 @@ class AbstractRecordableVertex(object):
             raise exceptions.ConfigurationException(
                 "cannot set the number of machine time steps of a given"
                 " model once it has already been set")
+
+    @property
+    def machine_time_step(self):
+        return self._machine_time_step
 
     def record(self, focus=None):
         """

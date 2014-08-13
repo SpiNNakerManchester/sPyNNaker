@@ -31,7 +31,7 @@ from spynnaker.pyNN.models.neural_models.izk_curr_exp \
 
 #neural projections
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
-    import DelayAfferentEdge
+    import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
@@ -39,9 +39,9 @@ from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
 from spynnaker.pyNN.models.neural_projections.delay_projection_subedge \
     import DelayProjectionSubedge
 from spynnaker.pyNN.models.neural_projections.projection_edge \
-    import ProjectionEdge
+    import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_subedge \
-    import ProjectionSubedge
+    import ProjectionPartitionedEdge
 
 #spike sources
 from spynnaker.pyNN.models.spike_source.spike_source_array \
@@ -191,12 +191,12 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     if not inspect.isclass(neuron_type):
         neuron_type = globals()[neuron_type]
         if neuron_type is None:
-            raise Exception("Unknown Vertex Type {}".format(neuron_type))
+            raise Exception("Unknown AbstractConstrainedVertex Type {}".format(neuron_type))
 
     if hasattr(neuron_type, "set_model_max_atoms_per_core"):
         neuron_type.set_model_max_atoms_per_core = max_permitted
     else:
-        raise Exception("{} is not a Vertex type".format(neuron_type))
+        raise Exception("{} is not a AbstractConstrainedVertex type".format(neuron_type))
 
 
 # noinspection PyPep8Naming

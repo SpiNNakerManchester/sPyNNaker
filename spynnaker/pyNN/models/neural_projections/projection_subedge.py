@@ -1,10 +1,10 @@
-from pacman.model.subgraph.subedge import Subedge
+from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 
 
-class ProjectionSubedge(Subedge):
+class ProjectionPartitionedEdge(PartitionedEdge):
     
     def __init__(self, presubvertex, postsubvertex, associated_edge):
-        Subedge.__init__(self, presubvertex, postsubvertex)
+        PartitionedEdge.__init__(self, presubvertex, postsubvertex)
         self._synapse_sublist = None
         self._associated_edge = associated_edge
 

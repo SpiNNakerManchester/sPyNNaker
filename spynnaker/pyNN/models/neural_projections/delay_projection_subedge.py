@@ -1,5 +1,5 @@
 from spynnaker.pyNN.models.neural_projections.projection_subedge \
-    import ProjectionSubedge
+    import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DelayProjectionSubedge(ProjectionSubedge):
+class DelayProjectionSubedge(ProjectionPartitionedEdge):
     
     def __init__(self, edge, presubvertex, postsubvertex, associated_edge):
         super(DelayProjectionSubedge, self).__init__(edge, presubvertex,

@@ -9,9 +9,9 @@ from abc import abstractmethod
 from six import add_metaclass
 
 from spynnaker.pyNN.models.neural_projections.projection_edge \
-    import ProjectionEdge
+    import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_subedge \
-    import ProjectionSubedge
+    import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN import exceptions
@@ -19,7 +19,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import utility_calls
-from pacman.model.graph.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 #spinnman imports
@@ -158,7 +158,7 @@ class AbstractSynapticManager(object):
         memory_size = 0
         
         for in_edge in in_edges:
-            if isinstance(in_edge, ProjectionEdge):
+            if isinstance(in_edge, ProjectionPartitionableEdge):
                 
                 # Get maximum row length in this edge 
                 max_n_words = in_edge.get_max_n_words(lo_atom, hi_atom)
@@ -201,7 +201,7 @@ class AbstractSynapticManager(object):
             return True
         self._stdp_checked = True
         for in_edge in in_edges:
-            if (isinstance(in_edge, ProjectionEdge)
+            if (isinstance(in_edge, ProjectionPartitionableEdge)
                     and in_edge.synapse_dynamics is not None):
                 if in_edge.synapse_dynamics.fast is not None:
                     raise exceptions.SynapticConfigurationException(
@@ -337,7 +337,7 @@ class AbstractSynapticManager(object):
         for that source pynn_population.py.
 
         Synaptic Matrix:
-        One block for each projection in the network (sub_edge in the graph).
+        One block for each projection in the network (sub_edge in the partitionable_graph).
         Blocks are always aligned to 1K boundaries (within the region).
         Each block contains one row for each arriving axon.
         Each row contains a header of two words and then one 32-bit word for
@@ -364,7 +364,7 @@ class AbstractSynapticManager(object):
         for subedge in in_subedges:
 
             # Only deal with incoming projection subedges
-            if not subedge.pruneable and isinstance(subedge, ProjectionSubedge):
+            if not subedge.pruneable and isinstance(subedge, ProjectionPartitionedEdge):
                 key = routing_info.get_key_from_subedge(subedge)
                 x = packet_conversions.get_x_from_key(key)
                 y = packet_conversions.get_y_from_key(key)

@@ -31,7 +31,7 @@ def network_specification_report(report_folder, graph, hostname):
         size = vertex.n_atoms
         #params = vertex.parameters
         constraints = vertex.constraints
-        f_network_specification.write("Vertex {}, size: {}\n"
+        f_network_specification.write("AbstractConstrainedVertex {}, size: {}\n"
                                       .format(label, size))
         f_network_specification.write("Model: {}\n".format(model))
         for constraint in constraints:
@@ -57,7 +57,7 @@ def network_specification_report(report_folder, graph, hostname):
         post_v_sz = post_v.n_atoms
         pre_v_label = pre_v.label
         post_v_label = post_v.label
-        edge_str = "Edge {} from vertex: '{}' ({} atoms) to vertex: '{}' " \
+        edge_str = "PartitionableEdge {} from vertex: '{}' ({} atoms) to vertex: '{}' " \
                    "({} atoms)\n".format(label, pre_v_label, pre_v_sz,
                                          post_v_label, post_v_sz)
         f_network_specification.write(edge_str)

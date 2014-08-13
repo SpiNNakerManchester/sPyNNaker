@@ -6,9 +6,9 @@ from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_projections.projection_edge \
-    import ProjectionEdge
+    import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
-    import DelayAfferentEdge
+    import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
     import DelayProjectionEdge
 from spynnaker.pyNN.utilities.timer import Timer
@@ -64,7 +64,7 @@ class Projection(object):
         # Check that the edge doesn't already exist elsewhere
         # This would be a possible place for a merge at some point,
         # but this needs more thought
-        graph_edges = self._spinnaker.graph.edges
+        graph_edges = self._spinnaker.partitionable_graph.edges
         for edge in graph_edges:
             if (edge.pre_vertex == presynaptic_population._get_vertex
                and edge.post_vertex == postsynaptic_population._get_vertex):
@@ -129,7 +129,7 @@ class Projection(object):
 
         else:
             self._projection_edge = \
-                ProjectionEdge(
+                ProjectionPartitionableEdge(
                     presynaptic_population._get_vertex,
                     postsynaptic_population._get_vertex, machine_time_step,
                     synapse_list=synapse_list,
@@ -154,7 +154,7 @@ class Projection(object):
             0, max_delay_per_neuron)
         if direct_synaptic_sublist.get_max_n_connections() != 0:
             direct_edge =\
-                ProjectionEdge(presynaptic_population._get_vertex,
+                ProjectionPartitionableEdge(presynaptic_population._get_vertex,
                                postsynaptic_population._get_vertex,
                                self._spinnaker.machineTimeStep,
                                synapse_list=direct_synaptic_sublist, 
@@ -176,7 +176,7 @@ class Projection(object):
         # Create a connection from the source pynn_population.py to the
         # delay vertex
         new_label = "{%s}_to_DE".format(label)
-        remaining_edge = DelayAfferentEdge(presynaptic_population._get_vertex,
+        remaining_edge = DelayAfferentPartitionableEdge(presynaptic_population._get_vertex,
                                            delay_vertex, label=new_label)
         self._spinnaker.add_edge(remaining_edge)
 

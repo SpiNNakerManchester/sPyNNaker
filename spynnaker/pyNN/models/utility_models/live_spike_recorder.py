@@ -1,8 +1,6 @@
 import os
 
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
-from pacman.model.graph.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
@@ -15,13 +13,13 @@ from data_specification.data_specification_generator import \
 from data_specification.file_data_writer import FileDataWriter
 
 
-class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
+class LiveSpikeRecorder(AbstractDataSpecableVertex,
                         AbstractPartitionableVertex):
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
     SYSTEM_REGION = 0
 
     """
-    A Vertex for the Monitoring application spikes and forwarding them to
+    A AbstractConstrainedVertex for the Monitoring application spikes and forwarding them to
     the host
 
     """
@@ -29,7 +27,6 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
         """
         Creates a new AppMonitor Object.
         """
-        AbstractRecordableVertex.__init__(self, "Monitor")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="Monitor",
                                             machine_time_step=machine_time_step)
@@ -87,7 +84,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
 
     def write_setup_info(self, spec, subvertex, graph_sub_graph_mapper):
         """
-        Write information used to control the simulationand gathering of
+        Write information used to control the simulation and gathering of
         results. Currently, this means the flag word used to signal whether
         information on neuron firing and neuron potential is either stored
         locally in a buffer or passed out of the simulation for storage/display
@@ -121,7 +118,7 @@ class LiveSpikeRecorder(AbstractRecordableVertex, AbstractDataSpecableVertex,
                                    'live_spike_recorder.aplx')
         return binary_name
 
-    #inhirrted from partitionable vertex
+    #inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
         return 0
 

@@ -14,7 +14,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
     import AbstractRecordableVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge import \
     DelayProjectionEdge
-from pacman.model.graph.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
@@ -170,7 +170,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
             if not isinstance(subedge_assocated_edge, DelayProjectionEdge):
                 raise exceptions.DelayExtensionException(
                     "One of the incoming subedges is not a subedge of a"
-                    " DelayAfferentEdge")
+                    " DelayAfferentPartitionableEdge")
 
             if subedge.pruneable:
                 continue

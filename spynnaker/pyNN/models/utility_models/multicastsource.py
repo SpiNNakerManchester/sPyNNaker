@@ -3,7 +3,7 @@ import os
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 from spynnaker.pyNN import exceptions
-from pacman.model.graph.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
@@ -32,7 +32,8 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         """
         constructor that depends upon the Component vertex
         """
-        AbstractRecordableVertex.__init__(self, "multi_cast_source_sender")
+        AbstractRecordableVertex.__init__(self, machine_time_step,
+                                          "multi_cast_source_sender")
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="multi_cast_source_sender",
                                             machine_time_step=machine_time_step)

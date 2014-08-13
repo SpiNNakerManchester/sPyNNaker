@@ -9,8 +9,8 @@ from pacman import exceptions
 
 class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
     
-    def __init__(self, graph_subgraph_mapper):
-        BasicRoutingInfoAllocator.__init__(self, graph_subgraph_mapper)
+    def __init__(self, graph_mapper):
+        BasicRoutingInfoAllocator.__init__(self, graph_mapper)
         self._supported_constraints.append(KeyAllocatorRoutingConstraint)
 
     #inhirrted from AbstractRoutingInfoAllocatorAlgorithm
@@ -20,7 +20,7 @@ class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
 
         :param out_going_subedge: the outgoing subedge from a given subvert
         :param placement: the placement for the given subvert
-        :type out_going_subedge: pacman.model.subgraph.subegde.Subedge
+        :type out_going_subedge: pacman.model.partitioned_graph.subegde.PartitionedEdge
         :type placement: pacman.model.placements.placement.Placement
         :return: a subedge_routing_info which contains the key, and mask of the\
          subvert

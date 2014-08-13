@@ -1,6 +1,6 @@
 import unittest
 from spynnaker.pyNN.models.neural_projections.projection_subedge \
-    import ProjectionSubedge
+    import ProjectionPartitionedEdge
 
 
 class MyTestCase(unittest.TestCase):

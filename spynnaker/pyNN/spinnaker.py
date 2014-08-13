@@ -1,8 +1,9 @@
 #pacman imports
 from pacman.model.constraints.vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
-from pacman.model.graph.graph import Graph
-from pacman.model.graph.edge import Edge
+from pacman.model.partitionable_graph.partitionable_graph import PartitionableGraph
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
 from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
@@ -41,8 +42,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
-from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning import \
-    SubgraphSubedgePruning
+from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning \
+    import SubgraphSubedgePruning
 from spynnaker.pyNN import reports
 
 #spinnman inports
@@ -101,9 +102,9 @@ class Spinnaker(object):
         self._visualiser_creation_utility = VisualiserCreationUtility()
 
         #main objects
-        self._graph = Graph(label=graph_label)
-        self._sub_graph = None
-        self._graph_subgraph_mapper = None
+        self._partitionable_graph = PartitionableGraph(label=graph_label)
+        self._partitioned_graph = None
+        self._graph_mapper = None
         self._machine = None
         self._no_machine_time_steps = None
         self._placements = None
@@ -143,7 +144,7 @@ class Spinnaker(object):
 
         logger.info("Setting appID to %d." % self._app_id)
 
-        #get the machien time step
+        #get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
         self._edge_count = 0
@@ -192,7 +193,7 @@ class Spinnaker(object):
             conf.config.set("SpecGeneration", "Binary_folder",
                             this_run_time_folder)
         elif where_to_write_application_data_files == "TEMP":
-            pass  # just dont set the config param, code downstairs
+            pass  # just don't set the config param, code downstairs
             #  from here will create temp folders if needed
         else:
             #add time stamped folder for this run
@@ -232,7 +233,8 @@ class Spinnaker(object):
                 os.makedirs(self._report_default_directory)
 
         #clear and clean out folders considered not useful anymore
-        if not created_folder:
+        if not created_folder \
+                and len(os.listdir(self._report_default_directory)) > 0:
             self._move_report_and_binary_files(
                 conf.config.getint("Reports", "max_reports_kept"),
                 self._report_default_directory)
@@ -441,7 +443,7 @@ class Spinnaker(object):
 
         if self._reports_states is not None:
             reports.network_specification_report(self._report_default_directory,
-                                                 self._graph, self._hostname)
+                                                 self._partitionable_graph, self._hostname)
 
         #calcualte number of machien time steps
         if run_time is not None:
@@ -454,6 +456,9 @@ class Spinnaker(object):
                     "The runtime and machine time step combination result in "
                     "a factional number of machine runable time steps and "
                     "therefore spinnaker cannot determine how many to run for")
+            for vertex in self._partitionable_graph.vertices:
+                if isinstance(vertex, AbstractRecordableVertex):
+                    vertex.set_no_machine_time_step(self._no_machine_time_steps)
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may"
@@ -465,15 +470,6 @@ class Spinnaker(object):
             timer = Timer()
         else:
             timer = None
-
-        #update models with new no_machine_time_step
-        for vertex in self._graph.vertices:
-            if isinstance(vertex, AbstractDataSpecableVertex):
-                vertex.set_application_runtime(self._runtime)
-                vertex.set_no_machine_time_steps(self._no_machine_time_steps)
-            if isinstance(vertex, AbstractRecordableVertex) and not \
-                    isinstance(vertex, AbstractDataSpecableVertex):
-                vertex.set_no_machine_time_step(self._no_machine_time_steps)
 
         self.set_runtime(run_time)
         logger.info("*** Running Mapper *** ")
@@ -513,7 +509,7 @@ class Spinnaker(object):
             if self._do_load is True:
                 logger.info("*** Loading data ***")
                 self._load_application_data(self._placements,
-                                            self._graph_subgraph_mapper,
+                                            self._graph_mapper,
                                             processor_to_app_data_base_address)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets)
@@ -552,8 +548,8 @@ class Spinnaker(object):
         if requires_visualiser:
             self._visualiser, self._visualiser_vertex_to_page_mapping = \
                 self._visualiser_creation_utility.create_visualiser_interface(
-                    has_board, self._txrx, self._graph,
-                    self._visualiser_vertices, self._machine, self._sub_graph,
+                    has_board, self._txrx, self._partitionable_graph,
+                    self._visualiser_vertices, self._machine, self._partitioned_graph,
                     self._placements, self._router_tables, self._runtime,
                     self._machine_time_step)
 
@@ -575,11 +571,11 @@ class Spinnaker(object):
 
     @property
     def sub_graph(self):
-        return self._sub_graph
+        return self._partitioned_graph
 
     @property
-    def graph(self):
-        return self._graph
+    def partitionable_graph(self):
+        return self._partitionable_graph
 
     def set_app_id(self, value):
         self._app_id = value
@@ -603,42 +599,41 @@ class Spinnaker(object):
             no_machine_time_steps=self._no_machine_time_steps,
             report_folder=self._report_default_directory,
             report_states=pacman_report_state, hostname=self._hostname,
-            placer_algorithm=self._placer_algorithm, machine=self._machine,
-            graph=self._graph)
-        self._sub_graph, self._graph_subgraph_mapper = \
-            partitioner.run(self._graph, self._machine)
+            placer_algorithm=self._placer_algorithm, machine=self._machine)
+        self._partitioned_graph, self._graph_mapper = \
+            partitioner.run(self._partitionable_graph)
 
         #execute placer
         placer = Placer(
             machine=self._machine, report_states=pacman_report_state,
-            report_folder=self._report_default_directory, graph=self._graph,
+            report_folder=self._report_default_directory,
+            partitonable_graph=self._partitionable_graph,
             hostname=self._hostname, placer_algorithm=self._placer_algorithm)
         self._placements = \
-            placer.run(self._sub_graph, self._graph_subgraph_mapper)
+            placer.run(self._partitioned_graph, self._graph_mapper)
 
         #execute pynn subedge pruning
         pruner = SubgraphSubedgePruning()
-        self._sub_graph, self._graph_subgraph_mapper = \
-            pruner.run(self._sub_graph, self._graph_subgraph_mapper)
+        self._partitioned_graph, self._graph_mapper = \
+            pruner.run(self._partitioned_graph, self._graph_mapper)
 
         #execute key allocator
         key_allocator = RoutingInfoAllocator(
             report_states=pacman_report_state, hostname=self._hostname,
             report_folder=self._report_default_directory, machine=self._machine,
-            graph_to_sub_graph_mapper=self._graph_subgraph_mapper,
+            graph_mapper=self._graph_mapper,
             routing_info_allocator_algorithm=self._key_allocator_algorithm)
-        self._routing_infos = key_allocator.run(self._sub_graph,
+        self._routing_infos = key_allocator.run(self._partitioned_graph,
                                                 self._placements)
 
         #execute router
-        router = Router(machine=self._machine, placements=self._placements,
-                        report_folder=self._report_default_directory,
+        router = Router(report_folder=self._report_default_directory,
                         report_states=self._reports_states,
-                        subgraph=self._sub_graph, graph=self._graph,
-                        routing_infos=self._routing_infos,
-                        graph_to_subgraph_mappings=self._graph_subgraph_mapper)
-        self._router_tables = router.run(self._routing_infos, self._placements,
-                                         self._machine)
+                        partitionable_graph=self._partitionable_graph,
+                        graph_mappings=self._graph_mapper)
+        self._router_tables = router.run(
+            self._routing_infos, self._placements, self._machine,
+            self._partitioned_graph)
 
     def generate_data_specifications(self):
         #iterate though subvertexes and call generate_data_spec for each vertex
@@ -650,14 +645,14 @@ class Spinnaker(object):
 
         for placement in self._placements.placements:
             associated_vertex =\
-                self._graph_subgraph_mapper.\
-                get_vertex_from_subvertex(placement.subvertex)
+                self._graph_mapper.get_vertex_from_subvertex(
+                    placement.subvertex)
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 associated_vertex.generate_data_spec(
                     placement.x, placement.y, placement.p, placement.subvertex,
-                    self._sub_graph, self._graph, self._routing_infos,
-                    self._hostname, self._graph_subgraph_mapper)
+                    self._partitioned_graph, self._partitionable_graph,
+                    self._routing_infos, self._hostname, self._graph_mapper)
 
                 binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():
@@ -696,7 +691,7 @@ class Spinnaker(object):
                                    "host machine")
 
         for placement in self._placements.placements:
-            associated_vertex = self._graph_subgraph_mapper.\
+            associated_vertex = self._graph_mapper.\
                 get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
@@ -841,10 +836,10 @@ class Spinnaker(object):
     def add_vertex(self, vertex_to_add):
         if type(vertex_to_add) == type(MultiCastSource(self._machine_time_step)):
             self._multi_cast_vertex = vertex_to_add
-        self._graph.add_vertex(vertex_to_add)
+        self._partitionable_graph.add_vertex(vertex_to_add)
 
     def add_edge(self, edge_to_add):
-        self._graph.add_edge(edge_to_add)
+        self._partitionable_graph.add_edge(edge_to_add)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(
@@ -872,8 +867,8 @@ class Spinnaker(object):
                 LiveSpikeRecorder(self.machine_time_step)
             self.add_vertex(self._live_spike_recorder)
         #create the edge and add
-        edge = Edge(vertex_to_record_from, self._live_spike_recorder,
-                    "recorder_edge")
+        edge = PartitionableEdge(vertex_to_record_from,
+                                 self._live_spike_recorder, "recorder_edge")
         self.add_edge(edge)
 
     def add_visualiser_vertex(self, visualiser_vertex_to_add):
@@ -974,7 +969,7 @@ class Spinnaker(object):
                     "SpecGeneration", "Binary_folder"), lines)
 
     def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
-        for vertex in self._graph.vertices:
+        for vertex in self._partitionable_graph.vertices:
             virtual_chip_constraints = \
                 pacman_utility_calls.locate_constraints_of_type(
                     vertex.constraints,
