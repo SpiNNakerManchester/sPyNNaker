@@ -12,13 +12,13 @@ class TestPyNNSetup(unittest.TestCase):
         self.assertEqual( conf.config.get("Model", "min_delay"), 1 )
         self.assertEqual( conf.config.get("Model", "max_delay"), 15.0 )
 
-    def test_setting_up_again(self):
-        import spynnaker.pyNN as pynn
-        # self.assertEqual(pynn._spinnaker, None)
-        pynn.setup(timestep=1.1, min_delay=1.1, max_delay=10.0)
-        self.assertNotEqual(pynn._spinnaker, None)
-        pynn.end()
-        self.assertEqual(pynn._spinnaker, None)
+    # def test_setting_up_again(self):
+    #     import spynnaker.pyNN as pynn
+    #     # self.assertEqual(pynn._spinnaker, None)
+    #     pynn.setup(timestep=1.1, min_delay=1.1, max_delay=10.0)
+    #     self.assertNotEqual(pynn._spinnaker, None)
+    #     pynn.end()
+    #     self.assertEqual(pynn._spinnaker, None)
 
 
 
