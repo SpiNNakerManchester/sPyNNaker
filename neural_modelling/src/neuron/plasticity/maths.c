@@ -1,5 +1,5 @@
 #include "../spin-neuron-impl.h"
-#include "../../common/compile_time_assert.h"
+#include <static-assert.h>
 #include "maths.h"
 
 //---------------------------------------
@@ -9,7 +9,7 @@ address_t copy_int16_lut(address_t start_address, uint32_t num_entries, int16_t 
 {
   // Get size of LUTs in words
   const uint32_t num_words = num_entries / 2;
-  COMPILE_TIME_ASSERT(num_words * 2 == num_entries, luts_must_be_word_aligned);
+  // static_assert(num_words * 2 == num_entries, luts_must_be_word_aligned);
 
   // Copy words to LUT
   memcpy(lut, start_address, sizeof(uint32_t) * num_words);

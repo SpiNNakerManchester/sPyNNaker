@@ -1,5 +1,5 @@
 #include "../spin-neuron-impl.h"
-#include "../../common/compile_time_assert.h"
+#include <static-assert.h>
 #include "stdp_trace_pair_impl.h"
 
 #include <string.h>
@@ -31,8 +31,8 @@ bool plasticity_region_filled (uint32_t* address, uint32_t flags)
   plasticity_region_data.max_weight = (int32_t)address[1];
   plasticity_region_data.a2_plus = (int32_t)address[2];
   plasticity_region_data.a2_minus = (int32_t)address[3];
-  
-  log_info("\tMin weight:%d, Max weight:%d, A2+:%d, A2-:%d", plasticity_region_data.min_weight, plasticity_region_data.max_weight, 
+
+  log_info("\tMin weight:%d, Max weight:%d, A2+:%d, A2-:%d", plasticity_region_data.min_weight, plasticity_region_data.max_weight,
     plasticity_region_data.a2_plus, plasticity_region_data.a2_minus);
 
   // Copy LUTs from following memory

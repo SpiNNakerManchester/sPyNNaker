@@ -35,7 +35,7 @@ DEBUGFLAGS =
 CFLAGS += -Wall -Wextra -D$(DEBUG) $(DEBUGFLAGS) -Ofast
 
 # because currently using floating point
-LIBRARIES += -lm   
+LIBRARIES += -lm
 
 #-------------------------------------------------------------------------------
 
@@ -45,8 +45,8 @@ LIBRARIES += -lm
 # in the application, add their object file names to this variable.
 
 
-OBJECTS = ../../common/bit_field.o ../../common/out_spikes.o ../../common/configuration.o ../../common/recording.o ../../common/spin1-api-configuration.o ../../common/simulate.o \
-	../common/spike_source.o spike_source_poisson.o ../../common/stdfix-exp.o
+OBJECTS = ../../common/out_spikes.o ../../common/configuration.o ../../common/recording.o ../../common/spin1-api-configuration.o \
+	../common/spike_source.o spike_source_poisson.o
 
 # Include common make file stuff
 include ../../Makefile.depend

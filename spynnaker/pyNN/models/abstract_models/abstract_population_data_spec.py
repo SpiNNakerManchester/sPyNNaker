@@ -147,6 +147,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_value(data=executable_constant)
         spec.write_value(data=self._machine_time_step)
+        spec.write_value(data=self._no_machine_time_steps)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=neuron_potential_region_sz)

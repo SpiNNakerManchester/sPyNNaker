@@ -1,5 +1,5 @@
 /*
- * spin1-api-configuration.c 
+ * spin1-api-configuration.c
  *
  *
  *  SUMMARY
@@ -18,7 +18,7 @@
  *    Manchester M13 9PL, UK
  *
  *  DESCRIPTION
- *    
+ *
  *
  *  CREATION DATE
  *    17 January, 2014
@@ -38,32 +38,30 @@
 #include "common-impl.h"
 
 // Globals
-uint32_t simulation_ticks = 0;
 uint simulation_rtr_entry = 0;
 
 address_t system_load_sram()
 {
   // Get pointer to 1st virtual processor info struct in SRAM
   vcpu_t *sark_virtual_processor_info = (vcpu_t*)SV_VCPU;
-  
+
   log_info("%08x", &sark_virtual_processor_info[spin1_get_core_id()].user0);
-  
+
   // Get the address this core's DTCM data starts at from the user data member of the structure associated with this virtual processor
   address_t address = (address_t)sark_virtual_processor_info[spin1_get_core_id()].user0;
-  simulation_ticks = sark_virtual_processor_info[spin1_get_core_id()].user1;
-  
-  log_info("SDRAM data begins at address:%08x Simulation should run for:%d ticks", address, simulation_ticks);
-  
+
+  log_info("SDRAM data begins at address:%08x", address);
+
   return address;
 }
 
 bool system_lead_app_configured ()
 {
   log_info("system_lead_app_configured: started");
-  
+
   // Get pointer to router table data in SDRAM
   rtr_entry_t *router_table_data = (rtr_entry_t*)0x77780000;
-  
+
   // Allocate specified number of entries
   log_info("Allocating %u router entries", router_table_data->free);
   simulation_rtr_entry = rtr_alloc_id(router_table_data->free, 0);
@@ -79,9 +77,9 @@ bool system_lead_app_configured ()
     log_info("rtr_mc_load failed");
     return (false);
   }
-  
+
   log_info("system_lead_app_configured: completed successfully");
-  
+
   return (true);
 }
 
