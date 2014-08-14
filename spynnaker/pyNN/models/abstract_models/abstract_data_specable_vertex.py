@@ -34,7 +34,7 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
 
     @abstractmethod
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, sub_graph, graph,
+                           processor_id, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_subgraph_mapper):
         """
         method to determine how to generate their data spec for a non neural

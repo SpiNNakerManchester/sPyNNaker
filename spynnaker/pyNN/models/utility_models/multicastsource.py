@@ -51,7 +51,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         self.add_constraint(routing_key_constraint)
 
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, sub_graph, graph,
+                           processor_id, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_subgraph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a

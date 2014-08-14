@@ -322,8 +322,9 @@ class Spinnaker(SpynnakerConfiguration):
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 associated_vertex.generate_data_spec(
                     placement.x, placement.y, placement.p, placement.subvertex,
-                    self._partitioned_graph, self._partitionable_graph,
-                    self._routing_infos, self._hostname, self._graph_mapper)
+                    placement, self._partitioned_graph,
+                    self._partitionable_graph, self._routing_infos,
+                    self._hostname, self._graph_mapper)
 
                 binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():

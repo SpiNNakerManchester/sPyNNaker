@@ -23,14 +23,14 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
-        AbstractRecordableVertex.__init__(self, label)
+        AbstractRecordableVertex.__init__(self, machine_time_step, label)
         AbstractDataSpecableVertex.__init__(self, label=label,
                                             n_atoms=n_neurons,
                                             machine_time_step=machine_time_step)
 
     def _write_setup_info(self, spec, spike_history_region_sz):
         """
-        Write information used to control the simulationand gathering of
+        Write information used to control the simulation and gathering of
         results. Currently, this means the flag word used to signal whether
         information on neuron firing and neuron potential is either stored
         locally in a buffer or passed out of the simulation for storage/display
@@ -41,14 +41,14 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
             Bit 0: Record spike history
         """
 
-        # What recording commands wereset for the parent
+        # What recording commands were set for the parent
         # pynn_population.py?
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
-            recording_info |= self._SPIKE_SOURCE_REGIONS.RECORD_SPIKE_BIT
+            recording_info |= self._SPIKE_SOURCE_REGIONS.RECORD_SPIKE_BIT.value
         recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
-        spec.switchWriteFocus(region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION)
+        spec.switchWriteFocus(region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write(data=recording_info)
         spec.write(data=spike_history_region_sz)
         spec.write(data=0)

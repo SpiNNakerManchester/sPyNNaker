@@ -207,7 +207,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         # End the loop over the neurons:
 
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, subgraph, graph,
+                           processor_id, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to

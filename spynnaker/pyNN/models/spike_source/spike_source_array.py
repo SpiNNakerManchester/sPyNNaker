@@ -157,20 +157,20 @@ class SpikeSourceArray(AbstractSpikeSource):
         The indices region will be copied to DTCM by the executable.
         """
         spec.reserve_memory_region(
-            region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION, size=setup_sz,
-            label='systemInfo')
+            region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
+            size=setup_sz, label='systemInfo')
 
         spec.reserve_memory_region(
-            region=AbstractSpikeSource.BLOCK_INDEX_REGION,
+            region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value,
             size=block_index_region_size, label='SpikeBlockIndexRegion')
 
         spec.reserve_memory_region(
-            region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION,
+            region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
             size=spike_region_size, label='SpikeDataRegion')
 
         if spike_hist_buff_sz > 0:
             spec.reserve_memory_region(
-                region=self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+                region=self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
                 leaveUnfilled=True)
 
@@ -200,14 +200,14 @@ class SpikeSourceArray(AbstractSpikeSource):
         recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
-            region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION)
+            region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=0)
         spec.write_value(data=0)
 
-    @staticmethod
-    def write_block_index_region(spec, subvertex, num_neurons, table_entries):
+    def write_block_index_region(self, spec, subvertex, placement,
+                                 num_neurons, table_entries):
         """
         Spike block index table. Gives address of each block of spikes.
         numNeurons is the total number of spike sources to be modelled.
@@ -218,9 +218,9 @@ class SpikeSourceArray(AbstractSpikeSource):
         } entry
         
         """
-        spec.switch_write_focus(region=AbstractSpikeSource.BLOCK_INDEX_REGION)
+        spec.switch_write_focus(region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value)
         # Word 0 is the key (x, y, p) for this core:
-        chip_x, chip_y, chip_p = subvertex.placement.processor.get_coordinates()
+        chip_x, chip_y, chip_p = placement.x, placement.y, placement.p
         population_identity = \
             packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
         spec.write_value(data=population_identity)
@@ -252,7 +252,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         position means that neuron fires this tick.
         """
         spec.switch_write_focus(
-            region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION)
+            region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value)
         vector_len = int(math.ceil(num_neurons / 32.0))
         for block in spike_blocks:
             spike_bit_vectors = [0] * vector_len
@@ -276,12 +276,12 @@ class SpikeSourceArray(AbstractSpikeSource):
         # Use standard behaviour to read spikes
         return self._get_spikes(
             spinnaker, compatible_output,
-            self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+            self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             sub_vertex_out_spike_bytes_function)
 
     #inhirrted from dataspecable vertex
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, subgraph, graph,
+                           processor_id, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_subgraph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
@@ -295,7 +295,6 @@ class SpikeSourceArray(AbstractSpikeSource):
         spec = DataSpecificationGenerator(data_writer)
         spike_history_region_sz = self.get_spike_buffer_size(subvertex.lo_atom,
                                                              subvertex.hi_atom)
-        self.write_setup_info(spec, spike_history_region_sz)
 
         spec.comment("\n*** Spec for SpikeSourceArray Instance ***\n\n")
 
@@ -316,7 +315,9 @@ class SpikeSourceArray(AbstractSpikeSource):
         self.reserve_memory_regions(spec, constants.SETUP_SIZE,
                                     block_index_region_size,
                                     spike_region_size, spike_history_region_sz)
-        self.write_block_index_region(spec, subvertex, num_neurons, 
+        self.write_setup_info(spec, spike_history_region_sz)
+
+        self.write_block_index_region(spec, subvertex, placement, num_neurons,
                                       table_entries)
         self.write_spike_data_region(spec, num_neurons, spike_blocks)
 

@@ -45,7 +45,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
     CORE_APP_IDENTIFIER = constants.DELAY_EXTENSION_CORE_APPLICATION_ID
     
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
-                 constraints=None, label="DelayExtension"):
+                 machine_time_step, constraints=None, label="DelayExtension"):
         """
         Creates a new DelayExtension Object.
         """
@@ -54,7 +54,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                                              constraints=constraints,
                                              label=label,
                                              max_atoms_per_core=256)
-        AbstractRecordableVertex.__init__(self, label=label)
+        AbstractRecordableVertex.__init__(self, machine_time_step,label=label)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._source_vertex = source_vertex
@@ -97,7 +97,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                 * constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
     def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, sub_graph,
+                           processor_id, subvertex, placement, sub_graph,
                            routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
