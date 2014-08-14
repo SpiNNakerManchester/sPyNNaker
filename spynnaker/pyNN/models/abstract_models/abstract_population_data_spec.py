@@ -87,9 +87,10 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             size=master_pop_table_sz, label='MasterPopTable')
-        spec.reserve_memory_region(
-            region=constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            size=all_syn_block_sz, label='SynBlocks')
+        if all_syn_block_sz > 0:
+            spec.reserve_memory_region(
+                region=constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+                size=all_syn_block_sz, label='SynBlocks')
 
         if self._record:
             spec.reserve_memory_region(
@@ -279,6 +280,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         self.write_row_length_translation_table(
             spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)
+
 
         self.write_synaptic_matrix_and_master_population_table(
             spec, subvertex, all_syn_block_sz, weight_scale,
