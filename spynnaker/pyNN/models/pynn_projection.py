@@ -1,7 +1,12 @@
+import logging
+import math
+
+import numpy
+
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
+from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
@@ -12,9 +17,7 @@ from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
     import DelayProjectionEdge
 from spynnaker.pyNN.utilities.timer import Timer
-import logging
-import numpy
-import math
+
 logger = logging.getLogger(__name__)
 
 

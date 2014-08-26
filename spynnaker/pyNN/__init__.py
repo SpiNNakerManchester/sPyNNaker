@@ -32,7 +32,7 @@ from spynnaker.pyNN.models.neural_models.izk_curr_exp \
 #neural projections
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
     import DelayAfferentPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
+from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
     import DelayProjectionEdge
@@ -77,14 +77,6 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
     import STDPMechanism
 
 #constraints
-from pacman.model.constraints.partitioner_maximum_size_constraint \
-    import PartitionerMaximumSizeConstraint
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint import\
-    PartitionerSameSizeAsVertexConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint \
-    import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_subvertex_same_chip_constraint \
-    import PlacerSubvertexSameChipConstraint
 
 
 #traditional logger

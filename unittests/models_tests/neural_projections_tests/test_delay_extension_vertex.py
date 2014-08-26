@@ -1,6 +1,4 @@
 import unittest
-from spynnaker.pyNN.models.neural_projections.delay_extension_vertex import \
-    DelayExtensionVertex
 
 
 class MyTestCase(unittest.TestCase):
