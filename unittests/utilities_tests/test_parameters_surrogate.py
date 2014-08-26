@@ -40,16 +40,16 @@ class TestParametersSurrogate(unittest.TestCase):
 
 
     def test_surrogate_get_item_exception(self):
+        test_vertex = MyTestVertex()
+        surrogate = PyNNParametersSurrogate(test_vertex)
         with self.assertRaises(Exception):
-            test_vertex = MyTestVertex()
-            surrogate = PyNNParametersSurrogate(test_vertex)
-            surrogate['tau_rev_e']
+            print surrogate['tau_rev_e']
 
 
     def test_surrogate_set_item_exception(self):
+        test_vertex = MyTestVertex()
+        surrogate = PyNNParametersSurrogate(test_vertex)
         with self.assertRaises(Exception):
-            test_vertex = MyTestVertex()
-            surrogate = PyNNParametersSurrogate(test_vertex)
             surrogate['tau_rev_e'] = 5
 
 

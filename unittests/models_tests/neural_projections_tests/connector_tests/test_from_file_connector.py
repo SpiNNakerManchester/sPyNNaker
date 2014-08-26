@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import unittest
+from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker.pyNN as pyNN
 from pprint import pprint as pp
 if pyNN._spinnaker is None:
@@ -62,24 +63,23 @@ class TestingFromListConnector(unittest.TestCase):
 
     def test_synapse_list_generation_for_simulated_one_to_one_smaller_to_larger(
             self):
-        with self.assertRaises(Exception):
-            number_of_neurons = 10
-            first_population = pyNN.Population(number_of_neurons,
-                                               pyNN.IF_curr_exp,
-                                               cell_params_lif, label="One pop")
-            second_population = pyNN.Population(number_of_neurons + 5,
-                                                pyNN.IF_curr_exp,
-                                                cell_params_lif,
-                                                label="Second pop")
-            weight = 2
-            delay = 1
-            connection_list = list()
-            for i in range(number_of_neurons + 5):
-                connection_list.append((i, i, weight, delay))
-            connection = pyNN.FromListConnector(connection_list)
+        number_of_neurons = 10
+        first_population = pyNN.Population(number_of_neurons,
+                                           pyNN.IF_curr_exp,
+                                           cell_params_lif, label="One pop")
+        second_population = pyNN.Population(number_of_neurons + 5,
+                                            pyNN.IF_curr_exp,
+                                            cell_params_lif,
+                                            label="Second pop")
+        weight = 2
+        delay = 1
+        connection_list = list()
+        for i in range(number_of_neurons + 5):
+            connection_list.append((i, i, weight, delay))
+        connection = pyNN.FromListConnector(connection_list)
+        with self.assertRaises(ConfigurationException):
             synaptic_list = connection.generate_synapse_list(
                 second_population._vertex, first_population._vertex, 1, 0)
-            pp(synaptic_list.get_rows())
 
     def test_not_safe(self):
         number_of_neurons = 5

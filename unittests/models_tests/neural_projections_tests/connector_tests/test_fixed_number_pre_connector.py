@@ -61,29 +61,29 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
 
     def test_generate_synapse_list_pre_6(self):
+        number_of_neurons = 5
+        first_population = pyNN.Population(number_of_neurons,
+                                           pyNN.IF_curr_exp,
+                                           cell_params_lif, label="One pop")
+        weight = 2
+        delay = 1
+        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        connection = pyNN.FixedNumberPreConnector(6, weight, delay)
         with self.assertRaises(ConfigurationException):
-            number_of_neurons = 5
-            first_population = pyNN.Population(number_of_neurons,
-                                               pyNN.IF_curr_exp,
-                                               cell_params_lif, label="One pop")
-            weight = 2
-            delay = 1
-            synapse_type = first_population._vertex.get_synapse_id('excitatory')
-            connection = pyNN.FixedNumberPreConnector(6, weight, delay)
             connection.generate_synapse_list(
                 first_population._vertex, first_population._vertex, 1,
                 synapse_type)
 
     def test_generate_synapse_list_pre_negative(self):
+        number_of_neurons = 5
+        first_population = pyNN.Population(number_of_neurons,
+                                           pyNN.IF_curr_exp,
+                                           cell_params_lif, label="One pop")
+        weight = 2
+        delay = 1
+        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        connection = pyNN.FixedNumberPreConnector(-1, weight, delay)
         with self.assertRaises(ConfigurationException):
-            number_of_neurons = 5
-            first_population = pyNN.Population(number_of_neurons,
-                                               pyNN.IF_curr_exp,
-                                               cell_params_lif, label="One pop")
-            weight = 2
-            delay = 1
-            synapse_type = first_population._vertex.get_synapse_id('excitatory')
-            connection = pyNN.FixedNumberPreConnector(-1, weight, delay)
             connection.generate_synapse_list(
                 first_population._vertex, first_population._vertex, 1,
                 synapse_type)

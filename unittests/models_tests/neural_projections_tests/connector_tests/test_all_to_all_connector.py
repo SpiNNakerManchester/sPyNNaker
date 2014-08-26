@@ -35,23 +35,6 @@ class TestingAllToAllConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
         self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
 
-    def test_synapse_list_generation_for_null_populations(self):
-        with self.assertRaises(ConfigurationException):
-            weight = 2
-            delay = 1
-            zp = pyNN.Population(0, pyNN.IF_curr_exp, cell_params_lif,
-                                 label="Zero pop")
-            first_population = pyNN.Population(5, pyNN.IF_curr_exp,
-                                               cell_params_lif, label="One pop")
-            connection = pyNN.AllToAllConnector(weight, delay)
-            synapse_type = first_population._vertex.get_synapse_id('excitatory')
-            number_of_neurons = 10
-            first_population = pyNN.Population(number_of_neurons,
-                                               pyNN.IF_curr_exp,
-                                               cell_params_lif, label="One pop")
-            connection.generate_synapse_list(
-                zp._vertex, first_population._vertex, 1, synapse_type)
-
     def test_synapse_list_generation_for_different_sized_populations(self):
         number_of_neurons = 10
         first_population = pyNN.Population(number_of_neurons, pyNN.IF_curr_exp,
