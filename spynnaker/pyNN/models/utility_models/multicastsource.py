@@ -50,8 +50,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
             KeyAllocatorRoutingConstraint(self.generate_routing_info)
         self.add_constraint(routing_key_constraint)
 
-    def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, placement, sub_graph, graph,
+    def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_subgraph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
@@ -59,9 +58,9 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         """
         #check that all keys for a subedge are the same when masked
         self.check_sub_edge_key_mask_consistancy(self._edge_map, self._app_mask)
-        binary_file_name = self.get_data_spec_file_name(processor_chip_x,
-                                                     processor_chip_y,
-                                                     processor_id, hostname)
+        binary_file_name = \
+            self.get_data_spec_file_name(placement.x, placement.y, placement.p,
+                                         hostname)
 
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)

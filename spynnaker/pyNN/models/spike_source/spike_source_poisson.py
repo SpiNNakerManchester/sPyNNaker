@@ -272,15 +272,15 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
     #inhirrted from dataspecable vertex
 
-    def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, placement, subgraph, graph,
+    def generate_data_spec(self, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_subgraph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSourcePoisson on one core.
         """
-        binary_file_name = self.get_data_spec_file_name(
-            processor_chip_x, processor_chip_y, processor_id, hostname)
+        binary_file_name = \
+            self.get_data_spec_file_name(placement.x, placement.y, placement.p,
+                                         hostname)
 
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)
@@ -299,8 +299,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         self.reserve_memory_regions(
             spec, constants.SETUP_SIZE, poisson_params_sz, spike_hist_buff_sz)
 
-        self.write_poisson_parameters(spec, processor_chip_x, processor_chip_y,
-                                      processor_id, subvertex.n_atoms)
+        self.write_poisson_parameters(spec, placement.x, placement.y,
+                                      placement.p, subvertex.n_atoms)
 
         # End-of-Spec:
         spec.end_specification()

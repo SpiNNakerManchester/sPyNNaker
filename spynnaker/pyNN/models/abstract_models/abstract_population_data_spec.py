@@ -206,8 +206,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 spec.write_value(data=value, data_type=datatype)
         # End the loop over the neurons:
 
-    def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, placement, subgraph, graph,
+    def generate_data_spec(self, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to
@@ -215,7 +214,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         """
         # Create new DataSpec for this processor:
         binary_file_name = self.get_data_spec_file_name(
-            processor_chip_x, processor_chip_y, processor_id, hostname)
+            placement.x, placement.y, placement.p, hostname)
 
         data_writer = FileDataWriter(binary_file_name)
 
@@ -269,7 +268,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         logger.debug("Weight scale is {}".format(weight_scale))
 
         self.write_neuron_parameters(
-            spec, processor_chip_x, processor_chip_y, processor_id, subvertex,
+            spec, placement.x, placement.y, placement.p, subvertex,
             ring_buffer_shift)
 
         self.write_synapse_parameters(spec, subvertex)

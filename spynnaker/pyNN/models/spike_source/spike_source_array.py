@@ -206,7 +206,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         spec.write_value(data=0)
         spec.write_value(data=0)
 
-    def write_block_index_region(self, spec, subvertex, placement,
+    def write_block_index_region(self, spec, placement,
                                  num_neurons, table_entries):
         """
         Spike block index table. Gives address of each block of spikes.
@@ -218,7 +218,8 @@ class SpikeSourceArray(AbstractSpikeSource):
         } entry
         
         """
-        spec.switch_write_focus(region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value)
+        spec.switch_write_focus(
+            region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value)
         # Word 0 is the key (x, y, p) for this core:
         chip_x, chip_y, chip_p = placement.x, placement.y, placement.p
         population_identity = \
@@ -280,15 +281,14 @@ class SpikeSourceArray(AbstractSpikeSource):
             sub_vertex_out_spike_bytes_function)
 
     #inhirrted from dataspecable vertex
-    def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, placement, subgraph, graph,
+    def generate_data_spec(self, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_subgraph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
         """
         binary_file_name = self.get_data_spec_file_name(
-            processor_chip_x, processor_chip_y, processor_id, hostname)
+            placement.x, placement.y, placement.p, hostname)
 
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)
@@ -317,7 +317,7 @@ class SpikeSourceArray(AbstractSpikeSource):
                                     spike_region_size, spike_history_region_sz)
         self.write_setup_info(spec, spike_history_region_sz)
 
-        self.write_block_index_region(spec, subvertex, placement, num_neurons,
+        self.write_block_index_region(spec, placement, num_neurons,
                                       table_entries)
         self.write_spike_data_region(spec, num_neurons, spike_blocks)
 

@@ -19,8 +19,8 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
     SYSTEM_REGION = 0
 
     """
-    A AbstractConstrainedVertex for the Monitoring application spikes and forwarding them to
-    the host
+    A AbstractConstrainedVertex for the Monitoring application spikes and
+    forwarding them to the host
 
     """
     def __init__(self, machine_time_step):
@@ -38,8 +38,7 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
     def model_name(self):
         return "AppMonitor"
 
-    def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, placement, sub_graph, graph,
+    def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
@@ -47,7 +46,7 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
         """
         # Create new DataSpec for this processor:
         binary_file_name = self.get_data_spec_file_name(
-            processor_chip_x, processor_chip_y, processor_id, hostname)
+            placement.x, placement.y, placement.p, hostname)
         data_writer = FileDataWriter(binary_file_name)
         spec = DataSpecificationGenerator(data_writer)
 
