@@ -5,7 +5,7 @@ from spynnaker.pyNN.overridden_pacman_functions.pynn_routing_info_allocator \
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
 
 if __name__ == '__main__':
