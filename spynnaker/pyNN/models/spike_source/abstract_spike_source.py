@@ -48,7 +48,8 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
             recording_info |= self._SPIKE_SOURCE_REGIONS.RECORD_SPIKE_BIT.value
         recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
-        spec.switchWriteFocus(region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+        spec.switchWriteFocus(
+            region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write(data=recording_info)
         spec.write(data=spike_history_region_sz)
         spec.write(data=0)

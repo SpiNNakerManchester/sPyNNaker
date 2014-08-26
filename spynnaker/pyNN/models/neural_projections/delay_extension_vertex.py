@@ -54,7 +54,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                                              constraints=constraints,
                                              label=label,
                                              max_atoms_per_core=256)
-        AbstractRecordableVertex.__init__(self, machine_time_step,label=label)
+        AbstractRecordableVertex.__init__(self, machine_time_step, label=label)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._source_vertex = source_vertex
@@ -96,15 +96,15 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps
                 * constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
-    def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, placement, sub_graph,
+    def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
         """
-        binary_file_name = self.get_data_spec_file_name(
-            processor_chip_x, processor_chip_y, processor_id, hostname)
+        binary_file_name = \
+            self.get_data_spec_file_name(placement.x, placement.y, placement.p,
+                                         hostname)
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)
         spec = DataSpecificationGenerator(data_writer)
@@ -134,9 +134,8 @@ class DelayExtensionVertex(AbstractRecordableVertex,
             region=_DELAY_EXTENSION_REGIONS.DELAY_PARAMS, 
             size=delay_params_sz, label='delay_params')
 
-        self.write_delay_parameters(
-            spec, processor_chip_x, processor_chip_y, processor_id, subvertex,
-            num_delay_blocks, delay_blocks)
+        self.write_delay_parameters(spec, placement.x, placement.y, placement.p,
+                                    subvertex, num_delay_blocks, delay_blocks)
 
         # End-of-Spec:
         spec.end_specification()
