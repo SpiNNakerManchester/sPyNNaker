@@ -321,8 +321,7 @@ class Spinnaker(SpynnakerConfiguration):
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 associated_vertex.generate_data_spec(
-                    placement.x, placement.y, placement.p, placement.subvertex,
-                    placement, self._partitioned_graph,
+                    placement.subvertex, placement, self._partitioned_graph,
                     self._partitionable_graph, self._routing_infos,
                     self._hostname, self._graph_mapper)
 
