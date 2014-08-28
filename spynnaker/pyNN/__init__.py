@@ -32,7 +32,7 @@ from spynnaker.pyNN.models.neural_models.izk_curr_exp \
 #neural projections
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
     import DelayAfferentPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
+from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
     import DelayProjectionEdge
@@ -77,14 +77,6 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
     import STDPMechanism
 
 #constraints
-from pacman.model.constraints.partitioner_maximum_size_constraint \
-    import PartitionerMaximumSizeConstraint
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint import\
-    PartitionerSameSizeAsVertexConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint \
-    import PlacerChipAndCoreConstraint
-from pacman.model.constraints.placer_subvertex_same_chip_constraint \
-    import PlacerSubvertexSameChipConstraint
 
 
 #traditional logger
@@ -189,14 +181,19 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     be used if no override is given.
     """
     if not inspect.isclass(neuron_type):
-        neuron_type = globals()[neuron_type]
+        if neuron_type in globals():
+            neuron_type = globals()[neuron_type]
+        else:
+            neuron_type = None
         if neuron_type is None:
-            raise Exception("Unknown AbstractConstrainedVertex Type {}".format(neuron_type))
+            raise Exception("Unknown AbstractConstrainedVertex Type {}"
+                            .format(neuron_type))
 
     if hasattr(neuron_type, "set_model_max_atoms_per_core"):
         neuron_type.set_model_max_atoms_per_core = max_permitted
     else:
-        raise Exception("{} is not a AbstractConstrainedVertex type".format(neuron_type))
+        raise Exception("{} is not a AbstractConstrainedVertex type"
+                        .format(neuron_type))
 
 
 # noinspection PyPep8Naming

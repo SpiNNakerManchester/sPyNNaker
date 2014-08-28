@@ -87,9 +87,10 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             size=master_pop_table_sz, label='MasterPopTable')
-        spec.reserve_memory_region(
-            region=constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            size=all_syn_block_sz, label='SynBlocks')
+        if all_syn_block_sz > 0:
+            spec.reserve_memory_region(
+                region=constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+                size=all_syn_block_sz, label='SynBlocks')
 
         if self._record:
             spec.reserve_memory_region(
@@ -205,8 +206,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 spec.write_value(data=value, data_type=datatype)
         # End the loop over the neurons:
 
-    def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, subgraph, graph,
+    def generate_data_spec(self, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_sub_graph_mapper):
         """
         Model-specific construction of the data blocks necessary to
@@ -214,7 +214,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         """
         # Create new DataSpec for this processor:
         binary_file_name = self.get_data_spec_file_name(
-            processor_chip_x, processor_chip_y, processor_id, hostname)
+            placement.x, placement.y, placement.p, hostname)
 
         data_writer = FileDataWriter(binary_file_name)
 
@@ -268,7 +268,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         logger.debug("Weight scale is {}".format(weight_scale))
 
         self.write_neuron_parameters(
-            spec, processor_chip_x, processor_chip_y, processor_id, subvertex,
+            spec, placement.x, placement.y, placement.p, subvertex,
             ring_buffer_shift)
 
         self.write_synapse_parameters(spec, subvertex)
@@ -279,6 +279,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         self.write_row_length_translation_table(
             spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)
+
 
         self.write_synaptic_matrix_and_master_population_table(
             spec, subvertex, all_syn_block_sz, weight_scale,

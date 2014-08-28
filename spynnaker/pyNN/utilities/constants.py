@@ -4,7 +4,7 @@ Utilities for accessing the location of memory regions on the board
 from enum import Enum
 
 # Some constants
-SETUP_SIZE = 16  # Single word of info with flags, etc.
+SETUP_SIZE = 28  # Single word of info with flags, etc.
                  # plus the lengths of each of the output buffer
                  # regions in bytes
 

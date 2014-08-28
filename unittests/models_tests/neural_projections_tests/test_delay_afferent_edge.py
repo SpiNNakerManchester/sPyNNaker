@@ -1,9 +1,11 @@
 import unittest
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+from pacman.model.partitionable_graph.partitionable_edge import \
+    PartitionableEdge
+
 
 class TestDelayAfferentEdge(unittest.TestCase):
     def test_filter_subedge(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
 
 if __name__ == '__main__':

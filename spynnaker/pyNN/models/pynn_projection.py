@@ -1,7 +1,12 @@
+import logging
+import math
+
+import numpy
+
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.neural_projections.delay_extension_vertex\
+from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
@@ -12,9 +17,7 @@ from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
     import DelayProjectionEdge
 from spynnaker.pyNN.utilities.timer import Timer
-import logging
-import numpy
-import math
+
 logger = logging.getLogger(__name__)
 
 
@@ -124,8 +127,8 @@ class Projection(object):
             source_sz = presynaptic_population._get_vertex.n_atoms
             self._add_delay_extension(
                 source_sz, max_delay, natively_supported_delay_for_models,
-                synapse_list, presynaptic_population, postsynaptic_population, 
-                label, synapse_dynamics)
+                synapse_list, presynaptic_population, postsynaptic_population,
+                machine_time_step, label, synapse_dynamics)
 
         else:
             self._projection_edge = \
@@ -138,8 +141,8 @@ class Projection(object):
 
     def _add_delay_extension(self, num_src_neurons, max_delay_for_projection,
                              max_delay_per_neuron, original_synapse_list,
-                             presynaptic_population, postsynaptic_population, 
-                             label, synapse_dynamics):
+                             presynaptic_population, postsynaptic_population,
+                             machine_time_step, label, synapse_dynamics):
         """
         Instantiate new delay extension component, connecting a new edge from
         the source vertex to it and new edges from it to the target (given
@@ -166,16 +169,17 @@ class Projection(object):
         delay_vertex = presynaptic_population._get_vertex.delay_vertex
         if delay_vertex is None:
             source_name = presynaptic_population._get_vertex.label
-            delay_name = "{%s}_delayed".format(source_name)
+            delay_name = "{}_delayed".format(source_name)
             delay_vertex = DelayExtensionVertex(
                 n_neurons=num_src_neurons, source_vertex=presynaptic_population,
-                max_delay_per_neuron=max_delay_per_neuron, label=delay_name)
+                max_delay_per_neuron=max_delay_per_neuron,
+                machine_time_step = machine_time_step, label=delay_name)
             presynaptic_population._get_vertex.delay_vertex = delay_vertex
             #spinnaker.add_vertex(self.delay_vertex)
 
         # Create a connection from the source pynn_population.py to the
         # delay vertex
-        new_label = "{%s}_to_DE".format(label)
+        new_label = "{}_to_DE".format(label)
         remaining_edge = DelayAfferentPartitionableEdge(presynaptic_population._get_vertex,
                                            delay_vertex, label=new_label)
         self._spinnaker.add_edge(remaining_edge)
@@ -188,7 +192,7 @@ class Projection(object):
 
         # Create a special DelayEdge from the delay vertex to the outgoing
         # pynn_population.py, with the same set of connections
-        delay_label = "DE to {%s}".format(label)
+        delay_label = "DE to {}".format(label)
         num_blocks = int(math.ceil(float(max_delay_for_projection)
                                    / float(max_delay_per_neuron))) - 1
         self._delay_edge = DelayProjectionEdge(

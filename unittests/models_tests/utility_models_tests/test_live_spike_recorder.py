@@ -12,7 +12,7 @@ class TestLiveSpikeRecorder(unittest.TestCase):
         constraint_list_copy.extend(live_spike_recorder.constraints)
         for index in range(len(constraint_list_copy)):
             constraint_list_copy[index] = type(constraint_list_copy[index])
-        self.assertIn(type(PlacerChipAndCoreConstraint(0,0)),
+        self.assertIn(type(PlacerChipAndCoreConstraint(0, 0)),
                       constraint_list_copy)
         for index in range(len(constraint_list_copy)):
             if constraint_list_copy[index] is PlacerChipAndCoreConstraint:

@@ -33,8 +33,7 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
             spec.write_value(data=self._no_machine_time_steps)
 
     @abstractmethod
-    def generate_data_spec(self, processor_chip_x, processor_chip_y,
-                           processor_id, subvertex, sub_graph, graph,
+    def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_subgraph_mapper):
         """
         method to determine how to generate their data spec for a non neural

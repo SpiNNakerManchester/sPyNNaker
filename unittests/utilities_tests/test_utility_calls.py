@@ -41,22 +41,22 @@ class TestUtilityCalls(unittest.TestCase):
         self.assertEqual(True, False, "NotImplementedError")
 
     def test_get_region_base_address_offset(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_get_ring_buffer_to_input_left_shift(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_convert_param_to_numpy_random_distribution(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_convert_param_to_numpy_iterable(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_convert_param_to_numpy_random(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
     def test_convert_param_to_numpy_exception(self):
-        self.assertEqual(True, False)
+        self.assertEqual(True, False, "Test not implemented yet")
 
 
 if __name__ == '__main__':

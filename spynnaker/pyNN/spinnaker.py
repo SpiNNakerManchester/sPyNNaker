@@ -321,9 +321,9 @@ class Spinnaker(SpynnakerConfiguration):
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 associated_vertex.generate_data_spec(
-                    placement.x, placement.y, placement.p, placement.subvertex,
-                    self._partitioned_graph, self._partitionable_graph,
-                    self._routing_infos, self._hostname, self._graph_mapper)
+                    placement.subvertex, placement, self._partitioned_graph,
+                    self._partitionable_graph, self._routing_infos,
+                    self._hostname, self._graph_mapper)
 
                 binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():
@@ -378,15 +378,14 @@ class Spinnaker(SpynnakerConfiguration):
                 data_writer = FileDataWriter(app_data_file_path)
 
                 #locate current memory requirement
-                current_memory_avilable = SDRAM.DEFAULT_SDRAM_BYTES
+                current_memory_available = SDRAM.DEFAULT_SDRAM_BYTES
                 key = "{}:{}".format(placement.x, placement.y)
                 if key in space_based_memory_tracker.keys():
-                    current_memory_avilable = space_based_memory_tracker[key]
+                    current_memory_available = space_based_memory_tracker[key]
 
                 #generate data spec exeuctor
                 host_based_data_spec_exeuctor = DataSpecificationExecutor(
-                    data_spec_reader, data_writer,
-                    SDRAM.DEFAULT_SDRAM_BYTES - current_memory_avilable)
+                    data_spec_reader, data_writer, current_memory_available)
 
                 #update memory calc and run data spec executor
                 bytes_used_by_spec = host_based_data_spec_exeuctor.execute()
@@ -395,13 +394,13 @@ class Spinnaker(SpynnakerConfiguration):
                 key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
                 processor_to_app_data_base_address[key] = \
                     {'start_address':
-                        ((SDRAM.DEFAULT_SDRAM_BYTES - current_memory_avilable)
+                        ((SDRAM.DEFAULT_SDRAM_BYTES - current_memory_available)
                          + constants.SDRAM_BASE_ADDR),
                      'memory_used': bytes_used_by_spec}
 
                 if key in space_based_memory_tracker.keys():
                     space_based_memory_tracker[key] = \
-                        current_memory_avilable + bytes_used_by_spec
+                        current_memory_available + bytes_used_by_spec
                 else:
                     space_based_memory_tracker[key] = bytes_used_by_spec
             #update the progress bar
