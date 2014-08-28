@@ -55,6 +55,9 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                                              label=label,
                                              max_atoms_per_core=256)
         AbstractRecordableVertex.__init__(self, machine_time_step, label=label)
+        AbstractDataSpecableVertex.__init__(self, label=label,
+                                            n_atoms=n_neurons,
+                                            machine_time_step=machine_time_step)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._source_vertex = source_vertex

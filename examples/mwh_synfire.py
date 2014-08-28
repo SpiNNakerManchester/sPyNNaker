@@ -11,7 +11,7 @@ import numpy, pylab
 #p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
 p.setup(timestep=1.0, min_delay = 1.0, max_delay = 144.0)
 nNeurons = 10 # number of neurons in each population
-#max_delay = 50
+max_delay = 50
 #p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
 #p.set_number_of_neurons_per_core("DelayExtension", nNeurons / 2)
 
@@ -31,14 +31,14 @@ populations = list()
 projections = list()
 
 weight_to_spike = 2.0
-#delay = 3.1
+d_value = 3.1
 #delay = 17
 #delay = numpy.random.RandomState()
-#delays = list()
-'''
+delays = list()
+
 loopConnections = list()
 for i in range(0, nNeurons):
-    d_value = int(delay.uniform(low=1, high=max_delay))
+    #d_value = int(delay.uniform(low=1, high=max_delay))
     if i == 0:
         d_value = 16.0
     if i == 1:
@@ -51,15 +51,15 @@ for i in range(0, nNeurons):
 
 injectionConnection = [(0, 0, weight_to_spike, 1)]
 spikeArray = {'spike_times': [[0]]}
-'''
+
 populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
-'''
+
 populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
 #populations[0].set_mapping_constraint({"x": 1, "y": 0})
 
 projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
-'''
+
 populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER)

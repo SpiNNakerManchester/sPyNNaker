@@ -12,9 +12,8 @@ logger = logging.getLogger(__name__)
 class DelayProjectionSubedge(ProjectionPartitionedEdge):
     
     def __init__(self, edge, presubvertex, postsubvertex, associated_edge):
-        super(DelayProjectionSubedge, self).__init__(edge, presubvertex,
-                                                     postsubvertex,
-                                                     associated_edge)
+        ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex,
+                                           associated_edge)
         
         self.synapse_sublist = None
         self.synapse_delay_rows = None
@@ -26,17 +25,16 @@ class DelayProjectionSubedge(ProjectionPartitionedEdge):
         if self.synapse_sublist is None:
             
             synapse_sublist = \
-                self._associated_edge.synapse_list.create_atom_sublist(
+                self._associated_edge.get_synaptic_data().get_atom_sublist(
                     self._pre_subvertex.lo_atom, self._pre_subvertex.hi_atom,
                     self._post_subvertex.lo_atom, self._post_subvertex.hi_atom)
             
             if logger.isEnabledFor("debug"):
                 logger.debug("Original Synapse List rows:")
-                orig_list = synapse_sublist.get_rows()
-                for i in range(len(orig_list)):
-                    logger.debug("{}: {}".format(i, orig_list[i]))
+                for i in range(len(synapse_sublist)):
+                    logger.debug("{}: {}".format(i, synapse_sublist[i]))
         
-            if synapse_sublist.get_n_rows() > 256:
+            if len(synapse_sublist) > 256:
                 raise exceptions.SynapticMaxIncomingAtomsSupportException(
                     "Delay sub-vertices can only support up to 256 incoming"
                     " neurons!")
@@ -46,8 +44,9 @@ class DelayProjectionSubedge(ProjectionPartitionedEdge):
                 min_delay = (i * self._associated_edge.max_delay_per_neuron)
                 max_delay = \
                     min_delay + self._associated_edge.max_delay_per_neuron
-                delay_list = synapse_sublist.get_delay_sublist(min_delay,
-                                                               max_delay)
+                delay_list =  \
+                    self._associated_edge.get_synaptic_data()\
+                        .get_delay_sublist(min_delay, max_delay)
                 
 #                 if logger.isEnabledFor("debug"):
 #                     logger.debug("    Rows for delays {} - {}:".format(

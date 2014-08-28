@@ -45,7 +45,7 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
 
     @delay_vertex.setter
     def delay_vertex(self, delay_vertex):
-        if self._delay_vertex is not None:
+        if self._delay_vertex is None:
             self._delay_vertex = delay_vertex
             self.add_constraint(
                 PartitionerSameSizeAsVertexConstraint(self._delay_vertex))

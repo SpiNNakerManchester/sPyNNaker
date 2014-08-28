@@ -40,13 +40,7 @@ class DelayProjectionEdge(ProjectionPartitionableEdge):
         Gets the number of synaptic rows coming in to a subvertex at the end of
         the connection
         """
-        n_atoms = self._pre_vertex.get_maximum_atoms_per_core()
-        if self._pre_vertex.custom_max_atoms_per_core is not None:
-            n_atoms = self._pre_vertex.custom_max_atoms_per_core
-        if self._pre_vertex.n_atoms < n_atoms:
-            n_atoms = self._pre_vertex.n_atoms
-        if n_atoms > 100:
-            n_atoms = 100
+        n_atoms = self._pre_vertex.get_max_atoms_per_core()
         return ((self._synapse_list.get_n_rows() / n_atoms) *
                 self._DELAY_PAGE_SIZE * self.num_delay_stages)
     

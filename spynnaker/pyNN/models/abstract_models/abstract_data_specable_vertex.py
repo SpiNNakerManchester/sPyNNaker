@@ -29,8 +29,7 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_value(data=core_app_identifier)
         spec.write_value(data=self._machine_time_step)
-        if isinstance(self, AbstractRecordableVertex):
-            spec.write_value(data=self._no_machine_time_steps)
+        spec.write_value(data=self._no_machine_time_steps)
 
     @abstractmethod
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,

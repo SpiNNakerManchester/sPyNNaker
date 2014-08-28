@@ -91,6 +91,7 @@ class ProjectionPartitionableEdge(PartitionableEdge):
 
         sub_graph = spinnaker.sub_graph
         min_delay = config.get("Model", "min_delay")
+
         if sub_graph is None:
             return self._synapse_list
         else:
