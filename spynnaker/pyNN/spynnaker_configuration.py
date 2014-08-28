@@ -1,5 +1,6 @@
 from pacman.model.partitionable_graph.partitionable_graph import \
     PartitionableGraph
+from spinn_machine.virutal_machine import VirtualMachine
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN import exceptions
@@ -15,6 +16,7 @@ from pacman.operations import routing_info_allocator_algorithms
 
 
 from spinnman.model.iptag import IPTag
+from spinnman.transceiver import create_transceiver_from_hostname
 
 import os
 import datetime
@@ -331,7 +333,8 @@ class SpynnakerConfiguration(object):
 
         if (config.has_option("Machine", "timeScaleFactor")
                 and config.get("Machine", "timeScaleFactor") != "None"):
-            self._time_scale_factor = config.getint("Machine", "timeScaleFactor")
+            self._time_scale_factor = \
+                config.getint("Machine", "timeScaleFactor")
             if timestep * self._time_scale_factor < 1000:
                 logger.warn("the combination of machine time step and the "
                             "machine time scale factor results in a real timer "
@@ -362,3 +365,47 @@ class SpynnakerConfiguration(object):
 
     def _set_tag_output(self, tag, port, hostname):
         self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
+
+    def _setup_interfaces(self):
+        """Set up the interfaces for communicating with the SpiNNaker board
+        """
+        requires_virtual_board = conf.config.getboolean("Machine",
+                                                        "virtual_board")
+        requires_visualiser = conf.config.getboolean("Visualiser", "enable")
+
+        if not requires_virtual_board:
+            if self._reports_states is None:
+                self._txrx = create_transceiver_from_hostname(
+                    hostname=self._hostname, generate_reports=False,
+                    discover=False)
+            else:
+                self._txrx = create_transceiver_from_hostname(
+                    hostname=self._hostname, generate_reports=True,
+                    default_report_directory=self._report_default_directory,
+                    discover=False)
+            #do autoboot if possible
+            self._txrx.ensure_board_is_ready(int(conf.config.get("Machine",
+                                                                 "version")))
+            self._txrx.discover_connections()
+            self._machine = self._txrx.get_machine_details()
+        else:
+            virtual_x_dimension = conf.config.get("Machine",
+                                                  "virutal_board_x_dimension")
+            virtual_y_dimension = conf.config.get("Machine",
+                                                  "virutal_board_y_dimension")
+            requires_wrap_around = conf.config.get("Machine",
+                                                   "requires_wrap_arounds")
+            self._machine = VirtualMachine(
+                x_dimension=virtual_x_dimension,
+                y_dimension=virtual_y_dimension,
+                with_wrap_arounds=requires_wrap_around)
+
+        if requires_visualiser:
+            self._visualiser, self._visualiser_vertex_to_page_mapping = \
+                self._visualiser_creation_utility.create_visualiser_interface(
+                    requires_virtual_board, self._txrx,
+                    self._partitionable_graph,
+                    self._visualiser_vertices, self._machine,
+                    self._partitioned_graph,
+                    self._placements, self._router_tables, self._runtime,
+                    self._machine_time_step)

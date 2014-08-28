@@ -1,5 +1,6 @@
 #pacman imports
-from pacman.model.constraints.vertex_requires_virtual_chip_in_machine_constraint import \
+from pacman.model.constraints.\
+    vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
@@ -20,7 +21,6 @@ from spinn_machine.chip import Chip
 
 
 #internal imports
-from spinn_machine.virutal_machine import VirtualMachine
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
@@ -35,12 +35,11 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
-from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning import \
-    SubgraphSubedgePruning
+from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning \
+    import SubgraphSubedgePruning
 from spynnaker.pyNN import reports
 
 #spinnman inports
-from spinnman.transceiver import create_transceiver_from_hostname
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.data.file_data_reader import FileDataReader \
     as SpinnmanFileDataReader
@@ -179,50 +178,6 @@ class Spinnaker(SpynnakerConfiguration):
                 self._has_ran = True
         else:
             logger.info("*** No simulation requested: Stopping. ***")
-
-    def _setup_interfaces(self):
-        """Set up the interfaces for communicating with the SpiNNaker board
-        """
-        requires_virtual_board = conf.config.getboolean("Machine",
-                                                        "virtual_board")
-        requires_visualiser = conf.config.getboolean("Visualiser", "enable")
-
-        if not requires_virtual_board:
-            if self._reports_states is None:
-                self._txrx = create_transceiver_from_hostname(
-                    hostname=self._hostname, generate_reports=False,
-                    discover=False)
-            else:
-                self._txrx = create_transceiver_from_hostname(
-                    hostname=self._hostname, generate_reports=True,
-                    default_report_directory=self._report_default_directory,
-                    discover=False)
-            #do autoboot if possible
-            self._txrx.ensure_board_is_ready(int(conf.config.get("Machine",
-                                                                 "version")))
-            self._txrx.discover_connections()
-            self._machine = self._txrx.get_machine_details()
-        else:
-            virtual_x_dimension = conf.config.get("Machine",
-                                                  "virutal_board_x_dimension")
-            virtual_y_dimension = conf.config.get("Machine",
-                                                  "virutal_board_y_dimension")
-            requires_wrap_around = conf.config.get("Machine",
-                                                   "requires_wrap_arounds")
-            self._machine = VirtualMachine(
-                x_dimension=virtual_x_dimension,
-                y_dimension=virtual_y_dimension,
-                with_wrap_arounds=requires_wrap_around)
-
-        if requires_visualiser:
-            self._visualiser, self._visualiser_vertex_to_page_mapping = \
-                self._visualiser_creation_utility.create_visualiser_interface(
-                    requires_virtual_board, self._txrx,
-                    self._partitionable_graph,
-                    self._visualiser_vertices, self._machine,
-                    self._partitioned_graph,
-                    self._placements, self._router_tables, self._runtime,
-                    self._machine_time_step)
 
     @property
     def app_id(self):
@@ -379,9 +334,10 @@ class Spinnaker(SpynnakerConfiguration):
 
                 #locate current memory requirement
                 current_memory_available = SDRAM.DEFAULT_SDRAM_BYTES
-                key = "{}:{}".format(placement.x, placement.y)
-                if key in space_based_memory_tracker.keys():
-                    current_memory_available = space_based_memory_tracker[key]
+                memory_tracker_key = "{}:{}".format(placement.x, placement.y)
+                if memory_tracker_key in space_based_memory_tracker.keys():
+                    current_memory_available = \
+                        space_based_memory_tracker[memory_tracker_key]
 
                 #generate data spec exeuctor
                 host_based_data_spec_exeuctor = DataSpecificationExecutor(
@@ -391,18 +347,17 @@ class Spinnaker(SpynnakerConfiguration):
                 bytes_used_by_spec = host_based_data_spec_exeuctor.execute()
 
                 #update base address mapper
-                key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
-                processor_to_app_data_base_address[key] = \
+                processor_mapping_key = \
+                    "{}:{}:{}".format(placement.x, placement.y, placement.p)
+                processor_to_app_data_base_address[processor_mapping_key] = \
                     {'start_address':
                         ((SDRAM.DEFAULT_SDRAM_BYTES - current_memory_available)
                          + constants.SDRAM_BASE_ADDR),
                      'memory_used': bytes_used_by_spec}
 
-                if key in space_based_memory_tracker.keys():
-                    space_based_memory_tracker[key] = \
-                        current_memory_available + bytes_used_by_spec
-                else:
-                    space_based_memory_tracker[key] = bytes_used_by_spec
+                space_based_memory_tracker[memory_tracker_key] = \
+                        current_memory_available - bytes_used_by_spec
+
             #update the progress bar
             progress_bar.update()
         #close the progress bar
@@ -440,6 +395,8 @@ class Spinnaker(SpynnakerConfiguration):
                                                            CPUState.SYNC0)
 
         if processors_ready != total_processors:
+            break_down = \
+                self._break_down_of_failure_to_reach_state(executable_targets)
             raise exceptions.ExecutableFailedToStartException(
                 "Only {} processors out of {} have sucessfully reached sync0"
                 .format(processors_ready, total_processors))
@@ -498,7 +455,8 @@ class Spinnaker(SpynnakerConfiguration):
                 commands)
 
     def add_vertex(self, vertex_to_add):
-        if type(vertex_to_add) == type(MultiCastSource(self._machine_time_step)):
+        if type(vertex_to_add) == \
+                type(MultiCastSource(self._machine_time_step)):
             self._multi_cast_vertex = vertex_to_add
         self._partitionable_graph.add_vertex(vertex_to_add)
 
@@ -570,6 +528,14 @@ class Spinnaker(SpynnakerConfiguration):
                 self._txrx.write_memory(placement.x, placement.y, start_address,
                                         application_data_file_reader,
                                         memory_used)
+                #update user 0 so that it points to the start of the \
+                # applications data region on sdram
+
+                user_o_register_address = \
+                    self._txrx.get_user_0_register_address_from_core(
+                        placement.x, placement.y, placement.p)
+                self._txrx.write_memory(placement.x, placement.y,
+                                        user_o_register_address, start_address)
 
                 #add lines to rerun_script if requested
                 if self._reports_states.transciever_report:
