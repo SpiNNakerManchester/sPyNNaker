@@ -53,7 +53,7 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
         spec.comment("\n*** Spec for AppMonitor Instance ***\n\n")
 
         # Calculate the size of the tables to be reserved in SDRAM:
-        setup_sz = 8
+        setup_sz = 16
 
         # Declare random number generators and distributions:
         #self.writeRandomDistributionDeclarations(spec, dao)
@@ -97,8 +97,6 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
             Bit 5: Output neuron potential
             Bit 6: Output spike rate
         """
-        self._write_basic_setup_info(spec,
-                                     LiveSpikeRecorder.CORE_APP_IDENTIFIER)
 
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(region=self.SYSTEM_REGION)

@@ -113,13 +113,18 @@ class Spinnaker(SpynnakerConfiguration):
                     "a factional number of machine runable time steps and "
                     "therefore spinnaker cannot determine how many to run for")
             for vertex in self._partitionable_graph.vertices:
-                if isinstance(vertex, AbstractRecordableVertex):
-                    vertex.set_no_machine_time_step(self._no_machine_time_steps)
+                vertex.set_no_machine_time_steps(self._no_machine_time_steps)
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may"
                         "cause the neural models to fail to partition "
                         "correctly")
+            for vertex in self._partitionable_graph.vertices:
+                if vertex.is_set_to_record_spikes():
+                    raise exceptions.ConfigurationException(
+                        "recording a population when set to infinite runtime "
+                        "is not currently supportable in this tool chain."
+                        "watch this space")
 
         do_timing = conf.config.getboolean("Reports", "outputTimesForSections")
         if do_timing:

@@ -27,16 +27,7 @@ class AbstractRecordableVertex(object):
         self._focus_level = None
         self._app_mask = pacman_constants.DEFAULT_MASK
         self._label = label
-        self._no_machine_time_steps = None
         self._machine_time_step = machine_time_step
-
-    def set_no_machine_time_step(self, no_machine_time_steps):
-        if self._no_machine_time_steps is None:
-            self._no_machine_time_steps = no_machine_time_steps
-        else:
-            raise exceptions.ConfigurationException(
-                "cannot set the number of machine time steps of a given"
-                " model once it has already been set")
 
     @property
     def machine_time_step(self):
