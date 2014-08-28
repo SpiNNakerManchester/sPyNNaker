@@ -12,37 +12,37 @@ void timer_callback (uint unused0, uint unused1)
   time++;
 
   log_info("Timer tick %u", time);
-  
+
   if (simulation_ticks != UINT32_MAX && time >= simulation_ticks + timer_period)
   {
     log_info("Simulation complete.\n");
-    
+
     spin1_exit(0);
   }
-  
+
   // Reset SDP message arguments
   g_spike_message.length = 0;
   g_spike_message.arg1 = time;
   g_spike_message.arg2 = 0;
   g_spike_message.arg3 = 1000;
-  
+
   // Cast message data to spikes
   spike_t *data = (spike_t*)g_spike_message.data;
-  
+
   // If there's still space in the message payload and more incoming spikes
   spike_t s;
   while (g_spike_message.length < SDP_BUF_SIZE && next_spike (& s))
   {
     // Add spike to buffer
     data[g_spike_message.arg2++] = s;
-    
+
     // Add size of spike to message length
     g_spike_message.length += sizeof(spike_t);
   }
-  
+
   // Add on size of header to message length
   g_spike_message.length += (sizeof(sdp_hdr_t) + sizeof(cmd_hdr_t));
-  
+
   // Send the spike message
   // **NOTE** 1ms timeout
   if(g_spike_message.arg2 > 0)
@@ -54,7 +54,7 @@ void timer_callback (uint unused0, uint unused1)
 void incoming_spike_callback (uint key, uint payload)
 {
   use(payload);
-  
+
 #ifdef DEBUG
   log_info("Received spike %x", key);
 #endif // DEBUG
@@ -66,7 +66,12 @@ void incoming_spike_callback (uint key, uint payload)
 
   // If there was space to add spike to incoming spike queue
   add_spike(key);
-  
+
+}
+
+void system_load_params(address_t address) {
+  timer_period = address[0];
+  simulation_ticks = address[1];
 }
 
 bool system_load_dtcm(void) {
@@ -80,6 +85,9 @@ bool system_load_dtcm(void) {
   {
 	return (false);
   }
+
+  system_load_params(region_start(0, address));
+
   return (true);
 }
 
@@ -88,36 +96,36 @@ void c_main (void)
 {
   // Configure system
   system_load_dtcm();
- 
+
   // Configure lead app-specific stuff
   if(leadAp)
   {
     system_lead_app_configured();
   }
-  
+
   // Initialize the incoming spike buffer
   initialize_spike_buffer (8192);
-  
+
   // Configure SDP message
   g_spike_message.tag = 1; // Arbitrary tag
   g_spike_message.flags = 0x07; // No reply required
-  
+
   g_spike_message.dest_addr = 0; // Chip 0,0
   g_spike_message.dest_port = PORT_ETH; // Dump through Ethernet
-  
+
   g_spike_message.srce_addr = spin1_get_chip_id();
   g_spike_message.srce_port = (3 << PORT_SHIFT) | spin1_get_core_id(); // Monitoring port
-  
+
   g_spike_message.cmd_rc = 64; // Monitoring channel
   g_spike_message.length = 0;
-  
+
   // Set timer_callback
   spin1_set_timer_tick(timer_period);
-  
+
   // Register callbacks
   spin1_callback_on (MC_PACKET_RECEIVED, incoming_spike_callback, -1);
   spin1_callback_on (TIMER_TICK,         timer_callback,           2);
-  
+
   log_info("Starting");
 
   // Start the time at "-1" so that the first tick will be 0

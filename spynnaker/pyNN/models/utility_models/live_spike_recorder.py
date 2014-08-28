@@ -53,9 +53,7 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
         spec.comment("\n*** Spec for AppMonitor Instance ***\n\n")
 
         # Calculate the size of the tables to be reserved in SDRAM:
-        setup_sz = 16  # Single word of info with flags, etc.
-                      # plus the lengths of each of the output buffer
-                      # regions in bytes
+        setup_sz = 8
 
         # Declare random number generators and distributions:
         #self.writeRandomDistributionDeclarations(spec, dao)
@@ -66,7 +64,7 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
-    
+
     def reserve_memory_regions(self, spec, setup_sz):
         """
         Reserve SDRAM space for memory areas:
@@ -101,12 +99,11 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
         """
         self._write_basic_setup_info(spec,
                                      LiveSpikeRecorder.CORE_APP_IDENTIFIER)
-        # What recording commands we reset for the parent pynn_population.py
-        recording_info = 0xBEEF0000
+
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(region=self.SYSTEM_REGION)
-        spec.write_value(data=recording_info)
-        return
+        spec.write_value(data=self._machine_time_step)
+        spec.write_value(data=self._no_machine_time_steps)
 
     def get_binary_file_name(self):
          # Rebuild executable name
