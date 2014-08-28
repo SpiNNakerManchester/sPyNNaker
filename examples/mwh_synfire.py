@@ -2,7 +2,10 @@
 Synfirechain-like example
 """
 #!/usr/bin/python
+import os
+print os.environ["PYTHONPATH"]
 import spynnaker.pyNN as p
+#import pyNN.spiNNaker as p
 import numpy, pylab
 
 #p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
@@ -61,7 +64,7 @@ populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER)
 
-run_time = 560
+run_time = 100
 print "Running for {} ms".format(run_time)
 p.run(run_time)
 '''
