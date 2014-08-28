@@ -28,14 +28,13 @@ RELOBJS:= $(ABSOBJS:$(ABSDIR)/%.o=%.o)
 OBJECTS:= $(RELOBJS:%.o=$(BUILDDIR)/%.o)
 
 CFLAGS += -I $(SPINN_COMMON_INCLUDE)
+LFLAGS += -L $(SPINN_COMMON_LIBS)
+LIBRARIES += -lspinn_common -lm
+
 ifeq ($(GNU),1)
     SPINN_LIBS += $(SPINN_LIB_DIR)/libspin1_api.a
-    SPINN_LIBS += $(SPINN_COMMON_LIBS)/libspinn_common.a
-    SCRIPT = $(SPINN_TOOLS_DIR)/sark.lnk
 else
     SPINN_LIBS += $(SPINN_LIB_DIR)/spin1_api.a
-    SPINN_LIBS += $(SPINN_COMMON_LIBS)/libspinn_common.a
-    SCRIPT = $(LIB_DIR)/sark.sct
 endif
 
 
