@@ -65,8 +65,7 @@ bool system_data_filled (address_t address, uint32_t flags,
 
   log_info("system_data_filled: starting");
 
-  timer_period = address[1];
-  simulation_ticks = address[2];
+  system_load_params(address);
 
   // Read recording region sizes
   system_word = address[3];
@@ -151,3 +150,8 @@ address_t region_start (uint32_t n, address_t address)
 
 address_t configuration_reader_offset(address_t address, uint32_t offset)
 { return (& address[address[offset] >> 2]); }
+
+void system_load_params(address_t address) {
+  timer_period = address[1];
+  simulation_ticks = address[2];
+}

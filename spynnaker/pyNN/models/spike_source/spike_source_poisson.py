@@ -122,6 +122,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         """
 
         # What recording commands wereset for the parent pynn_population.py?
+        self._write_basic_setup_info(spec,
+                                     SpikeSourcePoisson.CORE_APP_IDENTIFIER)
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT

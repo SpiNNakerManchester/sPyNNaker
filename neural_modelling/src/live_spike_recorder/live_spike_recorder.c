@@ -69,11 +69,6 @@ void incoming_spike_callback (uint key, uint payload)
 
 }
 
-void system_load_params(address_t address) {
-  timer_period = address[0];
-  simulation_ticks = address[1];
-}
-
 bool system_load_dtcm(void) {
 
   // Get the address this core's DTCM data starts at from SRAM

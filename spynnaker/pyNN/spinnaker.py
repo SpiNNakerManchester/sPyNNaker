@@ -22,8 +22,6 @@ from spinn_machine.chip import Chip
 
 #internal imports
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
 from spynnaker.pyNN.models.utility_models.multicastsource import MultiCastSource
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
@@ -361,7 +359,7 @@ class Spinnaker(SpynnakerConfiguration):
                      'memory_used': bytes_used_by_spec}
 
                 space_based_memory_tracker[memory_tracker_key] = \
-                        current_memory_available - bytes_used_by_spec
+                    current_memory_available - bytes_used_by_spec
 
             #update the progress bar
             progress_bar.update()
@@ -403,8 +401,8 @@ class Spinnaker(SpynnakerConfiguration):
             break_down = \
                 self._break_down_of_failure_to_reach_state(executable_targets)
             raise exceptions.ExecutableFailedToStartException(
-                "Only {} processors out of {} have sucessfully reached sync0"
-                .format(processors_ready, total_processors))
+                "Only {} processors out of {} have sucessfully reached sync0 {}"
+                .format(processors_ready, total_processors, break_down))
 
         # if correct, start applications
         logger.info("Starting application")
@@ -458,6 +456,9 @@ class Spinnaker(SpynnakerConfiguration):
             spinnman_reports.append_to_rerun_script(
                 conf.config.get("SpecGeneration", "Binary_folder"),
                 commands)
+
+    def _break_down_of_failure_to_reach_state(self, executable_targets):
+        return ""
 
     def add_vertex(self, vertex_to_add):
         if type(vertex_to_add) == \

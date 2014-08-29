@@ -39,12 +39,12 @@ delays = list()
 loopConnections = list()
 for i in range(0, nNeurons):
     #d_value = int(delay.uniform(low=1, high=max_delay))
-    if i == 0:
-        d_value = 16.0
-    if i == 1:
-        d_value = 17.0
-    if i == 2:
-        d_value = 33.0
+    #if i == 0:
+     #   d_value = 16.0
+    #if i == 1:
+     #   d_value = 17.0
+    #if i == 2:
+     #   d_value = 33.0
     delays.append(float(d_value))
     singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, d_value)
     loopConnections.append(singleConnection)
@@ -67,7 +67,7 @@ populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER)
 run_time = 100
 print "Running for {} ms".format(run_time)
 p.run(run_time)
-'''
+
 v = None
 gsyn = None
 spikes = None
@@ -114,5 +114,5 @@ if gsyn != None:
         pylab.plot([i[1] for i in gsyn_for_neuron], 
                 [i[2] for i in gsyn_for_neuron])
     pylab.show()
-'''
+
 p.end()

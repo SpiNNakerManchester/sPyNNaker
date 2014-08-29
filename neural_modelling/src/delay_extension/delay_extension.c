@@ -104,10 +104,10 @@ static bool load_dtcm ()
 
   // Read system region
   uint32_t spike_history_recording_region_size, neuron_potentials_recording_region_size, neuron_gsyns_recording_region_size;
-  if (!system_data_filled (region_start(1, address), flags, &spike_history_recording_region_size, &neuron_potentials_recording_region_size, &neuron_gsyns_recording_region_size))
+  if (!system_data_filled (region_start(0, address), flags, &spike_history_recording_region_size, &neuron_potentials_recording_region_size, &neuron_gsyns_recording_region_size))
     return (false);
 
-  if (!parrot_population_filled (region_start(2, address), flags))
+  if (!parrot_population_filled (region_start(1, address), flags))
     return (false);
 
   log_info("load_dtcm: completed successfully");
