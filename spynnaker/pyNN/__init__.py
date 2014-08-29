@@ -38,9 +38,9 @@ from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
     import DelayProjectionEdge
 from spynnaker.pyNN.models.neural_projections.delay_projection_subedge \
     import DelayProjectionSubedge
-from spynnaker.pyNN.models.neural_projections.projection_edge \
+from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.projection_subedge \
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 
 #spike sources

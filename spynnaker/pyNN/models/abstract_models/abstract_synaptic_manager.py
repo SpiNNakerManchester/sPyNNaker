@@ -8,9 +8,9 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
-from spynnaker.pyNN.models.neural_projections.projection_edge \
+from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.projection_subedge \
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.utilities import packet_conversions
@@ -47,7 +47,7 @@ class AbstractSynapticManager(object):
         """
 
         # Switch focus to the synaptic matrix memory region:
-        spec.switchWriteFocus(region)
+        spec.switch_write_focus(region)
 
         # Align the write pointer to the next 1Kbyte boundary using padding:
         write_ptr = current_write_ptr
@@ -59,7 +59,8 @@ class AbstractSynapticManager(object):
             # Pad out data file with the added alignment bytes:
             num_padding_bytes = write_ptr - current_write_ptr
             spec.set_register_value(register_id=15, data=num_padding_bytes)
-            spec.write_value(data=0xDD, repeatReg=15, sizeof='uint8')
+            spec.write_value(data=0xDD, repeats_register=15,
+                             data_type=DataType.INT16)
 
         # Remember this aligned address, it's where this block will start:
         block_start_addr = write_ptr
@@ -75,11 +76,11 @@ class AbstractSynapticManager(object):
 
             # Write the size of the plastic region
             spec.comment("\nWriting plastic region for row {}".format(row_no))
-            spec.write_value(data=len(plastic_region), sizeof="uint32")
+            spec.write_value(data=len(plastic_region))
             words_written += 1
 
             # Write the plastic region
-            spec.write_array(data=plastic_region)
+            spec.write_array(array_values=plastic_region)
             words_written += len(plastic_region)
 
             fixed_fixed_region = numpy.asarray(
@@ -93,12 +94,12 @@ class AbstractSynapticManager(object):
 
             # Write the size of the fixed parts
             spec.comment("\nWriting fixed region for row {}".format(row_no))
-            spec.write_value(data=len(fixed_fixed_region), sizeof="uint32")
-            spec.write_value(data=len(fixed_plastic_region), sizeof="uint32")
+            spec.write_value(data=len(fixed_fixed_region))
+            spec.write_value(data=len(fixed_plastic_region))
             words_written += 2
 
             # Write the fixed fixed region
-            spec.write_array(data=fixed_fixed_region)
+            spec.write_array(array_values=fixed_fixed_region)
             words_written += len(fixed_fixed_region)
 
             # As everything needs to be word aligned, add extra zero to
@@ -114,7 +115,7 @@ class AbstractSynapticManager(object):
             fixed_plastic_region_words = \
                 fixed_plastic_region.view(dtype="uint32")
 
-            spec.write_array(data=fixed_plastic_region_words)
+            spec.write_array(array_values=fixed_plastic_region_words)
 
             # noinspection PyTypeChecker
             words_written += len(fixed_plastic_region_words)
@@ -134,7 +135,7 @@ class AbstractSynapticManager(object):
         next_block_start_addr = write_ptr
         return block_start_addr, next_block_start_addr
     
-    def get_exact_synaptic_block_memory_size(self, subvertex,
+    def get_exact_synaptic_block_memory_size(self, graph_mapper,
                                              subvertex_in_edges):
         memory_size = 0
         
@@ -145,7 +146,8 @@ class AbstractSynapticManager(object):
             
             sublist = subedge.get_synapse_sublist()
             max_n_words = \
-                max([subedge.edge.synapse_row_io.get_n_words(synapse_row)
+                max([graph_mapper.get_edge_from_subedge(subedge)
+                    .get_synapse_row_io().get_n_words(synapse_row)
                     for synapse_row in sublist.get_rows()])
             all_syn_block_sz = \
                 self._calculate_all_synaptic_block_size(sublist,
@@ -326,7 +328,7 @@ class AbstractSynapticManager(object):
     def write_synaptic_matrix_and_master_population_table(
             self, spec, subvertex, all_syn_block_sz, weight_scale,
             master_pop_table_region, synaptic_matrix_region, routing_info,
-            graph_to_subgraph_mapper, subgraph):
+            graph_mapper, subgraph):
         """
         Simultaneously generates both the master pynn_population.py table and
         the synatic matrix.
@@ -364,7 +366,7 @@ class AbstractSynapticManager(object):
         for subedge in in_subedges:
 
             # Only deal with incoming projection subedges
-            if not subedge.pruneable and isinstance(subedge, ProjectionPartitionedEdge):
+            if isinstance(subedge, ProjectionPartitionedEdge):
                 key = routing_info.get_key_from_subedge(subedge)
                 x = packet_conversions.get_x_from_key(key)
                 y = packet_conversions.get_y_from_key(key)
@@ -374,14 +376,16 @@ class AbstractSynapticManager(object):
 
                 sublist = subedge.get_synapse_sublist()
                 associated_edge = \
-                    graph_to_subgraph_mapper.get_edge_from_subedge(subedge)
+                    graph_mapper.get_edge_from_subedge(subedge)
                 row_io = associated_edge.get_synapse_row_io()
                 if logger.isEnabledFor("debug"):
+                    subvertex_vertex =\
+                        graph_mapper.get_vertex_from_subvertex(subvertex)
                     logger.debug("Writing subedge from {} ({}-{}) to {} ({}-{})"
                                  .format(subedge.pre_subvertex.label,
                                          subedge.pre_subvertex.lo_atom,
                                          subedge.pre_subvertex.hi_atom,
-                                         subvertex.vertex.label,
+                                         subvertex_vertex.label,
                                          subvertex.lo_atom,
                                          subvertex.hi_atom))
                     rows = sublist.get_rows()
@@ -458,8 +462,8 @@ class AbstractSynapticManager(object):
 
         # Write entry:
         spec.switch_write_focus(region=master_pop_table_region)
-        spec.set_write_pointer(data=table_slot_addr)
-        spec.write_value(data=new_entry, sizeof='uint16')
+        spec.set_write_pointer(address=table_slot_addr)
+        spec.write_value(data=new_entry, data_type=DataType.INT16)
         return
 
     def _get_synaptic_data(self, spinnaker, pre_subvertex, pre_n_atoms,

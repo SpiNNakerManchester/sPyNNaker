@@ -6,7 +6,7 @@ from pacman.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge\
     import DelayProjectionEdge
-from spynnaker.pyNN.models.neural_projections.projection_subedge \
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge import \
     DelayAfferentPartitionableEdge

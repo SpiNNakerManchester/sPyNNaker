@@ -231,7 +231,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)
         all_syn_block_sz = \
-            self.get_exact_synaptic_block_memory_size(subvertex,
+            self.get_exact_synaptic_block_memory_size(graph_sub_graph_mapper,
                                                       subvert_in_edges)
 
         spike_hist_buff_sz = self.get_spike_buffer_size(subvertex.lo_atom,

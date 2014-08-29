@@ -10,7 +10,7 @@ from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_projections.projection_edge \
+from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
     import DelayAfferentPartitionableEdge

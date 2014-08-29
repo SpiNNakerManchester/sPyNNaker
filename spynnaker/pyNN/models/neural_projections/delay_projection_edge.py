@@ -1,4 +1,4 @@
-from spynnaker.pyNN.models.neural_projections.projection_edge import \
+from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge import \
     ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_projection_subedge import \
     DelayProjectionSubedge

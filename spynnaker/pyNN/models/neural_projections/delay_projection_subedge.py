@@ -1,4 +1,4 @@
-from spynnaker.pyNN.models.neural_projections.projection_subedge \
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \

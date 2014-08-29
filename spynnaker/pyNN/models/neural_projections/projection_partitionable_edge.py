@@ -1,5 +1,5 @@
 from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
-from spynnaker.pyNN.models.neural_projections.projection_subedge import \
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import \
     ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
