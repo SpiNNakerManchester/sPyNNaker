@@ -23,10 +23,10 @@ from spinn_machine.chip import Chip
 #internal imports
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.utility_models.multicastsource import MultiCastSource
+from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.utility_models.live_spike_recorder\
     import LiveSpikeRecorder
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
@@ -38,34 +38,17 @@ from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning \
 from spynnaker.pyNN import reports
 
 #spinnman inports
-from spinnman.messages.scp.scp_signal import SCPSignal
-from spinnman.data.file_data_reader import FileDataReader \
-    as SpinnmanFileDataReader
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
-from spinnman.model.cpu_state import CPUState
-from spinnman import reports as spinnman_reports
-
-
-#data spec import
-from data_specification.file_data_reader import FileDataReader \
-    as DataSpecFileDataReader
-from data_specification.file_data_writer import FileDataWriter
-from data_specification.data_specification_executor\
-    import DataSpecificationExecutor
 
 import logging
 import math
-import time
-import os
 import sys
-import pickle
-import ntpath
 
 logger = logging.getLogger(__name__)
 
 
-class Spinnaker(SpynnakerConfiguration):
+class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
                  max_delay=None, graph_label=None):
@@ -81,6 +64,9 @@ class Spinnaker(SpynnakerConfiguration):
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
 
+        SpynnakerCommsFunctions.__init__(self, self._reports_states,
+                                         self._report_default_directory)
+
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
 
@@ -92,7 +78,13 @@ class Spinnaker(SpynnakerConfiguration):
         self._edge_count = 0
 
     def run(self, run_time):
-        self._setup_interfaces()
+        self._setup_interfaces(
+            hostname=self._hostname, machine=self._machine,
+            machine_time_step=self.machine_time_step, runtime=self._runtime,
+            partitioned_graph=self._partitioned_graph,
+            placements=self._placements, router_tables=self._router_tables,
+            partitionable_graph=self._partitionable_graph,
+            visualiser_vertices=self._visualiser_vertices)
 
         if self._reports_states is not None:
             reports.network_specification_report(self._report_default_directory,
@@ -153,7 +145,7 @@ class Spinnaker(SpynnakerConfiguration):
         processor_to_app_data_base_address = \
             self.execute_data_specification_execution(
                 conf.config.getboolean("SpecExecution", "specExecOnHost"),
-                self._hostname)
+                self._hostname, self._placements, self._graph_mapper)
 
         #engage vis if requested
         if do_timing:
@@ -169,16 +161,21 @@ class Spinnaker(SpynnakerConfiguration):
                 logger.info("*** Loading data ***")
                 self._load_application_data(self._placements,
                                             self._graph_mapper,
-                                            processor_to_app_data_base_address)
+                                            processor_to_app_data_base_address,
+                                            self._hostname)
                 logger.info("*** Loading executables ***")
-                self._load_executable_images(executable_targets)
+                self._load_executable_images(executable_targets, self._app_id)
             if do_timing:
                 timer.take_sample()
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
-                self._start_execution_on_machine(executable_targets)
+                self._start_execution_on_machine(executable_targets,
+                                                 self._app_id, self._runtime)
                 self._has_ran = True
+                if self._retrieve_provance_data:
+                    #retrieve provance data
+                    self._retieve_provance_data_from_machine(executable_targets)
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
@@ -305,72 +302,6 @@ class Spinnaker(SpynnakerConfiguration):
         progress_bar.end()
         return executable_targets
 
-    def execute_data_specification_execution(self, host_based_execution,
-                                             hostname):
-        if host_based_execution:
-            return self.host_based_data_specificiation_execution(hostname)
-        else:
-            return self._chip_based_data_specificiation_execution(hostname)
-
-    def _chip_based_data_specificiation_execution(self, hostname):
-        raise NotImplementedError
-
-    def host_based_data_specificiation_execution(self, hostname):
-        space_based_memory_tracker = dict()
-        processor_to_app_data_base_address = dict()
-         #create a progress bar for end users
-        progress_bar = ProgressBar(len(list(self._placements.placements)),
-                                   "on executing data specifications on the "
-                                   "host machine")
-
-        for placement in self._placements.placements:
-            associated_vertex = self._graph_mapper.\
-                get_vertex_from_subvertex(placement.subvertex)
-            # if the vertex can generate a DSG, call it
-            if isinstance(associated_vertex, AbstractDataSpecableVertex):
-                data_spec_file_path = \
-                    associated_vertex.get_data_spec_file_name(
-                        placement.x, placement.y, placement.p, hostname
-                    )
-                app_data_file_path = \
-                    associated_vertex.get_application_data_file_name(
-                        placement.x, placement.y, placement.p, hostname
-                    )
-                data_spec_reader = DataSpecFileDataReader(data_spec_file_path)
-                data_writer = FileDataWriter(app_data_file_path)
-
-                #locate current memory requirement
-                current_memory_available = SDRAM.DEFAULT_SDRAM_BYTES
-                memory_tracker_key = "{}:{}".format(placement.x, placement.y)
-                if memory_tracker_key in space_based_memory_tracker.keys():
-                    current_memory_available = \
-                        space_based_memory_tracker[memory_tracker_key]
-
-                #generate data spec exeuctor
-                host_based_data_spec_exeuctor = DataSpecificationExecutor(
-                    data_spec_reader, data_writer, current_memory_available)
-
-                #update memory calc and run data spec executor
-                bytes_used_by_spec = host_based_data_spec_exeuctor.execute()
-
-                #update base address mapper
-                processor_mapping_key = \
-                    "{}:{}:{}".format(placement.x, placement.y, placement.p)
-                processor_to_app_data_base_address[processor_mapping_key] = \
-                    {'start_address':
-                        ((SDRAM.DEFAULT_SDRAM_BYTES - current_memory_available)
-                         + constants.SDRAM_BASE_ADDR),
-                     'memory_used': bytes_used_by_spec}
-
-                space_based_memory_tracker[memory_tracker_key] = \
-                    current_memory_available - bytes_used_by_spec
-
-            #update the progress bar
-            progress_bar.update()
-        #close the progress bar
-        progress_bar.end()
-        return processor_to_app_data_base_address
-
     def start_visualiser(self):
         """starts the port listener and ties it to the visualiser pages as
          required
@@ -382,87 +313,6 @@ class Spinnaker(SpynnakerConfiguration):
                 self._txrx.register_listener(associated_page.recieved_spike(),
                                              self._hostname)
         self._visualiser.start()
-
-    def stop(self):
-        self._txrx.send_signal(self._app_id, SCPSignal.STOP)
-        if conf.config.getboolean("Visualiser", "enable"):
-            self._visualiser.stop()
-
-    def _start_execution_on_machine(self, executable_targets):
-        #deduce how many processors this application uses up
-        total_processors = 0
-        executable_keys = executable_targets.keys()
-        for executable_target in executable_keys:
-            core_subset = executable_targets[executable_target]
-            for _ in core_subset:
-                total_processors += 1
-
-        #check that the right number of processors are in sync0
-        processors_ready = self._txrx.get_core_state_count(self._app_id,
-                                                           CPUState.SYNC0)
-
-        if processors_ready != total_processors:
-            break_down = \
-                self._break_down_of_failure_to_reach_state(executable_targets)
-            raise exceptions.ExecutableFailedToStartException(
-                "Only {} processors out of {} have sucessfully reached sync0 {}"
-                .format(processors_ready, total_processors, break_down))
-
-        # if correct, start applications
-        logger.info("Starting application")
-        self._txrx.send_signal(self._app_id, SCPSignal.SYNC0)
-
-        #check all apps have gone into run state
-        logger.info("Checking that the application has started")
-        processors_running = self._txrx.get_core_state_count(self._app_id,
-                                                             CPUState.RUNNING)
-        if processors_running < total_processors:
-            raise exceptions.ExecutableFailedToStartException(
-                "Only {} of {} processors started".format(processors_running,
-                                                          total_processors))
-
-        #if not running for infinity, check that applications stop correctly
-        if self._runtime is not None:
-            logger.info("Application started - waiting for it to stop")
-            time.sleep(self._runtime / 1000.0)
-            processors_not_finished = processors_ready
-            while processors_not_finished != 0:
-                processors_not_finished = \
-                    self._txrx.get_core_state_count(self._app_id,
-                                                    CPUState.RUNNING)
-                processors_rte = \
-                    self._txrx.get_core_state_count(self._app_id,
-                                                    CPUState.RUN_TIME_EXCEPTION)
-                if processors_rte > 0:
-                    raise exceptions.ExecutableFailedToStopException(
-                        "{} cores have gone into a run time error state."
-                        .format(processors_rte))
-
-            processors_exited =\
-                self._txrx.get_core_state_count(self._app_id, CPUState.FINSHED)
-
-            if processors_exited < total_processors:
-                raise exceptions.ExecutableFailedToStopException(
-                    "{} of the processors failed to exit successfully"
-                    .format(total_processors - processors_exited)
-                )
-
-            logger.info("Application has run to completion")
-        else:
-            logger.info("Application is set to run forever - PACMAN is exiting")
-
-        if self._reports_states.transciever_report:
-            commands = list()
-            commands.append("txrx.get_core_state_count({}, CPUState.SYNC0)"
-                            .format(self._app_id))
-            commands.append("txrx.send_signal({}, SCPSignal.SYNC0"
-                            .format(self._app_id))
-            spinnman_reports.append_to_rerun_script(
-                conf.config.get("SpecGeneration", "Binary_folder"),
-                commands)
-
-    def _break_down_of_failure_to_reach_state(self, executable_targets):
-        return ""
 
     def add_vertex(self, vertex_to_add):
         if type(vertex_to_add) == \
@@ -507,107 +357,6 @@ class Spinnaker(SpynnakerConfiguration):
         if self._visualiser_vertices is None:
             self._visualiser_vertices = list()
         self._visualiser_vertices.append(visualiser_vertex_to_add)
-
-    def _load_application_data(self, placements, vertex_to_subvertex_mapper,
-                               processor_to_app_data_base_address):
-
-        #if doing reload, start script
-        if self._reports_states.transciever_report:
-            spinnman_reports.start_transceiver_rerun_script(
-                conf.config.get("SpecGeneration", "Binary_folder"),
-                self._hostname)
-
-        #go through the placements and see if theres any application data to
-        # load
-        for placement in placements.placements:
-            associated_vertex = \
-                vertex_to_subvertex_mapper.get_vertex_from_subvertex(
-                    placement.subvertex)
-
-            if isinstance(associated_vertex, AbstractDataSpecableVertex):
-                key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
-                start_address = \
-                    processor_to_app_data_base_address[key]['start_address']
-                memory_used = \
-                    processor_to_app_data_base_address[key]['memory_used']
-                file_path_for_application_data = \
-                    associated_vertex.get_application_data_file_name(
-                        placement.x, placement.y, placement.p, self._hostname)
-                application_data_file_reader = \
-                    SpinnmanFileDataReader(file_path_for_application_data)
-                self._txrx.write_memory(placement.x, placement.y, start_address,
-                                        application_data_file_reader,
-                                        memory_used)
-                #update user 0 so that it points to the start of the \
-                # applications data region on sdram
-
-                user_o_register_address = \
-                    self._txrx.get_user_0_register_address_from_core(
-                        placement.x, placement.y, placement.p)
-                self._txrx.write_memory(placement.x, placement.y,
-                                        user_o_register_address, start_address)
-
-                #add lines to rerun_script if requested
-                if self._reports_states.transciever_report:
-                    lines = list()
-                    lines.append("application_data_file_reader = "
-                                 "SpinnmanFileDataReader(\"{}\")"
-                                 .format(ntpath.basename(
-                                 file_path_for_application_data)))
-
-                    lines.append("txrx.write_memory({}, {}, {}, "
-                                 "application_data_file_reader, {})"
-                                 .format(
-                                 placement.x, placement.y, start_address,
-                                 memory_used))
-                    spinnman_reports.append_to_rerun_script(
-                        conf.config.get("SpecGeneration", "Binary_folder"),
-                        lines)
-
-    def _load_executable_images(self, executable_targets):
-        """
-        go through the exeuctable targets and load each binary to everywhere and
-        then set each given core to sync0 that require it
-        """
-        if self._reports_states.transciever_report:
-            pickled_point = os.path.join(conf.config.get("SpecGeneration",
-                                                         "Binary_folder"),
-                                         "picked_executables_mappings")
-            pickle.dump(executable_targets, open(pickled_point, 'wb'))
-            lines = list()
-            lines.append("executable_targets = pickle.load(open(\"{}\", "
-                         "\"rb\"))".format(ntpath.basename(pickled_point)))
-            spinnman_reports.append_to_rerun_script(conf.config.get(
-                "SpecGeneration", "Binary_folder"), lines)
-
-        for exectuable_target_key in executable_targets.keys():
-            file_reader = SpinnmanFileDataReader(exectuable_target_key)
-            core_subset = executable_targets[exectuable_target_key]
-
-            # for some reason, we have to hand the size of a binary. The only
-            #logical way to do this is to read the exe and determine the length
-            #. TODO this needs to change so that the trasnciever figures this out
-            #itself
-
-            # TODO FIX THIS CHUNK
-            statinfo = os.stat(exectuable_target_key)
-            file_to_read_in = open(exectuable_target_key, 'rb')
-            buf = file_to_read_in.read(statinfo.st_size)
-            size = (len(buf))
-
-            self._txrx.execute_flood(core_subset, file_reader, self._app_id,
-                                     size)
-
-            if self._reports_states.transciever_report:
-                lines = list()
-                lines.append("core_subset = executable_targets[\"{}\"]"
-                             .format(exectuable_target_key))
-                lines.append("file_reader = SpinnmanFileDataReader(\"{}\")"
-                             .format(exectuable_target_key))
-                lines.append("txrx.execute_flood(core_subset, file_reader"
-                             ", {}, {})".format(self._app_id, size))
-                spinnman_reports.append_to_rerun_script(conf.config.get(
-                    "SpecGeneration", "Binary_folder"), lines)
 
     def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
         for vertex in self._partitionable_graph.vertices:
