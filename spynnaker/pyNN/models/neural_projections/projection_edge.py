@@ -89,14 +89,14 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         if spinnaker is None:
             return self._synapse_list
 
-        sub_graph = spinnaker.sub_graph
+        graph_subgraph_mapper = spinnaker.graph_mapper
         min_delay = config.get("Model", "min_delay")
 
-        if sub_graph is None:
+        if graph_subgraph_mapper is None:
             return self._synapse_list
         else:
             sorted_subedges = \
-                sorted(sub_graph.get_subedges_from_edge(self),
+                sorted(graph_subgraph_mapper.get_subedges_from_edge(self),
                        key=lambda sub_edge:
                        (sub_edge.presubvertex.lo_atom,
                         sub_edge.postsubvertex.lo_atom))

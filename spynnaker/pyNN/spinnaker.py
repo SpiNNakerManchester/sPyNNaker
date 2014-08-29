@@ -206,6 +206,10 @@ class Spinnaker(SpynnakerConfiguration):
     def partitionable_graph(self):
         return self._partitionable_graph
 
+    @property
+    def graph_mapper(self):
+        return self._graph_mapper
+
     def set_app_id(self, value):
         self._app_id = value
 
