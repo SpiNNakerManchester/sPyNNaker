@@ -18,8 +18,8 @@ from spinnman.model.cpu_state import CPUState
 from spinnman import reports as spinnman_reports
 from spinnman.transceiver import create_transceiver_from_hostname
 
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
-    AbstractDataSpecableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN import exceptions
@@ -167,9 +167,11 @@ class SpynnakerCommsFunctions(object):
     def _start_execution_on_machine(self, executable_targets, app_id, runtime):
         #deduce how many processors this application uses up
         total_processors = 0
+        total_cores = list()
         executable_keys = executable_targets.keys()
         for executable_target in executable_keys:
             core_subset = executable_targets[executable_target]
+            total_cores.append(core_subset)
             for _ in core_subset:
                 total_processors += 1
 
@@ -178,11 +180,17 @@ class SpynnakerCommsFunctions(object):
                                                            CPUState.SYNC0)
 
         if processors_ready != total_processors:
-            break_down = \
-                self._break_down_of_failure_to_reach_state(executable_targets,
+            sucessful_cores, unsucessful_cores = \
+                self._break_down_of_failure_to_reach_state(total_cores,
                                                            CPUState.SYNC0)
+            #break_down the successful cores and unsuccessful cores into string
+            # reps
+            break_down = \
+                turn_break_downs_into_string(total_cores, successful_cores,
+                                             unsuccessful_cores, CPUState.SYNC0)
             raise exceptions.ExecutableFailedToStartException(
-                "Only {} processors out of {} have sucessfully reached sync0 {}"
+                "Only {} processors out of {} have sucessfully reached sync0 "
+                "with breakdown of {}"
                 .format(processors_ready, total_processors, break_down))
 
         # if correct, start applications
@@ -194,9 +202,18 @@ class SpynnakerCommsFunctions(object):
         processors_running = self._txrx.get_core_state_count(app_id,
                                                              CPUState.RUNNING)
         if processors_running < total_processors:
+            sucessful_cores, unsucessful_cores = \
+                self._break_down_of_failure_to_reach_state(total_cores,
+                                                           CPUState.RUNNING)
+            #break_down the successful cores and unsuccessful cores into string
+            # reps
+            break_down = \
+                turn_break_downs_into_string(total_cores, successful_cores,
+                                             unsuccessful_cores,
+                                             CPUState.RUNNING)
             raise exceptions.ExecutableFailedToStartException(
-                "Only {} of {} processors started".format(processors_running,
-                                                          total_processors))
+                "Only {} of {} processors started with breakdown {}"
+                .format(processors_running, total_processors, break_down))
 
         #if not running for infinity, check that applications stop correctly
         if runtime is not None:
@@ -211,19 +228,34 @@ class SpynnakerCommsFunctions(object):
                     self._txrx.get_core_state_count(app_id,
                                                     CPUState.RUN_TIME_EXCEPTION)
                 if processors_rte > 0:
+                    sucessful_cores, unsucessful_cores = \
+                        self._break_down_of_failure_to_reach_state(
+                            total_cores, CPUState.RUNNING)
+                    #break_down the successful cores and unsuccessful cores into
+                    #  string reps
+                    break_down = turn_break_downs_into_string(
+                        total_cores, successful_cores, unsuccessful_cores,
+                        CPUState.RUNNING)
                     raise exceptions.ExecutableFailedToStopException(
-                        "{} cores have gone into a run time error state."
-                        .format(processors_rte))
+                        "{} cores have gone into a run time error state with "
+                        "breakdown {}.".format(processors_rte, break_down))
 
             processors_exited =\
                 self._txrx.get_core_state_count(app_id, CPUState.FINSHED)
 
             if processors_exited < total_processors:
+                sucessful_cores, unsucessful_cores = \
+                        self._break_down_of_failure_to_reach_state(
+                            total_cores, CPUState.RUNNING)
+                    #break_down the successful cores and unsuccessful cores into
+                    #  string reps
+                    break_down = turn_break_downs_into_string(
+                        total_cores, successful_cores, unsuccessful_cores,
+                        CPUState.RUNNING)
                 raise exceptions.ExecutableFailedToStopException(
-                    "{} of the processors failed to exit successfully"
-                    .format(total_processors - processors_exited)
-                )
-
+                    "{} of the processors failed to exit successfully with"
+                    " breakdown {}.".format(
+                        total_processors - processors_exited, break_down))
             logger.info("Application has run to completion")
         else:
             logger.info("Application is set to run forever - PACMAN is exiting")
@@ -238,9 +270,42 @@ class SpynnakerCommsFunctions(object):
                 conf.config.get("SpecGeneration", "Binary_folder"),
                 commands)
 
-    def _break_down_of_failure_to_reach_state(self, executable_targets, state):
+    def _break_down_of_failure_to_reach_state(self, total_cores, state):
+        sucessful_cores = list()
+        unsucessful_cores = dict()
+        for core_subset in total_cores:
+            for processor_id in core_subset:
+                core_state = \
+                    self._txrx.get_core_state(core_subset.x, core_subset.y,
+                                              processor_id)
+                if core_state == state:
+                    sucessful_cores.append((core_subset.x, core_subset.y,
+                                            processor_id))
+                else:
+                    unsucessful_cores[(core_subset.x, core_subset.y,
+                                       processor_id)] = core_state
+        return sucessful_cores, unsucessful_cores
 
-        return ""
+    @staticmethod
+    def turn_break_downs_into_string(total_cores, successful_cores,
+                                     unsuccessful_cores, state):
+        break_down = ""
+        for core_info in total_cores:
+            for processor_id in core_info:
+                core_coord = (core_info.x, core_info.y, processor_id)
+                if core_coord in successful_cores:
+                    break_down += "{}:{}:{} sucessfully in state {}"\
+                        .format(core_info.x, core_info.y, processor_id, state)
+                else:
+                    real_state = \
+                        unsuccessful_cores[(core_info.x, core_info.y,
+                                           processor_id)]
+                    break_down += \
+                        "{}:{}:{} failed to be in state {} and was in " \
+                        "state {} instead"\
+                        .format(core_info.x, core_info.y, processor_id,
+                                state, real_state)
+        return break_down
 
     def _load_application_data(self, placements, vertex_to_subvertex_mapper,
                                processor_to_app_data_base_address, hostname):
