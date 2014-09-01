@@ -95,6 +95,8 @@ static bool load_dtcm ()
   // Get the address this core's DTCM data starts at from SRAM
   address_t address = system_load_sram();
 
+  system_load_params(region_start(0, address));
+
   uint32_t version;
   uint32_t flags   = 0;
   if(!system_header_filled (address, &version, flags))
@@ -238,6 +240,7 @@ void c_main (void)
 {
   // Load DTCM data
   load_dtcm();
+
 
   // Configure lead app-specific stuff
   if(leadAp)

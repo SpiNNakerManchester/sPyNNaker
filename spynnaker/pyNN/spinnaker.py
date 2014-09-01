@@ -196,12 +196,20 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         return self._multi_cast_vertex
 
     @property
-    def sub_graph(self):
+    def partitioned_graph(self):
         return self._partitioned_graph
 
     @property
     def partitionable_graph(self):
         return self._partitionable_graph
+
+    @property
+    def placements(self):
+        return self._placements
+
+    @property
+    def transceiver(self):
+        return self._txrx
 
     @property
     def graph_mapper(self):

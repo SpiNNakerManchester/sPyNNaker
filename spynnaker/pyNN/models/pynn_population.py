@@ -195,6 +195,7 @@ class Population(object):
             timer = Timer()
             timer.start_timing()
         gsyn = self._vertex.get_gsyn(self._spinnaker,
+                                     self._spinnaker.machine_time_step,
                                      compatible_output=compatible_output)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
@@ -216,6 +217,7 @@ class Population(object):
             timer = Timer()
             timer.start_timing()
         v = self._vertex.get_v(self._spinnaker,
+                               self._spinnaker.machine_time_step,
                                compatible_output=compatible_output)
 
         if conf.config.getboolean("Reports", "outputTimesForSections"):

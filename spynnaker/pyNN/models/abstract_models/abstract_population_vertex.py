@@ -65,9 +65,10 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             lambda subvertex: constants.OUT_SPIKE_BYTES
         
         # Use standard behaviour to read spikes
-        return self._getSpikes(spinnaker, compatible_output,
-                               constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY,
-                               sub_vertex_out_spike_bytes_function, runtime)
+        return self._get_spikes(
+            spinnaker, compatible_output,
+            constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
+            sub_vertex_out_spike_bytes_function)
     
     def get_neuron_parameter(self, region, compatible_output, spinnaker,
                              machine_time_step):
@@ -78,41 +79,47 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         value = numpy.zeros((0, 3))
         
         # Find all the sub-vertices that this pynn_population.py exists on
-        for subvertex in self.subvertices:
-            (x, y, p) = subvertex.placement.processor.get_coordinates()
+        subvertices = spinnaker.graph_mapper.get_subvertices_from_vertex(self)
+        for subvertex in subvertices:
+            placment = \
+                spinnaker.placements.get_placement_of_subvertex(subvertex)
+            (x, y, p) = placment.x, placment.y, placment.p
             
             # Get the App Data for the core
-            app_data_base_address = \
-                spinnaker.txrx.get_cpu_information_from_core(x, y, p).user[0]
+            app_data_base_address = spinnaker.transceiver.\
+                get_cpu_information_from_core(x, y, p).user[0]
             
             # Get the position of the value buffer
             v_region_base_address_offset = \
                 get_region_base_address_offset(app_data_base_address, region)
             v_region_base_address_buf = \
-                spinnaker.txrx.read_memory(x, y, v_region_base_address_offset,
-                                           4)
-            v_region_base_address = \
-                struct.unpack("<I", v_region_base_address_buf)[0]
+                str(list(spinnaker.transceiver.
+                         read_memory(x, y, v_region_base_address_offset, 4))[0])
+            v_region_base_address = struct.unpack("<I",
+                                                  v_region_base_address_buf)[0]
             v_region_base_address += app_data_base_address
             
             # Read the size
             number_of_bytes_written_buf = \
-                spinnaker.txrx.read_memory(x, y, v_region_base_address, 4)
+                str(list(spinnaker.transceiver.
+                         read_memory(x, y, v_region_base_address, 4))[0])
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
                     
             # Read the values
-            logger.debug("Reading {%d} ({%s}) bytes starting at {%s}".format( 
+            logger.debug("Reading {} ({}) bytes starting at {}".format(
                 number_of_bytes_written, hex(number_of_bytes_written), 
                 hex(v_region_base_address + 4)))
-            v_data = spinnaker.txrx.read_memory(x, y, v_region_base_address + 4, 
-                                                number_of_bytes_written)
+            v_data = \
+                str(list(spinnaker.transceiver.
+                         read_memory(x, y, v_region_base_address + 4,
+                                     number_of_bytes_written))[0])
             bytes_per_time_step = subvertex.n_atoms * 4
             number_of_time_steps_written = \
                 number_of_bytes_written / bytes_per_time_step
             ms_per_timestep = machine_time_step / 1000.0
             
-            logger.debug("Processing {%d} timesteps"
+            logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
             
             # Standard fixed-point 'accum' type scaling
@@ -166,13 +173,13 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         :param bool compatible_output:
             not used - inserted to match PyNN specs
         """
-        logger.info("Getting v for {%s}".format(self.label))
+        logger.info("Getting v for {}".format(self.label))
         if not spinnaker.has_ran:
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore v cannot be "
                 "retrieved")
         return self.get_neuron_parameter(
-            constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY,
+            constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
             compatible_output, spinnaker, machine_time_step)
 
     def get_gsyn(self, spinnaker, machine_time_step, compatible_output=False):
@@ -183,14 +190,14 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         :param spinnaker:
         :param compatible_output:
         """
-        logger.info("Getting gsyn for {%s}".format(self.label))
+        logger.info("Getting gsyn for {}".format(self.label))
         if not spinnaker.has_ran:
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore gsyn cannot be "
                 "retrieved")
         return self.get_neuron_parameter(
-            constants.POPULATION_BASED_REGIONS.GSYN_HISTORY, compatible_output,
-            spinnaker, machine_time_step)
+            constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
+            compatible_output, spinnaker, machine_time_step)
 
     def get_synaptic_data(self, spinnaker, presubvertex, pre_n_atoms,
                           postsubvertex, synapse_io):
@@ -199,5 +206,6 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         """
         return self._get_synaptic_data(
             spinnaker, presubvertex, pre_n_atoms, postsubvertex,
-            constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE, synapse_io,
-            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX)
+            constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
+            synapse_io,
+            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)

@@ -211,18 +211,24 @@ class SpynnakerCommsFunctions(object):
         logger.info("Checking that the application has started")
         processors_running = self._txrx.get_core_state_count(app_id,
                                                              CPUState.RUNNING)
+        processors_finished = self._txrx.get_core_state_count(app_id,
+                                                              CPUState.FINSHED)
         if processors_running < total_processors:
-            sucessful_cores, unsucessful_cores = \
-                self._break_down_of_failure_to_reach_state(total_cores,
-                                                           CPUState.RUNNING)
-            #break_down the successful cores and unsuccessful cores into string
-            # reps
-            break_down = self.turn_break_downs_into_string(
-                total_cores, sucessful_cores, unsucessful_cores,
-                CPUState.RUNNING)
-            raise exceptions.ExecutableFailedToStartException(
-                "Only {} of {} processors started with breakdown {}"
-                .format(processors_running, total_processors, break_down))
+            if processors_running + processors_finished >= total_processors:
+                logger.warn("some processors finished between signal "
+                            "transmissions. Could be a sign of an error")
+            else:
+                sucessful_cores, unsucessful_cores = \
+                    self._break_down_of_failure_to_reach_state(total_cores,
+                                                               CPUState.RUNNING)
+                #break_down the successful cores and unsuccessful cores into
+                # string reps
+                break_down = self.turn_break_downs_into_string(
+                    total_cores, sucessful_cores, unsucessful_cores,
+                    CPUState.RUNNING)
+                raise exceptions.ExecutableFailedToStartException(
+                    "Only {} of {} processors started with breakdown {}"
+                    .format(processors_running, total_processors, break_down))
 
         #if not running for infinity, check that applications stop correctly
         if runtime is not None:

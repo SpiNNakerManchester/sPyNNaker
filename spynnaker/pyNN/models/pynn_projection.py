@@ -229,9 +229,7 @@ class Projection(object):
                     self._projection_edge.get_synaptic_data(self._spinnaker)
             if self._delay_edge is not None:
                 delay_synapse_list = \
-                    self._delay_edge.get_synaptic_data(
-                        self._spinnaker,
-                        DelayExtensionVertex.MAX_SUPPORTED_DELAY_TICS)
+                    self._delay_edge.get_synaptic_data(self._spinnaker)
 
             # If there is both a delay and a non-delay list, merge them
             if synapse_list is not None and delay_synapse_list is not None:

@@ -89,28 +89,24 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         if spinnaker is None:
             return self._synapse_list
 
-        graph_subgraph_mapper = spinnaker.graph_mapper
+        graph_mapper = spinnaker.graph_mapper
         min_delay = config.get("Model", "min_delay")
 
-        if graph_subgraph_mapper is None:
+        if graph_mapper is None:
             return self._synapse_list
         else:
             sorted_subedges = \
-                sorted(graph_subgraph_mapper.get_subedges_from_edge(self),
+                sorted(graph_mapper.get_subedges_from_edge(self),
                        key=lambda sub_edge:
-                       (sub_edge.presubvertex.lo_atom,
-                        sub_edge.postsubvertex.lo_atom))
+                       (sub_edge.pre_subvertex.lo_atom,
+                        sub_edge.post_subvertex.lo_atom))
 
             synaptic_list = list()
             last_pre_lo_atom = None
             for subedge in sorted_subedges:
-                if subedge.pruneable:
-                    rows = [SynapseRowInfo([], [], [], [])
-                            for _ in range(subedge.presubvertex.n_atoms)]
-                else:
-                    rows =\
-                        subedge.get_synaptic_data(spinnaker,
-                                                  min_delay).get_rows()
+                rows =\
+                    subedge.get_synaptic_data(spinnaker,
+                                              min_delay).get_rows()
                 if (last_pre_lo_atom is None) or \
                         (last_pre_lo_atom != subedge.presubvertex.lo_atom):
                     synaptic_list.extend(rows)

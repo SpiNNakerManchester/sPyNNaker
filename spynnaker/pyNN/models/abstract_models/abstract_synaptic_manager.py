@@ -30,6 +30,7 @@ from data_specification.enums.data_type import DataType
 
 logger = logging.getLogger(__name__)
 
+
 @add_metaclass(ABCMeta)
 class AbstractSynapticManager(object):
 
@@ -480,7 +481,7 @@ class AbstractSynapticManager(object):
         synapse_list = \
             self._translate_synaptic_block_from_memory(
                 synaptic_block, pre_n_atoms, max_row_length, synapse_io,
-                post_subvertex, spinnaker.subgraph)
+                post_subvertex, spinnaker.partitioned_graph)
 
         return synapse_list
 
@@ -521,6 +522,9 @@ class AbstractSynapticManager(object):
         extracts the 6 elements from a data block which is ordered
         no PP, pp, No ff, NO fp, FF fp
         """
+        #turn byte array list into a string so that unpack can work
+        synaptic_block = str(synaptic_block[0])
+        number = ord(synaptic_block[0])
         #locate offset after conversion to bytes
         position_in_block = \
             atom * 4 * (max_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)
@@ -563,17 +567,19 @@ class AbstractSynapticManager(object):
         reads in a synaptic block from a given processor and subvertex on the
         machine.
         """
+        post_placement = \
+            spinnaker.placements.get_placement_of_subvertex(post_subvertex)
         post_x, post_y, post_p = \
-            post_subvertex.placement.processor.get_coordinates()
-        spinnaker.txrx.select(post_x, post_y)
+            post_placement.x, post_placement.y, post_placement.p
         # either read in the master pop table or retrieve it from storage
         master_pop_base_mem_address, app_data_base_address = \
             self._read_in_master_pop_table(post_x, post_y, post_p, spinnaker,
                                            master_pop_table_region)
 
         # locate address of the synaptic block
-        pre_x, pre_y, pre_p = \
-            pre_subvertex.placement.processor.get_coordinates()
+        pre_placement = \
+            spinnaker.placements.get_placement_of_subvertex(pre_subvertex)
+        pre_x, pre_y, pre_p = pre_placement.x, pre_placement.y, pre_placement.p
         table_slot_addr = packet_conversions.\
             get_mpt_sb_mem_addrs_from_coords(pre_x, pre_y, pre_p)
         master_table_pop_entry_address = (table_slot_addr +
@@ -611,14 +617,13 @@ class AbstractSynapticManager(object):
             synaptic_block_base_address_offset
 
         #read in and return the synaptic block
-        block = spinnaker.txrx.read_memory(pre_x, pre_y,
-                                           synaptic_block_base_address,
-                                           synaptic_block_size)
+        block = list(spinnaker.transceiver.read_memory(
+            pre_x, pre_y, synaptic_block_base_address, synaptic_block_size))
         if len(block[0]) != synaptic_block_size:
             raise exceptions.SynapticBlockReadException(
                 "Not enough data has been read "
                 "(aka, something funkky happened)")
-        return block
+        return block, maxed_row_length
 
     def _read_in_master_pop_table(self, x, y, p, spinnaker,
                                   master_pop_table_region):
@@ -629,7 +634,7 @@ class AbstractSynapticManager(object):
         # (location where this cores memory starts in
         # sdram and region table)
         app_data_base_address =\
-            spinnaker.txrx.get_cpu_information_from_core(x, y, p).user[0]
+            spinnaker.transceiver.get_cpu_information_from_core(x, y, p).user[0]
 
         # Get the memory address of the master pop table region
         master_pop_region = master_pop_table_region
@@ -661,8 +666,12 @@ class AbstractSynapticManager(object):
         up to for 4 times, and then if still fails, throws an error.
         """
         try:
-            data = spinnaker.txrx.read_memory(x, y, address, length)
-            return struct.unpack(data_format, data)[0]
+            #turn byte array into str for unpack to work.
+            data = \
+                str(list(spinnaker.transceiver.read_memory(
+                    x, y, address, length))[0])
+            result = struct.unpack(data_format, data)[0]
+            return result
         except spinnman_exceptions.SpinnmanIOException:
             raise exceptions.SynapticBlockReadException(
                 "failed to read and translate a piece of memory due to a "

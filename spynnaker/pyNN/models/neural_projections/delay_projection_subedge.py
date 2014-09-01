@@ -65,10 +65,13 @@ class DelayProjectionSubedge(ProjectionPartitionedEdge):
         return self.synapse_sublist
     
     def get_synaptic_data(self, spinnaker, delay_offset):
-        delay_list = self._post_subvertex.vertex.get_synaptic_data(
-            spinnaker, self._pre_subvertex, self.synapse_delay_rows,
-            self._post_subvertex,
-            self._associated_edge.synapse_row_io).get_rows()
+        graph_mapper = spinnaker.graph_mapper
+        delay_list = graph_mapper.\
+            get_vertex_from_subvertex(self._post_subvertex)\
+            .get_synaptic_data(spinnaker, self._pre_subvertex,
+                               self.synapse_delay_rows, self._post_subvertex,
+                               self._associated_edge.get_synapse_row_io)\
+            .get_rows()
         rows = list()
         for pre_atom in range(0, self._pre_subvertex.n_atoms):
             rows.append(SynapseRowInfo([], [], [], []))

@@ -66,38 +66,40 @@ class AbstractRecordableVertex(object):
         recorded cells.   This is read directly from the memory for the board.
         """
         
-        logger.info("Getting spikes for {%s}".format(self._label))
+        logger.info("Getting spikes for {}".format(self._label))
         
         spikes = numpy.zeros((0, 2))
-        sub_graph = spinnaker.sub_graph
-        placements = spinnaker.placements
+        graph_mapper = spinnaker.graph_mapper
         
         # Find all the sub-vertices that this pynn_population.py exists on
-        subvertices = sub_graph.get_subvertices_from_vertex(self)
+        subvertices = graph_mapper.get_subvertices_from_vertex(self)
         for subvertex in subvertices:
-            placement = placements.get_subvertex_placement(subvertex)
-            (x, y, p) = placement.processor.get_coordinates()
-            logger.debug("Reading spikes from chip {%d}, {%d}, core {%d}, "
-                         "lo_atom {%d}".format(x, y, p, subvertex.lo_atom))
+            placement = \
+                spinnaker.placements.get_placement_of_subvertex(subvertex)
+            (x, y, p) = placement.x, placement.y, placement.p
+            logger.debug("Reading spikes from chip {}, {}, core {}, "
+                         "lo_atom {}".format(x, y, p, subvertex.lo_atom))
             
             # Get the App Data for the core
             app_data_base_address = \
-                spinnaker.txrx.get_cpu_information_from_core(x, y, p).user[0]
+                spinnaker.transceiver.get_cpu_information_from_core(
+                    x, y, p).user[0]
             
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
                 get_region_base_address_offset(app_data_base_address,
                                                spike_recording_region)
             spike_region_base_address_buf = \
-                spinnaker.txrx.read_memory(
-                    x, y, spike_region_base_address_offset, 4)
+                str(list(spinnaker.transceiver.read_memory(
+                    x, y, spike_region_base_address_offset, 4))[0])
             spike_region_base_address = \
                 struct.unpack("<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
             
             # Read the spike data size
             number_of_bytes_written_buf =\
-                spinnaker.txrx.read_memory(x, y, spike_region_base_address, 4)
+                str(list(spinnaker.transceiver.
+                         read_memory(x, y, spike_region_base_address, 4))[0])
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
 
@@ -113,20 +115,21 @@ class AbstractRecordableVertex(object):
                                                   "allocated for it")
             
             # Read the spikes
-            logger.debug("Reading {%d} ({%s}) bytes starting at {%s} + 4"
+            logger.debug("Reading {} ({}) bytes starting at {} + 4"
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
             spike_data =\
-                spinnaker.txrx.read_memory(x, y, spike_region_base_address + 4,
-                                           number_of_bytes_written)
+                str(list(spinnaker.transceiver.
+                         read_memory(x, y, spike_region_base_address + 4,
+                                     number_of_bytes_written))[0])
             
             # Extract number of spike bytes from subvertex
             out_spike_bytes = sub_vertex_out_spike_bytes_function(subvertex)
             number_of_time_steps_written = \
                 number_of_bytes_written / out_spike_bytes
             
-            logger.debug("Processing {%d} timesteps"
+            logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
             
             # Loop through ticks

@@ -153,6 +153,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         recording_info |= 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
+        self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER)
         spec.switch_write_focus(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
         spec.write_value(data=recording_info)
