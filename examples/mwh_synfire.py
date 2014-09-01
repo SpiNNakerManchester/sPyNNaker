@@ -31,8 +31,8 @@ populations = list()
 projections = list()
 
 weight_to_spike = 2.0
-d_value = 3.1
-#delay = 17
+#d_value = 3.1
+delay = 17
 #delay = numpy.random.RandomState()
 delays = list()
 
@@ -45,8 +45,8 @@ for i in range(0, nNeurons):
      #   d_value = 17.0
     #if i == 2:
      #   d_value = 33.0
-    delays.append(float(d_value))
-    singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, d_value)
+    delays.append(float(delay))
+    singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
     loopConnections.append(singleConnection)
 
 injectionConnection = [(0, 0, weight_to_spike, 1)]

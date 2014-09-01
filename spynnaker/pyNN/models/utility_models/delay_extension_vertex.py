@@ -27,12 +27,6 @@ from data_specification.file_data_writer import FileDataWriter
 
 logger = logging.getLogger(__name__)
 
-_DELAY_EXTENSION_REGIONS = Enum(
-    'SYSTEM',
-    'DELAY_PARAMS',
-    'SPIKE_HISTORY'
-)
-
 
 class DelayExtensionVertex(AbstractRecordableVertex,
                            AbstractPartitionableVertex,
@@ -43,6 +37,12 @@ class DelayExtensionVertex(AbstractRecordableVertex,
     """
 
     CORE_APP_IDENTIFIER = constants.DELAY_EXTENSION_CORE_APPLICATION_ID
+
+    _DELAY_EXTENSION_REGIONS = Enum(
+        value="DELAY_EXTENSION_REGIONS",
+        names=[('SYSTEM', 0),
+               ('DELAY_PARAMS', 1),
+               ('SPIKE_HISTORY', 2)])
     
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  machine_time_step, constraints=None, label="DelayExtension"):
@@ -111,11 +111,10 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         # Create new DataSpec for this processor:
         data_writer = FileDataWriter(binary_file_name)
         spec = DataSpecificationGenerator(data_writer)
-        
-        self.write_setup_info(spec, 0)
 
-        spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
-        
+         # Reserve memory:
+        spec.comment("\nReserving memory space for data regions:\n\n")
+
         # ###################################################################
         # Reserve SDRAM space for memory areas:
 
@@ -124,22 +123,23 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         block_len_words = int(ceil(n_atoms / 32.0))
         num_delay_blocks, delay_blocks = self.get_delay_blocks(
             subvertex, sub_graph, graph_sub_graph_mapper)
-        delay_params_sz = 4 * (delay_params_header_words 
+        delay_params_sz = 4 * (delay_params_header_words
                                + (num_delay_blocks * block_len_words))
-        
-        # Reserve memory:
-        spec.comment("\nReserving memory space for data regions:\n\n")
-
-        spec.reserve_memory_region(region=_DELAY_EXTENSION_REGIONS.SYSTEM,
-                                   size=constants.SETUP_SIZE, label='setup')
 
         spec.reserve_memory_region(
-            region=_DELAY_EXTENSION_REGIONS.DELAY_PARAMS, 
+            region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
+            size=constants.SETUP_SIZE, label='setup')
+
+        spec.reserve_memory_region(
+            region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
+        
+        self.write_setup_info(spec, 0)
+
+        spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
         self.write_delay_parameters(spec, placement.x, placement.y, placement.p,
                                     subvertex, num_delay_blocks, delay_blocks)
-
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
@@ -153,13 +153,14 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         recording_info |= 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(region=_DELAY_EXTENSION_REGIONS.SYSTEM)
+        spec.switch_write_focus(
+            region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=0)
         spec.write_value(data=0)
         
-    def get_delay_blocks(self, subvertex, sub_graph, graph_subgraph_mapper):
+    def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
         # Create empty list of words to fill in with delay data:
         num_words_per_row = int(ceil(subvertex.n_atoms / 32.0))
         one_block = [0] * num_words_per_row
@@ -168,19 +169,17 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         
         for subedge in sub_graph.outgoing_subedges_from_subvertex(subvertex):
             subedge_assocated_edge = \
-                graph_subgraph_mapper.get_edge_from_subedge(subedge)
+                graph_mapper.get_edge_from_subedge(subedge)
             if not isinstance(subedge_assocated_edge, DelayProjectionEdge):
                 raise exceptions.DelayExtensionException(
                     "One of the incoming subedges is not a subedge of a"
                     " DelayAfferentPartitionableEdge")
 
-            if subedge.pruneable:
-                continue
-    
             # Loop through each possible delay block
-            dest = subedge.postsubvertex
+            dest = subedge.post_subvertex
             synapse_list = \
-                subedge.edge.synapse_list.create_atom_sublist(
+                graph_mapper.get_edge_from_subedge(subedge)\
+                .get_synaptic_data().create_atom_sublist(
                     subvertex.lo_atom, subvertex.hi_atom, dest.lo_atom,
                     dest.hi_atom)
             for b in range(constants.MAX_DELAY_BLOCKS):
@@ -209,8 +208,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                     row_count += 1
         return num_delay_blocks, delay_block
 
-    @staticmethod
-    def write_delay_parameters(spec, processor_chip_x, processor_chip_y,
+    def write_delay_parameters(self, spec, processor_chip_x, processor_chip_y,
                                processor_id, subvertex, num_delay_blocks,
                                delay_block):
         """
@@ -218,11 +216,12 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         """
 
         # Write spec with commands to construct required delay region:
-        spec.comment("\nWriting Delay Parameters for {%d} Neurons:\n"
+        spec.comment("\nWriting Delay Parameters for {} Neurons:\n"
                      .format(subvertex.n_atoms))
 
         # Set the focus to the memory region 2 (delay parameters):
-        spec.switch_write_focus(region=_DELAY_EXTENSION_REGIONS.DELAY_PARAMS)
+        spec.switch_write_focus(
+            region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value)
 
         # Write header info to the memory region:
         # Write Key info for this core:
@@ -240,7 +239,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
 
         # Write the actual delay blocks
         for i in range(0, num_delay_blocks):
-            spec.write_array(data=delay_block[i])
+            spec.write_array(array_values=delay_block[i])
 
     #inhirrted from partitoionable vertex
     def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):

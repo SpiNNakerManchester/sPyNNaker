@@ -180,14 +180,15 @@ class SpynnakerCommsFunctions(object):
                                                            CPUState.SYNC0)
 
         if processors_ready != total_processors:
-            sucessful_cores, unsucessful_cores = \
+            successful_cores, unsucessful_cores = \
                 self._break_down_of_failure_to_reach_state(total_cores,
                                                            CPUState.SYNC0)
             #break_down the successful cores and unsuccessful cores into string
             # reps
             break_down = \
-                turn_break_downs_into_string(total_cores, successful_cores,
-                                             unsuccessful_cores, CPUState.SYNC0)
+                self.turn_break_downs_into_string(
+                    total_cores, successful_cores, unsucessful_cores,
+                    CPUState.SYNC0)
             raise exceptions.ExecutableFailedToStartException(
                 "Only {} processors out of {} have sucessfully reached sync0 "
                 "with breakdown of {}"
@@ -207,10 +208,9 @@ class SpynnakerCommsFunctions(object):
                                                            CPUState.RUNNING)
             #break_down the successful cores and unsuccessful cores into string
             # reps
-            break_down = \
-                turn_break_downs_into_string(total_cores, successful_cores,
-                                             unsuccessful_cores,
-                                             CPUState.RUNNING)
+            break_down = self.turn_break_downs_into_string(
+                total_cores, sucessful_cores, unsucessful_cores,
+                CPUState.RUNNING)
             raise exceptions.ExecutableFailedToStartException(
                 "Only {} of {} processors started with breakdown {}"
                 .format(processors_running, total_processors, break_down))
@@ -233,8 +233,8 @@ class SpynnakerCommsFunctions(object):
                             total_cores, CPUState.RUNNING)
                     #break_down the successful cores and unsuccessful cores into
                     #  string reps
-                    break_down = turn_break_downs_into_string(
-                        total_cores, successful_cores, unsuccessful_cores,
+                    break_down = self.turn_break_downs_into_string(
+                        total_cores, sucessful_cores, unsucessful_cores,
                         CPUState.RUNNING)
                     raise exceptions.ExecutableFailedToStopException(
                         "{} cores have gone into a run time error state with "
@@ -247,11 +247,11 @@ class SpynnakerCommsFunctions(object):
                 sucessful_cores, unsucessful_cores = \
                         self._break_down_of_failure_to_reach_state(
                             total_cores, CPUState.RUNNING)
-                    #break_down the successful cores and unsuccessful cores into
-                    #  string reps
-                    break_down = turn_break_downs_into_string(
-                        total_cores, successful_cores, unsuccessful_cores,
-                        CPUState.RUNNING)
+                #break_down the successful cores and unsuccessful cores into
+                #  string reps
+                break_down = self.turn_break_downs_into_string(
+                    total_cores, sucessful_cores, unsucessful_cores,
+                    CPUState.RUNNING)
                 raise exceptions.ExecutableFailedToStopException(
                     "{} of the processors failed to exit successfully with"
                     " breakdown {}.".format(
@@ -273,17 +273,13 @@ class SpynnakerCommsFunctions(object):
     def _break_down_of_failure_to_reach_state(self, total_cores, state):
         sucessful_cores = list()
         unsucessful_cores = dict()
-        for core_subset in total_cores:
-            for processor_id in core_subset:
-                core_state = \
-                    self._txrx.get_core_state(core_subset.x, core_subset.y,
-                                              processor_id)
-                if core_state == state:
-                    sucessful_cores.append((core_subset.x, core_subset.y,
-                                            processor_id))
-                else:
-                    unsucessful_cores[(core_subset.x, core_subset.y,
-                                       processor_id)] = core_state
+        core_infos = self._txrx.get_cpu_information(total_cores)
+        for core_info in core_infos:
+            if core_info.state == state:
+                sucessful_cores.append((core_info.x, core_info.y, core_info.p))
+            else:
+                unsucessful_cores[(core_info.x, core_info.y,core_info.p)] = \
+                    core_info.state
         return sucessful_cores, unsucessful_cores
 
     @staticmethod
