@@ -159,10 +159,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
             if self._do_load is True:
                 logger.info("*** Loading data ***")
-                self._load_application_data(self._placements,
-                                            self._graph_mapper,
-                                            processor_to_app_data_base_address,
-                                            self._hostname)
+                self._load_application_data(
+                    self._placements, self._router_tables, self._graph_mapper,
+                    processor_to_app_data_base_address, self._hostname)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
             if do_timing:

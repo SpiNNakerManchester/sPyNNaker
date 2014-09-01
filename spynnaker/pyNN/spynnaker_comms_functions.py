@@ -294,7 +294,7 @@ class SpynnakerCommsFunctions(object):
                 sucessful_cores.append((core_info.x, core_info.y, core_info.p))
             else:
                 unsucessful_cores[(core_info.x, core_info.y,core_info.p)] = \
-                    core_info.state.value
+                    core_info.state.name
         return sucessful_cores, unsucessful_cores
 
     @staticmethod
@@ -307,7 +307,7 @@ class SpynnakerCommsFunctions(object):
                 if core_coord in successful_cores:
                     break_down += "{}:{}:{} sucessfully in state {}{}"\
                         .format(core_info.x, core_info.y, processor_id,
-                                state.value, os.linesep)
+                                state.name, os.linesep)
                 else:
                     real_state = \
                         unsuccessful_cores[(core_info.x, core_info.y,
@@ -319,8 +319,9 @@ class SpynnakerCommsFunctions(object):
                                 state, real_state, os.linesep)
         return break_down
 
-    def _load_application_data(self, placements, vertex_to_subvertex_mapper,
-                               processor_to_app_data_base_address, hostname):
+    def _load_application_data(
+            self, placements, router_tables, vertex_to_subvertex_mapper,
+            processor_to_app_data_base_address, hostname):
 
         #if doing reload, start script
         if self._reports_states.transciever_report:
@@ -373,6 +374,13 @@ class SpynnakerCommsFunctions(object):
                     spinnman_reports.append_to_rerun_script(
                         conf.config.get("SpecGeneration", "Binary_folder"),
                         lines)
+        #load each router table thats needed for the application to run into
+        # the chips sdram
+        for router_table in router_tables.routing_tables:
+            if len(router_table.multicast_routing_entries) > 0:
+                self._txrx.load_multicast_routes(
+                    router_table.x, router_table.y,
+                    router_table.multicast_routing_entries)
 
     def _load_executable_images(self, executable_targets, app_id):
         """

@@ -60,7 +60,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         spike_dict = dict()
         if isinstance(self._spike_times, list):
             # This is in SpiNNaker 'list of lists' format:
-            for neuron in range(lo_atom, hi_atom):
+            for neuron in range(lo_atom, hi_atom + 1):
                 for timeStamp in self._spike_times[neuron]:
                     time_stamp_in_ticks = \
                         int((timeStamp * 1000.0) / self._machine_time_step)
@@ -238,8 +238,8 @@ class SpikeSourceArray(AbstractSpikeSource):
         for entry in table_entries:
             time_stamp = entry[0]   # Time in ticks when this block is used
             address = entry[1]   # Address into spikeBlock region
-            spec.write(data=time_stamp)
-            spec.write(data=address)
+            spec.write_value(data=time_stamp)
+            spec.write_value(data=address)
         return
 
     def write_spike_data_region(self, spec, num_neurons, spike_blocks):
