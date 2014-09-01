@@ -60,7 +60,7 @@ class AbstractSynapticManager(object):
             num_padding_bytes = write_ptr - current_write_ptr
             spec.set_register_value(register_id=15, data=num_padding_bytes)
             spec.write_value(data=0xDD, repeats_register=15,
-                             data_type=DataType.INT16)
+                             data_type=DataType.UINT8)
 
         # Remember this aligned address, it's where this block will start:
         block_start_addr = write_ptr
@@ -126,9 +126,9 @@ class AbstractSynapticManager(object):
             padding = ((fixed_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)
                        - words_written)
             if padding != 0:
-                spec.write(data=0xBBCCDDEE, repeats=padding, sizeof='uint32')
+                spec.write_value(data=0xBBCCDDEE, repeats=padding,
+                                 data_type=DataType.UINT32)
                 write_ptr += 4 * padding
-
             row_no += 1
 
         # The current write pointer is where the next block could start:
@@ -141,6 +141,7 @@ class AbstractSynapticManager(object):
         
         # Go through the subedges and add up the memory
         for subedge in subvertex_in_edges:
+            #pad the memory size to meet 1 k offsets
             if (memory_size & 0x3FF) != 0:
                 memory_size = (memory_size & 0xFFFFFC00) + 0x400
             
@@ -464,7 +465,6 @@ class AbstractSynapticManager(object):
         spec.switch_write_focus(region=master_pop_table_region)
         spec.set_write_pointer(address=table_slot_addr)
         spec.write_value(data=new_entry, data_type=DataType.INT16)
-        return
 
     def _get_synaptic_data(self, spinnaker, pre_subvertex, pre_n_atoms,
                            post_subvertex, master_pop_table_region, synapse_io,

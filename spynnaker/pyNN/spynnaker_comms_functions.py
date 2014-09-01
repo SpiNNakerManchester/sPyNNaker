@@ -170,14 +170,23 @@ class SpynnakerCommsFunctions(object):
         total_cores = list()
         executable_keys = executable_targets.keys()
         for executable_target in executable_keys:
-            core_subset = executable_targets[executable_target]
-            total_cores.append(core_subset)
-            for _ in core_subset:
+            core_subsets = executable_targets[executable_target]
+            for core_subset in core_subsets:
                 total_processors += 1
+                total_cores.append(core_subset)
+
+        processor_c_main = self._txrx.get_core_state_count(app_id,
+                                                           CPUState.C_MAIN)
+        #check that everything has gone though c main to reach sync0 or
+        # failing for some unknown reason
+        while processor_c_main != 0:
+            processor_c_main = self._txrx.get_core_state_count(app_id,
+                                                               CPUState.C_MAIN)
 
         #check that the right number of processors are in sync0
         processors_ready = self._txrx.get_core_state_count(app_id,
                                                            CPUState.SYNC0)
+
 
         if processors_ready != total_processors:
             successful_cores, unsucessful_cores = \
@@ -191,7 +200,7 @@ class SpynnakerCommsFunctions(object):
                     CPUState.SYNC0)
             raise exceptions.ExecutableFailedToStartException(
                 "Only {} processors out of {} have sucessfully reached sync0 "
-                "with breakdown of {}"
+                "with breakdown of: {}"
                 .format(processors_ready, total_processors, break_down))
 
         # if correct, start applications
@@ -285,22 +294,23 @@ class SpynnakerCommsFunctions(object):
     @staticmethod
     def turn_break_downs_into_string(total_cores, successful_cores,
                                      unsuccessful_cores, state):
-        break_down = ""
+        break_down = os.linesep
         for core_info in total_cores:
-            for processor_id in core_info:
+            for processor_id in core_info.processor_ids:
                 core_coord = (core_info.x, core_info.y, processor_id)
                 if core_coord in successful_cores:
-                    break_down += "{}:{}:{} sucessfully in state {}"\
-                        .format(core_info.x, core_info.y, processor_id, state)
+                    break_down += "{}:{}:{} sucessfully in state {}{}"\
+                        .format(core_info.x, core_info.y, processor_id, state,
+                                os.linesep)
                 else:
                     real_state = \
                         unsuccessful_cores[(core_info.x, core_info.y,
                                            processor_id)]
                     break_down += \
                         "{}:{}:{} failed to be in state {} and was in " \
-                        "state {} instead"\
+                        "state {} instead{}"\
                         .format(core_info.x, core_info.y, processor_id,
-                                state, real_state)
+                                state, real_state, os.linesep)
         return break_down
 
     def _load_application_data(self, placements, vertex_to_subvertex_mapper,
