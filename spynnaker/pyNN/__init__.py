@@ -92,7 +92,7 @@ def end():
     Unregisters the controller
     """
     global _spinnaker
-    _spinnaker.stop()
+    _spinnaker.stop(_spinnaker.app_id)
     _spinnaker = None
 
 

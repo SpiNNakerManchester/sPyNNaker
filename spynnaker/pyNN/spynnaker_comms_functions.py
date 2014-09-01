@@ -294,7 +294,7 @@ class SpynnakerCommsFunctions(object):
                 sucessful_cores.append((core_info.x, core_info.y, core_info.p))
             else:
                 unsucessful_cores[(core_info.x, core_info.y,core_info.p)] = \
-                    core_info.state
+                    core_info.state.value
         return sucessful_cores, unsucessful_cores
 
     @staticmethod
@@ -306,8 +306,8 @@ class SpynnakerCommsFunctions(object):
                 core_coord = (core_info.x, core_info.y, processor_id)
                 if core_coord in successful_cores:
                     break_down += "{}:{}:{} sucessfully in state {}{}"\
-                        .format(core_info.x, core_info.y, processor_id, state,
-                                os.linesep)
+                        .format(core_info.x, core_info.y, processor_id,
+                                state.value, os.linesep)
                 else:
                     real_state = \
                         unsuccessful_cores[(core_info.x, core_info.y,

@@ -119,10 +119,8 @@ class AbstractRecordableVertex(object):
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            spike_data =\
-                str(list(spinnaker.transceiver.
-                         read_memory(x, y, spike_region_base_address + 4,
-                                     number_of_bytes_written))[0])
+            spike_data = spinnaker.transceiver.read_memory(x, y, spike_region_base_address + 4,
+                                     number_of_bytes_written)
             
             # Extract number of spike bytes from subvertex
             out_spike_bytes = sub_vertex_out_spike_bytes_function(subvertex)
@@ -131,40 +129,29 @@ class AbstractRecordableVertex(object):
             
             logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
-            
-            # Loop through ticks
-            for tick in range(0, number_of_time_steps_written):
-                
-                # Convert tick to ms
-                time = tick * (self._machine_time_step / 1000.0)
-                
-                # Get offset into file data that the bit vector representing 
-                # the state at this tick begins at
-                vector_offset = (tick * out_spike_bytes)
-                
-                # Loop through the words that make up this vector
-                for neuronWordIndex in range(0, out_spike_bytes, 4):
-                    
+
+            current_tic = 0
+            for block in spike_data:
+                timer_tics_for_block = len(block) / out_spike_bytes
+                for tic in range(timer_tics_for_block):
+                    current_block_position = tic * out_spike_bytes
                     # Unpack the word containing the spikingness of 32 neurons
                     spike_vector_word = \
-                        struct.unpack_from("<I", spike_data,
-                                           vector_offset + neuronWordIndex)
+                        struct.unpack_from("<I", str(block),
+                                           current_block_position)
                     
                     if spike_vector_word != 0:
                         # Loop through each bit in this word
                         for neuronBitIndex in range(0, 32):
-                            
                             # If the bit is set
                             neuron_bit_mask = (1 << neuronBitIndex)
                             if (spike_vector_word[0] & neuron_bit_mask) != 0:
-                                
                                 # Calculate neuron ID
-                                neuron_id = ((neuronWordIndex * 8) +
-                                             neuronBitIndex + subvertex.lo_atom)
-                                
+                                neuron_id = neuronBitIndex + subvertex.lo_atom
                                 # Add spike time and neuron ID to returned lists
-                                spikes = numpy.append(spikes,
-                                                      [[time, neuron_id]], 0)
+                                spikes = \
+                                    numpy.append(spikes,
+                                                 [[current_tic, neuron_id]], 0)
             
         if len(spikes) > 0:
             

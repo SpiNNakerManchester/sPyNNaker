@@ -71,9 +71,9 @@ p.run(run_time)
 v = None
 gsyn = None
 spikes = None
-print(projections[0].getWeights())
-print(projections[0].getDelays())
-print delays
+#print(projections[0].getWeights())
+#print(projections[0].getDelays())
+#print delays
 
 v = populations[0].get_v(compatible_output=True)
 gsyn = populations[0].get_gsyn(compatible_output=True)
