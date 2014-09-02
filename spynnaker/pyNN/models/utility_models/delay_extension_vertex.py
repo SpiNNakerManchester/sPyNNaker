@@ -100,17 +100,17 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                 * constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
-                           routing_info, hostname, graph_sub_graph_mapper):
+                           routing_info, hostname, graph_sub_graph_mapper,
+                           report_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
         """
-        binary_file_name = \
-            self.get_data_spec_file_name(placement.x, placement.y, placement.p,
-                                         hostname)
-        # Create new DataSpec for this processor:
-        data_writer = FileDataWriter(binary_file_name)
-        spec = DataSpecificationGenerator(data_writer)
+        data_writer, report_writer = \
+            self.get_data_spec_file_writers(
+                placement.x, placement.y, placement.p, hostname, report_folder)
+
+        spec = DataSpecificationGenerator(data_writer, report_writer)
 
          # Reserve memory:
         spec.comment("\nReserving memory space for data regions:\n\n")

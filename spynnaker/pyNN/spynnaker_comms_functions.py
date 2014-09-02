@@ -12,11 +12,11 @@ from spinn_machine.virutal_machine import VirtualMachine
 
 
 from spinnman.messages.scp.scp_signal import SCPSignal
-from spinnman.data.file_data_reader import FileDataReader \
-    as SpinnmanFileDataReader
 from spinnman.model.cpu_state import CPUState
 from spinnman import reports as spinnman_reports
 from spinnman.transceiver import create_transceiver_from_hostname
+from spinnman.data.file_data_reader import FileDataReader \
+    as SpinnmanFileDataReader
 
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -117,11 +117,11 @@ class SpynnakerCommsFunctions(object):
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 data_spec_file_path = \
-                    associated_vertex.get_data_spec_file_name(
+                    associated_vertex.get_data_spec_file_path(
                         placement.x, placement.y, placement.p, hostname
                     )
                 app_data_file_path = \
-                    associated_vertex.get_application_data_file_name(
+                    associated_vertex.get_application_data_file_path(
                         placement.x, placement.y, placement.p, hostname
                     )
                 data_spec_reader = FileDataReader(data_spec_file_path)
@@ -342,7 +342,7 @@ class SpynnakerCommsFunctions(object):
                 memory_used = \
                     processor_to_app_data_base_address[key]['memory_used']
                 file_path_for_application_data = \
-                    associated_vertex.get_application_data_file_name(
+                    associated_vertex.get_application_data_file_path(
                         placement.x, placement.y, placement.p, hostname)
                 application_data_file_reader = \
                     SpinnmanFileDataReader(file_path_for_application_data)

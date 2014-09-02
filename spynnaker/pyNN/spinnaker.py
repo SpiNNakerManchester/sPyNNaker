@@ -289,7 +289,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 associated_vertex.generate_data_spec(
                     placement.subvertex, placement, self._partitioned_graph,
                     self._partitionable_graph, self._routing_infos,
-                    self._hostname, self._graph_mapper)
+                    self._hostname, self._graph_mapper,
+                    self._report_default_directory)
 
                 binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():

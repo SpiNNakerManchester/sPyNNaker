@@ -282,16 +282,17 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     #inhirrted from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_subgraph_mapper):
+                           routing_info, hostname, graph_subgraph_mapper,
+                           report_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
         """
-        binary_file_name = self.get_data_spec_file_name(
-            placement.x, placement.y, placement.p, hostname)
+        data_writer, report_writer = \
+            self.get_data_spec_file_writers(
+                placement.x, placement.y, placement.p, hostname, report_folder)
 
-        # Create new DataSpec for this processor:
-        data_writer = FileDataWriter(binary_file_name)
+        spec = DataSpecificationGenerator(data_writer, report_writer)
         spec = DataSpecificationGenerator(data_writer)
         spike_history_region_sz = self.get_spike_buffer_size(subvertex.lo_atom,
                                                              subvertex.hi_atom)

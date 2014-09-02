@@ -207,18 +207,18 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         # End the loop over the neurons:
 
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_sub_graph_mapper):
+                           routing_info, hostname, graph_sub_graph_mapper,
+                           report_folder):
         """
         Model-specific construction of the data blocks necessary to
         build a group of IF_curr_exp neurons resident on a single core.
         """
         # Create new DataSpec for this processor:
-        binary_file_name = self.get_data_spec_file_name(
-            placement.x, placement.y, placement.p, hostname)
+        data_writer, report_writer = \
+            self.get_data_spec_file_writers(
+                placement.x, placement.y, placement.p, hostname, report_folder)
 
-        data_writer = FileDataWriter(binary_file_name)
-
-        spec = DataSpecificationGenerator(data_writer)
+        spec = DataSpecificationGenerator(data_writer, report_writer)
 
         spec.comment("\n*** Spec for block of {} neurons ***\n"
                      .format(self.model_name))

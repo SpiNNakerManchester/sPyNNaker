@@ -1,6 +1,10 @@
-from pacman.model.partitionable_graph.abstract_constrained_vertex import AbstractConstrainedVertex
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
+from data_specification.file_data_writer import FileDataWriter
+
+
+from pacman.model.partitionable_graph.abstract_constrained_vertex \
+    import AbstractConstrainedVertex
+
+
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
@@ -33,7 +37,8 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
 
     @abstractmethod
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
-                           routing_info, hostname, graph_subgraph_mapper):
+                           routing_info, hostname, graph_subgraph_mapper,
+                           report_folder):
         """
         method to determine how to generate their data spec for a non neural
         application
@@ -73,28 +78,50 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
                 "cannot set the number of machine time steps of a given"
                 " model once it has already been set")
 
+    @staticmethod
+    def get_data_spec_file_writers(processor_chip_x, processor_chip_y,
+                                   processor_id, hostname, report_directory):
+        binary_file_path = \
+            AbstractDataSpecableVertex.get_data_spec_file_path(
+                processor_chip_x, processor_chip_y, processor_id, hostname)
+        data_writer = FileDataWriter(binary_file_path)
+        #check if text reports are needed and if so initilise the reprot writer
+        #to send down to dsg
+        report_writer = None
+        if config.getboolean("Reports", "writeTextSpecs"):
+            new_report_directory = os.path.join(report_directory,
+                                                "data_spec_text_files")
+            if not os.path.exists(new_report_directory):
+                os.mkdir(new_report_directory)
 
+            file_name = "{}_dataSpec_{}_{}_{}.txt"\
+                        .format(hostname, processor_chip_x, processor_chip_y,
+                                processor_id)
+            report_file_path = os.path.join(new_report_directory, file_name)
+            report_writer = FileDataWriter(report_file_path)
+
+        return data_writer, report_writer
 
     @staticmethod
-    def get_data_spec_file_name(processor_chip_x, processor_chip_y,
+    def get_data_spec_file_path(processor_chip_x, processor_chip_y,
                                 processor_id, hostname):
-        has_binary_folder_set = \
-            config.has_option("SpecGeneration", "Binary_folder")
+        has_binary_folder_set = config.has_option("SpecGeneration",
+                                                  "Binary_folder")
         if not has_binary_folder_set:
             binary_folder = tempfile.gettempdir()
             config.set("SpecGeneration", "Binary_folder", binary_folder)
         else:
             binary_folder = config.get("SpecGeneration", "Binary_folder")
 
-        binary_file_name = \
+        binary_file_path = \
             binary_folder + os.sep + "{}_dataSpec_{}_{}_{}.dat"\
                                      .format(hostname, processor_chip_x,
                                              processor_chip_y,
                                              processor_id)
-        return binary_file_name
+        return binary_file_path
 
     @staticmethod
-    def get_application_data_file_name(processor_chip_x, processor_chip_y,
+    def get_application_data_file_path(processor_chip_x, processor_chip_y,
                                        processor_id, hostname):
         has_binary_folder_set = \
             config.has_option("SpecGeneration", "Binary_folder")

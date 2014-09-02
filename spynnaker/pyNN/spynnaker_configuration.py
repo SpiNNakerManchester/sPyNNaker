@@ -191,24 +191,28 @@ class SpynnakerConfiguration(object):
     def _move_report_and_binary_files(max_to_keep, starting_directory):
         app_folder_name = os.path.join(starting_directory, "latest")
         app_name_file = os.path.join(app_folder_name, "time_stamp")
-        time_stamp_in = open(app_name_file, "r")
-        time_stamp_in_string = time_stamp_in.readline()
-        time_stamp_in.close()
-        new_app_folder = os.path.join(starting_directory, time_stamp_in_string)
-        os.makedirs(new_app_folder)
-        list_of_files = os.listdir(app_folder_name)
-        for file_to_move in list_of_files:
-            file_path = os.path.join(app_folder_name, file_to_move)
-            shutil.move(file_path, new_app_folder)
-        files_in_report_folder = os.listdir(starting_directory)
-        # while theres more than the valid max, remove the oldest one
-        while len(files_in_report_folder) > max_to_keep:
-            files_in_report_folder.sort(
-                cmp, key=lambda temp_file:
-                os.path.getmtime(os.path.join(starting_directory, temp_file)))
-            oldest_file = files_in_report_folder[0]
-            shutil.rmtree(os.path.join(starting_directory, oldest_file))
-            files_in_report_folder.remove(oldest_file)
+        if os.path.isfile(app_name_file):
+            time_stamp_in = open(app_name_file, "r")
+            time_stamp_in_string = time_stamp_in.readline()
+            time_stamp_in.close()
+            new_app_folder = os.path.join(starting_directory,
+                                          time_stamp_in_string)
+            os.makedirs(new_app_folder)
+            list_of_files = os.listdir(app_folder_name)
+            for file_to_move in list_of_files:
+                file_path = os.path.join(app_folder_name, file_to_move)
+                shutil.move(file_path, new_app_folder)
+            files_in_report_folder = os.listdir(starting_directory)
+            # while theres more than the valid max, remove the oldest one
+            while len(files_in_report_folder) > max_to_keep:
+                files_in_report_folder.sort(
+                    cmp, key=lambda temp_file:
+                    os.path.getmtime(os.path.join(starting_directory,
+                                                  temp_file)))
+                oldest_file = files_in_report_folder[0]
+                shutil.rmtree(os.path.join(starting_directory, oldest_file),
+                              ignore_errors=True)
+                files_in_report_folder.remove(oldest_file)
 
     def _set_up_recording_specifics(self):
         if config.has_option("Recording", "send_live_spikes"):
