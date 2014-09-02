@@ -14,15 +14,11 @@ from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
 
 
-from spinnman.model.iptag import IPTag
-
 import os
 import datetime
 import shutil
 import logging
 import math
-from spynnaker.pyNN.visualiser_package.visualiser_creation_utility import \
-    VisualiserCreationUtility
 
 logger = logging.getLogger(__name__)
 
@@ -46,13 +42,11 @@ class SpynnakerConfiguration(object):
         self._visualiser_port = None
         self._visualiser_vertices = None
         self._visualiser_vertex_to_page_mapping = None
-        self._visualiser_creation_utility = VisualiserCreationUtility()
 
         #main objects
         self._partitionable_graph = PartitionableGraph(label=graph_label)
         self._partitioned_graph = None
         self._graph_mapper = None
-        self._machine = None
         self._no_machine_time_steps = None
         self._placements = None
         self._router_tables = None
@@ -61,7 +55,6 @@ class SpynnakerConfiguration(object):
         self._runtime = None
         self._has_ran = False
         self._reports_states = None
-        self._iptags = None
         self._app_id = None
 
         #pacman mapping objects
@@ -186,57 +179,6 @@ class SpynnakerConfiguration(object):
         self._report_default_directory = app_folder_name
         self._retrieve_provance_data = config.getboolean("Reports",
                                                          "writeProvanceData")
-
-    @staticmethod
-    def _move_report_and_binary_files(max_to_keep, starting_directory):
-        app_folder_name = os.path.join(starting_directory, "latest")
-        app_name_file = os.path.join(app_folder_name, "time_stamp")
-        if os.path.isfile(app_name_file):
-            time_stamp_in = open(app_name_file, "r")
-            time_stamp_in_string = time_stamp_in.readline()
-            time_stamp_in.close()
-            new_app_folder = os.path.join(starting_directory,
-                                          time_stamp_in_string)
-            os.makedirs(new_app_folder)
-            list_of_files = os.listdir(app_folder_name)
-            for file_to_move in list_of_files:
-                file_path = os.path.join(app_folder_name, file_to_move)
-                shutil.move(file_path, new_app_folder)
-            files_in_report_folder = os.listdir(starting_directory)
-            # while theres more than the valid max, remove the oldest one
-            while len(files_in_report_folder) > max_to_keep:
-                files_in_report_folder.sort(
-                    cmp, key=lambda temp_file:
-                    os.path.getmtime(os.path.join(starting_directory,
-                                                  temp_file)))
-                oldest_file = files_in_report_folder[0]
-                shutil.rmtree(os.path.join(starting_directory, oldest_file),
-                              ignore_errors=True)
-                files_in_report_folder.remove(oldest_file)
-
-    def _set_up_recording_specifics(self):
-        if config.has_option("Recording", "send_live_spikes"):
-            if config.getboolean("Recording", "send_live_spikes"):
-                port = None
-                if config.has_option("Recording", "live_spike_port"):
-                    port = config.getint("Recording", "live_spike_port")
-                hostname = "localhost"
-                if config.has_option("Recording", "live_spike_host"):
-                    hostname = config.get("Recording", "live_spike_host")
-                tag = None
-                if config.has_option("Recording", "live_spike_tag"):
-                    tag = config.getint("Recording", "live_spike_tag")
-                if tag is None:
-                    raise exceptions.ConfigurationException(
-                        "Target tag for live spikes has not been set")
-
-                # Set up the forwarding so that monitored spikes are sent to the
-                # requested location
-                self._set_tag_output(tag, port, hostname)
-                #takes the same port for the visualiser if being used
-                if config.getboolean("Visualiser", "enable") and \
-                   config.getboolean("Machine", "have_board"):
-                    self._visualiser_creation_utility.set_visulaiser_port(port)
 
     def _set_up_main_objects(self):
         #report object
@@ -368,5 +310,29 @@ class SpynnakerConfiguration(object):
             raise Exception("A SpiNNaker machine must be specified in "
                             "pacman.cfg.")
 
-    def _set_tag_output(self, tag, port, hostname):
-        self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
+    @staticmethod
+    def _move_report_and_binary_files(max_to_keep, starting_directory):
+        app_folder_name = os.path.join(starting_directory, "latest")
+        app_name_file = os.path.join(app_folder_name, "time_stamp")
+        if os.path.isfile(app_name_file):
+            time_stamp_in = open(app_name_file, "r")
+            time_stamp_in_string = time_stamp_in.readline()
+            time_stamp_in.close()
+            new_app_folder = os.path.join(starting_directory,
+                                          time_stamp_in_string)
+            os.makedirs(new_app_folder)
+            list_of_files = os.listdir(app_folder_name)
+            for file_to_move in list_of_files:
+                file_path = os.path.join(app_folder_name, file_to_move)
+                shutil.move(file_path, new_app_folder)
+            files_in_report_folder = os.listdir(starting_directory)
+            # while theres more than the valid max, remove the oldest one
+            while len(files_in_report_folder) > max_to_keep:
+                files_in_report_folder.sort(
+                    cmp, key=lambda temp_file:
+                    os.path.getmtime(os.path.join(starting_directory,
+                                                  temp_file)))
+                oldest_file = files_in_report_folder[0]
+                shutil.rmtree(os.path.join(starting_directory, oldest_file),
+                              ignore_errors=True)
+                files_in_report_folder.remove(oldest_file)

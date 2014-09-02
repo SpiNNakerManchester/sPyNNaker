@@ -14,6 +14,7 @@ from spinn_machine.virutal_machine import VirtualMachine
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.cpu_state import CPUState
 from spinnman import reports as spinnman_reports
+from spinnman.model.iptag import IPTag
 from spinnman.transceiver import create_transceiver_from_hostname
 from spinnman.data.file_data_reader import FileDataReader \
     as SpinnmanFileDataReader
@@ -23,13 +24,15 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN import exceptions
-
+from spynnaker.pyNN.visualiser_package.visualiser_creation_utility import \
+    VisualiserCreationUtility
 
 import time
 import os
 import pickle
 import ntpath
 import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +42,12 @@ class SpynnakerCommsFunctions(object):
     def __init__(self, reports_states, report_default_directory):
         self._reports_states = reports_states
         self._report_default_directory = report_default_directory
-        self._visualiser_creation_utility = None
+        self._visualiser_creation_utility = VisualiserCreationUtility()
+        self._iptags = list()
+        self._machine = None
 
     def _setup_interfaces(self, hostname, partitionable_graph,
-                          visualiser_vertices, machine, partitioned_graph,
+                          visualiser_vertices, partitioned_graph,
                           placements, router_tables, runtime,
                           machine_time_step):
         """Set up the interfaces for communicating with the SpiNNaker board
@@ -82,9 +87,36 @@ class SpynnakerCommsFunctions(object):
             self._visualiser, self._visualiser_vertex_to_page_mapping = \
                 self._visualiser_creation_utility.create_visualiser_interface(
                     requires_virtual_board, self._txrx,
-                    partitionable_graph, visualiser_vertices, machine,
+                    partitionable_graph, visualiser_vertices, self._machine,
                     partitioned_graph, placements, router_tables, runtime,
                     machine_time_step)
+
+    def _set_up_recording_specifics(self):
+        if conf.config.has_option("Recording", "send_live_spikes"):
+            if conf.config.getboolean("Recording", "send_live_spikes"):
+                port = None
+                if conf.config.has_option("Recording", "live_spike_port"):
+                    port = conf.config.getint("Recording", "live_spike_port")
+                hostname = "localhost"
+                if conf.config.has_option("Recording", "live_spike_host"):
+                    hostname = conf.config.get("Recording", "live_spike_host")
+                tag = None
+                if conf.config.has_option("Recording", "live_spike_tag"):
+                    tag = conf.config.getint("Recording", "live_spike_tag")
+                if tag is None:
+                    raise exceptions.ConfigurationException(
+                        "Target tag for live spikes has not been set")
+
+                # Set up the forwarding so that monitored spikes are sent to the
+                # requested location
+                self._set_tag_output(tag, port, hostname)
+                #takes the same port for the visualiser if being used
+                if conf.config.getboolean("Visualiser", "enable") and \
+                   conf.config.getboolean("Machine", "have_board"):
+                    self._visualiser_creation_utility.set_visulaiser_port(port)
+
+    def _set_tag_output(self, tag, port, hostname):
+        self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
 
     def _retieve_provance_data_from_machine(self, executable_targets):
         pass
@@ -187,7 +219,6 @@ class SpynnakerCommsFunctions(object):
         processors_ready = self._txrx.get_core_state_count(app_id,
                                                            CPUState.SYNC0)
 
-
         if processors_ready != total_processors:
             successful_cores, unsucessful_cores = \
                 self._break_down_of_failure_to_reach_state(total_cores,
@@ -260,8 +291,8 @@ class SpynnakerCommsFunctions(object):
 
             if processors_exited < total_processors:
                 sucessful_cores, unsucessful_cores = \
-                        self._break_down_of_failure_to_reach_state(
-                            total_cores, CPUState.RUNNING)
+                    self._break_down_of_failure_to_reach_state(
+                        total_cores, CPUState.RUNNING)
                 #break_down the successful cores and unsuccessful cores into
                 #  string reps
                 break_down = self.turn_break_downs_into_string(
@@ -293,7 +324,7 @@ class SpynnakerCommsFunctions(object):
             if core_info.state == state:
                 sucessful_cores.append((core_info.x, core_info.y, core_info.p))
             else:
-                unsucessful_cores[(core_info.x, core_info.y,core_info.p)] = \
+                unsucessful_cores[(core_info.x, core_info.y, core_info.p)] = \
                     core_info.state.name
         return sucessful_cores, unsucessful_cores
 

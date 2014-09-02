@@ -58,7 +58,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._set_up_main_objects()
             self._set_up_pacman_algorthms_listings()
             self._set_up_executable_specifics()
-            self._set_up_recording_specifics()
             self._set_up_report_specifics()
             self._set_up_output_application_data_specifics()
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
@@ -66,6 +65,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         SpynnakerCommsFunctions.__init__(self, self._reports_states,
                                          self._report_default_directory)
+        self._set_up_recording_specifics()
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -78,10 +78,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         self._edge_count = 0
 
     def run(self, run_time):
+
         self._setup_interfaces(
-            hostname=self._hostname, machine=self._machine,
-            machine_time_step=self.machine_time_step, runtime=self._runtime,
-            partitioned_graph=self._partitioned_graph,
+            hostname=self._hostname, machine_time_step=self.machine_time_step,
+            runtime=self._runtime, partitioned_graph=self._partitioned_graph,
             placements=self._placements, router_tables=self._router_tables,
             partitionable_graph=self._partitionable_graph,
             visualiser_vertices=self._visualiser_vertices)
