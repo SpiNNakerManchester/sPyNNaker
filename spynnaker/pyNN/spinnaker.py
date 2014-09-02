@@ -150,6 +150,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         #engage vis if requested
         if do_timing:
             timer.take_sample()
+
         if conf.config.getboolean("Visualiser", "enable"):
             self.start_visualiser()
 
@@ -316,8 +317,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         """
        #register a listener at the trasnciever for each visualised vertex
         for vertex in self._visualiser_vertices:
-            associated_page = self._visualiser_vertex_to_page_mapping[vertex]
-            if associated_page is not None:
+            if vertex in self._visualiser_vertex_to_page_mapping.keys():
+                associated_page = self._visualiser_vertex_to_page_mapping[vertex]
                 self._txrx.register_listener(associated_page.recieved_spike(),
                                              self._hostname)
         self._visualiser.start()

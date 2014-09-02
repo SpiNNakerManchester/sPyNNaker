@@ -30,17 +30,18 @@ class VisualiserCreationUtility(object):
             machine_page = MachinePage(True, scope, machine, placements,
                                        router_tables)
             visualiser.add_page(machine_page, machine_page.label)
+            machine_page.show()
             #add configuration page
             config_page = ConfigPage(visualiser_vertex_to_page_mapping,
                                      visualiser_vertices, graph, visualiser,
                                      transceiver, has_board, sim_run_time,
                                      machine_time_step, subgraph, placements)
+            config_page.show()
             visualiser.add_page(config_page, config_page.label)
 
             if wait_for_run:  # add run now button if required
                 visualiser.add_menu_item("Run Now!", self._run_item_selected)
 
-            visualiser.start()
         return visualiser, visualiser_vertex_to_page_mapping
 
     def _run_item_selected(self):
