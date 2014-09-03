@@ -32,7 +32,7 @@ projections = list()
 
 weight_to_spike = 2.0
 #d_value = 3.1
-delay = 17
+delay = 3
 #delay = numpy.random.RandomState()
 delays = list()
 
@@ -115,4 +115,4 @@ if gsyn != None:
                 [i[2] for i in gsyn_for_neuron])
     pylab.show()
 
-p.end()
+#p.end()

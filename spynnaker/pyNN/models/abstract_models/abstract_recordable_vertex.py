@@ -13,6 +13,7 @@ from pacman.utilities import constants as pacman_constants
 import logging
 import numpy
 import struct
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -119,8 +120,8 @@ class AbstractRecordableVertex(object):
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            spike_data = spinnaker.transceiver.read_memory(x, y, spike_region_base_address + 4,
-                                     number_of_bytes_written)
+            spike_data = spinnaker.transceiver.read_memory(
+                x, y, spike_region_base_address + 4, number_of_bytes_written)
             
             # Extract number of spike bytes from subvertex
             out_spike_bytes = sub_vertex_out_spike_bytes_function(subvertex)
@@ -130,35 +131,28 @@ class AbstractRecordableVertex(object):
             logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
 
-            current_tic = 0
+            current_word_count = 0
             for block in spike_data:
-                timer_tics_for_block = len(block) / out_spike_bytes
-                for tic in range(timer_tics_for_block):
-                    current_block_position = tic * out_spike_bytes
+                read_pointer = 0
+                string_based_block = str(block)
+                words_in_block = int(math.ceil(len(string_based_block) / 4))
+                words_in_a_timer_tic = math.ceil(out_spike_bytes / 4)
+                for current_word_index in range(0, words_in_block):
                     # Unpack the word containing the spikingness of 32 neurons
-                    spike_vector_word = \
-                        struct.unpack_from("<I", str(block),
-                                           current_block_position)
-                    
-                    if spike_vector_word != 0:
-                        # Loop through each bit in this word
-                        for neuronBitIndex in range(0, 32):
-                            # If the bit is set
-                            neuron_bit_mask = (1 << neuronBitIndex)
-                            if (spike_vector_word[0] & neuron_bit_mask) != 0:
-                                # Calculate neuron ID
-                                neuron_id = neuronBitIndex + subvertex.lo_atom
-                                # Add spike time and neuron ID to returned lists
-                                spikes = \
-                                    numpy.append(spikes,
-                                                 [[current_tic, neuron_id]], 0)
-            
+                    spike_vector_word = struct.unpack_from(
+                        "<I", string_based_block, read_pointer)
+                    read_pointer += 4
+
+                    spikes = self._unpack_word_of_spikes(
+                        spikes, subvertex, current_word_count,
+                        spike_vector_word, words_in_a_timer_tic)
+                    current_word_count += 1
+
+
         if len(spikes) > 0:
-            
             logger.debug("Arranging spikes as per output spec")
             
             if compatible_output:
-                
                 # Change the order to be neuronID : time (don't know why - this
                 # is how it was done in the old code, so I am doing it here too)
                 spikes[:, [0, 1]] = spikes[:, [1, 0]]
@@ -175,3 +169,26 @@ class AbstractRecordableVertex(object):
         
         print("No spikes recorded")
         return None
+
+    @staticmethod
+    def _unpack_word_of_spikes(spikes, subvertex, current_word_count,
+                               spike_vector_word, words_in_a_timer_tic):
+        # if the word is zero no spikes have been recorded
+        neurons_per_word = constants.BITS_PER_WORD  # each bit is a neuron
+        if spike_vector_word[0] != 0:
+            # Loop through each bit in this word
+            for neuron_bit_index in range(0, int(constants.BITS_PER_WORD)):
+                # If the bit is set
+                neuron_bit_mask = (1 << neuron_bit_index)
+                if (spike_vector_word[0] & neuron_bit_mask) != 0:
+                    # Calculate neuron ID
+                    out_word_index = int(current_word_count %
+                                         words_in_a_timer_tic)
+                    base_neuron_id = out_word_index * neurons_per_word
+                    neuron_id = (neuron_bit_index + base_neuron_id +
+                                 subvertex.lo_atom)
+                    # Add spike time and neuron ID to returned lists
+                    current_tic = int(math.floor(current_word_count /
+                                      words_in_a_timer_tic))
+                    spikes = numpy.append(spikes, [[current_tic, neuron_id]], 0)
+        return spikes
