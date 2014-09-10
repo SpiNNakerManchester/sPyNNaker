@@ -61,7 +61,7 @@ class SpynnakerConfiguration(object):
         self._partitioner_algorithm = None
         self._placer_algorithm = None
         self._key_allocator_algorithm = None
-        self._routing_algorithm = None
+        self._router_algorithm = None
         self._report_default_directory = None
         self.this_run_time_string_repenstation = None
 
@@ -236,7 +236,7 @@ class SpynnakerConfiguration(object):
 
         routing_algorithms_list = \
             conf.get_valid_components(router_algorithms, "Routing")
-        self._routing_algorithm = \
+        self._router_algorithm = \
             routing_algorithms_list[config.get("Routing", "algorithm")]
 
     def _set_up_machine_specifics(self, timestep, min_delay, max_delay,

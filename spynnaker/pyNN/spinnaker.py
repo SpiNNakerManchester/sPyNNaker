@@ -4,10 +4,14 @@ from pacman.model.constraints.\
     VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
-from pacman.operations.partitioner import Partitioner
-from pacman.operations.placer import Placer
-from pacman.operations.routing_info_allocator import RoutingInfoAllocator
-from pacman.operations.router import Router
+from pacman.utilities import reports as pacman_reports
+from pacman.operations.partition_algorithms.basic_partitioner import \
+    BasicPartitioner
+from pacman.operations.router_algorithms.basic_dijkstra_routing \
+    import BasicDijkstraRouting
+from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
+from pacman.operations.routing_info_allocator_algorithms.\
+    basic_routing_info_allocator import BasicRoutingInfoAllocator
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls as pacman_utility_calls
 
@@ -231,47 +235,105 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         self._check_if_theres_any_pre_placement_constraints_to_satisify()
         
         #execute partitioner
-        partitioner = Partitioner(
-            partition_algorithm=self._partitioner_algorithm,
-            machine_time_step=self._machine_time_step,
-            no_machine_time_steps=self._no_machine_time_steps,
-            report_folder=self._report_default_directory,
-            report_states=pacman_report_state, hostname=self._hostname,
-            placer_algorithm=self._placer_algorithm, machine=self._machine)
-        self._partitioned_graph, self._graph_mapper = \
-            partitioner.run(self._partitionable_graph)
+        self._execute_partitioner(pacman_report_state)
 
         #execute placer
-        placer = Placer(
-            machine=self._machine, report_states=pacman_report_state,
-            report_folder=self._report_default_directory,
-            partitonable_graph=self._partitionable_graph,
-            hostname=self._hostname, placer_algorithm=self._placer_algorithm)
-        self._placements = \
-            placer.run(self._partitioned_graph, self._graph_mapper)
+        self._execute_placer(pacman_report_state)
 
         #execute pynn subedge pruning
-        pruner = SubgraphSubedgePruning()
         self._partitioned_graph, self._graph_mapper = \
-            pruner.run(self._partitioned_graph, self._graph_mapper)
+            SubgraphSubedgePruning().run(self._partitioned_graph,
+                                         self._graph_mapper)
 
         #execute key allocator
-        key_allocator = RoutingInfoAllocator(
-            report_states=pacman_report_state, hostname=self._hostname,
-            report_folder=self._report_default_directory, machine=self._machine,
-            graph_mapper=self._graph_mapper,
-            routing_info_allocator_algorithm=self._key_allocator_algorithm)
-        self._routing_infos = key_allocator.run(self._partitioned_graph,
-                                                self._placements)
+        self._execute_key_allocator(pacman_report_state)
 
         #execute router
-        router = Router(report_folder=self._report_default_directory,
-                        report_states=self._reports_states,
-                        partitionable_graph=self._partitionable_graph,
-                        graph_mappings=self._graph_mapper)
-        self._router_tables = router.run(
-            self._routing_infos, self._placements, self._machine,
-            self._partitioned_graph)
+        self._execute_router(pacman_report_state)
+
+    def _execute_key_allocator(self, pacman_report_state):
+        if self._key_allocator_algorithm is None:
+            self._key_allocator_algorithm = BasicRoutingInfoAllocator()
+        else:
+            self._key_allocator_algorithm = self._key_allocator_algorithm()
+
+        #execute routing info generator
+        self._routing_infos = \
+            self._key_allocator_algorithm.allocate_routing_info(
+                self._partitioned_graph, self._placements)
+
+        #generate reports
+        if (pacman_report_state is not None and
+                pacman_report_state.routing_info_report):
+            pacman_reports.routing_info_reports(
+                self._report_default_directory, self._hostname,
+                self._partitioned_graph, self._placements, self._routing_infos)
+
+    def _execute_router(self, pacman_report_state):
+        #set up a default placer algorithm if none are specified
+        if self._router_algorithm is None:
+            self._router_algorithm = BasicDijkstraRouting()
+        else:
+            self._router_algorithm = self._router_algorithm()
+
+        self._routing_tables = \
+            self._router_algorithm.route(
+                self._routing_infos, self._placements, self._machine,
+                self._partitioned_graph)
+
+        if pacman_report_state is not None and \
+                pacman_report_state.router_report:
+            pacman_reports.router_reports(
+                graph=self._partitionable_graph, hostname=self._hostname,
+                graph_to_sub_graph_mapper=self._graph_mapper,
+                placements=self._placements,
+                report_folder=self._report_default_directory,
+                include_dat_based=pacman_report_state.router_dat_based_report,
+                routing_tables=self._routing_tables,
+                routing_info=self._routing_infos, machine=self._machine)
+
+    def _execute_partitioner(self, pacman_report_state):
+        #execute partitioner or default partitioner (as seen fit)
+        if self._partitioner_algorithm is None:
+            self._partitioner_algorithm = \
+                BasicPartitioner(self._machine_time_step,
+                                 self._no_machine_time_steps)
+        else:
+            self._partitioner_algorithm = \
+                self._partitioner_algorithm(self._machine_time_step,
+                                            self._no_machine_time_steps)
+
+        # if algorithum needs a placer, add placer algorithum
+        if hasattr(self._partitioner_algorithm, "set_placer_algorithm"):
+            self._partitioner_algorithm.set_placer_algorithm(
+                self._placer_algorithm, self._machine)
+
+        self._partitioned_graph, self._graph_mapper = \
+            self._partitioner_algorithm.partition(self._partitionable_graph,
+                                                  self._machine)
+
+        if (pacman_report_state is not None and
+                pacman_report_state.partitioner_report):
+            pacman_reports.partitioner_reports(
+                self._report_default_directory, self._hostname,
+                self._partitionable_graph, self._graph_mapper)
+
+    def _execute_placer(self, pacman_report_state):
+        #execute placer or default placer (as seen fit)
+        if self._placer_algorithm is None:
+            self._placer_algorithm = BasicPlacer(self._machine)
+        else:
+            self._placer_algorithm = self._placer_algorithm(self._machine)
+        self._placements = self._placer_algorithm.place(self._partitioned_graph)
+
+        #execute placer reports if needed
+        if (pacman_report_state is not None and
+                pacman_report_state.placer_report):
+            pacman_reports.placer_reports(
+                graph=self._partitionable_graph,
+                graph_mapper=self._graph_mapper, hostname=self._hostname,
+                machine=self._machine, placements=self._placements,
+                report_folder=self._report_default_directory)
 
     def generate_data_specifications(self):
         #iterate though subvertexes and call generate_data_spec for each vertex

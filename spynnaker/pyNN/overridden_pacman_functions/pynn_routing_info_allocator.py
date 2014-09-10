@@ -9,8 +9,8 @@ from pacman import exceptions
 
 class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
     
-    def __init__(self, graph_mapper):
-        BasicRoutingInfoAllocator.__init__(self, graph_mapper)
+    def __init__(self):
+        BasicRoutingInfoAllocator.__init__(self)
         self._supported_constraints.append(KeyAllocatorRoutingConstraint)
 
     #inhirrted from AbstractRoutingInfoAllocatorAlgorithm

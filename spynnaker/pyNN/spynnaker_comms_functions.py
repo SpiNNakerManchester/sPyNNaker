@@ -191,8 +191,12 @@ class SpynnakerCommsFunctions(object):
         progress_bar.end()
         return processor_to_app_data_base_address
 
-    def stop(self, app_id):
-        self._txrx.send_signal(app_id, SCPSignal.STOP)
+    def stop(self, app_id, stop_on_board=True):
+        if stop_on_board:
+            self._txrx.send_signal(app_id, SCPSignal.STOP)
+            for router_table in self._router_tables:
+                self._txrx.clear_multicast_routes(router_table.x,
+                                                  router_table.y)
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()
 
@@ -367,6 +371,7 @@ class SpynnakerCommsFunctions(object):
                     placement.subvertex)
 
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
+                logger.debug("loading application data for vertex {}".format(associated_vertex.label))
                 key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
                 start_address = \
                     processor_to_app_data_base_address[key]['start_address']
@@ -377,12 +382,13 @@ class SpynnakerCommsFunctions(object):
                         placement.x, placement.y, placement.p, hostname)
                 application_data_file_reader = \
                     SpinnmanFileDataReader(file_path_for_application_data)
+                logger.debug("writing application data for vertex {}".format(associated_vertex.label))
                 self._txrx.write_memory(placement.x, placement.y, start_address,
                                         application_data_file_reader,
                                         memory_used)
                 #update user 0 so that it points to the start of the \
                 # applications data region on sdram
-
+                logger.debug("writing user 0 address for vertex {}".format(associated_vertex.label))
                 user_o_register_address = \
                     self._txrx.get_user_0_register_address_from_core(
                         placement.x, placement.y, placement.p)

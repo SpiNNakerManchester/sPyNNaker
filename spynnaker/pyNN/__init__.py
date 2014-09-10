@@ -85,14 +85,14 @@ logger = logging.getLogger(__name__)
 _spinnaker = None
 
 
-def end():
+def end(stop_on_board=True):
     """
     Do any necessary cleaning up before exiting.
 
     Unregisters the controller
     """
     global _spinnaker
-    _spinnaker.stop(_spinnaker.app_id)
+    _spinnaker.stop(_spinnaker.app_id, stop_on_board)
     _spinnaker = None
 
 
