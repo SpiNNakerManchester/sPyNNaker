@@ -276,7 +276,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         else:
             self._router_algorithm = self._router_algorithm()
 
-        self._routing_tables = \
+        self._router_tables = \
             self._router_algorithm.route(
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
@@ -289,7 +289,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 placements=self._placements,
                 report_folder=self._report_default_directory,
                 include_dat_based=pacman_report_state.router_dat_based_report,
-                routing_tables=self._routing_tables,
+                routing_tables=self._router_tables,
                 routing_info=self._routing_infos, machine=self._machine)
 
     def _execute_partitioner(self, pacman_report_state):
