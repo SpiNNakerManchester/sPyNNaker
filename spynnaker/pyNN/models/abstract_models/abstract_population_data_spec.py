@@ -1,6 +1,5 @@
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from data_specification.file_data_writer import FileDataWriter
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants

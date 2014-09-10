@@ -190,7 +190,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
                             .format(neuron_type))
 
     if hasattr(neuron_type, "set_model_max_atoms_per_core"):
-        neuron_type.set_model_max_atoms_per_core = max_permitted
+        neuron_type.set_model_max_atoms_per_core(max_permitted)
     else:
         raise Exception("{} is not a AbstractConstrainedVertex type"
                         .format(neuron_type))
