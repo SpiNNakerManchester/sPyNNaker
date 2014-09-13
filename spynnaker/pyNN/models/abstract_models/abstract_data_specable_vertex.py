@@ -21,7 +21,7 @@ import os
 class AbstractDataSpecableVertex(AbstractConstrainedVertex):
 
     def __init__(self, n_atoms, label, machine_time_step, constraints=None):
-        AbstractConstrainedVertex.__init__(self, n_atoms, label, constraints)
+        AbstractConstrainedVertex.__init__(self, label, constraints)
         self._machine_time_step = machine_time_step
         self._application_runtime = None
         self._no_machine_time_steps = None

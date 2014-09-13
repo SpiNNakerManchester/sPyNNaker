@@ -53,8 +53,9 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             raise exceptions.ConfigurationException(
                 "cannot set a vertex's delay vertex once its already been set")
 
-    def get_spikes(self, spinnaker, runtime, compatible_output=False):
-        if not spinnaker.has_ran:
+    def get_spikes(self, has_ran, txrx, placements, graph_mapper,
+                   compatible_output=False):
+        if not has_ran:
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran,therefore spikes cannot be "
                 "retrieved")
@@ -66,34 +67,37 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            spinnaker, compatible_output,
-            constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-            sub_vertex_out_spike_bytes_function)
+            graph_mapper=graph_mapper, placements=placements, txrx=txrx,
+            compatible_output=compatible_output,
+            sub_vertex_out_spike_bytes_function=
+            sub_vertex_out_spike_bytes_function,
+            spike_recording_region=
+            constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
     
-    def get_neuron_parameter(self, region, compatible_output, spinnaker,
-                             machine_time_step):
-        if not spinnaker.has_ran:
+    def get_neuron_parameter(
+            self, region, compatible_output, has_ran, graph_mapper, placements, 
+            txrx, machine_time_step):
+        if not has_ran:
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore gsyn cannot be "
                 "retrieved")
         value = numpy.zeros((0, 3))
         
         # Find all the sub-vertices that this pynn_population.py exists on
-        subvertices = spinnaker.graph_mapper.get_subvertices_from_vertex(self)
+        subvertices = graph_mapper.get_subvertices_from_vertex(self)
         for subvertex in subvertices:
-            placment = \
-                spinnaker.placements.get_placement_of_subvertex(subvertex)
+            placment = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placment.x, placment.y, placment.p
             
             # Get the App Data for the core
-            app_data_base_address = spinnaker.transceiver.\
+            app_data_base_address = txrx.\
                 get_cpu_information_from_core(x, y, p).user[0]
             
             # Get the position of the value buffer
             v_region_base_address_offset = \
                 get_region_base_address_offset(app_data_base_address, region)
             v_region_base_address_buf = \
-                str(list(spinnaker.transceiver.
+                str(list(txrx.
                          read_memory(x, y, v_region_base_address_offset, 4))[0])
             v_region_base_address = struct.unpack("<I",
                                                   v_region_base_address_buf)[0]
@@ -101,7 +105,7 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             
             # Read the size
             number_of_bytes_written_buf = \
-                str(list(spinnaker.transceiver.
+                str(list(txrx.
                          read_memory(x, y, v_region_base_address, 4))[0])
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
@@ -111,7 +115,7 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
                 number_of_bytes_written, hex(number_of_bytes_written), 
                 hex(v_region_base_address + 4)))
             v_data = \
-                str(list(spinnaker.transceiver.
+                str(list(txrx.
                          read_memory(x, y, v_region_base_address + 4,
                                      number_of_bytes_written))[0])
             bytes_per_time_step = subvertex.n_atoms * 4
@@ -130,8 +134,11 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             # Add an array for time and neuron id
             time = numpy.array([int(i / subvertex.n_atoms) * ms_per_timestep 
                                 for i in range(size)], dtype=numpy.float)
-            neuron_id = numpy.array([int(i % subvertex.n_atoms) + 
-                                     subvertex.lo_atom for i in range(size)], 
+            lo_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
+            hi_atom = graph_mapper.get_subvertex_slice(subvertex).hi_atom
+            n_atoms = hi_atom - lo_atom
+            neuron_id = numpy.array([int(i % n_atoms) +
+                                     lo_atom for i in range(size)],
                                     dtype=numpy.uint32)
             
             # Get the values
@@ -163,7 +170,8 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         value = value[v_index]
         return value
     
-    def get_v(self, spinnaker, machine_time_step, compatible_output=False):
+    def get_v(self, has_ran, graph_mapper, placements,
+              txrx, machine_time_step, compatible_output=False):
         """
         Return a 3-column numpy array containing cell ids, time, and Vm for 
         recorded cells.
@@ -174,30 +182,34 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             not used - inserted to match PyNN specs
         """
         logger.info("Getting v for {}".format(self.label))
-        if not spinnaker.has_ran:
+        if not has_ran:
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore v cannot be "
                 "retrieved")
         return self.get_neuron_parameter(
-            constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
-            compatible_output, spinnaker, machine_time_step)
+            region=constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
+            compatible_output=compatible_output, has_ran=has_ran,
+            machine_time_step=machine_time_step, graph_mapper=graph_mapper,
+            placements=placements, txrx=txrx)
 
-    def get_gsyn(self, spinnaker, machine_time_step, compatible_output=False):
+    def get_gsyn(self, has_ran, graph_mapper, placements, txrx,
+                 machine_time_step, compatible_output=False):
         """
         Return a 3-column numpy array containing cell ids and synaptic
         conductances for recorded cells.
 
-        :param spinnaker:
         :param compatible_output:
         """
         logger.info("Getting gsyn for {}".format(self.label))
-        if not spinnaker.has_ran:
+        if not has_ran:
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore gsyn cannot be "
                 "retrieved")
         return self.get_neuron_parameter(
-            constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
-            compatible_output, spinnaker, machine_time_step)
+            region=constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
+            compatible_output=compatible_output, has_ran=has_ran,
+            machine_time_step=machine_time_step, graph_mapper=graph_mapper,
+            placements=placements, txrx=txrx)
 
     def get_synaptic_data(self, spinnaker, presubvertex, pre_n_atoms,
                           postsubvertex, synapse_io):

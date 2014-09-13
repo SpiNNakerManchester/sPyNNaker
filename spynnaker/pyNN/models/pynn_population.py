@@ -3,7 +3,8 @@ from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
 from pacman.utilities import utility_calls as pacman_utility_calls
 
 from spynnaker.pyNN.models.utility_models.multicastsource \
@@ -55,7 +56,8 @@ class Population(object):
         if structure:
             raise Exception("Spatial structure is unsupported for Populations.")
 
-        # Create a partitionable_graph vertex for the population and add it to PACMAN
+        # Create a partitionable_graph vertex for the population and add it
+        # to PACMAN
         cellparams['label'] = label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
@@ -93,7 +95,7 @@ class Population(object):
             dependant_vertex = dependant_vertex_constrant.vertex
             self._spinnaker.add_vertex(dependant_vertex)
             dependant_edge = PartitionableEdge(pre_vertex=self._vertex,
-                                  post_vertex=dependant_vertex)
+                                               post_vertex=dependant_vertex)
             self._spinnaker.add_edge(dependant_edge)
 
         #initlise common stuff
@@ -172,7 +174,11 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        spikes = self._vertex.get_spikes(self._spinnaker, compatible_output)
+        spikes = self._vertex.get_spikes(
+            has_ran=self._spinnaker.has_ran, txrx=self._spinnaker.txrx,
+            placements=self._spinnaker.placements,
+            graph_mapper=self._spinnaker.graph_mapper,
+            compatible_output=compatible_output)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
         return spikes
@@ -194,9 +200,11 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        gsyn = self._vertex.get_gsyn(self._spinnaker,
-                                     self._spinnaker.machine_time_step,
-                                     compatible_output=compatible_output)
+        gsyn = self._vertex.get_gsyn(
+            has_ran=self._spinnaker.has_ran, txrx=self._spinnaker.txrx,
+            machine_time_step=self._spinnaker.machine_time_step,
+            graph_mapper=self._spinnaker.graph_mapper,
+            compatible_output=compatible_output)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
         return gsyn
@@ -216,9 +224,11 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        v = self._vertex.get_v(self._spinnaker,
-                               self._spinnaker.machine_time_step,
-                               compatible_output=compatible_output)
+        v = self._vertex.get_v(
+            has_ran=self._spinnaker.has_ran, txrx=self._spinnaker.txrx,
+            machine_time_step=self._spinnaker.machine_time_step,
+            graph_mapper=self._spinnaker.graph_mapper,
+            compatible_output=compatible_output)
 
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
@@ -248,8 +258,8 @@ class Population(object):
         initialize_attr = \
             getattr(self._vertex, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("AbstractConstrainedVertex does not support initialization of "
-                            "parameter {%s}".format(variable))
+            raise Exception("AbstractConstrainedVertex does not support "
+                            "initialization of parameter {%s}".format(variable))
 
         initialize_attr(value)
 
@@ -335,7 +345,8 @@ class Population(object):
         """
         record_attr = getattr(self._vertex, "record", None)
         if record_attr is None or not callable(record_attr):
-            raise Exception("AbstractConstrainedVertex does not support recording of spikes")
+            raise Exception("AbstractConstrainedVertex does not support "
+                            "recording of spikes")
 
         # Tell the vertex to record spikes
         self._vertex.record(focus=focus)
@@ -360,7 +371,8 @@ class Population(object):
         """
         if (not hasattr(self._vertex, "record_gsyn")
                 or not callable(self._vertex.record_gsyn)):
-            raise Exception("AbstractConstrainedVertex does not support recording of gsyn")
+            raise Exception("AbstractConstrainedVertex does not support "
+                            "recording of gsyn")
 
         self._vertex.record_gsyn()
         self._record_g_syn_file = to_file
@@ -373,7 +385,8 @@ class Population(object):
         """
         if (not hasattr(self._vertex, "record_v")
                 or not callable(self._vertex.record_v)):
-            raise Exception("AbstractConstrainedVertex does not support recording of potential")
+            raise Exception("AbstractConstrainedVertex does not support "
+                            "recording of potential")
 
         self._vertex.record_v()
         self._record_v_file = to_file

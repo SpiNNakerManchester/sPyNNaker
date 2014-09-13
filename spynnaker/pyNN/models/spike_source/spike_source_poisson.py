@@ -9,7 +9,6 @@ from spynnaker.pyNN.utilities.conf import config
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from data_specification.file_data_writer import FileDataWriter
 
 
 from math import exp, ceil
@@ -46,7 +45,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         Creates a new SpikeSourcePoisson Object.
         """
         AbstractSpikeSource.__init__(self, label, n_neurons, contraints,
-                                     machine_time_step = machine_time_step,
+                                     machine_time_step=machine_time_step,
                                      max_atoms_per_core=SpikeSourcePoisson.
                                      _model_based_max_atoms_per_core)
         self._rate = rate
@@ -111,10 +110,13 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
     def write_setup_info(self, spec, spike_history_region_sz):
         """
-        Write information used to control the simulationand gathering of results.
-        Currently, this means the flag word used to signal whether information on
-        neuron firing and neuron potential is either stored locally in a buffer or
-        passed out of the simulation for storage/display as the simulation proceeds.
+        Write information used to control the simulationand gathering of
+        results.
+        Currently, this means the flag word used to signal whether information
+        on neuron firing and neuron potential is either stored locally in a
+        buffer or
+        passed out of the simulation for storage/display as the simulation
+        proceeds.
 
         The format of the information is as follows:
         Word 0: Flags selecting data to be gathered during simulation.
@@ -238,15 +240,19 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             spec.write_value(data=exp_minus_lamda_scaled, sizeof='u032')
         return
     
-    def get_spikes(self, controller, compatible_output=False):
-        # Spike sources store spike vectors optimally so calculate min words to represent
+    def get_spikes(self, has_ran, txrx, placements, graph_mapper,
+                   compatible_output=False):
+        # Spike sources store spike vectors optimally so calculate min
+        # words to represent
         sub_vertex_out_spike_bytes_function = \
             lambda subvertex: int(ceil(subvertex.n_atoms / 32.0)) * 4
-        
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            controller, compatible_output,
-            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+            txrx=txrx, placements=placements,
+            graph_mapper=graph_mapper, compatible_output=compatible_output,
+            spike_recording_region=
+            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+            sub_vertex_out_spike_bytes_function=
             sub_vertex_out_spike_bytes_function)
 
     #inhirrtted from partionable vertex

@@ -383,13 +383,20 @@ class AbstractSynapticManager(object):
                 if logger.isEnabledFor("debug"):
                     subvertex_vertex =\
                         graph_mapper.get_vertex_from_subvertex(subvertex)
+                    pre_sub_lo = \
+                        graph_mapper.get_subvertex_slice(
+                            subedge.pre_subvertex).lo_atom
+                    pre_sub_hi = \
+                        graph_mapper.get_subvertex_slice(
+                            subedge.pre_subvertex).hi_atom
+                    sub_lo = graph_mapper.get_subvertex_slice(subvertex).lo_atom
+                    sub_hi = graph_mapper.get_subvertex_slice(subvertex).hi_atom
+
                     logger.debug("Writing subedge from {} ({}-{}) to {} ({}-{})"
                                  .format(subedge.pre_subvertex.label,
-                                         subedge.pre_subvertex.lo_atom,
-                                         subedge.pre_subvertex.hi_atom,
-                                         subvertex_vertex.label,
-                                         subvertex.lo_atom,
-                                         subvertex.hi_atom))
+                                         pre_sub_lo, pre_sub_hi,
+                                         subvertex_vertex.label, sub_lo,
+                                         sub_hi))
                     rows = sublist.get_rows()
                     for i in range(len(rows)):
                         logger.debug("{}: {}".format(i, rows[i]))

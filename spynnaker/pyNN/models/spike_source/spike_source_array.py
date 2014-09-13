@@ -269,15 +269,19 @@ class SpikeSourceArray(AbstractSpikeSource):
             for i in range(vector_len):
                 spec.write_value(data=spike_bit_vectors[i])
     
-    def get_spikes(self, spinnaker, compatible_output=False):
+    def get_spikes(self, has_ran, txrx, placements, graph_mapper,
+                   compatible_output=False):
         # Spike sources store spike vectors optimally so calculate min words to represent
         sub_vertex_out_spike_bytes_function = \
             lambda subvertex: int(ceil(subvertex.n_atoms / 32.0)) * 4
         
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            spinnaker, compatible_output,
+            txrx=txrx, placements=placements,
+            graph_mapper=graph_mapper, compatible_output=compatible_output,
+            spike_recording_region=
             self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+            sub_vertex_out_spike_bytes_function=
             sub_vertex_out_spike_bytes_function)
 
     #inhirrted from dataspecable vertex

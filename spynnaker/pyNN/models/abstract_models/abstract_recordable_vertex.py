@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from six import add_metaclass
+from abc import abstractmethod
 
 
 from spynnaker.pyNN import exceptions
@@ -18,6 +19,7 @@ import math
 logger = logging.getLogger(__name__)
 
 
+@add_metaclass(ABCMeta)
 class AbstractRecordableVertex(object):
     """
     Underlying AbstractConstrainedVertex model for Neural Applications.
@@ -60,8 +62,10 @@ class AbstractRecordableVertex(object):
         """
         return self._record
 
-    def _get_spikes(self, spinnaker, compatible_output, spike_recording_region,
-                    sub_vertex_out_spike_bytes_function):
+    @abstractmethod
+    def _get_spikes(
+            self, graph_mapper, placements, txrx, compatible_output, 
+            spike_recording_region, sub_vertex_out_spike_bytes_function):
         """
         Return a 2-column numpy array containing cell ids and spike times for 
         recorded cells.   This is read directly from the memory for the board.
@@ -70,20 +74,19 @@ class AbstractRecordableVertex(object):
         logger.info("Getting spikes for {}".format(self._label))
         
         spikes = numpy.zeros((0, 2))
-        graph_mapper = spinnaker.graph_mapper
         
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
         for subvertex in subvertices:
-            placement = \
-                spinnaker.placements.get_placement_of_subvertex(subvertex)
+            placement = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placement.x, placement.y, placement.p
+            lo_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
             logger.debug("Reading spikes from chip {}, {}, core {}, "
-                         "lo_atom {}".format(x, y, p, subvertex.lo_atom))
+                         "lo_atom {}".format(x, y, p, lo_atom))
             
             # Get the App Data for the core
             app_data_base_address = \
-                spinnaker.transceiver.get_cpu_information_from_core(
+                txrx.get_cpu_information_from_core(
                     x, y, p).user[0]
             
             # Get the position of the spike buffer
@@ -91,7 +94,7 @@ class AbstractRecordableVertex(object):
                 get_region_base_address_offset(app_data_base_address,
                                                spike_recording_region)
             spike_region_base_address_buf = \
-                str(list(spinnaker.transceiver.read_memory(
+                str(list(txrx.read_memory(
                     x, y, spike_region_base_address_offset, 4))[0])
             spike_region_base_address = \
                 struct.unpack("<I", spike_region_base_address_buf)[0]
@@ -99,7 +102,7 @@ class AbstractRecordableVertex(object):
             
             # Read the spike data size
             number_of_bytes_written_buf =\
-                str(list(spinnaker.transceiver.
+                str(list(txrx.
                          read_memory(x, y, spike_region_base_address, 4))[0])
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
@@ -120,7 +123,7 @@ class AbstractRecordableVertex(object):
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            spike_data = spinnaker.transceiver.read_memory(
+            spike_data = txrx.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
             
             # Extract number of spike bytes from subvertex
@@ -145,9 +148,9 @@ class AbstractRecordableVertex(object):
 
                     spikes = self._unpack_word_of_spikes(
                         spikes, subvertex, current_word_count,
-                        spike_vector_word, words_in_a_timer_tic)
+                        spike_vector_word, words_in_a_timer_tic,
+                        graph_mapper=graph_mapper)
                     current_word_count += 1
-
 
         if len(spikes) > 0:
             logger.debug("Arranging spikes as per output spec")
@@ -172,7 +175,8 @@ class AbstractRecordableVertex(object):
 
     @staticmethod
     def _unpack_word_of_spikes(spikes, subvertex, current_word_count,
-                               spike_vector_word, words_in_a_timer_tic):
+                               spike_vector_word, words_in_a_timer_tic,
+                               graph_mapper):
         # if the word is zero no spikes have been recorded
         neurons_per_word = constants.BITS_PER_WORD  # each bit is a neuron
         if spike_vector_word[0] != 0:
@@ -185,8 +189,9 @@ class AbstractRecordableVertex(object):
                     out_word_index = int(current_word_count %
                                          words_in_a_timer_tic)
                     base_neuron_id = out_word_index * neurons_per_word
-                    neuron_id = (neuron_bit_index + base_neuron_id +
-                                 subvertex.lo_atom)
+                    lo_atom = \
+                        graph_mapper.get_subvertex_slice(subvertex).lo_atom
+                    neuron_id = (neuron_bit_index + base_neuron_id + lo_atom)
                     # Add spike time and neuron ID to returned lists
                     current_tic = int(math.floor(current_word_count /
                                       words_in_a_timer_tic))

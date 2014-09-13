@@ -56,7 +56,7 @@ class SubgraphSubedgePruning(object):
                     subedge.pre_subvertex.hi_atom
                     != subedge.post_subvertex.hi_atom)
         elif isinstance(subedge, ProjectionPartitionedEdge):
-            return not subedge.is_connected()
+            return not subedge.is_connected(graph_mapper)
         elif isinstance(associated_edge, PartitionableEdge):
             return False
         else:

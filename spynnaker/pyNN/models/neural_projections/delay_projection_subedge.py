@@ -18,16 +18,23 @@ class DelayProjectionSubedge(ProjectionPartitionedEdge):
         self.synapse_sublist = None
         self.synapse_delay_rows = None
     
-    def get_synapse_sublist(self):
+    def get_synapse_sublist(self, graph_mapper):
         """
         Gets the synapse list for this subedge
         """
         if self.synapse_sublist is None:
+            pre_sub_lo = \
+                graph_mapper.get_subvertex_slice(self._pre_subvertex).lo_atom
+            pre_sub_hi = \
+                graph_mapper.get_subvertex_slice(self._.pre_subvertex).hi_atom
+            post_sub_lo = \
+                graph_mapper.get_subvertex_slice(self._post_subvertex).lo_atom
+            post_sub_hi = \
+                graph_mapper.get_subvertex_slice(self._post_subvertex).hi_atom
             
             synapse_sublist = \
                 self._associated_edge.get_synaptic_data().get_atom_sublist(
-                    self._pre_subvertex.lo_atom, self._pre_subvertex.hi_atom,
-                    self._post_subvertex.lo_atom, self._post_subvertex.hi_atom)
+                    pre_sub_lo, pre_sub_hi, post_sub_lo, post_sub_hi)
             
             if logger.isEnabledFor("debug"):
                 logger.debug("Original Synapse List rows:")
@@ -68,7 +75,7 @@ class DelayProjectionSubedge(ProjectionPartitionedEdge):
         graph_mapper = spinnaker.graph_mapper
         delay_list = graph_mapper.\
             get_vertex_from_subvertex(self._post_subvertex)\
-            .get_synaptic_data(spinnaker, self._pre_subvertex,
+            .get_synaptic_data(graph_mapper, self._pre_subvertex,
                                self.synapse_delay_rows, self._post_subvertex,
                                self._associated_edge.get_synapse_row_io)\
             .get_rows()

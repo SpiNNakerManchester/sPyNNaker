@@ -52,7 +52,6 @@ class SpynnakerConfiguration(object):
         self._router_tables = None
         self._routing_infos = None
         self._pruner_infos = None
-        self._runtime = None
         self._has_ran = False
         self._reports_states = None
         self._app_id = None

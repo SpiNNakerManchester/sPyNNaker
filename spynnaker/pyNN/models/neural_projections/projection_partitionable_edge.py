@@ -39,16 +39,23 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         """
         return ProjectionPartitionedEdge(presubvertex, postsubvertex, self)
         
-    def filter_sub_edge(self, subedge):
+    def filter_sub_edge(self, subedge, graph_mapper):
         """
         Method is called to allow a given sub-edge to prune itself if it
         serves no purpose.
         :return: True if the partricular sub-edge can be pruned, and
         False otherwise.
         """
-        return not self._synapse_list.is_connected(
-            subedge.presubvertex.lo_atom, subedge.presubvertex.hi_atom,
-            subedge.postsubvertex.lo_atom, subedge.postsubvertex.hi_atom)
+        pre_sub_lo = \
+            graph_mapper.get_subvertex_slice(subedge.presubvertex).lo_atom
+        pre_sub_hi = \
+            graph_mapper.get_subvertex_slice(subedge.presubvertex).hi_atom
+        post_sub_lo = \
+            graph_mapper.get_subvertex_slice(subedge.postsubvertex).lo_atom
+        post_sub_hi = \
+            graph_mapper.get_subvertex_slice(subedge.postsubvertex).hi_atom
+        return not self._synapse_list.is_connected(pre_sub_lo, pre_sub_hi,
+                                                   post_sub_lo, post_sub_hi)
 
     def get_max_n_words(self, lo_atom=None, hi_atom=None):
         """
@@ -76,7 +83,7 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         """
         return self._synapse_row_io
 
-    def get_synaptic_data(self, spinnaker=None):
+    def get_synaptic_data(self, graph_mapper):
         """
         Get synaptic data for all connections in this Projection.
         if spinnaker == None, then just return the one stored in memory via
@@ -86,10 +93,9 @@ class ProjectionPartitionableEdge(PartitionableEdge):
                      .format(self._pre_vertex.label, self._post_vertex.label))
 
         #if theres no spinnaker, assume your looking at the internal one here.
-        if spinnaker is None:
+        if graph_mapper is None:
             return self._synapse_list
 
-        graph_mapper = spinnaker.graph_mapper
         min_delay = config.get("Model", "min_delay")
 
         if graph_mapper is None:
@@ -105,7 +111,7 @@ class ProjectionPartitionableEdge(PartitionableEdge):
             last_pre_lo_atom = None
             for subedge in sorted_subedges:
                 rows =\
-                    subedge.get_synaptic_data(spinnaker,
+                    subedge.get_synaptic_data(graph_mapper,
                                               min_delay).get_rows()
                 if (last_pre_lo_atom is None) or \
                         (last_pre_lo_atom != subedge.presubvertex.lo_atom):

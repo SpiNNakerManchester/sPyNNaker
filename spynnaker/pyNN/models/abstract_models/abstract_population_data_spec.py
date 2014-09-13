@@ -206,7 +206,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         # End the loop over the neurons:
 
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_sub_graph_mapper,
+                           routing_info, hostname, graph_mapper,
                            report_folder):
         """
         Model-specific construction of the data blocks necessary to
@@ -221,27 +221,31 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         spec.comment("\n*** Spec for block of {} neurons ***\n"
                      .format(self.model_name))
+        
+        subvert_low_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
+        subvert_hi_atom = graph_mapper.get_subvertex_slice(subvertex).hi_atom
+        
 
         # Calculate the size of the tables to be reserved in SDRAM:
-        neuron_params_sz = self.get_neuron_params_size(subvertex.lo_atom,
-                                                       subvertex.hi_atom)
-        synapse_params_sz = self.get_synapse_parameter_size(subvertex.lo_atom,
-                                                            subvertex.hi_atom)
+        neuron_params_sz = self.get_neuron_params_size(subvert_low_atom,
+                                                       subvert_hi_atom)
+        synapse_params_sz = self.get_synapse_parameter_size(subvert_low_atom,
+                                                            subvert_hi_atom)
 
         subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)
         all_syn_block_sz = \
-            self.get_exact_synaptic_block_memory_size(graph_sub_graph_mapper,
+            self.get_exact_synaptic_block_memory_size(graph_mapper,
                                                       subvert_in_edges)
 
-        spike_hist_buff_sz = self.get_spike_buffer_size(subvertex.lo_atom,
-                                                        subvertex.hi_atom)
-        potential_hist_buff_sz = self.get_v_buffer_size(subvertex.lo_atom,
-                                                        subvertex.hi_atom)
-        gsyn_hist_buff_sz = self.get_g_syn_buffer_size(subvertex.lo_atom,
-                                                       subvertex.hi_atom)
+        spike_hist_buff_sz = self.get_spike_buffer_size(subvert_low_atom,
+                                                        subvert_hi_atom)
+        potential_hist_buff_sz = self.get_v_buffer_size(subvert_low_atom,
+                                                        subvert_hi_atom)
+        gsyn_hist_buff_sz = self.get_g_syn_buffer_size(subvert_low_atom,
+                                                       subvert_hi_atom)
         vertex_in_edges = graph.incoming_edges_to_vertex(self)
-        stdp_region_sz = self.get_stdp_parameter_size(subvertex.lo_atom,
-                                                      subvertex.hi_atom,
+        stdp_region_sz = self.get_stdp_parameter_size(subvert_low_atom,
+                                                      subvert_hi_atom,
                                                       vertex_in_edges)
 
         # Declare random number generators and distributions:
@@ -284,7 +288,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             spec, subvertex, all_syn_block_sz, weight_scale,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            routing_info, graph_sub_graph_mapper, subgraph)
+            routing_info, graph_mapper, subgraph)
 
         in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
         for subedge in in_subedges:

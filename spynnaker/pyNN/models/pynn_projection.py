@@ -226,10 +226,12 @@ class Projection(object):
             delay_synapse_list = None
             if self._projection_edge is not None:
                 synapse_list = \
-                    self._projection_edge.get_synaptic_data(self._spinnaker)
+                    self._projection_edge.get_synaptic_data(
+                        self._spinnaker.graph_mapper)
             if self._delay_edge is not None:
                 delay_synapse_list = \
-                    self._delay_edge.get_synaptic_data(self._spinnaker)
+                    self._delay_edge.get_synaptic_data(
+                        self._spinnaker.graph_mapper)
 
             # If there is both a delay and a non-delay list, merge them
             if synapse_list is not None and delay_synapse_list is not None:
@@ -327,7 +329,8 @@ class Projection(object):
             synapse_list = self._read_synapse_list
         else:
             synapse_list = \
-                self._projection_edge.get_synaptic_data(self._spinnaker)
+                self._projection_edge.get_synaptic_data(
+                    self._spinnaker.graph_mapper)
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
 
