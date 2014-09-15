@@ -37,8 +37,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
-from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning \
-    import SubgraphSubedgePruning
+from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
+    import GraphEdgeFilter
 from spynnaker.pyNN import reports
 
 #spinnman inports
@@ -242,7 +242,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #execute pynn subedge pruning
         self._partitioned_graph, self._graph_mapper = \
-            SubgraphSubedgePruning().run(self._partitioned_graph,
+            GraphEdgeFilter().run(self._partitioned_graph,
                                          self._graph_mapper)
 
         #execute key allocator

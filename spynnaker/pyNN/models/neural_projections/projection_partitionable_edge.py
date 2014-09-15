@@ -4,19 +4,21 @@ from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.models.neural_properties.synapse_row_info \
-    import SynapseRowInfo
+from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
+    import AbstractFilterableEdge
 from spynnaker.pyNN.utilities.conf import config
 import logging
 logger = logging.getLogger(__name__)
 
 
-class ProjectionPartitionableEdge(PartitionableEdge):
+class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
     
     def __init__(self, prevertex, postvertex, machine_time_step,
                  connector=None, synapse_list=None, synapse_dynamics=None,
                  label=None):
         PartitionableEdge.__init__(self, prevertex, postvertex, label=label)
+        AbstractFilterableEdge.__init__(self)
+
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
         self._synapse_list = synapse_list
@@ -38,37 +40,36 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         Creates a subedge from this edge
         """
         return ProjectionPartitionedEdge(presubvertex, postsubvertex, self)
-        
+
     def filter_sub_edge(self, subedge, graph_mapper):
         """
-        Method is called to allow a given sub-edge to prune itself if it
-        serves no purpose.
+        Method is inhirrted from filterable vertex and is called to allow a
+        given sub-edge to prune itself if it serves no purpose.
         :return: True if the partricular sub-edge can be pruned, and
         False otherwise.
         """
-        pre_sub_lo = \
-            graph_mapper.get_subvertex_slice(subedge.presubvertex).lo_atom
-        pre_sub_hi = \
-            graph_mapper.get_subvertex_slice(subedge.presubvertex).hi_atom
-        post_sub_lo = \
-            graph_mapper.get_subvertex_slice(subedge.postsubvertex).lo_atom
-        post_sub_hi = \
-            graph_mapper.get_subvertex_slice(subedge.postsubvertex).hi_atom
-        return not self._synapse_list.is_connected(pre_sub_lo, pre_sub_hi,
-                                                   post_sub_lo, post_sub_hi)
+        pre_vertex_slice = \
+            graph_mapper.get_subvertex_slice(subedge.pre_subvertex)
+        post_vertex_slice = \
+            graph_mapper.get_subvertex_slice(subedge.post_subvertex)
+        return not self._synapse_list.is_connected(pre_vertex_slice,
+                                                   post_vertex_slice)
 
-    def get_max_n_words(self, lo_atom=None, hi_atom=None):
+    def get_max_n_words(self, vertex_slice=None):
         """
         Gets the maximum number of words for a subvertex at the end of the
         connection
-        :param lo_atom: The start of the range of atoms in 
-                                   the subvertex (default is first atom)
-        :param hi_atom: The end of the range of atoms in 
-                                   the subvertex (default is last atom)
+        :param vertex_slice: the vertex slice for this vertex which contains \
+        the lo and hi atoms for this slice
         """
-        return max([self._synapse_row_io.get_n_words(synapse_row, lo_atom,
-                                                     hi_atom)
-                    for synapse_row in self._synapse_list.get_rows()])
+        if vertex_slice is None:
+            return max([self._synapse_row_io.get_n_words(
+                synapse_row, None, None)
+                for synapse_row in self._synapse_list.get_rows()])
+        else:
+            return max([self._synapse_row_io.get_n_words(
+                synapse_row, vertex_slice.lo_atom, vertex_slice.hi_atom)
+                for synapse_row in self._synapse_list.get_rows()])
         
     def get_n_rows(self):
         """
@@ -104,24 +105,30 @@ class ProjectionPartitionableEdge(PartitionableEdge):
             sorted_subedges = \
                 sorted(graph_mapper.get_subedges_from_edge(self),
                        key=lambda sub_edge:
-                       (sub_edge.pre_subvertex.lo_atom,
-                        sub_edge.post_subvertex.lo_atom))
+                       (graph_mapper.get_subvertex_slice(
+                           sub_edge.pre_subvertex).lo_atom,
+                        graph_mapper.get_subvertex_slice(
+                            sub_edge.post_subvertex).lo_atom))
 
             synaptic_list = list()
             last_pre_lo_atom = None
             for subedge in sorted_subedges:
-                rows =\
-                    subedge.get_synaptic_data(graph_mapper,
-                                              min_delay).get_rows()
-                if (last_pre_lo_atom is None) or \
-                        (last_pre_lo_atom != subedge.presubvertex.lo_atom):
+                rows = subedge.get_synaptic_data(graph_mapper,
+                                                 min_delay).get_rows()
+                pre_lo_atom = graph_mapper.get_subvertex_slice(
+                    subedge.presubvertex).lo_atom
+
+                if ((last_pre_lo_atom is None) or
+                        (last_pre_lo_atom != pre_lo_atom)):
                     synaptic_list.extend(rows)
-                    last_pre_lo_atom = subedge.presubvertex.lo_atom
+                    last_pre_lo_atom = pre_lo_atom
                 else:
                     for i in range(len(rows)):
                         row = rows[i]
+                        post_lo_atom = graph_mapper.get_subvertex_slice(
+                            subedge.postsubvertex).lo_atom
                         synaptic_list[i + last_pre_lo_atom]\
-                            .append(row, lo_atom=subedge.postsubvertex.lo_atom)
+                            .append(row, lo_atom=post_lo_atom)
 
             return SynapticList(synaptic_list)
 

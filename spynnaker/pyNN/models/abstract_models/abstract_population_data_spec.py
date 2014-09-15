@@ -222,30 +222,22 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.comment("\n*** Spec for block of {} neurons ***\n"
                      .format(self.model_name))
         
-        subvert_low_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
-        subvert_hi_atom = graph_mapper.get_subvertex_slice(subvertex).hi_atom
-        
+        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         # Calculate the size of the tables to be reserved in SDRAM:
-        neuron_params_sz = self.get_neuron_params_size(subvert_low_atom,
-                                                       subvert_hi_atom)
-        synapse_params_sz = self.get_synapse_parameter_size(subvert_low_atom,
-                                                            subvert_hi_atom)
+        neuron_params_sz = self.get_neuron_params_size(vertex_slice)
+        synapse_params_sz = self.get_synapse_parameter_size(vertex_slice)
 
         subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)
         all_syn_block_sz = \
             self.get_exact_synaptic_block_memory_size(graph_mapper,
                                                       subvert_in_edges)
 
-        spike_hist_buff_sz = self.get_spike_buffer_size(subvert_low_atom,
-                                                        subvert_hi_atom)
-        potential_hist_buff_sz = self.get_v_buffer_size(subvert_low_atom,
-                                                        subvert_hi_atom)
-        gsyn_hist_buff_sz = self.get_g_syn_buffer_size(subvert_low_atom,
-                                                       subvert_hi_atom)
+        spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
+        potential_hist_buff_sz = self.get_v_buffer_size(vertex_slice)
+        gsyn_hist_buff_sz = self.get_g_syn_buffer_size(vertex_slice)
         vertex_in_edges = graph.incoming_edges_to_vertex(self)
-        stdp_region_sz = self.get_stdp_parameter_size(subvert_low_atom,
-                                                      subvert_hi_atom,
+        stdp_region_sz = self.get_stdp_parameter_size(vertex_slice,
                                                       vertex_in_edges)
 
         # Declare random number generators and distributions:
@@ -282,7 +274,6 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         self.write_row_length_translation_table(
             spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)
-
 
         self.write_synaptic_matrix_and_master_population_table(
             spec, subvertex, all_syn_block_sz, weight_scale,

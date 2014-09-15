@@ -62,7 +62,6 @@ class AbstractRecordableVertex(object):
         """
         return self._record
 
-    @abstractmethod
     def _get_spikes(
             self, graph_mapper, placements, txrx, compatible_output, 
             spike_recording_region, sub_vertex_out_spike_bytes_function):

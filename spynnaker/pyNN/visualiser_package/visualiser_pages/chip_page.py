@@ -13,12 +13,14 @@ class ChipPage(AbstractPage):
     LOGICAL_VIEW = 0
     PHYSICAL_VIEW = 1
 
-    def __init__(self, chip, chip_placements, router_table, window_based=True):
+    def __init__(self, chip, chip_placements, router_table, graph_mapper,
+                 window_based=True):
         AbstractPage.__init__(self)
         self._chip = chip
         self._router_table = router_table
         self._coords = chip.get_coords()
         self._chip_placements = chip_placements
+        self._graph_mapper = graph_mapper
         #trakcer for subpop highlighting
         self.core_buttons = dict()
         self._window_based = window_based
@@ -204,11 +206,15 @@ class ChipPage(AbstractPage):
                             this_placement = placement
                     if processor.placement is not None:
                         subvert = this_placement.subvertex
+                        vertex_slice = \
+                            self._graph_mapper.get_subvertex_slice(subvert)
+                        vertex = \
+                            self._graph_mapper.get_vertex_from_subvertex(subvert)
 
                         button.set_tooltip_text("id : {}. \n {} to {}."
-                                                .format(subvert.vertex.label,
-                                                        subvert.lo_atom,
-                                                        subvert.hi_atom))
+                                                .format(vertex.label,
+                                                        vertex_slice.lo_atom,
+                                                        vertex_slice.hi_atom))
                     else:
                         button.set_tooltip_text("this core does not "
                                                 "contain any atoms")
@@ -231,12 +237,14 @@ class ChipPage(AbstractPage):
                     for placement in self._chip_placements:
                         if placement.processor == processor:
                             subvert = placement.subvertex
-                            vertex = placement.subvertex.vertex
-
+                            vertex_slice = \
+                                self._graph_mapper.get_subvertex_slice(subvert)
+                            vertex = \
+                                self._graph_mapper.get_vertex_from_subvertex(subvert)
                             button.set_tooltip_text("id : {}. \n  {} to {}."
                                                     .format(vertex.label,
-                                                            subvert.lo_atom,
-                                                            subvert.hi_atom))
+                                                            vertex_slice.lo_atom,
+                                                            vertex_slice.hi_atom))
                             found = True
                     if not found:
                         button.set_tooltip_text("this core does not "

@@ -65,7 +65,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         SpikeSourcePoisson.\
             _model_based_max_atoms_per_core = new_value
     
-    def get_spike_buffer_size(self, lo_atom, hi_atom):
+    def get_spike_buffer_size(self, vertex_slice):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
         """
@@ -75,16 +75,18 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         if self._no_machine_time_steps is None:
             return 0
         
-        bytes_per_time_step = int(ceil((hi_atom - lo_atom + 1) / 32.0)) * 4
+        bytes_per_time_step = int(
+            ceil((vertex_slice.hi_atom - vertex_slice.lo_atom + 1) / 32.0)) * 4
         return self.get_recording_region_size(bytes_per_time_step)
 
     @staticmethod
-    def get_params_bytes(lo_atom, hi_atom):
+    def get_params_bytes(vertex_slice):
         """
         Gets the size of the possion parameters in bytes
         """
         return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS
-                + (((hi_atom - lo_atom) + 1) * PARAMS_WORDS_PER_NEURON)) * 4
+                + (((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
+                   * PARAMS_WORDS_PER_NEURON)) * 4
 
     def reserve_memory_regions(self, spec, setup_sz, poisson_params_sz,
                                spike_hist_buff_sz):
@@ -256,33 +258,32 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             sub_vertex_out_spike_bytes_function)
 
     #inhirrtted from partionable vertex
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
         """
         method for calculating sdram usage
         """
-        poisson_params_sz = self.get_params_bytes(lo_atom, hi_atom)
-        spike_hist_buff_sz = self.get_spike_buffer_size(lo_atom, hi_atom)
+        poisson_params_sz = self.get_params_bytes(vertex_slice)
+        spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
         return constants.SETUP_SIZE + poisson_params_sz + spike_hist_buff_sz
 
-    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_dtcm_usage_for_atoms(self, vertex_slice):
         """
         method for caulculating dtcm usage for a coltection of atoms
         """
-        no_atoms = hi_atom - lo_atom + 1
+        no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         return (44 + (16 * 4)) * no_atoms
 
-    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_cpu_usage_for_atoms(self, vertex_slice):
         """
         Gets the CPU requirements for a range of atoms
         """
-        no_atoms = hi_atom - lo_atom + 1
+        no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         return 128 * no_atoms
 
     #inhirrted from dataspecable vertex
 
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_subgraph_mapper,
-                           report_folder):
+                           routing_info, hostname, graph_mapper, report_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSourcePoisson on one core.
@@ -293,14 +294,14 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
-        spike_hist_buff_sz = self.get_spike_buffer_size(subvertex.lo_atom,
-                                                        subvertex.hi_atom)
+        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+
+        spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
         self.write_setup_info(spec, spike_hist_buff_sz)
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
-        poisson_params_sz = self.get_params_bytes(subvertex.lo_atom,
-                                                  subvertex.hi_atom)
+        poisson_params_sz = self.get_params_bytes(vertex_slice)
 
         # Reserve SDRAM space for memory areas:
         self.reserve_memory_regions(

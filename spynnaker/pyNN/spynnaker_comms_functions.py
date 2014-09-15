@@ -208,7 +208,8 @@ class SpynnakerCommsFunctions(object):
         for executable_target in executable_keys:
             core_subsets = executable_targets[executable_target]
             for core_subset in core_subsets:
-                total_processors += 1
+                for _ in core_subset.processor_ids:
+                    total_processors += 1
                 total_cores.append(core_subset)
 
         processor_c_main = self._txrx.get_core_state_count(app_id,
@@ -227,16 +228,19 @@ class SpynnakerCommsFunctions(object):
             successful_cores, unsucessful_cores = \
                 self._break_down_of_failure_to_reach_state(total_cores,
                                                            CPUState.SYNC0)
-            #break_down the successful cores and unsuccessful cores into string
-            # reps
-            break_down = \
-                self.turn_break_downs_into_string(
-                    total_cores, successful_cores, unsucessful_cores,
-                    CPUState.SYNC0)
-            raise exceptions.ExecutableFailedToStartException(
-                "Only {} processors out of {} have sucessfully reached sync0 "
-                "with breakdown of: {}"
-                .format(processors_ready, total_processors, break_down))
+            #last chance to slip out of error check
+            if len(successful_cores) != total_processors:
+                #break_down the successful cores and unsuccessful cores into
+                # string
+                # reps
+                break_down = \
+                    self.turn_break_downs_into_string(
+                        total_cores, successful_cores, unsucessful_cores,
+                        CPUState.SYNC0)
+                raise exceptions.ExecutableFailedToStartException(
+                    "Only {} processors out of {} have sucessfully reached "
+                    "sync0 with breakdown of: {}"
+                    .format(processors_ready, total_processors, break_down))
 
         # if correct, start applications
         logger.info("Starting application")

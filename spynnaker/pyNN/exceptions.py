@@ -31,7 +31,7 @@ class RallocException(SpynnakerException):
     pass
 
 
-class PrunedException(SpynnakerException):
+class FilterableException(SpynnakerException):
     """rasied during the pynn's front end pruning of uninportant subedges when\
      a subedge cannot be detemrined if it is prunable or not
 

@@ -9,13 +9,17 @@ class SynapticList(object):
         """
         self._synaptic_rows = synaptic_rows
         
-    def get_max_n_connections(self, lo_atom=None, hi_atom=None):
+    def get_max_n_connections(self, vertex_slice=None):
         """
         Return the maximum number of connections in the rows
         """
-        return max(map(operator.methodcaller('get_n_connections', lo_atom,
-                                             hi_atom),
-                       self._synaptic_rows))
+        if vertex_slice is None:
+            return max(map(operator.methodcaller(
+                'get_n_connections', None, None), self._synaptic_rows))
+        else:
+            return max(map(operator.methodcaller(
+                'get_n_connections', vertex_slice.lo_atom,
+                vertex_slice.hi_atom), self._synaptic_rows))
     
     def get_min_max_delay(self):
         """
@@ -58,25 +62,28 @@ class SynapticList(object):
                 else:
                     inh_sum_array[index] += abs(weight)
     
-    def is_connected(self, from_lo_atom, from_hi_atom, to_lo_atom, to_hi_atom):
+    def is_connected(self, from_vertex_slice, to_vertex_slice):
         """
         Return true if the rows are connected for the specified range of
         incoming and outgoing atoms
         """
-        for row in self._synaptic_rows[from_lo_atom:from_hi_atom + 1]:
-            if row.get_n_connections(to_lo_atom, to_hi_atom) > 0:
+        for row in self._synaptic_rows[from_vertex_slice.lo_atom:
+                                       from_vertex_slice.hi_atom + 1]:
+            if row.get_n_connections(to_vertex_slice.lo_atom,
+                                     to_vertex_slice.hi_atom) > 0:
                 return True
         return False
     
-    def get_atom_sublist(self, from_lo_atom, from_hi_atom, to_lo_atom,
-                         to_hi_atom):
+    def get_atom_sublist(self, from_vertex_slice, to_vertex_slice):
         """
         Return a list of rows each of which represents only the information
         for atoms between lo_atom and hi_atom (inclusive)
         """
-        return map(operator.methodcaller('get_sub_row_by_atom',
-                                         to_lo_atom, to_hi_atom),
-                   self._synaptic_rows[from_lo_atom:from_hi_atom + 1])
+        return map(operator.methodcaller(
+            'get_sub_row_by_atom', to_vertex_slice.lo_atom,
+            to_vertex_slice.hi_atom),
+            self._synaptic_rows[from_vertex_slice.lo_atom:
+                                from_vertex_slice.hi_atom + 1])
     
     def get_delay_sublist(self, min_delay, max_delay):
         """
@@ -87,14 +94,13 @@ class SynapticList(object):
                                          max_delay),
                    self._synaptic_rows)
     
-    def create_atom_sublist(self, from_lo_atom, from_hi_atom, to_lo_atom,
-                            to_hi_atom):
+    def create_atom_sublist(self, from_vertex_slice, to_vertex_slice):
         """
         Create a sub list of this list which contains only atoms
         between lo_atom and hi_atom (inclusive)
         """
-        return SynapticList(self.get_atom_sublist(from_lo_atom, from_hi_atom,
-                                                  to_lo_atom, to_hi_atom))
+        return SynapticList(self.get_atom_sublist(from_vertex_slice,
+                                                  to_vertex_slice))
     
     def create_delay_sublist(self, min_delay, max_delay):
         """

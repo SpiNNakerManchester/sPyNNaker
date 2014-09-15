@@ -114,11 +114,11 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
         return binary_name
 
     #inherited from partitionable vertex
-    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_cpu_usage_for_atoms(self, vertex_slice):
         return 0
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
         return 0
 
-    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
+    def get_dtcm_usage_for_atoms(self, vertex_slice):
         return 0

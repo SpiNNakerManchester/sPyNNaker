@@ -1,10 +1,13 @@
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
+from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
+    AbstractFilterableEdge
 
 
-class ProjectionPartitionedEdge(PartitionedEdge):
+class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
     
     def __init__(self, presubvertex, postsubvertex, associated_edge):
         PartitionedEdge.__init__(self, presubvertex, postsubvertex)
+        AbstractFilterableEdge.__init__(self)
         self._synapse_sublist = None
         self._associated_edge = associated_edge
 
@@ -40,7 +43,7 @@ class ProjectionPartitionedEdge(PartitionedEdge):
         """
         self._synapse_sublist = None
 
-    def is_connected(self, graph_mapper):
+    def filter_sub_edge(self, subedge, graph_mapper):
         """determines if theres an actual connection in this subedge in temrs of
         synaptic data
 
@@ -48,6 +51,9 @@ class ProjectionPartitionedEdge(PartitionedEdge):
         if self._synapse_sublist is None:
             self.get_synapse_sublist(graph_mapper)
 
-        return self._synapse_sublist.is_connected(
-            self._pre_subvertex.lo_atom, self._pre_subvertex.hi_atom,
-            self._post_subvertex.lo_atom, self.post_subvertex.hi_atom)
+        pre_vertex_slice = graph_mapper.get_subvertex_slice(self._pre_subvertex)
+        post_vertex_slice = \
+            graph_mapper.get_subvertex_slice(self._post_subvertex)
+
+        return self._synapse_sublist.is_connected(pre_vertex_slice,
+                                                  post_vertex_slice)

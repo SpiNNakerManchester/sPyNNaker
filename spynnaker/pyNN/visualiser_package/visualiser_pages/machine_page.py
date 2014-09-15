@@ -16,9 +16,11 @@ class MachinePage(AbstractPage):
     CHIP_SCOPE = "chip"
     CORE_SCOPE = "core"
 
-    def __init__(self, static, scope, machine, placements, router_tables):
+    def __init__(self, static, scope, machine, placements, router_tables,
+                 graph_mapper):
         AbstractPage.__init__(self)
         self._current_button_right_clicked = None
+        self._graph_mapper = graph_mapper
         self._button_mapping = dict()
         self._chips_with_views = dict()
         self._machine_table = None
@@ -151,11 +153,11 @@ class MachinePage(AbstractPage):
         if menu_type == "win":
             ChipPage(chip, self._placements.get_placment_by_chip(chip_coords),
                      self._router_tables.get_router_table_by_chip(chip_coords),
-                     True)
+                     self._graph_mapper, True)
         elif menu_type == "tab":
             ChipPage(chip, self._placements.get_placment_by_chip(chip_coords),
                      self._router_tables.get_router_table_by_chip(chip_coords),
-                     False)
+                     self._graph_mapper, False)
 
     #handles the clicking of a chip button (either set up right click menu or
     # opens up chip view in new window
@@ -171,7 +173,7 @@ class MachinePage(AbstractPage):
                                                          'y': chip_coords[1]}),
                      self._placements.get_placment_by_chip(chip_coords),
                      self._router_tables.get_router_table_by_chip(chip_coords),
-                     True)
+                     self._graph_mapper, True)
         return False
 
     #checks the state of the chip being repsented in the dao, if not real, then

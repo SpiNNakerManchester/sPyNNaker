@@ -1,6 +1,9 @@
 from spynnaker.pyNN.utilities import utility_calls
+from abc import ABCMeta
+from six import add_metaclass
 
 
+@add_metaclass(ABCMeta)
 class AbstractConductiveVertex(object):
 
     def __init__(self, n_neurons, e_rev_e, e_rev_i):

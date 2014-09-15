@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class TopologicalPage(AbstractLiveSpikePage):
     def __init__(self, vertex_in_question, retina_drop_off_theshold,
-                 subgraph, placements, transciever, has_board):
+                 subgraph, placements, transciever, has_board, graph_mapper):
         AbstractLiveSpikePage.__init__(self, transciever, has_board)
 
         self._rectangle_size = {'x': 1, 'y': 1}
@@ -22,6 +22,7 @@ class TopologicalPage(AbstractLiveSpikePage):
         self._no_labels = 10
         self._no_color_mapping_labels = 10
         self._pixmap = None
+        self._graph_mapper = graph_mapper
 
         #holds all the vertexes being recorded for spikes
         self._vertex_in_question = vertex_in_question
@@ -50,11 +51,14 @@ class TopologicalPage(AbstractLiveSpikePage):
         for subvert in subgraph.get_subvertices_from_vertex(vertex_in_question):
             placement = placements.get_placement_of_subvertex(subvert)
             key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
-            self.lo_atom_mapping[key] = subvert.lo_atom
+            vertex_slice = self._graph_mapper.get_subvertex_slice(subvert)
+            self.lo_atom_mapping[key] = vertex_slice.lo_atom
         self._max_color_value = {'r': 1, 'g': 1, 'b': 1}
         self._min_color_value = {'r': 0, 'g': 0, 'b': 0}
-        number_of_neurons = (self._vertex_in_question.subvertices[0].hi_atom -
-                             self._vertex_in_question.subvertices[0].lo_atom)
+        vertex_slice = \
+            self._graph_mapper.get_subvertex_slice(
+                self._vertex_in_question.subvertices[0])
+        number_of_neurons = (vertex_slice.hi_atom - vertex_slice.lo_atom)
         if (vertex_in_question.visualiser_2d_dimensions['x'] is None or
            vertex_in_question.visualiser_2d_dimensions['y'] is None):
                 self._x_dim = int(math.sqrt(number_of_neurons))

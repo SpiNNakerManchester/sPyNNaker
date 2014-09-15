@@ -146,7 +146,7 @@ class AbstractSynapticManager(object):
             if (memory_size & 0x3FF) != 0:
                 memory_size = (memory_size & 0xFFFFFC00) + 0x400
             
-            sublist = subedge.get_synapse_sublist()
+            sublist = subedge.get_synapse_sublist(graph_mapper)
             max_n_words = \
                 max([graph_mapper.get_edge_from_subedge(subedge)
                     .get_synapse_row_io().get_n_words(synapse_row)
@@ -157,7 +157,7 @@ class AbstractSynapticManager(object):
             memory_size += all_syn_block_sz
         return memory_size
     
-    def get_synaptic_blocks_memory_size(self, lo_atom, hi_atom, in_edges):
+    def get_synaptic_blocks_memory_size(self, vertex_slice, in_edges):
         self._check_synapse_dynamics(in_edges)
         memory_size = 0
         
@@ -165,7 +165,7 @@ class AbstractSynapticManager(object):
             if isinstance(in_edge, ProjectionPartitionableEdge):
                 
                 # Get maximum row length in this edge 
-                max_n_words = in_edge.get_max_n_words(lo_atom, hi_atom)
+                max_n_words = in_edge.get_max_n_words(vertex_slice)
                 all_syn_block_sz = \
                     self._calculate_all_synaptic_block_size(in_edge,
                                                             max_n_words)
@@ -267,7 +267,7 @@ class AbstractSynapticManager(object):
         # smallest row that is big enough for our row of data
         return best_index, minimum_valid_row_length
 
-    def get_synapse_parameter_size(self, lo_atom, hi_atom):
+    def get_synapse_parameter_size(self, vertex_slice):
         raise NotImplementedError
 
     @staticmethod
@@ -289,10 +289,10 @@ class AbstractSynapticManager(object):
             return 1
         return None
 
-    def get_stdp_parameter_size(self, lo_atom, hi_atom, in_edges):
+    def get_stdp_parameter_size(self, vertex_slice, in_edges):
         self._check_synapse_dynamics(in_edges)
         if self._stdp_mechanism is not None:
-            return self._stdp_mechanism.get_params_size(self, lo_atom, hi_atom)
+            return self._stdp_mechanism.get_params_size(self, vertex_slice)
         return 0
 
     @staticmethod
@@ -376,7 +376,7 @@ class AbstractSynapticManager(object):
                 spec.comment("\nWriting matrix for subedge from {}, {}, {}\n"
                              .format(x, y, p))
 
-                sublist = subedge.get_synapse_sublist()
+                sublist = subedge.get_synapse_sublist(graph_mapper)
                 associated_edge = \
                     graph_mapper.get_edge_from_subedge(subedge)
                 row_io = associated_edge.get_synapse_row_io()
@@ -531,7 +531,6 @@ class AbstractSynapticManager(object):
         """
         #turn byte array list into a string so that unpack can work
         synaptic_block = str(synaptic_block[0])
-        number = ord(synaptic_block[0])
         #locate offset after conversion to bytes
         position_in_block = \
             atom * 4 * (max_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)

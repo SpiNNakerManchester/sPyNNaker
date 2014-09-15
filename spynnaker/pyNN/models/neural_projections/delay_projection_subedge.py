@@ -23,25 +23,21 @@ class DelayProjectionSubedge(ProjectionPartitionedEdge):
         Gets the synapse list for this subedge
         """
         if self.synapse_sublist is None:
-            pre_sub_lo = \
-                graph_mapper.get_subvertex_slice(self._pre_subvertex).lo_atom
-            pre_sub_hi = \
-                graph_mapper.get_subvertex_slice(self._.pre_subvertex).hi_atom
-            post_sub_lo = \
-                graph_mapper.get_subvertex_slice(self._post_subvertex).lo_atom
-            post_sub_hi = \
-                graph_mapper.get_subvertex_slice(self._post_subvertex).hi_atom
+            pre_vertex_slice = \
+                graph_mapper.get_subvertex_slice(self._pre_subvertex)
+            post_vertex_slice = \
+                graph_mapper.get_subvertex_slice(self._post_subvertex)
             
             synapse_sublist = \
-                self._associated_edge.get_synaptic_data().get_atom_sublist(
-                    pre_sub_lo, pre_sub_hi, post_sub_lo, post_sub_hi)
+                self._associated_edge.get_synaptic_data(graph_mapper)\
+                    .get_atom_sublist(pre_vertex_slice, post_vertex_slice)
             
             if logger.isEnabledFor("debug"):
                 logger.debug("Original Synapse List rows:")
                 for i in range(len(synapse_sublist)):
                     logger.debug("{}: {}".format(i, synapse_sublist[i]))
         
-            if len(synapse_sublist) > 256:
+            if synapse_sublist.get_n_rows() > 256:
                 raise exceptions.SynapticMaxIncomingAtomsSupportException(
                     "Delay sub-vertices can only support up to 256 incoming"
                     " neurons!")
@@ -51,9 +47,8 @@ class DelayProjectionSubedge(ProjectionPartitionedEdge):
                 min_delay = (i * self._associated_edge.max_delay_per_neuron)
                 max_delay = \
                     min_delay + self._associated_edge.max_delay_per_neuron
-                delay_list =  \
-                    self._associated_edge.get_synaptic_data()\
-                        .get_delay_sublist(min_delay, max_delay)
+                delay_list = \
+                    synapse_sublist.get_delay_sublist(min_delay, max_delay)
                 
 #                 if logger.isEnabledFor("debug"):
 #                     logger.debug("    Rows for delays {} - {}:".format(
@@ -71,8 +66,7 @@ class DelayProjectionSubedge(ProjectionPartitionedEdge):
             self.synapse_delay_rows = len(full_delay_list)
         return self.synapse_sublist
     
-    def get_synaptic_data(self, spinnaker, delay_offset):
-        graph_mapper = spinnaker.graph_mapper
+    def get_synaptic_data(self, graph_mapper, delay_offset):
         delay_list = graph_mapper.\
             get_vertex_from_subvertex(self._post_subvertex)\
             .get_synaptic_data(graph_mapper, self._pre_subvertex,

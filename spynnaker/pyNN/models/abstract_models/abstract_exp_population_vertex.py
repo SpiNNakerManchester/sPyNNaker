@@ -23,11 +23,12 @@ class AbstractExponentialPopulationVertex(object):
         self._machine_time_step = machine_time_step
 
     @staticmethod
-    def get_synapse_parameter_size(lo_atom, hi_atom):
+    def get_synapse_parameter_size(vertex_slice):
         """
         Gets the size of the synapse parameters for a range of neurons
         """
-        return NUM_SYNAPSE_PARAMS * 4 * ((hi_atom - lo_atom) + 1)
+        return NUM_SYNAPSE_PARAMS * 4 * \
+               ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
     @staticmethod
     def get_n_synapse_type_bits():

@@ -7,7 +7,7 @@ import pylab
 import spynnaker.pyNN as p
 
 
-p.setup(timestep=1.0, min_delay = 1.0, max_delay = 144.0)
+p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
 nNeurons = 200 # number of neurons in each population
 p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
 

@@ -1,9 +1,12 @@
 from spynnaker.pyNN.utilities import constants
 import math
+from abc import ABCMeta
+from six import add_metaclass
 
 NUM_SYNAPSE_PARAMS = 3  # tau_syn_E, tau_syn_E2 and tau_syn_I
 
 
+@add_metaclass(ABCMeta)
 class AbstractDualExponentialVertex(object):
     """
     This represents a population with two exponentially decaying synapses,
@@ -50,11 +53,12 @@ class AbstractDualExponentialVertex(object):
         return 2
 
     @staticmethod
-    def get_synapse_parameter_size(lo_atom, hi_atom):
+    def get_synapse_parameter_size(vertex_slice):
         """
         Gets the size of the synapse parameters for a range of neurons
         """
-        return NUM_SYNAPSE_PARAMS * 4 * ((hi_atom - lo_atom) + 1)
+        return NUM_SYNAPSE_PARAMS * 4 * ((vertex_slice.hi_atom -
+                                          vertex_slice.lo_atom) + 1)
 
     def write_synapse_parameters(self, spec, subvertex):
         """

@@ -11,11 +11,12 @@ logger = logging.getLogger(__name__)
 
 class RasterPage(AbstractLiveSpikePage):
     def __init__(self, vertex_in_question, raster_x_scope, do_fading, runtime,
-                 machine_time_step, transciever, has_board, current_vertex=None,
-                 merged=True):
+                 machine_time_step, transciever, has_board, graph_mapper,
+                 current_vertex=None, merged=True):
         AbstractLiveSpikePage.__init__(self, transciever, has_board)
         self._is_merged_version = merged
         self._last_timer_tic = None
+        self._graph_mapper = graph_mapper
         #holds all the vertexes being recorded for spikes
         if vertex_in_question is None:
             self._vertex_in_question = list()
@@ -191,7 +192,8 @@ class RasterPage(AbstractLiveSpikePage):
         #calcualte correct y axis
         index = self._vertex_in_question.index(subvertex.vertex)
         offset = self._off_sets[index]
-        pop_neuron_id = subvertex.lo_atom + local_neuron_id
+        vertex_slice = self._graph_mapper.get_subvertex_slice(subvertex)
+        pop_neuron_id = vertex_slice.lo_atom + local_neuron_id
         offsetted_neuron_id = pop_neuron_id + offset
         #calculate correct x axis
         xaxix = (time_in_tics * self._machine_time_step) / 1000  # to ms

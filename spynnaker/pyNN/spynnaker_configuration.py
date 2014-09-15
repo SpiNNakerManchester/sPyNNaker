@@ -30,6 +30,7 @@ class SpynnakerConfiguration(object):
         self._hostname = host_name
         self._time_scale_factor = None
         self._machine_time_step = None
+        self._runtime = None
 
         #specific utility vertexes
         self._live_spike_recorder = None

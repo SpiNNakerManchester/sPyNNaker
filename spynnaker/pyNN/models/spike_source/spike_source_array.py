@@ -47,7 +47,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         SpikeSourceArray.\
             _model_based_max_atoms_per_core = new_value
     
-    def get_spikes_per_timestep(self, lo_atom, hi_atom):
+    def get_spikes_per_timestep(self, vertex_slice):
         """
         spikeArray is a list with one entry per 'neuron'. The entry for
         one neuron is a list of times (in ms) when the neuron fires.
@@ -60,7 +60,8 @@ class SpikeSourceArray(AbstractSpikeSource):
         spike_dict = dict()
         if isinstance(self._spike_times, list):
             # This is in SpiNNaker 'list of lists' format:
-            for neuron in range(lo_atom, hi_atom + 1):
+            for neuron in range(vertex_slice.lo_atom,
+                                vertex_slice.hi_atom + 1):
                 for timeStamp in self._spike_times[neuron]:
                     time_stamp_in_ticks = \
                         int((timeStamp * 1000.0) / self._machine_time_step)
@@ -70,7 +71,7 @@ class SpikeSourceArray(AbstractSpikeSource):
                         spike_dict[time_stamp_in_ticks].append(neuron)
         else:
             # This is in official PyNN format, all neurons use the same list:
-            neuron_list = range(lo_atom, hi_atom)
+            neuron_list = range(vertex_slice.lo_atom, vertex_slice.hi_atom)
             for timeStamp in self._spike_times:
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
@@ -89,7 +90,7 @@ class SpikeSourceArray(AbstractSpikeSource):
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
         return spike_block_row_length * no_active_timesteps * 4
     
-    def get_spike_buffer_size(self, lo_atom, hi_atom):
+    def get_spike_buffer_size(self, vert_slice):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
         """
@@ -99,7 +100,8 @@ class SpikeSourceArray(AbstractSpikeSource):
         if self._no_machine_time_steps is None:
             return 0
         
-        out_spike_spikes = int(ceil((hi_atom - lo_atom + 1) / 32.0)) * 4
+        out_spike_spikes = \
+            int(ceil((vert_slice.hi_atom - vert_slice.lo_atom + 1) / 32.0)) * 4
         return self.get_recording_region_size(out_spike_spikes)
 
     @staticmethod
@@ -107,15 +109,15 @@ class SpikeSourceArray(AbstractSpikeSource):
         return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps
                 * constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
-    def process_spike_array_info(self, subvertex):
+    def process_spike_array_info(self, subvertex, graph_mapper):
         """
         Parse python definitons of the required spike arrays and construct
         both the spike blocks, containing lists of spike IDs for each time step,
         and the index table, which gives the address in memory to access 
         the spike block for the current time step.
         """
-        spike_dict = self.get_spikes_per_timestep(subvertex.lo_atom,
-                                                  subvertex.hi_atom)
+        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+        spike_dict = self.get_spikes_per_timestep(vertex_slice)
         
         # Dict spikeDict now has entries based on timeStamp and each entry
         # is a list of neurons firing at that time.
@@ -141,7 +143,7 @@ class SpikeSourceArray(AbstractSpikeSource):
             # Construct spikeBlock:
             list_of_spike_indices = spike_dict[timeStamp]
             for spikeIndex in list_of_spike_indices:
-                current_spike_block.append(spikeIndex - subvertex.lo_atom)
+                current_spike_block.append(spikeIndex - vertex_slice.lo_atom)
             # Add the spike block for this time step to the spike blocks list:
             spike_blocks.append(current_spike_block)
             spike_block_start_addr += spike_block_row_length
@@ -286,8 +288,7 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     #inhirrted from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_subgraph_mapper,
-                           report_folder):
+                           routing_info, hostname, graph_mapper, report_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
@@ -298,8 +299,11 @@ class SpikeSourceArray(AbstractSpikeSource):
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
         spec = DataSpecificationGenerator(data_writer)
-        spike_history_region_sz = self.get_spike_buffer_size(subvertex.lo_atom,
-                                                             subvertex.hi_atom)
+
+        #get slice from mapper
+        subvert_slice = graph_mapper.get_subvertex_slice(subvertex)
+
+        spike_history_region_sz = self.get_spike_buffer_size(subvert_slice)
 
         spec.comment("\n*** Spec for SpikeSourceArray Instance ***\n\n")
 
@@ -309,7 +313,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         spec.comment("\nReserving memory space for spike data region:\n\n")
 
         num_neurons, table_entries, spike_blocks, spike_region_size = \
-            self.process_spike_array_info(subvertex)
+            self.process_spike_array_info(subvertex, graph_mapper)
         if spike_region_size == 0:
             spike_region_size = 4
 
@@ -340,23 +344,24 @@ class SpikeSourceArray(AbstractSpikeSource):
         return binary_name
 
     #inhirrted from partitionable vertex
-    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
-        n_atoms = (hi_atom - lo_atom) + 1
+    def get_cpu_usage_for_atoms(self, vertex_slice):
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
-        spike_dict = self.get_spikes_per_timestep(lo_atom, hi_atom)
+    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
+        spike_dict = self.get_spikes_per_timestep(vertex_slice)
         no_active_timesteps = len(spike_dict.keys())
         spike_block_row_length = self.get_spike_block_row_length(
-            ((hi_atom - lo_atom) + 1))
+            ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1))
         spike_region_sz = self.get_spike_region_bytes(spike_block_row_length,
                                                       no_active_timesteps)
         block_index_region_size = \
             self.get_block_index_bytes(no_active_timesteps)
-        spike_history_region_sz = self.get_spike_buffer_size(lo_atom, hi_atom)
+
+        spike_history_region_sz = self.get_spike_buffer_size(vertex_slice)
         return (constants.SETUP_SIZE + spike_region_sz + block_index_region_size
                 + spike_history_region_sz)
 
-    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
-        n_atoms = (hi_atom - lo_atom) + 1
+    def get_dtcm_usage_for_atoms(self, vertex_slice):
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms

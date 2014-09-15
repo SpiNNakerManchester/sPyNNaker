@@ -1,6 +1,9 @@
 from spynnaker.pyNN.utilities import utility_calls
+from abc import ABCMeta
+from six import add_metaclass
 
 
+@add_metaclass(ABCMeta)
 class AbstractIzhikevichVertex(object):
 
     def __init__(self, n_neurons, a=0.02, c=-65.0, b=0.2, d=2.0, i_offset=0,

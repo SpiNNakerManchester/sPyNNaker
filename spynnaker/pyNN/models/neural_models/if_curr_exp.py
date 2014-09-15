@@ -50,8 +50,8 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
         IFCurrentExponentialPopulation.\
             _model_based_max_atoms_per_core = new_value
 
-    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
-        return 782 * ((hi_atom - lo_atom) + 1)
+    def get_cpu_usage_for_atoms(self, vertex_slice):
+        return 782 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
     def get_parameters(self):
         """

@@ -100,8 +100,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                 * constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
-                           routing_info, hostname, graph_sub_graph_mapper,
-                           report_folder):
+                           routing_info, hostname, graph_mapper, report_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
@@ -119,10 +118,13 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         # Reserve SDRAM space for memory areas:
 
         delay_params_header_words = 3
-        n_atoms = subvertex.hi_atom - subvertex.lo_atom + 1
+
+        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+
+        n_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         block_len_words = int(ceil(n_atoms / 32.0))
         num_delay_blocks, delay_blocks = self.get_delay_blocks(
-            subvertex, sub_graph, graph_sub_graph_mapper)
+            subvertex, sub_graph, graph_mapper)
         delay_params_sz = 4 * (delay_params_header_words
                                + (num_delay_blocks * block_len_words))
 
@@ -178,11 +180,12 @@ class DelayExtensionVertex(AbstractRecordableVertex,
 
             # Loop through each possible delay block
             dest = subedge.post_subvertex
+            source_vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            dest_vertex_slice = graph_mapper.get_subvertex_slice(dest)
             synapse_list = \
                 graph_mapper.get_edge_from_subedge(subedge)\
-                .get_synaptic_data().create_atom_sublist(
-                    subvertex.lo_atom, subvertex.hi_atom, dest.lo_atom,
-                    dest.hi_atom)
+                .get_synaptic_data().create_atom_sublist(source_vertex_slice,
+                                                         dest_vertex_slice)
             for b in range(constants.MAX_DELAY_BLOCKS):
                 min_delay = (b * self._max_delay_per_neuron) + 1
                 max_delay = min_delay + self._max_delay_per_neuron
@@ -243,16 +246,16 @@ class DelayExtensionVertex(AbstractRecordableVertex,
             spec.write_array(array_values=delay_block[i])
 
     #inhirrted from partitoionable vertex
-    def get_cpu_usage_for_atoms(self, lo_atom, hi_atom):
-        n_atoms = (hi_atom - lo_atom) + 1
+    def get_cpu_usage_for_atoms(self, vertex_slice):
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
 
-    def get_sdram_usage_for_atoms(self, lo_atom, hi_atom, vertex_in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
          # TODO: Fill this in
         return 0
 
-    def get_dtcm_usage_for_atoms(self, lo_atom, hi_atom):
-        n_atoms = (hi_atom - lo_atom) + 1
+    def get_dtcm_usage_for_atoms(self, vertex_slice):
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms
 
     def get_binary_file_name(self):

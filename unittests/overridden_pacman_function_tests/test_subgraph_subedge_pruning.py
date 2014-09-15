@@ -1,6 +1,6 @@
 import unittest
-from spynnaker.pyNN.overridden_pacman_functions.subgraph_subedge_pruning \
-    import SubgraphSubedgePruning
+from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
+    import GraphEdgeFilter
 
 
 class MyTestCase(unittest.TestCase):

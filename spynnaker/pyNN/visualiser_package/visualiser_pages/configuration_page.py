@@ -22,7 +22,7 @@ class ConfigPage(AbstractPage):
 
     def __init__(self, vertex_mapper, visualiser_vertexes, graph,
                  container, transciever, has_board, sim_runtime,
-                 machine_time_step, subgraph, placements):
+                 machine_time_step, subgraph, placements, graph_mapper):
         AbstractPage.__init__(self)
         self._vertex_mapper = vertex_mapper
         self._drop_box_mapper = dict()
@@ -37,6 +37,7 @@ class ConfigPage(AbstractPage):
         self._sim_run_time = sim_runtime
         self._machine_time_step = machine_time_step
         self._subgraph = subgraph
+        self._graph_mapper = graph_mapper
         self._placements = placements
 
         #get vertexes which are set to record
@@ -278,7 +279,8 @@ class ConfigPage(AbstractPage):
                                 data['v'], raster_plot_x_scope,
                                 raster_plot_do_fading, self._sim_run_time,
                                 self._machine_time_step, self._transciever,
-                                self._has_board, merged=False)
+                                self._has_board, self._graph_mapper,
+                                merged=False)
                         self._vertex_mapper[data['v']] = raster_page
                     else:
                         pass  # page already exists
@@ -286,7 +288,8 @@ class ConfigPage(AbstractPage):
                     raster_page = RasterPage(
                         data['v'], raster_plot_x_scope, raster_plot_do_fading,
                         self._sim_run_time, self._machine_time_step,
-                        self._transciever, self._has_board, merged=False)
+                        self._transciever, self._has_board, self._graph_mapper,
+                        merged=False)
                     self._vertex_mapper[data['v']] = raster_page
             elif selected == self.MERGED_RASTER_TEXT:  # merged
                 if data['v'] in self._vertex_mapper.keys():
@@ -308,7 +311,8 @@ class ConfigPage(AbstractPage):
                                 data['v'], raster_plot_x_scope,
                                 raster_plot_do_fading, self._sim_run_time,
                                 self._machine_time_step, self._transciever,
-                                self._has_board, merged=True)
+                                self._has_board, self._graph_mapper,
+                                merged=True)
                             self._vertex_mapper[data['v']] = raster_page
                 else:  # no page set currently for the vertex,
                 # locate any merged page and add it to it
@@ -324,7 +328,7 @@ class ConfigPage(AbstractPage):
                             data['v'], raster_plot_x_scope,
                             raster_plot_do_fading, self._sim_run_time,
                             self._machine_time_step, self._transciever,
-                            self._has_board, merged=True)
+                            self._has_board, self._graph_mapper, merged=True)
                         self._vertex_mapper[data['v']] = raster_page
             else:  # not set
                 if data['v'] in self._vertex_mapper.keys():
@@ -356,14 +360,16 @@ class ConfigPage(AbstractPage):
                     retina_page = \
                         TopologicalPage(vertex, retina_drop_off_theshold,
                                         self._subgraph, self._placements,
-                                        self._has_board, self._transciever)
+                                        self._has_board, self._transciever,
+                                        graph_mapper=self._graph_mapper)
                     self._vertex_mapper[vertex] = retina_page
                 else:
                     #create a topological view
                     retina_page = \
                         TopologicalPage(vertex, retina_drop_off_theshold,
                                         self._subgraph, self._placements,
-                                        self._has_board, self._transciever)
+                                        self._has_board, self._transciever,
+                                        graph_mapper=self._graph_mapper)
                     #update tracker
                     self._vertex_mapper[vertex] = retina_page
         except ValueError:
@@ -397,14 +403,16 @@ class ConfigPage(AbstractPage):
                     retina_page =\
                         TopologicalPage(vertex, retina_drop_off_theshold,
                                         self._subgraph, self._placements,
-                                        self._has_board, self._transciever)
+                                        self._has_board, self._transciever,
+                                        self._graph_mapper)
                     self._vertex_mapper[vertex] = retina_page
                 else:
                     #create a topological view
                     retina_page = \
                         TopologicalPage(vertex, retina_drop_off_theshold,
                                         self._subgraph, self._placements,
-                                        self._has_board, self._transciever)
+                                        self._has_board, self._transciever,
+                                        self._graph_mapper)
                     #update tracker
                     self._vertex_mapper[vertex] = retina_page
         except ValueError:
