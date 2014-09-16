@@ -95,6 +95,8 @@ class AbstractSynapticManager(object):
 
             # Write the size of the fixed parts
             spec.comment("\nWriting fixed region for row {}".format(row_no))
+            #spec.write_value(data=len(fixed_plastic_region))
+            #spec.write_value(data=len(fixed_fixed_region))
             spec.write_value(data=len(fixed_fixed_region))
             spec.write_value(data=len(fixed_plastic_region))
             words_written += 2

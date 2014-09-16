@@ -334,7 +334,7 @@ class Population(object):
         new_entry_for_vinit = {'v_init': distribution}
         self._parameters.update(new_entry_for_vinit)
 
-    def record(self, to_file=None, focus=None,
+    def record(self, to_file=None, focus=None, live_record=False,
                visualiser_mode=visualiser_constants.RASTER,
                visualiser_2d_dimension=None, visualiser_raster_seperate=None,
                visualiser_no_colours=None, visualiser_average_period_tics=None,
@@ -362,10 +362,14 @@ class Population(object):
                 visualiser_update_screen_in_tics, visualiser_reset_counters,
                 visualiser_reset_counter_period, self._vertex)
             self._spinnaker.add_visualiser_vertex(visualiser_vertex)
+
+        # set the file to store the spikes in once retrieved
         self._record_spike_file = to_file
 
-        # add an edge to the monitor
-        self._spinnaker.add_edge_to_recorder_vertex(self._vertex)
+        if (conf.config.getboolean("Recording", "send_live_spikes") and
+                live_record):
+            # add an edge to the monitor
+            self._spinnaker.add_edge_to_recorder_vertex(self._vertex)
 
     def record_gsyn(self, to_file=None):
         """

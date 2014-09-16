@@ -98,7 +98,7 @@ void sdp_packet_callback(uint mailbox, uint port)
 }
 
 bool multicast_source_data_filled(address_t base_address) {
-	address_t region_address = region_start(2, base_address);
+	address_t region_address = region_start(1, base_address);
 	schedule_size = region_address[0] >> 2;
 
 	// Allocate the space for the schedule

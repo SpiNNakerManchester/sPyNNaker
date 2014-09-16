@@ -67,7 +67,7 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            graph_mapper=graph_mapper, placements=placements, txrx=txrx,
+            graph_mapper=graph_mapper, placements=placements, transciever=txrx,
             compatible_output=compatible_output,
             sub_vertex_out_spike_bytes_function=
             sub_vertex_out_spike_bytes_function,

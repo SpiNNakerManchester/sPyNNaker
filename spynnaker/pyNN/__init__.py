@@ -77,7 +77,10 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
     import STDPMechanism
 
 #constraints
-
+from pacman.model.constraints.placer_chip_and_core_constraint \
+    import PlacerChipAndCoreConstraint
+from pacman.model.constraints.partitioner_maximum_size_constraint \
+    import PartitionerMaximumSizeConstraint
 
 #traditional logger
 logger = logging.getLogger(__name__)
@@ -194,6 +197,11 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     else:
         raise Exception("{} is not a AbstractConstrainedVertex type"
                         .format(neuron_type))
+
+
+def activate_live_recording_for(population):
+    global _spinnaker
+    _spinnaker.add_edge_to_recorder_vertex(population._vertex)
 
 
 # noinspection PyPep8Naming

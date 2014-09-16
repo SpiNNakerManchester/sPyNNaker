@@ -151,7 +151,7 @@ void timer_callback (uint unused0, uint unused1)
 }
 
 bool robot_source_data_filled(address_t base_address) {
-	address_t region_address = region_start(2, base_address);
+	address_t region_address = region_start(1, base_address);
 	log_info("Reading data from 0x%.8x", region_address);
 	key = region_address[0];
 	speed = region_address[1];

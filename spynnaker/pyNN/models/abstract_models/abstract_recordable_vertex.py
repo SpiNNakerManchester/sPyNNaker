@@ -63,7 +63,7 @@ class AbstractRecordableVertex(object):
         return self._record
 
     def _get_spikes(
-            self, graph_mapper, placements, txrx, compatible_output, 
+            self, graph_mapper, placements, transciever, compatible_output,
             spike_recording_region, sub_vertex_out_spike_bytes_function):
         """
         Return a 2-column numpy array containing cell ids and spike times for 
@@ -85,7 +85,7 @@ class AbstractRecordableVertex(object):
             
             # Get the App Data for the core
             app_data_base_address = \
-                txrx.get_cpu_information_from_core(
+                transciever.get_cpu_information_from_core(
                     x, y, p).user[0]
             
             # Get the position of the spike buffer
@@ -93,16 +93,16 @@ class AbstractRecordableVertex(object):
                 get_region_base_address_offset(app_data_base_address,
                                                spike_recording_region)
             spike_region_base_address_buf = \
-                str(list(txrx.read_memory(
+                str(list(transciever.read_memory(
                     x, y, spike_region_base_address_offset, 4))[0])
             spike_region_base_address = \
                 struct.unpack("<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
-            
+
+            aaa=list(transciever.read_memory(x, y, spike_region_base_address, 4))
             # Read the spike data size
             number_of_bytes_written_buf =\
-                str(list(txrx.
-                         read_memory(x, y, spike_region_base_address, 4))[0])
+                str(aaa[0])
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
 
@@ -122,7 +122,7 @@ class AbstractRecordableVertex(object):
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            spike_data = txrx.read_memory(
+            spike_data = transciever.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
             
             # Extract number of spike bytes from subvertex

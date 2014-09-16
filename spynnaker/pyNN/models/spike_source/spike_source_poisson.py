@@ -250,7 +250,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             lambda subvertex: int(ceil(subvertex.n_atoms / 32.0)) * 4
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            txrx=txrx, placements=placements,
+            transciever=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
             spike_recording_region=
             self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,

@@ -22,8 +22,8 @@ from data_specification.data_specification_generator import \
 class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
                       AbstractPartitionableVertex):
 
-    SYSTEM_REGION = 1
-    COMMANDS = 2
+    SYSTEM_REGION = 0
+    COMMANDS = 1
 
     CORE_APP_IDENTIFER = constants.MULTICAST_SOURCE_CORE_APPLICATION_ID
 

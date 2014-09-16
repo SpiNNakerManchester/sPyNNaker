@@ -280,7 +280,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            txrx=txrx, placements=placements,
+            transciever=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
             spike_recording_region=
             self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
