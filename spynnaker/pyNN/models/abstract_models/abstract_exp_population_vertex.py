@@ -38,7 +38,7 @@ class AbstractExponentialPopulationVertex(object):
         """
         return 1
         
-    def write_synapse_parameters(self, spec, subvertex):
+    def write_synapse_parameters(self, spec, subvertex, vertex_slice):
         """
         Write vectors of synapse parameters, one per neuron
         There is one parameter for each synapse, which is the decay constant for
@@ -52,8 +52,10 @@ class AbstractExponentialPopulationVertex(object):
         # Set the focus to the memory region 3 (synapse parameters):
         spec.switch_write_focus(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
+
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Synapse Parameters for "
-                     "{} Neurons:\n".format(subvertex.n_atoms))
+                     "{} Neurons:\n".format(n_atoms))
         
         decay_ex = numpy.exp(float(-self._machine_time_step) /
                              (1000.0 * self._tau_syn_e))
@@ -82,7 +84,7 @@ class AbstractExponentialPopulationVertex(object):
             numpy.multiply(init_in, numpy.array([float(pow(2, 32))],
                                                 dtype=float)).astype("uint32")
 
-        for atom in range(0, subvertex.n_atoms):
+        for atom in range(0, n_atoms):
             # noinspection PyTypeChecker
             if len(rescaled_decay_ex) > 1:
                 spec.write_value(data=rescaled_decay_ex[atom])
@@ -94,7 +96,7 @@ class AbstractExponentialPopulationVertex(object):
             else:
                 spec.write_value(data=rescaled_init_ex[0])
         
-        for atom in range(0, subvertex.n_atoms):
+        for atom in range(0, n_atoms):
             # noinspection PyTypeChecker
             if len(rescaled_decay_in) > 1:
                 spec.write_value(data=rescaled_decay_in[atom])

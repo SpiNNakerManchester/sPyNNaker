@@ -118,7 +118,9 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
                 str(list(txrx.
                          read_memory(x, y, v_region_base_address + 4,
                                      number_of_bytes_written))[0])
-            bytes_per_time_step = subvertex.n_atoms * 4
+            vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
+            bytes_per_time_step = n_atoms * 4
             number_of_time_steps_written = \
                 number_of_bytes_written / bytes_per_time_step
             ms_per_timestep = machine_time_step / 1000.0
@@ -132,17 +134,14 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             scale.fill(float(0x7FFF))
             
             # Add an array for time and neuron id
-            time = numpy.array([int(i / subvertex.n_atoms) * ms_per_timestep 
+            time = numpy.array([int(i / n_atoms) * ms_per_timestep
                                 for i in range(size)], dtype=numpy.float)
-            lo_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
-            hi_atom = graph_mapper.get_subvertex_slice(subvertex).hi_atom
-            n_atoms = hi_atom - lo_atom
+            lo_atom = vertex_slice.lo_atom
             neuron_id = numpy.array([int(i % n_atoms) +
                                      lo_atom for i in range(size)],
                                     dtype=numpy.uint32)
             
             # Get the values
-
             # noinspection PyNoneFunctionAssignment
             temp_value = numpy.frombuffer(v_data, dtype="<i4")
             # noinspection PyTypeChecker
@@ -211,13 +210,13 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
             placements=placements, txrx=txrx)
 
-    def get_synaptic_data(self, spinnaker, presubvertex, pre_n_atoms,
-                          postsubvertex, synapse_io):
+    def get_synaptic_data(self, presubvertex, pre_n_atoms, postsubvertex,
+                          synapse_io):
         """
         helper method to add other data for get weights via syanptic manager
         """
         return self._get_synaptic_data(
-            spinnaker, presubvertex, pre_n_atoms, postsubvertex,
+            presubvertex, pre_n_atoms, postsubvertex,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             synapse_io,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)

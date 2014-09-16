@@ -155,9 +155,11 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     def write_neuron_parameters(
             self, spec, processor_chip_x, processor_chip_y, processor_id,
-            subvertex, ring_buffer_to_input_left_shift):
+            subvertex, ring_buffer_to_input_left_shift, vertex_slice):
+
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} "
-                     "Neurons:\n".format(subvertex.n_atoms))
+                     "Neurons:\n".format(n_atoms))
 
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
@@ -172,7 +174,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.write_value(data=population_identity)
 
         # Write the number of neurons in the block:
-        spec.write_value(data=subvertex.n_atoms)
+        spec.write_value(data=n_atoms)
 
         # Write the number of parameters per neuron (struct size in words):
         params = self.get_parameters()
@@ -188,7 +190,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
-        for atom in range(0, subvertex.n_atoms):
+        for atom in range(0, n_atoms):
             # Process the parameters
 
             # noinspection PyTypeChecker
@@ -257,16 +259,15 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         ring_buffer_shift = \
             utility_calls.get_ring_buffer_to_input_left_shift(
-                subvertex, subgraph
-            )
+                subvertex, subgraph, graph_mapper)
         weight_scale = self.get_weight_scale(ring_buffer_shift)
         logger.debug("Weight scale is {}".format(weight_scale))
 
         self.write_neuron_parameters(
             spec, placement.x, placement.y, placement.p, subvertex,
-            ring_buffer_shift)
+            ring_buffer_shift, vertex_slice)
 
-        self.write_synapse_parameters(spec, subvertex)
+        self.write_synapse_parameters(spec, subvertex, vertex_slice)
 
         self.write_stdp_parameters(
             spec, subvertex, weight_scale, self._machine_time_step,

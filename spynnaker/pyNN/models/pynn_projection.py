@@ -47,6 +47,8 @@ class Projection(object):
         self._spinnaker = spinnaker_control
         self._projection_edge = None
         self._delay_edge = None
+        self._host_based_synapse_list = None
+        self._has_retrieved_synaptic_list_from_machine = False
 
         if isinstance(postsynaptic_population._get_vertex,
                       AbstractPopulationVertex):
@@ -80,7 +82,7 @@ class Projection(object):
                 presynaptic_population._get_vertex,
                 postsynaptic_population._get_vertex,
                 1000.0 / machine_time_step, synapse_type)
-        self._read_synapse_list = None
+        self._host_based_synapse_list = synapse_list
 
         # If there are some negative weights
         if synapse_list.get_min_weight() < 0:
@@ -221,33 +223,10 @@ class Projection(object):
         raise NotImplementedError
 
     def _retrieve_synaptic_data(self):
-        if self._read_synapse_list is None:
-            synapse_list = None
-            delay_synapse_list = None
-            if self._projection_edge is not None:
-                synapse_list = \
-                    self._projection_edge.get_synaptic_data(
-                        self._spinnaker.graph_mapper)
-            if self._delay_edge is not None:
-                delay_synapse_list = \
-                    self._delay_edge.get_synaptic_data(
-                        self._spinnaker.graph_mapper)
-
-            # If there is both a delay and a non-delay list, merge them
-            if synapse_list is not None and delay_synapse_list is not None:
-                rows = synapse_list.get_rows()
-                delay_rows = delay_synapse_list.get_rows()
-                for i in range(len(rows)):
-                    rows[i].append(delay_rows[i])
-                self._read_synapse_list = synapse_list
-
-            # If there is only a synapse list, return that
-            elif synapse_list is not None:
-                self._read_synapse_list = synapse_list
-            # Otherwise return the delay list (there should be at least one!)
-            else:
-                self._read_synapse_list = delay_synapse_list
-        return self._read_synapse_list
+        if (self._spinnaker.has_ran and not
+                self._has_retrieved_synaptic_list_from_machine):
+            self._retrieve_synaptic_data_from_machine()
+        return self._host_based_synapse_list
 
     # noinspection PyPep8Naming
     def getDelays(self, list_format='list', gather=True):
@@ -266,15 +245,17 @@ class Projection(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        if self._read_synapse_list is None:
-            self._retrieve_synaptic_data()
-        synapse_list = self._read_synapse_list
+
+        if (self._spinnaker.has_ran and not
+                self._has_retrieved_synaptic_list_from_machine):
+            self._retrieve_synaptic_data_from_machine()
+
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
 
         if list_format == 'list':
             delays = list()
-            for row in synapse_list.get_rows():
+            for row in self._host_based_synapse_list.get_rows():
                 delays.extend(
                     numpy.asarray(
                         row.delays * (
@@ -284,7 +265,7 @@ class Projection(object):
 
         delays = numpy.zeros((self._projection_edge.pre_vertex.n_atoms,
                               self._projection_edge.post_vertex.n_atoms))
-        rows = synapse_list.get_rows()
+        rows = self._host_based_synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]
             for i in xrange(len(row.target_indices)):
@@ -324,25 +305,23 @@ class Projection(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
-        if self._read_synapse_list is None and self._spinnaker.has_ran:
-            self._retrieve_synaptic_data()
-            synapse_list = self._read_synapse_list
-        else:
-            synapse_list = \
-                self._projection_edge.get_synaptic_data(
-                    self._spinnaker.graph_mapper)
+
+        if (self._spinnaker.has_ran and not
+                self._has_retrieved_synaptic_list_from_machine):
+            self._retrieve_synaptic_data_from_machine()
+
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
 
         if list_format == 'list':
             weights = list()
-            for row in synapse_list.get_rows():
+            for row in self._host_based_synapse_list.get_rows():
                 weights.extend(row.weights)
             return weights
 
         weights = numpy.zeros((self._projection_edge.pre_vertex.n_atoms,
                                self._projection_edge.post_vertex.n_atoms))
-        rows = synapse_list.get_rows()
+        rows = self._host_based_synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]
             for i in xrange(len(row.target_indices)):
@@ -397,6 +376,39 @@ class Projection(object):
         returns a string rep of the projection
         """
         return "projection {}".format(self._projection_edge.label)
+
+    def _retrieve_synaptic_data_from_machine(self):
+        synapse_list = None
+        delay_synapse_list = None
+        if self._projection_edge is not None:
+
+            synapse_list = \
+                self._projection_edge.get_synaptic_list_from_machine(
+                    graph_mapper=self._spinnaker.graph_mapper,
+                    partitioned_graph=self._spinnaker.partitioned_graph,
+                    placements=self._spinnaker.placements,
+                    transceiver=self._spinnaker.transceiver)
+        if self._delay_edge is not None:
+            delay_synapse_list = \
+                self._delay_edge.get_synaptic_list_from_machine(
+                    self._spinnaker.graph_mapper,
+                    self._spinnaker.placements,
+                    self._spinnaker.transceiver,
+                    self._spinnaker.partitioned_graph)
+
+        # If there is both a delay and a non-delay list, merge them
+        if synapse_list is not None and delay_synapse_list is not None:
+            rows = synapse_list.get_rows()
+            delay_rows = delay_synapse_list.get_rows()
+            for i in range(len(rows)):
+                rows[i].append(delay_rows[i])
+            self._host_based_synapse_list = synapse_list
+        # If there is only a synapse list, return that
+        elif synapse_list is not None:
+            self._host_based_synapse_list = synapse_list
+        # Otherwise return the delay list (there should be at least one!)
+        else:
+            self._host_based_synapse_list = delay_synapse_list
 
     #noinspection PyPep8Naming
     def saveConnections(self, file_name, gather=True, compatible_output=True):

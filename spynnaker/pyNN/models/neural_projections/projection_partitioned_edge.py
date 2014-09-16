@@ -15,27 +15,15 @@ class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
         """
         Gets the synapse list for this subedge
         """
-        pre_sub_lo = \
-            graph_mapper.get_subvertex_slice(self._pre_subvertex).lo_atom
-        pre_sub_hi = \
-            graph_mapper.get_subvertex_slice(self._pre_subvertex).hi_atom
-        post_sub_lo = \
-            graph_mapper.get_subvertex_slice(self._post_subvertex).lo_atom
-        post_sub_hi = \
-            graph_mapper.get_subvertex_slice(self._post_subvertex).hi_atom
+        pre_vertex_slice = \
+            graph_mapper.get_subvertex_slice(self._pre_subvertex)
+        post_vertex_slice = \
+            graph_mapper.get_subvertex_slice(self._post_subvertex)
         if self._synapse_sublist is None:
             self._synapse_sublist = \
-                self._associated_edge.get_synaptic_data().create_atom_sublist(
-                    pre_sub_lo, pre_sub_hi, post_sub_lo, post_sub_hi)
+                self._associated_edge.synapse_list.create_atom_sublist(
+                    pre_vertex_slice, post_vertex_slice)
         return self._synapse_sublist
-    
-    def get_synaptic_data(self, graph_mapper, min_delay):
-        """
-        Get synaptic data for all connections in this Projection.
-        """
-        return self._post_subvertex.vertex.get_synaptic_data(
-            graph_mapper, self._pre_subvertex, self._pre_subvertex.n_atoms,
-            self._post_subvertex, self._associated_edge.synapse_row_io)
     
     def free_sublist(self):
         """

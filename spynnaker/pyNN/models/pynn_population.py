@@ -175,7 +175,7 @@ class Population(object):
             timer = Timer()
             timer.start_timing()
         spikes = self._vertex.get_spikes(
-            has_ran=self._spinnaker.has_ran, txrx=self._spinnaker.txrx,
+            has_ran=self._spinnaker.has_ran, txrx=self._spinnaker.transceiver,
             placements=self._spinnaker.placements,
             graph_mapper=self._spinnaker.graph_mapper,
             compatible_output=compatible_output)
@@ -201,7 +201,9 @@ class Population(object):
             timer = Timer()
             timer.start_timing()
         gsyn = self._vertex.get_gsyn(
-            has_ran=self._spinnaker.has_ran, txrx=self._spinnaker.txrx,
+            has_ran=self._spinnaker.has_ran,
+            txrx=self._spinnaker.transceiver,
+            placements=self._spinnaker.placements,
             machine_time_step=self._spinnaker.machine_time_step,
             graph_mapper=self._spinnaker.graph_mapper,
             compatible_output=compatible_output)
@@ -225,7 +227,9 @@ class Population(object):
             timer = Timer()
             timer.start_timing()
         v = self._vertex.get_v(
-            has_ran=self._spinnaker.has_ran, txrx=self._spinnaker.txrx,
+            has_ran=self._spinnaker.has_ran,
+            txrx=self._spinnaker.transceiver,
+            placements=self._spinnaker.placements,
             machine_time_step=self._spinnaker.machine_time_step,
             graph_mapper=self._spinnaker.graph_mapper,
             compatible_output=compatible_output)

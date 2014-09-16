@@ -141,7 +141,8 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
         self.write_delay_parameters(spec, placement.x, placement.y, placement.p,
-                                    subvertex, num_delay_blocks, delay_blocks)
+                                    subvertex, num_delay_blocks, delay_blocks,
+                                    vertex_slice)
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
@@ -165,7 +166,10 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
         # Create empty list of words to fill in with delay data:
-        num_words_per_row = int(ceil(subvertex.n_atoms / 32.0))
+        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
+
+        num_words_per_row = int(ceil(n_atoms / 32.0))
         one_block = [0] * num_words_per_row
         delay_block = list()
         num_delay_blocks = 0
@@ -183,14 +187,12 @@ class DelayExtensionVertex(AbstractRecordableVertex,
             source_vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
             dest_vertex_slice = graph_mapper.get_subvertex_slice(dest)
             synapse_list = \
-                graph_mapper.get_edge_from_subedge(subedge)\
-                .get_synaptic_data().create_atom_sublist(source_vertex_slice,
-                                                         dest_vertex_slice)
+                graph_mapper.get_edge_from_subedge(subedge).synapse_list.\
+                create_atom_sublist(source_vertex_slice, dest_vertex_slice)
             for b in range(constants.MAX_DELAY_BLOCKS):
                 min_delay = (b * self._max_delay_per_neuron) + 1
                 max_delay = min_delay + self._max_delay_per_neuron
-                delay_list = synapse_list.get_delay_sublist(min_delay,
-                                                            max_delay)
+                delay_list = synapse_list.get_delay_sublist(min_delay, max_delay)
                 row_count = 0
                 for row in delay_list:
                     if len(row.target_indices) != 0:
@@ -214,14 +216,16 @@ class DelayExtensionVertex(AbstractRecordableVertex,
 
     def write_delay_parameters(self, spec, processor_chip_x, processor_chip_y,
                                processor_id, subvertex, num_delay_blocks,
-                               delay_block):
+                               delay_block, vertex_slice):
         """
         Generate Delay Parameter data (region 2):
         """
 
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
+
         # Write spec with commands to construct required delay region:
         spec.comment("\nWriting Delay Parameters for {} Neurons:\n"
-                     .format(subvertex.n_atoms))
+                     .format(n_atoms))
 
         # Set the focus to the memory region 2 (delay parameters):
         spec.switch_write_focus(
@@ -236,7 +240,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         spec.write_value(data=population_identity)
 
         # Write the number of neurons in the block:
-        spec.write_value(data=subvertex.n_atoms)
+        spec.write_value(data=n_atoms)
 
         # Write the number of blocks of delays:
         spec.write_value(data=num_delay_blocks)

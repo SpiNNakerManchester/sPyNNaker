@@ -19,8 +19,16 @@ class DelayProjectionEdge(ProjectionPartitionableEdge):
             self, prevertex, postvertex, machine_time_step, connector=connector,
             synapse_list=synapse_list, synapse_dynamics=synapse_dynamics,
             label=label)
-        self.num_delay_stages = num_delay_stages
-        self.max_delay_per_neuron = max_delay_per_neuron
+        self._num_delay_stages = num_delay_stages
+        self._max_delay_per_neuron = max_delay_per_neuron
+
+    @property
+    def num_delay_stages(self):
+        return self._num_delay_stages
+
+    @property
+    def max_delay_per_neuron(self):
+        return self._max_delay_per_neuron
         
     def get_max_n_words(self, lo_atom=None, hi_atom=None):
         """
@@ -42,7 +50,7 @@ class DelayProjectionEdge(ProjectionPartitionableEdge):
         """
         n_atoms = self._pre_vertex.get_max_atoms_per_core()
         return ((self._synapse_list.get_n_rows() / n_atoms) *
-                self._DELAY_PAGE_SIZE * self.num_delay_stages)
+                self._DELAY_PAGE_SIZE * self._num_delay_stages)
     
     def create_subedge(self, presubvertex, postsubvertex, label=None):
         """

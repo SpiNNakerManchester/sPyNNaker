@@ -474,21 +474,23 @@ class AbstractSynapticManager(object):
         spec.set_write_pointer(address=table_slot_addr)
         spec.write_value(data=new_entry, data_type=DataType.INT16)
 
-    def _get_synaptic_data(self, spinnaker, pre_subvertex, pre_n_atoms,
-                           post_subvertex, master_pop_table_region, synapse_io,
-                           synaptic_matrix_region):
+    def _get_synaptic_data_from_machine(
+            self, graph_mapper, placements, transceiver, partitioned_graph,
+            pre_subvertex, pre_n_atoms, post_subvertex, master_pop_table_region,
+            synapse_io, synaptic_matrix_region):
         """
         Get synaptic weights for a subvertex for a given projection
         """
         synaptic_block, max_row_length = \
             self._retrieve_synaptic_block(
-                spinnaker, pre_subvertex, pre_n_atoms, post_subvertex,
-                master_pop_table_region, synaptic_matrix_region)
+                graph_mapper, placements, transceiver, pre_subvertex,
+                pre_n_atoms, post_subvertex, master_pop_table_region,
+                synaptic_matrix_region)
         #translate the synaptic block into a sublist of synapse_row_infos
         synapse_list = \
             self._translate_synaptic_block_from_memory(
                 synaptic_block, pre_n_atoms, max_row_length, synapse_io,
-                post_subvertex, spinnaker.partitioned_graph)
+                post_subvertex, partitioned_graph)
 
         return synapse_list
 
@@ -566,20 +568,20 @@ class AbstractSynapticManager(object):
         return (plastic_plastic_entries, fixed_fixed_entries,
                 fixed_plastic_entries)
 
-    def _retrieve_synaptic_block(self, spinnaker, pre_subvertex, pre_n_atoms,
+    def _retrieve_synaptic_block(self, graph_mapper, placements, transceiver,
+                                 pre_subvertex, pre_n_atoms,
                                  post_subvertex, master_pop_table_region,
                                  synaptic_matrix_region):
         """
         reads in a synaptic block from a given processor and subvertex on the
         machine.
         """
-        post_placement = \
-            spinnaker.placements.get_placement_of_subvertex(post_subvertex)
+        post_placement = placements.get_placement_of_subvertex(post_subvertex)
         post_x, post_y, post_p = \
             post_placement.x, post_placement.y, post_placement.p
         # either read in the master pop table or retrieve it from storage
         master_pop_base_mem_address, app_data_base_address = \
-            self._read_in_master_pop_table(post_x, post_y, post_p, spinnaker,
+            self._read_in_master_pop_table(post_x, post_y, post_p, transceiver,
                                            master_pop_table_region)
 
         # locate address of the synaptic block
@@ -593,7 +595,7 @@ class AbstractSynapticManager(object):
         #read in the master pop entry
         master_pop_entry = \
             self._read_and_convert(pre_x, pre_y, master_table_pop_entry_address,
-                                   2, "<H", spinnaker)
+                                   2, "<H", transceiver)
 
         synaptic_block_base_address = master_pop_entry >> 3  # in kilobytes
         #convert synaptic_block_base_address into bytes from kilobytes
@@ -615,7 +617,7 @@ class AbstractSynapticManager(object):
         synapste_region_base_address = \
             self._read_and_convert(pre_x, pre_y,
                                    synapste_region_base_address_location, 4,
-                                   "<I", spinnaker)
+                                   "<I", transceiver)
         # the base address of the synaptic block in absolute terms is the app
         # base, plus the synaptic matrix base plus the offset
         synaptic_block_base_address = \
@@ -623,7 +625,7 @@ class AbstractSynapticManager(object):
             synaptic_block_base_address_offset
 
         #read in and return the synaptic block
-        block = list(spinnaker.transceiver.read_memory(
+        block = list(transceiver.read_memory(
             pre_x, pre_y, synaptic_block_base_address, synaptic_block_size))
         if len(block[0]) != synaptic_block_size:
             raise exceptions.SynapticBlockReadException(
@@ -631,7 +633,7 @@ class AbstractSynapticManager(object):
                 "(aka, something funkky happened)")
         return block, maxed_row_length
 
-    def _read_in_master_pop_table(self, x, y, p, spinnaker,
+    def _read_in_master_pop_table(self, x, y, p, transceiver,
                                   master_pop_table_region):
         """
         reads in the master pop table from a given processor on the machine
@@ -639,8 +641,8 @@ class AbstractSynapticManager(object):
         # Get the App Data base address for the core
         # (location where this cores memory starts in
         # sdram and region table)
-        app_data_base_address =\
-            spinnaker.transceiver.get_cpu_information_from_core(x, y, p).user[0]
+        app_data_base_address = \
+            transceiver.get_cpu_information_from_core(x, y, p).user[0]
 
         # Get the memory address of the master pop table region
         master_pop_region = master_pop_table_region
@@ -651,7 +653,7 @@ class AbstractSynapticManager(object):
 
         master_region_base_address_offset = \
             self._read_and_convert(x, y, master_region_base_address_address,
-                                   4, "<I", spinnaker)
+                                   4, "<I", transceiver)
 
         master_region_base_address =\
             master_region_base_address_offset + app_data_base_address
@@ -665,8 +667,7 @@ class AbstractSynapticManager(object):
         return master_region_base_address, app_data_base_address
 
     @staticmethod
-    def _read_and_convert(x, y, address, length, data_format,
-                          spinnaker):
+    def _read_and_convert(x, y, address, length, data_format, transceiver):
         """
         tries to read and convert a piece of memory. If it fails, it tries again
         up to for 4 times, and then if still fails, throws an error.
@@ -674,7 +675,7 @@ class AbstractSynapticManager(object):
         try:
             #turn byte array into str for unpack to work.
             data = \
-                str(list(spinnaker.transceiver.read_memory(
+                str(list(transceiver.read_memory(
                     x, y, address, length))[0])
             result = struct.unpack(data_format, data)[0]
             return result

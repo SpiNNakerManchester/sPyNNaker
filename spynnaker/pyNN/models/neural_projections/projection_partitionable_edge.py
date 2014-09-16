@@ -84,54 +84,51 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
         """
         return self._synapse_row_io
 
-    def get_synaptic_data(self, graph_mapper):
+    def get_synaptic_list_from_machine(
+            self, graph_mapper, placements, transceiver, partitioned_graph):
         """
-        Get synaptic data for all connections in this Projection.
-        if spinnaker == None, then just return the one stored in memory via
-         self._synapse_list
+        Get synaptic data for all connections in this Projection from the
+        machine.
         """
+
         logger.debug("Reading synapse data for edge between {} and {}"
                      .format(self._pre_vertex.label, self._post_vertex.label))
-
-        #if theres no spinnaker, assume your looking at the internal one here.
-        if graph_mapper is None:
-            return self._synapse_list
-
         min_delay = config.get("Model", "min_delay")
+        sorted_subedges = \
+            sorted(graph_mapper.get_subedges_from_edge(self),
+                   key=lambda sub_edge:
+                   (graph_mapper.get_subvertex_slice(
+                       sub_edge.pre_subvertex).lo_atom,
+                    graph_mapper.get_subvertex_slice(
+                        sub_edge.post_subvertex).lo_atom))
 
-        if graph_mapper is None:
-            return self._synapse_list
-        else:
-            sorted_subedges = \
-                sorted(graph_mapper.get_subedges_from_edge(self),
-                       key=lambda sub_edge:
-                       (graph_mapper.get_subvertex_slice(
-                           sub_edge.pre_subvertex).lo_atom,
-                        graph_mapper.get_subvertex_slice(
-                            sub_edge.post_subvertex).lo_atom))
+        synaptic_list = list()
+        last_pre_lo_atom = None
+        for subedge in sorted_subedges:
+            rows = subedge.get_synaptic_data(
+                graph_mapper, placements, transceiver, partitioned_graph,
+                min_delay).get_rows()
+            pre_lo_atom = graph_mapper.get_subvertex_slice(
+                subedge.presubvertex).lo_atom
 
-            synaptic_list = list()
-            last_pre_lo_atom = None
-            for subedge in sorted_subedges:
-                rows = subedge.get_synaptic_data(graph_mapper,
-                                                 min_delay).get_rows()
-                pre_lo_atom = graph_mapper.get_subvertex_slice(
-                    subedge.presubvertex).lo_atom
+            if ((last_pre_lo_atom is None) or
+                    (last_pre_lo_atom != pre_lo_atom)):
+                synaptic_list.extend(rows)
+                last_pre_lo_atom = pre_lo_atom
+            else:
+                for i in range(len(rows)):
+                    row = rows[i]
+                    post_lo_atom = graph_mapper.get_subvertex_slice(
+                        subedge.postsubvertex).lo_atom
+                    synaptic_list[i + last_pre_lo_atom]\
+                        .append(row, lo_atom=post_lo_atom)
 
-                if ((last_pre_lo_atom is None) or
-                        (last_pre_lo_atom != pre_lo_atom)):
-                    synaptic_list.extend(rows)
-                    last_pre_lo_atom = pre_lo_atom
-                else:
-                    for i in range(len(rows)):
-                        row = rows[i]
-                        post_lo_atom = graph_mapper.get_subvertex_slice(
-                            subedge.postsubvertex).lo_atom
-                        synaptic_list[i + last_pre_lo_atom]\
-                            .append(row, lo_atom=post_lo_atom)
-
-            return SynapticList(synaptic_list)
+        return SynapticList(synaptic_list)
 
     @property
     def synapse_dynamics(self):
         return self._synapse_dynamics
+
+    @property
+    def synapse_list(self):
+        return self._synapse_list

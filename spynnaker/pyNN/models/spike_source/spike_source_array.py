@@ -126,8 +126,9 @@ class SpikeSourceArray(AbstractSpikeSource):
         time_keys.sort()
 
         # Calculate how big the spike rows will be:
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spike_block_row_length = \
-            self.get_spike_block_row_length(subvertex.n_atoms)
+            self.get_spike_block_row_length(n_atoms)
         spike_region_size = self.get_spike_region_bytes(spike_block_row_length,
                                                         len(time_keys))
         
@@ -147,7 +148,7 @@ class SpikeSourceArray(AbstractSpikeSource):
             # Add the spike block for this time step to the spike blocks list:
             spike_blocks.append(current_spike_block)
             spike_block_start_addr += spike_block_row_length
-        return subvertex.n_atoms, table_entries, spike_blocks, spike_region_size
+        return n_atoms, table_entries, spike_blocks, spike_region_size
 
     def reserve_memory_regions(self, spec, setup_sz, block_index_region_size,
                                spike_region_size, spike_hist_buff_sz):

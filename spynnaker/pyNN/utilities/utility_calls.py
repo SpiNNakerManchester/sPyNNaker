@@ -39,12 +39,15 @@ def get_region_base_address_offset(app_data_base_address, region):
     return app_data_base_address + 16 + region * 4
 
 
-def get_ring_buffer_to_input_left_shift(subvertex, sub_graph):
+def get_ring_buffer_to_input_left_shift(subvertex, sub_graph, graph_mapper):
+
     in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
-    total_exc_weights = numpy.zeros(subvertex.n_atoms)
-    total_inh_weights = numpy.zeros(subvertex.n_atoms)
+    vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+    n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1  # do to starting at zero
+    total_exc_weights = numpy.zeros(n_atoms)
+    total_inh_weights = numpy.zeros(n_atoms)
     for subedge in in_sub_edges:
-        sublist = subedge.get_synapse_sublist()
+        sublist = subedge.get_synapse_sublist(graph_mapper)
         sublist.sum_weights(total_exc_weights, total_inh_weights)
 
     max_weight = max((max(total_exc_weights), max(total_inh_weights)))
