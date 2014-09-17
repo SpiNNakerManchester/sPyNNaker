@@ -7,6 +7,7 @@ from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.utilities import constants
 import logging
 logger = logging.getLogger(__name__)
 
@@ -105,12 +106,21 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
         synaptic_list = list()
         last_pre_lo_atom = None
         for subedge in sorted_subedges:
-            rows = subedge.get_synaptic_data(
-                graph_mapper, placements, transceiver, partitioned_graph,
-                min_delay).get_rows()
-            pre_lo_atom = graph_mapper.get_subvertex_slice(
-                subedge.presubvertex).lo_atom
+            vertex_slice = \
+                graph_mapper.get_subvertex_slice(subedge.pre_subvertex)
+            pre_n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
 
+            rows = \
+                subedge.post_subvertex.\
+                get_synaptic_list_from_machine(
+                    placements, transceiver, subedge.pre_subvertex, pre_n_atoms,
+                    subedge.post_subvertex,
+                    constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
+                    constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+                    self._synapse_row_io, partitioned_graph, graph_mapper)\
+                .get_rows()
+
+            pre_lo_atom = vertex_slice.lo_atom
             if ((last_pre_lo_atom is None) or
                     (last_pre_lo_atom != pre_lo_atom)):
                 synaptic_list.extend(rows)

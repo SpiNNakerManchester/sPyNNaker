@@ -476,29 +476,27 @@ class AbstractSynapticManager(object):
         spec.set_write_pointer(address=table_slot_addr)
         spec.write_value(data=new_entry, data_type=DataType.INT16)
 
-    def _get_synaptic_data_from_machine(
-            self, graph_mapper, placements, transceiver, partitioned_graph,
-            pre_subvertex, pre_n_atoms, post_subvertex, master_pop_table_region,
-            synapse_io, synaptic_matrix_region):
-        """
-        Get synaptic weights for a subvertex for a given projection
-        """
+    def get_synaptic_list_from_machine(
+            self, placements, transceiver, pre_subvertex, pre_n_atoms,
+            post_subvertex, master_pop_table_region, synaptic_matrix_region,
+            synapse_io, subgraph, graph_mapper):
+
         synaptic_block, max_row_length = \
             self._retrieve_synaptic_block(
-                graph_mapper, placements, transceiver, pre_subvertex,
-                pre_n_atoms, post_subvertex, master_pop_table_region,
-                synaptic_matrix_region)
+                placements, transceiver, pre_subvertex, pre_n_atoms,
+                post_subvertex, master_pop_table_region, synaptic_matrix_region)
         #translate the synaptic block into a sublist of synapse_row_infos
         synapse_list = \
             self._translate_synaptic_block_from_memory(
                 synaptic_block, pre_n_atoms, max_row_length, synapse_io,
-                post_subvertex, partitioned_graph)
+                post_subvertex, subgraph, graph_mapper)
 
         return synapse_list
 
     def _translate_synaptic_block_from_memory(self, synaptic_block, n_atoms,
                                               max_row_length, synapse_io,
-                                              post_subvertex, sub_graph):
+                                              post_subvertex, sub_graph,
+                                              graph_mapper):
         """
         translates a collection of memory into synaptic rows
         """
@@ -511,7 +509,7 @@ class AbstractSynapticManager(object):
             # create a synaptic_row from the 3 entries
             ring_buffer_shift = \
                 utility_calls.get_ring_buffer_to_input_left_shift(
-                    post_subvertex, sub_graph)
+                    post_subvertex, sub_graph, graph_mapper)
 
             weight_scale = self.get_weight_scale(ring_buffer_shift)
             bits_reserved_for_type = self.get_n_synapse_type_bits()
@@ -570,7 +568,7 @@ class AbstractSynapticManager(object):
         return (plastic_plastic_entries, fixed_fixed_entries,
                 fixed_plastic_entries)
 
-    def _retrieve_synaptic_block(self, graph_mapper, placements, transceiver,
+    def _retrieve_synaptic_block(self, placements, transceiver,
                                  pre_subvertex, pre_n_atoms,
                                  post_subvertex, master_pop_table_region,
                                  synaptic_matrix_region):
@@ -587,8 +585,7 @@ class AbstractSynapticManager(object):
                                            master_pop_table_region)
 
         # locate address of the synaptic block
-        pre_placement = \
-            spinnaker.placements.get_placement_of_subvertex(pre_subvertex)
+        pre_placement = placements.get_placement_of_subvertex(pre_subvertex)
         pre_x, pre_y, pre_p = pre_placement.x, pre_placement.y, pre_placement.p
         table_slot_addr = packet_conversions.\
             get_mpt_sb_mem_addrs_from_coords(pre_x, pre_y, pre_p)
