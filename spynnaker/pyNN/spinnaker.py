@@ -25,6 +25,7 @@ from spinn_machine.chip import Chip
 
 
 #internal imports
+from spinnman.messages.scp.scp_signal import SCPSignal
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.utility_models.multicastsource import MultiCastSource
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
@@ -494,3 +495,12 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             processors=processors, router=router_object, sdram=sdram_object,
             x=virtual_chip_constraint.virtual_chip_coords['x'],
             y=virtual_chip_constraint.virtual_chip_coords['y'], virtual=True)
+
+    def stop(self, app_id, stop_on_board=True):
+        if stop_on_board:
+            self._txrx.send_signal(app_id, SCPSignal.STOP)
+            for router_table in self._router_tables:
+                self._txrx.clear_multicast_routes(router_table.x,
+                                                  router_table.y)
+        if conf.config.getboolean("Visualiser", "enable"):
+            self._visualiser.stop()

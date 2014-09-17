@@ -133,8 +133,7 @@ class SpynnakerCommsFunctions(object):
     def _chip_based_data_specificiation_execution(self, hostname):
         raise NotImplementedError
 
-    @staticmethod
-    def host_based_data_specificiation_execution(hostname, placements,
+    def host_based_data_specificiation_execution(self, hostname, placements,
                                                  graph_mapper):
         space_based_memory_tracker = dict()
         processor_to_app_data_base_address = dict()
@@ -166,12 +165,30 @@ class SpynnakerCommsFunctions(object):
                     current_memory_available = \
                         space_based_memory_tracker[memory_tracker_key]
 
+                #generate a file writer for dse report (app pointer table)
+                report_writer = None
+                if conf.config.getboolean("Reports", "writeTextSpecs"):
+                    new_report_directory = \
+                        os.path.join(self._report_default_directory,
+                                     "data_spec_text_files")
+
+                if not os.path.exists(new_report_directory):
+                    os.mkdir(new_report_directory)
+
+                file_name = "{}_DSE_report_for_{}_{}_{}.txt"\
+                            .format(hostname, placement.x, placement.y,
+                                    placement.p)
+                report_file_path = os.path.join(new_report_directory, file_name)
+                report_writer = FileDataWriter(report_file_path)
+
                 #generate data spec exeuctor
                 host_based_data_spec_exeuctor = DataSpecificationExecutor(
-                    data_spec_reader, data_writer, current_memory_available)
+                    data_spec_reader, data_writer, current_memory_available,
+                    report_writer)
 
                 #update memory calc and run data spec executor
-                bytes_used_by_spec = host_based_data_spec_exeuctor.execute()
+                bytes_used_by_spec, bytes_written_by_spec = \
+                    host_based_data_spec_exeuctor.execute()
 
                 #update base address mapper
                 processor_mapping_key = \
@@ -180,7 +197,8 @@ class SpynnakerCommsFunctions(object):
                     {'start_address':
                         ((SDRAM.DEFAULT_SDRAM_BYTES - current_memory_available)
                          + constants.SDRAM_BASE_ADDR),
-                     'memory_used': bytes_used_by_spec}
+                     'memory_used': bytes_used_by_spec,
+                     'memory_written': bytes_written_by_spec}
 
                 space_based_memory_tracker[memory_tracker_key] = \
                     current_memory_available - bytes_used_by_spec
@@ -190,15 +208,6 @@ class SpynnakerCommsFunctions(object):
         #close the progress bar
         progress_bar.end()
         return processor_to_app_data_base_address
-
-    def stop(self, app_id, stop_on_board=True):
-        if stop_on_board:
-            self._txrx.send_signal(app_id, SCPSignal.STOP)
-            for router_table in self._router_tables:
-                self._txrx.clear_multicast_routes(router_table.x,
-                                                  router_table.y)
-        if conf.config.getboolean("Visualiser", "enable"):
-            self._visualiser.stop()
 
     def _start_execution_on_machine(self, executable_targets, app_id, runtime):
         #deduce how many processors this application uses up
@@ -375,24 +384,27 @@ class SpynnakerCommsFunctions(object):
                     placement.subvertex)
 
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
-                logger.debug("loading application data for vertex {}".format(associated_vertex.label))
+                logger.debug("loading application data for vertex {}"
+                             .format(associated_vertex.label))
                 key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
                 start_address = \
                     processor_to_app_data_base_address[key]['start_address']
-                memory_used = \
-                    processor_to_app_data_base_address[key]['memory_used']
+                memory_written = \
+                    processor_to_app_data_base_address[key]['memory_written']
                 file_path_for_application_data = \
                     associated_vertex.get_application_data_file_path(
                         placement.x, placement.y, placement.p, hostname)
                 application_data_file_reader = \
                     SpinnmanFileDataReader(file_path_for_application_data)
-                logger.debug("writing application data for vertex {}".format(associated_vertex.label))
+                logger.debug("writing application data for vertex {}"
+                             .format(associated_vertex.label))
                 self._txrx.write_memory(placement.x, placement.y, start_address,
                                         application_data_file_reader,
-                                        memory_used)
+                                        memory_written)
                 #update user 0 so that it points to the start of the \
                 # applications data region on sdram
-                logger.debug("writing user 0 address for vertex {}".format(associated_vertex.label))
+                logger.debug("writing user 0 address for vertex {}"
+                             .format(associated_vertex.label))
                 user_o_register_address = \
                     self._txrx.get_user_0_register_address_from_core(
                         placement.x, placement.y, placement.p)
@@ -411,7 +423,7 @@ class SpynnakerCommsFunctions(object):
                                  "application_data_file_reader, {})"
                                  .format(
                                  placement.x, placement.y, start_address,
-                                 memory_used))
+                                 memory_written))
                     spinnman_reports.append_to_rerun_script(
                         conf.config.get("SpecGeneration", "Binary_folder"),
                         lines)
