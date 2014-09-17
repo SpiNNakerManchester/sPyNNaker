@@ -36,6 +36,13 @@ class AbstractRecordableVertex(object):
     def machine_time_step(self):
         return self._machine_time_step
 
+    @property
+    def is_set_to_record_spikes(self):
+        """
+        method to return if the vertex is set to be recorded
+        """
+        return self._record
+
     def record(self, focus=None):
         """
         method that sets the vertex to be recordable, as well as data on how the
@@ -54,13 +61,6 @@ class AbstractRecordableVertex(object):
                             + " without a fixed run time")
         return (constants.RECORDING_ENTRY_BYTE_SIZE +
                 (self._no_machine_time_steps * bytes_per_timestep))
-
-    @property
-    def is_set_to_record_spikes(self):
-        """
-        method to return if the vertex is set to be recorded
-        """
-        return self._record
 
     def _get_spikes(
             self, graph_mapper, placements, transciever, compatible_output,
@@ -99,10 +99,10 @@ class AbstractRecordableVertex(object):
                 struct.unpack("<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
 
-            aaa=list(transciever.read_memory(x, y, spike_region_base_address, 4))
             # Read the spike data size
             number_of_bytes_written_buf =\
-                str(aaa[0])
+                str(list(transciever.read_memory(
+                    x, y, spike_region_base_address, 4))[0])
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
 
@@ -196,3 +196,108 @@ class AbstractRecordableVertex(object):
                                       words_in_a_timer_tic))
                     spikes = numpy.append(spikes, [[current_tic, neuron_id]], 0)
         return spikes
+
+    def get_neuron_parameter(
+            self, region, compatible_output, has_ran, graph_mapper, placements,
+            txrx, machine_time_step):
+        if not has_ran:
+            raise exceptions.SpynnakerException(
+                "The simulation has not yet ran, therefore neuron param cannot "
+                "be retrieved")
+
+        value = numpy.zeros((0, 3))
+
+        # Find all the sub-vertices that this pynn_population.py exists on
+        subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        for subvertex in subvertices:
+            placment = placements.get_placement_of_subvertex(subvertex)
+            (x, y, p) = placment.x, placment.y, placment.p
+
+            # Get the App Data for the core
+            app_data_base_address = txrx.\
+                get_cpu_information_from_core(x, y, p).user[0]
+
+            # Get the position of the value buffer
+            neuron_param_region_base_address_offset = \
+                get_region_base_address_offset(app_data_base_address, region)
+            neuron_param_region_base_address_buf = str(list(txrx.read_memory(
+                x, y, neuron_param_region_base_address_offset, 4))[0])
+            neuron_param_region_base_address = \
+                struct.unpack("<I", neuron_param_region_base_address_buf)[0]
+            neuron_param_region_base_address += app_data_base_address
+
+            # Read the size
+            number_of_bytes_written_buf = \
+                str(list(txrx.read_memory(
+                    x, y, neuron_param_region_base_address, 4))[0])
+
+            number_of_bytes_written = \
+                struct.unpack_from("<I", number_of_bytes_written_buf)[0]
+
+            # Read the values
+            logger.debug("Reading {} ({}) bytes starting at {}".format(
+                number_of_bytes_written, hex(number_of_bytes_written),
+                hex(neuron_param_region_base_address + 4)))
+
+            neuron_param_region_data = txrx.read_memory(
+                x, y, neuron_param_region_base_address + 4,
+                number_of_bytes_written)
+
+            vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
+
+            bytes_per_time_step = n_atoms * 4
+
+            number_of_time_steps_written = \
+                number_of_bytes_written / bytes_per_time_step
+
+            ms_per_timestep = machine_time_step / 1000.0
+
+            logger.debug("Processing {} timesteps"
+                         .format(number_of_time_steps_written))
+
+            temp_buffer = bytearray()
+
+            current_pointer = 0
+            for region_block in neuron_param_region_data:
+                size = len(region_block)
+                temp_buffer.extend(region_block)
+
+            # Standard fixed-point 'accum' type scaling
+            size = len(temp_buffer) / 4
+            scale = numpy.zeros(size, dtype=numpy.float)
+            scale.fill(float(0x7FFF))
+
+            # Add an array for time and neuron id
+            time = numpy.array([(int(i / n_atoms) * ms_per_timestep)
+                                for i in range(size)], dtype=numpy.float)
+
+            lo_atom = vertex_slice.lo_atom
+            neuron_id = numpy.array([int(i % n_atoms) +
+                                     lo_atom for i in range(size)],
+                                    dtype=numpy.uint32)
+            # Get the values
+            # noinspection PyNoneFunctionAssignment
+            temp_value = numpy.frombuffer(temp_buffer, dtype="<i4")
+            # noinspection PyTypeChecker
+            temp_value = numpy.divide(temp_value, scale)
+            temp_array = numpy.dstack((time, neuron_id, temp_value))
+            temp_array = numpy.reshape(temp_array, newshape=(-1, 3))
+            value = numpy.append(value, temp_array, axis=0)
+
+        logger.debug("Arranging parameter output")
+        if compatible_output:
+
+            # Change the order to be neuronID : time (don't know why - this
+            # is how it was done in the old code, so I am doing it here too)
+            value[:, [0, 1, 2]] = value[:, [1, 0, 2]]
+
+            # Sort by neuron ID and not by time
+            v_index = numpy.lexsort((value[:, 2], value[:, 1], value[:, 0]))
+            value = value[v_index]
+            return value
+
+        # If not compatible output, we will sort by time (as NEST seems to do)
+        v_index = numpy.lexsort((value[:, 2], value[:, 1], value[:, 0]))
+        value = value[v_index]
+        return value
