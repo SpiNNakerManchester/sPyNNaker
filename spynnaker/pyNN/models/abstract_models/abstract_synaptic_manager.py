@@ -294,7 +294,7 @@ class AbstractSynapticManager(object):
     def get_stdp_parameter_size(self, vertex_slice, in_edges):
         self._check_synapse_dynamics(in_edges)
         if self._stdp_mechanism is not None:
-            return self._stdp_mechanism.get_params_size(self, vertex_slice)
+            return self._stdp_mechanism.get_params_size()
         return 0
 
     @staticmethod
@@ -314,11 +314,10 @@ class AbstractSynapticManager(object):
         for entry in constants.ROW_LEN_TABLE_ENTRIES:
             spec.write_value(data=entry)
 
-    def write_stdp_parameters(self, spec, subvertex, weight_scale,
-                              machine_time_step, stdp_params):
+    def write_stdp_parameters(self, spec, machine_time_step, stdp_params):
         if self._stdp_mechanism is not None:
-            self._stdp_mechanism.write_plastic_params(
-                spec, stdp_params, machine_time_step, subvertex, weight_scale)
+            self._stdp_mechanism.write_plastic_params(spec, stdp_params,
+                                                      machine_time_step)
 
     @staticmethod
     def get_weight_scale(ring_buffer_to_input_left_shift):
@@ -532,7 +531,7 @@ class AbstractSynapticManager(object):
         no PP, pp, No ff, NO fp, FF fp
         """
         #turn byte array list into a string so that unpack can work
-        synaptic_block = str(synaptic_block[0])
+        synaptic_block = str(synaptic_block)
         #locate offset after conversion to bytes
         position_in_block = \
             atom * 4 * (max_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)
@@ -624,9 +623,14 @@ class AbstractSynapticManager(object):
             synaptic_block_base_address_offset
 
         #read in and return the synaptic block
-        block = list(transceiver.read_memory(
+        blocks = list(transceiver.read_memory(
             pre_x, pre_y, synaptic_block_base_address, synaptic_block_size))
-        if len(block[0]) != synaptic_block_size:
+
+        block = bytearray()
+        for message_block in blocks:
+            block.extend(message_block)
+
+        if len(block) != synaptic_block_size:
             raise exceptions.SynapticBlockReadException(
                 "Not enough data has been read "
                 "(aka, something funkky happened)")

@@ -55,21 +55,18 @@ class STDPMechanism(object):
         
         return size
     
-    def write_plastic_params(self, spec, region, machine_time_step, subvertex,
-                             weight_scale):
+    def write_plastic_params(self, spec, region, machine_time_step):
         spec.comment("Writing Plastic Parameters")
         
         # Switch focus to the region:
-        spec.switchWriteFocus(region)
+        spec.switch_write_focus(region)
 
         # Write weight dependence information to region
         if self.weight_dependence is not None:
-            self.weight_dependence.write_plastic_params(spec, machine_time_step,
-                                                        subvertex, weight_scale)
+            self.weight_dependence.write_plastic_params(spec, machine_time_step)
 
         if self.timing_dependence is not None:
-            self.timing_dependence.write_plastic_params(spec, machine_time_step,
-                                                        subvertex, weight_scale)
+            self.timing_dependence.write_plastic_params(spec, machine_time_step)
 
     # **TEMP** timing and weight components should be able to contribute their 
     # own components

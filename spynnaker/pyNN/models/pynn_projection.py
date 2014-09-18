@@ -259,7 +259,7 @@ class Projection(object):
                 delays.extend(
                     numpy.asarray(
                         row.delays * (
-                            float(self._spinnaker.machineTimeStep) / 1000.0),
+                            float(self._spinnaker.machine_time_step) / 1000.0),
                         dtype=float))
             return delays
 
@@ -271,7 +271,7 @@ class Projection(object):
             for i in xrange(len(row.target_indices)):
                 post_atom = row.target_indices[i]
                 delay = (float(row.delays[i])
-                         * (float(self._spinnaker.machineTimeStep) / 1000.0))
+                         * (float(self._spinnaker.machine_time_step) / 1000.0))
                 delays[pre_atom][post_atom] = delay
         return delays
 
@@ -381,7 +381,6 @@ class Projection(object):
         synapse_list = None
         delay_synapse_list = None
         if self._projection_edge is not None:
-
             synapse_list = \
                 self._projection_edge.get_synaptic_list_from_machine(
                     graph_mapper=self._spinnaker.graph_mapper,

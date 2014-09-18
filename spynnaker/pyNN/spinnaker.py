@@ -500,6 +500,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def stop(self, app_id, stop_on_board=True):
         if stop_on_board:
+            for router_table in self._router_tables.routing_tables:
+                if len(router_table.multicast_routing_entries) > 0:
+                    self._txrx.clear_multicast_routes(router_table.x,
+                                                      router_table.y)
+            time.sleep(0.5)
             self._txrx.send_signal(app_id, SCPSignal.STOP)
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()

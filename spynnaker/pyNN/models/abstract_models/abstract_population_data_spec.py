@@ -270,7 +270,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         self.write_synapse_parameters(spec, subvertex, vertex_slice)
 
         self.write_stdp_parameters(
-            spec, subvertex, weight_scale, self._machine_time_step,
+            spec, self._machine_time_step,
             constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value)
 
         self.write_row_length_translation_table(

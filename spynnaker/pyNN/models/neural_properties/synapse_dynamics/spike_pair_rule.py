@@ -1,5 +1,7 @@
 import math
 import logging
+from spynnaker.pyNN import exceptions
+from data_specification.enums.data_type import DataType
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +68,7 @@ class SpikePairRule(object):
                                            self._LOOKUP_TAU_MINUS_SHIFT)
     
     # Move somewhere more generic STDPRuleBase perhaps?
-    @staticmethod
-    def __write_exponential_decay_lut(spec, time_constant, size, shift):
+    def __write_exponential_decay_lut(self, spec, time_constant, size, shift):
         # Calculate time constant reciprocal
         time_constant_reciprocal = 1.0 / float(time_constant)
 
@@ -75,7 +76,7 @@ class SpikePairRule(object):
         last_time = (size - 1) << shift
         last_value = float(last_time) * time_constant_reciprocal
         last_exponential_float = math.exp(-last_value)
-        if spec.doubleToS511(last_exponential_float) != 0:
+        if self._double_to_s511(last_exponential_float) != 0:
             logger.warning("STDP lookup table with size %u is too short to "
                            "contain decay with time constant %u - last entry "
                            "is %f" % (size, time_constant,
@@ -91,4 +92,24 @@ class SpikePairRule(object):
             exponential_float = math.exp(-value)
 
             # Convert to fixed-point and write to spec
-            spec.write(data=spec.doubleToS511(exponential_float), sizeof="s511")
+            spec.write_value(data=self._double_to_s511(exponential_float),
+                             data_type=DataType.UINT32)
+
+    @staticmethod
+    def _double_to_s511(my_double):
+        """
+        Reformat a double into a 16-bit unsigned integer representing u511 format
+        (i.e. unsigned 5.11 used for STDP LUTs).
+        Raise an exception if the value cannot be represented in this way.
+        """
+        if (my_double < -31.0) or (my_double >= 31.0):
+            raise exceptions.ConfigurationException(
+                "ERROR: double cannot be recast as a u2111. Exiting.")
+
+        # Shift up by 11 bits:
+        scaled_my_double = float(my_double) * 2048.0
+
+        # Round to an integer:
+        # **THINK** should we actually round here?
+        my_s511 = int(scaled_my_double)
+        return my_s511
