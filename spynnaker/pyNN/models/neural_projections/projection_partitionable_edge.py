@@ -111,8 +111,7 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
             pre_n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
 
             rows = \
-                subedge.post_subvertex.\
-                get_synaptic_list_from_machine(
+                subedge.post_subvertex.get_synaptic_list_from_machine(
                     placements, transceiver, subedge.pre_subvertex, pre_n_atoms,
                     subedge.post_subvertex,
                     constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,

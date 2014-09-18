@@ -1,9 +1,10 @@
+from integration_tests.bugged_tests import pynnBrunnelPlot as pblt
+
 simulator_Name = 'spiNNaker'
 exec('import pyNN.%s as pynn'%simulator_Name)
 
 import pylab as plt 
-import numpy as np 
-import pynnBrunnelPlot as pblt # I stole some plotting functions from pyNest
+import numpy as np
 from pyNN.random import NumpyRNG, RandomDistribution
 
 def poisson_generator(rate, rng,t_start=0.0, t_stop=1000.0,array=True,debug=False):

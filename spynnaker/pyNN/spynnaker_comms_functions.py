@@ -369,7 +369,7 @@ class SpynnakerCommsFunctions(object):
 
     def _load_application_data(
             self, placements, router_tables, vertex_to_subvertex_mapper,
-            processor_to_app_data_base_address, hostname):
+            processor_to_app_data_base_address, hostname, app_id):
 
         #if doing reload, start script
         if self._reports_states.transciever_report:
@@ -433,7 +433,7 @@ class SpynnakerCommsFunctions(object):
             if len(router_table.multicast_routing_entries) > 0:
                 self._txrx.load_multicast_routes(
                     router_table.x, router_table.y,
-                    router_table.multicast_routing_entries)
+                    router_table.multicast_routing_entries, app_id)
 
     def _load_executable_images(self, executable_targets, app_id):
         """
