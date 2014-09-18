@@ -67,8 +67,12 @@ class SpynnakerCommsFunctions(object):
                     default_report_directory=self._report_default_directory,
                     discover=False)
             #do autoboot if possible
-            self._txrx.ensure_board_is_ready(int(conf.config.get("Machine",
-                                                                 "version")))
+            machine_version = conf.config.get("Machine", "version")
+            if machine_version is None:
+                raise exceptions.ConfigurationException(
+                    "Please set a machine version number in the configuration "
+                    "file (spynnaker.cfg or pacman.cfg)")
+            self._txrx.ensure_board_is_ready(int(machine_version))
             self._txrx.discover_connections()
             self._machine = self._txrx.get_machine_details()
         else:
@@ -172,23 +176,24 @@ class SpynnakerCommsFunctions(object):
                         os.path.join(self._report_default_directory,
                                      "data_spec_text_files")
 
-                if not os.path.exists(new_report_directory):
-                    os.mkdir(new_report_directory)
+                    if not os.path.exists(new_report_directory):
+                        os.mkdir(new_report_directory)
 
-                file_name = "{}_DSE_report_for_{}_{}_{}.txt"\
-                            .format(hostname, placement.x, placement.y,
-                                    placement.p)
-                report_file_path = os.path.join(new_report_directory, file_name)
-                report_writer = FileDataWriter(report_file_path)
+                    file_name = "{}_DSE_report_for_{}_{}_{}.txt"\
+                                .format(hostname, placement.x, placement.y,
+                                        placement.p)
+                    report_file_path = os.path.join(new_report_directory,
+                                                    file_name)
+                    report_writer = FileDataWriter(report_file_path)
 
-                #generate data spec exeuctor
-                host_based_data_spec_exeuctor = DataSpecificationExecutor(
+                #generate data spec executor
+                host_based_data_spec_executor = DataSpecificationExecutor(
                     data_spec_reader, data_writer, current_memory_available,
                     report_writer)
 
                 #update memory calc and run data spec executor
                 bytes_used_by_spec, bytes_written_by_spec = \
-                    host_based_data_spec_exeuctor.execute()
+                    host_based_data_spec_executor.execute()
 
                 #update base address mapper
                 processor_mapping_key = \

@@ -74,16 +74,20 @@ def get_ring_buffer_to_input_left_shift(subvertex, sub_graph, graph_mapper):
 
 
 def convert_param_to_numpy(param, no_atoms):
-        """
-        converts parameters into numpy arrays as needed
-        """
-        if isinstance(param, RandomDistribution):
-            return numpy.asarray(param.next(n=no_atoms))
-        elif not hasattr(param, '__iter__'):
-            return numpy.array([param], dtype=float)
-        elif len(param) != no_atoms:
-            raise exceptions.ConfigurationException("The number of params does"
-                                                    " not equal with the number"
-                                                    " of atoms in the vertex ")
-        else:
-            return numpy.array(param, dtype=float)
+    """
+    converts parameters into numpy arrays as needed
+    """
+    if RandomDistribution is None:
+        raise exceptions.ConfigurationException(
+            "Missing PyNN. Please install version 0.7.5 from "
+            "http://neuralensemble.org/PyNN/")
+    if isinstance(param, RandomDistribution):
+        return numpy.asarray(param.next(n=no_atoms))
+    elif not hasattr(param, '__iter__'):
+        return numpy.array([param], dtype=float)
+    elif len(param) != no_atoms:
+        raise exceptions.ConfigurationException("The number of params does"
+                                                " not equal with the number"
+                                                " of atoms in the vertex ")
+    else:
+        return numpy.array(param, dtype=float)
