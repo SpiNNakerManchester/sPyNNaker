@@ -25,7 +25,7 @@ populations = list()
 projections = list()
 
 weight_to_spike = 2.0
-delay = 30
+delay = 17
 loopConnections = list()
 for i in range(0, nNeurons):
     singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
@@ -44,14 +44,14 @@ populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record()
 
-p.run(200)
+p.run(500)
 
 v = None
 gsyn = None
 spikes = None
 
-#v = populations[0].get_v(compatible_output=True)
-#gsyn = populations[0].get_gsyn(compatible_output=True)
+v = populations[0].get_v(compatible_output=True)
+gsyn = populations[0].get_gsyn(compatible_output=True)
 spikes = populations[0].getSpikes(compatible_output=True)
 
 if spikes is not None:
@@ -94,4 +94,4 @@ if gsyn is not None:
                 [i[2] for i in gsyn_for_neuron])
     pylab.show()
 
-p.end(stop_on_board=False)
+p.end(stop_on_board=True)

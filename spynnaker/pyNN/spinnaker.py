@@ -49,6 +49,7 @@ from spinnman.model.core_subset import CoreSubset
 import logging
 import math
 import sys
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +168,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 logger.info("*** Loading data ***")
                 self._load_application_data(
                     self._placements, self._router_tables, self._graph_mapper,
-                    processor_to_app_data_base_address, self._hostname)
+                    processor_to_app_data_base_address, self._hostname,
+                    self._app_id)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
             if do_timing:
@@ -499,8 +501,5 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def stop(self, app_id, stop_on_board=True):
         if stop_on_board:
             self._txrx.send_signal(app_id, SCPSignal.STOP)
-            for router_table in self._router_tables:
-                self._txrx.clear_multicast_routes(router_table.x,
-                                                  router_table.y)
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()
