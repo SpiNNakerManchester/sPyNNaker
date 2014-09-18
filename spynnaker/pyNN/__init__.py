@@ -73,8 +73,16 @@ from spynnaker.pyNN.models.neural_projections.connectors.from_file \
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
     import SmallWorldConnector
 
+#stdp stuff
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
     import STDPMechanism
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+    additive_weight_dependence import AdditiveWeightDependence
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+    spike_pair_rule import SpikePairRule
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+    synapse_dynamics import SynapseDynamics
+
 
 #constraints
 from pacman.model.constraints.placer_chip_and_core_constraint \

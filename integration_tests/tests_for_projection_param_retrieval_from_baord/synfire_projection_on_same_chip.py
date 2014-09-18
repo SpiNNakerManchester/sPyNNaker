@@ -42,11 +42,20 @@ projections.append(p.Projection(populations[0], populations[0],
                                 p.FromListConnector(loopConnections)))
 projections.append(p.Projection(populations[1], populations[0],
                                 p.FromListConnector(injectionConnection)))
+print "before"
+delays = projections[0].getDelays()
+weights = projections[0].getWeights()
+print delays
+print weights
 
 p.run(100)
 
-projections[0].getDelays()
-projections[0].getWeights()
+print "after"
+delays = projections[0].getDelays()
+weights = projections[0].getWeights()
+
+print delays
+print weights
 
 v = None
 gsyn = None

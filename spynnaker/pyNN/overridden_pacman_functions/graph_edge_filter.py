@@ -16,8 +16,8 @@ class GraphEdgeFilter(object):
         pass
 
     def run(self, subgraph, graph_mapper):
-        new_sub_graph = PartitionedGraph()
-        new_graph_mapper = GraphMapper()
+        new_sub_graph = PartitionedGraph(label=subgraph.label)
+        new_graph_mapper = GraphMapper(graph_mapper.label1, subgraph.label)
 
         #create progress bar
         progress_bar = \

@@ -438,7 +438,7 @@ class SpynnakerCommsFunctions(object):
             if len(router_table.multicast_routing_entries) > 0:
                 self._txrx.load_multicast_routes(
                     router_table.x, router_table.y,
-                    router_table.multicast_routing_entries, app_id)
+                    router_table.multicast_routing_entries, app_id=app_id)
 
     def _load_executable_images(self, executable_targets, app_id):
         """
