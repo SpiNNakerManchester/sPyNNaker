@@ -228,6 +228,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def set_runtime(self, value):
         self._runtime = value
 
+    def __repr__(self):
+        return "Spinnaker object for machine {}".format(self._hostname)
+
     def map_model(self):
         """
         executes the pacman compilation stack
@@ -439,14 +442,14 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     vertex.constraints,
                     VertexRequiresVirtualChipInMachineConstraint)
             if len(virtual_chip_constraints) > 0:
-                for virutal_chip_constrant in virtual_chip_constraints:
+                for virtual_chip_constraint in virtual_chip_constraints:
                     #check if the virtual chip doesnt already exist
                     if (self._machine.get_chip_at(
-                            virutal_chip_constrant.virtual_chip_coords['x'],
-                            virutal_chip_constrant.virtual_chip_coords['y'])
+                            virtual_chip_constraint.virtual_chip_coords['x'],
+                            virtual_chip_constraint.virtual_chip_coords['y'])
                             is None):
                         virutal_chip = \
-                            self._create_virtual_chip(virutal_chip_constrant)
+                            self._create_virtual_chip(virtual_chip_constraint)
                         self._machine.add_chip(virutal_chip)
 
     def _create_virtual_chip(self, virtual_chip_constraint):
