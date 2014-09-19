@@ -3,7 +3,6 @@ Synfirechain-like example
 """
 #!/usr/bin/python
 import os
-print os.environ["PYTHONPATH"]
 import spynnaker.pyNN as p
 #import pyNN.spiNNaker as p
 import numpy, pylab
