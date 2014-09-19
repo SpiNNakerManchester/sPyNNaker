@@ -26,5 +26,5 @@ setup(
               'spynnaker.pyNN.visualiser_package',
               'spynnaker.pyNN.visualiser_package.visualiser_pages'],
     install_requires=['SpiNNMachine', 'SpiNNMan', 'PACMAN',
-            'DataSpecification', 'pyNN']
+            'DataSpecification', 'Visualiser', 'pyNN']
 )
