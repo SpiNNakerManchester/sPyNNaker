@@ -68,7 +68,12 @@ extern plasticity_trace_region_data_t plasticity_trace_region_data;
 extern plasticity_weight_region_data_t plasticity_weight_region_data;
 
 //---------------------------------------
-// Timing dependence functions
+// Declared functions
+//---------------------------------------
+uint32_t *plasticity_region_trace_filled(uint32_t* address, uint32_t flags);
+
+//---------------------------------------
+// Timing dependence inline functions
 //---------------------------------------
 static inline post_trace_t timing_get_initial_post_trace()
 {

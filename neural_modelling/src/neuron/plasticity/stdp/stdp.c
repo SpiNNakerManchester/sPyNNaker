@@ -1,6 +1,11 @@
+// Spinn_common includes
+#include "static-assert.h"
+
+// sPyNNaker neural modelling includes
 #include "../../spin-neuron-impl.h"
 #include "../../synapses_impl.h"
-#include "../../../common/compile_time_assert.h"
+
+// Plasticity common includes
 #include "../common/maths.h"
 #include "../common/runtime_log.h"
 #include "../common/pre_events_impl.h"
@@ -97,7 +102,7 @@ void initialise_plasticity_buffers()
 static inline plastic_synapse_t* plastic_synapses(address_t plastic)
 {
   const uint32_t pre_event_history_size_words = sizeof(pre_event_history_t) / sizeof(uint32_t);
-  COMPILE_TIME_ASSERT(pre_event_history_size_words * sizeof(uint32_t) == sizeof(pre_event_history_t), pre_event_history_t_should_be_word_padded)
+  static_assert(pre_event_history_size_words * sizeof(uint32_t) == sizeof(pre_event_history_t), "Size of pre_event_history_t structure should be a multiple of 32-bit words");
 
   return (plastic_synapse_t*)(&plastic[pre_event_history_size_words]); 
 }
