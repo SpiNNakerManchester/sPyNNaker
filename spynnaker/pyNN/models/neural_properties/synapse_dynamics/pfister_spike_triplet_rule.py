@@ -1,8 +1,3 @@
-'''
-Created on 7 Apr 2014
-
-@author: zzalsar4
-'''
 import math
 
 from weight_based_plastic_synapse_row_io import WeightBasedPlasticSynapseRowIo
@@ -16,6 +11,10 @@ LOOKUP_TAU_PLUS_SIZE = 256
 LOOKUP_TAU_PLUS_SHIFT = 0
 LOOKUP_TAU_MINUS_SIZE = 256
 LOOKUP_TAU_MINUS_SHIFT = 0
+LOOKUP_TAU_X_SIZE = 256
+LOOKUP_TAU_X_SHIFT = 2
+LOOKUP_TAU_Y_SIZE = 256
+LOOKUP_TAU_Y_SHIFT = 2
 
 # How many pre-synaptic events are buffered
 NUM_PRE_SYNAPTIC_EVENTS = 4
@@ -24,46 +23,60 @@ NUM_PRE_SYNAPTIC_EVENTS = 4
 TIME_STAMP_BYTES = 4
 
 # How large are the pre_synaptic_trace_entry_t structures
-ALL_TO_ALL_EVENT_BYTES = 2
-NEAREST_PAIR_EVENT_BYTES = 0
+ALL_TO_ALL_EVENT_BYTES = 4
+#NEAREST_PAIR_EVENT_BYTES = 0
 
 # Calculate number of words required for header
 ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS = 1 + ((NUM_PRE_SYNAPTIC_EVENTS * (TIME_STAMP_BYTES + ALL_TO_ALL_EVENT_BYTES)) / 4)
-NEAREST_PAIR_PLASTIC_REGION_HEADER_WORDS = 1 + ((NUM_PRE_SYNAPTIC_EVENTS * (TIME_STAMP_BYTES + NEAREST_PAIR_EVENT_BYTES)) / 4)
 
-class SpikePairRule(object):
-    def __init__(self, tau_plus = 20.0, tau_minus = 20.0, nearest = False):
+class PfisterSpikeTripletRule(object):
+    def __init__(self,  A3_plus, A3_minus, tau_plus, tau_minus, tau_x, tau_y, w_max):
+        self.A3_plus = A3_plus
+        self.A3_minus = A3_minus
         self.tau_plus = tau_plus
         self.tau_minus = tau_minus
-        self.nearest = nearest
+        self.tau_x = tau_x
+        self.tau_y = tau_y
+        self.w_max = w_max # HACK
         
     def __eq__(self, other):
-        if (other is None) or (not isinstance(other, SpikePairRule)):
+        if (other is None) or (not isinstance(other, PfisterSpikeTripletRule)):
             return False
-        return ((self.tau_plus == other.tau_plus) 
+        return ((self.tau_plus == other.tau_plus)
+                and (self.A3_plus == other.A3_plus) 
+                and (self.A3_minus == other.A3_minus) 
                 and (self.tau_minus == other.tau_minus)
-                and (self.nearest == other.nearest))
+                and (self.tau_x == other.tau_x)
+                and (self.tau_y == other.tau_y))
 
     def get_synapse_row_io(self):
-        synaptic_row_header_words = NEAREST_PAIR_PLASTIC_REGION_HEADER_WORDS if self.nearest else ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS
-        
-        return WeightBasedPlasticSynapseRowIo(synaptic_row_header_words)
+        return WeightBasedPlasticSynapseRowIo(ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS)
     
     def get_params_size_bytes(self):
-        return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
+        return (2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE + LOOKUP_TAU_X_SIZE + LOOKUP_TAU_Y_SIZE)) + (4 * 2)
 
     def get_vertex_executable_suffix(self):
-        return "nearest_pair" if self.nearest else "pair"
+        return "pfister_triplet"
         
     def write_plastic_params(self, spec, machineTimeStep, subvertex, 
             weight_scale):
         # Check timestep is valid
         if machineTimeStep != 1000:
             raise NotImplementedError("STDP LUT generation currently only supports 1ms timesteps")
-
+        
+        # Calculate scaling factor to incorporate the conversion to weight scale into additive constants
+        # **TODO** move me, along with a load of other stuff to magical stdp helper place
+        stdp_to_weight_scale = float(weight_scale) / 2048.0
+        
+        # Write parameters 
+        spec.write(data=spec.doubleToS2111(self.A3_plus * self.w_max * stdp_to_weight_scale), sizeof="s2111")
+        spec.write(data=spec.doubleToS2111(self.A3_minus * self.w_max * stdp_to_weight_scale), sizeof="s2111")
+        
         # Write lookup tables
         self.__write_exponential_decay_lut(spec, self.tau_plus, LOOKUP_TAU_PLUS_SIZE, LOOKUP_TAU_PLUS_SHIFT)
         self.__write_exponential_decay_lut(spec, self.tau_minus, LOOKUP_TAU_MINUS_SIZE, LOOKUP_TAU_MINUS_SHIFT)
+        self.__write_exponential_decay_lut(spec, self.tau_x, LOOKUP_TAU_X_SIZE, LOOKUP_TAU_X_SHIFT)
+        self.__write_exponential_decay_lut(spec, self.tau_y, LOOKUP_TAU_Y_SIZE, LOOKUP_TAU_Y_SHIFT)
     
     # Move somewhere more generic STDPRuleBase perhaps?
     def __write_exponential_decay_lut(self, spec, timeConstant, size, shift):

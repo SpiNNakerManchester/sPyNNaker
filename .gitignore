@@ -8,3 +8,4 @@
 /application_generated_data_files
 /spynnaker/pyNN/model_binaries
 *build/
+/sPyNNaker.egg-info/
