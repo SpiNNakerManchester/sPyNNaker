@@ -18,6 +18,8 @@ from spinnman.model.iptag import IPTag
 from spinnman.transceiver import create_transceiver_from_hostname
 from spinnman.data.file_data_reader import FileDataReader \
     as SpinnmanFileDataReader
+from spinnman.model.core_subsets import CoreSubsets
+from spinnman.model.core_subset import CoreSubset
 
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -57,15 +59,29 @@ class SpynnakerCommsFunctions(object):
         requires_visualiser = conf.config.getboolean("Visualiser", "enable")
 
         if not requires_virtual_board:
-            if self._reports_states is None:
-                self._txrx = create_transceiver_from_hostname(
-                    hostname=hostname, generate_reports=False,
-                    discover=False)
-            else:
-                self._txrx = create_transceiver_from_hostname(
-                    hostname=hostname, generate_reports=True,
-                    default_report_directory=self._report_default_directory,
-                    discover=False)
+            ignored_chips = None
+            ignored_cores = None
+            downed_chips = str(conf.config.get("Machine", "down_chips"))
+            if downed_chips is not None and downed_chips != "None":
+                ignored_chips = CoreSubsets()
+                for downed_chip in downed_chips.split(":"):
+                    x, y = downed_chip.split(",")
+                    ignored_chips.add_core_subset(CoreSubset(
+                            int(x), int(y), []))
+            downed_cores = str(conf.config.get("Machine", "down_cores"))
+            if downed_cores is not None and downed_cores != "None":
+                ignored_cores = CoreSubsets()
+                for downed_core in downed_cores.split(":"):
+                    x, y, processor_id = downed_core.split(",")
+                    ignored_cores.add_processor(int(x), int(y),
+                            int(processor_id))
+
+            self._txrx = create_transceiver_from_hostname(
+                hostname=hostname,
+                discover=False,
+                ignore_chips=ignored_chips,
+                ignore_cores=ignored_cores)
+
             #do autoboot if possible
             machine_version = conf.config.get("Machine", "version")
             if machine_version is None:
