@@ -50,25 +50,25 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson\
     import SpikeSourcePoisson
 
 #connections
-from spynnaker.pyNN.models.neural_projections.connectors.all_to_all\
+from spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector\
     import AllToAllConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_pre_connector import FixedNumberPreConnector
-from spynnaker.pyNN.models.neural_projections.connectors.fixed_probability \
+from spynnaker.pyNN.models.neural_projections.connectors.fixed_probability_connector \
     import FixedProbabilityConnector
-from spynnaker.pyNN.models.neural_projections.connectors.from_list \
+from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
     import FromListConnector
-from spynnaker.pyNN.models.neural_projections.connectors.from_file \
+from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
     import FromFileConnector
-from spynnaker.pyNN.models.neural_projections.connectors.multapse \
+from spynnaker.pyNN.models.neural_projections.connectors.multapse_connector \
     import MultapseConnector
-from spynnaker.pyNN.models.neural_projections.connectors.one_to_one \
+from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
-    distance_dependent_probability import DistanceDependentProbabilityConnector
+    distance_dependent_probability_connector import DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
-from spynnaker.pyNN.models.neural_projections.connectors.from_file \
+from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
     import FromFileConnector
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
     import SmallWorldConnector
