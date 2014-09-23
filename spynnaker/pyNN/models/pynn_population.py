@@ -17,7 +17,7 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
 
-from visualiser import visualiser_constants
+from visualiser_framework import visualiser_constants
 
 
 import logging

@@ -380,7 +380,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         return executable_targets
 
     def start_visualiser(self):
-        """starts the port listener and ties it to the visualiser pages as
+        """starts the port listener and ties it to the visualiser_framework pages as
          required
         """
        #register a listener at the trasnciever for each visualised vertex

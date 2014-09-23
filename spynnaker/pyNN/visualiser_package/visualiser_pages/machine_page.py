@@ -6,7 +6,7 @@ import pygtk
 
 logger = logging.getLogger(__name__)
 pygtk.require('2.0')
-from visualiser.abstract_page import AbstractPage
+from visualiser_framework.abstract_page import AbstractPage
 from spynnaker.pyNN.visualiser_package.visualiser_pages.chip_page \
     import ChipPage
 

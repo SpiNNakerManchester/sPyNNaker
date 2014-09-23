@@ -37,7 +37,7 @@ class SpynnakerConfiguration(object):
         self._multi_cast_vertex = None
         self._txrx = None
 
-        #visualiser objects
+        #visualiser_framework objects
         self._visualiser = None
         self._wait_for_run = False
         self._visualiser_port = None

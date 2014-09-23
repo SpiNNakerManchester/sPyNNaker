@@ -6,8 +6,8 @@ from spynnaker.pyNN.visualiser_package.visualiser_pages.topological_page\
     import TopologicalPage
 from spynnaker.pyNN.utilities import conf
 
-import visualiser.visualiser_constants as visualiser_modes
-from visualiser.abstract_page import AbstractPage
+import visualiser_framework.visualiser_constants as visualiser_modes
+from visualiser_framework.abstract_page import AbstractPage
 
 logger = logging.getLogger(__name__)
 

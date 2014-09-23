@@ -387,7 +387,7 @@ class TopologicalPage(AbstractLiveSpikePage):
     # noinspection PyUnusedLocal
     def redraw(self, timer_tic):
         """
-        method used by the main visualiser to promt this page to be redrawn
+        method used by the main visualiser_framework to promt this page to be redrawn
         :param timer_tic:
         """
         if not self._drawing:

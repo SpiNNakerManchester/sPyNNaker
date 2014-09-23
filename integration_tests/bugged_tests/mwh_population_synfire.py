@@ -3,7 +3,7 @@ Synfirechain-like example
 """
 #!/usr/bin/python
 import spynnaker.pyNN as p
-import visualiser.visualiser_constants as modes
+import visualiser_framework.visualiser_constants as modes
 import numpy, pylab
 
 p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)

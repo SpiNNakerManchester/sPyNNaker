@@ -1,7 +1,7 @@
 __author__ = 'stokesa6'
 import spynnaker.pyNN as p
 
-import visualiser.visualiser_constants as modes
+import visualiser_framework.visualiser_constants as modes
 import numpy as np, pylab
 from pyNN.random import RandomDistribution, NumpyRNG
 

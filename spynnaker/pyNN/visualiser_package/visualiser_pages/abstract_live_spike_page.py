@@ -1,4 +1,4 @@
-from visualiser.abstract_page import AbstractPage
+from visualiser_framework.abstract_page import AbstractPage
 
 
 class AbstractLiveSpikePage(AbstractPage):

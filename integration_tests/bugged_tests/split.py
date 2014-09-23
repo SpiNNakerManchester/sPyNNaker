@@ -1,5 +1,5 @@
 import spynnaker.pyNN as p
-from visualiser import visualiser_modes
+from visualiser_framework import visualiser_modes
 import numpy as np
 
 neuron_model = p.IF_curr_exp

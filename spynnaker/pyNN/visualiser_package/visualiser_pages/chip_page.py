@@ -1,7 +1,7 @@
 import gtk
 import math
 import logging
-from visualiser.abstract_page import AbstractPage
+from visualiser_framework.abstract_page import AbstractPage
 logger = logging.getLogger(__name__)
 
 
