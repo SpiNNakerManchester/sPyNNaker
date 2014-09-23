@@ -25,6 +25,7 @@ setup(
               'spynnaker.pyNN.utilities.conf',
               'spynnaker.pyNN.visualiser_package',
               'spynnaker.pyNN.visualiser_package.visualiser_pages'],
+    package_data={'spynnaker.pyNN': ['model_binaries/*.aplx']},
     install_requires=['SpiNNMachine', 'SpiNNMan', 'PACMAN',
             'DataSpecification', 'Visualiser', 'pyNN']
 )
