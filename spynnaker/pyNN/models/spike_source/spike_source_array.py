@@ -22,7 +22,7 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
-    
+
     def __init__(self, n_neurons, spike_times, machine_time_step,
                  constraints=None, label="SpikeSourceArray"):
         """
@@ -46,7 +46,7 @@ class SpikeSourceArray(AbstractSpikeSource):
     def set_model_max_atoms_per_core(new_value):
         SpikeSourceArray.\
             _model_based_max_atoms_per_core = new_value
-    
+
     def get_spikes_per_timestep(self, vertex_slice):
         """
         spikeArray is a list with one entry per 'neuron'. The entry for
@@ -58,7 +58,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         2) SpiNNaker format - list of lists, one per neuron
         """
         spike_dict = dict()
-        if isinstance(self._spike_times, list):
+        if isinstance(self._spike_times[0], list):
             # This is in SpiNNaker 'list of lists' format:
             for neuron in range(vertex_slice.lo_atom,
                                 vertex_slice.hi_atom + 1):
@@ -89,17 +89,17 @@ class SpikeSourceArray(AbstractSpikeSource):
     @staticmethod
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
         return spike_block_row_length * no_active_timesteps * 4
-    
+
     def get_spike_buffer_size(self, vert_slice):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
         """
         if not self._record:
             return 0
-        
+
         if self._no_machine_time_steps is None:
             return 0
-        
+
         out_spike_spikes = \
             int(ceil((vert_slice.hi_atom - vert_slice.lo_atom + 1) / 32.0)) * 4
         return self.get_recording_region_size(out_spike_spikes)
@@ -113,12 +113,12 @@ class SpikeSourceArray(AbstractSpikeSource):
         """
         Parse python definitons of the required spike arrays and construct
         both the spike blocks, containing lists of spike IDs for each time step,
-        and the index table, which gives the address in memory to access 
+        and the index table, which gives the address in memory to access
         the spike block for the current time step.
         """
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         spike_dict = self.get_spikes_per_timestep(vertex_slice)
-        
+
         # Dict spikeDict now has entries based on timeStamp and each entry
         # is a list of neurons firing at that time.
         # Get keys in time order:
@@ -131,7 +131,7 @@ class SpikeSourceArray(AbstractSpikeSource):
             self.get_spike_block_row_length(n_atoms)
         spike_region_size = self.get_spike_region_bytes(spike_block_row_length,
                                                         len(time_keys))
-        
+
         # Create a new tableEntry for each unique time stamp, then
         # build a spike Block, tracking its size:
         table_entries = list()
@@ -153,8 +153,8 @@ class SpikeSourceArray(AbstractSpikeSource):
     def reserve_memory_regions(self, spec, setup_sz, block_index_region_size,
                                spike_region_size, spike_hist_buff_sz):
         """
-        *** Modified version of same routine in models.py These could be 
-        combined to form a common routine, perhaps by passing a list of 
+        *** Modified version of same routine in models.py These could be
+        combined to form a common routine, perhaps by passing a list of
         entries. ***
         Reserve memory for the system, indices and spike data regions.
         The indices region will be copied to DTCM by the executable.
@@ -219,7 +219,7 @@ class SpikeSourceArray(AbstractSpikeSource):
             uint32 timeStamp          # In simulation ticks
             uint32 addressOfBlockWord # Relative to start of spikeDataRegion
         } entry
-        
+
         """
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value)
@@ -228,7 +228,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         population_identity = \
             packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
         spec.write_value(data=population_identity)
- 
+
         # Word 1 is the total number of 'neurons' (i.e. spike sources) in
         # the pynn_population.py:
         spec.write_value(data=num_neurons)
@@ -236,7 +236,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         # Word 2 is the total number of entries in this table of indices:
         num_entries = len(table_entries)
         spec.write_value(data=num_entries)
-        
+
         # Write individual entries:
         for entry in table_entries:
             time_stamp = entry[0]   # Time in ticks when this block is used
@@ -251,7 +251,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         Blocks given in list spikeBlocks.
         Each block is a list of the indices of 'neurons' that should
         fire this tick of the simulation clock. they are converted
-        into bit vectors of length ceil(numNeurons/32) words, in 
+        into bit vectors of length ceil(numNeurons/32) words, in
         which the bit position is the neuron index and a '1' in a given
         position means that neuron fires this tick.
         """
@@ -271,13 +271,13 @@ class SpikeSourceArray(AbstractSpikeSource):
             # Write this to spikeBlock region:
             for i in range(vector_len):
                 spec.write_value(data=spike_bit_vectors[i])
-    
+
     def get_spikes(self, has_ran, txrx, placements, graph_mapper,
                    compatible_output=False):
         # Spike sources store spike vectors optimally so calculate min words to represent
         sub_vertex_out_spike_bytes_function = \
             lambda subvertex: int(ceil(subvertex.n_atoms / 32.0)) * 4
-        
+
         # Use standard behaviour to read spikes
         return self._get_spikes(
             transciever=txrx, placements=placements,
