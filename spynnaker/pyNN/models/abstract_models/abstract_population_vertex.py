@@ -53,12 +53,8 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             raise exceptions.ConfigurationException(
                 "cannot set a vertex's delay vertex once its already been set")
 
-    def get_spikes(self, has_ran, txrx, placements, graph_mapper,
+    def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
-        if not has_ran:
-            raise exceptions.SpynnakerException(
-                "The simulation has not yet ran,therefore spikes cannot be "
-                "retrieved")
 
         # Spike sources store spike vectors optimally
         # so calculate min words to represent

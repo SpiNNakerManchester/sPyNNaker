@@ -171,11 +171,24 @@ class Population(object):
             logger.warn("Spynnaker only supports gather = true, will execute as"
                         "if gather was true anyhow")
         timer = None
+
+        if not self._vertex.record:
+            raise exceptions.ConfigurationException(
+                "This population has not been set to record spikes. Therefore "
+                "spikes cannot be retrieved. Please set this vertex to record "
+                "spikes before running this command.")
+
+        if not self._spinnaker.has_ran:
+            raise exceptions.SpynnakerException(
+                "The simulation has not yet ran, therefore spikes cannot be "
+                "retrieved. Please execute the simulation before running this "
+                "command")
+
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
         spikes = self._vertex.get_spikes(
-            has_ran=self._spinnaker.has_ran, txrx=self._spinnaker.transceiver,
+            txrx=self._spinnaker.transceiver,
             placements=self._spinnaker.placements,
             graph_mapper=self._spinnaker.graph_mapper,
             compatible_output=compatible_output)
