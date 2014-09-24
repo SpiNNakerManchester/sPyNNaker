@@ -7,7 +7,8 @@ from spynnaker.pyNN.utilities.conf import config
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from data_specification.file_data_writer import FileDataWriter
+
+from spynnaker.pyNN import exceptions
 
 
 from math import ceil
@@ -272,9 +273,11 @@ class SpikeSourceArray(AbstractSpikeSource):
             for i in range(vector_len):
                 spec.write_value(data=spike_bit_vectors[i])
     
-    def get_spikes(self, has_ran, txrx, placements, graph_mapper,
+    def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
-        # Spike sources store spike vectors optimally so calculate min words to represent
+
+        # Spike sources store spike vectors optimally so calculate min
+        # words to represent
         sub_vertex_out_spike_bytes_function = \
             lambda subvertex: int(ceil(subvertex.n_atoms / 32.0)) * 4
         

@@ -242,7 +242,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             spec.write_value(data=exp_minus_lamda_scaled, sizeof='u032')
         return
     
-    def get_spikes(self, has_ran, txrx, placements, graph_mapper,
+    def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
