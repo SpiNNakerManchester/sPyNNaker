@@ -8,7 +8,9 @@ import spynnaker.pyNN as p
 
 
 p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-nNeurons = 20 # number of neurons in each population
+nNeurons = 200 # number of neurons in each population
+p.set_number_of_neurons_per_core("IF_curr_exp", 10)
+
 
 cell_params_lif = {'cm'        : 0.25, # nF
                      'i_offset'  : 0.0,
@@ -25,7 +27,8 @@ populations = list()
 projections = list()
 
 weight_to_spike = 2.0
-delay = 30
+delay = 1
+
 loopConnections = list()
 for i in range(0, nNeurons):
     singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
@@ -34,7 +37,6 @@ for i in range(0, nNeurons):
 injectionConnection = [(0, 0, weight_to_spike, 1)]
 spikeArray = {'spike_times': [[0]]}
 populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
-populations[0].set_constraint(p.PlacerChipAndCoreConstraint(x=0, y=0, p=1))
 populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
 
 projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
@@ -44,7 +46,7 @@ projections.append(p.Projection(populations[1], populations[0], p.FromListConnec
 #populations[0].record_gsyn()
 populations[0].record()
 
-p.run(200)
+p.run(5000)
 
 v = None
 gsyn = None
@@ -59,11 +61,9 @@ if spikes is not None:
     pylab.figure()
     pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
     pylab.xlabel('Time/ms')
-    #pylab.xticks([0, 500, 1000, 2000, 3000, 4000, 5000])
-    pylab.xticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110,
-                  120, 130, 140, 150, 160, 170, 180, 190, 200])
-    pylab.yticks([0, 5, 10, 15, 20])
-    pylab.ylabel('neuron id')
+    pylab.ylabel('spikes')
+    pylab.xticks([0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000])
+    pylab.yticks([0, 50, 100, 150, 200])
     pylab.title('spikes')
     pylab.show()
 else:
