@@ -42,6 +42,8 @@ class Population(object):
     :returns a list of vertexes and edges
     """
 
+    _non_labelled_vertex_count = 0
+
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
                  multi_cast_vertex=None, structure=None):
         """
@@ -56,7 +58,12 @@ class Population(object):
 
         # Create a partitionable_graph vertex for the population and add it
         # to PACMAN
-        cellparams['label'] = label
+        cell_label = label
+        if label is None:
+            cell_label = "Population {}".format(
+                    Population._non_labelled_vertex_count)
+            Population._non_labelled_vertex_count += 1
+        cellparams['label'] = cell_label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         self._vertex = cellclass(**cellparams)
