@@ -24,7 +24,7 @@ class AbstractRecordableVertex(object):
     """
     Underlying AbstractConstrainedVertex model for Neural Applications.
     """
-    
+
     def __init__(self, machine_time_step, label):
         self._record = False
         self._focus_level = None
@@ -66,28 +66,29 @@ class AbstractRecordableVertex(object):
             self, graph_mapper, placements, transciever, compatible_output,
             spike_recording_region, sub_vertex_out_spike_bytes_function):
         """
-        Return a 2-column numpy array containing cell ids and spike times for 
+        Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
         """
-        
+
         logger.info("Getting spikes for {}".format(self._label))
-        
+
         spikes = numpy.zeros((0, 2))
-        
+
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
         for subvertex in subvertices:
             placement = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placement.x, placement.y, placement.p
-            lo_atom = graph_mapper.get_subvertex_slice(subvertex).lo_atom
+            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            lo_atom = subvertex_slice.lo_atom
             logger.debug("Reading spikes from chip {}, {}, core {}, "
                          "lo_atom {}".format(x, y, p, lo_atom))
-            
+
             # Get the App Data for the core
             app_data_base_address = \
                 transciever.get_cpu_information_from_core(
                     x, y, p).user[0]
-            
+
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
                 get_region_base_address_offset(app_data_base_address,
@@ -108,7 +109,8 @@ class AbstractRecordableVertex(object):
 
             #check that the number of spikes written is smaller or the same as
             #  the size of the memory region we allocated for spikes
-            out_spike_bytes = sub_vertex_out_spike_bytes_function(subvertex)
+            out_spike_bytes = sub_vertex_out_spike_bytes_function(subvertex,
+                    subvertex_slice)
             size_of_region = \
                 self.get_recording_region_size(out_spike_bytes)
 
@@ -116,7 +118,7 @@ class AbstractRecordableVertex(object):
                 raise exceptions.MemReadException("the amount of memory written"
                                                   " was larger than was "
                                                   "allocated for it")
-            
+
             # Read the spikes
             logger.debug("Reading {} ({}) bytes starting at {} + 4"
                          .format(number_of_bytes_written,
@@ -124,12 +126,11 @@ class AbstractRecordableVertex(object):
                                  hex(spike_region_base_address)))
             spike_data = transciever.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
-            
+
             # Extract number of spike bytes from subvertex
-            out_spike_bytes = sub_vertex_out_spike_bytes_function(subvertex)
             number_of_time_steps_written = \
                 number_of_bytes_written / out_spike_bytes
-            
+
             logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
 
@@ -153,22 +154,22 @@ class AbstractRecordableVertex(object):
 
         if len(spikes) > 0:
             logger.debug("Arranging spikes as per output spec")
-            
+
             if compatible_output:
                 # Change the order to be neuronID : time (don't know why - this
                 # is how it was done in the old code, so I am doing it here too)
                 spikes[:, [0, 1]] = spikes[:, [1, 0]]
-                
-                # Sort by neuron ID and not by time 
+
+                # Sort by neuron ID and not by time
                 spike_index = numpy.lexsort((spikes[:, 1], spikes[:, 0]))
                 spikes = spikes[spike_index]
                 return spikes
-            
+
             # If compatible output, return sorted by spike time
             spike_index = numpy.lexsort((spikes[:, 1], spikes[:, 0]))
             spikes = spikes[spike_index]
             return spikes
-        
+
         print("No spikes recorded")
         return None
 

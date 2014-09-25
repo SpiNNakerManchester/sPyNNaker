@@ -27,7 +27,7 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
     """
     Underlying AbstractConstrainedVertex model for Neural Populations.
     """
-    
+
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
                  machine_time_step, constraints=None):
 
@@ -59,8 +59,8 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         # Spike sources store spike vectors optimally
         # so calculate min words to represent
         sub_vertex_out_spike_bytes_function = \
-            lambda subvertex: constants.OUT_SPIKE_BYTES
-        
+            lambda subvertex, subvertex_slice: constants.OUT_SPIKE_BYTES
+
         # Use standard behaviour to read spikes
         return self._get_spikes(
             graph_mapper=graph_mapper, placements=placements, transciever=txrx,
@@ -69,11 +69,11 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             sub_vertex_out_spike_bytes_function,
             spike_recording_region=
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
-    
+
     def get_v(self, has_ran, graph_mapper, placements,
               txrx, machine_time_step, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids, time, and Vm for 
+        Return a 3-column numpy array containing cell ids, time, and Vm for
         recorded cells.
 
         :param bool gather:

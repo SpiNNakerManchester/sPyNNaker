@@ -72,15 +72,16 @@ class SpikeSourceArray(AbstractSpikeSource):
                         spike_dict[time_stamp_in_ticks].append(neuron)
         else:
             # This is in official PyNN format, all neurons use the same list:
-            neuron_list = range(vertex_slice.lo_atom, vertex_slice.hi_atom)
+            neuron_list = range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
             for timeStamp in self._spike_times:
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
                 if time_stamp_in_ticks not in spike_dict.keys():
                     spike_dict[time_stamp_in_ticks] = neuron_list
                 else:
-                    spike_dict[time_stamp_in_ticks].append(neuron_list)
+                    spike_dict[time_stamp_in_ticks].extend(neuron_list)
 
+        print spike_dict
         return spike_dict
 
     @staticmethod
@@ -176,7 +177,7 @@ class SpikeSourceArray(AbstractSpikeSource):
             spec.reserve_memory_region(
                 region=self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
-                leaveUnfilled=True)
+                empty=True)
 
     def write_setup_info(self, spec, spike_history_region_sz):
         """
@@ -279,7 +280,8 @@ class SpikeSourceArray(AbstractSpikeSource):
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
         sub_vertex_out_spike_bytes_function = \
-            lambda subvertex: int(ceil(subvertex.n_atoms / 32.0)) * 4
+            lambda subvertex, subvertex_slice: int(ceil(
+                    subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes
         return self._get_spikes(

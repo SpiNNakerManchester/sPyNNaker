@@ -64,17 +64,17 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     def set_model_max_atoms_per_core(new_value):
         SpikeSourcePoisson.\
             _model_based_max_atoms_per_core = new_value
-    
+
     def get_spike_buffer_size(self, vertex_slice):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
         """
         if not self._record:
             return 0
-        
+
         if self._no_machine_time_steps is None:
             return 0
-        
+
         bytes_per_time_step = int(
             ceil((vertex_slice.hi_atom - vertex_slice.lo_atom + 1) / 32.0)) * 4
         return self.get_recording_region_size(bytes_per_time_step)
@@ -156,14 +156,14 @@ class SpikeSourcePoisson(AbstractSpikeSource):
                 self._POISSON_SPIKE_SOURCE_REGIONS.SPOISSON_PARAMS_REGION)
 
         # Write header info to the memory region:
-        
+
         # Write Key info for this core:
         population_identity = \
             packet_conversions.get_key_from_coords(processor_chip_x,
                                                    processor_chip_y,
                                                    processor_id)
         spec.write_value(data=population_identity)
-        
+
         # Write the random seed (4 words), generated randomly!
         if self._seed is None:
             spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
@@ -175,44 +175,44 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             spec.write_value(data=self._seed[1])
             spec.write_value(data=self._seed[2])
             spec.write_value(data=self._seed[3])
-        
+
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
         slow_sources = list()
         fast_sources = list()
         for i in range(0, num_neurons):
-            
+
             # Get the parameter values for source i:
             rate_val = generate_parameter(self._rate, i)
             start_val = generate_parameter(self._start, i)
             end_val = generate_parameter(self._duration, i) + start_val
-            
-            # Decide if it is a fast or slow source and 
+
+            # Decide if it is a fast or slow source and
             spikes_per_tick = \
                 (float(rate_val) * (self._machine_time_step / 1000000.0))
             if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
                 slow_sources.append([i, rate_val, start_val, end_val])
             else:
                 fast_sources.append([i, spikes_per_tick, start_val, end_val])
-                
+
         # Write the numbers of each type of source
         spec.write_value(data=len(slow_sources))
         spec.write_value(data=len(fast_sources))
 
-        # Now write one struct for each slow source as follows 
+        # Now write one struct for each slow source as follows
         #
         #   typedef struct slow_spike_source_t
         #   {
         #     uint32_t neuron_id;
         #     uint32_t start_ticks;
         #     uint32_t end_ticks;
-        #      
+        #
         #     accum mean_isi_ticks;
         #     accum time_to_spike_ticks;
         #   } slow_spike_source_t;
         for (neuron_id, rate_val, start_val, end_val) in slow_sources:
-            isi_val_scaled = int(float(1000000.0 / 
-                                       (rate_val * self._machine_time_step)) 
+            isi_val_scaled = int(float(1000000.0 /
+                                       (rate_val * self._machine_time_step))
                                  * 32768.0)
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = int(end_val * 1000.0 / self._machine_time_step)
@@ -221,14 +221,14 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             spec.write_value(data=end_scaled, sizeof='uint32')
             spec.write_value(data=isi_val_scaled, sizeof='s1615')
             spec.write_value(data=0x0, sizeof='uint32')
-        
-        # Now write 
+
+        # Now write
         #   typedef struct fast_spike_source_t
         #   {
         #     uint32_t neuron_id;
         #     uint32_t start_ticks;
         #     uint32_t end_ticks;
-        #     
+        #
         #     unsigned long fract exp_minus_lambda;
         #   } fast_spike_source_t;
         for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
@@ -241,13 +241,15 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             spec.write_value(data=end_scaled, sizeof='uint32')
             spec.write_value(data=exp_minus_lamda_scaled, sizeof='u032')
         return
-    
+
     def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
         sub_vertex_out_spike_bytes_function = \
-            lambda subvertex: int(ceil(subvertex.n_atoms / 32.0)) * 4
+            lambda subvertex, subvertex_slice: int(ceil(
+                    subvertex_slice.n_atoms / 32.0)) * 4
+
         # Use standard behaviour to read spikes
         return self._get_spikes(
             transciever=txrx, placements=placements,
