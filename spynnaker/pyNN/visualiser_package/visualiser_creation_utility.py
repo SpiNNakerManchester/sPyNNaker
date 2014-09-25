@@ -14,7 +14,7 @@ class VisualiserCreationUtility(object):
     def create_visualiser_interface(self, has_board, transceiver, graph,
                                     visualiser_vertices, machine, subgraph,
                                     placements, router_tables, sim_run_time,
-                                    machine_time_step):
+                                    machine_time_step, graph_mapper):
         # Start visuliser if requested
         visualiser = None
         visualiser_vertex_to_page_mapping = dict()
@@ -29,7 +29,7 @@ class VisualiserCreationUtility(object):
             #create basic pages required
             #add basic machine page
             machine_page = MachinePage(True, scope, machine, placements,
-                                       router_tables)
+                                       router_tables, graph_mapper)
             pages.append(machine_page)
             #visualiser_framework.add_page(machine_page, machine_page.label)
             machine_page.show()
@@ -37,7 +37,8 @@ class VisualiserCreationUtility(object):
             config_page = ConfigPage(visualiser_vertex_to_page_mapping,
                                      visualiser_vertices, graph, visualiser,
                                      transceiver, has_board, sim_run_time,
-                                     machine_time_step, subgraph, placements)
+                                     machine_time_step, subgraph, placements,
+                                     graph_mapper)
             config_page.show()
             pages.append(config_page)
             #visualiser_framework.add_page(config_page, config_page.label)

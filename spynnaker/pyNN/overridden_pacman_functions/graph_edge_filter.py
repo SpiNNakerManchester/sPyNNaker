@@ -17,12 +17,13 @@ class GraphEdgeFilter(object):
 
     def run(self, subgraph, graph_mapper):
         new_sub_graph = PartitionedGraph(label=subgraph.label)
-        new_graph_mapper = GraphMapper(graph_mapper.first_graph_label, subgraph.label)
+        new_graph_mapper = GraphMapper(graph_mapper.first_graph_label,
+                                       subgraph.label)
 
         #create progress bar
         progress_bar = \
             ProgressBar(len(subgraph.subvertices) + len(subgraph.subedges),
-                        "on checking which subedges are prunable given "
+                        "on checking which subedges are filterable given "
                         "heuristics")
 
         #add the subverts directly, as they wont be pruned.
@@ -41,7 +42,7 @@ class GraphEdgeFilter(object):
                 new_sub_graph.add_subedge(subedge)
                 associated_edge = graph_mapper.get_edge_from_subedge(subedge)
                 new_graph_mapper.add_subedge(subedge, associated_edge)
-                progress_bar.update()
+            progress_bar.update()
         progress_bar.end()
         #returned the pruned partitioned_graph and graph_mapper
         return new_sub_graph, new_graph_mapper

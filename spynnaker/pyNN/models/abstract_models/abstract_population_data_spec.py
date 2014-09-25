@@ -23,24 +23,15 @@ logger = logging.getLogger(__name__)
 class AbstractPopulationDataSpec(AbstractSynapticManager,
                                  AbstractPartitionablePopulationVertex):
 
-    def __init__(self, record, binary, n_neurons, label, constraints,
-                 max_atoms_per_core, machine_time_step):
+    def __init__(self, binary, n_neurons, label, constraints, max_atoms_per_core,
+                 machine_time_step):
         AbstractSynapticManager.__init__(self)
         AbstractPartitionablePopulationVertex.__init__(
             self, n_atoms=n_neurons, label=label,
             machine_time_step=machine_time_step, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
-        self._record = record
-        self._record_v = False
-        self._record_gsyn = False
         self._binary = binary
         self._executable_constant = None
-
-    def record_v(self):
-        self._record_v = True
-
-    def record_gsyn(self):
-        self._record_gsyn = True
 
     @abstractmethod
     def get_parameters(self):

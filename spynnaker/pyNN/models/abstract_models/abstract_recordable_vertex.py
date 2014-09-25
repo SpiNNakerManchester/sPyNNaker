@@ -27,6 +27,8 @@ class AbstractRecordableVertex(object):
 
     def __init__(self, machine_time_step, label):
         self._record = False
+        self._record_v = False
+        self._record_gsyn = False
         self._focus_level = None
         self._app_mask = pacman_constants.DEFAULT_MASK
         self._label = label
@@ -37,20 +39,30 @@ class AbstractRecordableVertex(object):
         return self._machine_time_step
 
     @property
-    def is_set_to_record_spikes(self):
+    def record(self):
         """
         method to return if the vertex is set to be recorded
         """
         return self._record
 
-    def record(self, focus=None):
+    def set_record(self, setted_value):
         """
-        method that sets the vertex to be recordable, as well as data on how the
-        visuliser is to represent this vertex at runtime if at all
-        """
-        self._record = True
-        # set the focus level and stuff for the vis
-        self._focus_level = focus  # None, False, True
+        method that sets the vertex to be recordable, """
+        self._record = setted_value
+
+    @property
+    def record_v(self):
+        return self._record_v
+
+    @property
+    def record_gsyn(self):
+        return self._record_gsyn
+
+    def set_record_v(self, setted_value):
+        self._record_v = setted_value
+
+    def set_record_gsyn(self, setted_value):
+        self._record_gsyn = setted_value
 
     def get_recording_region_size(self, bytes_per_timestep):
         """

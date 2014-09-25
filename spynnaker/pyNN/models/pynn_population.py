@@ -6,6 +6,8 @@ from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
 from pacman.utilities import utility_calls as pacman_utility_calls
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
 
 from spynnaker.pyNN.models.utility_models.multicastsource \
     import MultiCastSource
@@ -15,10 +17,6 @@ from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
-
-from visualiser_framework import visualiser_constants
-
 
 import logging
 logger = logging.getLogger(__name__)
@@ -347,35 +345,19 @@ class Population(object):
         new_entry_for_vinit = {'v_init': distribution}
         self._parameters.update(new_entry_for_vinit)
 
-    def record(self, to_file=None, focus=None, live_record=False,
-               visualiser_mode=visualiser_constants.RASTER,
-               visualiser_2d_dimension=None, visualiser_raster_seperate=None,
-               visualiser_no_colours=None, visualiser_average_period_tics=None,
-               visualiser_longer_period_tics=None,
-               visualiser_update_screen_in_tics=None,
-               visualiser_reset_counters=None,
-               visualiser_reset_counter_period=None):
+    def record(self, to_file=None, live_record=False):
         """
         Record spikes from all cells in the Population.
         A flag is set for this population that is passed to the simulation,
         triggering spike time recording.
         """
-        record_attr = getattr(self._vertex, "record", None)
-        if record_attr is None or not callable(record_attr):
+
+        if not isinstance(self._vertex, AbstractRecordableVertex):
             raise Exception("AbstractConstrainedVertex does not support "
                             "recording of spikes")
 
         # Tell the vertex to record spikes
-        self._vertex.record(focus=focus)
-        if conf.config.getboolean("Visualiser", "enable"):
-            visualiser_vertex = VisualiserVertex(
-                visualiser_mode, visualiser_2d_dimension,
-                visualiser_raster_seperate, visualiser_no_colours,
-                visualiser_average_period_tics, visualiser_longer_period_tics,
-                visualiser_update_screen_in_tics, visualiser_reset_counters,
-                visualiser_reset_counter_period, self._vertex)
-            self._spinnaker.add_visualiser_vertex(visualiser_vertex)
-
+        self._vertex.set_record(True)
         # set the file to store the spikes in once retrieved
         self._record_spike_file = to_file
 
@@ -390,12 +372,11 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering gsyn value recording.
         """
-        if (not hasattr(self._vertex, "record_gsyn")
-                or not callable(self._vertex.record_gsyn)):
+        if not isinstance(self._vertex, AbstractRecordableVertex):
             raise Exception("AbstractConstrainedVertex does not support "
                             "recording of gsyn")
 
-        self._vertex.record_gsyn()
+        self._vertex.set_record_gsyn(True)
         self._record_g_syn_file = to_file
 
     def record_v(self, to_file=None):
@@ -404,12 +385,11 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering potential recording.
         """
-        if (not hasattr(self._vertex, "record_v")
-                or not callable(self._vertex.record_v)):
+        if not isinstance(self._vertex, AbstractRecordableVertex):
             raise Exception("AbstractConstrainedVertex does not support "
                             "recording of potential")
 
-        self._vertex.record_v()
+        self._vertex.set_record_v(True)
         self._record_v_file = to_file
 
     @property

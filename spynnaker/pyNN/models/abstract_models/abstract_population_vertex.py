@@ -33,7 +33,7 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
 
         AbstractRecordableVertex.__init__(self, machine_time_step, label)
         AbstractPopulationDataSpec.__init__(
-            self, False, binary, n_neurons, label, constraints,
+            self, binary, n_neurons, label, constraints,
             machine_time_step=machine_time_step,
             max_atoms_per_core=max_atoms_per_core)
         self._delay_vertex = None

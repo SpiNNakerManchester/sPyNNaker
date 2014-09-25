@@ -26,8 +26,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.visualiser_package.visualiser_creation_utility import \
-    VisualiserCreationUtility
+
 
 import time
 import os
@@ -44,19 +43,14 @@ class SpynnakerCommsFunctions(object):
     def __init__(self, reports_states, report_default_directory):
         self._reports_states = reports_states
         self._report_default_directory = report_default_directory
-        self._visualiser_creation_utility = VisualiserCreationUtility()
         self._iptags = list()
         self._machine = None
 
-    def _setup_interfaces(self, hostname, partitionable_graph,
-                          visualiser_vertices, partitioned_graph,
-                          placements, router_tables, runtime,
-                          machine_time_step):
+    def _setup_interfaces(self, hostname):
         """Set up the interfaces for communicating with the SpiNNaker board
         """
         requires_virtual_board = conf.config.getboolean("Machine",
                                                         "virtual_board")
-        requires_visualiser = conf.config.getboolean("Visualiser", "enable")
 
         if not requires_virtual_board:
             ignored_chips = None
@@ -103,13 +97,25 @@ class SpynnakerCommsFunctions(object):
                 y_dimension=virtual_y_dimension,
                 with_wrap_arounds=requires_wrap_around)
 
+    def _setup_visuliser(
+            self, partitionable_graph, visualiser_vertices, partitioned_graph,
+            placements, router_tables, runtime, machine_time_step,
+            graph_mapper):
+        requires_visualiser = conf.config.getboolean("Visualiser", "enable")
+        requires_virtual_board = conf.config.getboolean("Machine",
+                                                        "virtual_board")
+        #if the visuliser is required, import the correct requirements and
+        # create a new visulaiser object and mapping for spinnaker to maintain
         if requires_visualiser:
-            self._visualiser, self._visualiser_vertex_to_page_mapping = \
-                self._visualiser_creation_utility.create_visualiser_interface(
-                    requires_virtual_board, self._txrx,
-                    partitionable_graph, visualiser_vertices, self._machine,
-                    partitioned_graph, placements, router_tables, runtime,
-                    machine_time_step)
+            from spynnaker.pyNN.visualiser_package.visualiser_creation_utility \
+                import VisualiserCreationUtility
+            #create creation utility
+            visualiser_creation_utility = VisualiserCreationUtility()
+            return visualiser_creation_utility.create_visualiser_interface(
+                requires_virtual_board, self._txrx,
+                partitionable_graph, visualiser_vertices, self._machine,
+                partitioned_graph, placements, router_tables, runtime,
+                machine_time_step, graph_mapper)
 
     def _set_up_recording_specifics(self):
         if conf.config.has_option("Recording", "send_live_spikes"):
