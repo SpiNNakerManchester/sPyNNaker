@@ -81,7 +81,6 @@ class SpikeSourceArray(AbstractSpikeSource):
                 else:
                     spike_dict[time_stamp_in_ticks].extend(neuron_list)
 
-        print spike_dict
         return spike_dict
 
     @staticmethod
