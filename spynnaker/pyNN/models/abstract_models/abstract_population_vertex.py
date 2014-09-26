@@ -1,9 +1,8 @@
 from abc import ABCMeta
-import struct
+from math import ceil
+from six import add_metaclass
 import logging
 
-from six import add_metaclass
-import numpy
 from pacman.model.constraints.\
     partitioner_same_size_as_vertex_constraint import \
     PartitionerSameSizeAsVertexConstraint
@@ -13,8 +12,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
 from spynnaker.pyNN.models.abstract_models.abstract_population_data_spec \
     import AbstractPopulationDataSpec
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities.utility_calls import \
-    get_region_base_address_offset
 from spynnaker.pyNN.utilities import constants
 
 
@@ -59,14 +56,15 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         # Spike sources store spike vectors optimally
         # so calculate min words to represent
         sub_vertex_out_spike_bytes_function = \
-            lambda subvertex, subvertex_slice: constants.OUT_SPIKE_BYTES
+            lambda subvertex, subvertex_slice: int(ceil(
+                    subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
             graph_mapper=graph_mapper, placements=placements, transciever=txrx,
             compatible_output=compatible_output,
             sub_vertex_out_spike_bytes_function=
-            sub_vertex_out_spike_bytes_function,
+                sub_vertex_out_spike_bytes_function,
             spike_recording_region=
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
 

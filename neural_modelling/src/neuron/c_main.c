@@ -53,23 +53,22 @@
     neuron_array[i].exp_TC, \
     neuron_array[i].T_refract, \
     neuron_array[i].refract_timer \
-  );		
+  );
 */
 // **TODO** move somewhere else!
 void initialize_buffers (void)
 {
   //log_info("Initializing buffers");
-  
+
   time = 0;
-  
+
   reset_ring_buffer ();
   initialize_current_buffer ();
   initialize_spike_buffer (IN_SPIKE_SIZE);
-  initialize_out_spikes (MAX_NEURON_SIZE);
   initialise_plasticity_buffers();
   initialise_dma_buffers();
-  
-  
+
+
   //log_info("resetting of buffers completed");
 }
 
@@ -79,29 +78,29 @@ void c_main (void)
 #ifdef SPIN1_API_HARNESS
   // Load DTCM data
   system_load_dtcm();
- 
+
   // Configure lead app-specific stuff
   if(leadAp)
   {
     system_lead_app_configured();
   }
-  
+
   initialize_buffers();
- 
+
   // setup function which needs to be called in main program before any neuron code executes
   // currently minimum 100 microseconds, then in 100 steps...  if not called then defaults to 1ms(=1000us)
   provide_machine_timestep( h );
-  
+
   // Set timer tick (in microseconds)
   spin1_set_timer_tick (timer_period);
-  
+
   // Register callbacks
   spin1_callback_on (MC_PACKET_RECEIVED, incoming_spike_callback, -1);
   spin1_callback_on (DMA_TRANSFER_DONE,  dma_callback,             0);
   spin1_callback_on (USER_EVENT,         feed_dma_pipeline,        0);
   spin1_callback_on (TIMER_TICK,         timer_callback,           2);
   //spin1_callback_on (SDP_PACKET_RX,      sdp_packet_callback,      1);
-  
+
   log_info("Starting");
 
   // Start the time at "-1" so that the first tick will be 0
@@ -114,14 +113,14 @@ void c_main (void)
   {
     log_info ("DTCM OK %u", num_neurons );
   }
-  
+
   initialize_buffers ();
-  
+
   log_info ("Buffers OK");
 /*
-  for( index_t i = 0; i < num_neurons; i++ ) 
+  for( index_t i = 0; i < num_neurons; i++ )
   {
-    PRINT_NEURON( i );		
+    PRINT_NEURON( i );
 
     //		neuron_array[i].V_membrane = REAL_CONST( 0.0 );
     neuron_array[i].T_refract = 25;
@@ -129,9 +128,9 @@ void c_main (void)
   }
   */
   add_spike (make_key (0, 0, key_p(key)));
-  
+
   log_info ("add_spike OK");
-  
+
   harness ();
 
 #endif

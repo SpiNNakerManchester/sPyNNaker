@@ -75,7 +75,7 @@ static bool record_neuron_param(recording_channel_e channel, uint8_t parameter, 
 {
   // Get neuron parameter value
   accum parameterValue = neuron_get_state(parameter, neuron );
-  
+
   // Return the result of recording accum value
   return recording_record(channel, &parameterValue, sizeof(accum));
 }
@@ -96,7 +96,7 @@ void neuron (index_t n)
   {
     record_neuron_param(e_recording_channel_neuron_potential, 1, neuron);
   }
-  
+
   // If we should be recording gsyn
   if(system_data_test_bit(e_system_data_record_neuron_gsyn))
   {
@@ -139,15 +139,16 @@ bool neural_data_filled (address_t address, uint32_t flags)
 
   log_info("\tneurons = %u, params = %u, time step = %u",
 	   num_neurons, num_params, h);
-  
+
   // Allocate DTCM for new format neuron array and copy block of data
   neuron_array = (neuron_t*)spin1_malloc( num_neurons * sizeof(neuron_t) );
   if(neuron_array == NULL)
   {
     sentinel("Unable to allocate neuron array - Out of DTCM");
   }
-  
+
   memcpy( neuron_array, &address [5], num_neurons * sizeof(neuron_t) );
+  initialize_out_spikes (num_neurons);
   //print_neurons();
 /*
   a  =  configuration_reader_offset(address, 17);
