@@ -1,1 +1,0 @@
-from spynnaker.pyNN import *

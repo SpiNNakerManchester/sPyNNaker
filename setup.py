@@ -1,7 +1,4 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup
 
 setup(
     name="sPyNNaker",
@@ -25,7 +22,9 @@ setup(
               'spynnaker.pyNN.utilities.conf',
               'spynnaker.pyNN.visualiser_package',
               'spynnaker.pyNN.visualiser_package.visualiser_pages'],
-    package_data={'spynnaker.pyNN': ['model_binaries/*.aplx']},
+    package_data={'spynnaker.pyNN': ['model_binaries/*.aplx'],
+                  'spynnaker': ['spynnaker.cfg'],
+                  'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template']},
     install_requires=['SpiNNMachine', 'SpiNNMan', 'PACMAN',
-            'DataSpecification', 'Visualiser', 'pyNN']
+            'DataSpecification', 'pyNN', 'numpy']
 )
