@@ -1,6 +1,6 @@
-import math
-
+from data_specification.enums.data_type import DataType
 from weight_based_plastic_synapse_row_io import WeightBasedPlasticSynapseRowIo
+import stdp_helpers
 
 import logging
 logger = logging.getLogger(__name__)
@@ -24,7 +24,6 @@ TIME_STAMP_BYTES = 4
 
 # How large are the pre_synaptic_trace_entry_t structures
 ALL_TO_ALL_EVENT_BYTES = 4
-#NEAREST_PAIR_EVENT_BYTES = 0
 
 # Calculate number of words required for header
 ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS = 1 + ((NUM_PRE_SYNAPTIC_EVENTS * (TIME_STAMP_BYTES + ALL_TO_ALL_EVENT_BYTES)) / 4)
@@ -58,47 +57,17 @@ class PfisterSpikeTripletRule(object):
     def get_vertex_executable_suffix(self):
         return "pfister_triplet"
         
-    def write_plastic_params(self, spec, machineTimeStep, subvertex, 
-            weight_scale):
+    def write_plastic_params(self, spec, machineTimeStep, weight_scale):
         # Check timestep is valid
         if machineTimeStep != 1000:
             raise NotImplementedError("STDP LUT generation currently only supports 1ms timesteps")
-        
-        # Calculate scaling factor to incorporate the conversion to weight scale into additive constants
-        # **TODO** move me, along with a load of other stuff to magical stdp helper place
-        stdp_to_weight_scale = float(weight_scale) / 2048.0
-        
+       
         # Write parameters 
-        spec.write(data=spec.doubleToS2111(self.A3_plus * self.w_max * stdp_to_weight_scale), sizeof="s2111")
-        spec.write(data=spec.doubleToS2111(self.A3_minus * self.w_max * stdp_to_weight_scale), sizeof="s2111")
+        spec.write_value(data=int(round(self.A3_plus * self.w_max * weight_scale)), data_type=DataType.INT32)
+        spec.write_value(data=int(round(self.A3_minus * self.w_max * weight_scale)), data_type=DataType.INT32)
         
         # Write lookup tables
-        self.__write_exponential_decay_lut(spec, self.tau_plus, LOOKUP_TAU_PLUS_SIZE, LOOKUP_TAU_PLUS_SHIFT)
-        self.__write_exponential_decay_lut(spec, self.tau_minus, LOOKUP_TAU_MINUS_SIZE, LOOKUP_TAU_MINUS_SHIFT)
-        self.__write_exponential_decay_lut(spec, self.tau_x, LOOKUP_TAU_X_SIZE, LOOKUP_TAU_X_SHIFT)
-        self.__write_exponential_decay_lut(spec, self.tau_y, LOOKUP_TAU_Y_SIZE, LOOKUP_TAU_Y_SHIFT)
-    
-    # Move somewhere more generic STDPRuleBase perhaps?
-    def __write_exponential_decay_lut(self, spec, timeConstant, size, shift):
-        # Calculate time constant reciprocal
-        timeConstantReciprocal = 1.0 / float(timeConstant)
-
-        # Check that the last 
-        lastTime = (size - 1) << shift
-        lastValue = float(lastTime) * timeConstantReciprocal
-        lastExponentialFloat = math.exp(-lastValue)
-        if spec.doubleToS511(lastExponentialFloat) != 0:
-            logger.warning("STDP lookup table with size %u is too short to contain decay with time constant %u - last entry is %f" % (size, timeConstant, lastExponentialFloat))
-
-        # Generate LUT
-        for i in range(size):
-            # Apply shift to get time from index 
-            time = (i << shift)
-
-            # Multiply by time constant and calculate negative exponential
-            value = float(time) * timeConstantReciprocal
-            exponentialFloat = math.exp(-value);
-
-            # Convert to fixed-point and write to spec
-            spec.write(data=spec.doubleToS511(exponentialFloat), sizeof="s511")
-            
+        stdp_helpers.write_exponential_decay_lut(spec, self.tau_plus, LOOKUP_TAU_PLUS_SIZE, LOOKUP_TAU_PLUS_SHIFT)
+        stdp_helpers.write_exponential_decay_lut(spec, self.tau_minus, LOOKUP_TAU_MINUS_SIZE, LOOKUP_TAU_MINUS_SHIFT)
+        stdp_helpers.write_exponential_decay_lut(spec, self.tau_x, LOOKUP_TAU_X_SIZE, LOOKUP_TAU_X_SHIFT)
+        stdp_helpers.write_exponential_decay_lut(spec, self.tau_y, LOOKUP_TAU_Y_SIZE, LOOKUP_TAU_Y_SHIFT)

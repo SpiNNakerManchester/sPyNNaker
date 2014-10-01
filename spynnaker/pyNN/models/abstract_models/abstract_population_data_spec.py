@@ -257,11 +257,12 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         self.write_setup_info(spec, spike_hist_buff_sz, potential_hist_buff_sz,
                               gsyn_hist_buff_sz, self._executable_constant)
 
-        ring_buffer_shift = \
-            utility_calls.get_ring_buffer_to_input_left_shift(
-                subvertex, subgraph, graph_mapper)
+        ring_buffer_shift = self.get_ring_buffer_to_input_left_shift(
+            subvertex, subgraph, graph_mapper)
         weight_scale = self.get_weight_scale(ring_buffer_shift)
-        logger.debug("Weight scale is {}".format(weight_scale))
+        
+        logger.debug("Ring-buffer shift is %d, weight scale is %d" 
+            % (ring_buffer_shift, weight_scale))
 
         self.write_neuron_parameters(
             spec, placement.x, placement.y, placement.p, subvertex,
@@ -271,7 +272,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         self.write_stdp_parameters(
             spec, self._machine_time_step,
-            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value)
+            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value, weight_scale)
 
         self.write_row_length_translation_table(
             spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)

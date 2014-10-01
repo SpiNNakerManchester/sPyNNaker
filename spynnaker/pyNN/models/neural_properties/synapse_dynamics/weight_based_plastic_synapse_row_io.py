@@ -1,5 +1,7 @@
-from pacman103.front.common.abstract_synapse_row_io import AbstractSynapseRowIo
-from pacman103.front.common.synapse_row_info import SynapseRowInfo
+from spynnaker.pyNN.models.neural_properties.\
+    synapse_dynamics.abstract_synapse_row_io import AbstractSynapseRowIo
+from spynnaker.pyNN.models.neural_properties.\
+    synapse_row_info import SynapseRowInfo
 import numpy
 
 class WeightBasedPlasticSynapseRowIo(AbstractSynapseRowIo):

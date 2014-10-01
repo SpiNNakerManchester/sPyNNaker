@@ -59,13 +59,10 @@ class SpynnakerCommsFunctions(object):
         if not requires_virtual_board:
             if self._reports_states is None:
                 self._txrx = create_transceiver_from_hostname(
-                    hostname=hostname, generate_reports=False,
-                    discover=False)
+                    hostname=hostname, discover=False)
             else:
                 self._txrx = create_transceiver_from_hostname(
-                    hostname=hostname, generate_reports=True,
-                    default_report_directory=self._report_default_directory,
-                    discover=False)
+                    hostname=hostname, discover=False)
             #do autoboot if possible
             machine_version = conf.config.get("Machine", "version")
             if machine_version is None:
