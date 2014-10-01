@@ -17,11 +17,6 @@ bool plastic_runtime_log_enabled = false;
 #endif	// DEBUG
 
 //---------------------------------------
-// Externals
-//---------------------------------------
-extern uint32_t num_plastic_pre_synaptic_events;
-
-//---------------------------------------
 // Synapse update loop
 //---------------------------------------
 static inline final_state_t plasticity_update_synapse(uint32_t begin_time, uint32_t delay, update_state_t current_state,
@@ -145,7 +140,6 @@ void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t 
   // Get last pre-synaptic event from event history
   // **NOTE** at this level we don't care about individual synaptic delays
   const uint32_t last_pre_time = event_history->times[event_history->count_minus_one];
-  num_plastic_pre_synaptic_events += plastic_synapse;
   
   // Loop through plastic synapses
   for ( ; plastic_synapse > 0; plastic_synapse--) 

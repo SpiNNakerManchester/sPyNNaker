@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 // Spinn_common includes
-#include "static-assert.h"
+#include "arm_acle.h"
 
 //---------------------------------------
 // Macros
@@ -50,14 +50,8 @@ static inline int32_t plasticity_exponential_decay(uint32_t time,
 //---------------------------------------
 static inline int32_t plasticity_fixed_mul16(int32_t a, int32_t b, const int32_t fixed_point_position)
 {
-#if defined (__arm__) || defined (__thumb__)
-  register int32_t mul;
-  asm volatile ("smulbb %[mul], %[a], %[b]"
-  : [mul] "=r" (mul) : [a] "r" (a), [b] "r" (b) : );
-#else
-  // Cast a and b to 16-bits and multiply
-  int32_t mul = plasticity_mul_16x16((int16_t)a, (int16_t)b);
-#endif
+  // Multiply lower 16-bits of a and b together
+  int32_t mul = __smulbb(a, b);
   
   // Shift down
   return (mul >> fixed_point_position);

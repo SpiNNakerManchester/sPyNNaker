@@ -1,5 +1,4 @@
 #include "../../../spin-neuron-impl.h"
-#include "../../../../common/compile_time_assert.h"
 #include "pfister_triplet_impl.h"
 
 //---------------------------------------
