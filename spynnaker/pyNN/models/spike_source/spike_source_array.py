@@ -349,7 +349,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         return binary_name
 
     #inhirrted from partitionable vertex
-    def get_cpu_usage_for_atoms(self, vertex_slice):
+    def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
 
@@ -367,6 +367,6 @@ class SpikeSourceArray(AbstractSpikeSource):
         return (constants.SETUP_SIZE + spike_region_sz + block_index_region_size
                 + spike_history_region_sz)
 
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
+    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms

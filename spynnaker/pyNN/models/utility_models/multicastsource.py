@@ -246,15 +246,15 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         return "multi_cast_source"
 
     #inhirrted from partitionable vertex
-    def get_cpu_usage_for_atoms(self, vertex_slice):
+    def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
-    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         if self._memory_requirements is None:
             self._calculate_memory_requirements()
         return self._memory_requirements
 
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
+    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
     def get_binary_file_name(self):

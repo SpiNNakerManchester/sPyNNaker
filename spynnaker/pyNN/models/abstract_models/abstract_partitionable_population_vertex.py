@@ -31,7 +31,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                 (4 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
                  * self._n_params))
 
-    def get_sdram_usage_for_atoms(self, vertex_slice, in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the SDRAM requirements for a range of atoms
         """
@@ -40,15 +40,17 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         return (constants.SETUP_SIZE +
                 self.get_neuron_params_size(vertex_slice)
                 + self.get_synapse_parameter_size(vertex_slice)
-                + self.get_stdp_parameter_size(vertex_slice, in_edges)
+                + self.get_stdp_parameter_size(
+                    vertex_slice, graph.incoming_edges_to_vertex(self))
                 + constants.ROW_LEN_TABLE_SIZE
                 + constants.MASTER_POPULATION_TABLE_SIZE
-                + self.get_synaptic_blocks_memory_size(vertex_slice, in_edges)
+                + self.get_synaptic_blocks_memory_size(
+                    vertex_slice, graph.incoming_edges_to_vertex(self))
                 + self.get_spike_buffer_size(vertex_slice)
                 + self.get_v_buffer_size(vertex_slice)
                 + self.get_g_syn_buffer_size(vertex_slice))
 
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
+    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the DTCM requirements for a range of atoms
         """

@@ -260,7 +260,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             sub_vertex_out_spike_bytes_function)
 
     #inhirrtted from partionable vertex
-    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
         method for calculating sdram usage
         """
@@ -268,14 +268,14 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
         return constants.SETUP_SIZE + poisson_params_sz + spike_hist_buff_sz
 
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
+    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
         method for caulculating dtcm usage for a coltection of atoms
         """
         no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         return (44 + (16 * 4)) * no_atoms
 
-    def get_cpu_usage_for_atoms(self, vertex_slice):
+    def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the CPU requirements for a range of atoms
         """

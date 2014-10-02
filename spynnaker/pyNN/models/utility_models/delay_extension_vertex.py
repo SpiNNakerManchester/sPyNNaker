@@ -250,15 +250,15 @@ class DelayExtensionVertex(AbstractRecordableVertex,
             spec.write_array(array_values=delay_block[i])
 
     #inhirrted from partitoionable vertex
-    def get_cpu_usage_for_atoms(self, vertex_slice):
+    def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
 
-    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
          # TODO: Fill this in
         return 0
 
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
+    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms
 
