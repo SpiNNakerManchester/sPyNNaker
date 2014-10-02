@@ -26,7 +26,7 @@ class IFCurrentAlphaPopulation(AbstractIntegrateAndFireProperties,
                                             " supported by the tool chain....."
                                             "watch this space")
 
-    def get_cpu_usage_for_atoms(self, vertex_slice):
+    def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         raise exceptions.SpynnakerException("This neuron model is currently not"
                                             " supported by the tool chain....."
                                             "watch this space")

@@ -349,11 +349,11 @@ class SpikeSourceArray(AbstractSpikeSource):
         return binary_name
 
     #inhirrted from partitionable vertex
-    def get_cpu_usage_for_atoms(self, vertex_slice):
+    def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
 
-    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         spike_dict = self.get_spikes_per_timestep(vertex_slice)
         no_active_timesteps = len(spike_dict.keys())
         spike_block_row_length = self.get_spike_block_row_length(
@@ -367,6 +367,6 @@ class SpikeSourceArray(AbstractSpikeSource):
         return (constants.SETUP_SIZE + spike_region_sz + block_index_region_size
                 + spike_history_region_sz)
 
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
+    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms

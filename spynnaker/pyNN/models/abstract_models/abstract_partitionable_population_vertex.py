@@ -31,10 +31,11 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                 (4 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
                  * self._n_params))
 
-    def get_sdram_usage_for_atoms(self, vertex_slice, in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the SDRAM requirements for a range of atoms
         """
+        in_edges = graph.incoming_edges_to_vertex(self)
 
         # noinspection PyTypeChecker
         return (constants.SETUP_SIZE +
@@ -48,7 +49,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                 + self.get_v_buffer_size(vertex_slice)
                 + self.get_g_syn_buffer_size(vertex_slice))
 
-    def get_dtcm_usage_for_atoms(self, vertex_slice):
+    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the DTCM requirements for a range of atoms
         """
