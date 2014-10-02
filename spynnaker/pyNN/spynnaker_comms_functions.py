@@ -13,7 +13,6 @@ from spinn_machine.virutal_machine import VirtualMachine
 
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.cpu_state import CPUState
-from spinnman import reports as spinnman_reports
 from spinnman.model.iptag import IPTag
 from spinnman.transceiver import create_transceiver_from_hostname
 from spinnman.data.file_data_reader import FileDataReader \
@@ -26,12 +25,11 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities import reports
 
 
 import time
 import os
-import pickle
-import ntpath
 import logging
 
 
@@ -60,15 +58,15 @@ class SpynnakerCommsFunctions(object):
                 ignored_chips = CoreSubsets()
                 for downed_chip in downed_chips.split(":"):
                     x, y = downed_chip.split(",")
-                    ignored_chips.add_core_subset(CoreSubset(
-                            int(x), int(y), []))
+                    ignored_chips.add_core_subset(CoreSubset(int(x), int(y),
+                                                             []))
             downed_cores = str(conf.config.get("Machine", "down_cores"))
             if downed_cores is not None and downed_cores != "None":
                 ignored_cores = CoreSubsets()
                 for downed_core in downed_cores.split(":"):
                     x, y, processor_id = downed_core.split(",")
                     ignored_cores.add_processor(int(x), int(y),
-                            int(processor_id))
+                                                int(processor_id))
 
             self._txrx = create_transceiver_from_hostname(
                 hostname=hostname,
@@ -111,6 +109,8 @@ class SpynnakerCommsFunctions(object):
                 import VisualiserCreationUtility
             #create creation utility
             visualiser_creation_utility = VisualiserCreationUtility()
+            visualiser_creation_utility.set_visulaiser_port(
+                conf.config.getint("Recording", "live_spike_port"))
             return visualiser_creation_utility.create_visualiser_interface(
                 requires_virtual_board, self._txrx,
                 partitionable_graph, visualiser_vertices, self._machine,
@@ -136,10 +136,6 @@ class SpynnakerCommsFunctions(object):
                 # Set up the forwarding so that monitored spikes are sent to the
                 # requested location
                 self._set_tag_output(tag, port, hostname)
-                #takes the same port for the visualiser_framework if being used
-                if conf.config.getboolean("Visualiser", "enable") and \
-                   conf.config.getboolean("Machine", "have_board"):
-                    self._visualiser_creation_utility.set_visulaiser_port(port)
 
     def _set_tag_output(self, tag, port, hostname):
         self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
@@ -350,16 +346,6 @@ class SpynnakerCommsFunctions(object):
         else:
             logger.info("Application is set to run forever - PACMAN is exiting")
 
-        if self._reports_states.transciever_report:
-            commands = list()
-            commands.append("txrx.get_core_state_count({}, CPUState.SYNC0)"
-                            .format(app_id))
-            commands.append("txrx.send_signal({}, SCPSignal.SYNC0"
-                            .format(app_id))
-            spinnman_reports.append_to_rerun_script(
-                conf.config.get("SpecGeneration", "Binary_folder"),
-                commands)
-
     def _break_down_of_failure_to_reach_state(self, total_cores, state):
         sucessful_cores = list()
         unsucessful_cores = dict()
@@ -400,8 +386,9 @@ class SpynnakerCommsFunctions(object):
 
         #if doing reload, start script
         if self._reports_states.transciever_report:
-            spinnman_reports.start_transceiver_rerun_script(
-                conf.config.get("SpecGeneration", "Binary_folder"), hostname)
+            reports.start_transceiver_rerun_script(
+                conf.config.get("SpecGeneration", "Binary_folder"), hostname,
+                conf.config.get("Machine", "version"))
 
         #go through the placements and see if theres any application data to
         # load
@@ -440,20 +427,12 @@ class SpynnakerCommsFunctions(object):
 
                 #add lines to rerun_script if requested
                 if self._reports_states.transciever_report:
-                    lines = list()
-                    lines.append("application_data_file_reader = "
-                                 "SpinnmanFileDataReader(\"{}\")"
-                                 .format(ntpath.basename(
-                                 file_path_for_application_data)))
-
-                    lines.append("txrx.write_memory({}, {}, {}, "
-                                 "application_data_file_reader, {})"
-                                 .format(
-                                 placement.x, placement.y, start_address,
-                                 memory_written))
-                    spinnman_reports.append_to_rerun_script(
-                        conf.config.get("SpecGeneration", "Binary_folder"),
-                        lines)
+                    binary_folder = \
+                        conf.config.get("SpecGeneration", "Binary_folder")
+                    reports.re_load_script_applciation_data_load(
+                        file_path_for_application_data, placement,
+                        start_address, memory_written, user_o_register_address,
+                        binary_folder)
         #load each router table thats needed for the application to run into
         # the chips sdram
         for router_table in router_tables.routing_tables:
@@ -461,6 +440,11 @@ class SpynnakerCommsFunctions(object):
                 self._txrx.load_multicast_routes(
                     router_table.x, router_table.y,
                     router_table.multicast_routing_entries, app_id=app_id)
+                if self._reports_states.transciever_report:
+                    binary_folder = conf.config.get("SpecGeneration",
+                                                    "Binary_folder")
+                    reports.re_load_script_load_routing_tables(
+                        router_table, binary_folder, app_id)
 
     def _load_executable_images(self, executable_targets, app_id):
         """
@@ -468,15 +452,10 @@ class SpynnakerCommsFunctions(object):
         then set each given core to sync0 that require it
         """
         if self._reports_states.transciever_report:
-            pickled_point = os.path.join(conf.config.get("SpecGeneration",
-                                                         "Binary_folder"),
-                                         "picked_executables_mappings")
-            pickle.dump(executable_targets, open(pickled_point, 'wb'))
-            lines = list()
-            lines.append("executable_targets = pickle.load(open(\"{}\", "
-                         "\"rb\"))".format(ntpath.basename(pickled_point)))
-            spinnman_reports.append_to_rerun_script(conf.config.get(
-                "SpecGeneration", "Binary_folder"), lines)
+            binary_folder = os.path.join(conf.config.get("SpecGeneration",
+                                                         "Binary_folder"))
+            reports.re_load_script_load_executables_init(binary_folder,
+                                                         executable_targets)
 
         for exectuable_target_key in executable_targets.keys():
             file_reader = SpinnmanFileDataReader(exectuable_target_key)
@@ -497,12 +476,7 @@ class SpynnakerCommsFunctions(object):
                                      size)
 
             if self._reports_states.transciever_report:
-                lines = list()
-                lines.append("core_subset = executable_targets[\"{}\"]"
-                             .format(exectuable_target_key))
-                lines.append("file_reader = SpinnmanFileDataReader(\"{}\")"
-                             .format(exectuable_target_key))
-                lines.append("txrx.execute_flood(core_subset, file_reader"
-                             ", {}, {})".format(app_id, size))
-                spinnman_reports.append_to_rerun_script(conf.config.get(
-                    "SpecGeneration", "Binary_folder"), lines)
+                binary_folder = os.path.join(conf.config.get("SpecGeneration",
+                                                             "Binary_folder"))
+                reports.re_load_script_load_executables_individual(
+                    binary_folder, exectuable_target_key, app_id, size)

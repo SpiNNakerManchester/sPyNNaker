@@ -1,3 +1,10 @@
+import logging
+import os
+import ntpath
+import pickle
+import time
+
+logger = logging.getLogger(__name__)
 
 
 def generate_synaptic_matrix_report(common_report_directory, partitioned_graph):
@@ -8,3 +15,195 @@ def generate_synaptic_matrix_report_from_dat_file(
         common_report_directory, application_generated_data_files_directory,
         partitioned_graph):
     pass
+
+
+def network_specification_report(report_folder, graph, hostname):
+    """
+    Generate report on the user's network specification.
+    """
+    filename = report_folder + os.sep + "network_specification.rpt"
+    f_network_specification = None
+    try:
+        f_network_specification = open(filename, "w")
+    except IOError:
+        logger.error("Generate_placement_reports: Can't open file {}"
+                     " for writing.".format(filename))
+
+    f_network_specification.write("        Network Specification\n")
+    f_network_specification.write(" =====================\n\n")
+    time_date_string = time.strftime("%c")
+    f_network_specification.write("Generated: {}".format(time_date_string))
+    f_network_specification.write(" for target machine '{}'".format(hostname))
+    f_network_specification.write("\n\n")
+    # Print information on vertices:
+    f_network_specification.write("*** Vertices:\n")
+    for vertex in graph.vertices:
+        label = vertex.label
+        model = vertex.model_name
+        size = vertex.n_atoms
+        #params = vertex.parameters
+        constraints = vertex.constraints
+        f_network_specification.write("AbstractConstrainedVertex {}, size: {}\n"
+                                      .format(label, size))
+        f_network_specification.write("Model: {}\n".format(model))
+        for constraint in constraints:
+            constraint_str = constraint.label
+            f_network_specification.write("constraint: {}\n"
+                                          .format(constraint_str))
+        #if params is None or len(params.keys()) == 0:
+        #    f_network_specification.write("  Parameters: None\n\n")
+        #else:
+        #    f_network_specification.write("  Parameters: %s\n\n" % params)
+        f_network_specification.write("\n")
+
+    # Print information on edges:
+    f_network_specification.write("*** Edges:\n")
+    for edge in graph.edges:
+        label = edge.label
+        model = "No Model"
+        if hasattr(edge, "connector"):
+            model = edge.connector.__class__.__name__
+        pre_v = edge.pre_vertex
+        post_v = edge.post_vertex
+        pre_v_sz = pre_v.n_atoms
+        post_v_sz = post_v.n_atoms
+        pre_v_label = pre_v.label
+        post_v_label = post_v.label
+        edge_str = "PartitionableEdge {} from vertex: '{}' ({} atoms) to vertex: '{}' " \
+                   "({} atoms)\n".format(label, pre_v_label, pre_v_sz,
+                                         post_v_label, post_v_sz)
+        f_network_specification.write(edge_str)
+        f_network_specification.write("  Model: {}\n".format(model))
+        #if params is None or len(params.keys()) == 0:
+        #    f_network_specification.write("  Parameters: None\n\n")
+        #else:
+        #    f_network_specification.write("  Parameters: %s\n\n" % params)
+        f_network_specification.write("\n")
+    # Close file:
+    f_network_specification.close()
+
+
+def start_transceiver_rerun_script(report_directory, hostname, board_version):
+    """Generate the start of the rerun script (settign up trnasciever and such)
+
+    :param report_directory: the directroy to which reports are stored
+    :type report_directory: str
+    :return None
+    :rtype: None
+    :raise IOError: when a file cannot be opened for some reason
+    """
+    file_name = report_directory + os.sep + "rerun_script.py"
+    output = None
+    try:
+        output = open(file_name, "w")
+    except IOError:
+        logger.error("Generate_rerun_script: Can't open file {} for "
+                     "writing.".format(file_name))
+    output.write("from spinnman.transceiver import "
+                 "create_transceiver_from_hostname\n\n")
+    output.write("from spinnman.data.file_data_reader import FileDataReader as"
+                 " SpinnmanFileDataReader \n\n")
+    output.write("from spynnaker.pyNN.spynnaker_comms_functions import "
+                 "SpynnakerCommsFunctions \n \n")
+    output.write("import pickle \n\n")
+    output.write("txrx = create_transceiver_from_hostname(hostname=\"{}\", "
+                 "discover=False)\n\n".format(hostname))
+    output.write("txrx.ensure_board_is_ready(int({})) \n\n".format(board_version))
+    output.write("txrx.discover_connections() \n \n")
+    output.close()
+
+
+def _append_to_rerun_script(report_directory, appended_strings):
+    """helper method to add stuff to the rerun python script
+
+    :param report_directory: the directory to which the reload script is stored\
+     in
+    :param appended_strings: the iterable list of strings where each string is a\
+    command in string form
+    :type report_directory: str
+    :type appended_strings: iterable str
+    :return: None
+    :rtype: None
+    :raise IOError: when a file cannot be opened for some reason
+    """
+    file_name = report_directory + os.sep + "rerun_script.py"
+    output = None
+    try:
+        output = open(file_name, "a")
+    except IOError:
+        logger.error("Generate_rerun_script: Can't open file {} for "
+                     "writing.".format(file_name))
+
+    for line in appended_strings:
+        output.write(line + "\n")
+    output.close()
+
+
+def re_load_script_applciation_data_load(
+        file_path_for_application_data, placement, start_address,
+        memory_written, user_o_register_address, binary_folder):
+    lines = list()
+    lines.append("application_data_file_reader = "
+                 "SpinnmanFileDataReader(\"{}\")"
+                 .format(ntpath.basename(
+                 file_path_for_application_data)))
+
+    lines.append("txrx.write_memory({}, {}, {}, application_data_file_reader,"
+                 " {})".format(placement.x, placement.y, start_address,
+                               memory_written))
+
+    lines.append("txrx.write_memory({}, {}, {}, {})"
+                 .format(placement.x, placement.y, user_o_register_address,
+                         start_address))
+    _append_to_rerun_script(binary_folder, lines)
+
+
+def re_load_script_load_routing_tables(router_table, binary_folder, app_id):
+    pickled_point = os.path.join(binary_folder,
+                                 "picked_routing_table_for_{}_{}"
+                                 .format(router_table.x, router_table.y))
+    pickle.dump(router_table, open(pickled_point, 'wb'))
+    lines = list()
+    lines.append("router_table = pickle.load(open(\"{}\", ""\"rb\"))"
+                 .format(ntpath.basename(pickled_point)))
+    lines.append("txrx.load_multicast_routes(router_table.x, router_table.y, "
+                 "router_table.multicast_routing_entries, app_id={})"
+                 .format(app_id))
+    _append_to_rerun_script(binary_folder, lines)
+
+
+def re_load_script_load_executables_init(binary_folder, executable_targets):
+    pickled_point = os.path.join(binary_folder, "picked_executables_mappings")
+    pickle.dump(executable_targets, open(pickled_point, 'wb'))
+    lines = list()
+    lines.append("executable_targets = pickle.load(open(\"{}\", "
+                 "\"rb\"))".format(ntpath.basename(pickled_point)))
+    _append_to_rerun_script(binary_folder, lines)
+
+
+def re_load_script_load_executables_individual(
+        binary_folder, exectuable_target_key, app_id, size):
+    lines = list()
+    lines.append("core_subset = executable_targets[\"{}\"]"
+                 .format(exectuable_target_key))
+    lines.append("file_reader = SpinnmanFileDataReader(\"{}\")"
+                 .format(exectuable_target_key))
+    lines.append("txrx.execute_flood(core_subset, file_reader"
+                 ", {}, {})".format(app_id, size))
+    _append_to_rerun_script(binary_folder, lines)
+
+
+def re_load_script_running_aspects(
+        binary_folder, executable_targets, hostname, app_id, runtime):
+    pickled_point = os.path.join(binary_folder, "picked_executable_targets")
+    pickle.dump(executable_targets, open(pickled_point, 'wb'))
+    lines = list()
+    lines.append("executable_targets = pickle.load(open(\"{}\","" \"rb\"))"
+                 .format(ntpath.basename(pickled_point)))
+    lines.append("spinnaker_comms = SpynnakerCommsFunctions(None, None)")
+    lines.append("spinnaker_comms._setup_interfaces(\"{}\")"
+                 .format(hostname))
+    lines.append("spinnaker_comms._start_execution_on_machine("
+                 "executable_targets, {}, {})".format(app_id,
+                                                      runtime))
+    _append_to_rerun_script(binary_folder, lines)

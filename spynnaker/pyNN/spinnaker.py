@@ -32,6 +32,7 @@ from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
+from spynnaker.pyNN.utilities import reports
 from spynnaker.pyNN.models.utility_models.live_spike_recorder\
     import LiveSpikeRecorder
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
@@ -40,7 +41,6 @@ from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
-from spynnaker.pyNN import reports
 
 #spinnman inports
 from spinnman.model.core_subsets import CoreSubsets
@@ -50,6 +50,9 @@ import logging
 import math
 import sys
 import time
+import os
+import pickle
+import ntpath
 
 logger = logging.getLogger(__name__)
 
@@ -180,6 +183,13 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
+                if self._reports_states.transciever_report:
+                    binary_folder = conf.config.get("SpecGeneration",
+                                                    "Binary_folder")
+                    reports.re_load_script_running_aspects(
+                        binary_folder, executable_targets, self._hostname,
+                        self._app_id, run_time)
+
                 self._start_execution_on_machine(executable_targets,
                                                  self._app_id, self._runtime)
                 self._has_ran = True
@@ -251,8 +261,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #execute pynn subedge pruning
         self._partitioned_graph, self._graph_mapper = \
-            GraphEdgeFilter().run(self._partitioned_graph,
-                                         self._graph_mapper)
+            GraphEdgeFilter().run(self._partitioned_graph, self._graph_mapper)
 
         #execute key allocator
         self._execute_key_allocator(pacman_report_state)

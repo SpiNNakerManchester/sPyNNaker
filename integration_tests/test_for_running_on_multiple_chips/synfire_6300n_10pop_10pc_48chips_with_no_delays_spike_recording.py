@@ -10,7 +10,7 @@ import spynnaker.pyNN as p
 
 p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
 nNeurons = 10 # number of neurons in each population
-p.set_number_of_neurons_per_core("IF_curr_exp", 10)
+p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons)
 n_pops = 630
 
 
@@ -53,7 +53,7 @@ populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
 for i in range(0, n_pops):
     projections.append(p.Projection(populations[i], populations[i],
                                     p.FromListConnector(loopConnections)))
-    projections.append(p.Projection(populations[i], populations[((i + 1) % 10)],
+    projections.append(p.Projection(populations[i], populations[((i + 1) % n_pops)],
                                     p.FromListConnector(pop_jump_connection)))
 
 projections.append(p.Projection(populations[n_pops], populations[0],
