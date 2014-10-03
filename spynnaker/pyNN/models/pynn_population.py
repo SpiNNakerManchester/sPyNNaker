@@ -60,8 +60,8 @@ class Population(object):
         # to PACMAN
         cell_label = label
         if label is None:
-            cell_label = "Population {}".format(
-                    Population._non_labelled_vertex_count)
+            cell_label = "Population {}"\
+                         .format(Population._non_labelled_vertex_count)
             Population._non_labelled_vertex_count += 1
         cellparams['label'] = cell_label
         cellparams['n_neurons'] = size

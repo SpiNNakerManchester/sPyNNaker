@@ -404,8 +404,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         self._visualiser.start()
 
     def add_vertex(self, vertex_to_add):
-        if type(vertex_to_add) == \
-                type(MultiCastSource(self._machine_time_step)):
+        if isinstance(vertex_to_add, MultiCastSource):
             self._multi_cast_vertex = vertex_to_add
         self._partitionable_graph.add_vertex(vertex_to_add)
 
