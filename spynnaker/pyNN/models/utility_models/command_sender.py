@@ -16,7 +16,7 @@ class CommandSender(AbstractMultiCastSource):
     SYSTEM_REGION = 0
     COMMANDS = 1
 
-    CORE_APP_IDENTIFER = constants.MULTICAST_SOURCE_CORE_APPLICATION_ID
+    CORE_APP_IDENTIFER = constants.COMMAND_SENDER_CORE_APPLICATION_ID
 
     def __init__(self, machine_time_step):
         """

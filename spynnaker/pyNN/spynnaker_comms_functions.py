@@ -42,6 +42,7 @@ class SpynnakerCommsFunctions(object):
         self._reports_states = reports_states
         self._report_default_directory = report_default_directory
         self._iptags = list()
+        self._reverse_iptags = list()
         self._machine = None
 
     def _setup_interfaces(self, hostname):
@@ -117,28 +118,19 @@ class SpynnakerCommsFunctions(object):
                 partitioned_graph, placements, router_tables, runtime,
                 machine_time_step, graph_mapper)
 
-    def _set_up_recording_specifics(self):
-        if conf.config.has_option("Recording", "send_live_spikes"):
-            if conf.config.getboolean("Recording", "send_live_spikes"):
-                port = None
-                if conf.config.has_option("Recording", "live_spike_port"):
-                    port = conf.config.getint("Recording", "live_spike_port")
-                hostname = "localhost"
-                if conf.config.has_option("Recording", "live_spike_host"):
-                    hostname = conf.config.get("Recording", "live_spike_host")
-                tag = None
-                if conf.config.has_option("Recording", "live_spike_tag"):
-                    tag = conf.config.getint("Recording", "live_spike_tag")
-                if tag is None:
-                    raise exceptions.ConfigurationException(
-                        "Target tag for live spikes has not been set")
+    def _add_iptag(self, iptag):
+        self._iptags.append(iptag)
 
-                # Set up the forwarding so that monitored spikes are sent to the
-                # requested location
-                self._set_tag_output(tag, port, hostname)
+    def _add_reverse_tag(self, reverse_iptag):
+        self._reverse_iptags.append(reverse_iptag)
 
-    def _set_tag_output(self, tag, port, hostname):
-        self._iptags.append(IPTag(tag=tag, port=port, address=hostname))
+    def _load_iptags(self):
+        for iptag in self._iptags:
+            self._txrx.set_ip_tag(iptag)
+
+    def _load_reverse_ip_tags(self):
+        for reverse_iptag in self._reverse_iptags:
+            self._txrx.set_reverse_ip_tag(reverse_iptag)
 
     def _retieve_provance_data_from_machine(self, executable_targets):
         pass

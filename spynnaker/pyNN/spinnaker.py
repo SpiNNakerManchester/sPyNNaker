@@ -27,6 +27,10 @@ from spinn_machine.chip import Chip
 #internal imports
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
+    AbstractIPTagableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_reverse_iptagable_vertex import \
+    AbstractReverseIPTagableVertex
 from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
@@ -74,7 +78,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         SpynnakerCommsFunctions.__init__(self, self._reports_states,
                                          self._report_default_directory)
-        self._set_up_recording_specifics()
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -89,7 +92,17 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def run(self, run_time):
 
         self._setup_interfaces(hostname=self._hostname)
+        #extract iptags required by the graph
+        for vertex in self._partitionable_graph.vertices:
+            if isinstance(vertex, AbstractIPTagableVertex):
+                self._add_iptag(vertex.get_ip_tag())
 
+        #extract reverse iptags required by the graph
+        for vertex in self._partitionable_graph.vertices:
+            if isinstance(vertex, AbstractReverseIPTagableVertex):
+                self._add_reverse_tag(vertex.get_reverse_ip_tag())
+
+        #set up vis if needed
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser, self._visualiser_vertex_to_page_mapping =\
                 self._setup_visuliser(
@@ -98,6 +111,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._router_tables, self._runtime, self._machine_time_step,
                     self._graph_mapper)
 
+        #create network report if needed
         if self._reports_states is not None:
             reports.network_specification_report(self._report_default_directory,
                                                  self._partitionable_graph,
@@ -178,6 +192,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._app_id)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
+                logger.info("*** Loading Iptags ***")
+                self._load_iptags()
+                logger.info("*** Loading Reverse Iptags***")
+                self._load_reverse_ip_tags()
             if do_timing:
                 timer.take_sample()
 
@@ -448,8 +466,20 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def add_edge_to_recorder_vertex(self, vertex_to_record_from):
         #check to see if it needs to be created in the frist place
         if self._live_spike_recorder is None:
+            port = None
+            if conf.config.has_option("Recording", "live_spike_port"):
+                port = conf.config.getint("Recording", "live_spike_port")
+            hostname = "localhost"
+            if conf.config.has_option("Recording", "live_spike_host"):
+                hostname = conf.config.get("Recording", "live_spike_host")
+            tag = None
+            if conf.config.has_option("Recording", "live_spike_tag"):
+                tag = conf.config.getint("Recording", "live_spike_tag")
+            if tag is None:
+                raise exceptions.ConfigurationException(
+                    "Target tag for live spikes has not been set")
             self._live_spike_recorder = \
-                LiveSpikeRecorder(self.machine_time_step)
+                LiveSpikeRecorder(self.machine_time_step, tag, port, hostname)
             self.add_vertex(self._live_spike_recorder)
         #create the edge and add
         edge = PartitionableEdge(vertex_to_record_from,

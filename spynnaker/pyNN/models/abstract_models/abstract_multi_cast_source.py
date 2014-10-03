@@ -14,8 +14,6 @@ class AbstractMultiCastSource(
         AbstractRecordableVertex, AbstractDataSpecableVertex,
         AbstractPartitionableVertex):
 
-    CORE_APP_IDENTIFER = constants.MULTICAST_SOURCE_CORE_APPLICATION_ID
-
     def __init__(self, machine_time_step):
         """
         constructor that depends upon the Component vertex

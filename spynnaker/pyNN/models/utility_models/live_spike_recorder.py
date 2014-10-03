@@ -42,6 +42,9 @@ class LiveSpikeRecorder(
     def model_name(self):
         return "AppMonitor"
 
+    def is_ip_tagable_vertex(self):
+        return True
+
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_sub_graph_mapper,
                            report_folder):
