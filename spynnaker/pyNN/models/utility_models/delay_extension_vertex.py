@@ -176,7 +176,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         
         for subedge in sub_graph.outgoing_subedges_from_subvertex(subvertex):
             subedge_assocated_edge = \
-                graph_mapper.get_edge_from_subedge(subedge)
+                graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
             if not isinstance(subedge_assocated_edge, DelayProjectionEdge):
                 raise exceptions.DelayExtensionException(
                     "One of the incoming subedges is not a subedge of a"
@@ -187,7 +187,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
             source_vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
             dest_vertex_slice = graph_mapper.get_subvertex_slice(dest)
             synapse_list = \
-                graph_mapper.get_edge_from_subedge(subedge).synapse_list.\
+                graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge).synapse_list.\
                 create_atom_sublist(source_vertex_slice, dest_vertex_slice)
             for b in range(constants.MAX_DELAY_BLOCKS):
                 min_delay = (b * self._max_delay_per_neuron) + 1

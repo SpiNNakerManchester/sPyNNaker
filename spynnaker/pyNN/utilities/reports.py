@@ -139,7 +139,7 @@ def _append_to_rerun_script(report_directory, appended_strings):
     output.close()
 
 
-def re_load_script_applciation_data_load(
+def re_load_script_application_data_load(
         file_path_for_application_data, placement, start_address,
         memory_written, user_o_register_address, binary_folder):
     lines = list()

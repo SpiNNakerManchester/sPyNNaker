@@ -9,8 +9,8 @@ from pacman.utilities import utility_calls as pacman_utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 
-from spynnaker.pyNN.models.utility_models.multicastsource \
-    import MultiCastSource
+from spynnaker.pyNN.models.utility_models.command_sender \
+    import CommandSender
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 from spynnaker.pyNN.utilities import conf
@@ -80,7 +80,7 @@ class Population(object):
         for require_multi_cast_source_constraint \
                 in require_multi_cast_source_constraints:
             if multi_cast_vertex is None:
-                multi_cast_vertex = MultiCastSource(
+                multi_cast_vertex = CommandSender(
                     self._spinnaker.machine_time_step)
                 self._spinnaker.add_vertex(multi_cast_vertex)
             multi_cast_vertex = self._spinnaker.get_multi_cast_source

@@ -27,7 +27,7 @@ from spinn_machine.chip import Chip
 #internal imports
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.utility_models.multicastsource import MultiCastSource
+from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
@@ -404,7 +404,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         self._visualiser.start()
 
     def add_vertex(self, vertex_to_add):
-        if isinstance(vertex_to_add, MultiCastSource):
+        if isinstance(vertex_to_add, CommandSender):
             self._multi_cast_vertex = vertex_to_add
         self._partitionable_graph.add_vertex(vertex_to_add)
 

@@ -429,7 +429,7 @@ class SpynnakerCommsFunctions(object):
                 if self._reports_states.transciever_report:
                     binary_folder = \
                         conf.config.get("SpecGeneration", "Binary_folder")
-                    reports.re_load_script_applciation_data_load(
+                    reports.re_load_script_application_data_load(
                         file_path_for_application_data, placement,
                         start_address, memory_written, user_o_register_address,
                         binary_folder)

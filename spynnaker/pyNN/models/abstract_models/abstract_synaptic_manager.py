@@ -150,7 +150,7 @@ class AbstractSynapticManager(object):
             
             sublist = subedge.get_synapse_sublist(graph_mapper)
             max_n_words = \
-                max([graph_mapper.get_edge_from_subedge(subedge)
+                max([graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
                     .get_synapse_row_io().get_n_words(synapse_row)
                     for synapse_row in sublist.get_rows()])
             all_syn_block_sz = \
@@ -379,7 +379,7 @@ class AbstractSynapticManager(object):
 
                 sublist = subedge.get_synapse_sublist(graph_mapper)
                 associated_edge = \
-                    graph_mapper.get_edge_from_subedge(subedge)
+                    graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
                 row_io = associated_edge.get_synapse_row_io()
                 if logger.isEnabledFor("debug"):
                     subvertex_vertex =\

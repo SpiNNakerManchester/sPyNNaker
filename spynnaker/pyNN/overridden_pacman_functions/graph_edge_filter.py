@@ -40,8 +40,8 @@ class GraphEdgeFilter(object):
         for subedge in subgraph.subedges:
             if not self._is_filterable(subedge, graph_mapper):
                 new_sub_graph.add_subedge(subedge)
-                associated_edge = graph_mapper.get_edge_from_subedge(subedge)
-                new_graph_mapper.add_subedge(subedge, associated_edge)
+                associated_edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
+                new_graph_mapper.add_partitioned_edge(subedge, associated_edge)
             progress_bar.update()
         progress_bar.end()
         #returned the pruned partitioned_graph and graph_mapper
@@ -49,7 +49,7 @@ class GraphEdgeFilter(object):
 
     @staticmethod
     def _is_filterable(subedge, graph_mapper):
-        associated_edge = graph_mapper.get_edge_from_subedge(subedge)
+        associated_edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
         if isinstance(associated_edge, AbstractFilterableEdge):
             return associated_edge.filter_sub_edge(subedge, graph_mapper)
         elif isinstance(associated_edge, PartitionableEdge):

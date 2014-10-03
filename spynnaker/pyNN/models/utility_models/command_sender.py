@@ -1,26 +1,17 @@
 import os
 
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
 from spynnaker.pyNN import exceptions
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
+    AbstractMultiCastSource
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
-
-
 from pacman.model.constraints.key_allocator_routing_constraint \
     import KeyAllocatorRoutingConstraint
-
-
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 
 
-class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
-                      AbstractPartitionableVertex):
+class CommandSender(AbstractMultiCastSource):
 
     SYSTEM_REGION = 0
     COMMANDS = 1
@@ -31,15 +22,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         """
         constructor that depends upon the Component vertex
         """
-        AbstractRecordableVertex.__init__(self, machine_time_step,
-                                          "multi_cast_source_sender")
-        AbstractDataSpecableVertex.__init__(self, n_atoms=1,
-                                            label="multi_cast_source_sender",
-                                            machine_time_step=machine_time_step)
-        AbstractPartitionableVertex.__init__(
-            self, label="multi_cast_source_sender", n_atoms=1,
-            max_atoms_per_core=1)
-
+        AbstractMultiCastSource.__init__(self, machine_time_step)
         self._writes = None
         self._memory_requirements = None
         self._edge_map = dict()
@@ -61,7 +44,7 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
                 placement.x, placement.y, placement.p, hostname, report_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
-        self._write_basic_setup_info(spec, MultiCastSource.CORE_APP_IDENTIFER)
+        self._write_basic_setup_info(spec, CommandSender.CORE_APP_IDENTIFER)
 
         spec.comment("\n*** Spec for multi case source ***\n\n")
 
@@ -71,8 +54,8 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         #write system region
         spec.switch_write_focus(region=self.SYSTEM_REGION)
         spec.write_value(data=0xBEEF0000)
-        spec.write_value(data=0)
-        spec.write_value(data=0)
+        spec.write_value(data=self._machine_time_step)
+        spec.write_value(data=self._no_machine_time_steps)
         spec.write_value(data=0)
 
         #write commands to memory
@@ -89,7 +72,9 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
         commands = sorted(self._commands, key=lambda tup: tup['t'])
         #calculate size of region and the order of writes
         self._writes = list()
-        self._memory_requirements = 0
+        #add the extra memory requirements for the system region.
+        #  (4 ints = 16 bytes)
+        self._memory_requirements = 16
         #temporary holder
         commands_in_same_time_slot = list()
         self._memory_requirements += 12  # 3 ints holding coutners of cp,
@@ -263,5 +248,5 @@ class MultiCastSource(AbstractRecordableVertex, AbstractDataSpecableVertex,
                                                      "common_binary_folder"))
 
         binary_name = os.path.join(common_binary_path,
-                                   'multicast_source.aplx')
+                                   'command_sender.aplx')
         return binary_name

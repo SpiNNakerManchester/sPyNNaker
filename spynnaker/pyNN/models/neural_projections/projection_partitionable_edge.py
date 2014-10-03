@@ -96,7 +96,7 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
                      .format(self._pre_vertex.label, self._post_vertex.label))
         min_delay = config.get("Model", "min_delay")
         sorted_subedges = \
-            sorted(graph_mapper.get_subedges_from_edge(self),
+            sorted(graph_mapper.get_partitioned_edges_from_partitionable_edge(self),
                    key=lambda sub_edge:
                    (graph_mapper.get_subvertex_slice(
                        sub_edge.pre_subvertex).lo_atom,

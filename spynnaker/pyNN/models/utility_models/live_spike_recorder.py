@@ -2,6 +2,8 @@ import os
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
+    AbstractIPTagableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -10,11 +12,11 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from data_specification.file_data_writer import FileDataWriter
 
 
-class LiveSpikeRecorder(AbstractDataSpecableVertex,
-                        AbstractPartitionableVertex):
+class LiveSpikeRecorder(
+    AbstractDataSpecableVertex, AbstractPartitionableVertex,
+    AbstractIPTagableVertex):
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
     SYSTEM_REGION = 0
 
@@ -23,7 +25,7 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
     forwarding them to the host
 
     """
-    def __init__(self, machine_time_step):
+    def __init__(self, machine_time_step, tag, port, address):
         """
         Creates a new AppMonitor Object.
         """
@@ -32,6 +34,8 @@ class LiveSpikeRecorder(AbstractDataSpecableVertex,
                                             machine_time_step=machine_time_step)
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
                                              max_atoms_per_core=1)
+        AbstractIPTagableVertex.__init__(self, tag, port, address)
+
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
 
     @property
