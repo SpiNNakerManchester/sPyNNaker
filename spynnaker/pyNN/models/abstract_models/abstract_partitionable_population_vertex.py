@@ -35,6 +35,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         """
         Gets the SDRAM requirements for a range of atoms
         """
+        in_edges = graph.incoming_edges_to_vertex(self)
 
         # noinspection PyTypeChecker
         return (constants.SETUP_SIZE +
