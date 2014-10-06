@@ -38,6 +38,7 @@ class AbstractSynapticManager(object):
         self._stdp_checked = False
         self._stdp_mechanism = None
 
+
     @staticmethod
     def write_synapse_row_info(sublist, row_io, spec, current_write_ptr,
                                fixed_row_length, region, weight_scale,
