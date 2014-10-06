@@ -71,6 +71,9 @@ class SpynnakerConfiguration(object):
         self._writeTextSpecs = None
         self._retrieve_provance_data = True
 
+        #helper data stores
+        self._current_max_tag_value = 0
+
     def _set_up_output_application_data_specifics(self):
         where_to_write_application_data_files = \
             config.get("Reports", "defaultApplicationDataFilePath")

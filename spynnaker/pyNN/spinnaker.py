@@ -54,9 +54,6 @@ import logging
 import math
 import sys
 import time
-import os
-import pickle
-import ntpath
 
 logger = logging.getLogger(__name__)
 
@@ -90,17 +87,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         self._edge_count = 0
 
     def run(self, run_time):
-
         self._setup_interfaces(hostname=self._hostname)
         #extract iptags required by the graph
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractIPTagableVertex):
-                self._add_iptag(vertex.get_ip_tag())
-
-        #extract reverse iptags required by the graph
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractReverseIPTagableVertex):
-                self._add_reverse_tag(vertex.get_reverse_ip_tag())
+        self._set_iptags()
+        self._set_reverse_ip_tags()
 
         #set up vis if needed
         if conf.config.getboolean("Visualiser", "enable"):
@@ -216,6 +206,41 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._retieve_provance_data_from_machine(executable_targets)
         else:
             logger.info("*** No simulation requested: Stopping. ***")
+
+    def _set_iptags(self):
+        for vertex in self._partitionable_graph.vertices:
+            if isinstance(vertex, AbstractIPTagableVertex):
+                iptag = vertex.get_ip_tag()
+                if iptag.tag is not None:
+                    if iptag.tag > self._current_max_tag_value:
+                        self._current_max_tag_value = iptag.tag
+                self._add_iptag(iptag)
+        for vertex in self._partitionable_graph.vertices:
+            if isinstance(vertex, AbstractIPTagableVertex):
+                iptag = vertex.get_ip_tag()
+                if iptag.tag is None:
+                    iptag.set_tag(self._current_max_tag_value + 1)
+                    vertex.set_tag(self._current_max_tag_value + 1)
+                    self._current_max_tag_value += 1
+                    self._add_iptag(iptag)
+
+    def _set_reverse_ip_tags(self):
+        #extract reverse iptags required by the graph
+        for vertex in self._partitionable_graph.vertices:
+            if isinstance(vertex, AbstractReverseIPTagableVertex):
+                reverse_iptag = vertex.get_reverse_ip_tag()
+                if reverse_iptag.tag is not None:
+                    if reverse_iptag.tag > self._current_max_tag_value:
+                        self._current_max_tag_value = reverse_iptag.tag
+                self._add_reverse_tag(reverse_iptag)
+        for vertex in self._partitionable_graph.vertices:
+            if isinstance(vertex, AbstractReverseIPTagableVertex):
+                reverse_iptag = vertex.get_reverse_ip_tag()
+                if reverse_iptag.tag is None:
+                    reverse_iptag.set_tag(self._current_max_tag_value + 1)
+                    vertex.set_reverse_iptag_tag(self._current_max_tag_value + 1)
+                    self._current_max_tag_value += 1
+                    self._add_iptag(reverse_iptag)
 
     @property
     def app_id(self):
