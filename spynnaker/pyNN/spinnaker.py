@@ -278,6 +278,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def graph_mapper(self):
         return self._graph_mapper
 
+    @property
+    def routing_infos(self):
+        return self._routing_infos
+
     def set_app_id(self, value):
         self._app_id = value
 

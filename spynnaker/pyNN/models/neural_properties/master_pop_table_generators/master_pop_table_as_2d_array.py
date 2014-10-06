@@ -18,9 +18,17 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
     def __init__(self):
         AbstractMasterPopTableFactory.__init__(self)
 
-    def extract_synaptic_matrix_data_location(self, incoming_key):
-
-        pass
+    def extract_synaptic_matrix_data_location(
+            self, incoming_key, master_pop_base_mem_address):
+        # locate address of the synaptic block
+        pre_x = packet_conversions.get_x_from_key(incoming_key)
+        pre_y = packet_conversions.get_y_from_key(incoming_key)
+        pre_p = packet_conversions.get_p_from_key(incoming_key)
+        table_slot_addr = packet_conversions.\
+            get_mpt_sb_mem_addrs_from_coords(pre_x, pre_y, pre_p)
+        master_table_pop_entry_address = (table_slot_addr +
+                                          master_pop_base_mem_address)
+        return master_table_pop_entry_address
 
     def update_master_population_table(self, spec, block_start_addr, row_index,
                                        key, master_pop_table_region):
@@ -86,8 +94,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
                                            master_pop_region)
 
         master_region_base_address_offset = \
-            self._read_and_convert(x, y, master_region_base_address_address,
-                                   4, "<I", transceiver)
+            self.read_and_convert(x, y, master_region_base_address_address,
+                                  4, "<I", transceiver)
 
         master_region_base_address =\
             master_region_base_address_offset + app_data_base_address

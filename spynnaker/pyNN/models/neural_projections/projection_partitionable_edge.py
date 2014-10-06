@@ -86,7 +86,8 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
         return self._synapse_row_io
 
     def get_synaptic_list_from_machine(
-            self, graph_mapper, placements, transceiver, partitioned_graph):
+            self, graph_mapper, placements, transceiver, partitioned_graph,
+            routing_infos):
         """
         Get synaptic data for all connections in this Projection from the
         machine.
@@ -118,7 +119,8 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
                     subedge.post_subvertex,
                     constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
                     constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-                    self._synapse_row_io, partitioned_graph, graph_mapper)\
+                    self._synapse_row_io, partitioned_graph, graph_mapper,
+                    routing_infos)\
                 .get_rows()
 
             pre_lo_atom = vertex_slice.lo_atom

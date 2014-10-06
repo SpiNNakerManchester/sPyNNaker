@@ -3,6 +3,12 @@ from six import add_metaclass
 from abc import abstractmethod
 import logging
 
+#spinnman imports
+from spinnman import exceptions as spinnman_exceptions
+from spynnaker.pyNN import exceptions
+
+import struct
+
 logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
@@ -36,7 +42,8 @@ class AbstractMasterPopTableFactory(object):
         """
 
     @abstractmethod
-    def extract_synaptic_matrix_data_location(self, incoming_key):
+    def extract_synaptic_matrix_data_location(
+            self, incoming_key, master_pop_base_mem_address):
         """
         :param incoming_key: the source key which the synaptic matrix needs to \
         be mapped to
@@ -57,3 +64,33 @@ class AbstractMasterPopTableFactory(object):
         is being stored
         :return:
         """
+
+    @staticmethod
+    def read_and_convert(x, y, address, length, data_format, transceiver):
+        """
+        tries to read and convert a piece of memory. If it fails, it tries again
+        up to for 4 times, and then if still fails, throws an error.
+        """
+        try:
+            #turn byte array into str for unpack to work.
+            data = \
+                str(list(transceiver.read_memory(
+                    x, y, address, length))[0])
+            result = struct.unpack(data_format, data)[0]
+            return result
+        except spinnman_exceptions.SpinnmanIOException:
+            raise exceptions.SynapticBlockReadException(
+                "failed to read and translate a piece of memory due to a "
+                "spinnman io exception.")
+        except spinnman_exceptions.SpinnmanInvalidPacketException:
+            raise exceptions.SynapticBlockReadException(
+                "failed to read and translate a piece of memory due to a "
+                "invalid packet exception in spinnman.")
+        except spinnman_exceptions.SpinnmanInvalidParameterException:
+            raise exceptions.SynapticBlockReadException(
+                "failed to read and translate a piece of memory due to a "
+                "invalid parameter exception in spinnman.")
+        except spinnman_exceptions.SpinnmanUnexpectedResponseCodeException:
+            raise exceptions.SynapticBlockReadException(
+                "failed to read and translate a piece of memory due to a "
+                "unexpected response code exception in spinnman.")
