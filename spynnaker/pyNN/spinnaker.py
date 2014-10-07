@@ -26,6 +26,7 @@ from spinn_machine.chip import Chip
 
 #internal imports
 from spinnman.messages.scp.scp_signal import SCPSignal
+from spinnman.model.reverse_iptag import ReverseIPTag
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
@@ -88,9 +89,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def run(self, run_time):
         self._setup_interfaces(hostname=self._hostname)
-        #extract iptags required by the graph
-        self._set_iptags()
-        self._set_reverse_ip_tags()
 
         #set up vis if needed
         if conf.config.getboolean("Visualiser", "enable"):
@@ -146,6 +144,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if do_timing:
             timer.take_sample()
 
+        #extract iptags required by the graph
+        self._set_iptags()
+        self._set_reverse_ip_tags()
+
         #execute data spec generation
         if do_timing:
             timer.start_timing()
@@ -174,6 +176,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             if do_timing:
                 timer.start_timing()
 
+            logger.info("*** Loading Iptags ***")
+            self._load_iptags()
+            logger.info("*** Loading Reverse Iptags***")
+            self._load_reverse_ip_tags()
+
             if self._do_load is True:
                 logger.info("*** Loading data ***")
                 self._load_application_data(
@@ -182,10 +189,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._app_id)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
-                logger.info("*** Loading Iptags ***")
-                self._load_iptags()
-                logger.info("*** Loading Reverse Iptags***")
-                self._load_reverse_ip_tags()
             if do_timing:
                 timer.take_sample()
 
@@ -232,7 +235,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 if reverse_iptag.tag is not None:
                     if reverse_iptag.tag > self._current_max_tag_value:
                         self._current_max_tag_value = reverse_iptag.tag
-                self._add_reverse_tag(reverse_iptag)
+                    reverse_iptag = self._create_reverse_iptag_from_iptag(
+                        reverse_iptag, vertex)
+                    self._add_reverse_tag(reverse_iptag)
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractReverseIPTagableVertex):
                 reverse_iptag = vertex.get_reverse_ip_tag()
@@ -240,7 +245,24 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     reverse_iptag.set_tag(self._current_max_tag_value + 1)
                     vertex.set_reverse_iptag_tag(self._current_max_tag_value + 1)
                     self._current_max_tag_value += 1
-                    self._add_iptag(reverse_iptag)
+                    reverse_iptag = self._create_reverse_iptag_from_iptag(
+                        reverse_iptag, vertex)
+                    self._add_reverse_tag(reverse_iptag)
+
+    def _create_reverse_iptag_from_iptag(self, reverse_iptag, vertex):
+        subverts = self._graph_mapper.get_subvertices_from_vertex(vertex)
+        if len(subverts) > 1:
+            raise exceptions.ConfigurationException(
+                "reverse iptaggable populations can only be supported if they"
+                " are partitoned in a 1 to 1 ratio. Please reduce the number "
+                "of neurons per core, or the max-atoms per core to support a "
+                "one core mapping for your iptaggable population.")
+        subvert = next(iter(subverts))
+        placement = self._placements.get_placement_of_subvertex(subvert)
+        return ReverseIPTag(
+            address=reverse_iptag.address, port=reverse_iptag.port,
+            tag=reverse_iptag.tag, destination_x=placement.x,
+            destination_y=placement.y, destination_p=placement.p)
 
     @property
     def app_id(self):
