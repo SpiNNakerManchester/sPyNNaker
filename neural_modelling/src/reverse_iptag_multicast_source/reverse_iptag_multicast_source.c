@@ -4,9 +4,11 @@
 // Globals
 static uint32_t time;
 static bool apply_prefix;
+static bool check;
 static uint32_t prefix;
 static uint32_t key_space;
 static uint32_t mask;
+static uint32_t incorrect_keys;
 
 typedef struct
 {
@@ -30,9 +32,10 @@ void timer_callback (uint unused0, uint unused1)
   if ((simulation_ticks != UINT32_MAX) 
 	&& (time >= simulation_ticks + timer_period))
   {
-    log_info("Simulation complete.\n");
-    spin1_exit(0);
-    return;
+	log_info("Simulation complete.\n");
+	log_info("Incorrect keys discarded: %d\n", incorrect_keys);
+	spin1_exit(0);
+	return;
   }
 }
 
@@ -40,28 +43,36 @@ void process_16_bit_packets (void* event_pointer, uint8_t length,
 							 uint32_t pkt_prefix, bool payload)
 {
   uint32_t i;
-  uint16_t *events_array = (uint16_t *) event_pointer;
-  event16_t *events_struct = (event16_t *) event_pointer;
   
   if (!payload)
   {
+	uint16_t *events_array = (uint16_t *) event_pointer;
+	
 	for (i = 0; i < length; i++)
 	{
 	  uint32_t key = (uint32_t) events_array[i];
 	  key |= pkt_prefix;
 	  
-	  spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+	  if (check && (key & mask) == key_space)
+		spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+	  else
+		incorrect_keys++;
 	}
   }
   else
   {
+	event16_t *events_struct = (event16_t *) event_pointer;
+	
 	for (i = 0; i < length; i++)
 	{
 	  uint32_t payload = (uint32_t) events_struct[i].payload;
 	  uint32_t key = (uint32_t) events_struct[i].event;
 	  key |= pkt_prefix;
 	  
-	  spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+	  if (check && (key & mask) == key_space)
+		spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+	  else
+		incorrect_keys++;
 	}
   }
 }
@@ -76,14 +87,28 @@ void process_32_bit_packets (void* event_pointer, uint8_t length,
 	uint32_t *events = (uint32_t *) event_pointer;
 	
 	for (i = 0; i < length; i++)
-	  spin1_send_mc_packet(events[i] | pkt_prefix, NULL, NO_PAYLOAD);
+	{
+	  uint32_t key = events[i] | pkt_prefix;
+	  
+	  if (check && (key & mask) == key_space)
+		spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+	  else
+		incorrect_keys++;
+	}
   }
   else
   {
 	event32_t *events = (event32_t *) event_pointer;
 	
 	for (i = 0; i < length; i++)
-	  spin1_send_mc_packet(events[i].event | pkt_prefix, events[i].payload, WITH_PAYLOAD);
+	{
+	  uint32_t key = events[i].event | pkt_prefix;
+	  
+	  if (check && (key & mask) == key_space)
+		spin1_send_mc_packet(key , events[i].payload, WITH_PAYLOAD);
+	  else
+		incorrect_keys++;
+	}
   }
 }
 
@@ -92,8 +117,8 @@ void sdp_packet_callback(uint mailbox, uint port)
   sdp_msg_t *msg = (sdp_msg_t *) mailbox;
   uint16_t *data_hdr = (uint16_t *) msg;
   uint16_t data_hdr_value = data_hdr[0];
-  uint32_t pkt_prefix = 0;
-  void *event_pointer = (void *) data_hdr + 1;
+  uint32_t pkt_prefix = prefix;
+  void *event_pointer = (void *) (data_hdr + 1);
   
   use(port);
   
@@ -131,8 +156,11 @@ bool multicast_source_data_filled(address_t base_address) {
   // The lowest 16 bits are the prefix itself
   apply_prefix = region_address[0];
   prefix = region_address[1];
-  key_space = region_address[2];
-  mask = region_address[3];
+  check = region_address[2];
+  key_space = region_address[3];
+  mask = region_address[4];
+  
+  incorrect_keys = 0;
 
   return (true);
 }
