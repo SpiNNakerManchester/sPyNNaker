@@ -38,8 +38,8 @@ from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
-from spynnaker.pyNN.models.utility_models.live_spike_recorder\
-    import LiveSpikeRecorder
+from spynnaker.pyNN.models.utility_models.live_packet_gather\
+    import LivePacketGather
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
@@ -530,7 +530,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 raise exceptions.ConfigurationException(
                     "Target tag for live spikes has not been set")
             self._live_spike_recorder = \
-                LiveSpikeRecorder(self.machine_time_step, tag, port, hostname)
+                LivePacketGather(self.machine_time_step, tag, port, hostname)
             self.add_vertex(self._live_spike_recorder)
         #create the edge and add
         edge = PartitionableEdge(vertex_to_record_from,
