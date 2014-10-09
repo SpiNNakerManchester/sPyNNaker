@@ -9,6 +9,7 @@ static uint32_t prefix;
 static uint32_t key_space;
 static uint32_t mask;
 static uint32_t incorrect_keys;
+static uint32_t key_left_shift;
 
 typedef struct
 {
@@ -156,12 +157,20 @@ bool multicast_source_data_filled(address_t base_address) {
   // The lowest 16 bits are the prefix itself
   apply_prefix = region_address[0];
   prefix = region_address[1];
-  check = region_address[2];
-  key_space = region_address[3];
-  mask = region_address[4];
+  key_left_shift = region_address[2];
+  check = region_address[3];
+  key_space = region_address[4];
+  mask = region_address[5];
   
   incorrect_keys = 0;
 
+  io_printf (IO_BUF, "apply_prefix: %d\n", apply_prefix);
+  io_printf (IO_BUF, "prefix: %d\n", prefix);
+  io_printf (IO_BUF, "key_left_shift: %d\n", key_left_shift);
+  io_printf (IO_BUF, "check: %d\n", check);
+  io_printf (IO_BUF, "key_space: %08x\n", key_space);
+  io_printf (IO_BUF, "mask: %08x\n", mask);
+  
   return (true);
 }
 
