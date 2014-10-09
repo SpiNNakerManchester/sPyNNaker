@@ -298,14 +298,14 @@ class AbstractSynapticManager(object):
         return 0
 
     @staticmethod
-    def write_row_length_translation_table(spec, row_length_trnaslation_region):
+    def write_row_length_translation_table(spec, row_length_translation_region):
         """
         Generate Row Length Translation Table (region 4):
         """
         spec.comment("\nWriting Row Length Translation Table:\n")
 
         # Switch focus of writes to the memory region to hold the table:
-        spec.switch_write_focus(region=row_length_trnaslation_region)
+        spec.switch_write_focus(region=row_length_translation_region)
 
         # The table is a list of eight 32-bit words, that provide a row length
         # when given its encoding (3-bit value used as an index into the
@@ -314,10 +314,11 @@ class AbstractSynapticManager(object):
         for entry in constants.ROW_LEN_TABLE_ENTRIES:
             spec.write_value(data=entry)
 
-    def write_stdp_parameters(self, spec, machine_time_step, stdp_params):
+    def write_stdp_parameters(self, spec, machine_time_step, region, weight_scale):
         if self._stdp_mechanism is not None:
-            self._stdp_mechanism.write_plastic_params(spec, stdp_params,
-                                                      machine_time_step)
+            self._stdp_mechanism.write_plastic_params(spec, region,
+                                                      machine_time_step,
+                                                      weight_scale)
 
     @staticmethod
     def get_weight_scale(ring_buffer_to_input_left_shift):
@@ -327,7 +328,49 @@ class AbstractSynapticManager(object):
         ring_buffer_to_input_left_shift to produce an s1615 fixed point number
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
+    
+    
+    def get_ring_buffer_to_input_left_shift(self, subvertex, sub_graph, graph_mapper):
 
+        in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
+        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1  # do to starting at zero
+        total_exc_weights = numpy.zeros(n_atoms)
+        total_inh_weights = numpy.zeros(n_atoms)
+        for subedge in in_sub_edges:
+            sublist = subedge.get_synapse_sublist(graph_mapper)
+            sublist.sum_weights(total_exc_weights, total_inh_weights)
+
+        max_weight = max((max(total_exc_weights), max(total_inh_weights)))
+        
+        # If we have an STDP mechanism which has a weight dependence
+        if self._stdp_mechanism is not None\
+            and self._stdp_mechanism.weight_dependence is not None:
+                # If weight dependence has a max weight, 
+                # Take this into account as well
+                stdp_max_weight =  self._stdp_mechanism.weight_dependence.w_max
+                if stdp_max_weight is not None:
+                    max_weight = max(max_weight, stdp_max_weight)
+            
+        max_weight_log_2 = 0
+        if max_weight > 0:
+            max_weight_log_2 = math.log(max_weight, 2)
+
+        # Currently, we can only cope with positive left shifts, so the minimum
+        # scaling will be no shift i.e. a max weight of 0nA
+        if max_weight_log_2 < 0:
+            max_weight_log_2 = 0
+
+        max_weight_power = int(math.ceil(max_weight_log_2))
+
+        logger.debug("Max weight is {}, Max power is {}"
+                    .format(max_weight, max_weight_power))
+
+        # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
+        # but we ignore the "-1" to allow a bit of overhead in the above
+        # calculation in case a couple of extra spikes come in
+        return max_weight_power
+    
     def write_synaptic_matrix_and_master_population_table(
             self, spec, subvertex, all_syn_block_sz, weight_scale,
             master_pop_table_region, synaptic_matrix_region, routing_info,
@@ -507,7 +550,7 @@ class AbstractSynapticManager(object):
                                                          max_row_length)
             # create a synaptic_row from the 3 entries
             ring_buffer_shift = \
-                utility_calls.get_ring_buffer_to_input_left_shift(
+                self.get_ring_buffer_to_input_left_shift(
                     post_subvertex, sub_graph, graph_mapper)
 
             weight_scale = self.get_weight_scale(ring_buffer_shift)
