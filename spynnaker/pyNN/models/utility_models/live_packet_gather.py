@@ -12,20 +12,28 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
+from enum import Enum
 
 
-class LiveSpikeRecorder(
+class LivePacketGather(
     AbstractDataSpecableVertex, AbstractPartitionableVertex,
-    AbstractIPTagableVertex):
+        AbstractIPTagableVertex):
+
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
-    SYSTEM_REGION = 0
+
+    _LIVE_DATA_GATHER_REGIONS = Enum(
+        value="LIVE_DATA_GATHER_REGIONS",
+        names=[('SYSTEM', 0),
+               ('CONFIG', 1)])
+    _CONFIG_SIZE = 4
 
     """
-    A AbstractConstrainedVertex for the Monitoring application spikes and
+    A AbstractConstrainedVertex for the Monitoring application data and
     forwarding them to the host
 
     """
-    def __init__(self, machine_time_step, tag, port, address):
+    def __init__(self, machine_time_step, tag, port, address,
+                 send_timestamp=False):
         """
         Creates a new AppMonitor Object.
         """
@@ -37,10 +45,11 @@ class LiveSpikeRecorder(
         AbstractIPTagableVertex.__init__(self, tag, port, address)
 
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
+        self._send_timestamp = send_timestamp
 
     @property
     def model_name(self):
-        return "AppMonitor"
+        return "live packet gather"
 
     def is_ip_tagable_vertex(self):
         return True
@@ -68,6 +77,7 @@ class LiveSpikeRecorder(
         # Construct the data images needed for the Neuron:
         self.reserve_memory_regions(spec, setup_sz)
         self.write_setup_info(spec, subvertex, graph_sub_graph_mapper)
+        self.write_configuration_region(spec)
 
         # End-of-Spec:
         spec.end_specification()
@@ -82,10 +92,25 @@ class LiveSpikeRecorder(
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        spec.reserve_memory_region(region=self.SYSTEM_REGION,
-                                   size=setup_sz,
-                                   label='setup')
-        return
+        spec.reserve_memory_region(
+            region=self._LIVE_DATA_GATHER_REGIONS.SYSTEM.value,
+            size=setup_sz, label='setup')
+        spec.reserve_memory_region(
+            region=self._LIVE_DATA_GATHER_REGIONS.CONFIG.value,
+            size=self._CONFIG_SIZE, label='setup')
+
+    def write_configuration_region(self, spec):
+        """ writes the configuration region to the spec
+
+        :param spec:
+        :return:
+        """
+        spec.switch_write_focus(
+            region=self._LIVE_DATA_GATHER_REGIONS.CONFIG.value)
+        if self._send_timestamp:
+            spec.write_value(data=1)
+        else:
+            spec.write_value(data=0)
 
     def write_setup_info(self, spec, subvertex, graph_sub_graph_mapper):
         """
@@ -117,7 +142,7 @@ class LiveSpikeRecorder(
                                                      "common_binary_folder"))
 
         binary_name = os.path.join(common_binary_path,
-                                   'live_spike_recorder.aplx')
+                                   'live_packet_gather.aplx')
         return binary_name
 
     #inherited from partitionable vertex
@@ -125,7 +150,7 @@ class LiveSpikeRecorder(
         return 0
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        return 0
+        return constants.SETUP_SIZE + self._CONFIG_SIZE
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
-        return 0
+        return self._CONFIG_SIZE
