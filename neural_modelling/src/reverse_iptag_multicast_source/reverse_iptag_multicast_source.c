@@ -117,33 +117,45 @@ void sdp_packet_callback(uint mailbox, uint port)
   sdp_msg_t *msg = (sdp_msg_t *) mailbox;
   uint16_t *data_hdr = (uint16_t *) msg;
   uint16_t data_hdr_value = data_hdr[0];
-  uint32_t pkt_prefix = prefix;
+  uint32_t pkt_key_prefix = prefix;
   void *event_pointer = (void *) (data_hdr + 1);
-  
+
   use(port);
-  
+
   bool pkt_apply_prefix = (bool) (data_hdr_value >> 15);
   bool pkt_format = (bool) (data_hdr_value >> 14 & 0x1);
-  uint8_t pkt_type = (uint8_t) (data_hdr_value >> 12 & 0x3);
+  bool pkt_payload_prefix = (bool) (data_hdr_value >> 13 & 0x1);
+  bool pkt_timestamp = (bool) (data_hdr_value >> 12 & 0x1);
+  uint8_t pkt_type = (uint8_t) (data_hdr_value >> 10 & 0x3);
   uint8_t pkt_len = (uint8_t) (data_hdr_value & 0xFF) + 1;
-  bool payload = (bool) (pkt_type & 0x1);
-	
+  bool payload_on = (bool) (pkt_type & 0x1);
+
   if (pkt_apply_prefix)
+  {
+	uint16_t *key_prefix_ptr = data_hdr + 1;
+	event_pointer = (void*) (data_hdr + 2);
+
+	pkt_key_prefix = (uint32_t) key_prefix_ptr[0];
+
+	if (pkt_format) pkt_key_prefix <<= 16;
+  }
+
+  if (pkt_payload_prefix)
   {
 	uint16_t *prefix_ptr = data_hdr + 1;
 	event_pointer = (void*) (data_hdr + 2);
-	
-	pkt_prefix = (uint32_t) prefix_ptr[0];
-	
-	if (pkt_format) pkt_prefix <<= 16;
+
+	pkt_key_prefix = (uint32_t) prefix_ptr[0];
+
+	if (pkt_format) pkt_key_prefix <<= 16;
   }
   
   if (pkt_type == 0 || pkt_type ==1)
-	process_16_bit_packets (event_pointer, pkt_len, pkt_prefix, payload);
+	process_16_bit_packets (event_pointer, pkt_len, pkt_key_prefix, payload_on);
   else
-	process_32_bit_packets (event_pointer, pkt_len, pkt_prefix, payload);
-  
-  //free the message to stop overlaod
+	process_32_bit_packets (event_pointer, pkt_len, pkt_key_prefix, payload_on);
+
+  //free the message to stop overload
   spin1_msg_free(msg);
 }
 
