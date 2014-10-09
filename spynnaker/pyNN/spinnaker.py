@@ -26,7 +26,7 @@ from spinn_machine.chip import Chip
 
 #internal imports
 from spinnman.messages.scp.scp_signal import SCPSignal
-from spinnman.model.reverse_iptag import ReverseIPTag
+from spinnman.model.iptag.reverse_iptag import ReverseIPTag
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
