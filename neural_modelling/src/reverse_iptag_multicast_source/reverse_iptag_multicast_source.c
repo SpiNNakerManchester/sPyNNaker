@@ -66,7 +66,7 @@ void process_16_bit_packets (void* event_pointer, uint8_t length,
 //	  io_printf (IO_BUF, "process element: %d\n", i);
 //	  io_printf (IO_BUF, "element: %08x\n", events_array[i]);
 	  uint32_t key = (uint32_t) (events_array[i]);
-	  key |= pkt_prefix | 0x70000;
+	  key |= pkt_prefix;
 
 /*
 	  io_printf (IO_BUF, "check: %d\n", check);
