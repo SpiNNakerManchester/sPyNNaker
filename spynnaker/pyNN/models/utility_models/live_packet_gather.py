@@ -13,7 +13,8 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from enum import Enum
-
+from spinnman.messages.eieio.eieio_prefix_type import EIEIOPrefixType
+from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 class LivePacketGather(
     AbstractDataSpecableVertex, AbstractPartitionableVertex,
@@ -25,7 +26,7 @@ class LivePacketGather(
         value="LIVE_DATA_GATHER_REGIONS",
         names=[('SYSTEM', 0),
                ('CONFIG', 1)])
-    _CONFIG_SIZE = 4
+    _CONFIG_SIZE = 32
 
     """
     A AbstractConstrainedVertex for the Monitoring application data and
@@ -33,7 +34,10 @@ class LivePacketGather(
 
     """
     def __init__(self, machine_time_step, tag, port, address,
-                 send_timestamp=False):
+                 use_prefix=False, key_prefix=None, prefix_type=None,
+                 message_type=EIEIOTypeParam.KEY_32_BIT,
+                 right_shift=0, payload_as_time_stamps=True,
+                 number_of_packets_sent_per_time_step=-1):
         """
         Creates a new AppMonitor Object.
         """
@@ -45,7 +49,14 @@ class LivePacketGather(
         AbstractIPTagableVertex.__init__(self, tag, port, address)
 
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
-        self._send_timestamp = send_timestamp
+        self._use_prefix = use_prefix
+        self._key_prefix = key_prefix
+        self._prefix_type = prefix_type
+        self._message_type = message_type
+        self._right_shift = right_shift
+        self._payload_as_time_stamps = payload_as_time_stamps
+        self._number_of_packets_sent_per_time_step = \
+            number_of_packets_sent_per_time_step
 
     @property
     def model_name(self):
@@ -53,6 +64,9 @@ class LivePacketGather(
 
     def is_ip_tagable_vertex(self):
         return True
+
+    def set_number_of_packets_sent_per_time_step(self, new_value):
+        self._number_of_packets_sent_per_time_step = new_value
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_sub_graph_mapper,
@@ -107,10 +121,34 @@ class LivePacketGather(
         """
         spec.switch_write_focus(
             region=self._LIVE_DATA_GATHER_REGIONS.CONFIG.value)
-        if self._send_timestamp:
+        #has prefix
+        if self._use_prefix:
             spec.write_value(data=1)
         else:
             spec.write_value(data=0)
+        #prefix
+        if self._key_prefix is not None:
+            if self._prefix_type == EIEIOPrefixType.LOWER_HALF_WORD:
+                spec.write_value(data=self._key_prefix)
+            else:
+                spec.write_value(data=(self._key_prefix << 16))
+        else:
+            spec.write_value(data=0)
+        #packet type
+        spec.write_value(data=self._message_type.value)
+        #rightshift
+        spec.write_value(data=self._right_shift)
+        #payload as time stamp
+        if self._payload_as_time_stamps:
+            spec.write_value(data=1)
+        else:
+            spec.write_value(data=0)
+        #sdp tag
+        spec.write_value(data=self._tag)
+        #number of packets to send per time stamp
+        spec.write_value(data=self._number_of_packets_sent_per_time_step)
+
+
 
     def write_setup_info(self, spec, subvertex, graph_sub_graph_mapper):
         """
