@@ -132,7 +132,8 @@ class LivePacketGather(
         """
 
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(region=self.SYSTEM_REGION)
+        spec.switch_write_focus(
+            region=self._LIVE_DATA_GATHER_REGIONS.SYSTEM.value)
         spec.write_value(data=self._machine_time_step)
         spec.write_value(data=self._no_machine_time_steps)
 

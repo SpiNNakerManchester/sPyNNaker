@@ -79,7 +79,7 @@ class SpynnakerCommsFunctions(object):
             if machine_version is None:
                 raise exceptions.ConfigurationException(
                     "Please set a machine version number in the configuration "
-                    "file (spynnaker.cfg or pacman.cfg)")
+                    "file (pacman.cfg or pacman.cfg)")
             self._txrx.ensure_board_is_ready(int(machine_version))
             self._txrx.discover_connections()
             self._machine = self._txrx.get_machine_details()
