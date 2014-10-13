@@ -37,7 +37,7 @@ class LivePacketGather(
                  use_prefix=False, key_prefix=None, prefix_type=None,
                  message_type=EIEIOTypeParam.KEY_32_BIT,
                  right_shift=0, payload_as_time_stamps=True,
-                 number_of_packets_sent_per_time_step=-1):
+                 number_of_packets_sent_per_time_step=0):
         """
         Creates a new AppMonitor Object.
         """
@@ -90,7 +90,7 @@ class LivePacketGather(
         #self.writeRandomDistributionDeclarations(spec, dao)
         # Construct the data images needed for the Neuron:
         self.reserve_memory_regions(spec, setup_sz)
-        self.write_setup_info(spec, subvertex, graph_sub_graph_mapper)
+        self.write_setup_info(spec)
         self.write_configuration_region(spec)
 
         # End-of-Spec:
@@ -148,9 +148,7 @@ class LivePacketGather(
         #number of packets to send per time stamp
         spec.write_value(data=self._number_of_packets_sent_per_time_step)
 
-
-
-    def write_setup_info(self, spec, subvertex, graph_sub_graph_mapper):
+    def write_setup_info(self, spec):
         """
         Write information used to control the simulation and gathering of
         results. Currently, this means the flag word used to signal whether
@@ -172,6 +170,7 @@ class LivePacketGather(
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
             region=self._LIVE_DATA_GATHER_REGIONS.SYSTEM.value)
+        spec.write_value(data=self.CORE_APP_IDENTIFIER)
         spec.write_value(data=self._machine_time_step)
         spec.write_value(data=self._no_machine_time_steps)
 

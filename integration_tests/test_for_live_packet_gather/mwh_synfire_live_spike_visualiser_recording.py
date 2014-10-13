@@ -60,6 +60,8 @@ projections.append(p.Projection(populations[0], populations[0], p.FromListConnec
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
 
 populations[0].record(live_record=True)
+populations[0].set_constraint(p.PlacerChipAndCoreConstraint(0,0,2))
+populations[1].set_constraint(p.PlacerChipAndCoreConstraint(0,0,3))
 
 run_time = 100
 print "Running for {} ms".format(run_time)
@@ -77,8 +79,10 @@ if spikes is not None:
     print spikes
     pylab.figure()
     pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
-    pylab.xlabel('neuron id')
-    pylab.ylabel('Time/ms')
+    pylab.ylabel('neuron id')
+    pylab.xlabel('Time/ms')
+    pylab.yticks([0, 2, 4, 6, 8, 10])
+    pylab.xticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
     pylab.title('spikes')
     pylab.show()
 else:
