@@ -1,7 +1,7 @@
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
-from spinnman.model.reverse_iptag import ReverseIPTag
+from spinnman.model.iptag.reverse_iptag import ReverseIPTag
 
 @add_metaclass(ABCMeta)
 class AbstractReverseIPTagableVertex(object):
