@@ -468,7 +468,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         for vertex in self._visualiser_vertices:
             if vertex in self._visualiser_vertex_to_page_mapping.keys():
                 associated_page = self._visualiser_vertex_to_page_mapping[vertex]
-                self._txrx.register_listener(associated_page.recieved_spike(),
+                self._txrx.register_listener(associated_page.recieved_spike,
                                              self._hostname)
         self._visualiser.start()
 

@@ -148,6 +148,10 @@ class SpynnakerConfiguration(object):
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
                 created_folder = True
+        elif config_param == "REPORTS":
+            self._report_default_directory = 'reports'
+            if not os.path.exists(self._report_default_directory):
+                os.makedirs(self._report_default_directory)
         else:
             self._report_default_directory = \
                 os.path.join(config_param, 'reports')

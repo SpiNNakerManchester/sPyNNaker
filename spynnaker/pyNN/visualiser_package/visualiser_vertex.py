@@ -25,6 +25,7 @@ class VisualiserVertex(object):
         #raster views
         self._visualiser_raster_separate = visualiser_raster_separate
         self._vertex = vertex
+        self._n_atoms = self._vertex.n_atoms
 
     @property
     def visualiser_mode(self):

@@ -43,7 +43,7 @@ default = os.path.join(os.path.dirname(spynnaker.__file__), "spynnaker.cfg")
 spynnaker_user = os.path.expanduser("~/.spynnaker.cfg")
 spynnaker_others = ("spynnaker.cfg", spynnaker_user)
 
-legacy_pacmans = ("pacman.cfg", os.path.expanduser("~/.pacman.cfg"))
+legacy_pacmans = (os.path.expanduser("~/.pacman.cfg"), "pacman.cfg")
 
 found_spynnakers = False
 for possible_spynnaker_file in spynnaker_others:
