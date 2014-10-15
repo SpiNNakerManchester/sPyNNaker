@@ -26,7 +26,7 @@ class LivePacketGather(
         value="LIVE_DATA_GATHER_REGIONS",
         names=[('SYSTEM', 0),
                ('CONFIG', 1)])
-    _CONFIG_SIZE = 32
+    _CONFIG_SIZE = 36
 
     """
     A AbstractConstrainedVertex for the Monitoring application data and
@@ -128,12 +128,12 @@ class LivePacketGather(
             spec.write_value(data=0)
         #prefix
         if self._key_prefix is not None:
-            if self._prefix_type == EIEIOPrefixType.LOWER_HALF_WORD:
-                spec.write_value(data=self._key_prefix)
-            else:
-                spec.write_value(data=(self._key_prefix << 16))
+            spec.write_value(data=1)
         else:
             spec.write_value(data=0)
+
+        #prefix type
+        spec.write_value(data=self._prefix_type.value)
         #packet type
         spec.write_value(data=self._message_type.value)
         #rightshift
