@@ -1,9 +1,9 @@
 from spynnaker.pyNN.utilities import constants
-import math
+import numpy
 from abc import ABCMeta
 from six import add_metaclass
 
-NUM_SYNAPSE_PARAMS = 3  # tau_syn_E, tau_syn_E2 and tau_syn_I
+NUM_SYNAPSE_PARAMS = 6  # tau_syn_E, tau_syn_E2 and tau_syn_I and initializers
 
 
 @add_metaclass(ABCMeta)
@@ -60,11 +60,11 @@ class AbstractDualExponentialVertex(object):
         return NUM_SYNAPSE_PARAMS * 4 * ((vertex_slice.hi_atom -
                                           vertex_slice.lo_atom) + 1)
 
-    def write_synapse_parameters(self, spec, subvertex):
+    def write_synapse_parameters(self, spec, subvertex, vertex_slice):
         """
         Write vectors of synapse parameters, one per neuron
-        There is one parameter for each synapse, which is the decay constant for
-        the exponential decay.
+        There is one parameter for each synapse, which is the decay constant
+        for the exponential decay.
 
         Exponential decay factor calculated as:
         p11_XXX = exp(-h/tau_syn_XXX)
@@ -74,19 +74,82 @@ class AbstractDualExponentialVertex(object):
         # Set the focus to the memory region 3 (synapse parameters):
         spec.switchWriteFocus(
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS)
+        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Synapse Parameters for {%d} Neurons:\n"
                      .format(self._atoms))
-        decay_ex = math.exp(-float(self._machine_time_step)
-                            / (1000.0 * float(self._tau_syn_E)))
-        decay_ex2 = math.exp(-float(self._machine_time_step)
+
+        decay_ex = numpy.exp(float(-self._machine_time_step)
+                             / (1000.0 * self._tau_syn_E))
+        init_ex = (self._tau_syn_E * (1 - decay_ex)
+                                   * (1000.0 / self._machine_time_step))
+        decay_ex2 = numpy.exp(float(-self._machine_time_step)
                              / (1000.0 * float(self._tau_syn_E2)))
-        decay_in = math.exp(-float(self._machine_time_step)
+        init_ex2 = (self._tau_syn_E2 * (1 - decay_ex2)
+                                   * (1000.0 / self._machine_time_step))
+        decay_in = numpy.exp(float(-self._machine_time_step)
                             / (1000.0 * float(self._tau_syn_I)))
+        init_in = (self._tau_syn_I * (1 - decay_in)
+                                   * (1000.0 / self._machine_time_step))
 
-        rescaled_decay_ex = int(decay_ex * pow(2, 32))
-        rescaled_decay_ex2 = int(decay_ex2 * pow(2, 32))
-        rescaled_decay_in = int(decay_in * pow(2, 32))
+        # noinspection PyNoneFunctionAssignment
+        rescaled_decay_ex = \
+            numpy.multiply(decay_ex, numpy.array([float(pow(2, 32))],
+                                                 dtype=float)).astype("uint32")
+        # noinspection PyNoneFunctionAssignment
+        rescaled_init_ex = \
+            numpy.multiply(init_ex, numpy.array([float(pow(2, 32))],
+                                                dtype=float)).astype("uint32")
 
-        spec.write(data=rescaled_decay_ex, repeats=subvertex.n_atoms)
-        spec.write(data=rescaled_decay_ex2, repeats=subvertex.n_atoms)
-        spec.write(data=rescaled_decay_in, repeats=subvertex.n_atoms)
+        # noinspection PyNoneFunctionAssignment
+        rescaled_decay_ex2 = \
+            numpy.multiply(decay_ex2, numpy.array([float(pow(2, 32))],
+                                                 dtype=float)).astype("uint32")
+        # noinspection PyNoneFunctionAssignment
+        rescaled_init_ex2 = \
+            numpy.multiply(init_ex2, numpy.array([float(pow(2, 32))],
+                                                dtype=float)).astype("uint32")
+
+        # noinspection PyNoneFunctionAssignment
+        rescaled_decay_in = \
+            numpy.multiply(decay_in, numpy.array([float(pow(2, 32))],
+                                                 dtype=float)).astype("uint32")
+        # noinspection PyNoneFunctionAssignment
+        rescaled_init_in = \
+            numpy.multiply(init_in, numpy.array([float(pow(2, 32))],
+                                                dtype=float)).astype("uint32")
+
+        for atom in range(0, n_atoms):
+            # noinspection PyTypeChecker
+            if len(rescaled_decay_ex) > 1:
+                spec.write_value(data=rescaled_decay_ex[atom])
+            else:
+                spec.write_value(data=rescaled_decay_ex[0])
+            # noinspection PyTypeChecker
+            if len(rescaled_init_ex) > 1:
+                spec.write_value(data=rescaled_init_ex[atom])
+            else:
+                spec.write_value(data=rescaled_init_ex[0])
+
+        for atom in range(0, n_atoms):
+            # noinspection PyTypeChecker
+            if len(rescaled_decay_ex2) > 1:
+                spec.write_value(data=rescaled_decay_ex2[atom])
+            else:
+                spec.write_value(data=rescaled_decay_ex2[0])
+            # noinspection PyTypeChecker
+            if len(rescaled_init_ex2) > 1:
+                spec.write_value(data=rescaled_init_ex2[atom])
+            else:
+                spec.write_value(data=rescaled_init_ex2[0])
+
+        for atom in range(0, n_atoms):
+            # noinspection PyTypeChecker
+            if len(rescaled_decay_in) > 1:
+                spec.write_value(data=rescaled_decay_in[atom])
+            else:
+                spec.write_value(data=rescaled_decay_in[0])
+            # noinspection PyTypeChecker
+            if len(rescaled_init_in) > 1:
+                spec.write_value(data=rescaled_init_in[atom])
+            else:
+                spec.write_value(data=rescaled_init_in[0])

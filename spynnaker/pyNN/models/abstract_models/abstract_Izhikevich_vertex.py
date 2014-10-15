@@ -28,4 +28,4 @@ class AbstractIzhikevichVertex(object):
         self._u_init = utility_calls.convert_param_to_numpy(value, self._atoms)
 
     def ioffset(self, machine_time_step):
-        return self._i_offset / (1000.0 / float(machine_time_step))
+        return self._i_offset

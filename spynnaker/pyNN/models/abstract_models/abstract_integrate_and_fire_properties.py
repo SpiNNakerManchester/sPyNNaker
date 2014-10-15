@@ -32,14 +32,11 @@ class AbstractIntegrateAndFireProperties(object):
 
     def r_membrane(self, machine_time_step):
         return float(self._tau_m) / float(self._cm)
-        #return ((1000.0 * self._tau_m)
-        #        / (self._cm * float(machine_time_step)))
 
     def exp_tc(self, machine_time_step):
         return numpy.exp(float(-machine_time_step) / (1000.0 * self._tau_m))
 
     def ioffset(self, machine_time_step):
-        #return self._i_offset / (1000.0 / float(machine_time_step))
         return self._i_offset
 
     def scaled_t_refract(self):

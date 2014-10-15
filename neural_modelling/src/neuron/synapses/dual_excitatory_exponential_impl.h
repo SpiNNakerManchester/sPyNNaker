@@ -59,8 +59,8 @@ static inline void shape_current(index_t n)
 }
 
 static inline current_t get_exc_neuron_input(index_t n)
-{ 
-  return (current[ex1_offset(n)] + current[ex2_offset(n)]); 
+{
+  return (current[ex1_offset(n)] + current[ex2_offset(n)]);
 }
 
 static inline current_t get_inh_neuron_input (index_t n)
@@ -72,7 +72,7 @@ static inline void add_neuron_input(index_t neuron_id, index_t synapse_type,
 		current_t input)
 {
   current[input_current_offset(neuron_id, synapse_type)] += decay_s1615(input,
-      1 - neuron_synapse_params[synapse_type][neuron_id].neuron_synapse_init);
+      neuron_synapse_params[synapse_type][neuron_id].neuron_synapse_init);
 }
 
 #ifdef DEBUG
