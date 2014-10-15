@@ -81,7 +81,7 @@ class SpynnakerCommsFunctions(object):
                     "Please set a machine version number in the configuration "
                     "file (pacman.cfg or pacman.cfg)")
             self._txrx.ensure_board_is_ready(int(machine_version))
-            self._txrx.discover_connections()
+            self._txrx.discover_scamp_connections()
             self._machine = self._txrx.get_machine_details()
         else:
             virtual_x_dimension = conf.config.get("Machine",
