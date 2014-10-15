@@ -60,14 +60,14 @@ class AbstractExponentialPopulationVertex(object):
         decay_ex = numpy.exp(float(-self._machine_time_step) /
                              (1000.0 * self._tau_syn_e))
 
-        init_ex = (self._tau_syn_e * (1000.0 / float(self._machine_time_step))
-                * (1.0 - decay_ex))
+        init_ex = numpy.exp(float(-self._machine_time_step) /
+                             (1000.0 * self._tau_syn_e * 2))
 
         decay_in = numpy.exp(float(-self._machine_time_step) /
                              (1000.0 * self._tau_syn_i))
 
-        init_in = (self._tau_syn_i * (1000.0 / float(self._machine_time_step))
-                * (1.0 - decay_in))
+        init_in = numpy.exp(float(-self._machine_time_step) /
+                             (1000.0 * self._tau_syn_i * 2))
 
         # noinspection PyNoneFunctionAssignment
         rescaled_decay_ex = \
