@@ -1,7 +1,7 @@
 #ifndef RUNTIME_LOG
 #define RUNTIME_LOG
 
-#include <debug.h>
+#include "../../../common/common-impl.h"
 
 //---------------------------------------
 // Externals

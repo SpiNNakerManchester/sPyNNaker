@@ -157,7 +157,7 @@ void  print_neurons         (void);
 
 // Functions declared within a learning rule
 void initialise_plasticity_buffers();
-bool plasticity_region_filled (uint32_t* address, uint32_t flags);
+bool plasticity_region_filled (uint32_t *address, uint32_t flags);
 void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t *ring_buffer);
 void print_plastic_synapses(address_t plastic, address_t fixed);
 void plasticity_process_post_synaptic_event(uint32_t neuron_index);

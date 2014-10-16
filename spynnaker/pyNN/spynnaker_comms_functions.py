@@ -13,7 +13,7 @@ from spinn_machine.virutal_machine import VirtualMachine
 
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.cpu_state import CPUState
-from spinnman.model.iptag import IPTag
+from spinnman.model.iptag.iptag import IPTag
 from spinnman.transceiver import create_transceiver_from_hostname
 from spinnman.data.file_data_reader import FileDataReader \
     as SpinnmanFileDataReader

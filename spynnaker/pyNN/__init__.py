@@ -73,15 +73,21 @@ from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
     import SmallWorldConnector
 
-#stdp stuff
+# Mechanisms for synapse dynamics
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+    synapse_dynamics import SynapseDynamics
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
     import STDPMechanism
+
+# STDP weight dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     additive_weight_dependence import AdditiveWeightDependence
+
+# STDP timing dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     spike_pair_rule import SpikePairRule
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
-    synapse_dynamics import SynapseDynamics
+    pfister_spike_triplet_rule import PfisterSpikeTripletRule
 
 
 #constraints

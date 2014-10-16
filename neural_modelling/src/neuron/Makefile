@@ -1,4 +1,4 @@
-MODELS = IF_curr_exp IF_curr_delta IF_cond_exp IZK_curr_exp IZK_curr_delta IF_curr_exp_stdp_trace_pair IF_curr_exp_stdp_trace_nearest_pair IF_curr_exp_dual
+MODELS = IF_curr_exp IF_curr_delta IF_cond_exp IZK_curr_exp IZK_curr_delta IF_curr_exp_stdp_pair_additive IF_curr_exp_stdp_nearest_pair_additive IF_curr_exp_stdp_pfister_triplet_additive IF_curr_exp_dual
 BUILD_DIRS := $(addprefix builds/, $(MODELS))
 
 all: $(BUILD_DIRS)
