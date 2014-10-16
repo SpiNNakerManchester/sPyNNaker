@@ -33,7 +33,7 @@ class SpynnakerConfiguration(object):
         self._runtime = None
 
         #specific utility vertexes
-        self._live_spike_recorder = None
+        self._live_spike_recorder = dict()
         self._multi_cast_vertex = None
         self._txrx = None
 
@@ -63,7 +63,7 @@ class SpynnakerConfiguration(object):
         self._key_allocator_algorithm = None
         self._router_algorithm = None
         self._report_default_directory = None
-        self.this_run_time_string_repenstation = None
+        self._this_run_time_string_repenstation = None
 
         #exeuctable params
         self._do_load = None
@@ -108,7 +108,7 @@ class SpynnakerConfiguration(object):
             writer = open(time_of_run_file_name, "w")
             writer.writelines("app_{}_{}"
                               .format(self._app_id,
-                                      self.this_run_time_string_repenstation))
+                                      self._this_run_time_string_repenstation))
             writer.flush()
             writer.close()
 
@@ -122,7 +122,7 @@ class SpynnakerConfiguration(object):
             #add time stamped folder for this run
             this_run_time_folder = \
                 os.path.join(where_to_write_application_data_files,
-                             self.this_run_time_string_repenstation)
+                             self._this_run_time_string_repenstation)
             if not os.path.exists(this_run_time_folder):
                 os.makedirs(this_run_time_folder)
             config.add_section("SpecGeneration")
@@ -175,12 +175,12 @@ class SpynnakerConfiguration(object):
 
         # determine the time slot for later
         this_run_time = datetime.datetime.now()
-        self.this_run_time_string_repenstation = \
+        self._this_run_time_string_repenstation = \
             str(this_run_time.date()) + "-" + str(this_run_time.hour) + "-" + \
             str(this_run_time.minute) + "-" + str(this_run_time.second)
         writer.writelines("app_{}_{}"
                           .format(self._app_id,
-                                  self.this_run_time_string_repenstation))
+                                  self._this_run_time_string_repenstation))
         writer.flush()
         writer.close()
         self._report_default_directory = app_folder_name

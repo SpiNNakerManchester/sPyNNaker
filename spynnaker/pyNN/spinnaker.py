@@ -25,6 +25,8 @@ from spinn_machine.chip import Chip
 
 
 #internal imports
+from spinnman.connections.udp_packet_connections.reverse_iptag_connection import \
+    ReverseIPTagConnection
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
 from spynnaker.pyNN import exceptions
@@ -469,7 +471,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             if vertex in self._visualiser_vertex_to_page_mapping.keys():
                 associated_page = self._visualiser_vertex_to_page_mapping[vertex]
                 self._txrx.register_listener(associated_page.recieved_spike,
-                                             self._hostname)
+                                             vertex.receieve_port_no,
+                                             ReverseIPTagConnection)
         self._visualiser.start()
 
     def add_vertex(self, vertex_to_add):
@@ -517,23 +520,26 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def add_edge_to_recorder_vertex(self, vertex_to_record_from, port=None,
                                     tag=None):
         #check to see if it needs to be created in the frist place
-        if self._live_spike_recorder is None:
-            if conf.config.has_option("Recording", "live_spike_port"):
-                port = conf.config.getint("Recording", "live_spike_port")
-            hostname = "localhost"
-            if conf.config.has_option("Recording", "live_spike_host"):
-                hostname = conf.config.get("Recording", "live_spike_host")
-            if conf.config.has_option("Recording", "live_spike_tag"):
-                tag = conf.config.getint("Recording", "live_spike_tag")
-            if tag is None:
-                raise exceptions.ConfigurationException(
-                    "Target tag for live spikes has not been set")
-            self._live_spike_recorder = \
+        if conf.config.has_option("Recording", "live_spike_port"):
+            port = conf.config.getint("Recording", "live_spike_port")
+        hostname = "localhost"
+        if conf.config.has_option("Recording", "live_spike_host"):
+            hostname = conf.config.get("Recording", "live_spike_host")
+        if conf.config.has_option("Recording", "live_spike_tag"):
+            tag = conf.config.getint("Recording", "live_spike_tag")
+        if tag is None:
+            raise exceptions.ConfigurationException(
+                "Target tag for live spikes has not been set")
+        #locate the live spike recorder
+        if port in self._live_spike_recorder.keys():
+            live_spike_recorder = self._live_spike_recorder[port]
+        else:
+            live_spike_recorder = \
                 LivePacketGather(self.machine_time_step, tag, port, hostname)
-            self.add_vertex(self._live_spike_recorder)
+            self.add_vertex(live_spike_recorder)
         #create the edge and add
         edge = PartitionableEdge(vertex_to_record_from,
-                                 self._live_spike_recorder, "recorder_edge")
+                                 live_spike_recorder, "recorder_edge")
         self.add_edge(edge)
 
     def add_visualiser_vertex(self, visualiser_vertex_to_add):
