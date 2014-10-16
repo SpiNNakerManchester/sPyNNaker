@@ -340,7 +340,8 @@ class Population(object):
         """
         raise NotImplementedError
 
-    def random_init(self, distribution):
+    # noinspection PyPep8Naming
+    def randomInit(self, distribution):
         """
         Set initial membrane potentials for all the cells in the population to
         random values.

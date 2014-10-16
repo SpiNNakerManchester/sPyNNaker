@@ -15,7 +15,8 @@ class VisualisedVertex(Population):
             multi_cast_vertex=multi_cast_vertex, structure=structure)
 
     def record(
-            self, to_file=None, visualiser_mode=VISUALISER_MODES.RASTER,
+            self, to_file=None, receive_port_no=None,
+            visualiser_mode=VISUALISER_MODES.RASTER,
             visualiser_2d_dimension=None, visualiser_raster_seperate=None,
             visualiser_no_colours=None, visualiser_average_period_tics=None,
             visualiser_longer_period_tics=None,
@@ -29,7 +30,7 @@ class VisualisedVertex(Population):
             visualiser_longer_period_tics,
             visualiser_update_screen_in_tics, visualiser_reset_counters,
             visualiser_reset_counter_period, visualiser_raster_seperate,
-            self._vertex)
+            self._vertex, receive_port_no)
         self._spinnaker.add_visualiser_vertex(visualiser_vertex)
         self._vertex.set_record(True)
         # set the file to store the spikes in once retrieved

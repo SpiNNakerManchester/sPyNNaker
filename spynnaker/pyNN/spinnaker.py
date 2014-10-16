@@ -514,16 +514,15 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step)
 
-    def add_edge_to_recorder_vertex(self, vertex_to_record_from):
+    def add_edge_to_recorder_vertex(self, vertex_to_record_from, port=None,
+                                    tag=None):
         #check to see if it needs to be created in the frist place
         if self._live_spike_recorder is None:
-            port = None
             if conf.config.has_option("Recording", "live_spike_port"):
                 port = conf.config.getint("Recording", "live_spike_port")
             hostname = "localhost"
             if conf.config.has_option("Recording", "live_spike_host"):
                 hostname = conf.config.get("Recording", "live_spike_host")
-            tag = None
             if conf.config.has_option("Recording", "live_spike_tag"):
                 tag = conf.config.getint("Recording", "live_spike_tag")
             if tag is None:

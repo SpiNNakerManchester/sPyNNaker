@@ -92,6 +92,8 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 
+from pyNN.random import *
+
 #traditional logger
 logger = logging.getLogger(__name__)
 #global controller / spinnaker object that does everything
