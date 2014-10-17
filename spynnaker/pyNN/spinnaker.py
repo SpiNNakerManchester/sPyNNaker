@@ -261,9 +261,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         subvert = next(iter(subverts))
         placement = self._placements.get_placement_of_subvertex(subvert)
         return ReverseIPTag(
-            address=reverse_iptag.address, port=reverse_iptag.port,
-            tag=reverse_iptag.tag, destination_x=placement.x,
-            destination_y=placement.y, destination_p=placement.p)
+            port=reverse_iptag.port, tag=reverse_iptag.tag,
+            destination_x=placement.x, destination_y=placement.y,
+            destination_p=placement.p)
 
     @property
     def app_id(self):
