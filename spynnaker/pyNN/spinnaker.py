@@ -25,10 +25,6 @@ from spinn_machine.chip import Chip
 
 
 #internal imports
-from spinnman.connections.udp_packet_connections.reverse_iptag_connection import \
-    ReverseIPTagConnection
-from spinnman.messages.scp.scp_signal import SCPSignal
-from spinnman.model.iptag.reverse_iptag import ReverseIPTag
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
@@ -52,6 +48,9 @@ from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
 #spinnman inports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
+from spinnman.messages.scp.scp_signal import SCPSignal
+from spinnman.model.iptag.reverse_iptag import ReverseIPTag
+from spinnman.constants import CONNECTION_TYPE
 
 import logging
 import math
@@ -470,9 +469,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         for vertex in self._visualiser_vertices:
             if vertex in self._visualiser_vertex_to_page_mapping.keys():
                 associated_page = self._visualiser_vertex_to_page_mapping[vertex]
-                self._txrx.register_listener(associated_page.recieved_spike,
-                                             vertex.receieve_port_no,
-                                             ReverseIPTagConnection)
+                self._txrx.register_listener(
+                    associated_page.recieved_spike, vertex.receieve_port_no,
+                    CONNECTION_TYPE.UDP_IPTAG, vertex.traffic_type)
         self._visualiser.start()
 
     def add_vertex(self, vertex_to_add):

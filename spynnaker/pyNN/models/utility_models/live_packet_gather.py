@@ -58,6 +58,8 @@ class LivePacketGather(
         self._number_of_packets_sent_per_time_step = \
             number_of_packets_sent_per_time_step
 
+
+
     @property
     def model_name(self):
         return "live packet gather"
@@ -126,14 +128,18 @@ class LivePacketGather(
             spec.write_value(data=1)
         else:
             spec.write_value(data=0)
+
         #prefix
         if self._key_prefix is not None:
-            spec.write_value(data=1)
+            spec.write_value(data=self._key_prefix)
         else:
             spec.write_value(data=0)
 
         #prefix type
-        spec.write_value(data=self._prefix_type.value)
+        if self._prefix_type is not None:
+            spec.write_value(data=self._prefix_type.value)
+        else:
+            spec.write_value(data=0)
         #packet type
         spec.write_value(data=self._message_type.value)
         #rightshift

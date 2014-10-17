@@ -89,9 +89,9 @@ class VisualiserThread(threading.Thread):
         self._visulaiser_listener = listener
 
     def set_bufsize(self, bufsize):
-        """supports changing of the bufsize
+        """supports changing of the _bufsize
 
-        :param bufsize: the associated new bufsize
+        :param bufsize: the associated new _bufsize
         :type bufsize: int
         :return: None
         :rtype: None

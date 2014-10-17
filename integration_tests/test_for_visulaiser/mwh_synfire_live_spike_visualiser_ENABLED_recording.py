@@ -60,9 +60,10 @@ populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputS
 projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
 
-populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER, visualiser_raster_seperate=True)
-populations[0].set_constraint(p.PlacerChipAndCoreConstraint(0,0,2))
-populations[1].set_constraint(p.PlacerChipAndCoreConstraint(0,0,3))
+populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER,
+                      visualiser_raster_seperate=True)
+populations[0].set_constraint(p.PlacerChipAndCoreConstraint(0, 0, 2))
+populations[1].set_constraint(p.PlacerChipAndCoreConstraint(0, 0, 3))
 
 run_time = 100
 print "Running for {} ms".format(run_time)
@@ -72,9 +73,6 @@ v = None
 gsyn = None
 spikes = None
 spikes = populations[0].getSpikes(compatible_output=True)
-#print(projections[0].getWeights())
-#print(projections[0].getDelays())
-#print delays
 
 if spikes is not None:
     print spikes

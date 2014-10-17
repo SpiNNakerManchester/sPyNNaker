@@ -11,7 +11,8 @@ class VisualiserVertex(object):
                  visualiser_update_screen_in_tics,
                  visualiser_reset_counters,
                  visualiser_reset_counter_period,
-                 visualiser_raster_separate, vertex, receieve_port_no):
+                 visualiser_raster_separate, vertex, receieve_port_no,
+                 traffic_type):
         self._visualiser_mode = visualiser_mode
         #topological views
         self._visualiser_2d_dimensions = visualiser_2d_dimensions
@@ -27,6 +28,7 @@ class VisualiserVertex(object):
         self._vertex = vertex
         self._n_atoms = self._vertex.n_atoms
         self._recieve_port_no = receieve_port_no
+        self._traffic_type = traffic_type
 
     @property
     def visualiser_mode(self):
@@ -71,3 +73,7 @@ class VisualiserVertex(object):
     @property
     def receieve_port_no(self):
         return self._recieve_port_no
+
+    @property
+    def traffic_type(self):
+        return self._traffic_type

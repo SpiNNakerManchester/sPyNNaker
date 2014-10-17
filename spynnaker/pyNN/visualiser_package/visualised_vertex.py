@@ -4,6 +4,7 @@ from spynnaker.pyNN.utilities import conf
 
 from visualiser_framework.visualiser_constants import VISUALISER_MODES
 
+from spinnman.constants import TRAFFIC_TYPE
 
 class VisualisedVertex(Population):
 
@@ -16,6 +17,7 @@ class VisualisedVertex(Population):
 
     def record(
             self, to_file=None, receive_port_no=None,
+            traffic_type=TRAFFIC_TYPE.EIEIO,
             visualiser_mode=VISUALISER_MODES.RASTER,
             visualiser_2d_dimension=None, visualiser_raster_seperate=None,
             visualiser_no_colours=None, visualiser_average_period_tics=None,
@@ -30,7 +32,7 @@ class VisualisedVertex(Population):
             visualiser_longer_period_tics,
             visualiser_update_screen_in_tics, visualiser_reset_counters,
             visualiser_reset_counter_period, visualiser_raster_seperate,
-            self._vertex, receive_port_no)
+            self._vertex, receive_port_no, traffic_type)
         self._spinnaker.add_visualiser_vertex(visualiser_vertex)
         self._vertex.set_record(True)
         # set the file to store the spikes in once retrieved
