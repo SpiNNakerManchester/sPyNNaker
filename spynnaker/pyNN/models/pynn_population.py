@@ -350,8 +350,7 @@ class Population(object):
             the distribution used to draw random values.
 
         """
-        new_entry_for_vinit = {'v_init': distribution}
-        self._parameters.update(new_entry_for_vinit)
+        self.initialize('v', distribution)
 
     def record(self, to_file=None, live_record=False):
         """
