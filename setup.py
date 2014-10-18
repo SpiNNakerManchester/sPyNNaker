@@ -25,6 +25,6 @@ setup(
     package_data={'spynnaker.pyNN': ['model_binaries/*.aplx'],
                   'spynnaker': ['spynnaker.cfg'],
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template']},
-    install_requires=['SpiNNMachine', 'SpiNNMan', 'PACMAN',
-            'DataSpecification', 'pyNN', 'numpy']
+    install_requires=['SpiNNMachine', 'SpiNNMan', 'SpiNNaker_PACMAN',
+            'SpiNNaker_DataSpecification', 'pyNN', 'numpy']
 )
