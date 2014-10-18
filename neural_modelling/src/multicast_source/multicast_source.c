@@ -14,7 +14,7 @@ void timer_callback (uint unused0, uint unused1)
   use(unused0);
   use(unused1);
   time++;
-  
+
   if ((next_pos >= schedule_size)
 		  && (simulation_ticks != UINT32_MAX)
 		  && (time >= simulation_ticks + timer_period))
@@ -23,7 +23,7 @@ void timer_callback (uint unused0, uint unused1)
     spin1_exit(0);
     return;
   }
-  
+
   if ((next_pos < schedule_size) && schedule[next_pos] == time) {
 	  uint32_t with_payload_count = schedule[++next_pos];
 	  log_info("Sending %d packets with payloads at time %d",
@@ -136,20 +136,14 @@ void c_main (void)
 {
   // Configure system
   system_load_dtcm();
- 
-  // Configure lead app-specific stuff
-  if(leadAp)
-  {
-    system_lead_app_configured();
-  }
-  
+
   // Set timer_callback
   spin1_set_timer_tick(timer_period);
-  
+
   // Register callbacks
   spin1_callback_on (SDP_PACKET_RX,      sdp_packet_callback,  -1);
   spin1_callback_on (TIMER_TICK,         timer_callback,       2);
-  
+
   log_info("Starting");
 
   // Start the time at "-1" so that the first tick will be 0

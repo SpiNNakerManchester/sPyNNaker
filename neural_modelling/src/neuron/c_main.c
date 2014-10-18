@@ -79,12 +79,6 @@ void c_main (void)
   // Load DTCM data
   system_load_dtcm();
 
-  // Configure lead app-specific stuff
-  if(leadAp)
-  {
-    system_lead_app_configured();
-  }
-
   initialize_buffers();
 
   // setup function which needs to be called in main program before any neuron code executes

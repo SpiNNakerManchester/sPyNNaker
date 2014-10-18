@@ -92,12 +92,6 @@ void c_main (void)
   // Configure system
   system_load_dtcm();
 
-  // Configure lead app-specific stuff
-  if(leadAp)
-  {
-    system_lead_app_configured();
-  }
-
   // Initialize the incoming spike buffer
   initialize_spike_buffer (8192);
 
