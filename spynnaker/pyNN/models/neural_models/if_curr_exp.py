@@ -51,7 +51,7 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             _model_based_max_atoms_per_core = new_value
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        return 782 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
+        return 781 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
     def get_parameters(self):
         """
@@ -70,6 +70,6 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
                             DataType.S1615),
             NeuronParameter(self.exp_tc(self._machine_time_step),
                             DataType.S1615),
-            NeuronParameter(self.one_over_tau_rc, DataType.S1615),
-            NeuronParameter(self.refract_timer, DataType.UINT32),
-            NeuronParameter(self.scaled_t_refract(), DataType.UINT32)]
+            NeuronParameter(self._one_over_tau_rc, DataType.S1615),
+            NeuronParameter(self._refract_timer, DataType.UINT32),
+            NeuronParameter(self._scaled_t_refract(), DataType.UINT32)]

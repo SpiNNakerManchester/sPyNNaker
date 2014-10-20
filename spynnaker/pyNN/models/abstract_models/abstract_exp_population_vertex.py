@@ -22,13 +22,29 @@ class AbstractExponentialPopulationVertex(object):
                                                                n_neurons)
         self._machine_time_step = machine_time_step
 
+    @property
+    def tau_syn_e(self):
+        return self._tau_syn_e
+
+    @tau_syn_e.setter
+    def tau_syn_e(self, new_value):
+        self._tau_syn_e = new_value
+
+    @property
+    def tau_syn_i(self):
+        return self._tau_syn_i
+
+    @tau_syn_i.setter
+    def tau_syn_i(self, new_value):
+        self._tau_syn_i = new_value
+
     @staticmethod
     def get_synapse_parameter_size(vertex_slice):
         """
         Gets the size of the synapse parameters for a range of neurons
         """
         return NUM_SYNAPSE_PARAMS * 4 * \
-               ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
+            ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
     @staticmethod
     def get_n_synapse_type_bits():

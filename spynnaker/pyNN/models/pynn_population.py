@@ -565,6 +565,10 @@ class Population(object):
                 "variable being adjusted by the end user. Sorry")
 
     @property
+    def size(self):
+        return self._vertex.n_atoms
+
+    @property
     def structure(self):
         raise NotImplementedError
 

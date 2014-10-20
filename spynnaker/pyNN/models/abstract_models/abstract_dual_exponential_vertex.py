@@ -23,6 +23,36 @@ class AbstractDualExponentialVertex(object):
         self._machine_time_step = machine_time_step
         self._atoms = n_neurons
 
+    # noinspection PyPep8Naming
+    @property
+    def tau_syn_E(self):
+        return self._tau_syn_E
+
+    # noinspection PyPep8Naming
+    @tau_syn_E.setter
+    def tau_syn_E(self, new_value):
+        self._tau_syn_E = new_value
+
+    # noinspection PyPep8Naming
+    @property
+    def tau_syn_E2(self):
+        return self._tau_syn_E2
+
+    # noinspection PyPep8Naming
+    @tau_syn_E2.setter
+    def tau_syn_E2(self, new_value):
+        self._tau_syn_E2 = new_value
+
+    # noinspection PyPep8Naming
+    @property
+    def tau_syn_I(self):
+        return self._tau_syn_I
+
+    # noinspection PyPep8Naming
+    @tau_syn_I.setter
+    def tau_syn_I(self, new_value):
+        self._tau_syn_I = new_value
+
     @staticmethod
     def get_synapse_targets():
         """

@@ -40,12 +40,16 @@ class AbstractIntegrateAndFireProperties(object):
     def ioffset(self, machine_time_step):
         return self._i_offset / (1000.0 / float(machine_time_step))
 
-    def scaled_t_refract(self):
+    def _scaled_t_refract(self):
         return self._tau_refrac * self._t_refract_scale
 
     @property
     def cm(self):
         return self._cm
+
+    @property
+    def v_init(self):
+        return self._v_init
 
     @property
     def tau_m(self):
@@ -64,13 +68,45 @@ class AbstractIntegrateAndFireProperties(object):
         return self._v_thresh
 
     @property
-    def one_over_tau_rc(self):
+    def _one_over_tau_rc(self):
         return 1.0 / self._tau_m
 
     @property
-    def refract_timer(self):
+    def _refract_timer(self):
         return 0
 
     @property
-    def t_refract(self):
+    def tau_refract(self):
         return self._tau_refrac
+
+    @i_offset.setter
+    def i_offset(self, new_value):
+        self._i_offset = new_value
+
+    @v_rest.setter
+    def v_rest(self, new_value):
+        self._v_rest = new_value
+
+    @tau_refract.setter
+    def tau_refract(self, new_value):
+        self._tau_refrac = new_value
+
+    @tau_m.setter
+    def tau_m(self, new_value):
+        self._tau_m = new_value
+
+    @v_thresh.setter
+    def v_thresh(self, new_value):
+        self._v_thresh = new_value
+
+    @v_init.setter
+    def v_init(self, new_value):
+        self._v_init = new_value
+
+    @cm.setter
+    def cm(self, new_value):
+        self._cm = new_value
+
+
+
+
