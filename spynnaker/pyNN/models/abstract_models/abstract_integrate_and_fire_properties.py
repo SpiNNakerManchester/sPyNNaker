@@ -7,7 +7,7 @@ from six import add_metaclass
 
 @add_metaclass(ABCMeta)
 class AbstractIntegrateAndFireProperties(object):
-    
+
     def __init__(self, v_init, tau_m, cm, i_offset, atoms, v_rest, v_reset,
                  v_thresh, tau_refrac, t_refract_scale=10):
         self._tau_m = tau_m
@@ -31,14 +31,13 @@ class AbstractIntegrateAndFireProperties(object):
         self._v_init = utility_calls.convert_param_to_numpy(value, self._atoms)
 
     def r_membrane(self, machine_time_step):
-        return ((1000.0 * self._tau_m) 
-                / (self._cm * float(machine_time_step)))
+        return float(self._tau_m) / float(self._cm)
 
     def exp_tc(self, machine_time_step):
         return numpy.exp(float(-machine_time_step) / (1000.0 * self._tau_m))
-        
+
     def ioffset(self, machine_time_step):
-        return self._i_offset / (1000.0 / float(machine_time_step))
+        return self._i_offset
 
     def _scaled_t_refract(self):
         return self._tau_refrac * self._t_refract_scale
