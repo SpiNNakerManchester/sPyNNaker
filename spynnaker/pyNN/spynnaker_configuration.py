@@ -125,7 +125,8 @@ class SpynnakerConfiguration(object):
                              self.this_run_time_string_repenstation)
             if not os.path.exists(this_run_time_folder):
                 os.makedirs(this_run_time_folder)
-            config.add_section("SpecGeneration")
+            if not config.has_section("SpecGeneration"): 
+                config.add_section("SpecGeneration")
             config.set("SpecGeneration", "Binary_folder", this_run_time_folder)
 
     def _set_up_report_specifics(self):
