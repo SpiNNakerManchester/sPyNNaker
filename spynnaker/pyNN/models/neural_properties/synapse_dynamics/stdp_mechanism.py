@@ -1,19 +1,10 @@
-from additive_weight_dependence import AdditiveWeightDependence
-from weight_based_plastic_synapse_row_io import WeightBasedPlasticSynapseRowIo
-
-
 class STDPMechanism(object):
-    
     def __init__(self, timing_dependence=None, weight_dependence=None,
                  voltage_dependence=None):
         self.timing_dependence = timing_dependence
         self.weight_dependence = weight_dependence
         self.voltage_dependence = voltage_dependence
         
-        if not isinstance(weight_dependence, AdditiveWeightDependence):
-            raise Exception("weight_dependence must be an "
-                            "AdditiveWeightDependence")
-
         if self.voltage_dependence is not None:
             raise NotImplementedError("voltage_dependence not implemented")
 
@@ -26,8 +17,10 @@ class STDPMechanism(object):
                 and self.equals(other))
         
     def get_synapse_row_io(self):
-        return WeightBasedPlasticSynapseRowIo(
-            self._get_synaptic_row_header_words())
+        if self.timing_dependence is not None:
+            return self.timing_dependence.get_synapse_row_io()
+        else:
+            return None
         
     def equals(self, other):
         """
@@ -36,10 +29,11 @@ class STDPMechanism(object):
         raise NotImplementedError
     
     def get_vertex_executable_suffix(self):
-        name = "stdp_trace"
+        name = "stdp"
         if self.timing_dependence is not None:
             name += "_" + self.timing_dependence.get_vertex_executable_suffix()
-
+        if self.weight_dependence is not None:
+            name += "_" + self.weight_dependence.get_vertex_executable_suffix()
         return name
 
     def get_params_size(self):
@@ -48,14 +42,14 @@ class STDPMechanism(object):
         """
         size = 0
         if self.weight_dependence is not None:
-            size = size + self.weight_dependence.get_params_size_bytes()
+            size += self.weight_dependence.get_params_size_bytes()
 
         if self.timing_dependence is not None:
-            size = size + self.timing_dependence.get_params_size_bytes()
+            size += self.timing_dependence.get_params_size_bytes()
         
         return size
     
-    def write_plastic_params(self, spec, region, machine_time_step):
+    def write_plastic_params(self, spec, region, machine_time_step, weight_scale):
         spec.comment("Writing Plastic Parameters")
         
         # Switch focus to the region:
@@ -63,10 +57,10 @@ class STDPMechanism(object):
 
         # Write weight dependence information to region
         if self.weight_dependence is not None:
-            self.weight_dependence.write_plastic_params(spec, machine_time_step)
+            self.weight_dependence.write_plastic_params(spec, machine_time_step, weight_scale)
 
         if self.timing_dependence is not None:
-            self.timing_dependence.write_plastic_params(spec, machine_time_step)
+            self.timing_dependence.write_plastic_params(spec, machine_time_step, weight_scale)
 
     # **TEMP** timing and weight components should be able to contribute their 
     # own components
@@ -79,4 +73,5 @@ class STDPMechanism(object):
 
         if self.timing_dependence is not None:
             num_words += self.timing_dependence.get_synaptic_row_header_words()
+
         return num_words

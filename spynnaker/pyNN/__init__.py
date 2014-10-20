@@ -75,15 +75,21 @@ from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
     import SmallWorldConnector
 
-#stdp stuff
+# Mechanisms for synapse dynamics
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+    synapse_dynamics import SynapseDynamics
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
     import STDPMechanism
+
+# STDP weight dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     additive_weight_dependence import AdditiveWeightDependence
+
+# STDP timing dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     spike_pair_rule import SpikePairRule
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
-    synapse_dynamics import SynapseDynamics
+    pfister_spike_triplet_rule import PfisterSpikeTripletRule
 
 
 #constraints
@@ -92,6 +98,7 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 
+#note importing star is a bad thing to do.
 from pyNN.random import *
 
 #traditional logger
@@ -213,7 +220,6 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
 
 def activate_live_recording_for(population):
     global _spinnaker
-
     _spinnaker.add_edge_to_recorder_vertex(population._vertex)
 
 

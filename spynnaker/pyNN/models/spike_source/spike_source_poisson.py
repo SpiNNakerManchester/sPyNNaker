@@ -17,6 +17,7 @@ import os
 import numpy
 
 import logging
+from data_specification.enums.data_type import DataType
 logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 0.25
@@ -32,10 +33,10 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     """
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
-        'SYSTEM_REGION',
-        'POISSON_PARAMS_REGION',
-        'SPIKE_HISTORY_REGION'
-    )
+            value="_POISSON_SPIKE_SOURCE_REGIONS",
+            names=[('SYSTEM_REGION', 0),
+                   ('POISSON_PARAMS_REGION', 1),
+                   ('SPIKE_HISTORY_REGION', 2)])
     _model_based_max_atoms_per_core = 256
 
     def __init__(self, n_neurons, machine_time_step, contraints=None,
@@ -98,17 +99,16 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         # Reserve memory:
         spec.reserve_memory_region(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION,
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
             size=setup_sz, label='setup')
         spec.reserve_memory_region(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION,
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value,
             size=poisson_params_sz, label='PoissonParams')
         if spike_hist_buff_sz > 0:
-            spec.reserve_memory_regionm(
-                region=
-                self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+            spec.reserve_memory_region(
+                region=self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
-                leaveUnfilled=True)
+                empty=True)
 
     def write_setup_info(self, spec, spike_history_region_sz):
         """
@@ -133,8 +133,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
         # Write this to the system region (to be picked up by the simulation):
-        spec.switchWriteFocus(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION)
+        spec.switch_write_focus(
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=0)
@@ -146,14 +146,12 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         """
         Generate Neuron Parameter data for Poisson spike sources (region 2):
         """
-        spec.comment("\nWriting Neuron Parameters for {%d} poisson sources:\n"
+        spec.comment("\nWriting Neuron Parameters for {} poisson sources:\n"
                      .format(num_neurons))
 
         # Set the focus to the memory region 2 (neuron parameters):
-        spec.\
-            switch_write_focus(
-                region=
-                self._POISSON_SPIKE_SOURCE_REGIONS.SPOISSON_PARAMS_REGION)
+        spec.switch_write_focus(
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value)
 
         # Write header info to the memory region:
 
@@ -211,16 +209,15 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         #     accum time_to_spike_ticks;
         #   } slow_spike_source_t;
         for (neuron_id, rate_val, start_val, end_val) in slow_sources:
-            isi_val_scaled = int(float(1000000.0 /
-                                       (rate_val * self._machine_time_step))
-                                 * 32768.0)
+            isi_val_scaled = float(1000000.0 /
+                                    (rate_val * self._machine_time_step))
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, sizeof='uint32')
-            spec.write_value(data=start_scaled, sizeof='uint32')
-            spec.write_value(data=end_scaled, sizeof='uint32')
-            spec.write_value(data=isi_val_scaled, sizeof='s1615')
-            spec.write_value(data=0x0, sizeof='uint32')
+            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
+            spec.write_value(data=start_scaled, data_type=DataType.UINT32)
+            spec.write_value(data=end_scaled, data_type=DataType.UINT32)
+            spec.write_value(data=isi_val_scaled, data_type=DataType.S1615)
+            spec.write_value(data=0x0, data_type=DataType.UINT32)
 
         # Now write
         #   typedef struct fast_spike_source_t
@@ -236,10 +233,11 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             exp_minus_lamda_scaled = int(exp_minus_lamda * float(0xFFFFFFFF))
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, sizeof='uint32')
-            spec.write_value(data=start_scaled, sizeof='uint32')
-            spec.write_value(data=end_scaled, sizeof='uint32')
-            spec.write_value(data=exp_minus_lamda_scaled, sizeof='u032')
+            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
+            spec.write_value(data=start_scaled, data_type=DataType.UINT32)
+            spec.write_value(data=end_scaled, data_type=DataType.UINT32)
+            spec.write_value(data=exp_minus_lamda_scaled,
+                    data_type=DataType.U032)
         return
 
     def get_spikes(self, txrx, placements, graph_mapper,
@@ -272,15 +270,17 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         """
         method for caulculating dtcm usage for a coltection of atoms
         """
-        no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        return (44 + (16 * 4)) * no_atoms
+        return 0
+        #no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
+        #return (44 + (16 * 4)) * no_atoms
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the CPU requirements for a range of atoms
         """
-        no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        return 128 * no_atoms
+        return 0
+        #no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
+        #return 128 * no_atoms
 
     #inhirrted from dataspecable vertex
 
@@ -299,7 +299,6 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
-        self.write_setup_info(spec, spike_hist_buff_sz)
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
@@ -309,8 +308,10 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         self.reserve_memory_regions(
             spec, constants.SETUP_SIZE, poisson_params_sz, spike_hist_buff_sz)
 
+        self.write_setup_info(spec, spike_hist_buff_sz)
+
         self.write_poisson_parameters(spec, placement.x, placement.y,
-                                      placement.p, subvertex.n_atoms)
+                                      placement.p, vertex_slice.n_atoms)
 
         # End-of-Spec:
         spec.end_specification()
