@@ -14,29 +14,29 @@ class AbstractExponentialPopulationVertex(object):
     """
 
     def __init__(self, n_neurons, machine_time_step,
-                 tau_syn_e=5.0, tau_syn_i=5.0):
+                 tau_syn_E=5.0, tau_syn_I=5.0):
 
-        self._tau_syn_e = utility_calls.convert_param_to_numpy(tau_syn_e,
+        self._tau_syn_E = utility_calls.convert_param_to_numpy(tau_syn_E,
                                                                n_neurons)
-        self._tau_syn_i = utility_calls.convert_param_to_numpy(tau_syn_i,
+        self._tau_syn_I = utility_calls.convert_param_to_numpy(tau_syn_I,
                                                                n_neurons)
         self._machine_time_step = machine_time_step
 
     @property
-    def tau_syn_e(self):
-        return self._tau_syn_e
+    def tau_syn_E(self):
+        return self._tau_syn_E
 
-    @tau_syn_e.setter
-    def tau_syn_e(self, new_value):
-        self._tau_syn_e = new_value
+    @tau_syn_E.setter
+    def tau_syn_E(self, new_value):
+        self._tau_syn_E = new_value
 
     @property
-    def tau_syn_i(self):
-        return self._tau_syn_i
+    def tau_syn_I(self):
+        return self._tau_syn_I
 
-    @tau_syn_i.setter
-    def tau_syn_i(self, new_value):
-        self._tau_syn_i = new_value
+    @tau_syn_I.setter
+    def tau_syn_I(self, new_value):
+        self._tau_syn_I = new_value
 
     @staticmethod
     def get_synapse_parameter_size(vertex_slice):
@@ -74,15 +74,15 @@ class AbstractExponentialPopulationVertex(object):
                      "{} Neurons:\n".format(n_atoms))
 
         decay_ex = numpy.exp(float(-self._machine_time_step) /
-                             (1000.0 * self._tau_syn_e))
+                             (1000.0 * self._tau_syn_E))
 
-        init_ex = (self._tau_syn_e * (1 - decay_ex)
+        init_ex = (self._tau_syn_E * (1 - decay_ex)
                                    * (1000.0 / self._machine_time_step))
 
         decay_in = numpy.exp(float(-self._machine_time_step) /
-                             (1000.0 * self._tau_syn_i))
+                             (1000.0 * self._tau_syn_I))
 
-        init_in = (self._tau_syn_i * (1 - decay_in)
+        init_in = (self._tau_syn_I * (1 - decay_in)
                                    * (1000.0 / self._machine_time_step))
 
         # noinspection PyNoneFunctionAssignment

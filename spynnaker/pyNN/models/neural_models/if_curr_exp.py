@@ -26,7 +26,7 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
                  tau_refrac=0.1, i_offset=0, v_init=None):
         # Instantiate the parent classes
         AbstractExponentialPopulationVertex.__init__(
-            self, n_neurons=n_neurons, tau_syn_e=tau_syn_E, tau_syn_i=tau_syn_I,
+            self, n_neurons=n_neurons, tau_syn_E=tau_syn_E, tau_syn_I=tau_syn_I,
             machine_time_step=machine_time_step)
         AbstractIntegrateAndFireProperties.__init__(
             self, atoms=n_neurons, cm=cm, tau_m=tau_m, i_offset=i_offset,
@@ -57,7 +57,7 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
         """
         Generate Neuron Parameter data (region 2):
         """
-        
+
         # Get the parameters
         return [
             NeuronParameter(self._v_thresh, DataType.S1615),
