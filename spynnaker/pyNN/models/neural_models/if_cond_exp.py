@@ -1,6 +1,7 @@
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
+from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
 from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
@@ -36,8 +37,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, n_params=10, label=label,
-            max_atoms_per_core=
-            IFConductanceExponentialPopulation._model_based_max_atoms_per_core,
+            max_atoms_per_core=IFConductanceExponentialPopulation._model_based_max_atoms_per_core,
             binary="IF_cond_exp.aplx", constraints=constraints,
             machine_time_step=machine_time_step)
         self._executable_constant = \
@@ -51,12 +51,12 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
     def set_model_max_atoms_per_core(new_value):
         IFConductanceExponentialPopulation.\
             _model_based_max_atoms_per_core = new_value
-    
+
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the CPU requirements for a range of atoms
         """
-        return 782 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
+        return 781 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
     def get_parameters(self):
         """
@@ -71,13 +71,13 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
         # // membrane voltage threshold at which neuron spikes [mV]
         #    REAL     V_reset;    // post-spike reset membrane voltage    [mV]
         #    REAL     V_rest;     // membrane resting voltage [mV]
-        #    REAL     R_membrane; // membrane resistance [MegaOhm] 
-        #    
+        #    REAL     R_membrane; // membrane resistance [MegaOhm]
+        #
         #    REAL        V_rev_E;
         # // reversal voltage - Excitatory    [mV]
         #    REAL        V_rev_I;
         # // reversal voltage - Inhibitory    [mV]
-        #    
+        #
         #// variable-state parameter
         #    REAL     V_membrane; // membrane voltage [mV]
         #
@@ -85,12 +85,12 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
         #    REAL        I_offset;
         #  // offset current [nA] but take care because actually
         #     'per timestep charge'
-        #    
+        #
         #// 'fixed' computation parameter - time constant multiplier for
         #                                   closed-form solution
         #    REAL     exp_TC;
         # // exp( -(machine time step in ms)/(R * C) ) [.]
-        #    
+        #
         #// for ODE solution only
         #    REAL      one_over_tauRC;
         # // [kHz!] only necessary if one wants to use ODE solver because
@@ -103,16 +103,19 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
         #                              need more? Jan 2014
         #    int32_t T_refract;      // refractory time of neuron [ms/10]
         return [
-            NeuronParameter(self._v_thresh, 's1615'),
-            NeuronParameter(self._v_reset, 's1615'),
-            NeuronParameter(self._v_rest, 's1615'),
-            NeuronParameter(self.r_membrane(self._machine_time_step), 's1615'),
-            NeuronParameter(self._e_rev_e, 's1615'),
-            NeuronParameter(self._e_rev_i, 's1615'),
-            NeuronParameter(self._v_init, 's1615'),
-            NeuronParameter(self.ioffset(self._machine_time_step), 's1615'),
-            NeuronParameter(self.exp_tc(self._machine_time_step), 's1615'),
-            NeuronParameter(self._one_over_tau_rc, 's1615'),
-            NeuronParameter(self._refract_timer, 'uint32'),
-            NeuronParameter(self._scaled_t_refract(), 'uint32'),
+            NeuronParameter(self._v_thresh, DataType.S1615),
+            NeuronParameter(self._v_reset, DataType.S1615),
+            NeuronParameter(self._v_rest, DataType.S1615),
+            NeuronParameter(self.r_membrane(self._machine_time_step),
+                    DataType.S1615),
+            NeuronParameter(self._e_rev_e, DataType.S1615),
+            NeuronParameter(self._e_rev_i, DataType.S1615),
+            NeuronParameter(self._v_init, DataType.S1615),
+            NeuronParameter(self.ioffset(self._machine_time_step),
+                    DataType.S1615),
+            NeuronParameter(self.exp_tc(self._machine_time_step),
+                    DataType.S1615),
+            NeuronParameter(self._one_over_tau_rc, DataType.S1615),
+            NeuronParameter(self._refract_timer, DataType.S1615),
+            NeuronParameter(self._scaled_t_refract(), DataType.S1615),
         ]
