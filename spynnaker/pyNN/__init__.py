@@ -213,6 +213,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
 
 def activate_live_recording_for(population):
     global _spinnaker
+
     _spinnaker.add_edge_to_recorder_vertex(population._vertex)
 
 
