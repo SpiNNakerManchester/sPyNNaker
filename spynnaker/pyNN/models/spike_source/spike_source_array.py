@@ -3,29 +3,28 @@ from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities.conf import config
-
+from spynnaker.pyNN import exceptions
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 
-from spynnaker.pyNN import exceptions
-
-
-from math import ceil
 import logging
 import os
 import math
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_MEG_LIMIT = 8 * 1024 * 1024  # 8 mg in bytes
+MAX_MEG_LIMIT = 120 * 1024 * 1024  # only 120 meg is ever avilable for application usage
 
 class SpikeSourceArray(AbstractSpikeSource):
 
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID
-    _model_based_max_atoms_per_core = 256
+    _model_based_max_atoms_per_core = 2048  # limited to the n of the x,y,p,n key format
 
     def __init__(self, n_neurons, spike_times, machine_time_step,
-                 constraints=None, label="SpikeSourceArray"):
+                 constraints=None, max_on_chip_memory_usage=DEFAULT_MEG_LIMIT,
+                 label="SpikeSourceArray"):
         """
         Creates a new SpikeSourceArray Object.
         """
@@ -35,6 +34,15 @@ class SpikeSourceArray(AbstractSpikeSource):
                                      _model_based_max_atoms_per_core,
                                      machine_time_step=machine_time_step)
         self._spike_times = spike_times
+        self._requires_buffering = False
+        self._max_on_chip_memory_usage = max_on_chip_memory_usage
+        if (self._max_on_chip_memory_usage > MAX_MEG_LIMIT
+                or self._max_on_chip_memory_usage < 0):
+            raise exceptions.ConfigurationException(
+                "The memory usage on chip is either beyond what is supportable"
+                "on the spinnaker board being supported or you have requested"
+                "a negative value for the memory usage. Please correct and "
+                "try again")
 
     @property
     def model_name(self):
@@ -102,7 +110,8 @@ class SpikeSourceArray(AbstractSpikeSource):
             return 0
 
         out_spike_spikes = \
-            int(ceil((vert_slice.hi_atom - vert_slice.lo_atom + 1) / 32.0)) * 4
+            int(math.ceil((vert_slice.hi_atom - vert_slice.lo_atom + 1)
+                          / 32.0)) * 4
         return self.get_recording_region_size(out_spike_spikes)
 
     @staticmethod
@@ -279,8 +288,8 @@ class SpikeSourceArray(AbstractSpikeSource):
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
         sub_vertex_out_spike_bytes_function = \
-            lambda subvertex, subvertex_slice: int(ceil(
-                    subvertex_slice.n_atoms / 32.0)) * 4
+            lambda subvertex, subvertex_slice: int(math.ceil(
+                subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
@@ -362,12 +371,19 @@ class SpikeSourceArray(AbstractSpikeSource):
                                                       no_active_timesteps)
         block_index_region_size = \
             self.get_block_index_bytes(no_active_timesteps)
-
         spike_history_region_sz = self.get_spike_buffer_size(vertex_slice)
-        return (constants.SETUP_SIZE + spike_region_sz + block_index_region_size
-                + spike_history_region_sz)
+
+        total_sdram_usage_on_chip = \
+            (constants.SETUP_SIZE + spike_region_sz + block_index_region_size
+             + spike_history_region_sz)
+
+        if total_sdram_usage_on_chip >= self._max_on_chip_memory_usage:
+            total_sdram_usage_on_chip = self._max_on_chip_memory_usage
+            self._requires_buffering = True
+        return total_sdram_usage_on_chip
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
+
         return 0
         #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         #return (44 + (16 * 4)) * n_atoms
