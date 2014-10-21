@@ -88,13 +88,15 @@ void c_main (void)
 {
   // Load DTCM data
   load_dtcm();
-  
+
+/*
   // Configure lead app-specific stuff
   if(leadAp)
   {
     system_lead_app_configured();
   }
-  
+*/
+
   // Start the time at "-1" so that the first tick will be 0
   time = UINT32_MAX;
 

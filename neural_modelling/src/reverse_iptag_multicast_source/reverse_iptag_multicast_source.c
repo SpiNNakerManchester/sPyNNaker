@@ -17,12 +17,6 @@ typedef struct
   uint16_t payload;
 } event16_t;
 
-typedef struct
-{
-  uint32_t event;
-  uint32_t payload;
-} event32_t;
-
 // Callbacks
 void timer_callback (uint unused0, uint unused1)
 {
@@ -40,12 +34,13 @@ void timer_callback (uint unused0, uint unused1)
   }
 }
 
-void process_16_bit_packets (void* event_pointer, uint8_t length,
-							 uint32_t pkt_prefix, uint32_t pkt_payload_prefix,
-							 bool payload)
+void process_16_bit_packets (void* event_pointer, bool pkt_format,
+							 uint32_t length, uint32_t pkt_prefix,
+							 uint32_t pkt_payload_prefix, bool payload,
+							 bool pkt_payload_prefix_apply)
 {
   uint32_t i;
-  
+
 /*
   io_printf (IO_BUF, "process_16_bit_packets\n");
   io_printf (IO_BUF, "event_pointer: %08x\n", (uint32_t) event_pointer);
@@ -53,9 +48,10 @@ void process_16_bit_packets (void* event_pointer, uint8_t length,
   io_printf (IO_BUF, "pkt_prefix: %08x\n", pkt_prefix);
   io_printf (IO_BUF, "pkt_payload_prefix: %08x\n", pkt_payload_prefix);
   io_printf (IO_BUF, "payload on: %d\n", payload);
+  io_printf (IO_BUF, "pkt_format: %d\n", pkt_format);
 */
 
-  if (!payload)
+  if (!payload && !pkt_payload_prefix_apply)
   {
 	uint16_t *events_array = (uint16_t *) event_pointer;
 	
@@ -66,6 +62,8 @@ void process_16_bit_packets (void* event_pointer, uint8_t length,
 //	  io_printf (IO_BUF, "process element: %d\n", i);
 //	  io_printf (IO_BUF, "element: %08x\n", events_array[i]);
 	  uint32_t key = (uint32_t) (events_array[i]);
+
+	  if (!pkt_format) key <<= 16;
 	  key |= pkt_prefix;
 
 /*
@@ -76,10 +74,47 @@ void process_16_bit_packets (void* event_pointer, uint8_t length,
 	  io_printf (IO_BUF, "test: %d\n", (check && ((key & mask) == key_space)));
 */
 
+//	  io_printf (IO_BUF, "mc packet 16 key: %08x\n", key);
+
 	  if ( (!check) || (check && ((key & mask) == key_space)))
 	  {
-		io_printf (IO_BUF, "mc packet 16 key: %08x\n", key);
+//		io_printf (IO_BUF, "mc packet 16 key: %08x\n", key);
 		spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+	  }
+	  else
+		incorrect_keys++;
+	}
+  }
+  else if (!payload && pkt_payload_prefix_apply)
+  {
+	uint16_t *events_array = (uint16_t *) event_pointer;
+	uint32_t payload = pkt_payload_prefix;
+
+//	io_printf (IO_BUF, "no payload\n");
+
+	for (i = 0; i < length; i++)
+	{
+//	  io_printf (IO_BUF, "process element: %d\n", i);
+//	  io_printf (IO_BUF, "element: %08x\n", events_array[i]);
+	  uint32_t key = (uint32_t) (events_array[i]);
+
+	  if (!pkt_format) key <<= 16;
+	  key |= pkt_prefix;
+
+/*
+	  io_printf (IO_BUF, "check: %d\n", check);
+	  io_printf (IO_BUF, "key: %08x\n", key);
+	  io_printf (IO_BUF, "mask: %08x\n", mask);
+	  io_printf (IO_BUF, "key_space: %08x\n", key_space);
+	  io_printf (IO_BUF, "test: %d\n", (check && ((key & mask) == key_space)));
+*/
+
+//	  io_printf (IO_BUF, "mc packet 16 key: %08x, payload: %08x\n", key, payload);
+
+	  if ( (!check) || (check && ((key & mask) == key_space)))
+	  {
+//		io_printf (IO_BUF, "mc packet 16 key: %08x, payload: %08x\n", key, payload);
+		spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
 	  }
 	  else
 		incorrect_keys++;
@@ -93,12 +128,16 @@ void process_16_bit_packets (void* event_pointer, uint8_t length,
 	{
 	  uint32_t payload = (uint32_t) events_struct[i].payload;
 	  uint32_t key = (uint32_t) events_struct[i].event;
+
+	  if (!pkt_format) key <<= 16;
 	  key |= pkt_prefix;
 	  payload |= pkt_payload_prefix;
-	  
+
+//	  io_printf (IO_BUF, "mc packet 16 key: %08x, payload: %08x\n", key, payload);
+
 	  if ( (!check) || (check && ((key & mask) == key_space)))
 	  {
-		io_printf (IO_BUF, "mc packet 16 key: %08x, payload: 08x\n", key, payload);
+//		io_printf (IO_BUF, "mc packet 16 key: %08x, payload: %08x\n", key, payload);
 		spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
 	  }
 	  else
@@ -107,9 +146,10 @@ void process_16_bit_packets (void* event_pointer, uint8_t length,
   }
 }
 
-void process_32_bit_packets (void* event_pointer, uint8_t length,
-							 uint32_t pkt_prefix, uint32_t pkt_payload_prefix,
-							 bool payload)
+void process_32_bit_packets (void* event_pointer,
+							 uint32_t length, uint32_t pkt_prefix,
+							 uint32_t pkt_payload_prefix, bool payload,
+							 bool pkt_payload_prefix_apply)
 {
   uint32_t i;
 
@@ -120,20 +160,83 @@ void process_32_bit_packets (void* event_pointer, uint8_t length,
   io_printf (IO_BUF, "pkt_prefix: %08x\n", pkt_prefix);
   io_printf (IO_BUF, "pkt_payload_prefix: %08x\n", pkt_payload_prefix);
   io_printf (IO_BUF, "payload: %d\n", payload);
+  io_printf (IO_BUF, "pkt_payload_prefix_apply: %d\n", pkt_payload_prefix_apply);
 */
 
-  if (!payload)
+  if (!payload && !pkt_payload_prefix_apply)
   {
-	uint32_t *events = (uint32_t *) event_pointer;
-	
-	for (i = 0; i < length; i++)
+	uint16_t *events = (uint16_t *) event_pointer;
+
+/*
+	io_printf (IO_BUF, "case 1\n");
+	io_printf (IO_BUF, "event_pointer: %08x\n", (uint32_t) event_pointer);
+	io_printf (IO_BUF, "events: %08x\n", (uint32_t) events);
+	io_printf (IO_BUF, "no payload\n");
+*/
+
+	for (i = 0; i < (length << 1); i+=2)
 	{
-	  uint32_t key = events[i] | pkt_prefix;
-	  
+	  uint32_t key;
+	  uint32_t temp1 = events[i];
+	  uint32_t temp2 = events[i+1];
+
+	  key = temp2 << 16 | temp1;
+	  key |= pkt_prefix;
+
+/*
+	  io_printf (IO_BUF, "check: %d\n", check);
+	  io_printf (IO_BUF, "key: %08x\n", key);
+	  io_printf (IO_BUF, "mask: %08x\n", mask);
+	  io_printf (IO_BUF, "key_space: %08x\n", key_space);
+	  io_printf (IO_BUF, "test: %d\n", (check && ((key & mask) == key_space)));
+*/
+
+//	  io_printf (IO_BUF, "mc packet 32 key: %08x\n", key);
+
 	  if ( (!check) || (check && ((key & mask) == key_space)))
 	  {
-		io_printf (IO_BUF, "mc packet 32 key: %08x\n", key);
+//		io_printf (IO_BUF, "mc packet 32 key: %08x\n", key);
 		spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+	  }
+	  else
+		incorrect_keys++;
+	}
+  }
+  else if (!payload && pkt_payload_prefix_apply)
+  {
+	uint16_t *events = (uint16_t *) event_pointer;
+	uint32_t payload = pkt_payload_prefix;
+
+/*
+	io_printf (IO_BUF, "case 2\n");
+	io_printf (IO_BUF, "event_pointer: %08x\n", (uint32_t) event_pointer);
+	io_printf (IO_BUF, "events: %08x\n", (uint32_t) events);
+	io_printf (IO_BUF, "no payload\n");
+*/
+
+	for (i = 0; i < (length << 1); i+=2)
+	{
+	  uint32_t key;
+	  uint32_t temp1 = events[i];
+	  uint32_t temp2 = events[i+1];
+
+	  key = temp2 << 16 | temp1;
+	  key |= pkt_prefix;
+
+/*
+	  io_printf (IO_BUF, "check: %d\n", check);
+	  io_printf (IO_BUF, "key: %08x\n", key);
+	  io_printf (IO_BUF, "mask: %08x\n", mask);
+	  io_printf (IO_BUF, "key_space: %08x\n", key_space);
+	  io_printf (IO_BUF, "test: %d\n", (check && ((key & mask) == key_space)));
+*/
+
+//	  io_printf (IO_BUF, "mc packet 32 key: %08x, payload: %08x\n", key, payload);
+
+	  if ( (!check) || (check && ((key & mask) == key_space)))
+	  {
+//		io_printf (IO_BUF, "mc packet 32 key: %08x, payload: %08x\n", key, payload);
+		spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
 	  }
 	  else
 		incorrect_keys++;
@@ -141,16 +244,30 @@ void process_32_bit_packets (void* event_pointer, uint8_t length,
   }
   else
   {
-	event32_t *events = (event32_t *) event_pointer;
-	
-	for (i = 0; i < length; i++)
+	uint16_t *events = (uint16_t *) event_pointer;
+
+//	io_printf (IO_BUF, "case 3\n");
+
+	for (i = 0; i < (length << 2); i+=4)
 	{
-	  uint32_t key = events[i].event | pkt_prefix;
-	  uint32_t payload = events[i].payload | pkt_payload_prefix;
-	  
+	  uint32_t key;
+	  uint32_t payload;
+
+	  uint32_t temp1 = events[i];
+	  uint32_t temp2 = events[i+1];
+	  key = temp2 << 16 | temp1;
+	  key |= pkt_prefix;
+
+	  temp1 = events[i+2];
+	  temp2 = events[i+3];
+	  payload = temp2 << 16 | temp1;
+	  payload |= pkt_payload_prefix;
+
+//	  io_printf (IO_BUF, "mc packet 32 key: %08x, payload: %08x\n", key, payload);
+
 	  if ( (!check) || (check && ((key & mask) == key_space)))
 	  {
-		io_printf (IO_BUF, "mc packet 32 key: %08x, payload: 08x\n", key, payload);
+//		io_printf (IO_BUF, "mc packet 32 key: %08x, payload: %08x\n", key, payload);
 		spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
 	  }
 	  else
@@ -163,13 +280,18 @@ void sdp_packet_callback(uint mailbox, uint port)
 {
   use(port);
 
+//  io_printf (IO_BUF, "====================================\n");
+
   sdp_msg_t *msg = (sdp_msg_t *) mailbox;
   uint16_t *data_hdr = (uint16_t *) &(msg -> cmd_rc);
   uint16_t data_hdr_value = data_hdr[0];
   void *event_pointer = (void *) (data_hdr + 1);
 
 /*
-  uint32_t len = msg -> length + 16;
+  io_printf (IO_BUF, "data_hdr: %08x\n", (uint32_t) data_hdr);
+  io_printf (IO_BUF, "event_pointer: %08x\n", (uint32_t) event_pointer);
+
+  uint32_t len = msg -> length + 8;
   uint8_t *ptr = (uint8_t *) msg;
 
   io_printf (IO_BUF, "packet lenght: %d\n", len);
@@ -203,31 +325,60 @@ void sdp_packet_callback(uint mailbox, uint port)
 
   if (pkt_apply_prefix)
   {
-	uint16_t *key_prefix_ptr = (uint16_t *) (data_hdr + 1);
-	event_pointer = (void*) (data_hdr + 2);
+	uint16_t *key_prefix_ptr = (uint16_t *) event_pointer;
+	event_pointer = (void*) (((uint16_t *) event_pointer) + 1);
 
 	pkt_key_prefix = (uint32_t) key_prefix_ptr[0];
 
 	if (pkt_format) pkt_key_prefix <<= 16;
-  }
 
-//  io_printf (IO_BUF, "pkt_key_prefix: %08x\n", pkt_key_prefix);
+/*
+	io_printf (IO_BUF, "key_prefix_ptr: %08x\n", (uint32_t) key_prefix_ptr);
+	io_printf (IO_BUF, "event_pointer: %08x\n", (uint32_t) event_pointer);
+	io_printf (IO_BUF, "pkt_key_prefix: %08x\n", pkt_key_prefix);
+*/
+  }
+  else if (!pkt_apply_prefix && apply_prefix)
+  {
+	if (key_left_shift == 0)
+	  pkt_format = 1;
+	else
+	  pkt_format = 0;
+  }
 
   if (pkt_payload_prefix_apply)
   {
-	uint16_t *payload_prefix_ptr = (uint16_t *) (data_hdr + 2);
-	event_pointer = (void*) (data_hdr + 3);
+	if (!(pkt_type & 0x2)) //16 bit type packet
+	{
+	  uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
+	  event_pointer = (void*) (((uint16_t *) event_pointer) + 1);
 
-	pkt_payload_prefix = (uint32_t) payload_prefix_ptr[0];
+//	  io_printf (IO_BUF, "payload_prefix_ptr: %08x\n", (uint32_t) payload_prefix_ptr);
+
+	  pkt_payload_prefix = (uint32_t) payload_prefix_ptr[0];
+	}
+	else //32 bit type packet
+	{
+	  uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
+	  event_pointer = (void*) (((uint16_t *) event_pointer) + 2);
+
+//	  io_printf (IO_BUF, "payload_prefix_ptr: %08x\n", (uint32_t) payload_prefix_ptr);
+
+	  uint32_t temp1 = payload_prefix_ptr[0];
+	  uint32_t temp2 = payload_prefix_ptr[1];
+	  pkt_payload_prefix = temp2 << 16 | temp1;
+	}
+
+/*
+	io_printf (IO_BUF, "event_pointer: %08x\n", (uint32_t) event_pointer);
+	io_printf (IO_BUF, "pkt_key_prefix: %08x\n", pkt_key_prefix);
+*/
   }
 
-//  io_printf (IO_BUF, "pkt_payload_prefix: %08x\n", pkt_payload_prefix);
-
-
   if (pkt_type <= 1)
-	process_16_bit_packets (event_pointer, pkt_len, pkt_key_prefix, pkt_payload_prefix, payload_on);
+	process_16_bit_packets (event_pointer, pkt_format, pkt_len, pkt_key_prefix, pkt_payload_prefix, payload_on, pkt_payload_prefix_apply);
   else
-	process_32_bit_packets (event_pointer, pkt_len, pkt_key_prefix, pkt_payload_prefix, payload_on);
+	process_32_bit_packets (event_pointer, pkt_len, pkt_key_prefix, pkt_payload_prefix, payload_on, pkt_payload_prefix_apply);
 
 
   //free the message to stop overload
@@ -247,7 +398,7 @@ bool multicast_source_data_filled(address_t base_address) {
   check = region_address[3];
   key_space = region_address[4];
   mask = region_address[5];
-  
+
   incorrect_keys = 0;
 
 /*
@@ -287,13 +438,15 @@ void c_main (void)
 {
   // Configure system
   system_load_dtcm();
- 
+
+/*
   // Configure lead app-specific stuff
   if(leadAp)
   {
     system_lead_app_configured();
   }
-  
+*/
+
   // Set timer_callback
   spin1_set_timer_tick(timer_period);
   

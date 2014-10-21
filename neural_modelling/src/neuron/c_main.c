@@ -79,11 +79,13 @@ void c_main (void)
   // Load DTCM data
   system_load_dtcm();
 
+/*
   // Configure lead app-specific stuff
   if(leadAp)
   {
     system_lead_app_configured();
   }
+*/
 
   initialize_buffers();
 

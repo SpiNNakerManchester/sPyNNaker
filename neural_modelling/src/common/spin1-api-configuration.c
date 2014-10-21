@@ -55,6 +55,7 @@ address_t system_load_sram()
   return address;
 }
 
+/*
 bool system_lead_app_configured ()
 {
   log_info("system_lead_app_configured: started");
@@ -72,7 +73,7 @@ bool system_lead_app_configured ()
   }
 
   // Load router table from SDRAM
-  if(rtr_mc_load(router_table_data, 0, simulation_rtr_entry) == 0)
+  if(rtr_mc_load(router_table_data, 0, simulation_rtr_entry, 0) == 0)
   {
     log_info("rtr_mc_load failed");
     return (false);
@@ -82,6 +83,7 @@ bool system_lead_app_configured ()
 
   return (true);
 }
+*/
 
 bool system_runs_to_completion()
 {
