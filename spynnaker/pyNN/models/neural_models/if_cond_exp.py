@@ -116,6 +116,6 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
             NeuronParameter(self.exp_tc(self._machine_time_step),
                     DataType.S1615),
             NeuronParameter(self._one_over_tau_rc, DataType.S1615),
-            NeuronParameter(self._refract_timer, DataType.S1615),
-            NeuronParameter(self._scaled_t_refract(), DataType.S1615),
+            NeuronParameter(self._refract_timer, DataType.UINT32),
+            NeuronParameter(self._scaled_t_refract(), DataType.UINT32),
         ]
