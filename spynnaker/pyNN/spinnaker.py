@@ -4,8 +4,6 @@ from pacman.model.constraints.\
     VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
-from pacman.operations.router_check_functionality.redundant_route_checker import \
-    RedundantRouteChecker
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
@@ -348,9 +346,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._partitioned_graph)
 
         if conf.config.get("Mode", "mode") == "Debug":
-            #check for redundant routes
-            redundant_route_checker = RedundantRouteChecker()
-            redundant_route_checker.check_for_redundant_routes()
             #check that all routes are valid and no cycles exist
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
