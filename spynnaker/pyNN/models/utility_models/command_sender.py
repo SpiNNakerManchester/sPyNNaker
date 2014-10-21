@@ -158,7 +158,7 @@ class CommandSender(AbstractMultiCastSource):
         else:
             # if the subedge doesnt have any predefined messages to send,
             # then treat them with the subedge routing key
-            return subedge.key, self._app_mask
+            return subedge.key_combo, self._app_mask
 
     def reserve_memory_regions(self, spec, command_size):
         """
