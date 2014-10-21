@@ -303,7 +303,6 @@ class SpikeSourceArray(AbstractSpikeSource):
                 placement.x, placement.y, placement.p, hostname, report_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
-        spec = DataSpecificationGenerator(data_writer)
 
         #get slice from mapper
         subvert_slice = graph_mapper.get_subvertex_slice(subvertex)
@@ -350,8 +349,9 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        return 128 * n_atoms
+        return 0
+        #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
+        #return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
         spike_dict = self.get_spikes_per_timestep(vertex_slice)
@@ -368,5 +368,6 @@ class SpikeSourceArray(AbstractSpikeSource):
                 + spike_history_region_sz)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
-        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        return (44 + (16 * 4)) * n_atoms
+        return 0
+        #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
+        #return (44 + (16 * 4)) * n_atoms

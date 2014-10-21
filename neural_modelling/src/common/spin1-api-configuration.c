@@ -55,36 +55,6 @@ address_t system_load_sram()
   return address;
 }
 
-/*
-bool system_lead_app_configured ()
-{
-  log_info("system_lead_app_configured: started");
-
-  // Get pointer to router table data in SDRAM
-  rtr_entry_t *router_table_data = (rtr_entry_t*)0x77780000;
-
-  // Allocate specified number of entries
-  log_info("Allocating %u router entries", router_table_data->free);
-  simulation_rtr_entry = rtr_alloc_id(router_table_data->free, 0);
-  if(simulation_rtr_entry == 0)
-  {
-    log_info("rtr_alloc failed");
-    return (false);
-  }
-
-  // Load router table from SDRAM
-  if(rtr_mc_load(router_table_data, 0, simulation_rtr_entry, 0) == 0)
-  {
-    log_info("rtr_mc_load failed");
-    return (false);
-  }
-
-  log_info("system_lead_app_configured: completed successfully");
-
-  return (true);
-}
-*/
-
 bool system_runs_to_completion()
 {
   spin1_start(SYNC_WAIT);

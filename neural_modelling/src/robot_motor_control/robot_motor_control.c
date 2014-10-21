@@ -91,7 +91,7 @@ void timer_callback (uint unused0, uint unused1)
   use(unused0);
   use(unused1);
   time++;
-  
+
   log_info("Timer tick %d", time);
 
 #ifdef DEBUG
@@ -108,7 +108,7 @@ void timer_callback (uint unused0, uint unused1)
     spin1_exit(0);
     return;
   }
-  
+
   // Process the incoming spikes
   spike_t s;
   uint32_t nid;
@@ -217,24 +217,16 @@ void c_main (void)
   io_printf(IO_BUF, "Initializing robot code\n");
   system_load_dtcm();
 
-/*
-  // Configure lead app-specific stuff
-  if(leadAp)
-  {
-    system_lead_app_configured();
-  }
-*/
-
   // Initialize the incoming spike buffer
   initialize_spike_buffer (8192);
 
   // Set timer_callback
   spin1_set_timer_tick(timer_period);
-  
+
   // Register callbacks
   spin1_callback_on (MC_PACKET_RECEIVED, incoming_spike_callback, -1);
   spin1_callback_on (TIMER_TICK,         timer_callback,           2);
-  
+
   log_info("Starting");
 
   // Start the time at "-1" so that the first tick will be 0

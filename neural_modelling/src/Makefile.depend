@@ -5,16 +5,6 @@ endif
 
 include $(SPINN_DIRS)/Makefile.common
 
-# If SPINN_COMMON_LIBS is not defined, this is an error!
-ifndef SPINN_COMMON_LIBS
-    $(error SPINN_COMMON_LIBS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinn_common lib folder))
-endif
-
-# If SPINN_COMMON_INCLUDE is not defined, this is an error!
-ifndef SPINN_COMMON_INCLUDE
-    $(error SPINN_COMMON_INCLUDE is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinn_common lib folder))
-endif
-
 ifndef APP_OUTPUT_DIR
     $(error APP_OUTPUT_DIR is not set.  Please define APP_OUTPUT_DIR (possibly by running "source setup" in the spinnaker package folder))
 endif
@@ -27,8 +17,6 @@ ABSDIR = $(abspath $(SPINN_NEURAL_MODELLING_DIR))
 RELOBJS:= $(ABSOBJS:$(ABSDIR)/%.o=%.o)
 OBJECTS:= $(RELOBJS:%.o=$(BUILDDIR)/%.o)
 
-CFLAGS += -I $(SPINN_COMMON_INCLUDE)
-LFLAGS += -L $(SPINN_COMMON_LIBS)
 LIBRARIES += -lspinn_common -lm
 
 ifeq ($(GNU),1)

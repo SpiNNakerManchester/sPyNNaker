@@ -45,7 +45,6 @@ uint32_t* configuration_reader_offset (uint32_t* address, uint32_t offset);
 
 // Defined in spin1-api-configuration.c
 address_t system_load_sram();
-bool system_lead_app_configured();
 bool system_runs_to_completion();
 bool system_data_extracted();
 

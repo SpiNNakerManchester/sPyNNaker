@@ -471,7 +471,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 associated_page = self._visualiser_vertex_to_page_mapping[vertex]
                 self._txrx.register_listener(
                     associated_page.recieved_spike, vertex.receieve_port_no,
-                    CONNECTION_TYPE.UDP_IPTAG, vertex.traffic_type)
+                    vertex.hostname, vertex.connection_type,
+                    vertex.traffic_type)
         self._visualiser.start()
 
     def add_vertex(self, vertex_to_add):
@@ -516,19 +517,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step)
 
-    def add_edge_to_recorder_vertex(self, vertex_to_record_from, port=None,
-                                    tag=None):
-        #check to see if it needs to be created in the frist place
-        if conf.config.has_option("Recording", "live_spike_port"):
-            port = conf.config.getint("Recording", "live_spike_port")
-        hostname = "localhost"
-        if conf.config.has_option("Recording", "live_spike_host"):
-            hostname = conf.config.get("Recording", "live_spike_host")
-        if conf.config.has_option("Recording", "live_spike_tag"):
-            tag = conf.config.getint("Recording", "live_spike_tag")
-        if tag is None:
-            raise exceptions.ConfigurationException(
-                "Target tag for live spikes has not been set")
+    def add_edge_to_recorder_vertex(self, vertex_to_record_from, port,
+                                    hostname, tag):
+
         #locate the live spike recorder
         if port in self._live_spike_recorder.keys():
             live_spike_recorder = self._live_spike_recorder[port]
