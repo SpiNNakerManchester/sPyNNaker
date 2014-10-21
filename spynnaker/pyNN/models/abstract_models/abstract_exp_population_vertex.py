@@ -21,19 +21,23 @@ class AbstractExponentialPopulationVertex(object):
         self._tau_syn_I = utility_calls.convert_param_to_numpy(tau_syn_I,
                                                                n_neurons)
         self._machine_time_step = machine_time_step
-
+    
+    # noinspection PyPep8Naming
     @property
     def tau_syn_E(self):
         return self._tau_syn_E
 
+    # noinspection PyPep8Naming
     @tau_syn_E.setter
     def tau_syn_E(self, new_value):
         self._tau_syn_E = new_value
 
+    # noinspection PyPep8Naming
     @property
     def tau_syn_I(self):
         return self._tau_syn_I
 
+    # noinspection PyPep8Naming
     @tau_syn_I.setter
     def tau_syn_I(self, new_value):
         self._tau_syn_I = new_value
