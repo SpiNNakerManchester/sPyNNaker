@@ -1,6 +1,7 @@
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
+from pacman.model.constraints.placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
@@ -554,6 +555,29 @@ class Population(object):
             raise exceptions.ConfigurationException(
                 "the constraint entered is not a recongised constraint. "
                 "try again")
+
+    #NONE PYNN API CALL
+    def add_placement_constraint(self, x, y, p=None):
+        """ Add a placement constraint
+
+        :param x: The x-coordinate of the placement constraint
+        :type x: int
+        :param y: The y-coordinate of the placement constraint
+        :type y: int
+        :param p: The processor id of the placement constraint (optional)
+        :type p: int
+        """
+        self._vertex.add_constraint(PlacerChipAndCoreConstraint(x, y, p))
+
+    #NONE PYNN API CALL
+    def set_mapping_constraint(self, constraint_dict):
+        """ Add a placement constraint - for backwards compatibility
+
+        :param constraint_dict: A dictionary containing "x", "y" and\
+                    optionally "p" as keys, and ints as values
+        :type constraint_dict: dict of str->int
+        """
+        self.add_placement_constraint(**constraint_dict)
 
     #NONE PYNN API CALL
     def set_model_based_max_atoms_per_core(self, new_value):
