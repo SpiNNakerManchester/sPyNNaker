@@ -12,7 +12,7 @@ class AbstractExponentialPopulationVertex(object):
     This represents a pynn_population.py with two exponentially decaying synapses,
     one for excitatory connections and one for inhibitory connections
     """
-
+    # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step,
                  tau_syn_E=5.0, tau_syn_I=5.0):
 
