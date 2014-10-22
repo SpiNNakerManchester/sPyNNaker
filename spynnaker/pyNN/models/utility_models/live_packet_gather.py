@@ -13,8 +13,8 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from enum import Enum
-from spinnman.messages.eieio.eieio_prefix_type import EIEIOPrefixType
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
+
 
 class LivePacketGather(
     AbstractDataSpecableVertex, AbstractPartitionableVertex,
