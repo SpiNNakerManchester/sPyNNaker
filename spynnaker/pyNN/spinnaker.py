@@ -53,7 +53,6 @@ from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 
 import logging
-from logging import Logger
 import math
 import sys
 import time
