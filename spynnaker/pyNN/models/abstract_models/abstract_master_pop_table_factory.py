@@ -6,6 +6,7 @@ import logging
 #spinnman imports
 from spinnman import exceptions as spinnman_exceptions
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities import constants
 
 import struct
 
@@ -18,41 +19,18 @@ class AbstractMasterPopTableFactory(object):
         pass
 
     @abstractmethod
-    def read_in_master_pop_table(self, x, y, p, transceiver,
-                                 master_pop_table_region):
-        """
-
-        :param x: x coord for the chip to whcih this master pop table is \
-        being read
-        :type x: int
-        :param y: y coord for the chip to whcih this master pop table is \
-        being read
-        :type y: int
-        :param p: p coord for the processor to whcih this master pop table is \
-        being read
-        :type p: int
-        :param transceiver: the transciever object
-        :type spinnman.transciever.Transciever object
-        :param master_pop_table_region: the region to which the master pop\
-         resides
-         :type master_pop_table_region: int
-
-
-        :return: the master pop table in some form
-        """
-
-    @abstractmethod
     def extract_synaptic_matrix_data_location(
-            self, incoming_key, master_pop_base_mem_address):
+            self, incoming_key, master_pop_base_mem_address, incoming_mask):
         """
         :param incoming_key: the source key which the synaptic matrix needs to \
         be mapped to
+        :param incoming_mask: the mask being used to create a key combo
         :return: a synaptic matrix memory position.
         """
 
     @abstractmethod
     def update_master_population_table(self, spec, block_start_addr, row_index,
-                                       key, master_pop_table_region):
+                                       key, master_pop_table_region, mask):
         """ updates a spec with a master pop entry in some form
 
         :param spec: the spec to write the master pop entry to
@@ -60,6 +38,17 @@ class AbstractMasterPopTableFactory(object):
         :param row_index: the row length index for the row_length table for \
         this entry
         :param key: the key being recieved to be stored in the master pop table,
+        :param master_pop_table_region: the region to which the master pop table\
+        is being stored
+        :param mask: the mask being used to create a key combo
+        :return:
+        """
+
+    @abstractmethod
+    def finish_master_pop_table(self, spec, master_pop_table_region):
+        """ completes the master pop table in the spec
+
+        :param spec: the spec to write the master pop entry to
         :param master_pop_table_region: the region to which the master pop table\
         is being stored
         :return:
@@ -94,3 +83,53 @@ class AbstractMasterPopTableFactory(object):
             raise exceptions.SynapticBlockReadException(
                 "failed to read and translate a piece of memory due to a "
                 "unexpected response code exception in spinnman.")
+
+    def locate_master_pop_table_base_address(self, x, y, p, transceiver,
+                                             master_pop_table_region):
+        """
+
+        :param x: x coord for the chip to whcih this master pop table is \
+        being read
+        :type x: int
+        :param y: y coord for the chip to whcih this master pop table is \
+        being read
+        :type y: int
+        :param p: p coord for the processor to whcih this master pop table is \
+        being read
+        :type p: int
+        :param transceiver: the transciever object
+        :type spinnman.transciever.Transciever object
+        :param master_pop_table_region: the region to which the master pop\
+         resides
+         :type master_pop_table_region: int
+
+
+        :return: the master pop table in some form
+        """
+        # Get the App Data base address for the core
+        # (location where this cores memory starts in
+        # sdram and region table)
+        app_data_base_address = \
+            transceiver.get_cpu_information_from_core(x, y, p).user[0]
+
+        # Get the memory address of the master pop table region
+        master_pop_region = master_pop_table_region
+
+        master_region_base_address_address = \
+            self.get_region_base_address_offset(app_data_base_address,
+                                                master_pop_region)
+
+        master_region_base_address_offset = \
+            self.read_and_convert(x, y, master_region_base_address_address,
+                                  4, "<I", transceiver)
+
+        master_region_base_address =\
+            master_region_base_address_offset + app_data_base_address
+
+        #read in the master pop table and store in ram for future use
+        logger.debug("Reading {} ({}) bytes starting at {} + "
+                     "4".format(constants.MASTER_POPULATION_TABLE_SIZE,
+                                hex(constants.MASTER_POPULATION_TABLE_SIZE),
+                                hex(master_region_base_address)))
+
+        return master_region_base_address, app_data_base_address

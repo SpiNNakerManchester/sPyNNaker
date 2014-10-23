@@ -303,7 +303,7 @@ class AbstractSynapticManager(object):
             return 1
         return None
 
-    def get_stdp_parameter_size(self, vertex_slice, in_edges):
+    def get_stdp_parameter_size(self, in_edges):
         self._check_synapse_dynamics(in_edges)
         if self._stdp_mechanism is not None:
             return self._stdp_mechanism.get_params_size()
@@ -340,8 +340,7 @@ class AbstractSynapticManager(object):
         ring_buffer_to_input_left_shift to produce an s1615 fixed point number
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
-    
-    
+
     def get_ring_buffer_to_input_left_shift(self, subvertex, sub_graph, graph_mapper):
 
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
@@ -357,12 +356,12 @@ class AbstractSynapticManager(object):
         
         # If we have an STDP mechanism which has a weight dependence
         if self._stdp_mechanism is not None\
-            and self._stdp_mechanism.weight_dependence is not None:
-                # If weight dependence has a max weight, 
-                # Take this into account as well
-                stdp_max_weight =  self._stdp_mechanism.weight_dependence.w_max
-                if stdp_max_weight is not None:
-                    max_weight = max(max_weight, stdp_max_weight)
+                and self._stdp_mechanism.weight_dependence is not None:
+            # If weight dependence has a max weight,
+            # Take this into account as well
+            stdp_max_weight = self._stdp_mechanism.weight_dependence.w_max
+            if stdp_max_weight is not None:
+                max_weight = max(max_weight, stdp_max_weight)
             
         max_weight_log_2 = 0
         if max_weight > 0:
@@ -376,7 +375,7 @@ class AbstractSynapticManager(object):
         max_weight_power = int(math.ceil(max_weight_log_2))
 
         logger.debug("Max weight is {}, Max power is {}"
-                    .format(max_weight, max_weight_power))
+                     .format(max_weight, max_weight_power))
 
         # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
         # but we ignore the "-1" to allow a bit of overhead in the above
@@ -421,6 +420,7 @@ class AbstractSynapticManager(object):
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
         in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        block_start_addr = None
         for subedge in in_subedges:
 
             # Only deal with incoming projection subedges
@@ -481,6 +481,8 @@ class AbstractSynapticManager(object):
                     update_master_population_table(
                         spec, block_start_addr, row_index, key,
                         master_pop_table_region)
+        self._master_pop_table_generator.finish_master_pop_table(
+            spec, master_pop_table_region)
 
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
@@ -589,7 +591,8 @@ class AbstractSynapticManager(object):
             post_placement.x, post_placement.y, post_placement.p
         # either read in the master pop table or retrieve it from storage
         master_pop_base_mem_address, app_data_base_address = \
-            self._master_pop_table_generator.read_in_master_pop_table(
+            self._master_pop_table_generator.\
+            locate_master_pop_table_base_address(
                 post_x, post_y, post_p, transceiver, master_pop_table_region)
 
         # locate address of the synaptic block
@@ -603,15 +606,18 @@ class AbstractSynapticManager(object):
 
         incoming_edges = \
             subgraph.incoming_subedges_from_subvertex(post_subvertex)
-        incoming_key = None
+        incoming_key_combo = None
+        incoming_mask = None
         for subedge in incoming_edges:
             if subedge.pre_subvertex == pre_subvertex:
-                incoming_key = routing_infos.get_key_from_subedge(subedge)
+                routing_info = routing_infos.get_subedge_information_from_subedge(subedge)
+                incoming_key_combo = routing_info.key_mask_combo
+                incoming_mask = routing_info.mask
 
         master_table_pop_entry_address = \
             self._master_pop_table_generator.\
-            extract_synaptic_matrix_data_location(incoming_key,
-                                                  master_pop_base_mem_address)
+            extract_synaptic_matrix_data_location(
+                incoming_key_combo, master_pop_base_mem_address, incoming_mask)
         #read in the master pop entry
         master_pop_entry = \
             self._master_pop_table_generator.read_and_convert(
