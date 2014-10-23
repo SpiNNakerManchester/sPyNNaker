@@ -130,7 +130,7 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
                 for i in range(len(rows)):
                     row = rows[i]
                     post_lo_atom = graph_mapper.get_subvertex_slice(
-                        subedge.postsubvertex).lo_atom
+                        subedge.post_subvertex).lo_atom
                     synaptic_list[i + last_pre_lo_atom]\
                         .append(row, lo_atom=post_lo_atom)
 
