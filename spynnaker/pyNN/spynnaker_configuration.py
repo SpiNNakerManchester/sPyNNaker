@@ -79,12 +79,7 @@ class SpynnakerConfiguration(object):
             config.get("Reports", "defaultApplicationDataFilePath")
         created_folder = False
         if where_to_write_application_data_files == "DEFAULT":
-            exceptions_path = \
-                os.path.abspath(exceptions.__file__)
-            directory = \
-                os.path.abspath(os.path.join(exceptions_path,
-                                             os.pardir, os.pardir, os.pardir))
-            #global folder
+            directory = os.getcwd()
             application_generated_data_file_folder = \
                 os.path.join(directory, 'application_generated_data_files')
             if not os.path.exists(application_generated_data_file_folder):
@@ -125,7 +120,7 @@ class SpynnakerConfiguration(object):
                              self.this_run_time_string_repenstation)
             if not os.path.exists(this_run_time_folder):
                 os.makedirs(this_run_time_folder)
-            if not config.has_section("SpecGeneration"): 
+            if not config.has_section("SpecGeneration"):
                 config.add_section("SpecGeneration")
             config.set("SpecGeneration", "Binary_folder", this_run_time_folder)
 
@@ -138,11 +133,7 @@ class SpynnakerConfiguration(object):
         config_param = config.get("Reports", "defaultReportFilePath")
         created_folder = False
         if config_param == "DEFAULT":
-            exceptions_path = \
-                os.path.abspath(exceptions.__file__)
-            directory = \
-                os.path.abspath(os.path.join(exceptions_path,
-                                             os.pardir, os.pardir, os.pardir))
+            directory = os.getcwd()
 
             #global reports folder
             self._report_default_directory = os.path.join(directory, 'reports')
