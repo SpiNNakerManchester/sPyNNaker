@@ -209,14 +209,13 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         #     accum time_to_spike_ticks;
         #   } slow_spike_source_t;
         for (neuron_id, rate_val, start_val, end_val) in slow_sources:
-            isi_val_scaled = float(1000000.0 /
-                                    (rate_val * self._machine_time_step))
+            isi_val = float(1000000.0 / (rate_val * self._machine_time_step))
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = int(end_val * 1000.0 / self._machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
-            spec.write_value(data=isi_val_scaled, data_type=DataType.S1615)
+            spec.write_value(data=isi_val, data_type=DataType.S1615)
             spec.write_value(data=0x0, data_type=DataType.UINT32)
 
         # Now write
@@ -230,14 +229,12 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         #   } fast_spike_source_t;
         for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
             exp_minus_lamda = exp(-1.0 * spikes_per_tick)
-            exp_minus_lamda_scaled = int(exp_minus_lamda * float(0xFFFFFFFF))
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = int(end_val * 1000.0 / self._machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
-            spec.write_value(data=exp_minus_lamda_scaled,
-                    data_type=DataType.U032)
+            spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
         return
 
     def get_spikes(self, txrx, placements, graph_mapper,
