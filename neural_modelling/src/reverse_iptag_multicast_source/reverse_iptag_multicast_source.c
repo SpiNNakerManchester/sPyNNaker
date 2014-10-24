@@ -349,10 +349,6 @@ void sdp_packet_callback(uint mailbox, uint port)
 bool multicast_source_data_filled(address_t base_address) {
   address_t region_address = region_start(1, base_address);
 
-  // to write here retrieving the configuration of the population:
-  // one 32 bit value which contains the three leftmost bits
-  // Prefix, Format and Prefix Check
-  // The lowest 16 bits are the prefix itself
   apply_prefix = region_address[0];
   prefix = region_address[1];
   key_left_shift = region_address[2];
@@ -379,17 +375,15 @@ bool system_load_dtcm(void) {
   // Get the address this core's DTCM data starts at from SRAM
   address_t address = system_load_sram();
 
-  system_load_params(region_start(0, address));
-
   uint32_t version;
   uint32_t flags = 0;
   if(!system_header_filled (address, &version, flags))
-  {
 	return (false);
-  }
-  if (!multicast_source_data_filled(address)) {
+
+  system_load_params(region_start(0, address));
+
+  if (!multicast_source_data_filled(address))
 	return (false);
-  }
 
   return (true);
 }
@@ -399,14 +393,6 @@ void c_main (void)
 {
   // Configure system
   system_load_dtcm();
-
-/*
-  // Configure lead app-specific stuff
-  if(leadAp)
-  {
-    system_lead_app_configured();
-  }
-*/
 
   // Set timer_callback
   spin1_set_timer_tick(timer_period);

@@ -61,7 +61,7 @@ projections.append(p.Projection(populations[0], populations[0], p.FromListConnec
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
 
 populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER,
-                      visualiser_raster_seperate=True)
+                      visualiser_raster_separate=True)
 populations[0].set_constraint(p.PlacerChipAndCoreConstraint(0, 0, 2))
 populations[1].set_constraint(p.PlacerChipAndCoreConstraint(0, 0, 3))
 
