@@ -4,10 +4,11 @@ from spynnaker.pyNN.models.neural_properties.\
     synapse_row_info import SynapseRowInfo
 import numpy
 
-class WeightBasedPlasticSynapseRowIo(AbstractSynapseRowIo):
+class SynapseRowIoPlasticWeight(AbstractSynapseRowIo):
     
-    def __init__(self, num_header_words):
+    def __init__(self, num_header_words, dendritic_delay_fraction):
         self.num_header_words = num_header_words
+        self.dendritic_delay_fraction = dendritic_delay_fraction
     
     def get_n_words(self, synapse_row, lo_atom=None, hi_atom=None):
         """
@@ -51,11 +52,17 @@ class WeightBasedPlasticSynapseRowIo(AbstractSynapseRowIo):
         if len(synapse_row.delays) > 0 and max(synapse_row.delays) > max_delay:
             raise Exception("One or more delays are too large for the row")
 
+        # Use dendritic delay fraction to split delay into components
+        float_delays = numpy.asarray(synapse_row.delays, dtype = "float")
+        dendritic_delays = numpy.asarray(float_delays * float(self.dendritic_delay_fraction), dtype="uint16")
+        axonal_delays = numpy.asarray(float_delays * (1.0 - float(self.dendritic_delay_fraction)), dtype="uint16")
+        
         ids = synapse_row.target_indices & 0xFF
-        shifted_delays = synapse_row.delays << (8 + n_synapse_type_bits)
+        shifted_dendritic_delays = dendritic_delays << (8 + n_synapse_type_bits)
+        shifted_axonal_delays = axonal_delays << (8 + 4 + n_synapse_type_bits)        
         shifted_types = synapse_row.synapse_types << 8
 
-        return numpy.asarray(shifted_delays | shifted_types | ids, 
+        return numpy.asarray(shifted_axonal_delays | shifted_dendritic_delays | shifted_types | ids, 
                 dtype='uint16')
 
     def get_packed_plastic_region(self, synapse_row, weight_scale,

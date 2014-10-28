@@ -20,15 +20,15 @@ bool plastic_runtime_log_enabled = false;
 // Synapse update loop
 //---------------------------------------
 static inline final_state_t plasticity_update_synapse(uint32_t begin_time, uint32_t delay, update_state_t current_state,
-  const pre_event_history_t *pre_event_history, const post_event_history_t *post_event_history_t)
+  const pre_event_history_t *pre_event_history, const post_event_history_t *post_event_history)
 {
   // Get the pre-synaptic window of events to be processed
   pre_event_window_t pre_window = pre_get_window(pre_event_history, delay, begin_time);
 
   // Get the post-synaptic window of events to be processed
-  post_event_window_t post_window = post_get_window(post_event_history_t, begin_time);
+  post_event_window_t post_window = post_get_window(post_event_history, begin_time);
 
-  plastic_runtime_log_info("\tPerforming deferred synapse update at time:%u - pre_window.prev_time:%u, pre_window.num_events:%u, post_window.prev_time:%u, post_window.num_events:%u\n", 
+  plastic_runtime_log_info("\tPerforming deferred synapse update at time:%u - pre_window.prev_time:%u, pre_window.num_events:%u, post_window.prev_time:%u, post_window.num_events:%u", 
     time, pre_window.prev_time, pre_window.num_events, post_window.prev_time, post_window.num_events);
 
   // Process events that occur within window
@@ -39,10 +39,9 @@ static inline final_state_t plasticity_update_synapse(uint32_t begin_time, uint3
     const bool post_valid = (post_window.num_events > 0);
     
     // If next pre-synaptic event occurs before the next post-synaptic event
-    // **NOTE** If next pre-synaptic event time's UINT32_MAX, this will never be true and due to loop conditions, both will never be UINT32_MAX!
     if(pre_valid && (!post_valid || (*pre_window.next_time + delay) <= *post_window.next_time))
     {
-      plastic_runtime_log_info("\t\tApplying pre-synaptic event at time:%u\n", *pre_window.next_time + delay);
+      plastic_runtime_log_info("\t\tApplying pre-synaptic event at time:%u", *pre_window.next_time + delay);
       
       // Apply spike to state
       const uint32_t delayed_pre_time = *pre_window.next_time + delay;
@@ -57,7 +56,7 @@ static inline final_state_t plasticity_update_synapse(uint32_t begin_time, uint3
     // Otherwise, if the next post-synaptic event occurs before the next pre-synaptic event
     else if(post_valid && (!pre_valid || *post_window.next_time <= (*pre_window.next_time + delay)))
     {
-      plastic_runtime_log_info("\t\tApplying post-synaptic event at time:%u\n", *post_window.next_time);
+      plastic_runtime_log_info("\t\tApplying post-synaptic event at time:%u", *post_window.next_time);
       
       // Apply spike to state
       current_state = timing_apply_post_spike(*post_window.next_time, *post_window.next_trace, 
@@ -113,7 +112,7 @@ void plasticity_process_post_synaptic_event(uint32_t j)
   plastic_runtime_log_enabled = true;
 #endif  // DEBUG
 
-  plastic_runtime_log_info("Processing post-synaptic event at time:%u\n", time);
+  plastic_runtime_log_info("Adding post-synaptic event to trace at time:%u", time);
   
   // Add post-event
   post_event_history_t *history = &post_event_history[j];
@@ -164,13 +163,13 @@ void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t 
 
     // Add weight to ring-buffer entry
     // **NOTE** Dave suspects that this could be a potential location for overflow
-    ring_buffer[offset] += final_state.weight;
+    ring_buffer[offset] += synapse_get_final_weight(final_state);
 
     // Write back updated synaptic word to plastic region
-    *plastic_words++ = final_state.synaptic_word;
+    *plastic_words++ = synapse_get_final_synaptic_word(final_state);
   }
 
-  plastic_runtime_log_info("Processing pre-synaptic event at time:%u", time);
+  plastic_runtime_log_info("Adding pre-synaptic event to trace at time:%u", time);
 
   // Add pre-event
   const pre_trace_t last_pre_trace = event_history->traces[event_history->count_minus_one];
@@ -181,11 +180,11 @@ bool plasticity_region_filled (uint32_t *address, uint32_t flags)
 {
   use(flags);
   
-  // Load weight dependence data
-  address = plasticity_region_weight_filled(address, flags);
+  // Load timing dependence data
+  address = plasticity_region_trace_filled(address, flags);
   
-  // Load trace rule data
-  plasticity_region_trace_filled(address, flags);
+  // Load weight dependence data
+  plasticity_region_weight_filled(address, flags);
   
   return true;
 }

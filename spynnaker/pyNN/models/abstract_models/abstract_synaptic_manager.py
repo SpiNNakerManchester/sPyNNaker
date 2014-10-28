@@ -343,15 +343,11 @@ class AbstractSynapticManager(object):
 
         max_weight = max((max(total_exc_weights), max(total_inh_weights)))
         
-        # If we have an STDP mechanism which has a weight dependence
-        if self._stdp_mechanism is not None\
-            and self._stdp_mechanism.weight_dependence is not None:
-                # If weight dependence has a max weight, 
-                # Take this into account as well
-                stdp_max_weight =  self._stdp_mechanism.weight_dependence.w_max
-                if stdp_max_weight is not None:
-                    max_weight = max(max_weight, stdp_max_weight)
-            
+        # If we have an STDP mechanism, let it provide an extra max weight
+        if self._stdp_mechanism is not None:
+            stdp_max_weight = self._stdp_mechanism.get_max_weight()
+            max_weight = max(max_weight, stdp_max_weight)
+
         max_weight_log_2 = 0
         if max_weight > 0:
             max_weight_log_2 = math.log(max_weight, 2)
@@ -362,7 +358,13 @@ class AbstractSynapticManager(object):
             max_weight_log_2 = 0
 
         max_weight_power = int(math.ceil(max_weight_log_2))
-
+        
+        # If we have an STDP mechanism that uses signed weights,
+        # Add another bit of shift to prevent overflows
+        if self._stdp_mechanism is not None\
+            and self._stdp_mechanism.are_weights_signed():
+                max_weight_power = max_weight_power + 1
+        
         logger.debug("Max weight is {}, Max power is {}"
                     .format(max_weight, max_weight_power))
 

@@ -50,12 +50,6 @@ typedef struct pre_trace_t
   int16_t r2;
 } pre_trace_t;
 
-typedef struct
-{
-  int32_t a3_plus;
-  int32_t a3_minus;
-} plasticity_trace_region_data_t;
-
 //---------------------------------------
 // Externals
 //---------------------------------------
@@ -63,9 +57,6 @@ extern int16_t tau_plus_lookup[TAU_PLUS_SIZE];
 extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 extern int16_t tau_x_lookup[TAU_X_SIZE];
 extern int16_t tau_y_lookup[TAU_Y_SIZE];
-
-extern plasticity_trace_region_data_t plasticity_trace_region_data;
-extern plasticity_weight_region_data_t plasticity_weight_region_data;
 
 //---------------------------------------
 // Declared functions
@@ -128,15 +119,14 @@ static inline update_state_t timing_apply_pre_spike(uint32_t time, pre_trace_t t
   uint32_t time_since_last_post = time - last_post_time;
   int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace.o1, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
   
-  // Calculate depression
-  int32_t inner = plasticity_weight_region_data.a2_minus + STDP_FIXED_MUL_16X16(trace.r2, plasticity_trace_region_data.a3_minus);
-  int32_t depression = STDP_FIXED_MUL_16X16(decayed_o1, inner);
+  // Calculate triplet term
+  int32_t decayed_o1_r2 = STDP_FIXED_MUL_16X16(decayed_o1, trace.r2);
   
-  plastic_runtime_log_info("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d, r2=%d, depression=%d\n", 
-                           time_since_last_post, decayed_o1, trace.r2, depression);
+  plastic_runtime_log_info("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d, r2=%d, decayed_o1_r2=%d\n", 
+                           time_since_last_post, decayed_o1, trace.r2, decayed_o1_r2);
   
   // Apply depression to state (which is a weight_state)
-  return weight_apply_depression(previous_state, depression);
+  return weight_apply_depression(previous_state, decayed_o1, decayed_o1_r2);
 }
 //---------------------------------------
 static inline update_state_t timing_apply_post_spike(uint32_t time, post_trace_t trace, 
@@ -151,15 +141,14 @@ static inline update_state_t timing_apply_post_spike(uint32_t time, post_trace_t
   uint32_t time_since_last_pre = time - last_pre_time;
   int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace.r1, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
 
-   // Add this to current potentiation total
-  int32_t inner = plasticity_weight_region_data.a2_plus + STDP_FIXED_MUL_16X16(trace.o2, plasticity_trace_region_data.a3_plus);
-  int32_t potentiation = STDP_FIXED_MUL_16X16(decayed_r1, inner);
+  // Calculate triplet term
+  int32_t decayed_r1_o2 = STDP_FIXED_MUL_16X16(decayed_r1, trace.o2);
 
   plastic_runtime_log_info("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d, o2=%d, potentiation=%d\n", 
                            time_since_last_pre, decayed_r1, trace.o2, potentiation);
 
   // Apply potentiation to state (which is a weight_state)
-  return weight_apply_potentiation(previous_state, potentiation);
+  return weight_apply_potentiation(previous_state, decayed_r1, decayed_r1_o2);
 }
 
 #endif	// PFISTER_TRIPLET_IMPL_H
