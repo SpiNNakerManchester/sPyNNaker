@@ -33,6 +33,7 @@ class STDPMechanism(object):
         """
         raise NotImplementedError
     
+    # **TODO** make property
     def get_vertex_executable_suffix(self):
         name = "stdp"
         if self.timing_dependence is not None:
@@ -41,15 +42,18 @@ class STDPMechanism(object):
             name += "_" + self.weight_dependence.get_vertex_executable_suffix()
         return name
     
+    # **TODO** make property
     def are_weights_signed(self):
         return False
     
+    # **TODO** make property
     def get_max_weight(self):
         if self.weight_dependence != None:
             return self.weight_dependence.w_max
         else:
             return 0.0
 
+    # **TODO** make property
     def get_params_size(self):
         """
         Gets the size of the STDP parameters in bytes for a range of atoms
@@ -79,18 +83,3 @@ class STDPMechanism(object):
         # Write weight dependence information to region
         if self.weight_dependence is not None:
             self.weight_dependence.write_plastic_params(spec, machine_time_step, weight_scale, num_terms)
-
-       
-    # **TEMP** timing and weight components should be able to contribute their 
-    # own components
-    def _get_synaptic_row_header_words(self):
-        num_words = 0
-
-        # Allow weight dependance and timing dependance to add to these
-        if self.weight_dependence is not None:
-            num_words += self.weight_dependence.get_synaptic_row_header_words()
-
-        if self.timing_dependence is not None:
-            num_words += self.timing_dependence.get_synaptic_row_header_words()
-
-        return num_words
