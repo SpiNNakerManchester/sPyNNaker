@@ -1,5 +1,3 @@
-import os
-
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
@@ -112,14 +110,8 @@ class LiveSpikeRecorder(
         spec.write_value(data=self._no_machine_time_steps)
 
     def get_binary_file_name(self):
-         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'live_spike_recorder.aplx')
-        return binary_name
-
+        return "live_spike_recorder.aplx"
+    
     #inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0

@@ -1,9 +1,10 @@
-from pacman103.front.common.abstract_synapse_row_io import AbstractSynapseRowIo
-from pacman103.front.common.synapse_row_info import SynapseRowInfo
-import math
-import numpy
+from spynnaker.pyNN.models.neural_properties.\
+    synapse_dynamics.abstract_synapse_row_io import AbstractSynapseRowIo
+from spynnaker.pyNN.models.neural_properties.\
+    synapse_row_info import SynapseRowInfo
+import math, numpy
 
-class SynapseRowIoPlasticLongWeight(AbstractSynapseRowIo):
+class SynapseRowIoLongPlasticWeight(AbstractSynapseRowIo):
     
     def __init__(self, num_header_words, dendritic_delay_fraction, signed):
         self.num_header_words = num_header_words

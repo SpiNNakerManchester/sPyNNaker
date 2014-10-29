@@ -1,5 +1,3 @@
-import os
-
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
     AbstractMultiCastSource
@@ -243,10 +241,4 @@ class CommandSender(AbstractMultiCastSource):
         return 0
 
     def get_binary_file_name(self):
-        # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'command_sender.aplx')
-        return binary_name
+        return "command_sender.aplx"

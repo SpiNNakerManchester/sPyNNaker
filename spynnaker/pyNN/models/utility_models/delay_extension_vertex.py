@@ -1,6 +1,5 @@
 from math import ceil
 import copy
-import os
 import math
 import logging
 
@@ -263,10 +262,4 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         return (44 + (16 * 4)) * n_atoms
 
     def get_binary_file_name(self):
-         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'delay_extension.aplx')
-        return binary_name
+        return "delay_extension.aplx"

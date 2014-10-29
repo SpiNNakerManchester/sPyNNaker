@@ -13,7 +13,6 @@ from data_specification.data_specification_generator import \
 
 from math import exp, ceil
 from enum import Enum
-import os
 import numpy
 
 import logging
@@ -315,11 +314,4 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         data_writer.close()
 
     def get_binary_file_name(self):
-        # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'spike_source_poisson.aplx')
-
-        return binary_name
+        return "spike_source_poisson.aplx"
