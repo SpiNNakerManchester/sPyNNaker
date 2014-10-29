@@ -117,16 +117,23 @@ static inline update_state_t timing_apply_pre_spike(uint32_t time, pre_trace_t t
   
   // Get time of event relative to last post-synaptic event
   uint32_t time_since_last_post = time - last_post_time;
-  int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace.o1, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
-  
-  // Calculate triplet term
-  int32_t decayed_o1_r2 = STDP_FIXED_MUL_16X16(decayed_o1, trace.r2);
-  
-  plastic_runtime_log_info("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d, r2=%d, decayed_o1_r2=%d\n", 
-                           time_since_last_post, decayed_o1, trace.r2, decayed_o1_r2);
-  
-  // Apply depression to state (which is a weight_state)
-  return weight_apply_depression(previous_state, decayed_o1, decayed_o1_r2);
+  if(time_since_last_post > 0)
+  {
+    int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace.o1, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
+    
+    // Calculate triplet term
+    int32_t decayed_o1_r2 = STDP_FIXED_MUL_16X16(decayed_o1, trace.r2);
+    
+    plastic_runtime_log_info("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d, r2=%d, decayed_o1_r2=%d\n", 
+                            time_since_last_post, decayed_o1, trace.r2, decayed_o1_r2);
+    
+    // Apply depression to state (which is a weight_state)
+    return weight_apply_depression(previous_state, decayed_o1, decayed_o1_r2);
+  }
+  else
+  {
+    return previous_state;
+  }
 }
 //---------------------------------------
 static inline update_state_t timing_apply_post_spike(uint32_t time, post_trace_t trace, 
@@ -139,16 +146,23 @@ static inline update_state_t timing_apply_post_spike(uint32_t time, post_trace_t
   
   // Get time of event relative to last pre-synaptic event
   uint32_t time_since_last_pre = time - last_pre_time;
-  int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace.r1, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+  if(time_since_last_pre > 0)
+  {
+    int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace.r1, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
 
-  // Calculate triplet term
-  int32_t decayed_r1_o2 = STDP_FIXED_MUL_16X16(decayed_r1, trace.o2);
+    // Calculate triplet term
+    int32_t decayed_r1_o2 = STDP_FIXED_MUL_16X16(decayed_r1, trace.o2);
 
-  plastic_runtime_log_info("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d, o2=%d, potentiation=%d\n", 
-                           time_since_last_pre, decayed_r1, trace.o2, potentiation);
+    plastic_runtime_log_info("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d, o2=%d, potentiation=%d\n", 
+                            time_since_last_pre, decayed_r1, trace.o2, potentiation);
 
-  // Apply potentiation to state (which is a weight_state)
-  return weight_apply_potentiation(previous_state, decayed_r1, decayed_r1_o2);
+    // Apply potentiation to state (which is a weight_state)
+    return weight_apply_potentiation(previous_state, decayed_r1, decayed_r1_o2);
+  }
+  else
+  {
+    return previous_state;
+  }
 }
 
 #endif	// PFISTER_TRIPLET_IMPL_H
