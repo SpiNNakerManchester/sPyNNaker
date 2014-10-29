@@ -23,9 +23,12 @@ uint32_t *plasticity_region_weight_filled (uint32_t *address, uint32_t flags)
   plasticity_weight_region_data.max_weight = (int32_t)address[1];
   plasticity_weight_region_data.a2_plus = (int32_t)address[2];
   plasticity_weight_region_data.a2_minus = (int32_t)address[3];
+  plasticity_weight_region_data.weight_multiply_right_shift = 16 - (ring_buffer_to_input_left_shift + 1);
   
-  log_info("\tMin weight:%d, Max weight:%d, A2+:%d, A2-:%d", plasticity_weight_region_data.min_weight, plasticity_weight_region_data.max_weight, 
-    plasticity_weight_region_data.a2_plus, plasticity_weight_region_data.a2_minus);
+  log_info("\tMin weight:%d, Max weight:%d, A2+:%d, A2-:%d, Weight multiply right shift:%u", 
+    plasticity_weight_region_data.min_weight, plasticity_weight_region_data.max_weight, 
+    plasticity_weight_region_data.a2_plus, plasticity_weight_region_data.a2_minus,
+    plasticity_weight_region_data.weight_multiply_right_shift);
 
   log_info("plasticity_region_weight_filled: completed successfully");
 

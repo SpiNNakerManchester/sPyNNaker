@@ -15,8 +15,6 @@
 //---------------------------------------
 // Structures
 //---------------------------------------
-typedef int32_t weight_state_t;
-
 typedef struct
 {
   int32_t min_weight;
@@ -24,8 +22,11 @@ typedef struct
   
   int32_t a2_plus;
   int32_t a2_minus;
+  
+  uint32_t weight_multiply_right_shift;
 } plasticity_weight_region_data_t;
 
+typedef int32_t weight_state_t;
 
 //---------------------------------------
 // Externals
@@ -40,22 +41,28 @@ static inline weight_state_t weight_init(weight_t weight)
   return (int32_t)weight;
 }
 //---------------------------------------
-static inline weight_state_t stdp_weight_apply_depression(weight_state_t state, int32_t depression)
+static inline weight_state_t weight_apply_depression(weight_state_t state, int32_t depression)
 {
   // Calculate scale
-  int32_t scale = STDP_TRACE_FIXED_MUL_16X16(state - plasticity_weight_region_data.min_weight, plasticity_weight_region_data.a2_minus); 
+  // **NOTE** this calculation must be done at runtime-defined weight fixed-point format
+  int32_t scale = plasticity_fixed_mul16(state - plasticity_weight_region_data.min_weight, plasticity_weight_region_data.a2_minus, 
+    plasticity_weight_region_data.weight_multiply_right_shift); 
   
   // Multiply scale by depression and subtract
-  return state - STDP_TRACE_FIXED_MUL_16X16(scale, depression);
+  // **NOTE** using standard STDP fixed-point format handles format conversion
+  return state - STDP_FIXED_MUL_16X16(scale, depression);
 }
 //---------------------------------------
 static inline weight_state_t weight_apply_potentiation(weight_state_t state, int32_t potentiation)
 {
   // Calculate scale
-  int32_t scale = STDP_TRACE_FIXED_MUL_16X16(plasticity_weight_region_data.max_weight - state, plasticity_weight_region_data.a2_plus); 
+  // **NOTE** this calculation must be done at runtime-defined weight fixed-point format
+  int32_t scale = plasticity_fixed_mul16(plasticity_weight_region_data.max_weight - state, plasticity_weight_region_data.a2_plus, 
+    plasticity_weight_region_data.weight_multiply_right_shift); 
   
   // Multiply scale by potentiation and add
-  return state + STDP_TRACE_FIXED_MUL_16X16(scale, potentiation);
+  // **NOTE** using standard STDP fixed-point format handles format conversion
+  return state + STDP_FIXED_MUL_16X16(scale, potentiation);
 }
 //---------------------------------------
 static inline weight_t weight_get_final(weight_state_t new_state)

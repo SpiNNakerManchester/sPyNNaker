@@ -554,7 +554,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         for path in self._binary_search_paths:
             # Rebuild filename
             potential_filename = os.path.join(path, executable_name)
-            logger.info("CONSIDERING %s" % potential_filename)
+            
             # If this filename exists, return it
             if os.path.isfile(potential_filename):
                 return potential_filename
