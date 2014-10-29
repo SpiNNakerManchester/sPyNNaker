@@ -599,37 +599,19 @@ class AbstractSynapticManager(object):
         pre_placement = placements.get_placement_of_subvertex(pre_subvertex)
 
         pre_x, pre_y, pre_p = pre_placement.x, pre_placement.y, pre_placement.p
-        table_slot_addr = packet_conversions.\
-            get_mpt_sb_mem_addrs_from_coords(pre_x, pre_y, pre_p)
-        master_table_pop_entry_address = (table_slot_addr +
-                                          master_pop_base_mem_address)
 
         incoming_edges = \
             subgraph.incoming_subedges_from_subvertex(post_subvertex)
         incoming_key_combo = None
-        incoming_mask = None
         for subedge in incoming_edges:
             if subedge.pre_subvertex == pre_subvertex:
                 routing_info = routing_infos.get_subedge_information_from_subedge(subedge)
                 incoming_key_combo = routing_info.key_mask_combo
-                incoming_mask = routing_info.mask
 
-        master_table_pop_entry_address = \
+        maxed_row_length, synaptic_block_base_address_offset = \
             self._master_pop_table_generator.\
             extract_synaptic_matrix_data_location(
-                incoming_key_combo, master_pop_base_mem_address, incoming_mask)
-        #read in the master pop entry
-        master_pop_entry = \
-            self._master_pop_table_generator.read_and_convert(
-                pre_x, pre_y, master_table_pop_entry_address, 2, "<H",
-                transceiver)
-
-        synaptic_block_base_address = master_pop_entry >> 3  # in kilobytes
-        #convert synaptic_block_base_address into bytes from kilobytes
-        synaptic_block_base_address_offset = synaptic_block_base_address << 10
-        max_row_length_index = master_pop_entry & 0x7
-        #retrieve the max row length
-        maxed_row_length = constants.ROW_LEN_TABLE_ENTRIES[max_row_length_index]
+                incoming_key_combo, master_pop_base_mem_address)
 
         #calculate the synaptic block size in words
         synaptic_block_size = pre_n_atoms * 4 * \

@@ -20,7 +20,8 @@ class AbstractMasterPopTableFactory(object):
 
     @abstractmethod
     def extract_synaptic_matrix_data_location(
-            self, incoming_key, master_pop_base_mem_address, incoming_mask):
+            self, incoming_key, master_pop_base_mem_address, txrx, chip_x,
+            chip_y):
         """
         :param incoming_key: the source key which the synaptic matrix needs to \
         be mapped to
