@@ -21,14 +21,14 @@ class VisualisedVertex(Population):
             self, to_file=None, receive_port_no=None, hostname=None,
             tag=None, traffic_type=TRAFFIC_TYPE.EIEIO,
             visualiser_mode=VISUALISER_MODES.RASTER,
-            visualiser_2d_dimension=None, visualiser_raster_seperate=None,
+            visualiser_2d_dimension=None, visualiser_raster_separate=None,
             visualiser_no_colours=None, visualiser_average_period_tics=None,
             visualiser_longer_period_tics=None,
             visualiser_update_screen_in_tics=None,
             visualiser_reset_counters=None,
             visualiser_reset_counter_period=None):
 
-        #add a visulaiser vertex to the list of vertex's to be visualised by
+        #add a visualiser vertex to the list of vertex's to be visualised by
         # the visualiser
         connection_type = None
         if traffic_type == TRAFFIC_TYPE.EIEIO:
@@ -54,7 +54,7 @@ class VisualisedVertex(Population):
             visualiser_no_colours, visualiser_average_period_tics,
             visualiser_longer_period_tics,
             visualiser_update_screen_in_tics, visualiser_reset_counters,
-            visualiser_reset_counter_period, visualiser_raster_seperate,
+            visualiser_reset_counter_period, visualiser_raster_separate,
             self._vertex, receive_port_no, traffic_type, hostname,
             connection_type)
         self._spinnaker.add_visualiser_vertex(visualiser_vertex)
