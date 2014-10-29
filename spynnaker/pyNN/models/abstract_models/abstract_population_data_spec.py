@@ -284,7 +284,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     #inhirrited from data specable vertex
     def get_binary_file_name(self):
-         # Split binary name into title and extension
+        # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)
 
         # If we have an STDP mechanism, add it's executable suffic to title
@@ -293,9 +293,5 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 binary_title + "_" + \
                 self._stdp_mechanism.get_vertex_executable_suffix()
 
-        # Rebuild executable name
-        binary_name = os.path.join(config.get("SpecGeneration",
-                                              "common_binary_folder"),
-                                   binary_title + binary_extension)
-
-        return binary_name
+        # Reunite title and extension and return
+        return binary_title + binary_extension

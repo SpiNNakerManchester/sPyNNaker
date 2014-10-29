@@ -194,15 +194,6 @@ class SpynnakerConfiguration(object):
         if config.has_option("Execute", "run"):
             self._do_run = config.getboolean("Execute", "run")
 
-        #sort out the executable folder location
-        binary_path = os.path.abspath(exceptions.__file__)
-        binary_path = os.path.abspath(os.path.join(binary_path, os.pardir))
-        binary_path = os.path.join(binary_path, "model_binaries")
-
-        if not config.has_section("SpecGeneration"):
-            config.add_section("SpecGeneration")
-        config.set("SpecGeneration", "common_binary_folder", binary_path)
-
     def _set_up_pacman_algorthms_listings(self):
          #algorithum lists
         partitioner_algorithms_list = \

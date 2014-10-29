@@ -81,7 +81,15 @@ class DelayExtensionException(ConfigurationException):
     """
     pass
 
+class ExecutableNotFoundException(SpynnakerException):
+    """ raised when a suitable executable cannot be found
+    to load onto SpiNNaker for a particular vertex
 
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
+    
 class ExecutableFailedToStartException(SpynnakerException):
     """ raised when the messgaes from the trnasicever state that some or all the
     application images pushed to the board have failed to start when asked
