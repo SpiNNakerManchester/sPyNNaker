@@ -1,8 +1,9 @@
-import math
+import itertools
 import logging
+import math
+import numpy
 import struct
 import sys
-import numpy
 
 from abc import ABCMeta
 from abc import abstractmethod
@@ -407,69 +408,105 @@ class AbstractSynapticManager(object):
         # Track writes inside the synaptic matrix region:
         next_block_start_addr = 0
         n_synapse_type_bits = self.get_n_synapse_type_bits()
-
+        
+        # Filtering incoming subedges
+        in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        in_proj_subedges = [e for e in in_subedges if isinstance(e, ProjectionPartitionedEdge)]
+        
+        print("%u incoming projection sub-edges" % len(in_proj_subedges))
+        
+        # Get all combinations of these edges
+        proj_subedges_to_remove = []
+        for (a, b) in itertools.combinations(in_proj_subedges, 2):
+            a_key = routing_info.get_key_from_subedge(a)
+            b_key = routing_info.get_key_from_subedge(b)
+            
+            if a_key == b_key:
+                # Extract both projection edges synapse sublists
+                a_sublist = a.get_synapse_sublist(graph_mapper)
+                b_sublist = b.get_synapse_sublist(graph_mapper)
+                
+                # From these get rows
+                a_rows = a_sublist.get_rows()
+                b_rows = b_sublist.get_rows()
+                
+                if len(a_rows) != len(b_rows):
+                    raise Exception("Incoming projection subedges have different row lengths")
+                
+                # Loop through all rows in a and b and append rows from b onto a
+                for a_row, b_row in zip(a_rows, b_rows):
+                    a_row.append(b_row)
+                    
+                    print("MERGING")
+                    #print("Merging projection %s (%u-%u) and %s (%u-%u) both leading to vertex %s" % (a.edge.label, a.postsubvertex.lo_atom, a.postsubvertex.hi_atom, b.edge.label, b.postsubvertex.lo_atom, b.postsubvertex.hi_atom, self.label))
+                    
+                    # Add projection edge b to list to remove
+                    proj_subedges_to_remove.append(b)
+        
+        # If there are any projection subedges to remove
+        if len(proj_subedges_to_remove) > 0:
+            # Rebuild incoming projection list
+            in_proj_subedges = [i for i in in_proj_subedges if i not in proj_subedges_to_remove]
+        
+        
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
-        in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
-        for subedge in in_subedges:
+        for proj_subedge in in_proj_subedges:
+            key = routing_info.get_key_from_subedge(proj_subedge)
+            x = packet_conversions.get_x_from_key(key)
+            y = packet_conversions.get_y_from_key(key)
+            p = packet_conversions.get_p_from_key(key)
+            spec.comment("\nWriting matrix for subedge from {}, {}, {}\n"
+                            .format(x, y, p))
 
-            # Only deal with incoming projection subedges
-            if isinstance(subedge, ProjectionPartitionedEdge):
-                key = routing_info.get_key_from_subedge(subedge)
-                x = packet_conversions.get_x_from_key(key)
-                y = packet_conversions.get_y_from_key(key)
-                p = packet_conversions.get_p_from_key(key)
-                spec.comment("\nWriting matrix for subedge from {}, {}, {}\n"
-                             .format(x, y, p))
+            sublist = proj_subedge.get_synapse_sublist(graph_mapper)
+            associated_edge = \
+                graph_mapper.get_partitionable_edge_from_partitioned_edge(proj_subedge)
+            row_io = associated_edge.get_synapse_row_io()
+            if logger.isEnabledFor("debug"):
+                subvertex_vertex =\
+                    graph_mapper.get_vertex_from_subvertex(subvertex)
+                pre_sub_lo = \
+                    graph_mapper.get_subvertex_slice(
+                        proj_subedge.pre_subvertex).lo_atom
+                pre_sub_hi = \
+                    graph_mapper.get_subvertex_slice(
+                        proj_subedge.pre_subvertex).hi_atom
+                sub_lo = graph_mapper.get_subvertex_slice(subvertex).lo_atom
+                sub_hi = graph_mapper.get_subvertex_slice(subvertex).hi_atom
 
-                sublist = subedge.get_synapse_sublist(graph_mapper)
-                associated_edge = \
-                    graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
-                row_io = associated_edge.get_synapse_row_io()
-                if logger.isEnabledFor("debug"):
-                    subvertex_vertex =\
-                        graph_mapper.get_vertex_from_subvertex(subvertex)
-                    pre_sub_lo = \
-                        graph_mapper.get_subvertex_slice(
-                            subedge.pre_subvertex).lo_atom
-                    pre_sub_hi = \
-                        graph_mapper.get_subvertex_slice(
-                            subedge.pre_subvertex).hi_atom
-                    sub_lo = graph_mapper.get_subvertex_slice(subvertex).lo_atom
-                    sub_hi = graph_mapper.get_subvertex_slice(subvertex).hi_atom
+                logger.debug("Writing subedge from {} ({}-{}) to {} ({}-{})"
+                    .format(proj_subedge.pre_subvertex.label,
+                                        pre_sub_lo, pre_sub_hi,
+                                        subvertex_vertex.label, sub_lo,
+                                        sub_hi))
+                rows = sublist.get_rows()
+                for i in range(len(rows)):
+                    logger.debug("{}: {}".format(i, rows[i]))
 
-                    logger.debug("Writing subedge from {} ({}-{}) to {} ({}-{})"
-                                 .format(subedge.pre_subvertex.label,
-                                         pre_sub_lo, pre_sub_hi,
-                                         subvertex_vertex.label, sub_lo,
-                                         sub_hi))
-                    rows = sublist.get_rows()
-                    for i in range(len(rows)):
-                        logger.debug("{}: {}".format(i, rows[i]))
+            # Get the maximum row length in words, excluding headers
+            max_row_length = \
+                max([row_io.get_n_words(row) for row in sublist.get_rows()])
+            # Get an entry in the row length table for this length
+            row_index, row_length = \
+                self.select_minimum_row_length(max_row_length)
+            if max_row_length == 0 or row_length == 0:
+                print ""
 
-                # Get the maximum row length in words, excluding headers
-                max_row_length = \
-                    max([row_io.get_n_words(row) for row in sublist.get_rows()])
-                # Get an entry in the row length table for this length
-                row_index, row_length = \
-                    self.select_minimum_row_length(max_row_length)
-                if max_row_length == 0 or row_length == 0:
-                    print ""
+            # Write the synaptic block for the sublist
+            (block_start_addr, next_block_start_addr) = \
+                self.write_synapse_row_info(
+                    sublist, row_io, spec, next_block_start_addr,
+                    row_length, synaptic_matrix_region, weight_scale,
+                    n_synapse_type_bits)
 
-                # Write the synaptic block for the sublist
-                (block_start_addr, next_block_start_addr) = \
-                    self.write_synapse_row_info(
-                        sublist, row_io, spec, next_block_start_addr,
-                        row_length, synaptic_matrix_region, weight_scale,
-                        n_synapse_type_bits)
-
-                if (next_block_start_addr - 1) > all_syn_block_sz:
-                    raise exceptions.SynapticBlockGenerationException(
-                        "Too much synapse memory consumed (used {} of {})!"
-                        .format(next_block_start_addr - 1, all_syn_block_sz))
-                self.update_master_population_table(spec, block_start_addr,
-                                                    row_index, key,
-                                                    master_pop_table_region)
+            if (next_block_start_addr - 1) > all_syn_block_sz:
+                raise exceptions.SynapticBlockGenerationException(
+                    "Too much synapse memory consumed (used {} of {})!"
+                    .format(next_block_start_addr - 1, all_syn_block_sz))
+            self.update_master_population_table(spec, block_start_addr,
+                                                row_index, key,
+                                                master_pop_table_region)
 
     @staticmethod
     def update_master_population_table(spec, block_start_addr, row_index,

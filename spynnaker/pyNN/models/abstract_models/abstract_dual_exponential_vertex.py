@@ -102,7 +102,7 @@ class AbstractDualExponentialVertex(object):
         """
 
         # Set the focus to the memory region 3 (synapse parameters):
-        spec.switchWriteFocus(
+        spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS)
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Synapse Parameters for {%d} Neurons:\n"
