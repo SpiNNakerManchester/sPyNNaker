@@ -6,7 +6,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
 class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
     
     def __init__(self, presubvertex, postsubvertex, associated_edge):
-        PartitionedEdge.__init__(self, presubvertex, postsubvertex)
+        PartitionedEdge.__init__(self, presubvertex, postsubvertex, associated_edge.label)
         AbstractFilterableEdge.__init__(self)
         self._synapse_sublist = None
         self._associated_edge = associated_edge

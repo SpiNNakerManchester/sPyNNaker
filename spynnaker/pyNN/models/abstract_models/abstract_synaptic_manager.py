@@ -413,8 +413,6 @@ class AbstractSynapticManager(object):
         in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
         in_proj_subedges = [e for e in in_subedges if isinstance(e, ProjectionPartitionedEdge)]
         
-        print("%u incoming projection sub-edges" % len(in_proj_subedges))
-        
         # Get all combinations of these edges
         proj_subedges_to_remove = []
         for (a, b) in itertools.combinations(in_proj_subedges, 2):
@@ -432,19 +430,27 @@ class AbstractSynapticManager(object):
                 
                 if len(a_rows) != len(b_rows):
                     raise Exception("Incoming projection subedges have different row lengths")
-                
+
                 # Loop through all rows in a and b and append rows from b onto a
                 for a_row, b_row in zip(a_rows, b_rows):
+                    # Merge synaptic rows
+                    # **TODO** use proper merge functionality
                     a_row.append(b_row)
-                    
-                    print("MERGING")
-                    #print("Merging projection %s (%u-%u) and %s (%u-%u) both leading to vertex %s" % (a.edge.label, a.postsubvertex.lo_atom, a.postsubvertex.hi_atom, b.edge.label, b.postsubvertex.lo_atom, b.postsubvertex.hi_atom, self.label))
-                    
-                    # Add projection edge b to list to remove
-                    proj_subedges_to_remove.append(b)
+                
+                if logger.isEnabledFor(logging.DEBUG):
+                    a_slice = graph_mapper.get_subvertex_slice(a.post_subvertex)
+                    b_slice = graph_mapper.get_subvertex_slice(b.post_subvertex)
+                    logger.debug("Merging projection subedges %s (%u-%u) and %s (%u-%u) both leading to vertex %s" 
+                        % (a.label, a_slice.lo_atom, a_slice.hi_atom, 
+                           b.label, b_slice.lo_atom, b_slice.hi_atom, self.label))
+                
+                # Add projection edge b to list to remove
+                proj_subedges_to_remove.append(b)
         
         # If there are any projection subedges to remove
         if len(proj_subedges_to_remove) > 0:
+            logger.info("Merged %u incoming projection sub-edges" % len(proj_subedges_to_remove))
+            
             # Rebuild incoming projection list
             in_proj_subedges = [i for i in in_proj_subedges if i not in proj_subedges_to_remove]
         
