@@ -69,8 +69,8 @@ class SynapticList(object):
         """
         for row in self._synaptic_rows[from_vertex_slice.lo_atom:
                                        from_vertex_slice.hi_atom + 1]:
-            if row.get_n_connections(to_vertex_slice.lo_atom,
-                                     to_vertex_slice.hi_atom) > 0:
+            x = row.get_n_connections(to_vertex_slice.n_atoms)
+            if row.get_n_connections(to_vertex_slice.n_atoms) > 0:
                 return True
         return False
     
@@ -133,3 +133,7 @@ class SynapticList(object):
         Appends a synapse list to the end of this one
         """
         self._synaptic_rows.extend(synapse_list.synapticRows)
+
+    def __str__(self):
+        return "synaptic list containing {} entries which are {}"\
+            .format(len(self._synaptic_rows), self._synaptic_rows)

@@ -18,7 +18,7 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
-from spynnaker.pyNN.utilities import utility_calls
+
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
@@ -153,12 +153,15 @@ class AbstractSynapticManager(object):
                 max([graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
                     .get_synapse_row_io().get_n_words(synapse_row)
                     for synapse_row in sublist.get_rows()])
+            #check that the max_n_words is greater than zero
+            assert(max_n_words > 0)
             all_syn_block_sz = \
                 self._calculate_all_synaptic_block_size(sublist,
                                                         max_n_words)
             memory_size += all_syn_block_sz
         return memory_size
-    
+
+    # TODO DOES THIS METHOD EVER GET RAN????
     def get_synaptic_blocks_memory_size(self, vertex_slice, in_edges):
         self._check_synapse_dynamics(in_edges)
         memory_size = 0
@@ -291,7 +294,7 @@ class AbstractSynapticManager(object):
             return 1
         return None
 
-    def get_stdp_parameter_size(self, vertex_slice, in_edges):
+    def get_stdp_parameter_size(self, in_edges):
         self._check_synapse_dynamics(in_edges)
         if self._stdp_mechanism is not None:
             return self._stdp_mechanism.get_params_size()
@@ -328,9 +331,9 @@ class AbstractSynapticManager(object):
         ring_buffer_to_input_left_shift to produce an s1615 fixed point number
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
-    
-    
-    def get_ring_buffer_to_input_left_shift(self, subvertex, sub_graph, graph_mapper):
+
+    def get_ring_buffer_to_input_left_shift(self, subvertex, sub_graph,
+                                            graph_mapper):
 
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
@@ -345,12 +348,12 @@ class AbstractSynapticManager(object):
         
         # If we have an STDP mechanism which has a weight dependence
         if self._stdp_mechanism is not None\
-            and self._stdp_mechanism.weight_dependence is not None:
-                # If weight dependence has a max weight, 
-                # Take this into account as well
-                stdp_max_weight =  self._stdp_mechanism.weight_dependence.w_max
-                if stdp_max_weight is not None:
-                    max_weight = max(max_weight, stdp_max_weight)
+                and self._stdp_mechanism.weight_dependence is not None:
+            # If weight dependence has a max weight,
+            # Take this into account as well
+            stdp_max_weight = self._stdp_mechanism.weight_dependence.w_max
+            if stdp_max_weight is not None:
+                max_weight = max(max_weight, stdp_max_weight)
             
         max_weight_log_2 = 0
         if max_weight > 0:
@@ -364,7 +367,7 @@ class AbstractSynapticManager(object):
         max_weight_power = int(math.ceil(max_weight_log_2))
 
         logger.debug("Max weight is {}, Max power is {}"
-                    .format(max_weight, max_weight_power))
+                     .format(max_weight, max_weight_power))
 
         # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
         # but we ignore the "-1" to allow a bit of overhead in the above
@@ -448,11 +451,15 @@ class AbstractSynapticManager(object):
                 # Get the maximum row length in words, excluding headers
                 max_row_length = \
                     max([row_io.get_n_words(row) for row in sublist.get_rows()])
+                #check that the max_row_length is not zero
+                assert(max_row_length > 0)
                 # Get an entry in the row length table for this length
                 row_index, row_length = \
                     self.select_minimum_row_length(max_row_length)
                 if max_row_length == 0 or row_length == 0:
-                    print ""
+                    raise exceptions.SynapticBlockGenerationException(
+                        "generated a row length of zero, this is deemed an error"
+                        " and therefore the system will stop")
 
                 # Write the synaptic block for the sublist
                 (block_start_addr, next_block_start_addr) = \
@@ -507,6 +514,7 @@ class AbstractSynapticManager(object):
         if (block_start_addr & 0x3FF) != 0:
             raise exceptions.SynapticBlockGenerationException(
                 "Synaptic Block start address is not aligned to a 1K boundary")
+        assert (block_start_addr < math.pow(2, 32))
         #moves by 7 to tack on at the end the row_length information
         # which resides in the last 3 bits
         entry_addr_field = block_start_addr >> 7
@@ -521,7 +529,7 @@ class AbstractSynapticManager(object):
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
             post_subvertex, master_pop_table_region, synaptic_matrix_region,
-            synapse_io, subgraph, graph_mapper):
+            synapse_io, weight_scale):
 
         synaptic_block, max_row_length = \
             self._retrieve_synaptic_block(
@@ -531,29 +539,29 @@ class AbstractSynapticManager(object):
         synapse_list = \
             self._translate_synaptic_block_from_memory(
                 synaptic_block, pre_n_atoms, max_row_length, synapse_io,
-                post_subvertex, subgraph, graph_mapper)
-
+                weight_scale)
         return synapse_list
 
     def _translate_synaptic_block_from_memory(self, synaptic_block, n_atoms,
                                               max_row_length, synapse_io,
-                                              post_subvertex, sub_graph,
-                                              graph_mapper):
+                                              weight_scale):
         """
         translates a collection of memory into synaptic rows
         """
         synaptic_list = list()
+        numpy_block = numpy.frombuffer(dtype='uint8',
+                                       buffer=synaptic_block).view(dtype='<u4')
+        position_in_block = 0
         for atom in range(n_atoms):
             #extract the 3 elements of a row (PP, FF, FP)
-            p_p_entries, f_f_entries, f_p_entries, = \
-                self._extract_row_data_from_memory_block(atom, synaptic_block,
-                                                         max_row_length)
-            # create a synaptic_row from the 3 entries
-            ring_buffer_shift = \
-                self.get_ring_buffer_to_input_left_shift(
-                    post_subvertex, sub_graph, graph_mapper)
+            p_p_entries, f_f_entries, f_p_entries = \
+                self._extract_row_data_from_memory_block(numpy_block,
+                                                         position_in_block)
+            #new position in synpaptic block
+            position_in_block = \
+                ((atom + 1) *
+                 (max_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS))
 
-            weight_scale = self.get_weight_scale(ring_buffer_shift)
             bits_reserved_for_type = self.get_n_synapse_type_bits()
             synaptic_row = \
                 synapse_io.create_row_info_from_elements(p_p_entries,
@@ -566,49 +574,46 @@ class AbstractSynapticManager(object):
         return SynapticList(synaptic_list)
 
     @staticmethod
-    def _extract_row_data_from_memory_block(atom, synaptic_block,
-                                            max_row_length):
+    def _extract_row_data_from_memory_block(synaptic_block, position_in_block):
 
         """
         extracts the 6 elements from a data block which is ordered
         no PP, pp, No ff, NO fp, FF fp
         """
-        #turn byte array list into a string so that unpack can work
-        synaptic_block = str(synaptic_block)
-        #locate offset after conversion to bytes
-        position_in_block = \
-            atom * 4 * (max_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)
         #read in number of plastic plastic entries
-        no_plastic_plastic_entries = \
-            struct.unpack_from("<I", synaptic_block, position_in_block)[0]
-        position_in_block += 4
+        no_plastic_plastic_entries = synaptic_block[position_in_block]
+        position_in_block += 1
         #read inall the plastic entries
-        fmt = "<{}I".format(no_plastic_plastic_entries)
-        plastic_plastic_entries = \
-            struct.unpack_from(fmt, synaptic_block, position_in_block)
+        end_point = position_in_block + no_plastic_plastic_entries
+        plastic_plastic_entries = synaptic_block[position_in_block:end_point]
+        ##for element in plastic_plastic_entries:
+        ##    assert(element != 3150765550)
         #update position in block
-        position_in_block += (no_plastic_plastic_entries * 4)
+        position_in_block = end_point
         #update position in block
         #read in number of both fixed fixed and fixed plastic
-        no_fixed_fixed = \
-            struct.unpack_from("<I", synaptic_block, position_in_block)[0]
-        position_in_block += 4
-        no_fixed_plastic = \
-            struct.unpack_from("<I", synaptic_block, position_in_block)[0]
-        #update position in block
-        position_in_block += 4
+        no_fixed_fixed = synaptic_block[position_in_block]
+        position_in_block += 1
+        no_fixed_plastic = synaptic_block[position_in_block]
+        position_in_block += 1
         #read in fixed fixed
-        fmt = "<{}I".format(no_fixed_fixed)
-        fixed_fixed_entries = \
-            struct.unpack_from(fmt, synaptic_block, position_in_block)
-        #update position in block
-        position_in_block += (no_fixed_fixed * 4)
-        #read in fixed plastic
-        fmt = "<{}H".format(no_fixed_plastic)
+        end_point = position_in_block + no_fixed_fixed
+        fixed_fixed_entries = synaptic_block[position_in_block:end_point]
+        ##for element in fixed_fixed_entries:
+        ##    assert(element != 3150765550)
+        position_in_block = end_point
+        #read in fixed plastic (fixed plastic are in 16 bits, so each int is 2 entries)
+        end_point = position_in_block + math.ceil(no_fixed_plastic / 2.0)
         fixed_plastic_entries = \
-            struct.unpack_from(fmt, synaptic_block, position_in_block)
-        return (plastic_plastic_entries, fixed_fixed_entries,
-                fixed_plastic_entries)
+            synaptic_block[position_in_block:end_point].view(dtype='<u2')
+        if no_fixed_plastic % 2.0 == 1:  # remove last entry if required
+            fixed_plastic_entries = \
+                fixed_plastic_entries[0:len(fixed_plastic_entries) - 2]
+        ##for element in fixed_plastic_entries:
+        ##    assert(element != 3150765550)
+        #return the different entries
+        return plastic_plastic_entries, fixed_fixed_entries, \
+            fixed_plastic_entries
 
     def _retrieve_synaptic_block(self, placements, transceiver,
                                  pre_subvertex, pre_n_atoms,
@@ -635,8 +640,9 @@ class AbstractSynapticManager(object):
                                           master_pop_base_mem_address)
         #read in the master pop entry
         master_pop_entry = \
-            self._read_and_convert(pre_x, pre_y, master_table_pop_entry_address,
-                                   2, "<H", transceiver)
+            self._read_and_convert(post_x, post_y,
+                                   master_table_pop_entry_address, 2, "<H",
+                                   transceiver)
 
         synaptic_block_base_address = master_pop_entry >> 3  # in kilobytes
         #convert synaptic_block_base_address into bytes from kilobytes
@@ -655,10 +661,9 @@ class AbstractSynapticManager(object):
                                            synaptic_matrix_region)
 
         # read in the memory address of the synaptic_region base address
-        synapste_region_base_address = \
-            self._read_and_convert(pre_x, pre_y,
-                                   synapste_region_base_address_location, 4,
-                                   "<I", transceiver)
+        synapste_region_base_address = self._read_and_convert(
+            post_x, post_y, synapste_region_base_address_location, 4,
+            "<I", transceiver)
         # the base address of the synaptic block in absolute terms is the app
         # base, plus the synaptic matrix base plus the offset
         synaptic_block_base_address = \
@@ -667,7 +672,7 @@ class AbstractSynapticManager(object):
 
         #read in and return the synaptic block
         blocks = list(transceiver.read_memory(
-            pre_x, pre_y, synaptic_block_base_address, synaptic_block_size))
+            post_x, post_y, synaptic_block_base_address, synaptic_block_size))
 
         block = bytearray()
         for message_block in blocks:

@@ -98,8 +98,7 @@ class AbstractRecordableVertex(object):
 
             # Get the App Data for the core
             app_data_base_address = \
-                transciever.get_cpu_information_from_core(
-                    x, y, p).user[0]
+                transciever.get_cpu_information_from_core(x, y, p).user[0]
 
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
@@ -121,15 +120,15 @@ class AbstractRecordableVertex(object):
 
             #check that the number of spikes written is smaller or the same as
             #  the size of the memory region we allocated for spikes
-            out_spike_bytes = sub_vertex_out_spike_bytes_function(subvertex,
-                    subvertex_slice)
-            size_of_region = \
-                self.get_recording_region_size(out_spike_bytes)
+            out_spike_bytes = sub_vertex_out_spike_bytes_function(
+                subvertex, subvertex_slice)
+            size_of_region = self.get_recording_region_size(out_spike_bytes)
 
             if number_of_bytes_written > size_of_region:
-                raise exceptions.MemReadException("the amount of memory written"
-                                                  " was larger than was "
-                                                  "allocated for it")
+                raise exceptions.MemReadException(
+                    "the amount of memory written ({}) was larger than was "
+                    "allocated for it ({})"
+                    .format(number_of_bytes_written, size_of_region))
 
             # Read the spikes
             logger.debug("Reading {} ({}) bytes starting at {} + 4"

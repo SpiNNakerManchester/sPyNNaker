@@ -1,6 +1,4 @@
 import unittest
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
-    .additive_weight_dependence import AdditiveWeightDependence
 
 
 class MyTestCase(unittest.TestCase):

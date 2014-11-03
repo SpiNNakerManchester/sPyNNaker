@@ -1,7 +1,7 @@
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge import \
     ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_projection_subedge import \
-    DelayProjectionSubedge
+from spynnaker.pyNN.models.neural_projections.delay_partitioned_projection import \
+    DelayPartitionedProjection
 
 import logging
 logger = logging.getLogger(__name__)
@@ -56,4 +56,4 @@ class DelayProjectionEdge(ProjectionPartitionableEdge):
         """
         Creates a subedge from this edge
         """
-        return DelayProjectionSubedge(self, presubvertex, postsubvertex, self)
+        return DelayPartitionedProjection(presubvertex, postsubvertex)

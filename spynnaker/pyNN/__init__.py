@@ -4,7 +4,6 @@ and implementation for the PyNN High-level API
 (http://neuralensemble.org/trac/PyNN)
 """
 
-import logging
 import inspect
 
 #utility functions
@@ -36,8 +35,8 @@ from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
     import DelayProjectionEdge
-from spynnaker.pyNN.models.neural_projections.delay_projection_subedge \
-    import DelayProjectionSubedge
+from spynnaker.pyNN.models.neural_projections.delay_partitioned_projection \
+    import DelayPartitionedProjection
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
@@ -54,8 +53,8 @@ from spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector\
     import AllToAllConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_pre_connector import FixedNumberPreConnector
-from spynnaker.pyNN.models.neural_projections.connectors.fixed_probability_connector \
-    import FixedProbabilityConnector
+from spynnaker.pyNN.models.neural_projections.connectors.\
+    fixed_probability_connector import FixedProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
     import FromListConnector
 from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
@@ -65,7 +64,8 @@ from spynnaker.pyNN.models.neural_projections.connectors.multapse_connector \
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
-    distance_dependent_probability_connector import DistanceDependentProbabilityConnector
+    distance_dependent_probability_connector import \
+    DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
 from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
@@ -80,15 +80,15 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
     import STDPMechanism
 
 # STDP weight dependences
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     additive_weight_dependence import AdditiveWeightDependence
 
 # STDP timing dependences
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
-    spike_pair_rule import SpikePairRule
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
-    pfister_spike_triplet_rule import PfisterSpikeTripletRule
-
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
+    pfister_spike_triplet_time_dependence import \
+    PfisterSpikeTripletTimeDependence as PfisterSpikeTripletRule
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
+    spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
 #constraints
 from pacman.model.constraints.placer_chip_and_core_constraint \

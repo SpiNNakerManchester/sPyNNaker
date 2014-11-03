@@ -32,7 +32,6 @@ import time
 import os
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -161,6 +160,7 @@ class SpynnakerCommsFunctions(object):
                 get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
+
                 data_spec_file_path = \
                     associated_vertex.get_data_spec_file_path(
                         placement.x, placement.y, placement.p, hostname
@@ -174,7 +174,7 @@ class SpynnakerCommsFunctions(object):
 
                 #locate current memory requirement
                 current_memory_available = SDRAM.DEFAULT_SDRAM_BYTES
-                memory_tracker_key = "{}:{}".format(placement.x, placement.y)
+                memory_tracker_key = (placement.x, placement.y)
                 if memory_tracker_key in space_based_memory_tracker.keys():
                     current_memory_available = \
                         space_based_memory_tracker[memory_tracker_key]
@@ -206,8 +206,7 @@ class SpynnakerCommsFunctions(object):
                     host_based_data_spec_executor.execute()
 
                 #update base address mapper
-                processor_mapping_key = \
-                    "{}:{}:{}".format(placement.x, placement.y, placement.p)
+                processor_mapping_key = (placement.x, placement.y, placement.p)
                 processor_to_app_data_base_address[processor_mapping_key] = \
                     {'start_address':
                         ((SDRAM.DEFAULT_SDRAM_BYTES - current_memory_available)
@@ -395,7 +394,7 @@ class SpynnakerCommsFunctions(object):
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 logger.debug("loading application data for vertex {}"
                              .format(associated_vertex.label))
-                key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
+                key = (placement.x, placement.y, placement.p)
                 start_address = \
                     processor_to_app_data_base_address[key]['start_address']
                 memory_written = \

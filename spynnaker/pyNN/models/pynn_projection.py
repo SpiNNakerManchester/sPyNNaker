@@ -285,7 +285,7 @@ class Projection(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getWeights(self, list_format='list', gather=True):
+    def getWeights(self, format='list', gather=True):
         """
         Get synaptic weights for all connections in this Projection.
         (pyNN gather parameter not supported from the signiture
@@ -313,7 +313,7 @@ class Projection(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
 
-        if list_format == 'list':
+        if format == 'list':
             weights = list()
             for row in self._host_based_synapse_list.get_rows():
                 weights.extend(row.weights)
@@ -384,7 +384,6 @@ class Projection(object):
             synapse_list = \
                 self._projection_edge.get_synaptic_list_from_machine(
                     graph_mapper=self._spinnaker.graph_mapper,
-                    partitioned_graph=self._spinnaker.partitioned_graph,
                     placements=self._spinnaker.placements,
                     transceiver=self._spinnaker.transceiver)
         if self._delay_edge is not None:
@@ -392,8 +391,7 @@ class Projection(object):
                 self._delay_edge.get_synaptic_list_from_machine(
                     self._spinnaker.graph_mapper,
                     self._spinnaker.placements,
-                    self._spinnaker.transceiver,
-                    self._spinnaker.partitioned_graph)
+                    self._spinnaker.transceiver)
 
         # If there is both a delay and a non-delay list, merge them
         if synapse_list is not None and delay_synapse_list is not None:
