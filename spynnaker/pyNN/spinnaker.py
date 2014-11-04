@@ -45,12 +45,12 @@ from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
 
-#spinnman inports
+#spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
-from spinnman.constants import CONNECTION_TYPE
+#from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 import logging
 import math
@@ -462,8 +462,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         return executable_targets
 
     def start_visualiser(self):
-        """starts the port listener and ties it to the visualiser_framework pages as
-         required
+        """starts the port listener and ties it to the visualiser_framework
+         pages as required
         """
        #register a listener at the trasnciever for each visualised vertex
         for vertex in self._visualiser_vertices:

@@ -14,7 +14,7 @@ from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from enum import Enum
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
-
+from spynnaker.pyNN.exceptions import ConfigurationException
 
 class LivePacketGather(
     AbstractDataSpecableVertex, AbstractPartitionableVertex,
@@ -26,7 +26,7 @@ class LivePacketGather(
         value="LIVE_DATA_GATHER_REGIONS",
         names=[('SYSTEM', 0),
                ('CONFIG', 1)])
-    _CONFIG_SIZE = 36
+    _CONFIG_SIZE = 44
 
     """
     A AbstractConstrainedVertex for the Monitoring application data and
@@ -37,12 +37,25 @@ class LivePacketGather(
                  use_prefix=False, key_prefix=None, prefix_type=None,
                  message_type=EIEIOTypeParam.KEY_32_BIT,
                  right_shift=0, payload_as_time_stamps=True,
-                 use_payload_prefix=False, payload_prefix=None,
-                 payload_right_shift = 0,
+                 use_payload_prefix=True, payload_prefix=None,
+                 payload_right_shift=0,
                  number_of_packets_sent_per_time_step=0):
         """
         Creates a new AppMonitor Object.
         """
+        if (EIEIOTypeParam.KEY_PAYLOAD_32_BIT
+            or EIEIOTypeParam.KEY_PAYLOAD_16_BIT) \
+                and use_payload_prefix and payload_as_time_stamps:
+            raise ConfigurationException("Timestamp can either be included as "
+                                         "payload prefix or as payload to each "
+                                         "key, not both")
+        if (EIEIOTypeParam.KEY_32_BIT or EIEIOTypeParam.KEY_16_BIT) and \
+                not use_payload_prefix and payload_as_time_stamps:
+            raise ConfigurationException("Timestamp can either be included as "
+                                         "payload prefix or as payload to each "
+                                         "key, but current configuration does "
+                                         "not specify either of these")
+
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="Monitor",
                                             machine_time_step=machine_time_step)
@@ -62,8 +75,6 @@ class LivePacketGather(
         self._payload_right_shift = payload_right_shift
         self._number_of_packets_sent_per_time_step = \
             number_of_packets_sent_per_time_step
-
-
 
     @property
     def model_name(self):
