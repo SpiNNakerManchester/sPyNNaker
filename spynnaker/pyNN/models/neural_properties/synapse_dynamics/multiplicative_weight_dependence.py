@@ -22,9 +22,6 @@ class MultiplicativeWeightDependence(object):
         
         return (4 * 4)
     
-    def get_vertex_executable_suffix(self):
-        return "multiplicative"
-        
     def write_plastic_params(self, spec, machineTimeStep, weight_scale, num_terms):
         if num_terms != 1:
             raise NotImplementedError("Multiplicative weight dependence only supports single terms")
@@ -34,3 +31,7 @@ class MultiplicativeWeightDependence(object):
 
         spec.write_value(data=int(round(self.A_plus * weight_scale)), data_type=DataType.INT32)
         spec.write_value(data=int(round(self.A_minus * weight_scale)), data_type=DataType.INT32)
+    
+    @property
+    def vertex_executable_suffix(self):
+        return "multiplicative"

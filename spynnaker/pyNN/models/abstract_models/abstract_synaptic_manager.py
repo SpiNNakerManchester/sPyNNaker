@@ -449,7 +449,7 @@ class AbstractSynapticManager(object):
         
         # If there are any projection subedges to remove
         if len(proj_subedges_to_remove) > 0:
-            logger.info("Merged %u incoming projection sub-edges" % len(proj_subedges_to_remove))
+            logger.debug("Merged %u incoming projection sub-edges" % len(proj_subedges_to_remove))
             
             # Rebuild incoming projection list
             in_proj_subedges = [i for i in in_proj_subedges if i not in proj_subedges_to_remove]
