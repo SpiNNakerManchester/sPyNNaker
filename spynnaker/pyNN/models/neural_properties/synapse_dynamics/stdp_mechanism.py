@@ -1,3 +1,8 @@
+import math
+
+# How large are the time-stamps stored with each event
+TIME_STAMP_BYTES = 4
+
 # When not using the MAD scheme, how many pre-synaptic events are buffered
 NUM_PRE_SYNAPTIC_EVENTS = 4
 
@@ -24,11 +29,18 @@ class STDPMechanism(object):
                 and (self.voltage_dependence == other.voltage_dependence)
                 and (self.dendritic_delay_fraction == other.dendritic_delay_fraction)
                 and self.equals(other))
-        
+    
     def get_synapse_row_io(self):
         if self.timing_dependence is not None:
-            # Calculate size of synaptic row header in words
-            synaptic_row_header_words = (self.timing_dependence.event_size_bytes / 4) if self.mad else (1 + ((NUM_PRE_SYNAPTIC_EVENTS * self.timing_dependence.event_size_bytes) / 4))
+            # If we're using MAD, the header contains a single timestamp and pre-trace
+            if self.mad:
+                synaptic_row_header_bytes = TIME_STAMP_BYTES + self.timing_dependence.pre_trace_size_bytes
+            # Otherwise, headers consist of NUM_PRE_SYNAPTIC_EVENTS timestamps and pre-traces
+            else:
+                synaptic_row_header_bytes = NUM_PRE_SYNAPTIC_EVENTS * (TIME_STAMP_BYTES + self.timing_dependence.pre_trace_size_bytes)
+            
+            # Convert to words, rounding up to take into account word alignement
+            synaptic_row_header_words = int(math.ceil(float(synaptic_row_header_bytes) / 4.0))
             
             # Create a suitable synapse row io object
             return self.timing_dependence.create_synapse_row_io(synaptic_row_header_words, self.dendritic_delay_fraction)
@@ -47,6 +59,7 @@ class STDPMechanism(object):
         # Switch focus to the region:
         spec.switch_write_focus(region)
 
+        # Write timing dependence parameters to region and get number of weight terms it requires
         num_terms = 1
         if self.timing_dependence is not None:
             self.timing_dependence.write_plastic_params(spec, machine_time_step, weight_scale)
@@ -79,7 +92,7 @@ class STDPMechanism(object):
     # **TODO** make property
     def get_params_size(self):
         """
-        Gets the size of the STDP parameters in bytes for a range of atoms
+        Gets the size of the STDP parameters in bytes
         """
         size = 0
         num_terms = 1

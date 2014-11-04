@@ -18,11 +18,8 @@ TAU_X_LUT_SHIFT = 2
 TAU_Y_LUT_SIZE = 256
 TAU_Y_LUT_SHIFT = 2
 
-# How large are the time-stamps stored with each event
-TIME_STAMP_BYTES = 4
-
-# How large are the pre_synaptic_trace_entry_t structures
-ALL_TO_ALL_EVENT_BYTES = 4
+# How large are the pre_trace_t structures
+ALL_TO_ALL_PRE_TRACE_BYTES = 4
 
 class PfisterSpikeTripletRule(object):
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
@@ -55,8 +52,8 @@ class PfisterSpikeTripletRule(object):
         plasticity_helpers.write_exp_lut(spec, self.tau_y, TAU_Y_LUT_SIZE, TAU_Y_LUT_SHIFT, FIXED_POINT_ONE)
     
     @property
-    def event_size_bytes(self):
-        return TIME_STAMP_BYTES + ALL_TO_ALL_EVENT_BYTES
+    def pre_trace_size_bytes(self):
+        return ALL_TO_ALL_PRE_TRACE_BYTES
     
     @property
     def params_size_bytes(self):

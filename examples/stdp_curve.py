@@ -15,7 +15,6 @@ import pylab
 #-------------------------------------------------------------------
 time_between_pairs = 1000
 num_pairs = 60
-
 start_w = 0.5
 delta_t = [-100, -60, -40, -30, -20, -10, -1, 1, 10, 20, 30, 40, 60, 100]
 
@@ -42,14 +41,13 @@ for t in delta_t:
     # SpiNNaker setup
     sim.setup(timestep=1.0, min_delay=1.0, max_delay=10.0)
 
-    # Calculate phase of input spike trains, taking into account delay
-    # **NOTE** this assumes delay is all axonal
+    # Calculate phase of input spike trains, taking into account (dendritic) delay
     if t > 0:
-        post_phase = 1
-        pre_phase = t
+        post_phase = 0
+        pre_phase = 1 - t
     else:
-        post_phase = 1 - t
-        pre_phase = 0
+        post_phase = -t
+        pre_phase = 1
 
     sim_time = (num_pairs * time_between_pairs) + abs(t)
 
@@ -71,8 +69,8 @@ for t in delta_t:
 
     # Plastic Connection between pre_pop and post_pop
     stdp_model = sim.STDPMechanism(
-        timing_dependence = sim.SpikePairRule(tau_plus = 16.7, tau_minus = 33.7, nearest = False),
-        weight_dependence = sim.AdditiveWeightDependence(w_min = 0.0, w_max = 1.0, A_plus = 0.005, A_minus = 0.005)
+        timing_dependence = sim.SpikePairRule(tau_plus=16.7, tau_minus=33.7, nearest=False),
+        weight_dependence = sim.AdditiveWeightDependence(w_min=0.0, w_max=1.0, A_plus=0.005, A_minus=0.005), mad=True
     )
 
     plastic_projection = sim.Projection(pre_pop, post_pop, sim.OneToOneConnector(weights = start_w),

@@ -15,12 +15,9 @@ TAU_PLUS_LUT_SHIFT = 0
 TAU_MINUS_LUT_SIZE = 256
 TAU_MINUS_LUT_SHIFT = 0
 
-# How large are the time-stamps stored with each event
-TIME_STAMP_BYTES = 4
-
-# How large are the pre_synaptic_trace_entry_t structures
-ALL_TO_ALL_EVENT_BYTES = 2
-NEAREST_PAIR_EVENT_BYTES = 0
+# How large are the pre_trace_t structures
+ALL_TO_ALL_PRE_TRACE_BYTES = 2
+NEAREST_PAIR_PRE_TRACE_BYTES = 0
 
 class SpikePairRule(object):
     def __init__(self, tau_plus = 20.0, tau_minus = 20.0, nearest = False):
@@ -50,8 +47,8 @@ class SpikePairRule(object):
             TAU_MINUS_LUT_SIZE, TAU_MINUS_LUT_SHIFT, FIXED_POINT_ONE)
     
     @property
-    def event_size_bytes(self):
-        return TIME_STAMP_BYTES + (NEAREST_PAIR_EVENT_BYTES if self.nearest else ALL_TO_ALL_EVENT_BYTES)
+    def pre_trace_size_bytes(self):
+        return (NEAREST_PAIR_PRE_TRACE_BYTES if self.nearest else ALL_TO_ALL_PRE_TRACE_BYTES)
     
     @property
     def params_size_bytes(self):
