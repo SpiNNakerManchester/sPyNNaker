@@ -5,7 +5,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import generate_parameter_array
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities import exceptions
 import numpy
 
 
@@ -43,8 +43,8 @@ class FixedProbabilityConnector(AbstractConnector):
         self._allow_self_connections = allow_self_connections
 
         if not 0 <= self._p_connect <= 1:
-            raise ConfigurationException("The probability should be between 0"
-                                         " and 1 (inclusive)")
+            raise exceptions.ConfigurationException(
+                "The probability should be between 0 and 1 (inclusive)")
         
     def generate_synapse_list(self, prevertex, postvertex, delay_scale,
                               synapse_type):

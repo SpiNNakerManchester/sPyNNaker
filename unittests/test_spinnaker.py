@@ -1,5 +1,4 @@
 import unittest
-from spynnaker.pyNN.spinnaker import Spinnaker
 
 
 class MyTestCase(unittest.TestCase):

@@ -1,9 +1,9 @@
 from visualiser_framework.visualiser_thread import VisualiserThread
+from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.visualiser_package.visualiser_pages.machine_page \
     import MachinePage
 from spynnaker.pyNN.visualiser_package.visualiser_pages.configuration_page \
     import ConfigPage
-from spynnaker.pyNN.utilities import conf
 
 
 class VisualiserCreationUtility(object):

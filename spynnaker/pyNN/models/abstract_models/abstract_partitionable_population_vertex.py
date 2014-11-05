@@ -1,10 +1,9 @@
 from abc import ABCMeta
 from abc import abstractmethod
-
 from six import add_metaclass
 
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
@@ -16,7 +15,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
 
     def __init__(self, n_atoms, label, max_atoms_per_core, machine_time_step,
                  constraints=None):
-        AbstractDataSpecableVertex.__init__(self, n_atoms, label,
+        AbstractDataSpecableVertex.__init__(self, label,
                                             machine_time_step=machine_time_step,
                                             constraints=constraints)
         AbstractPartitionableVertex.__init__(

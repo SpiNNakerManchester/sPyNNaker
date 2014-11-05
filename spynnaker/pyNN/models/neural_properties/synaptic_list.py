@@ -69,7 +69,6 @@ class SynapticList(object):
         """
         for row in self._synaptic_rows[from_vertex_slice.lo_atom:
                                        from_vertex_slice.hi_atom + 1]:
-            x = row.get_n_connections(to_vertex_slice.n_atoms)
             if row.get_n_connections(to_vertex_slice.n_atoms) > 0:
                 return True
         return False

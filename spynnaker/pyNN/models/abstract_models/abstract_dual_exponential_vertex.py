@@ -64,7 +64,7 @@ class AbstractDualExponentialVertex(object):
     def get_synapse_id(target_name):
         """
         Returns the numeric identifier of a synapse, given its name.  This
-        is used by the neuron models.
+        is used by the neuron abstract_models.
         """
         if target_name == "excitatory":
             return 0
@@ -113,11 +113,11 @@ class AbstractDualExponentialVertex(object):
         init_ex = (self._tau_syn_E * (1 - decay_ex)
                                    * (1000.0 / self._machine_time_step))
         decay_ex2 = numpy.exp(float(-self._machine_time_step)
-                             / (1000.0 * float(self._tau_syn_E2)))
+                              / (1000.0 * float(self._tau_syn_E2)))
         init_ex2 = (self._tau_syn_E2 * (1 - decay_ex2)
-                                   * (1000.0 / self._machine_time_step))
+                                     * (1000.0 / self._machine_time_step))
         decay_in = numpy.exp(float(-self._machine_time_step)
-                            / (1000.0 * float(self._tau_syn_I)))
+                             / (1000.0 * float(self._tau_syn_I)))
         init_in = (self._tau_syn_I * (1 - decay_in)
                                    * (1000.0 / self._machine_time_step))
 
@@ -133,11 +133,11 @@ class AbstractDualExponentialVertex(object):
         # noinspection PyNoneFunctionAssignment
         rescaled_decay_ex2 = \
             numpy.multiply(decay_ex2, numpy.array([float(pow(2, 32))],
-                                                 dtype=float)).astype("uint32")
+                                                  dtype=float)).astype("uint32")
         # noinspection PyNoneFunctionAssignment
         rescaled_init_ex2 = \
             numpy.multiply(init_ex2, numpy.array([float(pow(2, 32))],
-                                                dtype=float)).astype("uint32")
+                                                 dtype=float)).astype("uint32")
 
         # noinspection PyNoneFunctionAssignment
         rescaled_decay_in = \

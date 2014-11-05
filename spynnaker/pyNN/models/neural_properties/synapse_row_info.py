@@ -66,7 +66,6 @@ class SynapseRowInfo(object):
         
         mask = ((self.target_indices >= 0)
                 & (self.target_indices <= n_atoms))
-        x = self.target_indices[mask]
         return self.target_indices[mask].size
     
     def get_min_delay(self):
@@ -92,11 +91,6 @@ class SynapseRowInfo(object):
         """
         mask = ((self.target_indices >= lo_atom)
                 & (self.target_indices <= hi_atom))
-        x = type(self)(self.target_indices[mask] - lo_atom,
-                          self.weights[mask], self.delays[mask],
-                          self.synapse_types[mask])
-        #print x
-        #print mask
         return type(self)(self.target_indices[mask] - lo_atom,
                           self.weights[mask], self.delays[mask],
                           self.synapse_types[mask])

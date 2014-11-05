@@ -1,10 +1,12 @@
-from spynnaker.pyNN.utilities import packet_conversions
-from spynnaker.pyNN.visualiser_package.visualiser_pages.\
-    abstract_live_spike_page import AbstractLiveSpikePage
-import math
 import gtk
 import cairo
 import logging
+
+from spinn_front_end_common.utilities import packet_conversions
+from spynnaker.pyNN.visualiser_package.visualiser_pages.\
+    abstract_live_spike_page import AbstractLiveSpikePage
+import math
+
 logger = logging.getLogger(__name__)
 
 

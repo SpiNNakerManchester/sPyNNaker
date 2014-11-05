@@ -1,5 +1,4 @@
 import unittest
-import spynnaker.pyNN.utilities.packet_conversions as packet_conversions
 
 
 class TestPacketConversions(unittest.TestCase):

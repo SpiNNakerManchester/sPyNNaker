@@ -1,24 +1,22 @@
-import math
 import logging
 import struct
 import sys
 import numpy
-
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
+import math
+from spinn_front_end_common.utilities import packet_conversions
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
-
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
@@ -286,7 +284,7 @@ class AbstractSynapticManager(object):
     def get_synapse_id(target_name):
         """
         Returns the numeric identifier of a synapse, given its name.  This
-        is used by the neuron models.
+        is used by the neuron abstract_models.
         """
         if target_name == "excitatory":
             return 0

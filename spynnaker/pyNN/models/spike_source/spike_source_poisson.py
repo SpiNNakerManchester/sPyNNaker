@@ -1,23 +1,21 @@
+from enum import Enum
+import os
+import numpy
+import logging
+
 from spynnaker.pyNN.models.spike_source.abstract_spike_source import \
     AbstractSpikeSource
-from spynnaker.pyNN.utilities import packet_conversions
+from spinn_front_end_common.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions import \
     generate_parameter
 from spynnaker.pyNN.utilities.conf import config
-
-
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-
-
 from math import exp, ceil
-from enum import Enum
-import os
-import numpy
-
-import logging
 from data_specification.enums.data_type import DataType
+
+
 logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 0.25
@@ -33,10 +31,10 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     """
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
-            value="_POISSON_SPIKE_SOURCE_REGIONS",
-            names=[('SYSTEM_REGION', 0),
-                   ('POISSON_PARAMS_REGION', 1),
-                   ('SPIKE_HISTORY_REGION', 2)])
+        value="_POISSON_SPIKE_SOURCE_REGIONS",
+        names=[('SYSTEM_REGION', 0),
+               ('POISSON_PARAMS_REGION', 1),
+               ('SPIKE_HISTORY_REGION', 2)])
     _model_based_max_atoms_per_core = 256
 
     def __init__(self, n_neurons, machine_time_step, contraints=None,
@@ -126,8 +124,9 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         """
 
         # What recording commands wereset for the parent pynn_population.py?
-        self._write_basic_setup_info(spec,
-                                     SpikeSourcePoisson.CORE_APP_IDENTIFIER)
+        self._write_basic_setup_info(
+            spec, SpikeSourcePoisson.CORE_APP_IDENTIFIER,
+            self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
@@ -243,7 +242,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         # words to represent
         sub_vertex_out_spike_bytes_function = \
             lambda subvertex, subvertex_slice: int(ceil(
-                    subvertex_slice.n_atoms / 32.0)) * 4
+                subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes
         return self._get_spikes(

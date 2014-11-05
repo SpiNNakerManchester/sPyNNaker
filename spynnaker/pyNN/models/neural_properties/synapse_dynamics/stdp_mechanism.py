@@ -1,6 +1,6 @@
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_time_dependency import AbstractTimeDependency
-from spynnaker.pyNN import exceptions
+from spinn_front_end_common.utilities import exceptions
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_voltage_dependency import AbstractVoltageDependency
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\

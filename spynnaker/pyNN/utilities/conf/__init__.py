@@ -8,29 +8,27 @@ working directory.
 All config is made accessible through the global object `config`.
 """
 import ConfigParser
-import inspect
 import logging
 import os
-import re
 import shutil
 import string
 import sys
+
 import spynnaker
-from spynnaker.pyNN import exceptions
-from . import log
+from spinn_front_end_common.utilities import exceptions
+from spynnaker.pyNN.utilities.conf import log
 
 
 def _install_cfg():
     template_cfg = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                "spynnaker.cfg.template")
+                                "spynnaker.cfg.template")
     home_cfg = os.path.expanduser("~/.spynnaker.cfg")
     shutil.copyfile(template_cfg, home_cfg)
     print "************************************"
     print("{} has been created.  Please edit this file and change \"None\""
           " after \"machineName\" to the hostname or IP address of your"
           " SpiNNaker board, and change \"None\" after \"version\" to the"
-          " version of SpiNNaker hardware you are running on:".format(
-                   home_cfg))
+          " version of SpiNNaker hardware you are running on:".format(home_cfg))
     print "[Machine]"
     print "machineName = None"
     print "version = None"
@@ -60,7 +58,7 @@ for possible_pacman_file in legacy_pacmans:
                 " not support integration of pacman.cfg and spynnaker.cfg."
                 " Please remove or merge these files. Recommendation is to"
                 " rename the merged file to spynnaker.cfg".format(
-                        possible_pacman_file))
+                    possible_pacman_file))
         else:
             found_pacmans = True
 
@@ -77,13 +75,6 @@ else:
     _install_cfg()
 
 read.append(default)
-
-
-# Get lists of appropriate routers, placers and partitioners
-def get_valid_components(module, terminator):
-    terminator = re.compile(terminator + '$')
-    return dict(map(lambda (name, router): (terminator.sub('', name), router),
-                inspect.getmembers(module, inspect.isclass)))
 
 
 # creates a directory if needed, or deletes it and rebuilds it

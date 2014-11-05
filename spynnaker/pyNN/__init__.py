@@ -7,8 +7,6 @@ and implementation for the PyNN High-level API
 import inspect
 
 #utility functions
-from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
@@ -18,7 +16,7 @@ from spynnaker.pyNN.utilities.constants import VISUALISER_MODES
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
 
-# neural models
+# neural abstract_models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
     import IFConductanceExponentialPopulation as IF_cond_exp
 from spynnaker.pyNN.models.neural_models.if_curr_dual_exp \
@@ -43,8 +41,6 @@ from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 
 #spike sources
-from spynnaker.pyNN.models.spike_source.spike_source_array \
-    import SpikeSourceArray
 from spynnaker.pyNN.models.spike_source.spike_source_poisson\
     import SpikeSourcePoisson
 
@@ -91,10 +87,6 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
 #constraints
-from pacman.model.constraints.placer_chip_and_core_constraint \
-    import PlacerChipAndCoreConstraint
-from pacman.model.constraints.partitioner_maximum_size_constraint \
-    import PartitionerMaximumSizeConstraint
 
 #note importing star is a bad thing to do.
 from pyNN.random import *

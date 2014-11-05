@@ -1,13 +1,14 @@
 import logging
 import gtk
+
+from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.visualiser_package.visualiser_pages.raster_page \
     import RasterPage
 from spynnaker.pyNN.visualiser_package.visualiser_pages.topological_page\
     import TopologicalPage
-from spynnaker.pyNN.utilities import conf
-
 import visualiser_framework.visualiser_constants as visualiser_modes
 from visualiser_framework.abstract_page import AbstractPage
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,4 @@
 import unittest
-from spynnaker.pyNN.models.spike_source.spike_source_array \
-    import SpikeSourceArray
 
 
 class MyTestCase(unittest.TestCase):

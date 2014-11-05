@@ -1,20 +1,20 @@
+import os
+import logging
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
+from spinn_front_end_common.utilities import packet_conversions
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
     AbstractSynapticManager
 from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex import \
     AbstractPartitionablePopulationVertex
 
-import os
-import logging
-from abc import ABCMeta
-from abc import abstractmethod
-from six import add_metaclass
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,7 @@
 import numpy
 
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.abstract_synapse_row_io import AbstractSynapseRowIo
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+    abstract_rules.abstract_synapse_row_io import AbstractSynapseRowIo
 from spynnaker.pyNN.models.neural_properties.synapse_row_info import \
     SynapseRowInfo
 from spynnaker.pyNN import exceptions

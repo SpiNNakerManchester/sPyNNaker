@@ -1,17 +1,17 @@
-from math import ceil
 import copy
 import os
-import math
 import logging
-
 from enum import Enum
 
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+from math import ceil
+import math
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+from spinn_front_end_common.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities import packet_conversions
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
-    import AbstractRecordableVertex
+from spinn_front_end_common.utilities import constants as common_constants
+from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex \
+    import AbstractPopulationRecordableVertex
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge import \
     DelayProjectionEdge
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -22,13 +22,12 @@ from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from data_specification.file_data_writer import FileDataWriter
 
 
 logger = logging.getLogger(__name__)
 
 
-class DelayExtensionVertex(AbstractRecordableVertex,
+class DelayExtensionVertex(AbstractPopulationRecordableVertex,
                            AbstractPartitionableVertex,
                            AbstractDataSpecableVertex):
     """
@@ -54,9 +53,8 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                                              constraints=constraints,
                                              label=label,
                                              max_atoms_per_core=256)
-        AbstractRecordableVertex.__init__(self, machine_time_step, label=label)
+        AbstractPopulationRecordableVertex.__init__(self, machine_time_step, label=label)
         AbstractDataSpecableVertex.__init__(self, label=label,
-                                            n_atoms=n_neurons,
                                             machine_time_step=machine_time_step)
 
         self._max_delay_per_neuron = max_delay_per_neuron
@@ -79,7 +77,7 @@ class DelayExtensionVertex(AbstractRecordableVertex,
 
     @staticmethod
     def get_spike_block_row_length(n_atoms):
-        return int(math.ceil(n_atoms / constants.BITS_PER_WORD))
+        return int(math.ceil(n_atoms / common_constants.BITS_PER_WORD))
 
     @staticmethod
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
@@ -140,9 +138,9 @@ class DelayExtensionVertex(AbstractRecordableVertex,
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
-        self.write_delay_parameters(spec, placement.x, placement.y, placement.p,
-                                    subvertex, num_delay_blocks, delay_blocks,
-                                    vertex_slice)
+        self.write_delay_parameters(
+            spec, placement.x, placement.y, placement.p, num_delay_blocks,
+            delay_blocks, vertex_slice)
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
@@ -156,7 +154,8 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         recording_info |= 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
-        self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER)
+        self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER,
+                                     self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
         spec.switch_write_focus(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
         spec.write_value(data=recording_info)
@@ -215,8 +214,8 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         return num_delay_blocks, delay_block
 
     def write_delay_parameters(self, spec, processor_chip_x, processor_chip_y,
-                               processor_id, subvertex, num_delay_blocks,
-                               delay_block, vertex_slice):
+                               processor_id, num_delay_blocks, delay_block,
+                               vertex_slice):
         """
         Generate Delay Parameter data (region 2):
         """

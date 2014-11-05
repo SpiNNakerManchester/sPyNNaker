@@ -1,5 +1,6 @@
 import unittest
-from spynnaker.pyNN.models.utility_models.live_spike_recorder \
+
+from spinn_front_end_common.utility_models.live_spike_recorder \
     import LiveSpikeRecorder
 from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint

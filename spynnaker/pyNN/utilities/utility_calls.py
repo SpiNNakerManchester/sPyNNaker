@@ -4,7 +4,7 @@ utility class containing simple helper methods
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import RandomDistribution
 from data_specification import constants as ds_constants
-from spynnaker.pyNN import exceptions
+from spinn_front_end_common.utilities import exceptions
 import numpy
 import math
 import os

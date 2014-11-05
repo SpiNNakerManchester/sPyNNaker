@@ -1,3 +1,5 @@
+import logging
+
 from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
 from pacman.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import \
@@ -7,7 +9,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import constants
-import logging
+
 logger = logging.getLogger(__name__)
 
 

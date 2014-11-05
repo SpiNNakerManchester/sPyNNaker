@@ -1,9 +1,11 @@
 import unittest
-from spynnaker.pyNN.spinnaker import Spinnaker
 import os
-from spynnaker.pyNN.utilities import conf
+
+from spynnaker.pyNN.spinnaker import Spinnaker
 import spynnaker.pyNN.exceptions as exceptions
 import time
+from spynnaker.pyNN.utilities import conf
+
 
 class TestCFGs(unittest.TestCase):
     def setUp(self):

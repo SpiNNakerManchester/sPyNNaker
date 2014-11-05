@@ -30,25 +30,33 @@ from spinn_machine.chip import Chip
 
 #internal imports
 from spinnman.messages.scp.scp_signal import SCPSignal
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
+
+#common front end imports
+from spinn_front_end_common.utilities import exceptions as common_exceptions, \
+    reports
+from spinn_front_end_common.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_reverse_iptagable_vertex import \
-    AbstractReverseIPTagableVertex
-from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
-from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
-from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
-from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities.timer import Timer
-from spynnaker.pyNN.utilities import reports
-from spynnaker.pyNN.models.utility_models.live_spike_recorder\
+from spinn_front_end_common.abstract_models.abstract_reverse_iptagable_vertex \
+    import AbstractReverseIPTagableVertex
+from spinn_front_end_common.utility_models.command_sender import CommandSender
+from spinn_front_end_common.interface.front_end_common_interface_functions \
+    import FrontEndCommonInterfaceFunctions
+from spinn_front_end_common.interface.front_end_common_configuration_functions \
+    import FrontEndCommonConfigurationFunctions
+from spinn_front_end_common.utilities.timer import Timer
+from spinn_front_end_common.utility_models.live_spike_recorder \
     import LiveSpikeRecorder
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+
+#local front end imports
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
+from spynnaker.pyNN.spynnaker_configurations import \
+    SpynnakerConfigurationFunctions
+from spynnaker.pyNN.utilities.conf import config
 
 #spinnman inports
 from spinnman.model.core_subsets import CoreSubsets
@@ -63,23 +71,58 @@ from multiprocessing.pool import ThreadPool
 logger = logging.getLogger(__name__)
 
 
-class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
+class Spinnaker(FrontEndCommonConfigurationFunctions,
+                FrontEndCommonInterfaceFunctions,
+                SpynnakerConfigurationFunctions):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
                  max_delay=None, graph_label=None):
-        SpynnakerConfiguration.__init__(self, host_name, graph_label)
+        FrontEndCommonConfigurationFunctions.__init__(self, host_name,
+                                                      graph_label)
+        SpynnakerConfigurationFunctions.__init__(self)
 
         if self._app_id is None:
-            self._set_up_main_objects()
-            self._set_up_pacman_algorthms_listings()
+            self._set_up_main_objects(
+                app_id=config.getint("Machine", "appID"),
+                execute_data_spec_report=
+                config.getboolean("Reports", "writeTextSpecs"),
+                execute_partitioner_report=
+                config.getboolean("Reports", "writePartitionerReports"),
+                execute_placer_report=
+                config.getboolean("Reports", "writePlacerReports"),
+                execute_router_dat_based_report=
+                config.getboolean("Reports", "writeRouterDatReport"),
+                reports_are_enabled=
+                config.getboolean("Reports", "reportsEnabled"),
+                generate_time_recordings_for_performance_measurements=
+                config.getboolean("Reports", "outputTimesForSections"),
+                execute_router_report=
+                config.getboolean("Reports", "writeRouterReports"),
+                execute_write_reload_steps=
+                config.getboolean("Reports", "writeReloadSteps"),
+                generate_transciever_report=
+                config.getboolean("Reports", "writeTransceiverReport"),
+                execute_routing_info_report=
+                config.getboolean("Reports", "writeRouterInfoReport"))
+            self._set_up_pacman_algorthms_listings(
+                partitioner_algorithum=config.get("Partitioner", "algorithm"),
+                placer_algorithum=config.get("Placer", "algorithm"),
+                key_allocator_algorithum=config.get("KeyAllocator",
+                                                    "algorithm"),
+                routing_algorithum=config.get("Routing", "algorithm")
+            )
+            #get the pynn specific key allocator algorthium
+            #  (overloaded from common call)
+            self._key_allocator_algorithm = \
+                self.get_pynn_specific_key_allocator()
             self._set_up_executable_specifics()
             self._set_up_report_specifics()
             self._set_up_output_application_data_specifics()
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
 
-        SpynnakerCommsFunctions.__init__(self, self._reports_states,
-                                         self._report_default_directory)
+        FrontEndCommonInterfaceFunctions.__init__(self, self._reports_states,
+                                                  self._report_default_directory)
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -92,13 +135,25 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         self._edge_count = 0
 
     def run(self, run_time):
-        self._setup_interfaces(hostname=self._hostname)
+        self._setup_interfaces(
+            hostname=self._hostname,
+            virtual_x_dimension=config.getint("Machine",
+                                              "virutal_board_x_dimension"),
+            virtual_y_dimension=config.getint("Machine",
+                                              "virutal_board_y_dimension"),
+            downed_chips=config.get("Machine", "down_chips"),
+            downed_cores=config.get("Machine", "down_cores"),
+            requires_virtual_board=config.getboolean("Machine",
+                                                     "virtual_board"),
+            requires_wrap_around=config.getboolean("Machine",
+                                                   "requires_wrap_arounds"),
+            machine_version=config.getint("Machine", "version"))
         #extract iptags required by the graph
         self._set_iptags()
         self._set_reverse_ip_tags()
 
         #set up vis if needed
-        if conf.config.getboolean("Visualiser", "enable"):
+        if config.getboolean("Visualiser", "enable"):
             self._visualiser, self._visualiser_vertex_to_page_mapping =\
                 self._setup_visuliser(
                     self._partitionable_graph, self._visualiser_vertices,
@@ -119,7 +174,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             ceiled_machine_time_steps = \
                 math.ceil((run_time * 1000.0) / self._machine_time_step)
             if self._no_machine_time_steps != ceiled_machine_time_steps:
-                raise exceptions.ConfigurationException(
+                raise common_exceptions.ConfigurationException(
                     "The runtime and machine time step combination result in "
                     "a factional number of machine runable time steps and "
                     "therefore spinnaker cannot determine how many to run for")
@@ -128,16 +183,16 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may"
-                        "cause the neural models to fail to partition "
+                        "cause the neural abstract_models to fail to partition "
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
                 if vertex.is_set_to_record_spikes():
-                    raise exceptions.ConfigurationException(
+                    raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
                         "is not currently supportable in this tool chain."
                         "watch this space")
 
-        do_timing = conf.config.getboolean("Reports", "outputTimesForSections")
+        do_timing = config.getboolean("Reports", "outputTimesForSections")
         if do_timing:
             timer = Timer()
         else:
@@ -165,8 +220,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             timer.start_timing()
         processor_to_app_data_base_address = \
             self.execute_data_specification_execution(
-                conf.config.getboolean("SpecExecution", "specExecOnHost"),
-                self._hostname, self._placements, self._graph_mapper)
+                config.getboolean("SpecExecution", "specExecOnHost"),
+                self._hostname, self._placements, self._graph_mapper,
+                )
 
         if self._reports_states is not None:
             reports.write_memory_map_report(self._report_default_directory,
@@ -176,10 +232,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if do_timing:
             timer.take_sample()
 
-        if conf.config.getboolean("Visualiser", "enable"):
+        if config.getboolean("Visualiser", "enable"):
             self.start_visualiser()
 
-        if conf.config.getboolean("Execute", "run_simulation"):
+        if config.getboolean("Execute", "run_simulation"):
             if do_timing:
                 timer.start_timing()
 
@@ -201,8 +257,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
                 if self._reports_states.transciever_report:
-                    binary_folder = conf.config.get("SpecGeneration",
-                                                    "Binary_folder")
+                    binary_folder = config.get("SpecGeneration",
+                                               "Binary_folder")
                     reports.re_load_script_running_aspects(
                         binary_folder, executable_targets, self._hostname,
                         self._app_id, run_time)
@@ -215,6 +271,28 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._retieve_provance_data_from_machine(executable_targets)
         else:
             logger.info("*** No simulation requested: Stopping. ***")
+
+    def _setup_visuliser(
+            self, partitionable_graph, visualiser_vertices, partitioned_graph,
+            placements, router_tables, runtime, machine_time_step,
+            graph_mapper):
+        requires_visualiser = config.getboolean("Visualiser", "enable")
+        requires_virtual_board = config.getboolean("Machine",
+                                                        "virtual_board")
+        #if the visuliser is required, import the correct requirements and
+        # create a new visulaiser object and mapping for spinnaker to maintain
+        if requires_visualiser:
+            from spynnaker.pyNN.visualiser_package.visualiser_creation_utility \
+                import VisualiserCreationUtility
+            #create creation utility
+            visualiser_creation_utility = VisualiserCreationUtility()
+            visualiser_creation_utility.set_visulaiser_port(
+                config.getint("Recording", "live_spike_port"))
+            return visualiser_creation_utility.create_visualiser_interface(
+                requires_virtual_board, self._txrx,
+                partitionable_graph, visualiser_vertices, self._machine,
+                partitioned_graph, placements, router_tables, runtime,
+                machine_time_step, graph_mapper)
 
     def _set_iptags(self):
         for vertex in self._partitionable_graph.vertices:
@@ -352,7 +430,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
 
-        if conf.config.get("Mode", "mode") == "Debug":
+        if config.get("Mode", "mode") == "Debug":
             #check that all routes are valid and no cycles exist
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
@@ -418,7 +496,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def generate_data_specifications(self):
         #iterate though subvertexes and call generate_data_spec for each vertex
         executable_targets = dict()
-        no_processors = conf.config.getint("Threading", "dsg_threads")
+        no_processors = config.getint("Threading", "dsg_threads")
         thread_pool = ThreadPool(processes=no_processors)
 
         #create a progress bar for end users
@@ -478,9 +556,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def create_visualised_population(self, size, cellclass, cellparams,
                                      structure, label):
-        requires_visualiser = conf.config.getboolean("Visualiser", "enable")
+        requires_visualiser = config.getboolean("Visualiser", "enable")
         if not requires_visualiser:
-            raise exceptions.ConfigurationException(
+            raise common_exceptions.ConfigurationException(
                 "The visualiser is currently turned off by a spinnaker.cfg or "
                 "pacman.cfg file. Please correct and try again.")
         else:
@@ -514,16 +592,16 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         #check to see if it needs to be created in the frist place
         if self._live_spike_recorder is None:
             port = None
-            if conf.config.has_option("Recording", "live_spike_port"):
-                port = conf.config.getint("Recording", "live_spike_port")
+            if config.has_option("Recording", "live_spike_port"):
+                port = config.getint("Recording", "live_spike_port")
             hostname = "localhost"
-            if conf.config.has_option("Recording", "live_spike_host"):
-                hostname = conf.config.get("Recording", "live_spike_host")
+            if config.has_option("Recording", "live_spike_host"):
+                hostname = config.get("Recording", "live_spike_host")
             tag = None
-            if conf.config.has_option("Recording", "live_spike_tag"):
-                tag = conf.config.getint("Recording", "live_spike_tag")
+            if config.has_option("Recording", "live_spike_tag"):
+                tag = config.getint("Recording", "live_spike_tag")
             if tag is None:
-                raise exceptions.ConfigurationException(
+                raise common_exceptions.ConfigurationException(
                     "Target tag for live spikes has not been set")
             self._live_spike_recorder = \
                 LiveSpikeRecorder(self.machine_time_step, tag, port, hostname)
@@ -612,5 +690,5 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                                                       router_table.y)
             time.sleep(0.5)
             self._txrx.send_signal(app_id, SCPSignal.STOP)
-        if conf.config.getboolean("Visualiser", "enable"):
+        if config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()

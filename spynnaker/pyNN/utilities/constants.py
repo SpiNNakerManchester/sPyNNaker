@@ -18,7 +18,7 @@ RECORD_SPIKE_BIT = 1 << 0
 RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
 RECORDING_ENTRY_BYTE_SIZE = 4
-BITS_PER_WORD = 32.0
+
 
 # From neuron common-typedefs.h
 SYNAPSE_INDEX_BITS = 8
@@ -45,13 +45,12 @@ MASTER_POPULATION_ENTRIES = (X_CHIPS * Y_CHIPS * CORES_PER_CHIP)
 MASTER_POPULATION_TABLE_SIZE = 2 * MASTER_POPULATION_ENTRIES  # 2 bytes per
                                                               # entry
 NA_TO_PA_SCALE = 1000.0
-SDRAM_BASE_ADDR = 0x70000000
 ####might not be used
 WEIGHT_FLOAT_TO_FIXED_SCALE = 16.0
 SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
 ####
 
-#natively supported delays for all models
+#natively supported delays for all abstract_models
 MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16

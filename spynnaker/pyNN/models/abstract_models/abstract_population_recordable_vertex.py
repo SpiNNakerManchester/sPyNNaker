@@ -1,12 +1,12 @@
 from abc import ABCMeta
 from six import add_metaclass
-from abc import abstractmethod
 
 
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
-from spynnaker.pyNN.utilities import constants
+from spinn_front_end_common.utilities import constants
+from spynnaker.pyNN.utilities import constants as local_constants
 
 from pacman.utilities import constants as pacman_constants
 
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractRecordableVertex(object):
+class AbstractPopulationRecordableVertex(object):
     """
     Underlying AbstractConstrainedVertex model for Neural Applications.
     """
@@ -71,7 +71,7 @@ class AbstractRecordableVertex(object):
         if self._no_machine_time_steps is None:
             raise Exception("This model cannot record this parameter"
                             + " without a fixed run time")
-        return (constants.RECORDING_ENTRY_BYTE_SIZE +
+        return (local_constants.RECORDING_ENTRY_BYTE_SIZE +
                 (self._no_machine_time_steps * bytes_per_timestep))
 
     def _get_spikes(
@@ -270,9 +270,7 @@ class AbstractRecordableVertex(object):
 
             temp_buffer = bytearray()
 
-            current_pointer = 0
             for region_block in neuron_param_region_data:
-                size = len(region_block)
                 temp_buffer.extend(region_block)
 
             # Standard fixed-point 'accum' type scaling

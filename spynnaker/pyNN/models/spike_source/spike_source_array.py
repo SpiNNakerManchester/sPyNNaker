@@ -1,20 +1,18 @@
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.spike_source.abstract_spike_source \
-    import AbstractSpikeSource
-from spynnaker.pyNN.utilities import packet_conversions
-from spynnaker.pyNN.utilities.conf import config
-
-
-from data_specification.data_specification_generator import \
-    DataSpecificationGenerator
-
-from spynnaker.pyNN import exceptions
-
-
-from math import ceil
 import logging
 import os
+
+from spynnaker.pyNN.utilities import constants
+from spinn_front_end_common.utilities import constants as \
+    front_end_common_constants
+from spynnaker.pyNN.models.spike_source.abstract_spike_source \
+    import AbstractSpikeSource
+from spinn_front_end_common.utilities import packet_conversions
+from spynnaker.pyNN.utilities.conf import config
+from data_specification.data_specification_generator import \
+    DataSpecificationGenerator
+from math import ceil
 import math
+
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +83,7 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     @staticmethod
     def get_spike_block_row_length(n_atoms):
-        return int(math.ceil(n_atoms / constants.BITS_PER_WORD))
+        return int(math.ceil(n_atoms / front_end_common_constants.BITS_PER_WORD))
 
     @staticmethod
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
@@ -154,7 +152,7 @@ class SpikeSourceArray(AbstractSpikeSource):
     def reserve_memory_regions(self, spec, setup_sz, block_index_region_size,
                                spike_region_size, spike_hist_buff_sz):
         """
-        *** Modified version of same routine in models.py These could be
+        *** Modified version of same routine in abstract_models.py These could be
         combined to form a common routine, perhaps by passing a list of
         entries. ***
         Reserve memory for the system, indices and spike data regions.
@@ -197,7 +195,9 @@ class SpikeSourceArray(AbstractSpikeSource):
             Bit 6: Output spike rate
         """
         # What recording commands were set for the parent pynn_population.py?
-        self._write_basic_setup_info(spec, SpikeSourceArray.CORE_APP_IDENTIFIER)
+        self._write_basic_setup_info(
+            spec, SpikeSourceArray.CORE_APP_IDENTIFIER,
+            self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
@@ -280,7 +280,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         # words to represent
         sub_vertex_out_spike_bytes_function = \
             lambda subvertex, subvertex_slice: int(ceil(
-                    subvertex_slice.n_atoms / 32.0)) * 4
+                subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes
         return self._get_spikes(

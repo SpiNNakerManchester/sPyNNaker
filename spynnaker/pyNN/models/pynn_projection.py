@@ -1,22 +1,21 @@
 import logging
-import math
-
 import numpy
 
+import math
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import AbstractPopulationVertex
-from spynnaker.pyNN import exceptions
+from spinn_front_end_common.utilities import exceptions
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import constants, conf
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
     import DelayProjectionEdge
-from spynnaker.pyNN.utilities.timer import Timer
+from spinn_front_end_common.utilities.timer import Timer
+
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +97,7 @@ class Projection(object):
                 synapse_list.flip()
 
         # check if all delays requested can fit into the natively supported
-        # delays in the models
+        # delays in the abstract_models
         min_delay, max_delay = synapse_list.get_min_max_delay()
         natively_supported_delay_for_models = \
             constants.MAX_SUPPORTED_DELAY_TICS

@@ -1,3 +1,5 @@
+import logging
+
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
@@ -7,19 +9,17 @@ from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
 from pacman.utilities import utility_calls as pacman_utility_calls
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
-
-from spynnaker.pyNN.models.utility_models.command_sender \
+from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex import \
+    AbstractPopulationRecordableVertex
+from spinn_front_end_common.utility_models.command_sender \
     import CommandSender
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
-from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities.timer import Timer
-from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN import exceptions
+from spinn_front_end_common.utilities.timer import Timer
+from spynnaker.pyNN.utilities import utility_calls, conf
+from spinn_front_end_common.utilities import exceptions
+from spynnaker.pyNN import exceptions as local_exceptions
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -28,11 +28,11 @@ class Population(object):
     A collection neuron of the same types. It encapsulates a type of
     :class:`pacman103.lib.partitionable_graph.AbstractConstrainedVertex`
     used with Spiking Neural Networks, comprising n cells (atoms)
-    of the same :py:mod:`pacman103.front.pynn.models` type.
+    of the same :py:mod:`pacman103.front.pynn.abstract_models` type.
 
     :param int size:
         size (number of cells) of the Population.
-    :param `pacman103.front.pynn.models` cellclass:
+    :param `pacman103.front.pynn.abstract_models` cellclass:
         specifies the neural model to use for the Population
     :param dict cellparams:
         a dictionary containing model specific parameters and values
@@ -185,7 +185,7 @@ class Population(object):
                 "spikes before running this command.")
 
         if not self._spinnaker.has_ran:
-            raise exceptions.SpynnakerException(
+            raise local_exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore spikes cannot be "
                 "retrieved. Please execute the simulation before running this "
                 "command")
@@ -360,7 +360,7 @@ class Population(object):
         triggering spike time recording.
         """
 
-        if not isinstance(self._vertex, AbstractRecordableVertex):
+        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
             raise Exception("AbstractConstrainedVertex does not support "
                             "recording of spikes")
 
@@ -380,7 +380,7 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering gsyn value recording.
         """
-        if not isinstance(self._vertex, AbstractRecordableVertex):
+        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
             raise Exception("AbstractConstrainedVertex does not support "
                             "recording of gsyn")
 
@@ -393,7 +393,7 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering potential recording.
         """
-        if not isinstance(self._vertex, AbstractRecordableVertex):
+        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
             raise Exception("AbstractConstrainedVertex does not support "
                             "recording of potential")
 

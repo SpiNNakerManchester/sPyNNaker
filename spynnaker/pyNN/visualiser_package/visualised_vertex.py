@@ -1,6 +1,6 @@
 from spynnaker.pyNN.models.pynn_population import Population
-from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
 from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.visualiser_package.visualiser_vertex import VisualiserVertex
 
 from visualiser_framework import visualiser_constants
 

@@ -8,7 +8,7 @@ class TestVisualiserVertex(unittest.TestCase):
     def setUp(self):
         self._visualiser_mode = constant.VISUALISER_MODES.RASTER.value
         #topological views
-        self._visualiser_2d_dimensions = (2,3)
+        self._visualiser_2d_dimensions = (2, 3)
         self._visualiser_no_colours = 256
         self._visualiser_average_period_tics = 11
         self._visualiser_longer_period_tics = 34
@@ -18,7 +18,7 @@ class TestVisualiserVertex(unittest.TestCase):
         self._visualiser_reset_counter_period = 50
         #raster views
         self._visualiser_raster_separate = 14
-        self._vertex = AbstractConstrainedVertex(10,"Test vertex")
+        self._vertex = AbstractConstrainedVertex("Test vertex")
         self.visualiser_vertex = VisualiserVertex(
             self._visualiser_mode,
             self._visualiser_2d_dimensions,

@@ -7,7 +7,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import generate_parameter
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities import exceptions
 import logging
 
 logger = logging.getLogger(__name__)
@@ -63,11 +63,13 @@ class FromListConnector(AbstractConnector):
             pre_atom = generate_parameter(conn[0], i)
             post_atom = generate_parameter(conn[1], i)
             if not 0 <= pre_atom < prevertex.n_atoms:
-                raise ConfigurationException("Invalid neuron id in presynaptic"
-                                             " population {}".format(pre_atom))
+                raise exceptions.ConfigurationException(
+                    "Invalid neuron id in presynaptic population {}"
+                    .format(pre_atom))
             if not 0 <= post_atom < postvertex.n_atoms:
-                raise ConfigurationException("Invalid neuron id in postsynaptic"
-                                             " population {}".format(post_atom))
+                raise exceptions.ConfigurationException(
+                    "Invalid neuron id in postsynaptic population {}"
+                    .format(post_atom))
             weight = generate_parameter(conn[2], i)
             delay = generate_parameter(conn[3], i) * delay_scale
             id_lists[pre_atom].append(post_atom)
