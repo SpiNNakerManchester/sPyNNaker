@@ -43,13 +43,14 @@ class LivePacketGather(
         """
         Creates a new AppMonitor Object.
         """
-        if (EIEIOTypeParam.KEY_PAYLOAD_32_BIT
-            or EIEIOTypeParam.KEY_PAYLOAD_16_BIT) \
+        if (message_type == EIEIOTypeParam.KEY_PAYLOAD_32_BIT
+            or message_type == EIEIOTypeParam.KEY_PAYLOAD_16_BIT) \
                 and use_payload_prefix and payload_as_time_stamps:
             raise ConfigurationException("Timestamp can either be included as "
                                          "payload prefix or as payload to each "
                                          "key, not both")
-        if (EIEIOTypeParam.KEY_32_BIT or EIEIOTypeParam.KEY_16_BIT) and \
+        if (message_type == EIEIOTypeParam.KEY_32_BIT
+            or message_type == EIEIOTypeParam.KEY_16_BIT) and \
                 not use_payload_prefix and payload_as_time_stamps:
             raise ConfigurationException("Timestamp can either be included as "
                                          "payload prefix or as payload to each "
