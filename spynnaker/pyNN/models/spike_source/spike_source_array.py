@@ -1,18 +1,20 @@
-import logging
-import os
-
 from spynnaker.pyNN.utilities import constants
-from spinn_front_end_common.utilities import constants as \
-    front_end_common_constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
+from spynnaker.pyNN import model_binaries
+
 from spinn_front_end_common.utilities import packet_conversions
-from spynnaker.pyNN.utilities.conf import config
+from spinn_front_end_common.utilities import constants as \
+    front_end_common_constants
+
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from math import ceil
-import math
 
+
+import math
+import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +102,8 @@ class SpikeSourceArray(AbstractSpikeSource):
             return 0
 
         out_spike_spikes = \
-            int(ceil((vert_slice.hi_atom - vert_slice.lo_atom + 1) / 32.0)) * 4
+            int(math.ceil((vert_slice.hi_atom - vert_slice.lo_atom + 1)
+                          / 32.0)) * 4
         return self.get_recording_region_size(out_spike_spikes)
 
     @staticmethod
@@ -279,7 +282,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
         sub_vertex_out_spike_bytes_function = \
-            lambda subvertex, subvertex_slice: int(ceil(
+            lambda subvertex, subvertex_slice: int(math.ceil(
                 subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes
@@ -293,14 +296,16 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     #inhirrted from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_mapper, report_folder):
+                           routing_info, hostname, graph_mapper, report_folder,
+                           write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
         """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
-                placement.x, placement.y, placement.p, hostname, report_folder)
+                placement.x, placement.y, placement.p, hostname, report_folder,
+                write_text_specs, application_run_time_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
@@ -340,10 +345,7 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     def get_binary_file_name(self):
         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
+        binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
                                    'spike_source_array.aplx')
         return binary_name
 

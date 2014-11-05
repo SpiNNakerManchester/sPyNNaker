@@ -15,7 +15,7 @@ class SynapticList(object):
         """
         if vertex_slice is None:
             return max(map(operator.methodcaller(
-                'get_n_connections', None, None), self._synaptic_rows))
+                'get_n_connections', None), self._synaptic_rows))
         else:
             return max(map(operator.methodcaller(
                 'get_n_connections', vertex_slice.lo_atom,

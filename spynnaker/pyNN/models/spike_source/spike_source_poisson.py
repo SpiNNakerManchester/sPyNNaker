@@ -9,7 +9,7 @@ from spinn_front_end_common.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions import \
     generate_parameter
-from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN import model_binaries
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from math import exp, ceil
@@ -281,14 +281,16 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     #inhirrted from dataspecable vertex
 
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_mapper, report_folder):
+                           routing_info, hostname, graph_mapper, report_folder,
+                           write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSourcePoisson on one core.
         """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
-                placement.x, placement.y, placement.p, hostname, report_folder)
+                placement.x, placement.y, placement.p, hostname, report_folder,
+                write_text_specs, application_run_time_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
@@ -314,11 +316,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         data_writer.close()
 
     def get_binary_file_name(self):
-        # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
+        binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
                                    'spike_source_poisson.aplx')
 
         return binary_name

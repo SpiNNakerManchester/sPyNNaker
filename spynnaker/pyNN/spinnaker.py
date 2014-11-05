@@ -104,20 +104,34 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 config.getboolean("Reports", "writeTransceiverReport"),
                 execute_routing_info_report=
                 config.getboolean("Reports", "writeRouterInfoReport"))
+
             self._set_up_pacman_algorthms_listings(
-                partitioner_algorithum=config.get("Partitioner", "algorithm"),
+                partitioner_algorithum=
+                config.get("Partitioner", "algorithm"),
                 placer_algorithum=config.get("Placer", "algorithm"),
-                key_allocator_algorithum=config.get("KeyAllocator",
-                                                    "algorithm"),
-                routing_algorithum=config.get("Routing", "algorithm")
-            )
+                key_allocator_algorithum=None,
+                routing_algorithum=config.get("Routing", "algorithm"))
             #get the pynn specific key allocator algorthium
             #  (overloaded from common call)
             self._key_allocator_algorithm = \
                 self.get_pynn_specific_key_allocator()
+            #set up exeuctable specifics
             self._set_up_executable_specifics()
-            self._set_up_report_specifics()
-            self._set_up_output_application_data_specifics()
+            self._set_up_report_specifics(
+                default_report_file_path=
+                config.get("Reports", "defaultReportFilePath"),
+                max_reports_kept=config.getint("Reports", "max_reports_kept"),
+                reports_are_enabled=
+                config.getboolean("Reports", "reportsEnabled"),
+                write_provance_data=
+                config.getboolean("Reports", "writeProvanceData"),
+                write_text_specs=config.getboolean("Reports", "writeTextSpecs"))
+            self._set_up_output_application_data_specifics(
+                max_application_binaries_kept=
+                config.getint("Reports", "max_application_binaries_kept"),
+                where_to_write_application_data_files=
+                config.get("Reports", "defaultApplicationDataFilePath")
+            )
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
 
@@ -137,16 +151,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
     def run(self, run_time):
         self._setup_interfaces(
             hostname=self._hostname,
-            virtual_x_dimension=config.getint("Machine",
-                                              "virutal_board_x_dimension"),
-            virtual_y_dimension=config.getint("Machine",
-                                              "virutal_board_y_dimension"),
+            virtual_x_dimension=config.get("Machine",
+                                           "virutal_board_x_dimension"),
+            virtual_y_dimension=config.get("Machine",
+                                           "virutal_board_y_dimension"),
             downed_chips=config.get("Machine", "down_chips"),
             downed_cores=config.get("Machine", "down_cores"),
             requires_virtual_board=config.getboolean("Machine",
                                                      "virtual_board"),
-            requires_wrap_around=config.getboolean("Machine",
-                                                   "requires_wrap_arounds"),
+            requires_wrap_around=config.get("Machine", "requires_wrap_arounds"),
             machine_version=config.getint("Machine", "version"))
         #extract iptags required by the graph
         self._set_iptags()
@@ -222,7 +235,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self.execute_data_specification_execution(
                 config.getboolean("SpecExecution", "specExecOnHost"),
                 self._hostname, self._placements, self._graph_mapper,
-                )
+                write_text_specs=config.getboolean("Reports", "writeTextSpecs"),
+                runtime_application_data_folder=
+                self._application_default_folder)
 
         if self._reports_states is not None:
             reports.write_memory_map_report(self._report_default_directory,
@@ -244,9 +259,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._load_application_data(
                     self._placements, self._router_tables, self._graph_mapper,
                     processor_to_app_data_base_address, self._hostname,
-                    self._app_id)
+                    self._app_id,
+                    machine_version=config.getint("Machine", "version"),
+                    application_run_time_report_folder=
+                    self._application_default_folder)
                 logger.info("*** Loading executables ***")
-                self._load_executable_images(executable_targets, self._app_id)
+                self._load_executable_images(
+                    executable_targets, self._app_id,
+                    application_run_time_report_folder=
+                    self._application_default_folder)
                 logger.info("*** Loading Iptags ***")
                 self._load_iptags()
                 logger.info("*** Loading Reverse Iptags***")
@@ -257,11 +278,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
                 if self._reports_states.transciever_report:
-                    binary_folder = config.get("SpecGeneration",
-                                               "Binary_folder")
                     reports.re_load_script_running_aspects(
-                        binary_folder, executable_targets, self._hostname,
-                        self._app_id, run_time)
+                        self._application_default_folder, executable_targets,
+                        self._hostname, self._app_id, run_time)
 
                 self._start_execution_on_machine(executable_targets,
                                                  self._app_id, self._runtime)
@@ -277,8 +296,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             placements, router_tables, runtime, machine_time_step,
             graph_mapper):
         requires_visualiser = config.getboolean("Visualiser", "enable")
-        requires_virtual_board = config.getboolean("Machine",
-                                                        "virtual_board")
+        requires_virtual_board = config.getboolean("Machine", "virtual_board")
         #if the visuliser is required, import the correct requirements and
         # create a new visulaiser object and mapping for spinnaker to maintain
         if requires_visualiser:
@@ -512,7 +530,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     associated_vertex, placement.subvertex, placement,
                     self._partitioned_graph, self._partitionable_graph,
                     self._routing_infos, self._hostname, self._graph_mapper,
-                    self._report_default_directory, progress_bar)
+                    self._report_default_directory, progress_bar,
+                    config.getboolean("Reports", "writeTextSpecs"),
+                    self._application_default_folder)
                 thread_pool.apply_async(data_generator_interface.start())
 
                 binary_name = associated_vertex.get_binary_file_name()

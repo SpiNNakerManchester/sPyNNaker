@@ -43,6 +43,8 @@ from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
 #spike sources
 from spynnaker.pyNN.models.spike_source.spike_source_poisson\
     import SpikeSourcePoisson
+from spynnaker.pyNN.models.spike_source.spike_source_array \
+    import SpikeSourceArray
 
 #connections
 from spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector\

@@ -7,13 +7,14 @@ from six import add_metaclass
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from spinn_front_end_common.utilities import packet_conversions
-from spynnaker.pyNN.utilities.conf import config
+
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
     AbstractSynapticManager
 from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex import \
     AbstractPartitionablePopulationVertex
+from spynnaker.pyNN import model_binaries
 
 
 logger = logging.getLogger(__name__)
@@ -200,7 +201,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_mapper,
-                           report_folder):
+                           report_folder, write_text_specs,
+                           application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to
         build a group of IF_curr_exp neurons resident on a single core.
@@ -208,7 +210,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         # Create new DataSpec for this processor:
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
-                placement.x, placement.y, placement.p, hostname, report_folder)
+                placement.x, placement.y, placement.p, hostname, report_folder,
+                write_text_specs, application_run_time_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
@@ -302,8 +305,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 self._stdp_mechanism.get_vertex_executable_suffix()
 
         # Rebuild executable name
-        binary_name = os.path.join(config.get("SpecGeneration",
-                                              "common_binary_folder"),
+        binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
                                    binary_title + binary_extension)
 
         return binary_name

@@ -2,9 +2,12 @@ import logging
 
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
-from spinn_front_end_common.utilities import exceptions
-from spynnaker.pyNN.utilities import constants, conf
+from spynnaker.pyNN.utilities import constants
+
 from pacman.operations import routing_info_allocator_algorithms
+
+from spinn_front_end_common.utilities import exceptions
+from spinn_front_end_common.utilities import helpful_functions
 import math
 
 
@@ -21,12 +24,12 @@ class SpynnakerConfigurationFunctions(object):
 
         #get common key allocator algorithms
         key_allocator_algorithms_list = \
-            conf.get_valid_components(routing_info_allocator_algorithms,
-                                      "RoutingInfoAllocator")
+            helpful_functions.get_valid_components(
+                routing_info_allocator_algorithms, "RoutingInfoAllocator")
         #get pynn specific key allocator
         pynn_overloaded_allocator = \
-            conf.get_valid_components(overridden_pacman_functions,
-                                      "RoutingInfoAllocator")
+            helpful_functions.get_valid_components(overridden_pacman_functions,
+                                                   "RoutingInfoAllocator")
         key_allocator_algorithms_list.update(pynn_overloaded_allocator)
 
         return key_allocator_algorithms_list[config.get("KeyAllocator",
