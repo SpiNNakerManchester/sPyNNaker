@@ -33,7 +33,7 @@ class LivePacketGather(
     forwarding them to the host
 
     """
-    def __init__(self, machine_time_step, tag, port, address,
+    def __init__(self, machine_time_step, tag, port, address, strip_sdp=True,
                  use_prefix=False, key_prefix=None, prefix_type=None,
                  message_type=EIEIOTypeParam.KEY_32_BIT,
                  right_shift=0, payload_as_time_stamps=True,
@@ -62,7 +62,8 @@ class LivePacketGather(
                                             machine_time_step=machine_time_step)
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
                                              max_atoms_per_core=1)
-        AbstractIPTagableVertex.__init__(self, tag, port, address)
+        AbstractIPTagableVertex.__init__(self, tag, port, address,
+                                         strip_sdp=strip_sdp)
 
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
         self._use_prefix = use_prefix
