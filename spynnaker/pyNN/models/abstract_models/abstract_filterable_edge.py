@@ -10,10 +10,9 @@ class AbstractFilterableEdge(object):
         pass
 
     @abstractmethod
-    def filter_sub_edge(self, subedge, graph_mapper):
+    def filter_sub_edge(self, graph_mapper, common_report_folder):
         """ method to allow edges to determine if a edge is filterable
 
-        :param subedge: the subedge to be considered for filtering
         :param graph_mapper: the mapper that informs partitioned vertexes of
         their slice of atoms
         :return: true or false

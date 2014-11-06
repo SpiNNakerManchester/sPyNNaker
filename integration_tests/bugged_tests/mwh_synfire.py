@@ -46,7 +46,7 @@ projections.append(p.Projection(populations[1], populations[0], p.FromListConnec
 
 populations[0].record_v()
 populations[0].record_gsyn()
-populations[0].record(visualiser_mode=modes.RASTER)
+populations[0].record(live_record=True)
 
 p.run(1000)
 
@@ -65,7 +65,7 @@ spikes = populations[0].getSpikes(compatible_output=True)
 if spikes != None:
     print spikes
     pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
+    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
     pylab.xlabel('Time/ms')
     pylab.ylabel('spikes')
     pylab.title('spikes')
@@ -83,7 +83,7 @@ if v != None:
     pylab.title('v')
     for pos in range(0, nNeurons, 20):
         v_for_neuron = v[pos * ticks : (pos + 1) * ticks]
-        pylab.plot([i[1] for i in v_for_neuron], 
+        pylab.plot([i[1] for i in v_for_neuron],
                 [i[2] for i in v_for_neuron])
     pylab.show()
 
@@ -94,8 +94,8 @@ if gsyn != None:
     pylab.title('gsyn')
     for pos in range(0, nNeurons, 20):
         gsyn_for_neuron = gsyn[pos * ticks : (pos + 1) * ticks]
-        pylab.plot([i[1] for i in gsyn_for_neuron], 
+        pylab.plot([i[1] for i in gsyn_for_neuron],
                 [i[2] for i in gsyn_for_neuron])
     pylab.show()
 
-p.end()
+#p.end()

@@ -58,7 +58,7 @@ void process_16_bit_packets (void* event_pointer, bool pkt_format,
 #ifdef DEBUG
 	log_info("16 bit, no payload");
 #endif
-	
+
 	for (i = 0; i < length; i++)
 	{
 	  uint32_t key = (uint32_t) (events_array[i]);

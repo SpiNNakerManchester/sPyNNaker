@@ -115,7 +115,7 @@ class ChipPage(AbstractPage):
 
         for router_key in chip_router_table.keys():
             index_label = gtk.Label("{}".format(position - 1))
-            key = int(chip_router_table[router_key][0].key)
+            key = int(chip_router_table[router_key][0].key_combo)
             mask = int(chip_router_table[router_key][0].mask)
             route = int(chip_router_table[router_key][0].route)
             core_id = "({%d}, {%d}, {%d})".format((key >> 24 & 0xFF),

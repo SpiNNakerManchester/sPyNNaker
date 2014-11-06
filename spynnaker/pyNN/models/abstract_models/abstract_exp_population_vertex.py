@@ -12,15 +12,35 @@ class AbstractExponentialPopulationVertex(object):
     This represents a pynn_population.py with two exponentially decaying synapses,
     one for excitatory connections and one for inhibitory connections
     """
-    
+    # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step,
-                 tau_syn_e=5.0, tau_syn_i=5.0):
+                 tau_syn_E=5.0, tau_syn_I=5.0):
 
-        self._tau_syn_e = utility_calls.convert_param_to_numpy(tau_syn_e,
+        self._tau_syn_E = utility_calls.convert_param_to_numpy(tau_syn_E,
                                                                n_neurons)
-        self._tau_syn_i = utility_calls.convert_param_to_numpy(tau_syn_i,
+        self._tau_syn_I = utility_calls.convert_param_to_numpy(tau_syn_I,
                                                                n_neurons)
         self._machine_time_step = machine_time_step
+    
+    # noinspection PyPep8Naming
+    @property
+    def tau_syn_E(self):
+        return self._tau_syn_E
+
+    # noinspection PyPep8Naming
+    @tau_syn_E.setter
+    def tau_syn_E(self, new_value):
+        self._tau_syn_E = new_value
+
+    # noinspection PyPep8Naming
+    @property
+    def tau_syn_I(self):
+        return self._tau_syn_I
+
+    # noinspection PyPep8Naming
+    @tau_syn_I.setter
+    def tau_syn_I(self, new_value):
+        self._tau_syn_I = new_value
 
     @staticmethod
     def get_synapse_parameter_size(vertex_slice):
@@ -28,7 +48,7 @@ class AbstractExponentialPopulationVertex(object):
         Gets the size of the synapse parameters for a range of neurons
         """
         return NUM_SYNAPSE_PARAMS * 4 * \
-               ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
+            ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
     @staticmethod
     def get_n_synapse_type_bits():
@@ -37,18 +57,18 @@ class AbstractExponentialPopulationVertex(object):
         row
         """
         return 1
-        
+
     def write_synapse_parameters(self, spec, subvertex, vertex_slice):
         """
         Write vectors of synapse parameters, one per neuron
         There is one parameter for each synapse, which is the decay constant for
         the exponential decay.
-        
+
         Exponential decay factor calculated as:
         p11_XXX = exp(-h/tau_syn_XXX)
         where h is the internal time step in milliseconds (passed in a uSec).
         """
-        
+
         # Set the focus to the memory region 3 (synapse parameters):
         spec.switch_write_focus(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
@@ -56,16 +76,18 @@ class AbstractExponentialPopulationVertex(object):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Synapse Parameters for "
                      "{} Neurons:\n".format(n_atoms))
-        
+
         decay_ex = numpy.exp(float(-self._machine_time_step) /
-                             (1000.0 * self._tau_syn_e))
-        
-        init_ex = self._tau_syn_e * (1.0 - decay_ex)
+                             (1000.0 * self._tau_syn_E))
+
+        init_ex = (self._tau_syn_E * (1 - decay_ex)
+                                   * (1000.0 / self._machine_time_step))
 
         decay_in = numpy.exp(float(-self._machine_time_step) /
-                             (1000.0 * self._tau_syn_i))
-        
-        init_in = self._tau_syn_i * (1.0 - decay_in)
+                             (1000.0 * self._tau_syn_I))
+
+        init_in = (self._tau_syn_I * (1 - decay_in)
+                                   * (1000.0 / self._machine_time_step))
 
         # noinspection PyNoneFunctionAssignment
         rescaled_decay_ex = \
@@ -95,7 +117,7 @@ class AbstractExponentialPopulationVertex(object):
                 spec.write_value(data=rescaled_init_ex[atom])
             else:
                 spec.write_value(data=rescaled_init_ex[0])
-        
+
         for atom in range(0, n_atoms):
             # noinspection PyTypeChecker
             if len(rescaled_decay_in) > 1:

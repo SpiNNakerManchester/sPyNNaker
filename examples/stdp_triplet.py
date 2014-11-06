@@ -76,7 +76,7 @@ for t in delta_t:
         # Plastic Connection between pre_pop and post_pop
         # Sjostrom visual cortex min-triplet params
         stdp_model = sim.STDPMechanism(
-            timing_dependence = sim.PfisterSpikeTripletRule(A3_plus = param_scale * 6.5e-3, A3_minus = param_scale * 0.0, tau_plus = 16.8, tau_minus = 33.7, tau_x = 101, tau_y = 114, w_max = 1.0),
+            timing_dependence = sim.PfisterSpikeTripletTimeDependence(A3_plus = param_scale * 6.5e-3, A3_minus = param_scale * 0.0, tau_plus = 16.8, tau_minus = 33.7, tau_x = 101, tau_y = 114, w_max = 1.0),
             weight_dependence = sim.AdditiveWeightDependence(w_min = 0.0, w_max = 1.0, A_plus = param_scale * 0.0, A_minus = param_scale * 7.1e-3)
         )
 

@@ -1,9 +1,13 @@
 #pacman imports
+from data_specification.interfaces.data_generator_interface import \
+    DataGeneratorInterface
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
+from pacman.operations.router_check_functionality.valid_routes_checker import \
+    ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
@@ -56,6 +60,7 @@ import logging
 import math
 import sys
 import time
+from multiprocessing.pool import ThreadPool
 
 logger = logging.getLogger(__name__)
 
@@ -165,6 +170,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self.execute_data_specification_execution(
                 conf.config.getboolean("SpecExecution", "specExecOnHost"),
                 self._hostname, self._placements, self._graph_mapper)
+
+        if self._reports_states is not None:
+            reports.write_memory_map_report(self._report_default_directory,
+                                            processor_to_app_data_base_address)
 
         #engage vis if requested
         if do_timing:
@@ -331,7 +340,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #execute pynn subedge pruning
         self._partitioned_graph, self._graph_mapper = \
-            GraphEdgeFilter().run(self._partitioned_graph, self._graph_mapper)
+            GraphEdgeFilter(self._report_default_directory)\
+            .run(self._partitioned_graph, self._graph_mapper)
 
         #execute key allocator
         self._execute_key_allocator(pacman_report_state)
@@ -368,6 +378,15 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._router_algorithm.route(
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
+
+        if conf.config.get("Mode", "mode") == "Debug":
+            #check that all routes are valid and no cycles exist
+            valid_route_checker = ValidRouteChecker(
+                placements=self._placements, routing_infos=self._routing_infos,
+                routing_tables=self._router_tables,
+                partitioned_graph=self._partitioned_graph,
+                machine=self._machine)
+            valid_route_checker.validate_routes()
 
         if pacman_report_state is not None and \
                 pacman_report_state.router_report:
@@ -426,22 +445,24 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def generate_data_specifications(self):
         #iterate though subvertexes and call generate_data_spec for each vertex
         executable_targets = dict()
+        no_processors = conf.config.getint("Threading", "dsg_threads")
+        thread_pool = ThreadPool(processes=no_processors)
 
         #create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
-
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
-                associated_vertex.generate_data_spec(
-                    placement.subvertex, placement, self._partitioned_graph,
-                    self._partitionable_graph, self._routing_infos,
-                    self._hostname, self._graph_mapper,
-                    self._report_default_directory)
+                data_generator_interface = DataGeneratorInterface(
+                    associated_vertex, placement.subvertex, placement,
+                    self._partitioned_graph, self._partitionable_graph,
+                    self._routing_infos, self._hostname, self._graph_mapper,
+                    self._report_default_directory, progress_bar)
+                thread_pool.apply_async(data_generator_interface.start())
 
                 binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():
@@ -455,8 +476,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     list_of_core_subsets = [initial_core_subset]
                     executable_targets[binary_name] = \
                         CoreSubsets(list_of_core_subsets)
-            #update the progress bar
-            progress_bar.update()
+
+        thread_pool.close()
+        thread_pool.join()
         #finish the progress bar
         progress_bar.end()
         return executable_targets

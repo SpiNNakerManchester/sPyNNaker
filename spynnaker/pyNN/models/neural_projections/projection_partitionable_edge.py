@@ -1,24 +1,22 @@
 from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+from pacman.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import \
     ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
-    import AbstractFilterableEdge
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import constants
 import logging
 logger = logging.getLogger(__name__)
 
 
-class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
+class ProjectionPartitionableEdge(PartitionableEdge):
     
     def __init__(self, prevertex, postvertex, machine_time_step,
                  connector=None, synapse_list=None, synapse_dynamics=None,
                  label=None):
         PartitionableEdge.__init__(self, prevertex, postvertex, label=label)
-        AbstractFilterableEdge.__init__(self)
 
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
@@ -40,21 +38,7 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
         """
         Creates a subedge from this edge
         """
-        return ProjectionPartitionedEdge(presubvertex, postsubvertex, self)
-
-    def filter_sub_edge(self, subedge, graph_mapper):
-        """
-        Method is inhirrted from filterable vertex and is called to allow a
-        given sub-edge to prune itself if it serves no purpose.
-        :return: True if the partricular sub-edge can be pruned, and
-        False otherwise.
-        """
-        pre_vertex_slice = \
-            graph_mapper.get_subvertex_slice(subedge.pre_subvertex)
-        post_vertex_slice = \
-            graph_mapper.get_subvertex_slice(subedge.post_subvertex)
-        return not self._synapse_list.is_connected(pre_vertex_slice,
-                                                   post_vertex_slice)
+        return ProjectionPartitionedEdge(presubvertex, postsubvertex)
 
     def get_max_n_words(self, vertex_slice=None):
         """
@@ -65,11 +49,11 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
         """
         if vertex_slice is None:
             return max([self._synapse_row_io.get_n_words(
-                synapse_row, None, None)
+                synapse_row)
                 for synapse_row in self._synapse_list.get_rows()])
         else:
             return max([self._synapse_row_io.get_n_words(
-                synapse_row, vertex_slice.lo_atom, vertex_slice.hi_atom)
+                synapse_row, vertex_slice)
                 for synapse_row in self._synapse_list.get_rows()])
         
     def get_n_rows(self):
@@ -85,9 +69,8 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
         """
         return self._synapse_row_io
 
-    def get_synaptic_list_from_machine(
-            self, graph_mapper, placements, transceiver, partitioned_graph,
-            routing_infos):
+    def get_synaptic_list_from_machine(self, graph_mapper, placements,
+                                       transceiver):
         """
         Get synaptic data for all connections in this Projection from the
         machine.
@@ -106,6 +89,8 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
 
         synaptic_list = list()
         last_pre_lo_atom = None
+        progress_bar = ProgressBar(len(sorted_subedges),
+                                   "progress on reading back synaptic matrix")
         for subedge in sorted_subedges:
             vertex_slice = \
                 graph_mapper.get_subvertex_slice(subedge.pre_subvertex)
@@ -113,14 +98,12 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
 
             sub_edge_post_vertex = \
                 graph_mapper.get_vertex_from_subvertex(subedge.post_subvertex)
-            rows = \
-                sub_edge_post_vertex.get_synaptic_list_from_machine(
-                    placements, transceiver, subedge.pre_subvertex, pre_n_atoms,
-                    subedge.post_subvertex,
-                    constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
-                    constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-                    self._synapse_row_io, partitioned_graph, graph_mapper,
-                    routing_infos)\
+            rows = sub_edge_post_vertex.get_synaptic_list_from_machine(
+                placements, transceiver, subedge.pre_subvertex, pre_n_atoms,
+                subedge.post_subvertex,
+                constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
+                constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+                self._synapse_row_io, subedge.weight_scale)\
                 .get_rows()
 
             pre_lo_atom = vertex_slice.lo_atom
@@ -132,10 +115,11 @@ class ProjectionPartitionableEdge(PartitionableEdge, AbstractFilterableEdge):
                 for i in range(len(rows)):
                     row = rows[i]
                     post_lo_atom = graph_mapper.get_subvertex_slice(
-                        subedge.postsubvertex).lo_atom
+                        subedge.post_subvertex).lo_atom
                     synaptic_list[i + last_pre_lo_atom]\
                         .append(row, lo_atom=post_lo_atom)
-
+            progress_bar.update()
+        progress_bar.end()
         return SynapticList(synaptic_list)
 
     @property

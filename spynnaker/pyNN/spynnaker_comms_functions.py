@@ -31,7 +31,6 @@ import time
 import os
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -160,6 +159,7 @@ class SpynnakerCommsFunctions(object):
                 get_vertex_from_subvertex(placement.subvertex)
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
+
                 data_spec_file_path = \
                     associated_vertex.get_data_spec_file_path(
                         placement.x, placement.y, placement.p, hostname
@@ -173,7 +173,7 @@ class SpynnakerCommsFunctions(object):
 
                 #locate current memory requirement
                 current_memory_available = SDRAM.DEFAULT_SDRAM_BYTES
-                memory_tracker_key = "{}:{}".format(placement.x, placement.y)
+                memory_tracker_key = (placement.x, placement.y)
                 if memory_tracker_key in space_based_memory_tracker.keys():
                     current_memory_available = \
                         space_based_memory_tracker[memory_tracker_key]
@@ -205,8 +205,7 @@ class SpynnakerCommsFunctions(object):
                     host_based_data_spec_executor.execute()
 
                 #update base address mapper
-                processor_mapping_key = \
-                    "{}:{}:{}".format(placement.x, placement.y, placement.p)
+                processor_mapping_key = (placement.x, placement.y, placement.p)
                 processor_to_app_data_base_address[processor_mapping_key] = \
                     {'start_address':
                         ((SDRAM.DEFAULT_SDRAM_BYTES - current_memory_available)
@@ -383,6 +382,9 @@ class SpynnakerCommsFunctions(object):
 
         #go through the placements and see if theres any application data to
         # load
+
+        progress_bar = ProgressBar(len(list(placements.placements)),
+                                   "Loading application data onto the machine")
         for placement in placements.placements:
             associated_vertex = \
                 vertex_to_subvertex_mapper.get_vertex_from_subvertex(
@@ -391,7 +393,7 @@ class SpynnakerCommsFunctions(object):
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
                 logger.debug("loading application data for vertex {}"
                              .format(associated_vertex.label))
-                key = "{}:{}:{}".format(placement.x, placement.y, placement.p)
+                key = (placement.x, placement.y, placement.p)
                 start_address = \
                     processor_to_app_data_base_address[key]['start_address']
                 memory_written = \
@@ -424,6 +426,11 @@ class SpynnakerCommsFunctions(object):
                         file_path_for_application_data, placement,
                         start_address, memory_written, user_o_register_address,
                         binary_folder)
+            progress_bar.update()
+        progress_bar.end()
+
+        progress_bar = ProgressBar(len(list(router_tables.routing_tables)),
+                                   "Loading routing data onto the machine")
         #load each router table thats needed for the application to run into
         # the chips sdram
         for router_table in router_tables.routing_tables:
@@ -436,6 +443,8 @@ class SpynnakerCommsFunctions(object):
                                                     "Binary_folder")
                     reports.re_load_script_load_routing_tables(
                         router_table, binary_folder, app_id)
+            progress_bar.update()
+        progress_bar.end()
 
     def _load_executable_images(self, executable_targets, app_id):
         """
@@ -448,6 +457,8 @@ class SpynnakerCommsFunctions(object):
             reports.re_load_script_load_executables_init(binary_folder,
                                                          executable_targets)
 
+        progress_bar = ProgressBar(len(executable_targets.keys()),
+                                   "Loading executables onto the machine")
         for exectuable_target_key in executable_targets.keys():
             file_reader = SpinnmanFileDataReader(exectuable_target_key)
             core_subset = executable_targets[exectuable_target_key]
@@ -471,3 +482,5 @@ class SpynnakerCommsFunctions(object):
                                                              "Binary_folder"))
                 reports.re_load_script_load_executables_individual(
                     binary_folder, exectuable_target_key, app_id, size)
+            progress_bar.update()
+        progress_bar.end()
