@@ -27,7 +27,7 @@ populations = list()
 projections = list()
 
 weight_to_spike = 2.0
-delay = 17
+delay = 3
 
 loopConnections = list()
 for i in range(0, nNeurons):
@@ -44,7 +44,7 @@ projections.append(p.Projection(populations[1], populations[0], p.FromListConnec
 
 populations[0].record_v()
 populations[0].record_gsyn()
-populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER)
+populations[0].record()
 
 p.run(5000)
 

@@ -1,7 +1,10 @@
+from spynnaker.pyNN.models.abstract_models.abstract_buffer_receivable_vertex import \
+    AbstractBufferReceivableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_buffer_sendable_vertex import \
+    AbstractBufferSendableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
-from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 
@@ -14,17 +17,20 @@ import math
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_MEG_LIMIT = 8 * 1024 * 1024  # 8 mg in bytes
-MAX_MEG_LIMIT = 120 * 1024 * 1024  # only 120 meg is ever avilable for application usage
 
-class SpikeSourceArray(AbstractSpikeSource):
+class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex,
+                       AbstractBufferSendableVertex):
 
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID
-    _model_based_max_atoms_per_core = 2048  # limited to the n of the x,y,p,n key format
+    _model_based_max_atoms_per_core = 2048  # limited to the n of
+                                            # the x,y,p,n key format
 
-    def __init__(self, n_neurons, spike_times, machine_time_step,
-                 constraints=None, max_on_chip_memory_usage=DEFAULT_MEG_LIMIT,
-                 label="SpikeSourceArray"):
+    def __init__(
+            self, n_neurons, spike_times, machine_time_step, constraints=None,
+            max_on_chip_memory_usage_for_recording_in_bytes=None,
+            max_on_chip_memory_usage_for_spikes_in_bytes=None,
+            no_buffers_for_recording=constants.NO_BUFFERS_FOR_TRANSMITTING,
+            label="SpikeSourceArray"):
         """
         Creates a new SpikeSourceArray Object.
         """
@@ -33,15 +39,27 @@ class SpikeSourceArray(AbstractSpikeSource):
                                      max_atoms_per_core=SpikeSourceArray.
                                      _model_based_max_atoms_per_core,
                                      machine_time_step=machine_time_step)
+        #set supers
+        AbstractBufferReceivableVertex.__init__(self, None, None, None)
+        AbstractBufferSendableVertex.__init__(self, None, None, None)
+
         self._spike_times = spike_times
-        self._requires_buffering = False
-        self._max_on_chip_memory_usage = max_on_chip_memory_usage
-        if (self._max_on_chip_memory_usage > MAX_MEG_LIMIT
-                or self._max_on_chip_memory_usage < 0):
+        self._max_on_chip_memory_usage_for_spikes = \
+            max_on_chip_memory_usage_for_spikes_in_bytes
+        self._max_on_chip_memory_usage_for_recording = \
+            max_on_chip_memory_usage_for_recording_in_bytes
+        self._no_buffers_for_recording = no_buffers_for_recording
+
+        max_memory_used_in_bytes = \
+            self._max_on_chip_memory_usage + \
+            self._max_on_chip_memory_usage_for_recording
+        if (max_memory_used_in_bytes > constants.MAX_MEG_LIMIT
+                or self._max_on_chip_memory_usage_for_spikes < 0
+                or self._max_on_chip_memory_usage_for_recording < 0):
             raise exceptions.ConfigurationException(
                 "The memory usage on chip is either beyond what is supportable"
                 "on the spinnaker board being supported or you have requested"
-                "a negative value for the memory usage. Please correct and "
+                "a negative value for a memory usage. Please correct and "
                 "try again")
 
     @property
@@ -56,7 +74,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         SpikeSourceArray.\
             _model_based_max_atoms_per_core = new_value
 
-    def get_spikes_per_timestep(self, vertex_slice):
+    def _get_spikes_per_timestep(self, vertex_slice):
         """
         spikeArray is a list with one entry per 'neuron'. The entry for
         one neuron is a list of times (in ms) when the neuron fires.
@@ -66,102 +84,59 @@ class SpikeSourceArray(AbstractSpikeSource):
         1) Official PyNN format - single list that is used for all neurons
         2) SpiNNaker format - list of lists, one per neuron
         """
-        spike_dict = dict()
+        no_buffers = 0
+        number_of_spikes_transmitted = 0
         if isinstance(self._spike_times[0], list):
             # This is in SpiNNaker 'list of lists' format:
             for neuron in range(vertex_slice.lo_atom,
                                 vertex_slice.hi_atom + 1):
-                for timeStamp in self._spike_times[neuron]:
+                for timeStamp in sorted(self._spike_times[neuron]):
                     time_stamp_in_ticks = \
                         int((timeStamp * 1000.0) / self._machine_time_step)
-                    if time_stamp_in_ticks not in spike_dict.keys():
-                        spike_dict[time_stamp_in_ticks] = [neuron]
+                    if time_stamp_in_ticks not in self._buffers_to_transmit.keys():
+                        self._buffers_to_transmit[time_stamp_in_ticks] = [neuron]
+                        no_buffers += 1
+                        number_of_spikes_transmitted += 1
                     else:
-                        spike_dict[time_stamp_in_ticks].append(neuron)
+                        self._buffers_to_transmit[time_stamp_in_ticks].append(neuron)
+                        number_of_spikes_transmitted += 1
         else:
             # This is in official PyNN format, all neurons use the same list:
             neuron_list = range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
-            for timeStamp in self._spike_times:
+            for timeStamp in sorted(self._spike_times):
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
-                if time_stamp_in_ticks not in spike_dict.keys():
-                    spike_dict[time_stamp_in_ticks] = neuron_list
+                if time_stamp_in_ticks not in self._buffers_to_transmit.keys():
+                    self._buffers_to_transmit[time_stamp_in_ticks] = neuron_list
+                    no_buffers += 1
+                    number_of_spikes_transmitted += vertex_slice.n_atoms
                 else:
-                    spike_dict[time_stamp_in_ticks].extend(neuron_list)
+                    self._buffers_to_transmit[time_stamp_in_ticks].extend(neuron_list)
+                    number_of_spikes_transmitted += vertex_slice.n_atoms
 
-        return spike_dict
+        memory_used = \
+            ((no_buffers * (constants.BUFFER_HEADER_SIZE +
+                            constants.TIMESTAMP_SPACE_REQUIREMENT)) +
+             (number_of_spikes_transmitted * constants.KEY_SIZE))
+        return memory_used
 
-    @staticmethod
-    def get_spike_block_row_length(n_atoms):
-        return int(math.ceil(n_atoms / constants.BITS_PER_WORD))
-
-    @staticmethod
-    def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
-        return spike_block_row_length * no_active_timesteps * 4
-
-    def get_spike_buffer_size(self, vert_slice):
+    def _get_spike_recording_size(self, spike_region_size):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
+        ASSUMES one spike per timer tic per neuron. Buffers can support more...
         """
-        if not self._record:
+        if not self._record or self._no_machine_time_steps is None:
             return 0
+        else:
+            spike_region_size = \
+                constants.RECORDING_ENTRY_BYTE_SIZE + spike_region_size
+            if spike_region_size > self._max_on_chip_memory_usage_for_recording:
+                return self._max_on_chip_memory_usage_for_recording
+            else:
+                return spike_region_size
 
-        if self._no_machine_time_steps is None:
-            return 0
-
-        out_spike_spikes = \
-            int(math.ceil((vert_slice.hi_atom - vert_slice.lo_atom + 1)
-                          / 32.0)) * 4
-        return self.get_recording_region_size(out_spike_spikes)
-
-    @staticmethod
-    def get_block_index_bytes(no_active_timesteps):
-        return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps
-                * constants.BLOCK_INDEX_ROW_WORDS)) * 4
-
-    def process_spike_array_info(self, subvertex, graph_mapper):
-        """
-        Parse python definitons of the required spike arrays and construct
-        both the spike blocks, containing lists of spike IDs for each time step,
-        and the index table, which gives the address in memory to access
-        the spike block for the current time step.
-        """
-        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-        spike_dict = self.get_spikes_per_timestep(vertex_slice)
-
-        # Dict spikeDict now has entries based on timeStamp and each entry
-        # is a list of neurons firing at that time.
-        # Get keys in time order:
-        time_keys = spike_dict.keys()
-        time_keys.sort()
-
-        # Calculate how big the spike rows will be:
-        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        spike_block_row_length = \
-            self.get_spike_block_row_length(n_atoms)
-        spike_region_size = self.get_spike_region_bytes(spike_block_row_length,
-                                                        len(time_keys))
-
-        # Create a new tableEntry for each unique time stamp, then
-        # build a spike Block, tracking its size:
-        table_entries = list()
-        spike_blocks = list()
-        spike_block_start_addr = 0
-        for timeStamp in time_keys:
-            current_spike_block = list()
-            # Create tableEntry:
-            table_entries.append([timeStamp, spike_block_start_addr])
-            # Construct spikeBlock:
-            list_of_spike_indices = spike_dict[timeStamp]
-            for spikeIndex in list_of_spike_indices:
-                current_spike_block.append(spikeIndex - vertex_slice.lo_atom)
-            # Add the spike block for this time step to the spike blocks list:
-            spike_blocks.append(current_spike_block)
-            spike_block_start_addr += spike_block_row_length
-        return n_atoms, table_entries, spike_blocks, spike_region_size
-
-    def reserve_memory_regions(self, spec, setup_sz, block_index_region_size,
-                               spike_region_size, spike_hist_buff_sz):
+    def _reserve_memory_regions(self, spec, setup_sz, spike_region_size,
+                                spike_hist_buff_sz):
         """
         *** Modified version of same routine in models.py These could be
         combined to form a common routine, perhaps by passing a list of
@@ -174,12 +149,8 @@ class SpikeSourceArray(AbstractSpikeSource):
             size=setup_sz, label='systemInfo')
 
         spec.reserve_memory_region(
-            region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value,
-            size=block_index_region_size, label='SpikeBlockIndexRegion')
-
-        spec.reserve_memory_region(
             region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
-            size=spike_region_size, label='SpikeDataRegion')
+            size=spike_region_size, label='SpikeDataRegion', empty=True)
 
         if spike_hist_buff_sz > 0:
             spec.reserve_memory_region(
@@ -187,7 +158,7 @@ class SpikeSourceArray(AbstractSpikeSource):
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
                 empty=True)
 
-    def write_setup_info(self, spec, spike_history_region_sz):
+    def _write_setup_info(self, spec, spike_history_region_sz):
         """
         Write information used to control the simulationand gathering of
         results. Currently, this means the flag word used to signal whether
@@ -219,72 +190,8 @@ class SpikeSourceArray(AbstractSpikeSource):
         spec.write_value(data=0)
         spec.write_value(data=0)
 
-    def write_block_index_region(self, spec, placement,
-                                 num_neurons, table_entries):
-        """
-        Spike block index table. Gives address of each block of spikes.
-        numNeurons is the total number of spike sources to be modelled.
-        tableEntries is a list of the entries, each of which consists of:
-        struct {
-            uint32 timeStamp          # In simulation ticks
-            uint32 addressOfBlockWord # Relative to start of spikeDataRegion
-        } entry
-
-        """
-        spec.switch_write_focus(
-            region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value)
-        # Word 0 is the key (x, y, p) for this core:
-        chip_x, chip_y, chip_p = placement.x, placement.y, placement.p
-        population_identity = \
-            packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
-        spec.write_value(data=population_identity)
-
-        # Word 1 is the total number of 'neurons' (i.e. spike sources) in
-        # the pynn_population.py:
-        spec.write_value(data=num_neurons)
-
-        # Word 2 is the total number of entries in this table of indices:
-        num_entries = len(table_entries)
-        spec.write_value(data=num_entries)
-
-        # Write individual entries:
-        for entry in table_entries:
-            time_stamp = entry[0]   # Time in ticks when this block is used
-            address = entry[1]   # Address into spikeBlock region
-            spec.write_value(data=time_stamp)
-            spec.write_value(data=address)
-        return
-
-    def write_spike_data_region(self, spec, num_neurons, spike_blocks):
-        """
-        Spike data blocks.
-        Blocks given in list spikeBlocks.
-        Each block is a list of the indices of 'neurons' that should
-        fire this tick of the simulation clock. they are converted
-        into bit vectors of length ceil(numNeurons/32) words, in
-        which the bit position is the neuron index and a '1' in a given
-        position means that neuron fires this tick.
-        """
-        spec.switch_write_focus(
-            region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value)
-        vector_len = int(math.ceil(num_neurons / 32.0))
-        for block in spike_blocks:
-            spike_bit_vectors = [0] * vector_len
-            # Process this block of spike indices, setting a bit corresponding
-            # to this index for each spiking neuron source:
-            for index in block:
-                word_num = index >> 5
-                bit_num = index & 0x1F
-                or_mask = 1 << bit_num
-                # Set the target bit:
-                spike_bit_vectors[word_num] |= or_mask
-            # Write this to spikeBlock region:
-            for i in range(vector_len):
-                spec.write_value(data=spike_bit_vectors[i])
-
     def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
-
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
         sub_vertex_out_spike_bytes_function = \
@@ -316,7 +223,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         #get slice from mapper
         subvert_slice = graph_mapper.get_subvertex_slice(subvertex)
 
-        spike_history_region_sz = self.get_spike_buffer_size(subvert_slice)
+        spike_history_region_sz = self._get_spike_buffer_size(subvert_slice)
 
         spec.comment("\n*** Spec for SpikeSourceArray Instance ***\n\n")
 
@@ -325,23 +232,27 @@ class SpikeSourceArray(AbstractSpikeSource):
 
         spec.comment("\nReserving memory space for spike data region:\n\n")
 
-        num_neurons, table_entries, spike_blocks, spike_region_size = \
-            self.process_spike_array_info(subvertex, graph_mapper)
-        if spike_region_size == 0:
-            spike_region_size = 4
+        real_spike_region_size = self.get_sdram_usage_for_atoms(subvertex, None)
+
+        # if the region size is zero, there still needs to be a header saying
+        if real_spike_region_size == 0:
+            real_spike_region_size = 4
 
         # Calculate memory requirements:
-        block_index_region_size = self.get_block_index_bytes(len(table_entries))
+        spike_buffer_region = \
+            self._get_spike_recording_size(real_spike_region_size)
+
+        #set buffered knowledge of the size of the buffered regions (in + out)
+        self._buffer_region_memory_size = real_spike_region_size
+        self._size_of_buffer_to_read_in_bytes = \
+            math.floor(spike_buffer_region / self._no_buffers_for_recording)
 
         # Create the data regions for the spike source array:
-        self.reserve_memory_regions(spec, constants.SETUP_SIZE,
-                                    block_index_region_size,
-                                    spike_region_size, spike_history_region_sz)
-        self.write_setup_info(spec, spike_history_region_sz)
+        self._reserve_memory_regions(
+            spec, constants.SETUP_SIZE, spike_buffer_region,
+            real_spike_region_size)
 
-        self.write_block_index_region(spec, placement, num_neurons,
-                                      table_entries)
-        self.write_spike_data_region(spec, num_neurons, spike_blocks)
+        self._write_setup_info(spec, spike_history_region_sz)
 
         # End-of-Spec:
         spec.end_specification()
@@ -358,32 +269,66 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
+        """ assumed correct cpu usage is not important
+
+        :param vertex_slice:
+        :param graph:
+        :return:
+        """
         return 0
-        #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        #return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
-        spike_dict = self.get_spikes_per_timestep(vertex_slice)
-        no_active_timesteps = len(spike_dict.keys())
-        spike_block_row_length = self.get_spike_block_row_length(
-            ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1))
-        spike_region_sz = self.get_spike_region_bytes(spike_block_row_length,
-                                                      no_active_timesteps)
-        block_index_region_size = \
-            self.get_block_index_bytes(no_active_timesteps)
-        spike_history_region_sz = self.get_spike_buffer_size(vertex_slice)
+        """ calcualtes the total sdram usage of the spike source array. If the
+        memory requirement is beyond what is deemed to be the usage of the
+        processor, then it executes a buffered format.
 
+        :param vertex_slice:
+        :param vertex_in_edges:
+        :return:
+        """
+        self._set_default_sizes()
+        spike_region_sz = self._get_spikes_per_timestep(vertex_slice)
+        spike_history_region_sz = self._get_spike_buffer_size(spike_region_sz)
         total_sdram_usage_on_chip = \
-            (constants.SETUP_SIZE + spike_region_sz + block_index_region_size
-             + spike_history_region_sz)
+            (constants.SETUP_SIZE + spike_region_sz + spike_history_region_sz)
 
         if total_sdram_usage_on_chip >= self._max_on_chip_memory_usage:
             total_sdram_usage_on_chip = self._max_on_chip_memory_usage
             self._requires_buffering = True
         return total_sdram_usage_on_chip
 
-    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
+    def _set_default_sizes(self):
+        """ used to do lazy evaluation of the default sizes of the chip
+        memory usage for both recording and receiving spikes
 
+        :return:
+        """
+        if self._max_on_chip_memory_usage_for_spikes is None:
+            if self.record:
+                self._max_on_chip_memory_usage_for_spikes = \
+                    constants.DEFAULT_MEG_LIMIT / 2
+            else:
+                self._max_on_chip_memory_usage_for_spikes = \
+                    constants.DEFAULT_MEG_LIMIT
+        if self._max_on_chip_memory_usage_for_recording is None:
+            if self.record:
+                self._max_on_chip_memory_usage_for_recording = \
+                    constants.DEFAULT_MEG_LIMIT / 2
+            else:
+                self._max_on_chip_memory_usage_for_recording = \
+                    constants.DEFAULT_MEG_LIMIT
+
+    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
+        """ assumed that correct dtcm usage is not required
+
+        :param vertex_slice:
+        :param graph:
+        :return:
+        """
         return 0
-        #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        #return (44 + (16 * 4)) * n_atoms
+
+    def is_buffer_receivable_vertex(self):
+        return True
+
+    def is_buffer_sendable_vertex(self):
+        return True

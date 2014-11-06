@@ -38,6 +38,16 @@ SYNAPTIC_ROW_HEADER_WORDS = 2 + 1   # Words - 2 for row lenth and number of
 ROW_LEN_TABLE_ENTRIES = [0, 1, 8, 16, 32, 64, 128, 256]
 ROW_LEN_TABLE_SIZE = 4 * len(ROW_LEN_TABLE_ENTRIES)
 
+# buffered in and out constants
+DEFAULT_MEG_LIMIT = 8 * 1024 * 1024  # 8 mg in bytes
+MAX_MEG_LIMIT = 120 * 1024 * 1024  # only 120 meg is ever avilable for application usage
+#buffer fixed sizes in bytes
+BUFFER_HEADER_SIZE = 2
+TIMESTAMP_SPACE_REQUIREMENT = 4
+KEY_SIZE = 4
+NO_BUFFERS_FOR_TRANSMITTING = 5
+
+
 X_CHIPS = 8
 Y_CHIPS = 8
 CORES_PER_CHIP = 18
