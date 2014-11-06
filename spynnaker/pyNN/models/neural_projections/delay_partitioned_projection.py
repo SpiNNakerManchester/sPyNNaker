@@ -11,14 +11,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DelayPartitionedProjection(ProjectionPartitionedEdge,
-                                 AbstractFilterableEdge):
+class DelayPartitionedProjection(ProjectionPartitionedEdge):
     
     def __init__(self, presubvertex, postsubvertex):
         ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
-
-        self._synapse_sublist = None
         self._synapse_delay_rows = None
     
     def get_synapse_sublist(self, graph_mapper):
@@ -74,19 +71,3 @@ class DelayPartitionedProjection(ProjectionPartitionedEdge,
         Indicates that the list will not be needed again
         """
         self._synapse_sublist = None
-
-    def filter_sub_edge(self, graph_mapper, common_report_folder):
-        """
-        Filters a subedge of this edge if the edge is not a one-to-one edge
-        """
-        pre_sub_lo = \
-            graph_mapper.get_subvertex_slice(self._pre_subvertex).lo_atom
-        pre_sub_hi = \
-            graph_mapper.get_subvertex_slice(self._pre_subvertex).hi_atom
-        post_sub_lo = \
-            graph_mapper.get_subvertex_slice(self._post_subvertex).lo_atom
-        post_sub_hi = \
-            graph_mapper.get_subvertex_slice(self._post_subvertex).hi_atom
-        if (pre_sub_lo != post_sub_lo) or (pre_sub_hi != post_sub_hi):
-            return True
-        return False

@@ -35,7 +35,7 @@ SYNAPTIC_ROW_HEADER_WORDS = 2 + 1   # Words - 2 for row lenth and number of
                                         #  rows and 1 for plastic region size
                                         # (which might be 0)
 
-ROW_LEN_TABLE_ENTRIES = [1, 8, 16, 32, 64, 128, 256, 512]
+ROW_LEN_TABLE_ENTRIES = [1, 8, 16, 32, 64, 128, 256, 256]
 ROW_LEN_TABLE_SIZE = 4 * len(ROW_LEN_TABLE_ENTRIES)
 
 X_CHIPS = 8

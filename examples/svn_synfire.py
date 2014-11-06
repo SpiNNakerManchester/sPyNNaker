@@ -46,7 +46,7 @@ populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record()
 
-p.run(5000)
+p.run(100)
 
 v = None
 gsyn = None

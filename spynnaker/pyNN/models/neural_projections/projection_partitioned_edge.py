@@ -1,7 +1,6 @@
 from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
     AbstractFilterableEdge
-from spynnaker.pyNN.utilities import reports
 
 
 class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
