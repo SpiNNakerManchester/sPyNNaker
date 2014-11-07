@@ -102,7 +102,12 @@ def write_memory_map_report(report_default_directory,
 
     for key in processor_to_app_data_base_address.keys():
         output.write(str(key) + ": ")
-        output.write(str(processor_to_app_data_base_address[key]) + "\n")
+        data = processor_to_app_data_base_address[key]
+        output.write(
+            "{}: ('start_address': {}, hex({}), 'memory_used': {}, "
+            "'memory_written': {} \n".format(
+                key, data['start_address'], hex(data['start_address']),
+                data['memory_used'], data['memory_written']))
     output.flush()
     output.close()
 
