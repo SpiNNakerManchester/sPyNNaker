@@ -1,6 +1,3 @@
-from spynnaker.pyNN.models.abstract_models.abstract_reverse_iptagable_vertex \
-    import AbstractReverseIPTagableVertex
-
 from collections import OrderedDict
 from abc import ABCMeta
 from six import add_metaclass
@@ -8,10 +5,9 @@ from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
-class AbstractBufferReceivableVertex(AbstractReverseIPTagableVertex):
+class AbstractBufferReceivableVertex(object):
 
-    def __init__(self, tag, port, address):
-        AbstractReverseIPTagableVertex.__init__(self, tag, port, address)
+    def __init__(self):
         self._requires_buffering = False
         self._buffers_to_transmit = OrderedDict()
         self._buffer_region_memory_size = None
@@ -40,13 +36,6 @@ class AbstractBufferReceivableVertex(AbstractReverseIPTagableVertex):
         :return:
         """
         return self._buffers_to_transmit
-
-    def is_reverse_ip_tagable_vertex(self):
-        """helper method for is instance
-
-        :return:
-        """
-        return True
 
     @abstractmethod
     def is_buffer_receivable_vertex(self):

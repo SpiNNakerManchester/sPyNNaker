@@ -10,6 +10,8 @@ setup(
               'spynnaker.pyNN.data_storage',
               'spynnaker.pyNN.models',
               'spynnaker.pyNN.models.abstract_models',
+              'spynnaker.pyNN.models.abstract_models.abstract_comm_models',
+              'spynnaker.pyNN.models.abstract_models.abstract_model_components',
               'spynnaker.pyNN.models.neural_models',
               'spynnaker.pyNN.models.neural_projections',
               'spynnaker.pyNN.models.neural_projections.connectors',

@@ -26,9 +26,9 @@ from spinn_machine.chip import Chip
 
 #internal imports
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_reverse_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_reverse_iptagable_vertex import \
     AbstractReverseIPTagableVertex
 from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
@@ -50,7 +50,6 @@ from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
-from spinnman.constants import CONNECTION_TYPE
 
 import logging
 import math
@@ -212,6 +211,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             logger.info("*** No simulation requested: Stopping. ***")
 
     def _set_iptags(self):
+        #locate vertexes with fixed tags ids
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractIPTagableVertex):
                 iptag = vertex.get_ip_tag()
@@ -219,6 +219,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     if iptag.tag > self._current_max_tag_value:
                         self._current_max_tag_value = iptag.tag
                 self._add_iptag(iptag)
+        #locate vertex's which need tag ids and add ones which will not conflict
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractIPTagableVertex):
                 iptag = vertex.get_ip_tag()
@@ -229,6 +230,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._add_iptag(iptag)
 
     def _set_reverse_ip_tags(self):
+        #locate vertexes with fixed tags ids
         #extract reverse iptags required by the graph
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractReverseIPTagableVertex):
@@ -239,6 +241,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     reverse_iptag = self._create_reverse_iptag_from_iptag(
                         reverse_iptag, vertex)
                     self._add_reverse_tag(reverse_iptag)
+        #locate vertex's which need tag ids and add ones which will not conflict
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractReverseIPTagableVertex):
                 reverse_iptag = vertex.get_reverse_ip_tag()

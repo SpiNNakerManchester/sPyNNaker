@@ -1,15 +1,12 @@
-from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
-    AbstractIPTagableVertex
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
-class AbstractBufferSendableVertex(AbstractIPTagableVertex):
+class AbstractBufferSendableVertex():
 
-    def __init__(self, tag, port, address):
-        AbstractIPTagableVertex.__init__(self, tag, port, address)
+    def __init__(self):
         self._will_send_buffers = False
         self._size_of_buffer_to_read_in_bytes = None
 
@@ -38,10 +35,3 @@ class AbstractBufferSendableVertex(AbstractIPTagableVertex):
 
         :return:
         """
-
-    def is_ip_tagable_vertex(self):
-        """ helper method for is isntance
-
-        :return:
-        """
-        return True

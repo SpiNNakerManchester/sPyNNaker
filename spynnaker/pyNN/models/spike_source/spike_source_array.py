@@ -1,19 +1,19 @@
+import logging
+import os
+
 from spynnaker.pyNN.models.abstract_models.abstract_buffer_receivable_vertex import \
     AbstractBufferReceivableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_buffer_sendable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_sendable_vertex import \
     AbstractBufferSendableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
-
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-
-import logging
-import os
 import math
+
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +40,8 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex,
                                      _model_based_max_atoms_per_core,
                                      machine_time_step=machine_time_step)
         #set supers
-        AbstractBufferReceivableVertex.__init__(self, None, None, None)
-        AbstractBufferSendableVertex.__init__(self, None, None, None)
+        AbstractBufferReceivableVertex.__init__(self)
+        AbstractBufferSendableVertex.__init__(self)
 
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \

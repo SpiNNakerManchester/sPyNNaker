@@ -1,9 +1,9 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter

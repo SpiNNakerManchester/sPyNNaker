@@ -1,8 +1,9 @@
 import os
+from enum import Enum
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
@@ -12,8 +13,6 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from enum import Enum
-from spinnman.messages.eieio.eieio_prefix_type import EIEIOPrefixType
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 class LivePacketGather(
