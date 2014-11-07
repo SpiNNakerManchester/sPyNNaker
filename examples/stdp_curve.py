@@ -17,6 +17,7 @@ time_between_pairs = 1000
 num_pairs = 60
 start_w = 0.5
 delta_t = [-100, -60, -40, -30, -20, -10, -1, 1, 10, 20, 30, 40, 60, 100]
+start_time = 200
 
 #-------------------------------------------------------------------
 # Experiment loop
@@ -42,9 +43,11 @@ for t in delta_t:
     sim.setup(timestep=1.0, min_delay=1.0, max_delay=10.0)
 
     # Calculate phase of input spike trains, taking into account (dendritic) delay
+    # Pre after post
     if t > 0:
         post_phase = 0
-        pre_phase = 1 - t
+        pre_phase = t + 1
+    # Post after pre
     else:
         post_phase = -t
         pre_phase = 1
