@@ -57,14 +57,14 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         # so calculate min words to represent
         sub_vertex_out_spike_bytes_function = \
             lambda subvertex, subvertex_slice: int(ceil(
-                    subvertex_slice.n_atoms / 32.0)) * 4
+                subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
             graph_mapper=graph_mapper, placements=placements, transciever=txrx,
             compatible_output=compatible_output,
             sub_vertex_out_spike_bytes_function=
-                sub_vertex_out_spike_bytes_function,
+            sub_vertex_out_spike_bytes_function,
             spike_recording_region=
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
 
@@ -119,3 +119,9 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             synapse_io,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
+
+    def __str__(self):
+        return "{} with {} atoms".format(self._label, self.n_atoms)
+
+    def __repr__(self):
+        return self.__str__()

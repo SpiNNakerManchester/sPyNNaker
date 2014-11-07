@@ -158,7 +158,7 @@ class CommandSender(AbstractMultiCastSource):
         else:
             # if the subedge doesnt have any predefined messages to send,
             # then treat them with the subedge routing key
-            return subedge.key, self._app_mask
+            return subedge.key_combo, self._app_mask
 
     def reserve_memory_regions(self, spec, command_size):
         """
@@ -228,7 +228,7 @@ class CommandSender(AbstractMultiCastSource):
         """
         return the name of the model
         """
-        return "multi_cast_source"
+        return "command_sender_multi_cast_source"
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -248,5 +248,5 @@ class CommandSender(AbstractMultiCastSource):
                                                      "common_binary_folder"))
 
         binary_name = os.path.join(common_binary_path,
-                                   'command_sender.aplx')
+                                   'command_sender_multicast_source.aplx')
         return binary_name

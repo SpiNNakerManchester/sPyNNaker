@@ -15,6 +15,8 @@ setup(
               'spynnaker.pyNN.models.neural_projections.connectors',
               'spynnaker.pyNN.models.neural_properties',
               'spynnaker.pyNN.models.neural_properties.synapse_dynamics',
+              'spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules',
+              'spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences',
               'spynnaker.pyNN.models.spike_source',
               'spynnaker.pyNN.models.utility_models',
               'spynnaker.pyNN.overridden_pacman_functions',
@@ -25,6 +27,6 @@ setup(
     package_data={'spynnaker.pyNN': ['model_binaries/*.aplx'],
                   'spynnaker': ['spynnaker.cfg'],
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template']},
-    install_requires=['SpiNNMachine', 'SpiNNMan', 'PACMAN',
-            'DataSpecification', 'pyNN', 'numpy']
+    install_requires=['SpiNNMachine', 'SpiNNMan', 'SpiNNaker_PACMAN',
+            'SpiNNaker_DataSpecification', 'pyNN', 'numpy']
 )

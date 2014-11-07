@@ -90,14 +90,3 @@ POPULATION_BASED_REGIONS = Enum(
            ('SPIKE_HISTORY', 7),
            ('POTENTIAL_HISTORY', 8),
            ('GSYN_HISTORY', 9)])
-
-VISUALISER_MODES = Enum(
-    value="VISUALISER_MODES",
-    names=[("RASTER", 0),
-           ("TOPOLOGICAL", 1)])
-
-
-PREFIX_TYPE = Enum(
-    value="PREFIX_TYPE",
-    names=[("LOWER_HALF_WORD", 0),
-           ("UPPER_HALF_WORD", 1)])

@@ -1,12 +1,35 @@
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
+    abstract_time_dependency import AbstractTimeDependency
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
+    abstract_voltage_dependency import AbstractVoltageDependency
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
+    abstract_weight_dependency import AbstractWeightDependency
+
+
 class STDPMechanism(object):
+
     def __init__(self, timing_dependence=None, weight_dependence=None,
                  voltage_dependence=None):
-        self.timing_dependence = timing_dependence
+        if timing_dependence is not None and \
+                not isinstance(timing_dependence, AbstractTimeDependency):
+            raise exceptions.ConfigurationException(
+                "The timing dependency handed is not a supported time "
+                "dependency. Please rectify and try again")
+        if weight_dependence is not None and \
+                not isinstance(weight_dependence, AbstractWeightDependency):
+            raise exceptions.ConfigurationException(
+                "The weight dependency handed is not a supported weight "
+                "dependency. Please rectify and try again")
+        if voltage_dependence is not None and \
+                not isinstance(voltage_dependence, AbstractVoltageDependency):
+            raise exceptions.ConfigurationException(
+                "The voltage dependency handed is not a supported voltage "
+                "dependency. Please rectify and try again")
+
         self.weight_dependence = weight_dependence
+        self.timing_dependence = timing_dependence
         self.voltage_dependence = voltage_dependence
-        
-        if self.voltage_dependence is not None:
-            raise NotImplementedError("voltage_dependence not implemented")
 
     def __eq__(self, other):
         if (other is None) or (not isinstance(other, self.__class__)):
@@ -57,10 +80,12 @@ class STDPMechanism(object):
 
         # Write weight dependence information to region
         if self.weight_dependence is not None:
-            self.weight_dependence.write_plastic_params(spec, machine_time_step, weight_scale)
+            self.weight_dependence.write_plastic_params(spec, machine_time_step,
+                                                        weight_scale)
 
         if self.timing_dependence is not None:
-            self.timing_dependence.write_plastic_params(spec, machine_time_step, weight_scale)
+            self.timing_dependence.write_plastic_params(spec, machine_time_step,
+                                                        weight_scale)
 
     # **TEMP** timing and weight components should be able to contribute their 
     # own components

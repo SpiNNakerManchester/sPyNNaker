@@ -33,7 +33,7 @@ class SpynnakerConfiguration(object):
         self._runtime = None
 
         #specific utility vertexes
-        self._live_spike_recorder = None
+        self._live_spike_recorder = dict()
         self._multi_cast_vertex = None
         self._txrx = None
 
@@ -63,7 +63,7 @@ class SpynnakerConfiguration(object):
         self._key_allocator_algorithm = None
         self._router_algorithm = None
         self._report_default_directory = None
-        self.this_run_time_string_repenstation = None
+        self._this_run_time_string_repenstation = None
 
         #exeuctable params
         self._do_load = None
@@ -79,12 +79,7 @@ class SpynnakerConfiguration(object):
             config.get("Reports", "defaultApplicationDataFilePath")
         created_folder = False
         if where_to_write_application_data_files == "DEFAULT":
-            exceptions_path = \
-                os.path.abspath(exceptions.__file__)
-            directory = \
-                os.path.abspath(os.path.join(exceptions_path,
-                                             os.pardir, os.pardir, os.pardir))
-            #global folder
+            directory = os.getcwd()
             application_generated_data_file_folder = \
                 os.path.join(directory, 'application_generated_data_files')
             if not os.path.exists(application_generated_data_file_folder):
@@ -108,7 +103,7 @@ class SpynnakerConfiguration(object):
             writer = open(time_of_run_file_name, "w")
             writer.writelines("app_{}_{}"
                               .format(self._app_id,
-                                      self.this_run_time_string_repenstation))
+                                      self._this_run_time_string_repenstation))
             writer.flush()
             writer.close()
 
@@ -119,13 +114,27 @@ class SpynnakerConfiguration(object):
             pass  # just dont set the config param, code downstairs
             #  from here will create temp folders if needed
         else:
-            #add time stamped folder for this run
             this_run_time_folder = \
-                os.path.join(where_to_write_application_data_files,
-                             self.this_run_time_string_repenstation)
+                os.path.join(where_to_write_application_data_files, "latest")
             if not os.path.exists(this_run_time_folder):
                 os.makedirs(this_run_time_folder)
-            config.add_section("SpecGeneration")
+            else:
+                self._move_report_and_binary_files(
+                    config.getint("Reports", "max_application_binaries_kept"),
+                    where_to_write_application_data_files)
+
+            #store timestamp in latest/time_stamp
+            time_of_run_file_name = os.path.join(this_run_time_folder,
+                                                 "time_stamp")
+            writer = open(time_of_run_file_name, "w")
+            writer.writelines("app_{}_{}"
+                              .format(self._app_id,
+                                      self._this_run_time_string_repenstation))
+
+            if not os.path.exists(this_run_time_folder):
+                os.makedirs(this_run_time_folder)
+            if not config.has_section("SpecGeneration"):
+                config.add_section("SpecGeneration")
             config.set("SpecGeneration", "Binary_folder", this_run_time_folder)
 
     def _set_up_report_specifics(self):
@@ -137,17 +146,17 @@ class SpynnakerConfiguration(object):
         config_param = config.get("Reports", "defaultReportFilePath")
         created_folder = False
         if config_param == "DEFAULT":
-            exceptions_path = \
-                os.path.abspath(exceptions.__file__)
-            directory = \
-                os.path.abspath(os.path.join(exceptions_path,
-                                             os.pardir, os.pardir, os.pardir))
+            directory = os.getcwd()
 
             #global reports folder
             self._report_default_directory = os.path.join(directory, 'reports')
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
                 created_folder = True
+        elif config_param == "REPORTS":
+            self._report_default_directory = 'reports'
+            if not os.path.exists(self._report_default_directory):
+                os.makedirs(self._report_default_directory)
         else:
             self._report_default_directory = \
                 os.path.join(config_param, 'reports')
@@ -171,12 +180,12 @@ class SpynnakerConfiguration(object):
 
         # determine the time slot for later
         this_run_time = datetime.datetime.now()
-        self.this_run_time_string_repenstation = \
+        self._this_run_time_string_repenstation = \
             str(this_run_time.date()) + "-" + str(this_run_time.hour) + "-" + \
             str(this_run_time.minute) + "-" + str(this_run_time.second)
         writer.writelines("app_{}_{}"
                           .format(self._app_id,
-                                  self.this_run_time_string_repenstation))
+                                  self._this_run_time_string_repenstation))
         writer.flush()
         writer.close()
         self._report_default_directory = app_folder_name

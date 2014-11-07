@@ -1,9 +1,13 @@
 #pacman imports
+from data_specification.interfaces.data_generator_interface import \
+    DataGeneratorInterface
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
+from pacman.operations.router_check_functionality.valid_routes_checker import \
+    ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
@@ -25,7 +29,6 @@ from spinn_machine.chip import Chip
 
 
 #internal imports
-from spinnman.messages.scp.scp_signal import SCPSignal
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
@@ -37,8 +40,8 @@ from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
-from spynnaker.pyNN.models.utility_models.live_spike_recorder\
-    import LiveSpikeRecorder
+from spynnaker.pyNN.models.utility_models.live_packet_gather\
+    import LivePacketGather
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
@@ -46,14 +49,18 @@ from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
 
-#spinnman inports
+#spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
+from spinnman.messages.scp.scp_signal import SCPSignal
+from spinnman.model.iptag.reverse_iptag import ReverseIPTag
+#from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 import logging
 import math
 import sys
 import time
+from multiprocessing.pool import ThreadPool
 
 logger = logging.getLogger(__name__)
 
@@ -88,9 +95,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def run(self, run_time):
         self._setup_interfaces(hostname=self._hostname)
-        #extract iptags required by the graph
-        self._set_iptags()
-        self._set_reverse_ip_tags()
 
         #set up vis if needed
         if conf.config.getboolean("Visualiser", "enable"):
@@ -146,6 +150,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if do_timing:
             timer.take_sample()
 
+        #extract iptags required by the graph
+        self._set_iptags()
+        self._set_reverse_ip_tags()
+
         #execute data spec generation
         if do_timing:
             timer.start_timing()
@@ -163,6 +171,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 conf.config.getboolean("SpecExecution", "specExecOnHost"),
                 self._hostname, self._placements, self._graph_mapper)
 
+        if self._reports_states is not None:
+            reports.write_memory_map_report(self._report_default_directory,
+                                            processor_to_app_data_base_address)
+
         #engage vis if requested
         if do_timing:
             timer.take_sample()
@@ -174,6 +186,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             if do_timing:
                 timer.start_timing()
 
+            logger.info("*** Loading Iptags ***")
+            self._load_iptags()
+            logger.info("*** Loading Reverse Iptags***")
+            self._load_reverse_ip_tags()
+
             if self._do_load is True:
                 logger.info("*** Loading data ***")
                 self._load_application_data(
@@ -182,10 +199,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._app_id)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
-                logger.info("*** Loading Iptags ***")
-                self._load_iptags()
-                logger.info("*** Loading Reverse Iptags***")
-                self._load_reverse_ip_tags()
             if do_timing:
                 timer.take_sample()
 
@@ -232,7 +245,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 if reverse_iptag.tag is not None:
                     if reverse_iptag.tag > self._current_max_tag_value:
                         self._current_max_tag_value = reverse_iptag.tag
-                self._add_reverse_tag(reverse_iptag)
+                    reverse_iptag = self._create_reverse_iptag_from_iptag(
+                        reverse_iptag, vertex)
+                    self._add_reverse_tag(reverse_iptag)
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractReverseIPTagableVertex):
                 reverse_iptag = vertex.get_reverse_ip_tag()
@@ -240,7 +255,24 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     reverse_iptag.set_tag(self._current_max_tag_value + 1)
                     vertex.set_reverse_iptag_tag(self._current_max_tag_value + 1)
                     self._current_max_tag_value += 1
-                    self._add_iptag(reverse_iptag)
+                    reverse_iptag = self._create_reverse_iptag_from_iptag(
+                        reverse_iptag, vertex)
+                    self._add_reverse_tag(reverse_iptag)
+
+    def _create_reverse_iptag_from_iptag(self, reverse_iptag, vertex):
+        subverts = self._graph_mapper.get_subvertices_from_vertex(vertex)
+        if len(subverts) > 1:
+            raise exceptions.ConfigurationException(
+                "reverse iptaggable populations can only be supported if they"
+                " are partitoned in a 1 to 1 ratio. Please reduce the number "
+                "of neurons per core, or the max-atoms per core to support a "
+                "one core mapping for your iptaggable population.")
+        subvert = next(iter(subverts))
+        placement = self._placements.get_placement_of_subvertex(subvert)
+        return ReverseIPTag(
+            port=reverse_iptag.port, tag=reverse_iptag.tag,
+            destination_x=placement.x, destination_y=placement.y,
+            destination_p=placement.p)
 
     @property
     def app_id(self):
@@ -278,6 +310,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def graph_mapper(self):
         return self._graph_mapper
 
+    @property
+    def routing_infos(self):
+        return self._routing_infos
+
     def set_app_id(self, value):
         self._app_id = value
 
@@ -304,7 +340,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #execute pynn subedge pruning
         self._partitioned_graph, self._graph_mapper = \
-            GraphEdgeFilter().run(self._partitioned_graph, self._graph_mapper)
+            GraphEdgeFilter(self._report_default_directory)\
+            .run(self._partitioned_graph, self._graph_mapper)
 
         #execute key allocator
         self._execute_key_allocator(pacman_report_state)
@@ -341,6 +378,15 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._router_algorithm.route(
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
+
+        if conf.config.get("Mode", "mode") == "Debug":
+            #check that all routes are valid and no cycles exist
+            valid_route_checker = ValidRouteChecker(
+                placements=self._placements, routing_infos=self._routing_infos,
+                routing_tables=self._router_tables,
+                partitioned_graph=self._partitioned_graph,
+                machine=self._machine)
+            valid_route_checker.validate_routes()
 
         if pacman_report_state is not None and \
                 pacman_report_state.router_report:
@@ -399,22 +445,24 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def generate_data_specifications(self):
         #iterate though subvertexes and call generate_data_spec for each vertex
         executable_targets = dict()
+        no_processors = conf.config.getint("Threading", "dsg_threads")
+        thread_pool = ThreadPool(processes=no_processors)
 
         #create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
-
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
-                associated_vertex.generate_data_spec(
-                    placement.subvertex, placement, self._partitioned_graph,
-                    self._partitionable_graph, self._routing_infos,
-                    self._hostname, self._graph_mapper,
-                    self._report_default_directory)
+                data_generator_interface = DataGeneratorInterface(
+                    associated_vertex, placement.subvertex, placement,
+                    self._partitioned_graph, self._partitionable_graph,
+                    self._routing_infos, self._hostname, self._graph_mapper,
+                    self._report_default_directory, progress_bar)
+                thread_pool.apply_async(data_generator_interface.start())
 
                 binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():
@@ -428,22 +476,25 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     list_of_core_subsets = [initial_core_subset]
                     executable_targets[binary_name] = \
                         CoreSubsets(list_of_core_subsets)
-            #update the progress bar
-            progress_bar.update()
+
+        thread_pool.close()
+        thread_pool.join()
         #finish the progress bar
         progress_bar.end()
         return executable_targets
 
     def start_visualiser(self):
-        """starts the port listener and ties it to the visualiser_framework pages as
-         required
+        """starts the port listener and ties it to the visualiser_framework
+         pages as required
         """
        #register a listener at the trasnciever for each visualised vertex
         for vertex in self._visualiser_vertices:
             if vertex in self._visualiser_vertex_to_page_mapping.keys():
                 associated_page = self._visualiser_vertex_to_page_mapping[vertex]
-                self._txrx.register_listener(associated_page.recieved_spike(),
-                                             self._hostname)
+                self._txrx.register_listener(
+                    associated_page.recieved_spike, vertex.receieve_port_no,
+                    vertex.hostname, vertex.connection_type,
+                    vertex.traffic_type)
         self._visualiser.start()
 
     def add_vertex(self, vertex_to_add):
@@ -488,27 +539,19 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step)
 
-    def add_edge_to_recorder_vertex(self, vertex_to_record_from):
-        #check to see if it needs to be created in the frist place
-        if self._live_spike_recorder is None:
-            port = None
-            if conf.config.has_option("Recording", "live_spike_port"):
-                port = conf.config.getint("Recording", "live_spike_port")
-            hostname = "localhost"
-            if conf.config.has_option("Recording", "live_spike_host"):
-                hostname = conf.config.get("Recording", "live_spike_host")
-            tag = None
-            if conf.config.has_option("Recording", "live_spike_tag"):
-                tag = conf.config.getint("Recording", "live_spike_tag")
-            if tag is None:
-                raise exceptions.ConfigurationException(
-                    "Target tag for live spikes has not been set")
-            self._live_spike_recorder = \
-                LiveSpikeRecorder(self.machine_time_step, tag, port, hostname)
-            self.add_vertex(self._live_spike_recorder)
+    def add_edge_to_recorder_vertex(self, vertex_to_record_from, port,
+                                    hostname, tag):
+
+        #locate the live spike recorder
+        if port in self._live_spike_recorder.keys():
+            live_spike_recorder = self._live_spike_recorder[port]
+        else:
+            live_spike_recorder = \
+                LivePacketGather(self.machine_time_step, tag, port, hostname)
+            self.add_vertex(live_spike_recorder)
         #create the edge and add
         edge = PartitionableEdge(vertex_to_record_from,
-                                 self._live_spike_recorder, "recorder_edge")
+                                 live_spike_recorder, "recorder_edge")
         self.add_edge(edge)
 
     def add_visualiser_vertex(self, visualiser_vertex_to_add):

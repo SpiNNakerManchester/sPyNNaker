@@ -15,7 +15,9 @@ class ChipPage(AbstractPage):
 
     def __init__(self, chip, chip_placements, router_table, graph_mapper,
                  window_based=True):
-        AbstractPage.__init__(self)
+        AbstractPage.__init__(self,
+                              gtk.Label("chip Page {}:{}".format(chip.x,
+                                                                 chip.y)))
         self._chip = chip
         self._router_table = router_table
         self._coords = chip.get_coords()
@@ -36,37 +38,41 @@ class ChipPage(AbstractPage):
                                                 self._coords[1]))
             chip_window.show()
             #add notebook for tabs of routing, cores,
-            chip_pages = gtk.Notebook()
-            chip_window.add(chip_pages)
-            self._initilise_nootbook(chip_pages)
+            self._chip_pages = gtk.Notebook()
+            chip_window.add(self._chip_pages)
+            self._initilise_nootbook(self._chip_pages)
             self._core_table = gtk.Table(4, 5, True)
             self._core_table.show()
-            chip_pages.append_page(self._core_table, gtk.Label("cores"))
+            self._chip_pages.append_page(self._core_table, gtk.Label("cores"))
 
-        else:  # is in a page of some other window's tabs
-            chip_page = gtk.Frame("")
-            chip_page.show()
+        else:  # is in a _page of some other window's tabs
+            self._chip_page = gtk.Frame("")
+            self._chip_page.show()
             # still needs its own tabs in a nested fashion
-            chip_pages = gtk.Notebook()
-            chip_page.add(chip_pages)
-            self._initilise_nootbook(chip_pages)
-            chip_page = gtk.Frame("cores")
-            chip_page.show()
-            chip_pages.append_page(chip_page, gtk.Label("cores"))
+            self._chip_pages = gtk.Notebook()
+            self._chip_page.add(self._chip_pages)
+            self._initilise_nootbook(self._chip_pages)
+            self._chip_page = gtk.Frame("cores")
+            self._chip_page.show()
+            self._chip_pages.append_page(self._chip_page, gtk.Label("cores"))
             self._core_table = gtk.Table(4, 3, True)
-            chip_page.add(self._core_table)
+            self._chip_page.add(self._core_table)
         self._core_table.show()
         self._update_table(ChipPage.LOGICAL_VIEW)
-        #create a routing page which contains routing entries
+        #create a routing _page which contains routing entries
         routing_page = gtk.ScrolledWindow(hadjustment=None, vadjustment=None)
         routing_page.set_policy(gtk.POLICY_NEVER, gtk.POLICY_ALWAYS)
         routing_page.show()
-        chip_pages.append_page(routing_page, gtk.Label("routing entries"))
+        self._chip_pages.append_page(routing_page, gtk.Label("routing entries"))
         #locate the router table for this chip
         self._update_routing_table_page(routing_page, self._router_table)
 
     def is_page(self):
         return not self._window_based
+
+    @property
+    def get_frame(self):
+        return self._chip_page
 
     @staticmethod
     def _initilise_nootbook(chip_pages):
@@ -109,7 +115,7 @@ class ChipPage(AbstractPage):
 
         for router_key in chip_router_table.keys():
             index_label = gtk.Label("{}".format(position - 1))
-            key = int(chip_router_table[router_key][0].key)
+            key = int(chip_router_table[router_key][0].key_combo)
             mask = int(chip_router_table[router_key][0].mask)
             route = int(chip_router_table[router_key][0].route)
             core_id = "({%d}, {%d}, {%d})".format((key >> 24 & 0xFF),

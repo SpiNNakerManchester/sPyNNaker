@@ -58,6 +58,11 @@ bool system_header_filled (uint32_t* address, uint32_t* version, uint32_t flags)
   return (true);
 }
 
+void system_load_params(address_t address) {
+  timer_period = address[1];
+  simulation_ticks = address[2];
+}
+
 bool system_data_filled (address_t address, uint32_t flags,
                          uint32_t *spike_history_recording_region_size, uint32_t *neuron_potentials_recording_region_size, uint32_t *neuron_gsyns_recording_region_size)
 {
@@ -151,7 +156,3 @@ address_t region_start (uint32_t n, address_t address)
 address_t configuration_reader_offset(address_t address, uint32_t offset)
 { return (& address[address[offset] >> 2]); }
 
-void system_load_params(address_t address) {
-  timer_period = address[1];
-  simulation_ticks = address[2];
-}

@@ -1,13 +1,13 @@
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge import \
     ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_projection_subedge import \
-    DelayProjectionSubedge
+from spynnaker.pyNN.models.neural_projections.delay_partitioned_projection import \
+    DelayPartitionedProjection
 
 import logging
 logger = logging.getLogger(__name__)
 
 
-class DelayProjectionEdge(ProjectionPartitionableEdge):
+class DelayPartitionableEdge(ProjectionPartitionableEdge):
 
     _DELAY_PAGE_SIZE = 256
     
@@ -30,7 +30,7 @@ class DelayProjectionEdge(ProjectionPartitionableEdge):
     def max_delay_per_neuron(self):
         return self._max_delay_per_neuron
         
-    def get_max_n_words(self, lo_atom=None, hi_atom=None):
+    def get_max_n_words(self, vertex_slice=None):
         """
         Gets the maximum number of words for a subvertex at the end of the
         connection
@@ -39,8 +39,7 @@ class DelayProjectionEdge(ProjectionPartitionableEdge):
         :param hi_atom: The end of the range of atoms in 
                                    the subvertex (default is last atom)
         """
-        return max([self._synapse_row_io.get_n_words(synapse_row, lo_atom,
-                                                     hi_atom)
+        return max([self._synapse_row_io.get_n_words(synapse_row, vertex_slice)
                     for synapse_row in self._synapse_list.get_rows()])
         
     def get_n_rows(self):
@@ -56,4 +55,4 @@ class DelayProjectionEdge(ProjectionPartitionableEdge):
         """
         Creates a subedge from this edge
         """
-        return DelayProjectionSubedge(self, presubvertex, postsubvertex, self)
+        return DelayPartitionedProjection(presubvertex, postsubvertex)

@@ -3,7 +3,6 @@ Synfirechain-like example
 """
 #!/usr/bin/python
 import os
-print os.environ["PYTHONPATH"]
 import spynnaker.pyNN as p
 #import pyNN.spiNNaker as p
 import numpy, pylab
@@ -62,7 +61,7 @@ projections.append(p.Projection(populations[1], populations[0], p.FromListConnec
 
 populations[0].record_v()
 populations[0].record_gsyn()
-populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER)
+populations[0].record()
 
 run_time = 100
 print "Running for {} ms".format(run_time)
@@ -115,4 +114,4 @@ if gsyn != None:
                 [i[2] for i in gsyn_for_neuron])
     pylab.show()
 
-#p.end()
+p.end()
