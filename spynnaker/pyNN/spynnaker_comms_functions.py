@@ -13,7 +13,6 @@ from spinn_machine.virutal_machine import VirtualMachine
 
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.cpu_state import CPUState
-from spinnman.model.iptag.iptag import IPTag
 from spinnman.transceiver import create_transceiver_from_hostname
 from spinnman.data.file_data_reader import FileDataReader \
     as SpinnmanFileDataReader
@@ -79,9 +78,9 @@ class SpynnakerCommsFunctions(object):
             if machine_version is None:
                 raise exceptions.ConfigurationException(
                     "Please set a machine version number in the configuration "
-                    "file (spynnaker.cfg or pacman.cfg)")
+                    "file (pacman.cfg or pacman.cfg)")
             self._txrx.ensure_board_is_ready(int(machine_version))
-            self._txrx.discover_connections()
+            self._txrx.discover_scamp_connections()
             self._machine = self._txrx.get_machine_details()
         else:
             virtual_x_dimension = conf.config.get("Machine",

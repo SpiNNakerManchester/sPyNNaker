@@ -69,8 +69,8 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         """
         return self._synapse_row_io
 
-    def get_synaptic_list_from_machine(self, graph_mapper, placements,
-                                       transceiver):
+    def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
+                                       placements, transceiver, routing_infos):
         """
         Get synaptic data for all connections in this Projection from the
         machine.
@@ -78,9 +78,9 @@ class ProjectionPartitionableEdge(PartitionableEdge):
 
         logger.debug("Reading synapse data for edge between {} and {}"
                      .format(self._pre_vertex.label, self._post_vertex.label))
-        min_delay = config.get("Model", "min_delay")
         sorted_subedges = \
-            sorted(graph_mapper.get_partitioned_edges_from_partitionable_edge(self),
+            sorted(graph_mapper.
+                   get_partitioned_edges_from_partitionable_edge(self),
                    key=lambda sub_edge:
                    (graph_mapper.get_subvertex_slice(
                        sub_edge.pre_subvertex).lo_atom,
@@ -103,8 +103,8 @@ class ProjectionPartitionableEdge(PartitionableEdge):
                 subedge.post_subvertex,
                 constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
                 constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-                self._synapse_row_io, subedge.weight_scale)\
-                .get_rows()
+                self._synapse_row_io, partitioned_graph, graph_mapper,
+                routing_infos, subedge.weight_scale).get_rows()
 
             pre_lo_atom = vertex_slice.lo_atom
             if ((last_pre_lo_atom is None) or

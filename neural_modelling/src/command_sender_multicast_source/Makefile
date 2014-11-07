@@ -23,7 +23,7 @@
 
 # Name of app (derived from C source - eg sark.c)
 
-APP = multicast_source$(EXT)
+APP = command_sender_multicast_source$(EXT)
 DIRS = ..
 BUILDDIR = build
 DEBUG = PRODUCTION_CODE
@@ -41,7 +41,7 @@ CFLAGS += -Wall -Wextra -D$(DEBUG) -Ofast
 # in the application, add their object file names to this variable.
 
 
-OBJECTS = multicast_source.o ../common/spin1-api-configuration.o ../common/configuration.o
+OBJECTS = command_sender_multicast_source.o ../common/spin1-api-configuration.o ../common/configuration.o
 
 # Include common make file stuff
 include ../Makefile.depend

@@ -1,8 +1,4 @@
-from visualiser_framework.visualiser_thread import VisualiserThread
-from spynnaker.pyNN.visualiser_package.visualiser_pages.machine_page \
-    import MachinePage
-from spynnaker.pyNN.visualiser_package.visualiser_pages.configuration_page \
-    import ConfigPage
+from spynnaker.pyNN.visualiser_package.visualiser_thread import VisualiserThread
 from spynnaker.pyNN.utilities import conf
 
 
@@ -27,22 +23,12 @@ class VisualiserCreationUtility(object):
             #visualiser_framework = VisualiserThread(has_board)
             pages = list()
             #create basic pages required
-            #add basic machine page
-            machine_page = MachinePage(True, scope, machine, placements,
-                                       router_tables, graph_mapper)
-            pages.append(machine_page)
-            #visualiser_framework.add_page(machine_page, machine_page.label)
-            machine_page.show()
-            #add configuration page
-            config_page = ConfigPage(visualiser_vertex_to_page_mapping,
-                                     visualiser_vertices, graph, visualiser,
-                                     transceiver, has_board, sim_run_time,
-                                     machine_time_step, subgraph, placements,
-                                     graph_mapper)
-            config_page.show()
-            pages.append(config_page)
+
             #visualiser_framework.add_page(config_page, config_page.label)
-            visualiser = VisualiserThread(has_board, pages=pages)
+            visualiser = VisualiserThread(
+                visualiser_vertex_to_page_mapping, visualiser_vertices, graph,
+                visualiser, transceiver, sim_run_time, machine_time_step,
+                subgraph, placements, graph_mapper, has_board=has_board)
             if wait_for_run:  # add run now button if required
                 visualiser.add_menu_item("Run Now!", self._run_item_selected)
 

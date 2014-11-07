@@ -13,12 +13,15 @@ from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
+from spynnaker.pyNN.models.neural_properties import master_pop_table_generators
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
-
+from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities import conf
+#pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
@@ -37,6 +40,15 @@ class AbstractSynapticManager(object):
     def __init__(self):
         self._stdp_checked = False
         self._stdp_mechanism = None
+        self._master_pop_table_generator = None
+        algorithum_id = \
+            "MasterPopTableAs" + \
+            conf.config.get("MasterPopTable", "generator")
+
+        algorithum_list = \
+            conf.get_valid_components(master_pop_table_generators,
+                                      "master_pop_table_as")
+        self._master_pop_table_generator = algorithum_list[algorithum_id]()
 
     @staticmethod
     def write_synapse_row_info(sublist, row_io, spec, current_write_ptr,
@@ -458,8 +470,8 @@ class AbstractSynapticManager(object):
                     self.select_minimum_row_length(max_row_length)
                 if max_row_length == 0 or row_length == 0:
                     raise exceptions.SynapticBlockGenerationException(
-                        "generated a row length of zero, this is deemed an error"
-                        " and therefore the system will stop")
+                        "generated a row length of zero, this is deemed an "
+                        "error and therefore the system will stop")
 
                 # Write the synaptic block for the sublist
                 (block_start_addr, next_block_start_addr) = \
@@ -472,69 +484,23 @@ class AbstractSynapticManager(object):
                     raise exceptions.SynapticBlockGenerationException(
                         "Too much synapse memory consumed (used {} of {})!"
                         .format(next_block_start_addr - 1, all_syn_block_sz))
-                self.update_master_population_table(spec, block_start_addr,
-                                                    row_index, key,
-                                                    master_pop_table_region)
-
-    @staticmethod
-    def update_master_population_table(spec, block_start_addr, row_index,
-                                       key, master_pop_table_region):
-        """
-        Writes an entry in the Master Population Table for the newly
-        created synaptic block.
-        An entry in the table is a 16-bit value, with the following structure:
-        Bits [2:0]  Row length information. This value (from 0->7)
-                    indicates the maximum number of synapses in this
-                    block. It is translated in the row length translation
-                    table by the executing code each time the table is
-                    accessed, to calculate offsets.
-        Bits [15:3] Address within the synaptic matrix region of the
-                    start of the block. This is 1K bytes aligned, so
-                    the true value is found by shifting left by 7 bits
-                    then adding the start address of the memory region.
-        """
-        # Which core has this projection arrived from?
-        x = packet_conversions.get_x_from_key(key)
-        y = packet_conversions.get_y_from_key(key)
-        # the plus one in p calc is due to the router table subtracting one off
-        # its routing key for p (also due to unknown reasons). As the c code
-        # compenstates for it, we also need to
-        p = packet_conversions.get_p_from_key(key)
-        # Calculate the index into the master pynn_population.py table for
-        # a projection from the given core:
-        table_slot_addr = \
-            packet_conversions.get_mpt_sb_mem_addrs_from_coords(x, y, p)
-        # What is the write address in the table for this index?
-
-        spec.comment("\nUpdate entry in master pynn_population.py table for i"
-                     "ncoming connection from {}, {}, {}:\n".format(x, y, p))
-
-        # Process start address (align to 1K boundary then shift right by 10 and
-        # left by 3 (i.e. 7) to make it the top 13-bits of the field):
-        if (block_start_addr & 0x3FF) != 0:
-            raise exceptions.SynapticBlockGenerationException(
-                "Synaptic Block start address is not aligned to a 1K boundary")
-        assert (block_start_addr < math.pow(2, 32))
-        #moves by 7 to tack on at the end the row_length information
-        # which resides in the last 3 bits
-        entry_addr_field = block_start_addr >> 7
-        # Assembly entry:
-        new_entry = entry_addr_field | row_index
-
-        # Write entry:
-        spec.switch_write_focus(region=master_pop_table_region)
-        spec.set_write_pointer(address=table_slot_addr)
-        spec.write_value(data=new_entry, data_type=DataType.INT16)
+                self._master_pop_table_generator.\
+                    update_master_population_table(
+                        spec, block_start_addr, row_index, key,
+                        master_pop_table_region)
+        self._master_pop_table_generator.finish_master_pop_table(
+            spec, master_pop_table_region)
 
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
             post_subvertex, master_pop_table_region, synaptic_matrix_region,
-            synapse_io, weight_scale):
+            synapse_io, subgraph, graph_mapper, routing_infos, weight_scale):
 
         synaptic_block, max_row_length = \
             self._retrieve_synaptic_block(
                 placements, transceiver, pre_subvertex, pre_n_atoms,
-                post_subvertex, master_pop_table_region, synaptic_matrix_region)
+                post_subvertex, master_pop_table_region, synaptic_matrix_region,
+                routing_infos, subgraph)
         #translate the synaptic block into a sublist of synapse_row_infos
         synapse_list = \
             self._translate_synaptic_block_from_memory(
@@ -618,7 +584,8 @@ class AbstractSynapticManager(object):
     def _retrieve_synaptic_block(self, placements, transceiver,
                                  pre_subvertex, pre_n_atoms,
                                  post_subvertex, master_pop_table_region,
-                                 synaptic_matrix_region):
+                                 synaptic_matrix_region, routing_infos,
+                                 subgraph):
         """
         reads in a synaptic block from a given processor and subvertex on the
         machine.
@@ -628,28 +595,27 @@ class AbstractSynapticManager(object):
             post_placement.x, post_placement.y, post_placement.p
         # either read in the master pop table or retrieve it from storage
         master_pop_base_mem_address, app_data_base_address = \
-            self._read_in_master_pop_table(post_x, post_y, post_p, transceiver,
-                                           master_pop_table_region)
+            self._master_pop_table_generator.\
+            locate_master_pop_table_base_address(
+                post_x, post_y, post_p, transceiver, master_pop_table_region)
 
         # locate address of the synaptic block
         pre_placement = placements.get_placement_of_subvertex(pre_subvertex)
-        pre_x, pre_y, pre_p = pre_placement.x, pre_placement.y, pre_placement.p
-        table_slot_addr = packet_conversions.\
-            get_mpt_sb_mem_addrs_from_coords(pre_x, pre_y, pre_p)
-        master_table_pop_entry_address = (table_slot_addr +
-                                          master_pop_base_mem_address)
-        #read in the master pop entry
-        master_pop_entry = \
-            self._read_and_convert(post_x, post_y,
-                                   master_table_pop_entry_address, 2, "<H",
-                                   transceiver)
 
-        synaptic_block_base_address = master_pop_entry >> 3  # in kilobytes
-        #convert synaptic_block_base_address into bytes from kilobytes
-        synaptic_block_base_address_offset = synaptic_block_base_address << 10
-        max_row_length_index = master_pop_entry & 0x7
-        #retrieve the max row length
-        maxed_row_length = constants.ROW_LEN_TABLE_ENTRIES[max_row_length_index]
+        pre_x, pre_y, pre_p = pre_placement.x, pre_placement.y, pre_placement.p
+
+        incoming_edges = \
+            subgraph.incoming_subedges_from_subvertex(post_subvertex)
+        incoming_key_combo = None
+        for subedge in incoming_edges:
+            if subedge.pre_subvertex == pre_subvertex:
+                routing_info = routing_infos.get_subedge_information_from_subedge(subedge)
+                incoming_key_combo = routing_info.key_mask_combo
+
+        maxed_row_length, synaptic_block_base_address_offset = \
+            self._master_pop_table_generator.\
+            extract_synaptic_matrix_data_location(
+                incoming_key_combo, master_pop_base_mem_address)
 
         #calculate the synaptic block size in words
         synaptic_block_size = pre_n_atoms * 4 * \
@@ -661,9 +627,10 @@ class AbstractSynapticManager(object):
                                            synaptic_matrix_region)
 
         # read in the memory address of the synaptic_region base address
-        synapste_region_base_address = self._read_and_convert(
-            post_x, post_y, synapste_region_base_address_location, 4,
-            "<I", transceiver)
+        synapste_region_base_address = \
+            self._master_pop_table_generator.read_and_convert(
+                post_x, post_y, synapste_region_base_address_location, 4,
+                "<I", transceiver)
         # the base address of the synaptic block in absolute terms is the app
         # base, plus the synaptic matrix base plus the offset
         synaptic_block_base_address = \

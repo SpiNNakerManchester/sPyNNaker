@@ -6,7 +6,7 @@ from spynnaker.pyNN.visualiser_package.visualiser_pages.topological_page\
     import TopologicalPage
 from spynnaker.pyNN.utilities import conf
 
-import visualiser_framework.visualiser_constants as visualiser_modes
+from visualiser_framework.visualiser_constants import VISUALISER_MODES
 from visualiser_framework.abstract_page import AbstractPage
 
 logger = logging.getLogger(__name__)
@@ -23,14 +23,13 @@ class ConfigPage(AbstractPage):
     def __init__(self, vertex_mapper, visualiser_vertexes, graph,
                  container, transciever, has_board, sim_runtime,
                  machine_time_step, subgraph, placements, graph_mapper):
-        AbstractPage.__init__(self)
+        AbstractPage.__init__(self, gtk.Label("Config Page"))
         self._vertex_mapper = vertex_mapper
         self._drop_box_mapper = dict()
         self._raster_combo_box_selection = dict()
         self._main_combo_box_selection = dict()
-        #set name of page
-        self._label = "population_config_page"
-        self._config_page = gtk.Frame(self._label)
+        #set name of _page
+        self._config_page = gtk.Frame("population_config_page")
         self._container = container
         self._transciever = transciever
         self._has_board = has_board
@@ -49,13 +48,21 @@ class ConfigPage(AbstractPage):
         self._table.set_col_spacings(0)
         self._table.set_row_spacings(0)
         self._config_page.add(self._table)
+        self._other_pages = list()
+
+    def get_other_pages(self):
+        return self._other_pages
+
+    def add_vertex(self):
         #add the vertex to the table
         self._add_vertexes()
-
         self._config_page.show_all()
-        
+
     def is_page(self):
         return False
+
+    def get_frame(self):
+        return self._config_page
 
     @property
     def label(self):
@@ -93,20 +100,21 @@ class ConfigPage(AbstractPage):
         liststore.append([self.NOT_SET_TEXT])
         # set model and connect tro response method
         combo_box.set_model(liststore)
-        combo_box.connect('changed', self._changed_main_cb)
         self._add_to_mapper(combo_box, vertex, position, 1)
         self._table.attach(combo_box, 1, 2, position, position+1)
         #set active value to the one from defaults
         mode = vertex.visualiser_mode
-        if mode == visualiser_modes.RASTER:
+        if mode == VISUALISER_MODES.RASTER:
             self._main_combo_box_selection[position] = 0
             combo_box.set_active(0)
-        elif mode == visualiser_modes.TOPOLOGICAL:
+        elif mode == VISUALISER_MODES.TOPOLOGICAL:
             combo_box.set_active(1)
             self._main_combo_box_selection[position] = 1
         else:
             self._main_combo_box_selection[position] = 2
             combo_box.set_active(2)
+        self._changed_main_cb(combo_box)
+        combo_box.connect('changed', self._changed_main_cb)
         return mode
 
     def _add_to_mapper(self, mappable_object, vertex, position, x):
@@ -125,16 +133,15 @@ class ConfigPage(AbstractPage):
         model = combo_box.get_model()
         index = combo_box.get_active()
         data = self._drop_box_mapper[combo_box]
-        if (index > -1 and
-           (data['p'] not in self._main_combo_box_selection.keys() or
-           index != self._main_combo_box_selection[data['p']])):
+        keys = self._main_combo_box_selection.keys()
+        if (index > -1):
 
             self._main_combo_box_selection[data['p']] = index
             selected = model[index][0]
 
             if selected == self.TOPOLOGICAL_TEXT:
                 data['v'].visualiser_raster_separate = None
-                data['v'].visualiser_mode = visualiser_modes.TOPOLOGICAL
+                data['v'].visualiser_mode = VISUALISER_MODES.TOPOLOGICAL
                 text_box = gtk.Entry()
                 if (data['v'].visualiser_2d_dimensions is not None and
                    data['v'].visualiser_2d_dimensions['x'] is not None):
@@ -162,8 +169,8 @@ class ConfigPage(AbstractPage):
                 self._table.attach(text_box, data['x']+2, data['x']+3,
                                    data['p'], data['p']+1)
             elif selected == self.RASTER_TEXT:
-                data['v'].visualiser_2d_dimensions = {'x': None, 'y': None}
-                data['v'].visualiser_mode = visualiser_modes.RASTER
+                data['v']._visualiser_2d_dimensions = {'x': None, 'y': None}
+                data['v']._visualiser_mode = VISUALISER_MODES.RASTER
                 liststore = gtk.ListStore(str)
                 combo_box = gtk.ComboBox(liststore)
                 cell = gtk.CellRendererText()
@@ -201,6 +208,7 @@ class ConfigPage(AbstractPage):
                 self._add_to_mapper(label, data['v'], data['p'], data['x']+2)
                 self._table.attach(label, data['x']+2, data['x']+3, data['p'],
                                    data['p']+1)
+                self._changed_raster_choice_cb(combo_box)
             else:
                 data['v'].visualiser_2d_dimensions = {'x': None, 'y': None}
                 data['v'].visualiser_raster_separate = None
@@ -266,7 +274,7 @@ class ConfigPage(AbstractPage):
         model = combo_box.get_model()
         index = combo_box.get_active()
         data = self._drop_box_mapper[combo_box]
-        if -1 < index != self._raster_combo_box_selection[data['p']]:
+        if -1 < index:
             selected = model[index][0]
             if selected == self.INDIVIDUAL_RASTER_TEXT:
                 if data['v'] in self._vertex_mapper.keys():
@@ -276,21 +284,23 @@ class ConfigPage(AbstractPage):
                         self._remove_page(data['v'])
                         raster_page =\
                             RasterPage(
-                                data['v'], raster_plot_x_scope,
+                                None, raster_plot_x_scope,
                                 raster_plot_do_fading, self._sim_run_time,
                                 self._machine_time_step, self._transciever,
                                 self._has_board, self._graph_mapper,
-                                merged=False)
+                                merged=False, current_vertex=data['v'])
                         self._vertex_mapper[data['v']] = raster_page
+                        self._other_pages.append(raster_page)
                     else:
                         pass  # page already exists
                 else:  # dont have a associated page
                     raster_page = RasterPage(
-                        data['v'], raster_plot_x_scope, raster_plot_do_fading,
+                        None, raster_plot_x_scope, raster_plot_do_fading,
                         self._sim_run_time, self._machine_time_step,
                         self._transciever, self._has_board, self._graph_mapper,
-                        merged=False)
+                        merged=False, current_vertex=data['v'])
                     self._vertex_mapper[data['v']] = raster_page
+                    self._other_pages.append(raster_page)
             elif selected == self.MERGED_RASTER_TEXT:  # merged
                 if data['v'] in self._vertex_mapper.keys():
                     associated_page = self._vertex_mapper[data['v']]
@@ -313,6 +323,7 @@ class ConfigPage(AbstractPage):
                                 self._machine_time_step, self._transciever,
                                 self._has_board, self._graph_mapper,
                                 merged=True)
+                            self._other_pages.append(raster_page)
                             self._vertex_mapper[data['v']] = raster_page
                 else:  # no page set currently for the vertex,
                 # locate any merged page and add it to it
@@ -330,6 +341,7 @@ class ConfigPage(AbstractPage):
                             self._machine_time_step, self._transciever,
                             self._has_board, self._graph_mapper, merged=True)
                         self._vertex_mapper[data['v']] = raster_page
+                        self._other_pages.append(raster_page)
             else:  # not set
                 if data['v'] in self._vertex_mapper.keys():
                     self._remove_page(data['v'])

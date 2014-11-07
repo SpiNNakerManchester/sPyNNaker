@@ -168,7 +168,7 @@ class AbstractRecordableVertex(object):
 
             if compatible_output:
                 # Change the order to be neuronID : time (don't know why - this
-                # is how it was done in the old code, so I am doing it here too)
+                # is how it was _done in the old code, so I am doing it here too)
                 spikes[:, [0, 1]] = spikes[:, [1, 0]]
 
                 # Sort by neuron ID and not by time
@@ -301,7 +301,7 @@ class AbstractRecordableVertex(object):
         if compatible_output:
 
             # Change the order to be neuronID : time (don't know why - this
-            # is how it was done in the old code, so I am doing it here too)
+            # is how it was _done in the old code, so I am doing it here too)
             value[:, [0, 1, 2]] = value[:, [1, 0, 2]]
 
             # Sort by neuron ID and not by time

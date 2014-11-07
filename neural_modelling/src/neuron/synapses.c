@@ -300,7 +300,7 @@ bool row_size_table_filled (uint32_t* address, uint32_t flags)
     if (row_size_table[i] > 256)
     {
       success = false;
-      log_info("row_size_table_filled: the row length entry is beyond what is currently achieveable. Crashed!")
+      log_info("row_size_table_filled: the row length entry is beyond what is currently achieveable. Crashed!");
     }
   }
 

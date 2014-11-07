@@ -29,7 +29,6 @@ from spinn_machine.chip import Chip
 
 
 #internal imports
-from spinnman.messages.scp.scp_signal import SCPSignal
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
@@ -41,8 +40,8 @@ from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
-from spynnaker.pyNN.models.utility_models.live_spike_recorder\
-    import LiveSpikeRecorder
+from spynnaker.pyNN.models.utility_models.live_packet_gather\
+    import LivePacketGather
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
@@ -50,9 +49,12 @@ from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
 
-#spinnman inports
+#spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
+from spinnman.messages.scp.scp_signal import SCPSignal
+from spinnman.model.iptag.reverse_iptag import ReverseIPTag
+#from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 import logging
 import math
@@ -93,9 +95,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def run(self, run_time):
         self._setup_interfaces(hostname=self._hostname)
-        #extract iptags required by the graph
-        self._set_iptags()
-        self._set_reverse_ip_tags()
 
         #set up vis if needed
         if conf.config.getboolean("Visualiser", "enable"):
@@ -151,6 +150,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if do_timing:
             timer.take_sample()
 
+        #extract iptags required by the graph
+        self._set_iptags()
+        self._set_reverse_ip_tags()
+
         #execute data spec generation
         if do_timing:
             timer.start_timing()
@@ -183,6 +186,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             if do_timing:
                 timer.start_timing()
 
+            logger.info("*** Loading Iptags ***")
+            self._load_iptags()
+            logger.info("*** Loading Reverse Iptags***")
+            self._load_reverse_ip_tags()
+
             if self._do_load is True:
                 logger.info("*** Loading data ***")
                 self._load_application_data(
@@ -191,10 +199,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._app_id)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
-                logger.info("*** Loading Iptags ***")
-                self._load_iptags()
-                logger.info("*** Loading Reverse Iptags***")
-                self._load_reverse_ip_tags()
             if do_timing:
                 timer.take_sample()
 
@@ -241,7 +245,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 if reverse_iptag.tag is not None:
                     if reverse_iptag.tag > self._current_max_tag_value:
                         self._current_max_tag_value = reverse_iptag.tag
-                self._add_reverse_tag(reverse_iptag)
+                    reverse_iptag = self._create_reverse_iptag_from_iptag(
+                        reverse_iptag, vertex)
+                    self._add_reverse_tag(reverse_iptag)
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractReverseIPTagableVertex):
                 reverse_iptag = vertex.get_reverse_ip_tag()
@@ -249,7 +255,24 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     reverse_iptag.set_tag(self._current_max_tag_value + 1)
                     vertex.set_reverse_iptag_tag(self._current_max_tag_value + 1)
                     self._current_max_tag_value += 1
-                    self._add_iptag(reverse_iptag)
+                    reverse_iptag = self._create_reverse_iptag_from_iptag(
+                        reverse_iptag, vertex)
+                    self._add_reverse_tag(reverse_iptag)
+
+    def _create_reverse_iptag_from_iptag(self, reverse_iptag, vertex):
+        subverts = self._graph_mapper.get_subvertices_from_vertex(vertex)
+        if len(subverts) > 1:
+            raise exceptions.ConfigurationException(
+                "reverse iptaggable populations can only be supported if they"
+                " are partitoned in a 1 to 1 ratio. Please reduce the number "
+                "of neurons per core, or the max-atoms per core to support a "
+                "one core mapping for your iptaggable population.")
+        subvert = next(iter(subverts))
+        placement = self._placements.get_placement_of_subvertex(subvert)
+        return ReverseIPTag(
+            port=reverse_iptag.port, tag=reverse_iptag.tag,
+            destination_x=placement.x, destination_y=placement.y,
+            destination_p=placement.p)
 
     @property
     def app_id(self):
@@ -286,6 +309,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     @property
     def graph_mapper(self):
         return self._graph_mapper
+
+    @property
+    def routing_infos(self):
+        return self._routing_infos
 
     def set_app_id(self, value):
         self._app_id = value
@@ -457,15 +484,17 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         return executable_targets
 
     def start_visualiser(self):
-        """starts the port listener and ties it to the visualiser_framework pages as
-         required
+        """starts the port listener and ties it to the visualiser_framework
+         pages as required
         """
        #register a listener at the trasnciever for each visualised vertex
         for vertex in self._visualiser_vertices:
             if vertex in self._visualiser_vertex_to_page_mapping.keys():
                 associated_page = self._visualiser_vertex_to_page_mapping[vertex]
-                self._txrx.register_listener(associated_page.recieved_spike(),
-                                             self._hostname)
+                self._txrx.register_listener(
+                    associated_page.recieved_spike, vertex.receieve_port_no,
+                    vertex.hostname, vertex.connection_type,
+                    vertex.traffic_type)
         self._visualiser.start()
 
     def add_vertex(self, vertex_to_add):
@@ -510,27 +539,19 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step)
 
-    def add_edge_to_recorder_vertex(self, vertex_to_record_from):
-        #check to see if it needs to be created in the frist place
-        if self._live_spike_recorder is None:
-            port = None
-            if conf.config.has_option("Recording", "live_spike_port"):
-                port = conf.config.getint("Recording", "live_spike_port")
-            hostname = "localhost"
-            if conf.config.has_option("Recording", "live_spike_host"):
-                hostname = conf.config.get("Recording", "live_spike_host")
-            tag = None
-            if conf.config.has_option("Recording", "live_spike_tag"):
-                tag = conf.config.getint("Recording", "live_spike_tag")
-            if tag is None:
-                raise exceptions.ConfigurationException(
-                    "Target tag for live spikes has not been set")
-            self._live_spike_recorder = \
-                LiveSpikeRecorder(self.machine_time_step, tag, port, hostname)
-            self.add_vertex(self._live_spike_recorder)
+    def add_edge_to_recorder_vertex(self, vertex_to_record_from, port,
+                                    hostname, tag):
+
+        #locate the live spike recorder
+        if port in self._live_spike_recorder.keys():
+            live_spike_recorder = self._live_spike_recorder[port]
+        else:
+            live_spike_recorder = \
+                LivePacketGather(self.machine_time_step, tag, port, hostname)
+            self.add_vertex(live_spike_recorder)
         #create the edge and add
         edge = PartitionableEdge(vertex_to_record_from,
-                                 self._live_spike_recorder, "recorder_edge")
+                                 live_spike_recorder, "recorder_edge")
         self.add_edge(edge)
 
     def add_visualiser_vertex(self, visualiser_vertex_to_add):

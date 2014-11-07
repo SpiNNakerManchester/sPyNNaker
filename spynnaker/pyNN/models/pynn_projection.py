@@ -384,14 +384,18 @@ class Projection(object):
             synapse_list = \
                 self._projection_edge.get_synaptic_list_from_machine(
                     graph_mapper=self._spinnaker.graph_mapper,
+                    partitioned_graph=self._spinnaker.partitioned_graph,
                     placements=self._spinnaker.placements,
-                    transceiver=self._spinnaker.transceiver)
+                    transceiver=self._spinnaker.transceiver,
+                    routing_infos=self._spinnaker.routing_infos)
         if self._delay_edge is not None:
             delay_synapse_list = \
                 self._delay_edge.get_synaptic_list_from_machine(
-                    self._spinnaker.graph_mapper,
-                    self._spinnaker.placements,
-                    self._spinnaker.transceiver)
+                    graph_mapper=self._spinnaker.graph_mapper,
+                    placements=self._spinnaker.placements,
+                    transceiver=self._spinnaker.transceiver,
+                    partitioned_graph=self._spinnaker.partitioned_graph,
+                    routing_infos=self._spinnaker.routing_infos)
 
         # If there is both a delay and a non-delay list, merge them
         if synapse_list is not None and delay_synapse_list is not None:
