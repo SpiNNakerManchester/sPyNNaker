@@ -470,8 +470,8 @@ class AbstractSynapticManager(object):
                     self.select_minimum_row_length(max_row_length)
                 if max_row_length == 0 or row_length == 0:
                     raise exceptions.SynapticBlockGenerationException(
-                        "generated a row length of zero, this is deemed an error"
-                        " and therefore the system will stop")
+                        "generated a row length of zero, this is deemed an "
+                        "error and therefore the system will stop")
 
                 # Write the synaptic block for the sublist
                 (block_start_addr, next_block_start_addr) = \
