@@ -1,3 +1,27 @@
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
+from spinn_front_end_common.utilities import packet_conversions
+from spinn_front_end_common.utilities import constants as common_constants
+
+
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex \
+    import AbstractPopulationRecordableVertex
+from spynnaker.pyNN.models.neural_projections.delay_projection_edge import \
+    DelayProjectionEdge
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN import model_binaries
+
+
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
+from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+    import PartitionerSameSizeAsVertexConstraint
+
+
+from data_specification.data_specification_generator import \
+    DataSpecificationGenerator
+
 import copy
 import os
 import logging
@@ -5,24 +29,6 @@ from enum import Enum
 
 from math import ceil
 import math
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
-from spinn_front_end_common.utilities import packet_conversions
-from spynnaker.pyNN.utilities import constants
-from spinn_front_end_common.utilities import constants as common_constants
-from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex \
-    import AbstractPopulationRecordableVertex
-from spynnaker.pyNN.models.neural_projections.delay_projection_edge import \
-    DelayProjectionEdge
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities.conf import config
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
-    import PartitionerSameSizeAsVertexConstraint
-from data_specification.data_specification_generator import \
-    DataSpecificationGenerator
-
 
 logger = logging.getLogger(__name__)
 
@@ -98,14 +104,16 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
                 * constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
-                           routing_info, hostname, graph_mapper, report_folder):
+                           routing_info, hostname, graph_mapper, report_folder,
+                           write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
         """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
-                placement.x, placement.y, placement.p, hostname, report_folder)
+                placement.x, placement.y, placement.p, hostname, report_folder,
+                write_text_specs, application_run_time_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
@@ -186,12 +194,15 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
             source_vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
             dest_vertex_slice = graph_mapper.get_subvertex_slice(dest)
             synapse_list = \
-                graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge).synapse_list.\
-                create_atom_sublist(source_vertex_slice, dest_vertex_slice)
+                graph_mapper.\
+                get_partitionable_edge_from_partitioned_edge(subedge).\
+                synapse_list.create_atom_sublist(source_vertex_slice,
+                                                 dest_vertex_slice)
             for b in range(constants.MAX_DELAY_BLOCKS):
                 min_delay = (b * self._max_delay_per_neuron) + 1
                 max_delay = min_delay + self._max_delay_per_neuron
-                delay_list = synapse_list.get_delay_sublist(min_delay, max_delay)
+                delay_list = synapse_list.get_delay_sublist(min_delay,
+                                                            max_delay)
                 row_count = 0
                 for row in delay_list:
                     if len(row.target_indices) != 0:
@@ -263,9 +274,6 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
 
     def get_binary_file_name(self):
          # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
+        binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
                                    'delay_extension.aplx')
         return binary_name
