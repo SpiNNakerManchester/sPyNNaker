@@ -70,7 +70,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         """
 
     @abstractmethod
-    def get_stdp_parameter_size(self, vertex_slice, in_edges):
+    def get_stdp_parameter_size(self, in_edges):
         """
         Gets the size of the stdp parameters for a given set of atoms
         """

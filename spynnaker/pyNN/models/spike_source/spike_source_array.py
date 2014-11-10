@@ -1,9 +1,11 @@
 import logging
 import os
 
-from spynnaker.pyNN.models.abstract_models.abstract_buffer_receivable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
+    abstract_buffer_receivable_vertex import \
     AbstractBufferReceivableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_sendable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
+    abstract_buffer_sendable_vertex import \
     AbstractBufferSendableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
@@ -49,18 +51,6 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex,
         self._max_on_chip_memory_usage_for_recording = \
             max_on_chip_memory_usage_for_recording_in_bytes
         self._no_buffers_for_recording = no_buffers_for_recording
-
-        max_memory_used_in_bytes = \
-            self._max_on_chip_memory_usage + \
-            self._max_on_chip_memory_usage_for_recording
-        if (max_memory_used_in_bytes > constants.MAX_MEG_LIMIT
-                or self._max_on_chip_memory_usage_for_spikes < 0
-                or self._max_on_chip_memory_usage_for_recording < 0):
-            raise exceptions.ConfigurationException(
-                "The memory usage on chip is either beyond what is supportable"
-                "on the spinnaker board being supported or you have requested"
-                "a negative value for a memory usage. Please correct and "
-                "try again")
 
     @property
     def model_name(self):
@@ -223,7 +213,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex,
         #get slice from mapper
         subvert_slice = graph_mapper.get_subvertex_slice(subvertex)
 
-        spike_history_region_sz = self._get_spike_buffer_size(subvert_slice)
+        spike_history_region_sz = self._get_spike_recording_size(subvert_slice)
 
         spec.comment("\n*** Spec for SpikeSourceArray Instance ***\n\n")
 
@@ -232,7 +222,9 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex,
 
         spec.comment("\nReserving memory space for spike data region:\n\n")
 
-        real_spike_region_size = self.get_sdram_usage_for_atoms(subvertex, None)
+        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+        real_spike_region_size = self.get_sdram_usage_for_atoms(vertex_slice,
+                                                                None)
 
         # if the region size is zero, there still needs to be a header saying
         if real_spike_region_size == 0:
@@ -249,8 +241,8 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex,
 
         # Create the data regions for the spike source array:
         self._reserve_memory_regions(
-            spec, constants.SETUP_SIZE, spike_buffer_region,
-            real_spike_region_size)
+            spec, constants.SETUP_SIZE, real_spike_region_size,
+            spike_buffer_region)
 
         self._write_setup_info(spec, spike_history_region_sz)
 
@@ -287,15 +279,22 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex,
         :return:
         """
         self._set_default_sizes()
-        spike_region_sz = self._get_spikes_per_timestep(vertex_slice)
-        spike_history_region_sz = self._get_spike_buffer_size(spike_region_sz)
-        total_sdram_usage_on_chip = \
-            (constants.SETUP_SIZE + spike_region_sz + spike_history_region_sz)
 
-        if total_sdram_usage_on_chip >= self._max_on_chip_memory_usage:
-            total_sdram_usage_on_chip = self._max_on_chip_memory_usage
+        spike_region_sz = self._get_spikes_per_timestep(vertex_slice)
+        spike_history_region_sz = \
+            self._get_spike_recording_size(spike_region_sz)
+
+        if spike_region_sz >= self._max_on_chip_memory_usage_for_spikes:
+            self._buffer_region_memory_size = \
+                self._max_on_chip_memory_usage_for_spikes
             self._requires_buffering = True
-        return total_sdram_usage_on_chip
+
+        if spike_history_region_sz >= self._max_on_chip_memory_usage_for_recording:
+            self._recording_region_size_in_bytes = \
+                self._max_on_chip_memory_usage_for_recording
+            self._will_send_buffers = True
+
+        return constants.SETUP_SIZE + spike_region_sz + spike_history_region_sz
 
     def _set_default_sizes(self):
         """ used to do lazy evaluation of the default sizes of the chip
@@ -317,6 +316,18 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex,
             else:
                 self._max_on_chip_memory_usage_for_recording = \
                     constants.DEFAULT_MEG_LIMIT
+        #check the values do not confleict with chip memory limit
+        max_memory_used_in_bytes = \
+            self._max_on_chip_memory_usage_for_spikes + \
+            self._max_on_chip_memory_usage_for_recording
+        if (max_memory_used_in_bytes > constants.MAX_MEG_LIMIT
+                or self._max_on_chip_memory_usage_for_spikes < 0
+                or self._max_on_chip_memory_usage_for_recording < 0):
+            raise exceptions.ConfigurationException(
+                "The memory usage on chip is either beyond what is supportable"
+                "on the spinnaker board being supported or you have requested"
+                "a negative value for a memory usage. Please correct and "
+                "try again")
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """ assumed that correct dtcm usage is not required

@@ -9,6 +9,7 @@ class AbstractBufferSendableVertex():
     def __init__(self):
         self._will_send_buffers = False
         self._size_of_buffer_to_read_in_bytes = None
+        self._recording_region_size_in_bytes = None
 
     @property
     def will_send_buffers(self):

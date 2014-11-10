@@ -230,8 +230,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         potential_hist_buff_sz = self.get_v_buffer_size(vertex_slice)
         gsyn_hist_buff_sz = self.get_g_syn_buffer_size(vertex_slice)
         vertex_in_edges = graph.incoming_edges_to_vertex(self)
-        stdp_region_sz = self.get_stdp_parameter_size(vertex_slice,
-                                                      vertex_in_edges)
+        stdp_region_sz = self.get_stdp_parameter_size(vertex_in_edges)
 
         # Declare random number generators and distributions:
         #TODO add random distrubtion stuff
