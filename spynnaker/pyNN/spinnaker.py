@@ -384,8 +384,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
                 routing_tables=self._router_tables,
-                partitioned_graph=self._partitioned_graph,
-                machine=self._machine)
+                partitioned_graph=self._partitioned_graph)
             valid_route_checker.validate_routes()
 
         if pacman_report_state is not None and \
