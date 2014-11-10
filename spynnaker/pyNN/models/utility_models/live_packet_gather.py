@@ -1,9 +1,8 @@
 import os
-from enum import Enum
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
@@ -13,7 +12,9 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
+from enum import Enum
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
+from spynnaker.pyNN.exceptions import ConfigurationException
 
 class LivePacketGather(
     AbstractDataSpecableVertex, AbstractPartitionableVertex,
@@ -25,27 +26,44 @@ class LivePacketGather(
         value="LIVE_DATA_GATHER_REGIONS",
         names=[('SYSTEM', 0),
                ('CONFIG', 1)])
-    _CONFIG_SIZE = 36
+    _CONFIG_SIZE = 44
 
     """
     A AbstractConstrainedVertex for the Monitoring application data and
     forwarding them to the host
 
     """
-    def __init__(self, machine_time_step, tag, port, address,
+    def __init__(self, machine_time_step, tag, port, address, strip_sdp=True,
                  use_prefix=False, key_prefix=None, prefix_type=None,
                  message_type=EIEIOTypeParam.KEY_32_BIT,
                  right_shift=0, payload_as_time_stamps=True,
+                 use_payload_prefix=True, payload_prefix=None,
+                 payload_right_shift=0,
                  number_of_packets_sent_per_time_step=0):
         """
         Creates a new AppMonitor Object.
         """
+        if (message_type == EIEIOTypeParam.KEY_PAYLOAD_32_BIT
+            or message_type == EIEIOTypeParam.KEY_PAYLOAD_16_BIT) \
+                and use_payload_prefix and payload_as_time_stamps:
+            raise ConfigurationException("Timestamp can either be included as "
+                                         "payload prefix or as payload to each "
+                                         "key, not both")
+        if (message_type == EIEIOTypeParam.KEY_32_BIT
+            or message_type == EIEIOTypeParam.KEY_16_BIT) and \
+                not use_payload_prefix and payload_as_time_stamps:
+            raise ConfigurationException("Timestamp can either be included as "
+                                         "payload prefix or as payload to each "
+                                         "key, but current configuration does "
+                                         "not specify either of these")
+
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
                                             label="Monitor",
                                             machine_time_step=machine_time_step)
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
                                              max_atoms_per_core=1)
-        AbstractIPTagableVertex.__init__(self, tag, port, address)
+        AbstractIPTagableVertex.__init__(self, tag, port, address,
+                                         strip_sdp=strip_sdp)
 
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
         self._use_prefix = use_prefix
@@ -54,10 +72,11 @@ class LivePacketGather(
         self._message_type = message_type
         self._right_shift = right_shift
         self._payload_as_time_stamps = payload_as_time_stamps
+        self._use_payload_prefix = use_payload_prefix
+        self._payload_prefix = payload_prefix
+        self._payload_right_shift = payload_right_shift
         self._number_of_packets_sent_per_time_step = \
             number_of_packets_sent_per_time_step
-
-
 
     @property
     def model_name(self):
@@ -148,6 +167,20 @@ class LivePacketGather(
             spec.write_value(data=1)
         else:
             spec.write_value(data=0)
+
+        #payload has prefix
+        if self._use_payload_prefix:
+            spec.write_value(data=1)
+        else:
+            spec.write_value(data=0)
+        #payload prefix
+        if self._payload_prefix is not None:
+            spec.write_value(data=self._payload_prefix)
+        else:
+            spec.write_value(data=0)
+        #rightshift
+        spec.write_value(data=self._payload_right_shift)
+
         #sdp tag
         spec.write_value(data=self._tag)
         #number of packets to send per time stamp

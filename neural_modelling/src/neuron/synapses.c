@@ -297,9 +297,10 @@ bool row_size_table_filled (uint32_t* address, uint32_t flags)
 
   for (i = 0; i < 8; i++)
   {
-    if ((i < 2 && row_size_table[i] != i) || (i >= 2 && row_size_table[i] != (uint32_t)(1 << (i+1))))
+    if (row_size_table[i] > 256)
     {
       success = false;
+      log_info("row_size_table_filled: the row length entry is beyond what is currently achieveable. Crashed!");
     }
   }
 

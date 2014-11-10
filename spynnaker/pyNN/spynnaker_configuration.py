@@ -114,10 +114,23 @@ class SpynnakerConfiguration(object):
             pass  # just dont set the config param, code downstairs
             #  from here will create temp folders if needed
         else:
-            #add time stamped folder for this run
             this_run_time_folder = \
-                os.path.join(where_to_write_application_data_files,
-                             self._this_run_time_string_repenstation)
+                os.path.join(where_to_write_application_data_files, "latest")
+            if not os.path.exists(this_run_time_folder):
+                os.makedirs(this_run_time_folder)
+            else:
+                self._move_report_and_binary_files(
+                    config.getint("Reports", "max_application_binaries_kept"),
+                    where_to_write_application_data_files)
+
+            #store timestamp in latest/time_stamp
+            time_of_run_file_name = os.path.join(this_run_time_folder,
+                                                 "time_stamp")
+            writer = open(time_of_run_file_name, "w")
+            writer.writelines("app_{}_{}"
+                              .format(self._app_id,
+                                      self._this_run_time_string_repenstation))
+
             if not os.path.exists(this_run_time_folder):
                 os.makedirs(this_run_time_folder)
             if not config.has_section("SpecGeneration"):

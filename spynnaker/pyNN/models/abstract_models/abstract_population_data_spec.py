@@ -250,9 +250,15 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         ring_buffer_shift = self.get_ring_buffer_to_input_left_shift(
             subvertex, subgraph, graph_mapper)
         weight_scale = self.get_weight_scale(ring_buffer_shift)
+
+        #update projections for future use
+        in_partitioned_edges = \
+            subgraph.incoming_subedges_from_subvertex(subvertex)
+        for partitioned_edge in in_partitioned_edges:
+            partitioned_edge.weight_scale_setter(weight_scale)
         
-        logger.debug("Ring-buffer shift is %d, weight scale is %d" 
-            % (ring_buffer_shift, weight_scale))
+        logger.debug("Ring-buffer shift is {}, weight scale is {}"
+                     .format(ring_buffer_shift, weight_scale))
 
         self.write_neuron_parameters(
             spec, placement.x, placement.y, placement.p, subvertex,
@@ -266,6 +272,9 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         self.write_row_length_translation_table(
             spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)
+
+        if placement.x != 0 or placement.y != 0:
+            print ""
 
         self.write_synaptic_matrix_and_master_population_table(
             spec, subvertex, all_syn_block_sz, weight_scale,

@@ -7,8 +7,109 @@ import time
 logger = logging.getLogger(__name__)
 
 
-def generate_synaptic_matrix_report(common_report_directory, partitioned_graph):
-    pass
+def generate_synaptic_matrix_reports(common_report_directory,
+                                     partitioned_graph):
+    top_level_folder = os.path.join(common_report_directory,
+                                    "synaptic_matrix_reports")
+    if not os.path.exists(top_level_folder):
+        os.mkdir(top_level_folder)
+    for partitioned_edge in partitioned_graph.subedges():
+        file_name = os.path.join(top_level_folder,
+                                 "synaptic_matrix_for_patitioned_edge_{}"
+                                 .format(partitioned_edge))
+        output = None
+        try:
+            output = open(file_name, "w")
+        except IOError:
+            logger.error("Generate_placement_reports: Can't open file"
+                         " {} for writing.".format(file_name))
+        #extract matrix
+        synaptic_matrix = partitioned_edge.synapse_sublist
+        counter = 0
+        for synaptic_row in synaptic_matrix.get_rows():
+            output_string = "entry {} [ \n target_index[".format(counter)
+            for target in synaptic_row.target_indices:
+                output_string += str(target) + ", "
+            output_string += "] \n"
+            output_string += "weights["
+            for weight in synaptic_row.weights:
+                output_string += str(weight) + ", "
+            output_string += "] \n"
+            output_string += "delays["
+            for delay in synaptic_row.delays:
+                output_string += str(delay) + ", "
+            output_string += "] \n"
+            output_string += "types["
+            for synapse_type in synaptic_row.synapse_types:
+                output_string += str(synapse_type) + ", "
+            output_string += "] \n ] \n"
+            output.write(output_string)
+            counter += 1
+        output.flush()
+        output.close()
+
+
+def generate_synaptic_matrix_report(common_report_directory, partitioned_edge):
+    top_level_folder = os.path.join(common_report_directory,
+                                    "synaptic_matrix_reports")
+    if not os.path.exists(top_level_folder):
+        os.mkdir(top_level_folder)
+    file_name = os.path.join(top_level_folder,
+                             "synaptic_matrix_for_patitioned_edge_{}"
+                             .format(partitioned_edge))
+    output = None
+    try:
+        output = open(file_name, "w")
+    except IOError:
+        logger.error("Generate_placement_reports: Can't open file"
+                     " {} for writing.".format(file_name))
+    #extract matrix
+    synaptic_matrix = partitioned_edge.synapse_sublist
+    counter = 0
+    for synaptic_row in synaptic_matrix.get_rows():
+        output_string = "entry {} [ \n target_index[".format(counter)
+        for target in synaptic_row.target_indices:
+            output_string += str(target) + ", "
+        output_string += "] \n"
+        output_string += "weights["
+        for weight in synaptic_row.weights:
+            output_string += str(weight) + ", "
+        output_string += "] \n"
+        output_string += "delays["
+        for delay in synaptic_row.delays:
+            output_string += str(delay) + ", "
+        output_string += "] \n"
+        output_string += "types["
+        for synapse_type in synaptic_row.synapse_types:
+            output_string += str(synapse_type) + ", "
+        output_string += "] \n ] \n"
+        output.write(output_string)
+        counter += 1
+    output.flush()
+    output.close()
+
+
+def write_memory_map_report(report_default_directory,
+                            processor_to_app_data_base_address):
+    file_name = os.path.join(report_default_directory,
+                             "memory_map_from_processor_to_address_space")
+    output = None
+    try:
+        output = open(file_name, "w")
+    except IOError:
+        logger.error("Generate_placement_reports: Can't open file"
+                     " {} for writing.".format(file_name))
+
+    for key in processor_to_app_data_base_address.keys():
+        output.write(str(key) + ": ")
+        data = processor_to_app_data_base_address[key]
+        output.write(
+            "{}: ('start_address': {}, hex({}), 'memory_used': {}, "
+            "'memory_written': {} \n".format(
+                key, data['start_address'], hex(data['start_address']),
+                data['memory_used'], data['memory_written']))
+    output.flush()
+    output.close()
 
 
 def generate_synaptic_matrix_report_from_dat_file(
