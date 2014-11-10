@@ -4,6 +4,8 @@ from pacman.model.constraints.\
     VertexRequiresVirtualChipInMachineConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
+from pacman.operations.router_check_functionality.valid_routes_checker import \
+    ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
@@ -371,6 +373,15 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._router_algorithm.route(
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
+
+        if conf.config.get("Mode", "mode") == "Debug":
+            #check that all routes are valid and no cycles exist
+            valid_route_checker = ValidRouteChecker(
+                placements=self._placements, routing_infos=self._routing_infos,
+                routing_tables=self._router_tables,
+                partitioned_graph=self._partitioned_graph,
+                machine=self._machine)
+            valid_route_checker.validate_routes()
 
         if pacman_report_state is not None and \
                 pacman_report_state.router_report:

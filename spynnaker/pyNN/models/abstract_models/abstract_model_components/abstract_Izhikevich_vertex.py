@@ -28,4 +28,60 @@ class AbstractIzhikevichVertex(object):
         self._u_init = utility_calls.convert_param_to_numpy(value, self._atoms)
 
     def ioffset(self, machine_time_step):
-        return self._i_offset / (1000.0 / float(machine_time_step))
+        return self._i_offset
+
+    @property
+    def a(self):
+        return self._a
+
+    @a.setter
+    def a(self, new_value):
+        self._a = new_value
+
+    @property
+    def b(self):
+        return self._b
+
+    @b.setter
+    def b(self, new_value):
+        self._b = new_value
+
+    @property
+    def c(self):
+        return self._c
+
+    @c.setter
+    def c(self, new_value):
+        self._c = new_value
+
+    @property
+    def d(self):
+        return self._d
+
+    @d.setter
+    def d(self, new_value):
+        self._d = new_value
+
+    @property
+    def i_offset(self):
+        return self._i_offset
+
+    @i_offset.setter
+    def i_offset(self, new_value):
+        self._i_offset = new_value
+
+    @property
+    def u_init(self):
+        return self._u_init
+
+    @u_init.setter
+    def u_init(self, new_value):
+        self._u_init = new_value
+
+    @property
+    def v_init(self):
+        return self._v_init
+
+    @v_init.setter
+    def v_init(self, new_value):
+        self._v_init = new_value

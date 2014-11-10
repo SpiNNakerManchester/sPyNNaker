@@ -1,6 +1,7 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
+from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
 from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_Izhikevich_vertex \
@@ -23,8 +24,8 @@ class IzhikevichCurrentExponentialPopulation(
 
         # Instantiate the parent classes
         AbstractExponentialPopulationVertex.__init__(
-            self, n_neurons=n_neurons, tau_syn_e=tau_syn_E,
-            tau_syn_i=tau_syn_I, machine_time_step=machine_time_step)
+            self, n_neurons=n_neurons, tau_syn_E=tau_syn_E,
+            tau_syn_I=tau_syn_I, machine_time_step=machine_time_step)
         AbstractIzhikevichVertex.__init__(self, n_neurons, a=a, c=c, b=b, d=d,
                                           i_offset=i_offset, u_init=u_init,
                                           v_init=v_init)
@@ -63,7 +64,7 @@ class IzhikevichCurrentExponentialPopulation(
         # // nominally 'fixed' parameters
         #     REAL         A;
         #     REAL         B;
-        #     REAL         C;            
+        #     REAL         C;
         #     REAL         D;
         #
         # // Variable-state parameters
@@ -72,17 +73,18 @@ class IzhikevichCurrentExponentialPopulation(
         #
         # // offset current [nA]
         #     REAL         I_offset;
-        # 
-        # // current timestep - simple correction for threshold in beta version   
-        #     REAL         this_h;  
+        #
+        # // current timestep - simple correction for threshold in beta version
+        #     REAL         this_h;
         # } neuron_t;
         return [
-            NeuronParameter(self._a, 's1615'),
-            NeuronParameter(self._b, 's1615'),
-            NeuronParameter(self._c, 's1615'),
-            NeuronParameter(self._d, 's1615'),
-            NeuronParameter(self._v_init, 's1615'),
-            NeuronParameter(self._u_init, 's1615'),
-            NeuronParameter(self.ioffset(self._machine_time_step), 's1615'),
-            NeuronParameter(0, 's1615')
+            NeuronParameter(self._a, DataType.S1615),
+            NeuronParameter(self._b, DataType.S1615),
+            NeuronParameter(self._c, DataType.S1615),
+            NeuronParameter(self._d, DataType.S1615),
+            NeuronParameter(self._v_init, DataType.S1615),
+            NeuronParameter(self._u_init, DataType.S1615),
+            NeuronParameter(self.ioffset(self._machine_time_step),
+                    DataType.S1615),
+            NeuronParameter(0, DataType.S1615)
         ]

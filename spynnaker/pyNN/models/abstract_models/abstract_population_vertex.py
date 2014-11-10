@@ -119,3 +119,9 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             synapse_io,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
+
+    def __str__(self):
+        return "{} with {} atoms".format(self._label, self.n_atoms)
+
+    def __repr__(self):
+        return self.__str__()

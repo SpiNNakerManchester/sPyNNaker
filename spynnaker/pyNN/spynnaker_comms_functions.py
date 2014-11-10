@@ -383,6 +383,9 @@ class SpynnakerCommsFunctions(object):
 
         #go through the placements and see if theres any application data to
         # load
+
+        progress_bar = ProgressBar(len(list(placements.placements)),
+                                   "Loading application data onto the machine")
         for placement in placements.placements:
             associated_vertex = \
                 vertex_to_subvertex_mapper.get_vertex_from_subvertex(
@@ -424,6 +427,11 @@ class SpynnakerCommsFunctions(object):
                         file_path_for_application_data, placement,
                         start_address, memory_written, user_o_register_address,
                         binary_folder)
+            progress_bar.update()
+        progress_bar.end()
+
+        progress_bar = ProgressBar(len(list(router_tables.routing_tables)),
+                                   "Loading routing data onto the machine")
         #load each router table thats needed for the application to run into
         # the chips sdram
         for router_table in router_tables.routing_tables:
@@ -436,6 +444,8 @@ class SpynnakerCommsFunctions(object):
                                                     "Binary_folder")
                     reports.re_load_script_load_routing_tables(
                         router_table, binary_folder, app_id)
+            progress_bar.update()
+        progress_bar.end()
 
     def _load_executable_images(self, executable_targets, app_id):
         """
@@ -448,6 +458,8 @@ class SpynnakerCommsFunctions(object):
             reports.re_load_script_load_executables_init(binary_folder,
                                                          executable_targets)
 
+        progress_bar = ProgressBar(len(executable_targets.keys()),
+                                   "Loading executables onto the machine")
         for exectuable_target_key in executable_targets.keys():
             file_reader = SpinnmanFileDataReader(exectuable_target_key)
             core_subset = executable_targets[exectuable_target_key]
@@ -471,3 +483,5 @@ class SpynnakerCommsFunctions(object):
                                                              "Binary_folder"))
                 reports.re_load_script_load_executables_individual(
                     binary_folder, exectuable_target_key, app_id, size)
+            progress_bar.update()
+        progress_bar.end()
