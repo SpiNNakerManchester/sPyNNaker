@@ -41,7 +41,7 @@ CFLAGS += -Wall -Wextra -D$(DEBUG) -Ofast
 # in the application, add their object file names to this variable.
 
 
-OBJECTS = robot_motor_control.o ../common/spin1-api-configuration.o ../common/configuration.o ../common/spikes.o
+OBJECTS = robot_motor_control.o ../common/in_spikes.o
 
 # Include common make file stuff
 include ../Makefile.depend
