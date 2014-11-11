@@ -12,6 +12,7 @@ from spynnaker.pyNN import exceptions
 
 
 from math import ceil
+from collections import defaultdict
 import logging
 import math
 
@@ -57,7 +58,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         1) Official PyNN format - single list that is used for all neurons
         2) SpiNNaker format - list of lists, one per neuron
         """
-        spike_dict = dict()
+        spike_dict = defaultdict(list)
         if isinstance(self._spike_times[0], list):
             # This is in SpiNNaker 'list of lists' format:
             for neuron in range(vertex_slice.lo_atom,
@@ -71,14 +72,13 @@ class SpikeSourceArray(AbstractSpikeSource):
                         spike_dict[time_stamp_in_ticks].append(neuron)
         else:
             # This is in official PyNN format, all neurons use the same list:
-            neuron_list = range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
+            neuron_list = list(range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
+            print neuron_list, self._spike_times
             for timeStamp in self._spike_times:
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
-                if time_stamp_in_ticks not in spike_dict.keys():
-                    spike_dict[time_stamp_in_ticks] = neuron_list
-                else:
-                    spike_dict[time_stamp_in_ticks].extend(neuron_list)
+                
+                spike_dict[time_stamp_in_ticks].extend(neuron_list)
 
         return spike_dict
 
