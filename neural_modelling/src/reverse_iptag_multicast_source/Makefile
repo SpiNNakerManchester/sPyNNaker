@@ -41,7 +41,7 @@ CFLAGS += -Wall -Wextra -D$(DEBUG) -Ofast
 # in the application, add their object file names to this variable.
 
 
-OBJECTS = reverse_iptag_multicast_source.o ../common/spin1-api-configuration.o ../common/configuration.o
+OBJECTS = reverse_iptag_multicast_source.o
 
 # Include common make file stuff
 include ../Makefile.depend
