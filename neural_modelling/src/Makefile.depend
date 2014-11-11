@@ -17,7 +17,7 @@ ABSDIR = $(abspath $(SPINN_NEURAL_MODELLING_DIR))
 RELOBJS:= $(ABSOBJS:$(ABSDIR)/%.o=%.o)
 OBJECTS:= $(RELOBJS:%.o=$(BUILDDIR)/%.o)
 
-LIBRARIES += -lspinn_common -lm
+LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
 
 ifeq ($(GNU),1)
     SPINN_LIBS += $(SPINN_LIB_DIR)/libspin1_api.a

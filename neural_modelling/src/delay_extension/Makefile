@@ -41,8 +41,7 @@ CFLAGS += -Wall -Wextra -D$(DEBUG) -Ofast
 # in the application, add their object file names to this variable.
 
 
-OBJECTS = ../common/configuration.o ../common/recording.o ../common/spin1-api-configuration.o ../common/spikes.o \
-	delay_extension.o 
+OBJECTS = ../common/recording.o ../common/in_spikes.o delay_extension.o 
 
 # Include common make file stuff
 include ../Makefile.depend

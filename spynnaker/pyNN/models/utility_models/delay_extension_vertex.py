@@ -56,7 +56,8 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
                                              constraints=constraints,
                                              label=label,
                                              max_atoms_per_core=256)
-        AbstractPopulationRecordableVertex.__init__(self, machine_time_step, label=label)
+        AbstractPopulationRecordableVertex.__init__(self, machine_time_step,
+                label=label)
         AbstractDataSpecableVertex.__init__(self, label=label,
                                             machine_time_step=machine_time_step)
 
@@ -115,7 +116,7 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
-         # Reserve memory:
+        # Reserve memory:
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # ###################################################################
@@ -154,20 +155,10 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
     def write_setup_info(self, spec, spike_history_region_sz):
         """
         """
-        recording_info = 0
-        if self._record:
-            recording_info |= constants.RECORD_SPIKE_BIT
-        recording_info |= 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER,
                                      self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
-        spec.switch_write_focus(
-            region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
-        spec.write_value(data=recording_info)
-        spec.write_value(data=spike_history_region_sz)
-        spec.write_value(data=0)
-        spec.write_value(data=0)
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
         # Create empty list of words to fill in with delay data:
@@ -181,7 +172,8 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
 
         for subedge in sub_graph.outgoing_subedges_from_subvertex(subvertex):
             subedge_assocated_edge = \
-                graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
+                graph_mapper.get_partitionable_edge_from_partitioned_edge(
+                        subedge)
             if not isinstance(subedge_assocated_edge, DelayPartitionableEdge):
                 raise exceptions.DelayExtensionException(
                     "One of the incoming subedges is not a subedge of a"

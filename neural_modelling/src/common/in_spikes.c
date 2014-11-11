@@ -46,7 +46,7 @@
 #include <debug.h>
 
 static spike_t* buffer;
-static uint buffer_size;
+static uint32_t buffer_size;
 
 static index_t output;
 static index_t input;
@@ -77,7 +77,7 @@ static inline bool non_full() {
     return (unallocated() > 0);
 }
 
-void in_spikes_initialize_spike_buffer(uint size) {
+void in_spikes_initialize_spike_buffer(uint32_t size) {
     buffer = (spike_t *) sark_alloc(1, size * sizeof(spike_t));
     buffer_size = size;
     input = size - 1;
@@ -118,9 +118,9 @@ bool in_spikes_get_next_spike(spike_t* spike) {
     return (success);
 }
 
-bool in_spikes_get_next_spike_if_equals(spike_t spike) {
+bool in_spikes_is_next_spike_equal(spike_t spike) {
     if (non_empty()) {
-        uint peek_output = peek_next(output);
+        uint32_t peek_output = peek_next(output);
         if (buffer[peek_output] == spike) {
             output = peek_output;
             return true;

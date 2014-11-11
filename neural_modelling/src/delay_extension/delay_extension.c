@@ -1,6 +1,7 @@
 #include "../common/in_spikes.h"
-#include "../common/out_spikes.h"
+#include "../common/key_conversion.h"
 
+#include <bit_field.h>
 #include <data_specification.h>
 #include <debug.h>
 #include <simulation.h>
@@ -163,7 +164,7 @@ void spike_process(uint unused0, uint unused1) {
 
     // While there are any incoming spikes
     spike_t s;
-    while (in_spikes_next_spike(&s)) {
+    while (in_spikes_get_next_spike(&s)) {
 
         // Mask out neuron id
         uint32_t neuron_id = (s & KEY_MASK);
@@ -222,7 +223,7 @@ void timer_callback(uint unused0, uint unused1) {
                     // sent with
                     uint32_t spike_key = n | delay_stage_key_mask;
 
-#ifdef LOG_LEVEL >= LOG_DEBUG
+#if LOG_LEVEL >= LOG_DEBUG
                     if(delay_stage_spike_counters[n] > 0)
                     {
                         log_debug("Neuron %u sending %u spikes after delay"
@@ -234,7 +235,7 @@ void timer_callback(uint unused0, uint unused1) {
                     // Loop through counted spikes and send
                     for (uint32_t s = 0; s < delay_stage_spike_counters[n];
                             s++) {
-                        spin1_send_mc_packet(spike_key, NULL, NO_PAYLOAD);
+                        spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD);
                     }
                 }
             }
@@ -262,7 +263,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Initialize the incoming spike buffer
-    initialize_spike_buffer(IN_SPIKE_SIZE);
+    in_spikes_initialize_spike_buffer(IN_SPIKE_SIZE);
 
     // Set timer tick (in microseconds)
     spin1_set_timer_tick(timer_period);
