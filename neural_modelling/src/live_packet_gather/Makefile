@@ -41,7 +41,7 @@ CFLAGS += -Wall -Wextra -D$(DEBUG) -Ofast
 # in the application, add their object file names to this variable.
 
 
-OBJECTS = live_packet_gather.o ../common/spikes.o ../common/spin1-api-configuration.o ../common/configuration.o
+OBJECTS = live_packet_gather.o
 
 # Include common make file stuff
 include ../Makefile.depend

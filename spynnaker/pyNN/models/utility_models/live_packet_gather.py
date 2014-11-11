@@ -1,19 +1,25 @@
 import os
+from enum import Enum
 
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex import AbstractDataSpecableVertex
-from spinn_front_end_common.abstract_models.abstract_iptagable_vertex import AbstractIPTagableVertex
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
+    import AbstractDataSpecableVertex
+from spinn_front_end_common.abstract_models.abstract_iptagable_vertex\
+    import AbstractIPTagableVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.conf import config
 from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from enum import Enum
+
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
+
+from spynnaker.pyNN import model_binaries
+from spynnaker.pyNN.utilities import constants
+
 
 class LivePacketGather(
     AbstractDataSpecableVertex, AbstractPartitionableVertex,
@@ -45,24 +51,23 @@ class LivePacketGather(
         if (message_type == EIEIOTypeParam.KEY_PAYLOAD_32_BIT
             or message_type == EIEIOTypeParam.KEY_PAYLOAD_16_BIT) \
                 and use_payload_prefix and payload_as_time_stamps:
-            raise ConfigurationException("Timestamp can either be included as "
-                                         "payload prefix or as payload to each "
-                                         "key, not both")
+            raise ConfigurationException("Timestamp can either be included as"
+                                         " payload prefix or as payload to"
+                                         " each key, not both")
         if (message_type == EIEIOTypeParam.KEY_32_BIT
             or message_type == EIEIOTypeParam.KEY_16_BIT) and \
                 not use_payload_prefix and payload_as_time_stamps:
-            raise ConfigurationException("Timestamp can either be included as "
-                                         "payload prefix or as payload to each "
-                                         "key, but current configuration does "
-                                         "not specify either of these")
+            raise ConfigurationException("Timestamp can either be included as"
+                                         " payload prefix or as payload to"
+                                         " each key, but current configuration"
+                                         " does not specify either of these")
 
         AbstractDataSpecableVertex.__init__(self, n_atoms=1,
-                                            label="Monitor",
-                                            machine_time_step=machine_time_step)
+            label="Monitor", machine_time_step=machine_time_step)
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
-                                             max_atoms_per_core=1)
+            max_atoms_per_core=1)
         AbstractIPTagableVertex.__init__(self, tag, port, address,
-                                         strip_sdp=strip_sdp)
+            strip_sdp=strip_sdp)
 
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
         self._use_prefix = use_prefix
@@ -187,36 +192,16 @@ class LivePacketGather(
 
     def write_setup_info(self, spec):
         """
-        Write information used to control the simulation and gathering of
-        results. Currently, this means the flag word used to signal whether
-        information on neuron firing and neuron potential is either stored
-        locally in a buffer or passed out of the simulation for storage/display
-        as the simulation proceeds.
-
-        The format of the information is as follows:
-        Word 0: Flags selecting data to be gathered during simulation.
-            Bit 0: Record spike history
-            Bit 1: Record neuron potential
-            Bit 2: Record gsyn values
-            Bit 3: Reserved
-            Bit 4: Output spike history on-the-fly
-            Bit 5: Output neuron potential
-            Bit 6: Output spike rate
         """
 
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(
-            region=self._LIVE_DATA_GATHER_REGIONS.SYSTEM.value)
-        spec.write_value(data=self.CORE_APP_IDENTIFIER)
-        spec.write_value(data=self._machine_time_step)
-        spec.write_value(data=self._no_machine_time_steps)
+        self._write_basic_setup_info(
+                spec, self.CORE_APP_IDENTIFIER,
+                self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
 
     def get_binary_file_name(self):
-         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
+        # Rebuild executable name
+        binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
                                    'live_packet_gather.aplx')
         return binary_name
 
