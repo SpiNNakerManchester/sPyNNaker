@@ -13,7 +13,14 @@ class RasterPage(AbstractLiveSpikePage):
     def __init__(self, vertex_in_question, raster_x_scope, do_fading, runtime,
                  machine_time_step, transciever, has_board, graph_mapper,
                  current_vertex=None, merged=True):
-        AbstractLiveSpikePage.__init__(self, transciever, has_board)
+        if vertex_in_question is None:
+            AbstractLiveSpikePage.__init__(self, transciever, has_board,
+                                           gtk.Label("raster _page for {}"
+                                                     .format(current_vertex.vertex.label)))
+        else:
+            AbstractLiveSpikePage.__init__(self, transciever, has_board,
+                                           gtk.Label("raster _page for {}"
+                                                     .format(vertex_in_question.vertex.label)))
         self._is_merged_version = merged
         self._last_timer_tic = None
         self._graph_mapper = graph_mapper
@@ -23,7 +30,7 @@ class RasterPage(AbstractLiveSpikePage):
             self._vertex_in_question.append(current_vertex)
         else:
             self._vertex_in_question = sorted(vertex_in_question,
-                                              key=lambda vertex: vertex.label)
+                                              key=lambda vertex: vertex.vertex.label)
 
         #creates a collection of offsets for y plot
         self._off_sets = list()
@@ -42,17 +49,17 @@ class RasterPage(AbstractLiveSpikePage):
         self._data_stores = []
             
         for current_vertex in self._vertex_in_question:
-            label = str(current_vertex.label)
+            label = str(current_vertex.vertex.label)
             self._data_stores.append(label)
             tuple_data = [(-1, -1), (-1, -1)]
             self._data_stores.append(tuple_data)
             self._off_sets.append(current_off_set)
-            current_off_set += current_vertex.n_atoms + 15
+            current_off_set += current_vertex._n_atoms + 15
 
         #records the maxiumum neuron value
         self._max_y_value = current_off_set
 
-        #set name of page
+        #set name of _page
         self._page = gtk.Frame("raster plot")
 
         self._figure = None
@@ -62,6 +69,9 @@ class RasterPage(AbstractLiveSpikePage):
         self._graphview = None
         #generate plot
         self._generate_plot(0, True)
+
+    def get_frame(self):
+        return self._page
 
     def add_vertex(self, vertex_to_add):
         label = vertex_to_add.label
@@ -105,9 +115,9 @@ class RasterPage(AbstractLiveSpikePage):
         for vertex in self._vertex_in_question:
             index = self._vertex_in_question.index(vertex)
             offset = self._off_sets[index]
-            yticks[offset] = "%s - %d" % (vertex.label, 0)
-            counter = offset + vertex.n_atoms
-            yticks[counter] = "%d" % vertex.n_atoms
+            yticks[offset] = "%s - %d" % (vertex.vertex.label, 0)
+            counter = offset + vertex._n_atoms
+            yticks[counter] = "%d" % vertex._n_atoms
             if i % 2 == 0:
                 colours.append("#ff0000")
             else:

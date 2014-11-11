@@ -3,21 +3,18 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.utilities import packet_conversions
 from spinn_front_end_common.utilities import constants as common_constants
 
-
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex \
     import AbstractPopulationRecordableVertex
-from spynnaker.pyNN.models.neural_projections.delay_projection_edge import \
-    DelayProjectionEdge
+from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge import \
+    DelayPartitionableEdge
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
-
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
@@ -48,7 +45,7 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
         names=[('SYSTEM', 0),
                ('DELAY_PARAMS', 1),
                ('SPIKE_HISTORY', 2)])
-    
+
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  machine_time_step, constraints=None, label="DelayExtension"):
         """
@@ -88,7 +85,7 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
     @staticmethod
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
         return spike_block_row_length * no_active_timesteps * 4
-    
+
     def get_spike_buffer_size(self, lo_atom, hi_atom):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
@@ -105,7 +102,8 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_mapper, report_folder,
-                           write_text_specs, application_run_time_folder):
+                           write_text_specs,
+                           application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
@@ -141,7 +139,7 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
-        
+
         self.write_setup_info(spec, 0)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
@@ -170,7 +168,7 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=0)
         spec.write_value(data=0)
-        
+
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
         # Create empty list of words to fill in with delay data:
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
@@ -180,11 +178,11 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
         one_block = [0] * num_words_per_row
         delay_block = list()
         num_delay_blocks = 0
-        
+
         for subedge in sub_graph.outgoing_subedges_from_subvertex(subvertex):
             subedge_assocated_edge = \
                 graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
-            if not isinstance(subedge_assocated_edge, DelayProjectionEdge):
+            if not isinstance(subedge_assocated_edge, DelayPartitionableEdge):
                 raise exceptions.DelayExtensionException(
                     "One of the incoming subedges is not a subedge of a"
                     " DelayAfferentPartitionableEdge")
@@ -206,20 +204,20 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
                 row_count = 0
                 for row in delay_list:
                     if len(row.target_indices) != 0:
-                        
+
                         # Fix the length of the list
                         num_delay_blocks = max(b + 1, num_delay_blocks)
                         while num_delay_blocks > len(delay_block):
                             delay_block.append(copy.copy(one_block))
-                        
+
                         # This source neurons has synapses in the current delay
                         # range. So set the bit in the delay_block:
                         word_id = int(row_count / 32)
                         bit_id = row_count - (word_id * 32)
-                        
+
                         #logger.debug("Adding delay for block {}, atom {}"
                         #        .format(b, row_count))
-                        
+
                         delay_block[b][word_id] |= (1 << bit_id)
                     row_count += 1
         return num_delay_blocks, delay_block
@@ -265,7 +263,7 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
         return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-         # TODO: Fill this in
+        # TODO: Fill this in
         return 0
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
@@ -273,7 +271,7 @@ class DelayExtensionVertex(AbstractPopulationRecordableVertex,
         return (44 + (16 * 4)) * n_atoms
 
     def get_binary_file_name(self):
-         # Rebuild executable name
+        # Rebuild executable name
         binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
                                    'delay_extension.aplx')
         return binary_name

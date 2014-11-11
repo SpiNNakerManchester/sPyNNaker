@@ -10,11 +10,11 @@ import inspect
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
-from spynnaker.pyNN.utilities.constants import VISUALISER_MODES
 
 #pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities.conf import config
 
 # neural abstract_models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -27,12 +27,12 @@ from spynnaker.pyNN.models.neural_models.izk_curr_exp \
     import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
 
 #neural projections
-from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
+from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
-    import DelayProjectionEdge
+from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
+    import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_partitioned_projection \
     import DelayPartitionedProjection
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
@@ -87,6 +87,9 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     PfisterSpikeTripletTimeDependence as PfisterSpikeTripletRule
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
+
+if config.get("Visualiser", "enable"):
+    from visualiser_framework.visualiser_constants import VISUALISER_MODES
 
 #constraints
 
@@ -223,7 +226,8 @@ def Population(size, cellclass, cellparams, structure=None, label=None):
 
 
 # noinspection PyPep8Naming
-def VisualisedVertex(size, cellclass, cellparams, structure=None, label=None):
+def VisualisedPopulation(size, cellclass, cellparams, structure=None,
+                         label=None):
     global _spinnaker
     return _spinnaker.create_visualised_population(size, cellclass, cellparams,
                                                    structure, label)

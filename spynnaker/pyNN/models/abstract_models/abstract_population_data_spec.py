@@ -217,7 +217,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         spec.comment("\n*** Spec for block of {} neurons ***\n"
                      .format(self.model_name))
-        
+
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         # Calculate the size of the tables to be reserved in SDRAM:
@@ -259,7 +259,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             subgraph.incoming_subedges_from_subvertex(subvertex)
         for partitioned_edge in in_partitioned_edges:
             partitioned_edge.weight_scale_setter(weight_scale)
-        
+
         logger.debug("Ring-buffer shift is {}, weight scale is {}"
                      .format(ring_buffer_shift, weight_scale))
 

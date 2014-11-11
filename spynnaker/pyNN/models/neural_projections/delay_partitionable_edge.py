@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DelayProjectionEdge(ProjectionPartitionableEdge):
+class DelayPartitionableEdge(ProjectionPartitionableEdge):
 
     _DELAY_PAGE_SIZE = 256
     

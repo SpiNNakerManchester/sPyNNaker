@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 class TopologicalPage(AbstractLiveSpikePage):
     def __init__(self, vertex_in_question, retina_drop_off_theshold,
                  subgraph, placements, transciever, has_board, graph_mapper):
-        AbstractLiveSpikePage.__init__(self, transciever, has_board)
+        AbstractLiveSpikePage.__init__(self, transciever, has_board,
+                                       gtk.Label("topological _page for vertex {}".format(vertex_in_question.label)))
 
         self._rectangle_size = {'x': 1, 'y': 1}
         self._exposure_bar_size = 20
@@ -95,7 +96,7 @@ class TopologicalPage(AbstractLiveSpikePage):
         if self._label is None:
             self._label = "Unknown"
 
-        #set name of page
+        #set name of _page
         self._page = gtk.Frame("topological plot")
         
         #generate plot area
@@ -106,6 +107,9 @@ class TopologicalPage(AbstractLiveSpikePage):
 
         #generate the rectangles that represent the retina view
         self._generate_retina_view()
+
+    def get_frame(self):
+        return self._page
 
     def _generate_objects(self):
         """
@@ -153,7 +157,7 @@ class TopologicalPage(AbstractLiveSpikePage):
 
     def _generate_plot(self):
         """
-        generates the initial drawing area and ties it into the page
+        generates the initial drawing area and ties it into the _page
         """
         self._drawing_area = gtk.DrawingArea()
         self._drawing_area.connect("expose_event", self.expose)
@@ -389,7 +393,7 @@ class TopologicalPage(AbstractLiveSpikePage):
     # noinspection PyUnusedLocal
     def redraw(self, timer_tic):
         """
-        method used by the main visualiser_framework to promt this page to be redrawn
+        method used by the main visualiser_framework to promt this _page to be redrawn
         :param timer_tic:
         """
         if not self._drawing:

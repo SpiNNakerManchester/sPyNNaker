@@ -28,7 +28,8 @@ def _install_cfg():
     print("{} has been created.  Please edit this file and change \"None\""
           " after \"machineName\" to the hostname or IP address of your"
           " SpiNNaker board, and change \"None\" after \"version\" to the"
-          " version of SpiNNaker hardware you are running on:".format(home_cfg))
+          " version of SpiNNaker hardware you are running on:".format(
+                  home_cfg))
     print "[Machine]"
     print "machineName = None"
     print "version = None"
@@ -41,7 +42,7 @@ default = os.path.join(os.path.dirname(spynnaker.__file__), "spynnaker.cfg")
 spynnaker_user = os.path.expanduser("~/.spynnaker.cfg")
 spynnaker_others = ("spynnaker.cfg", spynnaker_user)
 
-legacy_pacmans = ("pacman.cfg", os.path.expanduser("~/.pacman.cfg"))
+legacy_pacmans = (os.path.expanduser("~/.pacman.cfg"), "pacman.cfg")
 
 found_spynnakers = False
 for possible_spynnaker_file in spynnaker_others:

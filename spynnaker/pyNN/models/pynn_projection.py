@@ -1,21 +1,22 @@
 import logging
 import numpy
-
 import math
+
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import AbstractPopulationVertex
-from spinn_front_end_common.utilities import exceptions
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-from spynnaker.pyNN.utilities import constants, conf
+from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
+from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
-    import DelayProjectionEdge
+from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
+    import DelayPartitionableEdge
+    
 from spinn_front_end_common.utilities.timer import Timer
-
+from spinn_front_end_common.utilities import exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +98,7 @@ class Projection(object):
                 synapse_list.flip()
 
         # check if all delays requested can fit into the natively supported
-        # delays in the abstract_models
+        # delays in the models
         min_delay, max_delay = synapse_list.get_min_max_delay()
         natively_supported_delay_for_models = \
             constants.MAX_SUPPORTED_DELAY_TICS
@@ -197,7 +198,7 @@ class Projection(object):
         delay_label = "DE to {}".format(label)
         num_blocks = int(math.ceil(float(max_delay_for_projection)
                                    / float(max_delay_per_neuron))) - 1
-        self._delay_edge = DelayProjectionEdge(
+        self._delay_edge = DelayPartitionableEdge(
             delay_vertex, postsynaptic_population._get_vertex,
             self._spinnaker.machine_time_step, num_blocks, max_delay_per_neuron,
             synapse_list=remaining_synaptic_sublist,
@@ -383,14 +384,18 @@ class Projection(object):
             synapse_list = \
                 self._projection_edge.get_synaptic_list_from_machine(
                     graph_mapper=self._spinnaker.graph_mapper,
+                    partitioned_graph=self._spinnaker.partitioned_graph,
                     placements=self._spinnaker.placements,
-                    transceiver=self._spinnaker.transceiver)
+                    transceiver=self._spinnaker.transceiver,
+                    routing_infos=self._spinnaker.routing_infos)
         if self._delay_edge is not None:
             delay_synapse_list = \
                 self._delay_edge.get_synaptic_list_from_machine(
-                    self._spinnaker.graph_mapper,
-                    self._spinnaker.placements,
-                    self._spinnaker.transceiver)
+                    graph_mapper=self._spinnaker.graph_mapper,
+                    placements=self._spinnaker.placements,
+                    transceiver=self._spinnaker.transceiver,
+                    partitioned_graph=self._spinnaker.partitioned_graph,
+                    routing_infos=self._spinnaker.routing_infos)
 
         # If there is both a delay and a non-delay list, merge them
         if synapse_list is not None and delay_synapse_list is not None:

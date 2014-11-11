@@ -18,8 +18,7 @@ class SynapticList(object):
                 'get_n_connections', None), self._synaptic_rows))
         else:
             return max(map(operator.methodcaller(
-                'get_n_connections', vertex_slice.lo_atom,
-                vertex_slice.hi_atom), self._synaptic_rows))
+                'get_n_connections', vertex_slice), self._synaptic_rows))
     
     def get_min_max_delay(self):
         """

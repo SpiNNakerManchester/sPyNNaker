@@ -1,14 +1,13 @@
 import unittest
-
-from spinn_front_end_common.utility_models.live_spike_recorder \
-    import LiveSpikeRecorder
+from spynnaker.pyNN.models.utility_models.live_packet_gather \
+    import LivePacketGather
 from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 
 
 class TestLiveSpikeRecorder(unittest.TestCase):
     def test_new_live_spike_recorder(self):
-        live_spike_recorder = LiveSpikeRecorder(1)
+        live_spike_recorder = LivePacketGather(1)
         constraint_list_copy = list()
         constraint_list_copy.extend(live_spike_recorder.constraints)
         for index in range(len(constraint_list_copy)):

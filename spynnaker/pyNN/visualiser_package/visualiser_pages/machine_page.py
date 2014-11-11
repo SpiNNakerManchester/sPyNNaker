@@ -18,7 +18,7 @@ class MachinePage(AbstractPage):
 
     def __init__(self, static, scope, machine, placements, router_tables,
                  graph_mapper):
-        AbstractPage.__init__(self)
+        AbstractPage.__init__(self, gtk.Label("Machine Page"))
         self._current_button_right_clicked = None
         self._graph_mapper = graph_mapper
         self._button_mapping = dict()
@@ -30,21 +30,18 @@ class MachinePage(AbstractPage):
         self._router_tables = router_tables
         self._machine = machine
         if static:
-            self._label = "machine static"
-            self.page = gtk.Frame(self._label)
+            self._page = gtk.Frame("machine static")
         else:
-            self._label = "machine"
-            self.page = gtk.Frame(self._label)
+            self._page = gtk.Frame("machine")
         self._create_machine_page_content(scope)
         if not static:
             pass
 
-    @property
-    def label(self):
-        return self._label
-
     def is_page(self):
         return True
+
+    def get_frame(self):
+        return self._page
 
      #creates the machien table with edges and cores
     def _create_machine_page_content(self, scope):
@@ -52,14 +49,14 @@ class MachinePage(AbstractPage):
         self._machine_table = gtk.Table(self._x_dim, self._y_dim, True)
         self._machine_table.set_col_spacings(0)
         self._machine_table.set_row_spacings(0)
-        self.page.add(self._machine_table)
+        self._page.add(self._machine_table)
         self._machine_table.show()
         #set up buttons to represent cores
         self._set_up_chips_in_machine(scope)
         #add the edges
         self._add_edges()
 
-    #updates page with new machine layout
+    #updates _page with new machine layout
     def update_page(self, scope):
         for key in self._button_mapping.keys():
             button = self._button_mapping[key][2]

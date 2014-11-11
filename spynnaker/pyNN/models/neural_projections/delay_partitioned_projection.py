@@ -11,14 +11,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DelayPartitionedProjection(ProjectionPartitionedEdge,
-                                 AbstractFilterableEdge):
+class DelayPartitionedProjection(ProjectionPartitionedEdge):
     
     def __init__(self, presubvertex, postsubvertex):
         ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
-
-        self._synapse_sublist = None
         self._synapse_delay_rows = None
     
     def get_synapse_sublist(self, graph_mapper):
@@ -35,8 +32,9 @@ class DelayPartitionedProjection(ProjectionPartitionedEdge,
             graph_mapper.get_subvertex_slice(self._post_subvertex)
 
         synapse_sublist = \
-            self._associated_edge.synapse_list.\
-            create_atom_sublist(pre_vertex_slice, post_vertex_slice)
+            graph_mapper.get_partitionable_edge_from_partitioned_edge(self).\
+            synapse_list.create_atom_sublist(pre_vertex_slice,
+                                             post_vertex_slice)
 
         if synapse_sublist.get_n_rows() > 256:
             raise exceptions.SynapticMaxIncomingAtomsSupportException(
@@ -44,10 +42,12 @@ class DelayPartitionedProjection(ProjectionPartitionedEdge,
                 " neurons!")
 
         full_delay_list = list()
-        for i in range(0, self._associated_edge.num_delay_stages):
-            min_delay = (i * self._associated_edge.max_delay_per_neuron)
+        associated_edge = \
+            graph_mapper.get_partitionable_edge_from_partitioned_edge(self)
+        for i in range(0, associated_edge.num_delay_stages):
+            min_delay = (i * associated_edge.max_delay_per_neuron)
             max_delay = \
-                min_delay + self._associated_edge.max_delay_per_neuron
+                min_delay + associated_edge.max_delay_per_neuron
             delay_list = \
                 synapse_sublist.get_delay_sublist(min_delay, max_delay)
 
@@ -60,7 +60,7 @@ class DelayPartitionedProjection(ProjectionPartitionedEdge,
             full_delay_list.extend(delay_list)
 
             # Add extra rows for the "missing" items, up to 256
-            if (i + 1) < self._associated_edge.num_delay_stages:
+            if (i + 1) < associated_edge.num_delay_stages:
                 for _ in range(0, 256 - len(delay_list)):
                     full_delay_list.append(SynapseRowInfo([], [], [], []))
         self._synapse_sublist = SynapticList(full_delay_list)
@@ -71,19 +71,3 @@ class DelayPartitionedProjection(ProjectionPartitionedEdge,
         Indicates that the list will not be needed again
         """
         self._synapse_sublist = None
-
-    def filter_sub_edge(self, graph_mapper, common_report_folder):
-        """
-        Filters a subedge of this edge if the edge is not a one-to-one edge
-        """
-        pre_sub_lo = \
-            graph_mapper.get_subvertex_slice(self._pre_subvertex).lo_atom
-        pre_sub_hi = \
-            graph_mapper.get_subvertex_slice(self._pre_subvertex).hi_atom
-        post_sub_lo = \
-            graph_mapper.get_subvertex_slice(self._post_subvertex).lo_atom
-        post_sub_hi = \
-            graph_mapper.get_subvertex_slice(self._post_subvertex).hi_atom
-        if (pre_sub_lo != post_sub_lo) or (pre_sub_hi != post_sub_hi):
-            return True
-        return False
