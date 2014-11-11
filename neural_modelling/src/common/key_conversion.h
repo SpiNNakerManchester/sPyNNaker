@@ -1,6 +1,8 @@
 #ifndef _KEY_CONVERSION_H_
 #define _KEY_CONVERSION_H_
 
+#include "neuron-typedefs.h"
+
 static inline key_t key_x (key_t k) { return (k >> 24); }
 static inline key_t key_y (key_t k) { return ((k >> 16) & 0xFF); }
 static inline key_t key_p (key_t k) { return ((k >> 11) & 0x1F); }

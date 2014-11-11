@@ -1,5 +1,4 @@
-#include "../common/neuron-typedefs.h"
-
+#include <common-typedefs.h>
 #include <data_specification.h>
 #include <debug.h>
 #include <simulation.h>

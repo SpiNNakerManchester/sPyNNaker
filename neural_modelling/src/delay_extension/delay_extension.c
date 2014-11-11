@@ -1,3 +1,4 @@
+#include "../common/neuron-typedefs.h"
 #include "../common/in_spikes.h"
 #include "../common/key_conversion.h"
 
