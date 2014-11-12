@@ -155,7 +155,7 @@ void spike_source_impl_dma_callback(uint unused, uint tag) {
         sentinel("state (%u) = %u", state, e_state_dma_in_progress);
     }
 
-    log_info("DMA transfer complete");
+    log_debug("DMA transfer complete");
 
     // Set state to reflect that the spike block is now in the buffer
     state = e_state_spike_block_in_buffer;
@@ -181,7 +181,7 @@ void spike_source_impl_generate_spikes(uint32_t tick) {
         } else {
 
             // Otherwise error
-            log_info("ERROR: DMA hasn't completed in time for next tick");
+            log_debug("ERROR: DMA hasn't completed in time for next tick");
         }
     }
 
