@@ -85,13 +85,6 @@ typedef accum voltage_t;
 typedef accum resistance_t;
 #define current_0 (kbits (0))
 
-// Enumeration defining the bits of the system word
-typedef enum system_data_e {
-    e_system_data_record_spike_history = (1 << 0),
-    e_system_data_record_neuron_potential = (1 << 1),
-    e_system_data_record_neuron_gsyn = (1 << 2),
-} system_data_e;
-
 typedef unsigned long fract synapse_input_t;
 
 #ifndef SYNAPSE_INDEX_BITS

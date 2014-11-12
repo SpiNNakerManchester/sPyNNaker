@@ -30,6 +30,34 @@ static inline bool recording_channel_in_use(recording_channel_e channel) {
 //---------------------------------------
 // Public API
 //---------------------------------------
+bool recording_is_channel_enabled(uint32_t recording_flags,
+        recording_channel_e channel) {
+    return (recording_flags & (1 << channel)) != 0;
+}
+
+void recording_read_region_sizes(
+        address_t region_start, uint32_t* recording_flags,
+        uint32_t* spike_history_region_size,
+        uint32_t* neuron_potential_region_size,
+        uint32_t* neuron_gysn_region_size) {
+    *recording_flags = region_start[0];
+    if (recording_is_channel_enabled(*recording_flags,
+                e_recording_channel_spike_history)
+            && (spike_history_region_size != NULL)) {
+        *spike_history_region_size = region_start[1];
+    }
+    if (recording_is_channel_enabled(*recording_flags,
+                e_recording_channel_neuron_potential)
+            && (neuron_potential_region_size != NULL)) {
+        *neuron_potential_region_size = region_start[2];
+    }
+    if (recording_is_channel_enabled(*recording_flags,
+                e_recording_channel_neuron_gsyn)
+            && (neuron_gysn_region_size != NULL)) {
+        *neuron_gysn_region_size = region_start[3];
+    }
+}
+
 bool recording_initialze_channel(
         address_t output_region, recording_channel_e channel,
         uint32_t size_bytes) {

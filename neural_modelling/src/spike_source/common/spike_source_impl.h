@@ -1,19 +1,21 @@
+#ifndef _SPIKE_SOURCE_IMPL_H_
+#define _SPIKE_SOURCE_IMPL_H_
 
-#ifndef SPIKE_SOURCE_IMPL
-#define SPIKE_SOURCE_IMPL
+#include "../../common/neuron-typedefs.h"
+#include "../../common/out_spikes.h"
 
-#include "../../common/common-typedefs.h"
-#include "../../common/common-impl.h"
+#include <spin1_api.h>
 
-// Externals
-extern uint32_t num_spike_sources;
-extern uint32_t key;
+uint32_t spike_source_impl_get_application_id();
 
-// Function declarations in spike-source-poisson.c
-bool spike_source_data_filled (address_t base_address, uint32_t flags, uint32_t spike_history_recording_region_size, 
-                               uint32_t neuron_potentials_recording_region_size, uint32_t neuron_gsyns_recording_region_size);
-void spike_source_generate(uint32_t tick);
+uint32_t spike_source_impl_get_spike_recording_region_id();
 
-void spike_source_dma_callback(uint unused, uint tag);
+bool spike_source_impl_initialize(
+        address_t data_address, uint32_t *spike_source_key,
+        uint32_t *spike_source_n_sources);
 
-#endif  // SPIKE_SOURCE_IMPL
+void spike_source_impl_generate_spikes(uint32_t tick);
+
+void spike_source_impl_dma_callback(uint unused, uint tag);
+
+#endif  // _SPIKE_SOURCE_IMPL_H_

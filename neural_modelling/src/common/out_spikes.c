@@ -1,6 +1,6 @@
 #include "out_spikes.h"
+#include "recording.h"
 
-#include <bit_field.h>
 #include <debug.h>
 
 // Globals
@@ -19,15 +19,17 @@ void out_spikes_initialize(size_t max_spike_sources) {
 
     out_spikes = (bit_field_t) sark_alloc(out_spikes_size * sizeof(uint32_t),
             1);
-    reset_out_spikes();
+    out_spikes_reset();
 }
 
-void out_spikes_record() {
+void out_spikes_record(uint32_t recording_flags) {
 
     // If we should record the spike history, copy out-spikes to the
     // appropriate recording channel
-    if (system_data_test_bit(e_system_data_record_spike_history)) {
-        recording_record(e_recording_channel_spike_history, out_spikes,
+    if (recording_is_channel_enabled(
+            recording_flags, e_recording_channel_spike_history)) {
+        recording_record(
+                e_recording_channel_spike_history, out_spikes,
                 out_spikes_size * sizeof(uint32_t));
     }
 }

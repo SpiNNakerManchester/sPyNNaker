@@ -42,8 +42,7 @@ CFLAGS += -Wall -Wextra -D$(DEBUG) $(DEBUGFLAGS) -Ofast -DSPIKE_SOURCE_SEND_OUT_
 # in the application, add their object file names to this variable.
 
 
-OBJECTS = ../../common/out_spikes.o ../../common/configuration.o ../../common/recording.o ../../common/spin1-api-configuration.o \
-	../common/spike_source.o spike_source_array.o 
+OBJECTS = ../../common/out_spikes.o ../../common/recording.o ../common/spike_source.o spike_source_array.o 
 
 # Include common make file stuff
 include ../../Makefile.depend
