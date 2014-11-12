@@ -121,14 +121,17 @@ bool spike_source_impl_initialize(
     // Setup regions that specify spike source array data
     if (!read_parameters(
             data_specification_get_region(1, data_address), spike_source_key,
-            spike_source_n_sources))
+            spike_source_n_sources)) {
         return false;
+    }
 
     if (!read_spike_vector_region(
-            data_specification_get_region(2, data_address)))
+            data_specification_get_region(2, data_address))) {
         return false;
+    }
 
-    // If we have any spike blocks and the 1st spike block should be sent at the 1st timestep
+    // If we have any spike blocks and the 1st spike block should be sent at
+    // the 1st timestep
     if ((num_spike_blocks > 0) && (spike_blocks[0].timestep == 0)) {
 
         // Synchronously copy block into dma buffer
