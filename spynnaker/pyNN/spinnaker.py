@@ -383,7 +383,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             #check that all routes are valid and no cycles exist
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
-                routing_tables=self._router_tables,
+                routing_tables=self._router_tables, machine=self._machine,
                 partitioned_graph=self._partitioned_graph)
             valid_route_checker.validate_routes()
 
