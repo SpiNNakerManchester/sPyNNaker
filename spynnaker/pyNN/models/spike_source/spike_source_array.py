@@ -24,7 +24,9 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
                                             # the x,y,p,n key format
 
     def __init__(
-            self, n_neurons, spike_times, machine_time_step, constraints=None,
+            self, n_neurons, spike_times, machine_time_step,
+            buffer_ip_tag_tag_id, buffer_ip_tag_port, buffer_ip_tag_address,
+            constraints=None,
             max_on_chip_memory_usage_for_recording_in_bytes=None,
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
             no_buffers_for_recording=constants.NO_BUFFERS_FOR_TRANSMITTING,
@@ -35,7 +37,8 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
         AbstractSpikeSource.__init__(
             self, label=label, n_neurons=n_neurons, constraints=constraints,
             max_atoms_per_core=SpikeSourceArray._model_based_max_atoms_per_core,
-            machine_time_step=machine_time_step,
+            machine_time_step=machine_time_step, tag=buffer_ip_tag_tag_id,
+            port=buffer_ip_tag_port, address=buffer_ip_tag_address,
             max_on_chip_memory_usage_for_recording=
             max_on_chip_memory_usage_for_recording_in_bytes)
         #set supers
@@ -166,7 +169,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
         spec.write_value(data=recording_buffer_region_size)
         spec.write_value(data=self._size_of_buffer_to_read_in_bytes)
 
-    def get_spikes(self, txrx, placements, graph_mapper,
+    def get_spikes(self, txrx, placements, graph_mapper, buffer_manager,
                    compatible_output=False):
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
@@ -180,8 +183,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
             graph_mapper=graph_mapper, compatible_output=compatible_output,
             spike_recording_region=
             self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            sub_vertex_out_spike_bytes_function=
-            sub_vertex_out_spike_bytes_function)
+            buffer_manager=buffer_manager)
 
     #inhirrted from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
@@ -199,7 +201,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
         #get slice from mapper
         subvert_slice = graph_mapper.get_subvertex_slice(subvertex)
 
-        spike_history_region_sz = self._get_spike_recording_size(subvert_slice)
+        spike_history_region_sz = self._get_recording_region_size(subvert_slice)
 
         spec.comment("\n*** Spec for SpikeSourceArray Instance ***\n\n")
 
@@ -218,7 +220,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
 
         # Calculate memory requirements:
         spike_buffer_region_size = \
-            self._get_spike_recording_size(real_spike_region_size)
+            self._get_recording_region_size(real_spike_region_size)
 
         #set buffered knowledge of the size of the buffered regions (in + out)
         self._buffer_region_memory_size = real_spike_region_size
@@ -269,7 +271,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
 
         spike_region_sz = self._get_spikes_per_timestep(vertex_slice)
         spike_history_region_sz = \
-            self._get_spike_recording_size(spike_region_sz)
+            self._get_recording_region_size(spike_region_sz)
 
         if spike_region_sz >= self._max_on_chip_memory_usage_for_spikes:
             self._buffer_region_memory_size = \

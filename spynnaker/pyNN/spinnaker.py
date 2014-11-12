@@ -4,10 +4,10 @@ from data_specification.interfaces.data_generator_interface import \
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
-from pacman.operations.router_check_functionality.valid_routes_checker import \
-    ValidRouteChecker
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
+    import MultiCastPartitionableEdge
+from pacman.operations.multi_cast_router_check_functionality.\
+    valid_routes_checker import ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
@@ -30,14 +30,19 @@ from spinn_machine.chip import Chip
 
 #internal imports
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_receivable_vertex import \
+    AbstractBufferReceivableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_sendable_vertex import \
+    AbstractBufferSendableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_reverse_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_reverse_iptagable_vertex import \
     AbstractReverseIPTagableVertex
 from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.utilities.buffer_manager import BufferManager
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
 from spynnaker.pyNN.models.utility_models.live_packet_gather\
@@ -54,7 +59,7 @@ from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
-#from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
+from spinnman import constants as spinnman_constants
 
 import logging
 import math
@@ -77,6 +82,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._set_up_executable_specifics()
             self._set_up_report_specifics()
             self._set_up_output_application_data_specifics()
+            self._set_up_buffer_requirements()
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
 
@@ -199,9 +205,15 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._app_id)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
+                logger.info("*** Loading buffers ***")
+                self._load_buffers_for_bufferable_receivers()
+                logger.info("*** Setting up listeners for buffer reads")
+                self._load_listeners_for_bufferable_senders()
+                logger.info("*** Loading fixed route entries ***")
+                self._load_fixed_route_entries()
+            #end of entire loading setup
             if do_timing:
                 timer.take_sample()
-
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
                 if self._reports_states.transciever_report:
@@ -219,6 +231,51 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._retieve_provance_data_from_machine(executable_targets)
         else:
             logger.info("*** No simulation requested: Stopping. ***")
+
+    def _load_buffers_for_bufferable_receivers(self):
+        for partitionable_vertex in self.partitionable_graph.vertices:
+            #locate vertices which need to be buffer receiving managed
+            if isinstance(partitionable_vertex, AbstractBufferReceivableVertex):
+                key = partitionable_vertex.get_ip_tag().string_representation()
+                # if the buffer manager for this port has not been built yet,
+                # build it
+                if key not in self._buffer_managers.keys():
+                    self._buffer_managers[key] = \
+                        BufferManager(
+                            self._placements, self._routing_infos,
+                            self.graph_mapper,
+                            partitionable_vertex.get_ip_tag().port,
+                            partitionable_vertex.get_ip_tag().address)
+                #register the manageable vertex
+                self._buffer_managers[key].add_received_vertex(partitionable_vertex)
+            if isinstance(partitionable_vertex, AbstractBufferSendableVertex):
+                key = partitionable_vertex.get_ip_tag().string_representation()
+                # if the buffer manager for this port has not been built yet,
+                # build it
+                if key not in self._buffer_managers.keys():
+                    self._buffer_managers[key] = \
+                        BufferManager(
+                            self._placements, self._routing_infos,
+                            self.graph_mapper,
+                            partitionable_vertex.get_ip_tag().port,
+                            partitionable_vertex.get_ip_tag().address)
+                #register the manageable vertex
+                self._buffer_managers[key].add_sender_vertex(partitionable_vertex)
+        #set up listener for buffer command messages if the buffer manager has
+        #has been initilised
+        for buffer_manager_key in self._buffer_managers.keys():
+            self._txrx.register_listener(
+                self._buffer_managers[buffer_manager_key].receive_buffer_message,
+                self._buffer_managers[buffer_manager_key].port,
+                self._buffer_managers[buffer_manager_key].local_host,
+                spinnman_constants.CONNECTION_TYPE.UDP_IPTAG,
+                spinnman_constants.TRAFFIC_TYPE.EIEIO_COMMAND)
+
+    def _load_listeners_for_bufferable_senders(self):
+        pass
+
+    def _load_fixed_route_entries(self):
+        pass
 
     def _set_iptags(self):
         for vertex in self._partitionable_graph.vertices:
@@ -319,6 +376,22 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def set_runtime(self, value):
         self._runtime = value
+
+    @property
+    def buffer_ip_tag(self):
+        return self._default_buffer_ip_tag
+
+    @property
+    def buffer_ip_address(self):
+        return self._default_buffer_ip_address
+
+    @property
+    def buffer_ip_port(self):
+        return self._default_buffer_ip_port
+
+    @property
+    def buffer_managers(self):
+        return self._buffer_managers
 
     def __repr__(self):
         return "Spinnaker object for machine {}".format(self._hostname)
@@ -549,8 +622,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 LivePacketGather(self.machine_time_step, tag, port, hostname)
             self.add_vertex(live_spike_recorder)
         #create the edge and add
-        edge = PartitionableEdge(vertex_to_record_from,
-                                 live_spike_recorder, "recorder_edge")
+        edge = MultiCastPartitionableEdge(vertex_to_record_from,
+                                          live_spike_recorder, "recorder_edge")
         self.add_edge(edge)
 
     def add_visualiser_vertex(self, visualiser_vertex_to_add):

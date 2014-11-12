@@ -4,8 +4,8 @@ from pacman.model.constraints.vertex_has_dependent_constraint import \
 from pacman.model.constraints.placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
+    import MultiCastPartitionableEdge
 from pacman.utilities import utility_calls as pacman_utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
@@ -67,6 +67,14 @@ class Population(object):
         cellparams['label'] = cell_label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
+        #buffer details
+        if 'buffer_ip_tag_tag_id' not in cellparams.keys():
+            cellparams['buffer_ip_tag_tag_id'] = spinnaker.buffer_ip_tag
+        if 'buffer_ip_tag_address' not in cellparams.keys():
+            cellparams['buffer_ip_tag_address'] = spinnaker.buffer_ip_address
+        if 'buffer_ip_tag_port' not in cellparams.keys():
+            cellparams['buffer_ip_tag_port'] = spinnaker.buffer_ip_port
+
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
 
@@ -85,7 +93,7 @@ class Population(object):
                     self._spinnaker.machine_time_step)
                 self._spinnaker.add_vertex(multi_cast_vertex)
             multi_cast_vertex = self._spinnaker.get_multi_cast_source
-            edge = PartitionableEdge(multi_cast_vertex, self._vertex)
+            edge = MultiCastPartitionableEdge(multi_cast_vertex, self._vertex)
             multi_cast_vertex.add_commands(
                 require_multi_cast_source_constraint.commands, edge)
             self._spinnaker.add_edge(edge)
@@ -100,8 +108,8 @@ class Population(object):
         for dependant_vertex_constrant in dependant_vertex_constraints:
             dependant_vertex = dependant_vertex_constrant.vertex
             self._spinnaker.add_vertex(dependant_vertex)
-            dependant_edge = PartitionableEdge(pre_vertex=self._vertex,
-                                               post_vertex=dependant_vertex)
+            dependant_edge = MultiCastPartitionableEdge(
+                pre_vertex=self._vertex, post_vertex=dependant_vertex)
             self._spinnaker.add_edge(dependant_edge)
 
         #initlise common stuff
@@ -193,8 +201,11 @@ class Population(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer = Timer()
             timer.start_timing()
+
+        buffer_manager_key = self._vertex.get_ip_tag().string_representation()
+        buffer_manager = self._spinnaker.buffer_managers[buffer_manager_key]
         spikes = self._vertex.get_spikes(
-            txrx=self._spinnaker.transceiver,
+            txrx=self._spinnaker.transceiver, buffer_manager=buffer_manager,
             placements=self._spinnaker.placements,
             graph_mapper=self._spinnaker.graph_mapper,
             compatible_output=compatible_output)

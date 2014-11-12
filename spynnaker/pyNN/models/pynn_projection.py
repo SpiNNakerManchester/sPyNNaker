@@ -391,7 +391,6 @@ class Projection(object):
         if self._delay_edge is not None:
             delay_synapse_list = \
                 self._delay_edge.get_synaptic_list_from_machine(
-                    graph_mapper=self._spinnaker.graph_mapper,
                     placements=self._spinnaker.placements,
                     transceiver=self._spinnaker.transceiver,
                     partitioned_graph=self._spinnaker.partitioned_graph,

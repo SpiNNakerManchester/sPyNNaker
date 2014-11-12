@@ -37,6 +37,21 @@ class AbstractBufferReceivableVertex(object):
         """
         return self._buffers_to_transmit
 
+    def received_buffer_request(self, message):
+        """ method to support callback for sneding new buffers down to the
+         machine
+
+        :param message:
+        :return:
+        """
+        ##TODO translate the message to a number of buffers to transmit
+        no_buffers_requested = 1
+        #send sdp message to the core in question with
+
+
+
+
+
     @abstractmethod
     def is_buffer_receivable_vertex(self):
         """helper method for is instance

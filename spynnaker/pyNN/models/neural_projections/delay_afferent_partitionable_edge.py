@@ -1,13 +1,14 @@
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge import \
+    MultiCastPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_partitioned_edge \
     import DelayAfferentPartitionedEdge
 
 
-class DelayAfferentPartitionableEdge(PartitionableEdge):
-    
+class DelayAfferentPartitionableEdge(MultiCastPartitionableEdge):
+
     def __init__(self, prevertex, delayvertex, label=None):
-        PartitionableEdge.__init__(self, prevertex, delayvertex, label=label)
+        MultiCastPartitionableEdge.__init__(self, prevertex, delayvertex,
+                                            label=label)
 
     def create_subedge(self, pre_subvertex, post_subvertex, label=None):
         """ Create a subedge between the pre_subvertex and the post_subvertex
@@ -27,3 +28,10 @@ class DelayAfferentPartitionableEdge(PartitionableEdge):
         :raise None: does not raise any known exceptions
         """
         return DelayAfferentPartitionedEdge(pre_subvertex, post_subvertex)
+
+    def is_multi_cast_partitionable_edge(self):
+        """helper method for isinstance
+
+        :return:
+        """
+        return True

@@ -1,5 +1,5 @@
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
+    import MultiCastPartitionableEdge
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
@@ -59,7 +59,7 @@ class GraphEdgeFilter(object):
         if isinstance(subedge, AbstractFilterableEdge):
             return subedge.filter_sub_edge(graph_mapper,
                                            self._common_report_folder)
-        elif isinstance(associated_edge, PartitionableEdge):
+        elif isinstance(associated_edge, MultiCastPartitionableEdge):
             return False
         else:
             raise exceptions.FilterableException(

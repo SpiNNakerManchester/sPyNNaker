@@ -1,22 +1,23 @@
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
+     import MultiCastPartitionableEdge
 from pacman.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import \
     ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import constants
 import logging
 logger = logging.getLogger(__name__)
 
 
-class ProjectionPartitionableEdge(PartitionableEdge):
-    
+class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
+
     def __init__(self, prevertex, postvertex, machine_time_step,
                  connector=None, synapse_list=None, synapse_dynamics=None,
                  label=None):
-        PartitionableEdge.__init__(self, prevertex, postvertex, label=label)
+        MultiCastPartitionableEdge.__init__(self, prevertex, postvertex,
+                                            label=label)
 
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
@@ -103,8 +104,8 @@ class ProjectionPartitionableEdge(PartitionableEdge):
                 subedge.post_subvertex,
                 constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
                 constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-                self._synapse_row_io, partitioned_graph, graph_mapper,
-                routing_infos, subedge.weight_scale).get_rows()
+                self._synapse_row_io, partitioned_graph, routing_infos,
+                subedge.weight_scale).get_rows()
 
             pre_lo_atom = vertex_slice.lo_atom
             if ((last_pre_lo_atom is None) or
@@ -129,3 +130,6 @@ class ProjectionPartitionableEdge(PartitionableEdge):
     @property
     def synapse_list(self):
         return self._synapse_list
+
+    def is_multi_cast_partitionable_edge(self):
+        return True

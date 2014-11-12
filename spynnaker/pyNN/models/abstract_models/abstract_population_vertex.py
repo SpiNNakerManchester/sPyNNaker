@@ -26,9 +26,13 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
     """
 
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
-                 machine_time_step, constraints=None):
+                 machine_time_step, tag, port, address, constraints=None,
+                 max_on_chip_memory_usage_for_recording=
+                 constants.DEFAULT_MEG_LIMIT):
 
-        AbstractRecordableVertex.__init__(self, machine_time_step, label)
+        AbstractRecordableVertex.__init__(
+            self, machine_time_step, label, tag, port, address,
+            max_on_chip_memory_usage_for_recording)
         AbstractPopulationDataSpec.__init__(
             self, binary, n_neurons, label, constraints,
             machine_time_step=machine_time_step,
@@ -50,7 +54,7 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             raise exceptions.ConfigurationException(
                 "cannot set a vertex's delay vertex once its already been set")
 
-    def get_spikes(self, txrx, placements, graph_mapper,
+    def get_spikes(self, txrx, placements, graph_mapper, buffer_manager,
                    compatible_output=False):
 
         # Spike sources store spike vectors optimally
@@ -62,9 +66,7 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         # Use standard behaviour to read spikes
         return self._get_spikes(
             graph_mapper=graph_mapper, placements=placements, transciever=txrx,
-            compatible_output=compatible_output,
-            sub_vertex_out_spike_bytes_function=
-            sub_vertex_out_spike_bytes_function,
+            compatible_output=compatible_output, buffer_manager=buffer_manager,
             spike_recording_region=
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
 
@@ -119,6 +121,13 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             synapse_io,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
+
+    def is_recordable(self):
+        """ helper method for is instance
+
+        :return:
+        """
+        return True
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

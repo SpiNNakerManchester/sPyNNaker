@@ -18,7 +18,8 @@ class IzhikevichCurrentExponentialPopulation(
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
-    def __init__(self, n_neurons, machine_time_step, constraints=None,
+    def __init__(self, n_neurons, machine_time_step, buffer_ip_tag_tag_id,
+            buffer_ip_tag_port, buffer_ip_tag_address, constraints=None,
                  label=None, a=0.02, c=-65.0, b=0.2, d=2.0, i_offset=0,
                  u_init=-14.0, v_init=-70.0, tau_syn_E=5.0, tau_syn_I=5.0):
 
@@ -34,7 +35,8 @@ class IzhikevichCurrentExponentialPopulation(
             binary="IZK_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=IzhikevichCurrentExponentialPopulation.
             _model_based_max_atoms_per_core,
-            machine_time_step=machine_time_step)
+            machine_time_step=machine_time_step, tag=buffer_ip_tag_tag_id,
+            port=buffer_ip_tag_port, address=buffer_ip_tag_address)
         self._executable_constant = \
             IzhikevichCurrentExponentialPopulation.CORE_APP_IDENTIFIER
 

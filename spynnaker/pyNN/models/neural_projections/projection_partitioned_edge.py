@@ -1,12 +1,14 @@
-from pacman.model.partitioned_graph.partitioned_edge import PartitionedEdge
+from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
+    MultiCastPartitionedEdge
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
     AbstractFilterableEdge
 
 
-class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
-    
+class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
+                                AbstractFilterableEdge):
+
     def __init__(self, presubvertex, postsubvertex):
-        PartitionedEdge.__init__(self, presubvertex, postsubvertex)
+        MultiCastPartitionedEdge.__init__(self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
         self._synapse_sublist = None
         self._weight_scale = None
@@ -59,3 +61,6 @@ class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
     @property
     def synapse_sublist(self):
         return self._synapse_sublist
+
+    def is_multi_cast_partitioned_edge(self):
+        return True

@@ -494,7 +494,7 @@ class AbstractSynapticManager(object):
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
             post_subvertex, master_pop_table_region, synaptic_matrix_region,
-            synapse_io, subgraph, graph_mapper, routing_infos, weight_scale):
+            synapse_io, subgraph, routing_infos, weight_scale):
 
         synaptic_block, max_row_length = \
             self._retrieve_synaptic_block(
@@ -599,17 +599,13 @@ class AbstractSynapticManager(object):
             locate_master_pop_table_base_address(
                 post_x, post_y, post_p, transceiver, master_pop_table_region)
 
-        # locate address of the synaptic block
-        pre_placement = placements.get_placement_of_subvertex(pre_subvertex)
-
-        pre_x, pre_y, pre_p = pre_placement.x, pre_placement.y, pre_placement.p
-
         incoming_edges = \
             subgraph.incoming_subedges_from_subvertex(post_subvertex)
         incoming_key_combo = None
         for subedge in incoming_edges:
             if subedge.pre_subvertex == pre_subvertex:
-                routing_info = routing_infos.get_subedge_information_from_subedge(subedge)
+                routing_info = \
+                    routing_infos.get_subedge_information_from_subedge(subedge)
                 incoming_key_combo = routing_info.key_mask_combo
 
         maxed_row_length, synaptic_block_base_address_offset = \

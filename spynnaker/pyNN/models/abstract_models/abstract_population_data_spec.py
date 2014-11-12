@@ -273,9 +273,6 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         self.write_row_length_translation_table(
             spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)
 
-        if placement.x != 0 or placement.y != 0:
-            print ""
-
         self.write_synaptic_matrix_and_master_population_table(
             spec, subvertex, all_syn_block_sz, weight_scale,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,

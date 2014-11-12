@@ -1,5 +1,3 @@
-from pacman.model.partitionable_graph.partitionable_graph import \
-    PartitionableGraph
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN import exceptions
@@ -8,6 +6,8 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import overridden_pacman_functions
 
 
+from pacman.model.partitionable_graph.partitionable_graph import \
+    PartitionableGraph
 from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
@@ -73,6 +73,12 @@ class SpynnakerConfiguration(object):
 
         #helper data stores
         self._current_max_tag_value = 0
+
+        #comms stuff
+        self._default_buffer_ip_tag = None
+        self._default_buffer_ip_port = None
+        self._default_buffer_ip_address = None
+        self._buffer_managers = dict()
 
     def _set_up_output_application_data_specifics(self):
         where_to_write_application_data_files = \
@@ -348,3 +354,8 @@ class SpynnakerConfiguration(object):
                 shutil.rmtree(os.path.join(starting_directory, oldest_file),
                               ignore_errors=True)
                 files_in_report_folder.remove(oldest_file)
+
+    def _set_up_buffer_requirements(self):
+        self._default_buffer_ip_address = config.get("Buffers", "receve_buffer_host")
+        self._default_buffer_ip_port = config.getint("Buffers", "receve_buffer_port")
+        self._default_buffer_ip_tag = config.getint("Buffers", "receve_buffer_tag")

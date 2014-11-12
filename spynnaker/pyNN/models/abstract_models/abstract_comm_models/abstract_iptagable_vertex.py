@@ -15,6 +15,8 @@ class AbstractIPTagableVertex(object):
     def set_tag(self, new_tag):
         self._tag = new_tag
 
+
+
     def get_ip_tag(self):
         return IPTag(tag=self._tag, port=self._port, address=self._address,
                      strip_sdp=self._strip_sdp)
