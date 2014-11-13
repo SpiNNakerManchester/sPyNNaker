@@ -7,7 +7,7 @@ from abc import abstractmethod
 class AbstractSynapseRowIo(object):
 
     @abstractmethod
-    def get_n_words(self, synapse_row, lo_atom=None, hi_atom=None):
+    def get_n_words(self, synapse_row, vertex_slice=None):
         """
         Returns the total size of the fixed and plastic regions of the row in
         words

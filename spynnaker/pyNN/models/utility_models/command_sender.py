@@ -1,3 +1,5 @@
+import os
+
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
     AbstractMultiCastSource
@@ -226,7 +228,7 @@ class CommandSender(AbstractMultiCastSource):
         """
         return the name of the model
         """
-        return "multi_cast_source"
+        return "command_sender_multi_cast_source"
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -241,4 +243,5 @@ class CommandSender(AbstractMultiCastSource):
         return 0
 
     def get_binary_file_name(self):
-        return "command_sender.aplx"
+        # Rebuild executable name
+        return 'command_sender_multicast_source.aplx'

@@ -47,5 +47,5 @@ class Plot (gtk.DrawingArea):
         context.set_source_surface(self._surface, 0, 0)
         context.paint()
 
-    def size_allocate(self):
+    def size_allocate(self, *args, **kwargs):
         self.queue_draw()

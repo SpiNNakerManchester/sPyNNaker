@@ -15,6 +15,8 @@ setup(
               'spynnaker.pyNN.models.neural_projections.connectors',
               'spynnaker.pyNN.models.neural_properties',
               'spynnaker.pyNN.models.neural_properties.synapse_dynamics',
+              'spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules',
+              'spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences',
               'spynnaker.pyNN.models.spike_source',
               'spynnaker.pyNN.models.utility_models',
               'spynnaker.pyNN.overridden_pacman_functions',
