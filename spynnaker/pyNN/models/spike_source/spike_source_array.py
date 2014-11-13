@@ -66,14 +66,10 @@ class SpikeSourceArray(AbstractSpikeSource):
                 for timeStamp in self._spike_times[neuron]:
                     time_stamp_in_ticks = \
                         int((timeStamp * 1000.0) / self._machine_time_step)
-                    if time_stamp_in_ticks not in spike_dict.keys():
-                        spike_dict[time_stamp_in_ticks] = [neuron]
-                    else:
-                        spike_dict[time_stamp_in_ticks].append(neuron)
+                    spike_dict[time_stamp_in_ticks].append(neuron)
         else:
             # This is in official PyNN format, all neurons use the same list:
             neuron_list = list(range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
-            print neuron_list, self._spike_times
             for timeStamp in self._spike_times:
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
@@ -266,6 +262,7 @@ class SpikeSourceArray(AbstractSpikeSource):
                 word_num = index >> 5
                 bit_num = index & 0x1F
                 or_mask = 1 << bit_num
+                
                 # Set the target bit:
                 spike_bit_vectors[word_num] |= or_mask
             # Write this to spikeBlock region:
