@@ -21,4 +21,8 @@ bool out_spikes_is_spike(index_t neuron_index);
 
 void out_spikes_print();
 
+static inline void out_spikes_set_spike(index_t neuron_index) {
+    bit_field_set(out_spikes, neuron_index);
+}
+
 #endif // _OUT_SPIKES_H_

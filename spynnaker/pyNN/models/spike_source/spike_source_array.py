@@ -210,8 +210,6 @@ class SpikeSourceArray(AbstractSpikeSource):
             region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
-        spec.write_value(data=0)
-        spec.write_value(data=0)
 
     def write_block_index_region(self, spec, placement,
                                  num_neurons, table_entries):

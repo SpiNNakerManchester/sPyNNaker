@@ -136,8 +136,6 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
-        spec.write_value(data=0)
-        spec.write_value(data=0)
 
     def write_poisson_parameters(
             self, spec, processor_chip_x, processor_chip_y, processor_id,
