@@ -197,7 +197,7 @@ void timer_callback(uint unused0, uint unused1) {
     use(unused1);
     time++;
 
-    log_info("Timer tick %u", time);
+    log_debug("Timer tick %u", time);
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {

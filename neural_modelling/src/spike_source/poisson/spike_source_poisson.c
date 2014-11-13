@@ -156,7 +156,7 @@ void timer_callback(uint unused0, uint unused1) {
     use(unused1);
     time++;
 
-    log_info("Timer tick %u", time);
+    log_debug("Timer tick %u", time);
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {
@@ -209,7 +209,7 @@ void timer_callback(uint unused0, uint unused1) {
             // Get number of spikes to send this tick
             uint32_t num_spikes = fast_spike_source_get_num_spikes(
                     fast_spike_source->exp_minus_lambda);
-            log_info("Generating %d spikes", num_spikes);
+            log_debug("Generating %d spikes", num_spikes);
 
             // If there are any
             if (num_spikes > 0) {

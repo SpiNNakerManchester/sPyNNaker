@@ -225,8 +225,7 @@ void timer_callback(uint unused0, uint unused1) {
                     uint32_t spike_key = n | delay_stage_key_mask;
 
 #if LOG_LEVEL >= LOG_DEBUG
-                    if(delay_stage_spike_counters[n] > 0)
-                    {
+                    if (delay_stage_spike_counters[n] > 0) {
                         log_debug("Neuron %u sending %u spikes after delay"
                                 "stage %u with key %x",
                                 n, delay_stage_spike_counters[n], d, spike_key);
