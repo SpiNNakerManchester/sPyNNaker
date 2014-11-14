@@ -1,9 +1,13 @@
 import logging
 import os
+from spynnaker.pyNN.buffer_management.storage_objects.buffer_collection import \
+    BufferCollection
 
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
-    abstract_buffer_receivable_vertex import \
-    AbstractBufferReceivableVertex
+    abstract_buffer_receivable_partitionable_vertex import \
+    AbstractBufferReceivablePartitionableVertex
+from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex import \
+    SpikeSourceArrayPartitionedVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
@@ -17,9 +21,11 @@ import math
 logger = logging.getLogger(__name__)
 
 
-class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
+class SpikeSourceArray(AbstractSpikeSource,
+                       AbstractBufferReceivablePartitionableVertex):
 
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID
+    _CONFIGURATION_REGION_SIZE = 48
     _model_based_max_atoms_per_core = 2048  # limited to the n of
                                             # the x,y,p,n key format
 
@@ -42,7 +48,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
             max_on_chip_memory_usage_for_recording=
             max_on_chip_memory_usage_for_recording_in_bytes)
         #set supers
-        AbstractBufferReceivableVertex.__init__(self)
+        AbstractBufferReceivablePartitionableVertex.__init__(self)
 
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
@@ -50,6 +56,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
         self._max_on_chip_memory_usage_for_recording = \
             max_on_chip_memory_usage_for_recording_in_bytes
         self._no_buffers_for_recording = no_buffers_for_recording
+        self._buffer_region_memory_size = None
 
     @property
     def model_name(self):
@@ -73,6 +80,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
         1) Official PyNN format - single list that is used for all neurons
         2) SpiNNaker format - list of lists, one per neuron
         """
+        buffer_collection = BufferCollection()
         no_buffers = 0
         number_of_spikes_transmitted = 0
         if isinstance(self._spike_times[0], list):
@@ -82,12 +90,16 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
                 for timeStamp in sorted(self._spike_times[neuron]):
                     time_stamp_in_ticks = \
                         int((timeStamp * 1000.0) / self._machine_time_step)
-                    if time_stamp_in_ticks not in self._buffers_to_transmit.keys():
-                        self._buffers_to_transmit[time_stamp_in_ticks] = [neuron]
+                    if not buffer_collection.contains_key(time_stamp_in_ticks):
+                        buffer_collection.add_buffer_element_to_transmit(
+                            self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
+                            time_stamp_in_ticks, neuron)
                         no_buffers += 1
                         number_of_spikes_transmitted += 1
                     else:
-                        self._buffers_to_transmit[time_stamp_in_ticks].append(neuron)
+                        buffer_collection.add_buffer_element_to_transmit(
+                            self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
+                            time_stamp_in_ticks, neuron)
                         number_of_spikes_transmitted += 1
         else:
             # This is in official PyNN format, all neurons use the same list:
@@ -95,19 +107,23 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
             for timeStamp in sorted(self._spike_times):
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
-                if time_stamp_in_ticks not in self._buffers_to_transmit.keys():
-                    self._buffers_to_transmit[time_stamp_in_ticks] = neuron_list
+                if not buffer_collection.contains_key(time_stamp_in_ticks):
+                    buffer_collection.add_buffer_elements_to_transmit(
+                        self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
+                        time_stamp_in_ticks, neuron_list)
                     no_buffers += 1
                     number_of_spikes_transmitted += vertex_slice.n_atoms
                 else:
-                    self._buffers_to_transmit[time_stamp_in_ticks].extend(neuron_list)
+                    buffer_collection.add_buffer_elements_to_transmit(
+                        self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
+                        time_stamp_in_ticks, neuron_list)
                     number_of_spikes_transmitted += vertex_slice.n_atoms
 
         memory_used = \
             ((no_buffers * (constants.BUFFER_HEADER_SIZE +
                             constants.TIMESTAMP_SPACE_REQUIREMENT)) +
              (number_of_spikes_transmitted * constants.KEY_SIZE))
-        return memory_used
+        return memory_used, buffer_collection
 
     def _reserve_memory_regions(self, spec, setup_sz, spike_region_size,
                                 spike_hist_buff_sz):
@@ -136,7 +152,7 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
                 empty=True)
 
-    def _write_setup_info(self, spec, spike_history_region_sz,
+    def _write_setup_info(self, spec, spike_buffer_region_size,
                           recording_buffer_region_size):
         """
         Write information used to control the simulationand gathering of
@@ -158,25 +174,32 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
         # What recording commands were set for the parent pynn_population.py?
         self._write_basic_setup_info(spec, SpikeSourceArray.CORE_APP_IDENTIFIER)
         recording_info = 0
-        if (spike_history_region_sz > 0) and self._record:
+        if (spike_buffer_region_size > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
         #add the params saying how big each
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value)
+        #write configs for reverse ip tag
+        # NOTE
+        # as the packets are formed in the buffers, and that its a spike source
+        #array, and shouldnt have injectored packets, no config should be
+        # required for it to work. the packet format will override these anyhow
+        # END NOTE
+        spec.write_value(data=0)  # prefix value
+        spec.write_value(data=0)  # key left shift
+        spec.write_value(data=0)  # add key check
+        spec.write_value(data=0)  # key for transmitting
+        spec.write_value(data=0)  # mask for transmitting
+
+        #write configs for buffers
         spec.write_value(data=recording_info)
-        spec.write_value(data=spike_history_region_sz)
+        spec.write_value(data=spike_buffer_region_size)
         spec.write_value(data=recording_buffer_region_size)
-        spec.write_value(data=self._size_of_buffer_to_read_in_bytes)
+        spec.write_value(data=self._threshold_for_reporting_bytes_written)
 
     def get_spikes(self, txrx, placements, graph_mapper, buffer_manager,
                    compatible_output=False):
-        # Spike sources store spike vectors optimally so calculate min
-        # words to represent
-        sub_vertex_out_spike_bytes_function = \
-            lambda subvertex, subvertex_slice: int(math.ceil(
-                subvertex_slice.n_atoms / 32.0)) * 4
-
         # Use standard behaviour to read spikes
         return self._get_spikes(
             transciever=txrx, placements=placements,
@@ -224,12 +247,12 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
 
         #set buffered knowledge of the size of the buffered regions (in + out)
         self._buffer_region_memory_size = real_spike_region_size
-        self._size_of_buffer_to_read_in_bytes = math.floor(
+        self._threshold_for_reporting_bytes_written = math.floor(
             spike_buffer_region_size / self._no_buffers_for_recording)
 
         # Create the data regions for the spike source array:
         self._reserve_memory_regions(
-            spec, constants.SETUP_SIZE, real_spike_region_size,
+            spec, self._CONFIGURATION_REGION_SIZE, real_spike_region_size,
             spike_buffer_region_size)
 
         self._write_setup_info(
@@ -269,16 +292,16 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
         """
         self._set_default_sizes()
 
-        spike_region_sz = self._get_spikes_per_timestep(vertex_slice)
-        spike_history_region_sz = \
-            self._get_recording_region_size(spike_region_sz)
+        spike_region_sz, buffer_collection = \
+            self._get_spikes_per_timestep(vertex_slice)
+        recording_region_size = self._get_recording_region_size(spike_region_sz)
 
         if spike_region_sz >= self._max_on_chip_memory_usage_for_spikes:
             self._buffer_region_memory_size = \
                 self._max_on_chip_memory_usage_for_spikes
             self._requires_buffering = True
 
-        return constants.SETUP_SIZE + spike_region_sz + spike_history_region_sz
+        return constants.SETUP_SIZE + spike_region_sz + recording_region_size
 
     def _set_default_sizes(self):
         """ used to do lazy evaluation of the default sizes of the chip
@@ -322,12 +345,39 @@ class SpikeSourceArray(AbstractSpikeSource, AbstractBufferReceivableVertex):
         """
         return 0
 
-    # below are all helper method imps for is instance
-    def is_buffer_receivable_vertex(self):
-        return True
+    def create_subvertex(self, resources_required, vertex_slice, label=None,
+                         additional_constraints=list()):
+        """ overloaded method from abstract pattitionable vertex. used to hand
+        a partitioned spike soruce array its own buffers
+
+        :param resources_required:
+        :param vertex_slice:
+        :param label:
+        :param additional_constraints:
+        :return:
+        """
+        size, buffers = self._get_spikes_per_timestep(vertex_slice)
+        return SpikeSourceArrayPartitionedVertex(
+            buffers=buffers, label=label, resources_used=resources_required,
+            additional_constraints=additional_constraints)
 
     def is_buffer_sendable_vertex(self):
+        """helper method for isinstance
+
+        :return:
+        """
         return True
 
     def is_recordable(self):
+        """helper method for isinstance
+
+        :return:
+        """
+        return True
+
+    def is_buffer_receivable_partitionable_vertex(self):
+        """helper method for isinstance
+
+        :return:
+        """
         return True

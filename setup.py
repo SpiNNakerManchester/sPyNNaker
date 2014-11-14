@@ -7,6 +7,7 @@ setup(
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=['spynnaker',
               'spynnaker.pyNN',
+              'spynnaker.pyNN.buffer_management',
               'spynnaker.pyNN.data_storage',
               'spynnaker.pyNN.models',
               'spynnaker.pyNN.models.abstract_models',

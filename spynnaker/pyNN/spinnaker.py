@@ -30,8 +30,8 @@ from spinn_machine.chip import Chip
 
 #internal imports
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_receivable_vertex import \
-    AbstractBufferReceivableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_receivable_partitionable_vertex import \
+    AbstractBufferReceivablePartitionableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_sendable_vertex import \
     AbstractBufferSendableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_iptagable_vertex import \
@@ -42,7 +42,7 @@ from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities.buffer_manager import BufferManager
+from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
 from spynnaker.pyNN.models.utility_models.live_packet_gather\
@@ -235,7 +235,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def _load_buffers_for_bufferable_receivers(self):
         for partitionable_vertex in self.partitionable_graph.vertices:
             #locate vertices which need to be buffer receiving managed
-            if isinstance(partitionable_vertex, AbstractBufferReceivableVertex):
+            if isinstance(partitionable_vertex, AbstractBufferReceivablePartitionableVertex):
                 key = partitionable_vertex.get_ip_tag().string_representation()
                 # if the buffer manager for this port has not been built yet,
                 # build it
@@ -245,7 +245,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                             self._placements, self._routing_infos,
                             self.graph_mapper,
                             partitionable_vertex.get_ip_tag().port,
-                            partitionable_vertex.get_ip_tag().address)
+                            partitionable_vertex.get_ip_tag().address,
+                            self._txrx)
                 #register the manageable vertex
                 self._buffer_managers[key].add_received_vertex(partitionable_vertex)
             if isinstance(partitionable_vertex, AbstractBufferSendableVertex):
@@ -258,7 +259,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                             self._placements, self._routing_infos,
                             self.graph_mapper,
                             partitionable_vertex.get_ip_tag().port,
-                            partitionable_vertex.get_ip_tag().address)
+                            partitionable_vertex.get_ip_tag().address,
+                            self._txrx)
                 #register the manageable vertex
                 self._buffer_managers[key].add_sender_vertex(partitionable_vertex)
         #set up listener for buffer command messages if the buffer manager has

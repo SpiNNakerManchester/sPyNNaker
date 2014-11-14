@@ -147,9 +147,8 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            buffer_data = transciever.read_memory(
+            buffer_data = transciever.read_memory_return_byte_array(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
-
             #turn buffers into eieio data messages
             little_endian_byte_reader =\
                 LittleEndianByteArrayByteReader(buffer_data)
@@ -194,16 +193,16 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
         :return: the appended numpi array
         :rtype: numpy array
         """
-        timer_tic = message.eieio_header.payload_base()
+        timer_tic = message.eieio_header.payload_base
         #turn into numpy array of shorts (2 bytes, each representing neuron id)
         core_based_neuron_ids = numpy.frombuffer(message.data, dtype="<i2")
         #translate into the neuon id the pop understands
         pop_based_neuron_ids = numpy.add(core_based_neuron_ids, lo_atom)
-        pop_based_neuron_ids = numpy.reshape(pop_based_neuron_ids,
-                                             newshape=(-1, 2))
-        pop_based_neuron_ids_with_timer_tics = \
-            numpy.append(timer_tic, pop_based_neuron_ids, axis=0)
-        return spikes.append(pop_based_neuron_ids_with_timer_tics)
+        pop_based_neuron_ids_with_timer = \
+            numpy.zeros((len(pop_based_neuron_ids), 2))
+        pop_based_neuron_ids_with_timer[:, 1] = pop_based_neuron_ids
+        pop_based_neuron_ids_with_timer[:, 0].fill(timer_tic)
+        return spikes.append(pop_based_neuron_ids_with_timer)
 
     def get_neuron_parameter(
             self, region, compatible_output, has_ran, graph_mapper, placements,

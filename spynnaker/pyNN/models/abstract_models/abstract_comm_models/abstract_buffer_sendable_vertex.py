@@ -12,7 +12,7 @@ class AbstractBufferSendableVertex(AbstractIPTagableVertex):
         AbstractIPTagableVertex.__init__(self, tag=tag, port=port,
                                          address=address)
         self._will_send_buffers = False
-        self._size_of_buffer_to_read_in_bytes = None
+        self._threshold_for_reporting_bytes_written = None
         self._recording_region_size_in_bytes = None
 
     @property
@@ -32,7 +32,7 @@ class AbstractBufferSendableVertex(AbstractIPTagableVertex):
         :return: the size of each buffer in the core that will need to be read
         at some point during execution
         """
-        return self._size_of_buffer_to_read_in_bytes
+        return self._threshold_for_reporting_bytes_written
 
     @abstractmethod
     def is_buffer_sendable_vertex(self):
