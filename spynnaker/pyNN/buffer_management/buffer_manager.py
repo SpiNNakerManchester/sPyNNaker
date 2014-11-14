@@ -1,3 +1,4 @@
+from pacman.utilities.progress_bar import ProgressBar
 from spinnman import constants as spinnman_constants
 from spinnman import exceptions as spinnman_exceptions
 from spinnman.connections.udp_packet_connections.udp_spinnaker_connection import \
@@ -50,6 +51,14 @@ class BufferManager(object):
     @property
     def local_host(self):
         return self._local_host
+
+    def kill_threads(self):
+        """ turns off the threads as they are no longer needed
+
+        :return:
+        """
+        self._recieve_thread.stop()
+        self._sender_thread.stop()
 
     def receive_buffer_message(self, message):
         """ received a eieio message from the port which this manager manages
@@ -112,4 +121,16 @@ class BufferManager(object):
                 self._placements.get_placement_of_subvertex(vertex)
             self._sender_vertices[(placement.x, placement.y, placement.p)] = \
                 vertex
+
+    def contains_sender_vertices(self):
+        if len(self._sender_vertices) == 0:
+            return False
+        return True
+
+    def load_initial_buffers(self):
+        progress_bar = ProgressBar(len(self._sender_vertices),
+                                   "on loading buffer dependant vertices")
+        for send_vertex_key in self._sender_vertices.keys():
+            sender_vertex = self._sender_vertices[send_vertex_key]
+            #TODO complete this part
 

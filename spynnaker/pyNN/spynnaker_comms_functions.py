@@ -222,7 +222,8 @@ class SpynnakerCommsFunctions(object):
         progress_bar.end()
         return processor_to_app_data_base_address
 
-    def _start_execution_on_machine(self, executable_targets, app_id, runtime):
+    def _start_execution_on_machine(self, executable_targets, app_id, runtime,
+                                    buffered_managers):
         #deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
@@ -263,6 +264,13 @@ class SpynnakerCommsFunctions(object):
                     "Only {} processors out of {} have sucessfully reached "
                     "sync0 with breakdown of: {}"
                     .format(processors_ready, total_processors, break_down))
+
+        #every thing is in sync0. if there are buffered managers with sendable
+        #manageable vertices, load the initial buffers
+        for buffer_manager_key in buffered_managers.keys():
+            buffer_manager = buffered_managers[buffer_manager_key]
+            if buffer_manager.contains_sender_vertices():
+                buffer_manager.load_initial_buffers()
 
         # if correct, start applications
         logger.info("Starting application")
@@ -335,6 +343,10 @@ class SpynnakerCommsFunctions(object):
             logger.info("Application has run to completion")
         else:
             logger.info("Application is set to run forever - PACMAN is exiting")
+
+        #turn off buffers threads, as they are no longer needed
+        for buffered_manager_key in buffered_managers.keys():
+            buffered_managers[buffered_manager_key].kill_threads()
 
     def _break_down_of_failure_to_reach_state(self, total_cores, state):
         sucessful_cores = list()

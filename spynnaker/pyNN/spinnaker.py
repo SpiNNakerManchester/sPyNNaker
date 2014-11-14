@@ -206,9 +206,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
                 logger.info("*** Loading buffers ***")
-                self._load_buffers_for_bufferable_receivers()
+                self._load_buffers_for_bufferable_vertices()
                 logger.info("*** Setting up listeners for buffer reads")
-                self._load_listeners_for_bufferable_senders()
                 logger.info("*** Loading fixed route entries ***")
                 self._load_fixed_route_entries()
             #end of entire loading setup
@@ -223,8 +222,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                         binary_folder, executable_targets, self._hostname,
                         self._app_id, run_time)
 
-                self._start_execution_on_machine(executable_targets,
-                                                 self._app_id, self._runtime)
+                self._start_execution_on_machine(
+                    executable_targets, self._app_id, self._runtime,
+                    self._buffer_managers)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
@@ -232,7 +232,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
-    def _load_buffers_for_bufferable_receivers(self):
+    def _load_buffers_for_bufferable_vertices(self):
+        progress_bar = \
+            ProgressBar(len(self.partitionable_graph.vertices),
+                        "on initilising the buffer managers for vertices "
+                        "which require buffering")
         for partitionable_vertex in self.partitionable_graph.vertices:
             #locate vertices which need to be buffer receiving managed
             if isinstance(partitionable_vertex, AbstractBufferReceivablePartitionableVertex):
@@ -263,8 +267,13 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                             self._txrx)
                 #register the manageable vertex
                 self._buffer_managers[key].add_sender_vertex(partitionable_vertex)
+            progress_bar.update()
+        progress_bar.end()
         #set up listener for buffer command messages if the buffer manager has
         #has been initilised
+        progress_bar = ProgressBar(len(self._buffer_managers.keys()),
+                                   "on initilising the listeners for vertices "
+                                   "which require buffering")
         for buffer_manager_key in self._buffer_managers.keys():
             self._txrx.register_listener(
                 self._buffer_managers[buffer_manager_key].receive_buffer_message,
@@ -272,9 +281,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._buffer_managers[buffer_manager_key].local_host,
                 spinnman_constants.CONNECTION_TYPE.UDP_IPTAG,
                 spinnman_constants.TRAFFIC_TYPE.EIEIO_COMMAND)
-
-    def _load_listeners_for_bufferable_senders(self):
-        pass
+            progress_bar.update()
+        progress_bar.end()
 
     def _load_fixed_route_entries(self):
         pass
