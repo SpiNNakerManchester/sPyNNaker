@@ -579,7 +579,7 @@ class AbstractSynapticManager(object):
             synaptic_block[position_in_block:end_point].view(dtype='<u2')
         if no_fixed_plastic % 2.0 == 1:  # remove last entry if required
             fixed_plastic_entries = \
-                fixed_plastic_entries[0:len(fixed_plastic_entries) - 2]
+                fixed_plastic_entries[0:len(fixed_plastic_entries) - 1]
         ##for element in fixed_plastic_entries:
         ##    assert(element != 3150765550)
         #return the different entries
