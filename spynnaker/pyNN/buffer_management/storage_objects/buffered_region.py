@@ -2,6 +2,7 @@ from collections import OrderedDict
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
 
+
 class BufferedRegion(object):
 
     def __init__(self):

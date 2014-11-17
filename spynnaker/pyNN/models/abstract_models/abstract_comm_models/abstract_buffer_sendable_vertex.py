@@ -34,6 +34,13 @@ class AbstractBufferSendableVertex(AbstractIPTagableVertex):
         """
         return self._threshold_for_reporting_bytes_written
 
+    def set_recording_region_size_in_bytes(self, new_value):
+        """
+
+        :param new_value:
+        :return:
+        """
+
     @abstractmethod
     def is_buffer_sendable_vertex(self):
         """ helper method for is instance

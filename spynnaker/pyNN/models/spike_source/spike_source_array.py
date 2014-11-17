@@ -247,12 +247,12 @@ class SpikeSourceArray(AbstractSpikeSource,
             spikes_recording_region_size)
 
         #update the spike soruce partitioned vertex with its region sizes
-        subvertex.set_region_size(
+        subvertex.set_buffered_region_size(
             real_spike_region_size,
             self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value)
-        subvertex.set_region_size(
-            spikes_recording_region_size,
-            self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
+       # subvertex.set_sending_region_size(
+        #    spikes_recording_region_size,
+         #   self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
 
         self._write_setup_info(
             spec, spike_history_region_sz, spikes_recording_region_size)
@@ -357,9 +357,9 @@ class SpikeSourceArray(AbstractSpikeSource,
         """
         size, buffer_collection = self._get_spikes_per_timestep(vertex_slice)
         partitioned_vertex = SpikeSourceArrayPartitionedVertex(
-            buffer_collection=buffer_collection, label=label,
-            resources_used=resources_required,
-            additional_constraints=additional_constraints)
+            buffer_collection=buffer_collection, label=label, port=self._port,
+            resources_used=resources_required, address=self._address,
+            additional_constraints=additional_constraints, tag=self._tag)
         buffer_collection.set_partitioned_vertex(partitioned_vertex)
         return partitioned_vertex
 

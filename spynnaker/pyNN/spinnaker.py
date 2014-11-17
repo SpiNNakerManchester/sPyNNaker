@@ -1,6 +1,7 @@
 #pacman imports
 from data_specification.interfaces.data_generator_interface import \
     DataGeneratorInterface
+
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
@@ -30,13 +31,17 @@ from spinn_machine.chip import Chip
 
 #internal imports
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_receivable_partitionable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
+    abstract_buffer_receivable_partitionable_vertex import \
     AbstractBufferReceivablePartitionableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_sendable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
+    abstract_buffer_sendable_vertex import \
     AbstractBufferSendableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
+    abstract_iptagable_vertex import \
     AbstractIPTagableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_reverse_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
+    abstract_reverse_iptagable_vertex import \
     AbstractReverseIPTagableVertex
 from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
@@ -520,6 +525,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         #create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
+        data_generator_interfaces = list()
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
@@ -531,8 +537,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._partitioned_graph, self._partitionable_graph,
                     self._routing_infos, self._hostname, self._graph_mapper,
                     self._report_default_directory, progress_bar)
+                data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start())
 
+                #can get away with this bit, becuase its not dependent upon
+                # the completion of the dsg stuff
                 binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():
                     executable_targets[binary_name].add_processor(placement.x,
@@ -548,6 +557,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         thread_pool.close()
         thread_pool.join()
+        #check for exceptions
+        for data_generator_interface in data_generator_interfaces:
+            if data_generator_interface.exception is not None:
+                raise data_generator_interface.exception, None, \
+                    data_generator_interface.stack_trace
         #finish the progress bar
         progress_bar.end()
         return executable_targets

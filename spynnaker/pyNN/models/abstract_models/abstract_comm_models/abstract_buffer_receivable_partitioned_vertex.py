@@ -14,11 +14,11 @@ from spynnaker.pyNN.utilities import constants
 class AbstractBufferReceivablePartitionedVertex(object):
 
     def __init__(self, buffer_collection):
-        self._buffer_collection = buffer_collection
+        self._receiver_buffer_collection = buffer_collection
 
     @property
-    def buffer_collection(self):
-        return self._buffer_collection
+    def receiver_buffer_collection(self):
+        return self._receiver_buffer_collection
 
     @abstractmethod
     def is_bufferable_receivable_partitioned_vertex(self):
@@ -29,13 +29,13 @@ class AbstractBufferReceivablePartitionedVertex(object):
 
     def process_buffer_packet(self, buffered_packet):
         # if the region has no more buffers to transmit, return none
-        if self._buffer_collection.is_region_empty(
+        if self._receiver_buffer_collection.is_region_empty(
                 buffered_packet.region_id, buffered_packet.last_timer_tic):
             return None
 
         buffer_to_transmit = \
             self._generate_buffers_for_transmission(buffered_packet)
-        address_pointer = self._buffer_collection.\
+        address_pointer = self._receiver_buffer_collection.\
             get_region_absolute_region_address(buffered_packet.region_id)
         return SendDataRequest(
             chip_x=buffered_packet.chip_x, chip_y=buffered_packet.chip_y,
@@ -50,7 +50,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
         """
         #build the buffer for the size avilable
         data = LittleEndianByteArrayByteWriter()
-        buffers = self._buffer_collection.get_buffer_for_region(
+        buffers = self._receiver_buffer_collection.get_buffer_for_region(
             buffered_packet.region_id)
 
         buffer_keys = list(buffers.keys())
@@ -104,7 +104,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
                 constants.TIMESTAMP_SPACE_REQUIREMENT
             position_in_buffer += 1
             #deal with padding
-            length_of_region_left = self._buffer_collection.get_left_over_space(
+            length_of_region_left = self._receiver_buffer_collection.get_left_over_space(
                 buffered_packet.region_id, memory_used)
             min_memory_required_for_packet = \
                 (constants.BUFFER_HEADER_SIZE +

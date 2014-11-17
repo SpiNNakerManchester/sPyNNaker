@@ -165,7 +165,7 @@ class BufferManager(object):
                                    "on loading buffer dependant vertices")
         for send_vertex_key in self._recieve_vertices.keys():
             sender_vertex = self._sender_vertices[send_vertex_key]
-            for region_id in sender_vertex.buffer_collection.regions_managed:
+            for region_id in sender_vertex.receiver_buffer_collection.regions_managed:
                 self._handle_a_inital_buffer_for_region(region_id, sender_vertex)
             progress_bar.update()
         progress_bar.end()
@@ -181,7 +181,7 @@ class BufferManager(object):
         :return:
         """
         region_size = \
-            sender_vertex.buffer_collection.get_size_of_region(region_id)
+            sender_vertex.receiver_buffer_collection.get_size_of_region(region_id)
         self._locate_region_address(region_id, sender_vertex)
 
         #create a buffer packet to emulate core asking for region data
@@ -193,7 +193,7 @@ class BufferManager(object):
             spinnman_constants.BUFFER_COMMAND_IDS.BUFFER_SEND, region_id,
             region_size, 0)
         #create a buffer request for the right size
-        data_request = sender_vertex.buffer_collection.\
+        data_request = sender_vertex.receiver_buffer_collection.\
             process_buffer_packet(buffered_packet)
         #write memory to chip
         self._transciever.write_memory(
@@ -212,7 +212,7 @@ class BufferManager(object):
         :return: None
         """
         base_address = sender_vertex.\
-            buffer_collection.get_region_base_address_for(region_id)
+            receiver_buffer_collection.get_region_base_address_for(region_id)
         if base_address is None:
             placement = \
                 self._placements.get_placement_of_subvertex(sender_vertex)
@@ -226,5 +226,5 @@ class BufferManager(object):
             region_offset_to_core_base = str(list(self._transciever.read_memory(
                 placement.x, placement.y, region_offset_in_pointer_table, 4))[0])
             base_address = struct.unpack("<I", region_offset_to_core_base)[0]
-            sender_vertex.buffer_collection.\
+            sender_vertex.receiver_buffer_collection.\
                 set_region_base_address_for(region_id, base_address)
