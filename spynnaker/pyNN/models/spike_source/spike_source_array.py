@@ -250,9 +250,9 @@ class SpikeSourceArray(AbstractSpikeSource,
         subvertex.set_buffered_region_size(
             real_spike_region_size,
             self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value)
-       # subvertex.set_sending_region_size(
+        #subvertex.set_sending_region_size(
         #    spikes_recording_region_size,
-         #   self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
+        #    self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
 
         self._write_setup_info(
             spec, spike_history_region_sz, spikes_recording_region_size)

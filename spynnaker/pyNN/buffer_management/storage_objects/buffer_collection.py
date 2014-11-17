@@ -8,7 +8,7 @@ from spynnaker.pyNN import exceptions
 class BufferCollection(object):
 
     def __init__(self):
-        self._buffers_to_transmit = dict()
+        self._buffers_to_use = dict()
         self._managed_vertex = None
 
     def set_partitioned_vertex(self, partitioned_vertex):
@@ -32,9 +32,9 @@ class BufferCollection(object):
         :return: None
         :rtype: None
         """
-        if region_id not in self._buffers_to_transmit.keys():
-            self._buffers_to_transmit[region_id] = BufferedRegion()
-        self._buffers_to_transmit[region_id].\
+        if region_id not in self._buffers_to_use.keys():
+            self._buffers_to_use[region_id] = BufferedRegion()
+        self._buffers_to_use[region_id].\
             add_entry_to_buffer(buffer_key, data_piece)
 
     @property
@@ -44,18 +44,18 @@ class BufferCollection(object):
 
         :return:
         """
-        return self._buffers_to_transmit.keys()
+        return self._buffers_to_use.keys()
 
     def get_size_of_region(self, region_id):
         """ get the size of a region known by the buffer region
         :param region_id: the region id to check the size of
         :return:
         """
-        if region_id not in self._buffers_to_transmit.keys():
+        if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
-        return self._buffers_to_transmit[region_id].region_size
+        return self._buffers_to_use[region_id].region_size
 
     def set_size_of_region(self, region_id, region_size):
         """ set the region size of a region being managed by the buffered region
@@ -64,11 +64,11 @@ class BufferCollection(object):
         :param region_size: the size of the region to be set
         :return:
         """
-        if region_id not in self._buffers_to_transmit.keys():
+        if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
-        self._buffers_to_transmit[region_id].set_region_size(region_size)
+        self._buffers_to_use[region_id].set_region_size(region_size)
 
     def is_region_empty(self, region_id, las_timer_tic):
         """ checks if a region is empty or not (updates buffer if the last
@@ -78,11 +78,11 @@ class BufferCollection(object):
         :param las_timer_tic:
         :return:
         """
-        if region_id not in self._buffers_to_transmit.keys():
+        if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
-        return self._buffers_to_transmit[region_id].is_region_empty(las_timer_tic)
+        return self._buffers_to_use[region_id].is_region_empty(las_timer_tic)
 
     def get_region_absolute_region_address(self, region_id):
         """gets the regions absolute regiona ddress
@@ -90,11 +90,11 @@ class BufferCollection(object):
         :param region_id: the region id to get the absolute address from
         :return:
         """
-        if region_id not in self._buffers_to_transmit.keys():
+        if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
-        return self._buffers_to_transmit[region_id].current_absolute_address
+        return self._buffers_to_use[region_id].current_absolute_address
 
     def get_region_base_address_for(self, region_id):
         """ get the base address of a region
@@ -103,11 +103,11 @@ class BufferCollection(object):
         :return: the base address of the region
         :rtype: int
         """
-        if region_id not in self._buffers_to_transmit.keys():
+        if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
-        return self._buffers_to_transmit[region_id].region_base_address
+        return self._buffers_to_use[region_id].region_base_address
 
     def set_region_base_address_for(self, region_id, new_value):
         """ set the region base address for a given region
@@ -115,11 +115,11 @@ class BufferCollection(object):
         :param region_id: the region to which the base address is setting
         :return: None
         """
-        if region_id not in self._buffers_to_transmit.keys():
+        if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
-        return self._buffers_to_transmit[region_id].\
+        return self._buffers_to_use[region_id].\
             set_region_base_address(new_value)
 
     def get_buffer_for_region(self, region_id):
@@ -128,11 +128,11 @@ class BufferCollection(object):
         :param region_id:
         :return:
         """
-        if region_id not in self._buffers_to_transmit.keys():
+        if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
-        return self._buffers_to_transmit[region_id].buffer
+        return self._buffers_to_use[region_id].buffer
 
     def get_left_over_space(self, region_id, memory_used):
         """ checks how much memroy is left over given a number of bytes being
@@ -146,13 +146,13 @@ class BufferCollection(object):
         :return: the memory left over
         :rtype: int
         """
-        if region_id not in self._buffers_to_transmit.keys():
+        if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
         total_mem_used = \
-            self._buffers_to_transmit[region_id].position_in_region + memory_used
-        return self._buffers_to_transmit[region_id].region_size - total_mem_used
+            self._buffers_to_use[region_id].position_in_region + memory_used
+        return self._buffers_to_use[region_id].region_size - total_mem_used
 
     def add_buffer_elements_to_transmit(self, region_id, buffer_key,
                                         data_pieces):
@@ -167,9 +167,9 @@ class BufferCollection(object):
         :return: None
         :rtype: None
         """
-        if region_id not in self._buffers_to_transmit.keys():
-            self._buffers_to_transmit[region_id] = BufferedRegion()
-        self._buffers_to_transmit[region_id].\
+        if region_id not in self._buffers_to_use.keys():
+            self._buffers_to_use[region_id] = BufferedRegion()
+        self._buffers_to_use[region_id].\
             add_entries_to_buffer(buffer_key, data_pieces)
 
     def contains_key(self, region_id):
@@ -178,7 +178,7 @@ class BufferCollection(object):
         :param region_id: the region  id to check if being managed so far
         :return:
         """
-        if region_id in self._buffers_to_transmit.keys():
+        if region_id in self._buffers_to_use.keys():
             return True
         return False
 
@@ -191,7 +191,7 @@ class BufferCollection(object):
         :return: either a request or None
         """
         #check if the region has got buffers
-        if buffered_packet.region_id not in self._buffers_to_transmit.keys():
+        if buffered_packet.region_id not in self._buffers_to_use.keys():
             raise spinnman_exceptions.SpinnmanInvalidPacketException(
                 "buffered_packet.region_id",
                 "The region being requested does not contain any buffered data")

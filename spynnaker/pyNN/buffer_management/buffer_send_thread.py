@@ -1,18 +1,22 @@
 import threading
 import collections
 import logging
-import socket
+from spynnaker.pyNN.buffer_management.storage_objects.send_data_request import \
+    SendDataRequest
+from spynnaker.pyNN.buffer_management.storage_objects.stop_requests_request import \
+    StopRequestsRequest
+from spynnaker.pyNN import exceptions
 
 logger = logging.getLogger(__name__)
 
 
 class BufferSendThread(threading.Thread):
 
-    def __init__(self, sdp_connection):
+    def __init__(self, transciever):
         threading.Thread.__init__(self)
         self._queue = collections.deque()
         self._queue_condition = threading.Condition()
-        self._sdp_connection = sdp_connection
+        self._transciever = transciever
         self._done = False
         self._exited = False
         self.setDaemon(True)
@@ -71,3 +75,11 @@ class BufferSendThread(threading.Thread):
         :param request:
         :return:
         """
+        if isinstance(request, SendDataRequest):
+            raise NotImplementedError
+        elif isinstance(request, StopRequestsRequest):
+            raise NotImplementedError
+        else:
+            raise exceptions.ConfigurationException(
+                "this type of request is not suitable for this thread. Please "
+                "fix and try again")

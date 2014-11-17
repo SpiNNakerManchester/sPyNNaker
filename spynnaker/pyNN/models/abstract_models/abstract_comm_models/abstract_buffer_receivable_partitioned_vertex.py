@@ -7,6 +7,8 @@ from spinnman.data.little_endian_byte_array_byte_writer import \
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 from spynnaker.pyNN.buffer_management.storage_objects.send_data_request import \
     SendDataRequest
+from spynnaker.pyNN.buffer_management.storage_objects.stop_requests_request import \
+    StopRequestsRequest
 from spynnaker.pyNN.utilities import constants
 
 
@@ -31,7 +33,9 @@ class AbstractBufferReceivablePartitionedVertex(object):
         # if the region has no more buffers to transmit, return none
         if self._receiver_buffer_collection.is_region_empty(
                 buffered_packet.region_id, buffered_packet.last_timer_tic):
-            return None
+            return StopRequestsRequest(
+                buffered_packet.chip_x, buffered_packet.chip_y,
+                buffered_packet.chip_p, buffered_packet.region_id)
 
         buffer_to_transmit = \
             self._generate_buffers_for_transmission(buffered_packet)

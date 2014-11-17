@@ -8,11 +8,11 @@ logger = logging.getLogger(__name__)
 
 class BufferRecieveThread(threading.Thread):
 
-    def __init__(self, sdp_connection):
+    def __init__(self, transciever):
         threading.Thread.__init__(self)
         self._queue = collections.deque()
         self._queue_condition = threading.Condition()
-        self._sdp_connection = sdp_connection
+        self._transciever = transciever
         self._done = False
         self._exited = False
         self.setDaemon(True)
@@ -71,4 +71,4 @@ class BufferRecieveThread(threading.Thread):
         :param request:
         :return:
         """
-        pass
+        raise NotImplementedError

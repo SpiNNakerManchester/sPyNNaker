@@ -31,30 +31,10 @@ class BufferManager(object):
         self._transciever = transciever
         self._recieve_vertices = dict()
         self._sender_vertices = dict()
-        self._sort_out_threads()
+        self._sender_thread = BufferSendThread(transciever)
+        self._recieve_thread = BufferRecieveThread(transciever)
         self._sender_thread.start()
         self._recieve_thread.start()
-
-    def _sort_out_threads(self):
-        """ starts the sneder and reciever threads
-
-        :return:
-        """
-        connections = self._transciever.get_connections()
-        usable_connection = None
-        counter = 0
-        while usable_connection is None and counter < len(connections):
-            if isinstance(connections[counter], UDPSpinnakerConnection):
-                usable_connection = connections[counter]
-            counter += 1
-
-        if usable_connection is None:
-            raise spinnman_exceptions.SpinnmanException(
-                "There was no suitable connection avilable to the board."
-                "Please recrity and try again")
-        #set up connections
-        self._sender_thread = BufferSendThread(usable_connection)
-        self._recieve_thread = BufferRecieveThread(usable_connection)
 
     @property
     def port(self):
