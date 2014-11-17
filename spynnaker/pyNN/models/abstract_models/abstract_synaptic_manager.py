@@ -358,14 +358,13 @@ class AbstractSynapticManager(object):
 
         max_weight = max((max(total_exc_weights), max(total_inh_weights)))
         
-        # If we have an STDP mechanism which has a weight dependence
+        # If we have an STDP mechanism, let it provide an extra max weight
         if self._stdp_mechanism is not None\
                 and self._stdp_mechanism.weight_dependence is not None:
             # If weight dependence has a max weight,
             # Take this into account as well
-            stdp_max_weight = self._stdp_mechanism.weight_dependence.w_max
-            if stdp_max_weight is not None:
-                max_weight = max(max_weight, stdp_max_weight)
+            stdp_max_weight = self._stdp_mechanism.get_max_weight()
+            max_weight = max(max_weight, stdp_max_weight)
             
         max_weight_log_2 = 0
         if max_weight > 0:
@@ -377,6 +376,12 @@ class AbstractSynapticManager(object):
             max_weight_log_2 = 0
 
         max_weight_power = int(math.ceil(max_weight_log_2))
+        
+        # If we have an STDP mechanism that uses signed weights,
+        # Add another bit of shift to prevent overflows
+        if self._stdp_mechanism is not None\
+            and self._stdp_mechanism.are_weights_signed():
+                max_weight_power = max_weight_power + 1
 
         logger.debug("Max weight is {}, Max power is {}"
                      .format(max_weight, max_weight_power))
@@ -574,7 +579,7 @@ class AbstractSynapticManager(object):
             synaptic_block[position_in_block:end_point].view(dtype='<u2')
         if no_fixed_plastic % 2.0 == 1:  # remove last entry if required
             fixed_plastic_entries = \
-                fixed_plastic_entries[0:len(fixed_plastic_entries) - 2]
+                fixed_plastic_entries[0:len(fixed_plastic_entries) - 1]
         ##for element in fixed_plastic_entries:
         ##    assert(element != 3150765550)
         #return the different entries
@@ -615,7 +620,8 @@ class AbstractSynapticManager(object):
         maxed_row_length, synaptic_block_base_address_offset = \
             self._master_pop_table_generator.\
             extract_synaptic_matrix_data_location(
-                incoming_key_combo, master_pop_base_mem_address)
+                incoming_key_combo, master_pop_base_mem_address, transceiver,
+                post_x, post_y)
 
         #calculate the synaptic block size in words
         synaptic_block_size = pre_n_atoms * 4 * \

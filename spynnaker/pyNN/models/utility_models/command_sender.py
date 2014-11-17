@@ -244,9 +244,4 @@ class CommandSender(AbstractMultiCastSource):
 
     def get_binary_file_name(self):
         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'command_sender_multicast_source.aplx')
-        return binary_name
+        return 'command_sender_multicast_source.aplx'

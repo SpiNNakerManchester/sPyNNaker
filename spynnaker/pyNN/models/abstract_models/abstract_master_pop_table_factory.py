@@ -7,6 +7,8 @@ import logging
 from spinnman import exceptions as spinnman_exceptions
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.utility_calls \
+    import get_region_base_address_offset
 
 import struct
 
@@ -117,7 +119,7 @@ class AbstractMasterPopTableFactory(object):
         master_pop_region = master_pop_table_region
 
         master_region_base_address_address = \
-            self.get_region_base_address_offset(app_data_base_address,
+            get_region_base_address_offset(app_data_base_address,
                                                 master_pop_region)
 
         master_region_base_address_offset = \

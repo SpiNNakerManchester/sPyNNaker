@@ -1,15 +1,16 @@
-from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_time_dependency import AbstractTimeDependency
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     weight_based_plastic_synapse_row_io import WeightBasedPlasticSynapseRowIo
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics import stdp_helpers
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
+    import stdp_helpers
 
 import logging
 logger = logging.getLogger(__name__)
 
 # Constants
-# **NOTE** these should be passed through magical per-vertex build setting thing
+# **NOTE** these should be passed through magical per-vertex build setting
+# thing
 LOOKUP_TAU_PLUS_SIZE = 256
 LOOKUP_TAU_PLUS_SHIFT = 0
 LOOKUP_TAU_MINUS_SIZE = 256
@@ -29,43 +30,26 @@ TIME_STAMP_BYTES = 4
 ALL_TO_ALL_EVENT_BYTES = 4
 
 # Calculate number of words required for header
-ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS = \
-    1 + ((NUM_PRE_SYNAPTIC_EVENTS * (TIME_STAMP_BYTES + ALL_TO_ALL_EVENT_BYTES))
-         / 4)
+ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS = 1 + ((NUM_PRE_SYNAPTIC_EVENTS
+         * (TIME_STAMP_BYTES + ALL_TO_ALL_EVENT_BYTES)) / 4)
 
 
 class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
 
     # noinspection PyPep8Naming
-    def __init__(self, A3_plus, A3_minus, tau_plus, tau_minus, tau_x, tau_y,
-                 w_max):
+    def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
         AbstractTimeDependency.__init__(self, tau_plus, tau_minus)
-        self._A3_plus = A3_plus
-        self._A3_minus = A3_minus
         self._tau_x = tau_x
         self._tau_y = tau_y
-        self._w_max = w_max  # HACK
         
     def __eq__(self, other):
         if (other is None) or (
                 not isinstance(other, PfisterSpikeTripletTimeDependence)):
             return False
         return ((self._tau_plus == other.tau_plus)
-                and (self._A3_plus == other.A3_plus)
-                and (self._A3_minus == other.A3_minus)
                 and (self._tau_minus == other.tau_minus)
                 and (self._tau_x == other.tau_x)
                 and (self._tau_y == other.tau_y))
-
-    # noinspection PyPep8Naming
-    @property
-    def A3_plus(self):
-        return self._A3_plus
-
-    # noinspection PyPep8Naming
-    @property
-    def A3_minus(self):
-        return self._A3_minus
 
     @property
     def tau_x(self):
@@ -75,9 +59,13 @@ class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
     def tau_y(self):
         return self._tau_y
 
-    def get_synapse_row_io(self):
+    def get_synapse_row_io(self, dendritic_delay_fraction):
         return WeightBasedPlasticSynapseRowIo(
-            ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS)
+            ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS,
+            dendritic_delay_fraction)
+
+    def get_num_terms(self):
+        return 2
 
     def get_params_size_bytes(self):
         return (2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE +
@@ -95,14 +83,6 @@ class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
             raise NotImplementedError("STDP LUT generation currently only "
                                       "supports 1ms timesteps")
        
-        # Write parameters 
-        spec.write_value(data=int(
-                         round(self._A3_plus * self._w_max * weight_scale)),
-                         data_type=DataType.INT32)
-        spec.write_value(data=int(
-                         round(self._A3_minus * self._w_max * weight_scale)),
-                         data_type=DataType.INT32)
-        
         # Write lookup tables
         stdp_helpers.write_exponential_decay_lut(spec, self._tau_plus,
                                                  LOOKUP_TAU_PLUS_SIZE,

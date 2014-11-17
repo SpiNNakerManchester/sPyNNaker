@@ -58,6 +58,7 @@ from spinnman.model.iptag.reverse_iptag import ReverseIPTag
 
 import logging
 import math
+import os
 import sys
 import time
 from multiprocessing.pool import ThreadPool
@@ -68,7 +69,7 @@ logger = logging.getLogger(__name__)
 class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
-                 max_delay=None, graph_label=None):
+                 max_delay=None, graph_label=None, binary_search_paths=[]):
         SpynnakerConfiguration.__init__(self, host_name, graph_label)
 
         if self._app_id is None:
@@ -91,7 +92,21 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         #get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
+        
+        # Begin list of binary search paths 
+        # With those passed to constructor
+        self._binary_search_paths = binary_search_paths
+        
+        # Determine default executable folder location
+        binary_path = os.path.abspath(exceptions.__file__)
+        binary_path = os.path.abspath(os.path.join(binary_path, os.pardir))
+        binary_path = os.path.join(binary_path, "model_binaries")
+        
+        #add this default to end of list of search paths
+        self._binary_search_paths.append(binary_path)
+        
         self._edge_count = 0
+        
 
     def run(self, run_time):
         self._setup_interfaces(hostname=self._hostname)
@@ -463,9 +478,16 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._report_default_directory, progress_bar)
                 thread_pool.apply_async(data_generator_interface.start())
 
+                # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
-                if binary_name in executable_targets.keys():
-                    executable_targets[binary_name].add_processor(placement.x,
+                
+                # Attempt to find this within search paths
+                binary_path = self._get_executable_path(binary_name)
+                if binary_path is None:
+                    raise exceptions.ExecutableNotFoundException(binary_name)
+                
+                if binary_path in executable_targets.keys():
+                    executable_targets[binary_path].add_processor(placement.x,
                                                                   placement.y,
                                                                   placement.p)
                 else:
@@ -473,7 +495,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     initial_core_subset = CoreSubset(placement.x, placement.y,
                                                      processors)
                     list_of_core_subsets = [initial_core_subset]
-                    executable_targets[binary_name] = \
+                    executable_targets[binary_path] = \
                         CoreSubsets(list_of_core_subsets)
 
         thread_pool.close()
@@ -557,7 +579,20 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if self._visualiser_vertices is None:
             self._visualiser_vertices = list()
         self._visualiser_vertices.append(visualiser_vertex_to_add)
-
+    
+    def _get_executable_path(self, executable_name):
+        # Loop through search paths
+        for path in self._binary_search_paths:
+            # Rebuild filename
+            potential_filename = os.path.join(path, executable_name)
+            
+            # If this filename exists, return it
+            if os.path.isfile(potential_filename):
+                return potential_filename
+            
+        # No executable found
+        return None
+    
     def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
         for vertex in self._partitionable_graph.vertices:
             virtual_chip_constraints = \

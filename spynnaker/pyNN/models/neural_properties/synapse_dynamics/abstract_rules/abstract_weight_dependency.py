@@ -9,12 +9,15 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
 class AbstractWeightDependency(AbstractRulePart):
 
     #noinspection PyPep8Naming
-    def __init__(self, w_min, w_max, A_plus, A_minus):
+    def __init__(self, w_min, w_max, A_plus, A_minus, A3_plus=None,
+            A3_minus=None):
         AbstractRulePart.__init__(self)
         self._w_min = w_min
         self._w_max = w_max
         self._A_plus = A_plus
         self._A_minus = A_minus
+        self._A3_plus = A3_plus
+        self._A3_minus = A3_minus
 
     @property
     def w_min(self):
@@ -27,12 +30,22 @@ class AbstractWeightDependency(AbstractRulePart):
     #noinspection PyPep8Naming
     @property
     def A_plus(self):
-        return self.A_plus
+        return self._A_plus
 
     #noinspection PyPep8Naming
     @property
     def A_minus(self):
         return self._A_minus
+        
+    #noinspection PyPep8Naming
+    @property
+    def A3_plus(self):
+        return self._A3_plus
+
+    #noinspection PyPep8Naming
+    @property
+    def A3_minus(self):
+        return self._A3_minus
 
     def is_rule_part(self):
         return True

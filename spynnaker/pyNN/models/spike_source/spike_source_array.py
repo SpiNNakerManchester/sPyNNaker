@@ -13,7 +13,6 @@ from spynnaker.pyNN import exceptions
 
 from math import ceil
 import logging
-import os
 import math
 
 logger = logging.getLogger(__name__)
@@ -339,13 +338,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         data_writer.close()
 
     def get_binary_file_name(self):
-        # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'spike_source_array.aplx')
-        return binary_name
+        return "spike_source_array.aplx"
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):

@@ -83,11 +83,11 @@ class SpynnakerCommsFunctions(object):
             self._txrx.discover_scamp_connections()
             self._machine = self._txrx.get_machine_details()
         else:
-            virtual_x_dimension = conf.config.get("Machine",
+            virtual_x_dimension = conf.config.getint("Machine",
                                                   "virutal_board_x_dimension")
-            virtual_y_dimension = conf.config.get("Machine",
+            virtual_y_dimension = conf.config.getint("Machine",
                                                   "virutal_board_y_dimension")
-            requires_wrap_around = conf.config.get("Machine",
+            requires_wrap_around = conf.config.getboolean("Machine",
                                                    "requires_wrap_arounds")
             self._machine = VirtualMachine(
                 x_dimension=virtual_x_dimension,
@@ -463,15 +463,8 @@ class SpynnakerCommsFunctions(object):
             file_reader = SpinnmanFileDataReader(exectuable_target_key)
             core_subset = executable_targets[exectuable_target_key]
 
-            # for some reason, we have to hand the size of a binary. The only
-            #logical way to do this is to read the exe and determine the length
-            #. TODO this needs to change so that the trasnciever figures this out
-            #itself
-
-            # TODO FIX THIS CHUNK
-            statinfo = os.stat(exectuable_target_key)
             file_to_read_in = open(exectuable_target_key, 'rb')
-            buf = file_to_read_in.read(statinfo.st_size)
+            buf = file_to_read_in.read()
             size = (len(buf))
 
             self._txrx.execute_flood(core_subset, file_reader, app_id,

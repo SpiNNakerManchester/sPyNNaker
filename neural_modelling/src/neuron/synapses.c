@@ -170,8 +170,8 @@ int synaptic_row (address_t* address, size_t* size_bytes, spike_t key)
   s = d & 0x7; // get lowest 3 bits into s;
   d = d >> 3;  // d is now only 13 bits, i.e. 0..8095 .
 
-  log_info("spike = %08x, pid = %u, s = %u, d = %u, nid = %u",
-	   key, pid, s, d, nid);
+  //log_info("spike = %08x, pid = %u, s = %u, d = %u, nid = %u",
+  //  key, pid, s, d, nid);
 
   if(s == 0)
   {
@@ -190,7 +190,7 @@ int synaptic_row (address_t* address, size_t* size_bytes, spike_t key)
     // **NOTE** 1024 converts from kilobyte offset to byte offset
     uint32_t population_offset = d * 1024;
     
-    log_info("stride = %u, neuron offset = %u, population offset = %u, base = %08x, size = %u", stride, neuron_offset, population_offset, synaptic_row_base, *size_bytes);
+    //log_info("stride = %u, neuron offset = %u, population offset = %u, base = %08x, size = %u", stride, neuron_offset, population_offset, synaptic_row_base, *size_bytes);
     
     *address = (uint32_t*) ((uint32_t)synaptic_row_base + population_offset + neuron_offset);
   }

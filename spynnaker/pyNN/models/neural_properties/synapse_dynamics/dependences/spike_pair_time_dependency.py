@@ -2,13 +2,15 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_time_dependency import AbstractTimeDependency
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     weight_based_plastic_synapse_row_io import WeightBasedPlasticSynapseRowIo
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics import stdp_helpers
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
+    import stdp_helpers
 
 import logging
 logger = logging.getLogger(__name__)
 
 # Constants
-# **NOTE** these should be passed through magical per-vertex build setting thing
+# **NOTE** these should be passed through magical per-vertex build setting
+# thing
 LOOKUP_TAU_PLUS_SIZE = 256
 LOOKUP_TAU_PLUS_SHIFT = 0
 LOOKUP_TAU_MINUS_SIZE = 256
@@ -25,12 +27,10 @@ ALL_TO_ALL_EVENT_BYTES = 2
 NEAREST_PAIR_EVENT_BYTES = 0
 
 # Calculate number of words required for header
-ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS = \
-    1 + ((NUM_PRE_SYNAPTIC_EVENTS * (TIME_STAMP_BYTES + ALL_TO_ALL_EVENT_BYTES))
-         / 4)
-NEAREST_PAIR_PLASTIC_REGION_HEADER_WORDS = \
-    1 + ((NUM_PRE_SYNAPTIC_EVENTS *
-          (TIME_STAMP_BYTES + NEAREST_PAIR_EVENT_BYTES)) / 4)
+ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS = 1 + ((NUM_PRE_SYNAPTIC_EVENTS
+        * (TIME_STAMP_BYTES + ALL_TO_ALL_EVENT_BYTES)) / 4)
+NEAREST_PAIR_PLASTIC_REGION_HEADER_WORDS = 1 + ((NUM_PRE_SYNAPTIC_EVENTS
+        * (TIME_STAMP_BYTES + NEAREST_PAIR_EVENT_BYTES)) / 4)
 
 
 class SpikePairTimeDependency(AbstractTimeDependency):
@@ -50,14 +50,18 @@ class SpikePairTimeDependency(AbstractTimeDependency):
                 and (self._tau_minus == other.tau_minus)
                 and (self._nearest == other.nearest))
 
-    def get_synapse_row_io(self):
+    def get_synapse_row_io(self, dendritic_delay_fraction):
         synaptic_row_header_words = \
             NEAREST_PAIR_PLASTIC_REGION_HEADER_WORDS \
             if self.nearest else ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS
-        return WeightBasedPlasticSynapseRowIo(synaptic_row_header_words)
+        return WeightBasedPlasticSynapseRowIo(synaptic_row_header_words,
+                dendritic_delay_fraction)
 
     def get_params_size_bytes(self):
         return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
+    
+    def get_num_terms(self):
+        return 1
 
     def get_vertex_executable_suffix(self):
         return "nearest_pair" if self.nearest else "pair"

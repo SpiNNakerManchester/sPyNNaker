@@ -33,8 +33,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
                                           master_pop_base_mem_address)
         #read in entry
         master_pop_entry = \
-            self._master_pop_table_generator.read_and_convert(
-                pre_x, pre_y, master_table_pop_entry_address, 2, "<H",
+            self.read_and_convert(
+                chip_x, chip_y, master_table_pop_entry_address, 2, "<H",
                 txrx)
 
         synaptic_block_base_address = master_pop_entry >> 3  # in kilobytes
