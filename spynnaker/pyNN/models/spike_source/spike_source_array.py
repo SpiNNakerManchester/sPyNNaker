@@ -91,16 +91,12 @@ class SpikeSourceArray(AbstractSpikeSource,
                     time_stamp_in_ticks = \
                         int((timeStamp * 1000.0) / self._machine_time_step)
                     if not buffer_collection.contains_key(time_stamp_in_ticks):
-                        buffer_collection.add_buffer_element_to_transmit(
-                            self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
-                            time_stamp_in_ticks, neuron)
                         no_buffers += 1
-                        number_of_spikes_transmitted += 1
-                    else:
-                        buffer_collection.add_buffer_element_to_transmit(
-                            self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
-                            time_stamp_in_ticks, neuron)
-                        number_of_spikes_transmitted += 1
+                    #add to buffer collection
+                    buffer_collection.add_buffer_element_to_transmit(
+                        self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
+                        time_stamp_in_ticks, neuron)
+                    number_of_spikes_transmitted += 1
         else:
             # This is in official PyNN format, all neurons use the same list:
             neuron_list = range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
@@ -108,21 +104,16 @@ class SpikeSourceArray(AbstractSpikeSource,
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
                 if not buffer_collection.contains_key(time_stamp_in_ticks):
-                    buffer_collection.add_buffer_elements_to_transmit(
-                        self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
-                        time_stamp_in_ticks, neuron_list)
                     no_buffers += 1
-                    number_of_spikes_transmitted += vertex_slice.n_atoms
-                else:
-                    buffer_collection.add_buffer_elements_to_transmit(
-                        self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
-                        time_stamp_in_ticks, neuron_list)
-                    number_of_spikes_transmitted += vertex_slice.n_atoms
+                #add to buffer collection
+                buffer_collection.add_buffer_elements_to_transmit(
+                    self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
+                    time_stamp_in_ticks, neuron_list)
+                number_of_spikes_transmitted += vertex_slice.n_atoms
 
-        memory_used = \
-            ((no_buffers * (constants.BUFFER_HEADER_SIZE +
-                            constants.TIMESTAMP_SPACE_REQUIREMENT)) +
-             (number_of_spikes_transmitted * constants.KEY_SIZE))
+        memory_used = ((no_buffers * (constants.BUFFER_HEADER_SIZE +
+                        constants.TIMESTAMP_SPACE_REQUIREMENT)) +
+                       (number_of_spikes_transmitted * constants.KEY_SIZE))
         return memory_used, buffer_collection
 
     def _reserve_memory_regions(self, spec, setup_sz, spike_region_size,
@@ -242,21 +233,29 @@ class SpikeSourceArray(AbstractSpikeSource,
             real_spike_region_size = 4
 
         # Calculate memory requirements:
-        spike_buffer_region_size = \
+        spikes_recording_region_size = \
             self._get_recording_region_size(real_spike_region_size)
 
         #set buffered knowledge of the size of the buffered regions (in + out)
         self._buffer_region_memory_size = real_spike_region_size
         self._threshold_for_reporting_bytes_written = math.floor(
-            spike_buffer_region_size / self._no_buffers_for_recording)
+            spikes_recording_region_size / self._no_buffers_for_recording)
 
         # Create the data regions for the spike source array:
         self._reserve_memory_regions(
             spec, self._CONFIGURATION_REGION_SIZE, real_spike_region_size,
-            spike_buffer_region_size)
+            spikes_recording_region_size)
+
+        #update the spike soruce partitioned vertex with its region sizes
+        subvertex.set_region_size(
+            real_spike_region_size,
+            self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value)
+        subvertex.set_region_size(
+            spikes_recording_region_size,
+            self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
 
         self._write_setup_info(
-            spec, spike_history_region_sz, spike_buffer_region_size)
+            spec, spike_history_region_sz, spikes_recording_region_size)
 
         # End-of-Spec:
         spec.end_specification()
@@ -348,7 +347,7 @@ class SpikeSourceArray(AbstractSpikeSource,
     def create_subvertex(self, resources_required, vertex_slice, label=None,
                          additional_constraints=list()):
         """ overloaded method from abstract pattitionable vertex. used to hand
-        a partitioned spike soruce array its own buffers
+        a partitioned spike soruce array its own buffer_collection
 
         :param resources_required:
         :param vertex_slice:
@@ -356,10 +355,13 @@ class SpikeSourceArray(AbstractSpikeSource,
         :param additional_constraints:
         :return:
         """
-        size, buffers = self._get_spikes_per_timestep(vertex_slice)
-        return SpikeSourceArrayPartitionedVertex(
-            buffers=buffers, label=label, resources_used=resources_required,
+        size, buffer_collection = self._get_spikes_per_timestep(vertex_slice)
+        partitioned_vertex = SpikeSourceArrayPartitionedVertex(
+            buffer_collection=buffer_collection, label=label,
+            resources_used=resources_required,
             additional_constraints=additional_constraints)
+        buffer_collection.set_partitioned_vertex(partitioned_vertex)
+        return partitioned_vertex
 
     def is_buffer_sendable_vertex(self):
         """helper method for isinstance

@@ -1,19 +1,24 @@
 from spinnman import exceptions as spinnman_exceptions
-from spinnman.data.little_endian_byte_array_byte_writer import \
-    LittleEndianByteArrayByteWriter
-from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
-from spynnaker.pyNN.buffer_management.storage_objects.buffer_data_storage \
-    import BufferDataStorage
-from spynnaker.pyNN.buffer_management.storage_objects.send_data_request \
-    import SendDataRequest
+from spynnaker.pyNN.buffer_management.storage_objects.buffered_region \
+    import BufferedRegion
 from spynnaker.pyNN.utilities import constants
-import math
+from spynnaker.pyNN import exceptions
 
 
 class BufferCollection(object):
 
     def __init__(self):
         self._buffers_to_transmit = dict()
+        self._managed_vertex = None
+
+    def set_partitioned_vertex(self, partitioned_vertex):
+        if self._managed_vertex is None:
+            self._managed_vertex = partitioned_vertex
+        else:
+            raise exceptions.ConfigurationException(
+                "tried to set the managed vertex of a buffer collection region "
+                "twice, this is a error due to the imutability of this "
+                "parameter, please fix this issue and retry")
 
     def add_buffer_element_to_transmit(self, region_id, buffer_key, data_piece):
         """ adds a buffer for a given region id
@@ -28,9 +33,126 @@ class BufferCollection(object):
         :rtype: None
         """
         if region_id not in self._buffers_to_transmit.keys():
-            self._buffers_to_transmit[region_id] = BufferDataStorage()
+            self._buffers_to_transmit[region_id] = BufferedRegion()
         self._buffers_to_transmit[region_id].\
             add_entry_to_buffer(buffer_key, data_piece)
+
+    @property
+    def regions_managed(self):
+        """ returns the region ids of the regions managed by this buffer
+        collection
+
+        :return:
+        """
+        return self._buffers_to_transmit.keys()
+
+    def get_size_of_region(self, region_id):
+        """ get the size of a region known by the buffer region
+        :param region_id: the region id to check the size of
+        :return:
+        """
+        if region_id not in self._buffers_to_transmit.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        return self._buffers_to_transmit[region_id].region_size
+
+    def set_size_of_region(self, region_id, region_size):
+        """ set the region size of a region being managed by the buffered region
+
+        :param region_id: the region id to be managed
+        :param region_size: the size of the region to be set
+        :return:
+        """
+        if region_id not in self._buffers_to_transmit.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        self._buffers_to_transmit[region_id].set_region_size(region_size)
+
+    def is_region_empty(self, region_id, las_timer_tic):
+        """ checks if a region is empty or not (updates buffer if the last
+        timer tic is after what was expected
+
+        :param region_id:
+        :param las_timer_tic:
+        :return:
+        """
+        if region_id not in self._buffers_to_transmit.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        return self._buffers_to_transmit[region_id].is_region_empty(las_timer_tic)
+
+    def get_region_absolute_region_address(self, region_id):
+        """gets the regions absolute regiona ddress
+
+        :param region_id: the region id to get the absolute address from
+        :return:
+        """
+        if region_id not in self._buffers_to_transmit.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        return self._buffers_to_transmit[region_id].current_absolute_address
+
+    def get_region_base_address_for(self, region_id):
+        """ get the base address of a region
+
+        :param region_id: the region id to get the absolute address from
+        :return: the base address of the region
+        :rtype: int
+        """
+        if region_id not in self._buffers_to_transmit.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        return self._buffers_to_transmit[region_id].region_base_address
+
+    def set_region_base_address_for(self, region_id, new_value):
+        """ set the region base address for a given region
+
+        :param region_id: the region to which the base address is setting
+        :return: None
+        """
+        if region_id not in self._buffers_to_transmit.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        return self._buffers_to_transmit[region_id].\
+            set_region_base_address(new_value)
+
+    def get_buffer_for_region(self, region_id):
+        """ get the buffer for a given region
+
+        :param region_id:
+        :return:
+        """
+        if region_id not in self._buffers_to_transmit.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        return self._buffers_to_transmit[region_id].buffer
+
+    def get_left_over_space(self, region_id, memory_used):
+        """ checks how much memroy is left over given a number of bytes being
+         used
+
+        :param region_id: the region id to which this calcuation is being
+         carried out on
+         :type region_id: int
+        :param memory_used: the amount of memory being used in this region
+        :type memory_used: int
+        :return: the memory left over
+        :rtype: int
+        """
+        if region_id not in self._buffers_to_transmit.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        total_mem_used = \
+            self._buffers_to_transmit[region_id].position_in_region + memory_used
+        return self._buffers_to_transmit[region_id].region_size - total_mem_used
 
     def add_buffer_elements_to_transmit(self, region_id, buffer_key,
                                         data_pieces):
@@ -46,12 +168,17 @@ class BufferCollection(object):
         :rtype: None
         """
         if region_id not in self._buffers_to_transmit.keys():
-            self._buffers_to_transmit[region_id] = BufferDataStorage()
+            self._buffers_to_transmit[region_id] = BufferedRegion()
         self._buffers_to_transmit[region_id].\
             add_entries_to_buffer(buffer_key, data_pieces)
 
-    def contains_key(self, key):
-        if key in self._buffers_to_transmit.keys():
+    def contains_key(self, region_id):
+        """ checks if a region is being magaed so far
+
+        :param region_id: the region  id to check if being managed so far
+        :return:
+        """
+        if region_id in self._buffers_to_transmit.keys():
             return True
         return False
 
@@ -74,69 +201,5 @@ class BufferCollection(object):
             raise spinnman_exceptions.SpinnmanInvalidPacketException(
                 "buffered_packet.count",
                 "The count is below what is needed for a eieio header, and so"
-                "shouldnt have been requested")
-        # if the region has no more buffers to transmit, return none
-        if len(self._buffers_to_transmit[buffered_packet.region_id].buffer) == 0:
-            return None
-
-        buffer_to_transmit, memory_used = \
-            self._generate_buffers_for_transmission(buffered_packet)
-
-        address_pointer = \
-            self._buffers_to_transmit[buffered_packet.region_id].\
-            current_absolute_address
-        self._buffers_to_transmit[buffered_packet.region_id].add_to_pointer(memory_used)
-        return SendDataRequest(
-            chip_x=buffered_packet.chip_x, chip_y=buffered_packet.chip_y,
-            chip_p=buffered_packet.chip_p, address_pointer=address_pointer,
-            data=buffer_to_transmit)
-
-    def _generate_buffers_for_transmission(self, buffered_packet):
-        #build the buffer for the size avilable
-        data = LittleEndianByteArrayByteWriter()
-        buffers = self._buffers_to_transmit[buffered_packet.region_id].buffer
-        buffer_keys = list(buffers.keys())
-        #by default there is always a eieio header (in the form of a spike train)
-        memory_used = constants.BUFFER_HEADER_SIZE + \
-            constants.TIMESTAMP_SPACE_REQUIREMENT
-        while memory_used < buffered_packet.count:
-            header_byte_1 = (1 << 5) + (1 << 4) + \
-                            (EIEIOTypeParam.KEY_PAYLOAD_32_BIT.value << 2)
-            buffer_length = len(buffers[buffer_keys[memory_used]]) * 4
-            # check if theres enough space in buffer for packets for this
-            # time stamp
-            if buffer_length < buffered_packet.count:
-                #check that the limit on the eieio message count is valid
-                if len(buffers[buffer_keys[memory_used]]) > (math.pow(2, 8) - 1):
-                    data.write_byte(math.pow(2, 8) - 1)  # header count
-                    data.write_byte(header_byte_1)  # header header
-                    data.write_int(buffer_keys[memory_used])  # time stamp
-                    # write entries
-                    for entry in range(0, math.pow(2, 8) - 1):
-                        data.write_int(buffers[buffer_keys[memory_used]][entry])
-                    del buffers[buffer_keys[memory_used]][0:math.pow(2, 8) - 1]
-                    memory_used += (math.pow(2, 8) - 1 * 4)
-                else:
-                    data.write_byte(len(buffers[buffer_keys[memory_used]]))  # header count
-                    data.write_byte(header_byte_1)  # header header
-                    data.write_int(buffer_keys[memory_used])  # time stamp
-                    # write entries
-                    for entry in buffers[buffer_keys[memory_used]]:
-                        data.write_int(entry)
-                    del buffers[buffer_keys[memory_used]]
-                    memory_used += len(buffers[buffer_keys[memory_used]]) * 4
-            else:
-                length_avilable = buffered_packet.count - memory_used
-                entries_to_put_in = math.floor(length_avilable / 4)
-                data.write_byte(entries_to_put_in)  # header count
-                data.write_byte(header_byte_1)  # header header
-                data.write_int(buffer_keys[memory_used])  # time stamp
-                # write entries
-                for entry in range(0, entries_to_put_in):
-                    data.write_int(buffers[buffer_keys[memory_used]][entry])
-                del buffers[buffer_keys[memory_used]][0:entries_to_put_in]
-                memory_used += (entries_to_put_in * 4)
-            memory_used = constants.BUFFER_HEADER_SIZE + \
-                constants.TIMESTAMP_SPACE_REQUIREMENT
-
-        return data, memory_used
+                " shouldnt have been requested")
+        return self._managed_vertex.process_buffer_packet(buffered_packet)

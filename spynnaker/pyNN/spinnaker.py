@@ -238,37 +238,24 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                         "on initilising the buffer managers for vertices "
                         "which require buffering")
         for partitionable_vertex in self.partitionable_graph.vertices:
+            # if the buffer manager for this port has not been built yet,
+            # build it
+            key = partitionable_vertex.get_ip_tag().string_representation()
+            if key not in self._buffer_managers.keys():
+                self._buffer_managers[key] = BufferManager(
+                    self._placements, self._routing_infos, self.graph_mapper,
+                    partitionable_vertex.get_ip_tag().port,
+                    partitionable_vertex.get_ip_tag().address, self._txrx)
+
             #locate vertices which need to be buffer receiving managed
-            if isinstance(partitionable_vertex, AbstractBufferReceivablePartitionableVertex):
-                key = partitionable_vertex.get_ip_tag().string_representation()
-                # if the buffer manager for this port has not been built yet,
-                # build it
-                if key not in self._buffer_managers.keys():
-                    self._buffer_managers[key] = \
-                        BufferManager(
-                            self._placements, self._routing_infos,
-                            self.graph_mapper,
-                            partitionable_vertex.get_ip_tag().port,
-                            partitionable_vertex.get_ip_tag().address,
-                            self._txrx)
-                #register the manageable vertex
+            if isinstance(partitionable_vertex,
+                          AbstractBufferReceivablePartitionableVertex):
                 self._buffer_managers[key].add_received_vertex(partitionable_vertex)
             if isinstance(partitionable_vertex, AbstractBufferSendableVertex):
-                key = partitionable_vertex.get_ip_tag().string_representation()
-                # if the buffer manager for this port has not been built yet,
-                # build it
-                if key not in self._buffer_managers.keys():
-                    self._buffer_managers[key] = \
-                        BufferManager(
-                            self._placements, self._routing_infos,
-                            self.graph_mapper,
-                            partitionable_vertex.get_ip_tag().port,
-                            partitionable_vertex.get_ip_tag().address,
-                            self._txrx)
-                #register the manageable vertex
                 self._buffer_managers[key].add_sender_vertex(partitionable_vertex)
             progress_bar.update()
         progress_bar.end()
+
         #set up listener for buffer command messages if the buffer manager has
         #has been initilised
         progress_bar = ProgressBar(len(self._buffer_managers.keys()),
@@ -715,5 +702,12 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                                                       router_table.y)
             time.sleep(0.5)
             self._txrx.send_signal(app_id, SCPSignal.STOP)
+            #clear rtr_diagnostics
+            for chip in self._machine.chips:
+                self._txrx.clear_router_diagnostics(chip.x, chip.y)
+            #clear iptags
+            for iptag in self._iptags:
+                self._txrx.clear_ip_tag(iptag.tag)
+
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()
