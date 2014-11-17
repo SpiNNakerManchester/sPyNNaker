@@ -37,7 +37,7 @@ ALL_TO_ALL_PLASTIC_REGION_HEADER_WORDS = 1 + ((NUM_PRE_SYNAPTIC_EVENTS
 class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
 
     # noinspection PyPep8Naming
-    def __init__(self, A3_plus, A3_minus, tau_plus, tau_minus, tau_x, tau_y):
+    def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
         AbstractTimeDependency.__init__(self, tau_plus, tau_minus)
         self._tau_x = tau_x
         self._tau_y = tau_y

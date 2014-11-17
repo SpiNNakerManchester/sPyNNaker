@@ -149,17 +149,17 @@ class AbstractSynapticManager(object):
         # The current write pointer is where the next block could start:
         next_block_start_addr = write_ptr
         return block_start_addr, next_block_start_addr
-    
+
     def get_exact_synaptic_block_memory_size(self, graph_mapper,
                                              subvertex_in_edges):
         memory_size = 0
-        
+
         # Go through the subedges and add up the memory
         for subedge in subvertex_in_edges:
             #pad the memory size to meet 1 k offsets
             if (memory_size & 0x3FF) != 0:
                 memory_size = (memory_size & 0xFFFFFC00) + 0x400
-            
+
             sublist = subedge.get_synapse_sublist(graph_mapper)
             max_n_words = \
                 max([graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
@@ -177,16 +177,16 @@ class AbstractSynapticManager(object):
     def get_synaptic_blocks_memory_size(self, vertex_slice, in_edges):
         self._check_synapse_dynamics(in_edges)
         memory_size = 0
-        
+
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionPartitionableEdge):
-                
-                # Get maximum row length in this edge 
+
+                # Get maximum row length in this edge
                 max_n_words = in_edge.get_max_n_words(vertex_slice)
                 all_syn_block_sz = \
                     self._calculate_all_synaptic_block_size(in_edge,
                                                             max_n_words)
-                
+
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master pynn_population.py
                 # table
@@ -204,7 +204,7 @@ class AbstractSynapticManager(object):
                     extra_mem = 1024
                 all_syn_block_sz += extra_mem
                 memory_size += all_syn_block_sz
-                
+
         return memory_size
 
     def _calculate_all_synaptic_block_size(self, synaptic_sub_list,
@@ -343,8 +343,8 @@ class AbstractSynapticManager(object):
         ring_buffer_to_input_left_shift to produce an s1615 fixed point number
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
-    
-    def get_ring_buffer_to_input_left_shift(self, subvertex, sub_graph, 
+
+    def get_ring_buffer_to_input_left_shift(self, subvertex, sub_graph,
                                             graph_mapper):
 
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
@@ -357,7 +357,7 @@ class AbstractSynapticManager(object):
             sublist.sum_weights(total_exc_weights, total_inh_weights)
 
         max_weight = max((max(total_exc_weights), max(total_inh_weights)))
-        
+
         # If we have an STDP mechanism, let it provide an extra max weight
         if self._stdp_mechanism is not None\
                 and self._stdp_mechanism.weight_dependence is not None:
@@ -376,13 +376,13 @@ class AbstractSynapticManager(object):
             max_weight_log_2 = 0
 
         max_weight_power = int(math.ceil(max_weight_log_2))
-        
+
         # If we have an STDP mechanism that uses signed weights,
         # Add another bit of shift to prevent overflows
         if self._stdp_mechanism is not None\
             and self._stdp_mechanism.are_weights_signed():
                 max_weight_power = max_weight_power + 1
-        
+
         logger.debug("Max weight is {}, Max power is {}"
                     .format(max_weight, max_weight_power))
 
@@ -390,7 +390,7 @@ class AbstractSynapticManager(object):
         # but we ignore the "-1" to allow a bit of overhead in the above
         # calculation in case a couple of extra spikes come in
         return max_weight_power
-    
+
     def write_synaptic_matrix_and_master_population_table(
             self, spec, subvertex, all_syn_block_sz, weight_scale,
             master_pop_table_region, synaptic_matrix_region, routing_info,
@@ -620,7 +620,8 @@ class AbstractSynapticManager(object):
         maxed_row_length, synaptic_block_base_address_offset = \
             self._master_pop_table_generator.\
             extract_synaptic_matrix_data_location(
-                incoming_key_combo, master_pop_base_mem_address)
+                incoming_key_combo, master_pop_base_mem_address, transceiver,
+                post_x, post_y)
 
         #calculate the synaptic block size in words
         synaptic_block_size = pre_n_atoms * 4 * \

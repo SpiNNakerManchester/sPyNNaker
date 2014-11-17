@@ -45,7 +45,7 @@ class STDPMechanism(object):
         return self._timing_dependence
 
     @property
-    def weight_depenedence(self):
+    def weight_dependence(self):
         return self._weight_dependence
 
     @property

@@ -83,11 +83,11 @@ class SpynnakerCommsFunctions(object):
             self._txrx.discover_scamp_connections()
             self._machine = self._txrx.get_machine_details()
         else:
-            virtual_x_dimension = conf.config.get("Machine",
+            virtual_x_dimension = conf.config.getint("Machine",
                                                   "virutal_board_x_dimension")
-            virtual_y_dimension = conf.config.get("Machine",
+            virtual_y_dimension = conf.config.getint("Machine",
                                                   "virutal_board_y_dimension")
-            requires_wrap_around = conf.config.get("Machine",
+            requires_wrap_around = conf.config.getboolean("Machine",
                                                    "requires_wrap_arounds")
             self._machine = VirtualMachine(
                 x_dimension=virtual_x_dimension,
