@@ -21,7 +21,7 @@ class BufferRecieveThread(threading.Thread):
         """
         method to kill the thread
         """
-        logger.info("[_buffer receive thread] Stopping")
+        logger.debug("[_buffer receive thread] Stopping")
         self._queue_condition.acquire()
         self._done = True
         self._queue_condition.notify()
@@ -36,7 +36,7 @@ class BufferRecieveThread(threading.Thread):
         """
         runs by just pulling receive requests and executing them
         """
-        logger.info("[buffer recieve thread] starting")
+        logger.debug("[buffer recieve thread] starting")
         while not self._done:
             self._queue_condition.acquire()
             while len(self._queue) == 0 and not self._done:
