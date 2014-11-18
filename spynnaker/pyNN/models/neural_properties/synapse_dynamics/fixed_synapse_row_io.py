@@ -29,9 +29,8 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
     def get_packed_fixed_fixed_region(synapse_row, weight_scale,
                                       n_synapse_type_bits):
         abs_weights = numpy.abs(synapse_row.weights)
-        scaled_weights = numpy.asarray(abs_weights * weight_scale,
-                                       dtype='uint32')
-        
+        scaled_weights = numpy.rint(abs_weights * weight_scale).astype("uint32")
+
         if ((len(synapse_row.target_indices) > 0) 
                 and (numpy.amax(synapse_row.target_indices) > 0xFF)):
             raise Exception("One or more target indices are too large")

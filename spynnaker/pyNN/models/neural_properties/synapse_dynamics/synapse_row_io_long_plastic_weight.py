@@ -76,10 +76,10 @@ class SynapseRowIoLongPlasticWeight(AbstractSynapseRowIo):
         half_word_datatype = None
         scaled_weights = None
         if self.signed:
-            scaled_weights = numpy.asarray(synapse_row.weights * weight_scale, dtype="int16")
+            scaled_weights = numpy.rint(synapse_row.weights * weight_scale).astype("int16")
             half_word_datatype = "int16"
         else:
-            scaled_weights = numpy.asarray(numpy.abs(synapse_row.weights) * weight_scale, dtype="uint16")
+            scaled_weights = numpy.rint(numpy.abs(synapse_row.weights) * weight_scale).astype("uint16")
             half_word_datatype = "uint16"
         
         # Interleave these with zeros and get uint32 view
