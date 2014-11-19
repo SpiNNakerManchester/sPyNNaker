@@ -140,10 +140,13 @@ class AbstractSynapticManager(object):
             # Write padding (if required):
             padding = ((fixed_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)
                        - words_written)
-            if padding != 0:
-                spec.write_value(data=0xBBCCDDEE, repeats=padding,
+            # Loop through padding in terms of maximum 
+            # Size blocks that can be repeated
+            for i in range(0, padding,  255):
+                padding_repeats = min(255, padding - i)
+                spec.write_value(data=0xBBCCDDEE, repeats=padding_repeats,
                                  data_type=DataType.UINT32)
-                write_ptr += 4 * padding
+            write_ptr += 4 * padding
             row_no += 1
 
         # The current write pointer is where the next block could start:
