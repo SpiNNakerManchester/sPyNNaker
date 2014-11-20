@@ -83,16 +83,17 @@ class BufferManager(object):
             if (key in self._recieve_vertices.keys() and
                     buffer_packet.command ==
                     spinnman_constants.BUFFER_COMMAND_IDS.BUFFER_RECIEVE):
-                receive_data_request = \
-                    self._recieve_vertices[key].process_buffer_packet()
-                if receive_data_request is not None:
-                    self._recieve_thread.add_request(receive_data_request)
+                receive_data_requests = \
+                    self._recieve_vertices[key].process_buffered_packet()
+                if len(receive_data_requests) != 0:
+                    for receive_data_request in receive_data_requests:
+                        self._recieve_thread.add_request(receive_data_request)
             #if the vertex has send requrements, check to see if any are needed
             if (key in self._sender_vertices.keys() and
                     buffer_packet.command ==
                     spinnman_constants.BUFFER_COMMAND_IDS.BUFFER_SEND):
                 send_data_request = \
-                    self._sender_vertices[key].process_buffer_packet()
+                    self._sender_vertices[key].process_buffered_packet()
                 if send_data_request is not None:
                     self._sender_thread.add_request(send_data_request)
 
@@ -171,14 +172,15 @@ class BufferManager(object):
             placement_of_partitioned_vertex.x, placement_of_partitioned_vertex.y,
             placement_of_partitioned_vertex.p,
             spinnman_constants.BUFFER_COMMAND_IDS.BUFFER_SEND, region_id,
-            region_size, 0)
+            region_size, None)
         #create a buffer request for the right size
-        data_request = sender_vertex.receiver_buffer_collection.\
-            process_buffer_packet(buffered_packet)
-        #write memory to chip
-        self._transciever.write_memory(
-            data_request.chip_x, data_request.chip_y,
-            data_request.address_pointer, data_request.data)
+        data_requests = sender_vertex.process_buffered_packet(buffered_packet)
+        #send each data request
+        for data_request in data_requests:
+            #write memory to chip
+            self._transciever.write_memory(
+                data_request.chip_x, data_request.chip_y,
+                data_request.address_pointer, data_request.data)
 
     def _locate_region_address(self, region_id, sender_vertex):
         """ detemrines if the base adress of the region has been set. if the

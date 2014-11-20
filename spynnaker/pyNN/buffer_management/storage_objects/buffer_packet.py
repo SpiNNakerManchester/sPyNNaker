@@ -15,7 +15,7 @@ class BufferPacket(object):
         self._command = command
         self._region_id = region_id
         self._count = count
-        self._last_timer_tic = last_timer_tic
+        self._seqeunce_no = last_timer_tic
 
     @property
     def chip_x(self):
@@ -42,19 +42,18 @@ class BufferPacket(object):
         return self._count
 
     @property
-    def last_timer_tic(self):
-        return self._last_timer_tic
+    def sequence_no(self):
+        return self._seqeunce_no
 
     @staticmethod
     def build_buffer_packet_from_byte_array_reader(reader):
         """ converts a byte array reader into a buffered packet. the format of
         the buffered packet as currently defined is:
 
-              25                         71
-        ======H============  ============D==================================
-        |[8][8][5][4]      | |[3]     [4]         [32]               [32]   |
-        |[x][y][p][command]| |[spare] [region id] [last_timer_tic]   [count]|
-
+              25                         55
+        ======H============  ============D===========================
+        |[8][8][5][4]      | |[11]     [4]         [8]        [32]   |
+        |[x][y][p][command]| |[spare] [region id]  [seq_no]   [count]|
 
 
         :param reader: the reader for which the buffered packet is being read

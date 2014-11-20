@@ -2,7 +2,6 @@ import logging
 import os
 from spynnaker.pyNN.buffer_management.storage_objects.buffer_collection import \
     BufferCollection
-
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
     abstract_buffer_receivable_partitionable_vertex import \
     AbstractBufferReceivablePartitionableVertex
@@ -15,6 +14,8 @@ from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
+
+from spinnman import constants as spinnman_constants
 import math
 
 
@@ -111,7 +112,7 @@ class SpikeSourceArray(AbstractSpikeSource,
                     time_stamp_in_ticks, neuron_list)
                 number_of_spikes_transmitted += vertex_slice.n_atoms
 
-        memory_used = ((no_buffers * (constants.BUFFER_HEADER_SIZE +
+        memory_used = ((no_buffers * (spinnman_constants.EIEIO_DATA_HEADER_SIZE +
                         constants.TIMESTAMP_SPACE_REQUIREMENT)) +
                        (number_of_spikes_transmitted * constants.KEY_SIZE))
         return memory_used, buffer_collection

@@ -1,7 +1,10 @@
 """
 Utilities for accessing the location of memory regions on the board
 """
+from spinnman import constants as spinnman_constants
+
 from enum import Enum
+import math
 
 # Some constants
 SETUP_SIZE = 28  # Single word of info with flags, etc.
@@ -41,12 +44,19 @@ ROW_LEN_TABLE_SIZE = 4 * len(ROW_LEN_TABLE_ENTRIES)
 # buffered in and out constants
 DEFAULT_MEG_LIMIT = 8 * 1024 * 1024  # 8 mg in bytes
 MAX_MEG_LIMIT = 120 * 1024 * 1024  # only 120 meg is ever avilable for application usage
+
 #buffer fixed sizes in bytes
-BUFFER_HEADER_SIZE = 2
 TIMESTAMP_SPACE_REQUIREMENT = 4
 KEY_SIZE = 4
 NO_BUFFERS_FOR_TRANSMITTING = 5
-
+SEQUENCE_NO_SIZE = 1
+MAX_SEQUENCES_PER_TRANSMISSION = 16
+MAX_SEQUENCE_NO = math.pow(2, 8) - 1  # seq no is contianed in a 8 bit value
+MAX_EIEIO_ENTRIES_TO_STORE_IN_UDP = \
+    spinnman_constants.UDP_MESSAGE_MAX_SIZE - \
+    (spinnman_constants.EIEIO_DATA_HEADER_SIZE +
+     TIMESTAMP_SPACE_REQUIREMENT + SEQUENCE_NO_SIZE +
+     spinnman_constants.EIEIO_COMMAND_HEADER_SIZE)
 
 X_CHIPS = 8
 Y_CHIPS = 8

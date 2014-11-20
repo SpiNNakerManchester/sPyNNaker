@@ -1,11 +1,13 @@
 import threading
 import collections
 import logging
+
 from spynnaker.pyNN.buffer_management.storage_objects.send_data_request import \
     SendDataRequest
-from spynnaker.pyNN.buffer_management.storage_objects.stop_requests_request import \
+from spynnaker.pyNN.buffer_management.buffer_requests.stop_requests_request import \
     StopRequestsRequest
 from spynnaker.pyNN import exceptions
+
 
 logger = logging.getLogger(__name__)
 
@@ -75,10 +77,10 @@ class BufferSendThread(threading.Thread):
         :param request:
         :return:
         """
-        if isinstance(request, SendDataRequest):
-            raise NotImplementedError
-        elif isinstance(request, StopRequestsRequest):
-            raise NotImplementedError
+        if isinstance(request, SendDataRequest) \
+                or isinstance(request, StopRequestsRequest):
+            message = request.get_eieio_command_message()
+            self._transciever.send_eieio_command_message(message)
         else:
             raise exceptions.ConfigurationException(
                 "this type of request is not suitable for this thread. Please "

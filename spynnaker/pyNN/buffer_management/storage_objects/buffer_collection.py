@@ -1,5 +1,7 @@
 from spinnman import exceptions as spinnman_exceptions
-from spynnaker.pyNN.buffer_management.storage_objects.buffered_region \
+from spinnman import constants as spinnman_constants
+
+from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region \
     import BufferedRegion
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
@@ -70,19 +72,18 @@ class BufferCollection(object):
                 "try again".format(region_id))
         self._buffers_to_use[region_id].set_region_size(region_size)
 
-    def is_region_empty(self, region_id, las_timer_tic):
+    def is_region_empty(self, buffered_packet):
         """ checks if a region is empty or not (updates buffer if the last
         timer tic is after what was expected
 
-        :param region_id:
-        :param las_timer_tic:
+        :param buffered_packet:
         :return:
         """
-        if region_id not in self._buffers_to_use.keys():
+        if buffered_packet.region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
-                "try again".format(region_id))
-        return self._buffers_to_use[region_id].is_region_empty(las_timer_tic)
+                "try again".format(buffered_packet.region_id))
+        return self._buffers_to_use[buffered_packet.region_id].is_region_empty()
 
     def get_region_absolute_region_address(self, region_id):
         """gets the regions absolute regiona ddress
@@ -196,10 +197,10 @@ class BufferCollection(object):
                 "buffered_packet.region_id",
                 "The region being requested does not contain any buffered data")
         if (buffered_packet.count <
-            (constants.BUFFER_HEADER_SIZE +
+            (spinnman_constants.EIEIO_DATA_HEADER_SIZE +
                 constants.TIMESTAMP_SPACE_REQUIREMENT)):
             raise spinnman_exceptions.SpinnmanInvalidPacketException(
                 "buffered_packet.count",
                 "The count is below what is needed for a eieio header, and so"
                 " shouldnt have been requested")
-        return self._managed_vertex.process_buffer_packet(buffered_packet)
+        return self._managed_vertex.process_buffered_packet(buffered_packet)
