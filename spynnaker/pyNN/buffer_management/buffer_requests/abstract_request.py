@@ -10,8 +10,9 @@ class AbstractRequest(object):
         pass
 
     @abstractmethod
-    def get_eieio_command_message(self):
-        """ method to force requests to generate command messages
+    def get_eieio_command_message_as_byte_array(self):
+        """ method to force requests to generate command messages in the correct
+        format for a sdp message
 
         :return:
         """

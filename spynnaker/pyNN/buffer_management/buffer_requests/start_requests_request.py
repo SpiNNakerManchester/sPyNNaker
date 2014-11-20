@@ -1,21 +1,19 @@
 from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
 from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
-from spynnaker.pyNN.buffer_management.buffer_requests.abstract_request import \
-    AbstractRequest
 from spinnman import constants as spinnman_constants
 
+from spynnaker.pyNN.buffer_management.buffer_requests.abstract_request import \
+    AbstractRequest
 
-class SendDataRequest(AbstractRequest):
 
-    def __init__(self, chip_x, chip_y, chip_p, address_pointer, data,
-                 sequence_no):
+class StartRequestsRequest(AbstractRequest):
+
+    def __init__(self, chip_x, chip_y, chip_p, region_id):
         AbstractRequest.__init__(self)
         self._chip_x = chip_x
         self._chip_y = chip_y
         self._chip_p = chip_p
-        self._address_pointer = address_pointer
-        self._data = data
-        self._sequence_no = sequence_no
+        self._region_id = region_id
 
     @property
     def chip_x(self):
@@ -30,15 +28,11 @@ class SendDataRequest(AbstractRequest):
         return self._chip_p
 
     @property
-    def address_pointer(self):
-        return self._address_pointer
-
-    @property
-    def data(self):
-        return self._data
+    def region_id(self):
+        return self._region_id
 
     def get_eieio_command_message_as_byte_array(self):
         header = EIEIOCommandHeader(
-            spinnman_constants.SENT_BUFFER_COMMAND_IDS.NEW_BUFFERS)
+            spinnman_constants.SENT_BUFFER_COMMAND_IDS.START_SENDING_REQUESTS)
         message = EIEIOCommandMessage(header, self._data).convert_to_byte_array()
         return message

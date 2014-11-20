@@ -7,9 +7,10 @@ from spinnman.data.little_endian_byte_array_byte_writer import \
     LittleEndianByteArrayByteWriter
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 from spinnman import constants as spinn_man_constants
-from spynnaker.pyNN.buffer_management.storage_objects.\
+from spynnaker.pyNN.buffer_management.buffer_requests.\
     send_data_request import SendDataRequest
-from spynnaker.pyNN.buffer_management.buffer_requests.stop_requests_request import StopRequestsRequest
+from spynnaker.pyNN.buffer_management.buffer_requests.stop_requests_request \
+    import StopRequestsRequest
 from spynnaker.pyNN.utilities import constants
 
 

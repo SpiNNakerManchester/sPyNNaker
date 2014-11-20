@@ -82,7 +82,7 @@ class BufferManager(object):
             #if the vertex has recieve requrements, check to see if any are needed
             if (key in self._recieve_vertices.keys() and
                     buffer_packet.command ==
-                    spinnman_constants.BUFFER_COMMAND_IDS.BUFFER_RECIEVE):
+                    spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_RECIEVE):
                 receive_data_requests = \
                     self._recieve_vertices[key].process_buffered_packet()
                 if len(receive_data_requests) != 0:
@@ -91,7 +91,7 @@ class BufferManager(object):
             #if the vertex has send requrements, check to see if any are needed
             if (key in self._sender_vertices.keys() and
                     buffer_packet.command ==
-                    spinnman_constants.BUFFER_COMMAND_IDS.BUFFER_SEND):
+                    spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_SEND):
                 send_data_request = \
                     self._sender_vertices[key].process_buffered_packet()
                 if send_data_request is not None:
@@ -171,7 +171,7 @@ class BufferManager(object):
         buffered_packet = BufferPacket(
             placement_of_partitioned_vertex.x, placement_of_partitioned_vertex.y,
             placement_of_partitioned_vertex.p,
-            spinnman_constants.BUFFER_COMMAND_IDS.BUFFER_SEND, region_id,
+            spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_SEND, region_id,
             region_size, None)
         #create a buffer request for the right size
         data_requests = sender_vertex.process_buffered_packet(buffered_packet)

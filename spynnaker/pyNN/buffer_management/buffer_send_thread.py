@@ -2,10 +2,13 @@ import threading
 import collections
 import logging
 
-from spynnaker.pyNN.buffer_management.storage_objects.send_data_request import \
+from spinnman.messages.sdp.sdp_header import SDPHeader
+from spinnman.messages.sdp.sdp_message import SDPMessage
+
+from spynnaker.pyNN.buffer_management.buffer_requests.send_data_request import \
     SendDataRequest
-from spynnaker.pyNN.buffer_management.buffer_requests.stop_requests_request import \
-    StopRequestsRequest
+from spynnaker.pyNN.buffer_management.buffer_requests.\
+    stop_requests_request import StopRequestsRequest
 from spynnaker.pyNN import exceptions
 
 
@@ -74,13 +77,19 @@ class BufferSendThread(threading.Thread):
         """ handles a request from the munched queue by transmitting a chunk of
         memory to a buffer
 
-        :param request:
+        :param request: the request container for this command message
         :return:
         """
         if isinstance(request, SendDataRequest) \
                 or isinstance(request, StopRequestsRequest):
-            message = request.get_eieio_command_message()
-            self._transciever.send_eieio_command_message(message)
+            eieio_command_message_as_byte_array = \
+                request.get_eieio_command_message_as_byte_array()
+            sdp_header = SDPHeader(destination_chip_x=request.chip_x,
+                                   destination_chip_y=request.chip_y,
+                                   destination_cpu=request.chip_p)
+            sdp_message = \
+                SDPMessage(sdp_header, eieio_command_message_as_byte_array)
+            self._transciever.send_sdp_message(sdp_message)
         else:
             raise exceptions.ConfigurationException(
                 "this type of request is not suitable for this thread. Please "
