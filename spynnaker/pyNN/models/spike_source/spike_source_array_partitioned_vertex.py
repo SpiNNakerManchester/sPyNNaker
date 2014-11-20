@@ -3,7 +3,7 @@ from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
     abstract_buffer_receivable_partitioned_vertex import \
     AbstractBufferReceivablePartitionedVertex
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_sendable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_sendable_partitionable_vertex import \
     AbstractBufferSendableVertex
 
 

@@ -2,7 +2,7 @@ from spinnman import exceptions as spinnman_exceptions
 from spinnman import constants as spinnman_constants
 
 from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region \
-    import BufferedRegion
+    import BufferedSendingRegion
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 
@@ -35,7 +35,7 @@ class BufferCollection(object):
         :rtype: None
         """
         if region_id not in self._buffers_to_use.keys():
-            self._buffers_to_use[region_id] = BufferedRegion()
+            self._buffers_to_use[region_id] = BufferedSendingRegion()
         self._buffers_to_use[region_id].\
             add_entry_to_buffer(buffer_key, data_piece)
 
@@ -169,7 +169,7 @@ class BufferCollection(object):
         :rtype: None
         """
         if region_id not in self._buffers_to_use.keys():
-            self._buffers_to_use[region_id] = BufferedRegion()
+            self._buffers_to_use[region_id] = BufferedSendingRegion()
         self._buffers_to_use[region_id].\
             add_entries_to_buffer(buffer_key, data_pieces)
 

@@ -5,7 +5,7 @@ from spinnman.messages.eieio.eieio_message import EIEIOMessage
 
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
-    abstract_buffer_sendable_vertex import AbstractBufferSendableVertex
+    abstract_buffer_sendable_partitionable_vertex import AbstractBufferSendableVertex
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import constants

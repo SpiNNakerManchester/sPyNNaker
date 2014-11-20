@@ -6,7 +6,7 @@ from spynnaker.pyNN.utilities import constants
 from spinnman import constants as spinnman_constants
 
 
-class BufferedRegion(object):
+class BufferedSendingRegion(object):
 
     def __init__(self):
         self._buffer = OrderedDict()

@@ -35,7 +35,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
     abstract_buffer_receivable_partitionable_vertex import \
     AbstractBufferReceivablePartitionableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
-    abstract_buffer_sendable_vertex import \
+    abstract_buffer_sendable_partitionable_vertex import \
     AbstractBufferSendableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
     abstract_iptagable_vertex import \
