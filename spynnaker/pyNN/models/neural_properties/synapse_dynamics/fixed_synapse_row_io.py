@@ -14,7 +14,7 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
     # noinspection PyMethodOverriding
     @staticmethod
     def read_packed_plastic_plastic_region(synapse_row, data, offset,
-                                           length, weight_scale):
+                                           length, weight_scales):
         raise exceptions.SynapticConfigurationException("fixed synapse rows do"
                                                         "not contain a plastic "
                                                         "region")
@@ -26,11 +26,19 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def get_packed_fixed_fixed_region(synapse_row, weight_scale,
+    def get_packed_fixed_fixed_region(synapse_row, weight_scales,
                                       n_synapse_type_bits):
+        # Get the correct synapse scale for each element based on their synapse type
+        synapse_scales = numpy.array([weight_scales[t] for t in synapse_row.synapse_types], dtype="float")
+        
         abs_weights = numpy.abs(synapse_row.weights)
-        scaled_weights = numpy.rint(abs_weights * weight_scale).astype("uint32")
-
+        scaled_weights = numpy.rint(abs_weights * synapse_scales).astype("uint32")
+        
+        zero_float_weights = numpy.where(abs_weights == 0.0)[0]
+        zero_scaled_weights = numpy.where(scaled_weights == 0)[0]
+        if zero_float_weights.shape != zero_scaled_weights.shape or (zero_float_weights != zero_scaled_weights).any():
+            raise Exception("Weight scaling has reduced non-zero weights to zero")
+        
         if ((len(synapse_row.target_indices) > 0) 
                 and (numpy.amax(synapse_row.target_indices) > 0xFF)):
             raise Exception("One or more target indices are too large")
@@ -50,13 +58,13 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def get_packed_fixed_plastic_region(synapse_row, weight_scale,
+    def get_packed_fixed_plastic_region(synapse_row, weight_scales,
                                         n_synapse_type_bits):
         return []
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def get_packed_plastic_region(synapse_row, weight_scale,
+    def get_packed_plastic_region(synapse_row, weight_scales,
                                   n_synapse_type_bits):
         return []
 
@@ -64,7 +72,7 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
     @staticmethod
     def create_row_info_from_elements(p_p_entries, f_f_entries,
                                       f_p_entries, bits_reserved_for_type,
-                                      weight_scale):
+                                      weight_scales):
         """
         takes a collection of entries for both fixed fixed, plastic plasitic and
         fixed plastic and returns a synaptic row object for them
@@ -72,6 +80,10 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         p_p_entries and f_p_entries are ignored due to this model dealing with
         fixed synapses
         """
+        # Generate masks
+        synaptic_type_mask = (1 << bits_reserved_for_type) - 1
+        delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
+        
         if len(p_p_entries) > 0 or len(f_p_entries) > 0:
             raise exceptions.SynapticBlockGenerationException(
                 "fixed synaptic row ios cannot be built from plastic entries"
@@ -82,14 +94,16 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         synapse_types = list()
 
         #read in each element
+        #**TODO** use numpy
         for element in f_f_entries:
+            # Extract synapse type
+            synapse_type = (element >> 8) & synaptic_type_mask
+            
             # drops delay, type and id
-            weights.append(float(element >> 16) / float(weight_scale))
+            weights.append(float(element >> 16) / float(weight_scales[synapse_type]))
             target_indices.append(element & 0xFF)  # masks by 8 bits
-            # gets the size of the synapse type parameter
-            synaptic_type_mask = (1 << bits_reserved_for_type) - 1
-            synapse_types.append((element >> 8) & synaptic_type_mask)
-            delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
+            
+            synapse_types.append(synapse_type)
             delays_in_ticks.append((element >> 8 + bits_reserved_for_type) &
                                    delay_mask)
 

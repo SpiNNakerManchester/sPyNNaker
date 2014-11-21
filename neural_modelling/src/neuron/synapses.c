@@ -62,6 +62,8 @@
 
 // **NOTE** synapse shaping implementation gets included by compiler
 
+extern uint32_t ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT]; // Amount to left shift the ring buffer by to make it an input
+
 // ring buffers between synapses and neurons.
 static ring_entry_t  ring_buffer   [RING_BUFFER_SIZE];
 
@@ -102,11 +104,11 @@ void initialize_current_buffer (void)
 // At the moment we merely take the u12.4 value and
 // convert to an s16.15 value; this is a left shift of 11
 
-static inline current_t weight_to_current (weight_t w)
+static inline current_t weight_to_current(index_t synapse_type, weight_t w)
 {
   union { int_k_t r; s1615 fx; } x;
 
-  x.r = (int_k_t)(w) << ring_buffer_to_input_left_shift;
+  x.r = (int_k_t)(w) << ring_buffer_to_input_left_shifts[synapse_type];
 
   return x.fx;
 }
@@ -143,13 +145,13 @@ void ring_buffer_transfer (void)
     for(uint32_t s = 0; s < SYNAPSE_TYPE_COUNT; s++)
     {
       // Get offset of ring-buffer input for this synapse type
-      uint32_t off = offset_ring_buffer (time, s, n);
+      uint32_t off = offset_ring_buffer(time, s, n);
       
       // Convert ring-buffer entry to current and add on to correct input current for this s
-      add_neuron_input(n, s, weight_to_current(ring_buffer [off]));
+      add_neuron_input(n, s, weight_to_current(s, ring_buffer[off]));
       
       // Clear ring buffer
-      ring_buffer [off] = 0;
+      ring_buffer[off] = 0;
     }
   }
 }
@@ -373,9 +375,9 @@ bool synaptic_current_data_filled (address_t address, uint32_t flags)
 // We are treating weights as u12.4 fixed point format.
 // This requires a shift when printing them out.
 
-void print_weight (weight_t w)
+void print_weight (index_t synapse_type, weight_t w)
 {
-  if (w != 0) printf ("%12.6k", weight_to_current(w));
+  if (w != 0) printf ("%12.6k", weight_to_current(synapse_type, w));
   else        printf ("      ");
 }
 
@@ -402,7 +404,7 @@ void print_ring_buffers (void)
         for (d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) 
         {
           printf(" ");
-          print_weight (ring_buffer[offset_ring_buffer(d + time, t, n)]);
+          print_weight (t, ring_buffer[offset_ring_buffer(d + time, t, n)]);
         }
         printf ("\n");
       }
@@ -468,7 +470,7 @@ void print_synaptic_row (synaptic_row_t synaptic_row)
     uint32_t x = fixed_synapses[i];
 
     printf ("%08x [%3d: (w: %5u (=", x, i, sparse_weight(x));
-    print_weight (sparse_weight(x));
+    print_weight (sparse_type(x), sparse_weight(x));
     printf ("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
       sparse_delay(x),
       get_synapse_type_char(sparse_type(x)),
