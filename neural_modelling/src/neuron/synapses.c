@@ -207,28 +207,37 @@ static inline void process_fixed_synapses (address_t fixed)
 {
   register uint32_t *synaptic_words = fixed_weight_controls(fixed);
   register uint32_t fixed_synapse  = num_fixed_synapses(fixed);
-  register uint32_t synaptic_word, delay;
-  register uint32_t weight;
-  register uint32_t offset, index;
   register ring_entry_t *rp = ring_buffer;
   register uint32_t t = time;
   
   for ( ; fixed_synapse > 0; fixed_synapse--) 
   {
-    // Get the next 32 bit word from the synaptic_row (should autoincrement pointer in single instruction)
-    synaptic_word = *synaptic_words++;
+    // Get the next 32 bit word from the synaptic_row 
+    // (should autoincrement pointer in single instruction)
+    uint32_t synaptic_word = *synaptic_words++;
 
     // Extract components from this word
-    delay = sparse_delay(synaptic_word);
-    index = sparse_type_index(synaptic_word);
-    weight = sparse_weight(synaptic_word);
+    uint32_t delay = sparse_delay(synaptic_word);
+    uint32_t index = sparse_type_index(synaptic_word);
+    uint32_t weight = sparse_weight(synaptic_word);
     
     // Convert into ring buffer offset
-    offset = offset_sparse(delay + t, index);
+    uint32_t offset = offset_sparse(delay + t, index);
     
-    // Add weight to ring-buffer entry
-    // **NOTE** Dave suspects that this could be a potential location for overflow
-    rp[offset] += weight;         // Add the weight to the current ring_buffer value.
+    // Add weight to current ring buffer value
+    uint32_t accumulation = rp[offset] + weight;
+    
+    // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
+    // **NOTE** 0x10000 can be expressed as an ARM literal, but 0xFFFF cannot
+    // **NOTE** Therefore, we use (0x10000 - 1) to obtain this value
+    /*uint32_t sat_test = accumulation & 0x10000;
+    if(sat_test)
+    {
+      accumulation = sat_test - 1;
+    }*/
+    
+    // Store saturated value back in ring-buffer
+    rp[offset] = accumulation;         // Add the weight to the current ring_buffer value.
   }
 }
 

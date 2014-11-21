@@ -253,7 +253,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         weight_scales = [self.get_weight_scale(r) for r in ring_buffer_shifts]
         
         for t, r, w in zip(self.get_synapse_targets(), ring_buffer_shifts, weight_scales):
-            logger.info("Synapse type:%s - Ring buffer shift:%d, Max weight:%f" % (t, r, w))
+            logger.debug("Synapse type:%s - Ring buffer shift:%d, Max weight:%f" % (t, r, w))
 
         self.write_neuron_parameters(
             spec, placement.x, placement.y, placement.p, subvertex,
