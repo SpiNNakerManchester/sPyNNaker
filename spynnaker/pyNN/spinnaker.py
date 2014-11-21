@@ -1,6 +1,8 @@
 #pacman imports
 from data_specification.interfaces.data_generator_interface import \
     DataGeneratorInterface
+
+
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
@@ -38,6 +40,7 @@ from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.utilities.data_base_thread import DataBaseThread
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
 from spynnaker.pyNN.models.utility_models.live_packet_gather\
@@ -104,9 +107,13 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         
         #add this default to end of list of search paths
         self._binary_search_paths.append(binary_path)
-        
         self._edge_count = 0
-        
+
+        #add database generation if requested
+        if self._create_database:
+            self._database_thread = \
+                DataBaseThread(self._app_data_runtime_folder)
+            self._database_thread.run()
 
     def run(self, run_time):
         self._setup_interfaces(hostname=self._hostname)
@@ -164,6 +171,23 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         self.map_model()
         if do_timing:
             timer.take_sample()
+
+        #load database if needed
+        if self._create_database:
+            self._database_thread.\
+                add_partitionable_vertices(self._partitionable_graph)
+            self._database_thread.\
+                add_partitioned_vertices(
+                    self._partitioned_graph, self._partitionable_graph,
+                    self._graph_mapper)
+            self._database_thread.add_placements(self._placements)
+            self._database_thread.add_routing_infos(self._routing_infos)
+            self._database_thread.add_routing_tables(self._router_tables)
+            if conf.config.getboolean(
+                    "Visualiser", "create_routing_info_to_neuron_id_mapping"):
+                self._database_thread.create_neuron_to_key_mapping(
+                    self._routing_infos, self._placements, self._graph_mapper,
+                    self._partitioned_graph, self._partitionable_graph)
 
         #extract iptags required by the graph
         self._set_iptags()
@@ -669,3 +693,5 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._txrx.send_signal(app_id, SCPSignal.STOP)
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()
+        if self._create_database:
+            self._database_thread.stop()

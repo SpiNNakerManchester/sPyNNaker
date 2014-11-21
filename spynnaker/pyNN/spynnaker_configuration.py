@@ -63,6 +63,7 @@ class SpynnakerConfiguration(object):
         self._key_allocator_algorithm = None
         self._router_algorithm = None
         self._report_default_directory = None
+        self._app_data_runtime_folder = None
         self._this_run_time_string_repenstation = None
 
         #exeuctable params
@@ -74,10 +75,15 @@ class SpynnakerConfiguration(object):
         #helper data stores
         self._current_max_tag_value = 0
 
+        #database objects
+        self._create_database = False
+        self._database_thread = None
+
     def _set_up_output_application_data_specifics(self):
         where_to_write_application_data_files = \
             config.get("Reports", "defaultApplicationDataFilePath")
         created_folder = False
+        this_run_time_folder = None
         if where_to_write_application_data_files == "DEFAULT":
             directory = os.getcwd()
             application_generated_data_file_folder = \
@@ -107,9 +113,6 @@ class SpynnakerConfiguration(object):
             writer.flush()
             writer.close()
 
-            if not config.has_section("SpecGeneration"):
-                config.add_section("SpecGeneration")
-            config.set("SpecGeneration", "Binary_folder", this_run_time_folder)
         elif where_to_write_application_data_files == "TEMP":
             pass  # just dont set the config param, code downstairs
             #  from here will create temp folders if needed
@@ -133,9 +136,10 @@ class SpynnakerConfiguration(object):
 
             if not os.path.exists(this_run_time_folder):
                 os.makedirs(this_run_time_folder)
-            if not config.has_section("SpecGeneration"):
-                config.add_section("SpecGeneration")
+        if not config.has_section("SpecGeneration"):
+            config.add_section("SpecGeneration")
             config.set("SpecGeneration", "Binary_folder", this_run_time_folder)
+            self._app_data_runtime_folder = this_run_time_folder
 
     def _set_up_report_specifics(self):
         self._writeTextSpecs = False
@@ -196,10 +200,13 @@ class SpynnakerConfiguration(object):
         #report object
         if config.getboolean("Reports", "reportsEnabled"):
             self._reports_states = ReportState()
+        self._create_database = \
+            config.getboolean("Visualiser", "create_database")
 
         #communication objects
         self._iptags = list()
         self._app_id = config.getint("Machine", "appID")
+
 
     def _set_up_executable_specifics(self):
         #loading and running config params
