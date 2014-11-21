@@ -13,15 +13,13 @@ class SynapseRowInfo(object):
         self.delays = np.asarray(delays_in_ticks, dtype='uint32')
         self.synapse_types = np.asarray(synapse_types, dtype='uint32')
         
-        if hasattr(self.delays, '__iter__') and self.delays.shape != ():
-            self.delays = np.array(self.delays)
-        elif self.delays.shape == ():
-            self.delays = np.array([self.delays])
+        if hasattr(self.delays, '__iter__'):
+            iter(self.delays)
         else:
             self.delays = np.array([self.delays])
         
         if hasattr(self.weights, '__iter__'):
-            self.weights = np.array(self.weights)
+            iter(self.weights)
         else:
             self.weights = np.array([self.weights])
             
