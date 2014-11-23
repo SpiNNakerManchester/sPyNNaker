@@ -2,7 +2,6 @@
 from data_specification.interfaces.data_generator_interface import \
     DataGeneratorInterface
 
-
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
@@ -111,8 +110,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #add database generation if requested
         if self._create_database:
+            execute_mapping = conf.config.getboolean(
+                "Visualiser", "create_routing_info_to_neuron_id_mapping")
             self._database_thread = \
-                DataBaseThread(self._app_data_runtime_folder)
+                DataBaseThread(self._app_data_runtime_folder, execute_mapping)
             self._database_thread.run()
 
     def run(self, run_time):
@@ -174,22 +175,13 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #load database if needed
         if self._create_database:
-            self._database_thread.\
-                add_partitionable_vertices(self._partitionable_graph)
-            self._database_thread.\
-                add_partitioned_vertices(
-                    self._partitioned_graph, self._partitionable_graph,
-                    self._graph_mapper)
-            self._database_thread.add_placements(self._placements,
-                                                 self._partitioned_graph)
-            self._database_thread.add_routing_infos(self._routing_infos,
-                                                    self._partitioned_graph)
+            self._database_thread.add_partitionable_vertices(
+                self._partitionable_graph)
+            self._database_thread.add_partitioned_vertices(
+                self._partitioned_graph, self._graph_mapper)
+            self._database_thread.add_placements(self._placements)
+            self._database_thread.add_routing_infos(self._routing_infos)
             self._database_thread.add_routing_tables(self._router_tables)
-            if conf.config.getboolean(
-                    "Visualiser", "create_routing_info_to_neuron_id_mapping"):
-                self._database_thread.create_neuron_to_key_mapping(
-                    self._routing_infos, self._placements, self._graph_mapper,
-                    self._partitioned_graph)
 
         #extract iptags required by the graph
         self._set_iptags()
@@ -294,7 +286,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 reverse_iptag = vertex.get_reverse_ip_tag()
                 if reverse_iptag.tag is None:
                     reverse_iptag.set_tag(self._current_max_tag_value + 1)
-                    vertex.set_reverse_iptag_tag(self._current_max_tag_value + 1)
+                    vertex.set_reverse_iptag_tag(
+                        self._current_max_tag_value + 1)
                     self._current_max_tag_value += 1
                     reverse_iptag = self._create_reverse_iptag_from_iptag(
                         reverse_iptag, vertex)
@@ -537,7 +530,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
        #register a listener at the trasnciever for each visualised vertex
         for vertex in self._visualiser_vertices:
             if vertex in self._visualiser_vertex_to_page_mapping.keys():
-                associated_page = self._visualiser_vertex_to_page_mapping[vertex]
+                associated_page = \
+                    self._visualiser_vertex_to_page_mapping[vertex]
                 self._txrx.register_listener(
                     associated_page.recieved_spike, vertex.receieve_port_no,
                     vertex.hostname, vertex.connection_type,
