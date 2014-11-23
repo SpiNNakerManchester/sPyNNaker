@@ -29,7 +29,8 @@ class CommandSender(AbstractMultiCastSource):
         self._commands = list()
 
         routing_key_constraint =\
-            KeyAllocatorRoutingConstraint(self.generate_routing_info)
+            KeyAllocatorRoutingConstraint(self.generate_routing_info,
+                                          self._generate_routing_neuron_id_keys)
         self.add_constraint(routing_key_constraint)
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
@@ -159,6 +160,39 @@ class CommandSender(AbstractMultiCastSource):
             # if the subedge doesnt have any predefined messages to send,
             # then treat them with the subedge routing key
             return subedge.key_combo, self._app_mask
+
+    def _generate_routing_neuron_id_keys(self,  vertex_slice, vertex, placement,
+                                        subedge):
+        """ generates a list of keys with neuron ids
+
+        :param vertex_slice: the vertex slice of this subvertex
+        :param vertex: the vertex this subvertex is associated with
+        :param placement: the placment of this subvertex
+        :param subedge: the subedge associated with this key
+        :return: list of keys with neuron ids
+        """
+        keys = dict()
+        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
+            key_with_neuron_id = self._get_key_with_neuron_id(placement, atom)
+            keys[atom] = key_with_neuron_id
+        return keys
+
+    def _get_key_with_neuron_id(self, subedge, atom):
+        """ generates a key with a neuron id based off the placement and atom
+
+        :param subedge: the subedge of the subvertex
+        :param atom: the aton of this subvertex
+        :return:the key with a neuron id added to it
+        """
+        key = None
+        if self._edge_map[subedge.edge] is not None:
+            key = self._edge_map[subedge.edge][0]['key']
+        else:
+            # if the subedge doesnt have any predefined messages to send,
+            # then treat them with the subedge routing key
+            key = subedge.key_combo
+        key += atom
+        return key
 
     def reserve_memory_regions(self, spec, command_size):
         """

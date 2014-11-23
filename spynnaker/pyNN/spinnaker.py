@@ -180,14 +180,16 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 add_partitioned_vertices(
                     self._partitioned_graph, self._partitionable_graph,
                     self._graph_mapper)
-            self._database_thread.add_placements(self._placements)
-            self._database_thread.add_routing_infos(self._routing_infos)
+            self._database_thread.add_placements(self._placements,
+                                                 self._partitioned_graph)
+            self._database_thread.add_routing_infos(self._routing_infos,
+                                                    self._partitioned_graph)
             self._database_thread.add_routing_tables(self._router_tables)
             if conf.config.getboolean(
                     "Visualiser", "create_routing_info_to_neuron_id_mapping"):
                 self._database_thread.create_neuron_to_key_mapping(
                     self._routing_infos, self._placements, self._graph_mapper,
-                    self._partitioned_graph, self._partitionable_graph)
+                    self._partitioned_graph)
 
         #extract iptags required by the graph
         self._set_iptags()
