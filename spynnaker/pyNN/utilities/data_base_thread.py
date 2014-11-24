@@ -1,20 +1,34 @@
+from spinnman import constants as spinnman_constants
+
 import threading
 import os
-
 import logging
+from spinnman.connections.udp_packet_connections.reverse_iptag_connection import \
+    ReverseIPTagConnection
+from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
+from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
 
 logger = logging.getLogger(__name__)
 
 
 class DataBaseThread(threading.Thread):
 
-    def __init__(self, database_directory, execute_mapping):
+    def __init__(self, database_directory, execute_mapping, transceiver,
+                 wait_for_vis, listener_port_no=19845, hostname="0.0.0.0",
+                 vis_reponse_port_no=19846, reponse_hostname="0.0.0.0"):
         threading.Thread.__init__(self)
         self._done = False
         self._connection = None
         self._database_directory = database_directory
         self._execute_mapping = execute_mapping
-        self._callbacks = list()
+        #connection to vis stuff
+        self._transciever = transceiver
+        self._wait_for_vis = wait_for_vis
+        self._listener_port = listener_port_no
+        self._listener_hostname = hostname
+        self._vis_reponse_port = vis_reponse_port_no
+        self._vis_reponse_hostname = reponse_hostname
+
         self._cur = None
         #set up lock storage
         self._partitionable_graph = None
@@ -31,6 +45,10 @@ class DataBaseThread(threading.Thread):
         self._done_routing_info = False
         self._done_routing_tables = False
         self._done_mapping = False
+        if self._wait_for_vis:
+            self._vis_ready = False
+        else:
+            self._vis_ready = True
         self._lock_condition = threading.Condition()
         #set daemon
         self.setDaemon(True)
@@ -182,12 +200,46 @@ class DataBaseThread(threading.Thread):
                     ((self._done_mapping and self._execute_mapping) or
                         not self._execute_mapping)):
                 self._complete = True
-        self._send_response()
-        if self._done:
-            self._connection.close()
+        if self._wait_for_vis:
+            self._send_response()
+
+        self._lock_condition.acquire()
+        if not self._done:
+            self._lock_condition.wait()
+        self._lock_condition.release()
+        self._connection.close()
 
     def _send_response(self):
-        pass
+        self._transciever.register_listener(
+            self._set_vis_ready, self._vis_reponse_port,
+            self._vis_reponse_hostname,
+            spinnman_constants.CONNECTION_TYPE.UDP_IPTAG,
+            spinnman_constants.TRAFFIC_TYPE.EIEIO_COMMAND)
+        #create complete message for vis to pick up
+        eieio_command_header = EIEIOCommandHeader(
+            spinnman_constants.EIEIO_COMMAND_IDS.VISUALISER_MANAGEMENT)
+        eieio_command_message = EIEIOCommandMessage(eieio_command_header,
+                                                    bytearray())
+        #create connection to send message down
+        eieio_command_connection = ReverseIPTagConnection(
+            remote_host=self._listener_hostname, remote_port=self._listener_port)
+        #send message to the visulaiser saying ready
+        eieio_command_connection.\
+            send_eieio_command_message(eieio_command_message)
+
+
+    def _set_vis_ready(self, packet):
+        self._lock_condition.acquire()
+        self._vis_ready = True
+        self._lock_condition.notify()
+        self._lock_condition.release()
+
+    def is_vis_ready(self):
+        self._lock_condition.acquire()
+        is_vis_ready = self._vis_ready
+        self._lock_condition.notify()
+        self._lock_condition.release()
+        return is_vis_ready
 
     def add_partitionable_vertices(self, partitionable_graph):
         self._lock_condition.acquire()
@@ -378,7 +430,7 @@ class DataBaseThread(threading.Thread):
                 vertex_id = subverts.index(partitioned_vertex) + 1
                 vertex_slice = \
                     self._graph_mapper.get_subvertex_slice(partitioned_vertex)
-                key_to_neuron_map = routing_info.key_with_neuron_ids_function(
+                key_to_neuron_map = routing_info.key_with_atom_ids_function(
                     vertex_slice, vertex, placement, subedge)
                 for neuron_id in key_to_neuron_map.keys():
                     self._cur.execute("INSERT INTO key_to_neuron_mapping("
@@ -391,4 +443,7 @@ class DataBaseThread(threading.Thread):
 
     def stop(self):
         logger.debug("[data_base_thread] Stopping")
+        self._lock_condition.acquire()
         self._done = True
+        self._lock_condition.notify()
+        self._lock_condition.release()

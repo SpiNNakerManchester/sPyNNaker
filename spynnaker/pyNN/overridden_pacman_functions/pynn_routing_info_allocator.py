@@ -44,8 +44,8 @@ class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
                 router_constraints[0].key_function_call(out_going_subedge)
             subedge_routing_info = SubedgeRoutingInfo(
                 key=key, mask=mask, subedge=out_going_subedge,
-                key_with_neuron_ids_function=
-                router_constraints[0].neuron_ids_function_call)
+                key_with_atom_ids_function=
+                router_constraints[0].key_with_atom_ids_function_call)
             #check for storage of masks
             self.check_masks(mask, key, placement.subvertex)
             return subedge_routing_info

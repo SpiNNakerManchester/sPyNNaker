@@ -108,16 +108,19 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         self._binary_search_paths.append(binary_path)
         self._edge_count = 0
 
-        #add database generation if requested
+    def run(self, run_time):
+        self._setup_interfaces(hostname=self._hostname)
+
+         #add database generation if requested
         if self._create_database:
             execute_mapping = conf.config.getboolean(
                 "Visualiser", "create_routing_info_to_neuron_id_mapping")
+            wait_on_vis = conf.config.getboolean("Visualiser",
+                                                 "wait_on_vis_configuration")
             self._database_thread = \
-                DataBaseThread(self._app_data_runtime_folder, execute_mapping)
+                DataBaseThread(self._app_data_runtime_folder, execute_mapping,
+                               self._txrx, wait_on_vis)
             self._database_thread.start()
-
-    def run(self, run_time):
-        self._setup_interfaces(hostname=self._hostname)
 
         #set up vis if needed
         if conf.config.getboolean("Visualiser", "enable"):
@@ -244,8 +247,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                         binary_folder, executable_targets, self._hostname,
                         self._app_id, run_time)
 
-                self._start_execution_on_machine(executable_targets,
-                                                 self._app_id, self._runtime)
+                wait_on_vis = conf.config.getboolean("Visualiser",
+                                                     "wait_on_vis_configuration")
+                self._start_execution_on_machine(
+                    executable_targets, self._app_id, self._runtime,
+                    wait_on_vis, self._database_thread)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
