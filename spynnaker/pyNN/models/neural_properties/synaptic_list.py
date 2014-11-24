@@ -66,8 +66,7 @@ class SynapticList(object):
         Return true if the rows are connected for the specified range of
         incoming and outgoing atoms
         """
-        for row in self._synaptic_rows[from_vertex_slice.lo_atom:
-                                       from_vertex_slice.hi_atom + 1]:
+        for row in self._synaptic_rows[0:from_vertex_slice.n_atoms]:
             x = row.get_n_connections(to_vertex_slice.n_atoms)
             if row.get_n_connections(to_vertex_slice.n_atoms) > 0:
                 return True
