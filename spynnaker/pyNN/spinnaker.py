@@ -114,7 +114,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 "Visualiser", "create_routing_info_to_neuron_id_mapping")
             self._database_thread = \
                 DataBaseThread(self._app_data_runtime_folder, execute_mapping)
-            self._database_thread.run()
+            self._database_thread.start()
 
     def run(self, run_time):
         self._setup_interfaces(hostname=self._hostname)

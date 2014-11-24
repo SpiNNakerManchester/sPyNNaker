@@ -23,7 +23,6 @@ class DataBaseThread(threading.Thread):
         self._placements = None
         self._routing_infos = None
         self._routing_tables = None
-        self._execute_mapping = None
         self._complete = False
         # set up checks
         self._done_paritioning = False
@@ -172,8 +171,8 @@ class DataBaseThread(threading.Thread):
             if (self._partitioned_graph is not None
                     and self._graph_mapper is not None
                     and self._placements is not None and self._execute_mapping
-                    and self._routing_infos is not None and self._done_mapping):
-                self._lock_condition.release()
+                    and self._routing_infos is not None and
+                    not self._done_mapping):
                 self._create_neuron_to_key_mapping()
                 self._execute_mapping = True
             # check about ending and sending notification
@@ -184,6 +183,8 @@ class DataBaseThread(threading.Thread):
                         not self._execute_mapping)):
                 self._complete = True
         self._send_response()
+        if self._done:
+            self._connection.close()
 
     def _send_response(self):
         pass
@@ -210,8 +211,8 @@ class DataBaseThread(threading.Thread):
                 self._cur.execute("INSERT INTO Partitionable_edges ("
                                   "pre_vertex, post_vertex, edge_label) "
                                   "VALUES({}, {}, '{}');"
-                                  .format(vertices.index(edge.pre_vertex),
-                                          vertices.index(edge.post_vertex),
+                                  .format(vertices.index(edge.pre_vertex) + 1,
+                                          vertices.index(edge.post_vertex) + 1,
                                           edge.label))
         #update graph
         edge_id_offset = 0
@@ -222,7 +223,7 @@ class DataBaseThread(threading.Thread):
                 self._cur.execute("INSERT INTO Partitionable_graph ("
                                   "vertex_id, edge_id)"
                                   " VALUES({}, {});"
-                                  .format(vertices.index(vertex),
+                                  .format(vertices.index(vertex) + 1,
                                           edges.index(edge) + edge_id_offset))
             edge_id_offset += len(edges)
         self._connection.commit()
@@ -255,8 +256,8 @@ class DataBaseThread(threading.Thread):
                               "partitionable_vertex_id, partitioned_vertex_id,"
                               "lo_atom, hi_atom) "
                               "VALUES({}, {}, {}, {});"
-                              .format(vertices.index(vertex),
-                                      subverts.index(subvert),
+                              .format(vertices.index(vertex) + 1,
+                                      subverts.index(subvert) + 1,
                                       vertex_slice.lo_atom,
                                       vertex_slice.hi_atom))
 
@@ -265,8 +266,8 @@ class DataBaseThread(threading.Thread):
             self._cur.execute("INSERT INTO Partitioned_edges ("
                               "pre_vertex, post_vertex, label) "
                               "VALUES({}, {}, '{}');"
-                              .format(subverts.index(subedge.pre_subvertex),
-                                      subverts.index(subedge.post_subvertex),
+                              .format(subverts.index(subedge.pre_subvertex) + 1,
+                                      subverts.index(subedge.post_subvertex) + 1,
                                       subedge.label))
         #add graph_mapper edges
         subedges = list(self._partitioned_graph.subedges)
@@ -277,8 +278,8 @@ class DataBaseThread(threading.Thread):
             self._cur.execute("INSERT INTO graph_mapper_edges ("
                               "partitionable_edge_id, partitioned_edge_id) "
                               "VALUES({}, {})"
-                              .format(edges.index(edge),
-                                      subedges.index(subedge)))
+                              .format(edges.index(edge) + 1,
+                                      subedges.index(subedge) + 1))
 
         # add to partitioned graph
         edge_id_offset = 0
@@ -291,8 +292,8 @@ class DataBaseThread(threading.Thread):
                     "INSERT INTO Partitioned_graph ("
                     "vertex_id, edge_id)"
                     " VALUES({}, {});"
-                    .format(subverts.index(vertex),
-                            subedges.index(edge) + edge_id_offset))
+                    .format(subverts.index(vertex) + 1,
+                            subedges.index(edge) + 1 + edge_id_offset))
             edge_id_offset += len(edges)
         self._connection.commit()
 
@@ -308,7 +309,7 @@ class DataBaseThread(threading.Thread):
             self._cur.execute("INSERT INTO Placements("
                               "vertex_id, chip_x, chip_y, chip_p) "
                               "VALUES({}, {}, {}, {})"
-                              .format(subverts.index(placement.subvertex),
+                              .format(subverts.index(placement.subvertex) + 1,
                                       placement.x, placement.y, placement.p))
         self._connection.commit()
 
@@ -324,7 +325,7 @@ class DataBaseThread(threading.Thread):
             self._cur.execute("INSERT INTO Routing_info("
                               "edge_id, key, mask) "
                               "VALUES({}, {}, {})"
-                              .format(sub_edges.index(routing_info.subedge),
+                              .format(sub_edges.index(routing_info.subedge) + 1,
                                       routing_info.key, routing_info.mask))
         self._connection.commit()
 
@@ -354,6 +355,7 @@ class DataBaseThread(threading.Thread):
 
     def _create_neuron_to_key_mapping(self):
         #create table
+        self._done_mapping = True
         self._cur.execute("CREATE TABLE key_to_neuron_mapping("
                           "vertex_id INTEGER, "
                           "neuron_id INTEGER, "
@@ -373,14 +375,14 @@ class DataBaseThread(threading.Thread):
             for subedge in out_going_edges:
                 routing_info = self._routing_infos.\
                     get_subedge_information_from_subedge(subedge)
-                vertex_id = subverts.index(partitioned_vertex)
+                vertex_id = subverts.index(partitioned_vertex) + 1
                 vertex_slice = \
                     self._graph_mapper.get_subvertex_slice(partitioned_vertex)
                 key_to_neuron_map = routing_info.key_with_neuron_ids_function(
                     vertex_slice, vertex, placement, subedge)
                 for neuron_id in key_to_neuron_map.keys():
                     self._cur.execute("INSERT INTO key_to_neuron_mapping("
-                                      "vertex_id, neuron_id, key) "
+                                      "vertex_id, key, neuron_id) "
                                       "VALUES ({}, {}, {})"
                                       .format(vertex_id,
                                               key_to_neuron_map[neuron_id],
@@ -389,5 +391,4 @@ class DataBaseThread(threading.Thread):
 
     def stop(self):
         logger.debug("[data_base_thread] Stopping")
-        self._connection.close()
         self._done = True

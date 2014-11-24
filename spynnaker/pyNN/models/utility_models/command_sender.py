@@ -161,8 +161,8 @@ class CommandSender(AbstractMultiCastSource):
             # then treat them with the subedge routing key
             return subedge.key_combo, self._app_mask
 
-    def _generate_routing_neuron_id_keys(self,  vertex_slice, vertex, placement,
-                                        subedge):
+    def _generate_routing_neuron_id_keys(self, vertex_slice, vertex, placement,
+                                         subedge):
         """ generates a list of keys with neuron ids
 
         :param vertex_slice: the vertex slice of this subvertex
@@ -172,9 +172,9 @@ class CommandSender(AbstractMultiCastSource):
         :return: list of keys with neuron ids
         """
         keys = dict()
-        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
+        for atom in range(0, vertex_slice.n_atoms):
             key_with_neuron_id = self._get_key_with_neuron_id(placement, atom)
-            keys[atom] = key_with_neuron_id
+            keys[vertex_slice.lo_atom + atom] = key_with_neuron_id
         return keys
 
     def _get_key_with_neuron_id(self, subedge, atom):
