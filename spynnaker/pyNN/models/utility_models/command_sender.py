@@ -173,7 +173,7 @@ class CommandSender(AbstractMultiCastSource):
         """
         keys = dict()
         for atom in range(0, vertex_slice.n_atoms):
-            key_with_neuron_id = self._get_key_with_neuron_id(placement, atom)
+            key_with_neuron_id = self._get_key_with_neuron_id(subedge, atom)
             keys[vertex_slice.lo_atom + atom] = key_with_neuron_id
         return keys
 

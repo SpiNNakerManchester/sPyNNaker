@@ -201,7 +201,7 @@ class SpynnakerConfiguration(object):
         if config.getboolean("Reports", "reportsEnabled"):
             self._reports_states = ReportState()
         self._create_database = \
-            config.getboolean("Visualiser", "create_database")
+            config.getboolean("Database", "create_database")
 
         #communication objects
         self._iptags = list()
@@ -316,7 +316,8 @@ class SpynnakerConfiguration(object):
         else:
             raise Exception("A SpiNNaker machine must be specified in "
                             "pacman.cfg.")
-        if self._hostname == 'None':
+        use_virtual_board = config.getboolean("Machine", "virtual_board")
+        if self._hostname == 'None' and not use_virtual_board:
             raise Exception("A SpiNNaker machine must be specified in "
                             "pacman.cfg.")
 

@@ -114,12 +114,12 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
          #add database generation if requested
         if self._create_database:
             execute_mapping = conf.config.getboolean(
-                "Visualiser", "create_routing_info_to_neuron_id_mapping")
-            wait_on_vis = conf.config.getboolean("Visualiser",
-                                                 "wait_on_vis_configuration")
+                "Database", "create_routing_info_to_neuron_id_mapping")
+            wait_on_confirmation = conf.config.getboolean("Database",
+                                                 "wait_on_confirmation")
             self._database_thread = \
                 DataBaseThread(self._app_data_runtime_folder, execute_mapping,
-                               self._txrx, wait_on_vis)
+                               self._txrx, wait_on_confirmation)
             self._database_thread.start()
 
         #set up vis if needed
@@ -178,6 +178,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #load database if needed
         if self._create_database:
+            self._database_thread.add_machine_objects(self._machine)
             self._database_thread.add_partitionable_vertices(
                 self._partitionable_graph)
             self._database_thread.add_partitioned_vertices(
@@ -247,11 +248,12 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                         binary_folder, executable_targets, self._hostname,
                         self._app_id, run_time)
 
-                wait_on_vis = conf.config.getboolean("Visualiser",
+                wait_on_confirmation = conf.config.getboolean("Visualiser",
                                                      "wait_on_vis_configuration")
+                vis_enabled = conf.config.getboolean("Visualiser", "enable")
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
-                    wait_on_vis, self._database_thread)
+                    wait_on_confirmation, self._database_thread, vis_enabled)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
