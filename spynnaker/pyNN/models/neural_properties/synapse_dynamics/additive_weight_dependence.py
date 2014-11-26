@@ -20,30 +20,32 @@ class AdditiveWeightDependence(object):
                 and (self.A3_plus == other.A3_plus)
                 and (self.A3_minus == other.A3_minus))
 
-    def get_params_size_bytes(self, num_terms):
+    def get_params_size_bytes(self, num_synapse_types, num_terms):
         if num_terms == 1:
-            return (4 * 4)
+            return (4 * 4) * num_synapse_types
         elif num_terms == 2:
-            return (6 * 4)
+            return (6 * 4) * num_synapse_types
         else:
             raise NotImplementedError("Additive weight dependence only supports one or two terms")    
         
-    def write_plastic_params(self, spec, machineTimeStep, weight_scale, num_terms):
-        # In the synaptic row IO, write weights as integers
-        spec.write_value(data=int(round(self.w_min * weight_scale)), data_type=DataType.INT32)
-        spec.write_value(data=int(round(self.w_max * weight_scale)), data_type=DataType.INT32)
+    def write_plastic_params(self, spec, machineTimeStep, weight_scales, num_terms):
+        # Loop through each synapse type's weight scale
+        for w in weight_scales:
+            # In the synaptic row IO, write weights as integers
+            spec.write_value(data=int(round(self.w_min * w)), data_type=DataType.INT32)
+            spec.write_value(data=int(round(self.w_max * w)), data_type=DataType.INT32)
 
-        # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN/standardmodels/synapses.html
-        # Pre-multiply A+ and A- by Wmax
-        spec.write_value(data=int(round(self.A_plus * self.w_max * weight_scale)), data_type=DataType.INT32)
-        spec.write_value(data=int(round(self.A_minus * self.w_max * weight_scale)), data_type=DataType.INT32)
+            # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN/standardmodels/synapses.html
+            # Pre-multiply A+ and A- by Wmax
+            spec.write_value(data=int(round(self.A_plus * self.w_max * w)), data_type=DataType.INT32)
+            spec.write_value(data=int(round(self.A_minus * self.w_max * w)), data_type=DataType.INT32)
 
-        # If triplet term is required, write A3+ and A3-, also multiplied by Wmax
-        if num_terms == 2:
-            spec.write_value(data=int(round(self.A3_plus * self.w_max * weight_scale)), data_type=DataType.INT32)
-            spec.write_value(data=int(round(self.A3_minus * self.w_max * weight_scale)), data_type=DataType.INT32)
-        elif num_terms != 1:
-            raise NotImplementedError("Additive weight dependence only supports one or two terms")
+            # If triplet term is required, write A3+ and A3-, also multiplied by Wmax
+            if num_terms == 2:
+                spec.write_value(data=int(round(self.A3_plus * self.w_max * w)), data_type=DataType.INT32)
+                spec.write_value(data=int(round(self.A3_minus * self.w_max * w)), data_type=DataType.INT32)
+            elif num_terms != 1:
+                raise NotImplementedError("Additive weight dependence only supports one or two terms")
         
     @property
     def vertex_executable_suffix(self):

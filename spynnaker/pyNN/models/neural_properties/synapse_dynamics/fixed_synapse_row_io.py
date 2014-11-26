@@ -31,9 +31,11 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         # Get the correct synapse scale for each element based on their synapse type
         synapse_scales = numpy.array([weight_scales[t] for t in synapse_row.synapse_types], dtype="float")
         
+        # Scale weights
         abs_weights = numpy.abs(synapse_row.weights)
         scaled_weights = numpy.rint(abs_weights * synapse_scales).astype("uint32")
         
+        # Check zeros
         zero_float_weights = numpy.where(abs_weights == 0.0)[0]
         zero_scaled_weights = numpy.where(scaled_weights == 0)[0]
         if zero_float_weights.shape != zero_scaled_weights.shape or (zero_float_weights != zero_scaled_weights).any():

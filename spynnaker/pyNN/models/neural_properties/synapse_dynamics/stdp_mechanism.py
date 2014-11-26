@@ -53,7 +53,7 @@ class STDPMechanism(object):
         """
         raise NotImplementedError
 
-    def write_plastic_params(self, spec, region, machine_time_step, weight_scale):
+    def write_plastic_params(self, spec, region, machine_time_step, weight_scales):
         spec.comment("Writing Plastic Parameters")
         
         # Switch focus to the region:
@@ -62,12 +62,12 @@ class STDPMechanism(object):
         # Write timing dependence parameters to region and get number of weight terms it requires
         num_terms = 1
         if self.timing_dependence is not None:
-            self.timing_dependence.write_plastic_params(spec, machine_time_step, weight_scale)
+            self.timing_dependence.write_plastic_params(spec, machine_time_step, weight_scales)
             num_terms = self.timing_dependence.num_terms
 
         # Write weight dependence information to region
         if self.weight_dependence is not None:
-            self.weight_dependence.write_plastic_params(spec, machine_time_step, weight_scale, num_terms)
+            self.weight_dependence.write_plastic_params(spec, machine_time_step, weight_scales, num_terms)
     
      # **TODO** make property
     def get_vertex_executable_suffix(self):
@@ -90,7 +90,7 @@ class STDPMechanism(object):
             return 0.0
 
     # **TODO** make property
-    def get_params_size(self):
+    def get_params_size(self, num_synapse_types):
         """
         Gets the size of the STDP parameters in bytes
         """
@@ -101,6 +101,6 @@ class STDPMechanism(object):
             num_terms = self.timing_dependence.num_terms
 
         if self.weight_dependence is not None:
-            size += self.weight_dependence.get_params_size_bytes(num_terms)    
+            size += self.weight_dependence.get_params_size_bytes(num_synapse_types, num_terms)    
         
         return size

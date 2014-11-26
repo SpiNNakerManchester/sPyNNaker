@@ -300,7 +300,7 @@ class AbstractSynapticManager(object):
     def get_stdp_parameter_size(self, vertex_slice, in_edges):
         self._check_synapse_dynamics(in_edges)
         if self._stdp_mechanism is not None:
-            return self._stdp_mechanism.get_params_size()
+            return self._stdp_mechanism.get_params_size(len(self.get_synapse_targets()))
         return 0
 
     @staticmethod

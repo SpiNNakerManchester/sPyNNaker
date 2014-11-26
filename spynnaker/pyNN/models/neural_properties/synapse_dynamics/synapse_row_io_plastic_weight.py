@@ -37,13 +37,12 @@ class SynapseRowIoPlasticWeight(AbstractSynapseRowIo):
         """
         return []
     
-    def get_packed_fixed_plastic_region(self, synapse_row, weight_scale,
+    def get_packed_fixed_plastic_region(self, synapse_row, weight_scales,
             n_synapse_type_bits):
         """
         Gets the plastic part of the fixed region of the row as an array 
         of 16-bit words
         """
-        
         if (len(synapse_row.target_indices) > 0 
                 and numpy.amax(synapse_row.target_indices) > 0xFF):
             raise Exception("One or more target indices are too large")
@@ -65,22 +64,31 @@ class SynapseRowIoPlasticWeight(AbstractSynapseRowIo):
         return numpy.asarray(shifted_axonal_delays | shifted_dendritic_delays | shifted_types | ids, 
                 dtype='uint16')
 
-    def get_packed_plastic_region(self, synapse_row, weight_scale,
+    def get_packed_plastic_region(self, synapse_row, weight_scales,
             n_synapse_type_bits):
         """
         Gets the plastic region of the row as an array of 32-bit words
         """
-        # Scale absoluate weights and convert to uint16
-        abs_scaled_weights = numpy.asarray(
-                numpy.abs(synapse_row.weights) * weight_scale, dtype='uint16')
+        # Get the correct synapse scale for each element based on their synapse type
+        synapse_scales = numpy.array([weight_scales[t] for t in synapse_row.synapse_types], dtype="float")
+        
+         # Scale weights
+        abs_weights = numpy.abs(synapse_row.weights)
+        scaled_weights = numpy.rint(abs_weights * synapse_scales).astype("uint16")
+        
+        # Check zeros
+        zero_float_weights = numpy.where(abs_weights == 0.0)[0]
+        zero_scaled_weights = numpy.where(scaled_weights == 0)[0]
+        if zero_float_weights.shape != zero_scaled_weights.shape or (zero_float_weights != zero_scaled_weights).any():
+            raise Exception("Weight scaling has reduced non-zero weights to zero")
 
         # As we're packing into uint32s, add extra weight if we have an odd number
-        if (len(abs_scaled_weights) % 2) != 0:
-            abs_scaled_weights = numpy.asarray(numpy.append(
-                    abs_scaled_weights, 0), dtype='uint16')
+        if (len(scaled_weights) % 2) != 0:
+            scaled_weights = numpy.asarray(numpy.append(
+                    scaled_weights, 0), dtype='uint16')
 
         # Create view of weights as uint32s
-        abs_scaled_weights_view = abs_scaled_weights.view(dtype='uint32')
+        scaled_weights_view = scaled_weights.view(dtype='uint32')
 
         # Allocate memory for pre-synaptic event buffer
         pre_synaptic_event_buffer = numpy.zeros(self.num_header_words, 
@@ -88,19 +96,22 @@ class SynapseRowIoPlasticWeight(AbstractSynapseRowIo):
 
         # Combine together into plastic region and return
         plastic_region = numpy.asarray(numpy.append(pre_synaptic_event_buffer, 
-                abs_scaled_weights_view), dtype='uint32')
+                scaled_weights_view), dtype='uint32')
         return plastic_region
 
     def create_row_info_from_elements(self, p_p_entries, f_f_entries,
                                       f_p_entries, bits_reserved_for_type,
-                                      weight_scale):
+                                      weight_scales):
         """
         takes a collection of entries for both fixed fixed, plastic plasitic and
         fixed plastic and returns a synaptic row object for them
 
         f_f_entries are ignored due to this model dealing with plastic synapses
         """
-
+        # Generate masks
+        synaptic_type_mask = (1 << bits_reserved_for_type) - 1
+        delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
+        
         if len(f_f_entries) > 0:
             raise exceptions.SynapticBlockGenerationException(
                 "plastic synapses cannot create row ios from fixed entries.")
@@ -109,25 +120,28 @@ class SynapseRowIoPlasticWeight(AbstractSynapseRowIo):
         delays_in_ticks = list()
         synapse_types = list()
 
+        # Read fixed plastic region
+        for element in f_p_entries:
+            target_indices.append(element & 0xFF) # masks by 8 bits
+            synapse_types.append((element >> 8) & synaptic_type_mask)
+            delays_in_ticks.append((element >> 8 + bits_reserved_for_type) &
+                                   delay_mask)
+            
         #read in each element
         #the fact that the fixed plastic are shorts, means that its numebr is an
         #exact number for entries in the plastic plastic region. Becuase of the
         # pp elements are in shorts but read as ints, the for loop has to
         #  sleectively deicde each section of the int to read given the shorts
         #counter/index ABS and AGR
-        for index in range(len(f_p_entries)):
+        #read in each element
+        for index, synapse_type in enumerate(synapse_types):
+            weight_scale = float(weight_scales[synapse_type])
+            
             if index % 2 == 0:
                 weights.append((p_p_entries[self.num_header_words + int(index/2)] & 0xFFFF) / weight_scale) # drops delay, type and id
             else:
                 weights.append((p_p_entries[self.num_header_words + int(index/2)] >> 16) / weight_scale)
 
-        #read in each element
-        for element in f_p_entries:
-            target_indices.append(element & 0xFF) # masks by 8 bits
-            synaptic_type_mask = (1 << bits_reserved_for_type) - 1
-            synapse_types.append((element >> 8) & synaptic_type_mask)
-            delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
-            delays_in_ticks.append((element >> 8 + bits_reserved_for_type) &
-                                   delay_mask)
+        
         return SynapseRowInfo(target_indices, weights, delays_in_ticks,
                               synapse_types)

@@ -35,7 +35,7 @@ class SpikePairRule(object):
     def create_synapse_row_io(self, synaptic_row_header_words, dendritic_delay_fraction):
         return SynapseRowIoPlasticWeight(synaptic_row_header_words, dendritic_delay_fraction)
         
-    def write_plastic_params(self, spec, machineTimeStep, weight_scale):
+    def write_plastic_params(self, spec, machineTimeStep, weight_scales):
         # Check timestep is valid
         if machineTimeStep != 1000:
             raise NotImplementedError("STDP LUT generation currently only supports 1ms timesteps")
