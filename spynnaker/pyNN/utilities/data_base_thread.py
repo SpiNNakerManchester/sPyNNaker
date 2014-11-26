@@ -158,7 +158,7 @@ class DataBaseThread(threading.Thread):
                               "chip_p INT, "
                               "FOREIGN KEY (vertex_id) "
                                   "REFERENCES Partitioned_vertices(vertex_id), "
-                              "FOREIGN KEY (chip_x, chip_y, chip_p) "
+                              "FOREIGN KEY (chip_x, chip_y, chip_p, machine_id) "
                                   "REFERENCES Processor("
                                         "chip_x, chip_y, physical_id, "
                                         "machine_id))")
