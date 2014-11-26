@@ -286,9 +286,9 @@ class DataBaseThread(threading.Thread):
         self._cur.execute("INSERT INTO Machine_layout("
                           "x_dimension, y_dimension)"
                           " VALUES({}, {})".format(x_di, y_di))
-        for chip in self._machine.chips:
-            self._cur.execute("INSERT INTO Machine_chip("
-                              "no_processors, chip_x, chip_y, machine_id")
+        #for chip in self._machine.chips:
+        #    self._cur.execute("INSERT INTO Machine_chip("
+        #                      "no_processors, chip_x, chip_y, machine_id")
 
 
         self._connection.commit()
