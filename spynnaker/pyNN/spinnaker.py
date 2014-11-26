@@ -248,8 +248,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                         binary_folder, executable_targets, self._hostname,
                         self._app_id, run_time)
 
-                wait_on_confirmation = conf.config.getboolean("Visualiser",
-                                                     "wait_on_vis_configuration")
+                wait_on_confirmation = \
+                    conf.config.getboolean("Database", "wait_on_confirmation")
                 vis_enabled = conf.config.getboolean("Visualiser", "enable")
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
