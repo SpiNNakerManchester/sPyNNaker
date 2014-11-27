@@ -39,8 +39,8 @@ class DataBaseThread(threading.Thread):
         self._routing_infos = None
         self._routing_tables = None
         self._complete = False
+        self._machine_id = 0
         # set up checks
-
 
         self._done_machine_format = False
         self._done_paritioning = False
@@ -49,6 +49,7 @@ class DataBaseThread(threading.Thread):
         self._done_routing_info = False
         self._done_routing_tables = False
         self._done_mapping = False
+        self._done_machine = False
         if self._wait_for_vis:
             self._recieved_confirmation = False
         else:
@@ -66,116 +67,99 @@ class DataBaseThread(threading.Thread):
                                             "visualiser_database.db")
             self._connection = sqlite.connect(database_address)
             self._cur = self._connection.cursor()
-            self._cur.execute("CREATE TABLE Machine_layout("
-                              "machine_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                              " x_dimension INT, "
-                              "y_dimension INT)")
-            self._cur.execute("CREATE TABLE Machine_chip("
-                              "no_processors INT, chip_x INTEGER, "
-                              "chip_y INTEGER, machine_id INTEGER, "
-                              "PRIMARY KEY(chip_x, chip_y, machine_id), "
-                              "FOREIGN KEY (machine_id) "
-                                  "REFERENCES Machine_layout(machine_id))")
-            self._cur.execute("CREATE TABLE Processor("
-                              "chip_x INTEGER, chip_y INTEGER, "
-                              "machine_id INTEGER, avilableSDRAM INT, "
-                              "avilable_DTCM INT, avilable_CPU INT, "
-                              "physical_id INTEGER, "
-                              "PRIMARY KEY(chip_x, chip_y, machine_id), "
-                              "FOREIGN KEY (chip_x, chip_y, machine_id) "
-                                  "REFERENCES Machine_chip(chip_x, chip_y, "
-                                                          "machine_id))")
-            self._cur.execute("CREATE TABLE Partitionable_vertices("
-                              "vertex_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                              "vertex_label TEXT, "
-                              "no_atoms INT, "
-                              "max_atom_constrant INT)")
-            self._cur.execute("CREATE TABLE Partitionable_edges("
-                              "edge_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                              "pre_vertex INTEGER, "
-                              "post_vertex INTEGER, "
-                              "edge_label TEXT, "
-                              "FOREIGN KEY (pre_vertex)"
-                                  " REFERENCES Partitionable_vertices(vertex_id), "
-                              "FOREIGN KEY (post_vertex)"
-                                  " REFERENCES Partitionable_vertices(vertex_id))")
-            self._cur.execute("CREATE TABLE Partitionable_graph("
-                              "vertex_id INTEGER, "
-                              "edge_id INTEGER, "
-                              "FOREIGN KEY (vertex_id) "
-                                  "REFERENCES Partitionable_vertices(vertex_id), "
-                              "FOREIGN KEY (edge_id) "
-                                  "REFERENCES Partitionable_edges(edge_id), "
-                              "PRIMARY KEY (vertex_id, edge_id))")
-            self._cur.execute("CREATE TABLE Partitioned_vertices("
-                              "vertex_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                              "label TEXT, "
-                              "cpu_used INT, "
-                              "sdram_used INT, "
-                              "dtcm_used INT)")
-            self._cur.execute("CREATE TABLE Partitioned_edges("
-                              "edge_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                              "pre_vertex INTEGER, "
-                              "post_vertex INTEGER, "
-                              "label TEXT, "
-                              "FOREIGN KEY (pre_vertex)"
-                                  " REFERENCES Partitioned_vertices(vertex_id), "
-                              "FOREIGN KEY (post_vertex)"
-                                  " REFERENCES Partitioned_vertices(vertex_id))")
-            self._cur.execute("CREATE TABLE Partitioned_graph("
-                              "vertex_id INTEGER, "
-                              "edge_id INTEGER, "
-                              "PRIMARY KEY(vertex_id, edge_id), "
-                              "FOREIGN KEY (vertex_id)"
-                                  " REFERENCES Partitioned_vertices(vertex_id), "
-                              "FOREIGN KEY (edge_id)"
-                                  " REFERENCES Partitioned_edges(edge_id))")
-            self._cur.execute("CREATE TABLE graph_mapper_vertex("
-                              "partitionable_vertex_id INTEGER, "
-                              "partitioned_vertex_id INTEGER, "
-                              "lo_atom INT, "
-                              "hi_atom INT, "
-                              "PRIMARY KEY(partitionable_vertex_id, "
-                                          "partitioned_vertex_id), "
-                              "FOREIGN KEY (partitioned_vertex_id)"
-                                  " REFERENCES Partitioned_vertices(vertex_id), "
-                              "FOREIGN KEY (partitionable_vertex_id)"
-                                  " REFERENCES Partitionable_vertices(vertex_id))")
-            self._cur.execute("CREATE TABLE graph_mapper_edges("
-                              "partitionable_edge_id INTEGER, "
-                              "partitioned_edge_id INTEGER, "
-                              "PRIMARY KEY(partitionable_edge_id, "
-                                          "partitioned_edge_id), "
-                              "FOREIGN KEY (partitioned_edge_id)"
-                                  " REFERENCES Partitioned_edges(edge_id), "
-                              "FOREIGN KEY (partitionable_edge_id)"
-                                  " REFERENCES Partitionable_edges(edge_id))")
-            self._cur.execute("CREATE TABLE Placements("
-                              "vertex_id INTEGER PRIMARY KEY, "
-                              "machine_id INTEGER, "
-                              "chip_x INT, "
-                              "chip_y INT, "
-                              "chip_p INT, "
-                              "FOREIGN KEY (vertex_id) "
-                                  "REFERENCES Partitioned_vertices(vertex_id), "
-                              "FOREIGN KEY (chip_x, chip_y, chip_p, machine_id) "
-                                  "REFERENCES Processor("
-                                        "chip_x, chip_y, physical_id, "
-                                        "machine_id))")
-            self._cur.execute("CREATE TABLE Routing_info("
-                              "edge_id INTEGER PRIMARY KEY, "
-                              "key INT, "
-                              "mask INT, "
-                              "FOREIGN KEY (edge_id)"
-                                  " REFERENCES Partitioned_edges(edge_id))")
-            self._cur.execute("CREATE TABLE Routing_table("
-                              "chip_x INTEGER, "
-                              "chip_y INTEGER, "
-                              "position INTEGER, "
-                              "key_combo INT, "
-                              "mask INT, "
-                              "route INT, "
-                              "PRIMARY KEY (chip_x, chip_y, position))")
+            self._cur.execute(
+                "CREATE TABLE Machine_layout("
+                "machine_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                " x_dimension INT, y_dimension INT)")
+            self._cur.execute(
+                "CREATE TABLE Machine_chip("
+                "no_processors INT, chip_x INTEGER, chip_y INTEGER, "
+                "machine_id INTEGER, avilableSDRAM INT, "
+                "PRIMARY KEY(chip_x, chip_y, machine_id), "
+                "FOREIGN KEY (machine_id) "
+                "REFERENCES Machine_layout(machine_id))")
+            self._cur.execute(
+                "CREATE TABLE Processor("
+                "chip_x INTEGER, chip_y INTEGER, machine_id INTEGER, "
+                "avilable_DTCM INT, avilable_CPU INT, physical_id INTEGER, "
+                "PRIMARY KEY(chip_x, chip_y, machine_id, physical_id), "
+                "FOREIGN KEY (chip_x, chip_y, machine_id) "
+                "REFERENCES Machine_chip(chip_x, chip_y, machine_id))")
+            self._cur.execute(
+                "CREATE TABLE Partitionable_vertices("
+                "vertex_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                "vertex_label TEXT, no_atoms INT, max_atom_constrant INT)")
+            self._cur.execute(
+                "CREATE TABLE Partitionable_edges("
+                "edge_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                "pre_vertex INTEGER, post_vertex INTEGER, edge_label TEXT, "
+                "FOREIGN KEY (pre_vertex)"
+                " REFERENCES Partitionable_vertices(vertex_id), "
+                "FOREIGN KEY (post_vertex)"
+                " REFERENCES Partitionable_vertices(vertex_id))")
+            self._cur.execute(
+                "CREATE TABLE Partitionable_graph("
+                "vertex_id INTEGER, edge_id INTEGER, "
+                "FOREIGN KEY (vertex_id) "
+                "REFERENCES Partitionable_vertices(vertex_id), "
+                "FOREIGN KEY (edge_id) "
+                "REFERENCES Partitionable_edges(edge_id), "
+                "PRIMARY KEY (vertex_id, edge_id))")
+            self._cur.execute(
+                "CREATE TABLE Partitioned_vertices("
+                "vertex_id INTEGER PRIMARY KEY AUTOINCREMENT, label TEXT, "
+                "cpu_used INT, sdram_used INT, dtcm_used INT)")
+            self._cur.execute(
+                "CREATE TABLE Partitioned_edges("
+                "edge_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                "pre_vertex INTEGER, post_vertex INTEGER, label TEXT, "
+                "FOREIGN KEY (pre_vertex)"
+                " REFERENCES Partitioned_vertices(vertex_id), "
+                "FOREIGN KEY (post_vertex)"
+                " REFERENCES Partitioned_vertices(vertex_id))")
+            self._cur.execute(
+                "CREATE TABLE Partitioned_graph("
+                "vertex_id INTEGER, edge_id INTEGER, "
+                "PRIMARY KEY(vertex_id, edge_id), "
+                "FOREIGN KEY (vertex_id)"
+                " REFERENCES Partitioned_vertices(vertex_id), "
+                "FOREIGN KEY (edge_id)"
+                " REFERENCES Partitioned_edges(edge_id))")
+            self._cur.execute(
+                "CREATE TABLE graph_mapper_vertex("
+                "partitionable_vertex_id INTEGER, "
+                "partitioned_vertex_id INTEGER, lo_atom INT, hi_atom INT, "
+                "PRIMARY KEY(partitionable_vertex_id, partitioned_vertex_id), "
+                "FOREIGN KEY (partitioned_vertex_id)"
+                " REFERENCES Partitioned_vertices(vertex_id), "
+                "FOREIGN KEY (partitionable_vertex_id)"
+                " REFERENCES Partitionable_vertices(vertex_id))")
+            self._cur.execute(
+                "CREATE TABLE graph_mapper_edges("
+                "partitionable_edge_id INTEGER, partitioned_edge_id INTEGER, "
+                "PRIMARY KEY(partitionable_edge_id, partitioned_edge_id), "
+                "FOREIGN KEY (partitioned_edge_id)"
+                " REFERENCES Partitioned_edges(edge_id), "
+                "FOREIGN KEY (partitionable_edge_id)"
+                " REFERENCES Partitionable_edges(edge_id))")
+            self._cur.execute(
+                "CREATE TABLE Placements("
+                "vertex_id INTEGER PRIMARY KEY, machine_id INTEGER, chip_x INT, "
+                "chip_y INT, chip_p INT, "
+                "FOREIGN KEY (vertex_id) "
+                "REFERENCES Partitioned_vertices(vertex_id), "
+                "FOREIGN KEY (chip_x, chip_y, chip_p, machine_id) "
+                "REFERENCES Processor(chip_x, chip_y, physical_id, "
+                "machine_id))")
+            self._cur.execute(
+                "CREATE TABLE Routing_info("
+                "edge_id INTEGER PRIMARY KEY, key INT, mask INT, "
+                "FOREIGN KEY (edge_id) REFERENCES Partitioned_edges(edge_id))")
+            self._cur.execute(
+                "CREATE TABLE Routing_table("
+                "chip_x INTEGER, chip_y INTEGER, position INTEGER, "
+                "key_combo INT, mask INT, route INT, "
+                "PRIMARY KEY (chip_x, chip_y, position))")
         except Exception as e:
             print e
         self._connection.commit()
@@ -192,7 +176,7 @@ class DataBaseThread(threading.Thread):
                        not self._done_routing_tables)
                    and not self._complete and self._machine is None):
                 self._lock_condition.wait()
-            if self._machine is not None:
+            if self._machine is not None and not self._done_machine:
                 self._lock_condition.release()
                 self._add_machine()
             elif (self._partitionable_graph is not None and
@@ -260,12 +244,12 @@ class DataBaseThread(threading.Thread):
         eieio_command_connection.\
             send_eieio_command_message(eieio_command_message)
 
-
     def _received_confirmation(self, packet):
-        self._lock_condition.acquire()
-        self._recieved_confirmation = True
-        self._lock_condition.notify()
-        self._lock_condition.release()
+        if packet is not None:
+            self._lock_condition.acquire()
+            self._recieved_confirmation = True
+            self._lock_condition.notify()
+            self._lock_condition.release()
 
     def has_recieved_confirmation(self):
         self._lock_condition.acquire()
@@ -286,12 +270,26 @@ class DataBaseThread(threading.Thread):
         self._cur.execute("INSERT INTO Machine_layout("
                           "x_dimension, y_dimension)"
                           " VALUES({}, {})".format(x_di, y_di))
-        #for chip in self._machine.chips:
-        #    self._cur.execute("INSERT INTO Machine_chip("
-        #                      "no_processors, chip_x, chip_y, machine_id")
-
-
+        self._machine_id += 1
+        for chip in self._machine.chips:
+            self._cur.execute(
+                "INSERT INTO Machine_chip("
+                "no_processors, chip_x, chip_y, machine_id) "
+                "VALUES ({}, {}, {}, {})"
+                .format(len(list(chip.processors)), chip.x, chip.y,
+                        self._machine_id))
+            for processor in chip.processors:
+                self._cur.execute(
+                    "INSERT INTO Processor("
+                    "chip_x, chip_y, machine_id, avilable_DTCM, avilable_CPU, "
+                    "physical_id)"
+                    "VALUES({}, {}, {}, {}, {}, {})"
+                    .format(chip.x, chip.y, self._machine_id,
+                            processor.dtcm_available,
+                            processor.cpu_cycles_available,
+                            processor.processor_id))
         self._connection.commit()
+        self._done_machine = True
 
     def add_partitionable_vertices(self, partitionable_graph):
         self._lock_condition.acquire()
@@ -302,33 +300,35 @@ class DataBaseThread(threading.Thread):
     def _add_partitionable_vertices(self):
         #add vertices
         for vertex in self._partitionable_graph.vertices:
-            self._cur.execute("INSERT INTO Partitionable_vertices("
-                              "vertex_label, no_atoms, max_atom_constrant)"
-                              " VALUES('{}', {}, {});"
-                              .format(vertex.label, vertex.n_atoms,
-                                      vertex.get_max_atoms_per_core()))
+            self._cur.execute(
+                "INSERT INTO Partitionable_vertices("
+                "vertex_label, no_atoms, max_atom_constrant)"
+                " VALUES('{}', {}, {});"
+                .format(vertex.label, vertex.n_atoms,
+                        vertex.get_max_atoms_per_core()))
         #add edges
         vertices = self._partitionable_graph.vertices
         for vertex in self._partitionable_graph.vertices:
             for edge in self._partitionable_graph.\
                     outgoing_edges_from_vertex(vertex):
-                self._cur.execute("INSERT INTO Partitionable_edges ("
-                                  "pre_vertex, post_vertex, edge_label) "
-                                  "VALUES({}, {}, '{}');"
-                                  .format(vertices.index(edge.pre_vertex) + 1,
-                                          vertices.index(edge.post_vertex) + 1,
-                                          edge.label))
+                self._cur.execute(
+                    "INSERT INTO Partitionable_edges ("
+                    "pre_vertex, post_vertex, edge_label) "
+                    "VALUES({}, {}, '{}');"
+                    .format(vertices.index(edge.pre_vertex) + 1,
+                            vertices.index(edge.post_vertex) + 1, edge.label))
         #update graph
         edge_id_offset = 0
         for vertex in self._partitionable_graph.vertices:
             edges = self._partitionable_graph.outgoing_edges_from_vertex(vertex)
             for edge in self._partitionable_graph.\
                     outgoing_edges_from_vertex(vertex):
-                self._cur.execute("INSERT INTO Partitionable_graph ("
-                                  "vertex_id, edge_id)"
-                                  " VALUES({}, {});"
-                                  .format(vertices.index(vertex) + 1,
-                                          edges.index(edge) + edge_id_offset))
+                self._cur.execute(
+                    "INSERT INTO Partitionable_graph ("
+                    "vertex_id, edge_id)"
+                    " VALUES({}, {})"
+                    .format(vertices.index(vertex) + 1,
+                            edges.index(edge) + edge_id_offset))
             edge_id_offset += len(edges)
         self._connection.commit()
 
@@ -356,34 +356,34 @@ class DataBaseThread(threading.Thread):
         for subvert in self._partitioned_graph.subvertices:
             vertex = self._graph_mapper.get_vertex_from_subvertex(subvert)
             vertex_slice = self._graph_mapper.get_subvertex_slice(subvert)
-            self._cur.execute("INSERT INTO graph_mapper_vertex ("
-                              "partitionable_vertex_id, partitioned_vertex_id,"
-                              "lo_atom, hi_atom) "
-                              "VALUES({}, {}, {}, {});"
-                              .format(vertices.index(vertex) + 1,
-                                      subverts.index(subvert) + 1,
-                                      vertex_slice.lo_atom,
-                                      vertex_slice.hi_atom))
+            self._cur.execute(
+                "INSERT INTO graph_mapper_vertex ("
+                "partitionable_vertex_id, partitioned_vertex_id, lo_atom, "
+                "hi_atom) "
+                "VALUES({}, {}, {}, {});"
+                .format(vertices.index(vertex) + 1, subverts.index(subvert) + 1,
+                        vertex_slice.lo_atom, vertex_slice.hi_atom))
 
         # add partitioned_edges
         for subedge in self._partitioned_graph.subedges:
-            self._cur.execute("INSERT INTO Partitioned_edges ("
-                              "pre_vertex, post_vertex, label) "
-                              "VALUES({}, {}, '{}');"
-                              .format(subverts.index(subedge.pre_subvertex) + 1,
-                                      subverts.index(subedge.post_subvertex) + 1,
-                                      subedge.label))
+            self._cur.execute(
+                "INSERT INTO Partitioned_edges ("
+                "pre_vertex, post_vertex, label) "
+                "VALUES({}, {}, '{}');"
+                .format(subverts.index(subedge.pre_subvertex) + 1,
+                        subverts.index(subedge.post_subvertex) + 1,
+                        subedge.label))
         #add graph_mapper edges
         subedges = list(self._partitioned_graph.subedges)
         edges = self._partitionable_graph.edges
         for subedge in self._partitioned_graph.subedges:
             edge = self._graph_mapper.\
                 get_partitionable_edge_from_partitioned_edge(subedge)
-            self._cur.execute("INSERT INTO graph_mapper_edges ("
-                              "partitionable_edge_id, partitioned_edge_id) "
-                              "VALUES({}, {})"
-                              .format(edges.index(edge) + 1,
-                                      subedges.index(subedge) + 1))
+            self._cur.execute(
+                "INSERT INTO graph_mapper_edges ("
+                "partitionable_edge_id, partitioned_edge_id) "
+                "VALUES({}, {})"
+                .format(edges.index(edge) + 1, subedges.index(subedge) + 1))
 
         # add to partitioned graph
         edge_id_offset = 0
@@ -410,11 +410,12 @@ class DataBaseThread(threading.Thread):
     def _add_placements(self):
         subverts = list(self._partitioned_graph.subvertices)
         for placement in self._placements.placements:
-            self._cur.execute("INSERT INTO Placements("
-                              "vertex_id, chip_x, chip_y, chip_p, machine_id) "
-                              "VALUES({}, {}, {}, {}, {})"
-                              .format(subverts.index(placement.subvertex) + 1,
-                                      placement.x, placement.y, placement.p), 1)
+            self._cur.execute(
+                "INSERT INTO Placements("
+                "vertex_id, chip_x, chip_y, chip_p, machine_id) "
+                "VALUES({}, {}, {}, {}, {})"
+                .format(subverts.index(placement.subvertex) + 1, placement.x,
+                        placement.y, placement.p, self._machine_id))
         self._connection.commit()
 
     def add_routing_infos(self, routing_infos):
@@ -426,11 +427,12 @@ class DataBaseThread(threading.Thread):
     def _add_routing_infos(self):
         sub_edges = list(self._partitioned_graph.subedges)
         for routing_info in self._routing_infos.all_subedge_info:
-            self._cur.execute("INSERT INTO Routing_info("
-                              "edge_id, key, mask) "
-                              "VALUES({}, {}, {})"
-                              .format(sub_edges.index(routing_info.subedge) + 1,
-                                      routing_info.key, routing_info.mask))
+            self._cur.execute(
+                "INSERT INTO Routing_info("
+                "edge_id, key, mask) "
+                "VALUES({}, {}, {})"
+                .format(sub_edges.index(routing_info.subedge) + 1,
+                        routing_info.key, routing_info.mask))
         self._connection.commit()
 
     def add_routing_tables(self, routing_tables):
@@ -448,24 +450,23 @@ class DataBaseThread(threading.Thread):
                     route_entry |= (1 << (6 + processor_id))
                 for link_id in entry.link_ids:
                     route_entry |= (1 << link_id)
-                self._cur.execute("INSERT INTO Routing_table("
-                                  "chip_x, chip_y, position, key_combo, mask, "
-                                  "route) VALUES({}, {}, {}, {}, {}, {})"
-                                  .format(routing_table.x, routing_table.y,
-                                          counter, entry.key_combo, entry.mask,
-                                          route_entry))
+                self._cur.execute(
+                    "INSERT INTO Routing_table("
+                    "chip_x, chip_y, position, key_combo, mask, route) "
+                    "VALUES({}, {}, {}, {}, {}, {})"
+                    .format(routing_table.x, routing_table.y, counter,
+                            entry.key_combo, entry.mask, route_entry))
                 counter += 1
         self._connection.commit()
 
     def _create_neuron_to_key_mapping(self):
         #create table
         self._done_mapping = True
-        self._cur.execute("CREATE TABLE key_to_neuron_mapping("
-                          "vertex_id INTEGER, "
-                          "neuron_id INTEGER, "
-                          "key INTEGER PRIMARY KEY, "
-                          "FOREIGN KEY (vertex_id)"
-                              " REFERENCES Partitioned_vertices(vertex_id))")
+        self._cur.execute(
+            "CREATE TABLE key_to_neuron_mapping("
+            "vertex_id INTEGER, neuron_id INTEGER, key INTEGER PRIMARY KEY, "
+            "FOREIGN KEY (vertex_id)"
+            " REFERENCES Partitioned_vertices(vertex_id))")
         #insert into table
         subverts = list(self._partitioned_graph.subvertices)
         for partitioned_vertex in self._partitioned_graph.subvertices:
@@ -487,12 +488,12 @@ class DataBaseThread(threading.Thread):
                     vertex_slice, vertex, placement, subedge)
                 for neuron_id in key_to_neuron_map.keys():
                     if key_to_neuron_map[neuron_id] not in inserted_keys:
-                        self._cur.execute("INSERT INTO key_to_neuron_mapping("
-                                          "vertex_id, key, neuron_id) "
-                                          "VALUES ({}, {}, {})"
-                                          .format(vertex_id,
-                                                  key_to_neuron_map[neuron_id],
-                                                  neuron_id))
+                        self._cur.execute(
+                            "INSERT INTO key_to_neuron_mapping("
+                            "vertex_id, key, neuron_id) "
+                            "VALUES ({}, {}, {})"
+                            .format(vertex_id, key_to_neuron_map[neuron_id],
+                                    neuron_id))
                         inserted_keys.append(key_to_neuron_map[neuron_id])
         self._connection.commit()
 
