@@ -507,17 +507,17 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def create_visualised_population(self, size, cellclass, cellparams,
                                      structure, label):
         requires_visualiser = conf.config.getboolean("Visualiser", "enable")
-        if not requires_visualiser:
-            raise exceptions.ConfigurationException(
-                "The visualiser is currently turned off by a spinnaker.cfg or "
-                "pacman.cfg file. Please correct and try again.")
-        else:
-            from spynnaker.pyNN.visualiser_package.visualised_vertex \
-                import VisualisedVertex
-            return VisualisedVertex(
-                size=size, cellclass=cellclass, cellparams=cellparams,
-                structure=structure, label=label, spinnaker=self,
-                multi_cast_vertex=self._multi_cast_vertex)
+#        if not requires_visualiser:
+#            raise exceptions.ConfigurationException(
+#                "The visualiser is currently turned off by a spinnaker.cfg or "
+#                "pacman.cfg file. Please correct and try again.")
+#        else:
+        from spynnaker.pyNN.visualiser_package.visualised_vertex \
+            import VisualisedVertex
+        return VisualisedVertex(
+            size=size, cellclass=cellclass, cellparams=cellparams,
+            structure=structure, label=label, spinnaker=self,
+            multi_cast_vertex=self._multi_cast_vertex)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(

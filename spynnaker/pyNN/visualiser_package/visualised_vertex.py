@@ -19,7 +19,7 @@ class VisualisedVertex(Population):
 
     def record(
             self, to_file=None, receive_port_no=None, hostname=None,
-            tag=None, traffic_type=TRAFFIC_TYPE.EIEIO,
+            tag=None, traffic_type=TRAFFIC_TYPE.EIEIO_DATA,
             visualiser_mode=VISUALISER_MODES.RASTER,
             visualiser_2d_dimension=None, visualiser_raster_separate=None,
             visualiser_no_colours=None, visualiser_average_period_tics=None,
@@ -31,7 +31,7 @@ class VisualisedVertex(Population):
         #add a visualiser vertex to the list of vertex's to be visualised by
         # the visualiser
         connection_type = None
-        if traffic_type == TRAFFIC_TYPE.EIEIO:
+        if traffic_type == TRAFFIC_TYPE.EIEIO_DATA:
             connection_type = CONNECTION_TYPE.UDP_IPTAG
         elif traffic_type == TRAFFIC_TYPE.SDP:
             connection_type = CONNECTION_TYPE.SDP_IPTAG
