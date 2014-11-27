@@ -57,15 +57,16 @@ class SynapseRowInfo(object):
             self.delays = self.delays[sort_indices]
             self.synapse_types = self.synapse_types[sort_indices]
         
-    def get_n_connections(self, lo_atom=None, hi_atom=None):
+    def get_n_connections(self, n_atoms=None):
         """
         Returns the number of connections in the row
         """
-        if lo_atom is None or hi_atom is None:
+        if n_atoms is None:
             return self.target_indices.size
         
-        mask = ((self.target_indices >= lo_atom) 
-                & (self.target_indices <= hi_atom))
+        mask = ((self.target_indices >= 0)
+                & (self.target_indices <= n_atoms))
+        x = self.target_indices[mask]
         return self.target_indices[mask].size
     
     def get_min_delay(self):

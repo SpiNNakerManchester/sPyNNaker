@@ -27,3 +27,9 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
         AbstractDataSpecableVertex.__init__(self, label=label,
                                             n_atoms=n_neurons,
                                             machine_time_step=machine_time_step)
+
+    def __str__(self):
+        return "spike source with atoms {}".format(self.n_atoms)
+
+    def __repr__(self):
+        return self.__str__()

@@ -12,10 +12,10 @@ from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_afferent_edge \
+from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_projection_edge \
-    import DelayProjectionEdge
+from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
+    import DelayPartitionableEdge
 from spynnaker.pyNN.utilities.timer import Timer
 
 logger = logging.getLogger(__name__)
@@ -198,7 +198,7 @@ class Projection(object):
         delay_label = "DE to {}".format(label)
         num_blocks = int(math.ceil(float(max_delay_for_projection)
                                    / float(max_delay_per_neuron))) - 1
-        self._delay_edge = DelayProjectionEdge(
+        self._delay_edge = DelayPartitionableEdge(
             delay_vertex, postsynaptic_population._get_vertex,
             self._spinnaker.machine_time_step, num_blocks, max_delay_per_neuron,
             synapse_list=remaining_synaptic_sublist,
@@ -285,7 +285,7 @@ class Projection(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getWeights(self, list_format='list', gather=True):
+    def getWeights(self, format='list', gather=True):
         """
         Get synaptic weights for all connections in this Projection.
         (pyNN gather parameter not supported from the signiture
@@ -313,7 +313,7 @@ class Projection(object):
         if conf.config.getboolean("Reports", "outputTimesForSections"):
             timer.take_sample()
 
-        if list_format == 'list':
+        if format == 'list':
             weights = list()
             for row in self._host_based_synapse_list.get_rows():
                 weights.extend(row.weights)
@@ -386,14 +386,16 @@ class Projection(object):
                     graph_mapper=self._spinnaker.graph_mapper,
                     partitioned_graph=self._spinnaker.partitioned_graph,
                     placements=self._spinnaker.placements,
-                    transceiver=self._spinnaker.transceiver)
+                    transceiver=self._spinnaker.transceiver,
+                    routing_infos=self._spinnaker.routing_infos)
         if self._delay_edge is not None:
             delay_synapse_list = \
                 self._delay_edge.get_synaptic_list_from_machine(
-                    self._spinnaker.graph_mapper,
-                    self._spinnaker.placements,
-                    self._spinnaker.transceiver,
-                    self._spinnaker.partitioned_graph)
+                    graph_mapper=self._spinnaker.graph_mapper,
+                    placements=self._spinnaker.placements,
+                    transceiver=self._spinnaker.transceiver,
+                    partitioned_graph=self._spinnaker.partitioned_graph,
+                    routing_infos=self._spinnaker.routing_infos)
 
         # If there is both a delay and a non-delay list, merge them
         if synapse_list is not None and delay_synapse_list is not None:

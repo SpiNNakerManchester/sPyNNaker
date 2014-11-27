@@ -15,11 +15,10 @@ class SynapticList(object):
         """
         if vertex_slice is None:
             return max(map(operator.methodcaller(
-                'get_n_connections', None, None), self._synaptic_rows))
+                'get_n_connections', None), self._synaptic_rows))
         else:
             return max(map(operator.methodcaller(
-                'get_n_connections', vertex_slice.lo_atom,
-                vertex_slice.hi_atom), self._synaptic_rows))
+                'get_n_connections', vertex_slice), self._synaptic_rows))
     
     def get_min_max_delay(self):
         """
@@ -67,10 +66,9 @@ class SynapticList(object):
         Return true if the rows are connected for the specified range of
         incoming and outgoing atoms
         """
-        for row in self._synaptic_rows[from_vertex_slice.lo_atom:
-                                       from_vertex_slice.hi_atom + 1]:
-            if row.get_n_connections(to_vertex_slice.lo_atom,
-                                     to_vertex_slice.hi_atom) > 0:
+        for row in self._synaptic_rows[0:from_vertex_slice.n_atoms]:
+            x = row.get_n_connections(to_vertex_slice.n_atoms)
+            if row.get_n_connections(to_vertex_slice.n_atoms) > 0:
                 return True
         return False
     
@@ -133,3 +131,7 @@ class SynapticList(object):
         Appends a synapse list to the end of this one
         """
         self._synaptic_rows.extend(synapse_list.synapticRows)
+
+    def __str__(self):
+        return "synaptic list containing {} entries which are {}"\
+            .format(len(self._synaptic_rows), self._synaptic_rows)

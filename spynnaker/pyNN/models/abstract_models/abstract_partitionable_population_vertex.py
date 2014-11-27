@@ -41,7 +41,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                 self.get_neuron_params_size(vertex_slice)
                 + self.get_synapse_parameter_size(vertex_slice)
                 + self.get_stdp_parameter_size(
-                    vertex_slice, graph.incoming_edges_to_vertex(self))
+                    graph.incoming_edges_to_vertex(self))
                 + constants.ROW_LEN_TABLE_SIZE
                 + constants.MASTER_POPULATION_TABLE_SIZE
                 + self.get_synaptic_blocks_memory_size(
@@ -70,7 +70,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         """
 
     @abstractmethod
-    def get_stdp_parameter_size(self, vertex_slice, in_edges):
+    def get_stdp_parameter_size(self, in_edges):
         """
         Gets the size of the stdp parameters for a given set of atoms
         """

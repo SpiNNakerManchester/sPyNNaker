@@ -23,7 +23,7 @@ cell_params_lif = {'cm': 0.25,  # nF
 populations = list()
 projections = list()
 
-weight_to_spike = 2.0
+weight_to_spike = 1.0
 delay = 1
 loopConnections = list()
 for i in range(0, nNeurons):
@@ -34,7 +34,7 @@ injectionConnection = [(0, 0, weight_to_spike, 1)]
 spikeArray = {'spike_times': [[0]]}
 populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
                                 label='pop_1'))
-populations[0].set_constraint(p.PlacerChipAndCoreConstraint(x=0, y=0, p=1))
+populations[0].set_constraint(p.PlacerChipAndCoreConstraint(x=0, y=0, p=9))
 populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
                                 label='inputSpikes_1'))
 

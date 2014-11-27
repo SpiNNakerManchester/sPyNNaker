@@ -1,12 +1,12 @@
 from data_specification.enums.data_type import DataType
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
+    abstract_weight_dependency import AbstractWeightDependency
 
-class MultiplicativeWeightDependence(object):
+class MultiplicativeWeightDependence(AbstractWeightDependency):
     
     def __init__(self, w_min=0.0, w_max=1.0, A_plus=0.01, A_minus=0.01):
-        self.w_min = w_min
-        self.w_max = w_max
-        self.A_plus = A_plus
-        self.A_minus = A_minus
+        AbstractWeightDependency.__init__(self, w_min=w_min, w_max=w_max,
+                                          A_plus=A_plus, A_minus=A_minus)
     
     def __eq__(self, other):
         if (other is None) or (not isinstance(other, MultiplicativeWeightDependence)):

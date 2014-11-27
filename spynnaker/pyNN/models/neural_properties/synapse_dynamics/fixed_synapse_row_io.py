@@ -1,9 +1,10 @@
-from spynnaker.pyNN.models.neural_properties.\
-    synapse_dynamics.abstract_synapse_row_io import AbstractSynapseRowIo
+import numpy
+
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.abstract_synapse_row_io import AbstractSynapseRowIo
 from spynnaker.pyNN.models.neural_properties.synapse_row_info import \
     SynapseRowInfo
 from spynnaker.pyNN import exceptions
-import numpy
+
 #ABS the noinspections are due to a problem mapping from non static to static
 #  methods. Current thoughts from rowley and i are that itll clean up in the
 # wash and that its just pycharm being stupid again
@@ -21,8 +22,11 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def get_n_words(synapse_row, lo_atom=None, hi_atom=None):
-        return synapse_row.get_n_connections(lo_atom, hi_atom)
+    def get_n_words(synapse_row, vertex_slice=None):
+        if vertex_slice is None:
+            return synapse_row.get_n_connections()
+        else:
+            return synapse_row.get_n_connections(vertex_slice.n_atoms)
 
     # noinspection PyMethodOverriding
     @staticmethod
@@ -76,22 +80,14 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
             raise exceptions.SynapticBlockGenerationException(
                 "fixed synaptic row ios cannot be built from plastic entries"
             )
-        target_indices = list()
-        weights = list()
-        delays_in_ticks = list()
-        synapse_types = list()
+        delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
+        synaptic_type_mask = (1 << bits_reserved_for_type) - 1
 
-        #read in each element
-        for element in f_f_entries:
-            # drops delay, type and id
-            weights.append(float(element >> 16) / float(weight_scale))
-            target_indices.append(element & 0xFF)  # masks by 8 bits
-            # gets the size of the synapse type parameter
-            synaptic_type_mask = (1 << bits_reserved_for_type) - 1
-            synapse_types.append((element >> 8) & synaptic_type_mask)
-            delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
-            delays_in_ticks.append((element >> 8 + bits_reserved_for_type) &
-                                   delay_mask)
+        target_indices = f_f_entries & 0xFF
+        weights = (f_f_entries >> 16) / float(weight_scale)
+        delays_in_ticks = ((f_f_entries >> 8 + bits_reserved_for_type)
+                           & delay_mask)
+        synapse_types = (f_f_entries >> 8) & synaptic_type_mask
 
         return SynapseRowInfo(target_indices, weights, delays_in_ticks,
                               synapse_types)
