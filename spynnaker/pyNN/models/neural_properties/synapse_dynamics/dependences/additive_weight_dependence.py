@@ -34,9 +34,6 @@ class AdditiveWeightDependence(AbstractWeightDependency):
             raise NotImplementedError(
                 "Additive weight dependence only supports one or two terms")
 
-    def get_vertex_executable_suffix(self):
-        return "additive"
-        
     def write_plastic_params(self, spec, machine_time_step, weight_scale,
             num_terms):
         # In the synaptic row IO, write weights as integers
@@ -65,3 +62,7 @@ class AdditiveWeightDependence(AbstractWeightDependency):
         elif num_terms != 1:
             raise NotImplementedError(
                 "Additive weight dependence only supports one or two terms")
+
+    @property
+    def vertex_executable_suffix(self):
+        return "additive"

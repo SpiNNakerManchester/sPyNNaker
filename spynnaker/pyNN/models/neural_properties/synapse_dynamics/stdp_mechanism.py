@@ -79,7 +79,7 @@ class STDPMechanism(object):
     def get_synapse_row_io(self):
         if self.timing_dependence is not None:
             # If we're using MAD, the header contains a single timestamp and pre-trace
-            if self.mad:
+            if self._mad:
                 synaptic_row_header_bytes = TIME_STAMP_BYTES + self.timing_dependence.pre_trace_size_bytes
             # Otherwise, headers consist of NUM_PRE_SYNAPTIC_EVENTS timestamps and pre-traces
             else:
@@ -89,7 +89,7 @@ class STDPMechanism(object):
             synaptic_row_header_words = int(math.ceil(float(synaptic_row_header_bytes) / 4.0))
             
             # Create a suitable synapse row io object
-            return self._timing_dependence.create_synapse_row_io(synaptic_row_header_words, self.dendritic_delay_fraction)
+            return self._timing_dependence.create_synapse_row_io(synaptic_row_header_words, self._dendritic_delay_fraction)
         else:
             return None
         
@@ -100,27 +100,9 @@ class STDPMechanism(object):
         raise NotImplementedError
 
     # **TODO** make property
-    def get_vertex_executable_suffix(self):
-        name = "stdp"
-        if self._timing_dependence is not None:
-            name += \
-                "_" + self._timing_dependence.get_vertex_executable_suffix()
-        if self._weight_dependence is not None:
-            name += \
-                "_" + self._weight_dependence.get_vertex_executable_suffix()
-        return name
-
-    # **TODO** make property
     def are_weights_signed(self):
         return False
 
-     # **TODO** make property
-    def get_max_weight(self):
-        if self._weight_dependence != None:
-            return self._weight_dependence.w_max
-        else:
-            return 0.0
-    
     # **TODO** make property
     def get_params_size(self):
         """
@@ -130,7 +112,7 @@ class STDPMechanism(object):
         num_terms = 1
         if self._timing_dependence is not None:
             size += self._timing_dependence.get_params_size_bytes()
-            num_terms = self._timing_dependence.get_num_terms()
+            num_terms = self._timing_dependence.num_terms
 
         if self._weight_dependence is not None:
             size += self._weight_dependence.get_params_size_bytes(num_terms)
@@ -156,7 +138,7 @@ class STDPMechanism(object):
     
      # **TODO** make property
     def get_vertex_executable_suffix(self):
-        name = "stdp_mad" if self.mad else "stdp"
+        name = "stdp_mad" if self._mad else "stdp"
         if self.timing_dependence is not None:
             name += "_" + self.timing_dependence.vertex_executable_suffix
         if self.weight_dependence is not None:
@@ -164,30 +146,8 @@ class STDPMechanism(object):
         return name
     
     # **TODO** make property
-    def are_weights_signed(self):
-        return False
-    
-    # **TODO** make property
     def get_max_weight(self):
         if self.weight_dependence != None:
             return self.weight_dependence.w_max
         else:
             return 0.0
-
-    # **TODO** make property
-    def get_params_size(self):
-        """
-        Gets the size of the STDP parameters in bytes
-        """
-        size = 0
-        num_terms = 1
-        if self._timing_dependence is not None:
-            self._timing_dependence.write_plastic_params(spec,
-                    machine_time_step, weight_scale)
-            num_terms = self._timing_dependence.get_num_terms()
-
-        # Write weight dependence information to region
-        if self._weight_dependence is not None:
-            self._weight_dependence.write_plastic_params(spec,
-                    machine_time_step, weight_scale, num_terms)
-        return size

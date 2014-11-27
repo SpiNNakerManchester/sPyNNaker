@@ -1,7 +1,6 @@
 from abc import ABCMeta
 from six import add_metaclass
-from abc import abstractmethod
-
+from abc import abstractmethod, abstractproperty
 
 @add_metaclass(ABCMeta)
 class AbstractRulePart(object):
@@ -33,8 +32,8 @@ class AbstractRulePart(object):
         :return:
         """
 
-    @abstractmethod
-    def get_vertex_executable_suffix(self):
+    @abstractproperty
+    def vertex_executable_suffix(self):
         """
 
         :return:
