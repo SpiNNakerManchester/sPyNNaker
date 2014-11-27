@@ -4,7 +4,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
 
 
 class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
-
     def __init__(self, presubvertex, postsubvertex):
         PartitionedEdge.__init__(self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
@@ -73,3 +72,5 @@ class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
                 graph_mapper.get_partitionable_edge_from_partitioned_edge(self)
             
             return associated_edge.label
+        else:
+            return None

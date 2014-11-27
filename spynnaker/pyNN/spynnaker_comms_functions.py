@@ -222,7 +222,9 @@ class SpynnakerCommsFunctions(object):
         progress_bar.end()
         return processor_to_app_data_base_address
 
-    def _start_execution_on_machine(self, executable_targets, app_id, runtime):
+    def _start_execution_on_machine(self, executable_targets, app_id, runtime,
+                                    waiting_on_confirmation, database_thread,
+                                    vis_enabled):
         #deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
@@ -263,6 +265,15 @@ class SpynnakerCommsFunctions(object):
                     "Only {} processors out of {} have sucessfully reached "
                     "sync0 with breakdown of: {}"
                     .format(processors_ready, total_processors, break_down))
+
+        #wait till vis is ready for us to start if required
+        if waiting_on_confirmation and vis_enabled:
+            logger.info("*** Awaiting for a response from the visualiser to "
+                        "state its ready for the simulation to start ***")
+            is_vis_ready = database_thread.has_recieved_confirmation()
+            while not is_vis_ready:
+                is_vis_ready = database_thread.has_recieved_confirmation()
+
 
         # if correct, start applications
         logger.info("Starting application")
