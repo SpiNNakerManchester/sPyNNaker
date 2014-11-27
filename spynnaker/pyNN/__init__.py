@@ -23,6 +23,8 @@ from spynnaker.pyNN import exceptions
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
     import IFConductanceExponentialPopulation as IF_cond_exp
+from spynnaker.pyNN.models.neural_models.if_cond_exp_stoc \
+    import IFConductanceExponentialStochasticPopulation as IF_cond_exp_stoc
 from spynnaker.pyNN.models.neural_models.if_curr_dual_exp \
     import IFCurrentDualExponentialPopulation as IF_curr_dual_exp
 from spynnaker.pyNN.models.neural_models.if_curr_exp \
