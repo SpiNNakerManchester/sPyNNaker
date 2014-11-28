@@ -1,13 +1,11 @@
 import math, numpy, pylab, random, sys
 import pylab
+import spynnaker.pyNN as sim
 
 #-------------------------------------------------------------------
 # This example uses the sPyNNaker implementation of the triplet rule
 # Developed by Pfister and Gerstner(2006) to reproduce the pairing
 # Experiment first performed by Sjostrom (2001)
-#
-# **NOTE** Running this script takes some time!
-#
 #-------------------------------------------------------------------
 
 #-------------------------------------------------------------------
@@ -31,28 +29,28 @@ def generate_fixed_frequency_test_data(frequency, first_spike_time, num_spikes):
 #-------------------------------------------------------------------
 # Experiment loop
 #-------------------------------------------------------------------
-end_w = []
+# Population parameters
+model = sim.IF_curr_exp
+cell_params = {'cm'        : 0.25, # nF
+            'i_offset'  : 0.0,
+            'tau_m'     : 10.0,
+            'tau_refrac': 2.0,
+            'tau_syn_E' : 2.5,
+            'tau_syn_I' : 2.5,
+            'v_reset'   : -70.0,
+            'v_rest'    : -65.0,
+            'v_thresh'  : -55.4
+            }
+
+# SpiNNaker setup
+sim.setup(timestep=1.0, min_delay=1.0, max_delay=10.0)
+
+# Sweep times and frequencies
+projections = []
+sim_time = 0
 for t in delta_t:
-    freq_w = []
+    projections.append([])
     for f in frequencies:
-        import spynnaker.pyNN as sim
-
-        # Population parameters
-        model = sim.IF_curr_exp
-        cell_params = {'cm'        : 0.25, # nF
-                    'i_offset'  : 0.0,
-                    'tau_m'     : 10.0,
-                    'tau_refrac': 2.0,
-                    'tau_syn_E' : 2.5,
-                    'tau_syn_I' : 2.5,
-                    'v_reset'   : -70.0,
-                    'v_rest'    : -65.0,
-                    'v_thresh'  : -55.4
-                    }
-
-        # SpiNNaker setup
-        sim.setup(timestep=1.0, min_delay=1.0, max_delay=10.0)
-
         # Neuron populations
         pre_pop = sim.Population(1, model, cell_params)
         post_pop = sim.Population(1, model, cell_params)
@@ -63,7 +61,8 @@ for t in delta_t:
         pre_stim = sim.Population(1, sim.SpikeSourceArray, {'spike_times': [pre_times,]})
         post_stim = sim.Population(1, sim.SpikeSourceArray, {'spike_times': [post_times,]})
 
-        sim_time = max(max(pre_times), max(post_times)) + 100
+        # Update simulation time
+        sim_time = max(sim_time, max(max(pre_times), max(post_times)) + 100)
 
         # Connections between spike sources and neuron populations
         ee_connector = sim.OneToOneConnector(weights=2)
@@ -80,30 +79,26 @@ for t in delta_t:
             weight_dependence = sim.AdditiveWeightDependence(w_min = 0.0, w_max = 1.0, A_plus = param_scale * 0.0, A_minus = param_scale * 7.1e-3, A3_plus = param_scale * 6.5e-3, A3_minus = param_scale * 0.0)
         )
 
-        plastic_projection = sim.Projection(pre_pop, post_pop, sim.OneToOneConnector(weights = start_w),
+        projections[-1].append(sim.Projection(pre_pop, post_pop, sim.OneToOneConnector(weights = start_w),
             synapse_dynamics = sim.SynapseDynamics(slow = stdp_model)
-        )
+        ))
 
+print("Simulating for %us" % (sim_time / 1000))
 
-        # Run simulation
-        sim.run(sim_time)
+# Run simulation
+sim.run(sim_time)
 
-        # Extract weight from synapse
-        w = plastic_projection.getWeights()[0]
+# Read weights from each parameter value being tested
+weights = []
+for projection_delta_t in projections:
+    weights.append([p.getWeights()[0] for p in projection_delta_t])
 
-        print("Delta t=%ums, Frequency=%fHz, resultant_weight=%f" % (t, f, w))
-        freq_w.append(w)
-
-        # End simulation on SpiNNaker
-        sim.end(stop_on_board=True)
-
-    # Append list of weights calculated for this delta t value to list
-    end_w.append(freq_w)
+# End simulation on SpiNNaker
+sim.end(stop_on_board=True)
 
 #-------------------------------------------------------------------
 # Plotting
 #-------------------------------------------------------------------
-
 # Sjostrom et al. (2001) experimental data
 data_w = [
     [ -0.29, -0.41, -0.34, 0.56, 0.75 ],
@@ -114,14 +109,13 @@ data_e = [
     [ 0.05, 0.1, 0.14, 0.11, 0.26 ]
 ]
 
-
 # Plot Frequency response
 figure, axis = pylab.subplots()
 axis.set_xlabel("Frequency/Hz")
 axis.set_ylabel(r"$(\frac{\Delta w_{ij}}{w_{ij}})$", rotation = "horizontal", size = "xx-large")
 
 line_styles = ["--", "-"]
-for t, m_w, d_w, d_e, l in zip(delta_t, end_w, data_w, data_e, line_styles):
+for m_w, d_w, d_e, l in zip(weights, data_w, data_e, line_styles):
     # Calculate deltas from end weights
     delta_w = [(w - start_w) / start_w for w in m_w]
 

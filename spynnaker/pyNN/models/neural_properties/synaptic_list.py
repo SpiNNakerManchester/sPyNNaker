@@ -46,20 +46,26 @@ class SynapticList(object):
         return min(map(operator.methodcaller('get_min_weight'),
                        self._synaptic_rows))
         
-    def sum_weights(self, exc_sum_array, inh_sum_array):
+    def sum_weights(self, sum_arrays):
         """
-        Sums the positive weights of the rows into exc_sum_array, and the
-        negative weights of the rows into inh_sum_array, each of which is an 
-        array of numbers indexed by the target indices
+        Sums the weights going into each post-synaptic 
+        neuron on a per-synapse type basis
         """
+        # **TODO** numpyify
         for row in self._synaptic_rows:
-            for i in range(0, len(row.target_indices)):
-                index = row.target_indices[i]
-                weight = row.weights[i]
-                if weight > 0:
-                    exc_sum_array[index] += weight
-                else:
-                    inh_sum_array[index] += abs(weight)
+            for i, w, s in zip(row.target_indices, row.weights, row.synapse_types):
+                sum_arrays[s][i] += abs(w)
+    
+    def sum_fixed_weight(self, sum_arrays, fixed_weight):
+        """
+        Sums the weights going into each post-synaptic neuron,
+        Assuming each pre-synaptic neuron applies a fixed 
+        Weight - used with a maximum weight provided by an STDP rule
+        """
+        # **TODO** numpyify
+        for row in self._synaptic_rows:
+            for i, s in zip(row.target_indices, row.synapse_types):
+                sum_arrays[s][i] += fixed_weight
     
     def is_connected(self, from_vertex_slice, to_vertex_slice):
         """

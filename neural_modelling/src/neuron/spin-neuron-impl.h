@@ -62,7 +62,6 @@ extern uint32_t   time;
 
 extern uint32_t num_neurons;
 extern uint32_t key; // upper part of spike packet identifier
-extern uint32_t ring_buffer_to_input_left_shift; // Amount to left shift the ring buffer by to make it an input
 
 // Propagator multiplications
 
@@ -135,7 +134,7 @@ bool row_size_table_filled          (uint32_t* address, uint32_t flags);
 bool master_population_table_filled (uint32_t* address, uint32_t flags);
 bool synaptic_data_filled           (uint32_t* address, uint32_t flags);
 bool synaptic_current_data_filled   (uint32_t* address, uint32_t flags);
-void print_weight                   (weight_t w);
+void print_weight                   (index_t synapse_type, weight_t w);
 void print_current_buffer           (void);
 void print_currents                 (void);
 
