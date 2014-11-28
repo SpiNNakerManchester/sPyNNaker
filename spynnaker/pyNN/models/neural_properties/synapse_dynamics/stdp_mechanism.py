@@ -81,9 +81,9 @@ class STDPMechanism(object):
             # If we're using MAD, the header contains a single timestamp and pre-trace
             if self._mad:
                 synaptic_row_header_bytes = TIME_STAMP_BYTES + self.timing_dependence.pre_trace_size_bytes
-            # Otherwise, headers consist of NUM_PRE_SYNAPTIC_EVENTS timestamps and pre-traces
+            # Otherwise, headers consist of a counter followed by NUM_PRE_SYNAPTIC_EVENTS timestamps and pre-traces
             else:
-                synaptic_row_header_bytes = NUM_PRE_SYNAPTIC_EVENTS * (TIME_STAMP_BYTES + self.timing_dependence.pre_trace_size_bytes)
+                synaptic_row_header_bytes = 4 + (NUM_PRE_SYNAPTIC_EVENTS * (TIME_STAMP_BYTES + self.timing_dependence.pre_trace_size_bytes))
             
             # Convert to words, rounding up to take into account word alignement
             synaptic_row_header_words = int(math.ceil(float(synaptic_row_header_bytes) / 4.0))
@@ -147,7 +147,7 @@ class STDPMechanism(object):
     
     # **TODO** make property
     def get_max_weight(self):
-        if self.weight_dependence != None:
+        if self.weight_dependence is not None:
             return self.weight_dependence.w_max
         else:
             return 0.0

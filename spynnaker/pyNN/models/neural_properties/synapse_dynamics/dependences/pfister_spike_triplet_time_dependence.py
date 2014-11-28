@@ -80,7 +80,7 @@ class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
     
     @property
     def num_terms(self):
-        return 1
+        return 2
     
     @property
     def vertex_executable_suffix(self):

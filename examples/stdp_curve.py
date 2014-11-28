@@ -1,13 +1,11 @@
 import math, numpy, pylab, random, sys
 import pylab
+import spynnaker.pyNN as sim
 
 #-------------------------------------------------------------------
 # This example uses the sPyNNaker implementation of pair-based STDP
 # To reproduce the eponymous STDP curve first
 # Plotted by Bi and Poo (1998)
-#
-# **NOTE** Running this script takes some time!
-#
 #-------------------------------------------------------------------
 
 #-------------------------------------------------------------------
@@ -18,41 +16,53 @@ num_pairs = 60
 start_w = 0.5
 delta_t = [-100, -60, -40, -30, -20, -10, -1, 1, 10, 20, 30, 40, 60, 100]
 start_time = 200
+mad = False
+
+# Population parameters
+model = sim.IF_curr_exp
+cell_params = {'cm'        : 0.25, # nF
+                'i_offset'  : 0.0,
+                'tau_m'     : 10.0,
+                'tau_refrac': 2.0,
+                'tau_syn_E' : 2.5,
+                'tau_syn_I' : 2.5,
+                'v_reset'   : -70.0,
+                'v_rest'    : -65.0,
+                'v_thresh'  : -55.4
+                }
+
+# SpiNNaker setup
+sim.setup(timestep=1.0, min_delay=1.0, max_delay=10.0)
 
 #-------------------------------------------------------------------
 # Experiment loop
 #-------------------------------------------------------------------
-end_w = []
+projections = []
+sim_time = 0
 for t in delta_t:
-    import spynnaker.pyNN as sim
-
-    # Population parameters
-    model = sim.IF_curr_exp
-    cell_params = {'cm'        : 0.25, # nF
-                   'i_offset'  : 0.0,
-                   'tau_m'     : 10.0,
-                   'tau_refrac': 2.0,
-                   'tau_syn_E' : 2.5,
-                   'tau_syn_I' : 2.5,
-                   'v_reset'   : -70.0,
-                   'v_rest'    : -65.0,
-                   'v_thresh'  : -55.4
-                   }
-
-    # SpiNNaker setup
-    sim.setup(timestep=1.0, min_delay=1.0, max_delay=10.0)
-
-    # Calculate phase of input spike trains, taking into account (dendritic) delay
-    # Pre after post
-    if t > 0:
-        post_phase = 0
-        pre_phase = t + 1
-    # Post after pre
+    # Calculate phase of input spike trains
+    # If M.A.D., take into account dendritic delay
+    if mad:
+        # Pre after post
+        if t > 0:
+            post_phase = 0
+            pre_phase = t + 1
+        # Post after pre
+        else:
+            post_phase = -t
+            pre_phase = 1
+    # Otherwise, take into account axonal delay
     else:
-        post_phase = -t
-        pre_phase = 1
+        # Pre after post
+        if t > 0:
+            post_phase = 1
+            pre_phase = t
+        # Post after pre
+        else:
+            post_phase = 1 - t
+            pre_phase = 0
 
-    sim_time = (num_pairs * time_between_pairs) + abs(t)
+    sim_time = max(sim_time, (num_pairs * time_between_pairs) + abs(t))
 
     # Neuron populations
     pre_pop = sim.Population(1, model, cell_params)
@@ -73,30 +83,28 @@ for t in delta_t:
     # Plastic Connection between pre_pop and post_pop
     stdp_model = sim.STDPMechanism(
         timing_dependence = sim.SpikePairRule(tau_plus=16.7, tau_minus=33.7, nearest=False),
-        weight_dependence = sim.AdditiveWeightDependence(w_min=0.0, w_max=1.0, A_plus=0.005, A_minus=0.005), mad=True
+        weight_dependence = sim.AdditiveWeightDependence(w_min=0.0, w_max=1.0, A_plus=0.005, A_minus=0.005),
+        mad=mad
     )
 
-    plastic_projection = sim.Projection(pre_pop, post_pop, sim.OneToOneConnector(weights = start_w),
+    projections.append(sim.Projection(pre_pop, post_pop, sim.OneToOneConnector(weights = start_w),
         synapse_dynamics = sim.SynapseDynamics(slow = stdp_model)
-    )
+    ))
 
+print("Simulating for %us" % (sim_time / 1000))
 
-    # Run simulation
-    sim.run(sim_time)
+# Run simulation
+sim.run(sim_time)
 
-    # Extract weight from synapse
-    w = plastic_projection.getWeights()[0]
+# Get weight from each projection
+end_w = [p.getWeights()[0] for p in projections]
 
-    print("Delta t=%ums, resultant_weight=%f" % (t, w))
-    end_w.append(w)
-
-    # End simulation on SpiNNaker
-    sim.end(stop_on_board=True)
+# End simulation on SpiNNaker
+sim.end(stop_on_board=True)
 
 #-------------------------------------------------------------------
 # Plot curve
 #-------------------------------------------------------------------
-
 # Calculate deltas from end weights
 delta_w = [(w - start_w) / start_w for w in end_w]
 

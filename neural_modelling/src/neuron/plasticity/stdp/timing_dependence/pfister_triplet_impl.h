@@ -153,8 +153,8 @@ static inline update_state_t timing_apply_post_spike(uint32_t time, post_trace_t
     // Calculate triplet term
     int32_t decayed_r1_o2 = STDP_FIXED_MUL_16X16(decayed_r1, trace.o2);
 
-    plastic_runtime_log_info("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d, o2=%d, potentiation=%d\n", 
-                            time_since_last_pre, decayed_r1, trace.o2, potentiation);
+    plastic_runtime_log_info("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d, o2=%d, decayed_r1_o2=%d\n", 
+                            time_since_last_pre, decayed_r1, trace.o2, decayed_r1_o2);
 
     // Apply potentiation to state (which is a weight_state)
     return weight_apply_potentiation(previous_state, decayed_r1, decayed_r1_o2);

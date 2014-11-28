@@ -232,8 +232,9 @@ void print_plastic_synapses(address_t plastic, address_t fixed)
   weight_t *plastic_words = plastic_synapses(plastic);
   const control_t *control_words = plastic_controls(fixed);
   size_t plastic_synapse  = num_plastic_controls(fixed);
+  const pre_event_history_t *event_history = plastic_event_history(plastic);
 
-  printf ("Plastic region %u synapses\n", plastic_synapse);
+  printf ("Plastic region %u synapses pre-synaptic event buffer count:%u:\n", plastic_synapse, event_history->count_minus_one + 1);
 
   // Loop through plastic synapses
   for (uint32_t i = 0; i < plastic_synapse; i++) 
@@ -243,10 +244,10 @@ void print_plastic_synapses(address_t plastic, address_t fixed)
     uint32_t control_word = *control_words++;
 
     printf ("%08x [%3d: (w: %5u (=", control_word, i, weight);
-    print_weight (weight);
-    printf ("nA) d: %2u, %c, n = %3u)] - {%08x %08x}\n",
+    print_weight (sparse_type(control_word), weight);
+    printf ("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
       sparse_delay(control_word),
-      (sparse_type(control_word)==0)? 'X': 'I',
+      get_synapse_type_char(sparse_type(control_word)),
       sparse_index(control_word),
       SYNAPSE_DELAY_MASK,
       SYNAPSE_TYPE_INDEX_BITS

@@ -211,10 +211,10 @@ void print_plastic_synapses(address_t plastic, address_t fixed)
     uint32_t control_word = *control_words++;
 
     printf ("%08x [%3d: (w: %5u (=", control_word, i, weight);
-    print_weight (weight);
-    printf ("nA) d: %2u, %c, n = %3u)] - {%08x %08x}\n",
+    print_weight (sparse_type(control_word), weight);
+    printf ("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
       sparse_delay(control_word),
-      (sparse_type(control_word)==0)? 'X': 'I',
+      get_synapse_type_char(sparse_type(control_word)),
       sparse_index(control_word),
       SYNAPSE_DELAY_MASK,
       SYNAPSE_TYPE_INDEX_BITS
