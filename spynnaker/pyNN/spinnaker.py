@@ -115,8 +115,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if self._create_database:
             execute_mapping = conf.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
-            wait_on_confirmation = conf.config.getboolean("Database",
-                                                 "wait_on_confirmation")
+            wait_on_confirmation = \
+                conf.config.getboolean("Database", "wait_on_confirmation")
             self._database_thread = \
                 DataBaseThread(self._app_data_runtime_folder, execute_mapping,
                                self._txrx, wait_on_confirmation)
@@ -253,7 +253,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 vis_enabled = conf.config.getboolean("Visualiser", "enable")
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
-                    wait_on_confirmation, self._database_thread, vis_enabled)
+                    wait_on_confirmation, self._database_thread, vis_enabled,
+                    self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
@@ -421,7 +422,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
 
-        if conf.config.get("Mode", "mode") == "Debug":
+        if self._in_debug_mode:
             #check that all routes are valid and no cycles exist
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
@@ -668,7 +669,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         router_object = MachineRouter(
             links=links, emergency_routing_enabled=False,
             clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
-            n_available_multicast_entries=sys.maxint)
+            n_available_multicast_entries=sys.maxint, diagnostic_filters=list())
 
         #create the processors
         processors = list()
@@ -693,8 +694,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 if len(router_table.multicast_routing_entries) > 0:
                     self._txrx.clear_multicast_routes(router_table.x,
                                                       router_table.y)
-                    self._txrx.clear_router_diagnostics(router_table.x,
-                                                        router_table.y)
+                    self._txrx.clear_router_diagnostic_counters(router_table.x,
+                                                                router_table.y)
+                    self._txrx.\
+                        clear_router_diagnostic_non_default_positioned_filters(
+                            router_table.x, router_table.y)
             self._txrx.send_signal(app_id, SCPSignal.STOP)
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()

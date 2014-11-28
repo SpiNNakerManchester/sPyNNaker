@@ -37,6 +37,9 @@ class SpynnakerConfiguration(object):
         self._multi_cast_vertex = None
         self._txrx = None
 
+        #debug flag
+        self._in_debug_mode = None
+
         #visualiser_framework objects
         self._visualiser = None
         self._wait_for_run = False
@@ -197,6 +200,7 @@ class SpynnakerConfiguration(object):
                                                          "writeProvanceData")
 
     def _set_up_main_objects(self):
+        self._in_debug_mode = conf.config.get("Mode", "mode") == "Debug"
         #report object
         if config.getboolean("Reports", "reportsEnabled"):
             self._reports_states = ReportState()

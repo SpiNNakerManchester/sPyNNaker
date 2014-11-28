@@ -5,7 +5,7 @@ from data_specification.file_data_reader import FileDataReader
 
 
 from pacman.utilities.progress_bar import ProgressBar
-
+from spinn_machine.diagnostic_filter import DiagnosticFilter
 
 from spinn_machine.sdram import SDRAM
 from spinn_machine.virutal_machine import VirtualMachine
@@ -224,7 +224,7 @@ class SpynnakerCommsFunctions(object):
 
     def _start_execution_on_machine(self, executable_targets, app_id, runtime,
                                     waiting_on_confirmation, database_thread,
-                                    vis_enabled):
+                                    vis_enabled, in_debug_mode):
         #deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
@@ -274,6 +274,23 @@ class SpynnakerCommsFunctions(object):
             while not is_vis_ready:
                 is_vis_ready = database_thread.has_recieved_confirmation()
 
+        #if in debug mode, add the extra filter for router counters for packets
+        # that are defaultly routed to the monitor core
+        # (local mc packets with no router entry)
+        if in_debug_mode:
+            diagnostic_filter = DiagnosticFilter(
+                counter_event_has_occured=True, packet_type_fr_enabled=False,
+                packet_type_mc_enabled=True, packet_type_nn_enabled=False,
+                packet_type_p2p_enabled=False, is_default_routed=True,
+
+                                                 )
+            for chip in self._machine.chips:
+                self._txrx.set_router_diagnostics(
+                    chip.x, chip.y, diagnostic_filter,
+                    constants.MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION)
+            #clear all counters so that run is fresh
+            for chip in self._machine.chips:
+                self._txrx.clear_router_diagnostic_counters(chip.x, chip.y)
 
         # if correct, start applications
         logger.info("Starting application")
