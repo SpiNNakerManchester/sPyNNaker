@@ -65,7 +65,7 @@ class Projection(object):
             raise exceptions.ConfigurationException(
                 "postsynaptic_population is not a supposal reciever of"
                 " synaptic projections")
-
+        '''
         # Check that the edge doesn't already exist elsewhere
         # This would be a possible place for a merge at some point,
         # but this needs more thought
@@ -76,7 +76,7 @@ class Projection(object):
                     raise exceptions.ConfigurationException(
                         "More than one connection between the same pair of"
                         " vertices is not currently supported")
-
+        '''
         synapse_list = \
             connector.generate_synapse_list(
                 presynaptic_population._get_vertex,

@@ -90,13 +90,20 @@ static inline update_state_t timing_apply_pre_spike(uint32_t time, pre_trace_t t
 
   // Get time of event relative to last post-synaptic event
   uint32_t time_since_last_post = time - last_post_time;
-  int32_t decayed_o1 = DECAY_LOOKUP_TAU_MINUS(time_since_last_post);
+  if(time_since_last_post > 0)
+  {
+    int32_t decayed_o1 = DECAY_LOOKUP_TAU_MINUS(time_since_last_post);
 
-  plastic_runtime_log_info("\t\t\ttime_since_last_post=%u, decayed_o1=%d\n", 
-    time_since_last_post, decayed_o1);
-  
-  // Apply depression to state (which is a weight_state)
-  return weight_apply_depression(previous_state, decayed_o1);
+    plastic_runtime_log_info("\t\t\ttime_since_last_post=%u, decayed_o1=%d\n", 
+      time_since_last_post, decayed_o1);
+    
+    // Apply depression to state (which is a weight_state)
+    return weight_apply_depression(previous_state, decayed_o1);
+  }
+  else
+  {
+    return previous_state;
+  }
 }
 //---------------------------------------
 static inline update_state_t timing_apply_post_spike(uint32_t time, post_trace_t trace, 
@@ -111,13 +118,20 @@ static inline update_state_t timing_apply_post_spike(uint32_t time, post_trace_t
 
   // Get time of event relative to last pre-synaptic event
   uint32_t time_since_last_pre = time - last_pre_time;
-  int32_t decayed_r1 = DECAY_LOOKUP_TAU_PLUS(time_since_last_pre);
+  if(time_since_last_pre > 0)
+  {
+    int32_t decayed_r1 = DECAY_LOOKUP_TAU_PLUS(time_since_last_pre);
 
-  plastic_runtime_log_info("\t\t\ttime_since_last_pret=%u, decayed_r1=%d\n", 
-    time_since_last_pre, decayed_r1);
+    plastic_runtime_log_info("\t\t\ttime_since_last_pret=%u, decayed_r1=%d\n", 
+      time_since_last_pre, decayed_r1);
 
-  // Apply potentiation to state (which is a weight_state)
-  return weight_apply_potentiation(previous_state, decayed_r1);
+    // Apply potentiation to state (which is a weight_state)
+    return weight_apply_potentiation(previous_state, decayed_r1);
+  }
+  else
+  {
+    return previous_state;
+  }
 }
 
 #endif	// NEAREST_PAIR_IMPL

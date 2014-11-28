@@ -1,5 +1,7 @@
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.models.utility_models.exp_synapse_param\
+    import write_exp_synapse_param
 import numpy
 from abc import ABCMeta
 from six import add_metaclass
@@ -76,56 +78,7 @@ class AbstractExponentialPopulationVertex(object):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Synapse Parameters for "
                      "{} Neurons:\n".format(n_atoms))
-
-        decay_ex = numpy.exp(float(-self._machine_time_step) /
-                             (1000.0 * self._tau_syn_E))
-
-        init_ex = (self._tau_syn_E * (1 - decay_ex)
-                                   * (1000.0 / self._machine_time_step))
-
-        decay_in = numpy.exp(float(-self._machine_time_step) /
-                             (1000.0 * self._tau_syn_I))
-
-        init_in = (self._tau_syn_I * (1 - decay_in)
-                                   * (1000.0 / self._machine_time_step))
-
-        # noinspection PyNoneFunctionAssignment
-        rescaled_decay_ex = \
-            numpy.multiply(decay_ex, numpy.array([float(pow(2, 32))],
-                                                 dtype=float)).astype("uint32")
-        # noinspection PyNoneFunctionAssignment
-        rescaled_init_ex = \
-            numpy.multiply(init_ex, numpy.array([float(pow(2, 32))],
-                                                dtype=float)).astype("uint32")
-        # noinspection PyNoneFunctionAssignment
-        rescaled_decay_in = \
-            numpy.multiply(decay_in, numpy.array([float(pow(2, 32))],
-                                                 dtype=float)).astype("uint32")
-        # noinspection PyNoneFunctionAssignment
-        rescaled_init_in = \
-            numpy.multiply(init_in, numpy.array([float(pow(2, 32))],
-                                                dtype=float)).astype("uint32")
-
-        for atom in range(0, n_atoms):
-            # noinspection PyTypeChecker
-            if len(rescaled_decay_ex) > 1:
-                spec.write_value(data=rescaled_decay_ex[atom])
-            else:
-                spec.write_value(data=rescaled_decay_ex[0])
-            # noinspection PyTypeChecker
-            if len(rescaled_init_ex) > 1:
-                spec.write_value(data=rescaled_init_ex[atom])
-            else:
-                spec.write_value(data=rescaled_init_ex[0])
-
-        for atom in range(0, n_atoms):
-            # noinspection PyTypeChecker
-            if len(rescaled_decay_in) > 1:
-                spec.write_value(data=rescaled_decay_in[atom])
-            else:
-                spec.write_value(data=rescaled_decay_in[0])
-            # noinspection PyTypeChecker
-            if len(rescaled_init_in) > 1:
-                spec.write_value(data=rescaled_init_in[atom])
-            else:
-                spec.write_value(data=rescaled_init_in[0])
+        
+        # Write exponenential synapse parameters
+        write_exp_synapse_param(self._tau_syn_E, self._machine_time_step, n_atoms, spec)
+        write_exp_synapse_param(self._tau_syn_I, self._machine_time_step, n_atoms, spec)

@@ -40,7 +40,7 @@ timer_t  time;
 uint32_t  key;
 uint32_t  num_neurons;
 uint32_t  num_params;
-uint32_t  ring_buffer_to_input_left_shift;
+uint32_t  ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT];
 
 /*static inline voltage_t voltage_from_scale (unsigned long fract x)
 { return (decay (v_max-v_min,x) + v_min); }
@@ -127,18 +127,24 @@ bool neural_data_filled (address_t address, uint32_t flags)
   log_info("neural_data_filled: starting");
 
 
-// changed from above for new file format 13-1-2014
+  // changed from above for new file format 13-1-2014
   key   = address[0];
   log_info("\tkey = %08x, (x: %u, y: %u) proc: %u",
-	   key, key_x (key), key_y (key), key_p (key));
+    key, key_x (key), key_y (key), key_p (key));
 
   num_neurons = address [1];
   num_params  = address [2];
   h           = address [3]; // number of micro seconds per time step.
-  ring_buffer_to_input_left_shift = address[4];
-
-  log_info("\tneurons = %u, params = %u, time step = %u",
-	   num_neurons, num_params, h);
+  
+   log_info("\tneurons = %u, params = %u, time step = %u",
+     num_neurons, num_params, h);
+   
+  // Read ring buffer input shift for each synapse type
+  for(index_t i = 0; i < SYNAPSE_TYPE_COUNT; i++)
+  {
+    ring_buffer_to_input_left_shifts[i] = address[4 + i];
+    log_info("\tsynapse type %u, ring buffer to input left shift %u", i, ring_buffer_to_input_left_shifts[i]);
+  }
 
   // Allocate DTCM for new format neuron array and copy block of data
   neuron_array = (neuron_t*)spin1_malloc( num_neurons * sizeof(neuron_t) );
@@ -147,7 +153,7 @@ bool neural_data_filled (address_t address, uint32_t flags)
     sentinel("Unable to allocate neuron array - Out of DTCM");
   }
 
-  memcpy( neuron_array, &address [5], num_neurons * sizeof(neuron_t) );
+  memcpy( neuron_array, &address[4 + SYNAPSE_TYPE_COUNT], num_neurons * sizeof(neuron_t) );
   initialize_out_spikes (num_neurons);
   //print_neurons();
 /*

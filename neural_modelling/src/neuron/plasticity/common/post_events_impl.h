@@ -79,11 +79,65 @@ static inline post_event_window_t post_get_window(const post_event_history_t *ev
   return window;
 }
 //---------------------------------------
+static inline post_event_window_t post_get_window_delayed(const post_event_history_t *events, uint32_t begin_time, uint32_t end_time)
+{
+  // Start at end event - beyond end of post-event history
+  const uint32_t count = events->count_minus_one + 1;
+  const uint32_t *end_event_time = events->times + count;
+  const uint32_t *event_time = end_event_time;
+  
+  post_event_window_t window;
+  do
+  {
+    // Cache pointer to this event as potential 
+    // Next event and go back one event
+    // **NOTE** next_time can be invalid
+    window.next_time = event_time--;
+    
+    // If this event is still in the future, move the end time back
+    if(*event_time > end_time)
+    {
+      end_event_time = window.next_time;
+    }
+  } 
+  // Keep looping while event occured after start 
+  // Of window and we haven't hit beginning of array
+  while(*event_time > begin_time && event_time != events->times);
+  
+  // Deference event to use as previous
+  window.prev_time = *event_time;
+  
+  // Calculate number of events
+  window.num_events = (end_event_time - window.next_time);
+  
+  // Using num_events, find next and previous traces
+  const post_trace_t *end_event_trace = events->traces + count;
+  window.next_trace = (end_event_trace - window.num_events);
+  window.prev_trace = *(window.next_trace - 1);
+  
+  // Return window
+  return window;
+}
+//---------------------------------------
 static inline post_event_window_t post_next(post_event_window_t window)
 {
   // Update previous time and increment next time
   window.prev_time = *window.next_time++;
   window.prev_trace = *window.next_trace++;
+
+  // Decrement remining events
+  window.num_events--;
+  return window;
+}
+//---------------------------------------
+static inline post_event_window_t post_next_delayed(post_event_window_t window, uint32_t delayed_time)
+{
+  // Update previous time and increment next time
+  window.prev_time = delayed_time;
+  window.prev_trace = *window.next_trace++;
+  
+  // Go onto next event
+  window.next_time++;
 
   // Decrement remining events
   window.num_events--;

@@ -15,7 +15,7 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
     # noinspection PyMethodOverriding
     @staticmethod
     def read_packed_plastic_plastic_region(synapse_row, data, offset,
-                                           length, weight_scale):
+                                           length, weight_scales):
         raise exceptions.SynapticConfigurationException("fixed synapse rows do"
                                                         "not contain a plastic "
                                                         "region")
@@ -30,11 +30,22 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def get_packed_fixed_fixed_region(synapse_row, weight_scale,
+    def get_packed_fixed_fixed_region(synapse_row, weight_scales,
                                       n_synapse_type_bits):
+        # Convert per-synapse type weight scales to numpy and 
+        # Index this to obtain per-synapse weight scales.
+        weight_scales_numpy = numpy.array(weight_scales, dtype="float")
+        synapse_weight_scales = weight_scales_numpy[synapse_row.synapse_types]
+        
+        # Scale weights
         abs_weights = numpy.abs(synapse_row.weights)
-        scaled_weights = numpy.asarray(abs_weights * weight_scale,
-                                       dtype='uint32')
+        scaled_weights = numpy.rint(abs_weights * synapse_weight_scales).astype("uint32")
+        
+        # Check zeros
+        zero_float_weights = numpy.where(abs_weights == 0.0)[0]
+        zero_scaled_weights = numpy.where(scaled_weights == 0)[0]
+        if zero_float_weights.shape != zero_scaled_weights.shape or (zero_float_weights != zero_scaled_weights).any():
+            raise Exception("Weight scaling has reduced non-zero weights to zero")
         
         if ((len(synapse_row.target_indices) > 0) 
                 and (numpy.amax(synapse_row.target_indices) > 0xFF)):
@@ -55,13 +66,13 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def get_packed_fixed_plastic_region(synapse_row, weight_scale,
+    def get_packed_fixed_plastic_region(synapse_row, weight_scales,
                                         n_synapse_type_bits):
         return []
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def get_packed_plastic_region(synapse_row, weight_scale,
+    def get_packed_plastic_region(synapse_row, weight_scales,
                                   n_synapse_type_bits):
         return []
 
@@ -69,7 +80,7 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
     @staticmethod
     def create_row_info_from_elements(p_p_entries, f_f_entries,
                                       f_p_entries, bits_reserved_for_type,
-                                      weight_scale):
+                                      weight_scales):
         """
         takes a collection of entries for both fixed fixed, plastic plasitic and
         fixed plastic and returns a synaptic row object for them
@@ -81,14 +92,20 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
             raise exceptions.SynapticBlockGenerationException(
                 "fixed synaptic row ios cannot be built from plastic entries"
             )
-        delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
-        synaptic_type_mask = (1 << bits_reserved_for_type) - 1
-
+        
+        # Extract indices, delays and synapse types from fixed-plastic region
         target_indices = f_f_entries & 0xFF
-        weights = (f_f_entries >> 16) / float(weight_scale)
         delays_in_ticks = ((f_f_entries >> 8 + bits_reserved_for_type)
                            & delay_mask)
         synapse_types = (f_f_entries >> 8) & synaptic_type_mask
+        
+        # Convert per-synapse type weight scales to numpy and 
+        # Index this to obtain per-synapse weight scales.
+        weight_scales_numpy = numpy.array(weight_scales, dtype="float")
+        synapse_weight_scales = weight_scales_numpy[synapse_types]
+        
+        # Finally, shift out the weights from the fixed words and scale
+        weights = (f_f_entries >> 16).astype("float") / synapse_weight_scales
 
         return SynapseRowInfo(target_indices, weights, delays_in_ticks,
                               synapse_types)

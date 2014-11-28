@@ -8,12 +8,7 @@ class SynapseDynamics(object):
         if fast is not None:
             raise NotImplementedError(
                 "Fast synapse dynamics are not currently supported")
-
-        if not isinstance(slow, STDPMechanism):
-            raise NotImplementedError(
-                "slow must be an instance of a class that extends"
-                + "STDPMechanism")
-
+        
         self.fast = fast
         self.slow = slow
 
