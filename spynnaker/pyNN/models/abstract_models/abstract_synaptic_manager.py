@@ -1,8 +1,9 @@
-import math
+import itertools
 import logging
+import math
+import numpy
 import struct
 import sys
-import numpy
 
 from abc import ABCMeta
 from abc import abstractmethod
@@ -52,7 +53,7 @@ class AbstractSynapticManager(object):
 
     @staticmethod
     def write_synapse_row_info(sublist, row_io, spec, current_write_ptr,
-                               fixed_row_length, region, weight_scale,
+                               fixed_row_length, region, weight_scales,
                                n_synapse_type_bits):
         """
         Write this synaptic block to the designated synaptic matrix region at
@@ -84,7 +85,7 @@ class AbstractSynapticManager(object):
         for row in synaptic_rows:
             words_written = 0
             plastic_region = \
-                row_io.get_packed_plastic_region(row, weight_scale,
+                row_io.get_packed_plastic_region(row, weight_scales,
                                                  n_synapse_type_bits)
 
             # Write the size of the plastic region
@@ -97,11 +98,11 @@ class AbstractSynapticManager(object):
             words_written += len(plastic_region)
 
             fixed_fixed_region = numpy.asarray(
-                row_io.get_packed_fixed_fixed_region(row, weight_scale,
+                row_io.get_packed_fixed_fixed_region(row, weight_scales,
                                                      n_synapse_type_bits),
                 dtype="uint32")
             fixed_plastic_region = numpy.asarray(
-                row_io.get_packed_fixed_plastic_region(row, weight_scale,
+                row_io.get_packed_fixed_plastic_region(row, weight_scales,
                                                        n_synapse_type_bits),
                 dtype="uint16")
 
@@ -142,10 +143,12 @@ class AbstractSynapticManager(object):
                        - words_written)
             # Loop through padding in terms of maximum 
             # Size blocks that can be repeated
-            for i in range(0, padding,  255):
+            for i in range(0, padding, 255):
                 padding_repeats = min(255, padding - i)
                 spec.write_value(data=0xBBCCDDEE, repeats=padding_repeats,
                                  data_type=DataType.UINT32)
+            
+            # Update write pointer
             write_ptr += 4 * padding
             row_no += 1
 
@@ -312,7 +315,7 @@ class AbstractSynapticManager(object):
     def get_stdp_parameter_size(self, in_edges):
         self._check_synapse_dynamics(in_edges)
         if self._stdp_mechanism is not None:
-            return self._stdp_mechanism.get_params_size()
+            return self._stdp_mechanism.get_params_size(len(self.get_synapse_targets()))
         return 0
 
     @staticmethod
@@ -332,11 +335,11 @@ class AbstractSynapticManager(object):
         for entry in constants.ROW_LEN_TABLE_ENTRIES:
             spec.write_value(data=entry)
 
-    def write_stdp_parameters(self, spec, machine_time_step, region, weight_scale):
+    def write_stdp_parameters(self, spec, machine_time_step, region, weight_scales):
         if self._stdp_mechanism is not None:
             self._stdp_mechanism.write_plastic_params(spec, region,
                                                       machine_time_step,
-                                                      weight_scale)
+                                                      weight_scales)
 
     @staticmethod
     def get_weight_scale(ring_buffer_to_input_left_shift):
@@ -347,38 +350,32 @@ class AbstractSynapticManager(object):
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
-    def get_ring_buffer_to_input_left_shift(self, subvertex, sub_graph,
-                                            graph_mapper):
-
+    def get_ring_buffer_to_input_left_shifts(self, subvertex, sub_graph, graph_mapper):
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1  # do to starting at zero
-        total_exc_weights = numpy.zeros(n_atoms)
-        total_inh_weights = numpy.zeros(n_atoms)
+        
+        # If we have an STDP mechanism, get the maximum plastic weight
+        stdp_max_weight = None if self._stdp_mechanism is None else self._stdp_mechanism.get_max_weight()
+        
+        total_weights = [numpy.zeros(n_atoms) for i, _ in enumerate(self.get_synapse_targets())]
         for subedge in in_sub_edges:
             sublist = subedge.get_synapse_sublist(graph_mapper)
-            sublist.sum_weights(total_exc_weights, total_inh_weights)
-
-        max_weight = max((max(total_exc_weights), max(total_inh_weights)))
-        
-        # If we have an STDP mechanism, let it provide an extra max weight
-        if self._stdp_mechanism is not None\
-                and self._stdp_mechanism.weight_dependence is not None:
-            # If weight dependence has a max weight,
-            # Take this into account as well
-            stdp_max_weight = self._stdp_mechanism.get_max_weight()
-            max_weight = max(max_weight, stdp_max_weight)
             
-        max_weight_log_2 = 0
-        if max_weight > 0:
-            max_weight_log_2 = math.log(max_weight, 2)
-
-        # Currently, we can only cope with positive left shifts, so the minimum
-        # scaling will be no shift i.e. a max weight of 0nA
-        if max_weight_log_2 < 0:
-            max_weight_log_2 = 0
-
-        max_weight_power = int(math.ceil(max_weight_log_2))
+            # If there's no STDP maximum weight, sum the initial weights
+            if stdp_max_weight is None:
+                sublist.sum_weights(total_weights)
+            # Otherwise, sum the pathalogical case of all columns being at stdp_max_weight
+            else:
+                sublist.sum_fixed_weight(total_weights, stdp_max_weight)
+        
+        # Get maximum weight that can go into each post-synaptic neuron per synapse-type
+        max_weights = [max(t) for t in total_weights]
+        
+        # Convert these to powers
+        max_weight_powers = [0 if w <= 0 
+                            else int(math.ceil(max(0, math.log(w, 2))))
+                            for w in max_weights]
         
         # If we have an STDP mechanism that uses signed weights,
         # Add another bit of shift to prevent overflows
@@ -386,16 +383,13 @@ class AbstractSynapticManager(object):
             and self._stdp_mechanism.are_weights_signed():
                 max_weight_power = max_weight_power + 1
 
-        logger.debug("Max weight is {}, Max power is {}"
-                     .format(max_weight, max_weight_power))
-
         # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
         # but we ignore the "-1" to allow a bit of overhead in the above
         # calculation in case a couple of extra spikes come in
-        return max_weight_power
+        return max_weight_powers
     
     def write_synaptic_matrix_and_master_population_table(
-            self, spec, subvertex, all_syn_block_sz, weight_scale,
+            self, spec, subvertex, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region, routing_info,
             graph_mapper, subgraph):
         """
@@ -428,81 +422,124 @@ class AbstractSynapticManager(object):
         # Track writes inside the synaptic matrix region:
         next_block_start_addr = 0
         n_synapse_type_bits = self.get_n_synapse_type_bits()
+        
+        # Filtering incoming subedges
+        in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        in_proj_subedges = [e for e in in_subedges if isinstance(e, ProjectionPartitionedEdge)]
+        
+        # Get all combinations of these edges
+        proj_subedges_to_remove = []
+        for (a, b) in itertools.combinations(in_proj_subedges, 2):
+            a_key = routing_info.get_key_from_subedge(a)
+            b_key = routing_info.get_key_from_subedge(b)
+            
+            if a_key == b_key:
+                # Extract both projection edges synapse sublists
+                a_sublist = a.get_synapse_sublist(graph_mapper)
+                b_sublist = b.get_synapse_sublist(graph_mapper)
+                
+                # From these get rows
+                a_rows = a_sublist.get_rows()
+                b_rows = b_sublist.get_rows()
+                
+                if len(a_rows) != len(b_rows):
+                    raise Exception("Incoming projection subedges have different row lengths")
 
+                # Loop through all rows in a and b and append rows from b onto a
+                for a_row, b_row in zip(a_rows, b_rows):
+                    # Merge synaptic rows
+                    # **TODO** use proper merge functionality
+                    a_row.append(b_row)
+                
+                if logger.isEnabledFor(logging.DEBUG):
+                    a_slice = graph_mapper.get_subvertex_slice(a.post_subvertex)
+                    b_slice = graph_mapper.get_subvertex_slice(b.post_subvertex)
+                    logger.debug("Merging projection subedges %s (%u-%u) and %s (%u-%u) both leading to vertex %s" 
+                        % (a.label, a_slice.lo_atom, a_slice.hi_atom, 
+                           b.label, b_slice.lo_atom, b_slice.hi_atom, self.label))
+                
+                # Add projection edge b to list to remove
+                proj_subedges_to_remove.append(b)
+        
+        # If there are any projection subedges to remove
+        if len(proj_subedges_to_remove) > 0:
+            logger.debug("Merged %u incoming projection sub-edges" % len(proj_subedges_to_remove))
+            
+            # Rebuild incoming projection list
+            in_proj_subedges = [i for i in in_proj_subedges if i not in proj_subedges_to_remove]
+        
+        
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
-        in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
-        for subedge in in_subedges:
+        for subedge in in_proj_subedges:
+            key = routing_info.get_key_from_subedge(subedge)
+            x = packet_conversions.get_x_from_key(key)
+            y = packet_conversions.get_y_from_key(key)
+            p = packet_conversions.get_p_from_key(key)
+            spec.comment("\nWriting matrix for subedge from {}, {}, {}\n"
+                            .format(x, y, p))
 
-            # Only deal with incoming projection subedges
-            if isinstance(subedge, ProjectionPartitionedEdge):
-                key = routing_info.get_key_from_subedge(subedge)
-                x = packet_conversions.get_x_from_key(key)
-                y = packet_conversions.get_y_from_key(key)
-                p = packet_conversions.get_p_from_key(key)
-                spec.comment("\nWriting matrix for subedge from {}, {}, {}\n"
-                             .format(x, y, p))
+            sublist = subedge.get_synapse_sublist(graph_mapper)
+            associated_edge = \
+                graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
+            row_io = associated_edge.get_synapse_row_io()
+            if logger.isEnabledFor("debug"):
+                subvertex_vertex =\
+                    graph_mapper.get_vertex_from_subvertex(subvertex)
+                pre_sub_lo = \
+                    graph_mapper.get_subvertex_slice(
+                        subedge.pre_subvertex).lo_atom
+                pre_sub_hi = \
+                    graph_mapper.get_subvertex_slice(
+                        subedge.pre_subvertex).hi_atom
+                sub_lo = graph_mapper.get_subvertex_slice(subvertex).lo_atom
+                sub_hi = graph_mapper.get_subvertex_slice(subvertex).hi_atom
 
-                sublist = subedge.get_synapse_sublist(graph_mapper)
-                associated_edge = \
-                    graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
-                row_io = associated_edge.get_synapse_row_io()
-                if logger.isEnabledFor("debug"):
-                    subvertex_vertex =\
-                        graph_mapper.get_vertex_from_subvertex(subvertex)
-                    pre_sub_lo = \
-                        graph_mapper.get_subvertex_slice(
-                            subedge.pre_subvertex).lo_atom
-                    pre_sub_hi = \
-                        graph_mapper.get_subvertex_slice(
-                            subedge.pre_subvertex).hi_atom
-                    sub_lo = graph_mapper.get_subvertex_slice(subvertex).lo_atom
-                    sub_hi = graph_mapper.get_subvertex_slice(subvertex).hi_atom
+                logger.debug("Writing subedge from {} ({}-{}) to {} ({}-{})"
+                                .format(subedge.pre_subvertex.label,
+                                        pre_sub_lo, pre_sub_hi,
+                                        subvertex_vertex.label, sub_lo,
+                                        sub_hi))
+                rows = sublist.get_rows()
+                for i in range(len(rows)):
+                    logger.debug("{}: {}".format(i, rows[i]))
 
-                    logger.debug("Writing subedge from {} ({}-{}) to {} ({}-{})"
-                                 .format(subedge.pre_subvertex.label,
-                                         pre_sub_lo, pre_sub_hi,
-                                         subvertex_vertex.label, sub_lo,
-                                         sub_hi))
-                    rows = sublist.get_rows()
-                    for i in range(len(rows)):
-                        logger.debug("{}: {}".format(i, rows[i]))
+            # Get the maximum row length in words, excluding headers
+            max_row_length = \
+                max([row_io.get_n_words(row) for row in sublist.get_rows()])
+            #check that the max_row_length is not zero
+            assert(max_row_length > 0)
+            # Get an entry in the row length table for this length
+            row_index, row_length = \
+                self.select_minimum_row_length(max_row_length)
+            if max_row_length == 0 or row_length == 0:
+                raise exceptions.SynapticBlockGenerationException(
+                    "generated a row length of zero, this is deemed an "
+                    "error and therefore the system will stop")
 
-                # Get the maximum row length in words, excluding headers
-                max_row_length = \
-                    max([row_io.get_n_words(row) for row in sublist.get_rows()])
-                #check that the max_row_length is not zero
-                assert(max_row_length > 0)
-                # Get an entry in the row length table for this length
-                row_index, row_length = \
-                    self.select_minimum_row_length(max_row_length)
-                if max_row_length == 0 or row_length == 0:
-                    raise exceptions.SynapticBlockGenerationException(
-                        "generated a row length of zero, this is deemed an "
-                        "error and therefore the system will stop")
+            # Write the synaptic block for the sublist
+            (block_start_addr, next_block_start_addr) = \
+                self.write_synapse_row_info(
+                    sublist, row_io, spec, next_block_start_addr,
+                    row_length, synaptic_matrix_region, weight_scales,
+                    n_synapse_type_bits)
 
-                # Write the synaptic block for the sublist
-                (block_start_addr, next_block_start_addr) = \
-                    self.write_synapse_row_info(
-                        sublist, row_io, spec, next_block_start_addr,
-                        row_length, synaptic_matrix_region, weight_scale,
-                        n_synapse_type_bits)
-
-                if (next_block_start_addr - 1) > all_syn_block_sz:
-                    raise exceptions.SynapticBlockGenerationException(
-                        "Too much synapse memory consumed (used {} of {})!"
-                        .format(next_block_start_addr - 1, all_syn_block_sz))
-                self._master_pop_table_generator.\
-                    update_master_population_table(
-                        spec, block_start_addr, row_index, key,
-                        master_pop_table_region)
+            if (next_block_start_addr - 1) > all_syn_block_sz:
+                raise exceptions.SynapticBlockGenerationException(
+                    "Too much synapse memory consumed (used {} of {})!"
+                    .format(next_block_start_addr - 1, all_syn_block_sz))
+            self._master_pop_table_generator.\
+                update_master_population_table(
+                    spec, block_start_addr, row_index, key,
+                    master_pop_table_region)
+        
         self._master_pop_table_generator.finish_master_pop_table(
             spec, master_pop_table_region)
 
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
             post_subvertex, master_pop_table_region, synaptic_matrix_region,
-            synapse_io, subgraph, graph_mapper, routing_infos, weight_scale):
+            synapse_io, subgraph, graph_mapper, routing_infos, weight_scales):
 
         synaptic_block, max_row_length = \
             self._retrieve_synaptic_block(
@@ -513,12 +550,12 @@ class AbstractSynapticManager(object):
         synapse_list = \
             self._translate_synaptic_block_from_memory(
                 synaptic_block, pre_n_atoms, max_row_length, synapse_io,
-                weight_scale)
+                weight_scales)
         return synapse_list
 
     def _translate_synaptic_block_from_memory(self, synaptic_block, n_atoms,
                                               max_row_length, synapse_io,
-                                              weight_scale):
+                                              weight_scales):
         """
         translates a collection of memory into synaptic rows
         """
@@ -542,7 +579,7 @@ class AbstractSynapticManager(object):
                                                          f_f_entries,
                                                          f_p_entries,
                                                          bits_reserved_for_type,
-                                                         weight_scale)
+                                                         weight_scales)
 
             synaptic_list.append(synaptic_row)
         return SynapticList(synaptic_list)

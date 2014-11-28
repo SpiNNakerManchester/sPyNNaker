@@ -84,7 +84,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
 # STDP weight dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     additive_weight_dependence import AdditiveWeightDependence
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     multiplicative_weight_dependence import MultiplicativeWeightDependence
 
 # STDP timing dependences
