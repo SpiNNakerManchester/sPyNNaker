@@ -1,13 +1,14 @@
 DIRS = $(NEURAL_MODELLING_DIRS)/src
 BUILDDIR = build
 DEBUG = PRODUCTION_CODE
+SYNAPSE_BENCHMARK = PRODUCTION_CODE
 DEBUGFLAGS := 
 
 #-------------------------------------------------------------------------------
 
 # Set to 1 to use spin1-api-harness rather than test-harness
 HARNESS = 1
-CFLAGS += -Wall -Wextra -Ofast -D$(DEBUG) $(DEBUGFLAGS)
+CFLAGS += -Wall -Wextra -Ofast -D$(DEBUG) -D$(SYNAPSE_BENCHMARK) $(DEBUGFLAGS)
 
 # If spin1-api harness should be used, set compile-time define
 ifeq ($(HARNESS), 1)
