@@ -37,7 +37,4 @@ def generate_parameter_array(param_info, n_present, param_indices=None):
     elif isinstance(param_info, list):
         return numpy.extract(param_indices, numpy.asarray(param_info))
     elif isinstance(param_info, RandomDistribution):
-        if n_present > 1:
-            return numpy.asarray(param_info.next(n=n_present))
-        else:
-            return numpy.array([param_info.next(n=n_present)])
+        return numpy.asarray(param_info.next(n=n_present))

@@ -602,11 +602,7 @@ class Population(object):
         value_array, which must have the same dimensions as the Population.
         """
         raise NotImplementedError
-    
-    @property
-    def label(self):
-        return self._vertex.label
-    
+
     @property
     def _get_vertex(self):
         return self._vertex

@@ -40,12 +40,9 @@ class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
                 "please reduce the constraints and try again, or use another"
                 "routing info allocator")
         else:
-            key, mask = \
-                router_constraints[0].key_function_call(out_going_subedge)
-            subedge_routing_info = SubedgeRoutingInfo(
-                key=key, mask=mask, subedge=out_going_subedge,
-                key_with_atom_ids_function=
-                router_constraints[0].key_with_atom_ids_function_call)
+            key, mask = router_constraints[0].function_call(out_going_subedge)
+            subedge_routing_info = SubedgeRoutingInfo(key=key, mask=mask,
+                                                      subedge=out_going_subedge)
             #check for storage of masks
             self.check_masks(mask, key, placement.subvertex)
             return subedge_routing_info

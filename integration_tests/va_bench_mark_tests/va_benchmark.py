@@ -31,8 +31,7 @@ usage = """Usage: python VAbenchmarks.py <simulator> <benchmark>
 simulator_name = 'spiNNaker'
 benchmark = 'CUBA'
 
-#exec("from pyNN.%s import *" % simulator_name)
-from spynnaker.pyNN import *
+exec("from pyNN.%s import *" % simulator_name)
 from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.utility import Timer
 

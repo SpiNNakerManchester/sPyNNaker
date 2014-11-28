@@ -1,4 +1,4 @@
-DIRS = $(NEURAL_MODELLING_DIRS)/src
+DIRS = ../../..
 BUILDDIR = build
 DEBUG = PRODUCTION_CODE
 DEBUGFLAGS := 
@@ -22,26 +22,26 @@ endif
 # List of objects making up the application. If there are other files
 # in the application, add their object file names to this variable.
 
-OBJECTS = $(DIRS)/common/spikes.o $(DIRS)/common/out_spikes.o $(DIRS)/common/configuration.o $(DIRS)/common/recording.o \
-	$(DIRS)/neuron/c_main.o $(DIRS)/neuron/synapses.o  $(DIRS)/neuron/neuron.o $(MODEL_OBJS)
+OBJECTS = ../../../common/spikes.o ../../../common/out_spikes.o ../../../common/configuration.o ../../../common/recording.o \
+	../../c_main.o ../../synapses.o  ../../neuron.o $(MODEL_OBJS)
 
 ifeq ($(HARNESS), 1)
-	OBJECTS += $(DIRS)/neuron/spin1-api-harness.o $(DIRS)/common/spin1-api-configuration.o $(DIRS)/neuron/spin-neuron-configuration.o
+	OBJECTS += ../../spin1-api-harness.o ../../../common/spin1-api-configuration.o ../../spin-neuron-configuration.o
 else
-	OBJECTS += $(DIRS)/neuron/test-harness.o 
+	OBJECTS += ../../test-harness.o 
 endif
 
 # Include common make file stuff
-include $(DIRS)/Makefile.depend
+include ../../../Makefile.depend
 
-$(BUILDDIR)/neuron/neuron.o: $(DIRS)/neuron/neuron.c
+$(BUILDDIR)/neuron/neuron.o: ../../neuron.c
 	-mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -include $(NEURON_MODEL_H) -include $(SYNAPSE_SHAPING_H) -o $@ $<
 
-$(BUILDDIR)/neuron/synapses.o: $(DIRS)/neuron/synapses.c
+$(BUILDDIR)/neuron/synapses.o: ../../synapses.c
 	-mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -include $(SYNAPSE_SHAPING_H) -o $@ $<
 
-$(BUILDDIR)/neuron/spin1-api-harness.o: $(DIRS)/neuron/spin1-api-harness.c
+$(BUILDDIR)/neuron/spin1-api-harness.o: ../../spin1-api-harness.c
 	-mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -include $(SYNAPSE_SHAPING_H) -o $@ $<

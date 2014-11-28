@@ -1,5 +1,5 @@
 #include "../../../spin-neuron-impl.h"
-#include "multiplicative_impl.h"
+#include "additive_typedefs.h"
 
 //---------------------------------------
 // Globals
@@ -10,12 +10,12 @@ plasticity_weight_region_data_t plasticity_weight_region_data;
 //---------------------------------------
 // Functions
 //---------------------------------------
-uint32_t *plasticity_region_weight_filled (uint32_t *address, uint32_t flags)
+address_t plasticity_region_weight_filled (address_t address, uint32_t flags)
 {
   use(flags);
 
   log_info("plasticity_region_weight_filled: starting");
-  log_info("\tSTDP multiplicative weight dependance");
+  log_info("\tSTDP additive weight dependance");
   
   // Copy plasticity region data from address
   // **NOTE** this seems somewhat safer than relying on sizeof

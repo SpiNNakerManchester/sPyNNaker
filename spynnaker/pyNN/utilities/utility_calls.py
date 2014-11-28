@@ -49,10 +49,7 @@ def convert_param_to_numpy(param, no_atoms):
             "Missing PyNN. Please install version 0.7.5 from "
             "http://neuralensemble.org/PyNN/")
     if isinstance(param, RandomDistribution):
-        if no_atoms > 1:
-            return numpy.asarray(param.next(n=no_atoms))
-        else: 
-            return numpy.array([param.next(n=no_atoms)])
+        return numpy.asarray(param.next(n=no_atoms))
     elif not hasattr(param, '__iter__'):
         return numpy.array([param], dtype=float)
     elif len(param) != no_atoms:

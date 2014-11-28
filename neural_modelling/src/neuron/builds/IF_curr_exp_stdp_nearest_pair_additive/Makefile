@@ -1,26 +1,21 @@
 APP = $(notdir $(CURDIR))$(EXT)
-SOURCE_DIR = $(NEURAL_MODELLING_DIRS)/src/neuron
-MODEL_OBJS = $(SOURCE_DIR)/models/lif_curr.o $(SOURCE_DIR)/plasticity/common/post_events.o $(SOURCE_DIR)/plasticity/stdp/stdp.o $(SOURCE_DIR)/plasticity/common/maths.o $(SOURCE_DIR)/plasticity/stdp/timing_dependence/nearest_pair.o $(SOURCE_DIR)/plasticity/stdp/weight_dependence/additive_one_term.o
+MODEL_OBJS = ../../models/lif_curr.o ../../plasticity/common/post_events.o ../../plasticity/stdp/stdp.o ../../plasticity/common/maths.o ../../plasticity/stdp/timing_dependence/nearest_pair.o ../../plasticity/stdp/weight_dependence/additive.o
 NEURON_MODEL_H = ../../models/lif_curr.h
 SYNAPSE_SHAPING_H = ../../synapses/exponential_impl.h
 STDP_TYPEDEFS_H = ../../plasticity/stdp/stdp_typedefs.h
 TIMING_DEPENDENCE_H = ../../plasticity/stdp/timing_dependence/nearest_pair_impl.h
-WEIGHT_DEPENDENCE_H = ../../plasticity/stdp/weight_dependence/additive_one_term_impl.h
+WEIGHT_DEPENDENCE_H = ../../plasticity/stdp/weight_dependence/additive_fast_impl.h
 
 include ../Makefile.common
 
-$(BUILDDIR)/neuron/plasticity/stdp/timing_dependence/nearest_pair.o: $(SOURCE_DIR)/plasticity/stdp/timing_dependence/nearest_pair.c
+$(BUILDDIR)/neuron/plasticity/stdp/timing_dependence/nearest_pair.o: ../../plasticity/stdp/timing_dependence/nearest_pair.c
 	-mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -include $(STDP_TYPEDEFS_H) -include $(SYNAPSE_SHAPING_H) -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
+	$(CC) $(CFLAGS) -include $(STDP_TYPEDEFS_H) -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
-$(BUILDDIR)/neuron/plasticity/stdp/weight_dependence/additive_one_term.o: $(SOURCE_DIR)/plasticity/stdp/weight_dependence/additive_one_term.c
+$(BUILDDIR)/neuron/plasticity/stdp/stdp.o: ../../plasticity/stdp/stdp.c
 	-mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -include $(SYNAPSE_SHAPING_H) -o $@ $<
+	$(CC) $(CFLAGS) -include $(STDP_TYPEDEFS_H) -include $(WEIGHT_DEPENDENCE_H) -include $(SYNAPSE_SHAPING_H) -include $(TIMING_DEPENDENCE_H) -o $@ $<
 
-$(BUILDDIR)/neuron/plasticity/stdp/stdp.o: $(SOURCE_DIR)/plasticity/stdp/stdp.c
+$(BUILDDIR)/neuron/plasticity/common/post_events.o: ../../plasticity/common/post_events.c
 	-mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -include $(STDP_TYPEDEFS_H) -include $(SYNAPSE_SHAPING_H) -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H) -o $@ $<
-
-$(BUILDDIR)/neuron/plasticity/common/post_events.o: $(SOURCE_DIR)/plasticity/common/post_events.c
-	-mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -include $(STDP_TYPEDEFS_H) -include $(SYNAPSE_SHAPING_H) -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H) -o $@ $<
+	$(CC) $(CFLAGS) -include $(STDP_TYPEDEFS_H) -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H) -o $@ $<

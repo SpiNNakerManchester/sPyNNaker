@@ -4,19 +4,19 @@ from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
 
 
 class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
+    
     def __init__(self, presubvertex, postsubvertex):
         PartitionedEdge.__init__(self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
         self._synapse_sublist = None
-        self._weight_scales = None
+        self._weight_scale = None
 
     @property
-    def weight_scales(self):
-        return self._weight_scales
+    def weight_scale(self):
+        return self._weight_scale
 
-    # **YUCK** setters don't work properly with inheritance
-    def weight_scales_setter(self, value):
-        self._weight_scales = value
+    def weight_scale_setter(self, new_value):
+        self._weight_scale = new_value
 
     def get_synapse_sublist(self, graph_mapper):
         """
@@ -59,19 +59,3 @@ class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
     @property
     def synapse_sublist(self):
         return self._synapse_sublist
-    
-    @property
-    def label(self):
-        """ The label of the subedge
-
-        :return: The name, or None if there is no label
-        :rtype: str
-        :raise None: Raises no known exceptions
-        """
-        if self._synapse_sublist is None:
-            associated_edge = \
-                graph_mapper.get_partitionable_edge_from_partitioned_edge(self)
-            
-            return associated_edge.label
-        else:
-            return None

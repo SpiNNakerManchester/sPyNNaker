@@ -45,10 +45,10 @@ class SynapseRowInfo(object):
             self.delays = row.delays + min_delay
             self.synapse_types = row.synapse_types
         else:
-            self.target_indices = np.append(self.target_indices, row.target_indices + lo_atom)
-            self.weights = np.append(self.weights, row.weights)
-            self.delays = np.append(self.delays, row.delays + min_delay)
-            self.synapse_types = np.append(self.synapse_types, row.synapse_types)
+            np.append(self.target_indices, row.target_indices + lo_atom)
+            np.append(self.weights, row.weights)
+            np.append(self.delays, row.delays + min_delay)
+            np.append(self.synapse_types, row.synapse_types)
         
             sort_indices = np.lexsort((self.target_indices, self.weights,
                                        self.delays, self.synapse_types))

@@ -146,7 +146,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     def write_neuron_parameters(
             self, spec, processor_chip_x, processor_chip_y, processor_id,
-            subvertex, ring_buffer_to_input_left_shifts, vertex_slice):
+            subvertex, ring_buffer_to_input_left_shift, vertex_slice):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} "
@@ -177,7 +177,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.write_value(data=self._machine_time_step)
 
         # Write ring_buffer_to_input_left_shift
-        spec.write_array(ring_buffer_to_input_left_shifts)
+        spec.write_value(data=ring_buffer_to_input_left_shift)
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
@@ -247,35 +247,34 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         self.write_setup_info(spec, spike_hist_buff_sz, potential_hist_buff_sz,
                               gsyn_hist_buff_sz, self._executable_constant)
 
-        ring_buffer_shifts = self.get_ring_buffer_to_input_left_shifts(
+        ring_buffer_shift = self.get_ring_buffer_to_input_left_shift(
             subvertex, subgraph, graph_mapper)
-
-        weight_scales = [self.get_weight_scale(r) for r in ring_buffer_shifts]
-        
-        for t, r, w in zip(self.get_synapse_targets(), ring_buffer_shifts, weight_scales):
-            logger.debug("Synapse type:%s - Ring buffer shift:%d, Max weight:%f" % (t, r, w))
+        weight_scale = self.get_weight_scale(ring_buffer_shift)
 
         #update projections for future use
         in_partitioned_edges = \
             subgraph.incoming_subedges_from_subvertex(subvertex)
         for partitioned_edge in in_partitioned_edges:
-            partitioned_edge.weight_scales_setter(weight_scales)
+            partitioned_edge.weight_scale_setter(weight_scale)
+        
+        logger.debug("Ring-buffer shift is {}, weight scale is {}"
+                     .format(ring_buffer_shift, weight_scale))
 
         self.write_neuron_parameters(
             spec, placement.x, placement.y, placement.p, subvertex,
-            ring_buffer_shifts, vertex_slice)
+            ring_buffer_shift, vertex_slice)
 
         self.write_synapse_parameters(spec, subvertex, vertex_slice)
 
         self.write_stdp_parameters(
             spec, self._machine_time_step,
-            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value, weight_scales)
+            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value, weight_scale)
 
         self.write_row_length_translation_table(
             spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)
 
         self.write_synaptic_matrix_and_master_population_table(
-            spec, subvertex, all_syn_block_sz, weight_scales,
+            spec, subvertex, all_syn_block_sz, weight_scale,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             routing_info, graph_mapper, subgraph)
@@ -290,7 +289,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     #inhirrited from data specable vertex
     def get_binary_file_name(self):
-        # Split binary name into title and extension
+         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)
 
         # If we have an STDP mechanism, add it's executable suffic to title
@@ -299,5 +298,9 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 binary_title + "_" + \
                 self._stdp_mechanism.get_vertex_executable_suffix()
 
-        # Reunite title and extension and return
-        return binary_title + binary_extension
+        # Rebuild executable name
+        binary_name = os.path.join(config.get("SpecGeneration",
+                                              "common_binary_folder"),
+                                   binary_title + binary_extension)
+
+        return binary_name
