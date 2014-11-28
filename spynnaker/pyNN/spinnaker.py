@@ -693,7 +693,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 if len(router_table.multicast_routing_entries) > 0:
                     self._txrx.clear_multicast_routes(router_table.x,
                                                       router_table.y)
-            time.sleep(0.5)
+                    self._txrx.clear_router_diagnostics(router_table.x,
+                                                        router_table.y)
             self._txrx.send_signal(app_id, SCPSignal.STOP)
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()
