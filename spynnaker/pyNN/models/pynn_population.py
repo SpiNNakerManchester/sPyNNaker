@@ -18,6 +18,8 @@ from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.neural_properties.space import *
+import numpy # added for nearest functionality ADR
 
 import logging
 logger = logging.getLogger(__name__)
@@ -37,7 +39,7 @@ class Population(object):
     :param dict cellparams:
         a dictionary containing model specific parameters and values
     :param `pyNN.space` structure:
-        a spatial structure - not supported
+        a spatial structure
     :param string label:
         a label identifying the Population
     :returns a list of vertexes and edges
@@ -53,9 +55,6 @@ class Population(object):
         if size <= 0:
             raise exceptions.ConfigurationException(
                 "A population cannot have a negative or zero size.")
-        # Raise an exception if the Pop. attempts to employ spatial structure
-        if structure:
-            raise Exception("Spatial structure is unsupported for Populations.")
 
         # Create a partitionable_graph vertex for the population and add it
         # to PACMAN
@@ -69,6 +68,15 @@ class Population(object):
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
+
+        # Internal structure now supported 23 November 2014 ADR
+        # structure should be a valid Space.py structure type.
+        # generation of positions is deferred until needed.
+        if structure:
+           self._structure = structure
+           self._positions = None
+        else:
+           self._structure = None
 
         self._spinnaker.add_vertex(self._vertex)
 
@@ -157,9 +165,14 @@ class Population(object):
 
     def _get_cell_position(self, cell_id):
         """
-        returns the position of a cell (no idea what a cell is)
+        returns the position of a cell. Added functionality 23 November 2014 ADR 
         """
-        raise NotImplementedError
+        if self._structure is None:
+           raise ValueError("Attempted to get the position of a cell in an un-structured population")
+           return None
+        elif self._positions is None:
+           self._structure.generate_positions(self._vertex.n_atoms)
+        return self._positions[cell_id]
 
     def _get_cell_initial_value(self, cell_id, variable):
         """
@@ -330,16 +343,27 @@ class Population(object):
 
     def nearest(self, position):
         """
-        return the neuron closest to the specificed position
+        return the neuron closest to the specified position. Added functionality 23 November 2014 ADR
         """
-        raise NotImplementedError
+        if self._structure is None:
+           raise ValueError("attempted to retrieve positions for an un-structured population")
+        elif self._positions is None: 
+           self._structure.generate_positions(self._vertex.n_atoms)
+        position_diff = numpy.empty(self._positions.shape)
+        position_diff.fill(position)
+        distances=space.Space.distances(self._positions, position_diff)
+        return distances.argmin()
 
     @property
     def position_generator(self):
         """
-        returns a position generator
+        returns a position generator. Added functionality 27 November 2014 ADR
         """
-        raise NotImplementedError
+        if self._structure is None:
+           raise ValueError("attempted to retrieve positions for an un-structured population")
+           return None
+        else:
+           return self._structure.generate_positions
 
     # noinspection PyPep8Naming
     def randomInit(self, distribution):
@@ -402,7 +426,14 @@ class Population(object):
 
     @property
     def positions(self):
-        raise NotImplementedError
+        """
+        Returns the position array for structured populations. Added functionality 27 November 2014 ADR
+        """
+        if self._structure is None:
+           raise ValueError("attempted to retrieve positions for an un-structured population")
+        elif self._positions is None: 
+           self._positions = self._structure.generate_positions(self._vertex.n_atoms)
+        return self._positions
 
     #noinspection PyPep8Naming
     def printSpikes(self, filename, gather=True):
@@ -487,9 +518,15 @@ class Population(object):
 
     def save_positions(self, file_name):
         """
-        save positions to file
+        save positions to file. Added functionality 23 November 2014 ADR 
         """
-        raise NotImplementedError
+        if self._structure is None:
+           raise ValueError("attempted to retrieve positions for an un-structured population")
+        elif self._positions is None: 
+           self._structure.generate_positions(self._vertex.n_atoms)
+        file_handle = open(file_name, "w")
+        file_handle.write(self._positions)
+        file_handle.close()
 
     def set(self, *args, **kargs):
         """
@@ -514,9 +551,22 @@ class Population(object):
 
     def _set_cell_position(self, cell_id, pos):
         """
-        sets a cell to a given position
+        sets a cell to a given position. Added functionality 23 November 2014 ADR
         """
-        raise NotImplementedError
+        if self._structure is None:
+           raise ValueError("attempted to set a position for a cell in an un-structured population")
+        elif self._positions is None: 
+           self._structure.generate_positions(self._vertex.n_atoms)
+        self._positions[cell_id] = pos
+
+    def _set_positions(self, positions):
+        """
+        sets all the positions in the population. Added functionality 27 November 2014 ADR
+        """
+        if self._structure is None:
+           raise ValueError("attempted to set positions in an un-structured population")
+        else:
+           self._positions = positions
 
     def _set_string_value_pair(self, parameter, value=None):
         """
@@ -543,6 +593,13 @@ class Population(object):
         # Add a dictionary-structured set of new parameters to the current set:
         self._parameters.update(parameter)
 
+    @property
+    def structure(self):
+        """ 
+        Returns the structure for the population. Added 23 November 2014 ADR
+        """
+        return self._structure
+    
     #NONE PYNN API CALL
     def set_constraint(self, constraint):
         """
@@ -592,21 +649,13 @@ class Population(object):
     def size(self):
         return self._vertex.n_atoms
 
-    @property
-    def structure(self):
-        raise NotImplementedError
-
     def tset(self, parametername, value_array):
         """
         'Topographic' set. Set the value of parametername to the values in
         value_array, which must have the same dimensions as the Population.
         """
         raise NotImplementedError
-    
-    @property
-    def label(self):
-        return self._vertex.label
-    
+
     @property
     def _get_vertex(self):
         return self._vertex

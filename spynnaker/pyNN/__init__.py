@@ -84,7 +84,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
 # STDP weight dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     additive_weight_dependence import AdditiveWeightDependence
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     multiplicative_weight_dependence import MultiplicativeWeightDependence
 
 # STDP timing dependences
@@ -102,6 +102,7 @@ from pacman.model.constraints.partitioner_maximum_size_constraint \
 
 #note importing star is a bad thing to do.
 from pyNN.random import *
+from spynnaker.pyNN.models.neural_properties.space import *
 
 #traditional logger
 logger = logging.getLogger(__name__)

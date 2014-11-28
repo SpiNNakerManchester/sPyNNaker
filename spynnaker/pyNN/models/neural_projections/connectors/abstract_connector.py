@@ -9,7 +9,7 @@ class AbstractConnector(object):
     Abstract class which connectors extend
     """
     @abstractmethod
-    def generate_synapse_list(self, prevertex, postvertex, delay_scale, 
+    def generate_synapse_list(self, presynaptic_population, postsynaptic_population, delay_scale, 
                               synapse_type):
         """
         Generate a list of synapses that can be queried for information and

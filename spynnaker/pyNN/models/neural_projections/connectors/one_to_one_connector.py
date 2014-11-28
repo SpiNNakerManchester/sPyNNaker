@@ -30,8 +30,12 @@ class OneToOneConnector(AbstractConnector):
         self._weights = weights
         self._delays = delays
         
-    def generate_synapse_list(self, prevertex, postvertex, delay_scale,
+    def generate_synapse_list(self, presynaptic_population, postsynaptic_population, delay_scale,
                               synapse_type):
+
+        prevertex = presynaptic_population._get_vertex
+        postvertex = postsynaptic_population._get_vertex
+
         if prevertex.n_atoms != postvertex.n_atoms:
             raise ConfigurationException("The two populations to be connected "
                                          "with a One to One connector have to "
