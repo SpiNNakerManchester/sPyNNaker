@@ -79,6 +79,8 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
         """
         Gets the plastic region of the row as an array of 32-bit words
         """
+        # Convert per-synapse type weight scales to numpy and 
+        # Index this to obtain per-synapse weight scales. 
         weight_scales_numpy = numpy.array(weight_scales, dtype="float")
         synapse_weight_scales = weight_scales_numpy[synapse_row.synapse_types]
         
@@ -122,34 +124,29 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
         if len(f_f_entries) > 0:
             raise exceptions.SynapticBlockGenerationException(
                 "plastic synapses cannot create row ios from fixed entries.")
-
+        
+        # Calculate masks and convert per-synapse type weight scales to numpy
         synaptic_type_mask = (1 << bits_reserved_for_type) - 1
         delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
         weight_scales_numpy = numpy.array(weight_scales, dtype="float")
         
+        # Extract indices, delays and synapse types from fixed-plastic region
         target_indices = f_p_entries & 0xFF
-        weights = list()
         delays_in_ticks = (((f_p_entries >> 8) + bits_reserved_for_type)
                            & delay_mask)
         synapse_types = (f_p_entries >> 8) & synaptic_type_mask
 
+        # Index out per-synapse weight scales
         synapse_weight_scales = weight_scales_numpy[synapse_types]
-        #read in each element
-        #the fact that the fixed plastic are shorts, means that its numebr is an
-        #exact number for entries in the plastic plastic region. Becuase of the
-        # pp elements are in shorts but read as ints, the for loop has to
-        #  sleectively deicde each section of the int to read given the shorts
-        #counter/index ABS and AGR
-        #read in each element
-        for index, weight_scale in enumerate(synapse_weight_scales):
-            if index % 2 == 0:
-                weights.append((p_p_entries[self.num_header_words +
-                                            int(index / 2)] & 0xFFFF)
-                               / weight_scale)  # drops delay, type and id
-            else:
-                weights.append((p_p_entries[self.num_header_words +
-                                            int(index / 2)] >> 16)
-                               / weight_scale)
+  
+        # Create a half-word view of plastic region without header
+        half_words = p_p_entries[self.num_header_words:].view(dtype="uint16")
+        
+        # Trim off any extra half-words caused by padding
+        half_words = half_words[:len(f_p_entries)]
+  
+        # Cast to float and divide by weight scale
+        weights = half_words.astype("float") / synapse_weight_scales
 
         return SynapseRowInfo(target_indices, weights, delays_in_ticks,
                               synapse_types)

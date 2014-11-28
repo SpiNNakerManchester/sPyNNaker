@@ -355,29 +355,33 @@ class AbstractSynapticManager(object):
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1  # do to starting at zero
         
-
+        # If we have an STDP mechanism, get the maximum plastic weight
+        stdp_max_weight = None if self._stdp_mechanism is None else self._stdp_mechanism.get_max_weight()
+        
         total_weights = [numpy.zeros(n_atoms) for i, _ in enumerate(self.get_synapse_targets())]
         for subedge in in_sub_edges:
             sublist = subedge.get_synapse_sublist(graph_mapper)
-            sublist.sum_weights(total_weights)
+            
+            # If there's no STDP maximum weight, sum the initial weights
+            if stdp_max_weight is None:
+                sublist.sum_weights(total_weights)
+            # Otherwise, sum the pathalogical case of all columns being at stdp_max_weight
+            else:
+                sublist.sum_fixed_weight(total_weights, stdp_max_weight)
         
+        # Get maximum weight that can go into each post-synaptic neuron per synapse-type
         max_weights = [max(t) for t in total_weights]
         
-        # If we have an STDP mechanism, let it provide an extra max weight
-        #if self._stdp_mechanism is not None:
-        #    stdp_max_weight = self._stdp_mechanism.get_max_weight()
-        #    max_weight = max(max_weight, stdp_max_weight)
-        
+        # Convert these to powers
         max_weight_powers = [0 if w <= 0 
                             else int(math.ceil(max(0, math.log(w, 2))))
                             for w in max_weights]
         
         # If we have an STDP mechanism that uses signed weights,
         # Add another bit of shift to prevent overflows
-
-        #if self._stdp_mechanism is not None\
-        #    and self._stdp_mechanism.are_weights_signed():
-        #        max_weight_power = max_weight_power + 1
+        if self._stdp_mechanism is not None\
+            and self._stdp_mechanism.are_weights_signed():
+                max_weight_power = max_weight_power + 1
 
         # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
         # but we ignore the "-1" to allow a bit of overhead in the above

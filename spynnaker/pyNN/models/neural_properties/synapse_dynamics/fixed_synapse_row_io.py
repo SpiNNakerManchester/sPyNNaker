@@ -32,6 +32,8 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
     @staticmethod
     def get_packed_fixed_fixed_region(synapse_row, weight_scales,
                                       n_synapse_type_bits):
+        # Convert per-synapse type weight scales to numpy and 
+        # Index this to obtain per-synapse weight scales.
         weight_scales_numpy = numpy.array(weight_scales, dtype="float")
         synapse_weight_scales = weight_scales_numpy[synapse_row.synapse_types]
         
@@ -91,14 +93,19 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
                 "fixed synaptic row ios cannot be built from plastic entries"
             )
         
+        # Extract indices, delays and synapse types from fixed-plastic region
         target_indices = f_f_entries & 0xFF
         delays_in_ticks = ((f_f_entries >> 8 + bits_reserved_for_type)
                            & delay_mask)
         synapse_types = (f_f_entries >> 8) & synaptic_type_mask
-
+        
+        # Convert per-synapse type weight scales to numpy and 
+        # Index this to obtain per-synapse weight scales.
         weight_scales_numpy = numpy.array(weight_scales, dtype="float")
         synapse_weight_scales = weight_scales_numpy[synapse_types]
-        weights = (f_f_entries >> 16) / synapse_weight_scales
+        
+        # Finally, shift out the weights from the fixed words and scale
+        weights = (f_f_entries >> 16).astype("float") / synapse_weight_scales
 
         return SynapseRowInfo(target_indices, weights, delays_in_ticks,
                               synapse_types)

@@ -49,7 +49,7 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         """
         return []
 
-    def get_packed_fixed_plastic_region(self, synapse_row, weight_scale,
+    def get_packed_fixed_plastic_region(self, synapse_row, weight_scales,
                                         n_synapse_type_bits):
         """
         Gets the plastic part of the fixed region of the row as an array
@@ -80,21 +80,25 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         return numpy.asarray(shifted_axonal_delays | shifted_dendritic_delays
                  | shifted_types | ids, dtype='uint16')
 
-    def get_packed_plastic_region(self, synapse_row, weight_scale,
+    def get_packed_plastic_region(self, synapse_row, weight_scales,
                                   n_synapse_type_bits):
         """
         Gets the plastic region of the row as an array of 32-bit words
         """
+        # Convert per-synapse type weight scales to numpy and 
+        # Index this to obtain per-synapse weight scales. 
+        weight_scales_numpy = numpy.array(weight_scales, dtype="float")
+        synapse_weight_scales = weight_scales_numpy[synapse_row.synapse_types]
+        
         # Scale absoluate weights and convert to uint16
         half_word_datatype = None
         scaled_weights = None
         if self.signed:
-            scaled_weights = numpy.asarray(synapse_row.weights * weight_scale,
-                    dtype="int16")
+            scaled_weights = numpy.rint(synapse_row.weights * synapse_weight_scales).astype("int16")
             half_word_datatype = "int16"
         else:
-            scaled_weights = numpy.asarray(numpy.abs(synapse_row.weights)
-                    * weight_scale, dtype="uint16")
+            scaled_weights = numpy.rint(
+                numpy.abs(synapse_row.weights) * synapse_weight_scales).astype("uint16")
             half_word_datatype = "uint16"
 
         # Interleave these with zeros and get uint32 view
@@ -126,27 +130,28 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
             raise exceptions.SynapticBlockGenerationException(
                 "plastic synapses cannot create row ios from fixed entries.")
 
+        # Calculate masks and convert per-synapse type weight scales to numpy
         synaptic_type_mask = (1 << bits_reserved_for_type) - 1
         delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
+        weight_scales_numpy = numpy.array(weight_scales, dtype="float")
 
+         # Extract indices, delays and synapse types from fixed-plastic region
         target_indices = f_p_entries & 0xFF
         delays_in_ticks = (((f_p_entries >> 8) + bits_reserved_for_type)
                            & delay_mask)
         synapse_types = (f_p_entries >> 8) & synaptic_type_mask
 
-        # Convert plastic region entries to numpy array
-        # **TODO** why aren't they read in as this
-        numpy_p_p = numpy.asarray(p_p_entries, dtype="uint32")
+        # Index out per-synapse weight scales
+        synapse_weight_scales = weight_scales_numpy[synapse_types]
 
         # Get half word view of plastic region with correct signedness
         half_word_datatype = "int16" if self.signed else "uint16"
-        half_words = numpy_p_p[self.num_header_words:].view(
+        half_words = p_p_entries[self.num_header_words:].view(
                 dtype=half_word_datatype)
 
-        # Slice out weight half words, convert to float and divide by weight
-        # scale
-        weights = list(numpy.divide(numpy.asarray(half_words[0::2],
-                dtype="float"), weight_scale))
+        # Slice out weight half words, 
+        # Convert to float  and divide by weight scale
+        weights = half_words[0::2].astype("float") / synapse_weight_scales
 
         return SynapseRowInfo(target_indices, weights, delays_in_ticks,
                               synapse_types)
