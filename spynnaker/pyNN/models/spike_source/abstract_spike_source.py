@@ -20,13 +20,13 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
 
     def __init__(self, label, n_neurons, constraints, max_atoms_per_core,
                  machine_time_step):
+        AbstractDataSpecableVertex.__init__(self, label=label,
+                                            n_atoms=n_neurons,
+                                            machine_time_step=machine_time_step)
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
         AbstractRecordableVertex.__init__(self, machine_time_step, label)
-        AbstractDataSpecableVertex.__init__(self, label=label,
-                                            n_atoms=n_neurons,
-                                            machine_time_step=machine_time_step)
 
     def __str__(self):
         return "spike source with atoms {}".format(self.n_atoms)

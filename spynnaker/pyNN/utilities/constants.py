@@ -56,6 +56,12 @@ MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 
+#debug filter positions
+#multicast packets which are sent from a local chip where the local router has
+# router entry for it (this is default routed to the monitor core which
+#currently drops the packet).
+MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
+
 #Model Names
 APP_MONITOR_CORE_APPLICATION_ID = 0xAC0
 IF_CURRENT_EXP_CORE_APPLICATION_ID = 0xAC1

@@ -62,7 +62,7 @@ void timer_callback (uint unused0, uint unused1)
   uint sr = spin1_irq_disable();
   ring_buffer_transfer();
   spin1_mode_restore(sr);
-  print_currents ();
+  //print_currents ();
   
   // Tick neural simulation
   for (index_t n = 0; n < num_neurons; n++)
@@ -107,7 +107,7 @@ void set_up_and_request_synaptic_dma_read()
   while (!setup_done && next_spike (& s))
   {
 #ifdef SPIKE_DEBUG
-      io_printf(IO_BUF, "Checking for row for spike %x\n", s);
+    io_printf(IO_BUF, "Checking for row for spike %x\n", s);
 #endif
     // Decode spike to get address of destination synaptic row
     address_t address;
@@ -135,9 +135,9 @@ void set_up_and_request_synaptic_dma_read()
   if (!setup_done)
   {
 #if defined(SPIKE_DEBUG) || defined(DMA_DEBUG)
-      io_printf(IO_BUF, "DMA not busy\n");
+    io_printf(IO_BUF, "DMA not busy\n");
 #endif // SPIKE_DEBUG || DMA_DEBUG
-	log_info("DMA not busy");
+    log_info("DMA not busy");
     dma_busy = FALSE;
   }
 }
@@ -183,7 +183,7 @@ void dma_callback(uint unused, uint tag)
       subsequent_spikes = get_next_spike_if_equals(s);
 
       // Process synaptic row, writing it back if it's the last time it's going to be processed
-      print_synaptic_row(next_dma_buffer());
+      //print_synaptic_row(next_dma_buffer());
       process_synaptic_row(next_dma_buffer(), !subsequent_spikes);
 
     } while (subsequent_spikes);
@@ -195,7 +195,7 @@ void dma_callback(uint unused, uint tag)
   // Otherwise, if it ISN'T the result of a plastic region write
   else if(tag != DMA_TAG_WRITE_PLASTIC_REGION)
   {
-	io_printf(IO_BUF, "Invalid tag %d received in DMA\n", tag);
+    io_printf(IO_BUF, "Invalid tag %d received in DMA\n", tag);
     sentinel("tag (%d)", tag);
   }
 }

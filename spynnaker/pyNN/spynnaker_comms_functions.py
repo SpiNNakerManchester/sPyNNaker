@@ -5,7 +5,7 @@ from data_specification.file_data_reader import FileDataReader
 
 
 from pacman.utilities.progress_bar import ProgressBar
-
+from spinn_machine.diagnostic_filter import DiagnosticFilter
 
 from spinn_machine.sdram import SDRAM
 from spinn_machine.virutal_machine import VirtualMachine
@@ -83,11 +83,11 @@ class SpynnakerCommsFunctions(object):
             self._txrx.discover_scamp_connections()
             self._machine = self._txrx.get_machine_details()
         else:
-            virtual_x_dimension = conf.config.get("Machine",
+            virtual_x_dimension = conf.config.getint("Machine",
                                                   "virutal_board_x_dimension")
-            virtual_y_dimension = conf.config.get("Machine",
+            virtual_y_dimension = conf.config.getint("Machine",
                                                   "virutal_board_y_dimension")
-            requires_wrap_around = conf.config.get("Machine",
+            requires_wrap_around = conf.config.getboolean("Machine",
                                                    "requires_wrap_arounds")
             self._machine = VirtualMachine(
                 x_dimension=virtual_x_dimension,
@@ -222,7 +222,9 @@ class SpynnakerCommsFunctions(object):
         progress_bar.end()
         return processor_to_app_data_base_address
 
-    def _start_execution_on_machine(self, executable_targets, app_id, runtime):
+    def _start_execution_on_machine(self, executable_targets, app_id, runtime,
+                                    waiting_on_confirmation, database_thread,
+                                    vis_enabled, in_debug_mode):
         #deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
@@ -263,6 +265,32 @@ class SpynnakerCommsFunctions(object):
                     "Only {} processors out of {} have sucessfully reached "
                     "sync0 with breakdown of: {}"
                     .format(processors_ready, total_processors, break_down))
+
+        #wait till vis is ready for us to start if required
+        if waiting_on_confirmation and vis_enabled:
+            logger.info("*** Awaiting for a response from the visualiser to "
+                        "state its ready for the simulation to start ***")
+            is_vis_ready = database_thread.has_recieved_confirmation()
+            while not is_vis_ready:
+                is_vis_ready = database_thread.has_recieved_confirmation()
+
+        #if in debug mode, add the extra filter for router counters for packets
+        # that are defaultly routed to the monitor core
+        # (local mc packets with no router entry)
+        if in_debug_mode:
+            diagnostic_filter = DiagnosticFilter(
+                counter_event_has_occured=True, packet_type_fr_enabled=False,
+                packet_type_mc_enabled=True, packet_type_nn_enabled=False,
+                packet_type_p2p_enabled=False, is_default_routed=True,
+
+                                                 )
+            for chip in self._machine.chips:
+                self._txrx.set_router_diagnostics(
+                    chip.x, chip.y, diagnostic_filter,
+                    constants.MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION)
+            #clear all counters so that run is fresh
+            for chip in self._machine.chips:
+                self._txrx.clear_router_diagnostic_counters(chip.x, chip.y)
 
         # if correct, start applications
         logger.info("Starting application")
@@ -463,15 +491,8 @@ class SpynnakerCommsFunctions(object):
             file_reader = SpinnmanFileDataReader(exectuable_target_key)
             core_subset = executable_targets[exectuable_target_key]
 
-            # for some reason, we have to hand the size of a binary. The only
-            #logical way to do this is to read the exe and determine the length
-            #. TODO this needs to change so that the trasnciever figures this out
-            #itself
-
-            # TODO FIX THIS CHUNK
-            statinfo = os.stat(exectuable_target_key)
             file_to_read_in = open(exectuable_target_key, 'rb')
-            buf = file_to_read_in.read(statinfo.st_size)
+            buf = file_to_read_in.read()
             size = (len(buf))
 
             self._txrx.execute_flood(core_subset, file_reader, app_id,
