@@ -1,4 +1,5 @@
 import os
+from spynnaker.pyNN import model_binaries
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
@@ -213,12 +214,9 @@ class LivePacketGather(
         spec.write_value(data=self._no_machine_time_steps)
 
     def get_binary_file_name(self):
-         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'live_packet_gather.aplx')
+        # Rebuild executable name
+        binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
+                                    'live_packet_gather.aplx')
         return binary_name
 
     #inherited from partitionable vertex
