@@ -105,7 +105,11 @@ bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuro
 		spike = REAL_COMPARE( result, >=, r );  // has it spiked?
 
 		if( spike ) {
-             io_printf( IO_BUF, "\n 1", spike );
+             neuron->debug_counter++;
+             if(neuron->debug_counter > 20) {
+                 io_printf( IO_BUF, "\n %02d %11.4k %11.4k", neuron->debug_counter, neuron->V_membrane, result );
+                 neuron->debug_counter = 0
+             }
              neuron_discrete_changes( neuron );
         }
 		}
@@ -154,6 +158,8 @@ neuron_pointer_t create_lif_cond_stoc_neuron(REAL V_reset, REAL V_rest, REAL V_r
 
 	neuron->T_refract = T_refract;	  			io_printf( IO_STD, "T refract         %u microsecs\n",   neuron->T_refract * 100 );
 	neuron->refract_timer = refract_timer;	  	io_printf( IO_STD, "refr timer        %d microsecs\n",   neuron->refract_timer * 100 );
+
+    neuron->debug_counter = 0;
 
 	return neuron;
 }

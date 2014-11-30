@@ -46,6 +46,8 @@ typedef struct neuron_t {
 	int32_t refract_timer; // countdown to end of next refractory period [ms/10] - 3 secs limit do we need more? Jan 2014
 	int32_t T_refract;  	// refractory time of neuron [ms/10]
 
+    int32_t debug_counter;
+
 } neuron_t;
 
 
