@@ -46,20 +46,15 @@ class SynapticList(object):
         return min(map(operator.methodcaller('get_min_weight'),
                        self._synaptic_rows))
         
-    def sum_weights(self, exc_sum_array, inh_sum_array):
+    def sum_weights(self, sum_arrays):
         """
         Sums the weights going into each post-synaptic 
         neuron on a per-synapse type basis
         """
         # **TODO** numpyify
         for row in self._synaptic_rows:
-            for i in range(0, len(row.target_indices)):
-                index = row.target_indices[i]
-                weight = row.weights[i]
-                if weight > 0:
-                    exc_sum_array[index] += weight
-                else:
-                    inh_sum_array[index] += abs(weight)
+            for i, w, s in zip(row.target_indices, row.weights, row.synapse_types):
+                sum_arrays[s][i] += abs(w)
     
     def sum_fixed_weight(self, sum_arrays, fixed_weight):
         """

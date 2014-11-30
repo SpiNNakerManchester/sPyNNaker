@@ -25,13 +25,6 @@ class AbstractRulePart(object):
         :return:
         """
 
-    @abstractmethod
-    def get_params_size_bytes(self):
-        """
-
-        :return:
-        """
-
     @abstractproperty
     def vertex_executable_suffix(self):
         """

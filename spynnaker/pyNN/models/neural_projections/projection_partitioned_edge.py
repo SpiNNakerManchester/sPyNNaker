@@ -8,14 +8,15 @@ class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
         PartitionedEdge.__init__(self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
         self._synapse_sublist = None
-        self._weight_scale = None
+        self._weight_scales = None
 
     @property
-    def weight_scale(self):
-        return self._weight_scale
+    def weight_scales(self):
+        return self._weight_scales
 
-    def weight_scale_setter(self, new_value):
-        self._weight_scale = new_value
+    # **YUCK** setters don't work properly with inheritance
+    def weight_scales_setter(self, value):
+        self._weight_scales = value
 
     def get_synapse_sublist(self, graph_mapper):
         """
