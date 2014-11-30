@@ -104,7 +104,7 @@ class ProjectionPartitionableEdge(PartitionableEdge):
                 constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
                 constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 self._synapse_row_io, partitioned_graph, graph_mapper,
-                routing_infos, subedge.weight_scales).get_rows()
+                routing_infos, subedge.weight_scale).get_rows()
 
             pre_lo_atom = vertex_slice.lo_atom
             if ((last_pre_lo_atom is None) or

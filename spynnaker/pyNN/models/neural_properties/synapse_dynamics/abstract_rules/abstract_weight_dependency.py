@@ -56,10 +56,3 @@ class AbstractWeightDependency(AbstractRulePart):
         
         :return:
         """
-    
-    @abstractmethod
-    def get_params_size_bytes(self, num_synapse_types, num_terms):
-        """
-
-        :return:
-        """

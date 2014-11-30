@@ -17,9 +17,9 @@ typedef weight_t final_state_t;
 //---------------------------------------
 // Synapse interface functions
 //---------------------------------------
-static inline update_state_t synapse_init(plastic_synapse_t synaptic_word, index_t synapse_type)
+static inline update_state_t synapse_init(plastic_synapse_t synaptic_word)
 {
-  return weight_init(synaptic_word, synapse_type);
+  return weight_init(synaptic_word);
 }
 //---------------------------------------
 static inline final_state_t synapse_get_final(update_state_t state)

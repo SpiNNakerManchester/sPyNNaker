@@ -38,13 +38,6 @@ class AbstractTimeDependency(AbstractRulePart):
         :return:
         """
     
-    @abstractmethod
-    def get_params_size_bytes(self):
-        """
-
-        :return:
-        """
-        
     @abstractproperty
     def num_terms(self):
         """

@@ -104,7 +104,7 @@ class STDPMechanism(object):
         return False
 
     # **TODO** make property
-    def get_params_size(self, num_synapse_types):
+    def get_params_size(self):
         """
         Gets the size of the STDP parameters in bytes for a range of atoms
         """
@@ -115,12 +115,12 @@ class STDPMechanism(object):
             num_terms = self._timing_dependence.num_terms
 
         if self._weight_dependence is not None:
-            size += self._weight_dependence.get_params_size_bytes(num_synapse_types, num_terms)
+            size += self._weight_dependence.get_params_size_bytes(num_terms)
         
         return size
     
     def write_plastic_params(self, spec, region, machine_time_step,
-                                             weight_scales):
+            weight_scale):
         spec.comment("Writing Plastic Parameters")
         
         # Switch focus to the region:
@@ -129,12 +129,12 @@ class STDPMechanism(object):
         # Write timing dependence parameters to region and get number of weight terms it requires
         num_terms = 1
         if self.timing_dependence is not None:
-            self.timing_dependence.write_plastic_params(spec, machine_time_step, weight_scales)
+            self.timing_dependence.write_plastic_params(spec, machine_time_step, weight_scale)
             num_terms = self.timing_dependence.num_terms
 
         # Write weight dependence information to region
         if self.weight_dependence is not None:
-            self.weight_dependence.write_plastic_params(spec, machine_time_step, weight_scales, num_terms)
+            self.weight_dependence.write_plastic_params(spec, machine_time_step, weight_scale, num_terms)
     
      # **TODO** make property
     def get_vertex_executable_suffix(self):

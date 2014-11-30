@@ -16,23 +16,21 @@ class MultiplicativeWeightDependence(AbstractWeightDependency):
                 and (self.A_plus == other.A_plus) 
                 and (self.A_minus == other.A_minus))
 
-    def get_params_size_bytes(self, num_synapse_types, num_terms):
+    def get_params_size_bytes(self, num_terms):
         if num_terms != 1:
             raise NotImplementedError("Multiplicative weight dependence only supports single terms")
         
-        return (4 * 4) * num_synapse_types
+        return (4 * 4)
     
-    def write_plastic_params(self, spec, machineTimeStep, weight_scales, num_terms):
+    def write_plastic_params(self, spec, machineTimeStep, weight_scale, num_terms):
         if num_terms != 1:
             raise NotImplementedError("Multiplicative weight dependence only supports single terms")
         
-        # Loop through each synapse type's weight scale
-        for w in weight_scales:
-            spec.write_value(data=int(round(self.w_min * w)), data_type=DataType.INT32)
-            spec.write_value(data=int(round(self.w_max * w)), data_type=DataType.INT32)
+        spec.write_value(data=int(round(self.w_min * weight_scale)), data_type=DataType.INT32)
+        spec.write_value(data=int(round(self.w_max * weight_scale)), data_type=DataType.INT32)
 
-            spec.write_value(data=int(round(self.A_plus * w)), data_type=DataType.INT32)
-            spec.write_value(data=int(round(self.A_minus * w)), data_type=DataType.INT32)
+        spec.write_value(data=int(round(self.A_plus * weight_scale)), data_type=DataType.INT32)
+        spec.write_value(data=int(round(self.A_minus * weight_scale)), data_type=DataType.INT32)
     
     @property
     def vertex_executable_suffix(self):

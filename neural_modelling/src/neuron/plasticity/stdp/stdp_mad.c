@@ -187,12 +187,10 @@ void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t 
     // 16-bits of 32-bit fixed synapse so same functions can be used
     uint32_t delay_axonal = sparse_axonal_delay(control_word);
     uint32_t delay_dendritic = sparse_delay(control_word);
-    uint32_t type = sparse_type(control_word);
-    uint32_t index = sparse_index(control_word);
-    uint32_t type_index = sparse_type_index(control_word);
+    uint32_t index = sparse_type_index(control_word);
     
     // Create update state from the plastic synaptic word
-    update_state_t current_state = synapse_init(*plastic_words, type);
+    update_state_t current_state = synapse_init(*plastic_words);
     
     // Update the synapse state
     final_state_t final_state = plasticity_update_synapse(last_pre_time, last_pre_trace, 
@@ -200,7 +198,7 @@ void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t 
       current_state, &post_event_history[index]);
     
     // Convert into ring buffer offset
-    uint32_t offset = offset_sparse(delay_axonal + delay_dendritic + time, type_index);
+    uint32_t offset = offset_sparse(delay_axonal + delay_dendritic + time, index);
 
     // Add weight to ring-buffer entry
     // **NOTE** Dave suspects that this could be a potential location for overflow
