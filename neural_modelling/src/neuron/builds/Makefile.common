@@ -1,7 +1,7 @@
 DIRS = $(NEURAL_MODELLING_DIRS)/src
 BUILDDIR = build
 DEBUG = PRODUCTION_CODE
-SYNAPSE_BENCHMARK = PRODUCTION_CODE
+SYNAPSE_BENCHMARK = NO_SYNAPSE_BENCHMARKS
 DEBUGFLAGS := 
 
 #-------------------------------------------------------------------------------
