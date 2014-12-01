@@ -156,6 +156,13 @@ void plasticity_process_post_synaptic_event(uint32_t j)
   post_add(history, timing_add_post_spike(last_post_time, last_post_trace));
 }
 //---------------------------------------
+accum plasticity_get_intrinsic_bias(uint32_t j)
+{
+  use(j);
+  
+  return 0.0k;
+}
+//---------------------------------------
 void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t *ring_buffer)
 {
 #ifdef DEBUG
