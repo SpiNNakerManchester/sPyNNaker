@@ -87,9 +87,11 @@ bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuro
         
         //stochastic threshold code.
         //begin with random number between 0 and 1
-        unsigned long fract r = ulrbits(mars_kiss64_simp());
+        uint32_t r = mars_kiss64_simp();
+        r &= 0xffff;
+        unsigned accum ra = ukbits(r);
         
-        unsigned fract result;
+        unsigned accum result;
         accum exponent = (neuron->V_membrane-neuron->theta)*neuron->du_th_inv;
         const unsigned fract prob_saturation = 0.8;
         //if exponent is large, further calculation is unnecessary (result --> prob_saturation).
@@ -102,14 +104,10 @@ bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuro
         }
         //io_printf( IO_BUF, "\n %1.6R", result );
         
-		spike = REAL_COMPARE( result, >=, r );  // has it spiked?
+		spike = REAL_COMPARE( result, >=, ra );  // has it spiked?
 
 		if( spike ) {
-             neuron->debug_counter++;
-             if(neuron->debug_counter > 20) {
-                 io_printf( IO_BUF, "\n %02d %11.4k %11.4k", neuron->debug_counter, neuron->V_membrane, result );
-                 neuron->debug_counter = 0
-             }
+                 //io_printf( IO_BUF, "\n %11.4k %11.4K %11.4K", neuron->V_membrane, result ,r);
              neuron_discrete_changes( neuron );
         }
 		}
@@ -159,7 +157,6 @@ neuron_pointer_t create_lif_cond_stoc_neuron(REAL V_reset, REAL V_rest, REAL V_r
 	neuron->T_refract = T_refract;	  			io_printf( IO_STD, "T refract         %u microsecs\n",   neuron->T_refract * 100 );
 	neuron->refract_timer = refract_timer;	  	io_printf( IO_STD, "refr timer        %d microsecs\n",   neuron->refract_timer * 100 );
 
-    neuron->debug_counter = 0;
 
 	return neuron;
 }
