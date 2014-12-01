@@ -7,14 +7,13 @@ from spinn_front_end_common.utilities import packet_conversions
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
 
-
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 
-
 import math
-import logging
 import os
+from collections import defaultdict
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +57,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         1) Official PyNN format - single list that is used for all neurons
         2) SpiNNaker format - list of lists, one per neuron
         """
-        spike_dict = dict()
+        spike_dict = defaultdict(list)
         if isinstance(self._spike_times[0], list):
             # This is in SpiNNaker 'list of lists' format:
             for neuron in range(vertex_slice.lo_atom,
@@ -66,20 +65,15 @@ class SpikeSourceArray(AbstractSpikeSource):
                 for timeStamp in self._spike_times[neuron]:
                     time_stamp_in_ticks = \
                         int((timeStamp * 1000.0) / self._machine_time_step)
-                    if time_stamp_in_ticks not in spike_dict.keys():
-                        spike_dict[time_stamp_in_ticks] = [neuron]
-                    else:
-                        spike_dict[time_stamp_in_ticks].append(neuron)
+                    spike_dict[time_stamp_in_ticks].append(neuron)
         else:
             # This is in official PyNN format, all neurons use the same list:
-            neuron_list = range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
+            neuron_list = list(range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
             for timeStamp in self._spike_times:
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
-                if time_stamp_in_ticks not in spike_dict.keys():
-                    spike_dict[time_stamp_in_ticks] = neuron_list
-                else:
-                    spike_dict[time_stamp_in_ticks].extend(neuron_list)
+
+                spike_dict[time_stamp_in_ticks].extend(neuron_list)
 
         return spike_dict
 
@@ -268,6 +262,7 @@ class SpikeSourceArray(AbstractSpikeSource):
                 word_num = index >> 5
                 bit_num = index & 0x1F
                 or_mask = 1 << bit_num
+
                 # Set the target bit:
                 spike_bit_vectors[word_num] |= or_mask
             # Write this to spikeBlock region:

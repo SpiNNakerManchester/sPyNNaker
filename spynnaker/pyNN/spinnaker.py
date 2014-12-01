@@ -1,7 +1,9 @@
 #pacman imports
+
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
+from spynnaker.pyNN.utilities.data_base_thread import DataBaseThread
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
 from pacman.operations.router_check_functionality.valid_routes_checker import \
@@ -27,7 +29,6 @@ from spinn_machine.chip import Chip
 
 
 #internal imports
-from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
 
 #common front end imports
@@ -61,9 +62,13 @@ from spynnaker.pyNN.models.utility_models.live_packet_gather import LivePacketGa
 #spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
+from spinnman.messages.scp.scp_signal import SCPSignal
+from spinnman.model.iptag.reverse_iptag import ReverseIPTag
+#from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 import logging
 import math
+import os
 import sys
 import time
 from multiprocessing.pool import ThreadPool
@@ -162,6 +167,17 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             requires_wrap_around=config.get("Machine", "requires_wrap_arounds"),
             machine_version=config.getint("Machine", "version"))
 
+        # add database generation if requested
+        if self._create_database:
+            execute_mapping = config.getboolean(
+                "Database", "create_routing_info_to_neuron_id_mapping")
+            wait_on_confirmation = config.getboolean("Database",
+                                                 "wait_on_confirmation")
+            self._database_thread = \
+                DataBaseThread(self._app_data_runtime_folder, execute_mapping,
+                               self._txrx, wait_on_confirmation)
+            self._database_thread.start()
+
         #set up vis if needed
         if config.getboolean("Visualiser", "enable"):
             self._visualiser, self._visualiser_vertex_to_page_mapping =\
@@ -193,7 +209,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may"
-                        "cause the neural abstract_models to fail to partition "
+                        "cause the neural models to fail to partition "
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
                 if vertex.is_set_to_record_spikes():
@@ -215,6 +231,17 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self.map_model()
         if do_timing:
             timer.take_sample()
+
+        #load database if needed
+        if self._create_database:
+            self._database_thread.add_machine_objects(self._machine)
+            self._database_thread.add_partitionable_vertices(
+                self._partitionable_graph)
+            self._database_thread.add_partitioned_vertices(
+                self._partitioned_graph, self._graph_mapper)
+            self._database_thread.add_placements(self._placements)
+            self._database_thread.add_routing_infos(self._routing_infos)
+            self._database_thread.add_routing_tables(self._router_tables)
 
         #extract iptags required by the graph
         self._set_iptags()
@@ -284,8 +311,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         self._application_default_folder, executable_targets,
                         self._hostname, self._app_id, run_time)
 
-                self._start_execution_on_machine(executable_targets,
-                                                 self._app_id, self._runtime)
+                wait_on_confirmation = \
+                    config.getboolean("Database", "wait_on_confirmation")
+                vis_enabled = config.getboolean("Visualiser", "enable")
+                self._start_execution_on_machine(
+                    executable_targets, self._app_id, self._runtime,
+                    wait_on_confirmation, self._database_thread, vis_enabled)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
@@ -347,7 +378,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 reverse_iptag = vertex.get_reverse_ip_tag()
                 if reverse_iptag.tag is None:
                     reverse_iptag.set_tag(self._current_max_tag_value + 1)
-                    vertex.set_reverse_iptag_tag(self._current_max_tag_value + 1)
+                    vertex.set_reverse_iptag_tag(
+                        self._current_max_tag_value + 1)
                     self._current_max_tag_value += 1
                     reverse_iptag = self._create_reverse_iptag_from_iptag(
                         reverse_iptag, vertex)
@@ -477,9 +509,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             #check that all routes are valid and no cycles exist
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
-                routing_tables=self._router_tables,
-                partitioned_graph=self._partitioned_graph,
-                machine=self._machine)
+                routing_tables=self._router_tables, machine=self._machine,
+                partitioned_graph=self._partitioned_graph)
             valid_route_checker.validate_routes()
 
         if pacman_report_state is not None and \
@@ -560,6 +591,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._application_default_folder, progress_bar)
                 thread_pool.apply_async(data_generator_interface.start())
 
+                # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
                 if binary_name in executable_targets.keys():
                     executable_targets[binary_name].add_processor(placement.x,
@@ -655,6 +687,19 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._visualiser_vertices = list()
         self._visualiser_vertices.append(visualiser_vertex_to_add)
 
+    def _get_executable_path(self, executable_name):
+        # Loop through search paths
+        for path in self._binary_search_paths:
+            # Rebuild filename
+            potential_filename = os.path.join(path, executable_name)
+
+            # If this filename exists, return it
+            if os.path.isfile(potential_filename):
+                return potential_filename
+
+        # No executable found
+        return None
+
     def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
         for vertex in self._partitionable_graph.vertices:
             virtual_chip_constraints = \
@@ -731,3 +776,5 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._txrx.send_signal(app_id, SCPSignal.STOP)
         if config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()
+        if self._create_database:
+            self._database_thread.stop()

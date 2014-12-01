@@ -1,6 +1,6 @@
 from enum import Enum
 
-from spynnaker.pyNN.models.abstract_models. \
+from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex import \
@@ -22,13 +22,14 @@ class AbstractSpikeSource(AbstractPopulationRecordableVertex,
 
     def __init__(self, label, n_neurons, constraints, max_atoms_per_core,
                  machine_time_step):
+        AbstractDataSpecableVertex.__init__(self, label=label,
+                                            n_atoms=n_neurons,
+                                            machine_time_step=machine_time_step)
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
         AbstractPopulationRecordableVertex.__init__(self, machine_time_step,
                                                     label)
-        AbstractDataSpecableVertex.__init__(self, label=label,
-                                            machine_time_step=machine_time_step)
 
     def __str__(self):
         return "spike source with atoms {}".format(self.n_atoms)

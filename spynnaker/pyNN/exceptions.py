@@ -7,12 +7,29 @@ class SpynnakerException(Exception):
     pass
 
 
+class ConfigurationException(SpynnakerException):
+    """raised when the pynn front end determines a input param is invalid
+
+    :raise None: does not raise any known exceptions"""
+    pass
+
+
 class MemReadException(SpynnakerException):
     """raised when the pynn front end fails to read a certain memory region
 
     :raise None: does not raise any known exceptions
     """
     pass
+
+
+class RallocException(SpynnakerException):
+    """rasied when the pynn front end detects that a routing error has occured
+    (during multicast soruce)
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
+
 
 class FilterableException(SpynnakerException):
     """rasied during the pynn's front end pruning of uninportant subedges when\
@@ -59,6 +76,34 @@ class SynapticMaxIncomingAtomsSupportException(exceptions.ConfigurationException
 class DelayExtensionException(exceptions.ConfigurationException):
     """raised when a delay extension vertex is given a subedge that is not from
     a delay DelayAfferentPartitionableEdge
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
+
+class ExecutableNotFoundException(SpynnakerException):
+    """ raised when a suitable executable cannot be found
+    to load onto SpiNNaker for a particular vertex
+
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
+    
+class ExecutableFailedToStartException(SpynnakerException):
+    """ raised when the messgaes from the trnasicever state that some or all the
+    application images pushed to the board have failed to start when asked
+
+
+    :raise None: does not raise any known exceptions
+    """
+    pass
+
+
+class ExecutableFailedToStopException(SpynnakerException):
+    """ raised when the messgaes from the trnasicever state that some or all the
+    application images pushed to the board have failed to stop when expected
+
 
     :raise None: does not raise any known exceptions
     """

@@ -1,40 +1,39 @@
 #include "../../../spin-neuron-impl.h"
-#include "multiplicative_impl.h"
+#include "additive_two_term_impl.h"
 
 //---------------------------------------
 // Globals
 //---------------------------------------
 // Global plasticity parameter data
 plasticity_weight_region_data_t plasticity_weight_region_data[SYNAPSE_TYPE_COUNT];
-uint32_t weight_multiply_right_shift[SYNAPSE_TYPE_COUNT];
 
 //---------------------------------------
 // Functions
 //---------------------------------------
-uint32_t *plasticity_region_weight_filled (uint32_t *address, uint32_t flags)
+address_t plasticity_region_weight_filled (address_t address, uint32_t flags)
 {
   use(flags);
 
   log_info("plasticity_region_weight_filled: starting");
-  log_info("\tSTDP multiplicative weight dependance");
+  log_info("\tSTDP additive two-term  weight dependance");
   
   // Copy plasticity region data from address
   // **NOTE** this seems somewhat safer than relying on sizeof
   int32_t *plasticity_word = (int32_t*)address;
   for(uint32_t s = 0; s < SYNAPSE_TYPE_COUNT; s++)
   {
-    plasticity_weight_region_data[s].min_weight = plasticity_word++;
-    plasticity_weight_region_data[s].max_weight = plasticity_word++;
-    plasticity_weight_region_data[s].a2_plus = plasticity_word++;
-    plasticity_weight_region_data[s].a2_minus = plasticity_word++;
-    weight_multiply_right_shift[s] = 16 - (ring_buffer_to_input_left_shift[s] + 1);
+    plasticity_weight_region_data[s].min_weight = *plasticity_word++;
+    plasticity_weight_region_data[s].max_weight = *plasticity_word++;
+    plasticity_weight_region_data[s].a2_plus = *plasticity_word++;
+    plasticity_weight_region_data[s].a2_minus = *plasticity_word++;
+    plasticity_weight_region_data[s].a3_plus = *plasticity_word++;
+    plasticity_weight_region_data[s].a3_minus = *plasticity_word++;
     
-    log_info("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d, Weight multiply right shift:%u", 
+    log_info("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d, A3+:%d, A3-:%d", 
       s, plasticity_weight_region_data[s].min_weight, plasticity_weight_region_data[s].max_weight, 
-      plasticity_weight_region_data[s].a2_plus, plasticity_weight_region_data[s].a2_minus,
-      weight_multiply_right_shift[s]);
+      plasticity_weight_region_data[s].a2_plus, plasticity_weight_region_data[s].a2_minus, 
+      plasticity_weight_region_data[s].a3_plus, plasticity_weight_region_data[s].a3_minus);
   }
-  
   log_info("plasticity_region_weight_filled: completed successfully");
 
   // Return end address of region

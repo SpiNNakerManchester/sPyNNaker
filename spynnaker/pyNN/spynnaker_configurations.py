@@ -93,7 +93,9 @@ class SpynnakerConfigurationFunctions(object):
                             "automatic behaviour, please enter a "
                             "timescaleFactor value in your .pacman.cfg"
                             .format(self._time_scale_factor))
-        if hostname is not None:
+
+        use_virtual_board = config.getboolean("Machine", "virtual_board")
+        if hostname is not None and not use_virtual_board:
             self._hostname = hostname
             logger.warn("The machine name from PYNN setup is overriding the "
                         "machine name defined in the pacman.cfg file")

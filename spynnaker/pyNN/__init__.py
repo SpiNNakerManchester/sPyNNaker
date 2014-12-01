@@ -11,12 +11,15 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 
+if conf.config.getboolean("Visualiser", "enable"):
+    from visualiser_framework.visualiser_constants import VISUALISER_MODES
+
 #pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
 
-# neural abstract_models
+# neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
     import IFConductanceExponentialPopulation as IF_cond_exp
 from spynnaker.pyNN.models.neural_models.if_curr_dual_exp \
@@ -80,6 +83,8 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
 # STDP weight dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     additive_weight_dependence import AdditiveWeightDependence
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
+    multiplicative_weight_dependence import MultiplicativeWeightDependence
 
 # STDP timing dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
@@ -98,9 +103,22 @@ from pyNN.random import *
 
 #traditional logger
 logger = logging.getLogger(__name__)
+
 #global controller / spinnaker object that does everything
 _spinnaker = None
 
+# List of binary search paths
+_binary_search_paths = []
+
+def register_binary_search_path(search_path):
+    """Registers an additional binary search path for
+    for SpiNNaker executables. Should be called before
+    setup by sPyNNaker plugin modules 
+    
+    :param string search_path:
+    absolute search path for binaries
+    """
+    _binary_search_paths.append(search_path)
 
 def end(stop_on_board=True):
     """
@@ -177,13 +195,16 @@ def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
     ignore them because they have no bearing on the on-chip simulation code.
     """
     global _spinnaker
+    global _binary_search_paths
 
     logger.info("PACMAN103   (c) 2014 APT Group, University of Manchester")
     logger.info("                Release version 2014.4.1 - April 2014")
 
     if len(extra_params.keys()) > 1:
         logger.warn("Extra params has been applied which we do not consider")
-    _spinnaker = Spinnaker(machine, timestep, min_delay, max_delay)
+    _spinnaker = Spinnaker(host_name=machine, timestep=timestep, 
+                           min_delay=min_delay, max_delay=max_delay, 
+                           binary_search_paths=_binary_search_paths)
     # Return None, simply because the PyNN API says something must be returned
     return None
 
