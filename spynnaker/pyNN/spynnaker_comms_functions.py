@@ -274,24 +274,6 @@ class SpynnakerCommsFunctions(object):
             while not is_vis_ready:
                 is_vis_ready = database_thread.has_recieved_confirmation()
 
-        #if in debug mode, add the extra filter for router counters for packets
-        # that are defaultly routed to the monitor core
-        # (local mc packets with no router entry)
-        if in_debug_mode:
-            diagnostic_filter = DiagnosticFilter(
-                counter_event_has_occured=True, packet_type_fr_enabled=False,
-                packet_type_mc_enabled=True, packet_type_nn_enabled=False,
-                packet_type_p2p_enabled=False, is_default_routed=True,
-
-                                                 )
-            for chip in self._machine.chips:
-                self._txrx.set_router_diagnostics(
-                    chip.x, chip.y, diagnostic_filter,
-                    constants.MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION)
-            #clear all counters so that run is fresh
-            for chip in self._machine.chips:
-                self._txrx.clear_router_diagnostic_counters(chip.x, chip.y)
-
         # if correct, start applications
         logger.info("Starting application")
         self._txrx.send_signal(app_id, SCPSignal.SYNC0)
