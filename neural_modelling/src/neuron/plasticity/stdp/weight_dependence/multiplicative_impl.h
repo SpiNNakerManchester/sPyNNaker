@@ -46,7 +46,7 @@ static inline weight_state_t weight_init(weight_t weight, index_t synapse_type)
   return (weight_state_t){ 
     .weight = (int32_t)weight, 
     .weight_multiply_right_shift = weight_multiply_right_shift[synapse_type], 
-    .weight_region = plasticity_weight_region_data[synapse_type] };
+    .weight_region = &plasticity_weight_region_data[synapse_type] };
 }
 //---------------------------------------
 static inline weight_state_t weight_apply_depression(weight_state_t state, int32_t depression)
@@ -58,7 +58,8 @@ static inline weight_state_t weight_apply_depression(weight_state_t state, int32
   
   // Multiply scale by depression and subtract
   // **NOTE** using standard STDP fixed-point format handles format conversion
-  return state.weight - STDP_FIXED_MUL_16X16(scale, depression);
+  state.weight -= STDP_FIXED_MUL_16X16(scale, depression);
+  return state;
 }
 //---------------------------------------
 static inline weight_state_t weight_apply_potentiation(weight_state_t state, int32_t potentiation)
@@ -70,7 +71,8 @@ static inline weight_state_t weight_apply_potentiation(weight_state_t state, int
   
   // Multiply scale by potentiation and add
   // **NOTE** using standard STDP fixed-point format handles format conversion
-  return state.weight + STDP_FIXED_MUL_16X16(scale, potentiation);
+  state.weight += STDP_FIXED_MUL_16X16(scale, potentiation);
+  return state;
 }
 //---------------------------------------
 static inline weight_t weight_get_final(weight_state_t new_state)

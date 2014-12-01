@@ -8,6 +8,9 @@ class MultiplicativeWeightDependence(AbstractWeightDependency):
         AbstractWeightDependency.__init__(self, w_min=w_min, w_max=w_max,
                                           A_plus=A_plus, A_minus=A_minus)
     
+    def is_weight_dependance_rule_part(self):
+        return True
+    
     def __eq__(self, other):
         if (other is None) or (not isinstance(other, MultiplicativeWeightDependence)):
             return False

@@ -2,6 +2,11 @@
 #include "multiplicative_impl.h"
 
 //---------------------------------------
+// Externals
+//---------------------------------------
+extern uint32_t ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT];
+
+//---------------------------------------
 // Globals
 //---------------------------------------
 // Global plasticity parameter data
@@ -23,11 +28,14 @@ uint32_t *plasticity_region_weight_filled (uint32_t *address, uint32_t flags)
   int32_t *plasticity_word = (int32_t*)address;
   for(uint32_t s = 0; s < SYNAPSE_TYPE_COUNT; s++)
   {
-    plasticity_weight_region_data[s].min_weight = plasticity_word++;
-    plasticity_weight_region_data[s].max_weight = plasticity_word++;
-    plasticity_weight_region_data[s].a2_plus = plasticity_word++;
-    plasticity_weight_region_data[s].a2_minus = plasticity_word++;
-    weight_multiply_right_shift[s] = 16 - (ring_buffer_to_input_left_shift[s] + 1);
+    // Copy parameters
+    plasticity_weight_region_data[s].min_weight = *plasticity_word++;
+    plasticity_weight_region_data[s].max_weight = *plasticity_word++;
+    plasticity_weight_region_data[s].a2_plus = *plasticity_word++;
+    plasticity_weight_region_data[s].a2_minus = *plasticity_word++;
+    
+    // Calculate the right shift required to fixed-point multiply weights
+    weight_multiply_right_shift[s] = 16 - (ring_buffer_to_input_left_shifts[s] + 1);
     
     log_info("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d, Weight multiply right shift:%u", 
       s, plasticity_weight_region_data[s].min_weight, plasticity_weight_region_data[s].max_weight, 
