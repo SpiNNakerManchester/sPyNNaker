@@ -88,7 +88,8 @@ class DataBaseThread(threading.Thread):
             self._cur.execute(
                 "CREATE TABLE Partitionable_vertices("
                 "vertex_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                "vertex_label TEXT, no_atoms INT, max_atom_constrant INT)")
+                "vertex_label TEXT, no_atoms INT, max_atom_constrant INT,"
+                "recorded INT)")
             self._cur.execute(
                 "CREATE TABLE Partitionable_edges("
                 "edge_id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -302,10 +303,10 @@ class DataBaseThread(threading.Thread):
         for vertex in self._partitionable_graph.vertices:
             self._cur.execute(
                 "INSERT INTO Partitionable_vertices("
-                "vertex_label, no_atoms, max_atom_constrant)"
-                " VALUES('{}', {}, {});"
+                "vertex_label, no_atoms, max_atom_constrant, recorded)"
+                " VALUES('{}', {}, {}, {});"
                 .format(vertex.label, vertex.n_atoms,
-                        vertex.get_max_atoms_per_core()))
+                        vertex.get_max_atoms_per_core(), int(vertex.record)))
         #add edges
         vertices = self._partitionable_graph.vertices
         for vertex in self._partitionable_graph.vertices:
