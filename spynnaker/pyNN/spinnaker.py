@@ -3,7 +3,6 @@
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
-from spynnaker.pyNN.utilities.data_base_thread import DataBaseThread
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
 from pacman.operations.router_check_functionality.valid_routes_checker import \
@@ -50,6 +49,8 @@ from spinn_front_end_common.interface.data_generator_interface import \
     DataGeneratorInterface
 
 #local front end imports
+
+from spynnaker.pyNN.utilities.data_base_thread import DataBaseThread
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
@@ -108,7 +109,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 generate_transciever_report=
                 config.getboolean("Reports", "writeTransceiverReport"),
                 execute_routing_info_report=
-                config.getboolean("Reports", "writeRouterInfoReport"))
+                config.getboolean("Reports", "writeRouterInfoReport"),
+                in_debug_mode=(config.get("Mode", "mode") == "Debug"))
 
             self._set_up_pacman_algorthms_listings(
                 partitioner_algorithum=
@@ -316,7 +318,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 vis_enabled = config.getboolean("Visualiser", "enable")
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
-                    wait_on_confirmation, self._database_thread, vis_enabled)
+                    wait_on_confirmation, self._database_thread, vis_enabled,
+                    self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
@@ -505,7 +508,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
 
-        if config.get("Mode", "mode") == "Debug":
+        if self._in_debug_mode:
             #check that all routes are valid and no cycles exist
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
@@ -747,7 +750,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         router_object = MachineRouter(
             links=links, emergency_routing_enabled=False,
             clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
-            n_available_multicast_entries=sys.maxint)
+            n_available_multicast_entries=sys.maxint, diagnostic_filters=list())
 
         #create the processors
         processors = list()
@@ -772,7 +775,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if len(router_table.multicast_routing_entries) > 0:
                     self._txrx.clear_multicast_routes(router_table.x,
                                                       router_table.y)
-            time.sleep(0.5)
+                    self._txrx.clear_router_diagnostic_counters(router_table.x,
+                                                                router_table.y)
+                    self._txrx.\
+                        clear_router_diagnostic_non_default_positioned_filters(
+                            router_table.x, router_table.y)
             self._txrx.send_signal(app_id, SCPSignal.STOP)
         if config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()

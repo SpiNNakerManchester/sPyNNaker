@@ -59,19 +59,3 @@ class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
     @property
     def synapse_sublist(self):
         return self._synapse_sublist
-    
-    @property
-    def label(self):
-        """ The label of the subedge
-
-        :return: The name, or None if there is no label
-        :rtype: str
-        :raise None: Raises no known exceptions
-        """
-        if self._synapse_sublist is None:
-            associated_edge = \
-                graph_mapper.get_partitionable_edge_from_partitioned_edge(self)
-            
-            return associated_edge.label
-        else:
-            return None
