@@ -179,7 +179,6 @@ class AbstractSynapticManager(object):
             memory_size += all_syn_block_sz
         return memory_size
 
-    # TODO DOES THIS METHOD EVER GET RAN????
     def get_synaptic_blocks_memory_size(self, vertex_slice, in_edges):
         self._check_synapse_dynamics(in_edges)
         memory_size = 0
