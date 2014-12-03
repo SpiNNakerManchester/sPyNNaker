@@ -1,14 +1,14 @@
 
 import numpy
 # import math
-from pyNN.spiNNaker_103_2 import *            # Imports the pyNN.spiNNaker module
+from pyNN.spiNNaker import *            # Imports the pyNN.spiNNaker module
 
 pop_size = 32
 
 rng_weights=NumpyRNG(seed=369121518)
 rng_connections=NumpyRNG(seed=453276549)
 
-min_weight = 0.0
+min_weight = 0.1
 max_weight = 30.0
 weight_scale_ex_in = 0.25
 weight_dependence_e = RandomDistribution(distribution='uniform', parameters=[min_weight, max_weight], rng=rng_weights)

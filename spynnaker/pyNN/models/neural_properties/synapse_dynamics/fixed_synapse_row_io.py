@@ -37,7 +37,8 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         weight_scales_numpy = numpy.array(weight_scales, dtype="float")
         synapse_weight_scales = weight_scales_numpy[synapse_row.synapse_types]
 
-        # Scale weights
+        # Scale weights to be 16-bit numbers which are a fraction of the
+        # synapse weight scale
         abs_weights = numpy.abs(synapse_row.weights)
         scaled_weights = numpy.rint(
             abs_weights * synapse_weight_scales).astype("uint32")
@@ -47,8 +48,9 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         zero_scaled_weights = numpy.where(scaled_weights == 0)[0]
         if (zero_float_weights.shape != zero_scaled_weights.shape
                 or (zero_float_weights != zero_scaled_weights).any()):
-            raise Exception(
-                    "Weight scaling has reduced non-zero weights to zero")
+            print ("WARNING: Weight scaling has reduced non-zero weights to"
+                   " zero; the range of weights provided cannot be represented"
+                   " with 16-bits!")
 
         if ((len(synapse_row.target_indices) > 0)
                 and (numpy.amax(synapse_row.target_indices) > 0xFF)):
@@ -95,6 +97,9 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
             raise exceptions.SynapticBlockGenerationException(
                 "fixed synaptic row ios cannot be built from plastic entries"
             )
+
+        synaptic_type_mask = (1 << bits_reserved_for_type) - 1
+        delay_mask = (1 << (8 - bits_reserved_for_type)) - 1
 
         # Extract indices, delays and synapse types from fixed-plastic region
         target_indices = f_f_entries & 0xFF
