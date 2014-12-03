@@ -37,8 +37,13 @@ class MultapseConnector(AbstractConnector):
         self._delays = delays
         self._connection_array = connection_array
         
-    def generate_synapse_list(self, prevertex, postvertex, delay_scale,
-                              synapse_type):
+    def generate_synapse_list(self, presynaptic_population, 
+                                    postsynaptic_population, 
+                                    delay_scale, synapse_type):
+
+        prevertex = presynaptic_population._get_vertex
+        postvertex = postsynaptic_population._get_vertex
+
         id_lists = list()
         weight_lists = list()
         delay_lists = list()

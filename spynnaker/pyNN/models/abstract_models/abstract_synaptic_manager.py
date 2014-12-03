@@ -141,13 +141,13 @@ class AbstractSynapticManager(object):
             # Write padding (if required):
             padding = ((fixed_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)
                        - words_written)
-            # Loop through padding in terms of maximum 
+            # Loop through padding in terms of maximum
             # Size blocks that can be repeated
             for i in range(0, padding, 255):
                 padding_repeats = min(255, padding - i)
                 spec.write_value(data=0xBBCCDDEE, repeats=padding_repeats,
                                  data_type=DataType.UINT32)
-            
+
             # Update write pointer
             write_ptr += 4 * padding
             row_no += 1
@@ -155,17 +155,17 @@ class AbstractSynapticManager(object):
         # The current write pointer is where the next block could start:
         next_block_start_addr = write_ptr
         return block_start_addr, next_block_start_addr
-    
+
     def get_exact_synaptic_block_memory_size(self, graph_mapper,
                                              subvertex_in_edges):
         memory_size = 0
-        
+
         # Go through the subedges and add up the memory
         for subedge in subvertex_in_edges:
             #pad the memory size to meet 1 k offsets
             if (memory_size & 0x3FF) != 0:
                 memory_size = (memory_size & 0xFFFFFC00) + 0x400
-            
+
             sublist = subedge.get_synapse_sublist(graph_mapper)
             max_n_words = \
                 max([graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
@@ -183,16 +183,16 @@ class AbstractSynapticManager(object):
     def get_synaptic_blocks_memory_size(self, vertex_slice, in_edges):
         self._check_synapse_dynamics(in_edges)
         memory_size = 0
-        
+
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionPartitionableEdge):
-                
-                # Get maximum row length in this edge 
+
+                # Get maximum row length in this edge
                 max_n_words = in_edge.get_max_n_words(vertex_slice)
                 all_syn_block_sz = \
                     self._calculate_all_synaptic_block_size(in_edge,
                                                             max_n_words)
-                
+
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master pynn_population.py
                 # table
@@ -210,7 +210,7 @@ class AbstractSynapticManager(object):
                     extra_mem = 1024
                 all_syn_block_sz += extra_mem
                 memory_size += all_syn_block_sz
-                
+
         return memory_size
 
     def _calculate_all_synaptic_block_size(self, synaptic_sub_list,
@@ -354,29 +354,29 @@ class AbstractSynapticManager(object):
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1  # do to starting at zero
-        
+
         # If we have an STDP mechanism, get the maximum plastic weight
         stdp_max_weight = None if self._stdp_mechanism is None else self._stdp_mechanism.get_max_weight()
-        
+
         total_weights = [numpy.zeros(n_atoms) for i, _ in enumerate(self.get_synapse_targets())]
         for subedge in in_sub_edges:
             sublist = subedge.get_synapse_sublist(graph_mapper)
-            
+
             # If there's no STDP maximum weight, sum the initial weights
             if stdp_max_weight is None:
                 sublist.sum_weights(total_weights)
             # Otherwise, sum the pathalogical case of all columns being at stdp_max_weight
             else:
                 sublist.sum_fixed_weight(total_weights, stdp_max_weight)
-        
+
         # Get maximum weight that can go into each post-synaptic neuron per synapse-type
         max_weights = [max(t) for t in total_weights]
-        
+
         # Convert these to powers
-        max_weight_powers = [0 if w <= 0 
+        max_weight_powers = [0 if w <= 0
                             else int(math.ceil(max(0, math.log(w, 2))))
                             for w in max_weights]
-        
+
         # If we have an STDP mechanism that uses signed weights,
         # Add another bit of shift to prevent overflows
         if self._stdp_mechanism is not None\
@@ -387,7 +387,7 @@ class AbstractSynapticManager(object):
         # but we ignore the "-1" to allow a bit of overhead in the above
         # calculation in case a couple of extra spikes come in
         return max_weight_powers
-    
+
     def write_synaptic_matrix_and_master_population_table(
             self, spec, subvertex, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region, routing_info,
@@ -422,26 +422,26 @@ class AbstractSynapticManager(object):
         # Track writes inside the synaptic matrix region:
         next_block_start_addr = 0
         n_synapse_type_bits = self.get_n_synapse_type_bits()
-        
+
         # Filtering incoming subedges
         in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
         in_proj_subedges = [e for e in in_subedges if isinstance(e, ProjectionPartitionedEdge)]
-        
+
         # Get all combinations of these edges
         proj_subedges_to_remove = []
         for (a, b) in itertools.combinations(in_proj_subedges, 2):
             a_key = routing_info.get_key_from_subedge(a)
             b_key = routing_info.get_key_from_subedge(b)
-            
+
             if a_key == b_key:
                 # Extract both projection edges synapse sublists
                 a_sublist = a.get_synapse_sublist(graph_mapper)
                 b_sublist = b.get_synapse_sublist(graph_mapper)
-                
+
                 # From these get rows
                 a_rows = a_sublist.get_rows()
                 b_rows = b_sublist.get_rows()
-                
+
                 if len(a_rows) != len(b_rows):
                     raise Exception("Incoming projection subedges have different row lengths")
 
@@ -450,25 +450,25 @@ class AbstractSynapticManager(object):
                     # Merge synaptic rows
                     # **TODO** use proper merge functionality
                     a_row.append(b_row)
-                
+
                 if logger.isEnabledFor(logging.DEBUG):
                     a_slice = graph_mapper.get_subvertex_slice(a.post_subvertex)
                     b_slice = graph_mapper.get_subvertex_slice(b.post_subvertex)
-                    logger.debug("Merging projection subedges %s (%u-%u) and %s (%u-%u) both leading to vertex %s" 
-                        % (a.label, a_slice.lo_atom, a_slice.hi_atom, 
+                    logger.debug("Merging projection subedges %s (%u-%u) and %s (%u-%u) both leading to vertex %s"
+                        % (a.label, a_slice.lo_atom, a_slice.hi_atom,
                            b.label, b_slice.lo_atom, b_slice.hi_atom, self.label))
-                
+
                 # Add projection edge b to list to remove
                 proj_subedges_to_remove.append(b)
-        
+
         # If there are any projection subedges to remove
         if len(proj_subedges_to_remove) > 0:
             logger.debug("Merged %u incoming projection sub-edges" % len(proj_subedges_to_remove))
-            
+
             # Rebuild incoming projection list
             in_proj_subedges = [i for i in in_proj_subedges if i not in proj_subedges_to_remove]
-        
-        
+
+
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
         for subedge in in_proj_subedges:
@@ -532,7 +532,7 @@ class AbstractSynapticManager(object):
                 update_master_population_table(
                     spec, block_start_addr, row_index, key,
                     master_pop_table_region)
-        
+
         self._master_pop_table_generator.finish_master_pop_table(
             spec, master_pop_table_region)
 

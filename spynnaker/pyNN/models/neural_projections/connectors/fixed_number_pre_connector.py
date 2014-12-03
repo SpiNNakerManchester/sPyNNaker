@@ -43,8 +43,13 @@ class FixedNumberPreConnector(AbstractConnector):
         self._delays = int(delays)
         self._allow_self_connections = allow_self_connections
 
-    def generate_synapse_list(self, prevertex, postvertex, delay_scale,
-                              synapse_type):
+    def generate_synapse_list(self, presynaptic_population, 
+                                    postsynaptic_population, 
+                                    delay_scale, synapse_type):
+
+        prevertex = presynaptic_population._get_vertex
+        postvertex = postsynaptic_population._get_vertex
+
         id_lists = list()
         weight_lists = list()
         delay_lists = list()
@@ -65,7 +70,8 @@ class FixedNumberPreConnector(AbstractConnector):
         for pre_atom in pre_synaptic_neurons:
 
             present = numpy.ones(postvertex.n_atoms, dtype=numpy.uint32)
-            if not self._allow_self_connections and prevertex == postvertex:
+            if (not self._allow_self_connections 
+                and presynaptic_population == postsynaptic_population):
                 present[pre_atom] = 0
                 n_present = postvertex.n_atoms - 1
             else:

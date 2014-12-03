@@ -46,12 +46,18 @@ class FixedProbabilityConnector(AbstractConnector):
             raise ConfigurationException("The probability should be between 0"
                                          " and 1 (inclusive)")
         
-    def generate_synapse_list(self, prevertex, postvertex, delay_scale,
-                              synapse_type):
+    def generate_synapse_list(self, presynaptic_population, 
+                                    postsynaptic_population, 
+                                    delay_scale, synapse_type):
+
+        prevertex = presynaptic_population._get_vertex
+        postvertex = postsynaptic_population._get_vertex
+
         rows = list()
         for pre_atom in range(0, prevertex.n_atoms):
             present = numpy.random.rand(postvertex.n_atoms) <= self._p_connect
-            if not self._allow_self_connections and prevertex == postvertex:
+            if (not self._allow_self_connections 
+                and presynaptic_population == postsynaptic_population):
                 present[pre_atom] = 0
 
             n_present = numpy.sum(present)

@@ -85,11 +85,11 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         """
         Gets the plastic region of the row as an array of 32-bit words
         """
-        # Convert per-synapse type weight scales to numpy and 
-        # Index this to obtain per-synapse weight scales. 
+        # Convert per-synapse type weight scales to numpy and
+        # Index this to obtain per-synapse weight scales.
         weight_scales_numpy = numpy.array(weight_scales, dtype="float")
         synapse_weight_scales = weight_scales_numpy[synapse_row.synapse_types]
-        
+
         # Scale absoluate weights and convert to uint16
         half_word_datatype = None
         scaled_weights = None
@@ -149,7 +149,7 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         half_words = p_p_entries[self._num_header_words:].view(
                 dtype=half_word_datatype)
 
-        # Slice out weight half words, 
+        # Slice out weight half words,
         # Convert to float  and divide by weight scale
         weights = half_words[0::2].astype("float") / synapse_weight_scales
 

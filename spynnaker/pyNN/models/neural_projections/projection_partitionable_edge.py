@@ -13,10 +13,12 @@ logger = logging.getLogger(__name__)
 
 class ProjectionPartitionableEdge(PartitionableEdge):
     
-    def __init__(self, prevertex, postvertex, machine_time_step,
-                 connector=None, synapse_list=None, synapse_dynamics=None,
-                 label=None):
-        PartitionableEdge.__init__(self, prevertex, postvertex, label=label)
+    def __init__(self, presynaptic_population, postsynaptic_population, 
+                 machine_time_step, connector=None, synapse_list=None, 
+                 synapse_dynamics=None, label=None):
+        PartitionableEdge.__init__(self, presynaptic_population._get_vertex, 
+                                         postsynaptic_population._get_vertex, 
+                                         label=label)
 
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
@@ -26,7 +28,8 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         # If the synapse_list was not specified, create it using the connector
         if connector is not None and synapse_list is None:
             self._synapse_list = \
-                connector.generate_synapse_list(prevertex, postvertex,
+                connector.generate_synapse_list(presynaptic_population, 
+                                                postsynaptic_population,
                                                 1000.0 / machine_time_step)
         
         # If there are synapse dynamics for this connector, create a plastic
@@ -104,7 +107,7 @@ class ProjectionPartitionableEdge(PartitionableEdge):
                 constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
                 constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 self._synapse_row_io, partitioned_graph, graph_mapper,
-                routing_infos, subedge.weight_scales).get_rows()
+                routing_infos, subedge.weight_scale).get_rows()
 
             pre_lo_atom = vertex_slice.lo_atom
             if ((last_pre_lo_atom is None) or
