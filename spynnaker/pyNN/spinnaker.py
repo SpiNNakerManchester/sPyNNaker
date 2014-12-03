@@ -1,10 +1,10 @@
 #pacman imports
-from data_specification.interfaces.data_generator_interface import \
-    DataGeneratorInterface
 
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
+from spynnaker.pyNN.utilities.data_generator_interface import \
+    DataGeneratorInterface
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
 from pacman.operations.router_check_functionality.valid_routes_checker import \
@@ -90,20 +90,20 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     .format(self._time_scale_factor))
 
         logger.info("Setting appID to %d." % self._app_id)
-    
+
         #get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
-        
-        # Begin list of binary search paths 
+
+        # Begin list of binary search paths
         # With those passed to constructor
         self._binary_search_paths = binary_search_paths
-        
+
         # Determine default executable folder location
         binary_path = os.path.abspath(exceptions.__file__)
         binary_path = os.path.abspath(os.path.join(binary_path, os.pardir))
         binary_path = os.path.join(binary_path, "model_binaries")
-        
+
         #add this default to end of list of search paths
         self._binary_search_paths.append(binary_path)
         self._edge_count = 0
@@ -373,7 +373,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._reports_states.generate_pacman_report_states()
 
         self._check_if_theres_any_pre_placement_constraints_to_satisify()
-        
+
         #execute partitioner
         self._execute_partitioner(pacman_report_state)
 
@@ -492,6 +492,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         #create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
+        data_generator_interfaces = list()
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
@@ -503,16 +504,17 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._partitioned_graph, self._partitionable_graph,
                     self._routing_infos, self._hostname, self._graph_mapper,
                     self._report_default_directory, progress_bar)
+                data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start())
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
-                
+
                 # Attempt to find this within search paths
                 binary_path = self._get_executable_path(binary_name)
                 if binary_path is None:
                     raise exceptions.ExecutableNotFoundException(binary_name)
-                
+
                 if binary_path in executable_targets.keys():
                     executable_targets[binary_path].add_processor(placement.x,
                                                                   placement.y,
@@ -525,17 +527,21 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     executable_targets[binary_path] = \
                         CoreSubsets(list_of_core_subsets)
 
+        for data_generator_interface in data_generator_interfaces:
+            data_generator_interface.wait_for_finish()
         thread_pool.close()
         thread_pool.join()
-        #finish the progress bar
+
+        # finish the progress bar
         progress_bar.end()
+
         return executable_targets
 
     def start_visualiser(self):
         """starts the port listener and ties it to the visualiser_framework
          pages as required
         """
-       #register a listener at the trasnciever for each visualised vertex
+        # register a listener at the trasnciever for each visualised vertex
         for vertex in self._visualiser_vertices:
             if vertex in self._visualiser_vertex_to_page_mapping.keys():
                 associated_page = \
@@ -607,20 +613,20 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if self._visualiser_vertices is None:
             self._visualiser_vertices = list()
         self._visualiser_vertices.append(visualiser_vertex_to_add)
-    
+
     def _get_executable_path(self, executable_name):
         # Loop through search paths
         for path in self._binary_search_paths:
             # Rebuild filename
             potential_filename = os.path.join(path, executable_name)
-            
+
             # If this filename exists, return it
             if os.path.isfile(potential_filename):
                 return potential_filename
-            
+
         # No executable found
         return None
-    
+
     def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
         for vertex in self._partitionable_graph.vertices:
             virtual_chip_constraints = \

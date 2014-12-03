@@ -66,10 +66,6 @@ class DistanceDependentProbabilityConnector(FromListConnector):
         FromListConnector.__init__(self, conn_list=None, safe=safe,
                                    verbose=verbose)
 
-    def _distance_dependence_helper(self, *args, **kwargs):
-        return self._distance_dependence(kwargs["d_expression"],
-                                         kwargs["distances"], *args)
-
     def _distance_dependence(self, *args, **kwargs):
         if "d_expression" not in kwargs or "distances" not in kwargs:
             raise UnboundLocalError("To evaluate a distance dependence requires "
@@ -103,7 +99,7 @@ class DistanceDependentProbabilityConnector(FromListConnector):
         dd_potential_prob = rng.uniform(low=0.0, high=1.0,
                                         size=distances.shape)
         dd_actual_prob = numpy.fromfunction(
-            self._distance_dependence_helper, shape=distances.shape, dtype=int,
+            self._distance_dependence, shape=distances.shape, dtype=int,
             d_expression=d_expression, distances=distances)
         return dd_potential_prob < dd_actual_prob
 
@@ -137,11 +133,11 @@ class DistanceDependentProbabilityConnector(FromListConnector):
         if (not self.allow_self_connections
                 and presynaptic_population == postsynaptic_population):
             numpy.fill_diagonal(connections, False)
-        weights = numpy.fromfunction(function=self._distance_dependence_helper,
+        weights = numpy.fromfunction(function=self._distance_dependence,
                                      shape=distances.shape, dtype=int,
                                      d_expression=self.weights,
                                      distances=distances)
-        delays = numpy.fromfunction(function=self._distance_dependence_helper,
+        delays = numpy.fromfunction(function=self._distance_dependence,
                                     shape=distances.shape, dtype=int,
                                     d_expression=self.delays,
                                     distances=distances)
