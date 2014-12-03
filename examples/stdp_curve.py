@@ -16,7 +16,7 @@ num_pairs = 60
 start_w = 0.5
 delta_t = [-100, -60, -40, -30, -20, -10, -1, 1, 10, 20, 30, 40, 60, 100]
 start_time = 200
-mad = False
+mad = True
 
 # Population parameters
 model = sim.IF_curr_exp
@@ -82,7 +82,7 @@ for t in delta_t:
 
     # Plastic Connection between pre_pop and post_pop
     stdp_model = sim.STDPMechanism(
-        timing_dependence = sim.SpikePairRule(tau_plus=16.7, tau_minus=33.7, nearest=False),
+        timing_dependence = sim.SpikePairRule(tau_plus=16.7, tau_minus=33.7, nearest=True),
         weight_dependence = sim.AdditiveWeightDependence(w_min=0.0, w_max=1.0, A_plus=0.005, A_minus=0.005),
         mad=mad
     )

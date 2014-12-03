@@ -12,8 +12,12 @@
 #include <string.h>
 
 #ifdef DEBUG
-bool plastic_runtime_log_enabled = false;
-#endif	// DEBUG
+  bool plastic_runtime_log_enabled = false;
+#endif  // DEBUG
+
+#ifdef SYNAPSE_BENCHMARK
+  extern uint32_t num_plastic_pre_synaptic_events;
+#endif  // SYNAPSE_BENCHMARK
 
 //---------------------------------------
 // Macros
@@ -90,7 +94,7 @@ static inline final_state_t plasticity_update_synapse(const uint32_t last_pre_ti
     post_window = post_next_delayed(post_window, delayed_post_time);
   }
   
-  const uint32_t delayed_pre_time = time + delay_axonal - delay_dendritic;
+  const uint32_t delayed_pre_time = time + delay_axonal;
   plastic_runtime_log_info("\t\tApplying pre-synaptic event at time:%u last post time:%u\n", delayed_pre_time, post_window.prev_time);
       
   // Apply spike to state 
@@ -152,6 +156,13 @@ void plasticity_process_post_synaptic_event(uint32_t j)
   post_add(history, timing_add_post_spike(last_post_time, last_post_trace));
 }
 //---------------------------------------
+accum plasticity_get_intrinsic_bias(uint32_t j)
+{
+  use(j);
+  
+  return 0.0k;
+}
+//---------------------------------------
 void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t *ring_buffer)
 {
 #ifdef DEBUG
@@ -164,6 +175,10 @@ void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t 
   const control_t *control_words = plastic_controls(fixed);
   size_t plastic_synapse  = num_plastic_controls(fixed);
 
+#ifdef SYNAPSE_BENCHMARK
+  num_plastic_pre_synaptic_events += plastic_synapse;
+#endif  // SYNAPSE_BENCHMARK
+  
   // Get event history from synaptic row
   pre_event_history_t *event_history = plastic_event_history(plastic);
 
@@ -171,6 +186,8 @@ void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t 
   const uint32_t last_pre_time = event_history->prev_time;
   const pre_trace_t last_pre_trace = event_history->prev_trace;
   
+
+
   // Update pre-synaptic trace
   plastic_runtime_log_info("Adding pre-synaptic event to trace at time:%u", time);
   event_history->prev_time = time;
@@ -185,7 +202,7 @@ void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t 
      // Extract control-word components
     // **NOTE** cunningly, control word is just the same as lower 
     // 16-bits of 32-bit fixed synapse so same functions can be used
-    uint32_t delay_axonal = sparse_axonal_delay(control_word);
+    uint32_t delay_axonal = 0;//sparse_axonal_delay(control_word);
     uint32_t delay_dendritic = sparse_delay(control_word);
     uint32_t type = sparse_type(control_word);
     uint32_t index = sparse_index(control_word);
@@ -234,7 +251,7 @@ void print_plastic_synapses(address_t plastic, address_t fixed)
   size_t plastic_synapse  = num_plastic_controls(fixed);
   const pre_event_history_t *event_history = plastic_event_history(plastic);
 
-  printf ("Plastic region %u synapses pre-synaptic event buffer count:%u:\n", plastic_synapse, event_history->count_minus_one + 1);
+  printf ("Plastic region %u synapses\n", plastic_synapse);
 
   // Loop through plastic synapses
   for (uint32_t i = 0; i < plastic_synapse; i++) 

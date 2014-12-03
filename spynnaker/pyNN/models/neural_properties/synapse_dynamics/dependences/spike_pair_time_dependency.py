@@ -16,20 +16,13 @@ LOOKUP_TAU_PLUS_SHIFT = 0
 LOOKUP_TAU_MINUS_SIZE = 256
 LOOKUP_TAU_MINUS_SHIFT = 0
 
-# How many pre-synaptic events are buffered
-NUM_PRE_SYNAPTIC_EVENTS = 4
-
-# How large are the time-stamps stored with each event
-TIME_STAMP_BYTES = 4
-
-# How large are the pre_synaptic_trace_entry_t structures
-ALL_TO_ALL_EVENT_BYTES = 2
-NEAREST_PAIR_EVENT_BYTES = 0
-
 class SpikePairTimeDependency(AbstractTimeDependency):
 
     def __init__(self, tau_plus=20.0, tau_minus=20.0, nearest=False):
-        AbstractTimeDependency.__init__(self, tau_plus, tau_minus)
+        AbstractTimeDependency.__init__(self)
+        
+        self._tau_plus = tau_plus
+        self._tau_minus = tau_minus
         self._nearest = nearest
     
     def __eq__(self, other):
@@ -72,4 +65,15 @@ class SpikePairTimeDependency(AbstractTimeDependency):
     
     @property
     def pre_trace_size_bytes(self):
-        return NEAREST_PAIR_EVENT_BYTES if self._nearest else ALL_TO_ALL_EVENT_BYTES
+        # Pair rule requires no pre-synaptic trace when only the nearest
+        # Neighbours are considered and, a single 16-bit R1 trace
+        return 0 if self._nearest else 2
+    
+    @property
+    def tau_plus(self):
+        return self._tau_plus
+
+    @property
+    def tau_minus(self):
+        return self._tau_minus
+    

@@ -5,7 +5,7 @@ from data_specification.file_data_reader import FileDataReader
 
 
 from pacman.utilities.progress_bar import ProgressBar
-
+from spinn_machine.diagnostic_filter import DiagnosticFilter
 
 from spinn_machine.sdram import SDRAM
 from spinn_machine.virutal_machine import VirtualMachine
@@ -224,7 +224,7 @@ class SpynnakerCommsFunctions(object):
 
     def _start_execution_on_machine(self, executable_targets, app_id, runtime,
                                     waiting_on_confirmation, database_thread,
-                                    vis_enabled):
+                                    vis_enabled, in_debug_mode):
         #deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
@@ -273,7 +273,6 @@ class SpynnakerCommsFunctions(object):
             is_vis_ready = database_thread.has_recieved_confirmation()
             while not is_vis_ready:
                 is_vis_ready = database_thread.has_recieved_confirmation()
-
 
         # if correct, start applications
         logger.info("Starting application")

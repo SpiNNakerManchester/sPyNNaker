@@ -147,7 +147,7 @@ void neuron_discrete_changes( neuron_pointer_t neuron ) {
 
 
 // .277 ms
-bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuron ) {
+bool neuron_state_update( REAL exc_input, REAL inh_input, REAL external_bias, neuron_pointer_t neuron ) {
 
 	bool spike = false;
 	REAL V_last = neuron->V_membrane;
@@ -156,7 +156,7 @@ bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuro
 
 	if( neuron->refract_timer < 1 ) {  // test for outside refractory time
 
-		input_this_timestep = exc_input - inh_input + neuron->I_offset; // now adding offset current - all need to be in nA
+		input_this_timestep = exc_input - inh_input + external_bias + neuron->I_offset; // now adding offset current - all need to be in nA
 
 		lif_neuron_closed_form( neuron, V_last, -neuron->refract_timer );
 //		ode_solve_fix_ss_expl( RK_METHOD, NO_OF_EXPL_FIX_STEPS, EXPL_FIX_STEP_SIZE, neuron );

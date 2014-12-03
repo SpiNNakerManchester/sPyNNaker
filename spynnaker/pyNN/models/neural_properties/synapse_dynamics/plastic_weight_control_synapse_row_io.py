@@ -93,7 +93,7 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         # Scale absoluate weights and convert to uint16
         half_word_datatype = None
         scaled_weights = None
-        if self.signed:
+        if self._signed:
             scaled_weights = numpy.rint(synapse_row.weights * synapse_weight_scales).astype("int16")
             half_word_datatype = "int16"
         else:
@@ -108,7 +108,7 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         padded_weights_view = padded_weights.view(dtype="uint32")
 
         # Allocate memory for pre-synaptic event buffer
-        pre_synaptic_event_buffer = numpy.zeros(self.num_header_words,
+        pre_synaptic_event_buffer = numpy.zeros(self._num_header_words,
                                                 dtype='uint32')
 
         # Combine together into plastic region and return
@@ -145,8 +145,8 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         synapse_weight_scales = weight_scales_numpy[synapse_types]
 
         # Get half word view of plastic region with correct signedness
-        half_word_datatype = "int16" if self.signed else "uint16"
-        half_words = p_p_entries[self.num_header_words:].view(
+        half_word_datatype = "int16" if self._signed else "uint16"
+        half_words = p_p_entries[self._num_header_words:].view(
                 dtype=half_word_datatype)
 
         # Slice out weight half words,
