@@ -14,8 +14,8 @@ Classes:
   RandomStructure - represents a structure with neurons distributed randomly
                     within a given volume.
                     
-  Cuboid          - representation of a cuboidal volume, for use with RandomStructure.
-  Sphere          - representation of a spherical volume, for use with RandomStructure.
+  Cuboid   - representation of a cuboidal volume, for use with RandomStructure.
+  Sphere   - representation of a spherical volume, for use with RandomStructure.
   
 :copyright: Copyright 2006-2011 by the PyNN team, see AUTHORS.
 :license: CeCILL, see LICENSE for details.
@@ -57,7 +57,8 @@ class Space(object):
     """
     
     AXES = {'x' : [0],    'y': [1],    'z': [2],
-            'xy': [0,1], 'yz': [1,2], 'xz': [0,2], 'xyz': range(3), None: range(3)}
+            'xy': [0,1], 'yz': [1,2], 'xz': [0,2], 
+            'xyz': range(3), None: range(3)}
     
     def __init__(self, axes=None, scale_factor=1.0, offset=0.0,
                  periodic_boundaries=None):
@@ -115,7 +116,8 @@ class Space(object):
         def distance_map(i, j):
             d = self.distances(f(i), g(j))
             if d.shape[0] == 1:
-                d = d[0,:] # arguably this transformation should go in distances()
+                # arguably this transformation should go in distances()
+                d = d[0,:] 
             elif d.shape[1] == 1:
                 d = d[:,0]
             return d
@@ -178,7 +180,8 @@ class Grid2D(BaseStructure):
     """
     parameter_names = ("aspect_ratio", "dx", "dy", "x0", "y0", "fill_order")
     
-    def __init__(self, aspect_ratio=1.0, dx=1.0, dy=1.0, x0=0.0, y0=0.0, z=0, fill_order="sequential"):
+    def __init__(self, aspect_ratio=1.0, dx=1.0, dy=1.0, x0=0.0, y0=0.0, z=0, 
+                       fill_order="sequential"):
         """
         aspect_ratio - ratio of the number of grid points per side (not the ratio
                        of the side lengths, unless dx == dy)
@@ -201,7 +204,8 @@ class Grid2D(BaseStructure):
         x = self.x0 + self.dx*x.flatten()
         y = self.y0 + self.dy*y.flatten()
         z = self.z + z.flatten()
-        positions = numpy.array((x,y,z)) # use column_stack, if we decide to switch from (3,n) to (n,3)
+        # use column_stack, if we decide to switch from (3,n) to (n,3)
+        positions = numpy.array((x,y,z)) 
         if self.fill_order == 'sequential':
             return positions
         else: # random
@@ -212,13 +216,16 @@ class Grid3D(BaseStructure):
     """
     Represents a structure with neurons distributed on a 3D grid.
     """
-    parameter_names = ("aspect_ratios", "dx", "dy", "dz", "x0", "y0", "z0", "fill_order")
+    parameter_names = ("aspect_ratios", "dx", "dy", "dz", "x0", "y0", "z0",
+                       "fill_order")
     
-    def __init__(self, aspect_ratioXY=1.0, aspect_ratioXZ=1.0, dx=1.0, dy=1.0, dz=1.0, x0=0.0, y0=0.0, z0=0,
-                 fill_order="sequential"):
+    def __init__(self, aspect_ratioXY=1.0, aspect_ratioXZ=1.0, 
+                       dx=1.0, dy=1.0, dz=1.0, x0=0.0, y0=0.0, z0=0,
+                       fill_order="sequential"):
         """
-        If fill_order is 'sequential', the z-index will be filled first, then y then x, i.e.
-        the first cell will be at (0,0,0) (given default values for the other arguments),
+        If fill_order is 'sequential', the z-index will be filled first,
+        then y then x, i.e. the first cell will be at (0,0,0) 
+        (given default values for the other arguments),
         the second at (0,0,1), etc.
         """
         self.aspect_ratios = (aspect_ratioXY, aspect_ratioXZ)
@@ -266,7 +273,8 @@ class Cuboid(Shape):
         self.depth = depth
         
     def sample(self, n, rng):
-        return 0.5*rng.uniform(-1, 1, size=(n,3)) * (self.width, self.height, self.depth)
+        return (0.5*rng.uniform(-1, 1, size=(n,3)) * 
+                (self.width, self.height, self.depth))
 
 
 class Sphere(Shape):

@@ -44,53 +44,68 @@ class DistanceDependentProbabilityConnector(FromListConnector):
     """
 
     def __init__(self, d_expression, allow_self_connections=True,
-                 weights=0.0, delays=None, space=Space(), safe=True, verbose=False, n_connections=None):
+                 weights=0.0, delays=None, space=Space(), safe=True, 
+                 verbose=False, n_connections=None):
         """
-        Creates a new DistanceDependentConnector. Uses the underlying machinery for FromListConnector.
+        Creates a new DistanceDependentConnector. Uses the underlying machinery
+        for FromListConnector.
         """
         self.d_expression = d_expression
         self.allow_self_connections=allow_self_connections
         self.space = space
-        self.weights = weights # may be a fixed value, a list of values, a RandomDistribution object, or a distance_dependence function.
+        # weights may be a fixed value, a list of values,
+        # a RandomDistribution object, or a distance_dependence function.
+        self.weights = weights 
         self.delays = delays   # and similar for this value
         self.connections_per_neuron = n_connections
         self.connectionSeeds = SeedInfo()
-        FromListConnector.__init__(self, conn_list = None, safe = safe, verbose = verbose)
+        FromListConnector.__init__(self, conn_list = None, safe = safe, 
+                                   verbose = verbose)
 
     def _distance_dependence(self, *args, **kwargs):
         if "d_expression" not in kwargs or "distances" not in kwargs:
-           raise UnboundLocalError("To evaluate a distance dependence requires both a d_expression and a distances array in kwargs")
-        else:
-           if type(kwargs['d_expression']) == RandomDistribution:
-              DD = numpy.reshape(kwargs['d_expression'].next(numpy.ravel(kwargs['distances']).shape[0]), kwargs['distances'].shape)
-           elif type(kwargs['d_expression']) == str: 
-              dist_f = eval('lambda d: %s' % kwargs['d_expression']) 
-              DD = numpy.empty(kwargs['distances'].shape)
-              for pt in numpy.nditer(args, flags=['buffered', 'multi_index']):
-                  DD[pt]= dist_f(kwargs['distances'][pt])
-           else: 
-              DD = numpy.asarray(kwargs['d_expression'])
-              if len(DD.shape) == 0:
-                 DD = numpy.empty(kwargs['distances'].shape)
-                 DD.fill(kwargs['d_expression'])
-              else:
-                 DD.reshape(DD, kwargs['distances'].shape)
-           return DD
+           raise UnboundLocalError("To evaluate a distance dependence requires "
+                                   "both a d_expression and a distances array in"
+                                   " kwargs")
+           return None
+        if type(kwargs["d_expression"]) == RandomDistribution:
+           DD = numpy.reshape(kwargs["d_expression"].next(numpy.ravel(kwargs["distances"]).shape[0]),
+                              kwargs["distances"].shape)
+        elif type(kwargs["d_expression"]) == str: 
+           dist_f = eval('lambda d: %s' % kwargs["d_expression"]) 
+           DD = numpy.empty(kwargs["distances"].shape)
+           for pt in numpy.nditer(args, flags=['buffered', 'multi_index']):
+               DD[pt]= dist_f(kwargs["distances"][pt])
+        else: 
+           DD = numpy.asarray(kwargs["d_expression"])
+           if len(DD.shape) == 0:
+              DD = numpy.empty(kwargs["distances"].shape)
+              DD.fill(kwargs["d_expression"])
+           else:
+              DD.reshape(DD, kwargs["distances"].shape)
+        return DD
 
-    def _dd_connect(self, d_expression, distances, rng=None):
+    def _dd_is_there_a_connection(self, d_expression, distances, rng=None):
         if rng is None: rng=NumpyRNG(seed=self.connectionSeeds._parent_seed)
         dd_potential_prob=rng.uniform(low=0.0, high=1.0, size=distances.shape)
-        dd_actual_prob=numpy.fromfunction(self._distance_dependence, shape=distances.shape, dtype=int, **{'d_expression': d_expression, 'distances': distances})
+        dd_actual_prob=numpy.fromfunction(self._distance_dependence, 
+                                          shape=distances.shape, dtype=int, 
+                                          **{'d_expression': d_expression, 
+                                             'distances': distances})
         return dd_potential_prob < dd_actual_prob 
         
-    def generate_synapse_list(self, presynaptic_population, postsynaptic_population, delay_scale,
-                              synapse_type):
+    def generate_synapse_list(self, presynaptic_population, 
+                                    postsynaptic_population, 
+                                    delay_scale, synapse_type):
 
         prevertex = presynaptic_population._get_vertex
         postvertex = postsynaptic_population._get_vertex
 
-        if presynaptic_population.structure is None or postsynaptic_population.structure is None:
-           raise ValueError("Attempted to create a DistanceDependentProbabilityConnector with un-structured populations")
+        if (presynaptic_population.structure is None 
+            or postsynaptic_population.structure is None):
+           raise ValueError("Attempted to create a"
+                            "DistanceDependentProbabilityConnector" 
+                            "with un-structured populations")
            return None
 
         id_lists = list()
@@ -98,18 +113,30 @@ class DistanceDependentProbabilityConnector(FromListConnector):
         delay_lists = list()
         type_lists = list()
 
-        # distances are set by comparing positions. An attempt to access positions
-        # that have not been set yet will trigger generation of the positions, so
-        # this computation will create positions if necessary.
-        distances = self.space.distances(presynaptic_population.positions, postsynaptic_population.positions)
-        connections = self._dd_connect(d_expression=self.d_expression, distances=distances)
-        if not self.allow_self_connections and presynaptic_population==postsynaptic_population:
+        # distances are set by comparing positions. An attempt to access
+        # positions that have not been set yet will trigger generation of 
+        # the positions, so this computation will create positions if necessary.
+        distances = self.space.distances(presynaptic_population.positions, 
+                                         postsynaptic_population.positions)
+        connections = self._dd_is_there_a_connection(
+                                       d_expression=self.d_expression,
+                                       distances=distances)
+        if (not self.allow_self_connections 
+            and presynaptic_population==postsynaptic_population):
            numpy.fill_diagonal(connections, False)
-        weights = numpy.fromfunction(function=self._distance_dependence, shape=distances.shape, dtype=int, **{'d_expression': self.weights, 'distances':distances})
-        delays = numpy.fromfunction(function=self._distance_dependence, shape=distances.shape, dtype=int, **{'d_expression': self.delays, 'distances':distances})
+        weights = numpy.fromfunction(function=self._distance_dependence, 
+                                     shape=distances.shape, dtype=int, 
+                                     **{'d_expression': self.weights, 
+                                        'distances':distances})
+        delays = numpy.fromfunction(function=self._distance_dependence, 
+                                    shape=distances.shape, dtype=int, 
+                                    **{'d_expression': self.delays, 
+                                       'distances':distances})
         
         for i in range(0, prevertex.n_atoms):
-            self._conn_list.extend([(i, j, weights[i,j], delays[i,j]) for j in range(postvertex.n_atoms) if connections[i,j]])
+            self._conn_list.extend([(i, j, weights[i,j], delays[i,j]) 
+                                    for j in range(postvertex.n_atoms) 
+                                    if connections[i,j]])
             id_lists.append(list())
             weight_lists.append(list())
             delay_lists.append(list())

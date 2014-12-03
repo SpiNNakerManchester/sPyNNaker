@@ -11,14 +11,18 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
 
     _DELAY_PAGE_SIZE = 256
     
-    def __init__(self, presynaptic_population, postsynaptic_population, machine_time_step, 
-                 num_delay_stages, max_delay_per_neuron,
+    def __init__(self, presynaptic_population, postsynaptic_population, 
+                 machine_time_step, num_delay_stages, max_delay_per_neuron,
                  connector=None, synapse_list=None, synapse_dynamics=None,
                  label=None):
-        ProjectionPartitionableEdge.__init__(
-            self, presynaptic_population, postsynaptic_population, machine_time_step, connector=connector,
-            synapse_list=synapse_list, synapse_dynamics=synapse_dynamics,
-            label=label)
+        ProjectionPartitionableEdge.__init__(self, 
+                                             presynaptic_population, 
+                                             postsynaptic_population, 
+                                             machine_time_step, 
+                                             connector=connector,
+                                             synapse_list=synapse_list, 
+                                             synapse_dynamics=synapse_dynamics,
+                                             label=label)
         self._pre_vertex = presynaptic_population._get_vertex.delay_vertex
         self._num_delay_stages = num_delay_stages
         self._max_delay_per_neuron = max_delay_per_neuron

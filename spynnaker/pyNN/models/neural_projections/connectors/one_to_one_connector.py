@@ -30,8 +30,9 @@ class OneToOneConnector(AbstractConnector):
         self._weights = weights
         self._delays = delays
         
-    def generate_synapse_list(self, presynaptic_population, postsynaptic_population, delay_scale,
-                              synapse_type):
+    def generate_synapse_list(self, presynaptic_population, 
+                                    postsynaptic_population, 
+                                    delay_scale, synapse_type):
 
         prevertex = presynaptic_population._get_vertex
         postvertex = postsynaptic_population._get_vertex

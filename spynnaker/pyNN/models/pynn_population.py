@@ -1,7 +1,8 @@
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_chip_and_core_constraint import \
+    PlacerChipAndCoreConstraint
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
@@ -168,7 +169,8 @@ class Population(object):
         returns the position of a cell. Added functionality 23 November 2014 ADR 
         """
         if self._structure is None:
-           raise ValueError("Attempted to get the position of a cell in an un-structured population")
+           raise ValueError("Attempted to get the position of a cell "
+                            "in an un-structured population")
            return None
         elif self._positions is None:
            self._structure.generate_positions(self._vertex.n_atoms)
@@ -343,10 +345,12 @@ class Population(object):
 
     def nearest(self, position):
         """
-        return the neuron closest to the specified position. Added functionality 23 November 2014 ADR
+        return the neuron closest to the specified position. 
+        Added functionality 23 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to retrieve positions for an un-structured population")
+           raise ValueError("attempted to retrieve positions "
+                            "for an un-structured population")
         elif self._positions is None: 
            self._structure.generate_positions(self._vertex.n_atoms)
         position_diff = numpy.empty(self._positions.shape)
@@ -360,7 +364,8 @@ class Population(object):
         returns a position generator. Added functionality 27 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to retrieve positions for an un-structured population")
+           raise ValueError("attempted to retrieve positions "
+                            "for an un-structured population")
            return None
         else:
            return self._structure.generate_positions
@@ -427,12 +432,15 @@ class Population(object):
     @property
     def positions(self):
         """
-        Returns the position array for structured populations. Added functionality 27 November 2014 ADR
+        Returns the position array for structured populations.
+        Added functionality 27 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to retrieve positions for an un-structured population")
+           raise ValueError("attempted to retrieve positions "
+                            "for an un-structured population")
         elif self._positions is None: 
-           self._positions = self._structure.generate_positions(self._vertex.n_atoms)
+           self._positions = self._structure.generate_positions(
+                                  self._vertex.n_atoms)
         return self._positions
 
     #noinspection PyPep8Naming
@@ -521,7 +529,8 @@ class Population(object):
         save positions to file. Added functionality 23 November 2014 ADR 
         """
         if self._structure is None:
-           raise ValueError("attempted to retrieve positions for an un-structured population")
+           raise ValueError("attempted to retrieve positions "
+                            "for an un-structured population")
         elif self._positions is None: 
            self._structure.generate_positions(self._vertex.n_atoms)
         file_handle = open(file_name, "w")
@@ -554,17 +563,20 @@ class Population(object):
         sets a cell to a given position. Added functionality 23 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to set a position for a cell in an un-structured population")
+           raise ValueError("attempted to set a position for a cell "
+                            "in an un-structured population")
         elif self._positions is None: 
            self._structure.generate_positions(self._vertex.n_atoms)
         self._positions[cell_id] = pos
 
     def _set_positions(self, positions):
         """
-        sets all the positions in the population. Added functionality 27 November 2014 ADR
+        sets all the positions in the population. 
+        Added functionality 27 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to set positions in an un-structured population")
+           raise ValueError("attempted to set positions "
+                            "in an un-structured population")
         else:
            self._positions = positions
 
