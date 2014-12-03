@@ -11,6 +11,8 @@ from pacman.utilities import utility_calls as pacman_utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 
+from pyNN.space import Space
+
 from spynnaker.pyNN.models.utility_models.command_sender \
     import CommandSender
 from spynnaker.pyNN.utilities.parameters_surrogate\
@@ -19,10 +21,10 @@ from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.neural_properties.space import *
-import numpy # added for nearest functionality ADR
 
+import numpy
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -166,7 +168,7 @@ class Population(object):
 
     def _get_cell_position(self, cell_id):
         """
-        returns the position of a cell. Added functionality 23 November 2014 ADR 
+        returns the position of a cell. Added functionality 23 November 2014 ADR
         """
         if self._structure is None:
            raise ValueError("Attempted to get the position of a cell "
@@ -345,17 +347,17 @@ class Population(object):
 
     def nearest(self, position):
         """
-        return the neuron closest to the specified position. 
+        return the neuron closest to the specified position.
         Added functionality 23 November 2014 ADR
         """
         if self._structure is None:
            raise ValueError("attempted to retrieve positions "
                             "for an un-structured population")
-        elif self._positions is None: 
+        elif self._positions is None:
            self._structure.generate_positions(self._vertex.n_atoms)
         position_diff = numpy.empty(self._positions.shape)
         position_diff.fill(position)
-        distances=space.Space.distances(self._positions, position_diff)
+        distances=Space.distances(self._positions, position_diff)
         return distances.argmin()
 
     @property
@@ -438,7 +440,7 @@ class Population(object):
         if self._structure is None:
            raise ValueError("attempted to retrieve positions "
                             "for an un-structured population")
-        elif self._positions is None: 
+        elif self._positions is None:
            self._positions = self._structure.generate_positions(
                                   self._vertex.n_atoms)
         return self._positions
@@ -526,12 +528,12 @@ class Population(object):
 
     def save_positions(self, file_name):
         """
-        save positions to file. Added functionality 23 November 2014 ADR 
+        save positions to file. Added functionality 23 November 2014 ADR
         """
         if self._structure is None:
            raise ValueError("attempted to retrieve positions "
                             "for an un-structured population")
-        elif self._positions is None: 
+        elif self._positions is None:
            self._structure.generate_positions(self._vertex.n_atoms)
         file_handle = open(file_name, "w")
         file_handle.write(self._positions)
@@ -565,13 +567,13 @@ class Population(object):
         if self._structure is None:
            raise ValueError("attempted to set a position for a cell "
                             "in an un-structured population")
-        elif self._positions is None: 
+        elif self._positions is None:
            self._structure.generate_positions(self._vertex.n_atoms)
         self._positions[cell_id] = pos
 
     def _set_positions(self, positions):
         """
-        sets all the positions in the population. 
+        sets all the positions in the population.
         Added functionality 27 November 2014 ADR
         """
         if self._structure is None:
@@ -607,11 +609,11 @@ class Population(object):
 
     @property
     def structure(self):
-        """ 
+        """
         Returns the structure for the population. Added 23 November 2014 ADR
         """
         return self._structure
-    
+
     #NONE PYNN API CALL
     def set_constraint(self, constraint):
         """

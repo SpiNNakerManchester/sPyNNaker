@@ -3,7 +3,7 @@ import numpy
 import math
 import matplotlib.pyplot as py_plot
 import matplotlib.colors as colours
-from pyNN.spiNNaker_103_2 import *            # Imports the pyNN.spiNNaker module
+from pyNN.spiNNaker import *            # Imports the pyNN.spiNNaker module
 
 population_colours = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FF8000', '#FF0080', '#800000', '#008000', '#000080', '#808000', '#800080', '#008080', '#804000', '#800040', '#C00000', '#00C000', '#0000C0', '#C0C000', '#C000C0', '#00C0C0', '#C06000', '#C00060', '#400000', '#004000', '#000040', '#404000', '#400040', '#004040', '#402000', '#400020']
 colour_map_pop = colours.ListedColormap(colors=population_colours, name='population_colour_label')
@@ -47,12 +47,12 @@ tau_syn_inh = tau_syn_exc*3
 # cell_params will be passed to the constructor of the Population Object
 
 cell_params = {
-    'tau_m'      : tau_m,    'cm'         : cm,       'v_init'    : v_reset,    
+    'tau_m'      : tau_m,    'cm'         : cm,       'v_init'    : v_reset,
     'v_rest'     : v_rest,   'v_reset'    : v_reset,  'v_thresh'   : v_thresh,
     'tau_syn_E'       : tau_syn_exc,        'tau_syn_I'       : tau_syn_inh, 'tau_refrac'       : t_refrac, 'i_offset' : 0
     }
 observed_pop_list = []
-inputs = Population(pop_size,                                                      # size 
+inputs = Population(pop_size,                                                      # size
                     SpikeSourcePoisson,                                            # Neuron Type
                     {'duration': runtime, 'start': stim_start, 'rate': stim_rate}, # Neuron Parameters
                     label="inputs")                                                # Label
@@ -60,7 +60,7 @@ if 'inputs' in pops_to_observe:
    inputs.record()
    observed_pop_list.append(inputs)
 
-mapped_pop_1 = Population(pop_size,      # size 
+mapped_pop_1 = Population(pop_size,      # size
                           IF_curr_exp,   # Neuron Type
                           cell_params,   # Neuron Parameters
                           structure=RandomStructure(boundary=Sphere(radius=r_space), rng=rng_positions),
@@ -69,7 +69,7 @@ if 'mapped_pop_1' in pops_to_observe:
    mapped_pop_1.record()
    observed_pop_list.append(mapped_pop_1)
 
-pop_inhibit = Population(pop_size,         # size 
+pop_inhibit = Population(pop_size,         # size
                          IF_curr_exp,      # Neuron Type
                          cell_params,      # Neuron Parameters
                          structure=RandomStructure(boundary=Sphere(radius=r_space), rng=rng_positions),
@@ -78,7 +78,7 @@ if 'pop_inhibit' in pops_to_observe:
    pop_inhibit.record()
    observed_pop_list.append(pop_inhibit)
 
-mapped_pop_2 = Population(pop_size,         # size 
+mapped_pop_2 = Population(pop_size,         # size
                           IF_curr_exp,   # Neuron Type
                           cell_params,   # Neuron Parameters
                           structure=RandomStructure(boundary=Sphere(radius=r_space), rng=rng_positions),
@@ -87,19 +87,19 @@ if 'mapped_pop_2' in pops_to_observe:
    mapped_pop_2.record()
    observed_pop_list.append(mapped_pop_2)
 
-stimulate_pop_1 = Projection(inputs, 
-                             mapped_pop_1, 
-                             OneToOneConnector(weights=weight_dependence_n, delays=1.0), 
+stimulate_pop_1 = Projection(inputs,
+                             mapped_pop_1,
+                             OneToOneConnector(weights=weight_dependence_n, delays=1.0),
                              target='excitatory')
 
-stimulate_pop_I = Projection(mapped_pop_1, 
-                             pop_inhibit, 
-                             OneToOneConnector(weights=weight_dependence_e, delays=1.0), 
+stimulate_pop_I = Projection(mapped_pop_1,
+                             pop_inhibit,
+                             OneToOneConnector(weights=weight_dependence_e, delays=1.0),
                              target='excitatory')
 
-inh_pop2 = Projection(pop_inhibit, 
-                      mapped_pop_2, 
-                      DistanceDependentProbabilityConnector(d_expression=connection_dependence % (conn_prob_scale/conn_rate_ex_in, conn_char_dist), weights=weight_dependence_i, delays=delay_dependence), 
+inh_pop2 = Projection(pop_inhibit,
+                      mapped_pop_2,
+                      DistanceDependentProbabilityConnector(d_expression=connection_dependence % (conn_prob_scale/conn_rate_ex_in, conn_char_dist), weights=weight_dependence_i, delays=delay_dependence),
                       target='inhibitory')
 
 pop1_pop2 = Projection(mapped_pop_1,
@@ -118,7 +118,7 @@ for pop in observed_pop_list:
     id_accumulator += pop.size
     id_accumulator += 5
 state_plot = py_plot.gcf()
-state_plot.set_frameon(True)        # Background on 
+state_plot.set_frameon(True)        # Background on
 state_plot.set_facecolor('#808080') # A grey background is easiest to see
 py_plot.show()
 

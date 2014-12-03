@@ -84,7 +84,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
 # STDP weight dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     additive_weight_dependence import AdditiveWeightDependence
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     multiplicative_weight_dependence import MultiplicativeWeightDependence
 
 # STDP timing dependences
@@ -102,7 +102,7 @@ from pacman.model.constraints.partitioner_maximum_size_constraint \
 
 #note importing star is a bad thing to do.
 from pyNN.random import *
-from spynnaker.pyNN.models.neural_properties.space import *
+from pyNN.space import *
 
 #traditional logger
 logger = logging.getLogger(__name__)
@@ -116,8 +116,8 @@ _binary_search_paths = []
 def register_binary_search_path(search_path):
     """Registers an additional binary search path for
     for SpiNNaker executables. Should be called before
-    setup by sPyNNaker plugin modules 
-    
+    setup by sPyNNaker plugin modules
+
     :param string search_path:
     absolute search path for binaries
     """
@@ -205,8 +205,8 @@ def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
 
     if len(extra_params.keys()) > 1:
         logger.warn("Extra params has been applied which we do not consider")
-    _spinnaker = Spinnaker(host_name=machine, timestep=timestep, 
-                           min_delay=min_delay, max_delay=max_delay, 
+    _spinnaker = Spinnaker(host_name=machine, timestep=timestep,
+                           min_delay=min_delay, max_delay=max_delay,
                            binary_search_paths=_binary_search_paths)
     # Return None, simply because the PyNN API says something must be returned
     return None
