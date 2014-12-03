@@ -84,12 +84,16 @@ static bool record_neuron_param(recording_channel_e channel, uint8_t parameter, 
 void neuron (index_t n)
 {
   neuron_pointer_t neuron = &neuron_array[n];
-// If everything else is working correctly (i.e. PyNN weights to actual inputs) then the multiplier for get_*_input()
-// is either 1.0 for nA or 0.001 for pA.  We will need to test for this 3-2-14
+
+  // Get excitatory and inhibitory input from synapses
+  // **NOTE** this may be in either conductance or current units
   accum exc_neuron_input = get_exc_neuron_input(n);
   accum inh_neuron_input = get_inh_neuron_input(n);
+  
+  // Get external bias from any source of intrinsic plasticity
+  accum external_bias = plasticity_get_intrinsic_bias(n);
 
-  bool spike = neuron_state_update( exc_neuron_input, inh_neuron_input, neuron );
+  bool spike = neuron_state_update( exc_neuron_input, inh_neuron_input, external_bias, neuron );
 
   // If we should be recording potential, record this neuron parameter **YUCK** magic number
   if(system_data_test_bit(e_system_data_record_neuron_potential))

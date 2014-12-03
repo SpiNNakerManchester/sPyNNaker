@@ -160,6 +160,7 @@ bool plasticity_region_filled (uint32_t *address, uint32_t flags);
 void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t *ring_buffer);
 void print_plastic_synapses(address_t plastic, address_t fixed);
 void plasticity_process_post_synaptic_event(uint32_t neuron_index);
+accum plasticity_get_intrinsic_bias(uint32_t j);
 
 // Function declarations for test.c
 void      print_synaptic_row (uint32_t* synaptic_row);

@@ -20,6 +20,12 @@ static inline uint32_t* current_dma_buffer() { return (dma_buffer[dma_index]);}
 static inline uint32_t* next_dma_buffer()    { return (dma_buffer[dma_index ^ 1]); }
 static inline void      swap_dma_buffers()   { dma_index ^= 1; }
 
+// Globals
+#ifdef SYNAPSE_BENCHMARK
+  uint32_t  num_fixed_pre_synaptic_events = 0;
+  uint32_t  num_plastic_pre_synaptic_events = 0;
+#endif  // SYNAPSE_BENCHMARK
+
 // DMA tags
 #define DMA_TAG_READ_SYNAPTIC_ROW 0
 #define DMA_TAG_WRITE_PLASTIC_REGION 1
@@ -45,6 +51,10 @@ void timer_callback (uint unused0, uint unused1)
   if (simulation_ticks != UINT32_MAX && time >= simulation_ticks)
   {
     log_info("Simulation complete.\n");
+    
+#ifdef SYNAPSE_BENCHMARK
+    io_printf(IO_BUF, "Simulation complete - %u/%u fixed/plastic pre-synaptic events.\n", num_fixed_pre_synaptic_events, num_plastic_pre_synaptic_events);
+#endif  // SYNAPSE_BENCHMARK
     
     // Finalise any recordings that are in progress, writing back the final amounts of samples recorded to SDRAM
     recording_finalise();

@@ -381,7 +381,7 @@ class AbstractSynapticManager(object):
         # Add another bit of shift to prevent overflows
         if self._stdp_mechanism is not None\
             and self._stdp_mechanism.are_weights_signed():
-                max_weight_power = max_weight_power + 1
+                max_weight_powers = [m + 1 for m in max_weight_powers]
 
         # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
         # but we ignore the "-1" to allow a bit of overhead in the above

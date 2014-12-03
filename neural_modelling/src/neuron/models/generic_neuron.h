@@ -13,7 +13,7 @@ typedef struct neuron_t* neuron_pointer_t;
 
 
 // primary function called in timer loop after synaptic updates - assumes current input (in nA?)
-bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuron );
+bool neuron_state_update( REAL exc_input, REAL inh_input, REAL external_bias, neuron_pointer_t neuron );
 
 
 // solver or closed-form solution has just set new state variable values, so check for discrete state changes

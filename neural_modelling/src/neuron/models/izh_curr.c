@@ -67,9 +67,9 @@ void neuron_discrete_changes( neuron_pointer_t neuron ) {
 
 
 //
-bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuron ) {
+bool neuron_state_update( REAL exc_input, REAL inh_input, REAL external_bias, neuron_pointer_t neuron ) {
 
-	input_this_timestep = exc_input - inh_input + neuron->I_offset; 	// all need to be in nA
+	input_this_timestep = exc_input - inh_input + external_bias + neuron->I_offset; 	// all need to be in nA
 
 	rk2_kernel_midpoint( neuron->this_h, neuron );  						// the best AR update so far
 

@@ -20,14 +20,14 @@ LOOKUP_TAU_X_SHIFT = 2
 LOOKUP_TAU_Y_SIZE = 256
 LOOKUP_TAU_Y_SHIFT = 2
 
-# How large are the pre_synaptic_trace_entry_t structures
-ALL_TO_ALL_EVENT_BYTES = 4
-
 class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
-        AbstractTimeDependency.__init__(self, tau_plus, tau_minus)
+        AbstractTimeDependency.__init__(self)
+        
+        self._tau_plus = tau_plus
+        self._tau_minus = tau_minus
         self._tau_x = tau_x
         self._tau_y = tau_y
         
@@ -71,14 +71,6 @@ class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
                                         LOOKUP_TAU_Y_SHIFT)
     
     @property
-    def tau_x(self):
-        return self._tau_x
-
-    @property
-    def tau_y(self):
-        return self._tau_y
-    
-    @property
     def num_terms(self):
         return 2
     
@@ -88,4 +80,21 @@ class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
     
     @property
     def pre_trace_size_bytes(self):
-        return ALL_TO_ALL_EVENT_BYTES
+        # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
+        return 4
+    
+    @property
+    def tau_plus(self):
+        return self._tau_plus
+
+    @property
+    def tau_minus(self):
+        return self._tau_minus
+    
+    @property
+    def tau_x(self):
+        return self._tau_x
+
+    @property
+    def tau_y(self):
+        return self._tau_y

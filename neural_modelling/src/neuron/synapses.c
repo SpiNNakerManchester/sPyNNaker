@@ -64,6 +64,10 @@
 
 extern uint32_t ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT]; // Amount to left shift the ring buffer by to make it an input
 
+#ifdef SYNAPSE_BENCHMARK
+  extern uint32_t num_fixed_pre_synaptic_events;
+#endif  // SYNAPSE_BENCHMARK
+
 // ring buffers between synapses and neurons.
 static ring_entry_t  ring_buffer   [RING_BUFFER_SIZE];
 
@@ -209,7 +213,11 @@ static inline void process_fixed_synapses (address_t fixed)
   register uint32_t fixed_synapse  = num_fixed_synapses(fixed);
   register ring_entry_t *rp = ring_buffer;
   register uint32_t t = time;
-  
+
+#ifdef SYNAPSE_BENCHMARK
+  num_fixed_pre_synaptic_events += fixed_synapse;
+#endif // SYNAPSE_BENCHMARK
+
   for ( ; fixed_synapse > 0; fixed_synapse--) 
   {
     // Get the next 32 bit word from the synaptic_row 
