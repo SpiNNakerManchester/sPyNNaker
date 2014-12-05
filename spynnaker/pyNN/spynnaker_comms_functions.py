@@ -267,7 +267,7 @@ class SpynnakerCommsFunctions(object):
                     .format(processors_ready, total_processors, break_down))
 
         #wait till vis is ready for us to start if required
-        if waiting_on_confirmation and vis_enabled:
+        if waiting_on_confirmation:
             logger.info("*** Awaiting for a response from the visualiser to "
                         "state its ready for the simulation to start ***")
             is_vis_ready = database_thread.has_recieved_confirmation()
