@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 class DataBaseThread(threading.Thread):
 
     def __init__(self, database_directory, execute_mapping, transceiver,
-                 wait_for_vis, listener_port_no=19845, hostname="0.0.0.0",
-                 vis_reponse_port_no=19846, reponse_hostname="0.0.0.0"):
+                 wait_for_vis, listener_port_no=19999, hostname="localhost",
+                 vis_reponse_port_no=19998, reponse_hostname="localhost"):
         threading.Thread.__init__(self)
         self._done = False
         self._connection = None
@@ -235,22 +235,24 @@ class DataBaseThread(threading.Thread):
             spinnman_constants.TRAFFIC_TYPE.EIEIO_COMMAND)
         #create complete message for vis to pick up
         eieio_command_header = EIEIOCommandHeader(
-            spinnman_constants.EIEIO_COMMAND_IDS.DATABASE_CONFIRMATION)
+            spinnman_constants.EIEIO_COMMAND_IDS.DATABASE_CONFIRMATION.value)
         eieio_command_message = EIEIOCommandMessage(eieio_command_header,
                                                     bytearray())
         #create connection to send message down
         eieio_command_connection = ReverseIPTagConnection(
-            remote_host=self._listener_hostname, remote_port=self._listener_port)
+            remote_host=self._listener_hostname, remote_port=self._listener_port,
+            local_port=self._vis_reponse_port, local_host=self._listener_port)
         #send message to the visulaiser saying ready
         eieio_command_connection.\
             send_eieio_command_message(eieio_command_message)
+        eieio_command_connection.receive_eieio_command_message()
+        self._received_confirmation(None)
 
     def _received_confirmation(self, packet):
-        if packet is not None:
-            self._lock_condition.acquire()
-            self._recieved_confirmation = True
-            self._lock_condition.notify()
-            self._lock_condition.release()
+        self._lock_condition.acquire()
+        self._recieved_confirmation = True
+        self._lock_condition.notify()
+        self._lock_condition.release()
 
     def has_recieved_confirmation(self):
         self._lock_condition.acquire()
