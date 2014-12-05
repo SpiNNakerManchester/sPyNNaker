@@ -23,8 +23,26 @@ version         = None
 # (to port 17895 on current machine)
 send_live_spikes = False
 
-[Visualiser]
-# -----
-# This controls the visualiser
-#
-enable = False
+[Database]
+#---------
+# This controls the generation of a database, which can be used by external
+# programs, e.g. visualisations of simulations
+# create_database: Whether to create the database
+# wait_on_configuration: Allows the external program to communicate with
+#                        us so it knows when the database is ready, and so we
+#                        know when the visualisation is ready
+# create_routing_info_to_neuron_id_mapping: If true, the database will include
+#                                           a map of routing key to population-
+#                                           based neuron id
+#--------
+#create_database = False
+#wait_on_confirmation = False
+#create_routing_info_to_neuron_id_mapping = False
+
+[Simulation]
+# Maximum spikes per second of any neuron (spike rate in Hertz)
+#spikes_per_second = 30
+
+# The number of standard deviations from the mean to account for in
+# the ring buffer
+#ring_buffer_sigma = 5
