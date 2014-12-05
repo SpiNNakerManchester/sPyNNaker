@@ -145,6 +145,15 @@ void neuron_discrete_changes( neuron_pointer_t neuron ) {
 #endif  // the more complex one
 }
 
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_exc_input(REAL exc_input) {
+    return exc_input >> 10;
+}
+
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_inh_input(REAL inh_input) {
+    return inh_input >> 10;
+}
 
 // .277 ms
 bool neuron_state_update( REAL exc_input, REAL inh_input, REAL external_bias, neuron_pointer_t neuron ) {
@@ -159,8 +168,8 @@ bool neuron_state_update( REAL exc_input, REAL inh_input, REAL external_bias, ne
 // exc_input is conductance value from excitatory buffer
 // inh_input    "         "       from inhibitory buffer
 // we can probably assume that conductances must be positive, and so use unsigned in the buffers for better precision
-		input_this_timestep = 	(exc_input >> 10) * ( neuron->V_rev_E - V_last )  +   // need to check units and polarity of inh
-										(inh_input >> 10) * ( neuron->V_rev_I - V_last )  +
+		input_this_timestep = 	exc_input * ( neuron->V_rev_E - V_last )  +   // need to check units and polarity of inh
+										inh_input * ( neuron->V_rev_I - V_last )  +
 										external_bias + neuron->I_offset; // adding offset current - all need to be in nA
 
 		lif_neuron_closed_form( neuron, V_last, -neuron->refract_timer );

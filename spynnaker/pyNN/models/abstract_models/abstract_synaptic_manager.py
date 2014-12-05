@@ -469,13 +469,18 @@ class AbstractSynapticManager(object):
         # Get maximum weight that can go into each post-synaptic neuron per
         # synapse-type
         max_weights = [max(t) for t in total_weights]
+
+        # Clip the total items to avoid problems finding the mean of nothing(!)
         total_items = numpy.clip(total_items, a_min=1, a_max=None)
         weight_means = total_weights / total_items
+
+        # Calculate the standard deviation, clipping to avoid numerical errors
         weight_std_devs = numpy.sqrt(
-            numpy.divide(total_square_weights
-                         - numpy.divide(numpy.power(total_weights, 2),
-                                        total_items),
-                         total_items))
+            numpy.clip(numpy.divide(
+                total_square_weights
+                - numpy.divide(numpy.power(total_weights, 2),
+                               total_items),
+                total_items), a_min=0, a_max=None))
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1

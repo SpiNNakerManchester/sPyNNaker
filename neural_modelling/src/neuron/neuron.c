@@ -87,9 +87,9 @@ void neuron (index_t n)
 
   // Get excitatory and inhibitory input from synapses
   // **NOTE** this may be in either conductance or current units
-  accum exc_neuron_input = get_exc_neuron_input(n);
-  accum inh_neuron_input = get_inh_neuron_input(n);
-  
+  accum exc_neuron_input = neuron_get_exc_input(get_exc_neuron_input(n));
+  accum inh_neuron_input = neuron_get_inh_input(get_inh_neuron_input(n));
+
   // Get external bias from any source of intrinsic plasticity
   accum external_bias = plasticity_get_intrinsic_bias(n);
 
@@ -139,10 +139,10 @@ bool neural_data_filled (address_t address, uint32_t flags)
   num_neurons = address [1];
   num_params  = address [2];
   h           = address [3]; // number of micro seconds per time step.
-  
+
    log_info("\tneurons = %u, params = %u, time step = %u",
      num_neurons, num_params, h);
-   
+
   // Read ring buffer input shift for each synapse type
   for(index_t i = 0; i < SYNAPSE_TYPE_COUNT; i++)
   {
