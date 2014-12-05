@@ -9,9 +9,9 @@ logger = logging.getLogger(__name__)
 
 class FromFileConnector(FromListConnector):
 
-    def generate_synapse_list(self, presynaptic_population,
-                              postsynaptic_population, delay_scale,
-                              synapse_type):
+    def generate_synapse_list(
+            self, presynaptic_population, postsynaptic_population, delay_scale,
+            weight_scale, synapse_type):
         conn_file = open(self._filename, 'r')
         file_lines = conn_file.readlines()
         for line in file_lines:
@@ -50,7 +50,7 @@ class FromFileConnector(FromListConnector):
             self._conn_list.extend(conn_sublist)
         return FromListConnector.generate_synapse_list(
             self, presynaptic_population, postsynaptic_population,
-            delay_scale, synapse_type)
+            delay_scale, weight_scale, synapse_type)
 
     def __init__(self, conn_file, distributed=False, safe=True, verbose=False):
         FromListConnector.__init__(self, safe=safe, verbose=verbose)

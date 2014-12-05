@@ -159,8 +159,8 @@ bool neuron_state_update( REAL exc_input, REAL inh_input, REAL external_bias, ne
 // exc_input is conductance value from excitatory buffer
 // inh_input    "         "       from inhibitory buffer
 // we can probably assume that conductances must be positive, and so use unsigned in the buffers for better precision
-		input_this_timestep = 	exc_input * ( neuron->V_rev_E - V_last )  +   // need to check units and polarity of inh
-										inh_input * ( neuron->V_rev_I - V_last )  +
+		input_this_timestep = 	(exc_input >> 10) * ( neuron->V_rev_E - V_last )  +   // need to check units and polarity of inh
+										(inh_input >> 10) * ( neuron->V_rev_I - V_last )  +
 										external_bias + neuron->I_offset; // adding offset current - all need to be in nA
 
 		lif_neuron_closed_form( neuron, V_last, -neuron->refract_timer );

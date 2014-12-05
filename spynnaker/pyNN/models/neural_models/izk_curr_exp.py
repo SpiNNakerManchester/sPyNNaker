@@ -18,8 +18,9 @@ class IzhikevichCurrentExponentialPopulation(
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
-    def __init__(self, n_neurons, machine_time_step, constraints=None,
-                 label=None, a=0.02, c=-65.0, b=0.2, d=2.0, i_offset=0,
+    def __init__(self, n_neurons, machine_time_step, spikes_per_second,
+                 ring_buffer_sigma, constraints=None, label=None,
+                 a=0.02, c=-65.0, b=0.2, d=2.0, i_offset=0,
                  u_init=-14.0, v_init=-70.0, tau_syn_E=5.0, tau_syn_I=5.0):
 
         # Instantiate the parent classes
@@ -34,7 +35,9 @@ class IzhikevichCurrentExponentialPopulation(
             binary="IZK_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=IzhikevichCurrentExponentialPopulation.
             _model_based_max_atoms_per_core,
-            machine_time_step=machine_time_step)
+            machine_time_step=machine_time_step,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma)
         self._executable_constant = \
             IzhikevichCurrentExponentialPopulation.CORE_APP_IDENTIFIER
 
@@ -88,3 +91,6 @@ class IzhikevichCurrentExponentialPopulation(
                     DataType.S1615),
             NeuronParameter(0, DataType.S1615)
         ]
+
+    def is_population_vertex(self):
+        return True

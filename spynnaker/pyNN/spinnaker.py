@@ -82,6 +82,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._set_up_output_application_data_specifics()
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
+        self._spikes_per_second = float(conf.config.getfloat(
+            "Simulation", "spikes_per_second"))
+        self._ring_buffer_sigma = float(conf.config.getfloat(
+            "Simulation", "ring_buffer_sigma"))
 
         SpynnakerCommsFunctions.__init__(self, self._reports_states,
                                          self._report_default_directory)
@@ -328,6 +332,14 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     @property
     def machine_time_step(self):
         return self._machine_time_step
+
+    @property
+    def spikes_per_second(self):
+        return self._spikes_per_second
+
+    @property
+    def ring_buffer_sigma(self):
+        return self._ring_buffer_sigma
 
     @property
     def get_multi_cast_source(self):
@@ -702,9 +714,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                                                       router_table.y)
                     self._txrx.clear_router_diagnostic_counters(router_table.x,
                                                                 router_table.y)
-                    self._txrx.\
-                        clear_router_diagnostic_non_default_positioned_filters(
-                            router_table.x, router_table.y)
+                    # self._txrx.\
+                    #    clear_router_diagnostic_non_default_positioned_filters(
+                    #        router_table.x, router_table.y)
             self._txrx.send_signal(app_id, SCPSignal.STOP)
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser.stop()

@@ -2,13 +2,13 @@ import operator
 
 
 class SynapticList(object):
-    
+
     def __init__(self, synaptic_rows):
         """
         Creates a list of synaptic rows
         """
         self._synaptic_rows = synaptic_rows
-        
+
     def get_max_n_connections(self, vertex_slice=None):
         """
         Return the maximum number of connections in the rows
@@ -19,7 +19,7 @@ class SynapticList(object):
         else:
             return max(map(operator.methodcaller(
                 'get_n_connections', vertex_slice), self._synaptic_rows))
-    
+
     def get_min_max_delay(self):
         """
         Return the minimum and maximum delays in the rows
@@ -31,7 +31,7 @@ class SynapticList(object):
         max_delay = max(map(operator.methodcaller('get_max_delay'),
                             self._synaptic_rows))
         return min_delay, max_delay
-    
+
     def get_max_weight(self):
         """
         Return the maximum weight in the rows
@@ -45,28 +45,48 @@ class SynapticList(object):
         """
         return min(map(operator.methodcaller('get_min_weight'),
                        self._synaptic_rows))
-        
+
     def sum_weights(self, sum_arrays):
         """
-        Sums the weights going into each post-synaptic 
+        Sums the weights going into each post-synaptic
         neuron on a per-synapse type basis
         """
         # **TODO** numpyify
         for row in self._synaptic_rows:
-            for i, w, s in zip(row.target_indices, row.weights, row.synapse_types):
+            for i, w, s in zip(row.target_indices, row.weights,
+                               row.synapse_types):
                 sum_arrays[s][i] += abs(w)
-    
+
+    def sum_square_weights(self, sum_arrays):
+        """
+        Sums the square of the weights going into each post-synaptic
+        neuron on a per-synapse type basis
+        """
+        for row in self._synaptic_rows:
+            for i, w, s in zip(row.target_indices, row.weights,
+                               row.synapse_types):
+                sum_arrays[s][i] += w * w
+
     def sum_fixed_weight(self, sum_arrays, fixed_weight):
         """
         Sums the weights going into each post-synaptic neuron,
-        Assuming each pre-synaptic neuron applies a fixed 
+        Assuming each pre-synaptic neuron applies a fixed
         Weight - used with a maximum weight provided by an STDP rule
         """
         # **TODO** numpyify
         for row in self._synaptic_rows:
             for i, s in zip(row.target_indices, row.synapse_types):
                 sum_arrays[s][i] += fixed_weight
-    
+
+    def sum_n_connections(self, n_connections_arrays):
+        """
+        Sums the number of connections going into each post-synaptic neuron,
+        on a per-synapse type basis
+        """
+        for row in self._synaptic_rows:
+            for i, s in zip(row.target_indices, row.synapse_types):
+                n_connections_arrays[s][i] += 1
+
     def is_connected(self, from_vertex_slice, to_vertex_slice):
         """
         Return true if the rows are connected for the specified range of
@@ -77,7 +97,7 @@ class SynapticList(object):
             if row.get_n_connections(to_vertex_slice.n_atoms) > 0:
                 return True
         return False
-    
+
     def get_atom_sublist(self, from_vertex_slice, to_vertex_slice):
         """
         Return a list of rows each of which represents only the information
@@ -88,7 +108,7 @@ class SynapticList(object):
             to_vertex_slice.hi_atom),
             self._synaptic_rows[from_vertex_slice.lo_atom:
                                 from_vertex_slice.hi_atom + 1])
-    
+
     def get_delay_sublist(self, min_delay, max_delay):
         """
         Return a list of rows each of which represents only the information
@@ -97,7 +117,7 @@ class SynapticList(object):
         return map(operator.methodcaller('get_sub_row_by_delay', min_delay,
                                          max_delay),
                    self._synaptic_rows)
-    
+
     def create_atom_sublist(self, from_vertex_slice, to_vertex_slice):
         """
         Create a sub list of this list which contains only atoms
@@ -105,20 +125,20 @@ class SynapticList(object):
         """
         return SynapticList(self.get_atom_sublist(from_vertex_slice,
                                                   to_vertex_slice))
-    
+
     def create_delay_sublist(self, min_delay, max_delay):
         """
         Create a sub list of this list which contains only atoms with delays
         between min_delay and max_delay (inclusive)
         """
         return SynapticList(self.get_delay_sublist(min_delay, max_delay))
-    
+
     def get_rows(self):
         """
         Return the rows to be written
         """
         return self._synaptic_rows
-    
+
     def get_n_rows(self):
         """
         Return the number of rows
@@ -131,7 +151,7 @@ class SynapticList(object):
         """
         for _ in self._synaptic_rows:
             map(operator.methodcaller('flip_weights'), self._synaptic_rows)
-            
+
     def append(self, synapse_list):
         """
         Appends a synapse list to the end of this one

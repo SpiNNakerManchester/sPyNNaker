@@ -1,9 +1,7 @@
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
     AbstractSynapticManager
 from spynnaker.pyNN.models.abstract_models.\
@@ -23,8 +21,9 @@ logger = logging.getLogger(__name__)
 class AbstractPopulationDataSpec(AbstractSynapticManager,
                                  AbstractPartitionablePopulationVertex):
 
-    def __init__(self, binary, n_neurons, label, constraints, max_atoms_per_core,
-                 machine_time_step):
+    def __init__(self, binary, n_neurons, label, constraints,
+                 max_atoms_per_core, machine_time_step, spikes_per_second,
+                 ring_buffer_sigma):
         AbstractSynapticManager.__init__(self)
         AbstractPartitionablePopulationVertex.__init__(
             self, n_atoms=n_neurons, label=label,
@@ -32,6 +31,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             max_atoms_per_core=max_atoms_per_core)
         self._binary = binary
         self._executable_constant = None
+        self._spikes_per_second = spikes_per_second
+        self._ring_buffer_sigma = ring_buffer_sigma
 
     @abstractmethod
     def get_parameters(self):
@@ -214,7 +215,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         spec.comment("\n*** Spec for block of {} neurons ***\n"
                      .format(self.model_name))
-        
+
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         # Calculate the size of the tables to be reserved in SDRAM:
@@ -233,8 +234,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         stdp_region_sz = self.get_stdp_parameter_size(vertex_in_edges)
 
         # Declare random number generators and distributions:
-        #TODO add random distrubtion stuff
-        #self.write_random_distribution_declarations(spec)
+        # TODO add random distrubtion stuff
+        # self.write_random_distribution_declarations(spec)
 
         # Construct the data images needed for the Neuron:
         self.reserve_population_based_memory_regions(
@@ -248,14 +249,18 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                               gsyn_hist_buff_sz, self._executable_constant)
 
         ring_buffer_shifts = self.get_ring_buffer_to_input_left_shifts(
-            subvertex, subgraph, graph_mapper)
+            subvertex, subgraph, graph_mapper, self._spikes_per_second,
+            self._machine_time_step, self._ring_buffer_sigma)
 
         weight_scales = [self.get_weight_scale(r) for r in ring_buffer_shifts]
-        
-        for t, r, w in zip(self.get_synapse_targets(), ring_buffer_shifts, weight_scales):
-            logger.debug("Synapse type:%s - Ring buffer shift:%d, Max weight:%f" % (t, r, w))
 
-        #update projections for future use
+        for t, r, w in zip(self.get_synapse_targets(), ring_buffer_shifts,
+                           weight_scales):
+            logger.debug(
+                "Synapse type:%s - Ring buffer shift:%d, Max weight:%f"
+                % (t, r, w))
+
+        # update projections for future use
         in_partitioned_edges = \
             subgraph.incoming_subedges_from_subvertex(subvertex)
         for partitioned_edge in in_partitioned_edges:
@@ -269,7 +274,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         self.write_stdp_parameters(
             spec, self._machine_time_step,
-            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value, weight_scales)
+            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value,
+            weight_scales)
 
         self.write_row_length_translation_table(
             spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)
@@ -288,7 +294,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.end_specification()
         data_writer.close()
 
-    #inhirrited from data specable vertex
+    # inherited from data specable vertex
     def get_binary_file_name(self):
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)

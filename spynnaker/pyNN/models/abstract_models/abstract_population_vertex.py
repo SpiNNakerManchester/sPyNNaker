@@ -1,4 +1,4 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from math import ceil
 from six import add_metaclass
 import logging
@@ -26,19 +26,31 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
     """
 
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
-                 machine_time_step, constraints=None):
+                 machine_time_step, spikes_per_second, ring_buffer_sigma,
+                 weight_scale=1.0, constraints=None):
 
         AbstractRecordableVertex.__init__(self, machine_time_step, label)
         AbstractPopulationDataSpec.__init__(
             self, binary, n_neurons, label, constraints,
             machine_time_step=machine_time_step,
-            max_atoms_per_core=max_atoms_per_core)
+            max_atoms_per_core=max_atoms_per_core,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma)
         self._delay_vertex = None
         self._n_params = n_params
+        self._weight_scale = weight_scale
+
+    @abstractmethod
+    def is_population_vertex(self):
+        pass
 
     @property
     def delay_vertex(self):
         return self._delay_vertex
+
+    @property
+    def weight_scale(self):
+        return self._weight_scale
 
     @delay_vertex.setter
     def delay_vertex(self, delay_vertex):
