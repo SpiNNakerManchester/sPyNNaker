@@ -19,5 +19,16 @@ class AbstractVoltageDependency(AbstractRulePart):
         :return:
         """
 
+    @abstractmethod
+    def write_plastic_params(self, spec, machine_time_step, weight_scales,
+                             global_weight_scale, num_terms):
+        """ method that writes plastic params to a data spec generator
+
+        :param spec:
+        :param machine_time_step:
+        :param weight_scales:
+        :return:
+        """
+
     def is_rule_part(self):
         return True

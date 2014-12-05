@@ -3,6 +3,8 @@ from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
+    import AbstractPopulationVertex
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
@@ -69,6 +71,9 @@ class Population(object):
         cellparams['label'] = cell_label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
+        if issubclass(cellclass, AbstractPopulationVertex):
+            cellparams['spikes_per_second'] = spinnaker.spikes_per_second
+            cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
 

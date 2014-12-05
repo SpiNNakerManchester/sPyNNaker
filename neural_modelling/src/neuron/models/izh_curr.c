@@ -14,6 +14,16 @@ static const REAL V_threshold = REAL_CONST( 30.0 );
 static const REAL SIMPLE_TQ_OFFSET = REAL_CONST( 1.85 );
 
 
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_exc_input(REAL exc_input) {
+    return exc_input;
+}
+
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_inh_input(REAL inh_input) {
+    return inh_input;
+}
+
 /////////////////////////////////////////////////////////////
 // definition for Izhikevich neuron
 void neuron_ode( REAL t, REAL stateVar[], REAL dstateVar_dt[], neuron_pointer_t neuron ) {

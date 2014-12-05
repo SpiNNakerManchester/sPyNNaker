@@ -45,9 +45,9 @@ class FromListConnector(AbstractConnector):
         self._weight_seeds = SeedInfo()
         self._delay_seeds = SeedInfo()
 
-    def generate_synapse_list(self, presynaptic_population,
-                              postsynaptic_population,
-                              delay_scale, synapse_type):
+    def generate_synapse_list(
+            self, presynaptic_population, postsynaptic_population, delay_scale,
+            weight_scale, synapse_type):
 
         prevertex = presynaptic_population._get_vertex
         postvertex = postsynaptic_population._get_vertex
@@ -98,7 +98,7 @@ class FromListConnector(AbstractConnector):
                         raise ConfigurationException(
                             "Invalid neuron id in postsynaptic population {}"
                             .format(post_atom))
-                    weight = generate_parameter(conn[2], j)
+                    weight = generate_parameter(conn[2], j) * weight_scale
                     delay = generate_parameter(conn[3], j) * delay_scale
                     id_lists[pre_atom].append(post_atom)
                     weight_lists[pre_atom].append(weight)

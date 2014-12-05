@@ -3,6 +3,7 @@ Utilities for accessing the location of memory regions on the board
 """
 from enum import Enum
 
+POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 # Some constants
 SETUP_SIZE = 28  # Single word of info with flags, etc.
                  # plus the lengths of each of the output buffer

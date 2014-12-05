@@ -20,8 +20,9 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
-    def __init__(self, n_neurons, machine_time_step, constraints=None,
-                 label=None, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
+    def __init__(self, n_neurons, machine_time_step, spikes_per_second,
+                 ring_buffer_sigma, constraints=None, label=None,
+                 tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
                  v_thresh=-50.0, tau_syn_E=5.0, tau_syn_I=5.0,
                  tau_refrac=0.1, i_offset=0, v_init=None):
         # Instantiate the parent classes
@@ -37,7 +38,9 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             binary="IF_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=
             IFCurrentExponentialPopulation._model_based_max_atoms_per_core,
-            machine_time_step=machine_time_step)
+            machine_time_step=machine_time_step,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma)
         self._executable_constant = \
             IFCurrentExponentialPopulation.CORE_APP_IDENTIFIER
 
@@ -73,3 +76,6 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             NeuronParameter(self._one_over_tau_rc, DataType.S1615),
             NeuronParameter(self._refract_timer, DataType.UINT32),
             NeuronParameter(self._scaled_t_refract(), DataType.UINT32)]
+
+    def is_population_vertex(self):
+        return True
