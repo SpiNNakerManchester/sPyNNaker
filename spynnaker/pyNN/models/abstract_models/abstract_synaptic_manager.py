@@ -381,6 +381,7 @@ class AbstractSynapticManager(object):
         """
 
         # E[ number of spikes ] in a timestep
+        #x /1000000.0 = conversion between microsecond to millisecent
         average_spikes_per_timestep = (float(n_synapses_in * spikes_per_second)
                                        * (float(machine_timestep) / 1000000.0))
 
@@ -389,7 +390,8 @@ class AbstractSynapticManager(object):
 
         # Upper end of range for Poisson summation required below
         # upper_bound needs to be an integer
-        upper_bound = int(round(average_spikes_per_timestep + 3.0
+        upper_bound = int(round(average_spikes_per_timestep +
+                                constants.POSSION_SIGMA_SUMMATION_LIMIT
                                 * math.sqrt(average_spikes_per_timestep)))
 
         # Closed-form exact solution for summation that gives the variance
@@ -420,7 +422,6 @@ class AbstractSynapticManager(object):
     def _get_ring_buffer_totals(self, subvertex, sub_graph, graph_mapper):
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
 
         # If we have an STDP mechanism, get the maximum plastic weight
         stdp_max_weight = None
@@ -429,9 +430,9 @@ class AbstractSynapticManager(object):
 
         n_synapse_types = len(self.get_synapse_targets())
 
-        total_weights = numpy.zeros((n_synapse_types, n_atoms))
-        total_square_weights = numpy.zeros((n_synapse_types, n_atoms))
-        total_items = numpy.zeros((n_synapse_types, n_atoms))
+        total_weights = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
+        total_square_weights = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
+        total_items = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
         for subedge in in_sub_edges:
             sublist = subedge.get_synapse_sublist(graph_mapper)
             sublist.sum_n_connections(total_items)
@@ -483,7 +484,6 @@ class AbstractSynapticManager(object):
                 total_items), a_min=0, a_max=None))
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         n_synapse_types = len(self.get_synapse_targets())
         expected_weights = numpy.fromfunction(
             numpy.vectorize(
@@ -491,7 +491,7 @@ class AbstractSynapticManager(object):
                     weight_means[i][j], weight_std_devs[i][j],
                     spikes_per_second, machine_timestep, total_items[i][j],
                     sigma)),
-            (n_synapse_types, n_atoms))
+            (n_synapse_types, vertex_slice.n_atoms))
         expected_max_weights = [max(t) for t in expected_weights]
         max_weights = [min((w, e))
                        for w, e in zip(max_weights, expected_max_weights)]

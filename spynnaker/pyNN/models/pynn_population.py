@@ -3,7 +3,8 @@ from pacman.model.constraints.vertex_has_dependent_constraint import \
     VertexHasDependentConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import AbstractPopulationVertex
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
+    import AbstractPopulationVertex
 from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
