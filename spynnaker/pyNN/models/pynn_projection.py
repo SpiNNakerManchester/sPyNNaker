@@ -3,6 +3,9 @@ import math
 
 import numpy
 
+from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+    import PartitionerSameSizeAsVertexConstraint
+
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN import exceptions
@@ -16,6 +19,7 @@ from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge 
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
+
 from spynnaker.pyNN.utilities.timer import Timer
 
 logger = logging.getLogger(__name__)
@@ -173,16 +177,18 @@ class Projection(object):
             self._projection_edge = direct_edge
 
         # Create a delay extension vertex to do the extra delays
-        delay_vertex = presynaptic_population._get_vertex.delay_vertex
+        delay_vertex = presynaptic_population._internal_delay_vertex
         if delay_vertex is None:
             source_name = presynaptic_population._get_vertex.label
             delay_name = "{}_delayed".format(source_name)
             delay_vertex = DelayExtensionVertex(
                 n_neurons=num_src_neurons,
-                source_vertex=presynaptic_population,
+                source_vertex=presynaptic_population._get_vertex,
                 max_delay_per_neuron=max_delay_per_neuron,
                 machine_time_step=machine_time_step, label=delay_name)
-            presynaptic_population._get_vertex.delay_vertex = delay_vertex
+            presynaptic_population._internal_delay_vertex = delay_vertex
+            presynaptic_population._get_vertex.add_constraint(
+                PartitionerSameSizeAsVertexConstraint(delay_vertex))
             self._spinnaker.add_vertex(delay_vertex)
 
         # Create a connection from the source pynn_population.py to the

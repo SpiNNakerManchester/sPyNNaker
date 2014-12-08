@@ -3,12 +3,8 @@ from math import ceil
 from six import add_metaclass
 import logging
 
-from pacman.model.constraints.\
-    partitioner_same_size_as_vertex_constraint import \
-    PartitionerSameSizeAsVertexConstraint
-
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
+    import AbstractRecordableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_population_data_spec \
     import AbstractPopulationDataSpec
 from spynnaker.pyNN import exceptions
@@ -36,7 +32,6 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             max_atoms_per_core=max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma)
-        self._delay_vertex = None
         self._n_params = n_params
         self._weight_scale = weight_scale
 
@@ -45,29 +40,15 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         pass
 
     @property
-    def delay_vertex(self):
-        return self._delay_vertex
-
-    @property
     def weight_scale(self):
         return self._weight_scale
-
-    @delay_vertex.setter
-    def delay_vertex(self, delay_vertex):
-        if self._delay_vertex is None:
-            self._delay_vertex = delay_vertex
-            self.add_constraint(
-                PartitionerSameSizeAsVertexConstraint(self._delay_vertex))
-        else:
-            raise exceptions.ConfigurationException(
-                "cannot set a vertex's delay vertex once its already been set")
 
     def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
 
         # Spike sources store spike vectors optimally
         # so calculate min words to represent
-        sub_vertex_out_spike_bytes_function = \
+        out_spike_bytes_function = \
             lambda subvertex, subvertex_slice: int(ceil(
                 subvertex_slice.n_atoms / 32.0)) * 4
 
@@ -75,8 +56,7 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         return self._get_spikes(
             graph_mapper=graph_mapper, placements=placements, transciever=txrx,
             compatible_output=compatible_output,
-            sub_vertex_out_spike_bytes_function=
-            sub_vertex_out_spike_bytes_function,
+            sub_vertex_out_spike_bytes_function=out_spike_bytes_function,
             spike_recording_region=
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
 

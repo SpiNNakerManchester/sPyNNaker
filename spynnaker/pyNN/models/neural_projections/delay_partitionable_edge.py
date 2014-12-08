@@ -21,7 +21,7 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
                                              synapse_list=synapse_list,
                                              synapse_dynamics=synapse_dynamics,
                                              label=label)
-        self._pre_vertex = presynaptic_population._get_vertex.delay_vertex
+        self._pre_vertex = presynaptic_population._internal_delay_vertex
 
     @property
     def num_delay_stages(self):

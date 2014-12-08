@@ -76,19 +76,20 @@ class Population(object):
             cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
+        self._delay_vertex = None
 
         # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
         # generation of positions is deferred until needed.
         if structure:
-           self._structure = structure
-           self._positions = None
+            self._structure = structure
+            self._positions = None
         else:
-           self._structure = None
+            self._structure = None
 
         self._spinnaker.add_vertex(self._vertex)
 
-        #check if the vertex is a cmd sender, if so store for future
+        # check if the vertex is a cmd sender, if so store for future
         require_multi_cast_source_constraints = \
             pacman_utility_calls.locate_constraints_of_type(
                 self._vertex.constraints,
@@ -108,7 +109,7 @@ class Population(object):
 
         self._parameters = PyNNParametersSurrogate(self._vertex)
 
-        #add any dependant edges and verts if needed
+        # add any dependent edges and verts if needed
         dependant_vertex_constraints = \
             pacman_utility_calls.locate_constraints_of_type(
                 self._vertex.constraints, VertexHasDependentConstraint)
@@ -120,7 +121,7 @@ class Population(object):
                                                post_vertex=dependant_vertex)
             self._spinnaker.add_edge(dependant_edge)
 
-        #initlise common stuff
+        # initialize common stuff
         self._size = size
         self._record_spike_file = None
         self._record_v_file = None
@@ -173,14 +174,14 @@ class Population(object):
 
     def _get_cell_position(self, cell_id):
         """
-        returns the position of a cell. Added functionality 23 November 2014 ADR
+        returns the position of a cell.
         """
         if self._structure is None:
-           raise ValueError("Attempted to get the position of a cell "
-                            "in an un-structured population")
-           return None
+            raise ValueError("Attempted to get the position of a cell "
+                             "in an un-structured population")
+            return None
         elif self._positions is None:
-           self._structure.generate_positions(self._vertex.n_atoms)
+            self._structure.generate_positions(self._vertex.n_atoms)
         return self._positions[cell_id]
 
     def _get_cell_initial_value(self, cell_id, variable):
@@ -189,15 +190,15 @@ class Population(object):
         """
         raise NotImplementedError
 
-    #noinspection PyPep8Naming
+    # noinspection PyPep8Naming
     def getSpikes(self, compatible_output=False, gather=True):
         """
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
         """
         if not gather:
-            logger.warn("Spynnaker only supports gather = true, will execute as"
-                        "if gather was true anyhow")
+            logger.warn("Spynnaker only supports gather = true, will execute "
+                        " as if gather was true anyhow")
         timer = None
 
         if not self._vertex.record:
@@ -304,7 +305,8 @@ class Population(object):
             getattr(self._vertex, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
             raise Exception("AbstractConstrainedVertex does not support "
-                            "initialization of parameter {%s}".format(variable))
+                            "initialization of parameter {%s}".format(
+                                variable))
 
         initialize_attr(value)
 
@@ -316,7 +318,8 @@ class Population(object):
         raise NotImplementedError
 
     def can_record(self, variable):
-        """Determine whether `variable` can be recorded from this population."""
+        """ Determine whether `variable` can be recorded from this population.
+        """
         raise NotImplementedError
 
     def inject(self, current_source):
@@ -356,13 +359,13 @@ class Population(object):
         Added functionality 23 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to retrieve positions "
-                            "for an un-structured population")
+            raise ValueError("attempted to retrieve positions "
+                             "for an un-structured population")
         elif self._positions is None:
-           self._structure.generate_positions(self._vertex.n_atoms)
+            self._structure.generate_positions(self._vertex.n_atoms)
         position_diff = numpy.empty(self._positions.shape)
         position_diff.fill(position)
-        distances=Space.distances(self._positions, position_diff)
+        distances = Space.distances(self._positions, position_diff)
         return distances.argmin()
 
     @property
@@ -371,11 +374,11 @@ class Population(object):
         returns a position generator. Added functionality 27 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to retrieve positions "
-                            "for an un-structured population")
-           return None
+            raise ValueError("attempted to retrieve positions "
+                             "for an un-structured population")
+            return None
         else:
-           return self._structure.generate_positions
+            return self._structure.generate_positions
 
     # noinspection PyPep8Naming
     def randomInit(self, distribution):
@@ -443,21 +446,21 @@ class Population(object):
         Added functionality 27 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to retrieve positions "
-                            "for an un-structured population")
+            raise ValueError("attempted to retrieve positions "
+                             "for an un-structured population")
         elif self._positions is None:
-           self._positions = self._structure.generate_positions(
-                                  self._vertex.n_atoms)
+            self._positions = self._structure.generate_positions(
+                self._vertex.n_atoms)
         return self._positions
 
-    #noinspection PyPep8Naming
+    # noinspection PyPep8Naming
     def printSpikes(self, filename, gather=True):
         """
         Write spike time information from the population to a given file.
         """
         if not gather:
-            logger.warn("Spynnaker only supports gather = true, will execute as"
-                        "if gather was true anyhow")
+            logger.warn("Spynnaker only supports gather = true, will execute"
+                        " as if gather was true anyhow")
         spikes = self.getSpikes(compatible_output=True)
         if spikes is not None:
             first_id = 0
@@ -513,7 +516,7 @@ class Population(object):
         file_handle.write("# dt = %f\n" % time_step)
         file_handle.write("# dimensions = [%d]\n" % dimensions)
         file_handle.write("# last_id = %d\n" % (num_neurons - 1))
-        for (neuronId, time, value) in v:
+        for (neuronId, _, value) in v:
             file_handle.write("%f\t%d\n" % (value, neuronId))
         file_handle.close()
 
@@ -536,10 +539,10 @@ class Population(object):
         save positions to file. Added functionality 23 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to retrieve positions "
-                            "for an un-structured population")
+            raise ValueError("attempted to retrieve positions "
+                             "for an un-structured population")
         elif self._positions is None:
-           self._structure.generate_positions(self._vertex.n_atoms)
+            self._structure.generate_positions(self._vertex.n_atoms)
         file_handle = open(file_name, "w")
         file_handle.write(self._positions)
         file_handle.close()
@@ -567,25 +570,24 @@ class Population(object):
 
     def _set_cell_position(self, cell_id, pos):
         """
-        sets a cell to a given position. Added functionality 23 November 2014 ADR
+        sets a cell to a given position
         """
         if self._structure is None:
-           raise ValueError("attempted to set a position for a cell "
-                            "in an un-structured population")
+            raise ValueError("attempted to set a position for a cell "
+                             "in an un-structured population")
         elif self._positions is None:
-           self._structure.generate_positions(self._vertex.n_atoms)
+            self._structure.generate_positions(self._vertex.n_atoms)
         self._positions[cell_id] = pos
 
     def _set_positions(self, positions):
         """
         sets all the positions in the population.
-        Added functionality 27 November 2014 ADR
         """
         if self._structure is None:
-           raise ValueError("attempted to set positions "
-                            "in an un-structured population")
+            raise ValueError("attempted to set positions "
+                             "in an un-structured population")
         else:
-           self._positions = positions
+            self._positions = positions
 
     def _set_string_value_pair(self, parameter, value=None):
         """
@@ -619,7 +621,7 @@ class Population(object):
         """
         return self._structure
 
-    #NONE PYNN API CALL
+    # NONE PYNN API CALL
     def set_constraint(self, constraint):
         """
         Apply a constraint to a population that restricts the processor
@@ -632,7 +634,7 @@ class Population(object):
                 "the constraint entered is not a recongised constraint. "
                 "try again")
 
-    #NONE PYNN API CALL
+    # NONE PYNN API CALL
     def add_placement_constraint(self, x, y, p=None):
         """ Add a placement constraint
 
@@ -645,7 +647,7 @@ class Population(object):
         """
         self._vertex.add_constraint(PlacerChipAndCoreConstraint(x, y, p))
 
-    #NONE PYNN API CALL
+    # NONE PYNN API CALL
     def set_mapping_constraint(self, constraint_dict):
         """ Add a placement constraint - for backwards compatibility
 
@@ -655,7 +657,7 @@ class Population(object):
         """
         self.add_placement_constraint(**constraint_dict)
 
-    #NONE PYNN API CALL
+    # NONE PYNN API CALL
     def set_model_based_max_atoms_per_core(self, new_value):
         if hasattr(self._vertex, "set_model_max_atoms_per_core"):
             self._vertex.set_model_max_atoms_per_core(new_value)
@@ -678,3 +680,11 @@ class Population(object):
     @property
     def _get_vertex(self):
         return self._vertex
+
+    @property
+    def _internal_delay_vertex(self):
+        return self._delay_vertex
+
+    @_internal_delay_vertex.setter
+    def _internal_delay_vertex(self, delay_vertex):
+        self._delay_vertex = delay_vertex
