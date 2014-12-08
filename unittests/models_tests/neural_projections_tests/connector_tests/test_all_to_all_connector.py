@@ -33,7 +33,8 @@ class TestingAllToAllConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         # pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_synapse_list_generation_for_different_sized_populations(self):
         number_of_neurons = 10
@@ -50,7 +51,8 @@ class TestingAllToAllConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_allow_self_connections(self):
         number_of_neurons = 5

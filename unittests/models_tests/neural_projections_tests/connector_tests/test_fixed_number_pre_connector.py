@@ -58,7 +58,8 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_generate_synapse_list_pre_6(self):
         number_of_neurons = 5

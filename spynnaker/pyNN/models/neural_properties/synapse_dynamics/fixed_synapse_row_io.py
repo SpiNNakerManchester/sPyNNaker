@@ -1,6 +1,7 @@
 import numpy
 
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.abstract_synapse_row_io import AbstractSynapseRowIo
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
+    abstract_synapse_row_io import AbstractSynapseRowIo
 from spynnaker.pyNN.models.neural_properties.synapse_row_info import \
     SynapseRowInfo
 from spynnaker.pyNN import exceptions
@@ -16,17 +17,15 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
     @staticmethod
     def read_packed_plastic_plastic_region(synapse_row, data, offset,
                                            length, weight_scales):
-        raise exceptions.SynapticConfigurationException("fixed synapse rows do"
-                                                        "not contain a plastic "
-                                                        "region")
+        raise exceptions.SynapticConfigurationException(
+            "fixed synapse rows do not contain a plastic region")
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def get_n_words(synapse_row, vertex_slice=None):
-        if vertex_slice is None:
-            return synapse_row.get_n_connections()
-        else:
-            return synapse_row.get_n_connections(vertex_slice.n_atoms)
+    def get_n_words(synapse_row, vertex_slice=None,
+                    lo_delay=None, hi_delay=None):
+        return synapse_row.get_n_connections(
+            vertex_slice=vertex_slice, lo_delay=lo_delay, hi_delay=hi_delay)
 
     # noinspection PyMethodOverriding
     @staticmethod

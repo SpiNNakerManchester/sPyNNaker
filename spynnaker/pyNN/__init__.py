@@ -37,8 +37,8 @@ from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_partitioned_projection \
-    import DelayPartitionedProjection
+from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
+    import DelayPartitionedEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \

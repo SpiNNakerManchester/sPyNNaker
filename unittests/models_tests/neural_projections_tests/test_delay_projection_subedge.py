@@ -1,5 +1,5 @@
 import unittest
-from spynnaker.pyNN.models.neural_projections.delay_partitioned_projection \
+from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
     import DelayPartitionedProjection
 
 

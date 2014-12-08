@@ -381,7 +381,7 @@ class AbstractSynapticManager(object):
         """
 
         # E[ number of spikes ] in a timestep
-        #x /1000000.0 = conversion between microsecond to millisecent
+        # x /1000000.0 = conversion between microsecond to second
         average_spikes_per_timestep = (float(n_synapses_in * spikes_per_second)
                                        * (float(machine_timestep) / 1000000.0))
 
@@ -431,7 +431,8 @@ class AbstractSynapticManager(object):
         n_synapse_types = len(self.get_synapse_targets())
 
         total_weights = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
-        total_square_weights = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
+        total_square_weights = numpy.zeros(
+            (n_synapse_types, vertex_slice.n_atoms))
         total_items = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
         for subedge in in_sub_edges:
             sublist = subedge.get_synapse_sublist(graph_mapper)

@@ -37,7 +37,8 @@ class TestingOneToOneConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_self_connect_population(self):
         number_of_neurons = 10
@@ -53,7 +54,8 @@ class TestingOneToOneConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_synapse_list_generation_for_different_sized_populations(self):
         number_of_neurons = 10
