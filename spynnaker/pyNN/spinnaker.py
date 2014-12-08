@@ -121,9 +121,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 "Database", "create_routing_info_to_neuron_id_mapping")
             wait_on_confirmation = \
                 conf.config.getboolean("Database", "wait_on_confirmation")
-            self._database_thread = \
-                DataBaseThread(self._app_data_runtime_folder, execute_mapping,
-                               self._txrx, wait_on_confirmation)
+            self._database_thread = DataBaseThread(
+                self._app_data_runtime_folder, execute_mapping,
+                wait_on_confirmation)
             self._database_thread.start()
 
         #set up vis if needed
@@ -254,10 +254,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
                 wait_on_confirmation = \
                     conf.config.getboolean("Database", "wait_on_confirmation")
-                vis_enabled = conf.config.getboolean("Visualiser", "enable")
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
-                    wait_on_confirmation, self._database_thread, vis_enabled,
+                    wait_on_confirmation, self._database_thread,
                     self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
