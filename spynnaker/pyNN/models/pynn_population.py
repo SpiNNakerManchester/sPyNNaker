@@ -127,6 +127,10 @@ class Population(object):
         self._record_v_file = None
         self._record_g_syn_file = None
 
+        self._spikes = None
+        self._v = None
+        self._gsyn = None
+
     def __add__(self, other):
         """
         merges populations
@@ -196,34 +200,36 @@ class Population(object):
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
         """
-        if not gather:
-            logger.warn("Spynnaker only supports gather = true, will execute "
-                        " as if gather was true anyhow")
-        timer = None
+        if self._spikes is None:
 
-        if not self._vertex.record:
-            raise exceptions.ConfigurationException(
-                "This population has not been set to record spikes. Therefore "
-                "spikes cannot be retrieved. Please set this vertex to record "
-                "spikes before running this command.")
+            if not gather:
+                logger.warn("Spynnaker only supports gather = true, will "
+                            " execute as if gather was true anyhow")
+            timer = None
 
-        if not self._spinnaker.has_ran:
-            raise exceptions.SpynnakerException(
-                "The simulation has not yet ran, therefore spikes cannot be "
-                "retrieved. Please execute the simulation before running this "
-                "command")
+            if not self._vertex.record:
+                raise exceptions.ConfigurationException(
+                    "This population has not been set to record spikes. "
+                    "Therefore spikes cannot be retrieved. Please set this "
+                    "vertex to record spikes before running this command.")
 
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer = Timer()
-            timer.start_timing()
-        spikes = self._vertex.get_spikes(
-            txrx=self._spinnaker.transceiver,
-            placements=self._spinnaker.placements,
-            graph_mapper=self._spinnaker.graph_mapper,
-            compatible_output=compatible_output)
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer.take_sample()
-        return spikes
+            if not self._spinnaker.has_ran:
+                raise exceptions.SpynnakerException(
+                    "The simulation has not yet ran, therefore spikes cannot "
+                    "be retrieved. Please execute the simulation before "
+                    "running this command")
+
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer = Timer()
+                timer.start_timing()
+            self._spikes = self._vertex.get_spikes(
+                txrx=self._spinnaker.transceiver,
+                placements=self._spinnaker.placements,
+                graph_mapper=self._spinnaker.graph_mapper,
+                compatible_output=compatible_output)
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer.take_sample()
+        return self._spikes
 
     def get_spike_counts(self, gather=True):
         """
@@ -238,20 +244,21 @@ class Population(object):
         conductances for recorded cells.
 
         """
-        timer = None
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer = Timer()
-            timer.start_timing()
-        gsyn = self._vertex.get_gsyn(
-            has_ran=self._spinnaker.has_ran,
-            txrx=self._spinnaker.transceiver,
-            placements=self._spinnaker.placements,
-            machine_time_step=self._spinnaker.machine_time_step,
-            graph_mapper=self._spinnaker.graph_mapper,
-            compatible_output=compatible_output)
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer.take_sample()
-        return gsyn
+        if self._gsyn is None:
+            timer = None
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer = Timer()
+                timer.start_timing()
+            self._gsyn = self._vertex.get_gsyn(
+                has_ran=self._spinnaker.has_ran,
+                txrx=self._spinnaker.transceiver,
+                placements=self._spinnaker.placements,
+                machine_time_step=self._spinnaker.machine_time_step,
+                graph_mapper=self._spinnaker.graph_mapper,
+                compatible_output=compatible_output)
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer.take_sample()
+        return self._gsyn
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -264,22 +271,23 @@ class Population(object):
         :param bool compatible_output:
             not used - inserted to match PyNN specs
         """
-        timer = None
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer = Timer()
-            timer.start_timing()
-        v = self._vertex.get_v(
-            has_ran=self._spinnaker.has_ran,
-            txrx=self._spinnaker.transceiver,
-            placements=self._spinnaker.placements,
-            machine_time_step=self._spinnaker.machine_time_step,
-            graph_mapper=self._spinnaker.graph_mapper,
-            compatible_output=compatible_output)
+        if self._v is None:
+            timer = None
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer = Timer()
+                timer.start_timing()
+            self._v = self._vertex.get_v(
+                has_ran=self._spinnaker.has_ran,
+                txrx=self._spinnaker.transceiver,
+                placements=self._spinnaker.placements,
+                machine_time_step=self._spinnaker.machine_time_step,
+                graph_mapper=self._spinnaker.graph_mapper,
+                compatible_output=compatible_output)
 
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer.take_sample()
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer.take_sample()
 
-        return v
+        return self._v
 
     def id_to_index(self, cell_id):
         """
@@ -547,21 +555,6 @@ class Population(object):
         file_handle.write(self._positions)
         file_handle.close()
 
-    def set(self, *args, **kargs):
-        """
-        converts key value pairs in key args into a collection of string
-        parameter and value entries used with old fashion set.
-
-        Assumes parameters_surrogate will throw error when entries not
-        avilable for a vertex is given
-        """
-        if len(args) == 0:
-            for key in kargs.keys():
-                self._set_string_value_pair(key, kargs[key])
-        else:
-            for element in range(0, len(args), 2):
-                self._set_string_value_pair(args[element], args[element + 1])
-
     def _set_cell_initial_value(self, cell_id, variable, value):
         """
         set a given cells intial value
@@ -589,7 +582,7 @@ class Population(object):
         else:
             self._positions = positions
 
-    def _set_string_value_pair(self, parameter, value=None):
+    def set(self, parameter, value=None):
         """
         Set one or more parameters for every cell in the population.
 

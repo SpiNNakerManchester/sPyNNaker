@@ -174,7 +174,7 @@ def run(run_time=None):
     return None
 
 
-def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
+def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
           **extra_params):
     """
     Should be called at the very beginning of a script.
@@ -265,3 +265,8 @@ def Projection(presynaptic_population, postsynaptic_population,
     return _spinnaker.create_projection(
         presynaptic_population, postsynaptic_population, connector, source,
         target, synapse_dynamics, label, rng)
+
+
+def get_current_time():
+    global _spinnaker
+    return _spinnaker.get_current_time()

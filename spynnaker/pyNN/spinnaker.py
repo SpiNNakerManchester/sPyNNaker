@@ -374,6 +374,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def set_runtime(self, value):
         self._runtime = value
 
+    def get_current_time(self):
+        if self._has_ran:
+            return float(self._runtime)
+        return 0.0
+
     def __repr__(self):
         return "Spinnaker object for machine {}".format(self._hostname)
 
