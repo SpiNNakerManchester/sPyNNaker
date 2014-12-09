@@ -408,7 +408,7 @@ class AbstractSynapticManager(object):
         weight_variance = (math.exp(-average_spikes_per_timestep)
                            * average_spikes_per_timestep
                            * (weight_std_dev ** 2)
-                           * (pow(-average_spikes_per_timestep, upper_bound)
+                           * (-pow(average_spikes_per_timestep, upper_bound)
                               + math.exp(average_spikes_per_timestep)
                               * special.gammaincc(1 + upper_bound,
                                                   average_spikes_per_timestep)
@@ -473,7 +473,8 @@ class AbstractSynapticManager(object):
         max_weights = [max(t) for t in total_weights]
 
         # Clip the total items to avoid problems finding the mean of nothing(!)
-        total_items = numpy.clip(total_items, a_min=1, a_max=None)
+        total_items = numpy.clip(total_items, a_min=1,
+                                 a_max=numpy.iinfo(int).max)
         weight_means = total_weights / total_items
 
         # Calculate the standard deviation, clipping to avoid numerical errors
@@ -482,7 +483,7 @@ class AbstractSynapticManager(object):
                 total_square_weights
                 - numpy.divide(numpy.power(total_weights, 2),
                                total_items),
-                total_items), a_min=0, a_max=None))
+                total_items), a_min=0.0, a_max=numpy.finfo(float).max))
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_synapse_types = len(self.get_synapse_targets())
