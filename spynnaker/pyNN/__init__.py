@@ -13,9 +13,6 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 
-if conf.config.getboolean("Visualiser", "enable"):
-    from visualiser_framework.visualiser_constants import VISUALISER_MODES
-
 #pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
