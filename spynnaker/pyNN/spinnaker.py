@@ -207,12 +207,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             reports.write_memory_map_report(self._report_default_directory,
                                             processor_to_app_data_base_address)
 
-        #engage vis if requested
         if do_timing:
             timer.take_sample()
-
-        if conf.config.getboolean("Visualiser", "enable"):
-            self.start_visualiser()
 
         if conf.config.getboolean("Execute", "run_simulation"):
             if do_timing:
@@ -549,21 +545,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         return executable_targets
 
-    def start_visualiser(self):
-        """starts the port listener and ties it to the visualiser_framework
-         pages as required
-        """
-        # register a listener at the trasnciever for each visualised vertex
-        for vertex in self._visualiser_vertices:
-            if vertex in self._visualiser_vertex_to_page_mapping.keys():
-                associated_page = \
-                    self._visualiser_vertex_to_page_mapping[vertex]
-                self._txrx.register_listener(
-                    associated_page.recieved_spike, vertex.receieve_port_no,
-                    vertex.hostname, vertex.connection_type,
-                    vertex.traffic_type)
-        self._visualiser.start()
-
     def add_vertex(self, vertex_to_add):
         if isinstance(vertex_to_add, CommandSender):
             self._multi_cast_vertex = vertex_to_add
@@ -606,11 +587,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         edge = PartitionableEdge(vertex_to_record_from,
                                  live_spike_recorder, "recorder_edge")
         self.add_edge(edge)
-
-    def add_visualiser_vertex(self, visualiser_vertex_to_add):
-        if self._visualiser_vertices is None:
-            self._visualiser_vertices = list()
-        self._visualiser_vertices.append(visualiser_vertex_to_add)
 
     def _get_executable_path(self, executable_name):
         # Loop through search paths
@@ -703,7 +679,5 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     #    clear_router_diagnostic_non_default_positioned_filters(
                     #        router_table.x, router_table.y)
             self._txrx.send_signal(app_id, SCPSignal.STOP)
-        if conf.config.getboolean("Visualiser", "enable"):
-            self._visualiser.stop()
         if self._create_database:
             self._database_thread.stop()
