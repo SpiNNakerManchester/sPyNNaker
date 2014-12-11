@@ -43,8 +43,9 @@ class Projection(object):
 
     # noinspection PyUnusedLocal
     def __init__(self, presynaptic_population, postsynaptic_population, label,
-                 connector, spinnaker_control, machine_time_step, source=None,
-                 target='excitatory', synapse_dynamics=None, rng=None):
+                 connector, spinnaker_control, machine_time_step,
+                 timescale_factor, source=None, target='excitatory',
+                 synapse_dynamics=None, rng=None):
         """
         Instantiates a :py:object:`Projection`.
         """
@@ -139,7 +140,7 @@ class Projection(object):
             self._add_delay_extension(
                 source_sz, max_delay, natively_supported_delay_for_models,
                 synapse_list, presynaptic_population, postsynaptic_population,
-                machine_time_step, label, synapse_dynamics)
+                machine_time_step, timescale_factor, label, synapse_dynamics)
 
         else:
             self._projection_edge = \
@@ -153,7 +154,8 @@ class Projection(object):
     def _add_delay_extension(self, num_src_neurons, max_delay_for_projection,
                              max_delay_per_neuron, original_synapse_list,
                              presynaptic_population, postsynaptic_population,
-                             machine_time_step, label, synapse_dynamics):
+                             machine_time_step, timescale_factor, label,
+                             synapse_dynamics):
         """
         Instantiate new delay extension component, connecting a new edge from
         the source vertex to it and new edges from it to the target (given
@@ -185,7 +187,8 @@ class Projection(object):
                 n_neurons=num_src_neurons,
                 source_vertex=presynaptic_population._get_vertex,
                 max_delay_per_neuron=max_delay_per_neuron,
-                machine_time_step=machine_time_step, label=delay_name)
+                machine_time_step=machine_time_step,
+                timescale_factor=timescale_factor, label=delay_name)
             presynaptic_population._internal_delay_vertex = delay_vertex
             presynaptic_population._get_vertex.add_constraint(
                 PartitionerSameSizeAsVertexConstraint(delay_vertex))

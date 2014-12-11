@@ -256,8 +256,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     conf.config.getboolean("Database", "wait_on_confirmation")
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
-                    wait_on_confirmation, self._database_thread,
-                    self._in_debug_mode)
+                    self._time_scale_factor, wait_on_confirmation,
+                    self._database_thread, self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
@@ -331,6 +331,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     @property
     def machine_time_step(self):
         return self._machine_time_step
+
+    @property
+    def timescale_factor(self):
+        return self._time_scale_factor
 
     @property
     def spikes_per_second(self):
@@ -609,7 +613,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             postsynaptic_population=postsynaptic_population, rng=rng,
             connector=connector, source=source, target=target,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
-            machine_time_step=self._machine_time_step)
+            machine_time_step=self._machine_time_step,
+            timescale_factor=self._time_scale_factor)
 
     def add_edge_to_recorder_vertex(self, vertex_to_record_from, port,
                                     hostname, tag):

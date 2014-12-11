@@ -63,6 +63,11 @@ class SynapticList(object):
                                row.synapse_types):
                 sum_arrays[s][i] += abs(w)
 
+    def max_weights(self, max_arrays):
+        for row in self._synaptic_rows:
+            for w, s in zip(row.weights, row.synapse_types):
+                max_arrays[s] = max(max_arrays[s], w)
+
     def sum_square_weights(self, sum_arrays):
         """
         Sums the square of the weights going into each post-synaptic

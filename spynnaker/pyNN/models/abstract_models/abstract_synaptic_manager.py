@@ -402,18 +402,39 @@ class AbstractSynapticManager(object):
         # multiplication and (2) it's actually the complement that is needed
         # i.e. 'gammaincc']
 
-        # expensive and used twice, so store
-        gamma = special.gamma(1 + upper_bound)
+        weight_variance = 0
 
-        weight_variance = (math.exp(-average_spikes_per_timestep)
-                           * average_spikes_per_timestep
-                           * (weight_std_dev ** 2)
-                           * (-pow(average_spikes_per_timestep, upper_bound)
-                              + math.exp(average_spikes_per_timestep)
-                              * special.gammaincc(1 + upper_bound,
-                                                  average_spikes_per_timestep)
-                              * gamma)
-                           / gamma)
+        if weight_std_dev > 0:
+
+            lngamma = special.gammaln(1 + upper_bound)
+
+            gammai = special.gammaincc(1 + upper_bound,
+                                       average_spikes_per_timestep)
+
+            big_ratio = (math.log(average_spikes_per_timestep) * upper_bound
+                         - lngamma)
+
+            log_weight_variance = (
+                -average_spikes_per_timestep
+                + math.log(average_spikes_per_timestep)
+                + 2.0 * math.log(weight_std_dev)
+                + math.log(math.exp(average_spikes_per_timestep) * gammai
+                           - math.exp(big_ratio)))
+
+            weight_variance = math.exp(log_weight_variance)
+
+        # expensive and used twice, so store
+#         gamma = special.gamma(1 + upper_bound)
+#
+#         weight_variance = (math.exp(-average_spikes_per_timestep)
+#                            * average_spikes_per_timestep
+#                            * (weight_std_dev ** 2)
+#                            * (-pow(average_spikes_per_timestep, upper_bound)
+#                               + math.exp(average_spikes_per_timestep)
+#                               * special.gammaincc(1 + upper_bound,
+#                                                   average_spikes_per_timestep)
+#                               * gamma)
+#                            / gamma)
 
         # upper bound calculation -> mean + n * SD
         return ((average_spikes_per_timestep * weight_mean)
@@ -422,13 +443,14 @@ class AbstractSynapticManager(object):
     def _get_ring_buffer_totals(self, subvertex, sub_graph, graph_mapper):
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+        n_synapse_types = len(self.get_synapse_targets())
+        absolute_max_weights = numpy.zeros(n_synapse_types)
 
         # If we have an STDP mechanism, get the maximum plastic weight
         stdp_max_weight = None
         if self._stdp_mechanism is not None:
             stdp_max_weight = self._stdp_mechanism.get_max_weight()
-
-        n_synapse_types = len(self.get_synapse_targets())
+            absolute_max_weights.fill(stdp_max_weight)
 
         total_weights = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
         total_square_weights = numpy.zeros(
@@ -441,6 +463,7 @@ class AbstractSynapticManager(object):
             if stdp_max_weight is None:
 
                 # If there's no STDP maximum weight, sum the initial weights
+                sublist.max_weights(absolute_max_weights)
                 sublist.sum_weights(total_weights)
                 sublist.sum_square_weights(total_square_weights)
 
@@ -452,7 +475,8 @@ class AbstractSynapticManager(object):
                 sublist.sum_fixed_weight(total_square_weights,
                                          stdp_max_weight * stdp_max_weight)
 
-        return total_weights, total_square_weights, total_items
+        return (total_weights, total_square_weights, total_items,
+                absolute_max_weights)
 
     def _get_expected_max_weight(
             self, i, j, weight_means, weight_std_devs, weight_n_items,
@@ -465,7 +489,7 @@ class AbstractSynapticManager(object):
             self, subvertex, sub_graph, graph_mapper, spikes_per_second,
             machine_timestep, sigma):
 
-        total_weights, total_square_weights, total_items =\
+        total_weights, total_square_weights, total_items, abs_max_weights =\
             self._get_ring_buffer_totals(subvertex, sub_graph, graph_mapper)
 
         # Get maximum weight that can go into each post-synaptic neuron per
@@ -497,11 +521,19 @@ class AbstractSynapticManager(object):
         expected_max_weights = [max(t) for t in expected_weights]
         max_weights = [min((w, e))
                        for w, e in zip(max_weights, expected_max_weights)]
+        max_weights = [max((w, a))
+                       for w, a in zip(max_weights, abs_max_weights)]
 
         # Convert these to powers
         max_weight_powers = [0 if w <= 0
                              else int(math.ceil(max(0, math.log(w, 2))))
                              for w in max_weights]
+
+        # If 2^max_weight_power equals the max weight, we have to add another
+        # power, as range is 0 - (just under 2^max_weight_power)!
+        max_weight_powers = [w + 1 if (2 ** w) >= a else w
+                             for w, a in zip(max_weight_powers,
+                                             abs_max_weights)]
 
         # If we have an STDP mechanism that uses signed weights,
         # Add another bit of shift to prevent overflows
@@ -509,9 +541,6 @@ class AbstractSynapticManager(object):
                 and self._stdp_mechanism.are_weights_signed():
             max_weight_powers = [m + 1 for m in max_weight_powers]
 
-        # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
-        # but we ignore the "-1" to allow a bit of overhead in the above
-        # calculation in case a couple of extra spikes come in
         return max_weight_powers
 
     def write_synaptic_matrix_and_master_population_table(

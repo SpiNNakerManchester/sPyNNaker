@@ -155,7 +155,6 @@ class AbstractRecordableVertex(object):
         result = numpy.dstack((spike_ids, spike_times))[0]
         result = result[numpy.lexsort((spike_times, spike_ids))]
 
-        print self._label, "spikes =", result
         return result
 
     def get_neuron_parameter(

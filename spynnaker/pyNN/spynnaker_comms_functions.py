@@ -223,8 +223,8 @@ class SpynnakerCommsFunctions(object):
         return processor_to_app_data_base_address
 
     def _start_execution_on_machine(self, executable_targets, app_id, runtime,
-                                    waiting_on_confirmation, database_thread,
-                                    in_debug_mode):
+                                    time_scaling, waiting_on_confirmation,
+                                    database_thread, in_debug_mode):
         #deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()

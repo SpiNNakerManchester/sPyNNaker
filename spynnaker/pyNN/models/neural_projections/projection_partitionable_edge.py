@@ -25,13 +25,6 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         self._synapse_list = synapse_list
         self._synapse_row_io = FixedSynapseRowIO()
 
-        # If the synapse_list was not specified, create it using the connector
-        if connector is not None and synapse_list is None:
-            self._synapse_list = \
-                connector.generate_synapse_list(presynaptic_population,
-                                                postsynaptic_population,
-                                                1000.0 / machine_time_step)
-
         # If there are synapse dynamics for this connector, create a plastic
         # synapse list
         if synapse_dynamics is not None:

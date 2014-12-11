@@ -71,6 +71,7 @@ class Population(object):
         cellparams['label'] = cell_label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
+        cellparams['timescale_factor'] = spinnaker.timescale_factor
         if issubclass(cellclass, AbstractPopulationVertex):
             cellparams['spikes_per_second'] = spinnaker.spikes_per_second
             cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
@@ -99,7 +100,8 @@ class Population(object):
                 in require_multi_cast_source_constraints:
             if multi_cast_vertex is None:
                 multi_cast_vertex = CommandSender(
-                    self._spinnaker.machine_time_step)
+                    self._spinnaker.machine_time_step,
+                    self._spinnaker.timescale_factor)
                 self._spinnaker.add_vertex(multi_cast_vertex)
             multi_cast_vertex = self._spinnaker.get_multi_cast_source
             edge = PartitionableEdge(multi_cast_vertex, self._vertex)

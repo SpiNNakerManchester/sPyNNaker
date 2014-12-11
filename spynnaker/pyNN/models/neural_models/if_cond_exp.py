@@ -20,11 +20,12 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
-    def __init__(self, n_neurons, machine_time_step, spikes_per_second,
-                 ring_buffer_sigma, constraints=None, label=None,
-                 tau_m=20, cm=1.0, e_rev_E=0.0, e_rev_I=-70.0,
+    def __init__(self, n_neurons, machine_time_step, timescale_factor,
+                 spikes_per_second, ring_buffer_sigma, constraints=None,
+                 label=None, tau_m=20, cm=1.0, e_rev_E=0.0, e_rev_I=-70.0,
                  v_rest=-65.0, v_reset=-65.0, v_thresh=-50.0, tau_syn_E=5.0,
                  tau_syn_I=5.0, tau_refrac=0.1, i_offset=0, v_init=None):
+
         # Instantiate the parent classes
         AbstractConductiveVertex.__init__(self, n_neurons, e_rev_E=e_rev_E,
                                           e_rev_I=e_rev_I)
@@ -42,6 +43,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
             IFConductanceExponentialPopulation._model_based_max_atoms_per_core,
             binary="IF_cond_exp.aplx", constraints=constraints,
             machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             weight_scale=AbstractConductiveVertex.WEIGHT_SCALE)

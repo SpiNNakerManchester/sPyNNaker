@@ -20,7 +20,8 @@ class AbstractIntegrateAndFireProperties(object):
             utility_calls.convert_param_to_numpy(v_thresh, atoms)
         self._tau_refrac = \
             utility_calls.convert_param_to_numpy(tau_refrac, atoms)
-        #if v_init is not set to v_rest then set to v_init
+
+        # if v_init is not set to v_rest then set to v_init
         self._v_init = v_rest
         if v_init is not None:
             self._v_init = \
@@ -105,7 +106,3 @@ class AbstractIntegrateAndFireProperties(object):
     @cm.setter
     def cm(self, new_value):
         self._cm = new_value
-
-
-
-

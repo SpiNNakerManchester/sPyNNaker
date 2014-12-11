@@ -2,7 +2,6 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.utility_models.exp_synapse_param\
     import write_exp_synapse_param
-import numpy
 from abc import ABCMeta
 from six import add_metaclass
 
@@ -22,7 +21,7 @@ class AbstractDualExponentialVertex(object):
         self._tau_syn_E = utility_calls.convert_param_to_numpy(tau_syn_E,
                                                                n_neurons)
         self._tau_syn_E2 = utility_calls.convert_param_to_numpy(tau_syn_E2,
-                                                               n_neurons)
+                                                                n_neurons)
         self._tau_syn_I = utility_calls.convert_param_to_numpy(tau_syn_I,
                                                                n_neurons)
         self._machine_time_step = machine_time_step
@@ -111,7 +110,7 @@ class AbstractDualExponentialVertex(object):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Synapse Parameters for {} Neurons:\n"
                      .format(self._atoms))
-        
+
         # Write exponenential synapse parameters
         write_exp_synapse_param(self._tau_syn_E, self._machine_time_step, n_atoms, spec)
         write_exp_synapse_param(self._tau_syn_E2, self._machine_time_step, n_atoms, spec)

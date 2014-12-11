@@ -33,7 +33,8 @@ class LivePacketGather(
     forwarding them to the host
 
     """
-    def __init__(self, machine_time_step, tag, port, address, strip_sdp=True,
+    def __init__(self, machine_time_step, timescale_factor,
+                 tag, port, address, strip_sdp=True,
                  use_prefix=False, key_prefix=None, prefix_type=None,
                  message_type=EIEIOTypeParam.KEY_32_BIT,
                  right_shift=0, payload_as_time_stamps=True,
@@ -57,9 +58,10 @@ class LivePacketGather(
                                          "key, but current configuration does "
                                          "not specify either of these")
 
-        AbstractDataSpecableVertex.__init__(self, n_atoms=1,
-                                            label="Monitor",
-                                            machine_time_step=machine_time_step)
+        AbstractDataSpecableVertex.__init__(
+            self, n_atoms=1, label="Monitor",
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor)
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
                                              max_atoms_per_core=1)
         AbstractIPTagableVertex.__init__(self, tag, port, address,
@@ -208,9 +210,7 @@ class LivePacketGather(
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
             region=self._LIVE_DATA_GATHER_REGIONS.SYSTEM.value)
-        spec.write_value(data=self.CORE_APP_IDENTIFIER)
-        spec.write_value(data=self._machine_time_step)
-        spec.write_value(data=self._no_machine_time_steps)
+        self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER)
 
     def get_binary_file_name(self):
          # Rebuild executable name

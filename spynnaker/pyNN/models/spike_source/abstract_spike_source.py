@@ -8,8 +8,9 @@ from spynnaker.pyNN.models.abstract_models.\
 from enum import Enum
 
 
-class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
-                          AbstractDataSpecableVertex):
+class AbstractSpikeSource(
+        AbstractRecordableVertex, AbstractPartitionableVertex,
+        AbstractDataSpecableVertex):
 
     _SPIKE_SOURCE_REGIONS = Enum(
         value="_SPIKE_SOURCE_REGIONS",
@@ -19,10 +20,11 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
                ('SPIKE_HISTORY_REGION', 3)])
 
     def __init__(self, label, n_neurons, constraints, max_atoms_per_core,
-                 machine_time_step):
-        AbstractDataSpecableVertex.__init__(self, label=label,
-                                            n_atoms=n_neurons,
-                                            machine_time_step=machine_time_step)
+                 machine_time_step, timescale_factor):
+        AbstractDataSpecableVertex.__init__(
+            self, label=label, n_atoms=n_neurons,
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor)
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)

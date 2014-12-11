@@ -15,10 +15,10 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                                             AbstractPartitionableVertex):
 
     def __init__(self, n_atoms, label, max_atoms_per_core, machine_time_step,
-                 constraints=None):
-        AbstractDataSpecableVertex.__init__(self, n_atoms, label,
-                                            machine_time_step=machine_time_step,
-                                            constraints=constraints)
+                 timescale_factor, constraints=None):
+        AbstractDataSpecableVertex.__init__(
+            self, n_atoms, label, machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor, constraints=constraints)
         AbstractPartitionableVertex.__init__(
             self, n_atoms, label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)

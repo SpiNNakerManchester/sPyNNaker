@@ -42,7 +42,8 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                ('SPIKE_HISTORY', 2)])
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
-                 machine_time_step, constraints=None, label="DelayExtension"):
+                 machine_time_step, timescale_factor, constraints=None,
+                 label="DelayExtension"):
         """
         Creates a new DelayExtension Object.
         """
@@ -54,7 +55,8 @@ class DelayExtensionVertex(AbstractRecordableVertex,
         AbstractRecordableVertex.__init__(self, machine_time_step, label=label)
         AbstractDataSpecableVertex.__init__(
             self, label=label, n_atoms=n_neurons,
-            machine_time_step=machine_time_step)
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0

@@ -40,7 +40,7 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         # synapse weight scale
         abs_weights = numpy.abs(synapse_row.weights)
         scaled_weights = numpy.rint(
-            abs_weights * synapse_weight_scales).astype("uint32")
+            abs_weights * synapse_weight_scales).astype("uint32") & 0xFFFF
 
         # Check zeros
         zero_float_weights = numpy.where(abs_weights == 0.0)[0]

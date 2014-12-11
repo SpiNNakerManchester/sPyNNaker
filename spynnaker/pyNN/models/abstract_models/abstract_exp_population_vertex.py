@@ -2,17 +2,17 @@ from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.utility_models.exp_synapse_param\
     import write_exp_synapse_param
-import numpy
 from abc import ABCMeta
 from six import add_metaclass
 
 NUM_SYNAPSE_PARAMS = 4  # tau_syn_E and tau_syn_I, and initial multipiers
 
+
 @add_metaclass(ABCMeta)
 class AbstractExponentialPopulationVertex(object):
     """
-    This represents a pynn_population.py with two exponentially decaying synapses,
-    one for excitatory connections and one for inhibitory connections
+    This represents a pynn_population.py with two exponentially decaying
+    synapses, one for excitatory connections and one for inhibitory connections
     """
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step,
@@ -23,7 +23,7 @@ class AbstractExponentialPopulationVertex(object):
         self._tau_syn_I = utility_calls.convert_param_to_numpy(tau_syn_I,
                                                                n_neurons)
         self._machine_time_step = machine_time_step
-    
+
     # noinspection PyPep8Naming
     @property
     def tau_syn_E(self):
@@ -63,8 +63,8 @@ class AbstractExponentialPopulationVertex(object):
     def write_synapse_parameters(self, spec, subvertex, vertex_slice):
         """
         Write vectors of synapse parameters, one per neuron
-        There is one parameter for each synapse, which is the decay constant for
-        the exponential decay.
+        There is one parameter for each synapse, which is the decay constant
+        for the exponential decay.
 
         Exponential decay factor calculated as:
         p11_XXX = exp(-h/tau_syn_XXX)
@@ -78,7 +78,9 @@ class AbstractExponentialPopulationVertex(object):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Synapse Parameters for "
                      "{} Neurons:\n".format(n_atoms))
-        
+
         # Write exponenential synapse parameters
-        write_exp_synapse_param(self._tau_syn_E, self._machine_time_step, n_atoms, spec)
-        write_exp_synapse_param(self._tau_syn_I, self._machine_time_step, n_atoms, spec)
+        write_exp_synapse_param(self._tau_syn_E, self._machine_time_step,
+                                n_atoms, spec)
+        write_exp_synapse_param(self._tau_syn_I, self._machine_time_step,
+                                n_atoms, spec)

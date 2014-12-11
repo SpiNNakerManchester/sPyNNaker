@@ -46,6 +46,8 @@ class DelayPartitionedEdge(ProjectionPartitionedEdge):
             max_delay = ((stage + 2) * delay_edge.max_delay_per_neuron)
             delay_list = synapse_sublist.get_delay_sublist(
                 min_delay, max_delay)
+            for row in delay_list:
+                row.delays -= (min_delay - 1)
             full_delay_list.extend(delay_list)
 
         self._synapse_sublist = SynapticList(full_delay_list)
