@@ -250,14 +250,6 @@ def Population(size, cellclass, cellparams, structure=None, label=None):
 
 
 # noinspection PyPep8Naming
-def VisualisedPopulation(size, cellclass, cellparams, structure=None,
-                         label=None):
-    global _spinnaker
-    return _spinnaker.create_visualised_population(size, cellclass, cellparams,
-                                                   structure, label)
-
-
-# noinspection PyPep8Naming
 def Projection(presynaptic_population, postsynaptic_population,
                connector, source=None, target='excitatory',
                synapse_dynamics=None, label=None, rng=None):

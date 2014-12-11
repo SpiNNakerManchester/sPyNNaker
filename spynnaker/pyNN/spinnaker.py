@@ -126,15 +126,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 wait_on_confirmation)
             self._database_thread.start()
 
-        #set up vis if needed
-        if conf.config.getboolean("Visualiser", "enable"):
-            self._visualiser, self._visualiser_vertex_to_page_mapping =\
-                self._setup_visuliser(
-                    self._partitionable_graph, self._visualiser_vertices,
-                    self._partitioned_graph, self._placements,
-                    self._router_tables, self._runtime, self._machine_time_step,
-                    self._graph_mapper)
-
         #create network report if needed
         if self._reports_states is not None:
             reports.network_specification_report(self._report_default_directory,
@@ -580,21 +571,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def add_edge(self, edge_to_add):
         self._partitionable_graph.add_edge(edge_to_add)
-
-    def create_visualised_population(self, size, cellclass, cellparams,
-                                     structure, label):
-        requires_visualiser = conf.config.getboolean("Visualiser", "enable")
-        if not requires_visualiser:
-            raise exceptions.ConfigurationException(
-                "The visualiser is currently turned off by a spinnaker.cfg or "
-                "pacman.cfg file. Please correct and try again.")
-        else:
-            from spynnaker.pyNN.visualiser_package.visualised_vertex \
-                import VisualisedVertex
-            return VisualisedVertex(
-                size=size, cellclass=cellclass, cellparams=cellparams,
-                structure=structure, label=label, spinnaker=self,
-                multi_cast_vertex=self._multi_cast_vertex)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(

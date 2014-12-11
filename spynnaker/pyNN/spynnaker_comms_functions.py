@@ -94,28 +94,6 @@ class SpynnakerCommsFunctions(object):
                 y_dimension=virtual_y_dimension,
                 with_wrap_arounds=requires_wrap_around)
 
-    def _setup_visuliser(
-            self, partitionable_graph, visualiser_vertices, partitioned_graph,
-            placements, router_tables, runtime, machine_time_step,
-            graph_mapper):
-        requires_visualiser = conf.config.getboolean("Visualiser", "enable")
-        requires_virtual_board = conf.config.getboolean("Machine",
-                                                        "virtual_board")
-        #if the visuliser is required, import the correct requirements and
-        # create a new visulaiser object and mapping for spinnaker to maintain
-        if requires_visualiser:
-            from spynnaker.pyNN.visualiser_package.visualiser_creation_utility \
-                import VisualiserCreationUtility
-            #create creation utility
-            visualiser_creation_utility = VisualiserCreationUtility()
-            visualiser_creation_utility.set_visulaiser_port(
-                conf.config.getint("Recording", "live_spike_port"))
-            return visualiser_creation_utility.create_visualiser_interface(
-                requires_virtual_board, self._txrx,
-                partitionable_graph, visualiser_vertices, self._machine,
-                partitioned_graph, placements, router_tables, runtime,
-                machine_time_step, graph_mapper)
-
     def _add_iptag(self, iptag):
         self._iptags.append(iptag)
 
