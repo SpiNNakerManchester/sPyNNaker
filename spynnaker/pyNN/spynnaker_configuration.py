@@ -40,13 +40,6 @@ class SpynnakerConfiguration(object):
         #debug flag
         self._in_debug_mode = None
 
-        #visualiser_framework objects
-        self._visualiser = None
-        self._wait_for_run = False
-        self._visualiser_port = None
-        self._visualiser_vertices = None
-        self._visualiser_vertex_to_page_mapping = None
-
         #main objects
         self._partitionable_graph = PartitionableGraph(label=graph_label)
         self._partitioned_graph = None
