@@ -415,13 +415,19 @@ class Population(object):
 
         # Tell the vertex to record spikes
         self._vertex.set_record(True)
+
         # set the file to store the spikes in once retrieved
         self._record_spike_file = to_file
 
         if (conf.config.getboolean("Recording", "send_live_spikes") and
                 live_record):
+
             # add an edge to the monitor
-            self._spinnaker.add_edge_to_recorder_vertex(self._vertex)
+            self._spinnaker.add_edge_to_recorder_vertex(
+                self._vertex,
+                conf.config.getint("Recording", "live_spike_port"),
+                conf.config.get("Recording", "live_spike_host"),
+                conf.config.getint("Recording", "live_spike_tag"))
 
     def record_gsyn(self, to_file=None):
         """

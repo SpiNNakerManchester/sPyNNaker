@@ -274,5 +274,4 @@ class CommandSender(AbstractMultiCastSource):
         return 0
 
     def get_binary_file_name(self):
-        # Rebuild executable name
         return 'command_sender_multicast_source.aplx'

@@ -580,8 +580,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if port in self._live_spike_recorder.keys():
             live_spike_recorder = self._live_spike_recorder[port]
         else:
-            live_spike_recorder = \
-                LivePacketGather(self.machine_time_step, tag, port, hostname)
+            live_spike_recorder = LivePacketGather(
+                self.machine_time_step, self.timescale_factor,
+                tag, port, hostname)
             self.add_vertex(live_spike_recorder)
         #create the edge and add
         edge = PartitionableEdge(vertex_to_record_from,

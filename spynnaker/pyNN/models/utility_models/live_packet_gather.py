@@ -213,13 +213,7 @@ class LivePacketGather(
         self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER)
 
     def get_binary_file_name(self):
-         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'live_packet_gather.aplx')
-        return binary_name
+        return 'live_packet_gather.aplx'
 
     #inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
