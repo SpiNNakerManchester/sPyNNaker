@@ -197,8 +197,10 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     global _spinnaker
     global _binary_search_paths
 
-    logger.info("PACMAN103   (c) 2014 APT Group, University of Manchester")
-    logger.info("                Release version 2014.4.1 - April 2014")
+    logger.info(
+        "sPyNNaker   (c) 2014 APT Group, University of Manchester")
+    logger.info(
+        "                Release version 2014.12-rc-01 - December 2014")
 
     if len(extra_params.keys()) > 1:
         logger.warn("Extra params has been applied which we do not consider")
