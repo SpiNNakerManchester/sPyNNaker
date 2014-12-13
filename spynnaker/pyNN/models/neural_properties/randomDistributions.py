@@ -15,7 +15,10 @@ def generate_parameter(param_info, param_index=0):
         return param_info
     elif RandomDistribution is not None and isinstance(param_info,
                                                        RandomDistribution):
-        return param_info.next(n=1)
+        val = param_info.next(n=1)
+        if hasattr(val, "__len__"):
+            return val[0]
+        return val
     elif isinstance(param_info, list):
         if 0 <= param_index < len(param_info):
             return param_info[param_index]
