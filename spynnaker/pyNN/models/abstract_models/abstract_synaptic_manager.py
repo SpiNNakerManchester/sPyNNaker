@@ -402,7 +402,7 @@ class AbstractSynapticManager(object):
         # multiplication and (2) it's actually the complement that is needed
         # i.e. 'gammaincc']
 
-        weight_variance = 0
+        weight_variance = 0.0
 
         if weight_std_dev > 0:
 
@@ -414,27 +414,16 @@ class AbstractSynapticManager(object):
             big_ratio = (math.log(average_spikes_per_timestep) * upper_bound
                          - lngamma)
 
-            log_weight_variance = (
-                -average_spikes_per_timestep
-                + math.log(average_spikes_per_timestep)
-                + 2.0 * math.log(weight_std_dev)
-                + math.log(math.exp(average_spikes_per_timestep) * gammai
-                           - math.exp(big_ratio)))
+            if big_ratio < 701.0:
 
-            weight_variance = math.exp(log_weight_variance)
+                log_weight_variance = (
+                    -average_spikes_per_timestep
+                    + math.log(average_spikes_per_timestep)
+                    + 2.0 * math.log(weight_std_dev)
+                    + math.log(math.exp(average_spikes_per_timestep) * gammai
+                               - math.exp(big_ratio)))
 
-        # expensive and used twice, so store
-#         gamma = special.gamma(1 + upper_bound)
-#
-#         weight_variance = (math.exp(-average_spikes_per_timestep)
-#                            * average_spikes_per_timestep
-#                            * (weight_std_dev ** 2)
-#                            * (-pow(average_spikes_per_timestep, upper_bound)
-#                               + math.exp(average_spikes_per_timestep)
-#                               * special.gammaincc(1 + upper_bound,
-#                                                   average_spikes_per_timestep)
-#                               * gamma)
-#                            / gamma)
+                weight_variance = math.exp(log_weight_variance)
 
         # upper bound calculation -> mean + n * SD
         return ((average_spikes_per_timestep * weight_mean)
@@ -477,13 +466,6 @@ class AbstractSynapticManager(object):
 
         return (total_weights, total_square_weights, total_items,
                 absolute_max_weights)
-
-    def _get_expected_max_weight(
-            self, i, j, weight_means, weight_std_devs, weight_n_items,
-            spikes_per_second, machine_timestep, ring_buffer_sigma):
-        return self._ring_buffer_expected_upper_bound(
-            weight_means[i][j], weight_std_devs[i][j], spikes_per_second,
-            machine_timestep, weight_n_items[i][j], ring_buffer_sigma)
 
     def get_ring_buffer_to_input_left_shifts(
             self, subvertex, sub_graph, graph_mapper, spikes_per_second,
