@@ -402,25 +402,33 @@ class Population(object):
         """
         self.initialize('v', distribution)
 
-    def record(self, to_file=None, live_record=False):
+    def record(self, to_file=None):
         """
         Record spikes from all cells in the Population.
         A flag is set for this population that is passed to the simulation,
         triggering spike time recording.
         """
 
-        if not isinstance(self._vertex, AbstractRecordableVertex):
-            raise Exception("AbstractConstrainedVertex does not support "
-                            "recording of spikes")
+        record_spikes_on_sdram = conf.config.getboolean(
+            "Recording", "record_spikes_on_sdram")
+        send_live_spikes = conf.config.getboolean(
+            "Recording", "send_live_spikes")
+        if not record_spikes_on_sdram and not send_live_spikes:
+            logger.warn("Neither record_spikes_on_sdram nor send_live_spikes"
+                        " are set, so no spikes will be recorded or sent")
 
-        # Tell the vertex to record spikes
-        self._vertex.set_record(True)
+        if record_spikes_on_sdram:
 
-        # set the file to store the spikes in once retrieved
-        self._record_spike_file = to_file
+            if not isinstance(self._vertex, AbstractRecordableVertex):
+                raise Exception("This population does not support recording!")
 
-        if (conf.config.getboolean("Recording", "send_live_spikes") and
-                live_record):
+            # Tell the vertex to record spikes
+            self._vertex.set_record(True)
+
+            # set the file to store the spikes in once retrieved
+            self._record_spike_file = to_file
+
+        if send_live_spikes:
 
             # add an edge to the monitor
             self._spinnaker.add_edge_to_recorder_vertex(

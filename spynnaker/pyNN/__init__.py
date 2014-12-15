@@ -236,10 +236,10 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
                         .format(neuron_type))
 
 
-def activate_live_recording_for(population, port, host, tag):
+def activate_live_output_for(population, port, host, tag):
     global _spinnaker
     _spinnaker.add_edge_to_recorder_vertex(population._vertex,
-            port, host, tag)
+                                           port, host, tag)
 
 
 # noinspection PyPep8Naming
