@@ -15,7 +15,7 @@ class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
 
     #inhirrted from AbstractRoutingInfoAllocatorAlgorithm
     def _allocate_subedge_key_mask(self, out_going_subedge, placement):
-        """helper method (can be overlaoded by future impliemntations of key
+        """helper method (can be overloaded by future implementations of key
         alloc
 
         :param out_going_subedge: the outgoing subedge from a given subvert
@@ -37,8 +37,8 @@ class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
         elif len(router_constraints) > 1:
             raise exceptions.PacmanRouteInfoAllocationException(
                 "cannot determine how to reduce more than one router_constraint"
-                "please reduce the constraints and try again, or use another"
-                "routing info allocator")
+                " please reduce the constraints and try again, or use another"
+                " routing info allocator")
         else:
             key, mask = router_constraints[0].function_call(out_going_subedge)
             subedge_routing_info = SubedgeRoutingInfo(key=key, mask=mask,

@@ -29,7 +29,7 @@ class BufferedSendingRegion(object):
         else:
             raise exceptions.ConfigurationException(
                 "tried to set the base address of a buffer data storage region "
-                "twice, this is a error due to the imutability of this "
+                "twice, this is a error due to the immutability of this "
                 "parameter, please fix this issue and retry")
 
     def set_region_size(self, new_size):

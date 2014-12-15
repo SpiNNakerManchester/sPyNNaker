@@ -47,7 +47,7 @@ class SpikeSourceArray(AbstractSpikeSource,
             machine_time_step=machine_time_step, tag=buffer_ip_tag_tag_id,
             port=buffer_ip_tag_port, address=buffer_ip_tag_address,
             max_on_chip_memory_usage_for_recording=
-            max_on_chip_memory_usage_for_recording_in_bytes)
+            max_on_chip_memory_usage_for_recording_in_bytes, strip_sdp=True)
         #set supers
         AbstractBufferReceivablePartitionableVertex.__init__(self)
 
@@ -147,7 +147,7 @@ class SpikeSourceArray(AbstractSpikeSource,
     def _write_setup_info(self, spec, spike_buffer_region_size,
                           recording_buffer_region_size):
         """
-        Write information used to control the simulationand gathering of
+        Write information used to control the simulation and gathering of
         results. Currently, this means the flag word used to signal whether
         information on neuron firing and neuron potential is either stored
         locally in a buffer or passed out of the simulation for storage/display
@@ -166,19 +166,20 @@ class SpikeSourceArray(AbstractSpikeSource,
         # What recording commands were set for the parent pynn_population.py?
         self._write_basic_setup_info(spec, SpikeSourceArray.CORE_APP_IDENTIFIER)
         recording_info = 0
-        if (spike_buffer_region_size > 0) and self._record:
+        if (recording_buffer_region_size > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
         #add the params saying how big each
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value)
-        #write configs for reverse ip tag
+        # write configs for reverse ip tag
         # NOTE
         # as the packets are formed in the buffers, and that its a spike source
-        #array, and shouldnt have injectored packets, no config should be
+        # array, and shouldn't have injected packets, no config should be
         # required for it to work. the packet format will override these anyhow
         # END NOTE
         spec.write_value(data=0)  # prefix value
+        spec.write_value(data=0)  # prefix
         spec.write_value(data=0)  # key left shift
         spec.write_value(data=0)  # add key check
         spec.write_value(data=0)  # key for transmitting
@@ -186,9 +187,10 @@ class SpikeSourceArray(AbstractSpikeSource,
 
         #write configs for buffers
         spec.write_value(data=recording_info)
-        spec.write_value(data=spike_buffer_region_size)
         spec.write_value(data=recording_buffer_region_size)
+        spec.write_value(data=spike_buffer_region_size)
         spec.write_value(data=self._threshold_for_reporting_bytes_written)
+        spec.write_value(data=self._tag)
 
     def get_spikes(self, txrx, placements, graph_mapper, buffer_manager,
                    compatible_output=False):
@@ -212,11 +214,6 @@ class SpikeSourceArray(AbstractSpikeSource,
                 placement.x, placement.y, placement.p, hostname, report_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
-
-        #get slice from mapper
-        subvert_slice = graph_mapper.get_subvertex_slice(subvertex)
-
-        spike_history_region_sz = self._get_recording_region_size(subvert_slice)
 
         spec.comment("\n*** Spec for SpikeSourceArray Instance ***\n\n")
 
@@ -247,7 +244,7 @@ class SpikeSourceArray(AbstractSpikeSource,
             spec, self._CONFIGURATION_REGION_SIZE, real_spike_region_size,
             spikes_recording_region_size)
 
-        #update the spike soruce partitioned vertex with its region sizes
+        #update the spike source partitioned vertex with its region sizes
         subvertex.set_buffered_region_size(
             real_spike_region_size,
             self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value)
@@ -256,7 +253,7 @@ class SpikeSourceArray(AbstractSpikeSource,
         #    self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
 
         self._write_setup_info(
-            spec, spike_history_region_sz, spikes_recording_region_size)
+            spec, real_spike_region_size, spikes_recording_region_size)
 
         # End-of-Spec:
         spec.end_specification()
@@ -267,8 +264,10 @@ class SpikeSourceArray(AbstractSpikeSource,
         common_binary_path = os.path.join(config.get("SpecGeneration",
                                                      "common_binary_folder"))
 
+#        binary_name = os.path.join(common_binary_path,
+#                                   'spike_source_array.aplx')
         binary_name = os.path.join(common_binary_path,
-                                   'spike_source_array.aplx')
+                                   'reverse_iptag_multicast_source.aplx')
         return binary_name
 
     #inhirrted from partitionable vertex
@@ -282,7 +281,7 @@ class SpikeSourceArray(AbstractSpikeSource,
         return 0
 
     def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
-        """ calcualtes the total sdram usage of the spike source array. If the
+        """ calculates the total sdram usage of the spike source array. If the
         memory requirement is beyond what is deemed to be the usage of the
         processor, then it executes a buffered format.
 
@@ -323,7 +322,7 @@ class SpikeSourceArray(AbstractSpikeSource,
             else:
                 self._max_on_chip_memory_usage_for_recording = \
                     constants.DEFAULT_MEG_LIMIT
-        #check the values do not confleict with chip memory limit
+        #check the values do not conflict with chip memory limit
         max_memory_used_in_bytes = \
             self._max_on_chip_memory_usage_for_spikes + \
             self._max_on_chip_memory_usage_for_recording
@@ -347,8 +346,8 @@ class SpikeSourceArray(AbstractSpikeSource,
 
     def create_subvertex(self, resources_required, vertex_slice, label=None,
                          additional_constraints=list()):
-        """ overloaded method from abstract pattitionable vertex. used to hand
-        a partitioned spike soruce array its own buffer_collection
+        """ overloaded method from abstract partitionable vertex. used to hand
+        a partitioned spike source array its own buffer_collection
 
         :param resources_required:
         :param vertex_slice:

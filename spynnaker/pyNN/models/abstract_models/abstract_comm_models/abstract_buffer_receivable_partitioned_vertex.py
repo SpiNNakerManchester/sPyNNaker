@@ -11,6 +11,8 @@ from spynnaker.pyNN.buffer_management.buffer_requests.\
     send_data_request import SendDataRequest
 from spynnaker.pyNN.buffer_management.buffer_requests.stop_requests_request \
     import StopRequestsRequest
+from spynnaker.pyNN.buffer_management.buffer_requests.event_stop_request \
+    import EventStopRequest
 from spynnaker.pyNN.utilities import constants
 
 
@@ -40,24 +42,24 @@ class AbstractBufferReceivablePartitionedVertex(object):
         return self._generate_buffers_for_transmission(buffered_packet)
 
     def _generate_buffers_for_transmission(self, buffered_packet):
-        """ uses the recieved buffered packet and determines what to do with it.
+        """ uses the received buffered packet and determines what to do with it.
 
         :param buffered_packet: the packet which determines future actions
         :return:
         """
-        #build the buffer for the size avilable
+        #build the buffer for the size available
         buffers = self._receiver_buffer_collection.get_buffer_for_region(
             buffered_packet.region_id)
 
         #remove received elements
-        self._remove_recieved_elements(buffered_packet, buffers)
+        self._remove_received_elements(buffered_packet, buffers)
 
         #start
         buffer_keys = list(buffers.keys())
         position_in_buffer = 0
-        seqeunce_no = buffered_packet.sequence_no
-        if seqeunce_no is None:
-            seqeunce_no = 0
+        sequence_no = buffered_packet.sequence_no
+        if sequence_no is None:
+            sequence_no = 0
         used_seqeunce_no = 0
         send_requests = list()
         #by default there is always a eieio header (in the form of a spike train)
@@ -77,16 +79,27 @@ class AbstractBufferReceivablePartitionedVertex(object):
                 send_request, used_memory, position_in_buffer = \
                     self._deal_with_entire_timer_stamp(
                         buffers, buffer_keys, position_in_buffer, header_byte_1,
-                        seqeunce_no, buffered_packet)
+                        sequence_no, buffered_packet)
             else:
                 send_request, used_memory = self._deal_with_partial_timer_stamp(
                     buffered_packet, memory_used, header_byte_1, buffer_keys,
-                    position_in_buffer, buffers, seqeunce_no)
+                    position_in_buffer, buffers, sequence_no)
             send_requests.append(send_request)
+            if (position_in_buffer == len(buffer_keys) and
+                    memory_used < buffered_packet.count):
+                address_pointer = self._receiver_buffer_collection.\
+                    get_region_absolute_region_address(
+                        buffered_packet.region_id)
+                end_request = EventStopRequest(
+                    chip_x=buffered_packet.chip_x,
+                    chip_y=buffered_packet.chip_y,
+                    chip_p=buffered_packet.chip_p,
+                    address_pointer=address_pointer, size=2)
+                send_requests.append(end_request)
             memory_used += used_memory
-            seqeunce_no += 1
+            sequence_no += 1
             used_seqeunce_no += 1
-            seqeunce_no = (seqeunce_no + 1) % constants.MAX_SEQUENCE_NO
+            sequence_no = (sequence_no + 1) % constants.MAX_SEQUENCE_NO
         return send_requests
 
     def _deal_with_partial_timer_stamp(
@@ -107,8 +120,8 @@ class AbstractBufferReceivablePartitionedVertex(object):
         used by this method.
         """
         data = LittleEndianByteArrayByteWriter()
-        length_avilable = buffered_packet.count - memory_used
-        entries_to_put_in = math.floor(length_avilable /
+        length_available = buffered_packet.count - memory_used
+        entries_to_put_in = math.floor(length_available /
                                        constants.KEY_SIZE)
         entries_to_store_into_udp = \
             math.floor(constants.MAX_EIEIO_ENTRIES_TO_STORE_IN_UDP,
@@ -130,7 +143,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
         request = SendDataRequest(
             chip_x=buffered_packet.chip_x, chip_y=buffered_packet.chip_y,
             chip_p=buffered_packet.chip_p, address_pointer=address_pointer,
-            data=data, sequence_no=seqeunce_no)
+            data=data.data, sequence_no=seqeunce_no)
         return request, memory_used
 
     def _deal_with_entire_timer_stamp(
@@ -181,13 +194,13 @@ class AbstractBufferReceivablePartitionedVertex(object):
         request = SendDataRequest(
             chip_x=buffered_packet.chip_x, chip_y=buffered_packet.chip_y,
             chip_p=buffered_packet.chip_p, address_pointer=address_pointer,
-            data=data, sequence_no=seqeunce_no)
+            data=data.data, sequence_no=seqeunce_no)
         return request, memory_used, position_in_buffer
 
     @staticmethod
-    def _remove_recieved_elements(buffered_packet, region):
-        last_seq_no_recieved = buffered_packet.sequence_no
-        if last_seq_no_recieved is not None:
+    def _remove_received_elements(buffered_packet, region):
+        last_seq_no_received = buffered_packet.sequence_no
+        if last_seq_no_received is not None:
             keys = region.keys()
             position_in_keys = 0
             reached = False
@@ -198,9 +211,9 @@ class AbstractBufferReceivablePartitionedVertex(object):
                 to_remove = list()
                 #locate stuff to remove
                 for element in elements:
-                    if element.seqeuence_no == last_seq_no_recieved:
+                    if element.seqeuence_no == last_seq_no_received:
                         reached = True
-                    if element.seqeuence_no != last_seq_no_recieved and reached:
+                    if element.seqeuence_no != last_seq_no_received and reached:
                         finished = True
                     if not finished:
                         to_remove.append(element)

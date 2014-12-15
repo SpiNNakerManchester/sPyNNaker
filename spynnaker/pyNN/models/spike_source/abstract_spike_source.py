@@ -26,13 +26,13 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
 
     def __init__(self, label, n_neurons, constraints, max_atoms_per_core,
                  machine_time_step, max_on_chip_memory_usage_for_recording,
-                 tag, port, address):
+                 tag, port, address, strip_sdp=False):
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
         AbstractRecordableVertex.__init__(
             self, machine_time_step, label, tag, port, address,
-            max_on_chip_memory_usage_for_recording)
+            max_on_chip_memory_usage_for_recording, strip_sdp=strip_sdp)
         AbstractDataSpecableVertex.__init__(self, label=label,
                                             n_atoms=n_neurons,
                                             machine_time_step=machine_time_step)

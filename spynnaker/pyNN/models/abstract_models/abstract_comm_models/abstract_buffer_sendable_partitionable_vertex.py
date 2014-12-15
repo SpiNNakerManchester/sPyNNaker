@@ -9,9 +9,9 @@ from spynnaker.pyNN import exceptions
 @add_metaclass(ABCMeta)
 class AbstractBufferSendableVertex(AbstractIPTagableVertex):
 
-    def __init__(self, tag, port, address):
+    def __init__(self, tag, port, address, strip_sdp=False):
         AbstractIPTagableVertex.__init__(self, tag=tag, port=port,
-                                         address=address)
+                                         address=address, strip_sdp=strip_sdp)
         self._will_send_buffers = False
         self._threshold_for_reporting_bytes_written = None
         self._recording_region_size_in_bytes = None

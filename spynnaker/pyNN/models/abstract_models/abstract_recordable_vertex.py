@@ -30,8 +30,9 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
     """
 
     def __init__(self, machine_time_step, label, tag, port, address,
-                 max_on_chip_memory_usage_for_recording):
-        AbstractBufferSendableVertex.__init__(self, tag, port, address)
+                 max_on_chip_memory_usage_for_recording, strip_sdp=False):
+        AbstractBufferSendableVertex.__init__(
+            self, tag, port, address, strip_sdp=strip_sdp)
         self._record = False
         self._record_v = False
         self._record_gsyn = False
@@ -155,7 +156,7 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
             eieio_messages = \
                 EIEIOMessage.create_eieio_messages_from(little_endian_byte_reader)
 
-            # interpreate each message into spikes
+            # interpret each message into spikes
             for message in eieio_messages:
                 spikes = self._turn_message_info_spike_train(
                     spikes, message,
@@ -187,7 +188,7 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
         numpy array param
 
         :param spikes: the numpy array to append to
-        :param message: the message to interprete
+        :param message: the message to interpret
         :type spikes: numpy array
         :type message: a EIEIOMessage
         :return: the appended numpi array
@@ -196,7 +197,7 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
         timer_tic = message.eieio_header.payload_base
         #turn into numpy array of shorts (2 bytes, each representing neuron id)
         core_based_neuron_ids = numpy.frombuffer(message.data, dtype="<i2")
-        #translate into the neuon id the pop understands
+        #translate into the neuron id the pop understands
         pop_based_neuron_ids = numpy.add(core_based_neuron_ids, lo_atom)
         pop_based_neuron_ids_with_timer = \
             numpy.zeros((len(pop_based_neuron_ids), 2))

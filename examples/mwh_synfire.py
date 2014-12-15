@@ -76,18 +76,18 @@ spikes = None
 
 v = populations[0].get_v(compatible_output=True)
 gsyn = populations[0].get_gsyn(compatible_output=True)
-spikes = populations[0].getSpikes(compatible_output=True)
+#spikes = populations[0].getSpikes(compatible_output=True)
 
-if spikes is not None:
-    print spikes
-    pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
-    pylab.xlabel('neuron id')
-    pylab.ylabel('Time/ms')
-    pylab.title('spikes')
-    pylab.show()
-else:
-    print "No spikes received"
+#if spikes is not None:
+#    print spikes
+#    pylab.figure()
+#    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
+#    pylab.xlabel('neuron id')
+#    pylab.ylabel('Time/ms')
+#    pylab.title('spikes')
+#    pylab.show()
+#else:
+#    print "No spikes received"
 
 # Make some graphs
 ticks = len(v) / nNeurons

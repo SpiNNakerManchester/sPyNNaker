@@ -110,7 +110,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         #set up vis if needed
         if conf.config.getboolean("Visualiser", "enable"):
             self._visualiser, self._visualiser_vertex_to_page_mapping =\
-                self._setup_visuliser(
+                self._setup_visualiser(
                     self._partitionable_graph, self._visualiser_vertices,
                     self._partitioned_graph, self._placements,
                     self._router_tables, self._runtime, self._machine_time_step,
@@ -122,7 +122,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                                                  self._partitionable_graph,
                                                  self._hostname)
 
-        #calcualte number of machien time steps
+        #calcualte number of machine time steps
         if run_time is not None:
             self._no_machine_time_steps =\
                 int((run_time * 1000.0) / self._machine_time_step)
@@ -233,7 +233,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
-                    self._retieve_provance_data_from_machine(executable_targets)
+                    self._retrieve_provance_data_from_machine(executable_targets)
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
@@ -262,7 +262,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         progress_bar.end()
 
         #set up listener for buffer command messages if the buffer manager has
-        #has been initilised
+        #has been initialised
         progress_bar = ProgressBar(len(self._buffer_managers.keys()),
                                    "on initilising the listeners for vertices "
                                    "which require buffering")
@@ -405,7 +405,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         pacman_report_state = \
             self._reports_states.generate_pacman_report_states()
 
-        self._check_if_theres_any_pre_placement_constraints_to_satisify()
+        self._check_if_theres_any_pre_placement_constraints_to_satisfy()
         
         #execute partitioner
         self._execute_partitioner(pacman_report_state)
@@ -570,7 +570,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         """starts the port listener and ties it to the visualiser_framework
          pages as required
         """
-       #register a listener at the trasnciever for each visualised vertex
+       #register a listener at the transciever for each visualised vertex
         for vertex in self._visualiser_vertices:
             if vertex in self._visualiser_vertex_to_page_mapping.keys():
                 associated_page = self._visualiser_vertex_to_page_mapping[vertex]
@@ -642,7 +642,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._visualiser_vertices = list()
         self._visualiser_vertices.append(visualiser_vertex_to_add)
 
-    def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
+    def _check_if_theres_any_pre_placement_constraints_to_satisfy(self):
         for vertex in self._partitionable_graph.vertices:
             virtual_chip_constraints = \
                 pacman_utility_calls.locate_constraints_of_type(

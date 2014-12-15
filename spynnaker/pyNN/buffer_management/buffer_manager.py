@@ -5,6 +5,8 @@ from spinnman import constants as spinnman_constants
 from spinnman import exceptions as spinnman_exceptions
 from spinnman.connections.udp_packet_connections.udp_spinnaker_connection import \
     UDPSpinnakerConnection
+from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
+from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
 from spinnman.data.little_endian_byte_array_byte_reader \
     import LittleEndianByteArrayByteReader
 
@@ -147,11 +149,11 @@ class BufferManager(object):
         for send_vertex_key in self._recieve_vertices.keys():
             sender_vertex = self._sender_vertices[send_vertex_key]
             for region_id in sender_vertex.receiver_buffer_collection.regions_managed:
-                self._handle_a_inital_buffer_for_region(region_id, sender_vertex)
+                self._handle_a_initial_buffer_for_region(region_id, sender_vertex)
             progress_bar.update()
         progress_bar.end()
 
-    def _handle_a_inital_buffer_for_region(self, region_id, sender_vertex):
+    def _handle_a_initial_buffer_for_region(self, region_id, sender_vertex):
         """ collects the initial regions buffered data and transmits it to the
         board based chip's memory
 
@@ -169,21 +171,36 @@ class BufferManager(object):
         placement_of_partitioned_vertex = \
             self._placements.get_placement_of_subvertex(sender_vertex)
         buffered_packet = BufferPacket(
-            placement_of_partitioned_vertex.x, placement_of_partitioned_vertex.y,
+            placement_of_partitioned_vertex.x,
+            placement_of_partitioned_vertex.y,
             placement_of_partitioned_vertex.p,
-            spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_SEND, region_id,
-            region_size, None)
+            spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_SEND,
+            region_id, region_size, None)
         #create a buffer request for the right size
         data_requests = sender_vertex.process_buffered_packet(buffered_packet)
+        space_used = 0
         #send each data request
         for data_request in data_requests:
             #write memory to chip
             self._transciever.write_memory(
                 data_request.chip_x, data_request.chip_y,
                 data_request.address_pointer, data_request.data)
+            #add padding at the end of memory region during initial memory write
+            space_used += len(data_request.data)
+        length_to_be_padded = region_size - space_used
+        padding_packet_header = EIEIOCommandHeader(
+            spinnman_constants.EIEIO_COMMAND_IDS.EVENT_PADDING.value)
+        padding_packet = EIEIOCommandMessage(padding_packet_header, None)
+        padding_packet_bytes = padding_packet.convert_to_byte_array()
+        number_of_padding_packets = length_to_be_padded / \
+            len(padding_packet_bytes)
+        full_padding = padding_packet_bytes * number_of_padding_packets
+        self._transciever.write_memory(
+            data_request.chip_x, data_request.chip_y,
+            data_request.address_pointer + space_used, full_padding)
 
     def _locate_region_address(self, region_id, sender_vertex):
-        """ detemrines if the base adress of the region has been set. if the
+        """ determines if the base address of the region has been set. if the
         address has not been set, it reads the address from the pointer table.
         ONLY PLACE WHERE THIS IS STORED!
 
@@ -206,7 +223,9 @@ class BufferManager(object):
             region_offset_in_pointer_table = utility_calls.\
                 get_region_base_address_offset(app_data_base_address, region_id)
             region_offset_to_core_base = str(list(self._transciever.read_memory(
-                placement.x, placement.y, region_offset_in_pointer_table, 4))[0])
-            base_address = struct.unpack("<I", region_offset_to_core_base)[0]
+                placement.x, placement.y,
+                region_offset_in_pointer_table, 4))[0])
+            base_address = struct.unpack("<I", region_offset_to_core_base)[0] +\
+                           app_data_base_address
             sender_vertex.receiver_buffer_collection.\
                 set_region_base_address_for(region_id, base_address)

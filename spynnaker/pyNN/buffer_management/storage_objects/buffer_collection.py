@@ -86,7 +86,7 @@ class BufferCollection(object):
         return self._buffers_to_use[buffered_packet.region_id].is_region_empty()
 
     def get_region_absolute_region_address(self, region_id):
-        """gets the regions absolute regiona ddress
+        """gets the regions absolute region address
 
         :param region_id: the region id to get the absolute address from
         :return:

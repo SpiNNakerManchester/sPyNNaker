@@ -4,7 +4,7 @@ from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
-class AbstractRequest(object):
+class AbstractCommandRequest(object):
 
     def __init__(self):
         pass
