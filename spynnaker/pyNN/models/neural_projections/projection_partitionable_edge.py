@@ -1,11 +1,14 @@
-from pacman.model.partitionable_graph.partitionable_edge import PartitionableEdge
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
 from pacman.utilities.progress_bar import ProgressBar
-from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import \
-    ProjectionPartitionedEdge
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
+    import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
+
+from spynnaker.pyNN.models.neural_properties.synapse_row_info \
+    import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import constants
 import logging
 logger = logging.getLogger(__name__)
@@ -17,8 +20,8 @@ class ProjectionPartitionableEdge(PartitionableEdge):
                  machine_time_step, connector=None, synapse_list=None,
                  synapse_dynamics=None, label=None):
         PartitionableEdge.__init__(self, presynaptic_population._get_vertex,
-                                         postsynaptic_population._get_vertex,
-                                         label=label)
+                                   postsynaptic_population._get_vertex,
+                                   label=label)
 
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
@@ -71,7 +74,7 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         Get synaptic data for all connections in this Projection from the
         machine.
         """
-logger.debug("Reading synapse data for edge between {} and {}"
+        logger.debug("Reading synapse data for edge between {} and {}"
                      .format(self._pre_vertex.label, self._post_vertex.label))
         subedges = \
             graph_mapper.get_partitioned_edges_from_partitionable_edge(self)
