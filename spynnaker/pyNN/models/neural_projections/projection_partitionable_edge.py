@@ -71,49 +71,35 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         Get synaptic data for all connections in this Projection from the
         machine.
         """
-
-        logger.debug("Reading synapse data for edge between {} and {}"
+logger.debug("Reading synapse data for edge between {} and {}"
                      .format(self._pre_vertex.label, self._post_vertex.label))
-        sorted_subedges = \
-            sorted(graph_mapper.
-                   get_partitioned_edges_from_partitionable_edge(self),
-                   key=lambda sub_edge:
-                   (graph_mapper.get_subvertex_slice(
-                       sub_edge.pre_subvertex).lo_atom,
-                    graph_mapper.get_subvertex_slice(
-                        sub_edge.post_subvertex).lo_atom))
+        subedges = \
+            graph_mapper.get_partitioned_edges_from_partitionable_edge(self)
 
-        synaptic_list = list()
-        last_pre_lo_atom = None
-        progress_bar = ProgressBar(len(sorted_subedges),
+        synaptic_list = [SynapseRowInfo([], [], [], [])
+                         for _ in range(self._pre_vertex.n_atoms)]
+        progress_bar = ProgressBar(len(subedges),
                                    "progress on reading back synaptic matrix")
-        for subedge in sorted_subedges:
-            vertex_slice = \
+        for subedge in subedges:
+            n_rows = subedge.get_n_rows(graph_mapper)
+            pre_vertex_slice = \
                 graph_mapper.get_subvertex_slice(subedge.pre_subvertex)
-            pre_n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
+            post_vertex_slice = \
+                graph_mapper.get_subvertex_slice(subedge.post_subvertex)
 
             sub_edge_post_vertex = \
                 graph_mapper.get_vertex_from_subvertex(subedge.post_subvertex)
             rows = sub_edge_post_vertex.get_synaptic_list_from_machine(
-                placements, transceiver, subedge.pre_subvertex, pre_n_atoms,
+                placements, transceiver, subedge.pre_subvertex, n_rows,
                 subedge.post_subvertex,
                 constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
                 constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 self._synapse_row_io, partitioned_graph, graph_mapper,
                 routing_infos, subedge.weight_scales).get_rows()
 
-            pre_lo_atom = vertex_slice.lo_atom
-            if ((last_pre_lo_atom is None) or
-                    (last_pre_lo_atom != pre_lo_atom)):
-                synaptic_list.extend(rows)
-                last_pre_lo_atom = pre_lo_atom
-            else:
-                for i in range(len(rows)):
-                    row = rows[i]
-                    post_lo_atom = graph_mapper.get_subvertex_slice(
-                        subedge.post_subvertex).lo_atom
-                    synaptic_list[i + last_pre_lo_atom]\
-                        .append(row, lo_atom=post_lo_atom)
+            for i in range(len(rows)):
+                synaptic_list[i + pre_vertex_slice.lo_atom].append(
+                    rows[i], lo_atom=post_vertex_slice.lo_atom)
             progress_bar.update()
         progress_bar.end()
         return SynapticList(synaptic_list)

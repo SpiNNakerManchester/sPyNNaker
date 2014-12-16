@@ -34,6 +34,11 @@ class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
                     pre_vertex_slice, post_vertex_slice)
         return self._synapse_sublist
 
+    def get_n_rows(self, graph_mapper):
+        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._pre_subvertex)
+        return pre_vertex_slice.n_atoms
+
     def free_sublist(self):
         """
         Indicates that the list will not be needed again
