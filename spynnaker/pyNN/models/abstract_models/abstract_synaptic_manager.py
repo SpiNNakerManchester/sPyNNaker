@@ -414,7 +414,7 @@ class AbstractSynapticManager(object):
             big_ratio = (math.log(average_spikes_per_timestep) * upper_bound
                          - lngamma)
 
-            if big_ratio < 701.0:
+            if big_ratio > -701.0 and big_ratio < 701.0 and big_ratio != 0.0:
 
                 log_weight_variance = (
                     -average_spikes_per_timestep
