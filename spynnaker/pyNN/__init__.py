@@ -16,6 +16,7 @@ from spynnaker.pyNN.utilities.parameters_surrogate\
 #pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
+from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -236,10 +237,19 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
                         .format(neuron_type))
 
 
-def activate_live_output_for(population, port, host, tag):
+def activate_live_output_for(
+        population, port, host, tag=None,
+        strip_sdp=True, use_prefix=False, key_prefix=None,
+        prefix_type=None, message_type=EIEIOTypeParam.KEY_32_BIT,
+        right_shift=0, payload_as_time_stamps=True,
+        use_payload_prefix=True, payload_prefix=None,
+        payload_right_shift=0, number_of_packets_sent_per_time_step=0):
     global _spinnaker
-    _spinnaker.add_edge_to_recorder_vertex(population._vertex,
-                                           port, host, tag)
+    _spinnaker.add_edge_to_recorder_vertex(
+        population._vertex, port, host, tag, strip_sdp, use_prefix,
+        key_prefix, prefix_type, message_type, right_shift,
+        payload_as_time_stamps, use_payload_prefix, payload_prefix,
+        payload_right_shift, number_of_packets_sent_per_time_step)
 
 
 # noinspection PyPep8Naming

@@ -22,8 +22,8 @@ from . import log
 
 def _install_cfg():
     template_cfg = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                "pacman.cfg.template")
-    home_cfg = os.path.expanduser("~/.pacman.cfg")
+                "spynnaker.cfg.template")
+    home_cfg = os.path.expanduser("~/.spynnaker.cfg")
     shutil.copyfile(template_cfg, home_cfg)
     print "************************************"
     print("{} has been created.  Please edit this file and change \"None\""
@@ -55,12 +55,12 @@ for possible_pacman_file in legacy_pacmans:
     if os.path.isfile(possible_pacman_file):
         if found_spynnakers:
             raise exceptions.ConfigurationException(
-                "The configuration tools discovered a pacman.cfg in path \n"
-                "{}\n as well as a non-default pacman.cfg. Spynnaker does"
-                " not support integration of pacman.cfg and pacman.cfg."
+                "The configuration tools discovered a spynnaker.cfg in path \n"
+                "{}\n as well as a non-default spynnaker.cfg. Spynnaker does"
+                " not support integration of pacman.cfg and spynnaker.cfg."
                 " Please remove or merge these files. Recommendation is to"
-                " rename the merged file to pacman.cfg".format(
-                        possible_pacman_file))
+                " rename the merged file to spynnaker.cfg".format(
+                    possible_pacman_file))
         else:
             found_pacmans = True
 
@@ -71,6 +71,7 @@ if found_spynnakers:
 elif found_pacmans:
     read = config.read(legacy_pacmans)
 else:
+
     # Create a default pacman.cfg in the user home directory and get them
     # to update it.
     _install_cfg()

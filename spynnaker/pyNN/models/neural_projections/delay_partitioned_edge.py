@@ -24,6 +24,13 @@ class DelayPartitionedEdge(ProjectionPartitionedEdge):
             self._calculate_synapse_sublist(graph_mapper)
         return self._synapse_sublist
 
+    def get_n_rows(self, graph_mapper):
+        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._pre_subvertex)
+        delay_edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
+            self)
+        return pre_vertex_slice.n_atoms * delay_edge.num_delay_stages
+
     def _calculate_synapse_sublist(self, graph_mapper):
         pre_vertex_slice = graph_mapper.get_subvertex_slice(
             self._pre_subvertex)
