@@ -81,8 +81,19 @@ bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuro
 		input_this_timestep = 	exc_input * ( neuron->V_rev_E - V_last )  +   // need to check units and polarity of inh
 										inh_input * ( neuron->V_rev_I - V_last )  +
 										neuron->I_offset; // adding offset current - all need to be in nA
+        
 
 		lif_neuron_closed_form( neuron, V_last, -neuron->refract_timer );
+        bool ishigh = false;
+        ishigh = REAL_COMPARE( neuron->V_membrane, >=, neuron->V_rev_E );
+        if(ishigh) {
+            neuron->V_membrane = neuron->V_rev_E;
+        }
+        bool islow = false;
+        islow = REAL_COMPARE( neuron->V_membrane, <=, neuron->V_rev_I );
+        if(islow) {
+            neuron->V_membrane = neuron->V_rev_I;
+        }
 //		ode_solve_fix_ss_expl( RK_METHOD, NO_OF_EXPL_FIX_STEPS, EXPL_FIX_STEP_SIZE, neuron );
         
         //stochastic threshold code.
@@ -107,7 +118,7 @@ bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuro
 		spike = REAL_COMPARE( result, >=, ra );  // has it spiked?
 
 		if( spike ) {
-                 //io_printf( IO_BUF, "\n %11.4k %11.4K %11.4K", neuron->V_membrane, result ,r);
+             //io_printf( IO_BUF, "\n %11.4k %11.4k %11.4K %11.4K %11.4K", neuron->V_membrane, exc_input, inh_input, result ,ra);
              neuron_discrete_changes( neuron );
         }
 		}

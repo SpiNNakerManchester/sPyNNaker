@@ -17,7 +17,7 @@ class IFConductanceExponentialStochasticPopulation(AbstractExponentialPopulation
                                          AbstractIntegrateAndFireProperties,
                                          AbstractPopulationVertex):
     CORE_APP_IDENTIFIER = constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID
-    _model_based_max_atoms_per_core = 256
+    _model_based_max_atoms_per_core = 60
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, constraints=None,
