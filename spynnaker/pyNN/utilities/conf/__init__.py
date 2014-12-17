@@ -71,7 +71,6 @@ if found_spynnakers:
 elif found_pacmans:
     read = config.read(legacy_pacmans)
 else:
-
     # Create a default pacman.cfg in the user home directory and get them
     # to update it.
     _install_cfg()
