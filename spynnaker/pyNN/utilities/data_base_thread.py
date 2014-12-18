@@ -5,6 +5,8 @@ import os
 import logging
 from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
 from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
 from spynnaker.pyNN.utilities.data_base_message_connection\
     import DataBaseMessageConnection
 
@@ -300,12 +302,21 @@ class DataBaseThread(threading.Thread):
 
         # add vertices
         for vertex in self._partitionable_graph.vertices:
-            self._cur.execute(
-                "INSERT INTO Partitionable_vertices("
-                "vertex_label, no_atoms, max_atom_constrant, recorded)"
-                " VALUES('{}', {}, {}, {});"
-                .format(vertex.label, vertex.n_atoms,
-                        vertex.get_max_atoms_per_core(), int(vertex.record)))
+            if isinstance(vertex, AbstractRecordableVertex):
+                self._cur.execute(
+                    "INSERT INTO Partitionable_vertices("
+                    "vertex_label, no_atoms, max_atom_constrant, recorded)"
+                    " VALUES('{}', {}, {}, {});"
+                    .format(vertex.label, vertex.n_atoms,
+                            vertex.get_max_atoms_per_core(),
+                            int(vertex.record)))
+            else:
+                self._cur.execute(
+                    "INSERT INTO Partitionable_vertices("
+                    "vertex_label, no_atoms, max_atom_constrant, recorded)"
+                    " VALUES('{}', {}, {}, 0);"
+                    .format(vertex.label, vertex.n_atoms,
+                            vertex.get_max_atoms_per_core()))
         # add edges
         vertices = self._partitionable_graph.vertices
         for vertex in self._partitionable_graph.vertices:

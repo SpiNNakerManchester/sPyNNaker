@@ -9,8 +9,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import packet_conversions
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
-    import AbstractRecordableVertex
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge import \
     DelayPartitionableEdge
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -25,8 +23,7 @@ from data_specification.data_specification_generator import \
 logger = logging.getLogger(__name__)
 
 
-class DelayExtensionVertex(AbstractRecordableVertex,
-                           AbstractPartitionableVertex,
+class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractDataSpecableVertex):
     """
     Instance of this class provide delays to incoming spikes in multiples
@@ -52,7 +49,6 @@ class DelayExtensionVertex(AbstractRecordableVertex,
                                              constraints=constraints,
                                              label=label,
                                              max_atoms_per_core=256)
-        AbstractRecordableVertex.__init__(self, machine_time_step, label=label)
         AbstractDataSpecableVertex.__init__(
             self, label=label, n_atoms=n_neurons,
             machine_time_step=machine_time_step,

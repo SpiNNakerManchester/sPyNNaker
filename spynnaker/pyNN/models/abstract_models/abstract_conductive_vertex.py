@@ -1,6 +1,7 @@
 from spynnaker.pyNN.utilities import utility_calls
 from abc import ABCMeta
 from six import add_metaclass
+from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
@@ -38,3 +39,8 @@ class AbstractConductiveVertex(object):
     @e_rev_I.setter
     def e_rev_I(self, new_value):
         self._e_rev_I = new_value
+
+    @abstractmethod
+    def is_conductive(self):
+        """helper method for is_instance
+        """

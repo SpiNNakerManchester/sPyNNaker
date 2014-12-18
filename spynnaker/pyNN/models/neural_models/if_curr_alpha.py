@@ -12,6 +12,7 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
 
 class IFCurrentAlphaPopulation(AbstractIntegrateAndFireProperties,
                                AbstractPopulationVertex):
+
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma, constraints=None,
@@ -43,3 +44,15 @@ class IFCurrentAlphaPopulation(AbstractIntegrateAndFireProperties,
 
     def is_population_vertex(self):
         return True
+
+    def get_n_synapse_type_bits(self):
+        pass
+
+    def is_integrate_and_fire_vertex(self):
+        pass
+
+    def write_synapse_parameters(self, spec, subvertex):
+        pass
+
+    def is_recordable(self):
+        pass

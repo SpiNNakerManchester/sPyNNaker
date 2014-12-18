@@ -48,3 +48,15 @@ class HHConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
 
     def is_population_vertex(self):
         return True
+
+    def is_integrate_and_fire_vertex(self):
+        pass
+
+    def is_conductive(self):
+        pass
+
+    def is_exp_vertex(self):
+        pass
+
+    def is_recordable(self):
+        pass

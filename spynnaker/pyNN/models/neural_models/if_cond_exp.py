@@ -16,6 +16,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
                                          AbstractConductiveVertex,
                                          AbstractIntegrateAndFireProperties,
                                          AbstractPopulationVertex):
+
     CORE_APP_IDENTIFIER = constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
 
@@ -128,4 +129,16 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
         ]
 
     def is_population_vertex(self):
+        return True
+
+    def is_integrate_and_fire_vertex(self):
+        return True
+
+    def is_conductive(self):
+        return True
+
+    def is_exp_vertex(self):
+        return True
+
+    def is_recordable(self):
         return True

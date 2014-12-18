@@ -362,3 +362,6 @@ class SpikeSourceArray(AbstractSpikeSource):
         return 0
         #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         #return (44 + (16 * 4)) * n_atoms
+
+    def is_recordable(self):
+        return True

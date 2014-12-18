@@ -4,7 +4,6 @@ from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions import \
     generate_parameter
-from spynnaker.pyNN.utilities.conf import config
 
 
 from data_specification.data_specification_generator import \
@@ -30,12 +29,13 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     This class represents a Poisson Spike source object, which can represent
     a pynn_population.py of virtual neurons each with its own parameters.
     """
+
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
-            value="_POISSON_SPIKE_SOURCE_REGIONS",
-            names=[('SYSTEM_REGION', 0),
-                   ('POISSON_PARAMS_REGION', 1),
-                   ('SPIKE_HISTORY_REGION', 2)])
+        value="_POISSON_SPIKE_SOURCE_REGIONS",
+        names=[('SYSTEM_REGION', 0),
+               ('POISSON_PARAMS_REGION', 1),
+               ('SPIKE_HISTORY_REGION', 2)])
     _model_based_max_atoms_per_core = 256
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
@@ -243,7 +243,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         # words to represent
         sub_vertex_out_spike_bytes_function = \
             lambda subvertex, subvertex_slice: int(ceil(
-                    subvertex_slice.n_atoms / 32.0)) * 4
+                subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
@@ -316,3 +316,6 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
     def get_binary_file_name(self):
         return "spike_source_poisson.aplx"
+
+    def is_recordable(self):
+        return True
