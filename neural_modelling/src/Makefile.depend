@@ -14,7 +14,8 @@ SPINN_NEURAL_MODELLING_DIR = $(DIRS)
 ABSOBJS = $(abspath $(OBJECTS))
 ABSDIR = $(abspath $(SPINN_NEURAL_MODELLING_DIR))
 ifdef EXTRA_SRC_DIR
-    EXTRA_OBJS := $(ABSOBJS:$(EXTRA_SRC_DIR)/%.o=%.o)
+    ABS_EXTRA_SRC_DIR = $(abspath $(EXTRA_SRC_DIR))
+    EXTRA_OBJS := $(ABSOBJS:$(ABS_EXTRA_SRC_DIR)/%.o=%.o)
 else
     EXTRA_OBJS := $(ABSOBJS)
 endif
@@ -73,6 +74,12 @@ $(BUILDDIR)/$(APP).o: $(APP).c $(SPINN_INC_DIR)/spinnaker.h $(SPINN_INC_DIR)/sar
 $(BUILDDIR)/%.o: $(SPINN_NEURAL_MODELLING_DIR)/%.c
 	-mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -o $@ $<
+	
+ifdef EXTRA_SRC_DIR
+    $(BUILDDIR)/%.o: $(EXTRA_SRC_DIR)/%.c
+		-mkdir -p $(dir $@)
+		$(CC) $(CFLAGS) -o $@ $<
+endif
 
 # Tidy and cleaning dependencies
 clean:
