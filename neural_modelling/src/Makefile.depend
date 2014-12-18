@@ -9,12 +9,16 @@ ifndef APP_OUTPUT_DIR
     $(error APP_OUTPUT_DIR is not set.  Please define APP_OUTPUT_DIR (possibly by running "source setup" in the spinnaker package folder))
 endif
 
-
 # Convert the objs into the correct format to work here
 SPINN_NEURAL_MODELLING_DIR = $(DIRS)
 ABSOBJS = $(abspath $(OBJECTS))
 ABSDIR = $(abspath $(SPINN_NEURAL_MODELLING_DIR))
-RELOBJS:= $(ABSOBJS:$(ABSDIR)/%.o=%.o)
+ifdef EXTRA_SRC_DIR
+    EXTRA_OBJS := $(ABSOBJS:$(EXTRA_SRC_DIR)/%.o=%.o)
+else
+    EXTRA_OBJS := $(ABSOBJS)
+endif
+RELOBJS:= $(EXTRA_OBJS:$(ABSDIR)/%.o=%.o)
 OBJECTS:= $(RELOBJS:%.o=$(BUILDDIR)/%.o)
 
 LIBRARIES += -lspinn_common -lm
