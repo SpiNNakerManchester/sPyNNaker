@@ -196,14 +196,14 @@ class SpynnakerCommsFunctions(object):
 
             #update the progress bar
             progress_bar.update()
-        #close the progress bar
+        # close the progress bar
         progress_bar.end()
         return processor_to_app_data_base_address
 
     def _start_execution_on_machine(self, executable_targets, app_id, runtime,
                                     time_scaling, waiting_on_confirmation,
                                     database_thread, in_debug_mode):
-        #deduce how many processors this application uses up
+        # deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
         executable_keys = executable_targets.keys()
@@ -216,13 +216,14 @@ class SpynnakerCommsFunctions(object):
 
         processor_c_main = self._txrx.get_core_state_count(app_id,
                                                            CPUState.C_MAIN)
-        #check that everything has gone though c main to reach sync0 or
+        # check that everything has gone though c main to reach sync0 or
         # failing for some unknown reason
         while processor_c_main != 0:
+            time.sleep(0.1)
             processor_c_main = self._txrx.get_core_state_count(app_id,
                                                                CPUState.C_MAIN)
 
-        #check that the right number of processors are in sync0
+        # check that the right number of processors are in sync0
         processors_ready = self._txrx.get_core_state_count(app_id,
                                                            CPUState.SYNC0)
 
@@ -230,9 +231,9 @@ class SpynnakerCommsFunctions(object):
             successful_cores, unsucessful_cores = \
                 self._break_down_of_failure_to_reach_state(total_cores,
                                                            CPUState.SYNC0)
-            #last chance to slip out of error check
+            # last chance to slip out of error check
             if len(successful_cores) != total_processors:
-                #break_down the successful cores and unsuccessful cores into
+                # break_down the successful cores and unsuccessful cores into
                 # string
                 # reps
                 break_down = \
@@ -244,7 +245,7 @@ class SpynnakerCommsFunctions(object):
                     "sync0 with breakdown of: {}"
                     .format(processors_ready, total_processors, break_down))
 
-        #wait till vis is ready for us to start if required
+        # wait till vis is ready for us to start if required
         if waiting_on_confirmation:
             logger.info("*** Awaiting for a response from the visualiser to "
                         "state its ready for the simulation to start ***")
@@ -254,7 +255,7 @@ class SpynnakerCommsFunctions(object):
         logger.info("Starting application")
         self._txrx.send_signal(app_id, SCPSignal.SYNC0)
 
-        #check all apps have gone into run state
+        # check all apps have gone into run state
         logger.info("Checking that the application has started")
         processors_running = self._txrx.get_core_state_count(app_id,
                                                              CPUState.RUNNING)
@@ -268,7 +269,7 @@ class SpynnakerCommsFunctions(object):
                 sucessful_cores, unsucessful_cores = \
                     self._break_down_of_failure_to_reach_state(total_cores,
                                                                CPUState.RUNNING)
-                #break_down the successful cores and unsuccessful cores into
+                # break_down the successful cores and unsuccessful cores into
                 # string reps
                 break_down = self.turn_break_downs_into_string(
                     total_cores, sucessful_cores, unsucessful_cores,
@@ -277,10 +278,12 @@ class SpynnakerCommsFunctions(object):
                     "Only {} of {} processors started with breakdown {}"
                     .format(processors_running, total_processors, break_down))
 
-        #if not running for infinity, check that applications stop correctly
+        # if not running for infinity, check that applications stop correctly
         if runtime is not None:
-            logger.info("Application started - waiting for it to stop")
-            time.sleep(runtime / 1000.0)
+            time_to_wait = (runtime / 1000.0) + 1.0
+            logger.info("Application started - waiting {} seconds for it to"
+                        " stop".format(time_to_wait))
+            time.sleep(time_to_wait)
             processors_not_finished = processors_ready
             while processors_not_finished != 0:
                 processors_not_finished = \
@@ -293,14 +296,17 @@ class SpynnakerCommsFunctions(object):
                     sucessful_cores, unsucessful_cores = \
                         self._break_down_of_failure_to_reach_state(
                             total_cores, CPUState.RUNNING)
-                    #break_down the successful cores and unsuccessful cores into
-                    #  string reps
+                    # break_down the successful cores and unsuccessful cores
+                    # into string reps
                     break_down = self.turn_break_downs_into_string(
                         total_cores, sucessful_cores, unsucessful_cores,
                         CPUState.RUNNING)
                     raise exceptions.ExecutableFailedToStopException(
                         "{} cores have gone into a run time error state with "
                         "breakdown {}.".format(processors_rte, break_down))
+                logger.info("Simulation still not finished or failed - "
+                            "waiting a bit longer...")
+                time.sleep(0.5)
 
             processors_exited =\
                 self._txrx.get_core_state_count(app_id, CPUState.FINSHED)
@@ -309,7 +315,7 @@ class SpynnakerCommsFunctions(object):
                 sucessful_cores, unsucessful_cores = \
                     self._break_down_of_failure_to_reach_state(
                         total_cores, CPUState.RUNNING)
-                #break_down the successful cores and unsuccessful cores into
+                # break_down the successful cores and unsuccessful cores into
                 #  string reps
                 break_down = self.turn_break_downs_into_string(
                     total_cores, sucessful_cores, unsucessful_cores,
