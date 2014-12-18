@@ -3,8 +3,8 @@ Synfirechain-like example
 """
 #!/usr/bin/python
 import os
-import spynnaker.pyNN as p
-#import pyNN.spiNNaker as p
+#import spynnaker.pyNN as p
+import pyNN.spiNNaker as p
 import numpy, pylab
 
 #p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
