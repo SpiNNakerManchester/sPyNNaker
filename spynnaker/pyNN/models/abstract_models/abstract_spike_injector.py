@@ -8,6 +8,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from abc import ABCMeta
 from six import add_metaclass
+from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
@@ -32,3 +33,9 @@ class AbstractSpikeInjector(
 
     def is_reverse_ip_tagable_vertex(self):
         return True
+
+    @abstractmethod
+    def is_spike_injecotr(self):
+        """ helper emthod for is_instance
+        :return:
+        """

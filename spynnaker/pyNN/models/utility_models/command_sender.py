@@ -2,7 +2,6 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
     AbstractMultiCastSource
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.conf import config
 from pacman.model.constraints.key_allocator_routing_constraint \
     import KeyAllocatorRoutingConstraint
 from data_specification.data_specification_generator import \
@@ -181,7 +180,6 @@ class CommandSender(AbstractMultiCastSource):
         :param atom: the aton of this subvertex
         :return:the key with a neuron id added to it
         """
-        key = None
         if self._edge_map[subedge.edge] is not None:
             key = self._edge_map[subedge.edge][0]['key']
         else:
@@ -275,3 +273,9 @@ class CommandSender(AbstractMultiCastSource):
 
     def get_binary_file_name(self):
         return 'command_sender_multicast_source.aplx'
+
+    def is_recordable(self):
+        return True
+
+    def is_multi_cast_source(self):
+        return True

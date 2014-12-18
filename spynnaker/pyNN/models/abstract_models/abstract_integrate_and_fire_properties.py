@@ -3,7 +3,7 @@ import numpy
 from spynnaker.pyNN.utilities import utility_calls
 from abc import ABCMeta
 from six import add_metaclass
-
+from abc import abstractmethod
 
 @add_metaclass(ABCMeta)
 class AbstractIntegrateAndFireProperties(object):
@@ -106,3 +106,9 @@ class AbstractIntegrateAndFireProperties(object):
     @cm.setter
     def cm(self, new_value):
         self._cm = new_value
+
+    @abstractmethod
+    def is_integrate_and_fire_vertex(self):
+        """ helper emthod for is_instance
+        :return:
+        """

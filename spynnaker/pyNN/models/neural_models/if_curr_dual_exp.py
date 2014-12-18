@@ -14,6 +14,7 @@ from data_specification.enums.data_type import DataType
 class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                                          AbstractIntegrateAndFireProperties,
                                          AbstractPopulationVertex):
+
     CORE_APP_IDENTIFIER = constants.IF_CURRENT_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
 
@@ -83,4 +84,13 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
         ]
 
     def is_population_vertex(self):
+        return True
+
+    def is_duel_exponential_vertex(self):
+        return True
+
+    def is_integrate_and_fire_vertex(self):
+        return True
+
+    def is_recordable(self):
         return True

@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from six import add_metaclass
+from abc import abstractmethod
 
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.utility_calls \
@@ -60,6 +61,10 @@ class AbstractRecordableVertex(object):
 
     def set_record_gsyn(self, setted_value):
         self._record_gsyn = setted_value
+
+    @abstractmethod
+    def is_recordable(self):
+        """helper method for is isinstance"""
 
     def get_recording_region_size(self, bytes_per_timestep):
         """

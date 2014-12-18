@@ -4,6 +4,7 @@ from spynnaker.pyNN.models.utility_models.exp_synapse_param\
     import write_exp_synapse_param
 from abc import ABCMeta
 from six import add_metaclass
+from abc import abstractmethod
 
 NUM_SYNAPSE_PARAMS = 6  # tau_syn_E, tau_syn_E2 and tau_syn_I and initializers
 
@@ -55,6 +56,11 @@ class AbstractDualExponentialVertex(object):
     @tau_syn_I.setter
     def tau_syn_I(self, new_value):
         self._tau_syn_I = new_value
+
+    @abstractmethod
+    def is_duel_exponential_vertex(self):
+        """ helper method for is_instance
+        """
 
     @staticmethod
     def get_synapse_targets():

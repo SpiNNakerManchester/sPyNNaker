@@ -7,7 +7,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from spynnaker.pyNN.utilities.conf import config
 from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from data_specification.data_specification_generator import \
@@ -16,8 +15,9 @@ from enum import Enum
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 from spynnaker.pyNN.exceptions import ConfigurationException
 
+
 class LivePacketGather(
-    AbstractDataSpecableVertex, AbstractPartitionableVertex,
+        AbstractDataSpecableVertex, AbstractPartitionableVertex,
         AbstractIPTagableVertex):
 
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID

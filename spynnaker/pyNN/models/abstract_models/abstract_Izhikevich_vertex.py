@@ -1,7 +1,7 @@
 from spynnaker.pyNN.utilities import utility_calls
 from abc import ABCMeta
 from six import add_metaclass
-
+from abc import abstractmethod
 
 @add_metaclass(ABCMeta)
 class AbstractIzhikevichVertex(object):
@@ -85,3 +85,10 @@ class AbstractIzhikevichVertex(object):
     @v_init.setter
     def v_init(self, new_value):
         self._v_init = new_value
+
+    @abstractmethod
+    def is_izhikevich_vertex(self):
+        """ helper method for is_instance
+
+        :return:
+        """
