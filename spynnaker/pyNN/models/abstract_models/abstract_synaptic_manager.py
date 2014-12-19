@@ -79,77 +79,64 @@ class AbstractSynapticManager(object):
 
         # Remember this aligned address, it's where this block will start:
         block_start_addr = write_ptr
+
         # Write the synaptic block, tracking the word count:
         synaptic_rows = sublist.get_rows()
+        data = numpy.zeros(
+            (fixed_row_length
+             + constants.SYNAPTIC_ROW_HEADER_WORDS)
+            * sublist.get_n_rows(), dtype="uint32")
+        data.fill(0xBBCCDDEE)
 
         row_no = 0
         for row in synaptic_rows:
-            words_written = 0
-            plastic_region = \
-                row_io.get_packed_plastic_region(row, weight_scales,
-                                                 n_synapse_type_bits)
+            data_pos = ((fixed_row_length
+                         + constants.SYNAPTIC_ROW_HEADER_WORDS)
+                        * row_no)
+
+            plastic_region = row_io.get_packed_plastic_region(
+                row, weight_scales, n_synapse_type_bits)
 
             # Write the size of the plastic region
-            spec.comment("\nWriting plastic region for row {}".format(row_no))
-            spec.write_value(data=len(plastic_region))
-            words_written += 1
+            data[data_pos] = plastic_region.size
+            data_pos += 1
 
             # Write the plastic region
-            spec.write_array(array_values=plastic_region)
-            words_written += len(plastic_region)
+            data[data_pos:(data_pos + plastic_region.size)] = plastic_region
+            data_pos += plastic_region.size
 
-            fixed_fixed_region = numpy.asarray(
-                row_io.get_packed_fixed_fixed_region(row, weight_scales,
-                                                     n_synapse_type_bits),
-                dtype="uint32")
-            fixed_plastic_region = numpy.asarray(
-                row_io.get_packed_fixed_plastic_region(row, weight_scales,
-                                                       n_synapse_type_bits),
-                dtype="uint16")
+            fixed_fixed_region = row_io.get_packed_fixed_fixed_region(
+                row, weight_scales, n_synapse_type_bits)
+            fixed_plastic_region = row_io.get_packed_fixed_plastic_region(
+                row, weight_scales, n_synapse_type_bits)
 
             # Write the size of the fixed parts
-            spec.comment("\nWriting fixed region for row {}".format(row_no))
-            spec.write_value(data=len(fixed_fixed_region))
-            spec.write_value(data=len(fixed_plastic_region))
-            words_written += 2
+            data[data_pos] = fixed_fixed_region.size
+            data[data_pos + 1] = fixed_plastic_region.size
+            data_pos += 2
 
             # Write the fixed fixed region
-            spec.write_array(array_values=fixed_fixed_region)
-            words_written += len(fixed_fixed_region)
+            data[data_pos:(data_pos + fixed_fixed_region.size)] = \
+                fixed_fixed_region
+            data_pos += fixed_fixed_region.size
 
             # As everything needs to be word aligned, add extra zero to
             # fixed_plastic Region if it has an odd number of entries and build
             # uint32 view of it
-            if (len(fixed_plastic_region) % 2) != 0:
-                fixed_plastic_region = \
-                    numpy.asarray(numpy.append(fixed_plastic_region, 0),
-                                  dtype='uint16')
+            if (fixed_plastic_region.size % 2) != 0:
+                fixed_plastic_region = numpy.asarray(numpy.append(
+                    fixed_plastic_region, 0), dtype='uint16')
             # does indeed return something (due to c fancy stuff in numpi) ABS
 
             # noinspection PyNoneFunctionAssignment
-            fixed_plastic_region_words = \
-                fixed_plastic_region.view(dtype="uint32")
-
-            spec.write_array(array_values=fixed_plastic_region_words)
-
-            # noinspection PyTypeChecker
-            words_written += len(fixed_plastic_region_words)
-
-            write_ptr += (4 * words_written)
-
-            # Write padding (if required):
-            padding = ((fixed_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)
-                       - words_written)
-            # Loop through padding in terms of maximum
-            # Size blocks that can be repeated
-            for i in range(0, padding, 255):
-                padding_repeats = min(255, padding - i)
-                spec.write_value(data=0xBBCCDDEE, repeats=padding_repeats,
-                                 data_type=DataType.UINT32)
-
-            # Update write pointer
-            write_ptr += 4 * padding
+            fixed_plastic_region_words = fixed_plastic_region.view(
+                dtype="uint32")
+            data[data_pos:(data_pos + fixed_plastic_region_words.size)] = \
+                fixed_plastic_region_words
             row_no += 1
+
+        spec.write_array(data)
+        write_ptr += data.size * 4
 
         # The current write pointer is where the next block could start:
         next_block_start_addr = write_ptr
@@ -514,8 +501,7 @@ class AbstractSynapticManager(object):
         # If 2^max_weight_power equals the max weight, we have to add another
         # power, as range is 0 - (just under 2^max_weight_power)!
         max_weight_powers = [w + 1 if (2 ** w) >= a else w
-                             for w, a in zip(max_weight_powers,
-                                             abs_max_weights)]
+                             for w, a in zip(max_weight_powers, max_weights)]
 
         # If we have an STDP mechanism that uses signed weights,
         # Add another bit of shift to prevent overflows
@@ -591,17 +577,6 @@ class AbstractSynapticManager(object):
                     # **TODO** use proper merge functionality
                     a_row.append(b_row)
 
-                if logger.isEnabledFor(logging.DEBUG):
-                    a_slice = graph_mapper.get_subvertex_slice(
-                        a.post_subvertex)
-                    b_slice = graph_mapper.get_subvertex_slice(
-                        b.post_subvertex)
-                    logger.debug("Merging projection subedges %s (%u-%u) and"
-                                 " %s (%u-%u) both leading to vertex %s"
-                                 % (a.label, a_slice.lo_atom, a_slice.hi_atom,
-                                    b.label, b_slice.lo_atom, b_slice.hi_atom,
-                                    self.label))
-
                 # Add projection edge b to list to remove
                 proj_subedges_to_remove.append(b)
 
@@ -630,25 +605,6 @@ class AbstractSynapticManager(object):
                 graph_mapper.get_partitionable_edge_from_partitioned_edge(
                     subedge)
             row_io = associated_edge.get_synapse_row_io()
-            if logger.isEnabledFor("debug"):
-                subvertex_vertex =\
-                    graph_mapper.get_vertex_from_subvertex(subvertex)
-                pre_sub_lo = \
-                    graph_mapper.get_subvertex_slice(
-                        subedge.pre_subvertex).lo_atom
-                pre_sub_hi = \
-                    graph_mapper.get_subvertex_slice(
-                        subedge.pre_subvertex).hi_atom
-                sub_lo = graph_mapper.get_subvertex_slice(subvertex).lo_atom
-                sub_hi = graph_mapper.get_subvertex_slice(subvertex).hi_atom
-
-                logger.debug(
-                    "Writing subedge from {} ({}-{}) to {} ({}-{})".format(
-                        subedge.pre_subvertex.label, pre_sub_lo, pre_sub_hi,
-                        subvertex_vertex.label, sub_lo, sub_hi))
-                rows = sublist.get_rows()
-                for i in range(len(rows)):
-                    logger.debug("{}: {}".format(i, rows[i]))
 
             # Get the maximum row length in words, excluding headers
             max_row_length = \

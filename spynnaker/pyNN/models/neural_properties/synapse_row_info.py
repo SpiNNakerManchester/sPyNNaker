@@ -23,14 +23,6 @@ class SynapseRowInfo(object):
         else:
             self.weights = np.array([self.weights])
 
-    def __str__(self):
-        return "[Indices: {}, Weights: {}, Delays: {}, Types: {}]"\
-            .format(self.target_indices, self.weights, self.delays,
-                    self.synapse_types)
-
-    def __repr__(self):
-        return self.__str__()
-
     def append(self, row, lo_atom=0, min_delay=0):
         """
         Appends another row to this one

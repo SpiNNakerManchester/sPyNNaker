@@ -72,13 +72,13 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
     @staticmethod
     def get_packed_fixed_plastic_region(synapse_row, weight_scales,
                                         n_synapse_type_bits):
-        return []
+        return numpy.zeros(0)
 
     # noinspection PyMethodOverriding
     @staticmethod
     def get_packed_plastic_region(synapse_row, weight_scales,
                                   n_synapse_type_bits):
-        return []
+        return numpy.zeros(0)
 
     # noinspection PyMethodOverriding
     @staticmethod
