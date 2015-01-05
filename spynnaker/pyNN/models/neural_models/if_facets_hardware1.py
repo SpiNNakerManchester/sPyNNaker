@@ -62,3 +62,6 @@ class IFFacetsConductancePopulation(AbstractConductanceVertex,
 
     def is_recordable(self):
         pass
+
+    def set_model_max_atoms_per_core(new_value):
+        pass
