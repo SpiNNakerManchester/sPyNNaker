@@ -48,6 +48,9 @@ class EIFConductanceAlphaPopulation(AbstractExponentialPopulationVertex,
                                             " supported by the tool chain....."
                                             "watch this space")
 
+    def set_model_max_atoms_per_core(new_value):
+        pass
+
     def is_population_vertex(self):
         return True
 

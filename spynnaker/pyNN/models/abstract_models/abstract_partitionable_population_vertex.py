@@ -74,6 +74,12 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         Gets the size of the stdp parameters for a given set of atoms
         """
 
+    @abstractmethod
+    def set_model_max_atoms_per_core(new_value):
+        """
+        enforces other neural models to support model based max atoms contraints
+        """
+
     # noinspection PyUnusedLocal
     def get_spike_buffer_size(self, vertex_slice):
         """
