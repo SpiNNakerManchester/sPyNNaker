@@ -162,10 +162,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     def write_setup_info(self, spec, spike_history_region_sz):
         """
         """
-        recording_info = 0
-        if self._record:
-            recording_info |= constants.RECORD_SPIKE_BIT
-        recording_info |= 0xBEEF0000
+        recording_info = 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER)

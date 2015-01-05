@@ -13,15 +13,18 @@ class SynapseRowInfo(object):
         self.delays = np.asarray(delays_in_ticks, dtype='uint32')
         self.synapse_types = np.asarray(synapse_types, dtype='uint32')
 
-        if hasattr(self.delays, '__iter__'):
-            iter(self.delays)
-        else:
-            self.delays = np.array([self.delays])
+        #if hasattr(self.delays, '__iter__'):
+        #    if self.delays.size > 0:
+        #        iter(self.delays)
+        #else:
+        #    self.delays = np.array([self.delays])
 
-        if hasattr(self.weights, '__iter__'):
-            iter(self.weights)
-        else:
-            self.weights = np.array([self.weights])
+        #if hasattr(self.weights, '__iter__'):
+        #    if self.weights.size > 0:
+        #        print "Weights", weights
+        #        iter(self.weights)
+        #else:
+        #    self.weights = np.array([self.weights])
 
     def append(self, row, lo_atom=0, min_delay=0):
         """
@@ -31,7 +34,7 @@ class SynapseRowInfo(object):
         If min_delay is not None, min_delay is added to each delay before
         appending
         """
-        if len(self.target_indices) == 0:
+        if self.target_indices.size == 0:
             self.target_indices = row.target_indices + lo_atom
             self.weights = row.weights
             self.delays = row.delays + min_delay
@@ -56,6 +59,9 @@ class SynapseRowInfo(object):
         """
         Returns the number of connections in the row
         """
+        if self.target_indices.size == 0:
+            return 0
+
         if vertex_slice is None and lo_delay is None and hi_delay is None:
             return self.target_indices.size
 
@@ -79,7 +85,7 @@ class SynapseRowInfo(object):
         """
         Returns the minimum delay in the row
         """
-        if len(self.delays) == 0:
+        if self.delays.size == 0:
             return 0
         return np.amin(self.delays)
 
@@ -87,7 +93,7 @@ class SynapseRowInfo(object):
         """
         Returns the maximum delay in the row
         """
-        if len(self.delays) == 0:
+        if self.delays.size == 0:
             return 0
         return np.amax(self.delays)
 
@@ -96,6 +102,8 @@ class SynapseRowInfo(object):
         Returns a subset of the row so that only connections to atoms between
         lo_atom and hi_atom (inclusive) are considered
         """
+        if self.target_indices.size == 0:
+            return type(self)([], [], [], [])
         mask = ((self.target_indices >= lo_atom)
                 & (self.target_indices <= hi_atom))
         return type(self)(self.target_indices[mask] - lo_atom,
@@ -107,6 +115,8 @@ class SynapseRowInfo(object):
         Returns a subset of the row so that only connections with delays
         between lo_delay and hi_delay (inclusive) are considered
         """
+        if self.target_indices.size == 0:
+            return type(self)([], [], [], [])
         mask = ((self.delays >= lo_delay) & (self.delays <= hi_delay))
         return type(self)(self.target_indices[mask], self.weights[mask],
                           self.delays[mask],
@@ -116,7 +126,7 @@ class SynapseRowInfo(object):
         """
         Return the maximum weight in this row
         """
-        if len(self.weights) == 0:
+        if self.weights.size == 0:
             return 0
         return np.amax(np.abs(self.weights))
 
@@ -124,7 +134,7 @@ class SynapseRowInfo(object):
         """
         Return the minimum weight in this row
         """
-        if len(self.weights) == 0:
+        if self.weights.size == 0:
             return 0
         return np.amin(np.abs(self.weights))
 
