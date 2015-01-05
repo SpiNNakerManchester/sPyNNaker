@@ -326,8 +326,16 @@ class SpynnakerConfiguration(object):
             time_stamp_in = open(app_name_file, "r")
             time_stamp_in_string = time_stamp_in.readline()
             time_stamp_in.close()
+            os.remove(app_name_file)
             new_app_folder = os.path.join(starting_directory,
                                           time_stamp_in_string)
+            extra = 2
+            while os.path.exists(new_app_folder):
+                new_app_folder = os.path.join(
+                    starting_directory,
+                    time_stamp_in_string + "_" + str(extra))
+                extra += 1
+
             os.makedirs(new_app_folder)
             list_of_files = os.listdir(app_folder_name)
             for file_to_move in list_of_files:

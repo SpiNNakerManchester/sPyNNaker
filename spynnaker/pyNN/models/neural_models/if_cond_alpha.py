@@ -3,11 +3,11 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
 from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_conductive_vertex \
-    import AbstractConductiveVertex
+from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
+    import AbstractConductanceVertex
 
 
-class IFConductanceAlphaPopulation(AbstractConductiveVertex,
+class IFConductanceAlphaPopulation(AbstractConductanceVertex,
                                    AbstractIntegrateAndFireProperties,
                                    AbstractPopulationVertex):
 

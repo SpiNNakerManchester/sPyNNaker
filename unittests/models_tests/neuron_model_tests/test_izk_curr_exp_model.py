@@ -16,7 +16,7 @@ class TestIZKCurrExpModel(unittest.TestCase):
                            'v_thresh': -50.0}
         n_neurons = 10
         izk_curr_exp = IzhikevichCurrentExponentialPopulation(
-            n_neurons, 1000)
+            n_neurons, 1000, 1.0, 1, 1)
 
         self.assertEqual(izk_curr_exp.model_name, "IZK_curr_exp")
         self.assertEqual(len(izk_curr_exp.get_parameters()), 8)
@@ -26,8 +26,8 @@ class TestIZKCurrExpModel(unittest.TestCase):
         self.assertEqual(izk_curr_exp._d, 2.0)
 
         self.assertEqual(izk_curr_exp._i_offset, 0)
-        self.assertEqual(izk_curr_exp._tau_syn_e, 5.0)
-        self.assertEqual(izk_curr_exp._tau_syn_i, 5.0)
+        self.assertEqual(izk_curr_exp._tau_syn_E, 5.0)
+        self.assertEqual(izk_curr_exp._tau_syn_I, 5.0)
 
 
 if __name__ == "__main__":

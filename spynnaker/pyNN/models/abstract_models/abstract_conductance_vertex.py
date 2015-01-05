@@ -5,7 +5,7 @@ from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
-class AbstractConductiveVertex(object):
+class AbstractConductanceVertex(object):
 
     # Amount by which to scale the weights to maintain accuracy.
     # The weights will be divided by this amount when leaving

@@ -31,8 +31,7 @@ class TestingOneToOneConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.OneToOneConnector(weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, second_population._vertex, 1,
-            synapse_type)
+            first_population, second_population, 1, 1.0, synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
@@ -49,7 +48,7 @@ class TestingOneToOneConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.OneToOneConnector(weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
@@ -70,8 +69,8 @@ class TestingOneToOneConnector(unittest.TestCase):
         delay = 1
         connection = pyNN.OneToOneConnector(weight, delay)
         with self.assertRaises(ConfigurationException):
-            connection.generate_synapse_list(first_population._vertex,
-                                             second_population._vertex, 1, 0)
+            connection.generate_synapse_list(first_population,
+                                             second_population, 1, 1.0, 0)
 
     def test_connector_populations_of_different_sizes(self):
         weight = 2

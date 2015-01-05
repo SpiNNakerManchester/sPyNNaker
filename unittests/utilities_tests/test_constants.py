@@ -4,7 +4,7 @@ import spynnaker.pyNN.utilities.constants as constants
 
 class TestConstants(unittest.TestCase):
     def test_free_floating_constants(self):
-        self.assertEqual(constants.SETUP_SIZE,16)
+        self.assertEqual(constants.SETUP_SIZE, 28)
         self.assertEqual(constants.NO_PARAMS, 10)
         self.assertEqual(constants.PARAMS_HEADER_SIZE, 3)
         self.assertEqual(constants.PARAMS_BASE_SIZE, 4 * (constants.PARAMS_HEADER_SIZE + constants.NO_PARAMS))
@@ -52,7 +52,6 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID, 0xAC3)
         self.assertEqual(constants.DELAY_EXTENSION_CORE_APPLICATION_ID, 0xAC4)
         self.assertEqual(constants.MUNICH_MOTOR_CONTROL_CORE_APPLICATION_ID, 0xAC5)
-        self.assertEqual(constants.MULTICAST_SOURCE_CORE_APPLICATION_ID, 0xAC6)
         self.assertEqual(constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID, 0xAC7)
         self.assertEqual(constants.IZK_CURRENT_EXP_CORE_APPLICATION_ID, 0xAC8)
 
@@ -76,10 +75,6 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value, 7)
         self.assertEqual(constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value, 8)
         self.assertEqual(constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value, 9)
-
-    def test_visualiser_modes(self):
-        self.assertEqual(constants.VISUALISER_MODES.RASTER.value, 0)
-        self.assertEqual(constants.VISUALISER_MODES.TOPOLOGICAL.value, 1)
 
 if __name__ == '__main__':
     unittest.main()
