@@ -237,7 +237,7 @@ class AbstractSynapticManager(object):
         """
 
     @abstractmethod
-    def write_synapse_parameters(self, spec, subvertex):
+    def write_synapse_parameters(self, spec, subvertex, vertex_slice):
         """forced method for dealing with writing synapse params
 
         """

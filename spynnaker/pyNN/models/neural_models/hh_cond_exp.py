@@ -61,5 +61,6 @@ class HHConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
     def is_recordable(self):
         pass
 
+    @staticmethod
     def set_model_max_atoms_per_core(new_value):
         pass

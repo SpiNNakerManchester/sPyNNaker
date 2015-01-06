@@ -40,6 +40,7 @@ class IFConductanceAlphaPopulation(AbstractConductanceVertex,
                                             " supported by the tool chain....."
                                             "watch this space")
 
+    @staticmethod
     def set_model_max_atoms_per_core(new_value):
         pass
 
@@ -55,7 +56,7 @@ class IFConductanceAlphaPopulation(AbstractConductanceVertex,
     def is_conductive(self):
         pass
 
-    def write_synapse_parameters(self, spec, subvertex):
+    def write_synapse_parameters(self, spec, subvertex, vertex_slice):
         pass
 
     def is_recordable(self):

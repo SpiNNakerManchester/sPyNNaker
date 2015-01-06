@@ -57,11 +57,12 @@ class IFFacetsConductancePopulation(AbstractConductanceVertex,
     def is_conductive(self):
         pass
 
-    def write_synapse_parameters(self, spec, subvertex):
+    def write_synapse_parameters(self, spec, subvertex, vertex_slice):
         pass
 
     def is_recordable(self):
         pass
 
+    @staticmethod
     def set_model_max_atoms_per_core(new_value):
         pass

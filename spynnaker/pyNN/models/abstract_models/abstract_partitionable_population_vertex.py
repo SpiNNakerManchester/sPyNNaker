@@ -74,6 +74,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         Gets the size of the stdp parameters for a given set of atoms
         """
 
+    @staticmethod
     @abstractmethod
     def set_model_max_atoms_per_core(new_value):
         """
