@@ -8,11 +8,11 @@ from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_propertie
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_conductive_vertex \
-    import AbstractConductiveVertex
+from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
+    import AbstractConductanceVertex
 
 
-class IFFacetsConductancePopulation(AbstractConductiveVertex,
+class IFFacetsConductancePopulation(AbstractConductanceVertex,
                                     AbstractIntegrateAndFireProperties,
                                     AbstractPopulationVertex):
 

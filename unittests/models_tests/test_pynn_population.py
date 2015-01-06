@@ -79,6 +79,7 @@ class TestingPopulation(unittest.TestCase):
         self.assertEqual(populations[0]._size, 1)
         self.assertEqual(populations[1]._size, 10)
 
+    @unittest.skip("Not implemented")
     def test_get_spikes_from_virtual_spinnaker(self):
         self.assertEqual(True, False, "Test not implemented yet")
 

@@ -29,7 +29,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.FixedNumberPreConnector(0, weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         pp(synaptic_list.get_rows())
 
     def test_generate_synapse_list_pre_1(self):
@@ -41,7 +41,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.FixedNumberPreConnector(1, weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         pp(synaptic_list.get_rows())
 
     def test_generate_synapse_list_pre_5(self):
@@ -53,7 +53,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.FixedNumberPreConnector(5, weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
@@ -72,8 +72,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
         connection = pyNN.FixedNumberPreConnector(6, weight, delay)
         with self.assertRaises(ConfigurationException):
             connection.generate_synapse_list(
-                first_population._vertex, first_population._vertex, 1,
-                synapse_type)
+                first_population, first_population, 1, 1.0, synapse_type)
 
     def test_generate_synapse_list_pre_negative(self):
         number_of_neurons = 5
@@ -86,8 +85,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
         connection = pyNN.FixedNumberPreConnector(-1, weight, delay)
         with self.assertRaises(ConfigurationException):
             connection.generate_synapse_list(
-                first_population._vertex, first_population._vertex, 1,
-                synapse_type)
+                first_population, first_population, 1, 1.0, synapse_type)
 
     def test_allow_self_connections(self):
         number_of_neurons = 5
@@ -99,7 +97,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
         connection = pyNN.FixedNumberPreConnector(5, weight, delay,
                                                   allow_self_connections=False)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         pp(synaptic_list.get_rows())
 
 

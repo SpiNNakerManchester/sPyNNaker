@@ -8,12 +8,12 @@ from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_propertie
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
-from spynnaker.pyNN.models.abstract_models.abstract_conductive_vertex \
-    import AbstractConductiveVertex
+from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
+    import AbstractConductanceVertex
 
 
 class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
-                                         AbstractConductiveVertex,
+                                         AbstractConductanceVertex,
                                          AbstractIntegrateAndFireProperties,
                                          AbstractPopulationVertex):
 
@@ -28,7 +28,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
                  tau_syn_I=5.0, tau_refrac=0.1, i_offset=0, v_init=None):
 
         # Instantiate the parent classes
-        AbstractConductiveVertex.__init__(self, n_neurons, e_rev_E=e_rev_E,
+        AbstractConductanceVertex.__init__(self, n_neurons, e_rev_E=e_rev_E,
                                           e_rev_I=e_rev_I)
         AbstractExponentialPopulationVertex.__init__(
             self, n_neurons=n_neurons, tau_syn_E=tau_syn_E,
@@ -47,7 +47,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
-            weight_scale=AbstractConductiveVertex.WEIGHT_SCALE)
+            weight_scale=AbstractConductanceVertex.WEIGHT_SCALE)
         self._executable_constant = \
             IFConductanceExponentialPopulation.CORE_APP_IDENTIFIER
 

@@ -102,17 +102,6 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
             placements=placements, txrx=txrx)
 
-    def get_synaptic_data(self, presubvertex, pre_n_atoms, postsubvertex,
-                          synapse_io):
-        """
-        helper method to add other data for get weights via syanptic manager
-        """
-        return self._get_synaptic_data(
-            presubvertex, pre_n_atoms, postsubvertex,
-            constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
-            synapse_io,
-            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
-
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)
 
