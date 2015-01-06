@@ -1,14 +1,13 @@
 __author__ = 'stokesa6'
 import spynnaker.pyNN as p
 
-import visualiser_framework.visualiser_constants as modes
 import numpy as np, pylab
 from pyNN.random import RandomDistribution, NumpyRNG
 
 p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
 
 nNeurons = 200 # number of neurons in each population
-neuron_model = p.IF_curr_exp(nNeurons, 1.0)
+neuron_model = p.IF_curr_exp(nNeurons, 1000.0, 1.0, 30, 5)
 p.set_number_of_neurons_per_core("IF_curr_exp", 100)
 
 cm = list()
@@ -62,16 +61,16 @@ spikeArray = {'spike_times': [[0]]}
 populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
 populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
 
-populations[0].set('_cm', 0.25)
-populations[0].set('_cm', cm)
-populations[0].set('_tau_m', tau_m, '_v_thresh', v_thresh)
-populations[0].set('_i_offset', gbar_na_distr)
+populations[0].set('cm', 0.25)
+populations[0].set('cm', cm)
+populations[0].set({'tau_m': tau_m, 'v_thresh': v_thresh})
+populations[0].set('i_offset', gbar_na_distr)
 
-populations[0].set(_cm=0.25)
-populations[0].set(_cm=cm)
-populations[0].set(_tau_m=tau_m, _v_thresh=v_thresh)
-populations[0].set(_i_offset=gbar_na_distr)
-populations[0].set(_i_offset=i_off)
+populations[0].set({'cm': 0.25})
+populations[0].set('cm', cm)
+populations[0].set({'tau_m': tau_m, 'v_thresh': v_thresh})
+populations[0].set('i_offset', gbar_na_distr)
+populations[0].set('i_offset', i_off)
 
 
 #populations[0].set_mapping_constraint({"x": 1, "y": 0})
@@ -81,7 +80,7 @@ projections.append(p.Projection(populations[1], populations[0], p.FromListConnec
 
 populations[0].record_v()
 populations[0].record_gsyn()
-populations[0].record(visualiser_mode=modes.RASTER)
+populations[0].record()
 
 p.run(100)
 

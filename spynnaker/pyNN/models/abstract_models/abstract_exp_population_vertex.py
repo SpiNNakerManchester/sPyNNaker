@@ -88,6 +88,6 @@ class AbstractExponentialPopulationVertex(object):
 
         # Write exponenential synapse parameters
         write_exp_synapse_param(self._tau_syn_E, self._machine_time_step,
-                                n_atoms, spec)
+                                vertex_slice, spec)
         write_exp_synapse_param(self._tau_syn_I, self._machine_time_step,
-                                n_atoms, spec)
+                                vertex_slice, spec)

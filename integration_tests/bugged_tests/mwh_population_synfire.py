@@ -3,7 +3,6 @@ Synfirechain-like example
 """
 #!/usr/bin/python
 import spynnaker.pyNN as p
-import visualiser_framework.visualiser_constants as modes
 import numpy, pylab
 
 p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
@@ -52,7 +51,7 @@ projections.append(p.Projection(populations[-1],populations[0],p.AllToAllConnect
 for i in range(0,nPopulations):
     populations[i].record_v()
     populations[i].record_gsyn()
-    populations[i].record(visualiser_mode=modes.RASTER)
+    populations[i].record()
 
 p.run(1500)
 
@@ -71,7 +70,7 @@ spikes = populations[0].getSpikes(compatible_output=True)
 if spikes != None:
     print spikes
     pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
+    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
     pylab.xlabel('Time/ms')
     pylab.ylabel('spikes')
     pylab.title('spikes')
@@ -89,7 +88,7 @@ if v != None:
     pylab.title('v')
     for pos in range(0, nNeurons, 20):
         v_for_neuron = v[pos * ticks : (pos + 1) * ticks]
-        pylab.plot([i[1] for i in v_for_neuron], 
+        pylab.plot([i[1] for i in v_for_neuron],
                 [i[2] for i in v_for_neuron])
     pylab.show()
 
@@ -100,7 +99,7 @@ if gsyn != None:
     pylab.title('gsyn')
     for pos in range(0, nNeurons, 20):
         gsyn_for_neuron = gsyn[pos * ticks : (pos + 1) * ticks]
-        pylab.plot([i[1] for i in gsyn_for_neuron], 
+        pylab.plot([i[1] for i in gsyn_for_neuron],
                 [i[2] for i in gsyn_for_neuron])
     pylab.show()
 

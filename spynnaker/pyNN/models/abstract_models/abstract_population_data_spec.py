@@ -181,7 +181,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
-        for atom in range(0, n_atoms):
+        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
             # Process the parameters
 
             # noinspection PyTypeChecker
@@ -189,6 +189,11 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 value = param.get_value()
                 if hasattr(value, "__len__"):
                     if len(value) > 1:
+                        if len(value) <= atom:
+                            raise Exception(
+                                "Not enough parameters have been specified"
+                                " for parameter of population {}".format(
+                                    self.label))
                         value = value[atom]
                     else:
                         value = value[0]

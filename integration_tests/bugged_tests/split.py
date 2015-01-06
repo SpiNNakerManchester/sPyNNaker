@@ -1,5 +1,4 @@
 import spynnaker.pyNN as p
-from visualiser_framework import visualiser_modes
 import numpy as np
 
 neuron_model = p.IF_curr_exp
@@ -15,16 +14,16 @@ else:
 simtime = 500.
 n_hyper = 1 #10
 n_attr = 6 #10
-n_exc_hyper = 12 # 800 
+n_exc_hyper = 12 # 800
 
 # Neural/synapse params
 cell_params = {  'tau_m'      : 20,
-                 'v_rest'     : -70,   
-                 'v_reset'    : -70,  
+                 'v_rest'     : -70,
+                 'v_reset'    : -70,
                  'v_thresh'   : -50,
                  'tau_syn_E'  : 2,
                  'tau_syn_I'  : 2,
-                 'tau_refrac' : 2, 
+                 'tau_refrac' : 2,
                  'cm'         : .25,
                  'i_offset'   : 0.
                   }
@@ -32,9 +31,9 @@ cell_params = {  'tau_m'      : 20,
 exc_populations = list()
 
 # Create cells of network
-for i_mini in range(n_attr): 
+for i_mini in range(n_attr):
     exc_populations.append(p.Population(n_exc_hyper/n_attr, neuron_model, cell_params, label="pop %u" % i_mini))
-    exc_populations[-1].record(visuliser_mode=visualiser_modes.RASTER)
+    exc_populations[-1].record()
 
 # Noise
 noise_rate = 400. #100 #1000
@@ -51,7 +50,7 @@ for cell in enumerate(exc_populations):
   spikes = cell[1].getSpikes(compatible_output=True)
 
   if spikes != None:
-      pylab.plot([i[1] for i in spikes], [i[0] + (n_exc_hyper/n_attr * cell[0]) for i in spikes], ".") 
+      pylab.plot([i[1] for i in spikes], [i[0] + (n_exc_hyper/n_attr * cell[0]) for i in spikes], ".")
   else:
       print "No spikes received"
 

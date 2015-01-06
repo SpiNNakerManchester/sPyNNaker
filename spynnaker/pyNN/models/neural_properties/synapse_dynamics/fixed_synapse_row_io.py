@@ -13,6 +13,8 @@ from spynnaker.pyNN import exceptions
 
 class FixedSynapseRowIO(AbstractSynapseRowIo):
 
+    zero_weight_error_displayed = False
+
     # noinspection PyMethodOverriding
     @staticmethod
     def read_packed_plastic_plastic_region(synapse_row, data, offset,
@@ -47,9 +49,11 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         zero_scaled_weights = numpy.where(scaled_weights == 0)[0]
         if (zero_float_weights.shape != zero_scaled_weights.shape
                 or (zero_float_weights != zero_scaled_weights).any()):
-            print ("WARNING: Weight scaling has reduced non-zero weights to"
-                   " zero; the range of weights provided cannot be represented"
-                   " with 16-bits!")
+            if not FixedSynapseRowIO.zero_weight_error_displayed:
+                print ("WARNING: Weight scaling has reduced non-zero weights"
+                       " to zero; the range of weights provided cannot be"
+                       " represented with 16-bits!")
+                FixedSynapseRowIO.zero_weight_error_displayed = True
 
         if ((len(synapse_row.target_indices) > 0)
                 and (numpy.amax(synapse_row.target_indices) > 0xFF)):

@@ -59,7 +59,7 @@ populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputS
 projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
 
-populations[0].record(live_record=True)
+populations[0].record()
 populations[0].set_constraint(p.PlacerChipAndCoreConstraint(0,0,2))
 populations[1].set_constraint(p.PlacerChipAndCoreConstraint(0,0,3))
 
@@ -78,7 +78,7 @@ spikes = populations[0].getSpikes(compatible_output=True)
 if spikes is not None:
     print spikes
     pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
+    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
     pylab.ylabel('neuron id')
     pylab.xlabel('Time/ms')
     pylab.yticks([0, 2, 4, 6, 8, 10])
@@ -98,7 +98,7 @@ if v != None:
     pylab.title('v')
     for pos in range(0, nNeurons, 20):
         v_for_neuron = v[pos * ticks : (pos + 1) * ticks]
-        pylab.plot([i[1] for i in v_for_neuron], 
+        pylab.plot([i[1] for i in v_for_neuron],
                 [i[2] for i in v_for_neuron])
     pylab.show()
 
@@ -109,7 +109,7 @@ if gsyn != None:
     pylab.title('gsyn')
     for pos in range(0, nNeurons, 20):
         gsyn_for_neuron = gsyn[pos * ticks : (pos + 1) * ticks]
-        pylab.plot([i[1] for i in gsyn_for_neuron], 
+        pylab.plot([i[1] for i in gsyn_for_neuron],
                 [i[2] for i in gsyn_for_neuron])
     pylab.show()
 """
