@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="sPyNNaker",
-    version="2014.12-rc-03",
+    version="2015.001",
     description="Spinnaker implementation of PyNN",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=['spynnaker',
@@ -26,9 +26,9 @@ setup(
     package_data={'spynnaker.pyNN': ['model_binaries/*.aplx'],
                   'spynnaker': ['spynnaker.cfg'],
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template']},
-    install_requires=['SpiNNMachine >= 2014.12-rc-01',
-                      'SpiNNMan >= 2014.12-rc-01',
-                      'SpiNNaker_PACMAN >= 2014.12-rc-01',
-                      'SpiNNaker_DataSpecification >= 2014.12-rc-01',
+    install_requires=['SpiNNMachine >= 2015.001',
+                      'SpiNNMan >= 2015.001',
+                      'SpiNNaker_PACMAN >= 2015.001',
+                      'SpiNNaker_DataSpecification >= 2015.001',
                       'pyNN >= 0.70, < 0.8', 'numpy', 'scipy']
 )
