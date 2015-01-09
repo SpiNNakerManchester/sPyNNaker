@@ -30,5 +30,5 @@ setup(
                       'SpiNNMan >= 2015.001',
                       'SpiNNaker_PACMAN >= 2015.001',
                       'SpiNNaker_DataSpecification >= 2015.001',
-                      'pyNN >= 0.70, < 0.8', 'numpy', 'scipy']
+                      'pyNN >= 0.7, < 0.8', 'numpy', 'scipy']
 )
