@@ -40,7 +40,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  contraints=None, label="SpikeSourcePoisson",
-                 rate=1, start=0, duration=10000, seed=None):
+                 rate=1.0, start=0.0, duration=10000000000.0, seed=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
