@@ -479,7 +479,7 @@ class Population(object):
         Write conductance information from the population to a given file.
 
         """
-        time_step = (self._spinnaker.dao.machineTimeStep * 1.0) / 1000.0
+        time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
         gsyn = self.get_gsyn(gather, compatible_output=True)
         first_id = 0
         num_neurons = self._vertex.n_atoms
@@ -501,7 +501,7 @@ class Population(object):
         Write membrane potential information from the population to a given
         file.
         """
-        time_step = (self._spinnaker.dao.machineTimeStep * 1.0) / 1000.0
+        time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
         v = self.get_v(gather, compatible_output=True)
         utility_calls.check_directory_exists_and_create_if_not(filename)
         file_handle = open(filename, "w")
