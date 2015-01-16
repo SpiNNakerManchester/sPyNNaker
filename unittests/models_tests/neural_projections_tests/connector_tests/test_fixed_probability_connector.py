@@ -30,7 +30,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.FixedProbabilityConnector(0.5, weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         pp(synaptic_list.get_rows())
 
     def test_generate_synapse_list_probability_zero_percent(self):
@@ -42,7 +42,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.FixedProbabilityConnector(0, weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         pp(synaptic_list.get_rows())
 
     def test_generate_synapse_list_probability_100_percent(self):
@@ -54,12 +54,13 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.FixedProbabilityConnector(1, weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_generate_synapse_list_probability_200_percent(self):
         with self.assertRaises(ConfigurationException):
@@ -84,7 +85,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
         delay = 1
         connection = pyNN.FixedProbabilityConnector(0.1, weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, second_population._vertex, 1, 0)
+            first_population, second_population, 1, 1.0, 0)
         pp(synaptic_list.get_rows())
 
     def test_allow_self_connections(self):
@@ -97,7 +98,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
         connection = pyNN.FixedProbabilityConnector(
             1, weight, delay, allow_self_connections=False)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         pp(synaptic_list.get_rows())
 
 

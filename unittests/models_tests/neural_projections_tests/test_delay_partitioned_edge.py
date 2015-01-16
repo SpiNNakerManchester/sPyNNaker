@@ -1,9 +1,11 @@
 import unittest
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
-    .weight_based_plastic_synapse_row_io import WeightBasedPlasticSynapseRowIo
+from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
+    import DelayPartitionedEdge
 
 
 class MyTestCase(unittest.TestCase):
+
+    @unittest.skip("Not implemented")
     def test_something(self):
         self.assertEqual(True, False, "Test not implemented yet")
 

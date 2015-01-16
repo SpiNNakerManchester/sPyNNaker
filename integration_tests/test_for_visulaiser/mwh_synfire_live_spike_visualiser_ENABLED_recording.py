@@ -52,7 +52,7 @@ for i in range(0, nNeurons):
 injectionConnection = [(0, 0, weight_to_spike, 1)]
 spikeArray = {'spike_times': [[0]]}
 
-populations.append(p.VisualisedPopulation(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
+populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
 
 populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
 #populations[0].set_mapping_constraint({"x": 1, "y": 0})
@@ -60,8 +60,7 @@ populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputS
 projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
 
-populations[0].record(visualiser_mode=p.VISUALISER_MODES.RASTER,
-                      visualiser_raster_separate=True)
+populations[0].record()
 populations[0].set_constraint(p.PlacerChipAndCoreConstraint(0, 0, 2))
 populations[1].set_constraint(p.PlacerChipAndCoreConstraint(0, 0, 3))
 

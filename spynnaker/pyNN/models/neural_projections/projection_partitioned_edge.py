@@ -33,7 +33,12 @@ class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
                 associated_edge.synapse_list.create_atom_sublist(
                     pre_vertex_slice, post_vertex_slice)
         return self._synapse_sublist
-    
+
+    def get_n_rows(self, graph_mapper):
+        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._pre_subvertex)
+        return pre_vertex_slice.n_atoms
+
     def free_sublist(self):
         """
         Indicates that the list will not be needed again
@@ -45,17 +50,11 @@ class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
         synaptic data
 
         """
-        if self._synapse_sublist is None:
-            self.get_synapse_sublist(graph_mapper)
-            #reports.generate_synaptic_matrix_report(common_report_folder, self)
+        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._pre_subvertex)
+        post_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._post_subvertex)
+        edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(self)
 
-        pre_vertex_slice = graph_mapper.get_subvertex_slice(self._pre_subvertex)
-        post_vertex_slice = \
-            graph_mapper.get_subvertex_slice(self._post_subvertex)
-
-        return not self._synapse_sublist.is_connected(pre_vertex_slice,
-                                                      post_vertex_slice)
-
-    @property
-    def synapse_sublist(self):
-        return self._synapse_sublist
+        return not edge.synapse_list.is_connected(pre_vertex_slice,
+                                                  post_vertex_slice)

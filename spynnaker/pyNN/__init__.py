@@ -13,12 +13,10 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 
-if conf.config.getboolean("Visualiser", "enable"):
-    from visualiser_framework.visualiser_constants import VISUALISER_MODES
-
 #pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
+from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -37,8 +35,8 @@ from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_partitioned_projection \
-    import DelayPartitionedProjection
+from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
+    import DelayPartitionedEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
@@ -174,7 +172,7 @@ def run(run_time=None):
     return None
 
 
-def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
+def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
           **extra_params):
     """
     Should be called at the very beginning of a script.
@@ -200,8 +198,10 @@ def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
     global _spinnaker
     global _binary_search_paths
 
-    logger.info("PACMAN103   (c) 2014 APT Group, University of Manchester")
-    logger.info("                Release version 2014.4.1 - April 2014")
+    logger.info(
+        "sPyNNaker   (c) 2014 APT Group, University of Manchester")
+    logger.info(
+        "                Release version 2015.001 - January 2015")
 
     if len(extra_params.keys()) > 1:
         logger.warn("Extra params has been applied which we do not consider")
@@ -237,9 +237,19 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
                         .format(neuron_type))
 
 
-def activate_live_recording_for(population):
+def activate_live_output_for(
+        population, port, host, tag=None,
+        strip_sdp=True, use_prefix=False, key_prefix=None,
+        prefix_type=None, message_type=EIEIOTypeParam.KEY_32_BIT,
+        right_shift=0, payload_as_time_stamps=True,
+        use_payload_prefix=True, payload_prefix=None,
+        payload_right_shift=0, number_of_packets_sent_per_time_step=0):
     global _spinnaker
-    _spinnaker.add_edge_to_recorder_vertex(population._vertex)
+    _spinnaker.add_edge_to_recorder_vertex(
+        population._vertex, port, host, tag, strip_sdp, use_prefix,
+        key_prefix, prefix_type, message_type, right_shift,
+        payload_as_time_stamps, use_payload_prefix, payload_prefix,
+        payload_right_shift, number_of_packets_sent_per_time_step)
 
 
 # noinspection PyPep8Naming
@@ -250,14 +260,6 @@ def Population(size, cellclass, cellparams, structure=None, label=None):
 
 
 # noinspection PyPep8Naming
-def VisualisedPopulation(size, cellclass, cellparams, structure=None,
-                         label=None):
-    global _spinnaker
-    return _spinnaker.create_visualised_population(size, cellclass, cellparams,
-                                                   structure, label)
-
-
-# noinspection PyPep8Naming
 def Projection(presynaptic_population, postsynaptic_population,
                connector, source=None, target='excitatory',
                synapse_dynamics=None, label=None, rng=None):
@@ -265,3 +267,8 @@ def Projection(presynaptic_population, postsynaptic_population,
     return _spinnaker.create_projection(
         presynaptic_population, postsynaptic_population, connector, source,
         target, synapse_dynamics, label, rng)
+
+
+def get_current_time():
+    global _spinnaker
+    return _spinnaker.get_current_time()

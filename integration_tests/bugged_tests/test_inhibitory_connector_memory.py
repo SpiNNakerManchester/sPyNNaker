@@ -2,7 +2,6 @@
 import unittest
 
 import spynnaker.pyNN as p
-from spynnaker.pyNN.utilities.constants import VISUALISER_MODES as modes
 import numpy, pylab
 
 class TestInhibitoryProjection(unittest.TestCase):
@@ -12,7 +11,7 @@ class TestInhibitoryProjection(unittest.TestCase):
         weight_to_spike = 10
         delay = 1
         cell_params_lif = {
-            'cm'        : 0.25, 
+            'cm'        : 0.25,
             'i_offset'  : 0.0,
             'tau_m'     : 20.0,
             'tau_refrac': 1.0,
@@ -38,7 +37,7 @@ class TestInhibitoryProjection(unittest.TestCase):
         p_inhibitor.record()
         p_initial_spike.record()
         p_access.record()
-        
+
 
         pr_initial_spike1 = p.Projection(p_initial_spike,p_mem,p.OneToOneConnector(weight_to_spike,delay))
         pr_initial_spike2 = p.Projection(p_initial_spike,p_inhibitor,p.OneToOneConnector(weight_to_spike,delay))
@@ -54,11 +53,11 @@ class TestInhibitoryProjection(unittest.TestCase):
         pr_bridge_output = p.Projection(p_bridge,p_out,p.OneToOneConnector(weight_to_spike,delay))
 
         pr_bridge_inhibitor = p.Projection(p_bridge,p_inhibitor,p.OneToOneConnector(weight_to_spike,delay))
-        
+
 
         p_mem.record_v()
         p_mem.record_gsyn()
-        p_mem.record(visualiser_mode=modes.RASTER)
+        p_mem.record()
         p.run(30)
 
         v = None
@@ -67,12 +66,12 @@ class TestInhibitoryProjection(unittest.TestCase):
 
         v = p_mem.get_v(compatible_output=True)
         gsyn = p_mem.get_gsyn(compatible_output=True)
-        spikes = p_mem.get_spikes(compatible_output=True)
+        spikes = p_mem.getSpikes(compatible_output=True)
 
         if spikes != None:
             print spikes
             pylab.figure()
-            pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
+            pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
             pylab.xlabel('Time/ms')
             pylab.ylabel('spikes')
             pylab.title('spikes')
@@ -90,7 +89,7 @@ class TestInhibitoryProjection(unittest.TestCase):
             pylab.title('v')
             for pos in range(0, 1, 20):
                 v_for_neuron = v[pos * ticks : (pos + 1) * ticks]
-                pylab.plot([i[1] for i in v_for_neuron], 
+                pylab.plot([i[1] for i in v_for_neuron],
                         [i[2] for i in v_for_neuron])
             pylab.show()
 
@@ -101,7 +100,7 @@ class TestInhibitoryProjection(unittest.TestCase):
             pylab.title('gsyn')
             for pos in range(0, 1, 20):
                 gsyn_for_neuron = gsyn[pos * ticks : (pos + 1) * ticks]
-                pylab.plot([i[1] for i in gsyn_for_neuron], 
+                pylab.plot([i[1] for i in gsyn_for_neuron],
                         [i[2] for i in gsyn_for_neuron])
             pylab.show()
 

@@ -22,12 +22,13 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                                  AbstractPartitionablePopulationVertex):
 
     def __init__(self, binary, n_neurons, label, constraints,
-                 max_atoms_per_core, machine_time_step, spikes_per_second,
-                 ring_buffer_sigma):
+                 max_atoms_per_core, machine_time_step, timescale_factor,
+                 spikes_per_second, ring_buffer_sigma):
         AbstractSynapticManager.__init__(self)
         AbstractPartitionablePopulationVertex.__init__(
             self, n_atoms=n_neurons, label=label,
-            machine_time_step=machine_time_step, constraints=constraints,
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
         self._binary = binary
         self._executable_constant = None
@@ -137,9 +138,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value)
-        spec.write_value(data=executable_constant)
-        spec.write_value(data=self._machine_time_step)
-        spec.write_value(data=self._no_machine_time_steps)
+        self._write_basic_setup_info(spec, executable_constant)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=neuron_potential_region_sz)
@@ -182,7 +181,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
-        for atom in range(0, n_atoms):
+        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
             # Process the parameters
 
             # noinspection PyTypeChecker
@@ -190,6 +189,11 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 value = param.get_value()
                 if hasattr(value, "__len__"):
                     if len(value) > 1:
+                        if len(value) <= atom:
+                            raise Exception(
+                                "Not enough parameters have been specified"
+                                " for parameter of population {}".format(
+                                    self.label))
                         value = value[atom]
                     else:
                         value = value[0]

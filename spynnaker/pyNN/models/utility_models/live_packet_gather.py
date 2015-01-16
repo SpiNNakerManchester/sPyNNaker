@@ -7,7 +7,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from spynnaker.pyNN.utilities.conf import config
 from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from data_specification.data_specification_generator import \
@@ -16,8 +15,9 @@ from enum import Enum
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 from spynnaker.pyNN.exceptions import ConfigurationException
 
+
 class LivePacketGather(
-    AbstractDataSpecableVertex, AbstractPartitionableVertex,
+        AbstractDataSpecableVertex, AbstractPartitionableVertex,
         AbstractIPTagableVertex):
 
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
@@ -33,7 +33,8 @@ class LivePacketGather(
     forwarding them to the host
 
     """
-    def __init__(self, machine_time_step, tag, port, address, strip_sdp=True,
+    def __init__(self, machine_time_step, timescale_factor,
+                 tag, port, address, strip_sdp=True,
                  use_prefix=False, key_prefix=None, prefix_type=None,
                  message_type=EIEIOTypeParam.KEY_32_BIT,
                  right_shift=0, payload_as_time_stamps=True,
@@ -57,9 +58,10 @@ class LivePacketGather(
                                          "key, but current configuration does "
                                          "not specify either of these")
 
-        AbstractDataSpecableVertex.__init__(self, n_atoms=1,
-                                            label="Monitor",
-                                            machine_time_step=machine_time_step)
+        AbstractDataSpecableVertex.__init__(
+            self, n_atoms=1, label="Monitor",
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor)
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
                                              max_atoms_per_core=1)
         AbstractIPTagableVertex.__init__(self, tag, port, address,
@@ -206,18 +208,10 @@ class LivePacketGather(
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
             region=self._LIVE_DATA_GATHER_REGIONS.SYSTEM.value)
-        spec.write_value(data=self.CORE_APP_IDENTIFIER)
-        spec.write_value(data=self._machine_time_step)
-        spec.write_value(data=self._no_machine_time_steps)
+        self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER)
 
     def get_binary_file_name(self):
-         # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-        binary_name = os.path.join(common_binary_path,
-                                   'live_packet_gather.aplx')
-        return binary_name
+        return 'live_packet_gather.aplx'
 
     #inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):

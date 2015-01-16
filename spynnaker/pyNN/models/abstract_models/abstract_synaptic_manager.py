@@ -79,77 +79,64 @@ class AbstractSynapticManager(object):
 
         # Remember this aligned address, it's where this block will start:
         block_start_addr = write_ptr
+
         # Write the synaptic block, tracking the word count:
         synaptic_rows = sublist.get_rows()
+        data = numpy.zeros(
+            (fixed_row_length
+             + constants.SYNAPTIC_ROW_HEADER_WORDS)
+            * sublist.get_n_rows(), dtype="uint32")
+        data.fill(0xBBCCDDEE)
 
         row_no = 0
         for row in synaptic_rows:
-            words_written = 0
-            plastic_region = \
-                row_io.get_packed_plastic_region(row, weight_scales,
-                                                 n_synapse_type_bits)
+            data_pos = ((fixed_row_length
+                         + constants.SYNAPTIC_ROW_HEADER_WORDS)
+                        * row_no)
+
+            plastic_region = row_io.get_packed_plastic_region(
+                row, weight_scales, n_synapse_type_bits)
 
             # Write the size of the plastic region
-            spec.comment("\nWriting plastic region for row {}".format(row_no))
-            spec.write_value(data=len(plastic_region))
-            words_written += 1
+            data[data_pos] = plastic_region.size
+            data_pos += 1
 
             # Write the plastic region
-            spec.write_array(array_values=plastic_region)
-            words_written += len(plastic_region)
+            data[data_pos:(data_pos + plastic_region.size)] = plastic_region
+            data_pos += plastic_region.size
 
-            fixed_fixed_region = numpy.asarray(
-                row_io.get_packed_fixed_fixed_region(row, weight_scales,
-                                                     n_synapse_type_bits),
-                dtype="uint32")
-            fixed_plastic_region = numpy.asarray(
-                row_io.get_packed_fixed_plastic_region(row, weight_scales,
-                                                       n_synapse_type_bits),
-                dtype="uint16")
+            fixed_fixed_region = row_io.get_packed_fixed_fixed_region(
+                row, weight_scales, n_synapse_type_bits)
+            fixed_plastic_region = row_io.get_packed_fixed_plastic_region(
+                row, weight_scales, n_synapse_type_bits)
 
             # Write the size of the fixed parts
-            spec.comment("\nWriting fixed region for row {}".format(row_no))
-            spec.write_value(data=len(fixed_fixed_region))
-            spec.write_value(data=len(fixed_plastic_region))
-            words_written += 2
+            data[data_pos] = fixed_fixed_region.size
+            data[data_pos + 1] = fixed_plastic_region.size
+            data_pos += 2
 
             # Write the fixed fixed region
-            spec.write_array(array_values=fixed_fixed_region)
-            words_written += len(fixed_fixed_region)
+            data[data_pos:(data_pos + fixed_fixed_region.size)] = \
+                fixed_fixed_region
+            data_pos += fixed_fixed_region.size
 
             # As everything needs to be word aligned, add extra zero to
             # fixed_plastic Region if it has an odd number of entries and build
             # uint32 view of it
-            if (len(fixed_plastic_region) % 2) != 0:
-                fixed_plastic_region = \
-                    numpy.asarray(numpy.append(fixed_plastic_region, 0),
-                                  dtype='uint16')
+            if (fixed_plastic_region.size % 2) != 0:
+                fixed_plastic_region = numpy.asarray(numpy.append(
+                    fixed_plastic_region, 0), dtype='uint16')
             # does indeed return something (due to c fancy stuff in numpi) ABS
 
             # noinspection PyNoneFunctionAssignment
-            fixed_plastic_region_words = \
-                fixed_plastic_region.view(dtype="uint32")
-
-            spec.write_array(array_values=fixed_plastic_region_words)
-
-            # noinspection PyTypeChecker
-            words_written += len(fixed_plastic_region_words)
-
-            write_ptr += (4 * words_written)
-
-            # Write padding (if required):
-            padding = ((fixed_row_length + constants.SYNAPTIC_ROW_HEADER_WORDS)
-                       - words_written)
-            # Loop through padding in terms of maximum
-            # Size blocks that can be repeated
-            for i in range(0, padding, 255):
-                padding_repeats = min(255, padding - i)
-                spec.write_value(data=0xBBCCDDEE, repeats=padding_repeats,
-                                 data_type=DataType.UINT32)
-
-            # Update write pointer
-            write_ptr += 4 * padding
+            fixed_plastic_region_words = fixed_plastic_region.view(
+                dtype="uint32")
+            data[data_pos:(data_pos + fixed_plastic_region_words.size)] = \
+                fixed_plastic_region_words
             row_no += 1
+
+        spec.write_array(data)
+        write_ptr += data.size * 4
 
         # The current write pointer is where the next block could start:
         next_block_start_addr = write_ptr
@@ -250,7 +237,7 @@ class AbstractSynapticManager(object):
         """
 
     @abstractmethod
-    def write_synapse_parameters(self, spec, subvertex):
+    def write_synapse_parameters(self, spec, subvertex, vertex_slice):
         """forced method for dealing with writing synapse params
 
         """
@@ -381,7 +368,7 @@ class AbstractSynapticManager(object):
         """
 
         # E[ number of spikes ] in a timestep
-        #x /1000000.0 = conversion between microsecond to millisecent
+        # x /1000000.0 = conversion between microsecond to second
         average_spikes_per_timestep = (float(n_synapses_in * spikes_per_second)
                                        * (float(machine_timestep) / 1000000.0))
 
@@ -402,18 +389,28 @@ class AbstractSynapticManager(object):
         # multiplication and (2) it's actually the complement that is needed
         # i.e. 'gammaincc']
 
-        # expensive and used twice, so store
-        gamma = special.gamma(1 + upper_bound)
+        weight_variance = 0.0
 
-        weight_variance = (math.exp(-average_spikes_per_timestep)
-                           * average_spikes_per_timestep
-                           * (weight_std_dev ** 2)
-                           * (pow(-average_spikes_per_timestep, upper_bound)
-                              + math.exp(average_spikes_per_timestep)
-                              * special.gammaincc(1 + upper_bound,
-                                                  average_spikes_per_timestep)
-                              * gamma)
-                           / gamma)
+        if weight_std_dev > 0:
+
+            lngamma = special.gammaln(1 + upper_bound)
+
+            gammai = special.gammaincc(1 + upper_bound,
+                                       average_spikes_per_timestep)
+
+            big_ratio = (math.log(average_spikes_per_timestep) * upper_bound
+                         - lngamma)
+
+            if big_ratio > -701.0 and big_ratio < 701.0 and big_ratio != 0.0:
+
+                log_weight_variance = (
+                    -average_spikes_per_timestep
+                    + math.log(average_spikes_per_timestep)
+                    + 2.0 * math.log(weight_std_dev)
+                    + math.log(math.exp(average_spikes_per_timestep) * gammai
+                               - math.exp(big_ratio)))
+
+                weight_variance = math.exp(log_weight_variance)
 
         # upper bound calculation -> mean + n * SD
         return ((average_spikes_per_timestep * weight_mean)
@@ -422,16 +419,18 @@ class AbstractSynapticManager(object):
     def _get_ring_buffer_totals(self, subvertex, sub_graph, graph_mapper):
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+        n_synapse_types = len(self.get_synapse_targets())
+        absolute_max_weights = numpy.zeros(n_synapse_types)
 
         # If we have an STDP mechanism, get the maximum plastic weight
         stdp_max_weight = None
         if self._stdp_mechanism is not None:
             stdp_max_weight = self._stdp_mechanism.get_max_weight()
-
-        n_synapse_types = len(self.get_synapse_targets())
+            absolute_max_weights.fill(stdp_max_weight)
 
         total_weights = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
-        total_square_weights = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
+        total_square_weights = numpy.zeros(
+            (n_synapse_types, vertex_slice.n_atoms))
         total_items = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
         for subedge in in_sub_edges:
             sublist = subedge.get_synapse_sublist(graph_mapper)
@@ -440,6 +439,7 @@ class AbstractSynapticManager(object):
             if stdp_max_weight is None:
 
                 # If there's no STDP maximum weight, sum the initial weights
+                sublist.max_weights(absolute_max_weights)
                 sublist.sum_weights(total_weights)
                 sublist.sum_square_weights(total_square_weights)
 
@@ -451,20 +451,14 @@ class AbstractSynapticManager(object):
                 sublist.sum_fixed_weight(total_square_weights,
                                          stdp_max_weight * stdp_max_weight)
 
-        return total_weights, total_square_weights, total_items
-
-    def _get_expected_max_weight(
-            self, i, j, weight_means, weight_std_devs, weight_n_items,
-            spikes_per_second, machine_timestep, ring_buffer_sigma):
-        return self._ring_buffer_expected_upper_bound(
-            weight_means[i][j], weight_std_devs[i][j], spikes_per_second,
-            machine_timestep, weight_n_items[i][j], ring_buffer_sigma)
+        return (total_weights, total_square_weights, total_items,
+                absolute_max_weights)
 
     def get_ring_buffer_to_input_left_shifts(
             self, subvertex, sub_graph, graph_mapper, spikes_per_second,
             machine_timestep, sigma):
 
-        total_weights, total_square_weights, total_items =\
+        total_weights, total_square_weights, total_items, abs_max_weights =\
             self._get_ring_buffer_totals(subvertex, sub_graph, graph_mapper)
 
         # Get maximum weight that can go into each post-synaptic neuron per
@@ -472,7 +466,8 @@ class AbstractSynapticManager(object):
         max_weights = [max(t) for t in total_weights]
 
         # Clip the total items to avoid problems finding the mean of nothing(!)
-        total_items = numpy.clip(total_items, a_min=1, a_max=None)
+        total_items = numpy.clip(total_items, a_min=1,
+                                 a_max=numpy.iinfo(int).max)
         weight_means = total_weights / total_items
 
         # Calculate the standard deviation, clipping to avoid numerical errors
@@ -481,7 +476,7 @@ class AbstractSynapticManager(object):
                 total_square_weights
                 - numpy.divide(numpy.power(total_weights, 2),
                                total_items),
-                total_items), a_min=0, a_max=None))
+                total_items), a_min=0.0, a_max=numpy.finfo(float).max))
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_synapse_types = len(self.get_synapse_targets())
@@ -495,11 +490,18 @@ class AbstractSynapticManager(object):
         expected_max_weights = [max(t) for t in expected_weights]
         max_weights = [min((w, e))
                        for w, e in zip(max_weights, expected_max_weights)]
+        max_weights = [max((w, a))
+                       for w, a in zip(max_weights, abs_max_weights)]
 
         # Convert these to powers
         max_weight_powers = [0 if w <= 0
                              else int(math.ceil(max(0, math.log(w, 2))))
                              for w in max_weights]
+
+        # If 2^max_weight_power equals the max weight, we have to add another
+        # power, as range is 0 - (just under 2^max_weight_power)!
+        max_weight_powers = [w + 1 if (2 ** w) >= a else w
+                             for w, a in zip(max_weight_powers, max_weights)]
 
         # If we have an STDP mechanism that uses signed weights,
         # Add another bit of shift to prevent overflows
@@ -507,9 +509,6 @@ class AbstractSynapticManager(object):
                 and self._stdp_mechanism.are_weights_signed():
             max_weight_powers = [m + 1 for m in max_weight_powers]
 
-        # Actual shift is the max_weight_power - 1 for 16-bit fixed to s1615,
-        # but we ignore the "-1" to allow a bit of overhead in the above
-        # calculation in case a couple of extra spikes come in
         return max_weight_powers
 
     def write_synaptic_matrix_and_master_population_table(
@@ -578,17 +577,6 @@ class AbstractSynapticManager(object):
                     # **TODO** use proper merge functionality
                     a_row.append(b_row)
 
-                if logger.isEnabledFor(logging.DEBUG):
-                    a_slice = graph_mapper.get_subvertex_slice(
-                        a.post_subvertex)
-                    b_slice = graph_mapper.get_subvertex_slice(
-                        b.post_subvertex)
-                    logger.debug("Merging projection subedges %s (%u-%u) and"
-                                 " %s (%u-%u) both leading to vertex %s"
-                                 % (a.label, a_slice.lo_atom, a_slice.hi_atom,
-                                    b.label, b_slice.lo_atom, b_slice.hi_atom,
-                                    self.label))
-
                 # Add projection edge b to list to remove
                 proj_subedges_to_remove.append(b)
 
@@ -617,25 +605,6 @@ class AbstractSynapticManager(object):
                 graph_mapper.get_partitionable_edge_from_partitioned_edge(
                     subedge)
             row_io = associated_edge.get_synapse_row_io()
-            if logger.isEnabledFor("debug"):
-                subvertex_vertex =\
-                    graph_mapper.get_vertex_from_subvertex(subvertex)
-                pre_sub_lo = \
-                    graph_mapper.get_subvertex_slice(
-                        subedge.pre_subvertex).lo_atom
-                pre_sub_hi = \
-                    graph_mapper.get_subvertex_slice(
-                        subedge.pre_subvertex).hi_atom
-                sub_lo = graph_mapper.get_subvertex_slice(subvertex).lo_atom
-                sub_hi = graph_mapper.get_subvertex_slice(subvertex).hi_atom
-
-                logger.debug(
-                    "Writing subedge from {} ({}-{}) to {} ({}-{})".format(
-                        subedge.pre_subvertex.label, pre_sub_lo, pre_sub_hi,
-                        subvertex_vertex.label, sub_lo, sub_hi))
-                rows = sublist.get_rows()
-                for i in range(len(rows)):
-                    logger.debug("{}: {}".format(i, rows[i]))
 
             # Get the maximum row length in words, excluding headers
             max_row_length = \

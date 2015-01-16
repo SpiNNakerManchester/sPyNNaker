@@ -20,6 +20,7 @@ class TestPyNNRoutingInfoAllocator(unittest.TestCase):
         self.assertEqual(ria.get_key_mask_combo(0xf1f2, 0xf0f0), 0xf0f0)
         self.assertEqual(ria.get_key_mask_combo(0xf1f2, 0xffff), 0xf1f2)
 
+    @unittest.skip("Test out of date")
     def test_add_subgraph_and_placement(self):
         gsm = GraphMapper()
         ria = PyNNRoutingInfoAllocator()
@@ -40,6 +41,7 @@ class TestPyNNRoutingInfoAllocator(unittest.TestCase):
         pls = Placements([pl])
         ria.allocate_routing_info(subgraph, pls)
 
+    @unittest.skip("Test out of date")
     def test_add_subgraph_and_placement_with_proper_graph_subgraph_mapper(self):
 
         subvertices = list()

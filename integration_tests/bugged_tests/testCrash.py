@@ -1,5 +1,7 @@
 import numpy, pylab, random, sys
 import spynnaker.pyNN as sim
+from matplotlib.pyplot import bar
+from matplotlib import pyplot
 
 # SpiNNaker setup
 sim.setup(timestep=1.0, min_delay=1.0, max_delay=10.0)
@@ -35,7 +37,7 @@ pre_pop = sim.Population(pop_size, model, cell_params, label="pre")
 post_pop = sim.Population(pop_size, model, cell_params, label="post")
 #post_pop.set_mapping_constraint({"x": 1, "y": 0})
 # Stimulating populations
-#pre_stim = sim.Population(pop_size, sim.SpikeSourcePoisson, {'rate': 5})
+pre_stim = sim.Population(pop_size, sim.SpikeSourcePoisson, {'rate': 5})
 #pre_stim.set_mapping_constraint({"x": 1, "y": 1})
 
 # +-------------------------------------------------------------------+
@@ -51,7 +53,7 @@ stdp_model = sim.STDPMechanism(
 variableWeights = sim.Projection(pre_pop, post_pop, sim.FixedProbabilityConnector(0.1, weights=.5), synapse_dynamics = sim.SynapseDynamics(slow= stdp_model))
 
 # Record spikes
-#pre_stim.record()
+pre_stim.record()
 pre_pop.record()
 post_pop.record()
 
@@ -69,17 +71,17 @@ def plot_spikes(spikes, title):
         pylab.figure()
         pylab.xlim((0, sim_time))
         pylab.ylim((0, pop_size))
-        pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
+        pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
         pylab.xlabel('Time [ms]')
         pylab.ylabel('Neuron ID')
         pylab.title(title)
     else:
         print "No spikes received"
-        
+
 def plot_firing_rate(spikes, title):
     pylab.figure()
     # plot firing rate in bins of 10 ms (factor to scale to Hz)
-    a = pyplot.hist(pre_spikes[:,1], bins=sim_time/10, range=[0,sim_time])*100/pop_size
+    a = pyplot.hist(spikes[:,1], bins=sim_time/10, range=[0,sim_time])*100/pop_size
     bar(a)
     pylab.title(title)
     pylab.xlabel('Time [ms]')

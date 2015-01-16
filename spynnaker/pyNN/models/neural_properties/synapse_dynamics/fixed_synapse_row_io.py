@@ -1,6 +1,7 @@
 import numpy
 
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.abstract_synapse_row_io import AbstractSynapseRowIo
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
+    abstract_synapse_row_io import AbstractSynapseRowIo
 from spynnaker.pyNN.models.neural_properties.synapse_row_info import \
     SynapseRowInfo
 from spynnaker.pyNN import exceptions
@@ -12,21 +13,21 @@ from spynnaker.pyNN import exceptions
 
 class FixedSynapseRowIO(AbstractSynapseRowIo):
 
+    zero_weight_error_displayed = False
+
     # noinspection PyMethodOverriding
     @staticmethod
     def read_packed_plastic_plastic_region(synapse_row, data, offset,
                                            length, weight_scales):
-        raise exceptions.SynapticConfigurationException("fixed synapse rows do"
-                                                        "not contain a plastic "
-                                                        "region")
+        raise exceptions.SynapticConfigurationException(
+            "fixed synapse rows do not contain a plastic region")
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def get_n_words(synapse_row, vertex_slice=None):
-        if vertex_slice is None:
-            return synapse_row.get_n_connections()
-        else:
-            return synapse_row.get_n_connections(vertex_slice.n_atoms)
+    def get_n_words(synapse_row, vertex_slice=None,
+                    lo_delay=None, hi_delay=None):
+        return synapse_row.get_n_connections(
+            vertex_slice=vertex_slice, lo_delay=lo_delay, hi_delay=hi_delay)
 
     # noinspection PyMethodOverriding
     @staticmethod
@@ -41,16 +42,18 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         # synapse weight scale
         abs_weights = numpy.abs(synapse_row.weights)
         scaled_weights = numpy.rint(
-            abs_weights * synapse_weight_scales).astype("uint32")
+            abs_weights * synapse_weight_scales).astype("uint32") & 0xFFFF
 
         # Check zeros
         zero_float_weights = numpy.where(abs_weights == 0.0)[0]
         zero_scaled_weights = numpy.where(scaled_weights == 0)[0]
         if (zero_float_weights.shape != zero_scaled_weights.shape
                 or (zero_float_weights != zero_scaled_weights).any()):
-            print ("WARNING: Weight scaling has reduced non-zero weights to"
-                   " zero; the range of weights provided cannot be represented"
-                   " with 16-bits!")
+            if not FixedSynapseRowIO.zero_weight_error_displayed:
+                print ("WARNING: Weight scaling has reduced non-zero weights"
+                       " to zero; the range of weights provided cannot be"
+                       " represented with 16-bits!")
+                FixedSynapseRowIO.zero_weight_error_displayed = True
 
         if ((len(synapse_row.target_indices) > 0)
                 and (numpy.amax(synapse_row.target_indices) > 0xFF)):
@@ -73,13 +76,13 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
     @staticmethod
     def get_packed_fixed_plastic_region(synapse_row, weight_scales,
                                         n_synapse_type_bits):
-        return []
+        return numpy.zeros(0)
 
     # noinspection PyMethodOverriding
     @staticmethod
     def get_packed_plastic_region(synapse_row, weight_scales,
                                   n_synapse_type_bits):
-        return []
+        return numpy.zeros(0)
 
     # noinspection PyMethodOverriding
     @staticmethod

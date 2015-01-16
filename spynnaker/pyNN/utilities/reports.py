@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def generate_synaptic_matrix_reports(common_report_directory,
-                                     partitioned_graph):
+                                     partitioned_graph, graph_mapper):
     top_level_folder = os.path.join(common_report_directory,
                                     "synaptic_matrix_reports")
     if not os.path.exists(top_level_folder):
@@ -24,7 +24,7 @@ def generate_synaptic_matrix_reports(common_report_directory,
             logger.error("Generate_placement_reports: Can't open file"
                          " {} for writing.".format(file_name))
         #extract matrix
-        synaptic_matrix = partitioned_edge.synapse_sublist
+        synaptic_matrix = partitioned_edge.get_synapse_sublist(graph_mapper)
         counter = 0
         for synaptic_row in synaptic_matrix.get_rows():
             output_string = "entry {} [ \n target_index[".format(counter)

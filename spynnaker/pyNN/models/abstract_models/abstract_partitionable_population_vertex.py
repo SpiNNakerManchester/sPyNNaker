@@ -1,6 +1,5 @@
 from abc import ABCMeta
 from abc import abstractmethod
-
 from six import add_metaclass
 
 from spynnaker.pyNN.utilities import constants
@@ -15,10 +14,10 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
                                             AbstractPartitionableVertex):
 
     def __init__(self, n_atoms, label, max_atoms_per_core, machine_time_step,
-                 constraints=None):
-        AbstractDataSpecableVertex.__init__(self, n_atoms, label,
-                                            machine_time_step=machine_time_step,
-                                            constraints=constraints)
+                 timescale_factor, constraints=None):
+        AbstractDataSpecableVertex.__init__(
+            self, n_atoms, label, machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor, constraints=constraints)
         AbstractPartitionableVertex.__init__(
             self, n_atoms, label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
@@ -73,6 +72,13 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
     def get_stdp_parameter_size(self, in_edges):
         """
         Gets the size of the stdp parameters for a given set of atoms
+        """
+
+    @staticmethod
+    @abstractmethod
+    def set_model_max_atoms_per_core(new_value):
+        """
+        enforces other neural models to support model based max atoms contraints
         """
 
     # noinspection PyUnusedLocal

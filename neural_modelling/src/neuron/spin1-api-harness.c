@@ -195,7 +195,7 @@ void dma_callback(uint unused, uint tag)
       subsequent_spikes = get_next_spike_if_equals(s);
 
       // Process synaptic row, writing it back if it's the last time it's going to be processed
-      //print_synaptic_row(next_dma_buffer());
+      print_synaptic_row(next_dma_buffer());
       process_synaptic_row(next_dma_buffer(), !subsequent_spikes);
 
     } while (subsequent_spikes);

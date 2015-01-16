@@ -2,7 +2,6 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
     AbstractMultiCastSource
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.conf import config
 from pacman.model.constraints.key_allocator_routing_constraint \
     import KeyAllocatorRoutingConstraint
 from data_specification.data_specification_generator import \
@@ -16,11 +15,12 @@ class CommandSender(AbstractMultiCastSource):
 
     CORE_APP_IDENTIFER = constants.COMMAND_SENDER_CORE_APPLICATION_ID
 
-    def __init__(self, machine_time_step):
+    def __init__(self, machine_time_step, timescale_factor):
         """
         constructor that depends upon the Component vertex
         """
-        AbstractMultiCastSource.__init__(self, machine_time_step)
+        AbstractMultiCastSource.__init__(
+            self, machine_time_step, timescale_factor)
         self._writes = None
         self._memory_requirements = None
         self._edge_map = dict()
@@ -49,12 +49,10 @@ class CommandSender(AbstractMultiCastSource):
 
         #reserve regions
         self.reserve_memory_regions(spec, self._memory_requirements)
-        
+
         #write system region
         spec.switch_write_focus(region=self.SYSTEM_REGION)
-        spec.write_value(data=0xBEEF0000)
-        spec.write_value(data=self._machine_time_step)
-        spec.write_value(data=self._no_machine_time_steps)
+        self._write_basic_setup_info(spec, 0xBEEF0000)
         spec.write_value(data=0)
 
         #write commands to memory
@@ -182,7 +180,6 @@ class CommandSender(AbstractMultiCastSource):
         :param atom: the aton of this subvertex
         :return:the key with a neuron id added to it
         """
-        key = None
         if self._edge_map[subedge.edge] is not None:
             key = self._edge_map[subedge.edge][0]['key']
         else:
@@ -275,5 +272,10 @@ class CommandSender(AbstractMultiCastSource):
         return 0
 
     def get_binary_file_name(self):
-        # Rebuild executable name
         return 'command_sender_multicast_source.aplx'
+
+    def is_recordable(self):
+        return True
+
+    def is_multi_cast_source(self):
+        return True

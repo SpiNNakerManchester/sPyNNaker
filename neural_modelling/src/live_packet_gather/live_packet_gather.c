@@ -1,5 +1,5 @@
 #include "../common/common-impl.h"
-#include "../../../../spinnaker_tools/include/sark.h"
+#include <sark.h>
 
 // Globals
 static sdp_msg_t g_spike_message;

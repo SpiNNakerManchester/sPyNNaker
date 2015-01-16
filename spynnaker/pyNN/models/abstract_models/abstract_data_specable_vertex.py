@@ -20,9 +20,11 @@ import os
 @add_metaclass(ABCMeta)
 class AbstractDataSpecableVertex(AbstractConstrainedVertex):
 
-    def __init__(self, n_atoms, label, machine_time_step, constraints=None):
+    def __init__(self, n_atoms, label, machine_time_step, timescale_factor,
+                 constraints=None):
         AbstractConstrainedVertex.__init__(self, label, constraints)
         self._machine_time_step = machine_time_step
+        self._timescale_factor = timescale_factor
         self._application_runtime = None
         self._no_machine_time_steps = None
 
@@ -32,7 +34,7 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_value(data=core_app_identifier)
-        spec.write_value(data=self._machine_time_step)
+        spec.write_value(data=self._machine_time_step * self._timescale_factor)
         spec.write_value(data=self._no_machine_time_steps)
 
     @abstractmethod

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="sPyNNaker",
-    version="0.1-SNAPSHOT",
+    version="2015.001",
     description="Spinnaker implementation of PyNN",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=['spynnaker',
@@ -14,6 +14,7 @@ setup(
               'spynnaker.pyNN.models.neural_projections',
               'spynnaker.pyNN.models.neural_projections.connectors',
               'spynnaker.pyNN.models.neural_properties',
+              'spynnaker.pyNN.models.neural_properties.master_pop_table_generators',
               'spynnaker.pyNN.models.neural_properties.synapse_dynamics',
               'spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules',
               'spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences',
@@ -21,12 +22,13 @@ setup(
               'spynnaker.pyNN.models.utility_models',
               'spynnaker.pyNN.overridden_pacman_functions',
               'spynnaker.pyNN.utilities',
-              'spynnaker.pyNN.utilities.conf',
-              'spynnaker.pyNN.visualiser_package',
-              'spynnaker.pyNN.visualiser_package.visualiser_pages'],
+              'spynnaker.pyNN.utilities.conf'],
     package_data={'spynnaker.pyNN': ['model_binaries/*.aplx'],
                   'spynnaker': ['spynnaker.cfg'],
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template']},
-    install_requires=['SpiNNMachine', 'SpiNNMan', 'SpiNNaker_PACMAN',
-            'SpiNNaker_DataSpecification', 'pyNN', 'numpy']
+    install_requires=['SpiNNMachine >= 2015.001',
+                      'SpiNNMan >= 2015.001',
+                      'SpiNNaker_PACMAN >= 2015.001',
+                      'SpiNNaker_DataSpecification >= 2015.001',
+                      'pyNN >= 0.7, < 0.8', 'numpy', 'scipy']
 )

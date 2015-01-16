@@ -47,7 +47,7 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         Gets the fixed part of the fixed region of the row as an array
         of 32-bit words
         """
-        return []
+        return numpy.zeros(0)
 
     def get_packed_fixed_plastic_region(self, synapse_row, weight_scales,
                                         n_synapse_type_bits):

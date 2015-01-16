@@ -31,13 +31,13 @@ class TestingOneToOneConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.OneToOneConnector(weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, second_population._vertex, 1,
-            synapse_type)
+            first_population, second_population, 1, 1.0, synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_self_connect_population(self):
         number_of_neurons = 10
@@ -48,12 +48,13 @@ class TestingOneToOneConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.OneToOneConnector(weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_synapse_list_generation_for_different_sized_populations(self):
         number_of_neurons = 10
@@ -68,8 +69,8 @@ class TestingOneToOneConnector(unittest.TestCase):
         delay = 1
         connection = pyNN.OneToOneConnector(weight, delay)
         with self.assertRaises(ConfigurationException):
-            connection.generate_synapse_list(first_population._vertex,
-                                             second_population._vertex, 1, 0)
+            connection.generate_synapse_list(first_population,
+                                             second_population, 1, 1.0, 0)
 
     def test_connector_populations_of_different_sizes(self):
         weight = 2

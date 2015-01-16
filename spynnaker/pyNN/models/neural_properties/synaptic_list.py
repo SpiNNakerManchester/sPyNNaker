@@ -9,28 +9,34 @@ class SynapticList(object):
         """
         self._synaptic_rows = synaptic_rows
 
-    def get_max_n_connections(self, vertex_slice=None):
+    def get_max_n_connections(
+            self, vertex_slice=None, lo_delay=None, hi_delay=None):
         """
         Return the maximum number of connections in the rows
         """
-        if vertex_slice is None:
-            return max(map(operator.methodcaller(
-                'get_n_connections', None), self._synaptic_rows))
-        else:
-            return max(map(operator.methodcaller(
-                'get_n_connections', vertex_slice), self._synaptic_rows))
+        return max(map(operator.methodcaller(
+            'get_n_connections', vertex_slice, lo_delay, hi_delay),
+            self._synaptic_rows))
 
-    def get_min_max_delay(self):
+    def get_min_delay(self):
         """
         Return the minimum and maximum delays in the rows
         """
         if len(self._synaptic_rows) == 0:
-            return 0, 0
+            return 0
         min_delay = min(map(operator.methodcaller('get_min_delay'),
                             self._synaptic_rows))
+        return min_delay
+
+    def get_max_delay(self):
+        """
+        Return the minimum and maximum delays in the rows
+        """
+        if len(self._synaptic_rows) == 0:
+            return 0
         max_delay = max(map(operator.methodcaller('get_max_delay'),
                             self._synaptic_rows))
-        return min_delay, max_delay
+        return max_delay
 
     def get_max_weight(self):
         """
@@ -56,6 +62,11 @@ class SynapticList(object):
             for i, w, s in zip(row.target_indices, row.weights,
                                row.synapse_types):
                 sum_arrays[s][i] += abs(w)
+
+    def max_weights(self, max_arrays):
+        for row in self._synaptic_rows:
+            for w, s in zip(row.weights, row.synapse_types):
+                max_arrays[s] = max(max_arrays[s], abs(w))
 
     def sum_square_weights(self, sum_arrays):
         """
@@ -92,9 +103,9 @@ class SynapticList(object):
         Return true if the rows are connected for the specified range of
         incoming and outgoing atoms
         """
-        for row in self._synaptic_rows[0:from_vertex_slice.n_atoms]:
-            x = row.get_n_connections(to_vertex_slice.n_atoms)
-            if row.get_n_connections(to_vertex_slice.n_atoms) > 0:
+        for row in self._synaptic_rows[
+                from_vertex_slice.lo_atom:from_vertex_slice.hi_atom + 1]:
+            if row.get_n_connections(vertex_slice=to_vertex_slice) > 0:
                 return True
         return False
 
