@@ -4,11 +4,9 @@ import logging
 
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_message import SDPMessage
-
-from spynnaker.pyNN.buffer_management.buffer_requests.send_data_request import \
+from spynnaker.pyNN.buffer_management.buffer_requests.data_requests.send_data_request import \
     SendDataRequest
-from spynnaker.pyNN.buffer_management.buffer_requests.\
-    stop_requests_request import StopRequestsRequest
+from spynnaker.pyNN.buffer_management.buffer_requests.data_requests.stop_requests_request import StopRequestsRequest
 from spynnaker.pyNN import exceptions
 
 

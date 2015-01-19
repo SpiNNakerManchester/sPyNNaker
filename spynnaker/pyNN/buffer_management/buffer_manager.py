@@ -186,7 +186,8 @@ class BufferManager(object):
                 data_request.chip_x, data_request.chip_y,
                 data_request.address_pointer, data_request.data)
             #add padding at the end of memory region during initial memory write
-            space_used += len(data_request.data)
+            if data_request.data is not None:
+                space_used += len(data_request.data)
         length_to_be_padded = region_size - space_used
         padding_packet_header = EIEIOCommandHeader(
             spinnman_constants.EIEIO_COMMAND_IDS.EVENT_PADDING.value)

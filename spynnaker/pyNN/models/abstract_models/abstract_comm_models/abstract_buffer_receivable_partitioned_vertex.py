@@ -1,17 +1,16 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
-
 import math
+
 from spinnman.data.little_endian_byte_array_byte_writer import \
     LittleEndianByteArrayByteWriter
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 from spinnman import constants as spinn_man_constants
-from spynnaker.pyNN.buffer_management.buffer_requests.\
-    send_data_request import SendDataRequest
-from spynnaker.pyNN.buffer_management.buffer_requests.stop_requests_request \
+from spynnaker.pyNN.buffer_management.buffer_requests.data_requests.send_data_request import SendDataRequest
+from spynnaker.pyNN.buffer_management.buffer_requests.data_requests.stop_requests_request \
     import StopRequestsRequest
-from spynnaker.pyNN.buffer_management.buffer_requests.event_stop_request \
+from spynnaker.pyNN.buffer_management.buffer_requests.command_requests.event_stop_request \
     import EventStopRequest
 from spynnaker.pyNN.utilities import constants
 
@@ -69,7 +68,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
                and position_in_buffer < len(buffer_keys)
                and used_seqeunce_no < constants.MAX_SEQUENCES_PER_TRANSMISSION):
             header_byte_1 = (1 << 5) + (1 << 4) + \
-                            (EIEIOTypeParam.KEY_PAYLOAD_32_BIT.value << 2)
+                            (EIEIOTypeParam.KEY_32_BIT.value << 2)
             buffer_length = len(buffers[buffer_keys[position_in_buffer]]) \
                 * constants.KEY_SIZE
             # check if theres enough space in buffer for packets for this
