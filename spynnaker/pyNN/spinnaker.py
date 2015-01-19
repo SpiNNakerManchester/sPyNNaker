@@ -173,6 +173,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #load database if needed
         if self._create_database:
+            self._database_thread.add_system_params(
+                self._time_scale_factor, self._machine_time_step, self._runtime)
             self._database_thread.add_machine_objects(self._machine)
             self._database_thread.add_partitionable_vertices(
                 self._partitionable_graph)

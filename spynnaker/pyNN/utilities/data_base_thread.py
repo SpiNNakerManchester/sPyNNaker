@@ -42,6 +42,9 @@ class DataBaseThread(threading.Thread):
         self._routing_tables = None
         self._complete = False
         self._machine_id = 0
+        self._time_scale_factor = None
+        self._machine_time_step = None
+        self._runtime = None
 
         # set up checks
         self._done_machine_format = False
@@ -52,6 +55,7 @@ class DataBaseThread(threading.Thread):
         self._done_routing_tables = False
         self._done_mapping = False
         self._done_machine = False
+        self._done_system_params = False
         if self._wait_for_vis:
             self._recieved_confirmation = False
         else:
@@ -164,6 +168,10 @@ class DataBaseThread(threading.Thread):
                 "chip_x INTEGER, chip_y INTEGER, position INTEGER, "
                 "key_combo INT, mask INT, route INT, "
                 "PRIMARY KEY (chip_x, chip_y, position))")
+            self._cur.execute(
+                "CREATE TABLE configuration_parameters("
+                "parameter_id TEXT, value INTEGER, "
+                "PRIMARY KEY (parameter_id))")
         except Exception as e:
             print e
         self._connection.commit()
@@ -180,7 +188,12 @@ class DataBaseThread(threading.Thread):
                        not self._done_routing_tables)
                    and not self._complete and self._machine is None):
                 self._lock_condition.wait()
-            if self._machine is not None and not self._done_machine:
+            if (self._machine_time_step is not None and
+                    self._time_scale_factor is not None and
+                    self._runtime is not None and not self._done_system_params):
+                self._lock_condition.release()
+                self._add_system_params()
+            elif self._machine is not None and not self._done_machine:
                 self._lock_condition.release()
                 self._add_machine()
             elif (self._partitionable_graph is not None and
@@ -217,7 +230,7 @@ class DataBaseThread(threading.Thread):
             # check about ending and sending notification
             if (self._done_mapping and self._done_placements and
                     self._done_routing_tables and self._done_partitioned and
-                    self._done_routing_info and
+                    self._done_routing_info and self._done_system_params and
                     ((self._done_mapping and self._execute_mapping) or
                         not self._execute_mapping)):
                 self._complete = True
@@ -298,8 +311,28 @@ class DataBaseThread(threading.Thread):
         self._lock_condition.notify()
         self._lock_condition.release()
 
-    def _add_partitionable_vertices(self):
+    def _add_system_params(self):
+        self._cur.execute(
+            "INSERT INTO configuration_parameters("
+            "parameter_id, value)"
+            " VALUES('{}', {}), ('{}', {}), ('{}', {});"
+            .format("machine_time_step", self._machine_time_step,
+                    "time_scale_factor", self._time_scale_factor,
+                    "runtime", self._runtime)
+        )
+        self._done_system_params = True
+        self._connection.commit()
 
+    def add_system_params(self, time_scale_factor, machine_time_step, runtime):
+        self._lock_condition.acquire()
+        self._time_scale_factor = time_scale_factor
+        self._machine_time_step = machine_time_step
+        self._runtime = runtime
+        self._lock_condition.notify()
+        self._lock_condition.release()
+
+
+    def _add_partitionable_vertices(self):
         # add vertices
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractRecordableVertex):
