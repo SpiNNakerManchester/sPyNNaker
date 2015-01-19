@@ -170,7 +170,7 @@ class DataBaseThread(threading.Thread):
                 "PRIMARY KEY (chip_x, chip_y, position))")
             self._cur.execute(
                 "CREATE TABLE configuration_parameters("
-                "parameter_id TEXT, value INTEGER, "
+                "parameter_id TEXT, value REAL, "
                 "PRIMARY KEY (parameter_id))")
         except Exception as e:
             print e
@@ -190,7 +190,8 @@ class DataBaseThread(threading.Thread):
                 self._lock_condition.wait()
             if (self._machine_time_step is not None and
                     self._time_scale_factor is not None and
-                    self._runtime is not None and not self._done_system_params):
+                    self._runtime is not None
+                    and not self._done_system_params):
                 self._lock_condition.release()
                 self._add_system_params()
             elif self._machine is not None and not self._done_machine:
@@ -312,13 +313,20 @@ class DataBaseThread(threading.Thread):
         self._lock_condition.release()
 
     def _add_system_params(self):
+
+        # Done in 3 statements, as Windows seems to not support multiple value
+        # sets in a single statement
         self._cur.execute(
-            "INSERT INTO configuration_parameters("
-            "parameter_id, value)"
-            " VALUES('{}', {}), ('{}', {}), ('{}', {});"
-            .format("machine_time_step", self._machine_time_step,
-                    "time_scale_factor", self._time_scale_factor,
-                    "runtime", self._runtime)
+            "INSERT INTO configuration_parameters (parameter_id, value)"
+            " VALUES ('machine_time_step', {})".format(self._machine_time_step)
+        )
+        self._cur.execute(
+            "INSERT INTO configuration_parameters (parameter_id, value)"
+            " VALUES ('time_scale_factor', {})".format(self._time_scale_factor)
+        )
+        self._cur.execute(
+            "INSERT INTO configuration_parameters (parameter_id, value)"
+            " VALUES ('runtime', {})".format(self._runtime)
         )
         self._done_system_params = True
         self._connection.commit()
@@ -330,7 +338,6 @@ class DataBaseThread(threading.Thread):
         self._runtime = runtime
         self._lock_condition.notify()
         self._lock_condition.release()
-
 
     def _add_partitionable_vertices(self):
         # add vertices
@@ -519,7 +526,6 @@ class DataBaseThread(threading.Thread):
             " REFERENCES Partitioned_vertices(vertex_id))")
 
         # insert into table
-        subverts = list(self._partitioned_graph.subvertices)
         vertices = list(self._partitionable_graph.vertices)
         for partitioned_vertex in self._partitioned_graph.subvertices:
             vertex = self._graph_mapper.get_vertex_from_subvertex(
