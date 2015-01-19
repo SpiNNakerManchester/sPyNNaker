@@ -487,6 +487,7 @@ class DataBaseThread(threading.Thread):
 
         # insert into table
         subverts = list(self._partitioned_graph.subvertices)
+        vertices = list(self._partitionable_graph.vertices)
         for partitioned_vertex in self._partitioned_graph.subvertices:
             vertex = self._graph_mapper.get_vertex_from_subvertex(
                 partitioned_vertex)
@@ -499,7 +500,9 @@ class DataBaseThread(threading.Thread):
             for subedge in out_going_edges:
                 routing_info = self._routing_infos.\
                     get_subedge_information_from_subedge(subedge)
-                vertex_id = subverts.index(partitioned_vertex) + 1
+                vertex = self._graph_mapper.get_vertex_from_subvertex(
+                    partitioned_vertex)
+                vertex_id = vertices.index(vertex) + 1
                 vertex_slice = \
                     self._graph_mapper.get_subvertex_slice(partitioned_vertex)
                 key_to_neuron_map = routing_info.key_with_atom_ids_function(
