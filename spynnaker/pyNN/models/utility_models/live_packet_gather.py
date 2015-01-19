@@ -108,8 +108,6 @@ class LivePacketGather(
         # Calculate the size of the tables to be reserved in SDRAM:
         setup_sz = 16
 
-        # Declare random number generators and distributions:
-        #self.writeRandomDistributionDeclarations(spec, dao)
         # Construct the data images needed for the Neuron:
         self.reserve_memory_regions(spec, setup_sz)
         self.write_setup_info(spec)

@@ -216,7 +216,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     """
     Sets a ceiling on the number of neurons of a given type that can be placed
     on a single core.
-    This information is stored in  dictionary in the dao and is referenced
+    This information is stored in the model itself  and is referenced
     during the partition stage of the mapper.
     Note that each neuron type has a default value for this parameter that will
     be used if no override is given.
