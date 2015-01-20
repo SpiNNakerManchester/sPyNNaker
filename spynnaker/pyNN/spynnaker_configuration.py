@@ -33,7 +33,6 @@ class SpynnakerConfiguration(object):
         self._runtime = None
 
         #specific utility vertexes
-        self._live_spike_recorders = dict()
         self._multi_cast_vertex = None
         self._txrx = None
 

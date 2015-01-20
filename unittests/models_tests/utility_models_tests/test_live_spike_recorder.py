@@ -1,4 +1,5 @@
 import unittest
+
 from spynnaker.pyNN.models.utility_models.live_packet_gather \
     import LivePacketGather
 from pacman.model.constraints.placer_chip_and_core_constraint \

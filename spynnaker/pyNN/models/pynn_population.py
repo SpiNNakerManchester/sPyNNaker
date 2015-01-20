@@ -184,7 +184,6 @@ class Population(object):
         if self._structure is None:
             raise ValueError("Attempted to get the position of a cell "
                              "in an un-structured population")
-            return None
         elif self._positions is None:
             self._structure.generate_positions(self._vertex.n_atoms)
         return self._positions[cell_id]
@@ -385,7 +384,6 @@ class Population(object):
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
                              "for an un-structured population")
-            return None
         else:
             return self._structure.generate_positions
 
@@ -426,15 +424,6 @@ class Population(object):
 
             # set the file to store the spikes in once retrieved
             self._record_spike_file = to_file
-
-        if send_live_spikes:
-
-            # add an edge to the monitor
-            self._spinnaker.add_edge_to_recorder_vertex(
-                self._vertex,
-                conf.config.getint("Recording", "live_spike_port"),
-                conf.config.get("Recording", "live_spike_host"),
-                conf.config.getint("Recording", "live_spike_tag"))
 
     def record_gsyn(self, to_file=None):
         """
