@@ -81,10 +81,10 @@ class BufferManager(object):
             key = (buffer_packet.chip_x, buffer_packet.chip_y,
                    buffer_packet.chip_p)
 
-            #if the vertex has recieve requrements, check to see if any are needed
+            #if the vertex has receive requirements, check to see if any are needed
             if (key in self._recieve_vertices.keys() and
                     buffer_packet.command ==
-                    spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_RECIEVE):
+                    spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_RECEIVE):
                 receive_data_requests = \
                     self._recieve_vertices[key].process_buffered_packet()
                 if len(receive_data_requests) != 0:
