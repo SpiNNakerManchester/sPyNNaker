@@ -220,9 +220,8 @@ void timer_callback(uint unused0, uint unused1) {
                 // If this neuron emits a spike after this stage
                 if (bit_field_test(delay_stage_config, n)) {
 
-                    // Calculate key all spikes coming from this neuron will be
-                    // sent with
-                    uint32_t spike_key = n | delay_stage_key_mask;
+                    // Calculate key all spikes coming from this neuron will be sent with
+          uint32_t spike_key = ((d * num_neurons) + n) | key;
 
 #if LOG_LEVEL >= LOG_DEBUG
                     if (delay_stage_spike_counters[n] > 0) {

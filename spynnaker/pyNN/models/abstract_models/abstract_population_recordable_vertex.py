@@ -1,6 +1,6 @@
 from abc import ABCMeta
 from six import add_metaclass
-
+from abc import abstractmethod
 
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.utility_calls \
@@ -14,7 +14,6 @@ from pacman.utilities import constants as pacman_constants
 import logging
 import numpy
 import struct
-import math
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +63,10 @@ class AbstractPopulationRecordableVertex(object):
     def set_record_gsyn(self, setted_value):
         self._record_gsyn = setted_value
 
+    @abstractmethod
+    def is_recordable(self):
+        """helper method for is isinstance"""
+
     def get_recording_region_size(self, bytes_per_timestep):
         """
         Gets the size of a recording region in bytes
@@ -84,7 +87,9 @@ class AbstractPopulationRecordableVertex(object):
 
         logger.info("Getting spikes for {}".format(self._label))
 
-        spikes = numpy.zeros((0, 2))
+        spike_times = list()
+        spike_ids = list()
+        ms_per_tick = self._machine_time_step / 1000.0
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
@@ -118,7 +123,7 @@ class AbstractPopulationRecordableVertex(object):
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
 
-            #check that the number of spikes written is smaller or the same as
+            # check that the number of spikes written is smaller or the same as
             #  the size of the memory region we allocated for spikes
             out_spike_bytes = sub_vertex_out_spike_bytes_function(
                 subvertex, subvertex_slice)
@@ -138,86 +143,38 @@ class AbstractPopulationRecordableVertex(object):
             spike_data = transciever.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
 
-            # Extract number of spike bytes from subvertex
-            number_of_time_steps_written = \
-                number_of_bytes_written / out_spike_bytes
+            data_list = bytearray()
+            for data in spike_data:
+                data_list.extend(data)
 
-            logger.debug("Processing {} timesteps"
-                         .format(number_of_time_steps_written))
+            numpy_data = numpy.asarray(data_list, dtype="uint8").view(
+                dtype="<i4").byteswap().view("uint8")
+            bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
+                (-1, 32))).reshape((-1, out_spike_bytes * 8))
+            indices = [numpy.add(numpy.where(items)[0], lo_atom)
+                       for items in bits]
+            times = [numpy.repeat(i * ms_per_tick, len(indices[i]))
+                     for i in range(len(indices))]
+            spike_ids.extend([item for sublist in indices for item in sublist])
+            spike_times.extend([item for sublist in times for item in sublist])
 
-            current_word_count = 0
-            for block in spike_data:
-                read_pointer = 0
-                string_based_block = str(block)
-                words_in_block = int(math.ceil(len(string_based_block) / 4))
-                words_in_a_timer_tic = math.ceil(out_spike_bytes / 4)
-                for current_word_index in range(0, words_in_block):
-                    # Unpack the word containing the spikingness of 32 neurons
-                    spike_vector_word = struct.unpack_from(
-                        "<I", string_based_block, read_pointer)
-                    read_pointer += 4
+        result = numpy.dstack((spike_ids, spike_times))[0]
+        result = result[numpy.lexsort((spike_times, spike_ids))]
 
-                    spikes = self._unpack_word_of_spikes(
-                        spikes, subvertex, current_word_count,
-                        spike_vector_word, words_in_a_timer_tic,
-                        graph_mapper=graph_mapper)
-                    current_word_count += 1
-
-        if len(spikes) > 0:
-            logger.debug("Arranging spikes as per output spec")
-
-            if compatible_output:
-                # Change the order to be neuronID : time (don't know why - this
-                # is how it was done in the old code, so I am doing it here too)
-                spikes[:, [0, 1]] = spikes[:, [1, 0]]
-
-                # Sort by neuron ID and not by time
-                spike_index = numpy.lexsort((spikes[:, 1], spikes[:, 0]))
-                spikes = spikes[spike_index]
-                return spikes
-
-            # If compatible output, return sorted by spike time
-            spike_index = numpy.lexsort((spikes[:, 1], spikes[:, 0]))
-            spikes = spikes[spike_index]
-            return spikes
-
-        print("No spikes recorded")
-        return None
-
-    @staticmethod
-    def _unpack_word_of_spikes(spikes, subvertex, current_word_count,
-                               spike_vector_word, words_in_a_timer_tic,
-                               graph_mapper):
-        # if the word is zero no spikes have been recorded
-        neurons_per_word = constants.BITS_PER_WORD  # each bit is a neuron
-        if spike_vector_word[0] != 0:
-            # Loop through each bit in this word
-            for neuron_bit_index in range(0, int(constants.BITS_PER_WORD)):
-                # If the bit is set
-                neuron_bit_mask = (1 << neuron_bit_index)
-                if (spike_vector_word[0] & neuron_bit_mask) != 0:
-                    # Calculate neuron ID
-                    out_word_index = int(current_word_count %
-                                         words_in_a_timer_tic)
-                    base_neuron_id = out_word_index * neurons_per_word
-                    lo_atom = \
-                        graph_mapper.get_subvertex_slice(subvertex).lo_atom
-                    neuron_id = (neuron_bit_index + base_neuron_id + lo_atom)
-                    # Add spike time and neuron ID to returned lists
-                    current_tic = int(math.floor(current_word_count /
-                                      words_in_a_timer_tic))
-                    spikes = numpy.append(spikes, [[current_tic, neuron_id]], 0)
-        return spikes
+        return result
 
     def get_neuron_parameter(
             self, region, compatible_output, has_ran, graph_mapper, placements,
             txrx, machine_time_step):
         if not has_ran:
             raise exceptions.SpynnakerException(
-                "The simulation has not yet ran, therefore neuron param cannot "
-                "be retrieved")
+                "The simulation has not yet ran, therefore neuron param "
+                "cannot be retrieved")
 
-        value = numpy.zeros((0, 3))
+        times = numpy.zeros(0)
+        ids = numpy.zeros(0)
+        values = numpy.zeros(0)
+        ms_per_tick = self._machine_time_step / 1000.0
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
@@ -263,51 +220,22 @@ class AbstractPopulationRecordableVertex(object):
             number_of_time_steps_written = \
                 number_of_bytes_written / bytes_per_time_step
 
-            ms_per_timestep = machine_time_step / 1000.0
-
             logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
 
-            temp_buffer = bytearray()
+            data_list = bytearray()
+            for data in neuron_param_region_data:
+                data_list.extend(data)
 
-            for region_block in neuron_param_region_data:
-                temp_buffer.extend(region_block)
+            numpy_data = numpy.asarray(data_list, dtype="uint8").view(
+                dtype="<i4") / 32767.0
+            values = numpy.append(values, numpy_data)
+            times = numpy.append(
+                times, numpy.repeat(range(numpy_data.size / n_atoms),
+                                    n_atoms) * ms_per_tick)
+            ids = numpy.append(ids, numpy.add(
+                numpy.arange(numpy_data.size) % n_atoms, vertex_slice.lo_atom))
 
-            # Standard fixed-point 'accum' type scaling
-            size = len(temp_buffer) / 4
-            scale = numpy.zeros(size, dtype=numpy.float)
-            scale.fill(float(0x7FFF))
-
-            # Add an array for time and neuron id
-            time = numpy.array([(int(i / n_atoms) * ms_per_timestep)
-                                for i in range(size)], dtype=numpy.float)
-
-            lo_atom = vertex_slice.lo_atom
-            neuron_id = numpy.array([int(i % n_atoms) +
-                                     lo_atom for i in range(size)],
-                                    dtype=numpy.uint32)
-            # Get the values
-            # noinspection PyNoneFunctionAssignment
-            temp_value = numpy.frombuffer(temp_buffer, dtype="<i4")
-            # noinspection PyTypeChecker
-            temp_value = numpy.divide(temp_value, scale)
-            temp_array = numpy.dstack((time, neuron_id, temp_value))
-            temp_array = numpy.reshape(temp_array, newshape=(-1, 3))
-            value = numpy.append(value, temp_array, axis=0)
-
-        logger.debug("Arranging parameter output")
-        if compatible_output:
-
-            # Change the order to be neuronID : time (don't know why - this
-            # is how it was done in the old code, so I am doing it here too)
-            value[:, [0, 1, 2]] = value[:, [1, 0, 2]]
-
-            # Sort by neuron ID and not by time
-            v_index = numpy.lexsort((value[:, 2], value[:, 1], value[:, 0]))
-            value = value[v_index]
-            return value
-
-        # If not compatible output, we will sort by time (as NEST seems to do)
-        v_index = numpy.lexsort((value[:, 2], value[:, 1], value[:, 0]))
-        value = value[v_index]
-        return value
+        result = numpy.dstack((ids, times, values))[0]
+        result = result[numpy.lexsort((times, ids))]
+        return result

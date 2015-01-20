@@ -30,7 +30,7 @@ class TestIFCurrExpModel(unittest.TestCase):
             'i_offset': 0}
         n_neurons = 10
         if_cond_exp = IFConductanceExponentialPopulation(
-            n_neurons, 1000)
+            n_neurons, 1000, 1.0, 1, 1)
         self.assertEqual(if_cond_exp.model_name, "IF_cond_exp")
         self.assertEqual(len(if_cond_exp.get_parameters()), 12)
         self.assertEqual(if_cond_exp._v_thresh, cell_params_lif['v_thresh'])
@@ -40,13 +40,13 @@ class TestIFCurrExpModel(unittest.TestCase):
         self.assertEqual(if_cond_exp._tau_refrac,
                          [cell_params_lif['tau_refrac']])
 
-        self.assertEqual(if_cond_exp._tau_syn_i, cell_params_lif['tau_syn_I'])
-        self.assertEqual(if_cond_exp._tau_syn_e, cell_params_lif['tau_syn_E'])
+        self.assertEqual(if_cond_exp._tau_syn_I, cell_params_lif['tau_syn_I'])
+        self.assertEqual(if_cond_exp._tau_syn_E, cell_params_lif['tau_syn_E'])
         self.assertEqual(if_cond_exp._i_offset, cell_params_lif['i_offset'])
         self.assertEqual(if_cond_exp._cm, cell_params_lif['cm'])
 
-        self.assertEqual(if_cond_exp._e_rev_e, cell_params_lif['e_rev_E'])
-        self.assertEqual(if_cond_exp._e_rev_i, cell_params_lif['e_rev_I'])
+        self.assertEqual(if_cond_exp._e_rev_E, cell_params_lif['e_rev_E'])
+        self.assertEqual(if_cond_exp._e_rev_I, cell_params_lif['e_rev_I'])
 
 
 if __name__ == "__main__":

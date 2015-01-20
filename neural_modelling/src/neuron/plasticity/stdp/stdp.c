@@ -12,9 +12,13 @@
 #include "../common/post_events_impl.h"
 #include <string.h>
 
+#ifdef SYNAPSE_BENCHMARK
+  extern uint32_t num_plastic_pre_synaptic_events;
+#endif  // SYNAPSE_BENCHMARK
+  
 #ifdef DEBUG
-bool plastic_runtime_log_enabled = false;
-#endif	// DEBUG
+  bool plastic_runtime_log_enabled = false;
+#endif  // DEBUG
 
 //---------------------------------------
 // Synapse update loop
@@ -121,6 +125,13 @@ void plasticity_process_post_synaptic_event(uint32_t j)
   post_add(history, timing_add_post_spike(last_post_time, last_post_trace));
 }
 //---------------------------------------
+accum plasticity_get_intrinsic_bias(uint32_t j)
+{
+  use(j);
+  
+  return 0.0k;
+}
+//---------------------------------------
 void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t *ring_buffer)
 {
 #ifdef DEBUG
@@ -133,6 +144,10 @@ void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t 
   const control_t *control_words = plastic_controls(fixed);
   size_t plastic_synapse  = num_plastic_controls(fixed);
 
+#ifdef SYNAPSE_BENCHMARK
+  num_plastic_pre_synaptic_events += plastic_synapse;
+#endif  // SYNAPSE_BENCHMARK
+  
   // Get event history from synaptic row
   pre_event_history_t *event_history = plastic_event_history(plastic);
 

@@ -24,7 +24,7 @@ class SpikeSourceArray(AbstractSpikeSource):
     _model_based_max_atoms_per_core = 256
 
     def __init__(self, n_neurons, spike_times, machine_time_step,
-                 constraints=None, label="SpikeSourceArray"):
+                 timescale_factor, constraints=None, label="SpikeSourceArray"):
         """
         Creates a new SpikeSourceArray Object.
         """
@@ -32,7 +32,8 @@ class SpikeSourceArray(AbstractSpikeSource):
                                      constraints=constraints,
                                      max_atoms_per_core=SpikeSourceArray.
                                      _model_based_max_atoms_per_core,
-                                     machine_time_step=machine_time_step)
+                                     machine_time_step=machine_time_step,
+                                     timescale_factor=timescale_factor)
         self._spike_times = spike_times
 
     @property
@@ -366,3 +367,6 @@ class SpikeSourceArray(AbstractSpikeSource):
         return 0
         #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         #return (44 + (16 * 4)) * n_atoms
+
+    def is_recordable(self):
+        return True

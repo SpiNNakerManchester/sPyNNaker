@@ -33,12 +33,13 @@ class TestingFromListConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.FromListConnector(connection_list)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_synapse_list_generation_simulated_one_to_one_larger_to_smaller(
             self):
@@ -55,11 +56,12 @@ class TestingFromListConnector(unittest.TestCase):
             connection_list.append((i, i, weight, delay))
         connection = pyNN.FromListConnector(connection_list)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, second_population._vertex, 1, 0)
+            first_population, second_population, 1, 1.0, 0)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_synapse_list_generation_for_simulated_one_to_one_smaller_to_larger(
             self):
@@ -79,7 +81,7 @@ class TestingFromListConnector(unittest.TestCase):
         connection = pyNN.FromListConnector(connection_list)
         with self.assertRaises(ConfigurationException):
             connection.generate_synapse_list(
-                second_population._vertex, first_population._vertex, 1, 0)
+                second_population, first_population, 1, 1.0, 0)
 
     def test_not_safe(self):
         number_of_neurons = 5
@@ -95,12 +97,13 @@ class TestingFromListConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.FromListConnector(connection_list, safe=False)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_verbose(self):
         number_of_neurons = 5
@@ -116,12 +119,13 @@ class TestingFromListConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.FromListConnector(connection_list, verbose=True)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_not_safe_and_verbose(self):
         number_of_neurons = 5
@@ -138,12 +142,13 @@ class TestingFromListConnector(unittest.TestCase):
         connection = pyNN.FromListConnector(connection_list, safe=False,
                                             verbose=True)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
 
 if __name__ == "__main__":

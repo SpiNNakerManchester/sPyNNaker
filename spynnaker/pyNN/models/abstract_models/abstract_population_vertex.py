@@ -1,11 +1,7 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from math import ceil
 from six import add_metaclass
 import logging
-
-from pacman.model.constraints.\
-    partitioner_same_size_as_vertex_constraint import \
-    PartitionerSameSizeAsVertexConstraint
 
 from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
@@ -27,36 +23,34 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
     """
 
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
-                 machine_time_step, constraints=None):
+                 machine_time_step, timescale_factor, spikes_per_second,
+                 ring_buffer_sigma, weight_scale=1.0, constraints=None):
 
         AbstractPopulationRecordableVertex.__init__(self, machine_time_step, label)
         AbstractPopulationDataSpec.__init__(
             self, binary, n_neurons, label, constraints,
             machine_time_step=machine_time_step,
-            max_atoms_per_core=max_atoms_per_core)
-        self._delay_vertex = None
+            timescale_factor=timescale_factor,
+            max_atoms_per_core=max_atoms_per_core,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma)
         self._n_params = n_params
+        self._weight_scale = weight_scale
+
+    @abstractmethod
+    def is_population_vertex(self):
+        pass
 
     @property
-    def delay_vertex(self):
-        return self._delay_vertex
-
-    @delay_vertex.setter
-    def delay_vertex(self, delay_vertex):
-        if self._delay_vertex is None:
-            self._delay_vertex = delay_vertex
-            self.add_constraint(
-                PartitionerSameSizeAsVertexConstraint(self._delay_vertex))
-        else:
-            raise exceptions.ConfigurationException(
-                "cannot set a vertex's delay vertex once its already been set")
+    def weight_scale(self):
+        return self._weight_scale
 
     def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
 
         # Spike sources store spike vectors optimally
         # so calculate min words to represent
-        sub_vertex_out_spike_bytes_function = \
+        out_spike_bytes_function = \
             lambda subvertex, subvertex_slice: int(ceil(
                 subvertex_slice.n_atoms / 32.0)) * 4
 
@@ -64,8 +58,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
         return self._get_spikes(
             graph_mapper=graph_mapper, placements=placements, transciever=txrx,
             compatible_output=compatible_output,
-            sub_vertex_out_spike_bytes_function=
-            sub_vertex_out_spike_bytes_function,
+            sub_vertex_out_spike_bytes_function=out_spike_bytes_function,
             spike_recording_region=
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
 
@@ -109,17 +102,6 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             compatible_output=compatible_output, has_ran=has_ran,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
             placements=placements, txrx=txrx)
-
-    def get_synaptic_data(self, presubvertex, pre_n_atoms, postsubvertex,
-                          synapse_io):
-        """
-        helper method to add other data for get weights via syanptic manager
-        """
-        return self._get_synaptic_data(
-            presubvertex, pre_n_atoms, postsubvertex,
-            constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
-            synapse_io,
-            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

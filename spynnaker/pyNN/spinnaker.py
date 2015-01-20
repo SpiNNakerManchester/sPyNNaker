@@ -1,8 +1,9 @@
-#pacman imports
-
+# pacman imports
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
+from spynnaker.pyNN import model_binaries
+import exceptions
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
 from pacman.operations.router_check_functionality.valid_routes_checker import \
@@ -18,19 +19,14 @@ from pacman.operations.routing_info_allocator_algorithms.\
 from pacman.utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls as pacman_utility_calls
 
-
-#spinnmachine imports
+# spinnmachine imports
 from spinn_machine.sdram import SDRAM
 from spinn_machine.router import Router as MachineRouter
 from spinn_machine.link import Link
 from spinn_machine.processor import Processor
 from spinn_machine.chip import Chip
 
-
-#internal imports
-from spinnman.model.iptag.reverse_iptag import ReverseIPTag
-
-#common front end imports
+# common front end imports
 from spinn_front_end_common.utilities import exceptions as common_exceptions, \
     reports
 from spinn_front_end_common.abstract_models.abstract_iptagable_vertex import \
@@ -48,8 +44,7 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.interface.data_generator_interface import \
     DataGeneratorInterface
 
-#local front end imports
-
+# local front end imports
 from spynnaker.pyNN.utilities.data_base_thread import DataBaseThread
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
@@ -65,13 +60,12 @@ from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
-#from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
+from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 import logging
 import math
 import os
 import sys
-import time
 from multiprocessing.pool import ThreadPool
 
 logger = logging.getLogger(__name__)
@@ -82,7 +76,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 SpynnakerConfigurationFunctions):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
-                 max_delay=None, graph_label=None):
+                 max_delay=None, graph_label=None, binary_search_paths=[]):
         FrontEndCommonConfigurationFunctions.__init__(self, host_name,
                                                       graph_label)
         SpynnakerConfigurationFunctions.__init__(self)
@@ -141,6 +135,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             )
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
+        self._spikes_per_second = float(config.getfloat(
+            "Simulation", "spikes_per_second"))
+        self._ring_buffer_sigma = float(config.getfloat(
+            "Simulation", "ring_buffer_sigma"))
 
         FrontEndCommonInterfaceFunctions.__init__(self, self._reports_states,
                                                   self._report_default_directory)
@@ -153,6 +151,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         #get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
+
+        # Begin list of binary search paths
+        # With those passed to constructor
+        self._binary_search_paths = binary_search_paths
+
+        # Determine default executable folder location
+        # and add this default to end of list of search paths
+        self._binary_search_paths.append(os.path.dirname(
+            model_binaries.__file__))
         self._edge_count = 0
 
     def run(self, run_time):
@@ -173,21 +180,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if self._create_database:
             execute_mapping = config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
-            wait_on_confirmation = config.getboolean("Database",
-                                                 "wait_on_confirmation")
-            self._database_thread = \
-                DataBaseThread(self._app_data_runtime_folder, execute_mapping,
-                               self._txrx, wait_on_confirmation)
+            wait_on_confirmation = \
+                config.getboolean("Database", "wait_on_confirmation")
+            self._database_thread = DataBaseThread(
+                self._app_data_runtime_folder, execute_mapping,
+                wait_on_confirmation)
             self._database_thread.start()
-
-        #set up vis if needed
-        if config.getboolean("Visualiser", "enable"):
-            self._visualiser, self._visualiser_vertex_to_page_mapping =\
-                self._setup_visuliser(
-                    self._partitionable_graph, self._visualiser_vertices,
-                    self._partitioned_graph, self._placements,
-                    self._router_tables, self._runtime, self._machine_time_step,
-                    self._graph_mapper)
 
         #create network report if needed
         if self._reports_states is not None:
@@ -236,6 +234,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         #load database if needed
         if self._create_database:
+            self._database_thread.add_system_params(
+                self._time_scale_factor, self._machine_time_step, self._runtime)
             self._database_thread.add_machine_objects(self._machine)
             self._database_thread.add_partitionable_vertices(
                 self._partitionable_graph)
@@ -273,12 +273,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             reports.write_memory_map_report(self._report_default_directory,
                                             processor_to_app_data_base_address)
 
-        #engage vis if requested
         if do_timing:
             timer.take_sample()
-
-        if config.getboolean("Visualiser", "enable"):
-            self.start_visualiser()
 
         if config.getboolean("Execute", "run_simulation"):
             if do_timing:
@@ -315,38 +311,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
                 wait_on_confirmation = \
                     config.getboolean("Database", "wait_on_confirmation")
-                vis_enabled = config.getboolean("Visualiser", "enable")
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
-                    wait_on_confirmation, self._database_thread, vis_enabled,
-                    self._in_debug_mode)
+                    self._time_scale_factor, wait_on_confirmation,
+                    self._database_thread, self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
                     self._retieve_provance_data_from_machine(executable_targets)
         else:
             logger.info("*** No simulation requested: Stopping. ***")
-
-    def _setup_visuliser(
-            self, partitionable_graph, visualiser_vertices, partitioned_graph,
-            placements, router_tables, runtime, machine_time_step,
-            graph_mapper):
-        requires_visualiser = config.getboolean("Visualiser", "enable")
-        requires_virtual_board = config.getboolean("Machine", "virtual_board")
-        #if the visuliser is required, import the correct requirements and
-        # create a new visulaiser object and mapping for spinnaker to maintain
-        if requires_visualiser:
-            from spynnaker.pyNN.visualiser_package.visualiser_creation_utility \
-                import VisualiserCreationUtility
-            #create creation utility
-            visualiser_creation_utility = VisualiserCreationUtility()
-            visualiser_creation_utility.set_visulaiser_port(
-                config.getint("Recording", "live_spike_port"))
-            return visualiser_creation_utility.create_visualiser_interface(
-                requires_virtual_board, self._txrx,
-                partitionable_graph, visualiser_vertices, self._machine,
-                partitioned_graph, placements, router_tables, runtime,
-                machine_time_step, graph_mapper)
 
     def _set_iptags(self):
         for vertex in self._partitionable_graph.vertices:
@@ -416,6 +390,18 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         return self._machine_time_step
 
     @property
+    def timescale_factor(self):
+        return self._time_scale_factor
+
+    @property
+    def spikes_per_second(self):
+        return self._spikes_per_second
+
+    @property
+    def ring_buffer_sigma(self):
+        return self._ring_buffer_sigma
+
+    @property
     def get_multi_cast_source(self):
         return self._multi_cast_vertex
 
@@ -448,6 +434,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
     def set_runtime(self, value):
         self._runtime = value
+
+    def get_current_time(self):
+        if self._has_ran:
+            return float(self._runtime)
+        return 0.0
 
     def __repr__(self):
         return "Spinnaker object for machine {}".format(self._hostname)
@@ -579,6 +570,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         #create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
+        data_generator_interfaces = list()
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
@@ -592,12 +584,19 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._report_default_directory,
                     config.getboolean("Reports", "writeTextSpecs"),
                     self._application_default_folder, progress_bar)
+                data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start())
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
-                if binary_name in executable_targets.keys():
-                    executable_targets[binary_name].add_processor(placement.x,
+
+                # Attempt to find this within search paths
+                binary_path = self._get_executable_path(binary_name)
+                if binary_path is None:
+                    raise exceptions.ExecutableNotFoundException(binary_name)
+
+                if binary_path in executable_targets.keys():
+                    executable_targets[binary_path].add_processor(placement.x,
                                                                   placement.y,
                                                                   placement.p)
                 else:
@@ -605,28 +604,18 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     initial_core_subset = CoreSubset(placement.x, placement.y,
                                                      processors)
                     list_of_core_subsets = [initial_core_subset]
-                    executable_targets[binary_name] = \
+                    executable_targets[binary_path] = \
                         CoreSubsets(list_of_core_subsets)
 
+        for data_generator_interface in data_generator_interfaces:
+            data_generator_interface.wait_for_finish()
         thread_pool.close()
         thread_pool.join()
-        #finish the progress bar
-        progress_bar.end()
-        return executable_targets
 
-    def start_visualiser(self):
-        """starts the port listener and ties it to the visualiser_framework
-         pages as required
-        """
-       #register a listener at the trasnciever for each visualised vertex
-        for vertex in self._visualiser_vertices:
-            if vertex in self._visualiser_vertex_to_page_mapping.keys():
-                associated_page = self._visualiser_vertex_to_page_mapping[vertex]
-                self._txrx.register_listener(
-                    associated_page.recieved_spike, vertex.receieve_port_no,
-                    vertex.hostname, vertex.connection_type,
-                    vertex.traffic_type)
-        self._visualiser.start()
+        # finish the progress bar
+        progress_bar.end()
+
+        return executable_targets
 
     def add_vertex(self, vertex_to_add):
         if isinstance(vertex_to_add, CommandSender):
@@ -635,21 +624,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
     def add_edge(self, edge_to_add):
         self._partitionable_graph.add_edge(edge_to_add)
-
-    def create_visualised_population(self, size, cellclass, cellparams,
-                                     structure, label):
-        requires_visualiser = config.getboolean("Visualiser", "enable")
-        if not requires_visualiser:
-            raise common_exceptions.ConfigurationException(
-                "The visualiser is currently turned off by a spinnaker.cfg or "
-                "pacman.cfg file. Please correct and try again.")
-        else:
-            from spynnaker.pyNN.visualiser_package.visualised_vertex \
-                import VisualisedVertex
-            return VisualisedVertex(
-                size=size, cellclass=cellclass, cellparams=cellparams,
-                structure=structure, label=label, spinnaker=self,
-                multi_cast_vertex=self._multi_cast_vertex)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(
@@ -668,27 +642,34 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             postsynaptic_population=postsynaptic_population, rng=rng,
             connector=connector, source=source, target=target,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
-            machine_time_step=self._machine_time_step)
+            machine_time_step=self._machine_time_step,
+            timescale_factor=self._time_scale_factor)
 
-    def add_edge_to_recorder_vertex(self, vertex_to_record_from, port,
-                                    hostname, tag):
+    def add_edge_to_recorder_vertex(
+            self, vertex_to_record_from, port, hostname, tag=None,
+            strip_sdp=True, use_prefix=False, key_prefix=None,
+            prefix_type=None, message_type=EIEIOTypeParam.KEY_32_BIT,
+            right_shift=0, payload_as_time_stamps=True,
+            use_payload_prefix=True, payload_prefix=None,
+            payload_right_shift=0, number_of_packets_sent_per_time_step=0):
 
-        #locate the live spike recorder
-        if port in self._live_spike_recorder.keys():
-            live_spike_recorder = self._live_spike_recorder[port]
+        # locate the live spike recorder
+        if (port, hostname) in self._live_spike_recorders:
+            live_spike_recorder = self._live_spike_recorders[(port, hostname)]
         else:
-            live_spike_recorder = \
-                LivePacketGather(self.machine_time_step, tag, port, hostname)
+            live_spike_recorder = LivePacketGather(
+                self.machine_time_step, self.timescale_factor,
+                tag, port, hostname, strip_sdp, use_prefix, key_prefix,
+                prefix_type, message_type, right_shift, payload_as_time_stamps,
+                use_payload_prefix, payload_prefix, payload_right_shift,
+                number_of_packets_sent_per_time_step)
+            self._live_spike_recorders[(port, hostname)] = live_spike_recorder
             self.add_vertex(live_spike_recorder)
-        #create the edge and add
+
+        # create the edge and add
         edge = PartitionableEdge(vertex_to_record_from,
                                  live_spike_recorder, "recorder_edge")
         self.add_edge(edge)
-
-    def add_visualiser_vertex(self, visualiser_vertex_to_add):
-        if self._visualiser_vertices is None:
-            self._visualiser_vertices = list()
-        self._visualiser_vertices.append(visualiser_vertex_to_add)
 
     def _get_executable_path(self, executable_name):
         # Loop through search paths
@@ -777,11 +758,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                                       router_table.y)
                     self._txrx.clear_router_diagnostic_counters(router_table.x,
                                                                 router_table.y)
-                    self._txrx.\
-                        clear_router_diagnostic_non_default_positioned_filters(
-                            router_table.x, router_table.y)
-            self._txrx.send_signal(app_id, SCPSignal.STOP)
-        if config.getboolean("Visualiser", "enable"):
-            self._visualiser.stop()
+                    # self._txrx.\
+                    #    clear_router_diagnostic_non_default_positioned_filters(
+                    #        router_table.x, router_table.y)
+            # self._txrx.send_signal(app_id, SCPSignal.STOP)
         if self._create_database:
             self._database_thread.stop()

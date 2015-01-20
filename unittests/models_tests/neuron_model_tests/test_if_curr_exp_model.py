@@ -16,7 +16,7 @@ class TestIFCurrExpModel(unittest.TestCase):
                            'v_thresh': -50.0}
         n_neurons = 10
         if_curr_exp = IFCurrentExponentialPopulation(
-            n_neurons, 1, None, None, **cell_params_lif)
+            n_neurons, 1000, 1.0, 1, 1, **cell_params_lif)
         self.assertEqual(if_curr_exp.model_name, "IF_curr_exp")
         self.assertEqual(len(if_curr_exp.get_parameters()), 10)
         self.assertEqual(if_curr_exp._v_thresh, cell_params_lif['v_thresh'])
@@ -25,8 +25,8 @@ class TestIFCurrExpModel(unittest.TestCase):
         self.assertEqual(if_curr_exp._tau_m, cell_params_lif['tau_m'])
         self.assertEqual(if_curr_exp._tau_refrac, cell_params_lif['tau_refrac'])
 
-        self.assertEqual(if_curr_exp._tau_syn_i, cell_params_lif['tau_syn_I'])
-        self.assertEqual(if_curr_exp._tau_syn_e, cell_params_lif['tau_syn_E'])
+        self.assertEqual(if_curr_exp._tau_syn_I, cell_params_lif['tau_syn_I'])
+        self.assertEqual(if_curr_exp._tau_syn_E, cell_params_lif['tau_syn_E'])
         self.assertEqual(if_curr_exp._i_offset, cell_params_lif['i_offset'])
         self.assertEqual(if_curr_exp._cm, cell_params_lif['cm'])
 

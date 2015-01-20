@@ -3,7 +3,6 @@ Simple Associative Memory
 """
 #!/usr/bin/python
 import spynnaker.pyNN as p
-import visualiser.visualiser_modes as modes
 import numpy, pylab
 from pyNN.random import NumpyRNG, RandomDistribution
 import patternGenerator as pg
@@ -123,7 +122,7 @@ spikeArray = {'spike_times': myStimulus.streams}
 teachingSpikeArray = {'spike_times': teachingInput.streams}
 
 populations.append(p.Population(nSourceNeurons, p.SpikeSourceArray, spikeArray, label='excit_pop_ss_array'))       # 0
-populations[0].add_placement_constraint(x=2, y=2)
+#populations[0].add_placement_constraint(x=2, y=2)
 populations.append(p.Population(nInhibNeurons, p.IF_curr_exp, cell_params_lif, label='inhib_pop'))                 # 1
 populations.append(p.Population(nExcitNeurons, p.IF_curr_exp, cell_params_lif, label='excit_pop'))                 # 2
 populations.append(p.Population(nTeachNeurons, p.SpikeSourceArray, teachingSpikeArray, label='teaching_ss_array')) # 3
@@ -159,17 +158,17 @@ populations[teacher].record()
 #populations[noise].record(visualiser_mode=modes.RASTER)
 
 print "weights before"
-final_weights = projections[0].getWeights()
+final_weights = projections[0].getWeights(format="array")
 print "Length of weights is ", len(final_weights)
-print final_weights
+#print final_weights
 
 p.run(runTime)
 
 #final_weights = projections[0].getWeights()
 print "weights after"
-final_weights = projections[0].getWeights()
+final_weights = projections[0].getWeights(format="array")
 print "Length of weights is ", len(final_weights)
-print final_weights
+#print final_weights
 
 count_plus = 0
 count_minus = 0
@@ -221,7 +220,7 @@ spikesTeach = populations[teacher].getSpikes(compatible_output=True)
 
 if spikesStim != None:
     pylab.figure()
-    pylab.plot([i[1] for i in spikesStim], [i[0] for i in spikesStim], ".") 
+    pylab.plot([i[1] for i in spikesStim], [i[0] for i in spikesStim], ".")
     pylab.xlabel('Time/ms')
     pylab.ylabel('spikes')
     pylab.title('Spikes from Source Neurons')
@@ -231,7 +230,7 @@ else:
 
 if spikes != None:
     pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
+    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
     pylab.xlabel('Time/ms')
     pylab.ylabel('spikes')
     pylab.title('Spikes of Excitatory Neurons')
@@ -241,7 +240,7 @@ else:
 
 if spikesTeach != None:
     pylab.figure()
-    pylab.plot([i[1] for i in spikesTeach], [i[0] for i in spikesTeach], ".") 
+    pylab.plot([i[1] for i in spikesTeach], [i[0] for i in spikesTeach], ".")
     pylab.xlabel('Time/ms')
     pylab.ylabel('spikes')
     pylab.title('Spikes of Teaching Input')
@@ -251,7 +250,7 @@ else:
 
 #if spikesInhib != None:
 #    pylab.figure()
-#    pylab.plot([i[1] for i in spikesInhib], [i[0] for i in spikesInhib], ".") 
+#    pylab.plot([i[1] for i in spikesInhib], [i[0] for i in spikesInhib], ".")
 #    pylab.xlabel('Time/ms')
 #    pylab.ylabel('spikes')
 #    pylab.title('Spikes Inhibitory Neurons')
@@ -261,7 +260,7 @@ else:
 
 #if spikesNoise != None:
 #    pylab.figure()
-#    pylab.plot([i[1] for i in spikesNoise], [i[0] for i in spikesNoise], ".") 
+#    pylab.plot([i[1] for i in spikesNoise], [i[0] for i in spikesNoise], ".")
 #    pylab.xlabel('Time/ms')
 #    pylab.ylabel('spikes')
 #    pylab.title('Spikes of Noise Sources')

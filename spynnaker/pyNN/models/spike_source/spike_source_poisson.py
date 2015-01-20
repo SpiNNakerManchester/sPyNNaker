@@ -1,21 +1,21 @@
-from enum import Enum
-import os
-import numpy
-import logging
-
 from spynnaker.pyNN.models.spike_source.abstract_spike_source import \
     AbstractSpikeSource
 from spinn_front_end_common.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions import \
     generate_parameter
-from spynnaker.pyNN import model_binaries
+
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
+
+
 from math import exp, ceil
+from enum import Enum
+import numpy
+
+import logging
 from data_specification.enums.data_type import DataType
-
-
 logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 0.25
@@ -29,6 +29,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     This class represents a Poisson Spike source object, which can represent
     a pynn_population.py of virtual neurons each with its own parameters.
     """
+
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="_POISSON_SPIKE_SOURCE_REGIONS",
@@ -37,14 +38,15 @@ class SpikeSourcePoisson(AbstractSpikeSource):
                ('SPIKE_HISTORY_REGION', 2)])
     _model_based_max_atoms_per_core = 256
 
-    def __init__(self, n_neurons, machine_time_step, contraints=None,
-                 label="SpikeSourcePoisson", rate=1, start=0, duration=10000,
-                 seed=None):
+    def __init__(self, n_neurons, machine_time_step, timescale_factor,
+                 contraints=None, label="SpikeSourcePoisson",
+                 rate=1.0, start=0.0, duration=10000000000.0, seed=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
         AbstractSpikeSource.__init__(self, label, n_neurons, contraints,
                                      machine_time_step=machine_time_step,
+                                     timescale_factor=timescale_factor,
                                      max_atoms_per_core=SpikeSourcePoisson.
                                      _model_based_max_atoms_per_core)
         self._rate = rate
@@ -314,7 +316,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         data_writer.close()
 
     def get_binary_file_name(self):
-        binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
-                                   'spike_source_poisson.aplx')
+        return "spike_source_poisson.aplx"
 
-        return binary_name
+    def is_recordable(self):
+        return True

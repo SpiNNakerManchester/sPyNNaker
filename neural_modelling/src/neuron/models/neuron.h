@@ -12,9 +12,15 @@ typedef struct neuron_t* neuron_pointer_t;
 // then defaults to 1ms timestep
 void neuron_set_machine_timestep(uint16_t microsecs);
 
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_exc_input(REAL exc_input);
+
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_inh_input(REAL inh_input);
+
 // primary function called in timer loop after synaptic updates
 bool neuron_state_update(REAL exc_input, REAL inh_input,
-        neuron_pointer_t neuron);
+                         REAL external_bias, neuron_pointer_t neuron);
 
 /*
  * NB in the following 2 functions and in neuron code in general; parameters,

@@ -17,7 +17,7 @@
 
 /*
  * Data representation in sparse psp:
- * 
+ *
  * +----------+----------+----------+----------+
  * |       weight        |   delay x|   index  |
  * +----------+----------+----------+----------+
@@ -27,7 +27,7 @@
  *   [31:16] weight is 16 bits,
  *   [12:9]  delay  is 4 bits,
  *   [8]     x      is an optional one bit indicating whether
- *                       we need seperate excitatory/inhibitory synapses. 
+ *                       we need seperate excitatory/inhibitory synapses.
  *   [7:0]   index  is 8 bits of neuron index.
  *
  * We can manipulate the quantities in delay/x/index, provided the
@@ -160,6 +160,7 @@ bool plasticity_region_filled (uint32_t *address, uint32_t flags);
 void process_plastic_synapses (address_t plastic, address_t fixed, ring_entry_t *ring_buffer);
 void print_plastic_synapses(address_t plastic, address_t fixed);
 void plasticity_process_post_synaptic_event(uint32_t neuron_index);
+accum plasticity_get_intrinsic_bias(uint32_t j);
 
 // Function declarations for test.c
 void      print_synaptic_row (uint32_t* synaptic_row);
@@ -176,5 +177,6 @@ void print_master_population(void);
 void print_sdram (uint32_t start, uint32_t items);
 void print_row_size_table (void);
 void print_synaptic_rows (uint32_t* rows);
+void print_saturation_count();
 
 #endif /* __SPIN_NEURON_IMPL_H__ */

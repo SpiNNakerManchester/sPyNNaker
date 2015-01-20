@@ -1,5 +1,4 @@
 import os
-from enum import Enum
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
@@ -14,15 +13,14 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-
+from enum import Enum
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
-from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
 
 
 class LivePacketGather(
-    AbstractDataSpecableVertex, AbstractPartitionableVertex,
+        AbstractDataSpecableVertex, AbstractPartitionableVertex,
         AbstractIPTagableVertex):
 
     CORE_APP_IDENTIFIER = constants.APP_MONITOR_CORE_APPLICATION_ID
@@ -38,7 +36,8 @@ class LivePacketGather(
     forwarding them to the host
 
     """
-    def __init__(self, machine_time_step, tag, port, address, strip_sdp=True,
+    def __init__(self, machine_time_step, timescale_factor,
+                 tag, port, address, strip_sdp=True,
                  use_prefix=False, key_prefix=None, prefix_type=None,
                  message_type=EIEIOTypeParam.KEY_32_BIT,
                  right_shift=0, payload_as_time_stamps=True,
@@ -62,12 +61,14 @@ class LivePacketGather(
                                          " each key, but current configuration"
                                          " does not specify either of these")
 
-        AbstractDataSpecableVertex.__init__(self, n_atoms=1,
-            label="Monitor", machine_time_step=machine_time_step)
+        AbstractDataSpecableVertex.__init__(
+            self, n_atoms=1, label="Monitor",
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor)
         AbstractPartitionableVertex.__init__(self, n_atoms=1, label="Monitor",
-            max_atoms_per_core=1)
+                                             max_atoms_per_core=1)
         AbstractIPTagableVertex.__init__(self, tag, port, address,
-            strip_sdp=strip_sdp)
+                                         strip_sdp=strip_sdp)
 
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
         self._use_prefix = use_prefix
@@ -110,8 +111,6 @@ class LivePacketGather(
         # Calculate the size of the tables to be reserved in SDRAM:
         setup_sz = 16
 
-        # Declare random number generators and distributions:
-        #self.writeRandomDistributionDeclarations(spec, dao)
         # Construct the data images needed for the Neuron:
         self.reserve_memory_regions(spec, setup_sz)
         self.write_setup_info(spec)
@@ -200,11 +199,8 @@ class LivePacketGather(
                 self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
 
     def get_binary_file_name(self):
-        # Rebuild executable name
-        binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
-                                   'live_packet_gather.aplx')
-        return binary_name
-
+        return 'live_packet_gather.aplx'
+    
     #inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0

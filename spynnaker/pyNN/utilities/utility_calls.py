@@ -14,10 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def check_directory_exists_and_create_if_not(filename):
-    components = os.path.abspath(filename).split(os.sep)
-    directory = os.path.abspath(os.path.join(os.sep,
-                                             *components[1:len(components) - 1]))
-    #check if directory exists
+    directory = os.path.dirname(filename)
     if not os.path.exists(directory):
         os.makedirs(directory)
 

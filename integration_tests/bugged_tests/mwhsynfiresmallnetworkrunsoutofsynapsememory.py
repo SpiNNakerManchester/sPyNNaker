@@ -3,7 +3,6 @@ Synfirechain-like example
 """
 #!/usr/bin/python
 import spynnaker.pyNN as p
-import visualiser_framework.visualiser_modes as modes
 import numpy, pylab
 
 p.setup(timestep=0.1, min_delay = 1.0, max_delay = 7.5)
@@ -53,7 +52,7 @@ projections.append(p.Projection(populations[1], populations[2], p.OneToOneConnec
 #projections.append(p.Projection(populations[1], populations[0], p.FromListConnector([(0, 0, weight_to_spike, injection_delay)])))
 
 populations[2].record_v()
-populations[2].record(visualiser_mode=modes.RASTER)
+populations[2].record()
 
 p.run(100)
 

@@ -21,14 +21,14 @@ class FixedProbabilityConnector(AbstractConnector):
         Population to itself, this flag determines whether a neuron is
         allowed to connect to itself, or only to other neurons in the
         Population.
-    :param weights: 
+    :param weights:
         may either be a float, a !RandomDistribution object, a list/
         1D array with at least as many items as connections to be
         created. Units nA.
-    :param delays: 
+    :param delays:
         If `None`, all synaptic delays will be set
         to the global minimum delay.
-    :param `pyNN.Space` space: 
+    :param `pyNN.Space` space:
         a Space object, needed if you wish to specify distance-
         dependent weights or delays - not implemented
     """
@@ -45,25 +45,31 @@ class FixedProbabilityConnector(AbstractConnector):
         if not 0 <= self._p_connect <= 1:
             raise exceptions.ConfigurationException(
                 "The probability should be between 0 and 1 (inclusive)")
-        
-    def generate_synapse_list(self, prevertex, postvertex, delay_scale,
-                              synapse_type):
+
+    def generate_synapse_list(
+            self, presynaptic_population, postsynaptic_population, delay_scale,
+            weight_scale, synapse_type):
+
+        prevertex = presynaptic_population._get_vertex
+        postvertex = postsynaptic_population._get_vertex
+
         rows = list()
         for pre_atom in range(0, prevertex.n_atoms):
             present = numpy.random.rand(postvertex.n_atoms) <= self._p_connect
-            if not self._allow_self_connections and prevertex == postvertex:
+            if (not self._allow_self_connections
+                    and presynaptic_population == postsynaptic_population):
                 present[pre_atom] = 0
 
             n_present = numpy.sum(present)
 
             ids = numpy.where(present)[0]
 
-            delays = (generate_parameter_array(self._delays, n_present, present)
-                      * delay_scale)
-            weights = generate_parameter_array(self._weights, n_present,
-                                               present)
-            synapse_types = (numpy.ones(len(ids), dtype='uint32') 
+            delays = (generate_parameter_array(
+                self._delays, n_present, present) * delay_scale)
+            weights = (generate_parameter_array(
+                self._weights, n_present, present) * weight_scale)
+            synapse_types = (numpy.ones(len(ids), dtype='uint32')
                              * synapse_type)
-            
+
             rows.append(SynapseRowInfo(ids, weights, delays, synapse_types))
         return SynapticList(rows)

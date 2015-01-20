@@ -15,16 +15,6 @@ class AbstractRulePart(object):
         :return:
         """
 
-    @abstractmethod
-    def write_plastic_params(self, spec, machine_time_step, weight_scale):
-        """ method that writes plastic params to a data spec generator
-
-        :param spec:
-        :param machine_time_step:
-        :param weight_scale:
-        :return:
-        """
-
     @abstractproperty
     def vertex_executable_suffix(self):
         """

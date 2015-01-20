@@ -3,6 +3,7 @@ import numpy
 from spynnaker.pyNN.utilities import utility_calls
 from abc import ABCMeta
 from six import add_metaclass
+from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
@@ -10,9 +11,9 @@ class AbstractIntegrateAndFireProperties(object):
 
     def __init__(self, v_init, tau_m, cm, i_offset, atoms, v_rest, v_reset,
                  v_thresh, tau_refrac, t_refract_scale=10):
-        self._tau_m = tau_m
-        self._cm = cm
-        self._i_offset = i_offset
+        self._tau_m = utility_calls.convert_param_to_numpy(tau_m, atoms)
+        self._cm = utility_calls.convert_param_to_numpy(cm, atoms)
+        self._i_offset = utility_calls.convert_param_to_numpy(i_offset, atoms)
         self._atoms = atoms
         self._v_rest = utility_calls.convert_param_to_numpy(v_rest, atoms)
         self._v_reset = utility_calls.convert_param_to_numpy(v_reset, atoms)
@@ -20,7 +21,8 @@ class AbstractIntegrateAndFireProperties(object):
             utility_calls.convert_param_to_numpy(v_thresh, atoms)
         self._tau_refrac = \
             utility_calls.convert_param_to_numpy(tau_refrac, atoms)
-        #if v_init is not set to v_rest then set to v_init
+
+        # if v_init is not set to v_rest then set to v_init
         self._v_init = v_rest
         if v_init is not None:
             self._v_init = \
@@ -31,7 +33,7 @@ class AbstractIntegrateAndFireProperties(object):
         self._v_init = utility_calls.convert_param_to_numpy(value, self._atoms)
 
     def r_membrane(self, machine_time_step):
-        return float(self._tau_m) / float(self._cm)
+        return self._tau_m / self._cm
 
     def exp_tc(self, machine_time_step):
         return numpy.exp(float(-machine_time_step) / (1000.0 * self._tau_m))
@@ -106,6 +108,8 @@ class AbstractIntegrateAndFireProperties(object):
     def cm(self, new_value):
         self._cm = new_value
 
-
-
-
+    @abstractmethod
+    def is_integrate_and_fire_vertex(self):
+        """ helper emthod for is_instance
+        :return:
+        """
