@@ -1,6 +1,7 @@
 #include "../common/common-impl.h"
 #include <string.h>
 
+#define EIEIO_ACK_CMD 1
 #define EVENT_PADDING 2
 #define EVENT_STOP 3
 #define SEQUENCED_EIEIO_PKT 4
@@ -10,7 +11,6 @@
 #define BUFFER_OPERATION_READ 0
 #define BUFFER_OPERATION_WRITE 1
 
-#define EIEIO_ACK_CMD 1
 #define INITIAL_PACKET_FSM_STATE 0xFF
 
 #pragma pack(1)
