@@ -39,6 +39,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     _model_based_max_atoms_per_core = 256
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
+                 spikes_per_second, ring_buffer_sigma,
                  contraints=None, label="SpikeSourcePoisson",
                  rate=1.0, start=0.0, duration=10000000000.0, seed=None):
         """

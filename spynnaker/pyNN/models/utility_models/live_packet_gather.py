@@ -57,7 +57,8 @@ class LivePacketGather(
                 "Timestamp can either be included as payload prefix or as"
                 " payload to each key, but current configuration does not "
                 "specify either of these")
-        if not isinstance(prefix_type, EIEIOPrefixType):
+        if (not isinstance(prefix_type, EIEIOPrefixType)
+                and prefix_type is not None):
             raise exceptions.ConfigurationException(
                 "the type of a prefix type should be of a EIEIOPrefixType, "
                 "which can be located in :"
