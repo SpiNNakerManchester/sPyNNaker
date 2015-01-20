@@ -10,7 +10,7 @@ import numpy, pylab
 
 #p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
 p.setup(timestep=1.0, min_delay = 1.0, max_delay = 144.0)
-nNeurons = 10 # number of neurons in each population
+nNeurons = 100 # number of neurons in each population
 max_delay = 50
 #p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
 #p.set_number_of_neurons_per_core("DelayExtension", nNeurons / 2)
@@ -64,7 +64,7 @@ populations[0].record()
 populations[0].set_constraint(p.PlacerChipAndCoreConstraint(0, 0, 2))
 populations[1].set_constraint(p.PlacerChipAndCoreConstraint(0, 0, 3))
 
-run_time = 100
+run_time = 1000
 print "Running for {} ms".format(run_time)
 p.run(run_time)
 

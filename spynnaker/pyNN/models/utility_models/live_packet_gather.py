@@ -13,8 +13,8 @@ from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from enum import Enum
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
-from spynnaker.pyNN.exceptions import ConfigurationException
-
+from spinnman.messages.eieio.eieio_prefix_type import EIEIOPrefixType
+from spynnaker.pyNN import exceptions
 
 class LivePacketGather(
         AbstractDataSpecableVertex, AbstractPartitionableVertex,
@@ -47,16 +47,21 @@ class LivePacketGather(
         if (message_type == EIEIOTypeParam.KEY_PAYLOAD_32_BIT
             or message_type == EIEIOTypeParam.KEY_PAYLOAD_16_BIT) \
                 and use_payload_prefix and payload_as_time_stamps:
-            raise ConfigurationException("Timestamp can either be included as "
-                                         "payload prefix or as payload to each "
-                                         "key, not both")
+            raise exceptions.ConfigurationException(
+                "Timestamp can either be included as payload prefix or as "
+                "payload to each key, not both")
         if (message_type == EIEIOTypeParam.KEY_32_BIT
             or message_type == EIEIOTypeParam.KEY_16_BIT) and \
                 not use_payload_prefix and payload_as_time_stamps:
-            raise ConfigurationException("Timestamp can either be included as "
-                                         "payload prefix or as payload to each "
-                                         "key, but current configuration does "
-                                         "not specify either of these")
+            raise exceptions.ConfigurationException(
+                "Timestamp can either be included as payload prefix or as"
+                " payload to each key, but current configuration does not "
+                "specify either of these")
+        if not isinstance(prefix_type, EIEIOPrefixType):
+            raise exceptions.ConfigurationException(
+                "the type of a prefix type should be of a EIEIOPrefixType, "
+                "which can be located in :"
+                "spinnman..messages.eieio.eieio_prefix_type")
 
         AbstractDataSpecableVertex.__init__(
             self, n_atoms=1, label="Monitor",
@@ -68,9 +73,9 @@ class LivePacketGather(
                                          strip_sdp=strip_sdp)
 
         self.add_constraint(PlacerChipAndCoreConstraint(0, 0))
+        self._prefix_type = prefix_type
         self._use_prefix = use_prefix
         self._key_prefix = key_prefix
-        self._prefix_type = prefix_type
         self._message_type = message_type
         self._right_shift = right_shift
         self._payload_as_time_stamps = payload_as_time_stamps
