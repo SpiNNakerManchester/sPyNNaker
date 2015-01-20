@@ -127,6 +127,15 @@ def end(stop_on_board=True):
     _spinnaker = None
 
 
+def get_spynnaker():
+    """helper method for other plugins to add stuff to the graph
+
+    :return:
+    """
+    global _spinnaker
+    return _spinnaker
+
+
 def num_processes():
     """Return the number of MPI processes
        (not used for SpiNNaker, always returns 1)
@@ -230,21 +239,6 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     else:
         raise Exception("{} is not a AbstractConstrainedVertex type"
                         .format(neuron_type))
-
-
-def activate_live_output_for(
-        population, port, host, tag=None,
-        strip_sdp=True, use_prefix=False, key_prefix=None,
-        prefix_type=None, message_type=EIEIOTypeParam.KEY_32_BIT,
-        right_shift=0, payload_as_time_stamps=True,
-        use_payload_prefix=True, payload_prefix=None,
-        payload_right_shift=0, number_of_packets_sent_per_time_step=0):
-    global _spinnaker
-    _spinnaker.add_edge_to_recorder_vertex(
-        population._vertex, port, host, tag, strip_sdp, use_prefix,
-        key_prefix, prefix_type, message_type, right_shift,
-        payload_as_time_stamps, use_payload_prefix, payload_prefix,
-        payload_right_shift, number_of_packets_sent_per_time_step)
 
 
 # noinspection PyPep8Naming

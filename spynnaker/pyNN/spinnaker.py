@@ -4,8 +4,6 @@ from pacman.model.constraints.\
     VertexRequiresVirtualChipInMachineConstraint
 from spynnaker.pyNN import model_binaries
 import exceptions
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
@@ -53,12 +51,10 @@ from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
 from spynnaker.pyNN.spynnaker_configurations import \
     SpynnakerConfigurationFunctions
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.utility_models.live_packet_gather import LivePacketGather
 
 #spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
-from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
@@ -644,32 +640,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step,
             timescale_factor=self._time_scale_factor)
-
-    def add_edge_to_recorder_vertex(
-            self, vertex_to_record_from, port, hostname, tag=None,
-            strip_sdp=True, use_prefix=False, key_prefix=None,
-            prefix_type=None, message_type=EIEIOTypeParam.KEY_32_BIT,
-            right_shift=0, payload_as_time_stamps=True,
-            use_payload_prefix=True, payload_prefix=None,
-            payload_right_shift=0, number_of_packets_sent_per_time_step=0):
-
-        # locate the live spike recorder
-        if (port, hostname) in self._live_spike_recorders:
-            live_spike_recorder = self._live_spike_recorders[(port, hostname)]
-        else:
-            live_spike_recorder = LivePacketGather(
-                self.machine_time_step, self.timescale_factor,
-                tag, port, hostname, strip_sdp, use_prefix, key_prefix,
-                prefix_type, message_type, right_shift, payload_as_time_stamps,
-                use_payload_prefix, payload_prefix, payload_right_shift,
-                number_of_packets_sent_per_time_step)
-            self._live_spike_recorders[(port, hostname)] = live_spike_recorder
-            self.add_vertex(live_spike_recorder)
-
-        # create the edge and add
-        edge = PartitionableEdge(vertex_to_record_from,
-                                 live_spike_recorder, "recorder_edge")
-        self.add_edge(edge)
 
     def _get_executable_path(self, executable_name):
         # Loop through search paths

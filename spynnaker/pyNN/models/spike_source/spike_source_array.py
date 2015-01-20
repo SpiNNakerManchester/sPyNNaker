@@ -24,6 +24,7 @@ class SpikeSourceArray(AbstractSpikeSource):
     _model_based_max_atoms_per_core = 256
 
     def __init__(self, n_neurons, spike_times, machine_time_step,
+                 spikes_per_second, ring_buffer_sigma,
                  timescale_factor, constraints=None, label="SpikeSourceArray"):
         """
         Creates a new SpikeSourceArray Object.
