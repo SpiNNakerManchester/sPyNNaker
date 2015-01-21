@@ -42,6 +42,6 @@ setup(
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=[],
     install_requires=['pyNN >= 0.7, < 0.8',
-                      'sPyNNaker == 2015.002'],
+                      'sPyNNaker == 2015.003'],
     cmdclass={'install': CustomInstall}
 )
