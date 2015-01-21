@@ -37,7 +37,7 @@ class CustomInstall(install):
 
 setup(
     name="pyNN-spiNNaker",
-    version="2015.002",
+    version="2015.003",
     description="Tools for the SpiNNaker platform.",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=[],
