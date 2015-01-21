@@ -406,24 +406,14 @@ class Population(object):
         triggering spike time recording.
         """
 
-        record_spikes_on_sdram = conf.config.getboolean(
-            "Recording", "record_spikes_on_sdram")
-        send_live_spikes = conf.config.getboolean(
-            "Recording", "send_live_spikes")
-        if not record_spikes_on_sdram and not send_live_spikes:
-            logger.warn("Neither record_spikes_on_sdram nor send_live_spikes"
-                        " are set, so no spikes will be recorded or sent")
+        if not isinstance(self._vertex, AbstractRecordableVertex):
+            raise Exception("This population does not support recording!")
 
-        if record_spikes_on_sdram:
+        # Tell the vertex to record spikes
+        self._vertex.set_record(True)
 
-            if not isinstance(self._vertex, AbstractRecordableVertex):
-                raise Exception("This population does not support recording!")
-
-            # Tell the vertex to record spikes
-            self._vertex.set_record(True)
-
-            # set the file to store the spikes in once retrieved
-            self._record_spike_file = to_file
+        # set the file to store the spikes in once retrieved
+        self._record_spike_file = to_file
 
     def record_gsyn(self, to_file=None):
         """
