@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="sPyNNaker",
-    version="2015.002",
+    version="2015.003",
     description="Spinnaker implementation of PyNN",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=['spynnaker',
