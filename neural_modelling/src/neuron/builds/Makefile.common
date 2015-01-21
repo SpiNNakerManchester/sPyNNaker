@@ -23,7 +23,7 @@ endif
 # List of objects making up the application. If there are other files
 # in the application, add their object file names to this variable.
 
-OBJECTS = $(DIRS)/common/spikes.o $(DIRS)/common/out_spikes.o $(DIRS)/common/configuration.o $(DIRS)/common/recording.o \
+OBJECTS = $(DIRS)/common/in_spikes.o $(DIRS)/common/out_spikes.o $(DIRS)/common/recording.o \
 	$(DIRS)/neuron/c_main.o $(DIRS)/neuron/synapses.o  $(DIRS)/neuron/neuron.o $(MODEL_OBJS)
 
 ifeq ($(HARNESS), 1)
