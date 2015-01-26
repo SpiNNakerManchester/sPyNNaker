@@ -79,9 +79,16 @@ class SpynnakerCommsFunctions(object):
                 raise exceptions.ConfigurationException(
                     "Please set a machine version number in the configuration "
                     "file (pacman.cfg or pacman.cfg)")
+            #determine if FPGA's need to be supported in the key space
+            requires_fpga_support =\
+                conf.config.getboolean("Machine", "set_up_FPGAs")
+
+
+
             self._txrx.ensure_board_is_ready(int(machine_version))
             self._txrx.discover_scamp_connections()
-            self._machine = self._txrx.get_machine_details()
+            self._machine = \
+                self._txrx.get_machine_details(requires_fpga_support)
         else:
             virtual_x_dimension = conf.config.getint("Machine",
                                                   "virutal_board_x_dimension")

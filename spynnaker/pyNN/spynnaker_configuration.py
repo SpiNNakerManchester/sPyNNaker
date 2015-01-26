@@ -72,7 +72,7 @@ class SpynnakerConfiguration(object):
 
         #database objects
         self._create_database = False
-        self._database_thread = None
+        self._database_interface = None
 
     def _set_up_output_application_data_specifics(self):
         where_to_write_application_data_files = \

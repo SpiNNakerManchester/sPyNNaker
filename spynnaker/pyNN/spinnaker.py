@@ -5,8 +5,6 @@ from pacman.model.constraints.\
     VertexRequiresVirtualChipInMachineConstraint
 from spynnaker.pyNN.utilities.data_generator_interface import \
     DataGeneratorInterface
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
@@ -39,7 +37,7 @@ from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities.data_base_thread import DataBaseThread
+from spynnaker.pyNN.utilities.database.data_base_thread import DataBaseInterface
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
@@ -53,7 +51,6 @@ from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
-from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 import logging
 import math
@@ -113,14 +110,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
          #add database generation if requested
         if self._create_database:
-            execute_mapping = conf.config.getboolean(
-                "Database", "create_routing_info_to_neuron_id_mapping")
             wait_on_confirmation = \
                 conf.config.getboolean("Database", "wait_on_confirmation")
-            self._database_thread = DataBaseThread(
-                self._app_data_runtime_folder, execute_mapping,
-                wait_on_confirmation)
-            self._database_thread.start()
+            self._database_interface = DataBaseInterface(
+                self._app_data_runtime_folder, wait_on_confirmation)
 
         #create network report if needed
         if self._reports_states is not None:
@@ -169,16 +162,29 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #load database if needed
         if self._create_database:
-            self._database_thread.add_system_params(
+            self._database_interface.add_system_params(
                 self._time_scale_factor, self._machine_time_step, self._runtime)
-            self._database_thread.add_machine_objects(self._machine)
-            self._database_thread.add_partitionable_vertices(
+            self._database_interface.add_machine_objects(self._machine)
+            self._database_interface.add_partitionable_vertices(
                 self._partitionable_graph)
-            self._database_thread.add_partitioned_vertices(
-                self._partitioned_graph, self._graph_mapper)
-            self._database_thread.add_placements(self._placements)
-            self._database_thread.add_routing_infos(self._routing_infos)
-            self._database_thread.add_routing_tables(self._router_tables)
+            self._database_interface.add_partitioned_vertices(
+                self._partitioned_graph, self._graph_mapper,
+                self._partitionable_graph)
+            self._database_interface.add_placements(self._placements,
+                                                    self._partitioned_graph)
+            self._database_interface.add_routing_infos(
+                self._routing_infos, self._partitioned_graph)
+            self._database_interface.add_routing_tables(self._router_tables)
+            execute_mapping = conf.config.getboolean(
+                "Database", "create_routing_info_to_neuron_id_mapping")
+            if execute_mapping:
+                self._database_interface.create_neuron_to_key_mapping(
+                    graph_mapper=self._graph_mapper,
+                    partitionable_graph=self._partitionable_graph,
+                    partitioned_graph=self._partitioned_graph,
+                    routing_infos=self._routing_infos,
+                    placements=self._placements)
+            self._database_interface.send_visualiser_notifcation()
 
         #extract iptags required by the graph
         self._set_iptags()
@@ -242,7 +248,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
                     self._time_scale_factor, wait_on_confirmation,
-                    self._database_thread, self._in_debug_mode)
+                    self._database_interface, self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
@@ -511,7 +517,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._routing_infos, self._hostname, self._graph_mapper,
                     self._report_default_directory, progress_bar)
                 data_generator_interfaces.append(data_generator_interface)
-                thread_pool.apply_async(data_generator_interface.start())
+                #data_generator_interface.start()
+                thread_pool.apply_async(data_generator_interface.start)
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
@@ -663,4 +670,4 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     #        router_table.x, router_table.y)
             # self._txrx.send_signal(app_id, SCPSignal.STOP)
         if self._create_database:
-            self._database_thread.stop()
+            self._database_interface.stop()
