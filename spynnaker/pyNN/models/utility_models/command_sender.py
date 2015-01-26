@@ -1,10 +1,7 @@
-import os
-
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
     AbstractMultiCastSource
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.conf import config
 from pacman.model.constraints.key_allocator_routing_constraint \
     import KeyAllocatorRoutingConstraint
 from data_specification.data_specification_generator import \
@@ -18,18 +15,20 @@ class CommandSender(AbstractMultiCastSource):
 
     CORE_APP_IDENTIFER = constants.COMMAND_SENDER_CORE_APPLICATION_ID
 
-    def __init__(self, machine_time_step):
+    def __init__(self, machine_time_step, timescale_factor):
         """
         constructor that depends upon the Component vertex
         """
-        AbstractMultiCastSource.__init__(self, machine_time_step)
+        AbstractMultiCastSource.__init__(
+            self, machine_time_step, timescale_factor)
         self._writes = None
         self._memory_requirements = None
         self._edge_map = dict()
         self._commands = list()
 
         routing_key_constraint =\
-            KeyAllocatorRoutingConstraint(self.generate_routing_info)
+            KeyAllocatorRoutingConstraint(self.generate_routing_info,
+                                          self._generate_routing_neuron_id_keys)
         self.add_constraint(routing_key_constraint)
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
@@ -50,12 +49,10 @@ class CommandSender(AbstractMultiCastSource):
 
         #reserve regions
         self.reserve_memory_regions(spec, self._memory_requirements)
-        
+
         #write system region
         spec.switch_write_focus(region=self.SYSTEM_REGION)
-        spec.write_value(data=0xBEEF0000)
-        spec.write_value(data=self._machine_time_step)
-        spec.write_value(data=self._no_machine_time_steps)
+        self._write_basic_setup_info(spec, 0xBEEF0000)
         spec.write_value(data=0)
 
         #write commands to memory
@@ -160,6 +157,38 @@ class CommandSender(AbstractMultiCastSource):
             # then treat them with the subedge routing key
             return subedge.key_combo, self._app_mask
 
+    def _generate_routing_neuron_id_keys(self, vertex_slice, vertex, placement,
+                                         subedge):
+        """ generates a list of keys with neuron ids
+
+        :param vertex_slice: the vertex slice of this subvertex
+        :param vertex: the vertex this subvertex is associated with
+        :param placement: the placment of this subvertex
+        :param subedge: the subedge associated with this key
+        :return: list of keys with neuron ids
+        """
+        keys = dict()
+        for atom in range(0, vertex_slice.n_atoms):
+            key_with_neuron_id = self._get_key_with_neuron_id(subedge, atom)
+            keys[vertex_slice.lo_atom + atom] = key_with_neuron_id
+        return keys
+
+    def _get_key_with_neuron_id(self, subedge, atom):
+        """ generates a key with a neuron id based off the placement and atom
+
+        :param subedge: the subedge of the subvertex
+        :param atom: the aton of this subvertex
+        :return:the key with a neuron id added to it
+        """
+        if self._edge_map[subedge.edge] is not None:
+            key = self._edge_map[subedge.edge][0]['key']
+        else:
+            # if the subedge doesnt have any predefined messages to send,
+            # then treat them with the subedge routing key
+            key = subedge.key_combo
+        key += atom
+        return key
+
     def reserve_memory_regions(self, spec, command_size):
         """
         Reserve SDRAM space for memory areas:
@@ -243,10 +272,10 @@ class CommandSender(AbstractMultiCastSource):
         return 0
 
     def get_binary_file_name(self):
-        # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
+        return 'command_sender_multicast_source.aplx'
 
-        binary_name = os.path.join(common_binary_path,
-                                   'command_sender_multicast_source.aplx')
-        return binary_name
+    def is_recordable(self):
+        return True
+
+    def is_multi_cast_source(self):
+        return True

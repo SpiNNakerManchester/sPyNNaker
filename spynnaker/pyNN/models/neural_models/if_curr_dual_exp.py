@@ -1,9 +1,9 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_dual_exponential_vertex \
+from spynnaker.pyNN.models.abstract_models.abstract_dual_exponential_vertex \
     import AbstractDualExponentialVertex
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_integrate_and_fire_properties \
+from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
@@ -14,17 +14,18 @@ from data_specification.enums.data_type import DataType
 class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                                          AbstractIntegrateAndFireProperties,
                                          AbstractPopulationVertex):
+
     CORE_APP_IDENTIFIER = constants.IF_CURRENT_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
-    def __init__(
-            self, n_neurons, machine_time_step, buffer_ip_tag_tag_id,
-            buffer_ip_tag_port, buffer_ip_tag_address, constraints=None,
-            label=None, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
-            v_thresh=-50.0, tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0,
-            tau_refrac=0.1, i_offset=0, v_init=None):
-        
+    def __init__(self, n_neurons, machine_time_step, buffer_ip_tag_tag_id,
+                 buffer_ip_tag_port, buffer_ip_tag_address, timescale_factor,
+                 spikes_per_second, ring_buffer_sigma, constraints=None,
+                 label=None, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
+                 v_thresh=-50.0, tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0,
+                 tau_refrac=0.1, i_offset=0, v_init=None):
+
         # Instantiate the parent classes
         AbstractDualExponentialVertex.__init__(
             self, n_neurons=n_neurons, tau_syn_E=tau_syn_E,
@@ -39,7 +40,11 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
             binary="IF_curr_exp_dual.aplx", constraints=constraints,
             max_atoms_per_core=
             IFCurrentDualExponentialPopulation._model_based_max_atoms_per_core,
-            machine_time_step=machine_time_step, address=buffer_ip_tag_address,
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma,
+            address=buffer_ip_tag_address,
             tag=buffer_ip_tag_tag_id, port=buffer_ip_tag_port)
         self._executable_constant = \
             IFCurrentDualExponentialPopulation.CORE_APP_IDENTIFIER
@@ -63,7 +68,7 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
         """
         Generate Neuron Parameter data (region 2):
         """
-        
+
         # Get the parameters
         return [
             NeuronParameter(self._v_thresh, DataType.S1615),
@@ -80,3 +85,15 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
             NeuronParameter(self._refract_timer, DataType.UINT32),
             NeuronParameter(self._scaled_t_refract(), DataType.UINT32)
         ]
+
+    def is_population_vertex(self):
+        return True
+
+    def is_duel_exponential_vertex(self):
+        return True
+
+    def is_integrate_and_fire_vertex(self):
+        return True
+
+    def is_recordable(self):
+        return True

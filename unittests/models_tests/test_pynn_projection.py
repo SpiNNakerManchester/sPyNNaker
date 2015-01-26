@@ -2,6 +2,7 @@
 import unittest
 import spynnaker.pyNN.exceptions as exc
 import spynnaker.pyNN as pyNN
+from spynnaker.pyNN.models.pynn_projection import Projection
 
 projections = list()
 populations = list()
@@ -195,27 +196,35 @@ class TestProjection(unittest.TestCase):
             pyNN.Projection(different_population, second_population, pyNN.
                             OneToOneConnector(weight_to_spike, delay))
 
-    def test_multiple_connections_between_same_vertices(self):
+    def test_multiple_connections_between_same_populations(self):
         p1 = pyNN.Population(no_neurons, pyNN.IF_curr_exp, cell_params_lif,
                              label="LIF Pop")
         p2 = pyNN.Population(no_neurons, pyNN.IF_curr_exp, cell_params_lif,
                              label="LIF Pop")
         pyNN.Projection(p1, p2, pyNN.OneToOneConnector(1, 1))
-        with self.assertRaises(exc.ConfigurationException):
-            pyNN.Projection(p1, p2, pyNN.OneToOneConnector(1, 1))
+        self.assertIsInstance(pyNN.Projection(p1, p2,
+                                              pyNN.OneToOneConnector(1, 1)),
+                              Projection,
+                              "Failed to create multiple connections between"
+                              " the same pair of populations")
 
+    @unittest.skip("Not implemented")
     def test_all_to_all_connector(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
+    @unittest.skip("Not implemented")
     def test_fixed_probability_connector(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
+    @unittest.skip("Not implemented")
     def test_fixed_number_pre_connector(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
+    @unittest.skip("Not implemented")
     def test_from_list_connector(self):
         self.assertEqual(True, False, "Test not implemented yet")
 
+    @unittest.skip("Not implemented")
     def test_from_file_connector(self):
         self.assertEqual(True, False, "Test not implemented yet")
 

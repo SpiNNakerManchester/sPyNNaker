@@ -13,12 +13,10 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 
-if conf.config.get("Visualiser", "enable"):
-    from visualiser_framework.visualiser_constants import VISUALISER_MODES
-
 #pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
+from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -37,8 +35,8 @@ from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_partitioned_projection \
-    import DelayPartitionedProjection
+from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
+    import DelayPartitionedEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
@@ -84,6 +82,8 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
 # STDP weight dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     additive_weight_dependence import AdditiveWeightDependence
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
+    multiplicative_weight_dependence import MultiplicativeWeightDependence
 
 # STDP timing dependences
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
@@ -100,12 +100,26 @@ from pacman.model.constraints.partitioner_maximum_size_constraint \
 
 #note importing star is a bad thing to do.
 from pyNN.random import *
+from pyNN.space import *
 
 #traditional logger
 logger = logging.getLogger(__name__)
+
 #global controller / spinnaker object that does everything
 _spinnaker = None
 
+# List of binary search paths
+_binary_search_paths = []
+
+def register_binary_search_path(search_path):
+    """Registers an additional binary search path for
+    for SpiNNaker executables. Should be called before
+    setup by sPyNNaker plugin modules
+
+    :param string search_path:
+    absolute search path for binaries
+    """
+    _binary_search_paths.append(search_path)
 
 def end(stop_on_board=True):
     """
@@ -116,6 +130,15 @@ def end(stop_on_board=True):
     global _spinnaker
     _spinnaker.stop(_spinnaker.app_id, stop_on_board)
     _spinnaker = None
+
+
+def get_spynnaker():
+    """helper method for other plugins to add stuff to the graph
+
+    :return:
+    """
+    global _spinnaker
+    return _spinnaker
 
 
 def num_processes():
@@ -158,7 +181,7 @@ def run(run_time=None):
     return None
 
 
-def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
+def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
           **extra_params):
     """
     Should be called at the very beginning of a script.
@@ -182,13 +205,18 @@ def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
     ignore them because they have no bearing on the on-chip simulation code.
     """
     global _spinnaker
+    global _binary_search_paths
 
-    logger.info("PACMAN103   (c) 2014 APT Group, University of Manchester")
-    logger.info("                Release version 2014.4.1 - April 2014")
+    logger.info(
+        "sPyNNaker   (c) 2014 APT Group, University of Manchester")
+    logger.info(
+        "                Release version 2015.001 - January 2015")
 
     if len(extra_params.keys()) > 1:
         logger.warn("Extra params has been applied which we do not consider")
-    _spinnaker = Spinnaker(machine, timestep, min_delay, max_delay)
+    _spinnaker = Spinnaker(host_name=machine, timestep=timestep,
+                           min_delay=min_delay, max_delay=max_delay,
+                           binary_search_paths=_binary_search_paths)
     # Return None, simply because the PyNN API says something must be returned
     return None
 
@@ -197,7 +225,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     """
     Sets a ceiling on the number of neurons of a given type that can be placed
     on a single core.
-    This information is stored in  dictionary in the dao and is referenced
+    This information is stored in the model itself  and is referenced
     during the partition stage of the mapper.
     Note that each neuron type has a default value for this parameter that will
     be used if no override is given.
@@ -218,24 +246,11 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
                         .format(neuron_type))
 
 
-def activate_live_recording_for(population):
-    global _spinnaker
-    _spinnaker.add_edge_to_recorder_vertex(population._vertex)
-
-
 # noinspection PyPep8Naming
 def Population(size, cellclass, cellparams, structure=None, label=None):
     global _spinnaker
     return _spinnaker.create_population(size, cellclass, cellparams,
                                         structure, label)
-
-
-# noinspection PyPep8Naming
-def VisualisedPopulation(size, cellclass, cellparams, structure=None,
-                         label=None):
-    global _spinnaker
-    return _spinnaker.create_visualised_population(size, cellclass, cellparams,
-                                                   structure, label)
 
 
 # noinspection PyPep8Naming
@@ -246,3 +261,8 @@ def Projection(presynaptic_population, postsynaptic_population,
     return _spinnaker.create_projection(
         presynaptic_population, postsynaptic_population, connector, source,
         target, synapse_dynamics, label, rng)
+
+
+def get_current_time():
+    global _spinnaker
+    return _spinnaker.get_current_time()

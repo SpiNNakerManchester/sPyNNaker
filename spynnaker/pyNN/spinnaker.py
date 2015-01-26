@@ -1,14 +1,14 @@
 #pacman imports
-from data_specification.interfaces.data_generator_interface import \
-    DataGeneratorInterface
 
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
-    import MultiCastPartitionableEdge
-from pacman.operations.multi_cast_router_check_functionality.\
-    valid_routes_checker import ValidRouteChecker
+from spynnaker.pyNN.utilities.data_generator_interface import \
+    DataGeneratorInterface
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
+from pacman.operations.router_check_functionality.valid_routes_checker import \
+    ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
@@ -48,10 +48,9 @@ from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
+from spynnaker.pyNN.utilities.data_base_thread import DataBaseThread
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
-from spynnaker.pyNN.models.utility_models.live_packet_gather\
-    import LivePacketGather
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
@@ -62,14 +61,14 @@ from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
 #spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
-from spinnman.messages.scp.scp_signal import SCPSignal
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
+from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 from spinnman import constants as spinnman_constants
 
 import logging
 import math
+import os
 import sys
-import time
 from multiprocessing.pool import ThreadPool
 
 logger = logging.getLogger(__name__)
@@ -78,7 +77,7 @@ logger = logging.getLogger(__name__)
 class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
-                 max_delay=None, graph_label=None):
+                 max_delay=None, graph_label=None, binary_search_paths=[]):
         SpynnakerConfiguration.__init__(self, host_name, graph_label)
 
         if self._app_id is None:
@@ -90,6 +89,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._set_up_buffer_requirements()
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
+        self._spikes_per_second = float(conf.config.getfloat(
+            "Simulation", "spikes_per_second"))
+        self._ring_buffer_sigma = float(conf.config.getfloat(
+            "Simulation", "ring_buffer_sigma"))
 
         SpynnakerCommsFunctions.__init__(self, self._reports_states,
                                          self._report_default_directory)
@@ -98,23 +101,37 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     .format(self._time_scale_factor))
 
         logger.info("Setting appID to %d." % self._app_id)
-    
+
         #get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
+
+        # Begin list of binary search paths
+        # With those passed to constructor
+        self._binary_search_paths = binary_search_paths
+
+        # Determine default executable folder location
+        binary_path = os.path.abspath(exceptions.__file__)
+        binary_path = os.path.abspath(os.path.join(binary_path, os.pardir))
+        binary_path = os.path.join(binary_path, "model_binaries")
+
+        #add this default to end of list of search paths
+        self._binary_search_paths.append(binary_path)
         self._edge_count = 0
 
     def run(self, run_time):
         self._setup_interfaces(hostname=self._hostname)
 
-        #set up vis if needed
-        if conf.config.getboolean("Visualiser", "enable"):
-            self._visualiser, self._visualiser_vertex_to_page_mapping =\
-                self._setup_visualiser(
-                    self._partitionable_graph, self._visualiser_vertices,
-                    self._partitioned_graph, self._placements,
-                    self._router_tables, self._runtime, self._machine_time_step,
-                    self._graph_mapper)
+         #add database generation if requested
+        if self._create_database:
+            execute_mapping = conf.config.getboolean(
+                "Database", "create_routing_info_to_neuron_id_mapping")
+            wait_on_confirmation = \
+                conf.config.getboolean("Database", "wait_on_confirmation")
+            self._database_thread = DataBaseThread(
+                self._app_data_runtime_folder, execute_mapping,
+                wait_on_confirmation)
+            self._database_thread.start()
 
         #create network report if needed
         if self._reports_states is not None:
@@ -161,6 +178,19 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if do_timing:
             timer.take_sample()
 
+        #load database if needed
+        if self._create_database:
+            self._database_thread.add_system_params(
+                self._time_scale_factor, self._machine_time_step, self._runtime)
+            self._database_thread.add_machine_objects(self._machine)
+            self._database_thread.add_partitionable_vertices(
+                self._partitionable_graph)
+            self._database_thread.add_partitioned_vertices(
+                self._partitioned_graph, self._graph_mapper)
+            self._database_thread.add_placements(self._placements)
+            self._database_thread.add_routing_infos(self._routing_infos)
+            self._database_thread.add_routing_tables(self._router_tables)
+
         #extract iptags required by the graph
         self._set_iptags()
         self._set_reverse_ip_tags()
@@ -186,12 +216,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             reports.write_memory_map_report(self._report_default_directory,
                                             processor_to_app_data_base_address)
 
-        #engage vis if requested
         if do_timing:
             timer.take_sample()
-
-        if conf.config.getboolean("Visualiser", "enable"):
-            self.start_visualiser()
 
         if conf.config.getboolean("Execute", "run_simulation"):
             if do_timing:
@@ -218,6 +244,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             #end of entire loading setup
             if do_timing:
                 timer.take_sample()
+
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
                 if self._reports_states.transciever_report:
@@ -227,9 +254,15 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                         binary_folder, executable_targets, self._hostname,
                         self._app_id, run_time)
 
+                wait_on_confirmation = \
+                    conf.config.getboolean("Database", "wait_on_confirmation")
+                wait_on_confirmation = \
+                    conf.config.getboolean("Database", "wait_on_confirmation")
                 self._start_execution_on_machine(
-                    executable_targets, self._app_id, self._runtime,
-                    self._buffer_managers)
+                    executable_targets, self._app_id, self._runtime, 
+                    self._buffer_managers, self._time_scale_factor,
+                    wait_on_confirmation, self._database_thread,
+                    self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
@@ -312,7 +345,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 reverse_iptag = vertex.get_reverse_ip_tag()
                 if reverse_iptag.tag is None:
                     reverse_iptag.set_tag(self._current_max_tag_value + 1)
-                    vertex.set_reverse_iptag_tag(self._current_max_tag_value + 1)
+                    vertex.set_reverse_iptag_tag(
+                        self._current_max_tag_value + 1)
                     self._current_max_tag_value += 1
                     reverse_iptag = self._create_reverse_iptag_from_iptag(
                         reverse_iptag, vertex)
@@ -344,6 +378,18 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     @property
     def machine_time_step(self):
         return self._machine_time_step
+
+    @property
+    def timescale_factor(self):
+        return self._time_scale_factor
+
+    @property
+    def spikes_per_second(self):
+        return self._spikes_per_second
+
+    @property
+    def ring_buffer_sigma(self):
+        return self._ring_buffer_sigma
 
     @property
     def get_multi_cast_source(self):
@@ -394,6 +440,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     @property
     def buffer_managers(self):
         return self._buffer_managers
+
+    def get_current_time(self):
+        if self._has_ran:
+            return float(self._runtime)
+        return 0.0
 
     def __repr__(self):
         return "Spinnaker object for machine {}".format(self._hostname)
@@ -454,11 +505,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
 
-        if conf.config.get("Mode", "mode") == "Debug":
+        if self._in_debug_mode:
             #check that all routes are valid and no cycles exist
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
-                routing_tables=self._router_tables,
+                routing_tables=self._router_tables, machine=self._machine,
                 partitioned_graph=self._partitioned_graph)
             valid_route_checker.validate_routes()
 
@@ -540,11 +591,16 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start())
 
-                #can get away with this bit, becuase its not dependent upon
-                # the completion of the dsg stuff
+                # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
-                if binary_name in executable_targets.keys():
-                    executable_targets[binary_name].add_processor(placement.x,
+
+                # Attempt to find this within search paths
+                binary_path = self._get_executable_path(binary_name)
+                if binary_path is None:
+                    raise exceptions.ExecutableNotFoundException(binary_name)
+
+                if binary_path in executable_targets.keys():
+                    executable_targets[binary_path].add_processor(placement.x,
                                                                   placement.y,
                                                                   placement.p)
                 else:
@@ -552,33 +608,18 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     initial_core_subset = CoreSubset(placement.x, placement.y,
                                                      processors)
                     list_of_core_subsets = [initial_core_subset]
-                    executable_targets[binary_name] = \
+                    executable_targets[binary_path] = \
                         CoreSubsets(list_of_core_subsets)
 
+        for data_generator_interface in data_generator_interfaces:
+            data_generator_interface.wait_for_finish()
         thread_pool.close()
         thread_pool.join()
-        #check for exceptions
-        for data_generator_interface in data_generator_interfaces:
-            if data_generator_interface.exception is not None:
-                raise data_generator_interface.exception, None, \
-                    data_generator_interface.stack_trace
+        
         #finish the progress bar
         progress_bar.end()
-        return executable_targets
 
-    def start_visualiser(self):
-        """starts the port listener and ties it to the visualiser_framework
-         pages as required
-        """
-       #register a listener at the transciever for each visualised vertex
-        for vertex in self._visualiser_vertices:
-            if vertex in self._visualiser_vertex_to_page_mapping.keys():
-                associated_page = self._visualiser_vertex_to_page_mapping[vertex]
-                self._txrx.register_listener(
-                    associated_page.recieved_spike, vertex.receieve_port_no,
-                    vertex.hostname, vertex.connection_type,
-                    vertex.traffic_type)
-        self._visualiser.start()
+        return executable_targets
 
     def add_vertex(self, vertex_to_add):
         if isinstance(vertex_to_add, CommandSender):
@@ -587,21 +628,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def add_edge(self, edge_to_add):
         self._partitionable_graph.add_edge(edge_to_add)
-
-    def create_visualised_population(self, size, cellclass, cellparams,
-                                     structure, label):
-        requires_visualiser = conf.config.getboolean("Visualiser", "enable")
-        if not requires_visualiser:
-            raise exceptions.ConfigurationException(
-                "The visualiser is currently turned off by a spinnaker.cfg or "
-                "pacman.cfg file. Please correct and try again.")
-        else:
-            from spynnaker.pyNN.visualiser_package.visualised_vertex \
-                import VisualisedVertex
-            return VisualisedVertex(
-                size=size, cellclass=cellclass, cellparams=cellparams,
-                structure=structure, label=label, spinnaker=self,
-                multi_cast_vertex=self._multi_cast_vertex)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(
@@ -620,27 +646,21 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             postsynaptic_population=postsynaptic_population, rng=rng,
             connector=connector, source=source, target=target,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
-            machine_time_step=self._machine_time_step)
+            machine_time_step=self._machine_time_step,
+            timescale_factor=self._time_scale_factor)
 
-    def add_edge_to_recorder_vertex(self, vertex_to_record_from, port,
-                                    hostname, tag):
+    def _get_executable_path(self, executable_name):
+        # Loop through search paths
+        for path in self._binary_search_paths:
+            # Rebuild filename
+            potential_filename = os.path.join(path, executable_name)
 
-        #locate the live spike recorder
-        if port in self._live_spike_recorder.keys():
-            live_spike_recorder = self._live_spike_recorder[port]
-        else:
-            live_spike_recorder = \
-                LivePacketGather(self.machine_time_step, tag, port, hostname)
-            self.add_vertex(live_spike_recorder)
-        #create the edge and add
-        edge = MultiCastPartitionableEdge(vertex_to_record_from,
-                                          live_spike_recorder, "recorder_edge")
-        self.add_edge(edge)
+            # If this filename exists, return it
+            if os.path.isfile(potential_filename):
+                return potential_filename
 
-    def add_visualiser_vertex(self, visualiser_vertex_to_add):
-        if self._visualiser_vertices is None:
-            self._visualiser_vertices = list()
-        self._visualiser_vertices.append(visualiser_vertex_to_add)
+        # No executable found
+        return None
 
     def _check_if_theres_any_pre_placement_constraints_to_satisfy(self):
         for vertex in self._partitionable_graph.vertices:
@@ -689,7 +709,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         router_object = MachineRouter(
             links=links, emergency_routing_enabled=False,
             clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
-            n_available_multicast_entries=sys.maxint)
+            n_available_multicast_entries=sys.maxint, diagnostic_filters=list())
 
         #create the processors
         processors = list()
@@ -714,14 +734,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 if len(router_table.multicast_routing_entries) > 0:
                     self._txrx.clear_multicast_routes(router_table.x,
                                                       router_table.y)
-            time.sleep(0.5)
-            self._txrx.send_signal(app_id, SCPSignal.STOP)
-            #clear rtr_diagnostics
-            for chip in self._machine.chips:
-                self._txrx.clear_router_diagnostics(chip.x, chip.y)
-            #clear iptags
-            for iptag in self._iptags:
-                self._txrx.clear_ip_tag(iptag.tag)
-
-        if conf.config.getboolean("Visualiser", "enable"):
-            self._visualiser.stop()
+                    self._txrx.clear_router_diagnostic_counters(router_table.x,
+                                                                router_table.y)
+#            time.sleep(0.5)
+#            self._txrx.send_signal(app_id, SCPSignal.STOP)
+        if self._create_database:
+            self._database_thread.stop()

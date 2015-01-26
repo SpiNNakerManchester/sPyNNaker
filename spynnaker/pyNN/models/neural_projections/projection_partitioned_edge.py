@@ -11,14 +11,15 @@ class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
         MultiCastPartitionedEdge.__init__(self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
         self._synapse_sublist = None
-        self._weight_scale = None
+        self._weight_scales = None
 
     @property
-    def weight_scale(self):
-        return self._weight_scale
+    def weight_scales(self):
+        return self._weight_scales
 
-    def weight_scale_setter(self, new_value):
-        self._weight_scale = new_value
+    # **YUCK** setters don't work properly with inheritance
+    def weight_scales_setter(self, value):
+        self._weight_scales = value
 
     def get_synapse_sublist(self, graph_mapper):
         """
@@ -35,7 +36,12 @@ class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
                 associated_edge.synapse_list.create_atom_sublist(
                     pre_vertex_slice, post_vertex_slice)
         return self._synapse_sublist
-    
+
+    def get_n_rows(self, graph_mapper):
+        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._pre_subvertex)
+        return pre_vertex_slice.n_atoms
+
     def free_sublist(self):
         """
         Indicates that the list will not be needed again
@@ -47,20 +53,17 @@ class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
         synaptic data
 
         """
-        if self._synapse_sublist is None:
-            self.get_synapse_sublist(graph_mapper)
-            #reports.generate_synaptic_matrix_report(common_report_folder, self)
+        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._pre_subvertex)
+        post_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._post_subvertex)
+        edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(self)
 
-        pre_vertex_slice = graph_mapper.get_subvertex_slice(self._pre_subvertex)
-        post_vertex_slice = \
-            graph_mapper.get_subvertex_slice(self._post_subvertex)
-
-        return not self._synapse_sublist.is_connected(pre_vertex_slice,
-                                                      post_vertex_slice)
+        return not edge.synapse_list.is_connected(pre_vertex_slice,                                             post_vertex_slice)
 
     @property
     def synapse_sublist(self):
         return self._synapse_sublist
-
+    
     def is_multi_cast_partitioned_edge(self):
         return True

@@ -8,8 +8,9 @@ from spynnaker.pyNN.models.abstract_models.\
 from enum import Enum
 
 
-class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
-                          AbstractDataSpecableVertex):
+class AbstractSpikeSource(
+        AbstractRecordableVertex, AbstractPartitionableVertex,
+        AbstractDataSpecableVertex):
 
     def is_buffer_sendable_vertex(self):
         pass
@@ -33,9 +34,10 @@ class AbstractSpikeSource(AbstractRecordableVertex, AbstractPartitionableVertex,
         AbstractRecordableVertex.__init__(
             self, machine_time_step, label, tag, port, address,
             max_on_chip_memory_usage_for_recording, strip_sdp=strip_sdp)
-        AbstractDataSpecableVertex.__init__(self, label=label,
-                                            n_atoms=n_neurons,
-                                            machine_time_step=machine_time_step)
+        AbstractDataSpecableVertex.__init__(
+            self, label=label, n_atoms=n_neurons,
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor)
 
     def __str__(self):
         return "spike source with atoms {}".format(self.n_atoms)

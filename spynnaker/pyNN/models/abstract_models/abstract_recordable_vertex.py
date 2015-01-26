@@ -73,7 +73,11 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
     def set_record_gsyn(self, setted_value):
         self._record_gsyn = setted_value
 
-    def _get_recording_region_size(self, spike_region_size):
+    @abstractmethod
+    def is_recordable(self):
+        """helper method for is isinstance"""
+
+    def get_recording_region_size(self, spike_region_size, bytes_per_timestep):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
         ASSUMES one spike per timer tic per neuron. Buffers can support more...
@@ -210,10 +214,13 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
             txrx, machine_time_step):
         if not has_ran:
             raise exceptions.SpynnakerException(
-                "The simulation has not yet ran, therefore neuron param cannot "
-                "be retrieved")
+                "The simulation has not yet ran, therefore neuron param "
+                "cannot be retrieved")
 
-        value = numpy.zeros((0, 3))
+        times = numpy.zeros(0)
+        ids = numpy.zeros(0)
+        values = numpy.zeros(0)
+        ms_per_tick = self._machine_time_step / 1000.0
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
@@ -259,55 +266,27 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
             number_of_time_steps_written = \
                 number_of_bytes_written / bytes_per_time_step
 
-            ms_per_timestep = machine_time_step / 1000.0
-
             logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
 
-            temp_buffer = bytearray()
+            data_list = bytearray()
+            for data in neuron_param_region_data:
+                data_list.extend(data)
 
-            for region_block in neuron_param_region_data:
-                temp_buffer.extend(region_block)
+            numpy_data = numpy.asarray(data_list, dtype="uint8").view(
+                dtype="<i4") / 32767.0
+            values = numpy.append(values, numpy_data)
+            times = numpy.append(
+                times, numpy.repeat(range(numpy_data.size / n_atoms),
+                                    n_atoms) * ms_per_tick)
+            ids = numpy.append(ids, numpy.add(
+                numpy.arange(numpy_data.size) % n_atoms, vertex_slice.lo_atom))
 
-            # Standard fixed-point 'accum' type scaling
-            size = len(temp_buffer) / 4
-            scale = numpy.zeros(size, dtype=numpy.float)
-            scale.fill(float(0x7FFF))
+        result = numpy.dstack((ids, times, values))[0]
+        result = result[numpy.lexsort((times, ids))]
+        return result
 
-            # Add an array for time and neuron id
-            time = numpy.array([(int(i / n_atoms) * ms_per_timestep)
-                                for i in range(size)], dtype=numpy.float)
-
-            lo_atom = vertex_slice.lo_atom
-            neuron_id = numpy.array([int(i % n_atoms) +
-                                     lo_atom for i in range(size)],
-                                    dtype=numpy.uint32)
-            # Get the values
-            # noinspection PyNoneFunctionAssignment
-            temp_value = numpy.frombuffer(temp_buffer, dtype="<i4")
-            # noinspection PyTypeChecker
-            temp_value = numpy.divide(temp_value, scale)
-            temp_array = numpy.dstack((time, neuron_id, temp_value))
-            temp_array = numpy.reshape(temp_array, newshape=(-1, 3))
-            value = numpy.append(value, temp_array, axis=0)
-
-        logger.debug("Arranging parameter output")
-        if compatible_output:
-
-            # Change the order to be neuronID : time (don't know why - this
-            # is how it was _done in the old code, so I am doing it here too)
-            value[:, [0, 1, 2]] = value[:, [1, 0, 2]]
-
-            # Sort by neuron ID and not by time
-            v_index = numpy.lexsort((value[:, 2], value[:, 1], value[:, 0]))
-            value = value[v_index]
-            return value
-
-        # If not compatible output, we will sort by time (as NEST seems to do)
-        v_index = numpy.lexsort((value[:, 2], value[:, 1], value[:, 0]))
-        value = value[v_index]
-        return value
-
+    
     @abstractmethod
     def is_recordable(self):
         return True

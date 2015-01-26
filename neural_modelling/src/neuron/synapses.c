@@ -21,7 +21,7 @@
  *         necessary shaping.
  *
  *    There are also support functions for:
- *     
+ *
  *     (-) printing (if #def'd)
  *     (-) configuration
  *     (-) randomly setting up data structures
@@ -39,7 +39,7 @@
  *    Manchester M13 9PL, UK
  *
  *  DESCRIPTION
- *    
+ *
  *
  *  CREATION DATE
  *    9 August, 2013
@@ -62,6 +62,12 @@
 
 // **NOTE** synapse shaping implementation gets included by compiler
 
+extern uint32_t ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT]; // Amount to left shift the ring buffer by to make it an input
+
+#ifdef SYNAPSE_BENCHMARK
+  extern uint32_t num_fixed_pre_synaptic_events;
+#endif  // SYNAPSE_BENCHMARK
+
 // ring buffers between synapses and neurons.
 static ring_entry_t  ring_buffer   [RING_BUFFER_SIZE];
 
@@ -74,6 +80,9 @@ static uint32_t  row_size_table    [ROW_SIZE_TABLE_MAX];
 
 // 2D array of synapse decays - num synapse types by
 synapse_param_t *neuron_synapse_params[SYNAPSE_TYPE_COUNT];
+
+// Saturation count
+static uint32_t saturation_count = 0;
 
 // initialize_current_buffer
 //
@@ -102,11 +111,11 @@ void initialize_current_buffer (void)
 // At the moment we merely take the u12.4 value and
 // convert to an s16.15 value; this is a left shift of 11
 
-static inline current_t weight_to_current (weight_t w)
+static inline current_t weight_to_current(index_t synapse_type, weight_t w)
 {
   union { int_k_t r; s1615 fx; } x;
 
-  x.r = (int_k_t)(w) << ring_buffer_to_input_left_shift;
+  x.r = (int_k_t)(w) << ring_buffer_to_input_left_shifts[synapse_type];
 
   return x.fx;
 }
@@ -130,26 +139,26 @@ static inline current_t weight_to_current (weight_t w)
 // enabling/disabling).
 //
 // In these circustances we can use _all_ ring buffer values for transfers
-// i.e. delays in the range 1 - 16 (represented by 1-15 and 0). 
+// i.e. delays in the range 1 - 16 (represented by 1-15 and 0).
 
 void ring_buffer_transfer (void)
 {
-  for (uint32_t n = 0; n < num_neurons; n++) 
+  for (uint32_t n = 0; n < num_neurons; n++)
   {
     // Shape the current according to the included rume
     shape_current(n);
-  
+
     // Loop through all synapse types
     for(uint32_t s = 0; s < SYNAPSE_TYPE_COUNT; s++)
     {
       // Get offset of ring-buffer input for this synapse type
-      uint32_t off = offset_ring_buffer (time, s, n);
-      
+      uint32_t off = offset_ring_buffer(time, s, n);
+
       // Convert ring-buffer entry to current and add on to correct input current for this s
-      add_neuron_input(n, s, weight_to_current(ring_buffer [off]));
-      
+      add_neuron_input(n, s, weight_to_current(s, ring_buffer[off]));
+
       // Clear ring buffer
-      ring_buffer [off] = 0;
+      ring_buffer[off] = 0;
     }
   }
 }
@@ -170,8 +179,8 @@ int synaptic_row (address_t* address, size_t* size_bytes, spike_t key)
   s = d & 0x7; // get lowest 3 bits into s;
   d = d >> 3;  // d is now only 13 bits, i.e. 0..8095 .
 
-  log_info("spike = %08x, pid = %u, s = %u, d = %u, nid = %u",
-	   key, pid, s, d, nid);
+  //log_info("spike = %08x, pid = %u, s = %u, d = %u, nid = %u",
+  //  key, pid, s, d, nid);
 
   if(s == 0)
   {
@@ -183,18 +192,18 @@ int synaptic_row (address_t* address, size_t* size_bytes, spike_t key)
     // **THINK** this is dependant on synaptic row format so could be dependant on implementatin
     uint32_t num_synaptic_words = row_size_table [s];
     *size_bytes = (num_synaptic_words + 3) * sizeof(uint32_t);
-    
+
     stride   = (row_size_table [s] + 3);
     uint32_t neuron_offset   = nid * stride * sizeof (uint32_t);
-    
+
     // **NOTE** 1024 converts from kilobyte offset to byte offset
     uint32_t population_offset = d * 1024;
-    
-    log_info("stride = %u, neuron offset = %u, population offset = %u, base = %08x, size = %u", stride, neuron_offset, population_offset, synaptic_row_base, *size_bytes);
-    
+
+    //log_info("stride = %u, neuron offset = %u, population offset = %u, base = %08x, size = %u", stride, neuron_offset, population_offset, synaptic_row_base, *size_bytes);
+
     *address = (uint32_t*) ((uint32_t)synaptic_row_base + population_offset + neuron_offset);
   }
-  
+
   return (s);
 }
 
@@ -205,28 +214,42 @@ static inline void process_fixed_synapses (address_t fixed)
 {
   register uint32_t *synaptic_words = fixed_weight_controls(fixed);
   register uint32_t fixed_synapse  = num_fixed_synapses(fixed);
-  register uint32_t synaptic_word, delay;
-  register uint32_t weight;
-  register uint32_t offset, index;
   register ring_entry_t *rp = ring_buffer;
   register uint32_t t = time;
-  
-  for ( ; fixed_synapse > 0; fixed_synapse--) 
+
+#ifdef SYNAPSE_BENCHMARK
+  num_fixed_pre_synaptic_events += fixed_synapse;
+#endif // SYNAPSE_BENCHMARK
+
+  for ( ; fixed_synapse > 0; fixed_synapse--)
   {
-    // Get the next 32 bit word from the synaptic_row (should autoincrement pointer in single instruction)
-    synaptic_word = *synaptic_words++;
+    // Get the next 32 bit word from the synaptic_row
+    // (should autoincrement pointer in single instruction)
+    uint32_t synaptic_word = *synaptic_words++;
 
     // Extract components from this word
-    delay = sparse_delay(synaptic_word);
-    index = sparse_type_index(synaptic_word);
-    weight = sparse_weight(synaptic_word);
-    
+    uint32_t delay = sparse_delay(synaptic_word);
+    uint32_t index = sparse_type_index(synaptic_word);
+    uint32_t weight = sparse_weight(synaptic_word);
+
     // Convert into ring buffer offset
-    offset = offset_sparse(delay + t, index);
-    
-    // Add weight to ring-buffer entry
-    // **NOTE** Dave suspects that this could be a potential location for overflow
-    rp[offset] += weight;         // Add the weight to the current ring_buffer value.
+    uint32_t offset = offset_sparse(delay + t, index);
+
+    // Add weight to current ring buffer value
+    uint32_t accumulation = rp[offset] + weight;
+
+    // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
+    // **NOTE** 0x10000 can be expressed as an ARM literal, but 0xFFFF cannot
+    // **NOTE** Therefore, we use (0x10000 - 1) to obtain this value
+    uint32_t sat_test = accumulation & 0x10000;
+    if(sat_test)
+    {
+      accumulation = sat_test - 1;
+      saturation_count += 1;
+    }
+
+    // Store saturated value back in ring-buffer
+    rp[offset] = accumulation;         // Add the weight to the current ring_buffer value.
   }
 }
 
@@ -248,7 +271,7 @@ void process_synaptic_row (synaptic_row_t row, bool write)
     process_plastic_synapses(plastic, fixed, ring_buffer);
 
     // Perform DMA writeback
-    // **NOTE** this isn't great as we're assuming something about 
+    // **NOTE** this isn't great as we're assuming something about
     // Structure of harness DMA implementation i.e. that row == next_dma_buffer()
     if(write)
     {
@@ -335,38 +358,46 @@ bool synaptic_data_filled (address_t address, uint32_t flags)
   synaptic_row_base = address;
 
   log_info("address of base of synatic matrix %08x", (uint32_t)address);
- 
+
   return (true);
 }
 
 bool synaptic_current_data_filled (address_t address, uint32_t flags)
 {
   use(flags);
-  
+
   log_info("synaptic_current_data_filled: starting");
-  
+
   // Loop through synapse types
   for(index_t s = 0; s < SYNAPSE_TYPE_COUNT; s++)
   {
     log_info("\tCopying %u synapse type %u parameters of size %u", num_neurons, s, sizeof(synapse_param_t));
-    
+
     // Allocate block of memory for this synapse type's pre-calculated per-neuron decay
     neuron_synapse_params[s] = (synapse_param_t*) spin1_malloc(sizeof(synapse_param_t) * num_neurons);
-    
+
     // Check for success
     if(neuron_synapse_params[s] == NULL)
     {
       sentinel("Cannot allocate neuron synapse decay parameters - Out of DTCM");
       return false;
     }
-    
+
     log_info("\tCopying %u bytes to %u", num_neurons * sizeof(synapse_param_t), address + ((num_neurons * s * sizeof(synapse_param_t)) / 4));
     memcpy(neuron_synapse_params[s], address + ((num_neurons * s * sizeof(synapse_param_t)) / 4),
     		num_neurons * sizeof(synapse_param_t));
   }
-  
+
   log_info("synaptic_current_data_filled: completed successfully");
   return true;
+}
+
+void print_saturation_count()
+{
+  if (saturation_count > 0)
+  {
+    printf("\t[WARN] Ring buffer saturation events: %d\n", saturation_count);
+  }
 }
 
 #ifdef DEBUG
@@ -374,9 +405,9 @@ bool synaptic_current_data_filled (address_t address, uint32_t flags)
 // We are treating weights as u12.4 fixed point format.
 // This requires a shift when printing them out.
 
-void print_weight (weight_t w)
+void print_weight (index_t synapse_type, weight_t w)
 {
-  if (w != 0) printf ("%12.6k", weight_to_current(w));
+  if (w != 0) printf ("%12.6k", weight_to_current(synapse_type, w));
   else        printf ("      ");
 }
 
@@ -384,12 +415,12 @@ void print_ring_buffers (void)
 {
   counter_t d, n, t;
   bool empty;
-  
+
   printf ("Ring Buffer\n");
   printf ("-----------------------------------------------------------------\n");
-  for (n = 0; n < (1 << SYNAPSE_INDEX_BITS); n++) 
+  for (n = 0; n < (1 << SYNAPSE_INDEX_BITS); n++)
   {
-    for (t = 0; t < SYNAPSE_TYPE_COUNT; t++) 
+    for (t = 0; t < SYNAPSE_TYPE_COUNT; t++)
     {
       const char *type_string = get_synapse_type_char(t);
       empty = true;
@@ -397,13 +428,13 @@ void print_ring_buffers (void)
       {
         empty = empty && (ring_buffer[offset_ring_buffer(d + time, t, n)] == 0);
       }
-      if (!empty) 
+      if (!empty)
       {
         printf("%3d(%s):", n, type_string);
-        for (d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) 
+        for (d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++)
         {
           printf(" ");
-          print_weight (ring_buffer[offset_ring_buffer(d + time, t, n)]);
+          print_weight (t, ring_buffer[offset_ring_buffer(d + time, t, n)]);
         }
         printf ("\n");
       }
@@ -418,7 +449,7 @@ void print_master_population (void)
 
   printf ("master_population\n");
   printf ("------------------------------------------\n");
-  for (i = 0; i < MASTER_POPULATION_MAX; i++) 
+  for (i = 0; i < MASTER_POPULATION_MAX; i++)
   {
     mp = (uint32_t)(master_population[i]);
     s  = mp & 0x7;
@@ -445,15 +476,15 @@ void print_row_size_table (void)
 }
 
 void print_synaptic_rows (uint32_t* rows)
-{ 
-  use(rows); 
-  return; 
+{
+  use(rows);
+  return;
 }
 
 void print_synaptic_row (synaptic_row_t synaptic_row)
 {
   printf ("\nSynaptic row, at address %08x Num plastic words:%u\n", (uint32_t)synaptic_row, plastic_size(synaptic_row));
-  if (synaptic_row == NULL) 
+  if (synaptic_row == NULL)
   {
     return;
   }
@@ -469,7 +500,7 @@ void print_synaptic_row (synaptic_row_t synaptic_row)
     uint32_t x = fixed_synapses[i];
 
     printf ("%08x [%3d: (w: %5u (=", x, i, sparse_weight(x));
-    print_weight (sparse_weight(x));
+    print_weight (sparse_type(x), sparse_weight(x));
     printf ("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
       sparse_delay(x),
       get_synapse_type_char(sparse_type(x)),
@@ -486,7 +517,7 @@ void print_synaptic_row (synaptic_row_t synaptic_row)
     address_t plastic = plastic_region(synaptic_row);
     print_plastic_synapses(plastic, fixed);
   }
-  
+
   printf ("----------------------------------------\n");
 }
 
@@ -495,7 +526,7 @@ uint32_t* generate_synfire_chain(uint32_t* start, uint32_t delay, uint32_t p)
   uint32_t* r = start;
   uint32_t  n;
 
-  for (n = 0; n < p; n++) 
+  for (n = 0; n < p; n++)
   {
     // generate an entry for each neuron: n.
     r[8*n]   = 1;
@@ -554,12 +585,12 @@ void print_currents (void)
   {
     empty = empty && (bitsk (get_exc_neuron_input(i) - get_inh_neuron_input(i)) == 0);
   }
-  
-  if (!empty) 
+
+  if (!empty)
   {
     printf ("-------------------------------------\n");
 
-    for (index_t i = 0; i < num_neurons; i ++) 
+    for (index_t i = 0; i < num_neurons; i ++)
     {
       c = get_exc_neuron_input(i) - get_inh_neuron_input(i);
       if (bitsk (c) != 0)

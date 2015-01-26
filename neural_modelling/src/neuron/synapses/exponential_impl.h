@@ -13,8 +13,8 @@
 // Synapse parameters
 //---------------------------------------
 typedef struct synapse_param_t {
-	decay_t neuron_synapse_decay;
-	decay_t neuron_synapse_init;
+  decay_t neuron_synapse_decay;
+  decay_t neuron_synapse_init;
 } synapse_param_t;
 
 //---------------------------------------

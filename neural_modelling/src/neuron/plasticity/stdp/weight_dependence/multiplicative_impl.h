@@ -15,8 +15,6 @@
 //---------------------------------------
 // Structures
 //---------------------------------------
-typedef int32_t weight_state_t;
-
 typedef struct
 {
   int32_t min_weight;
@@ -26,43 +24,62 @@ typedef struct
   int32_t a2_minus;
 } plasticity_weight_region_data_t;
 
+typedef struct
+{
+  int32_t weight;
+  
+  uint32_t weight_multiply_right_shift;
+  const plasticity_weight_region_data_t *weight_region;
+} weight_state_t;
 
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern plasticity_weight_region_data_t plasticity_weight_region_data;
+extern plasticity_weight_region_data_t plasticity_weight_region_data[SYNAPSE_TYPE_COUNT];
+extern uint32_t weight_multiply_right_shift[SYNAPSE_TYPE_COUNT];
 
 //---------------------------------------
 // Weight dependance functions
 //---------------------------------------
-static inline weight_state_t weight_init(weight_t weight)
+static inline weight_state_t weight_init(weight_t weight, index_t synapse_type)
 {
-  return (int32_t)weight;
+  return (weight_state_t){ 
+    .weight = (int32_t)weight, 
+    .weight_multiply_right_shift = weight_multiply_right_shift[synapse_type], 
+    .weight_region = &plasticity_weight_region_data[synapse_type] };
 }
 //---------------------------------------
-static inline weight_state_t stdp_weight_apply_depression(weight_state_t state, int32_t depression)
+static inline weight_state_t weight_apply_depression(weight_state_t state, int32_t depression)
 {
   // Calculate scale
-  int32_t scale = STDP_TRACE_FIXED_MUL_16X16(state - plasticity_weight_region_data.min_weight, plasticity_weight_region_data.a2_minus); 
+  // **NOTE** this calculation must be done at runtime-defined weight fixed-point format
+  int32_t scale = plasticity_fixed_mul16(state.weight - state.weight_region->min_weight, 
+    state.weight_region->a2_minus, state.weight_multiply_right_shift); 
   
   // Multiply scale by depression and subtract
-  return state - STDP_TRACE_FIXED_MUL_16X16(scale, depression);
+  // **NOTE** using standard STDP fixed-point format handles format conversion
+  state.weight -= STDP_FIXED_MUL_16X16(scale, depression);
+  return state;
 }
 //---------------------------------------
 static inline weight_state_t weight_apply_potentiation(weight_state_t state, int32_t potentiation)
 {
   // Calculate scale
-  int32_t scale = STDP_TRACE_FIXED_MUL_16X16(plasticity_weight_region_data.max_weight - state, plasticity_weight_region_data.a2_plus); 
+  // **NOTE** this calculation must be done at runtime-defined weight fixed-point format
+  int32_t scale = plasticity_fixed_mul16(state.weight_region->max_weight - state.weight, 
+    state.weight_region->a2_plus, state.weight_multiply_right_shift); 
   
   // Multiply scale by potentiation and add
-  return state + STDP_TRACE_FIXED_MUL_16X16(scale, potentiation);
+  // **NOTE** using standard STDP fixed-point format handles format conversion
+  state.weight += STDP_FIXED_MUL_16X16(scale, potentiation);
+  return state;
 }
 //---------------------------------------
 static inline weight_t weight_get_final(weight_state_t new_state)
 {
-  plastic_runtime_log_info("\tnew_weight:%d\n", new_state);
+  plastic_runtime_log_info("\tnew_weight:%d\n", new_state.weight);
   
-  return (weight_t)new_state;
+  return (weight_t)new_state.weight;
 }
 
 #endif  // MULTIPLICATIVE_IMPL_H

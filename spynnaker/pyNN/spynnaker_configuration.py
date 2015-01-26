@@ -1,3 +1,5 @@
+from pacman.model.partitionable_graph.partitionable_graph import \
+    PartitionableGraph
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN import exceptions
@@ -6,8 +8,6 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import overridden_pacman_functions
 
 
-from pacman.model.partitionable_graph.partitionable_graph import \
-    PartitionableGraph
 from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
@@ -33,16 +33,11 @@ class SpynnakerConfiguration(object):
         self._runtime = None
 
         #specific utility vertexes
-        self._live_spike_recorder = dict()
         self._multi_cast_vertex = None
         self._txrx = None
 
-        #visualiser_framework objects
-        self._visualiser = None
-        self._wait_for_run = False
-        self._visualiser_port = None
-        self._visualiser_vertices = None
-        self._visualiser_vertex_to_page_mapping = None
+        #debug flag
+        self._in_debug_mode = None
 
         #main objects
         self._partitionable_graph = PartitionableGraph(label=graph_label)
@@ -63,6 +58,7 @@ class SpynnakerConfiguration(object):
         self._key_allocator_algorithm = None
         self._router_algorithm = None
         self._report_default_directory = None
+        self._app_data_runtime_folder = None
         self._this_run_time_string_repenstation = None
 
         #exeuctable params
@@ -80,10 +76,15 @@ class SpynnakerConfiguration(object):
         self._default_buffer_ip_address = None
         self._buffer_managers = dict()
 
+        #database objects
+        self._create_database = False
+        self._database_thread = None
+
     def _set_up_output_application_data_specifics(self):
         where_to_write_application_data_files = \
             config.get("Reports", "defaultApplicationDataFilePath")
         created_folder = False
+        this_run_time_folder = None
         if where_to_write_application_data_files == "DEFAULT":
             directory = os.getcwd()
             application_generated_data_file_folder = \
@@ -113,9 +114,6 @@ class SpynnakerConfiguration(object):
             writer.flush()
             writer.close()
 
-            if not config.has_section("SpecGeneration"):
-                config.add_section("SpecGeneration")
-            config.set("SpecGeneration", "Binary_folder", this_run_time_folder)
         elif where_to_write_application_data_files == "TEMP":
             pass  # just dont set the config param, code downstairs
             #  from here will create temp folders if needed
@@ -139,9 +137,10 @@ class SpynnakerConfiguration(object):
 
             if not os.path.exists(this_run_time_folder):
                 os.makedirs(this_run_time_folder)
-            if not config.has_section("SpecGeneration"):
-                config.add_section("SpecGeneration")
+        if not config.has_section("SpecGeneration"):
+            config.add_section("SpecGeneration")
             config.set("SpecGeneration", "Binary_folder", this_run_time_folder)
+            self._app_data_runtime_folder = this_run_time_folder
 
     def _set_up_report_specifics(self):
         self._writeTextSpecs = False
@@ -199,13 +198,17 @@ class SpynnakerConfiguration(object):
                                                          "writeProvanceData")
 
     def _set_up_main_objects(self):
+        self._in_debug_mode = conf.config.get("Mode", "mode") == "Debug"
         #report object
         if config.getboolean("Reports", "reportsEnabled"):
             self._reports_states = ReportState()
+        self._create_database = \
+            config.getboolean("Database", "create_database")
 
         #communication objects
         self._iptags = list()
         self._app_id = config.getint("Machine", "appID")
+
 
     def _set_up_executable_specifics(self):
         #loading and running config params
@@ -216,15 +219,6 @@ class SpynnakerConfiguration(object):
         self._do_run = True
         if config.has_option("Execute", "run"):
             self._do_run = config.getboolean("Execute", "run")
-
-        #sort out the executable folder location
-        binary_path = os.path.abspath(exceptions.__file__)
-        binary_path = os.path.abspath(os.path.join(binary_path, os.pardir))
-        binary_path = os.path.join(binary_path, "model_binaries")
-
-        if not config.has_section("SpecGeneration"):
-            config.add_section("SpecGeneration")
-        config.set("SpecGeneration", "common_binary_folder", binary_path)
 
     def _set_up_pacman_algorthms_listings(self):
          #algorithum lists
@@ -324,7 +318,8 @@ class SpynnakerConfiguration(object):
         else:
             raise Exception("A SpiNNaker machine must be specified in "
                             "pacman.cfg.")
-        if self._hostname == 'None':
+        use_virtual_board = config.getboolean("Machine", "virtual_board")
+        if self._hostname == 'None' and not use_virtual_board:
             raise Exception("A SpiNNaker machine must be specified in "
                             "pacman.cfg.")
 
@@ -336,8 +331,16 @@ class SpynnakerConfiguration(object):
             time_stamp_in = open(app_name_file, "r")
             time_stamp_in_string = time_stamp_in.readline()
             time_stamp_in.close()
+            os.remove(app_name_file)
             new_app_folder = os.path.join(starting_directory,
                                           time_stamp_in_string)
+            extra = 2
+            while os.path.exists(new_app_folder):
+                new_app_folder = os.path.join(
+                    starting_directory,
+                    time_stamp_in_string + "_" + str(extra))
+                extra += 1
+
             os.makedirs(new_app_folder)
             list_of_files = os.listdir(app_folder_name)
             for file_to_move in list_of_files:

@@ -5,15 +5,20 @@
 
 
 // for required types & some macros
-#include "maths-util.h"   
+#include "maths-util.h"
 
 
 // forward declaration of neuron type
-typedef struct neuron_t* neuron_pointer_t; 
+typedef struct neuron_t* neuron_pointer_t;
 
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_exc_input(REAL exc_input);
+
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_inh_input(REAL inh_input);
 
 // primary function called in timer loop after synaptic updates - assumes current input (in nA?)
-bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuron );
+bool neuron_state_update( REAL exc_input, REAL inh_input, REAL external_bias, neuron_pointer_t neuron );
 
 
 // solver or closed-form solution has just set new state variable values, so check for discrete state changes
@@ -26,11 +31,11 @@ void neuron_ode( REAL t, REAL stateVar[], REAL dstateVar_dt[], neuron_pointer_t 
 #endif
 
 /*
- * NB in the following 2 functions and in neuron code in general; parameters, lists, loops etc go from 1..n 
- * (not 0..n-1) i.e. just like IN REAL LIFE (and MATLAB, Fortran, Mathematica, R).  This is in order to help 
+ * NB in the following 2 functions and in neuron code in general; parameters, lists, loops etc go from 1..n
+ * (not 0..n-1) i.e. just like IN REAL LIFE (and MATLAB, Fortran, Mathematica, R).  This is in order to help
  * scientists, mathematicians, statisticans, economists and other non-IT people retain their sanity, and me
  * to avoid writing bugs
- * 
+ *
  */
 // set the neuron state variable(s)
 void	neuron_set_state( uint8_t i, REAL stateVar[], neuron_pointer_t neuron );

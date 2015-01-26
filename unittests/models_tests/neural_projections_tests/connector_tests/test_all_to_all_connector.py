@@ -28,12 +28,13 @@ class TestingAllToAllConnector(unittest.TestCase):
         synapse_type = first_population._vertex.get_synapse_id('excitatory')
         connection = pyNN.AllToAllConnector(weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0, synapse_type)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         # pp(synaptic_list.get_rows())
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_synapse_list_generation_for_different_sized_populations(self):
         number_of_neurons = 10
@@ -46,11 +47,12 @@ class TestingAllToAllConnector(unittest.TestCase):
         delay = 1
         connection = pyNN.AllToAllConnector(weight, delay)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, second_population._vertex, 1, 0)
+            first_population, second_population, 1, 1.0, 0)
         self.assertEqual(synaptic_list.get_max_weight(), weight)
         self.assertEqual(synaptic_list.get_min_weight(), weight)
         self.assertEqual(synaptic_list.get_n_rows(), number_of_neurons)
-        self.assertEqual(synaptic_list.get_min_max_delay(), (delay, delay))
+        self.assertEqual(synaptic_list.get_max_delay(), delay)
+        self.assertEqual(synaptic_list.get_min_delay(), delay)
 
     def test_allow_self_connections(self):
         number_of_neurons = 5
@@ -62,7 +64,8 @@ class TestingAllToAllConnector(unittest.TestCase):
         connection = pyNN.AllToAllConnector(weight, delay,
                                             allow_self_connections=False)
         synaptic_list = connection.generate_synapse_list(
-            first_population._vertex, first_population._vertex, 1, synapse_type)
+            first_population, first_population, 1, 1.0,
+            synapse_type)
         pp(synaptic_list.get_rows())
 
 

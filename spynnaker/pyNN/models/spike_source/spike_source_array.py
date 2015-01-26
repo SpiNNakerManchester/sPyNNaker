@@ -1,5 +1,3 @@
-import logging
-import os
 from spynnaker.pyNN.buffer_management.storage_objects.buffer_collection import \
     BufferCollection
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
@@ -10,12 +8,13 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex im
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
-from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 
 from spinnman import constants as spinnman_constants
+
+import logging
 import math
 
 
@@ -31,26 +30,24 @@ class SpikeSourceArray(AbstractSpikeSource,
                                             # the x,y,p,n key format
 
     def __init__(
-            self, n_neurons, spike_times, machine_time_step,
-            buffer_ip_tag_tag_id, buffer_ip_tag_port, buffer_ip_tag_address,
-            constraints=None,
+            self, n_neurons, spike_times, machine_time_step, spikes_per_second,
+            ring_buffer_sigma, timescale_factor, buffer_ip_tag_tag_id,
+            buffer_ip_tag_port, buffer_ip_tag_address,
             max_on_chip_memory_usage_for_recording_in_bytes=None,
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
             no_buffers_for_recording=constants.NO_BUFFERS_FOR_TRANSMITTING,
-            label="SpikeSourceArray"):
+            constraints=None, label="SpikeSourceArray"):
         """
         Creates a new SpikeSourceArray Object.
         """
         AbstractSpikeSource.__init__(
             self, label=label, n_neurons=n_neurons, constraints=constraints,
             max_atoms_per_core=SpikeSourceArray._model_based_max_atoms_per_core,
-            machine_time_step=machine_time_step, tag=buffer_ip_tag_tag_id,
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor, tag=buffer_ip_tag_tag_id,
             port=buffer_ip_tag_port, address=buffer_ip_tag_address,
             max_on_chip_memory_usage_for_recording=
             max_on_chip_memory_usage_for_recording_in_bytes, strip_sdp=True)
-        #set supers
-        AbstractBufferReceivablePartitionableVertex.__init__(self)
-
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
@@ -260,15 +257,7 @@ class SpikeSourceArray(AbstractSpikeSource,
         data_writer.close()
 
     def get_binary_file_name(self):
-        # Rebuild executable name
-        common_binary_path = os.path.join(config.get("SpecGeneration",
-                                                     "common_binary_folder"))
-
-#        binary_name = os.path.join(common_binary_path,
-#                                   'spike_source_array.aplx')
-        binary_name = os.path.join(common_binary_path,
-                                   'reverse_iptag_multicast_source.aplx')
-        return binary_name
+        return "spike_source_array.aplx"
 
     #inhirrted from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):

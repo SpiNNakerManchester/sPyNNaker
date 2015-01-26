@@ -1,9 +1,9 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_exp_population_vertex \
+from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_integrate_and_fire_properties \
+from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
@@ -20,12 +20,12 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
-    def __init__(
-            self, n_neurons, machine_time_step, buffer_ip_tag_tag_id,
-            buffer_ip_tag_port, buffer_ip_tag_address,
-            constraints=None, label=None, tau_m=20.0, cm=1.0, v_rest=-65.0,
-            v_reset=-65.0, v_thresh=-50.0, tau_syn_E=5.0, tau_syn_I=5.0,
-            tau_refrac=0.1, i_offset=0, v_init=None):
+    def __init__(self, n_neurons, machine_time_step, buffer_ip_tag_tag_id,
+                 buffer_ip_tag_port, buffer_ip_tag_address, timescale_factor,
+                 spikes_per_second, ring_buffer_sigma, constraints=None,
+                 label=None, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
+                 v_thresh=-50.0, tau_syn_E=5.0, tau_syn_I=5.0, tau_refrac=0.1,
+                 i_offset=0, v_init=None):
         # Instantiate the parent classes
         AbstractExponentialPopulationVertex.__init__(
             self, n_neurons=n_neurons, tau_syn_E=tau_syn_E, tau_syn_I=tau_syn_I,
@@ -40,7 +40,10 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             max_atoms_per_core=
             IFCurrentExponentialPopulation._model_based_max_atoms_per_core,
             machine_time_step=machine_time_step, tag=buffer_ip_tag_tag_id,
-            port=buffer_ip_tag_port, address=buffer_ip_tag_address)
+            port=buffer_ip_tag_port, address=buffer_ip_tag_address,
+            timescale_factor=timescale_factor,
+            spikes_per_second=spikes_per_second,
+            ring_buffer_sigma=ring_buffer_sigma)
         self._executable_constant = \
             IFCurrentExponentialPopulation.CORE_APP_IDENTIFIER
 
@@ -76,3 +79,15 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             NeuronParameter(self._one_over_tau_rc, DataType.S1615),
             NeuronParameter(self._refract_timer, DataType.UINT32),
             NeuronParameter(self._scaled_t_refract(), DataType.UINT32)]
+
+    def is_population_vertex(self):
+        return True
+
+    def is_integrate_and_fire_vertex(self):
+        return True
+
+    def is_exp_vertex(self):
+        return True
+
+    def is_recordable(self):
+        return True

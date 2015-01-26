@@ -14,6 +14,16 @@ static const REAL V_threshold = REAL_CONST( 30.0 );
 static const REAL SIMPLE_TQ_OFFSET = REAL_CONST( 1.85 );
 
 
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_exc_input(REAL exc_input) {
+    return exc_input;
+}
+
+// function that converts the input into the real value to be used by the neuron
+REAL neuron_get_inh_input(REAL inh_input) {
+    return inh_input;
+}
+
 /////////////////////////////////////////////////////////////
 // definition for Izhikevich neuron
 void neuron_ode( REAL t, REAL stateVar[], REAL dstateVar_dt[], neuron_pointer_t neuron ) {
@@ -67,9 +77,9 @@ void neuron_discrete_changes( neuron_pointer_t neuron ) {
 
 
 //
-bool neuron_state_update( REAL exc_input, REAL inh_input, neuron_pointer_t neuron ) {
+bool neuron_state_update( REAL exc_input, REAL inh_input, REAL external_bias, neuron_pointer_t neuron ) {
 
-	input_this_timestep = exc_input - inh_input + neuron->I_offset; 	// all need to be in nA
+	input_this_timestep = exc_input - inh_input + external_bias + neuron->I_offset; 	// all need to be in nA
 
 	rk2_kernel_midpoint( neuron->this_h, neuron );  						// the best AR update so far
 

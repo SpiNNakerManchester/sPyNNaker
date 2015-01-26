@@ -1,9 +1,7 @@
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
     AbstractSynapticManager
 from spynnaker.pyNN.models.abstract_models.\
@@ -23,15 +21,19 @@ logger = logging.getLogger(__name__)
 class AbstractPopulationDataSpec(AbstractSynapticManager,
                                  AbstractPartitionablePopulationVertex):
 
-    def __init__(self, binary, n_neurons, label, constraints, max_atoms_per_core,
-                 machine_time_step):
+    def __init__(self, binary, n_neurons, label, constraints,
+                 max_atoms_per_core, machine_time_step, timescale_factor,
+                 spikes_per_second, ring_buffer_sigma):
         AbstractSynapticManager.__init__(self)
         AbstractPartitionablePopulationVertex.__init__(
             self, n_atoms=n_neurons, label=label,
-            machine_time_step=machine_time_step, constraints=constraints,
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
         self._binary = binary
         self._executable_constant = None
+        self._spikes_per_second = spikes_per_second
+        self._ring_buffer_sigma = ring_buffer_sigma
 
     @abstractmethod
     def get_parameters(self):
@@ -136,9 +138,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value)
-        spec.write_value(data=executable_constant)
-        spec.write_value(data=self._machine_time_step)
-        spec.write_value(data=self._no_machine_time_steps)
+        self._write_basic_setup_info(spec, executable_constant)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=neuron_potential_region_sz)
@@ -146,7 +146,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     def write_neuron_parameters(
             self, spec, processor_chip_x, processor_chip_y, processor_id,
-            subvertex, ring_buffer_to_input_left_shift, vertex_slice):
+            subvertex, ring_buffer_to_input_left_shifts, vertex_slice):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} "
@@ -177,11 +177,11 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.write_value(data=self._machine_time_step)
 
         # Write ring_buffer_to_input_left_shift
-        spec.write_value(data=ring_buffer_to_input_left_shift)
+        spec.write_array(ring_buffer_to_input_left_shifts)
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
-        for atom in range(0, n_atoms):
+        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
             # Process the parameters
 
             # noinspection PyTypeChecker
@@ -189,6 +189,11 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 value = param.get_value()
                 if hasattr(value, "__len__"):
                     if len(value) > 1:
+                        if len(value) <= atom:
+                            raise Exception(
+                                "Not enough parameters have been specified"
+                                " for parameter of population {}".format(
+                                    self.label))
                         value = value[atom]
                     else:
                         value = value[0]
@@ -214,7 +219,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         spec.comment("\n*** Spec for block of {} neurons ***\n"
                      .format(self.model_name))
-        
+
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         # Calculate the size of the tables to be reserved in SDRAM:
@@ -233,8 +238,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         stdp_region_sz = self.get_stdp_parameter_size(vertex_in_edges)
 
         # Declare random number generators and distributions:
-        #TODO add random distrubtion stuff
-        #self.write_random_distribution_declarations(spec)
+        # TODO add random distrubtion stuff
+        # self.write_random_distribution_declarations(spec)
 
         # Construct the data images needed for the Neuron:
         self.reserve_population_based_memory_regions(
@@ -247,34 +252,40 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         self.write_setup_info(spec, spike_hist_buff_sz, potential_hist_buff_sz,
                               gsyn_hist_buff_sz, self._executable_constant)
 
-        ring_buffer_shift = self.get_ring_buffer_to_input_left_shift(
-            subvertex, subgraph, graph_mapper)
-        weight_scale = self.get_weight_scale(ring_buffer_shift)
+        ring_buffer_shifts = self.get_ring_buffer_to_input_left_shifts(
+            subvertex, subgraph, graph_mapper, self._spikes_per_second,
+            self._machine_time_step, self._ring_buffer_sigma)
 
-        #update projections for future use
+        weight_scales = [self.get_weight_scale(r) for r in ring_buffer_shifts]
+
+        for t, r, w in zip(self.get_synapse_targets(), ring_buffer_shifts,
+                           weight_scales):
+            logger.debug(
+                "Synapse type:%s - Ring buffer shift:%d, Max weight:%f"
+                % (t, r, w))
+
+        # update projections for future use
         in_partitioned_edges = \
             subgraph.incoming_subedges_from_subvertex(subvertex)
         for partitioned_edge in in_partitioned_edges:
-            partitioned_edge.weight_scale_setter(weight_scale)
-        
-        logger.debug("Ring-buffer shift is {}, weight scale is {}"
-                     .format(ring_buffer_shift, weight_scale))
+            partitioned_edge.weight_scales_setter(weight_scales)
 
         self.write_neuron_parameters(
             spec, placement.x, placement.y, placement.p, subvertex,
-            ring_buffer_shift, vertex_slice)
+            ring_buffer_shifts, vertex_slice)
 
         self.write_synapse_parameters(spec, subvertex, vertex_slice)
 
         self.write_stdp_parameters(
             spec, self._machine_time_step,
-            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value, weight_scale)
+            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value,
+            weight_scales)
 
         self.write_row_length_translation_table(
             spec, constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value)
 
         self.write_synaptic_matrix_and_master_population_table(
-            spec, subvertex, all_syn_block_sz, weight_scale,
+            spec, subvertex, all_syn_block_sz, weight_scales,
             constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             routing_info, graph_mapper, subgraph)
@@ -287,9 +298,9 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.end_specification()
         data_writer.close()
 
-    #inhirrited from data specable vertex
+    # inherited from data specable vertex
     def get_binary_file_name(self):
-         # Split binary name into title and extension
+        # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)
 
         # If we have an STDP mechanism, add it's executable suffic to title
@@ -298,9 +309,5 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 binary_title + "_" + \
                 self._stdp_mechanism.get_vertex_executable_suffix()
 
-        # Rebuild executable name
-        binary_name = os.path.join(config.get("SpecGeneration",
-                                              "common_binary_folder"),
-                                   binary_title + binary_extension)
-
-        return binary_name
+        # Reunite title and extension and return
+        return binary_title + binary_extension
