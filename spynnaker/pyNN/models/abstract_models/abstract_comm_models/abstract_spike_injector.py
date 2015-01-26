@@ -2,7 +2,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_reverse_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_reverse_iptagable_vertex import \
     AbstractReverseIPTagableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -16,6 +16,7 @@ class AbstractSpikeInjector(
         AbstractRecordableVertex, AbstractDataSpecableVertex,
         AbstractPartitionableVertex, AbstractReverseIPTagableVertex):
 
+    #TODO: requires: tag, port, address, max_on_chip_memory_usage_for_recording
     def __init__(self, machine_time_step, timescale_factor, tag, port, address):
         """
         constructor that depends upon the Component vertex
@@ -35,7 +36,7 @@ class AbstractSpikeInjector(
         return True
 
     @abstractmethod
-    def is_spike_injecotr(self):
-        """ helper emthod for is_instance
+    def is_spike_injector(self):
+        """ helper method for is_instance
         :return:
         """

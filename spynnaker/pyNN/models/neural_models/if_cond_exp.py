@@ -2,13 +2,13 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from data_specification.enums.data_type import DataType
-from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
-from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_conductance_vertex \
     import AbstractConductanceVertex
 
 
@@ -136,7 +136,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
     def is_integrate_and_fire_vertex(self):
         return True
 
-    def is_conductive(self):
+    def is_conductance(self):
         return True
 
     def is_exp_vertex(self):

@@ -1,5 +1,5 @@
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
+from pacman.model.partitionable_graph.abstract_partitionable_edge \
+    import AbstractPartitionableEdge
 from pacman.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
@@ -14,14 +14,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ProjectionPartitionableEdge(PartitionableEdge):
+class ProjectionPartitionableEdge(AbstractPartitionableEdge):
 
     def __init__(self, presynaptic_population, postsynaptic_population,
                  machine_time_step, connector=None, synapse_list=None,
                  synapse_dynamics=None, label=None):
-        PartitionableEdge.__init__(self, presynaptic_population._get_vertex,
-                                   postsynaptic_population._get_vertex,
-                                   label=label)
+        AbstractPartitionableEdge.__init__(self,
+                                           presynaptic_population._get_vertex,
+                                           postsynaptic_population._get_vertex,
+                                           label=label)
 
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
@@ -114,6 +115,9 @@ class ProjectionPartitionableEdge(PartitionableEdge):
     @property
     def synapse_list(self):
         return self._synapse_list
+
+    def is_partitionable_edge(self):
+        return True
 
     def is_multi_cast_partitionable_edge(self):
         return True

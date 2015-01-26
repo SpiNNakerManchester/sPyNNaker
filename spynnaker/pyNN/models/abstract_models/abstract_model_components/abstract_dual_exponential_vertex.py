@@ -116,7 +116,7 @@ class AbstractDualExponentialVertex(object):
         spec.comment("\nWriting Synapse Parameters for {} Neurons:\n"
                      .format(self._atoms))
 
-        # Write exponenential synapse parameters
+        # Write exponential synapse parameters
         write_exp_synapse_param(self._tau_syn_E, self._machine_time_step,
                                 vertex_slice, spec)
         write_exp_synapse_param(self._tau_syn_E2, self._machine_time_step,

@@ -26,7 +26,8 @@ class AbstractSpikeSource(
                ('SPIKE_HISTORY_REGION', 3)])
 
     def __init__(self, label, n_neurons, constraints, max_atoms_per_core,
-                 machine_time_step, max_on_chip_memory_usage_for_recording,
+                 machine_time_step, timescale_factor,
+                 max_on_chip_memory_usage_for_recording,
                  tag, port, address, strip_sdp=False):
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,

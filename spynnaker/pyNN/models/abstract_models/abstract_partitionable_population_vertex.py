@@ -92,7 +92,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         if self._no_machine_time_steps is None:
             return 0
 
-        return self._get_recording_region_size(constants.OUT_SPIKE_BYTES)
+        return self.get_recording_region_size(constants.OUT_SPIKE_BYTES)
 
     def get_v_buffer_size(self, vertex_slice):
         """
@@ -103,7 +103,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         size_per_time_step = \
             ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1) *\
             constants.V_BUFFER_SIZE_PER_TICK_PER_NEURON
-        return self._get_recording_region_size(size_per_time_step)
+        return self.get_recording_region_size(size_per_time_step)
 
     def get_g_syn_buffer_size(self, vertex_slice):
         """
@@ -115,4 +115,4 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         size_per_time_step = \
             ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1) * \
             constants.GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON
-        return self._get_recording_region_size(size_per_time_step)
+        return self.get_recording_region_size(size_per_time_step)

@@ -43,6 +43,10 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
         self._max_on_chip_memory_usage_for_recording = \
             max_on_chip_memory_usage_for_recording
 
+        self._will_send_buffers = None
+        self._recording_region_size_in_bytes = None
+
+
     @property
     def machine_time_step(self):
         return self._machine_time_step
@@ -73,11 +77,8 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
     def set_record_gsyn(self, setted_value):
         self._record_gsyn = setted_value
 
-    @abstractmethod
-    def is_recordable(self):
-        """helper method for is isinstance"""
-
-    def get_recording_region_size(self, spike_region_size, bytes_per_timestep):
+    def get_recording_region_size(self, spike_region_size,
+                                  bytes_per_timestep=0):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
         ASSUMES one spike per timer tic per neuron. Buffers can support more...
@@ -154,11 +155,12 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
                                  hex(spike_region_base_address)))
             buffer_data = transciever.read_memory_return_byte_array(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
-            #turn buffers into eieio data messages
+            # turn buffers into eieio data messages
             little_endian_byte_reader =\
                 LittleEndianByteArrayByteReader(buffer_data)
             eieio_messages = \
-                EIEIOMessage.create_eieio_messages_from(little_endian_byte_reader)
+                EIEIOMessage.create_eieio_messages_from(
+                    little_endian_byte_reader)
 
             # interpret each message into spikes
             for message in eieio_messages:
@@ -199,9 +201,9 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
         :rtype: numpy array
         """
         timer_tic = message.eieio_header.payload_base
-        #turn into numpy array of shorts (2 bytes, each representing neuron id)
+        # turn into numpy array of shorts (2 bytes, each representing neuron id)
         core_based_neuron_ids = numpy.frombuffer(message.data, dtype="<i2")
-        #translate into the neuron id the pop understands
+        # translate into the neuron id the pop understands
         pop_based_neuron_ids = numpy.add(core_based_neuron_ids, lo_atom)
         pop_based_neuron_ids_with_timer = \
             numpy.zeros((len(pop_based_neuron_ids), 2))
@@ -286,10 +288,9 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
         result = result[numpy.lexsort((times, ids))]
         return result
 
-    
     @abstractmethod
     def is_recordable(self):
-        return True
+        """helper method for is isinstance"""
 
     def is_buffer_sendable_vertex(self):
         return True

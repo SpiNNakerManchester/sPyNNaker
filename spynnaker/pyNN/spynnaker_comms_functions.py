@@ -108,7 +108,7 @@ class SpynnakerCommsFunctions(object):
         for reverse_iptag in self._reverse_iptags:
             self._txrx.set_reverse_ip_tag(reverse_iptag)
 
-    def _retrieve_provance_data_from_machine(self, executable_targets):
+    def _retrieve_provence_data_from_machine(self, executable_targets):
         pass
 
     def execute_data_specification_execution(self, host_based_execution,
