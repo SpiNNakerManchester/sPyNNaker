@@ -280,7 +280,7 @@ class SpynnakerCommsFunctions(object):
 
         # if not running for infinity, check that applications stop correctly
         if runtime is not None:
-            time_to_wait = (runtime / 1000.0) + 1.0
+            time_to_wait = ((runtime / 1000.0) * time_scaling) + 1.0
             logger.info("Application started - waiting {} seconds for it to"
                         " stop".format(time_to_wait))
             time.sleep(time_to_wait)
