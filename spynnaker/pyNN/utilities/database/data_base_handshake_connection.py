@@ -7,9 +7,9 @@ from spinnman.connections.abstract_classes.abstract_udp_connection\
 from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
 
 
-class DataBaseMessageConnection(AbstractUDPConnection,
-                                AbstractUDPEIEIOCommandReceiver,
-                                AbstractUDPEIEIOCommandSender):
+class DataBaseHandshakeConnection(AbstractUDPConnection,
+                                  AbstractUDPEIEIOCommandReceiver,
+                                  AbstractUDPEIEIOCommandSender):
 
     def __init__(self, listen_port, host_to_notify, port_to_notify):
         AbstractUDPConnection.__init__(

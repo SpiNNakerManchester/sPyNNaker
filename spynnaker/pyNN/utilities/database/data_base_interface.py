@@ -7,8 +7,8 @@ from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
 from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
-from spynnaker.pyNN.utilities.database.data_base_message_connection \
-    import DataBaseMessageConnection
+from spynnaker.pyNN.utilities.database.data_base_handshake_connection \
+    import DataBaseHandshakeConnection
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,6 @@ class DataBaseInterface(object):
         self._wait_pool = ThreadPool(processes=1)
         self._database_address = None
         # set up checks
-        self._sent_visualisation_confirmation = False
         self._machine_id = 0
         self._lock_condition = threading.Condition()
         #start creation for database
@@ -161,7 +160,7 @@ class DataBaseInterface(object):
 
     def _notify_visualiser_and_wait(self):
 
-        data_base_message_connection = DataBaseMessageConnection(
+        data_base_message_connection = DataBaseHandshakeConnection(
             self._listen_port, self._host_to_notify, self._port_to_notify)
 
         # create complete message for vis to pick up

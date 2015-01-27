@@ -3,6 +3,9 @@
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
+from pacman.operations.routing_info_allocator_algorithms.\
+    malloc_based_routing_allocator.malloc_based_routing_info_allocator import \
+    MallocBasedRoutingInfoAllocator
 from spynnaker.pyNN.utilities.data_generator_interface import \
     DataGeneratorInterface
 from pacman.operations.router_check_functionality.valid_routes_checker import \
@@ -37,7 +40,7 @@ from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities.database.data_base_thread import DataBaseInterface
+from spynnaker.pyNN.utilities.database.data_base_interface import DataBaseInterface
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
@@ -184,6 +187,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     partitioned_graph=self._partitioned_graph,
                     routing_infos=self._routing_infos,
                     placements=self._placements)
+            execute_key_register = conf.config.getboolean(
+                "Database", "create_key_register")
+            if execute_key_register:
+                self._database_interface.create_routing_key_register()
             self._database_interface.send_visualiser_notifcation()
 
         #extract iptags required by the graph
@@ -406,6 +413,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def _execute_key_allocator(self, pacman_report_state):
         if self._key_allocator_algorithm is None:
             self._key_allocator_algorithm = BasicRoutingInfoAllocator()
+        elif isinstance(self._key_allocator_algorithm,
+                        MallocBasedRoutingInfoAllocator):
+            self._key_allocator_algorithm = \
+                self._key_allocator_algorithm(self._graph_mapper)
         else:
             self._key_allocator_algorithm = self._key_allocator_algorithm()
 
