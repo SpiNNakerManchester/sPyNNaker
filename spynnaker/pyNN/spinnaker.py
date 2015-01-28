@@ -409,9 +409,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def _execute_key_allocator(self, pacman_report_state):
         if self._key_allocator_algorithm is None:
             self._key_allocator_algorithm = BasicRoutingInfoAllocator()
-        elif self._key_allocator_algorithm == MallocBasedRoutingInfoAllocator:
-            self._key_allocator_algorithm = \
-                self._key_allocator_algorithm(self._graph_mapper)
         else:
             self._key_allocator_algorithm = self._key_allocator_algorithm()
 

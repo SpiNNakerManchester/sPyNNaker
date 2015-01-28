@@ -144,9 +144,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.write_value(data=neuron_potential_region_sz)
         spec.write_value(data=gsyn_region_sz)
 
-    def write_neuron_parameters(
-            self, spec, processor_chip_x, processor_chip_y, processor_id,
-            subvertex, ring_buffer_to_input_left_shifts, vertex_slice):
+    def write_neuron_parameters(self, spec, key, subvertex,
+                                ring_buffer_to_input_left_shifts, vertex_slice):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} "
@@ -158,11 +157,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         # Write header info to the memory region:
         # Write Key info for this core:
-        population_identity = \
-            packet_conversions.get_key_from_coords(processor_chip_x,
-                                                   processor_chip_y,
-                                                   processor_id)
-        spec.write_value(data=population_identity)
+        spec.write_value(data=key)
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
@@ -270,9 +265,16 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         for partitioned_edge in in_partitioned_edges:
             partitioned_edge.weight_scales_setter(weight_scales)
 
-        self.write_neuron_parameters(
-            spec, placement.x, placement.y, placement.p, subvertex,
-            ring_buffer_shifts, vertex_slice)
+        #NOTE: using the first outgoing subedge to acquire the trnasmitting key
+        # the assumption here is that all outgoing subedges use the same key.
+        #This is true for pynn based populations, but may not hold for
+        # other models.
+
+        key = routing_info.get_key_from_subedge(
+            subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+
+        self.write_neuron_parameters(spec, key, subvertex,
+                                     ring_buffer_shifts, vertex_slice)
 
         self.write_synapse_parameters(spec, subvertex, vertex_slice)
 

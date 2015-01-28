@@ -141,9 +141,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         spec.write_value(data=0)
         spec.write_value(data=0)
 
-    def write_poisson_parameters(
-            self, spec, processor_chip_x, processor_chip_y, processor_id,
-            num_neurons):
+    def write_poisson_parameters(self, spec, key, num_neurons):
         """
         Generate Neuron Parameter data for Poisson spike sources (region 2):
         """
@@ -157,11 +155,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         # Write header info to the memory region:
 
         # Write Key info for this core:
-        population_identity = \
-            packet_conversions.get_key_from_coords(processor_chip_x,
-                                                   processor_chip_y,
-                                                   processor_id)
-        spec.write_value(data=population_identity)
+        spec.write_value(data=key)
 
         # Write the random seed (4 words), generated randomly!
         if self._seed is None:
@@ -308,8 +302,15 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         self.write_setup_info(spec, spike_hist_buff_sz)
 
-        self.write_poisson_parameters(spec, placement.x, placement.y,
-                                      placement.p, vertex_slice.n_atoms)
+        #NOTE: using the first outgoing subedge to acquire the trnasmitting key
+        # the assumption here is that all outgoing subedges use the same key.
+        #This is true for pynn based populations, but may not hold for
+        # other models.
+
+        key = routing_info.get_key_from_subedge(
+            subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+
+        self.write_poisson_parameters(spec, key, vertex_slice.n_atoms)
 
         # End-of-Spec:
         spec.end_specification()

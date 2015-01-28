@@ -204,7 +204,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         spec.write_value(data=0)
         spec.write_value(data=0)
 
-    def write_block_index_region(self, spec, placement,
+    def write_block_index_region(self, spec, key,
                                  num_neurons, table_entries):
         """
         Spike block index table. Gives address of each block of spikes.
@@ -218,11 +218,8 @@ class SpikeSourceArray(AbstractSpikeSource):
         """
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value)
-        # Word 0 is the key (x, y, p) for this core:
-        chip_x, chip_y, chip_p = placement.x, placement.y, placement.p
-        population_identity = \
-            packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
-        spec.write_value(data=population_identity)
+
+        spec.write_value(data=key)
 
         # Word 1 is the total number of 'neurons' (i.e. spike sources) in
         # the pynn_population.py:
@@ -325,7 +322,15 @@ class SpikeSourceArray(AbstractSpikeSource):
                                     spike_region_size, spike_history_region_sz)
         self.write_setup_info(spec, spike_history_region_sz)
 
-        self.write_block_index_region(spec, placement, num_neurons,
+        #NOTE: using the first outgoing subedge to acquire the trnasmitting key
+        # the assumption here is that all outgoing subedges use the same key.
+        #This is true for pynn based populations, but may not hold for
+        # other models.
+
+        key = routing_info.get_key_from_subedge(
+            subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+
+        self.write_block_index_region(spec, key, num_neurons,
                                       table_entries)
         self.write_spike_data_region(spec, num_neurons, spike_blocks)
 
