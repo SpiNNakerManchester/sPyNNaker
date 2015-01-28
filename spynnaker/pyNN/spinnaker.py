@@ -187,10 +187,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     partitioned_graph=self._partitioned_graph,
                     routing_infos=self._routing_infos,
                     placements=self._placements)
-            execute_key_register = conf.config.getboolean(
-                "Database", "create_key_register")
-            if execute_key_register:
-                self._database_interface.create_routing_key_register()
             self._database_interface.send_visualiser_notifcation()
 
         #extract iptags required by the graph
@@ -413,8 +409,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def _execute_key_allocator(self, pacman_report_state):
         if self._key_allocator_algorithm is None:
             self._key_allocator_algorithm = BasicRoutingInfoAllocator()
-        elif isinstance(self._key_allocator_algorithm,
-                        MallocBasedRoutingInfoAllocator):
+        elif self._key_allocator_algorithm == MallocBasedRoutingInfoAllocator:
             self._key_allocator_algorithm = \
                 self._key_allocator_algorithm(self._graph_mapper)
         else:

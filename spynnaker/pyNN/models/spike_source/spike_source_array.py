@@ -2,13 +2,10 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
 from spynnaker.pyNN.utilities import packet_conversions
-from spynnaker.pyNN.utilities.conf import config
 
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-
-from spynnaker.pyNN import exceptions
 
 
 from math import ceil

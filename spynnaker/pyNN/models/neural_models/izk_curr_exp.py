@@ -1,3 +1,7 @@
+from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
+    KeyAllocatorFixedMaskConstraint
+import pacman.utilities.constants as pacman_constants
+
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
@@ -41,6 +45,8 @@ class IzhikevichCurrentExponentialPopulation(
             ring_buffer_sigma=ring_buffer_sigma)
         self._executable_constant = \
             IzhikevichCurrentExponentialPopulation.CORE_APP_IDENTIFIER
+        self.add_constraint(KeyAllocatorFixedMaskConstraint(
+            pacman_constants.DEFAULT_MASK))
 
     @property
     def model_name(self):
