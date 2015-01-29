@@ -5,10 +5,14 @@ import logging
 from spinnman import constants as spinnman_constants
 from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
 from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
+
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 from spynnaker.pyNN.utilities.database.data_base_handshake_connection \
     import DataBaseHandshakeConnection
+from spynnaker.pyNN.utilities import constants as spynnaker_constants
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities.conf import config
 
 logger = logging.getLogger(__name__)
 
@@ -151,23 +155,38 @@ class DataBaseInterface(object):
         self._wait_pool.apply_async(self._send_visualiser_notifcation)
 
     def _send_visualiser_notifcation(self):
-        self._sent_visualisation_confirmation = True
-        self._thread_pool.close()
-        self._thread_pool.join()
-        #after all writing, send notifcation to vis
-        if self._wait_for_vis:
-            self._notify_visualiser_and_wait()
+        try:
+            self._sent_visualisation_confirmation = True
+            self._thread_pool.close()
+            self._thread_pool.join()
+            #after all writing, send notifcation to vis
+            if self._wait_for_vis:
+                self._notify_visualiser_and_wait()
+        except Exception as e:
+            print e
 
     def _notify_visualiser_and_wait(self):
-
         data_base_message_connection = DataBaseHandshakeConnection(
             self._listen_port, self._host_to_notify, self._port_to_notify)
 
         # create complete message for vis to pick up
         eieio_command_header = EIEIOCommandHeader(
             spinnman_constants.EIEIO_COMMAND_IDS.DATABASE_CONFIRMATION.value)
-        eieio_command_message = EIEIOCommandMessage(eieio_command_header,
-                                                    bytearray())
+        eieio_command_message = EIEIOCommandMessage(eieio_command_header)
+        # add file path to database into command message.
+        #|------P------||------F-----|---------path----------|
+        #       0              1               path
+        send_file_path = config.getboolean("Database", "send_file_path")
+        if send_file_path:
+            number_of_chars = len(self._database_address)
+            if number_of_chars > spynnaker_constants.MAX_DATABASE_PATH_LENGTH:
+                raise exceptions.ConfigurationException(
+                    "The file path to the database is too large to be "
+                    "transmitted to the visualiser via the command packet, "
+                    "please set the file path in your visualiser manually and "
+                    "turn off the .cfg parameter [Database] send_file_path "
+                    "to False")
+            eieio_command_message.add_data(self._database_address)
         # Send command and wait for response
         logger.info("*** Notifying visualiser that the database is ready ***")
         data_base_message_connection.send_eieio_command_message(
