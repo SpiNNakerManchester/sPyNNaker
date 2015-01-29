@@ -1,18 +1,20 @@
+from spinnman import constants as spinnman_constants
+from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
+from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
+from spinnman.connections.udp_packet_connections.eieio_command_connection \
+    import EieioCommandConnection
+
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
+from spynnaker.pyNN.utilities import constants as spynnaker_constants
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
+
 from multiprocessing.pool import ThreadPool
 import threading
 import os
 import logging
-
-from spinnman import constants as spinnman_constants
-from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
-from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
-from spinnman.connections.udp_packet_connections.eieio_command_connection \
-    import EieioCommandConnection
-from spynnaker.pyNN.utilities import constants as spynnaker_constants
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities.conf import config
 
 
 logger = logging.getLogger(__name__)
@@ -20,15 +22,12 @@ logger = logging.getLogger(__name__)
 
 class DataBaseInterface(object):
 
-    def __init__(self, database_directory, wait_for_vis, listen_port_no=19998,
-                 host_to_notify="localhost", port_to_notify=19999):
+    def __init__(self, database_directory, wait_for_vis, socket_addresses):
+        self._socket_addresses = socket_addresses
         self._done = False
         self._database_directory = database_directory
         # connection to vis stuff
         self._wait_for_vis = wait_for_vis
-        self._listen_port = listen_port_no
-        self._host_to_notify = host_to_notify
-        self._port_to_notify = port_to_notify
         self._thread_pool = ThreadPool(processes=1)
         self._wait_pool = ThreadPool(processes=1)
         self._database_address = None
@@ -167,8 +166,14 @@ class DataBaseInterface(object):
             print e
 
     def _notify_visualiser_and_wait(self):
-        data_base_message_connection = EieioCommandConnection(
-            self._listen_port, self._host_to_notify, self._port_to_notify)
+
+        data_base_message_connections = list()
+        for socket_address in self._socket_addresses:
+            data_base_message_connection = \
+                EieioCommandConnection(
+                    socket_address.listen_port, socket_address.notify_host_name,
+                    socket_address.notify_port_no)
+            data_base_message_connections.append(data_base_message_connection)
 
         # create complete message for vis to pick up
         eieio_command_header = EIEIOCommandHeader(
@@ -190,9 +195,11 @@ class DataBaseInterface(object):
             eieio_command_message.add_data(self._database_address)
         # Send command and wait for response
         logger.info("*** Notifying visualiser that the database is ready ***")
-        data_base_message_connection.send_eieio_command_message(
-            eieio_command_message)
-        data_base_message_connection.receive_eieio_command_message()
+        for connection in data_base_message_connections:
+            connection.send_eieio_command_message(eieio_command_message)
+
+        for connection in data_base_message_connections:
+            connection.receive_eieio_command_message()
         logger.info("*** Confirmation received, continuing ***")
 
     def wait_for_confirmation(self):

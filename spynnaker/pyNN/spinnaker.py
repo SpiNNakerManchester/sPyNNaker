@@ -41,6 +41,7 @@ from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
 from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.database.data_base_interface import DataBaseInterface
+from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import reports
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
@@ -67,8 +68,21 @@ logger = logging.getLogger(__name__)
 class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
-                 max_delay=None, graph_label=None, binary_search_paths=[]):
+                 max_delay=None, graph_label=None, binary_search_paths=None,
+                 database_socket_addresses=None):
         SpynnakerConfiguration.__init__(self, host_name, graph_label)
+
+        if binary_search_paths is None:
+            binary_search_paths = []
+
+        if database_socket_addresses is None:
+            database_socket_addresses = list()
+            listen_port = conf.config.getint("Database", "listen_port")
+            notify_port = conf.config.getint("Database", "notify_port")
+            noftiy_hostname = conf.config.getint("Database", "notify_hostname")
+            database_socket_addresses.append(
+                SocketAddress(noftiy_hostname, notify_port, listen_port))
+        self._database_socket_addresses = database_socket_addresses
 
         if self._app_id is None:
             self._set_up_main_objects()
@@ -116,7 +130,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             wait_on_confirmation = \
                 conf.config.getboolean("Database", "wait_on_confirmation")
             self._database_interface = DataBaseInterface(
-                self._app_data_runtime_folder, wait_on_confirmation)
+                self._app_data_runtime_folder, wait_on_confirmation,
+                self._database_socket_addresses)
 
         #create network report if needed
         if self._reports_states is not None:
