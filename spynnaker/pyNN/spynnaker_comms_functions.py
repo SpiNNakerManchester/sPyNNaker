@@ -108,8 +108,11 @@ class SpynnakerCommsFunctions(object):
         for reverse_iptag in self._reverse_iptags:
             self._txrx.set_reverse_ip_tag(reverse_iptag)
 
-    def _retieve_provance_data_from_machine(self, executable_targets):
-        pass
+    def _retieve_provance_data_from_machine(
+            self, executable_targets, routing_tables, machine):
+        #create writer to a report in reports
+        reports.generate_provance_routings(routing_tables, machine, self._txrx,
+                                           self._report_default_directory)
 
     def execute_data_specification_execution(self, host_based_execution,
                                              hostname, placements,
