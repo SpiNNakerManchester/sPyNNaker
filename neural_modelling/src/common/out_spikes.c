@@ -12,14 +12,19 @@ void out_spikes_reset() {
     clear_bit_field(out_spikes, out_spikes_size);
 }
 
-void out_spikes_initialize(size_t max_spike_sources) {
+bool out_spikes_initialize(size_t max_spike_sources) {
     out_spikes_size = get_bit_field_size(max_spike_sources);
     log_info("Out spike size is %u words, allowing %u spike sources",
-            out_spikes_size, max_spike_sources);
+             out_spikes_size, max_spike_sources);
 
-    out_spikes = (bit_field_t) sark_alloc(out_spikes_size * sizeof(uint32_t),
-            1);
+    out_spikes = (bit_field_t) sark_alloc(
+        out_spikes_size * sizeof(uint32_t), 1);
+    if (out_spikes == NULL) {
+        log_error("Could not allocate out spikes array");
+        return false;
+    }
     out_spikes_reset();
+    return true;
 }
 
 void out_spikes_record(uint32_t recording_flags) {

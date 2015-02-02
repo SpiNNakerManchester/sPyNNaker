@@ -77,13 +77,18 @@ static inline bool non_full() {
     return (unallocated() > 0);
 }
 
-void in_spikes_initialize_spike_buffer(uint32_t size) {
+bool in_spikes_initialize_spike_buffer(uint32_t size) {
     buffer = (spike_t *) sark_alloc(1, size * sizeof(spike_t));
+    if (buffer == NULL) {
+        log_error("Cannot allocate in spikes buffer");
+        return false;
+    }
     buffer_size = size;
     input = size - 1;
     output = 0;
     overflows = 0;
     underflows = 0;
+    return true;
 }
 
 uint32_t in_spikes_n_spikes_in_buffer() {

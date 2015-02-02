@@ -1,0 +1,47 @@
+# If SPINN_DIRS is not defined, this is an error!
+ifndef SPINN_DIRS
+    $(error SPINN_DIRS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinnaker package folder))
+endif
+
+ifndef APP_OUTPUT_DIR
+    $(error APP_OUTPUT_DIR is not set.  Please define APP_OUTPUT_DIR (possibly by running "source setup" in the spinnaker package folder))
+endif
+
+# Convert the objs into the correct format to work here
+ABSOBJS = $(abspath $(OBJECTS))
+ABSDIR = $(abspath $(NEURAL_MODELLING_DIRS)/src)
+ifdef EXTRA_SRC_DIR
+    ABS_EXTRA_SRC_DIR = $(abspath $(EXTRA_SRC_DIR))
+    EXTRA_OBJS = $(ABSOBJS:$(ABS_EXTRA_SRC_DIR)/%.o=%.o)
+else
+    EXTRA_OBJS = $(ABSOBJS)
+endif
+RELOBJS := $(EXTRA_OBJS:$(ABSDIR)/%.o=%.o)
+OBJECTS := $(RELOBJS:%.o=$(BUILD_DIR)%.o)
+
+LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
+ifndef DEBUG
+    DEBUG = PRODUCTION_CODE
+endif
+CFLAGS += -Wall -Wextra -D$(DEBUG) -Ofast
+
+include $(SPINN_DIRS)/Makefile.common
+
+$(BUILD_DIR)%.o: $(NEURAL_MODELLING_DIRS)/src/%.c
+	-mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -o $@ $<
+	
+ifdef EXTRA_SRC_DIR
+    $(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c
+		-mkdir -p $(dir $@)
+		$(CC) $(CFLAGS) -o $@ $<
+endif
+
+all: $(BUILD_DIR) $(APP_OUTPUT_DIR)$(APP).aplx
+
+$(BUILD_DIR):
+	-mkdir -p $@
+
+# Tidy and cleaning dependencies
+clean:
+	$(RM) $(OBJECTS) $(BUILD_DIR)$(APP).elf $(BUILD_DIR)$(APP).txt $(APP_OUTPUT_DIR)$(APP).aplx

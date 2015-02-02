@@ -144,9 +144,11 @@ static bool initialize(uint32_t *timer_period) {
             &spike_history_region_size, NULL, NULL);
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
-        recording_initialze_channel(
+        if (!recording_initialze_channel(
                 data_specification_get_region(3, address),
-                e_recording_channel_spike_history, spike_history_region_size);
+                e_recording_channel_spike_history, spike_history_region_size)) {
+            return false;
+        }
     }
 
     // Setup regions that specify spike source array data

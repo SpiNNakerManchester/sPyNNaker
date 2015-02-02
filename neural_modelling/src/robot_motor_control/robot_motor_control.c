@@ -210,7 +210,9 @@ void c_main(void) {
     }
 
     // Initialize the incoming spike buffer
-    in_spikes_initialize_spike_buffer(8192);
+    if (!in_spikes_initialize_spike_buffer(8192)) {
+        return;
+    }
 
     // Set timer_callback
     spin1_set_timer_tick(timer_period);

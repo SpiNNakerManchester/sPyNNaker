@@ -135,9 +135,11 @@ static bool initialize(uint32_t *timer_period) {
             &spike_history_region_size, NULL, NULL);
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
-        recording_initialze_channel(
+        if (!recording_initialze_channel(
                 data_specification_get_region(2, address),
-                e_recording_channel_spike_history, spike_history_region_size);
+                e_recording_channel_spike_history, spike_history_region_size)) {
+            return false;
+        }
     }
 
     // Setup regions that specify spike source array data
@@ -240,13 +242,18 @@ void c_main(void) {
 
     // Load DTCM data
     uint32_t timer_period;
-    initialize(&timer_period);
+    if (!initialize(&timer_period)) {
+        return;
+    }
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;
 
     // Initialize out spikes buffer to support number of neurons
-    out_spikes_initialize(num_fast_spike_sources + num_slow_spike_sources);
+    if (!out_spikes_initialize(
+            num_fast_spike_sources + num_slow_spike_sources)) {
+        return;
+    }
 
     // Set timer tick (in microseconds)
     spin1_set_timer_tick(timer_period);

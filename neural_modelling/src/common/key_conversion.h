@@ -15,12 +15,12 @@ static inline key_t key_p(key_t k) {
     return ((k >> 11) & 0x1F);
 }
 
-static inline key_t make_key(key_t x, key_t y, key_t p) {
-    return ((x << 24) | (y << 16) | ((p - 1) << 11));
+static inline key_t key_n(key_t k) {
+    return k & 0x7FF;
 }
 
-static inline uint32_t make_pid(key_t x, key_t y, key_t p) {
-    return (((x << 3) + y) * 18 + p);
+static inline key_t make_key(key_t x, key_t y, key_t p) {
+    return ((x << 24) | (y << 16) | ((p - 1) << 11));
 }
 
 #endif // _KEY_CONVERSION_H_

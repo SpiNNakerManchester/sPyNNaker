@@ -14,7 +14,7 @@
 //    underflows: a counter for the number of times the buffer underflows
 //
 // If underflows is ever non-zero, then there is a problem with this code.
-void in_spikes_initialize_spike_buffer(uint32_t size);
+bool in_spikes_initialize_spike_buffer(uint32_t size);
 
 bool in_spikes_add_spike(spike_t spike);
 

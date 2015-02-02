@@ -7,4 +7,4 @@ set -a
 NEURAL_MODELLING_DIRS=$PWD
 
 # Define the location of the app output
-APP_OUTPUT_DIR=$NEURAL_MODELLING_DIRS/../spynnaker/pyNN/model_binaries
+APP_OUTPUT_DIR=$NEURAL_MODELLING_DIRS/../spynnaker/pyNN/model_binaries/

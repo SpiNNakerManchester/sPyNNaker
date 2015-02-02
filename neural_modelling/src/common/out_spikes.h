@@ -9,7 +9,7 @@ extern bit_field_t out_spikes;
 
 void out_spikes_reset();
 
-void out_spikes_initialize(size_t max_spike_sources);
+bool out_spikes_initialize(size_t max_spike_sources);
 
 void out_spikes_record(uint32_t recording_flags);
 

@@ -168,7 +168,7 @@ void spike_process(uint unused0, uint unused1) {
     while (in_spikes_get_next_spike(&s)) {
 
         // Mask out neuron id
-        uint32_t neuron_id = (s & KEY_MASK);
+        uint32_t neuron_id = key_n(s);
         if (neuron_id < num_neurons) {
             // Increment counter
             current_time_slot_spike_counters[neuron_id]++;
@@ -262,7 +262,9 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Initialize the incoming spike buffer
-    in_spikes_initialize_spike_buffer(IN_SPIKE_SIZE);
+    if (!in_spikes_initialize_spike_buffer(256)) {
+        return;
+    }
 
     // Set timer tick (in microseconds)
     spin1_set_timer_tick(timer_period);
