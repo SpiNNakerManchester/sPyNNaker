@@ -27,7 +27,7 @@ class BufferCollection(object):
 
         :param region_id: the region id for which this buffer is being built
         :param buffer_key: the key for the buffer
-        :param data_piece: the peice of data to add to the buffer
+        :param data_piece: the piece of data to add to the buffer
         :type region_id: int
         :type buffer_key: int
         :type data_piece: int
@@ -72,18 +72,18 @@ class BufferCollection(object):
                 "try again".format(region_id))
         self._buffers_to_use[region_id].set_region_size(region_size)
 
-    def is_region_empty(self, buffered_packet):
+    def is_region_empty(self, region_id):
         """ checks if a region is empty or not (updates buffer if the last
         timer tic is after what was expected
 
         :param buffered_packet:
         :return:
         """
-        if buffered_packet.region_id not in self._buffers_to_use.keys():
+        if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
-                "try again".format(buffered_packet.region_id))
-        return self._buffers_to_use[buffered_packet.region_id].is_region_empty()
+                "try again".format(region_id))
+        return self._buffers_to_use[region_id].is_region_empty()
 
     def get_region_absolute_region_address(self, region_id):
         """gets the regions absolute region address
@@ -136,10 +136,10 @@ class BufferCollection(object):
         return self._buffers_to_use[region_id].buffer
 
     def get_left_over_space(self, region_id, memory_used):
-        """ checks how much memroy is left over given a number of bytes being
+        """ checks how much memory is left over given a number of bytes being
          used
 
-        :param region_id: the region id to which this calcuation is being
+        :param region_id: the region id to which this calculation is being
          carried out on
          :type region_id: int
         :param memory_used: the amount of memory being used in this region
@@ -161,7 +161,7 @@ class BufferCollection(object):
 
         :param region_id: the region id for which this buffer is being built
         :param buffer_key: the key for the buffer
-        :param data_pieces: the peices of data to add to the buffer
+        :param data_pieces: the pieces of data to add to the buffer
         :type region_id: int
         :type buffer_key: int
         :type data_pieces: iterable
@@ -174,7 +174,7 @@ class BufferCollection(object):
             add_entries_to_buffer(buffer_key, data_pieces)
 
     def contains_key(self, region_id):
-        """ checks if a region is being magaed so far
+        """ checks if a region is being managed so far
 
         :param region_id: the region  id to check if being managed so far
         :return:
@@ -191,7 +191,7 @@ class BufferCollection(object):
         :type buffered_packet: spynnaker.pynn.buffer_management.buffer_packet.BufferPacket
         :return: either a request or None
         """
-        #check if the region has got buffers
+        # check if the region has got buffers
         if buffered_packet.region_id not in self._buffers_to_use.keys():
             raise spinnman_exceptions.SpinnmanInvalidPacketException(
                 "buffered_packet.region_id",

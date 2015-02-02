@@ -1,5 +1,6 @@
 from spynnaker.pyNN import exceptions
 
+
 class BufferElement(object):
 
     def __init__(self, entry):

@@ -5,12 +5,17 @@ import math
 
 from spinnman.data.little_endian_byte_array_byte_writer import \
     LittleEndianByteArrayByteWriter
+from spinnman.messages.eieio.eieio_header import EIEIOHeader
+from spinnman.messages.eieio.eieio_message import EIEIOMessage
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
-from spinnman import constants as spinn_man_constants
-from spynnaker.pyNN.buffer_management.buffer_requests.data_requests.send_data_request import SendDataRequest
-from spynnaker.pyNN.buffer_management.buffer_requests.command_requests.stop_requests_request \
+from spinnman import constants as spinnman_constants
+from spynnaker.pyNN.buffer_management.buffer_data_objects.eieio_32bit_timed_data_packet import \
+    EIEIO32BitTimedDataPacket
+from spynnaker.pyNN.buffer_management.buffer_requests.sequenced_eieio_send_data import \
+    SequencedEIEIOSendData
+from spynnaker.pyNN.buffer_management.buffer_requests.stop_requests_request \
     import StopRequestsRequest
-from spynnaker.pyNN.buffer_management.buffer_requests.command_requests.event_stop_request \
+from spynnaker.pyNN.buffer_management.buffer_requests.event_stop_request \
     import EventStopRequest
 from spynnaker.pyNN.utilities import constants
 
@@ -19,11 +24,11 @@ from spynnaker.pyNN.utilities import constants
 class AbstractBufferReceivablePartitionedVertex(object):
 
     def __init__(self, buffer_collection):
-        self._receiver_buffer_collection = buffer_collection
+        self._buffers_to_send_collection = buffer_collection
 
     @property
     def receiver_buffer_collection(self):
-        return self._receiver_buffer_collection
+        return self._buffers_to_send_collection
 
     @abstractmethod
     def is_bufferable_receivable_partitioned_vertex(self):
@@ -32,174 +37,168 @@ class AbstractBufferReceivablePartitionedVertex(object):
         :return:
         """
 
-    def process_buffered_packet(self, buffered_packet):
-        # if the region has no more buffers to transmit, return none
-        if self._receiver_buffer_collection.is_region_empty(buffered_packet):
-            return StopRequestsRequest(
-                buffered_packet.chip_x, buffered_packet.chip_y,
-                buffered_packet.chip_p, buffered_packet.region_id)
-        return self._generate_buffers_for_transmission(buffered_packet)
+    def get_next_set_of_packets(self, region_size, region_id, sequence_no):
+        # get all the buffers for the subvertex
+        buffers = self._buffers_to_send_collection.get_buffer_for_region(
+            region_id)
 
-    def _generate_buffers_for_transmission(self, buffered_packet):
+        # if there is a sequence number, eliminate all the packets which
+        # have already been acknowledged but the spinnaker machine
+        if sequence_no is not None:
+            self._remove_received_elements(region_id, sequence_no)
+
+        # if the region has no more buffers to transmit, stop requests
+        # coming from the machine
+        if self._buffers_to_send_collection.is_region_empty(region_id):
+            send_requests = list()
+            request = EventStopRequest()
+            send_requests.append(request)
+            return send_requests
+
+        else:
+            return self._generate_buffers_for_transmission(
+                buffers, region_size, sequence_no)
+
+
+    def _generate_buffers_for_transmission(
+            self, buffers, region_size, sequence_no):
         """ uses the received buffered packet and determines what to do with it.
 
         :param buffered_packet: the packet which determines future actions
         :return:
         """
-        #build the buffer for the size available
-        buffers = self._receiver_buffer_collection.get_buffer_for_region(
-            buffered_packet.region_id)
-
-        #remove received elements
-        self._remove_received_elements(buffered_packet, buffers)
-
-        #start
         buffer_keys = list(buffers.keys())
         position_in_buffer = 0
-        sequence_no = buffered_packet.sequence_no
-        if sequence_no is None:
-            sequence_no = 0
-        used_seqeunce_no = 0
+        used_sequence_no = 0
         send_requests = list()
-        #by default there is always a eieio header (in the form of a spike train)
-        memory_used = spinn_man_constants.EIEIO_DATA_HEADER_SIZE + \
-            constants.TIMESTAMP_SPACE_REQUIREMENT
-        while (memory_used < buffered_packet.count
+        memory_used = 0
+
+        while (memory_used < region_size
                and position_in_buffer < len(buffer_keys)
-               and used_seqeunce_no < constants.MAX_SEQUENCES_PER_TRANSMISSION):
-            header_byte_1 = (1 << 5) + (1 << 4) + \
-                            (EIEIOTypeParam.KEY_32_BIT.value << 2)
-            buffer_length = len(buffers[buffer_keys[position_in_buffer]]) \
-                * constants.KEY_SIZE
-            # check if theres enough space in buffer for packets for this
+               and used_sequence_no < constants.MAX_SEQUENCES_PER_TRANSMISSION):
+            timestamp = buffer_keys[position_in_buffer]
+            buffer_length = len(buffers[timestamp]) * constants.KEY_SIZE
+            # check if there is enough space in buffer for packets for this
             # time stamp
-            send_request = None
-            if buffer_length < buffered_packet.count:
-                send_request, used_memory, position_in_buffer = \
+            if buffer_length < region_size:
+                send_request, position_in_buffer = \
                     self._deal_with_entire_timer_stamp(
-                        buffers, buffer_keys, position_in_buffer, header_byte_1,
-                        sequence_no, buffered_packet)
+                        buffers, buffer_keys, position_in_buffer, sequence_no)
             else:
-                send_request, used_memory = self._deal_with_partial_timer_stamp(
-                    buffered_packet, memory_used, header_byte_1, buffer_keys,
-                    position_in_buffer, buffers, sequence_no)
+                memory_available = region_size - memory_used
+                send_request = self._deal_with_partial_timer_stamp(
+                    buffers, buffer_keys, position_in_buffer, sequence_no,
+                    memory_available)
             send_requests.append(send_request)
+            memory_used += send_request.length
             if (position_in_buffer == len(buffer_keys) and
-                    memory_used < buffered_packet.count):
-                address_pointer = self._receiver_buffer_collection.\
-                    get_region_absolute_region_address(
-                        buffered_packet.region_id)
-                end_request = EventStopRequest(
-                    chip_x=buffered_packet.chip_x,
-                    chip_y=buffered_packet.chip_y,
-                    chip_p=buffered_packet.chip_p,
-                    address_pointer=address_pointer, size=2)
+                    memory_used < region_size):
+
+                end_request = EventStopRequest()
                 send_requests.append(end_request)
-            memory_used += used_memory
-            sequence_no += 1
-            used_seqeunce_no += 1
-            sequence_no = (sequence_no + 1) % constants.MAX_SEQUENCE_NO
+                memory_used += end_request.length
+
+            used_sequence_no += 1
+            if sequence_no is not None:
+                sequence_no += 1
+                sequence_no = (sequence_no + 1) % constants.MAX_SEQUENCE_NO
+
         return send_requests
 
     def _deal_with_partial_timer_stamp(
-            self, buffered_packet, memory_used, header_byte_1, buffer_keys,
-            position_in_buffer, buffers, seqeunce_no):
+            self, buffers, buffer_keys, position_in_buffer, sequence_no,
+            memory_available):
         """ handles creating a eieio packet for a buffer which is only partially
-        trnasmitted
+        transmitted
 
         :param buffered_packet: the buffered packet request
-        :param memory_used: the amount of memory used up with preivous eieio
-        messages planned to be trnasmitted
+        :param memory_available: the amount of memory used up with previous eieio
+        messages planned to be transmitted
         :param header_byte_1: the 1st byte of the eieio header
-        :param buffer_keys: the ordered list of keys from the buffers (time stamps)
+        :param buffer_keys: the ordered list of keys from the buffers \
+        (time stamps)
         :param position_in_buffer: the position in buffer keys being used
         :param buffers: the entire buffers supply.
-        :param seqeunce_no: the seqeunce number of this eieio message
+        :param sequence_no: the sequence number of this eieio message
         :return: a send data request and a tracker of how much memory has been
         used by this method.
         """
-        data = LittleEndianByteArrayByteWriter()
-        length_available = buffered_packet.count - memory_used
-        entries_to_put_in = math.floor(length_available /
-                                       constants.KEY_SIZE)
-        entries_to_store_into_udp = \
-            math.floor(constants.MAX_EIEIO_ENTRIES_TO_STORE_IN_UDP,
-                       constants.KEY_SIZE)
+        timestamp = buffer_keys[position_in_buffer]
+        packet = EIEIO32BitTimedDataPacket(timestamp)
+
+        entries_to_put_in = math.floor((memory_available - packet.header_size) /
+                                       packet.key_size)
+        entries_to_store_into_udp = packet.get_max_count()
         if entries_to_put_in > entries_to_store_into_udp:
             entries_to_put_in = entries_to_store_into_udp
-        data.write_byte(entries_to_put_in)  # header count
-        data.write_byte(header_byte_1)  # header header
-        data.write_int(buffer_keys[position_in_buffer])  # time stamp
+
         # write entries
         for entry in range(0, entries_to_put_in):
-            data.write_int(
-                buffers[buffer_keys[position_in_buffer]][entry].entry)
-            buffers[buffer_keys[position_in_buffer]][entry]\
-                .set_seqeuence_no(seqeunce_no)
-        memory_used += (entries_to_put_in * constants.KEY_SIZE)
-        address_pointer = self._receiver_buffer_collection.\
-            get_region_absolute_region_address(buffered_packet.region_id)
-        request = SendDataRequest(
-            chip_x=buffered_packet.chip_x, chip_y=buffered_packet.chip_y,
-            chip_p=buffered_packet.chip_p, address_pointer=address_pointer,
-            data=data.data, sequence_no=seqeunce_no)
-        return request, memory_used
+            packet.insert_key(buffers[timestamp][entry].entry)
+            if sequence_no is not None:
+                buffers[timestamp][entry].set_seqeuence_no(sequence_no)
+            else:
+                buffers[timestamp][entry].set_seqeuence_no(0)
+
+        # if a sequence number is passed, generate a sequenced eieio packet
+        # otherwise return packet as it is
+        if sequence_no is not None:
+            sequenced_packet = SequencedEIEIOSendData(packet, sequence_no)
+            packet = sequenced_packet
+
+        return packet
 
     def _deal_with_entire_timer_stamp(
-            self, buffers, buffer_keys, position_in_buffer, header_byte_1,
-            seqeunce_no, buffered_packet):
-        """handles creating a eieio packet for a buffer which is completly
-        trnasmitted
+            self, buffers, buffer_keys, position_in_buffer, sequence_no):
+        """handles creating a eieio packet for a buffer which is completely
+        transmitted
 
         :param buffered_packet: the buffered packet request
-        :param header_byte_1: the 1st byte of the eieio header
         :param buffer_keys: the ordered list of keys from the buffers (time stamps)
         :param position_in_buffer: the position in buffer keys being used
         :param buffers: the entire buffers supply.
-        :param seqeunce_no: the seqeunce number of this eieio message
+        :param sequence_no: the sequence number of this eieio message
         :return: a send data request and a tracker of how much memory has been
         used by this method.
         :return: a send data request and a tracker of how much memory has been
         used by this method.
         """
-        data = LittleEndianByteArrayByteWriter()
         moved_to_new_buffer = False
-        entries_to_store_into_udp = \
-            math.floor(constants.MAX_EIEIO_ENTRIES_TO_STORE_IN_UDP /
-                       constants.KEY_SIZE)
-        #check that the limit on the eieio message count is valid
-        if (len(buffers[buffer_keys[position_in_buffer]]) <=
-                entries_to_store_into_udp):
-            entries_to_store_into_udp = \
-                len(buffers[buffer_keys[position_in_buffer]])
+        timestamp = buffer_keys[position_in_buffer]
+        # write the header
+        packet = EIEIO32BitTimedDataPacket(timestamp)
+        max_entries_in_packet = packet.get_max_count()
+
+        # check that the limit on the eieio message count is valid
+        if len(buffers[timestamp]) <= max_entries_in_packet:
+            max_entries_in_packet = len(buffers[timestamp])
             moved_to_new_buffer = True
-        #write the header
-        data.write_byte(entries_to_store_into_udp)  # header count
-        data.write_byte(header_byte_1)  # header header
-        data.write_int(buffer_keys[position_in_buffer])  # time stamp
         entry_counter = 0
+
         # write entries
-        for entry_index in range(entries_to_store_into_udp):
-            data.write_int(buffers[buffer_keys[position_in_buffer]]
-                           [entry_counter].entry)
-            buffers[buffer_keys[position_in_buffer]][entry_counter]\
-                .set_seqeuence_no(seqeunce_no)
-        #create request and returns stats
+        for entry_index in range(max_entries_in_packet):
+            key = buffers[timestamp][entry_counter].entry
+            packet.insert_key(key)
+            if sequence_no is not None:
+                buffers[timestamp][entry_counter].set_seqeuence_no(sequence_no)
+            else:
+                buffers[timestamp][entry_counter].set_seqeuence_no(0)
+
+        # if a sequence number is passed, generate a sequenced eieio packet
+        # otherwise return packet as it is
+        if sequence_no is not None:
+            sequenced_packet = SequencedEIEIOSendData(packet, sequence_no)
+            packet = sequenced_packet
+
+        # create request and returns stats
         if moved_to_new_buffer:
             position_in_buffer += 1
-        memory_used = entries_to_store_into_udp * constants.KEY_SIZE
-        address_pointer = self._receiver_buffer_collection.\
-            get_region_absolute_region_address(buffered_packet.region_id)
-        request = SendDataRequest(
-            chip_x=buffered_packet.chip_x, chip_y=buffered_packet.chip_y,
-            chip_p=buffered_packet.chip_p, address_pointer=address_pointer,
-            data=data.data, sequence_no=seqeunce_no)
-        return request, memory_used, position_in_buffer
+
+        return packet, position_in_buffer
 
     @staticmethod
-    def _remove_received_elements(buffered_packet, region):
-        last_seq_no_received = buffered_packet.sequence_no
-        if last_seq_no_received is not None:
+    def _remove_received_elements(region, sequence_no):
+        if sequence_no is not None:
             keys = region.keys()
             position_in_keys = 0
             reached = False
@@ -208,24 +207,17 @@ class AbstractBufferReceivablePartitionedVertex(object):
             while position_in_keys < len(keys) and not finished:
                 elements = region[keys[position_in_keys]]
                 to_remove = list()
-                #locate stuff to remove
+                # locate stuff to remove
                 for element in elements:
-                    if element.seqeuence_no == last_seq_no_received:
+                    if element.seqeuence_no == sequence_no:
                         reached = True
-                    if element.seqeuence_no != last_seq_no_received and reached:
+                    if element.seqeuence_no != sequence_no and reached:
                         finished = True
                     if not finished:
                         to_remove.append(element)
-                #if everything is to be removed, remove key from dict
+                # if everything is to be removed, remove key from dict
                 if len(to_remove) == len(elements):
                     del region[keys[position_in_keys]]
-                else:  # need to remvoe a subsample
+                else:  # need to remove a subsample
                     for remove_element in to_remove:
                         region[keys[position_in_keys]].remove(remove_element)
-
-
-
-
-
-
-

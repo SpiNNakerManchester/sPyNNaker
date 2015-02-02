@@ -8,14 +8,14 @@ class BufferPacket(object):
     """
 
     def __init__(self, chip_x, chip_y, chip_p, command, region_id,
-                 count, last_timer_tic):
+                 size, sequence_no):
         self._chip_x = chip_x
         self._chip_y = chip_y
         self._chip_p = chip_p
         self._command = command
         self._region_id = region_id
-        self._count = count
-        self._seqeunce_no = last_timer_tic
+        self._size = size
+        self._sequence_no = sequence_no
 
     @property
     def chip_x(self):
@@ -38,12 +38,12 @@ class BufferPacket(object):
         return self._region_id
 
     @property
-    def count(self):
-        return self._count
+    def size(self):
+        return self._size
 
     @property
     def sequence_no(self):
-        return self._seqeunce_no
+        return self._sequence_no
 
     @staticmethod
     def build_buffer_packet_from_byte_array_reader(reader):
@@ -72,7 +72,7 @@ class BufferPacket(object):
         last_of_command = (last_of_command_command_id_region_id >> 7)
         command = (most_of_command << 3) + last_of_command
         region_id = (last_of_command_command_id_region_id & math.pow(2, 4))
-        last_timer_tic = reader.read_int()
+        sequence_no = reader.read_int()
         count = reader.read_int()
         return BufferPacket(chip_x, chip_y, chip_p, command, region_id, count,
-                            last_timer_tic)
+                            sequence_no)

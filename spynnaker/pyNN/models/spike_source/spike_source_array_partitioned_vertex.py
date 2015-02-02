@@ -36,4 +36,5 @@ class SpikeSourceArrayPartitionedVertex(
         return True
 
     def set_buffered_region_size(self, region_size, region_id):
-        self._receiver_buffer_collection.set_size_of_region(region_id, region_size)
+        self._buffers_to_send_collection.set_size_of_region(
+            region_id, region_size)

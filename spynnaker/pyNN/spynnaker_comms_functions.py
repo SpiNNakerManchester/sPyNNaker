@@ -73,7 +73,7 @@ class SpynnakerCommsFunctions(object):
                 ignore_chips=ignored_chips,
                 ignore_cores=ignored_cores)
 
-            #do autoboot if possible
+            # do autoboot if possible
             machine_version = conf.config.get("Machine", "version")
             if machine_version is None:
                 raise exceptions.ConfigurationException(
@@ -83,12 +83,12 @@ class SpynnakerCommsFunctions(object):
             self._txrx.discover_scamp_connections()
             self._machine = self._txrx.get_machine_details()
         else:
-            virtual_x_dimension = conf.config.getint("Machine",
-                                                  "virutal_board_x_dimension")
-            virtual_y_dimension = conf.config.getint("Machine",
-                                                  "virutal_board_y_dimension")
-            requires_wrap_around = conf.config.getboolean("Machine",
-                                                   "requires_wrap_arounds")
+            virtual_x_dimension = conf.config.getint(
+                "Machine", "virtual_board_x_dimension")
+            virtual_y_dimension = conf.config.getint(
+                "Machine", "virtual_board_y_dimension")
+            requires_wrap_around = conf.config.getboolean(
+                "Machine", "requires_wrap_arounds")
             self._machine = VirtualMachine(
                 x_dimension=virtual_x_dimension,
                 y_dimension=virtual_y_dimension,
@@ -127,7 +127,7 @@ class SpynnakerCommsFunctions(object):
                                                 graph_mapper):
         space_based_memory_tracker = dict()
         processor_to_app_data_base_address = dict()
-         #create a progress bar for end users
+        # create a progress bar for end users
         progress_bar = ProgressBar(len(list(placements.placements)),
                                    "on executing data specifications on the "
                                    "host machine")
@@ -149,14 +149,14 @@ class SpynnakerCommsFunctions(object):
                 data_spec_reader = FileDataReader(data_spec_file_path)
                 data_writer = FileDataWriter(app_data_file_path)
 
-                #locate current memory requirement
+                # locate current memory requirement
                 current_memory_available = SDRAM.DEFAULT_SDRAM_BYTES
                 memory_tracker_key = (placement.x, placement.y)
                 if memory_tracker_key in space_based_memory_tracker.keys():
                     current_memory_available = \
                         space_based_memory_tracker[memory_tracker_key]
 
-                #generate a file writer for dse report (app pointer table)
+                # generate a file writer for dse report (app pointer table)
                 report_writer = None
                 if conf.config.getboolean("Reports", "writeTextSpecs"):
                     new_report_directory = \
@@ -173,16 +173,16 @@ class SpynnakerCommsFunctions(object):
                                                     file_name)
                     report_writer = FileDataWriter(report_file_path)
 
-                #generate data spec executor
+                # generate data spec executor
                 host_based_data_spec_executor = DataSpecificationExecutor(
                     data_spec_reader, data_writer, current_memory_available,
                     report_writer)
 
-                #update memory calc and run data spec executor
+                # update memory calc and run data spec executor
                 bytes_used_by_spec, bytes_written_by_spec = \
                     host_based_data_spec_executor.execute()
 
-                #update base address mapper
+                # update base address mapper
                 processor_mapping_key = (placement.x, placement.y, placement.p)
                 processor_to_app_data_base_address[processor_mapping_key] = \
                     {'start_address':
@@ -194,7 +194,7 @@ class SpynnakerCommsFunctions(object):
                 space_based_memory_tracker[memory_tracker_key] = \
                     current_memory_available - bytes_used_by_spec
 
-            #update the progress bar
+            # update the progress bar
             progress_bar.update()
         # close the progress bar
         progress_bar.end()
@@ -204,8 +204,8 @@ class SpynnakerCommsFunctions(object):
                                     buffered_managers, time_scaling,
                                     waiting_on_confirmation, database_thread,
                                     in_debug_mode):
-        #every thing is in sync0. if there are buffered managers with sendable
-        #manageable vertices, load the initial buffers
+        # every thing is in sync0. if there are buffered managers with sendable
+        # manageable vertices, load the initial buffers
         for buffer_manager_key in buffered_managers.keys():
             buffer_manager = buffered_managers[buffer_manager_key]
             if buffer_manager.contains_sender_vertices():
@@ -249,7 +249,7 @@ class SpynnakerCommsFunctions(object):
                         total_cores, successful_cores, unsuccessful_cores,
                         CPUState.SYNC0)
                 raise exceptions.ExecutableFailedToStartException(
-                    "Only {} processors out of {} have sucessfully reached "
+                    "Only {} processors out of {} have successfully reached "
                     "sync0 with breakdown of: {}"
                     .format(processors_ready, total_processors, break_down))
 
@@ -336,7 +336,7 @@ class SpynnakerCommsFunctions(object):
         else:
             logger.info("Application is set to run forever - PACMAN is exiting")
 
-        #turn off buffers threads, as they are no longer needed
+        # turn off buffers threads, as they are no longer needed
         for buffered_manager_key in buffered_managers.keys():
             buffered_managers[buffered_manager_key].kill_threads()
 
@@ -378,13 +378,13 @@ class SpynnakerCommsFunctions(object):
             self, placements, router_tables, vertex_to_subvertex_mapper,
             processor_to_app_data_base_address, hostname, app_id):
 
-        #if doing reload, start script
+        # if doing reload, start script
         if self._reports_states.transciever_report:
             reports.start_transceiver_rerun_script(
                 conf.config.get("SpecGeneration", "Binary_folder"), hostname,
                 conf.config.get("Machine", "version"))
 
-        #go through the placements and see if theres any application data to
+        # go through the placements and see if theres any application data to
         # load
 
         progress_bar = ProgressBar(len(list(placements.placements)),
@@ -412,7 +412,7 @@ class SpynnakerCommsFunctions(object):
                 self._txrx.write_memory(placement.x, placement.y, start_address,
                                         application_data_file_reader,
                                         memory_written)
-                #update user 0 so that it points to the start of the \
+                # update user 0 so that it points to the start of the \
                 # applications data region on sdram
                 logger.debug("writing user 0 address for vertex {}"
                              .format(associated_vertex.label))
@@ -422,7 +422,7 @@ class SpynnakerCommsFunctions(object):
                 self._txrx.write_memory(placement.x, placement.y,
                                         user_o_register_address, start_address)
 
-                #add lines to rerun_script if requested
+                # add lines to rerun_script if requested
                 if self._reports_states.transciever_report:
                     binary_folder = \
                         conf.config.get("SpecGeneration", "Binary_folder")
@@ -435,7 +435,7 @@ class SpynnakerCommsFunctions(object):
 
         progress_bar = ProgressBar(len(list(router_tables.routing_tables)),
                                    "Loading routing data onto the machine")
-        #load each router table thats needed for the application to run into
+        # load each router table that is needed for the application to run into
         # the chips sdram
         for router_table in router_tables.routing_tables:
             if len(router_table.multicast_routing_entries) > 0:
