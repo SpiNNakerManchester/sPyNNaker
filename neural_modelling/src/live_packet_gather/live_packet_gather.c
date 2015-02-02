@@ -20,15 +20,32 @@ static uint8_t event_size;
 static uint8_t header_len;
 static uint32_t simulation_ticks = 0;
 
-static uint32_t apply_prefix;			// P bit
-static uint32_t prefix;					// Prefix data
-static uint32_t packet_type;			// Type bits
-static uint32_t prefix_type;			// F bit (for the receiver)
-static uint32_t key_right_shift;		// Right payload shift (for the sender)
-static uint32_t payload_timestamp;		// T bit
-static uint32_t payload_apply_prefix;	// D bit
-static uint32_t payload_prefix;		    // Payload prefix data (for the rcvr)
-static uint32_t payload_right_shift;	// Right payload shift (for the sender)
+// P bit
+static uint32_t apply_prefix;
+
+// Prefix data
+static uint32_t prefix;
+
+// Type bits
+static uint32_t packet_type;
+
+// F bit (for the receiver)
+static uint32_t prefix_type;
+
+// Right payload shift (for the sender)
+static uint32_t key_right_shift;
+
+// T bit
+static uint32_t payload_timestamp;
+
+// D bit
+static uint32_t payload_apply_prefix;
+
+// Payload prefix data (for the rcvr)
+static uint32_t payload_prefix;
+
+// Right payload shift (for the sender)
+static uint32_t payload_right_shift;
 static uint32_t sdp_tag;
 static uint32_t packets_per_timestamp;
 
@@ -55,7 +72,7 @@ void flush_events(void) {
             sdp_msg_aer_header[0] |= (event_count & 0xff);
 
             g_event_message.length = sizeof(sdp_hdr_t) + header_len
-                    + event_count * event_size;
+                                     + event_count * event_size;
 
 #if LOG_LEVEL >= LOG_DEBUG
             log_debug("===========Packet============\n");
@@ -63,7 +80,7 @@ void flush_events(void) {
             for (uint8_t i = 0; i < g_event_message.length + 8; i++) {
                 log_debug("%02x ", print_ptr[i]);
             }
-#endif // DEBUG
+#endif // LOG_LEVEL >= LOG_DEBUG
 
             if (payload_apply_prefix && payload_timestamp) {
                 uint16_t *temp = (uint16_t *) sdp_msg_aer_payload_prefix;
@@ -82,7 +99,7 @@ void flush_events(void) {
             for (uint8_t i = 0; i < buffer_index * event_size; i++) {
                 log_debug("%02x ", print_ptr[i]);
             }
-#endif // DEBUG
+#endif // LOG_LEVEL >= LOG_DEBUG
 
             spin1_send_sdp_msg(&g_event_message, 1);
             packets_sent++;
@@ -196,7 +213,7 @@ void incoming_event_payload_callback(uint key, uint payload) {
         //if there is a payload to be added
         if ((packet_type & 0x1) && (!payload_timestamp)) {
             buf_pointer[buffer_index] = (payload >> payload_right_shift)
-                    & 0xFFFF;
+                                        & 0xFFFF;
             buffer_index++;
         } else if ((packet_type & 0x1) && payload_timestamp) {
             buf_pointer[buffer_index] = (time & 0xFFFF);
@@ -231,18 +248,32 @@ void incoming_event_payload_callback(uint key, uint payload) {
 
 void read_parameters(address_t region_address) {
 
-    apply_prefix = region_address[0];         // P bit
-    prefix = region_address[1];               // Prefix data
-    prefix_type = region_address[2];          // F bit (for the receiver)
-    packet_type = region_address[3];          // Type bits
-    key_right_shift = region_address[4];      // Right packet shift
-                                              //     (for the sender)
-    payload_timestamp = region_address[5];    // T bit
-    payload_apply_prefix = region_address[6]; // D bit
-    payload_prefix = region_address[7];	      // Payload prefix data
-                                              //     (for the receiver)
-    payload_right_shift = region_address[8];  // Right payload shift
-                                              //     (for the sender)
+    // P bit
+    apply_prefix = region_address[0];
+
+    // Prefix data
+    prefix = region_address[1];
+
+    // F bit (for the receiver)
+    prefix_type = region_address[2];
+
+    // Type bits
+    packet_type = region_address[3];
+
+    // Right packet shift (for the sender)
+    key_right_shift = region_address[4];
+
+    // T bit
+    payload_timestamp = region_address[5];
+
+    // D bit
+    payload_apply_prefix = region_address[6];
+
+    // Payload prefix data (for the receiver)
+    payload_prefix = region_address[7];
+
+    // Right payload shift (for the sender)
+    payload_right_shift = region_address[8];
     sdp_tag = region_address[9];
     packets_per_timestamp = region_address[10];
 
@@ -310,13 +341,13 @@ bool configure_sdp_msg(void) {
     // check incompatible options
     if (payload_timestamp && payload_apply_prefix && (packet_type & 0x1)) {
         log_error("Timestamp can either be included as payload prefix or as"
-                "payload to each key, not both\n");
+                  "payload to each key, not both\n");
         return false;
     }
     if (payload_timestamp && !payload_apply_prefix && !(packet_type & 0x1)) {
         log_error("Timestamp can either be included as payload prefix or as"
-                "payload to each key, but current configuration does not"
-                "specify either of these\n");
+                  "payload to each key, but current configuration does not"
+                  "specify either of these\n");
         return false;
     }
 
@@ -371,6 +402,7 @@ bool configure_sdp_msg(void) {
             temp_ptr = (void *) (a + 2);
             header_len += 4;
             if (!payload_timestamp) {
+
                 // add payload prefix as required - not a timestamp
                 a[0] = (payload_prefix & 0xFFFF);
                 a[1] = ((payload_prefix >> 16) & 0xFFFF);
@@ -407,9 +439,9 @@ bool configure_sdp_msg(void) {
 
     log_debug("sdp_msg_aer_header: %08x\n", (uint32_t) sdp_msg_aer_header);
     log_debug("sdp_msg_aer_key_prefix: %08x\n",
-            (uint32_t) sdp_msg_aer_key_prefix);
+              (uint32_t) sdp_msg_aer_key_prefix);
     log_debug("sdp_msg_aer_payload_prefix: %08x\n",
-            (uint32_t) sdp_msg_aer_payload_prefix);
+              (uint32_t) sdp_msg_aer_payload_prefix);
     log_debug("sdp_msg_aer_data: %08x\n", (uint32_t) sdp_msg_aer_data);
 
     packets_sent = 0;
@@ -438,7 +470,7 @@ void c_main(void) {
     // Register callbacks
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_event_callback, -1);
     spin1_callback_on(MCPL_PACKET_RECEIVED,
-            incoming_event_payload_callback,-1);
+                      incoming_event_payload_callback, -1);
     spin1_callback_on(TIMER_TICK, timer_callback, 2);
 
     log_info("Starting\n");

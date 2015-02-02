@@ -51,7 +51,7 @@ static bool read_parameters(address_t address) {
 
     key = address[0];
     log_info("\tkey = %08x, (x: %u, y: %u) proc: %u", key,
-            key_x(key), key_y(key), key_p(key));
+             key_x(key), key_y(key), key_p(key));
 
     n_sources = address[1];
     num_spike_blocks = address[2];
@@ -60,7 +60,7 @@ static bool read_parameters(address_t address) {
     // **NOTE** in floating point terms this is ceil(num_neurons / 32)
     const uint32_t neurons_to_blocks_shift = 5;
     const uint32_t neurons_to_blocks_remainder =
-            (1 << neurons_to_blocks_shift) - 1;
+        (1 << neurons_to_blocks_shift) - 1;
     spike_vector_words = n_sources >> 5;
     if ((n_sources & neurons_to_blocks_remainder) != 0) {
         spike_vector_words++;
@@ -70,13 +70,13 @@ static bool read_parameters(address_t address) {
     spike_vector_bytes = spike_vector_words * sizeof(uint32_t);
 
     log_info("\tnum spike sources = %u, spike vector words = %u,"
-            " spike vector bytes = %u, num spike blocks = %u",
-            n_sources, spike_vector_words, spike_vector_bytes,
-            num_spike_blocks);
+             " spike vector bytes = %u, num spike blocks = %u",
+             n_sources, spike_vector_words, spike_vector_bytes,
+             num_spike_blocks);
 
     // Allocate DTCM for array of spike blocks and copy block of data
     spike_blocks = (spike_block_t*) spin1_malloc(
-            num_spike_blocks * sizeof(spike_block_t));
+        num_spike_blocks * sizeof(spike_block_t));
     if (spike_blocks == NULL) {
         log_error("Failed to allocated spike blocks");
         return false;
@@ -86,7 +86,7 @@ static bool read_parameters(address_t address) {
     log_debug("\tSpike blocks:");
     for(uint32_t b = 0; b < num_spike_blocks; b++) {
         log_debug("\t\t%u - Timestep: %u Offset: %u", b,
-                spike_blocks[b].timestep, spike_blocks[b].block_offset_words);
+                  spike_blocks[b].timestep, spike_blocks[b].block_offset_words);
     }
 
     // Allocate correctly sized DMA buffer
@@ -101,7 +101,6 @@ static bool read_parameters(address_t address) {
         return false;
     }
     clear_bit_field(empty_buffer, spike_vector_words);
-
 
     log_info("read_parameters: completed successfully");
     return true;
@@ -166,7 +165,7 @@ static bool initialize(uint32_t *timer_period) {
 
         // Synchronously copy block into dma buffer
         memcpy(dma_buffer, get_spike_block_start_address(&spike_blocks[0]),
-                spike_vector_bytes);
+               spike_vector_bytes);
 
         // Set state to reflect that there is data already in the buffer
         state = e_state_spike_block_in_buffer;
@@ -221,7 +220,7 @@ void timer_callback(uint unused0, uint unused1) {
             if (nonempty_bit_field(dma_buffer, spike_vector_words)) {
 
                 for (index_t i = 0; i < n_sources; i++) {
-                    if (bit_field_test(dma_buffer, i)){
+                    if (bit_field_test(dma_buffer, i)) {
                         log_debug("Sending spike packet %x", key | i);
                         spin1_send_mc_packet(key | i, 0, NO_PAYLOAD);
                         spin1_delay_us(1);
@@ -239,9 +238,8 @@ void timer_callback(uint unused0, uint unused1) {
             // appropriate recording channel
             if (recording_is_channel_enabled(
                     recording_flags, e_recording_channel_spike_history)) {
-                recording_record(
-                        e_recording_channel_spike_history, dma_buffer,
-                        spike_vector_bytes);
+                recording_record(e_recording_channel_spike_history, dma_buffer,
+                                 spike_vector_bytes);
             }
         } else {
 
@@ -253,9 +251,8 @@ void timer_callback(uint unused0, uint unused1) {
         // appropriate recording channel
         if (recording_is_channel_enabled(
                 recording_flags, e_recording_channel_spike_history)) {
-            recording_record(
-                    e_recording_channel_spike_history, empty_buffer,
-                    spike_vector_bytes);
+            recording_record(e_recording_channel_spike_history, empty_buffer,
+                             spike_vector_bytes);
         }
     }
 
@@ -273,8 +270,8 @@ void timer_callback(uint unused0, uint unused1) {
             // Start a DMA transfer from the absolute address of the spike
             // block into buffer
             spin1_dma_transfer(
-                    0, get_spike_block_start_address(next_spike_block),
-                    dma_buffer, DMA_READ, spike_vector_bytes);
+                0, get_spike_block_start_address(next_spike_block),
+                dma_buffer, DMA_READ, spike_vector_bytes);
 
             // Set state to dma in progress
             state = e_state_dma_in_progress;

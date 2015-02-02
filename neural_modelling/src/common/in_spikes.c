@@ -150,7 +150,7 @@ void in_spikes_print_buffer() {
     index_t a;
 
     log_debug("buffer: input = %3u, output = %3u elements = %3u\n", input,
-            output, n);
+              output, n);
     printf("------------------------------------------------\n");
 
     for (; n > 0; n--) {

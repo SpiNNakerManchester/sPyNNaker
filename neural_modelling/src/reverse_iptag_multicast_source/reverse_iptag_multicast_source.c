@@ -64,7 +64,7 @@ void process_16_bit_packets(
 
             log_debug("mc packet 16 key: %08x", key);
             log_debug("check before send packet: %d",
-                    (!check) || (check && ((key & mask) == key_space)));
+                      (!check) || (check && ((key & mask) == key_space)));
 
             if ((!check) || (check && ((key & mask) == key_space))) {
                 spin1_send_mc_packet(key, 0, NO_PAYLOAD);
@@ -88,7 +88,7 @@ void process_16_bit_packets(
 
             log_debug("mc packet 16 key: %08x, payload: %08x", key, payload);
             log_debug("check before send packet: %d",
-                    (!check) || (check && ((key & mask) == key_space)));
+                      (!check) || (check && ((key & mask) == key_space)));
 
             if ((!check) || (check && ((key & mask) == key_space))) {
                 spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
@@ -113,7 +113,7 @@ void process_16_bit_packets(
 
             log_debug("mc packet 16 key: %08x, payload: %08x", key, payload);
             log_debug("check before send packet: %d",
-                    (!check) || (check && ((key & mask) == key_space)));
+                      (!check) || (check && ((key & mask) == key_space)));
 
             if ((!check) || (check && ((key & mask) == key_space))) {
                 spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
@@ -153,7 +153,7 @@ void process_32_bit_packets(
 
             log_debug("mc packet 32 key: %08x", key);
             log_debug("check before send packet: %d",
-                    (!check) || (check && ((key & mask) == key_space)));
+                      (!check) || (check && ((key & mask) == key_space)));
 
             if ((!check) || (check && ((key & mask) == key_space))) {
                 spin1_send_mc_packet(key, 0, NO_PAYLOAD);
@@ -177,7 +177,7 @@ void process_32_bit_packets(
 
             log_debug("mc packet 32 key: %08x, payload: %08x", key, payload);
             log_debug("check before send packet: %d",
-                    (!check) || (check && ((key & mask) == key_space)));
+                      (!check) || (check && ((key & mask) == key_space)));
 
             if ((!check) || (check && ((key & mask) == key_space))) {
                 spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
@@ -206,7 +206,7 @@ void process_32_bit_packets(
 
             log_debug("mc packet 32 key: %08x, payload: %08x", key, payload);
             log_debug("check before send packet: %d",
-                    (!check) || (check && ((key & mask) == key_space)));
+                      (!check) || (check && ((key & mask) == key_space)));
 
             if ((!check) || (check && ((key & mask) == key_space))) {
                 spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
@@ -298,12 +298,13 @@ void sdp_packet_callback(uint mailbox, uint port) {
     }
 
     if (pkt_type <= 1) {
-        process_16_bit_packets(event_pointer, pkt_format, pkt_len,
-                pkt_key_prefix, pkt_payload_prefix, payload_on,
-                pkt_payload_prefix_apply);
+        process_16_bit_packets(
+            event_pointer, pkt_format, pkt_len, pkt_key_prefix,
+            pkt_payload_prefix, payload_on, pkt_payload_prefix_apply);
     } else {
-        process_32_bit_packets(event_pointer, pkt_len, pkt_key_prefix,
-                pkt_payload_prefix, payload_on, pkt_payload_prefix_apply);
+        process_32_bit_packets(
+            event_pointer, pkt_len, pkt_key_prefix, pkt_payload_prefix,
+            payload_on, pkt_payload_prefix_apply);
     }
 
     //free the message to stop overload

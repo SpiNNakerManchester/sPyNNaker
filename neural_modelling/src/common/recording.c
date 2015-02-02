@@ -77,12 +77,12 @@ bool recording_initialze_channel(
         // Calculate pointers to the start, current position and end of this
         // memory block
         recording_channel->start = recording_channel->current =
-                (uint8_t*) &output_region[1];
+            (uint8_t*) &output_region[1];
         recording_channel->end = recording_channel->start + size_bytes;
 
         log_info("Recording channel %u configured to use %u byte memory block"
-                " starting at %08x", channel, size_bytes,
-                recording_channel->start);
+                 " starting at %08x", channel, size_bytes,
+                 recording_channel->start);
         return true;
     }
 }
@@ -121,16 +121,16 @@ void recording_finalise() {
         // If this channel's in use
         if (recording_channel_in_use(channel)) {
             recording_channel_t *recording_channel =
-                    &g_recording_channels[channel];
+                &g_recording_channels[channel];
 
             // Calculate the number of bytes that have been written and write
             // back to SDRAM counter
             uint32_t num_bytes_written = recording_channel->current
-                    - recording_channel->start;
+                                         - recording_channel->start;
             log_info(
-                    "\tFinalising channel %u - %x bytes of data starting at %08x",
-                    channel, num_bytes_written + sizeof(uint32_t),
-                    recording_channel->counter);
+                "\tFinalising channel %u - %x bytes of data starting at %08x",
+                channel, num_bytes_written + sizeof(uint32_t),
+                recording_channel->counter);
             *recording_channel->counter = num_bytes_written;
         }
     }

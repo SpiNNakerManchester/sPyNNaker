@@ -71,7 +71,7 @@ void timer_callback(uint unused0, uint unused1) {
                 uint16_t delay = delay_and_repeat_data & 0x0000ffff;
                 for (uint16_t repeat_count = 0; repeat_count < repeat;
                         repeat_count++) {
-                    spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+                    spin1_send_mc_packet(key, 0, NO_PAYLOAD);
 
                     // if the delay is 0, dont call delay
                     if (delay > 0) {
@@ -81,7 +81,7 @@ void timer_callback(uint unused0, uint unused1) {
             } else {
 
                 //if no repeats, then just sned the message
-                spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+                spin1_send_mc_packet(key, 0, NO_PAYLOAD);
             }
 
         }

@@ -34,8 +34,8 @@ void out_spikes_record(uint32_t recording_flags) {
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
         recording_record(
-                e_recording_channel_spike_history, out_spikes,
-                out_spikes_size * sizeof(uint32_t));
+            e_recording_channel_spike_history, out_spikes,
+            out_spikes_size * sizeof(uint32_t));
     }
 }
 
@@ -53,8 +53,8 @@ bool out_spikes_is_spike(index_t neuron_index) {
     return (bit_field_test(out_spikes, neuron_index));
 }
 
-#if LOG_LEVEL >= LOG_DEBUG
 void out_spikes_print() {
+#if LOG_LEVEL >= LOG_DEBUG
     log_debug("out_spikes:\n");
 
     if (nonempty_out_spikes()) {
@@ -62,9 +62,5 @@ void out_spikes_print() {
         print_bit_field(out_spikes, out_spikes_size);
         log_debug("-----------\n");
     }
+#endif // LOG_LEVEL >= LOG_DEBUG
 }
-#else
-void out_spikes_print() {
-    skip();
-}
-#endif  // DEBUG
