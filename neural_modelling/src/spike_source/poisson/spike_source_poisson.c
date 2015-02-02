@@ -1,6 +1,7 @@
 #include "../../common/key_conversion.h"
 #include "../../common/out_spikes.h"
 #include "../../common/recording.h"
+#include "../../common/maths-util.h"
 
 #include <data_specification.h>
 #include <debug.h>
@@ -16,15 +17,15 @@ typedef struct slow_spike_source_t {
     uint32_t start_ticks;
     uint32_t end_ticks;
 
-    accum mean_isi_ticks;
-    accum time_to_spike_ticks;
+    REAL mean_isi_ticks;
+    REAL time_to_spike_ticks;
 } slow_spike_source_t;
 
 typedef struct fast_spike_source_t {
     uint32_t neuron_id;
     uint32_t start_ticks;
     uint32_t end_ticks;
-    unsigned long fract exp_minus_lambda;
+    UFRACT exp_minus_lambda;
 } fast_spike_source_t;
 
 // Globals
@@ -38,13 +39,13 @@ static uint32_t recording_flags = 0;
 static uint32_t time;
 static uint32_t simulation_ticks = 0;
 
-static inline accum slow_spike_source_get_time_to_spike(accum mean_isi_ticks) {
+static inline REAL slow_spike_source_get_time_to_spike(REAL mean_isi_ticks) {
     return exponential_dist_variate(mars_kiss64_seed, spike_source_seed)
             * mean_isi_ticks;
 }
 
 static inline uint32_t fast_spike_source_get_num_spikes(
-        unsigned long fract exp_minus_lambda) {
+        UFRACT exp_minus_lambda) {
     return poisson_dist_variate_exp_minus_lambda(
         mars_kiss64_seed, spike_source_seed, exp_minus_lambda);
 }
@@ -179,7 +180,7 @@ void timer_callback(uint unused0, uint unused1) {
                 && (time < slow_spike_source->end_ticks)) {
 
             // If this spike source should spike now
-            if (slow_spike_source->time_to_spike_ticks <= 0.0k) {
+            if (slow_spike_source->time_to_spike_ticks <= REAL_CONST(0.0)) {
 
                 // Write spike to out spikes
                 out_spikes_set_spike(slow_spike_source->neuron_id);
@@ -198,7 +199,7 @@ void timer_callback(uint unused0, uint unused1) {
             }
 
             // Subtract tick
-            slow_spike_source->time_to_spike_ticks -= 1.0k;
+            slow_spike_source->time_to_spike_ticks -= REAL_CONST(1.0);
         }
     }
 

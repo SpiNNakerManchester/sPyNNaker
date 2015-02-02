@@ -31,8 +31,14 @@ typedef unsigned int Card;
 
 #include <math.h>
 
-typedef double          REAL
+typedef double          REAL;
+typedef double          UREAL;
+typedef double          FRACT;
+typedef double          UFRACT;
 #define REAL_CONST(x)   x
+#define UREAL_CONST(x)  x
+#define FRACT_CONST(x)  x
+#define UFRACT_CONST(x) x
 
 static REAL macro_arg_1, macro_arg_2, macro_arg_3, macro_arg_4;
 
@@ -59,8 +65,14 @@ static REAL macro_arg_1, macro_arg_2, macro_arg_3, macro_arg_4;
 #include <stdfix.h>
 #include <stdfix-full-iso.h>
 
-typedef accum           REAL;
-#define REAL_CONST(x)   x##k	 // accum -> k, unsigned accum -> uk
+typedef accum                REAL;
+typedef unsigned accum       UREAL;
+typedef long fract           FRACT;
+typedef unsigned long fract  UFRACT;
+#define REAL_CONST(x)   x##k	 // accum -> k
+#define UREAL_CONST(x)  x##uk    // unsigned accum -> uk
+#define FRACT_CONST(x)  x##lr
+#define UFRACT_CONST(x) x##ulr
 
 #define ONE             REAL_CONST(1.0000)
 #define HALF            REAL_CONST(0.5000)

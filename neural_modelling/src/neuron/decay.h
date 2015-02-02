@@ -1,9 +1,10 @@
 #ifndef _DECAY_H_
 #define _DECAY_H_
 
+#include "../common/maths-util.h"
 #include "../common/neuron-typedefs.h"
 
-typedef unsigned long fract decay_t;
+typedef UFRACT decay_t;
 
 static inline s1615 decay_s1615(s1615 x, decay_t decay) {
     int64_t s = (int64_t) (bitsk(x));
