@@ -7,6 +7,49 @@ from spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
     abstract_eieio_packet import AbstractEIEIOPacket
 from spinnman import constants as spinnman_constants
 
+from spynnaker.pyNN.buffer_management.buffer_data_objects.eieio_16bit import \
+    eieio_16bit_data_packet, eieio_16bit_lower_key_prefix_data_packet, \
+    eieio_16bit_payload_prefix_data_packet, \
+    eieio_16bit_payload_prefix_lower_key_prefix_data_packet,\
+    eieio_16bit_payload_prefix_upper_key_prefix_data_packet,\
+    eieio_16bit_timed_payload_prefix_data_packet,\
+    eieio_16bit_timed_payload_prefix_lower_key_prefix_data_packet,\
+    eieio_16bit_timed_payload_prefix_upper_key_prefix_data_packet,\
+    eieio_16bit_upper_key_prefix_data_packet
+
+from spynnaker.pyNN.buffer_management.buffer_data_objects.\
+    eieio_16bit_with_payload import eieio_16bit_with_payload_data_packet, \
+    eieio_16bit_with_payload_lower_key_prefix_data_packet, \
+    eieio_16bit_with_payload_payload_prefix_data_packet, \
+    eieio_16bit_with_payload_payload_prefix_lower_key_prefix_data_packet, \
+    eieio_16bit_with_payload_payload_prefix_upper_key_prefix_data_packet, \
+    eieio_16bit_with_payload_timed_data_packet, \
+    eieio_16bit_with_payload_timed_lower_key_prefix_data_packet, \
+    eieio_16bit_with_payload_timed_upper_key_prefix_data_packet, \
+    eieio_16bit_with_payload_upper_key_prefix_data_packet
+
+from spynnaker.pyNN.buffer_management.buffer_data_objects.eieio_32bit import \
+    eieio_32bit_data_packet, \
+    eieio_32bit_lower_key_prefix_data_packet, \
+    eieio_32bit_payload_prefix_data_packet, \
+    eieio_32bit_payload_prefix_lower_key_prefix_data_packet, \
+    eieio_32bit_payload_prefix_upper_key_prefix_data_packet, \
+    eieio_32bit_timed_payload_prefix_data_packet, \
+    eieio_32bit_timed_payload_prefix_lower_key_prefix_data_packet, \
+    eieio_32bit_timed_payload_prefix_upper_key_prefix_data_packet, \
+    eieio_32bit_upper_key_prefix_data_packet
+
+from spynnaker.pyNN.buffer_management.buffer_data_objects.\
+    eieio_32bit_with_payload import eieio_32bit_with_payload_data_packet, \
+    eieio_32bit_with_payload_lower_key_prefix_data_packet, \
+    eieio_32bit_with_payload_payload_prefix_data_packet, \
+    eieio_32bit_with_payload_payload_prefix_lower_key_prefix_data_packet, \
+    eieio_32bit_with_payload_payload_prefix_upper_key_prefix_data_packet, \
+    eieio_32bit_with_payload_timed_data_packet, \
+    eieio_32bit_with_payload_timed_lower_key_prefix_data_packet, \
+    eieio_32bit_with_payload_timed_upper_key_prefix_data_packet, \
+    eieio_32bit_with_payload_upper_key_prefix_data_packet
+
 import math
 
 
@@ -99,11 +142,11 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
         """
         return self._base_size
 
-    @abstractmethod
     def get_eieio_message_as_byte_array(self):
         """
         returns the eieio packet as a bytearray string
         """
+        return self._message.convert_to_byte_array()
 
     @abstractmethod
     def is_data_packet(self):
@@ -136,4 +179,61 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
         :param reader:
         :return:
         """
-        pass
+        # parsed_packet = EIEIOMessage.create_eieio_messages_from(reader)
+        # packet_type_number = parsed_packet.eieio_header.type_param * 16
+        #
+        # if parsed_packet.eieio_header.is_time:
+        #     packet_type_number += 8
+        #
+        # if parsed_packet.eieio_header.payload_base is not None:
+        #     packet_type_number += 4
+        #
+        # if parsed_packet.eieio_header.prefix_type:
+        #     packet_type_number += 2
+        #
+        # if parsed_packet.eieio_header.prefix_param is not None:
+        #     packet_type_number += 1
+        #
+        # packet_types = {
+        #     0:  eieio_16bit_data_packet.EIEIO16BitDataPacket(data=parsed_packet.data),
+        #     1:  eieio_16bit_lower_key_prefix_data_packet.EIEIO16BitLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     3:  eieio_16bit_upper_key_prefix_data_packet.EIEIO16BitLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     4:  eieio_16bit_payload_prefix_data_packet.EIEIO16BitPayloadPrefixDataPacket(parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     5:  eieio_16bit_payload_prefix_lower_key_prefix_data_packet.EIEIO16BitPayloadPrefixLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     7:  eieio_16bit_payload_prefix_upper_key_prefix_data_packet.EIEIO16BitPayloadPrefixUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     12: eieio_16bit_timed_payload_prefix_data_packet.EIEIO16BitTimedPayloadPrefixDataPacket(parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     13: eieio_16bit_timed_payload_prefix_lower_key_prefix_data_packet.EIEIO16BitTimedPayloadPrefixLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     15: eieio_16bit_timed_payload_prefix_upper_key_prefix_data_packet.EIEIO16BitTimedPayloadPrefixUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     16: eieio_16bit_with_payload_data_packet.EIEIO16BitWithPayloadDataPacket(data=parsed_packet.data),
+        #     17: eieio_16bit_with_payload_lower_key_prefix_data_packet.EIEIO16BitWithPayloadLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     19: eieio_16bit_with_payload_upper_key_prefix_data_packet.EIEIO16BitWithPayloadUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     20: eieio_16bit_with_payload_payload_prefix_data_packet.EIEIO16BitWithPayloadPayloadPrefixDataPacket(parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     21: eieio_16bit_with_payload_payload_prefix_lower_key_prefix_data_packet.EIEIO16BitWithPayloadPayloadPrefixLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     23: eieio_16bit_with_payload_payload_prefix_upper_key_prefix_data_packet.EIEIO16BitWithPayloadPayloadPrefixUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     24: eieio_16bit_with_payload_timed_data_packet.EIEIO16BitWithPayloadTimedDataPacket(data=parsed_packet.data),
+        #     25: eieio_16bit_with_payload_timed_lower_key_prefix_data_packet.EIEIO16BitWithPayloadTimedLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     27: eieio_16bit_with_payload_timed_upper_key_prefix_data_packet.EIEIO16BitWithPayloadTimedUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     32: eieio_32bit_data_packet.EIEIO32BitDataPacket(data=parsed_packet.data),
+        #     33: eieio_32bit_lower_key_prefix_data_packet.EIEIO32BitLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     35: eieio_32bit_upper_key_prefix_data_packet.EIEIO32BitUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     36: eieio_32bit_payload_prefix_data_packet.EIEIO32BitPayloadPrefixDataPacket(parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     37: eieio_32bit_payload_prefix_lower_key_prefix_data_packet.EIEIO32BitPayloadPrefixLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     39: eieio_32bit_payload_prefix_upper_key_prefix_data_packet.EIEIO32BitPayloadPrefixUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     44: eieio_32bit_timed_payload_prefix_data_packet.EIEIO32BitTimedPayloadPrefixDataPacket(parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     45: eieio_32bit_timed_payload_prefix_lower_key_prefix_data_packet.EIEIO32BitTimedPayloadPrefixLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     47: eieio_32bit_timed_payload_prefix_upper_key_prefix_data_packet.EIEIO32BitTimedPayloadPrefixUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     48: eieio_32bit_with_payload_data_packet.EIEIO32BitWithPayloadDataPacket(data=parsed_packet.data),
+        #     49: eieio_32bit_with_payload_lower_key_prefix_data_packet.EIEIO32BitWithPayloadLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     51: eieio_32bit_with_payload_upper_key_prefix_data_packet.EIEIO32BitWithPayloadUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     52: eieio_32bit_with_payload_payload_prefix_data_packet.EIEIO32BitWithPayloadPayloadPrefixDataPacket(parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     53: eieio_32bit_with_payload_payload_prefix_lower_key_prefix_data_packet.EIEIO32BitWithPayloadPayloadPrefixLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     55: eieio_32bit_with_payload_payload_prefix_upper_key_prefix_data_packet.EIEIO32BitWithPayloadPayloadPrefixUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, parsed_packet.eieio_header.payload_base, data=parsed_packet.data),
+        #     56: eieio_32bit_with_payload_timed_data_packet.EIEIO32BitWithPayloadTimedDataPacket(data=parsed_packet.data),
+        #     57: eieio_32bit_with_payload_timed_lower_key_prefix_data_packet.EIEIO32BitWithPayloadTimedLowerKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     59: eieio_32bit_with_payload_timed_upper_key_prefix_data_packet.EIEIO32BitWithPayloadTimedUpperKeyPrefixDataPacket(parsed_packet.eieio_header.prefix_param, data=parsed_packet.data),
+        #     }
+        #
+        # if packet_type_number not in packet_types:
+        #     raise
+        # else:
+        #     packet_types[packet_type_number]

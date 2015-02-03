@@ -1,22 +1,20 @@
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
+from spinnman.messages.eieio.eieio_prefix_type import EIEIOPrefixType
 from spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
     abstract_eieio_data_packet import AbstractEIEIODataPacket
 
 
-class EIEIO32BitPayloadDataPacket(AbstractEIEIODataPacket):
+class EIEIO16BitWithPayloadPayloadPrefixUpperKeyPrefixDataPacket(
+        AbstractEIEIODataPacket):
 
-    def __init__(self, data=None):
+    def __init__(self, key_prefix, payload_prefix, data=None):
         if data is None:
             data = bytearray()
 
         AbstractEIEIODataPacket.__init__(
-            self, EIEIOTypeParam.KEY_PAYLOAD_32_BIT, data=data)
-
-    def get_eieio_message_as_byte_array(self):
-        """
-        returns the eieio packet as a bytearray string
-        """
-        return self._message.convert_to_byte_array()
+            self, EIEIOTypeParam.KEY_PAYLOAD_16_BIT, prefix_param=key_prefix,
+            prefix_type=EIEIOPrefixType.UPPER_HALF_WORD,
+            payload_base=payload_prefix, data=data)
 
     def insert_key_and_payload(self, key, payload):
         if self.get_available_count() > 0:  # there is space available
@@ -27,7 +25,11 @@ class EIEIO32BitPayloadDataPacket(AbstractEIEIODataPacket):
             return False
 
     @property
-    def pkt_time(self):
+    def key_prefix(self):
+        return AbstractEIEIODataPacket(self).prefix_param
+
+    @property
+    def payload_prefix(self):
         return AbstractEIEIODataPacket(self).payload_base
 
     @property

@@ -4,33 +4,27 @@ from spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
     abstract_eieio_data_packet import AbstractEIEIODataPacket
 
 
-class EIEIO32BitLowerDataPrefixDataPacket(AbstractEIEIODataPacket):
+class EIEIO32BitWithPayloadUpperKeyPrefixDataPacket(AbstractEIEIODataPacket):
 
-    def __init__(self, data_prefix, data=None):
+    def __init__(self, key_prefix, data=None):
         if data is None:
             data = bytearray()
 
         AbstractEIEIODataPacket.__init__(
-            self, EIEIOTypeParam.KEY_32_BIT, prefix_param=data_prefix,
-            prefix_type=EIEIOPrefixType.LOWER_HALF_WORD, data=data)
+            self, EIEIOTypeParam.KEY_PAYLOAD_32_BIT, prefix_param=key_prefix,
+            prefix_type=EIEIOPrefixType.UPPER_HALF_WORD, data=data)
 
-    def get_eieio_message_as_byte_array(self):
-        """
-        returns the eieio packet as a bytearray string
-        """
-        return self._message.convert_to_byte_array()
-
-    def insert_key(self, key):
+    def insert_key_and_payload(self, key, payload):
         if self.get_available_count() > 0:  # there is space available
-            AbstractEIEIODataPacket(self)._insert_key(key)
+            AbstractEIEIODataPacket(self)._insert_key_and_payload(key, payload)
             self._length += self._element_size
             return True
         else:
             return False
 
     @property
-    def pkt_time(self):
-        return AbstractEIEIODataPacket(self).payload_base
+    def key_prefix(self):
+        return AbstractEIEIODataPacket(self).prefix_param
 
     @property
     def length(self):

@@ -12,12 +12,6 @@ class EIEIO32BitDataPacket(AbstractEIEIODataPacket):
         AbstractEIEIODataPacket.__init__(self, EIEIOTypeParam.KEY_32_BIT,
                                          data=data)
 
-    def get_eieio_message_as_byte_array(self):
-        """
-        returns the eieio packet as a bytearray string
-        """
-        return self._message.convert_to_byte_array()
-
     def insert_key(self, key):
         if self.get_available_count() > 0:  # there is space available
             AbstractEIEIODataPacket(self)._insert_key(key)
@@ -25,10 +19,6 @@ class EIEIO32BitDataPacket(AbstractEIEIODataPacket):
             return True
         else:
             return False
-
-    @property
-    def pkt_time(self):
-        return AbstractEIEIODataPacket(self).payload_base
 
     @property
     def length(self):
@@ -39,4 +29,3 @@ class EIEIO32BitDataPacket(AbstractEIEIODataPacket):
         handler for isinstance
         """
         return True
-

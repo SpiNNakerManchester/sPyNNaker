@@ -3,18 +3,10 @@ from abc import abstractmethod
 from six import add_metaclass
 import math
 
-from spinnman.data.little_endian_byte_array_byte_writer import \
-    LittleEndianByteArrayByteWriter
-from spinnman.messages.eieio.eieio_header import EIEIOHeader
-from spinnman.messages.eieio.eieio_message import EIEIOMessage
-from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
-from spinnman import constants as spinnman_constants
-from spynnaker.pyNN.buffer_management.buffer_data_objects.eieio_32bit_timed_data_packet import \
-    EIEIO32BitTimedDataPacket
+from spynnaker.pyNN.buffer_management.buffer_data_objects.eieio_32bit.eieio_32bit_timed_payload_prefix_data_packet import \
+    EIEIO32BitTimedPayloadPrefixDataPacket
 from spynnaker.pyNN.buffer_management.buffer_requests.sequenced_eieio_send_data import \
     SequencedEIEIOSendData
-from spynnaker.pyNN.buffer_management.buffer_requests.stop_requests_request \
-    import StopRequestsRequest
 from spynnaker.pyNN.buffer_management.buffer_requests.event_stop_request \
     import EventStopRequest
 from spynnaker.pyNN.utilities import constants
@@ -124,7 +116,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
         used by this method.
         """
         timestamp = buffer_keys[position_in_buffer]
-        packet = EIEIO32BitTimedDataPacket(timestamp)
+        packet = EIEIO32BitTimedPayloadPrefixDataPacket(timestamp)
 
         entries_to_put_in = math.floor((memory_available - packet.header_size) /
                                        packet.key_size)
@@ -166,7 +158,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
         moved_to_new_buffer = False
         timestamp = buffer_keys[position_in_buffer]
         # write the header
-        packet = EIEIO32BitTimedDataPacket(timestamp)
+        packet = EIEIO32BitTimedPayloadPrefixDataPacket(timestamp)
         max_entries_in_packet = packet.get_max_count()
 
         # check that the limit on the eieio message count is valid
