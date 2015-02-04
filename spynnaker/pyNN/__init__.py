@@ -205,7 +205,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     logger.info(
         "sPyNNaker   (c) 2014 APT Group, University of Manchester")
     logger.info(
-        "                Release version 2015.001 - January 2015")
+        "                Release version 2015.003 - January 2015")
 
     if len(extra_params.keys()) > 1:
         logger.warn("Extra params has been applied which we do not consider")
