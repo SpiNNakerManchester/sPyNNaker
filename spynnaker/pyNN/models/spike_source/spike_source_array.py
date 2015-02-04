@@ -70,7 +70,7 @@ class SpikeSourceArray(AbstractSpikeSource):
                     spike_dict[time_stamp_in_ticks].append(neuron)
         else:
             # This is in official PyNN format, all neurons use the same list:
-            neuron_list = list(range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
+            neuron_list = list(range(vertex_slice.n_atoms))
             for timeStamp in self._spike_times:
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
@@ -81,7 +81,8 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     @staticmethod
     def get_spike_block_row_length(n_atoms):
-        return int(math.ceil(n_atoms / front_end_common_constants.BITS_PER_WORD))
+        return int(math.ceil(n_atoms
+                             / front_end_common_constants.BITS_PER_WORD))
 
     @staticmethod
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
@@ -110,8 +111,8 @@ class SpikeSourceArray(AbstractSpikeSource):
     def process_spike_array_info(self, subvertex, graph_mapper):
         """
         Parse python definitons of the required spike arrays and construct
-        both the spike blocks, containing lists of spike IDs for each time step,
-        and the index table, which gives the address in memory to access
+        both the spike blocks, containing lists of spike IDs for each time
+        step, and the index table, which gives the address in memory to access
         the spike block for the current time step.
         """
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
@@ -151,8 +152,8 @@ class SpikeSourceArray(AbstractSpikeSource):
     def reserve_memory_regions(self, spec, setup_sz, block_index_region_size,
                                spike_region_size, spike_hist_buff_sz):
         """
-        *** Modified version of same routine in abstract_models.py These could be
-        combined to form a common routine, perhaps by passing a list of
+        *** Modified version of same routine in abstract_models.py These could
+        be combined to form a common routine, perhaps by passing a list of
         entries. ***
         Reserve memory for the system, indices and spike data regions.
         The indices region will be copied to DTCM by the executable.
@@ -276,7 +277,7 @@ class SpikeSourceArray(AbstractSpikeSource):
 
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
-        sub_vertex_out_spike_bytes_function = \
+        out_spike_bytes_function = \
             lambda subvertex, subvertex_slice: int(math.ceil(
                 subvertex_slice.n_atoms / 32.0)) * 4
 
@@ -284,12 +285,11 @@ class SpikeSourceArray(AbstractSpikeSource):
         return self._get_spikes(
             transciever=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
-            spike_recording_region=
-            self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            sub_vertex_out_spike_bytes_function=
-            sub_vertex_out_spike_bytes_function)
+            spike_recording_region=self._SPIKE_SOURCE_REGIONS
+                                       .SPIKE_HISTORY_REGION.value,
+            sub_vertex_out_spike_bytes_function=out_spike_bytes_function)
 
-    #inhirrted from dataspecable vertex
+    # inherited from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_mapper, report_folder,
                            write_text_specs, application_run_time_folder):
@@ -304,8 +304,11 @@ class SpikeSourceArray(AbstractSpikeSource):
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
-        #get slice from mapper
+        # get slice from mapper
         subvert_slice = graph_mapper.get_subvertex_slice(subvertex)
+
+        # Setup words + 1 for flags + 1 for recording size
+        setup_size = (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS + 2) * 4
 
         spike_history_region_sz = self.get_spike_buffer_size(subvert_slice)
 
@@ -322,12 +325,13 @@ class SpikeSourceArray(AbstractSpikeSource):
             spike_region_size = 4
 
         # Calculate memory requirements:
-        block_index_region_size = self.get_block_index_bytes(len(table_entries))
+        block_index_region_size = self.get_block_index_bytes(
+            len(table_entries))
 
         # Create the data regions for the spike source array:
-        self.reserve_memory_regions(spec, constants.SETUP_SIZE,
-                                    block_index_region_size,
-                                    spike_region_size, spike_history_region_sz)
+        self.reserve_memory_regions(
+            spec, setup_size, block_index_region_size, spike_region_size,
+            spike_history_region_sz)
         self.write_setup_info(spec, spike_history_region_sz)
 
         self.write_block_index_region(spec, placement, num_neurons,
@@ -344,11 +348,9 @@ class SpikeSourceArray(AbstractSpikeSource):
                                    'spike_source_array.aplx')
         return binary_name
 
-    #inhirrted from partitionable vertex
+    # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0
-        #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        #return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
         spike_dict = self.get_spikes_per_timestep(vertex_slice)
@@ -361,13 +363,12 @@ class SpikeSourceArray(AbstractSpikeSource):
             self.get_block_index_bytes(no_active_timesteps)
 
         spike_history_region_sz = self.get_spike_buffer_size(vertex_slice)
-        return (constants.SETUP_SIZE + spike_region_sz + block_index_region_size
+        return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4)
+                + spike_region_sz + block_index_region_size
                 + spike_history_region_sz)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         return 0
-        #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        #return (44 + (16 * 4)) * n_atoms
 
     def is_recordable(self):
         return True

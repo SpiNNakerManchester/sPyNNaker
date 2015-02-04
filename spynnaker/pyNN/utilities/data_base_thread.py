@@ -5,10 +5,11 @@ import os
 import logging
 from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
 from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
 from spynnaker.pyNN.utilities.data_base_message_connection\
     import DataBaseMessageConnection
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_population_recordable_vertex \
+    import AbstractPopulationRecordableVertex
 
 logger = logging.getLogger(__name__)
 
@@ -342,7 +343,7 @@ class DataBaseThread(threading.Thread):
     def _add_partitionable_vertices(self):
         # add vertices
         for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractRecordableVertex):
+            if isinstance(vertex, AbstractPopulationRecordableVertex):
                 self._cur.execute(
                     "INSERT INTO Partitionable_vertices("
                     "vertex_label, no_atoms, max_atom_constrant, recorded)"

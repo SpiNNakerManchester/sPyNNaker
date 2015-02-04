@@ -17,4 +17,8 @@ void synapse_dynamics_process_post_synaptic_event(
 
 input_t synapse_dynamics_get_intrinsic_bias(index_t neuron_index);
 
+void synapse_dynamics_print_plastic_synapses(
+        address_t plastic_region_address, address_t fixed_region_address,
+        uint32_t *ring_buffer_to_input_buffer_left_shifts);
+
 #endif // _SYNAPSE_DYNAMICS_H_

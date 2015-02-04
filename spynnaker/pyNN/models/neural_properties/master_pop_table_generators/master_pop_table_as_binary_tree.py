@@ -1,10 +1,9 @@
-from spynnaker.pyNN.models.abstract_models.abstract_master_pop_table_factory\
-    import AbstractMasterPopTableFactory
+from spynnaker.pyNN.models.neural_properties.master_pop_table_generators\
+    .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 
 import logging
-import math
 import numpy
 logger = logging.getLogger(__name__)
 

@@ -52,11 +52,10 @@ from spynnaker.pyNN.spynnaker_configurations import \
     SpynnakerConfigurationFunctions
 from spynnaker.pyNN.utilities.conf import config
 
-#spinnman imports
+# spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 from spinnman.model.iptag.reverse_iptag import ReverseIPTag
-from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 import logging
 import math
@@ -80,54 +79,56 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if self._app_id is None:
             self._set_up_main_objects(
                 app_id=config.getint("Machine", "appID"),
-                execute_data_spec_report=
-                config.getboolean("Reports", "writeTextSpecs"),
-                execute_partitioner_report=
-                config.getboolean("Reports", "writePartitionerReports"),
-                execute_placer_report=
-                config.getboolean("Reports", "writePlacerReports"),
-                execute_router_dat_based_report=
-                config.getboolean("Reports", "writeRouterDatReport"),
-                reports_are_enabled=
-                config.getboolean("Reports", "reportsEnabled"),
-                generate_time_recordings_for_performance_measurements=
-                config.getboolean("Reports", "outputTimesForSections"),
-                execute_router_report=
-                config.getboolean("Reports", "writeRouterReports"),
-                execute_write_reload_steps=
-                config.getboolean("Reports", "writeReloadSteps"),
-                generate_transciever_report=
-                config.getboolean("Reports", "writeTransceiverReport"),
-                execute_routing_info_report=
-                config.getboolean("Reports", "writeRouterInfoReport"),
-                in_debug_mode=(config.get("Mode", "mode") == "Debug"))
+                execute_data_spec_report=config.getboolean(
+                    "Reports", "writeTextSpecs"),
+                execute_partitioner_report=config.getboolean(
+                    "Reports", "writePartitionerReports"),
+                execute_placer_report=config.getboolean(
+                    "Reports", "writePlacerReports"),
+                execute_router_dat_based_report=config.getboolean(
+                    "Reports", "writeRouterDatReport"),
+                reports_are_enabled=config.getboolean(
+                    "Reports", "reportsEnabled"),
+                generate_performance_measurements=config.getboolean(
+                    "Reports", "outputTimesForSections"),
+                execute_router_report=config.getboolean(
+                    "Reports", "writeRouterReports"),
+                execute_write_reload_steps=config.getboolean(
+                    "Reports", "writeReloadSteps"),
+                generate_transciever_report=config.getboolean(
+                    "Reports", "writeTransceiverReport"),
+                execute_routing_info_report=config.getboolean(
+                    "Reports", "writeRouterInfoReport"),
+                in_debug_mode=config.get("Mode", "mode") == "Debug",
+                create_database=config.get("Database", "create_database"))
 
             self._set_up_pacman_algorthms_listings(
-                partitioner_algorithum=
-                config.get("Partitioner", "algorithm"),
-                placer_algorithum=config.get("Placer", "algorithm"),
-                key_allocator_algorithum=None,
-                routing_algorithum=config.get("Routing", "algorithm"))
-            #get the pynn specific key allocator algorthium
+                partitioner_algorithm=config.get("Partitioner", "algorithm"),
+                placer_algorithm=config.get("Placer", "algorithm"),
+                key_allocator_algorithm=None,
+                routing_algorithm=config.get("Routing", "algorithm"))
+
+            # get the pynn specific key allocator algorithm
             #  (overloaded from common call)
             self._key_allocator_algorithm = \
                 self.get_pynn_specific_key_allocator()
-            #set up exeuctable specifics
+            # set up exeuctable specifics
             self._set_up_executable_specifics()
             self._set_up_report_specifics(
-                default_report_file_path=
-                config.get("Reports", "defaultReportFilePath"),
+                default_report_file_path=config.get(
+                    "Reports", "defaultReportFilePath"),
                 max_reports_kept=config.getint("Reports", "max_reports_kept"),
-                reports_are_enabled=
-                config.getboolean("Reports", "reportsEnabled"),
-                write_provance_data=
-                config.getboolean("Reports", "writeProvanceData"),
-                write_text_specs=config.getboolean("Reports", "writeTextSpecs"))
+                reports_are_enabled=config.getboolean(
+                    "Reports", "reportsEnabled"),
+                write_provance_data=config.getboolean(
+                    "Reports", "writeProvanceData"),
+                write_text_specs=config.getboolean(
+                    "Reports", "writeTextSpecs"))
             self._set_up_output_application_data_specifics(
-                max_application_binaries_kept=
-                config.getint("Reports", "max_application_binaries_kept"),
-                where_to_write_application_data_files=
-                config.get("Reports", "defaultApplicationDataFilePath")
+                max_application_binaries_kept=config.getint(
+                    "Reports", "max_application_binaries_kept"),
+                where_to_write_application_data_files=config.get(
+                    "Reports", "defaultApplicationDataFilePath")
             )
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
@@ -136,15 +137,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
 
-        FrontEndCommonInterfaceFunctions.__init__(self, self._reports_states,
-                                                  self._report_default_directory)
+        FrontEndCommonInterfaceFunctions.__init__(
+            self, self._reports_states, self._report_default_directory)
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
 
         logger.info("Setting appID to %d." % self._app_id)
 
-        #get the machine time step
+        # get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
@@ -169,7 +170,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             downed_cores=config.get("Machine", "down_cores"),
             requires_virtual_board=config.getboolean("Machine",
                                                      "virtual_board"),
-            requires_wrap_around=config.get("Machine", "requires_wrap_arounds"),
+            requires_wrap_around=config.get("Machine",
+                                            "requires_wrap_arounds"),
             machine_version=config.getint("Machine", "version"))
 
         # add database generation if requested
@@ -183,13 +185,13 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 wait_on_confirmation)
             self._database_thread.start()
 
-        #create network report if needed
+        # create network report if needed
         if self._reports_states is not None:
-            reports.network_specification_report(self._report_default_directory,
-                                                 self._partitionable_graph,
-                                                 self._hostname)
+            reports.network_specification_report(
+                self._report_default_directory, self._partitionable_graph,
+                self._hostname)
 
-        #calcualte number of machien time steps
+        # calcualte number of machien time steps
         if run_time is not None:
             self._no_machine_time_steps =\
                 int((run_time * 1000.0) / self._machine_time_step)
@@ -228,10 +230,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if do_timing:
             timer.take_sample()
 
-        #load database if needed
+        # load database if needed
         if self._create_database:
             self._database_thread.add_system_params(
-                self._time_scale_factor, self._machine_time_step, self._runtime)
+                self._time_scale_factor, self._machine_time_step,
+                self._runtime)
             self._database_thread.add_machine_objects(self._machine)
             self._database_thread.add_partitionable_vertices(
                 self._partitionable_graph)
@@ -241,11 +244,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._database_thread.add_routing_infos(self._routing_infos)
             self._database_thread.add_routing_tables(self._router_tables)
 
-        #extract iptags required by the graph
+        # extract iptags required by the graph
         self._set_iptags()
         self._set_reverse_ip_tags()
 
-        #execute data spec generation
+        # execute data spec generation
         if do_timing:
             timer.start_timing()
         logger.info("*** Generating Output *** ")
@@ -254,16 +257,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if do_timing:
             timer.take_sample()
 
-        #execute data spec execution
+        # execute data spec execution
         if do_timing:
             timer.start_timing()
         processor_to_app_data_base_address = \
             self.execute_data_specification_execution(
                 config.getboolean("SpecExecution", "specExecOnHost"),
                 self._hostname, self._placements, self._graph_mapper,
-                write_text_specs=config.getboolean("Reports", "writeTextSpecs"),
-                runtime_application_data_folder=
-                self._application_default_folder)
+                write_text_specs=config.getboolean(
+                    "Reports", "writeTextSpecs"),
+                runtime_application_data_folder=self._app_data_runtime_folder)
 
         if self._reports_states is not None:
             reports.write_memory_map_report(self._report_default_directory,
@@ -288,13 +291,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     processor_to_app_data_base_address, self._hostname,
                     self._app_id,
                     machine_version=config.getint("Machine", "version"),
-                    application_run_time_report_folder=
-                    self._application_default_folder)
+                    app_data_folder=self._app_data_runtime_folder)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(
                     executable_targets, self._app_id,
-                    application_run_time_report_folder=
-                    self._application_default_folder)
+                    app_data_folder=self._app_data_runtime_folder)
             if do_timing:
                 timer.take_sample()
 
@@ -302,7 +303,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 logger.info("*** Running simulation... *** ")
                 if self._reports_states.transciever_report:
                     reports.re_load_script_running_aspects(
-                        self._application_default_folder, executable_targets,
+                        self._app_data_runtime_folder, executable_targets,
                         self._hostname, self._app_id, run_time)
 
                 wait_on_confirmation = \
@@ -313,8 +314,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._database_thread, self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
-                    #retrieve provance data
-                    self._retieve_provance_data_from_machine(executable_targets)
+                    # retrieve provenance data
+                    self._retieve_provance_data_from_machine(
+                        executable_targets)
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
@@ -336,7 +338,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._add_iptag(iptag)
 
     def _set_reverse_ip_tags(self):
-        #extract reverse iptags required by the graph
+        # extract reverse iptags required by the graph
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractReverseIPTagableVertex):
                 reverse_iptag = vertex.get_reverse_ip_tag()
@@ -448,21 +450,21 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         self._check_if_theres_any_pre_placement_constraints_to_satisify()
 
-        #execute partitioner
+        # execute partitioner
         self._execute_partitioner(pacman_report_state)
 
-        #execute placer
+        # execute placer
         self._execute_placer(pacman_report_state)
 
-        #execute pynn subedge pruning
+        # execute pynn subedge pruning
         self._partitioned_graph, self._graph_mapper = \
             GraphEdgeFilter(self._report_default_directory)\
             .run(self._partitioned_graph, self._graph_mapper)
 
-        #execute key allocator
+        # execute key allocator
         self._execute_key_allocator(pacman_report_state)
 
-        #execute router
+        # execute router
         self._execute_router(pacman_report_state)
 
     def _execute_key_allocator(self, pacman_report_state):
@@ -471,12 +473,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         else:
             self._key_allocator_algorithm = self._key_allocator_algorithm()
 
-        #execute routing info generator
+        # execute routing info generator
         self._routing_infos = \
             self._key_allocator_algorithm.allocate_routing_info(
                 self._partitioned_graph, self._placements)
 
-        #generate reports
+        # generate reports
         if (pacman_report_state is not None and
                 pacman_report_state.routing_info_report):
             pacman_reports.routing_info_reports(
@@ -484,7 +486,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._partitioned_graph, self._placements, self._routing_infos)
 
     def _execute_router(self, pacman_report_state):
-        #set up a default placer algorithm if none are specified
+
+        # set up a default placer algorithm if none are specified
         if self._router_algorithm is None:
             self._router_algorithm = BasicDijkstraRouting()
         else:
@@ -496,7 +499,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._partitioned_graph)
 
         if self._in_debug_mode:
-            #check that all routes are valid and no cycles exist
+            # check that all routes are valid and no cycles exist
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
                 routing_tables=self._router_tables, machine=self._machine,
@@ -515,7 +518,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 routing_info=self._routing_infos, machine=self._machine)
 
     def _execute_partitioner(self, pacman_report_state):
-        #execute partitioner or default partitioner (as seen fit)
+
+        # execute partitioner or default partitioner (as seen fit)
         if self._partitioner_algorithm is None:
             self._partitioner_algorithm = \
                 BasicPartitioner(self._machine_time_step,
@@ -525,7 +529,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._partitioner_algorithm(self._machine_time_step,
                                             self._no_machine_time_steps)
 
-        # if algorithum needs a placer, add placer algorithum
+        # if algorithm needs a placer, add placer algorithm
         if hasattr(self._partitioner_algorithm, "set_placer_algorithm"):
             self._partitioner_algorithm.set_placer_algorithm(
                 self._placer_algorithm, self._machine)
@@ -541,14 +545,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._partitionable_graph, self._graph_mapper)
 
     def _execute_placer(self, pacman_report_state):
-        #execute placer or default placer (as seen fit)
+
+        # execute placer or default placer (as seen fit)
         if self._placer_algorithm is None:
             self._placer_algorithm = BasicPlacer(self._machine)
         else:
             self._placer_algorithm = self._placer_algorithm(self._machine)
-        self._placements = self._placer_algorithm.place(self._partitioned_graph)
+        self._placements = self._placer_algorithm.place(
+            self._partitioned_graph)
 
-        #execute placer reports if needed
+        # execute placer reports if needed
         if (pacman_report_state is not None and
                 pacman_report_state.placer_report):
             pacman_reports.placer_reports(
@@ -558,12 +564,13 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 report_folder=self._report_default_directory)
 
     def generate_data_specifications(self):
-        #iterate though subvertexes and call generate_data_spec for each vertex
+        # iterate though subvertexes and call generate_data_spec for each
+        # vertex
         executable_targets = dict()
         no_processors = config.getint("Threading", "dsg_threads")
         thread_pool = ThreadPool(processes=no_processors)
 
-        #create a progress bar for end users
+        # create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
         data_generator_interfaces = list()
@@ -579,7 +586,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._routing_infos, self._hostname, self._graph_mapper,
                     self._report_default_directory,
                     config.getboolean("Reports", "writeTextSpecs"),
-                    self._application_default_folder, progress_bar)
+                    self._app_data_runtime_folder, progress_bar)
                 data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start())
 
@@ -627,9 +634,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             structure=structure, label=label, spinnaker=self,
             multi_cast_vertex=self._multi_cast_vertex)
 
-    def create_projection(self, presynaptic_population, postsynaptic_population,
-                          connector, source, target, synapse_dynamics, label,
-                          rng):
+    def create_projection(self, presynaptic_population,
+                          postsynaptic_population, connector, source, target,
+                          synapse_dynamics, label, rng):
         if label is None:
             label = "Projection {}".format(self._edge_count)
             self._edge_count += 1
@@ -662,7 +669,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     VertexRequiresVirtualChipInMachineConstraint)
             if len(virtual_chip_constraints) > 0:
                 for virtual_chip_constraint in virtual_chip_constraints:
-                    #check if the virtual chip doesnt already exist
+
+                    # check if the virtual chip doesnt already exist
                     if (self._machine.get_chip_at(
                             virtual_chip_constraint.virtual_chip_coords['x'],
                             virtual_chip_constraint.virtual_chip_coords['y'])
@@ -673,48 +681,54 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
     def _create_virtual_chip(self, virtual_chip_constraint):
         sdram_object = SDRAM()
-        #creates the two links
+
+        # creates the two links
         to_virtual_chip_link = Link(
             destination_x=virtual_chip_constraint.virtual_chip_coords['x'],
             destination_y=virtual_chip_constraint.virtual_chip_coords['y'],
             source_x=virtual_chip_constraint.connected_to_chip_coords['x'],
             source_y=virtual_chip_constraint.connected_to_chip_coords['y'],
-            multicast_default_from=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
-            multicast_default_to=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
+            multicast_default_from=(virtual_chip_constraint
+                                    .connected_to_chip_link_id + 3) % 6,
+            multicast_default_to=(virtual_chip_constraint
+                                  .connected_to_chip_link_id + 3) % 6,
             source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
 
         from_virtual_chip_link = Link(
-            destination_x=virtual_chip_constraint.connected_to_chip_coords['x'],
-            destination_y=virtual_chip_constraint.connected_to_chip_coords['y'],
+            destination_x=(virtual_chip_constraint
+                           .connected_to_chip_coords['x']),
+            destination_y=(virtual_chip_constraint
+                           .connected_to_chip_coords['y']),
             source_x=virtual_chip_constraint.virtual_chip_coords['x'],
             source_y=virtual_chip_constraint.virtual_chip_coords['y'],
-            multicast_default_from=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
-            multicast_default_to=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
+            multicast_default_from=(virtual_chip_constraint
+                                    .connected_to_chip_link_id + 3) % 6,
+            multicast_default_to=(virtual_chip_constraint
+                                  .connected_to_chip_link_id + 3) % 6,
             source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
 
-        #create the router
+        # create the router
         links = [from_virtual_chip_link]
         router_object = MachineRouter(
             links=links, emergency_routing_enabled=False,
             clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
-            n_available_multicast_entries=sys.maxint, diagnostic_filters=list())
+            n_available_multicast_entries=sys.maxint,
+            diagnostic_filters=list())
 
-        #create the processors
+        # create the processors
         processors = list()
         for virtual_core_id in range(0, 128):
             processors.append(Processor(virtual_core_id,
                                         Processor.CPU_AVAILABLE,
                                         virtual_core_id == 0))
-        #connect the real chip with the virtual one
+
+        # connect the real chip with the virtual one
         connected_chip = self._machine.get_chip_at(
             virtual_chip_constraint.connected_to_chip_coords['x'],
             virtual_chip_constraint.connected_to_chip_coords['y'])
         connected_chip.router.add_link(to_virtual_chip_link)
-        #return new v chip
+
+        # return new v chip
         return Chip(
             processors=processors, router=router_object, sdram=sdram_object,
             x=virtual_chip_constraint.virtual_chip_coords['x'],

@@ -22,13 +22,13 @@ static uint32_t n_neurons;
 static weight_t ring_buffers[RING_BUFFER_SIZE];
 
 // Amount to left shift the ring buffer by to make it an input
-static uint32_t *ring_buffer_to_input_left_shifts;
+static uint32_t ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT];
 
 // Input buffer to handle input and shaping of the input
 static input_t input_buffers[INPUT_BUFFER_SIZE];
 
 // The synapse shaping parameters
-static synapse_param_t **neuron_synapse_shaping_params;
+static synapse_param_t *neuron_synapse_shaping_params[SYNAPSE_TYPE_COUNT];
 
 // Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
@@ -36,31 +36,10 @@ static uint32_t saturation_count = 0;
 
 /* PRIVATE FUNCTIONS */
 
-// Converts a weight stored in a synapse row to an input
-static inline input_t _convert_weight_to_input(index_t synapse_type,
-        weight_t weight) {
-    union {
-        int_k_t input_type;
-        s1615 output_type;
-    } converter;
-
-    converter.input_type = (int_k_t) (weight)
-        << ring_buffer_to_input_left_shifts[synapse_type];
-
-    return converter.output_type;
-}
-
-static inline void _print_weight(index_t synapse_type, weight_t weight) {
-    if (weight != 0)
-        log_debug("%12.6k", _convert_weight_to_input(synapse_type, weight));
-    else
-        log_debug("      ");
-}
-
 static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("\nSynaptic row, at address %08x Num plastic words:%u\n",
-              (uint32_t )synaptic_row, plastic_size(synaptic_row));
+              (uint32_t )synaptic_row, synapse_row_plastic_size(synaptic_row));
     if (synaptic_row == NULL) {
         return;
     }
@@ -78,28 +57,31 @@ static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
 
     for (uint32_t i = 0; i < n_fixed_synapses; i++) {
         uint32_t synapse = fixed_synapses[i];
+        uint32_t synapse_type = synapse_row_sparse_type(synapse);
 
         log_debug("%08x [%3d: (w: %5u (=", synapse, i,
                   synapse_row_sparse_weight(synapse));
-        _print_weight(sparse_type(synapse),
-                     synapse_row_sparse_weight(synapse));
+        synapses_print_weight(synapse_row_sparse_weight(synapse),
+                              ring_buffer_to_input_left_shifts[synapse_type]);
         log_debug(
             "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
             synapse_row_sparse_delay(synapse),
-            synapse_type_get_type_char(synapse_row_sparse_type(synapse)),
+            synapse_types_get_type_char(synapse_row_sparse_type(synapse)),
             synapse_row_sparse_index(synapse),
             SYNAPSE_DELAY_MASK, SYNAPSE_TYPE_INDEX_BITS);
     }
 
     // If there's a plastic region
     if (synapse_row_plastic_size(synaptic_row) > 0) {
-        printf("----------------------------------------\n");
+        log_debug("----------------------------------------\n");
         address_t plastic_region_address =
             synapse_row_plastic_region(synaptic_row);
-        print_plastic_synapses(plastic_region_address, fixed_region_address);
+        synapse_dynamics_print_plastic_synapses(
+            plastic_region_address, fixed_region_address,
+            ring_buffer_to_input_left_shifts);
     }
 
-    printf("----------------------------------------\n");
+    log_debug("----------------------------------------\n");
 #else
     use(synaptic_row);
 #endif // LOG_LEVEL >= LOG_DEBUG
@@ -121,8 +103,10 @@ static inline void _print_ring_buffers(uint32_t time) {
                 log_debug("%3d(%s):", n, type_string);
                 for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
                     log_debug(" ");
-                    _print_weight(t, ring_buffers[
-                        synapses_get_ring_buffer_index(d + time, t, n)]);
+                    uint32_t ring_buffer_index =
+                        synapses_get_ring_buffer_index(d + time, t, n);
+                    synapses_print_weight(ring_buffers[ring_buffer_index],
+                                          ring_buffer_to_input_left_shifts[t]);
                 }
                 log_debug("\n");
             }
@@ -155,7 +139,7 @@ static inline void _print_inputs() {
                 - synapse_types_get_inhibitory_input(input_buffers, i);
             if (bitsk(input) != 0) {
                 log_debug("%3u: %12.6k (= ", i, input);
-                synapse_types_print_input(i);
+                synapse_types_print_input(input_buffers, i);
                 log_debug(")\n");
             }
         }
@@ -170,7 +154,6 @@ static inline void _print_inputs() {
 // be put into the ring buffer.
 static inline void _process_fixed_synapses(address_t fixed_region_address,
                                            uint32_t time) {
-#if LOG_LEVEL >= LOG_DEBUG
     register uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
         fixed_region_address);
     register uint32_t fixed_synapse = synapse_row_num_fixed_synapses(
@@ -212,10 +195,6 @@ static inline void _process_fixed_synapses(address_t fixed_region_address,
         // Store saturated value back in ring-buffer
         ring_buffers[ring_buffer_index] = accumulation;
     }
-#else
-    use(fixed_region_address);
-    use(time);
-#endif
 }
 
 
@@ -251,13 +230,13 @@ bool synapses_initialise(address_t address, uint32_t n_neurons_value,
 
         // Check for success
         if (neuron_synapse_shaping_params[synapse_index] == NULL) {
-            log_error("Cannot allocate neuron synapse decay parameters"
+            log_error("Cannot allocate neuron synapse parameters"
                       "- Out of DTCM");
             return false;
         }
 
         log_debug(
-            "\tCopying %u bytes to %u", n_neurons * sizeof(synapse_param_t),
+            "\tCopying %u bytes from %u", n_neurons * sizeof(synapse_param_t),
             address + ((n_neurons * synapse_index
                        * sizeof(synapse_param_t)) / 4));
         memcpy(neuron_synapse_shaping_params[synapse_index],
@@ -291,6 +270,10 @@ void synapses_do_timestep_update(timer_t time) {
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
             neuron_index++) {
 
+        // Shape the existing input according to the included rule
+        synapse_types_shape_input(input_buffers, neuron_index,
+                neuron_synapse_shaping_params);
+
         // Loop through all synapse types
         for (uint32_t synapse_type_index = 0;
                 synapse_type_index < SYNAPSE_TYPE_COUNT; synapse_type_index++) {
@@ -300,16 +283,13 @@ void synapses_do_timestep_update(timer_t time) {
             uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
                 time, synapse_type_index, neuron_index);
 
-            // Shape the existing input according to the included rule
-            synapse_types_shape_input(input_buffers, neuron_index,
-                    neuron_synapse_shaping_params);
-
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
             synapse_types_add_neuron_input(input_buffers, synapse_type_index,
                     neuron_index, neuron_synapse_shaping_params,
-                    _convert_weight_to_input(synapse_type_index,
-                                             ring_buffers[ring_buffer_index]));
+                    synapses_convert_weight_to_input(
+                        ring_buffers[ring_buffer_index],
+                        ring_buffer_to_input_left_shifts[synapse_type_index]));
 
             // Clear ring buffer
             ring_buffers[ring_buffer_index] = 0;

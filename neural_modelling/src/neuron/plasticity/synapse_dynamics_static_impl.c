@@ -31,5 +31,13 @@ void synapse_dynamics_process_plastic_synapses(address_t plastic_region_address,
 //---------------------------------------
 input_t synapse_dynamics_get_intrinsic_bias(index_t neuron_index) {
     use(neuron_index);
-    return 0.0k;
+    return REAL_CONST(0.0);
+}
+
+void synapse_dynamics_print_plastic_synapses(
+        address_t plastic_region_address, address_t fixed_region_address,
+        uint32_t *ring_buffer_to_input_left_shifts) {
+    use(plastic_region_address);
+    use(fixed_region_address);
+    use(ring_buffer_to_input_left_shifts);
 }

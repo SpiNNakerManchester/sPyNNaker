@@ -99,7 +99,6 @@ void neuron_set_input_buffers(input_t *input_buffers_value) {
 
 void neuron_do_timestep_update(timer_t time) {
     use(time);
-    _print_neurons();
 
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
         neuron_pointer_t neuron = &neuron_array[neuron_index];
@@ -149,6 +148,9 @@ void neuron_do_timestep_update(timer_t time) {
             }
         }
     }
+
+    out_spikes_print();
+    _print_neurons();
 
     // Record any spikes this timestep
     out_spikes_record(recording_flags);

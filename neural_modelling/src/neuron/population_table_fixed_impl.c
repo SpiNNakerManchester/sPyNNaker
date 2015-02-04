@@ -46,22 +46,22 @@ bool population_table_initialise(address_t table_address,
                                  address_t synapse_rows_address,
                                  uint32_t *row_max_n_words) {
     log_info("population_table_initialise: starting");
+    // Copy the master population table
+    memcpy(master_population_table, table_address,
+           MASTER_POPULATION_MAX * sizeof(uint16_t));
+
+    // Store the base address
+    synaptic_rows_base_address = synapse_rows_address;
 
     // Copy the row size table
-    memcpy(row_size_table, table_address,
+    memcpy(row_size_table,
+           table_address + ((MASTER_POPULATION_MAX * sizeof(uint16_t)) / 4),
            ROW_SIZE_TABLE_MAX * sizeof(uint32_t));
 
     // The the maximum number of words to be the entry at the end of the
     // row size table
     *row_max_n_words = row_size_table[ROW_SIZE_TABLE_MAX - 1]
                        + N_SYNAPSE_ROW_HEADER_WORDS;
-
-    // Copy the master population table
-    memcpy(master_population_table, table_address + ROW_SIZE_TABLE_MAX,
-           MASTER_POPULATION_MAX * sizeof(uint16_t));
-
-    // Store the base address
-    synaptic_rows_base_address = synapse_rows_address;
 
     log_info("population_table_initialise: completed successfully");
     _print_master_population_table();

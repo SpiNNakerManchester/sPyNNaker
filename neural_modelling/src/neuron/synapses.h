@@ -24,6 +24,27 @@ static inline index_t synapses_get_ring_buffer_index_combined(
             | combined_synapse_neuron_index);
 }
 
+// Converts a weight stored in a synapse row to an input
+static inline input_t synapses_convert_weight_to_input(weight_t weight,
+                                                       uint32_t left_shift) {
+    union {
+        int_k_t input_type;
+        s1615 output_type;
+    } converter;
+
+    converter.input_type = (int_k_t) (weight) << left_shift;
+
+    return converter.output_type;
+}
+
+static inline void synapses_print_weight(weight_t weight, uint32_t left_shift) {
+    if (weight != 0)
+        log_debug("%12.6k", synapses_convert_weight_to_input(
+            weight, left_shift));
+    else
+        log_debug("      ");
+}
+
 bool synapses_initialise(address_t address, uint32_t n_neurons,
                          input_t **input_buffers_value,
                          uint32_t **ring_buffer_to_input_buffer_left_shifts);

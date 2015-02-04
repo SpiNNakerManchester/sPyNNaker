@@ -7,7 +7,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex
     AbstractPopulationRecordableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_population_data_spec \
     import AbstractPopulationDataSpec
-from spinn_front_end_common.utilities import exceptions
 from spynnaker.pyNN import exceptions as local_exceptions
 from spynnaker.pyNN.utilities import constants
 
@@ -26,7 +25,8 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
                  machine_time_step, timescale_factor, spikes_per_second,
                  ring_buffer_sigma, weight_scale=1.0, constraints=None):
 
-        AbstractPopulationRecordableVertex.__init__(self, machine_time_step, label)
+        AbstractPopulationRecordableVertex.__init__(
+            self, machine_time_step, label)
         AbstractPopulationDataSpec.__init__(
             self, binary, n_neurons, label, constraints,
             machine_time_step=machine_time_step,
@@ -59,8 +59,8 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             graph_mapper=graph_mapper, placements=placements, transciever=txrx,
             compatible_output=compatible_output,
             sub_vertex_out_spike_bytes_function=out_spike_bytes_function,
-            spike_recording_region=
-            constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
+            spike_recording_region=constants.POPULATION_BASED_REGIONS
+                                            .SPIKE_HISTORY.value)
 
     def get_v(self, has_ran, graph_mapper, placements,
               txrx, machine_time_step, compatible_output=False):

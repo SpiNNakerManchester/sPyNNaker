@@ -226,7 +226,7 @@ state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
 
 
 // printout of neuron definition and state variables
-void neuron_print(restrict neuron_pointer_t neuron) {
+void neuron_model_print(restrict neuron_pointer_t neuron) {
     log_debug("V membrane    = %11.4k mv", neuron->V_membrane);
     log_debug("V thresh      = %11.4k mv", neuron->V_thresh);
     log_debug("V reset       = %11.4k mv", neuron->V_reset);

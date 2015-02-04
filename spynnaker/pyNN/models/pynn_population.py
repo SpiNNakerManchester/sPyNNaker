@@ -212,12 +212,11 @@ class Population(object):
                     "Therefore spikes cannot be retrieved. Please set this "
                     "vertex to record spikes before running this command.")
 
-        if not self._spinnaker.has_ran:
-            raise local_exceptions.SpynnakerException(
-                "The simulation has not yet ran, therefore spikes cannot be "
-                "retrieved. Please execute the simulation before running this "
-                "command")
-
+            if not self._spinnaker.has_ran:
+                raise local_exceptions.SpynnakerException(
+                    "The simulation has not yet ran, therefore spikes cannot"
+                    " be retrieved. Please execute the simulation before"
+                    " running this command")
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
                 timer.start_timing()
@@ -415,7 +414,7 @@ class Population(object):
 
         if record_spikes_on_sdram:
 
-            if not isinstance(self._vertex, AbstractRecordableVertex):
+            if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
                 raise Exception("This population does not support recording!")
 
             # Tell the vertex to record spikes

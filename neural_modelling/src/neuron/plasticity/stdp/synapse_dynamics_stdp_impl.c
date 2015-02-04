@@ -117,44 +117,6 @@ static inline pre_event_history_t *_plastic_event_history(
 }
 
 //---------------------------------------
-static inline void _print_plastic_synapses(address_t plastic_region_address,
-                                           address_t fixed_region_address) {
-    use(plastic_region_address);
-    use(fixed_region_address);
-#if LOG_LEVEL >= LOG_DEBUG
-
-    // Extract seperate arrays of weights (from plastic region),
-    // Control words (from fixed region) and number of plastic synapses
-    weight_t *plastic_words = _plastic_synapses(plastic_region_address);
-    const control_t *control_words = synapse_row_plastic_controls(
-        fixed_region_address);
-    size_t plastic_synapse = synapse_row_num_plastic_controls(
-        fixed_region_address);
-    const pre_event_history_t *event_history = _plastic_event_history(
-        plastic_region_address);
-
-    log_debug(
-        "Plastic region %u synapses pre-synaptic event buffer count:%u:\n",
-        plastic_synapse, event_history->count_minus_one + 1);
-
-    // Loop through plastic synapses
-    for (uint32_t i = 0; i < plastic_synapse; i++) {
-
-        // Get next weight and control word (autoincrementing control word)
-        uint32_t weight = *plastic_words++;
-        uint32_t control_word = *control_words++;
-
-        log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
-        print_weight(sparse_type(control_word), weight);
-        log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-                  sparse_delay(control_word),
-                  get_synapse_type_char(sparse_type(control_word)),
-                  sparse_index(control_word), SYNAPSE_DELAY_MASK,
-                  SYNAPSE_TYPE_INDEX_BITS);
-    }
-#endif // LOG_LEVEL >= LOG_DEBUG
-}
-
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
@@ -268,4 +230,46 @@ void synapse_dynamics_process_post_synaptic_event(
 input_t synapse_dynamics_get_intrinsic_bias(index_t neuron_index) {
     use(neuron_index);
     return 0.0k;
+}
+
+void synapse_dynamics_print_plastic_synapses(
+        address_t plastic_region_address, address_t fixed_region_address,
+        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+    use(plastic_region_address);
+    use(fixed_region_address);
+    use(ring_buffer_to_input_buffer_left_shifts);
+#if LOG_LEVEL >= LOG_DEBUG
+
+    // Extract seperate arrays of weights (from plastic region),
+    // Control words (from fixed region) and number of plastic synapses
+    weight_t *plastic_words = _plastic_synapses(plastic_region_address);
+    const control_t *control_words = synapse_row_plastic_controls(
+        fixed_region_address);
+    size_t plastic_synapse = synapse_row_num_plastic_controls(
+        fixed_region_address);
+    const pre_event_history_t *event_history = _plastic_event_history(
+        plastic_region_address);
+
+    log_debug(
+        "Plastic region %u synapses pre-synaptic event buffer count:%u:\n",
+        plastic_synapse, event_history->count_minus_one + 1);
+
+    // Loop through plastic synapses
+    for (uint32_t i = 0; i < plastic_synapse; i++) {
+
+        // Get next weight and control word (autoincrementing control word)
+        uint32_t weight = *plastic_words++;
+        uint32_t control_word = *control_words++;
+        uint32_t synapse_type = synapse_row_sparse_type(control_word);
+
+        log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
+        synapses_print_weight(
+            weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
+        log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
+                  sparse_delay(control_word),
+                  get_synapse_type_char(synapse_row_sparse_type(control_word)),
+                  synapse_row_sparse_index(control_word), SYNAPSE_DELAY_MASK,
+                  SYNAPSE_TYPE_INDEX_BITS);
+    }
+#endif // LOG_LEVEL >= LOG_DEBUG
 }

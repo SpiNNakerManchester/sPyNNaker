@@ -91,13 +91,15 @@ class AbstractDualExponentialVertex(object):
         """
         return 2
 
-    @staticmethod
-    def get_synapse_parameter_size(vertex_slice):
-        """
-        Gets the size of the synapse parameters for a range of neurons
-        """
-        return NUM_SYNAPSE_PARAMS * 4 * ((vertex_slice.hi_atom -
-                                          vertex_slice.lo_atom) + 1)
+    def get_n_synapse_parameters_per_synapse_type(self):
+
+        # There are 2 synapse parameters per synapse type (tau_syn and initial)
+        return 2
+
+    def get_n_synapse_types(self):
+
+        # There are 3 synapse types (2 excitatory and 1 inhibitory)
+        return 3
 
     def write_synapse_parameters(self, spec, subvertex, vertex_slice):
         """

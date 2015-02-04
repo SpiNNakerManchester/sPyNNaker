@@ -149,7 +149,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
-            size=constants.SETUP_SIZE, label='setup')
+            size=constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
+            label='setup')
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
@@ -160,8 +161,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
         self.write_delay_parameters(
-            spec, placement.x, placement.y, placement.p, subvertex, num_delay_blocks,
-            delay_blocks, vertex_slice)
+            spec, placement.x, placement.y, placement.p, subvertex,
+            num_delay_blocks, delay_blocks, vertex_slice)
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
@@ -171,11 +172,12 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         """
 
         # Write this to the system region (to be picked up by the simulation):
-        self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER,
-                                     self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
+        self._write_basic_setup_info(
+            spec, self.CORE_APP_IDENTIFIER,
+            self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
-        
+
         # Create empty list of words to fill in with delay data:
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1

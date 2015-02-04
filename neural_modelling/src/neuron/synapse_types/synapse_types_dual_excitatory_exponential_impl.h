@@ -103,7 +103,7 @@ static inline const char *synapse_types_get_type_char(
 
 static inline void synapse_types_print_input(
         input_t *input_buffers, index_t neuron_index) {
-    log_debug("%12.6k + %12.6k - %12.6k",
+    io_printf(IO_BUF, "%12.6k + %12.6k - %12.6k",
               input_buffers[_ex1_offset(neuron_index)],
               input_buffers[_ex2_offset(neuron_index)],
               input_buffers[_in_offset(neuron_index)]);
