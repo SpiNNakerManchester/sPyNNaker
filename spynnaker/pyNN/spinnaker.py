@@ -79,7 +79,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             database_socket_addresses = list()
             listen_port = conf.config.getint("Database", "listen_port")
             notify_port = conf.config.getint("Database", "notify_port")
-            noftiy_hostname = conf.config.getint("Database", "notify_hostname")
+            noftiy_hostname = conf.config.get("Database", "notify_hostname")
             database_socket_addresses.append(
                 SocketAddress(noftiy_hostname, notify_port, listen_port))
         self._database_socket_addresses = database_socket_addresses

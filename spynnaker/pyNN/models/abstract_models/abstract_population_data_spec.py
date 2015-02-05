@@ -270,8 +270,11 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         #This is true for pynn based populations, but may not hold for
         # other models.
 
-        key = routing_info.get_key_from_subedge(
-            subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+        if len(subgraph.outgoing_subedges_from_subvertex(subvertex)) > 0:
+            key = routing_info.get_key_from_subedge(
+                subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+        else: #TODO this needs debating
+            key = 0
 
         self.write_neuron_parameters(spec, key, subvertex,
                                      ring_buffer_shifts, vertex_slice)

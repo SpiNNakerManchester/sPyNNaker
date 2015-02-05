@@ -118,9 +118,8 @@ class SpynnakerCommsFunctions(object):
     def _retieve_provance_data_from_machine(self, executable_targets):
         pass
 
-    def execute_data_specification_execution(self, host_based_execution,
-                                             hostname, placements,
-                                             graph_mapper):
+    def execute_data_specification_execution(
+            self, host_based_execution, hostname, placements, graph_mapper):
         if host_based_execution:
             return self.host_based_data_specificiation_execution(
                 hostname, placements, graph_mapper)

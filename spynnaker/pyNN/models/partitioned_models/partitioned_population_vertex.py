@@ -8,3 +8,7 @@ class PartitionedPopulationVertex(PartitionedVertex):
         PartitionedVertex.__init__(self, resources_required=resources_required,
                                    label=label, constraints=constraints)
         self._n_atoms = n_atoms
+
+    @property
+    def n_atoms(self):
+        return self._n_atoms
