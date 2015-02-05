@@ -270,7 +270,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     #retrieve provance data
-                    self._retieve_provance_data_from_machine(executable_targets)
+                    self._retieve_provance_data_from_machine(
+                        executable_targets, self._router_tables, self._machine)
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
