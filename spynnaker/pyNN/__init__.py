@@ -97,6 +97,8 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
 
 #note importing star is a bad thing to do.
 from pyNN.random import *
