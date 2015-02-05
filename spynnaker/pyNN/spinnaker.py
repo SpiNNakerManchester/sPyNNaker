@@ -441,7 +441,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         logger.info("adding re-injection populations to graph")
         for chip in self._machine.chips:
             chip_re_injection_vertex = ReInjectionVertex(
-                self._machine_time_step, self._time_scale_factor)
+                self._machine_time_step, self._time_scale_factor,
+                label="re_injection_vertex_for_chip({}:{})"
+                .format(chip.x, chip.y))
             chip_re_injection_vertex.add_constraint(
                 PlacerChipAndCoreConstraint(chip.x, chip.y))
             self._partitionable_graph.add_vertex(chip_re_injection_vertex)
