@@ -156,7 +156,19 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write header info to the memory region:
+
+        #if key is None, write boolean saying key is not to be used otherwise
+        # write bool saying key is to be used
+        #if key is None:
+         #   spec.write_value(data=0)
+        #else:
+         #   spec.write_value(data=1)
+
         # Write Key info for this core:
+        #if key is None:
+         #   spec.write_value(data=0)
+        #else:
+        #    spec.write_value(data=key)
         spec.write_value(data=key)
 
         # Write the number of neurons in the block:
@@ -269,12 +281,10 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         # the assumption here is that all outgoing subedges use the same key.
         #This is true for pynn based populations, but may not hold for
         # other models.
-
+        key = None
         if len(subgraph.outgoing_subedges_from_subvertex(subvertex)) > 0:
             key = routing_info.get_key_from_subedge(
                 subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
-        else: #TODO this needs debating
-            key = 0
 
         self.write_neuron_parameters(spec, key, subvertex,
                                      ring_buffer_shifts, vertex_slice)
