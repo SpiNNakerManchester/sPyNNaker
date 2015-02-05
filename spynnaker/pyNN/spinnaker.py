@@ -1,4 +1,6 @@
 #pacman imports
+from pacman.model.constraints.placer_chip_and_core_constraint import \
+    PlacerChipAndCoreConstraint
 
 from pacman.model.constraints.\
     vertex_requires_virtual_chip_in_machine_constraint import \
@@ -6,6 +8,8 @@ from pacman.model.constraints.\
 from pacman.operations.routing_info_allocator_algorithms.\
     malloc_based_routing_allocator.malloc_based_routing_info_allocator import \
     MallocBasedRoutingInfoAllocator
+from spynnaker.pyNN.models.utility_models.re_injection_vertex import \
+    ReInjectionVertex
 from spynnaker.pyNN.utilities.data_generator_interface import \
     DataGeneratorInterface
 from pacman.operations.router_check_functionality.valid_routes_checker import \
@@ -138,6 +142,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             reports.network_specification_report(self._report_default_directory,
                                                  self._partitionable_graph,
                                                  self._hostname)
+
+        #add re-injection populations to graph for python support
+        self._add_reinjection_populations()
 
         #calcualte number of machien time steps
         if run_time is not None:
@@ -421,6 +428,23 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #execute router
         self._execute_router(pacman_report_state)
+
+    def _add_reinjection_populations(self):
+        """ helper method to add reinjection vertices into the graph for
+        modeling.
+        Works by cycling through the chips on the machine and adding a new model
+        thats forced on that chip to pick up dropped packets due to deadlock
+         and reinject them
+
+        :return: None
+        """
+        logger.info("adding re-injection populations to graph")
+        for chip in self._machine.chips:
+            chip_re_injection_vertex = ReInjectionVertex(
+                self._machine_time_step, self._time_scale_factor)
+            chip_re_injection_vertex.add_constraint(
+                PlacerChipAndCoreConstraint(chip.x, chip.y))
+            self._partitionable_graph.add_vertex(chip_re_injection_vertex)
 
     def _execute_key_allocator(self, pacman_report_state):
         if self._key_allocator_algorithm is None:
