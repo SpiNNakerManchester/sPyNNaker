@@ -144,7 +144,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                                                  self._hostname)
 
         #add re-injection populations to graph for python support
-        self._add_reinjection_populations()
+        if self._use_re_injection:
+            self._add_reinjection_populations()
 
         #calcualte number of machien time steps
         if run_time is not None:
