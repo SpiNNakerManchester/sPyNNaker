@@ -7,7 +7,6 @@
 // Plasticity common includes
 #include "../common/maths.h"
 #include "../common/post_events.h"
-#include "synapse_weight.h"
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
@@ -115,7 +114,7 @@ static inline final_state_t _plasticity_update_synapse(
         post_window.prev_time, post_window.prev_trace, current_state);
 
     // Return final synaptic word and weight
-    return synapse_weight_get_final_state(current_state);
+    return synapse_structure_get_final_state(current_state);
 }
 
 //---------------------------------------
@@ -257,7 +256,7 @@ void synapse_dynamics_process_plastic_synapses(
         uint32_t type_index = synapse_row_sparse_type_index(control_word);
 
         // Create update state from the plastic synaptic word
-        update_state_t current_state = synapse_weight_get_initial(
+        update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
 
         // Update the synapse state
@@ -273,11 +272,12 @@ void synapse_dynamics_process_plastic_synapses(
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
         // potential location for overflow
-        ring_buffers[ring_buffer_index] += synapse_weight_get_final_weight(
-                final_state);
+        ring_buffers[ring_buffer_index] += synapse_structure_get_final_weight(
+            final_state);
 
         // Write back updated synaptic word to plastic region
-        *plastic_words++ = synapse_weight_get_final_synaptic_word(final_state);
+        *plastic_words++ = synapse_structure_get_final_synaptic_word(
+            final_state);
     }
 }
 

@@ -84,7 +84,7 @@ typedef struct neuron_t {
 neuron_pointer_t neuron_model_lif_cond_impl_create(
     REAL V_thresh, REAL V_reset, REAL V_rest, REAL V_rev_E, REAL V_rev_I,
     REAL one_over_tauRC, REAL R, int32_t T_refract, REAL V, REAL I,
-    int32_t refract_timer, REAL exp_tc );
+    int32_t refract_timer, REAL exp_tc);
 
 // function that converts the input into the real value to be used by the neuron
 inline input_t neuron_model_convert_input(input_t input) {

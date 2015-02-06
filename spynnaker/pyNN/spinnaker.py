@@ -41,6 +41,7 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.interface.data_generator_interface import \
     DataGeneratorInterface
+from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 
 # local front end imports
 from spynnaker.pyNN.utilities.data_base_thread import DataBaseThread
@@ -65,13 +66,15 @@ from multiprocessing.pool import ThreadPool
 
 logger = logging.getLogger(__name__)
 
+executable_finder = ExecutableFinder()
+
 
 class Spinnaker(FrontEndCommonConfigurationFunctions,
                 FrontEndCommonInterfaceFunctions,
                 SpynnakerConfigurationFunctions):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
-                 max_delay=None, graph_label=None, binary_search_paths=[]):
+                 max_delay=None, graph_label=None):
         FrontEndCommonConfigurationFunctions.__init__(self, host_name,
                                                       graph_label)
         SpynnakerConfigurationFunctions.__init__(self)
@@ -100,7 +103,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 execute_routing_info_report=config.getboolean(
                     "Reports", "writeRouterInfoReport"),
                 in_debug_mode=config.get("Mode", "mode") == "Debug",
-                create_database=config.get("Database", "create_database"))
+                create_database=config.getboolean(
+                    "Database", "create_database"))
 
             self._set_up_pacman_algorthms_listings(
                 partitioner_algorithm=config.get("Partitioner", "algorithm"),
@@ -112,6 +116,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             #  (overloaded from common call)
             self._key_allocator_algorithm = \
                 self.get_pynn_specific_key_allocator()
+
             # set up exeuctable specifics
             self._set_up_executable_specifics()
             self._set_up_report_specifics(
@@ -128,8 +133,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 max_application_binaries_kept=config.getint(
                     "Reports", "max_application_binaries_kept"),
                 where_to_write_application_data_files=config.get(
-                    "Reports", "defaultApplicationDataFilePath")
-            )
+                    "Reports", "defaultApplicationDataFilePath"))
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
         self._spikes_per_second = float(config.getfloat(
@@ -149,13 +153,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
-        # Begin list of binary search paths
-        # With those passed to constructor
-        self._binary_search_paths = binary_search_paths
-
         # Determine default executable folder location
         # and add this default to end of list of search paths
-        self._binary_search_paths.append(os.path.dirname(
+        executable_finder.add_path(os.path.dirname(
             model_binaries.__file__))
         self._edge_count = 0
 
@@ -314,7 +314,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._database_thread, self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
-                    
+
                     # retrieve provenance data
                     self._retieve_provance_data_from_machine(
                         executable_targets, self._router_tables, self._machine)
@@ -595,7 +595,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 binary_name = associated_vertex.get_binary_file_name()
 
                 # Attempt to find this within search paths
-                binary_path = self._get_executable_path(binary_name)
+                binary_path = executable_finder.get_executable_path(
+                    binary_name)
                 if binary_path is None:
                     raise exceptions.ExecutableNotFoundException(binary_name)
 
@@ -648,19 +649,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step,
             timescale_factor=self._time_scale_factor)
-
-    def _get_executable_path(self, executable_name):
-        # Loop through search paths
-        for path in self._binary_search_paths:
-            # Rebuild filename
-            potential_filename = os.path.join(path, executable_name)
-
-            # If this filename exists, return it
-            if os.path.isfile(potential_filename):
-                return potential_filename
-
-        # No executable found
-        return None
 
     def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
         for vertex in self._partitionable_graph.vertices:

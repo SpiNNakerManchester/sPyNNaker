@@ -723,7 +723,7 @@ class AbstractSynapticManager(object):
         # table
         synapse_region_base_address_location = get_region_base_address_offset(
             app_data_base_address,
-            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX_REGION)
+            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
         # read in the memory address of the synaptic_region base address
         synapse_region_base_address = helpful_functions.read_and_convert(
@@ -771,7 +771,7 @@ class AbstractSynapticManager(object):
 
         master_region_base_address_address = get_region_base_address_offset(
             app_data_base_address,
-            constants.POPULATION_BASED_REGIONS.POPULATION_TABLE)
+            constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
 
         master_region_base_address_offset = helpful_functions.read_and_convert(
             x, y, master_region_base_address_address, 4, "<I", transceiver)
@@ -779,4 +779,4 @@ class AbstractSynapticManager(object):
         master_region_base_address =\
             master_region_base_address_offset + app_data_base_address
 
-        return master_region_base_address, app_data_base_address
+        return master_region_base_address

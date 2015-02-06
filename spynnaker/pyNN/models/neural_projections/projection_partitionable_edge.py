@@ -95,8 +95,6 @@ class ProjectionPartitionableEdge(PartitionableEdge):
             rows = sub_edge_post_vertex.get_synaptic_list_from_machine(
                 placements, transceiver, subedge.pre_subvertex, n_rows,
                 subedge.post_subvertex,
-                constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
-                constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 self._synapse_row_io, partitioned_graph, graph_mapper,
                 routing_infos, subedge.weight_scales).get_rows()
 

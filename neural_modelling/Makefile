@@ -1,4 +1,4 @@
-BUILDS = live_packet_gather spike_source/array spike_source/poisson delay_extension neuron command_sender_multicast_source robot_motor_control reverse_iptag_multicast_source
+BUILDS = spike_source/array spike_source/poisson delay_extension neuron
 DIRS = $(BUILDS:%=src/%)
 
 all: $(DIRS)

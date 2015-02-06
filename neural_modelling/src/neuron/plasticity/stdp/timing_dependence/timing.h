@@ -1,8 +1,7 @@
 #ifndef _TIMING_H_
 #define _TIMING_H_
 
-#include "../../../../common/neuron-typedefs.h"
-#include "../synapse_weight.h"
+#include "../synapse_structure/synapse_structure.h"
 
 address_t timing_initialise(address_t address);
 

@@ -6,13 +6,14 @@ and implementation for the PyNN High-level API
 
 import inspect
 
-#utility functions
+# utility functions
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 
-#pynn centric classes
+# pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
+from spynnaker.pyNN.spinnaker import executable_finder
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
@@ -27,7 +28,7 @@ from spynnaker.pyNN.models.neural_models.if_curr_exp \
 from spynnaker.pyNN.models.neural_models.izk_curr_exp \
     import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
 
-#neural projections
+# neural projections
 from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
@@ -41,13 +42,13 @@ from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 
-#spike sources
+# spike sources
 from spynnaker.pyNN.models.spike_source.spike_source_poisson\
     import SpikeSourcePoisson
 from spynnaker.pyNN.models.spike_source.spike_source_array \
     import SpikeSourceArray
 
-#connections
+# connections
 from spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector\
     import AllToAllConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
@@ -67,8 +68,6 @@ from spynnaker.pyNN.models.neural_projections.connectors.\
     DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
-from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
-    import FromFileConnector
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
     import SmallWorldConnector
 
@@ -91,30 +90,26 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
-#constraints
-
-#note importing star is a bad thing to do.
+# note importing star is a bad thing to do.
 from pyNN.random import *
 from pyNN.space import *
 
-#traditional logger
+# traditional logger
 logger = logging.getLogger(__name__)
 
-#global controller / spinnaker object that does everything
+# global controller / spinnaker object that does everything
 _spinnaker = None
 
-# List of binary search paths
-_binary_search_paths = []
 
 def register_binary_search_path(search_path):
-    """Registers an additional binary search path for
-    for SpiNNaker executables. Should be called before
-    setup by sPyNNaker plugin modules
+    """ Registers an additional binary search path for
+        for executables
 
     :param string search_path:
     absolute search path for binaries
     """
-    _binary_search_paths.append(search_path)
+    executable_finder.add_path(search_path)
+
 
 def end(stop_on_board=True):
     """
@@ -200,7 +195,6 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     ignore them because they have no bearing on the on-chip simulation code.
     """
     global _spinnaker
-    global _binary_search_paths
 
     logger.info(
         "sPyNNaker   (c) 2014 APT Group, University of Manchester")
@@ -210,8 +204,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     if len(extra_params.keys()) > 1:
         logger.warn("Extra params has been applied which we do not consider")
     _spinnaker = Spinnaker(host_name=machine, timestep=timestep,
-                           min_delay=min_delay, max_delay=max_delay,
-                           binary_search_paths=_binary_search_paths)
+                           min_delay=min_delay, max_delay=max_delay)
     # Return None, simply because the PyNN API says something must be returned
     return None
 

@@ -2,6 +2,7 @@
 #define _WEIGHT_H_
 
 #include "../../../../common/neuron-typedefs.h"
+#include "../../../synapse_row.h"
 
 address_t weight_initialise(address_t address,
                             uint32_t *ring_buffer_to_input_buffer_left_shifts);

@@ -3,6 +3,7 @@
 
 // Include generic plasticity maths functions
 #include "../../common/maths.h"
+#include "../../common/stdp_typedefs.h"
 #include "../../../synapse_row.h"
 
 #include <debug.h>
