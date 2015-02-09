@@ -4,10 +4,10 @@ import logging
 
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_message import SDPMessage
-from spynnaker.pyNN.buffer_management.buffer_requests.sequenced_eieio_send_data\
-    import SequencedEIEIOSendData
-from spynnaker.pyNN.buffer_management.buffer_requests.stop_requests_request \
-    import StopRequestsRequest
+from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data\
+    import HostSendSequencedData
+from spynnaker.pyNN.buffer_management.command_objects.stop_requests \
+    import StopRequests
 from spynnaker.pyNN import exceptions
 
 
@@ -79,8 +79,8 @@ class BufferSendThread(threading.Thread):
         :param request: the request container for this command message
         :return:
         """
-        if isinstance(request, SequencedEIEIOSendData) \
-                or isinstance(request, StopRequestsRequest):
+        if isinstance(request, HostSendSequencedData) \
+                or isinstance(request, StopRequests):
             eieio_command_message_as_byte_array = \
                 request.get_eieio_command_message_as_byte_array()
             sdp_header = SDPHeader(destination_chip_x=request.chip_x,

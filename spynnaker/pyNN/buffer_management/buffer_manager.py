@@ -6,12 +6,14 @@ from spinnman import exceptions as spinnman_exceptions
 from spynnaker.pyNN import exceptions as spynnaker_exceptions
 from spinnman.data.little_endian_byte_array_byte_reader \
     import LittleEndianByteArrayByteReader
+from spynnaker.pyNN.buffer_management.abstract_eieio_packets.abstract_eieio_packet import \
+    AbstractEIEIOPacket
 from spynnaker.pyNN.buffer_management.buffer_recieve_thread import \
     BufferRecieveThread
 from spynnaker.pyNN.buffer_management.buffer_send_thread import BufferSendThread
 from spynnaker.pyNN.buffer_management.storage_objects.buffer_packet\
     import BufferPacket
-from spynnaker.pyNN.buffer_management.buffer_requests.padding_request import \
+from spynnaker.pyNN.buffer_management.command_objects.padding_request import \
     PaddingRequest
 from spynnaker.pyNN.utilities import utility_calls
 
@@ -49,7 +51,7 @@ class BufferManager(object):
         self._recieve_thread.stop()
         self._sender_thread.stop()
 
-    def receive_buffer_message(self, message):
+    def receive_buffer_command_message(self, message):
         """ received a eieio message from the port which this manager manages
         and locates what requests are required from it.
 
@@ -57,14 +59,15 @@ class BufferManager(object):
         :type message: spinnman.messages.eieio.eieio_message.EIEIOMessage
         :return:
         """
-        if (message.eieio_command_header.command !=
-                spinnman_constants.EIEIO_COMMAND_IDS.BUFFER_MANAGEMENT):
-            raise spinnman_exceptions.SpinnmanInvalidPacketException(
-                "message.eieio_command_header.command",
-                "The command id from this command packet is invalid for "
-                "buffer management")
-
         byte_reader = LittleEndianByteArrayByteReader(message.data)
+        packet = AbstractEIEIOPacket.create_class_from_reader(byte_reader)
+        # if (message.eieio_command_header.command !=
+        #         spinnman_constants.EIEIO_COMMAND_IDS.BUFFER_MANAGEMENT):
+        #     raise spinnman_exceptions.SpinnmanInvalidPacketException(
+        #         "message.eieio_command_header.command",
+        #         "The command id from this command packet is invalid for "
+        #         "buffer management")
+
         buffer_packets = list()
         # while not byte_reader.is_at_end():
         #     buffer_packets.append(
@@ -244,3 +247,23 @@ class BufferManager(object):
                 app_data_base_address
             sender_vertex.receiver_buffer_collection.\
                 set_region_base_address_for(region_id, base_address)
+
+    # to be copied in the buffered in buffer manager
+
+    @staticmethod
+    def create_eieio_messages_from(buffer_data):
+        """this method takes a collection of buffers in the form of a single
+        byte array and interprets them as eieio messages and returns a list of
+        eieio messages
+
+        :param buffer_data: the byte array data
+        :type buffer_data: LittleEndianByteArrayByteReader
+        :rtype: list of EIEIOMessages
+        :return: a list containing EIEIOMessages
+        """
+        messages = list()
+        while not buffer_data.is_at_end():
+            eieio_packet = AbstractEIEIOPacket.create_class_from_reader(
+                buffer_data)
+            messages.append(eieio_packet)
+        return messages

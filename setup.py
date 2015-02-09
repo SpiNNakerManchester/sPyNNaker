@@ -8,7 +8,7 @@ setup(
     packages=['spynnaker',
               'spynnaker.pyNN',
               'spynnaker.pyNN.buffer_management',
-              'spynnaker.pyNN.buffer_management.buffer_requests',
+              'spynnaker.pyNN.buffer_management.command_objects',
               'spynnaker.pyNN.buffer_management.storage_objects',
               'spynnaker.pyNN.data_storage',
               'spynnaker.pyNN.models',

@@ -5,9 +5,9 @@ import math
 
 from spynnaker.pyNN.buffer_management.buffer_data_objects.eieio_32bit.eieio_32bit_timed_payload_prefix_data_packet import \
     EIEIO32BitTimedPayloadPrefixDataPacket
-from spynnaker.pyNN.buffer_management.buffer_requests.sequenced_eieio_send_data import \
-    SequencedEIEIOSendData
-from spynnaker.pyNN.buffer_management.buffer_requests.event_stop_request \
+from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data import \
+    HostSendSequencedData
+from spynnaker.pyNN.buffer_management.command_objects.event_stop_request \
     import EventStopRequest
 from spynnaker.pyNN.utilities import constants
 
@@ -50,7 +50,6 @@ class AbstractBufferReceivablePartitionedVertex(object):
         else:
             return self._generate_buffers_for_transmission(
                 buffers, region_size, sequence_no)
-
 
     def _generate_buffers_for_transmission(
             self, buffers, region_size, sequence_no):
@@ -135,7 +134,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
         # if a sequence number is passed, generate a sequenced eieio packet
         # otherwise return packet as it is
         if sequence_no is not None:
-            sequenced_packet = SequencedEIEIOSendData(packet, sequence_no)
+            sequenced_packet = HostSendSequencedData(packet, sequence_no)
             packet = sequenced_packet
 
         return packet
@@ -179,7 +178,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
         # if a sequence number is passed, generate a sequenced eieio packet
         # otherwise return packet as it is
         if sequence_no is not None:
-            sequenced_packet = SequencedEIEIOSendData(packet, sequence_no)
+            sequenced_packet = HostSendSequencedData(packet, sequence_no)
             packet = sequenced_packet
 
         # create request and returns stats

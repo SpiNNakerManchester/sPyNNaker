@@ -299,7 +299,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         for buffer_manager_key in self._buffer_managers.keys():
             self._txrx.register_listener(
                 self._buffer_managers[buffer_manager_key].
-                receive_buffer_message,
+                receive_buffer_command_message,
                 self._buffer_managers[buffer_manager_key].port,
                 self._buffer_managers[buffer_manager_key].local_host,
                 spinnman_constants.CONNECTION_TYPE.UDP_IPTAG,
