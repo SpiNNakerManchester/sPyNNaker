@@ -41,7 +41,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma,
                  contraints=None, label="SpikeSourcePoisson",
-                 rate=1.0, start=0.0, duration=10000000000.0, seed=None):
+                 rate=1.0, start=0.0, duration=None, seed=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
@@ -54,6 +54,10 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         self._start = start
         self._duration = duration
         self._seed = seed
+
+        if duration is None:
+            self._duration = ((4294967295.0 - self._start)
+                              / (1000.0 * machine_time_step))
 
     @property
     def model_name(self):
