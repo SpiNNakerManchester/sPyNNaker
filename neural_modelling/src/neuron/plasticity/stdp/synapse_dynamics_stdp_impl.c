@@ -267,8 +267,9 @@ void synapse_dynamics_print_plastic_synapses(
         synapses_print_weight(
             weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-                  sparse_delay(control_word),
-                  get_synapse_type_char(synapse_row_sparse_type(control_word)),
+                  synapse_row_sparse_delay(control_word),
+                  synapse_types_get_type_char(synapse_row_sparse_type(
+                                             control_word)),
                   synapse_row_sparse_index(control_word), SYNAPSE_DELAY_MASK,
                   SYNAPSE_TYPE_INDEX_BITS);
     }

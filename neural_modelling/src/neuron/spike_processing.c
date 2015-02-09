@@ -7,7 +7,7 @@
 #include <debug.h>
 
 // The number of DMA Buffers to use
-#define N_DMA_BUFFERS 3
+#define N_DMA_BUFFERS 2
 
 // The number of extra words to keep in a DMA buffer for local use
 #define N_DMA_BUFFER_EXTRA_WORDS 2
@@ -24,10 +24,6 @@ extern uint32_t time;
 // True if the DMA "loop" is currently running
 static bool dma_busy;
 
-// True if a read would have taken place, but the position in the dma buffers
-// is currently being written to SDRAM, so the read would clash
-static bool write_blocked_next_read;
-
 // The DTCM buffers for the synapse rows
 static uint32_t* dma_buffers[N_DMA_BUFFERS];
 
@@ -37,56 +33,45 @@ static uint32_t next_buffer_to_fill;
 // The index of the buffer currently being filled by a DMA read
 static uint32_t buffer_being_read;
 
-// The index of the buffer currently being
-static uint32_t buffer_being_written;
-
-
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void _setup_synaptic_dma_read() {
 
-    // If the next buffer to be filled is currently being written,
-    // we need to wait until the write completes
-    if (next_buffer_to_fill == buffer_being_written) {
-        write_blocked_next_read = true;
-    } else {
+    // If there's more incoming spikes
+    spike_t spike;
+    uint32_t setup_done = false;
+    while (!setup_done && in_spikes_get_next_spike(&spike)) {
+        log_debug("Checking for row for spike 0x%.8x\n", spike);
 
-        // If there's more incoming spikes
-        spike_t spike;
-        uint32_t setup_done = false;
-        while (!setup_done && in_spikes_get_next_spike(&spike)) {
-            log_debug("Checking for row for spike 0x%.8x\n", spike);
+        // Decode spike to get address of destination synaptic row
+        address_t row_address;
+        size_t n_bytes_to_transfer;
 
-            // Decode spike to get address of destination synaptic row
-            address_t row_address;
-            size_t n_bytes_to_transfer;
+        if (population_table_get_address(spike, &row_address,
+                &n_bytes_to_transfer)) {
 
-            if (population_table_get_address(spike, &row_address,
-                    &n_bytes_to_transfer)) {
+            // Write the SDRAM address and originating spike to the
+            // beginning of dma buffer
+            dma_buffers[next_buffer_to_fill][0] = (uint32_t) row_address;
+            dma_buffers[next_buffer_to_fill][1] = spike;
 
-                // Write the SDRAM address and originating spike to the
-                // beginning of dma buffer
-                dma_buffers[next_buffer_to_fill][0] = (uint32_t) row_address;
-                dma_buffers[next_buffer_to_fill][1] = spike;
+            // Start a DMA transfer to fetch this synaptic row into current
+            // buffer
+            buffer_being_read = next_buffer_to_fill;
+            spin1_dma_transfer(DMA_TAG_READ_SYNAPTIC_ROW, row_address,
+                               &dma_buffers[next_buffer_to_fill][2],
+                               DMA_READ, n_bytes_to_transfer);
+            next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 
-                // Start a DMA transfer to fetch this synaptic row into current
-                // buffer
-                buffer_being_read = next_buffer_to_fill;
-                spin1_dma_transfer(DMA_TAG_READ_SYNAPTIC_ROW, row_address,
-                                   &dma_buffers[next_buffer_to_fill][2],
-                                   DMA_READ, n_bytes_to_transfer);
-                next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
-
-                setup_done = true;
-            }
+            setup_done = true;
         }
+    }
 
-        // If the setup was not done, and there are no more spikes,
-        // stop trying to set up synaptic dmas
-        if (!setup_done) {
-            log_debug("DMA not busy");
-            dma_busy = false;
-        }
+    // If the setup was not done, and there are no more spikes,
+    // stop trying to set up synaptic dmas
+    if (!setup_done) {
+        log_debug("DMA not busy");
+        dma_busy = false;
     }
 }
 
@@ -103,7 +88,6 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
               n_plastic_region_bytes, writeback_address);
 
     // Start transfer
-    buffer_being_written = dma_buffer_index;
     spin1_dma_transfer(
         DMA_TAG_WRITE_PLASTIC_REGION, writeback_address,
         synapse_row_plastic_region(dma_buffers[dma_buffer_index]),
@@ -154,12 +138,15 @@ void _dma_complete_callback(uint unused, uint tag) {
     // If this DMA is the result of a read
     if (tag == DMA_TAG_READ_SYNAPTIC_ROW) {
 
+        // Store the index of the current buffer
+        uint32_t current_buffer = buffer_being_read;
+
         // Start the next DMA transfer, so it is complete when we are finished
         _setup_synaptic_dma_read();
 
         // Extract originating spike from start of DMA buffer
         spike_t spike = synapse_row_originating_spike(
-                dma_buffers[buffer_being_read]);
+                dma_buffers[current_buffer]);
 
         // Process synaptic row repeatedly
         bool subsequent_spikes;
@@ -170,21 +157,15 @@ void _dma_complete_callback(uint unused, uint tag) {
 
             // Process synaptic row, writing it back if it's the last time
             // it's going to be processed
-            synapses_process_synaptic_row(time, dma_buffers[buffer_being_read],
+            synapses_process_synaptic_row(time, dma_buffers[current_buffer],
                                           !subsequent_spikes,
-                                          buffer_being_read);
+                                          current_buffer);
 
         } while (subsequent_spikes);
+
     } else if (tag == DMA_TAG_WRITE_PLASTIC_REGION) {
 
-        // If this is a DMA write, reset the index
-        buffer_being_written = -1;
-
-        // If the write blocked a read, start reading again
-        if (write_blocked_next_read) {
-            write_blocked_next_read = false;
-            _setup_synaptic_dma_read();
-        }
+        // Do Nothing
 
     } else {
 
@@ -209,10 +190,8 @@ bool spike_processing_initialise(size_t row_max_n_words) {
         }
     }
     dma_busy = false;
-    write_blocked_next_read = false;
     next_buffer_to_fill = 0;
     buffer_being_read = N_DMA_BUFFERS;
-    buffer_being_written = N_DMA_BUFFERS;
 
     // Allocate incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(N_INCOMING_SPIKES)) {
