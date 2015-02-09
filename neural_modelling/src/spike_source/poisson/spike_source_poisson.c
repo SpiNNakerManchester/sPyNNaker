@@ -71,39 +71,44 @@ bool read_parameters(address_t address) {
              num_slow_spike_sources, num_fast_spike_sources);
 
     // Allocate DTCM for array of slow spike sources and copy block of data
-    slow_spike_source_array = (slow_spike_source_t*) spin1_malloc(
-        num_slow_spike_sources * sizeof(slow_spike_source_t));
-    if (slow_spike_source_array == NULL) {
-        log_error("Failed to allocate slow_spike_source_array");
-        return false;
-    }
-    memcpy(slow_spike_source_array, &address[3 + seed_size],
-           num_slow_spike_sources * sizeof(slow_spike_source_t));
+    if (num_slow_spike_sources > 0) {
+        slow_spike_source_array = (slow_spike_source_t*) spin1_malloc(
+            num_slow_spike_sources * sizeof(slow_spike_source_t));
+        if (slow_spike_source_array == NULL) {
+            log_error("Failed to allocate slow_spike_source_array");
+            return false;
+        }
+        memcpy(slow_spike_source_array, &address[3 + seed_size],
+               num_slow_spike_sources * sizeof(slow_spike_source_t));
 
-    // Loop through slow spike sources and initialise 1st time to spike
-    for (index_t s = 0; s < num_slow_spike_sources; s++) {
-        slow_spike_source_array[s].time_to_spike_ticks =
-            slow_spike_source_get_time_to_spike(
-                slow_spike_source_array[s].mean_isi_ticks);
+        // Loop through slow spike sources and initialise 1st time to spike
+        for (index_t s = 0; s < num_slow_spike_sources; s++) {
+            slow_spike_source_array[s].time_to_spike_ticks =
+                slow_spike_source_get_time_to_spike(
+                    slow_spike_source_array[s].mean_isi_ticks);
+        }
     }
 
     // Allocate DTCM for array of fast spike sources and copy block of data
-    uint32_t fast_spike_source_offset =
-        3 + seed_size + (num_slow_spike_sources
-                         * (sizeof(slow_spike_source_t) / sizeof(uint32_t)));
-    fast_spike_source_array = (fast_spike_source_t*) spin1_malloc(
-        num_fast_spike_sources * sizeof(fast_spike_source_t));
-    if (fast_spike_source_array == NULL) {
-        log_error("Failed to allocate fast_spike_source_array");
-        return false;
-    }
-    memcpy(fast_spike_source_array, &address[fast_spike_source_offset],
-           num_fast_spike_sources * sizeof(fast_spike_source_t));
+    if (num_fast_spike_sources > 0) {
+        uint32_t fast_spike_source_offset =
+            3 + seed_size + (num_slow_spike_sources
+                             * (sizeof(slow_spike_source_t)
+                                / sizeof(uint32_t)));
+        fast_spike_source_array = (fast_spike_source_t*) spin1_malloc(
+            num_fast_spike_sources * sizeof(fast_spike_source_t));
+        if (fast_spike_source_array == NULL) {
+            log_error("Failed to allocate fast_spike_source_array");
+            return false;
+        }
+        memcpy(fast_spike_source_array, &address[fast_spike_source_offset],
+               num_fast_spike_sources * sizeof(fast_spike_source_t));
 
-    for (index_t s = 0; s < num_fast_spike_sources; s++) {
-        log_debug("\t\tNeuron id %d, exp(-k) = %0.8x",
-                  fast_spike_source_array[s].neuron_id,
-                  fast_spike_source_array[s].exp_minus_lambda);
+        for (index_t s = 0; s < num_fast_spike_sources; s++) {
+            log_debug("\t\tNeuron id %d, exp(-k) = %0.8x",
+                      fast_spike_source_array[s].neuron_id,
+                      fast_spike_source_array[s].exp_minus_lambda);
+        }
     }
     log_info("read_parameters: completed successfully");
     return true;
