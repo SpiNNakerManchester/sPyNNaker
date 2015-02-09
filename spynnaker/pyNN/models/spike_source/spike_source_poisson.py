@@ -41,7 +41,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma,
                  contraints=None, label="SpikeSourcePoisson",
-                 rate=1.0, start=0.0, duration=10000000000.0, seed=None):
+                 rate=1.0, start=0.0, duration=None, seed=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
@@ -54,6 +54,10 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         self._start = start
         self._duration = duration
         self._seed = seed
+
+        if duration is None:
+            self._duration = ((4294967295.0 - self._start)
+                              / (1000.0 * machine_time_step))
 
     @property
     def model_name(self):
@@ -103,11 +107,13 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
             size=setup_sz, label='setup')
         spec.reserve_memory_region(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value,
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION
+                                                     .value,
             size=poisson_params_sz, label='PoissonParams')
         if spike_hist_buff_sz > 0:
             spec.reserve_memory_region(
-                region=self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+                region=self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION
+                                                         .value,
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
                 empty=True)
 
@@ -126,7 +132,6 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             Bit 0: Record spike history
         """
 
-        # What recording commands wereset for the parent pynn_population.py?
         self._write_basic_setup_info(
             spec, SpikeSourcePoisson.CORE_APP_IDENTIFIER,
             self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
@@ -134,9 +139,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         if (spike_history_region_sz > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
+
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
 
@@ -151,7 +155,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value)
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION
+                                                     .value)
 
         # Write header info to the memory region:
 
@@ -241,7 +246,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
                    compatible_output=False):
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
-        sub_vertex_out_spike_bytes_function = \
+        out_spike_bytes_function = \
             lambda subvertex, subvertex_slice: int(ceil(
                 subvertex_slice.n_atoms / 32.0)) * 4
 
@@ -249,38 +254,33 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         return self._get_spikes(
             transciever=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
-            spike_recording_region=
-            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            sub_vertex_out_spike_bytes_function=
-            sub_vertex_out_spike_bytes_function)
+            spike_recording_region=self._POISSON_SPIKE_SOURCE_REGIONS
+                                       .SPIKE_HISTORY_REGION.value,
+            sub_vertex_out_spike_bytes_function=out_spike_bytes_function)
 
-    #inhirrtted from partionable vertex
+    # inherited from partionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
         method for calculating sdram usage
         """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
-        return constants.SETUP_SIZE + poisson_params_sz + spike_hist_buff_sz
+        return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) + 8
+                + poisson_params_sz + spike_hist_buff_sz)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
         method for caulculating dtcm usage for a coltection of atoms
         """
         return 0
-        #no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        #return (44 + (16 * 4)) * no_atoms
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the CPU requirements for a range of atoms
         """
         return 0
-        #no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        #return 128 * no_atoms
 
-    #inhirrted from dataspecable vertex
-
+    # inherited from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_mapper, report_folder,
                            write_text_specs, application_run_time_folder):
@@ -301,11 +301,15 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
+        # Basic setup plus 8 bytes for recording flags and recording size
+        setup_sz = ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4)
+                    + 8)
+
         poisson_params_sz = self.get_params_bytes(vertex_slice)
 
         # Reserve SDRAM space for memory areas:
         self.reserve_memory_regions(
-            spec, constants.SETUP_SIZE, poisson_params_sz, spike_hist_buff_sz)
+            spec, setup_sz, poisson_params_sz, spike_hist_buff_sz)
 
         self.write_setup_info(spec, spike_hist_buff_sz)
 
