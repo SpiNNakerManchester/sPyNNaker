@@ -19,6 +19,7 @@ from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge 
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
+from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 
 from spynnaker.pyNN.utilities.timer import Timer
 
@@ -51,7 +52,9 @@ class Projection(object):
         """
         self._spinnaker = spinnaker_control
         self._projection_edge = None
+        self._projection_list_ranges = None
         self._delay_edge = None
+        self._delay_list_ranges = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
 
@@ -70,18 +73,7 @@ class Projection(object):
             raise exceptions.ConfigurationException(
                 "postsynaptic_population is not a supposal reciever of"
                 " synaptic projections")
-        '''
-        # Check that the edge doesn't already exist elsewhere
-        # This would be a possible place for a merge at some point,
-        # but this needs more thought
-        graph_edges = self._spinnaker.partitionable_graph.edges
-        for edge in graph_edges:
-            if (edge.pre_vertex == presynaptic_population._get_vertex
-               and edge.post_vertex == postsynaptic_population._get_vertex):
-                    raise exceptions.ConfigurationException(
-                        "More than one connection between the same pair of"
-                        " vertices is not currently supported")
-        '''
+
         self._weight_scale = postsynaptic_population._get_vertex.weight_scale
         synapse_list = \
             connector.generate_synapse_list(
@@ -144,13 +136,34 @@ class Projection(object):
                 machine_time_step, timescale_factor, label, synapse_dynamics)
 
         else:
-            self._projection_edge = \
-                ProjectionPartitionableEdge(
-                    presynaptic_population,
-                    postsynaptic_population, machine_time_step,
-                    synapse_list=synapse_list,
+
+            # Find out if there is an existing edge between the populations
+            edge_to_merge = self._find_existing_edge(
+                presynaptic_population._get_vertex,
+                postsynaptic_population._get_vertex)
+            if edge_to_merge is not None:
+
+                # If there is an existing edge, merge the lists
+                self._projection_list_ranges = \
+                    edge_to_merge.synapse_list.merge(synapse_list)
+                self._projection_edge = edge_to_merge
+            else:
+
+                # If there isn't an existing edge, create a new one
+                self._projection_edge = ProjectionPartitionableEdge(
+                    presynaptic_population, postsynaptic_population,
+                    machine_time_step, synapse_list=synapse_list,
                     synapse_dynamics=synapse_dynamics, label=label)
-            spinnaker_control.add_edge(self._projection_edge)
+                spinnaker_control.add_edge(self._projection_edge)
+                self._projection_list_ranges = synapse_list.ranges()
+
+    def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
+        graph_edges = self._spinnaker.partitionable_graph.edges
+        for edge in graph_edges:
+            if ((edge.pre_vertex == presynaptic_vertex)
+                    and (edge.post_vertex == postsynaptic_vertex)):
+                return edge
+        return None
 
     def _add_delay_extension(self, num_src_neurons, max_delay_for_projection,
                              max_delay_per_neuron, original_synapse_list,
@@ -170,14 +183,21 @@ class Projection(object):
         direct_synaptic_sublist = original_synapse_list.create_delay_sublist(
             0, max_delay_per_neuron)
         if direct_synaptic_sublist.get_max_n_connections() != 0:
-            direct_edge =\
-                ProjectionPartitionableEdge(
-                    presynaptic_population,
-                    postsynaptic_population,
+            edge_to_merge = self._find_existing_edge(
+                presynaptic_population._get_vertex,
+                postsynaptic_population._get_vertex)
+            if edge_to_merge is not None:
+                self._projection_list_ranges = \
+                    edge_to_merge.synapse_list.merge(direct_synaptic_sublist)
+                self._projection_edge = edge_to_merge
+            else:
+                direct_edge = ProjectionPartitionableEdge(
+                    presynaptic_population, postsynaptic_population,
                     self._spinnaker.machine_time_step,
                     synapse_list=direct_synaptic_sublist, label=label)
-            self._spinnaker.add_edge(direct_edge)
-            self._projection_edge = direct_edge
+                self._spinnaker.add_edge(direct_edge)
+                self._projection_edge = direct_edge
+                self._projection_list_ranges = direct_synaptic_sublist.ranges()
 
         # Create a delay extension vertex to do the extra delays
         delay_vertex = presynaptic_population._internal_delay_vertex
@@ -197,10 +217,14 @@ class Projection(object):
 
         # Create a connection from the source pynn_population.py to the
         # delay vertex
-        new_label = "{}_to_DE".format(label)
-        remaining_edge = DelayAfferentPartitionableEdge(
-            presynaptic_population._get_vertex, delay_vertex, label=new_label)
-        self._spinnaker.add_edge(remaining_edge)
+        existing_remaining_edge = self._find_existing_edge(
+            presynaptic_population._get_vertex, delay_vertex)
+        if existing_remaining_edge is None:
+            new_label = "{}_to_DE".format(label)
+            remaining_edge = DelayAfferentPartitionableEdge(
+                presynaptic_population._get_vertex, delay_vertex,
+                label=new_label)
+            self._spinnaker.add_edge(remaining_edge)
 
         # Create a list of the connections with delay larger than that which
         # can be handled by the neuron itself
@@ -214,13 +238,22 @@ class Projection(object):
                                     / float(max_delay_per_neuron)))
         if num_blocks > delay_vertex.max_stages:
             delay_vertex.max_stages = num_blocks
-        self._delay_edge = DelayPartitionableEdge(
-            presynaptic_population, postsynaptic_population,
-            self._spinnaker.machine_time_step, num_blocks,
-            max_delay_per_neuron, synapse_list=remaining_sublist,
-            synapse_dynamics=synapse_dynamics, label=delay_label)
 
-        self._spinnaker.add_edge(self._delay_edge)
+        # Create the delay edge
+        existing_delay_edge = self._find_existing_edge(
+            delay_vertex, postsynaptic_population._get_vertex)
+        if existing_delay_edge is not None:
+            self._delay_list_ranges = existing_delay_edge.synapse_list.merge(
+                remaining_sublist)
+            self._delay_edge = existing_delay_edge
+        else:
+            self._delay_edge = DelayPartitionableEdge(
+                presynaptic_population, postsynaptic_population,
+                self._spinnaker.machine_time_step, num_blocks,
+                max_delay_per_neuron, synapse_list=remaining_sublist,
+                synapse_dynamics=synapse_dynamics, label=delay_label)
+            self._delay_list_ranges = remaining_sublist.ranges()
+            self._spinnaker.add_edge(self._delay_edge)
 
     def describe(self, template='projection_default.txt', engine='default'):
         """
@@ -238,12 +271,6 @@ class Projection(object):
         """Return the `i`th connection within the Projection."""
         raise NotImplementedError
 
-    def _retrieve_synaptic_data(self):
-        if (self._spinnaker.has_ran and not
-                self._has_retrieved_synaptic_list_from_machine):
-            self._retrieve_synaptic_data_from_machine()
-        return self._host_based_synapse_list
-
     # noinspection PyPep8Naming
     def getDelays(self, list_format='list', gather=True):
         """
@@ -257,17 +284,10 @@ class Projection(object):
             exceptions.ConfigurationException(
                 "the gather param has no meaning for spinnaker when set to "
                 "false")
-        timer = None
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer = Timer()
-            timer.start_timing()
 
         if (self._spinnaker.has_ran and not
                 self._has_retrieved_synaptic_list_from_machine):
             self._retrieve_synaptic_data_from_machine()
-
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer.take_sample()
 
         if list_format == 'list':
             delays = list()
@@ -318,17 +338,9 @@ class Projection(object):
                 "the gather param has no meaning for spinnaker when set to "
                 "false")
 
-        timer = None
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer = Timer()
-            timer.start_timing()
-
         if (self._spinnaker.has_ran and not
                 self._has_retrieved_synaptic_list_from_machine):
             self._retrieve_synaptic_data_from_machine()
-
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer.take_sample()
 
         if format == 'list':
             weights = list()
@@ -395,6 +407,10 @@ class Projection(object):
         return "projection {}".format(self._projection_edge.label)
 
     def _retrieve_synaptic_data_from_machine(self):
+        timer = None
+        if conf.config.getboolean("Reports", "outputTimesForSections"):
+            timer = Timer()
+            timer.start_timing()
         synapse_list = None
         delay_synapse_list = None
         if self._projection_edge is not None:
@@ -418,17 +434,32 @@ class Projection(object):
         if synapse_list is not None and delay_synapse_list is not None:
             rows = synapse_list.get_rows()
             delay_rows = delay_synapse_list.get_rows()
+            combined_rows = list()
             for i in range(len(rows)):
-                rows[i].append(delay_rows[i])
-            self._host_based_synapse_list = synapse_list
+                combined_row = rows[i][self._projection_list_ranges]
+                combined_row.append(delay_rows[i][self._delay_list_ranges[i]])
+                combined_rows.append(combined_row)
+            self._host_based_synapse_list = SynapticList(combined_rows)
 
         # If there is only a synapse list, return that
         elif synapse_list is not None:
-            self._host_based_synapse_list = synapse_list
+            rows = synapse_list.get_rows()
+            new_rows = list()
+            for i in range(len(rows)):
+                new_rows.append(rows[i][self._projection_list_ranges[i]])
+            self._host_based_synapse_list = SynapticList(new_rows)
 
         # Otherwise return the delay list (there should be at least one!)
         else:
-            self._host_based_synapse_list = delay_synapse_list
+            rows = delay_synapse_list.get_rows()
+            new_rows = list()
+            for i in range(len(rows)):
+                new_rows.append(rows[i][self._delay_list_ranges[i]])
+            self._host_based_synapse_list = SynapticList(new_rows)
+
+        if conf.config.getboolean("Reports", "outputTimesForSections"):
+            timer.take_sample()
+        self._has_retrieved_synaptic_list_from_machine = True
 
     # noinspection PyPep8Naming
     def saveConnections(self, file_name, gather=True, compatible_output=True):

@@ -169,6 +169,29 @@ class SynapticList(object):
         """
         self._synaptic_rows.extend(synapse_list.synapticRows)
 
+    def ranges(self):
+        """
+        Get the ranges of the current synaptic rows (start and end slice)
+        """
+        return [slice(0, len(row.target_indices))
+                for row in self._synaptic_rows]
+
+    def merge(self, synapse_list):
+        """
+        Merge the synapse list with this one - must have the same number of
+        rows
+        """
+        if len(self._synaptic_rows) != len(synapse_list._synaptic_rows):
+            raise Exception("Cannot merge lists as they have a different"
+                            " number of rows")
+        ranges = list()
+        for row, new_row in zip(self._synaptic_rows,
+                                synapse_list._synaptic_rows):
+            start_offset = len(row.target_indices)
+            row.append(new_row)
+            ranges.append(slice(start_offset, len(row.target_indices)))
+        return ranges
+
     def __str__(self):
         return "synaptic list containing {} entries which are {}"\
             .format(len(self._synaptic_rows), self._synaptic_rows)

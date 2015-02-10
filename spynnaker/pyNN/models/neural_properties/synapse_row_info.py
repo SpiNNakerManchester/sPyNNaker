@@ -13,19 +13,6 @@ class SynapseRowInfo(object):
         self.delays = np.asarray(delays_in_ticks, dtype='uint32')
         self.synapse_types = np.asarray(synapse_types, dtype='uint32')
 
-        #if hasattr(self.delays, '__iter__'):
-        #    if self.delays.size > 0:
-        #        iter(self.delays)
-        #else:
-        #    self.delays = np.array([self.delays])
-
-        #if hasattr(self.weights, '__iter__'):
-        #    if self.weights.size > 0:
-        #        print "Weights", weights
-        #        iter(self.weights)
-        #else:
-        #    self.weights = np.array([self.weights])
-
     def append(self, row, lo_atom=0, min_delay=0):
         """
         Appends another row to this one
@@ -47,12 +34,16 @@ class SynapseRowInfo(object):
             self.synapse_types = np.append(self.synapse_types,
                                            row.synapse_types)
 
-            sort_indices = np.lexsort((self.target_indices, self.weights,
-                                       self.delays, self.synapse_types))
-            self.target_indices = self.target_indices[sort_indices]
-            self.weights = self.weights[sort_indices]
-            self.delays = self.delays[sort_indices]
-            self.synapse_types = self.synapse_types[sort_indices]
+            # sort_indices = np.lexsort((self.target_indices, self.weights,
+            #                            self.delays, self.synapse_types))
+            # self.target_indices = self.target_indices[sort_indices]
+            # self.weights = self.weights[sort_indices]
+            # self.delays = self.delays[sort_indices]
+            # self.synapse_types = self.synapse_types[sort_indices]
+
+    def __getitem__(self, index):
+        return SynapseRowInfo(self.target_indices[index], self.weights[index],
+                              self.delays[index], self.synapse_types[index])
 
     def get_n_connections(self, vertex_slice=None, lo_delay=None,
                           hi_delay=None):
