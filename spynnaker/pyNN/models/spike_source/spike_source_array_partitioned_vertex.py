@@ -5,6 +5,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
     AbstractBufferReceivablePartitionedVertex
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_buffer_sendable_partitionable_vertex import \
     AbstractBufferSendableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_reverse_iptagable_vertex import \
+    AbstractReverseIPTagableVertex
 
 
 class SpikeSourceArrayPartitionedVertex(
@@ -29,6 +31,13 @@ class SpikeSourceArrayPartitionedVertex(
         return True
 
     def is_buffer_sendable_vertex(self):
+        """ helper method for is isinstance
+
+        :return:
+        """
+        return True
+
+    def is_reverse_ip_tagable_vertex(self):
         """ helper method for is isinstance
 
         :return:

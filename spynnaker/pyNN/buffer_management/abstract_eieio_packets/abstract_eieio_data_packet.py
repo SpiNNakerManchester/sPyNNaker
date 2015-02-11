@@ -5,11 +5,10 @@ from spinnman.data.little_endian_byte_array_byte_reader import \
 from spinnman.messages.eieio.eieio_header import EIEIOHeader
 from spinnman.messages.eieio.eieio_message import EIEIOMessage
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
-from spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
-    abstract_eieio_packet import AbstractEIEIOPacket
 from spinnman import constants as spinnman_constants
-
 import math
+from spynnaker.pyNN.buffer_management.abstract_eieio_packets.abstract_eieio_packet import \
+    AbstractEIEIOPacket
 
 
 class AbstractEIEIODataPacket(AbstractEIEIOPacket):
@@ -62,7 +61,8 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
     def get_available_count(self):
         available_payload_space = (spinnman_constants.UDP_MESSAGE_MAX_SIZE -
                                    self._length)
-        max_count = math.floor(available_payload_space / self._element_size)
+        max_float = math.floor(available_payload_space / self._element_size)
+        max_count = int(max_float)
         return max_count
 
     def get_max_count(self):
@@ -72,7 +72,8 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
         """
         available_payload_space = (spinnman_constants.UDP_MESSAGE_MAX_SIZE -
                                    self._base_size)
-        max_count = math.floor(available_payload_space / self._element_size)
+        max_float = math.floor(available_payload_space / self._element_size)
+        max_count = int(max_float)
         return max_count
 
     def get_next_element(self):

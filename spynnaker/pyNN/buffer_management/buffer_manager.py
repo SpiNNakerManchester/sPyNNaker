@@ -1,18 +1,21 @@
 import struct
 
 from pacman.utilities.progress_bar import ProgressBar
-from spinnman import constants as spinnman_constants
 from spinnman import exceptions as spinnman_exceptions
 from spynnaker.pyNN import exceptions as spynnaker_exceptions
 from spinnman.data.little_endian_byte_array_byte_reader \
     import LittleEndianByteArrayByteReader
 from spynnaker.pyNN.buffer_management.abstract_eieio_packets.abstract_eieio_packet import \
     AbstractEIEIOPacket
+from spynnaker.pyNN.buffer_management.abstract_eieio_packets.create_eieio_packets import \
+    create_class_from_reader
 from spynnaker.pyNN.buffer_management.buffer_recieve_thread import \
     BufferRecieveThread
 from spynnaker.pyNN.buffer_management.buffer_send_thread import BufferSendThread
-from spynnaker.pyNN.buffer_management.storage_objects.buffer_packet\
-    import BufferPacket
+from spynnaker.pyNN.buffer_management.command_objects.spinnaker_request_buffers import \
+    SpinnakerRequestBuffers
+from spynnaker.pyNN.buffer_management.command_objects.spinnaker_request_read_data import \
+    SpinnakerRequestReadData
 from spynnaker.pyNN.buffer_management.command_objects.padding_request import \
     PaddingRequest
 from spynnaker.pyNN.utilities import utility_calls
@@ -60,44 +63,67 @@ class BufferManager(object):
         :return:
         """
         byte_reader = LittleEndianByteArrayByteReader(message.data)
-        packet = AbstractEIEIOPacket.create_class_from_reader(byte_reader)
-        # if (message.eieio_command_header.command !=
-        #         spinnman_constants.EIEIO_COMMAND_IDS.BUFFER_MANAGEMENT):
-        #     raise spinnman_exceptions.SpinnmanInvalidPacketException(
-        #         "message.eieio_command_header.command",
-        #         "The command id from this command packet is invalid for "
-        #         "buffer management")
+        packet = create_class_from_reader(byte_reader)
+        key = (packet.x, packet.y, packet.p)
+        
+        if isinstance(packet, SpinnakerRequestBuffers):
+            if key in self._recieve_vertices.keys():
+                data_requests = \
+                    self._recieve_vertices[key].get_next_set_of_packets(
+                        packet.space_available, packet.region_id,
+                        packet.sequence_no)
+                if len(data_requests) != 0:
+                    for buffers in data_requests:
+                        data_request = {'data': buffers,
+                                        'x': packet.x,
+                                        'y': packet.y,
+                                        'p': packet.p}
+                        self._recieve_thread.add_request(data_request)
 
-        buffer_packets = list()
-        # while not byte_reader.is_at_end():
-        #     buffer_packets.append(
-        #         BufferPacket.
-        #         build_buffer_packet_from_byte_array_reader(byte_reader))
+        elif isinstance(packet, SpinnakerRequestReadData):
+            pass
+        else:
+            raise spinnman_exceptions.SpinnmanInvalidPacketException(
+                packet.__class__,
+                "The command packet is invalid for buffer management")
 
-        # check that for each buffer packet request what is needed to be done
-        for buffer_packet in buffer_packets:
-            key = (buffer_packet.chip_x, buffer_packet.chip_y,
-                   buffer_packet.chip_p)
-
-            # if the vertex has receive requirements,
-            # check to see if any are needed
-            if (key in self._recieve_vertices.keys() and
-                    buffer_packet.command ==
-                    spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_RECEIVE):
-                receive_data_requests = \
-                    self._recieve_vertices[key].process_buffered_packet()
-                if len(receive_data_requests) != 0:
-                    for receive_data_request in receive_data_requests:
-                        self._recieve_thread.add_request(receive_data_request)
-            # if the vertex has send requirements, check to see if any are
-            # needed
-            if (key in self._sender_vertices.keys() and
-                    buffer_packet.command ==
-                    spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_SEND):
-                send_data_request = \
-                    self._sender_vertices[key].process_buffered_packet()
-                if send_data_request is not None:
-                    self._sender_thread.add_request(send_data_request)
+        # # if (message.eieio_command_header.command !=
+        # #         spinnman_constants.EIEIO_COMMAND_IDS.BUFFER_MANAGEMENT):
+        # #     raise spinnman_exceptions.SpinnmanInvalidPacketException(
+        # #         "message.eieio_command_header.command",
+        # #         "The command id from this command packet is invalid for "
+        # #         "buffer management")
+        #
+        # # buffer_packets = list()
+        # # while not byte_reader.is_at_end():
+        # #     buffer_packets.append(
+        # #         BufferPacket.
+        # #         build_buffer_packet_from_byte_array_reader(byte_reader))
+        #
+        # # check that for each buffer packet request what is needed to be done
+        # for buffer_packet in buffer_packets:
+        #     key = (buffer_packet.chip_x, buffer_packet.chip_y,
+        #            buffer_packet.chip_p)
+        #
+        #     # if the vertex has receive requirements,
+        #     # check to see if any are needed
+        #     if (key in self._recieve_vertices.keys() and
+        #             buffer_packet.command ==
+        #             spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_RECEIVE):
+        #         receive_data_requests = \
+        #             self._recieve_vertices[key].process_buffered_packet()  # this should modify to get_next_set_of_packets (??)
+        #         if len(receive_data_requests) != 0:
+        #             for receive_data_request in receive_data_requests:
+        #                 self._recieve_thread.add_request(receive_data_request)
+        #     # if the vertex has send requirements, check to see if any are
+        #     # needed
+        #     if (key in self._sender_vertices.keys() and
+        #             buffer_packet.command ==
+        #             spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_SEND):
+        #         send_data_request = \
+        #             self._sender_vertices[key].process_buffered_packet()  # this should modify to get_next_set_of_packets (??)
+        #         if send_data_request is not None:
+        #             self._sender_thread.add_request(send_data_request)
 
     def add_received_vertex(self, manageable_vertex):
         """ adds a partitioned vertex into the managed list for vertices

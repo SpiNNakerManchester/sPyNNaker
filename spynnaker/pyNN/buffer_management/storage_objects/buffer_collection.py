@@ -19,7 +19,7 @@ class BufferCollection(object):
         else:
             raise exceptions.ConfigurationException(
                 "tried to set the managed vertex of a buffer collection region "
-                "twice, this is a error due to the imutability of this "
+                "twice, this is a error due to the immutability of this "
                 "parameter, please fix this issue and retry")
 
     def add_buffer_element_to_transmit(self, region_id, buffer_key, data_piece):

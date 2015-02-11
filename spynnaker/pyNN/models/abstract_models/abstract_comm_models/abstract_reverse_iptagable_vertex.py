@@ -3,6 +3,7 @@ from six import add_metaclass
 from abc import abstractmethod
 from spinnman.model.iptag.iptag import IPTag
 
+
 @add_metaclass(ABCMeta)
 class AbstractReverseIPTagableVertex(object):
 
@@ -21,3 +22,27 @@ class AbstractReverseIPTagableVertex(object):
     @abstractmethod
     def is_reverse_ip_tagable_vertex(self):
         pass
+
+    @property
+    def tag(self):
+        return self._tag
+
+    @property
+    def port(self):
+        return self._port
+
+    @property
+    def address(self):
+        return self._address
+
+    @tag.setter
+    def tag(self, value):
+        self._tag = value
+
+    @port.setter
+    def port(self, value):
+        self._port = value
+
+    @address.setter
+    def address(self, value):
+        self._address = value

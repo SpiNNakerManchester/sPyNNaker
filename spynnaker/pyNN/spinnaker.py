@@ -237,6 +237,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 logger.info("*** Setting up listeners for buffer reads")
                 logger.info("*** Loading fixed route entries ***")
                 self._load_fixed_route_entries()
+
             # end of entire loading setup
             if do_timing:
                 timer.take_sample()

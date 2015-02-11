@@ -21,7 +21,7 @@ class EIEIOWithPayloadDataPacket(AbstractEIEIODataPacket):
 
     def insert_key_and_payload(self, key, payload):
         if self.get_available_count() > 0:  # there is space available
-            AbstractEIEIODataPacket(self)._insert_key_and_payload(key, payload)
+            self._insert_key_and_payload(key, payload)
             self._length += self._element_size
             return True
         else:

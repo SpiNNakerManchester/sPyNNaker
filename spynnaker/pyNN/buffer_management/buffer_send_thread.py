@@ -4,8 +4,12 @@ import logging
 
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_message import SDPMessage
+from spynnaker.pyNN.buffer_management.command_objects.event_stop_request \
+    import EventStopRequest
 from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data\
     import HostSendSequencedData
+from spynnaker.pyNN.buffer_management.command_objects.start_requests \
+    import StartRequests
 from spynnaker.pyNN.buffer_management.command_objects.stop_requests \
     import StopRequests
 from spynnaker.pyNN import exceptions
@@ -79,15 +83,17 @@ class BufferSendThread(threading.Thread):
         :param request: the request container for this command message
         :return:
         """
-        if isinstance(request, HostSendSequencedData) \
-                or isinstance(request, StopRequests):
-            eieio_command_message_as_byte_array = \
-                request.get_eieio_command_message_as_byte_array()
-            sdp_header = SDPHeader(destination_chip_x=request.chip_x,
-                                   destination_chip_y=request.chip_y,
-                                   destination_cpu=request.chip_p)
+        x, y, p = request['x'], request['y'], request['p']
+        buffers = request['data']
+        if isinstance(buffers, (HostSendSequencedData, StopRequests,
+                                StartRequests, EventStopRequest)):
+            eieio_message_as_byte_array = \
+                buffers.get_eieio_message_as_byte_array()
+            sdp_header = SDPHeader(destination_chip_x=x,
+                                   destination_chip_y=y,
+                                   destination_cpu=p)
             sdp_message = \
-                SDPMessage(sdp_header, eieio_command_message_as_byte_array)
+                SDPMessage(sdp_header, eieio_message_as_byte_array)
             self._transciever.send_sdp_message(sdp_message)
         else:
             raise exceptions.ConfigurationException(
