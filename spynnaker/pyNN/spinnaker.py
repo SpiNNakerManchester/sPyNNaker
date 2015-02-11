@@ -143,10 +143,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                                                  self._partitionable_graph,
                                                  self._hostname)
 
-        #add re-injection populations to graph for python support
-        if self._use_re_injection:
-            self._add_reinjection_populations()
-
         #calcualte number of machien time steps
         if run_time is not None:
             self._no_machine_time_steps =\
@@ -429,25 +425,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         #execute router
         self._execute_router(pacman_report_state)
-
-    def _add_reinjection_populations(self):
-        """ helper method to add reinjection vertices into the graph for
-        modeling.
-        Works by cycling through the chips on the machine and adding a new model
-        thats forced on that chip to pick up dropped packets due to deadlock
-         and reinject them
-
-        :return: None
-        """
-        logger.info("adding re-injection populations to graph")
-        for chip in self._machine.chips:
-            chip_re_injection_vertex = ReInjectionVertex(
-                self._machine_time_step, self._time_scale_factor,
-                label="re_injection_vertex_for_chip({}:{})"
-                .format(chip.x, chip.y))
-            chip_re_injection_vertex.add_constraint(
-                PlacerChipAndCoreConstraint(chip.x, chip.y))
-            self._partitionable_graph.add_vertex(chip_re_injection_vertex)
 
     def _execute_key_allocator(self, pacman_report_state):
         if self._key_allocator_algorithm is None:

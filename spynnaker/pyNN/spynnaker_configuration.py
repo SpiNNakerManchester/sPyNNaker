@@ -214,9 +214,6 @@ class SpynnakerConfiguration(object):
         if config.has_option("Execute", "run"):
             self._do_run = config.getboolean("Execute", "run")
 
-        self._use_re_injection = \
-            config.getboolean("Execute", "use_re_injection_support")
-
     def _set_up_pacman_algorthms_listings(self):
          #algorithum lists
         partitioner_algorithms_list = \
