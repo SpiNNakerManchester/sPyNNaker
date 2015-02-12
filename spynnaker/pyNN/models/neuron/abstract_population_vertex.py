@@ -48,11 +48,19 @@ from spynnaker.pyNN.models.neuron.population_partitioned_vertex \
 # dsg imports
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
+from data_specification.utility_calls \
+    import get_region_base_address_offset
+
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 from abc import ABCMeta
 from six import add_metaclass
 import logging
 import os
+import numpy
+import struct
 
 logger = logging.getLogger(__name__)
 
@@ -146,6 +154,9 @@ class AbstractPopulationVertex(
 
         # bool for if state has changed.
         self._change_requires_mapping = True
+
+        # By default, profiling is disabled
+        self.profiler_num_samples = 0
 
     @property
     def requires_mapping(self):
@@ -333,6 +344,62 @@ class AbstractPopulationVertex(
 
         subvertex.reserve_provenance_data_region(spec)
 
+        if self.profiler_num_samples != 0:
+            spec.reserve_memory_region(
+                region=constants.POPULATION_BASED_REGIONS.PROFILING.value,
+                size=(8 + (self.profiler_num_samples * 8)), label="profilerRegion")
+
+        
+    def get_profiling_data(self, txrx, placements, graph_mapper):
+        # Create a dictionary to hold each sub-vertex's profiling data
+        profile_data = {}
+        
+        subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        for subvertex in subvertices:
+            placement = placements.get_placement_of_subvertex(subvertex)
+            (x, y, p) = placement.x, placement.y, placement.p
+            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            lo_atom = subvertex_slice.lo_atom
+            logger.debug("Reading spikes from chip {}, {}, core {}, "
+                         "lo_atom {}".format(x, y, p, lo_atom))
+
+            # Get the App Data for the core
+            app_data_base_address = \
+                txrx.get_cpu_information_from_core(x, y, p).user[0]
+            # Get the position of the value buffer
+            profiling_region_base_address_offset = \
+                get_region_base_address_offset(app_data_base_address, 
+                                               constants.POPULATION_BASED_REGIONS.PROFILING.value)
+            profiling_region_base_address_buf = str(list(txrx.read_memory(
+                x, y, profiling_region_base_address_offset, 4))[0])
+            profiling_region_base_address = \
+                struct.unpack("<I", profiling_region_base_address_buf)[0]
+            profiling_region_base_address += app_data_base_address
+            
+            # Read the profiling data size
+            words_written_data =\
+                str(list(txrx.read_memory(
+                    x, y, profiling_region_base_address, 4))[0])
+            words_written = \
+                struct.unpack_from("<I", words_written_data)[0]
+            
+            # Read the profiling data
+            profiling_data = txrx.read_memory(
+                x, y, profiling_region_base_address + 4, words_written * 4)
+            
+            # Convert into byte array
+            profiling_data_list = bytearray()
+            for data in profiling_data:
+                profiling_data_list.extend(data)
+            
+            # Finally read into numpy
+            profiling_samples = numpy.asarray(profiling_data_list, dtype="uint8").view(dtype="<u8")
+            
+            # Add samples to dictionary
+            profile_data[placement] = profiling_samples
+            
+        return profile_data
+        
     def _write_setup_info(
             self, spec, spike_history_region_sz, neuron_potential_region_sz,
             gsyn_region_sz, ip_tags, buffer_size_before_receive,
@@ -349,6 +416,12 @@ class AbstractPopulationVertex(
             [spike_history_region_sz, neuron_potential_region_sz,
              gsyn_region_sz], buffer_size_before_receive,
             time_between_requests)
+        
+        if self.profiler_num_samples != 0:
+            # Write profiler info
+            spec.switch_write_focus(region=constants.POPULATION_BASED_REGIONS.PROFILING.value)
+            spec.write_value(data=self.profiler_num_samples)
+
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice):

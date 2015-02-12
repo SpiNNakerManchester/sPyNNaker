@@ -57,4 +57,6 @@ POPULATION_BASED_REGIONS = Enum(
            ('POTENTIAL_HISTORY', 7),
            ('GSYN_HISTORY', 8),
            ('BUFFERING_OUT_STATE', 9),
-           ('PROVENANCE_DATA', 10)])
+           ('PROVENANCE_DATA', 10),
+           ('PROFILING', 10)])
+>>>>>>> 2919ed3... Resurrect profiler onto new code base

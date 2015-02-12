@@ -2,6 +2,8 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from spynnaker.pyNN.models.neuron.abstract_population_vertex import \
+    AbstractPopulationVertex
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
@@ -682,6 +684,22 @@ class Population(object):
         # state that something has changed in the population,
         self._change_requires_mapping = True
 
+    # NONE PYNN API CALL
+    def profile(self, num_samples):
+        if not isinstance(self._vertex, AbstractPopulationVertex):
+            raise Exception("This population does not support profiling!")
+        else:
+            self._vertex.profiler_num_samples = num_samples
+    
+    def get_profiling_data(self):
+        if not isinstance(self._vertex, AbstractPopulationVertex):
+            raise Exception("This population does not support profiling!")
+        else:
+            return self._vertex.get_profiling_data(
+                txrx=self._spinnaker.transceiver,
+                placements=self._spinnaker.placements,
+                graph_mapper=self._spinnaker.graph_mapper)
+            
     @property
     def size(self):
         """ The number of neurons in the population
