@@ -1,6 +1,10 @@
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
 from pacman.utilities.progress_bar import ProgressBar
+
+
+from spynnaker.pyNN.utilities.timer import Timer
+from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
@@ -70,13 +74,17 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         return self._synapse_row_io
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
-                                       placements, transceiver, routing_infos,
-                                       use_cache=True):
+                                       placements, transceiver, routing_infos):
         """
         Get synaptic data for all connections in this Projection from the
         machine.
         """
-        if self._stored_synaptic_data_from_machine is None or not use_cache:
+        if self._stored_synaptic_data_from_machine is None:
+            timer = None
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer = Timer()
+                timer.start_timing()
+
             logger.debug("Reading synapse data for edge between {} and {}"
                          .format(self._pre_vertex.label,
                                  self._post_vertex.label))
@@ -113,6 +121,9 @@ class ProjectionPartitionableEdge(PartitionableEdge):
             progress_bar.end()
             self._stored_synaptic_data_from_machine = SynapticList(
                 synaptic_list)
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer.take_sample()
+
         return self._stored_synaptic_data_from_machine
 
     @property

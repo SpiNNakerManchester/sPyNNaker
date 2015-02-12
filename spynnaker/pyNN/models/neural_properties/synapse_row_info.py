@@ -34,14 +34,13 @@ class SynapseRowInfo(object):
             self.synapse_types = np.append(self.synapse_types,
                                            row.synapse_types)
 
-            # sort_indices = np.lexsort((self.target_indices, self.weights,
-            #                            self.delays, self.synapse_types))
-            # self.target_indices = self.target_indices[sort_indices]
-            # self.weights = self.weights[sort_indices]
-            # self.delays = self.delays[sort_indices]
-            # self.synapse_types = self.synapse_types[sort_indices]
-
     def __getitem__(self, index):
+        """
+        This is a python method to support slicing of a synaptic list
+
+        :param index: the part of the slice to return.
+        :return: a SynapseRowInfo
+        """
         return SynapseRowInfo(self.target_indices[index], self.weights[index],
                               self.delays[index], self.synapse_types[index])
 

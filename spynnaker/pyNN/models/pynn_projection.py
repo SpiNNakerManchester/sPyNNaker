@@ -21,7 +21,7 @@ from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 
-from spynnaker.pyNN.utilities.timer import Timer
+
 
 logger = logging.getLogger(__name__)
 
@@ -158,6 +158,19 @@ class Projection(object):
                 self._projection_list_ranges = synapse_list.ranges()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
+        """ searches though the partitionable graph's edges to locate any
+        edge which has the same post and pre vertex
+
+        :param presynaptic_vertex: the source partitionable vertex of the
+        multapse
+        :type presynaptic_vertex: instance of
+        pacman.model.partitionable_graph.abstract_partitionable_vertex
+        :param postsynaptic_vertex: The destination partitionable vertex of
+        the multapse
+        :type postsynaptic_vertex: instance of
+        pacman.model.partitionable_graph.abstract_partitionable_vertex
+        :return: None or the edge going to these vertices.
+        """
         graph_edges = self._spinnaker.partitionable_graph.edges
         for edge in graph_edges:
             if ((edge.pre_vertex == presynaptic_vertex)
@@ -407,10 +420,6 @@ class Projection(object):
         return "projection {}".format(self._projection_edge.label)
 
     def _retrieve_synaptic_data_from_machine(self):
-        timer = None
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer = Timer()
-            timer.start_timing()
         synapse_list = None
         delay_synapse_list = None
         if self._projection_edge is not None:
@@ -457,8 +466,6 @@ class Projection(object):
                 new_rows.append(rows[i][self._delay_list_ranges[i]])
             self._host_based_synapse_list = SynapticList(new_rows)
 
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer.take_sample()
         self._has_retrieved_synaptic_list_from_machine = True
 
     # noinspection PyPep8Naming

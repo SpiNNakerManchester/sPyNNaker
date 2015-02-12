@@ -181,12 +181,13 @@ class SynapticList(object):
         Merge the synapse list with this one - must have the same number of
         rows
         """
-        if len(self._synaptic_rows) != len(synapse_list._synaptic_rows):
+        if len(self._synaptic_rows) != synapse_list.get_n_rows():
             raise Exception("Cannot merge lists as they have a different"
                             " number of rows")
         ranges = list()
-        for row, new_row in zip(self._synaptic_rows,
-                                synapse_list._synaptic_rows):
+
+        # the zip operator is a way to iterate over multiple things in unsion
+        for row, new_row in zip(self._synaptic_rows, synapse_list.get_rows()):
             start_offset = len(row.target_indices)
             row.append(new_row)
             ranges.append(slice(start_offset, len(row.target_indices)))

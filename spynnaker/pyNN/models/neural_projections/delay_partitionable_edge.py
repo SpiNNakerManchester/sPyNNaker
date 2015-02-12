@@ -7,6 +7,8 @@ from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
 from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
     import DelayPartitionedEdge
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.timer import Timer
+from spynnaker.pyNN.utilities import conf
 
 from pacman.utilities.progress_bar import ProgressBar
 
@@ -49,10 +51,9 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
         """
         Gets the maximum number of words for a subvertex at the end of the
         connection
-        :param lo_atom: The start of the range of atoms in
-                                   the subvertex (default is first atom)
-        :param hi_atom: The end of the range of atoms in
-                                   the subvertex (default is last atom)
+        :param vertex_slice: the vertex slice which represents which part
+                             of the partitionable vertex
+        :type vertex_slice: pacman.model.graph_mapper.slide
         """
         return max([self._get_delay_stage_max_n_words(vertex_slice, stage)
                     for stage in range(self._pre_vertex.max_stages)])
@@ -71,16 +72,20 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
         return DelayPartitionedEdge(presubvertex, postsubvertex)
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
-                                       placements, transceiver, routing_infos,
-                                       use_cache=True):
+                                       placements, transceiver, routing_infos):
         """
         Get synaptic data for all connections in this Projection from the
         machine.
         """
-        if self._stored_synaptic_data_from_machine is None or not use_cache:
+        if self._stored_synaptic_data_from_machine is None:
             logger.debug("Reading synapse data for edge between {} and {}"
                          .format(self._pre_vertex.label,
                                  self._post_vertex.label))
+            timer = None
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer = Timer()
+                timer.start_timing()
+
             subedges = \
                 graph_mapper.get_partitioned_edges_from_partitionable_edge(
                     self)
@@ -113,11 +118,15 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
                     min_delay = (delay_stage
                                  * self.pre_vertex.max_delay_per_neuron)
                     synaptic_list[(i % pre_vertex_slice.n_atoms)
-                                  + pre_vertex_slice.lo_atom].append(
-                        rows[i], lo_atom=post_vertex_slice.lo_atom,
-                        min_delay=min_delay)
+                                  + pre_vertex_slice.lo_atom]\
+                        .append(rows[i], lo_atom=post_vertex_slice.lo_atom,
+                                min_delay=min_delay)
                 progress_bar.update()
             progress_bar.end()
             self._stored_synaptic_data_from_machine = SynapticList(
                 synaptic_list)
+
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer.take_sample()
+
         return self._stored_synaptic_data_from_machine

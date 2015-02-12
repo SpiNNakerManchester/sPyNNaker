@@ -1,4 +1,3 @@
-import itertools
 import logging
 import math
 import numpy
@@ -339,8 +338,9 @@ class AbstractSynapticManager(object):
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
+    @staticmethod
     def _ring_buffer_expected_upper_bound(
-            self, weight_mean, weight_std_dev, spikes_per_second,
+            weight_mean, weight_std_dev, spikes_per_second,
             machine_timestep, n_synapses_in, sigma):
 
         """
