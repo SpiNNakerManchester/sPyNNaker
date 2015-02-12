@@ -184,17 +184,15 @@ class DataBaseInterface(object):
         # add file path to database into command message.
         # |------P------||------F-----|---------path----------|
         #        0              1               path
-        send_file_path = config.getboolean("Database", "send_file_path")
-        if send_file_path:
-            number_of_chars = len(self._database_address)
-            if number_of_chars > spynnaker_constants.MAX_DATABASE_PATH_LENGTH:
-                raise exceptions.ConfigurationException(
-                    "The file path to the database is too large to be "
-                    "transmitted to the visualiser via the command packet, "
-                    "please set the file path in your visualiser manually and "
-                    "turn off the .cfg parameter [Database] send_file_path "
-                    "to False")
-            eieio_command_message.add_data(self._database_address)
+        number_of_chars = len(self._database_address)
+        if number_of_chars > spynnaker_constants.MAX_DATABASE_PATH_LENGTH:
+            raise exceptions.ConfigurationException(
+                "The file path to the database is too large to be "
+                "transmitted to the visualiser via the command packet, "
+                "please set the file path in your visualiser manually and "
+                "turn off the .cfg parameter [Database] send_file_path "
+                "to False")
+        eieio_command_message.add_data(self._database_address)
 
         # Send command and wait for response
         logger.info("*** Notifying visualiser that the database is ready ***")
