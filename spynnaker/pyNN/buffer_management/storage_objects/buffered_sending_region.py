@@ -45,6 +45,9 @@ class BufferedSendingRegion(object):
             (self._read_position_in_region + number_of_bytes_moved) \
             % self._region_size
 
+    def get_next_timestamp(self):
+        return self._buffer.items()[0][0]
+
     def is_region_empty(self):
         """ checks if the region is empty based from the last timer tic given
          by the core. If the last timer tic has moved, the buffer is updated
@@ -56,6 +59,13 @@ class BufferedSendingRegion(object):
             return True
         else:
             return False
+
+    def get_next_entry(self):
+        timestamp = self.get_next_timestamp()
+        value = self._buffer[timestamp].pop(0)
+        if len(self._buffer[timestamp]):
+            self._buffer.popitem(last=False)
+        return value
 
     @staticmethod
     def _memory_required_for_buffer(packet_buffer):

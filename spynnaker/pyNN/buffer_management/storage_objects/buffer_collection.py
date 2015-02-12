@@ -3,6 +3,8 @@ from spinnman import constants as spinnman_constants
 
 from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region \
     import BufferedSendingRegion
+from spynnaker.pyNN.buffer_management.storage_objects.buffers_sent_deque import \
+    BuffersSentDeque
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 
@@ -11,6 +13,7 @@ class BufferCollection(object):
 
     def __init__(self):
         self._buffers_to_use = dict()
+        self._buffers_sent = dict()
         self._managed_vertex = None
 
     def set_partitioned_vertex(self, partitioned_vertex):
@@ -38,6 +41,24 @@ class BufferCollection(object):
             self._buffers_to_use[region_id] = BufferedSendingRegion()
         self._buffers_to_use[region_id].\
             add_entry_to_buffer(buffer_key, data_piece)
+
+    def add_buffer_elements_to_transmit(self, region_id, buffer_key,
+                                        data_pieces):
+        """ adds a buffer for a given region id
+
+        :param region_id: the region id for which this buffer is being built
+        :param buffer_key: the key for the buffer
+        :param data_pieces: the pieces of data to add to the buffer
+        :type region_id: int
+        :type buffer_key: int
+        :type data_pieces: iterable
+        :return: None
+        :rtype: None
+        """
+        if region_id not in self._buffers_to_use.keys():
+            self._buffers_to_use[region_id] = BufferedSendingRegion()
+        self._buffers_to_use[region_id].\
+            add_entries_to_buffer(buffer_key, data_pieces)
 
     @property
     def regions_managed(self):
@@ -85,18 +106,6 @@ class BufferCollection(object):
                 "try again".format(region_id))
         return self._buffers_to_use[region_id].is_region_empty()
 
-    def get_region_absolute_region_address(self, region_id):
-        """gets the regions absolute region address
-
-        :param region_id: the region id to get the absolute address from
-        :return:
-        """
-        if region_id not in self._buffers_to_use.keys():
-            raise exceptions.ConfigurationException(
-                "The region id {} is not being managed. Please rectify and "
-                "try again".format(region_id))
-        return self._buffers_to_use[region_id].current_absolute_address
-
     def get_region_base_address_for(self, region_id):
         """ get the base address of a region
 
@@ -135,44 +144,6 @@ class BufferCollection(object):
                 "try again".format(region_id))
         return self._buffers_to_use[region_id].buffer
 
-    def get_left_over_space(self, region_id, memory_used):
-        """ checks how much memory is left over given a number of bytes being
-         used
-
-        :param region_id: the region id to which this calculation is being
-         carried out on
-         :type region_id: int
-        :param memory_used: the amount of memory being used in this region
-        :type memory_used: int
-        :return: the memory left over
-        :rtype: int
-        """
-        if region_id not in self._buffers_to_use.keys():
-            raise exceptions.ConfigurationException(
-                "The region id {} is not being managed. Please rectify and "
-                "try again".format(region_id))
-        total_mem_used = \
-            self._buffers_to_use[region_id].position_in_region + memory_used
-        return self._buffers_to_use[region_id].region_size - total_mem_used
-
-    def add_buffer_elements_to_transmit(self, region_id, buffer_key,
-                                        data_pieces):
-        """ adds a buffer for a given region id
-
-        :param region_id: the region id for which this buffer is being built
-        :param buffer_key: the key for the buffer
-        :param data_pieces: the pieces of data to add to the buffer
-        :type region_id: int
-        :type buffer_key: int
-        :type data_pieces: iterable
-        :return: None
-        :rtype: None
-        """
-        if region_id not in self._buffers_to_use.keys():
-            self._buffers_to_use[region_id] = BufferedSendingRegion()
-        self._buffers_to_use[region_id].\
-            add_entries_to_buffer(buffer_key, data_pieces)
-
     def contains_key(self, region_id):
         """ checks if a region is being managed so far
 
@@ -183,24 +154,68 @@ class BufferCollection(object):
             return True
         return False
 
-    def process_buffer_packet(self, buffered_packet):
-        """ method to support callback for sneding new buffers down to the
-         machine
+    # def get_region_absolute_region_address(self, region_id):
+    #     """gets the regions absolute region address
+    #
+    #     :param region_id: the region id to get the absolute address from
+    #     :return:
+    #     """
+    #     if region_id not in self._buffers_to_use.keys():
+    #         raise exceptions.ConfigurationException(
+    #             "The region id {} is not being managed. Please rectify and "
+    #             "try again".format(region_id))
+    #     return self._buffers_to_use[region_id].current_absolute_address
 
-        :param buffered_packet: the buffered packet from the board for this vertex
-        :type buffered_packet: spynnaker.pynn.buffer_management.buffer_packet.BufferPacket
-        :return: either a request or None
-        """
-        # check if the region has got buffers
-        if buffered_packet.region_id not in self._buffers_to_use.keys():
-            raise spinnman_exceptions.SpinnmanInvalidPacketException(
-                "buffered_packet.region_id",
-                "The region being requested does not contain any buffered data")
-        if (buffered_packet.count <
-            (spinnman_constants.EIEIO_DATA_HEADER_SIZE +
-                constants.TIMESTAMP_SPACE_REQUIREMENT)):
-            raise spinnman_exceptions.SpinnmanInvalidPacketException(
-                "buffered_packet.count",
-                "The count is below what is needed for a eieio header, and so"
-                " shouldnt have been requested")
-        return self._managed_vertex.process_buffered_packet(buffered_packet)
+    # def get_left_over_space(self, region_id, memory_used):
+    #     """ checks how much memory is left over given a number of bytes being
+    #      used
+    #
+    #     :param region_id: the region id to which this calculation is being
+    #      carried out on
+    #      :type region_id: int
+    #     :param memory_used: the amount of memory being used in this region
+    #     :type memory_used: int
+    #     :return: the memory left over
+    #     :rtype: int
+    #     """
+    #     if region_id not in self._buffers_to_use.keys():
+    #         raise exceptions.ConfigurationException(
+    #             "The region id {} is not being managed. Please rectify and "
+    #             "try again".format(region_id))
+    #     total_mem_used = \
+    #         self._buffers_to_use[region_id].position_in_region + memory_used
+    #     return self._buffers_to_use[region_id].region_size - total_mem_used
+
+    # def process_buffer_packet(self, buffered_packet):
+    #     """ method to support callback for sending new buffers down to the
+    #      machine
+    #
+    #     :param buffered_packet: the buffered packet from the board for this vertex
+    #     :type buffered_packet: spynnaker.pynn.buffer_management.buffer_packet.BufferPacket
+    #     :return: either a request or None
+    #     """
+    #     # check if the region has got buffers
+    #     if buffered_packet.region_id not in self._buffers_to_use.keys():
+    #         raise spinnman_exceptions.SpinnmanInvalidPacketException(
+    #             "buffered_packet.region_id",
+    #             "The region being requested does not contain any buffered data")
+    #     if (buffered_packet.count <
+    #         (spinnman_constants.EIEIO_DATA_HEADER_SIZE +
+    #             constants.TIMESTAMP_SPACE_REQUIREMENT)):
+    #         raise spinnman_exceptions.SpinnmanInvalidPacketException(
+    #             "buffered_packet.count",
+    #             "The count is below what is needed for a eieio header, and so"
+    #             " shouldnt have been requested")
+    #     return self._managed_vertex.process_buffered_packet(buffered_packet)
+
+    def add_packet_sent(self, packet, region_id):
+        if region_id not in self._buffers_sent.keys():
+            self._buffers_sent[region_id] = BuffersSentDeque()
+        self._buffers_sent[region_id].add_packet(packet)
+
+    def get_next_timestamp(self, region_id):
+        if region_id not in self._buffers_to_use.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        return self._buffers_to_use[region_id].get_next_timestamp()

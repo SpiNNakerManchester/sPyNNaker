@@ -64,6 +64,9 @@ class AbstractBufferReceivablePartitionedVertex(object):
         send_requests = list()
         memory_used = 0
 
+        # check if there were previous packets with a sequence number set
+        # which represent history of packet not received by the machine
+
         while (memory_used < region_size
                and position_in_buffer < len(buffer_keys)
                and used_sequence_no < constants.MAX_SEQUENCES_PER_TRANSMISSION):
@@ -168,12 +171,12 @@ class AbstractBufferReceivablePartitionedVertex(object):
 
         # write entries
         for entry_index in range(max_entries_in_packet):
-            key = buffers[timestamp][entry_counter].entry
+            key = buffers[timestamp][entry_index].entry
             packet.insert_key(key)
             if sequence_no is not None:
-                buffers[timestamp][entry_counter].set_seqeuence_no(sequence_no)
+                buffers[timestamp][entry_index].set_seqeuence_no(sequence_no)
             else:
-                buffers[timestamp][entry_counter].set_seqeuence_no(0)
+                buffers[timestamp][entry_index].set_seqeuence_no(0)
 
         # if a sequence number is passed, generate a sequenced eieio packet
         # otherwise return packet as it is
