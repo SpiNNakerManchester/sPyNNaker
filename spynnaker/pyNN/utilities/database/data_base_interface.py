@@ -8,12 +8,12 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 from spynnaker.pyNN.utilities import constants as spynnaker_constants
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities.conf import config
 
 from multiprocessing.pool import ThreadPool
 import threading
 import os
 import logging
+import traceback
 
 
 logger = logging.getLogger(__name__)
@@ -45,8 +45,8 @@ class DataBaseInterface(object):
             self._database_address = os.path.join(self._database_directory,
                                                   "input_output_database.db")
             self._create_tables()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def _create_tables(self):
         import sqlite3 as sqlite
@@ -164,8 +164,8 @@ class DataBaseInterface(object):
             # after all writing, send notifcation to vis
             if self._wait_for_vis:
                 self._notify_visualiser_and_wait()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def _notify_visualiser_and_wait(self):
 
@@ -242,8 +242,8 @@ class DataBaseInterface(object):
             connection.commit()
             connection.close()
             self._lock_condition.release()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def add_partitionable_vertices(self, partitionable_graph):
         self._thread_pool.apply_async(self._add_partitionable_vertices,
@@ -301,8 +301,8 @@ class DataBaseInterface(object):
             connection.commit()
             connection.close()
             self._lock_condition.release()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def add_system_params(self, time_scale_factor, machine_time_step, runtime):
         self._thread_pool.apply_async(
@@ -333,8 +333,8 @@ class DataBaseInterface(object):
             connection.commit()
             connection.close()
             self._lock_condition.release()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def add_partitioned_vertices(self, partitioned_graph, graph_mapper,
                                  partitionable_graph):
@@ -416,8 +416,8 @@ class DataBaseInterface(object):
             connection.commit()
             connection.close()
             self._lock_condition.release()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def add_placements(self, placements, partitioned_graph):
         self._thread_pool.apply_async(self._add_placements,
@@ -442,8 +442,8 @@ class DataBaseInterface(object):
             connection.commit()
             connection.close()
             self._lock_condition.release()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def add_routing_infos(self, routing_infos, partitioned_graph):
         self._thread_pool.apply_async(self._add_routing_infos,
@@ -467,8 +467,8 @@ class DataBaseInterface(object):
             connection.commit()
             connection.close()
             self._lock_condition.release()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def add_routing_tables(self, routing_tables):
         self._thread_pool.apply_async(self._add_routing_tables,
@@ -499,8 +499,8 @@ class DataBaseInterface(object):
             connection.commit()
             connection.close()
             self._lock_condition.release()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def create_neuron_to_key_mapping(
             self, partitionable_graph, partitioned_graph, routing_infos,
@@ -514,7 +514,6 @@ class DataBaseInterface(object):
             self, partitionable_graph, partitioned_graph, routing_infos,
             graph_mapper, placements):
         try:
-            self._lock_condition.acquire()
             import sqlite3 as sqlite
             self._lock_condition.acquire()
             connection = sqlite.connect(self._database_address)
@@ -561,8 +560,8 @@ class DataBaseInterface(object):
             connection.commit()
             connection.close()
             self._lock_condition.release()
-        except Exception as e:
-            print e
+        except Exception:
+            traceback.print_exc()
 
     def stop(self):
         logger.debug("[data_base_thread] Stopping")
