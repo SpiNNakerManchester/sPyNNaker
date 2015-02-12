@@ -1,4 +1,3 @@
-import itertools
 import logging
 import math
 import numpy
@@ -339,8 +338,9 @@ class AbstractSynapticManager(object):
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
+    @staticmethod
     def _ring_buffer_expected_upper_bound(
-            self, weight_mean, weight_std_dev, spikes_per_second,
+            weight_mean, weight_std_dev, spikes_per_second,
             machine_timestep, n_synapses_in, sigma):
 
         """
@@ -552,42 +552,6 @@ class AbstractSynapticManager(object):
         in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
         in_proj_subedges = [e for e in in_subedges
                             if isinstance(e, ProjectionPartitionedEdge)]
-
-        # Get all combinations of these edges
-        proj_subedges_to_remove = []
-        for (a, b) in itertools.combinations(in_proj_subedges, 2):
-            a_key = routing_info.get_key_from_subedge(a)
-            b_key = routing_info.get_key_from_subedge(b)
-
-            if a_key == b_key:
-                # Extract both projection edges synapse sublists
-                a_sublist = a.get_synapse_sublist(graph_mapper)
-                b_sublist = b.get_synapse_sublist(graph_mapper)
-
-                # From these get rows
-                a_rows = a_sublist.get_rows()
-                b_rows = b_sublist.get_rows()
-
-                if len(a_rows) != len(b_rows):
-                    raise Exception("Incoming projection subedges have"
-                                    " different row lengths")
-
-                # Merge synaptic rows
-                for a_row, b_row in zip(a_rows, b_rows):
-                    # **TODO** use proper merge functionality
-                    a_row.append(b_row)
-
-                # Add projection edge b to list to remove
-                proj_subedges_to_remove.append(b)
-
-        # If there are any projection subedges to remove
-        if len(proj_subedges_to_remove) > 0:
-            logger.debug("Merged %u incoming projection sub-edges" % len(
-                         proj_subedges_to_remove))
-
-            # Rebuild incoming projection list
-            in_proj_subedges = [i for i in in_proj_subedges
-                                if i not in proj_subedges_to_remove]
 
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
