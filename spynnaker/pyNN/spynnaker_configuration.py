@@ -26,20 +26,21 @@ logger = logging.getLogger(__name__)
 class SpynnakerConfiguration(object):
 
     def __init__(self, host_name, graph_label):
-        #machine specific bits
+
+        # machine specific bits
         self._hostname = host_name
         self._time_scale_factor = None
         self._machine_time_step = None
         self._runtime = None
 
-        #specific utility vertexes
+        # specific utility vertexes
         self._multi_cast_vertex = None
         self._txrx = None
 
-        #debug flag
+        # debug flag
         self._in_debug_mode = None
 
-        #main objects
+        # main objects
         self._partitionable_graph = PartitionableGraph(label=graph_label)
         self._partitioned_graph = None
         self._key_register = None
@@ -53,7 +54,7 @@ class SpynnakerConfiguration(object):
         self._reports_states = None
         self._app_id = None
 
-        #pacman mapping objects
+        # pacman mapping objects
         self._partitioner_algorithm = None
         self._placer_algorithm = None
         self._key_allocator_algorithm = None
@@ -62,16 +63,16 @@ class SpynnakerConfiguration(object):
         self._app_data_runtime_folder = None
         self._this_run_time_string_repenstation = None
 
-        #exeuctable params
+        # exeuctable params
         self._do_load = None
         self._do_run = None
         self._writeTextSpecs = None
         self._retrieve_provance_data = True
 
-        #helper data stores
+        # helper data stores
         self._current_max_tag_value = 0
 
-        #database objects
+        # database objects
         self._create_database = False
         self._database_interface = None
 
@@ -93,13 +94,13 @@ class SpynnakerConfiguration(object):
                     config.getint("Reports", "max_application_binaries_kept"),
                     application_generated_data_file_folder)
 
-            #add time stamped folder for this run
+            # add time stamped folder for this run
             this_run_time_folder = \
                 os.path.join(application_generated_data_file_folder, "latest")
             if not os.path.exists(this_run_time_folder):
                 os.makedirs(this_run_time_folder)
 
-            #store timestamp in latest/time_stamp
+            # store timestamp in latest/time_stamp
             time_of_run_file_name = os.path.join(this_run_time_folder,
                                                  "time_stamp")
             writer = open(time_of_run_file_name, "w")
@@ -122,7 +123,7 @@ class SpynnakerConfiguration(object):
                     config.getint("Reports", "max_application_binaries_kept"),
                     where_to_write_application_data_files)
 
-            #store timestamp in latest/time_stamp
+            # store timestamp in latest/time_stamp
             time_of_run_file_name = os.path.join(this_run_time_folder,
                                                  "time_stamp")
             writer = open(time_of_run_file_name, "w")
@@ -142,13 +143,13 @@ class SpynnakerConfiguration(object):
         if config.getboolean("Reports", "reportsEnabled"):
             self._writeTextSpecs = config.getboolean("Reports",
                                                      "writeTextSpecs")
-        #determine common report folder
+        # determine common report folder
         config_param = config.get("Reports", "defaultReportFilePath")
         created_folder = False
         if config_param == "DEFAULT":
             directory = os.getcwd()
 
-            #global reports folder
+            # global reports folder
             self._report_default_directory = os.path.join(directory, 'reports')
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
@@ -163,18 +164,19 @@ class SpynnakerConfiguration(object):
             if not os.path.exists(self._report_default_directory):
                 os.makedirs(self._report_default_directory)
 
-        #clear and clean out folders considered not useful anymore
+        # clear and clean out folders considered not useful anymore
         if not created_folder \
                 and len(os.listdir(self._report_default_directory)) > 0:
             self._move_report_and_binary_files(
                 config.getint("Reports", "max_reports_kept"),
                 self._report_default_directory)
 
-        #handle timing app folder and cleaning of report folder from last run
-        app_folder_name = os.path.join(self._report_default_directory, "latest")
+        # handle timing app folder and cleaning of report folder from last run
+        app_folder_name = os.path.join(self._report_default_directory,
+                                       "latest")
         if not os.path.exists(app_folder_name):
                 os.makedirs(app_folder_name)
-        #store timestamp in latest/time_stamp
+        # store timestamp in latest/time_stamp
         time_of_run_file_name = os.path.join(app_folder_name, "time_stamp")
         writer = open(time_of_run_file_name, "w")
 
@@ -194,18 +196,20 @@ class SpynnakerConfiguration(object):
 
     def _set_up_main_objects(self):
         self._in_debug_mode = conf.config.get("Mode", "mode") == "Debug"
-        #report object
+
+        # report object
         if config.getboolean("Reports", "reportsEnabled"):
             self._reports_states = ReportState()
         self._create_database = \
             config.getboolean("Database", "create_database")
 
-        #communication objects
+        # communication objects
         self._iptags = list()
         self._app_id = config.getint("Machine", "appID")
 
     def _set_up_executable_specifics(self):
-        #loading and running config params
+
+        # loading and running config params
         self._do_load = True
         if config.has_option("Execute", "load"):
             self._do_load = config.getboolean("Execute", "load")
@@ -215,7 +219,8 @@ class SpynnakerConfiguration(object):
             self._do_run = config.getboolean("Execute", "run")
 
     def _set_up_pacman_algorthms_listings(self):
-         #algorithum lists
+
+        # algorithm lists
         partitioner_algorithms_list = \
             conf.get_valid_components(partition_algorithms, "Partitioner")
         self._partitioner_algorithm = \
@@ -226,11 +231,12 @@ class SpynnakerConfiguration(object):
         self._placer_algorithm = \
             placer_algorithms_list[config.get("Placer", "algorithm")]
 
-        #get common key allocator algorithms
+        # get common key allocator algorithms
         key_allocator_algorithms_list = \
             conf.get_valid_components(routing_info_allocator_algorithms,
                                       "RoutingInfoAllocator")
-        #get pynn specific key allocator
+
+        # get pynn specific key allocator
         pynn_overloaded_allocator = \
             conf.get_valid_components(overridden_pacman_functions,
                                       "RoutingInfoAllocator")
@@ -248,7 +254,8 @@ class SpynnakerConfiguration(object):
     def _set_up_machine_specifics(self, timestep, min_delay, max_delay,
                                   hostname):
         self._machine_time_step = config.getint("Machine", "machineTimeStep")
-        #deal with params allowed via the setup optimals
+
+        # deal with params allowed via the setup optimals
         if timestep is not None:
             timestep *= 1000  # convert into ms from microseconds
             config.set("Machine", "machineTimeStep", timestep)
@@ -290,9 +297,9 @@ class SpynnakerConfiguration(object):
                 config.getint("Machine", "timeScaleFactor")
             if timestep * self._time_scale_factor < 1000:
                 logger.warn("the combination of machine time step and the "
-                            "machine time scale factor results in a real timer "
-                            "tic that is currently not reliably supported by "
-                            "the spinnaker machine.")
+                            "machine time scale factor results in a real "
+                            "timer tic that is currently not reliably "
+                            "supported by the spinnaker machine.")
         else:
             self._time_scale_factor = max(1,
                                           math.ceil(1000.0 / float(timestep)))

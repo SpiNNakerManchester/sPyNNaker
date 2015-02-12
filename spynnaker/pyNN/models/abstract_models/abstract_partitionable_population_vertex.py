@@ -80,7 +80,8 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
     @abstractmethod
     def set_model_max_atoms_per_core(new_value):
         """
-        enforces other neural models to support model based max atoms contraints
+        enforces other neural models to support model based max atoms
+        constraints
         """
 
     # noinspection PyUnusedLocal
@@ -122,14 +123,15 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          additional_constraints=list()):
         """ overloaded from abstract_partitionable_vertex so that partitioned
-        vertices has a n_atoms (used in key-allocator algorithums)
+            vertices has a n_atoms (used in key-allocator algorithms)
 
-        :param vertex_slice: the slice of atoms from the partitionable vertex
-        to the partitioned vertex
-        :param resources_required: the resources used by thsi partitioned vertex
-        :param label: the string represnetation of this vertex
-        :param additional_constraints: any additional constraints used by
-        future mapping algorithums.
+        :param vertex_slice: the slice of atoms from the partitionable vertex\
+                    to the partitioned vertex
+        :param resources_required: the resources used by this partitioned\
+                    vertex
+        :param label: the string representation of this vertex
+        :param additional_constraints: any additional constraints used by\
+                    future mapping algorithms.
         :return: a instance of a partitioned_vertex
         """
         partitioned_vertex = PartitionedPopulationVertex(

@@ -1,6 +1,5 @@
 from spynnaker.pyNN.models.spike_source.abstract_spike_source import \
     AbstractSpikeSource
-from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions import \
     generate_parameter
@@ -107,11 +106,13 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
             size=setup_sz, label='setup')
         spec.reserve_memory_region(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value,
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION
+                                                     .value,
             size=poisson_params_sz, label='PoissonParams')
         if spike_hist_buff_sz > 0:
             spec.reserve_memory_region(
-                region=self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+                region=self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION
+                                                         .value,
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
                 empty=True)
 
@@ -154,7 +155,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value)
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION
+                                                     .value)
 
         # Write header info to the memory region:
 
@@ -240,7 +242,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
                    compatible_output=False):
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
-        sub_vertex_out_spike_bytes_function = \
+        out_spike_bytes_function = \
             lambda subvertex, subvertex_slice: int(ceil(
                 subvertex_slice.n_atoms / 32.0)) * 4
 
@@ -248,12 +250,11 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         return self._get_spikes(
             transciever=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
-            spike_recording_region=
-            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            sub_vertex_out_spike_bytes_function=
-            sub_vertex_out_spike_bytes_function)
+            spike_recording_region=self._POISSON_SPIKE_SOURCE_REGIONS
+                                       .SPIKE_HISTORY_REGION.value,
+            sub_vertex_out_spike_bytes_function=out_spike_bytes_function)
 
-    #inhirrtted from partionable vertex
+    # inherited from partionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
         method for calculating sdram usage
@@ -264,24 +265,20 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
-        method for caulculating dtcm usage for a coltection of atoms
+        method for calculating dtcm usage for a collection of atoms
         """
         return 0
-        #no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        #return (44 + (16 * 4)) * no_atoms
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the CPU requirements for a range of atoms
         """
         return 0
-        #no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        #return 128 * no_atoms
 
-    #inhirrted from dataspecable vertex
-
+    # inherited from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_mapper, report_folder):
+                           routing_info, hostname, graph_mapper,
+                           report_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSourcePoisson on one core.
@@ -306,11 +303,10 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         self.write_setup_info(spec, spike_hist_buff_sz)
 
-        #NOTE: using the first outgoing subedge to acquire the trnasmitting key
-        # the assumption here is that all outgoing subedges use the same key.
-        #This is true for pynn based populations, but may not hold for
+        # NOTE: using the first outgoing subedge to acquire the trnasmitting
+        # key; the assumption here is that all outgoing subedges use the same
+        # key. This is true for pynn based populations, but may not hold for
         # other models.
-
         key = routing_info.get_key_from_subedge(
             subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
 

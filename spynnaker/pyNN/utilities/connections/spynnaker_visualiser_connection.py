@@ -17,14 +17,15 @@ class SpynnakerVisualisationConnection(object):
                                             packet])
 
     def __init__(
-            self, receive_handshake_function, receive_spinnaker_packet_function,
+            self, receive_handshake_function,
+            receive_spinnaker_packet_function,
             hand_shake_local_port=19999, hand_shake_remote_port=19998,
             hand_shake_remote_host="localhost", no_threads=5,
             spinnaker_packets_local_port=None):
 
         self._receive_spinnaker_function = receive_spinnaker_packet_function
 
-        #create connections and register listeners
+        # create connections and register listeners
         self._database_handshake_connection =\
             EieioCommandConnection(
                 hand_shake_local_port, hand_shake_remote_host,
@@ -37,5 +38,3 @@ class SpynnakerVisualisationConnection(object):
             register_callback(self.packet_translater,
                               constants.TRAFFIC_TYPE.EIEIO_DATA)
         self._thread_pool = ThreadPool(processes=no_threads)
-
-

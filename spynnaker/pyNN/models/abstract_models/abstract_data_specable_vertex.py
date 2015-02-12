@@ -17,8 +17,9 @@ import tempfile
 import os
 import threading
 
-#used to stop file conflicts
+# used to stop file conflicts
 _lock_condition = threading.Condition()
+
 
 @add_metaclass(ABCMeta)
 class AbstractDataSpecableVertex(AbstractConstrainedVertex):
@@ -90,8 +91,9 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
             AbstractDataSpecableVertex.get_data_spec_file_path(
                 processor_chip_x, processor_chip_y, processor_id, hostname)
         data_writer = FileDataWriter(binary_file_path)
-        #check if text reports are needed and if so initilise the reprot writer
-        #to send down to dsg
+
+        # check if text reports are needed and if so initialize the report
+        # writer to send down to dsg
         report_writer = None
         if config.getboolean("Reports", "writeTextSpecs"):
             new_report_directory = os.path.join(report_directory,

@@ -1,6 +1,5 @@
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
     AbstractSynapticManager
@@ -74,14 +73,16 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=synapse_params_sz, label='SynapseParams')
         spec.reserve_memory_region(
-            region=constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value,
+            region=constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION
+                                                     .value,
             size=row_len_trans_sz, label='RowLenTable')
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
             size=master_pop_table_sz, label='MasterPopTable')
         if all_syn_block_sz > 0:
             spec.reserve_memory_region(
-                region=constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+                region=constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX
+                                                         .value,
                 size=all_syn_block_sz, label='SynBlocks')
 
         if self._record:
@@ -91,8 +92,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 empty=True)
         if self._record_v:
             spec.reserve_memory_region(
-                region=
-                constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
+                region=constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY
+                                                         .value,
                 size=potential_hist_buff_sz, label='potHistBuffer',
                 empty=True)
         if self._record_gsyn:
@@ -145,7 +146,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         spec.write_value(data=gsyn_region_sz)
 
     def write_neuron_parameters(self, spec, key, subvertex,
-                                ring_buffer_to_input_left_shifts, vertex_slice):
+                                ring_buffer_to_input_left_shifts,
+                                vertex_slice):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} "
@@ -157,17 +159,17 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         # Write header info to the memory region:
 
-        #if key is None, write boolean saying key is not to be used otherwise
+        # TODO: This is for the future!
+        # if key is None, write boolean saying key is not to be used otherwise
         # write bool saying key is to be used
-        #if key is None:
-         #   spec.write_value(data=0)
-        #else:
-         #   spec.write_value(data=1)
-
+        # if key is None:
+        #    spec.write_value(data=0)
+        # else:
+        #    spec.write_value(data=1)
         # Write Key info for this core:
-        #if key is None:
-         #   spec.write_value(data=0)
-        #else:
+        # if key is None:
+        #    spec.write_value(data=0)
+        # else:
         #    spec.write_value(data=key)
         spec.write_value(data=key)
 
@@ -277,9 +279,9 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         for partitioned_edge in in_partitioned_edges:
             partitioned_edge.weight_scales_setter(weight_scales)
 
-        #NOTE: using the first outgoing subedge to acquire the trnasmitting key
-        # the assumption here is that all outgoing subedges use the same key.
-        #This is true for pynn based populations, but may not hold for
+        # NOTE: using the first outgoing subedge to acquire the transmitting
+        # key; the assumption here is that all outgoing subedges use the same
+        # key This is true for pynn based populations, but may not hold for
         # other models.
         key = None
         if len(subgraph.outgoing_subedges_from_subvertex(subvertex)) > 0:
@@ -315,6 +317,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     # inherited from data specable vertex
     def get_binary_file_name(self):
+
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)
 

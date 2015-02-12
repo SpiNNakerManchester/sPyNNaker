@@ -45,7 +45,8 @@ class AbstractSpikeSource(
 
         :param vertex_slice: the slice of atoms from the partitionable vertex
         to the partitioned vertex
-        :param resources_required: the resources used by thsi partitioned vertex
+        :param resources_required: the resources used by thsi partitioned\
+                    vertex
         :param label: the string represnetation of this vertex
         :param additional_constraints: any additional constraints used by
         future mapping algorithums.

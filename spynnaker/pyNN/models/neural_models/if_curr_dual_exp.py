@@ -41,8 +41,8 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, n_params=10, label=label,
             binary="IF_curr_exp_dual.aplx", constraints=constraints,
-            max_atoms_per_core=
-            IFCurrentDualExponentialPopulation._model_based_max_atoms_per_core,
+            max_atoms_per_core=(IFCurrentDualExponentialPopulation
+                                ._model_based_max_atoms_per_core),
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,

@@ -6,14 +6,14 @@ and implementation for the PyNN High-level API
 
 import inspect
 
-#utility functions
+# utility functions
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 
-#pynn centric classes
+# pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
 from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
@@ -28,7 +28,7 @@ from spynnaker.pyNN.models.neural_models.if_curr_exp \
 from spynnaker.pyNN.models.neural_models.izk_curr_exp \
     import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
 
-#neural projections
+# neural projections
 from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
@@ -42,13 +42,13 @@ from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 
-#spike sources
+# spike sources
 from spynnaker.pyNN.models.spike_source.spike_source_array \
     import SpikeSourceArray
 from spynnaker.pyNN.models.spike_source.spike_source_poisson\
     import SpikeSourcePoisson
 
-#connections
+# connections
 from spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector\
     import AllToAllConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
@@ -68,8 +68,6 @@ from spynnaker.pyNN.models.neural_projections.connectors.\
     DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
-from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
-    import FromFileConnector
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
     import SmallWorldConnector
 
@@ -92,24 +90,25 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
-#constraints
+# constraints
 from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
 
-#note importing star is a bad thing to do.
+# note importing star is a bad thing to do.
 from pyNN.random import *
 from pyNN.space import *
 
-#traditional logger
+# traditional logger
 logger = logging.getLogger(__name__)
 
-#global controller / spinnaker object that does everything
+# global controller / spinnaker object that does everything
 _spinnaker = None
 
 # List of binary search paths
 _binary_search_paths = []
+
 
 def register_binary_search_path(search_path):
     """Registers an additional binary search path for
@@ -120,6 +119,7 @@ def register_binary_search_path(search_path):
     absolute search path for binaries
     """
     _binary_search_paths.append(search_path)
+
 
 def end(stop_on_board=True):
     """

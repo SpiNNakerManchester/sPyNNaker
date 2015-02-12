@@ -9,7 +9,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
 from spynnaker.pyNN.utilities import constants as spynnaker_constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
 
 from multiprocessing.pool import ThreadPool
 import threading
@@ -26,20 +25,22 @@ class DataBaseInterface(object):
         self._socket_addresses = socket_addresses
         self._done = False
         self._database_directory = database_directory
+
         # connection to vis stuff
         self._wait_for_vis = wait_for_vis
         self._thread_pool = ThreadPool(processes=1)
         self._wait_pool = ThreadPool(processes=1)
         self._database_address = None
+
         # set up checks
         self._machine_id = 0
         self._lock_condition = threading.Condition()
-        #start creation for database
+
+        # start creation for database
         self.initilisation()
 
     def initilisation(self):
         try:
-            import sqlite3 as sqlite
             logger.debug("creating database and initial tables")
             self._database_address = os.path.join(self._database_directory,
                                                   "input_output_database.db")
@@ -159,7 +160,8 @@ class DataBaseInterface(object):
             self._sent_visualisation_confirmation = True
             self._thread_pool.close()
             self._thread_pool.join()
-            #after all writing, send notifcation to vis
+
+            # after all writing, send notifcation to vis
             if self._wait_for_vis:
                 self._notify_visualiser_and_wait()
         except Exception as e:
@@ -169,19 +171,19 @@ class DataBaseInterface(object):
 
         data_base_message_connections = list()
         for socket_address in self._socket_addresses:
-            data_base_message_connection = \
-                EieioCommandConnection(
-                    socket_address.listen_port, socket_address.notify_host_name,
-                    socket_address.notify_port_no)
+            data_base_message_connection = EieioCommandConnection(
+                socket_address.listen_port, socket_address.notify_host_name,
+                socket_address.notify_port_no)
             data_base_message_connections.append(data_base_message_connection)
 
         # create complete message for vis to pick up
         eieio_command_header = EIEIOCommandHeader(
             spinnman_constants.EIEIO_COMMAND_IDS.DATABASE_CONFIRMATION.value)
         eieio_command_message = EIEIOCommandMessage(eieio_command_header)
+
         # add file path to database into command message.
-        #|------P------||------F-----|---------path----------|
-        #       0              1               path
+        # |------P------||------F-----|---------path----------|
+        #        0              1               path
         send_file_path = config.getboolean("Database", "send_file_path")
         if send_file_path:
             number_of_chars = len(self._database_address)
@@ -193,6 +195,7 @@ class DataBaseInterface(object):
                     "turn off the .cfg parameter [Database] send_file_path "
                     "to False")
             eieio_command_message.add_data(self._database_address)
+
         # Send command and wait for response
         logger.info("*** Notifying visualiser that the database is ready ***")
         for connection in data_base_message_connections:
@@ -308,7 +311,8 @@ class DataBaseInterface(object):
             self._add_system_params,
             args=[time_scale_factor, machine_time_step, runtime])
 
-    def _add_system_params(self, time_scale_factor, machine_time_step, runtime):
+    def _add_system_params(self, time_scale_factor, machine_time_step,
+                           runtime):
         try:
             import sqlite3 as sqlite
             self._lock_condition.acquire()
@@ -394,7 +398,8 @@ class DataBaseInterface(object):
                     "INSERT INTO graph_mapper_edges ("
                     "partitionable_edge_id, partitioned_edge_id) "
                     "VALUES({}, {})"
-                    .format(edges.index(edge) + 1, subedges.index(subedge) + 1))
+                    .format(edges.index(edge) + 1,
+                            subedges.index(subedge) + 1))
 
             # add to partitioned graph
             edge_id_offset = 0
@@ -542,15 +547,17 @@ class DataBaseInterface(object):
                     vertex_id = vertices.index(vertex) + 1
                     vertex_slice = \
                         graph_mapper.get_subvertex_slice(partitioned_vertex)
-                    key_to_neuron_map = routing_info.key_with_atom_ids_function(
-                        vertex_slice, vertex, placement, subedge)
+                    key_to_neuron_map = \
+                        routing_info.key_with_atom_ids_function(
+                            vertex_slice, vertex, placement, subedge)
                     for neuron_id in key_to_neuron_map.keys():
                         if key_to_neuron_map[neuron_id] not in inserted_keys:
                             cur.execute(
                                 "INSERT INTO key_to_neuron_mapping("
                                 "vertex_id, key, neuron_id) "
                                 "VALUES ({}, {}, {})"
-                                .format(vertex_id, key_to_neuron_map[neuron_id],
+                                .format(vertex_id,
+                                        key_to_neuron_map[neuron_id],
                                         neuron_id))
                             inserted_keys.append(key_to_neuron_map[neuron_id])
             connection.commit()

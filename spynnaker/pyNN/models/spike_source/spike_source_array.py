@@ -1,7 +1,6 @@
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
-from spynnaker.pyNN.utilities import packet_conversions
 
 
 from data_specification.data_specification_generator import \
@@ -68,7 +67,8 @@ class SpikeSourceArray(AbstractSpikeSource):
                     spike_dict[time_stamp_in_ticks].append(neuron)
         else:
             # This is in official PyNN format, all neurons use the same list:
-            neuron_list = list(range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
+            neuron_list = list(range(vertex_slice.lo_atom,
+                                     vertex_slice.hi_atom + 1))
             for timeStamp in self._spike_times:
                 time_stamp_in_ticks = \
                     int((timeStamp * 1000.0) / self._machine_time_step)
@@ -106,8 +106,8 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     def process_spike_array_info(self, subvertex, graph_mapper):
         """
-        Parse python definitons of the required spike arrays and construct
-        both the spike blocks, containing lists of spike IDs for each time step,
+        Parse python definitions of the required spike arrays and construct
+        both the spike blocks, containing lists of spike IDs for each timestep,
         and the index table, which gives the address in memory to access
         the spike block for the current time step.
         """
@@ -191,7 +191,8 @@ class SpikeSourceArray(AbstractSpikeSource):
             Bit 6: Output spike rate
         """
         # What recording commands were set for the parent pynn_population.py?
-        self._write_basic_setup_info(spec, SpikeSourceArray.CORE_APP_IDENTIFIER)
+        self._write_basic_setup_info(spec,
+                                     SpikeSourceArray.CORE_APP_IDENTIFIER)
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
@@ -270,22 +271,22 @@ class SpikeSourceArray(AbstractSpikeSource):
 
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
-        sub_vertex_out_spike_bytes_function = \
-            lambda subvertex, subvertex_slice: int(ceil(
-                    subvertex_slice.n_atoms / 32.0)) * 4
+        out_spike_bytes_function = \
+            lambda subvertex, subvertex_slice: \
+            int(ceil(subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
             transciever=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
-            spike_recording_region=
-            self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            sub_vertex_out_spike_bytes_function=
-            sub_vertex_out_spike_bytes_function)
+            spike_recording_region=self._SPIKE_SOURCE_REGIONS
+                                       .SPIKE_HISTORY_REGION.value,
+            sub_vertex_out_spike_bytes_function=out_spike_bytes_function)
 
-    #inhirrted from dataspecable vertex
+    # inherited from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_mapper, report_folder):
+                           routing_info, hostname, graph_mapper,
+                           report_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
@@ -296,7 +297,7 @@ class SpikeSourceArray(AbstractSpikeSource):
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
-        #get slice from mapper
+        # get slice from mapper
         subvert_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         spike_history_region_sz = self.get_spike_buffer_size(subvert_slice)
@@ -314,7 +315,8 @@ class SpikeSourceArray(AbstractSpikeSource):
             spike_region_size = 4
 
         # Calculate memory requirements:
-        block_index_region_size = self.get_block_index_bytes(len(table_entries))
+        block_index_region_size = self.get_block_index_bytes(
+            len(table_entries))
 
         # Create the data regions for the spike source array:
         self.reserve_memory_regions(spec, constants.SETUP_SIZE,
@@ -322,11 +324,10 @@ class SpikeSourceArray(AbstractSpikeSource):
                                     spike_region_size, spike_history_region_sz)
         self.write_setup_info(spec, spike_history_region_sz)
 
-        #NOTE: using the first outgoing subedge to acquire the trnasmitting key
-        # the assumption here is that all outgoing subedges use the same key.
-        #This is true for pynn based populations, but may not hold for
+        # NOTE: using the first outgoing subedge to acquire the transmitting
+        # key; the assumption here is that all outgoing subedges use the same
+        # key. This is true for pynn based populations, but may not hold for
         # other models.
-
         key = routing_info.get_key_from_subedge(
             subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
 
@@ -341,11 +342,9 @@ class SpikeSourceArray(AbstractSpikeSource):
     def get_binary_file_name(self):
         return "spike_source_array.aplx"
 
-    #inhirrted from partitionable vertex
+    # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0
-        #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        #return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
         spike_dict = self.get_spikes_per_timestep(vertex_slice)
@@ -358,13 +357,11 @@ class SpikeSourceArray(AbstractSpikeSource):
             self.get_block_index_bytes(no_active_timesteps)
 
         spike_history_region_sz = self.get_spike_buffer_size(vertex_slice)
-        return (constants.SETUP_SIZE + spike_region_sz + block_index_region_size
-                + spike_history_region_sz)
+        return (constants.SETUP_SIZE + spike_region_sz
+                + block_index_region_size + spike_history_region_sz)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         return 0
-        #n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        #return (44 + (16 * 4)) * n_atoms
 
     def is_recordable(self):
         return True

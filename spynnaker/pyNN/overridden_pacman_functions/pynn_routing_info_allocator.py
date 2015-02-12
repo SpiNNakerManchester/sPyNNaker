@@ -10,25 +10,27 @@ from pacman import exceptions
 
 
 class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
-    
+
     def __init__(self):
         BasicRoutingInfoAllocator.__init__(self)
         self._supported_constraints.append(KeyAllocatorRoutingConstraint)
         self._supported_constraints.append(KeyAllocatorFixedMaskConstraint)
 
-    #inhirrted from AbstractRoutingInfoAllocatorAlgorithm
+    # inherited from AbstractRoutingInfoAllocatorAlgorithm
     def _allocate_subedge_key_mask(self, out_going_subedge, placement):
-        """helper method (can be overlaoded by future impliemntations of key
-        alloc
+        """ helper method (can be overlaoded by future impliemntations of key
+            alloc
 
         :param out_going_subedge: the outgoing subedge from a given subvert
         :param placement: the placement for the given subvert
-        :type out_going_subedge: pacman.model.partitioned_graph.subegde.PartitionedEdge
+        :type out_going_subedge: \
+                    :py:class:`pacman.model.partitioned_graph.subegde.PartitionedEdge`
         :type placement: pacman.model.placements.placement.Placement
-        :return: a subedge_routing_info which contains the key, and mask of the\
-         subvert
-         :rtype: pacman.model.routing_info.subegde_rotuing_info.SubedgeRoutingInfo
-         :raise None: does not raise any known exceptions
+        :return: a subedge_routing_info which contains the key, and mask of\
+                    the subvert
+        :rtype:\
+                    :py:class:`pacman.model.routing_info.subegde_rotuing_info.SubedgeRoutingInfo`
+        :raise None: does not raise any known exceptions
         """
         router_constraints = \
             utility_calls.locate_constraints_of_type(
@@ -39,15 +41,15 @@ class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
                 self, out_going_subedge, placement)
         elif len(router_constraints) > 1:
             raise exceptions.PacmanRouteInfoAllocationException(
-                "cannot determine how to reduce more than one router_constraint"
-                "please reduce the constraints and try again, or use another"
-                "routing info allocator")
+                "cannot determine how to reduce more than one "
+                "router_constraint please reduce the constraints and try "
+                "again, or use another routing info allocator")
         else:
             fixed_mask_constraints = utility_calls.locate_constraints_of_type(
                 constraints=placement.subvertex.constraints,
                 constraint_type=KeyAllocatorFixedMaskConstraint)
-            key, mask = \
-                router_constraints[0].key_function_call(out_going_subedge)
+            key, mask = router_constraints[0].key_function_call(
+                out_going_subedge)
             if len(fixed_mask_constraints) != 0:
                 if len(fixed_mask_constraints) > 1:
                     raise exceptions.PacmanRouteInfoAllocationException(
@@ -62,8 +64,9 @@ class PyNNRoutingInfoAllocator(BasicRoutingInfoAllocator):
                         "again.".format(mask, router_constraints[0].mask))
             subedge_routing_info = SubedgeRoutingInfo(
                 key=key, mask=mask, subedge=out_going_subedge,
-                key_with_atom_ids_function=
-                router_constraints[0].key_with_atom_ids_function_call)
-            #check for storage of masks
+                key_with_atom_ids_function=(router_constraints[0]
+                                            .key_with_atom_ids_function_call))
+
+            # check for storage of masks
             self.check_masks(mask, key, placement.subvertex)
             return subedge_routing_info
