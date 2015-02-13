@@ -5,7 +5,9 @@ and implementation for the PyNN High-level API
 """
 
 import inspect
+
 from ._version import __version__, __version_month__, __version_year__
+
 
 #utility functions
 from spynnaker.pyNN.utilities import conf
@@ -17,7 +19,6 @@ from spynnaker.pyNN.utilities.parameters_surrogate\
 #pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
-from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -94,13 +95,8 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
 #constraints
-from pacman.model.constraints.placer_chip_and_core_constraint \
-    import PlacerChipAndCoreConstraint
-from pacman.model.constraints.partitioner_maximum_size_constraint \
-    import PartitionerMaximumSizeConstraint
 
 #note importing star is a bad thing to do.
-from pyNN.random import *
 from pyNN.space import *
 
 #traditional logger

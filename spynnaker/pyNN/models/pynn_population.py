@@ -1,20 +1,21 @@
-from pacman.model.constraints.abstract_constraint import AbstractConstraint
-from pacman.model.constraints.vertex_has_dependent_constraint import \
-    VertexHasDependentConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
-    import AbstractPopulationVertex
-from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
+from pyNN.space import Space
+
+from pacman.model.constraints.abstract_constraints.abstract_constraint\
+    import AbstractConstraint
+from pacman.model.constraints.utility_constraints.\
+    vertex_has_dependent_constraint import VertexHasDependentConstraint
+from pacman.model.constraints.placer_constraints.\
+    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.utility_constraints.\
+    vertex_requires_multi_cast_source_constraint \
     import VertexRequiresMultiCastSourceConstraint
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
 from pacman.utilities import utility_calls as pacman_utility_calls
+
+
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
-
-from pyNN.space import Space
-
 from spynnaker.pyNN.models.utility_models.command_sender \
     import CommandSender
 from spynnaker.pyNN.utilities.parameters_surrogate\
@@ -24,8 +25,10 @@ from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
 
+
 import numpy
 import logging
+
 
 logger = logging.getLogger(__name__)
 

@@ -24,6 +24,8 @@ class ReportState(object):
             config.getboolean("Reports", "outputTimesForSections")
         self._transciever_report = \
             config.getboolean("Reports", "writeTransceiverReport")
+        self._tag_allocator_report = \
+            config.getboolean("Reports", "writeTagAllocationReports")
 
     @property
     def partitioner_report(self):
@@ -58,11 +60,16 @@ class ReportState(object):
         return self._transciever_report
 
     @property
+    def tag_allocation_report(self):
+        return self._tag_allocator_report
+
+    @property
     def generate_time_recordings_for_performance_measurements(self):
         return self._generate_time_recordings_for_performance_measurements
 
     def generate_pacman_report_states(self):
         return PacmanReportState(
             self._partitioner_report, self._placer_report, self._router_report,
-            self._router_dat_based_report, self._routing_info_report)
+            self._router_dat_based_report, self._routing_info_report,
+            self._tag_allocator_report)
 

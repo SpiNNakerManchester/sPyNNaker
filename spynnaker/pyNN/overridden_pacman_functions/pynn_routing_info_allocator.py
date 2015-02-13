@@ -1,5 +1,5 @@
-from pacman.model.constraints.key_allocator_routing_constraint import \
-    KeyAllocatorRoutingConstraint
+from pacman.model.constraints.key_allocator_constraints.\
+    key_allocator_routing_constraint import KeyAllocatorRoutingConstraint
 from pacman.model.routing_info.subedge_routing_info import SubedgeRoutingInfo
 from pacman.operations.routing_info_allocator_algorithms import \
     BasicRoutingInfoAllocator

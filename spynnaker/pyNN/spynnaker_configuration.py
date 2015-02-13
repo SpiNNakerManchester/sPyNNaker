@@ -12,6 +12,7 @@ from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
+from pacman.operations import tag_allocator_algorithms
 
 
 import os
@@ -45,6 +46,7 @@ class SpynnakerConfiguration(object):
         self._graph_mapper = None
         self._no_machine_time_steps = None
         self._placements = None
+        self._tag_infos = None
         self._router_tables = None
         self._routing_infos = None
         self._pruner_infos = None
@@ -55,6 +57,7 @@ class SpynnakerConfiguration(object):
         #pacman mapping objects
         self._partitioner_algorithm = None
         self._placer_algorithm = None
+        self._tag_allocator_algorithm = None
         self._key_allocator_algorithm = None
         self._router_algorithm = None
         self._report_default_directory = None
@@ -225,6 +228,11 @@ class SpynnakerConfiguration(object):
             conf.get_valid_components(placer_algorithms, "Placer")
         self._placer_algorithm = \
             placer_algorithms_list[config.get("Placer", "algorithm")]
+
+        tag_allocator_list = \
+            conf.get_valid_components(tag_allocator_algorithms, "TagAllocator")
+        self._tag_allocator_algorithm = \
+            tag_allocator_list[config.get("TagAllocator", "algorithm")]
 
         #get common key allocator algorithms
         key_allocator_algorithms_list = \
