@@ -29,7 +29,7 @@ setup(
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template']},
     install_requires=['SpiNNMachine >= 2015.002',
                       'SpiNNMan >= 2015.002',
-                      'SpiNNaker_PACMAN >= 2015.002',
+                      'SpiNNaker_PACMAN >= 2015.003-alpha-01',
                       'SpiNNaker_DataSpecification >= 2015.002',
                       'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml']
 )
