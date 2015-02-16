@@ -98,6 +98,8 @@ from pacman.model.constraints.placer_chip_and_core_constraint \
     import PlacerChipAndCoreConstraint
 from pacman.model.constraints.partitioner_maximum_size_constraint \
     import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
 
 #note importing star is a bad thing to do.
 from pyNN.random import *
@@ -183,7 +185,7 @@ def run(run_time=None):
 
 
 def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
-          **extra_params):
+          database_socket_addresses=None, **extra_params):
     """
     Should be called at the very beginning of a script.
     extra_params contains any keyword arguments that are required by a given
@@ -217,9 +219,10 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
 
     if len(extra_params.keys()) > 1:
         logger.warn("Extra params has been applied which we do not consider")
-    _spinnaker = Spinnaker(host_name=machine, timestep=timestep,
-                           min_delay=min_delay, max_delay=max_delay,
-                           binary_search_paths=_binary_search_paths)
+    _spinnaker = Spinnaker(
+        host_name=machine, timestep=timestep, min_delay=min_delay,
+        max_delay=max_delay, binary_search_paths=_binary_search_paths,
+        database_socket_addresses=database_socket_addresses)
     # Return None, simply because the PyNN API says something must be returned
     return None
 

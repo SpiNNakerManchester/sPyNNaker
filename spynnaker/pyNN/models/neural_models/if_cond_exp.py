@@ -1,3 +1,7 @@
+from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
+    KeyAllocatorFixedMaskConstraint
+import pacman.utilities.constants as pacman_constants
+
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
@@ -50,6 +54,8 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
             weight_scale=AbstractConductanceVertex.WEIGHT_SCALE)
         self._executable_constant = \
             IFConductanceExponentialPopulation.CORE_APP_IDENTIFIER
+        self.add_constraint(KeyAllocatorFixedMaskConstraint(
+            pacman_constants.DEFAULT_MASK))
 
     @property
     def model_name(self):

@@ -15,7 +15,10 @@ from abc import abstractmethod
 
 import tempfile
 import os
+import threading
 
+#used to stop file conflicts
+_lock_condition = threading.Condition()
 
 @add_metaclass(ABCMeta)
 class AbstractDataSpecableVertex(AbstractConstrainedVertex):
@@ -93,8 +96,10 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
         if config.getboolean("Reports", "writeTextSpecs"):
             new_report_directory = os.path.join(report_directory,
                                                 "data_spec_text_files")
+            _lock_condition.acquire()
             if not os.path.exists(new_report_directory):
                 os.mkdir(new_report_directory)
+            _lock_condition.release()
 
             file_name = "{}_dataSpec_{}_{}_{}.txt"\
                         .format(hostname, processor_chip_x, processor_chip_y,

@@ -2,17 +2,14 @@
 Synfirechain-like example
 """
 #!/usr/bin/python
-import os
-import spynnaker.pyNN as p
-#import pyNN.spiNNaker as p
-import numpy, pylab
+import pylab
 
-#p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
-p.setup(timestep=1.0, min_delay = 1.0, max_delay = 144.0)
-nNeurons = 10 # number of neurons in each population
-max_delay = 50
-#p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
-#p.set_number_of_neurons_per_core("DelayExtension", nNeurons / 2)
+import spynnaker.pyNN as p
+
+
+p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+nNeurons = 200 # number of neurons in each population
+p.set_number_of_neurons_per_core("IF_curr_exp", 10)
 
 
 cell_params_lif = {'cm'        : 0.25, # nF
@@ -30,87 +27,73 @@ populations = list()
 projections = list()
 
 weight_to_spike = 2.0
-#d_value = 3.1
-delay = 3
-#delay = numpy.random.RandomState()
-delays = list()
+delay = 1
 
 loopConnections = list()
 for i in range(0, nNeurons):
-    #d_value = int(delay.uniform(low=1, high=max_delay))
-    #if i == 0:
-     #   d_value = 16.0
-    #if i == 1:
-     #   d_value = 17.0
-    #if i == 2:
-     #   d_value = 33.0
-    delays.append(float(delay))
     singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
     loopConnections.append(singleConnection)
 
 injectionConnection = [(0, 0, weight_to_spike, 1)]
 spikeArray = {'spike_times': [[0]]}
-
 populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
-
+populations[0].set_constraint(p.PlacerRadialPlacementFromChipConstraint(3, 3))
 populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
-#populations[0].set_mapping_constraint({"x": 1, "y": 0})
 
 projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
 
+#populations[0].record_v()
+#populations[0].record_gsyn()
 populations[0].record()
-populations[0].set_constraint(p.PlacerChipAndCoreConstraint(0,0,2))
-populations[1].set_constraint(p.PlacerChipAndCoreConstraint(0,0,3))
 
-run_time = 100
-print "Running for {} ms".format(run_time)
-p.run(run_time)
+p.run(5000)
 
 v = None
 gsyn = None
 spikes = None
+
+#v = populations[0].get_v(compatible_output=True)
+#gsyn = populations[0].get_gsyn(compatible_output=True)
 spikes = populations[0].getSpikes(compatible_output=True)
-#print(projections[0].getWeights())
-#print(projections[0].getDelays())
-#print delays
 
 if spikes is not None:
     print spikes
     pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
-    pylab.ylabel('neuron id')
+    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
     pylab.xlabel('Time/ms')
-    pylab.yticks([0, 2, 4, 6, 8, 10])
-    pylab.xticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+    pylab.ylabel('spikes')
+    pylab.xticks([0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000])
+    pylab.yticks([0, 50, 100, 150, 200])
     pylab.title('spikes')
     pylab.show()
 else:
     print "No spikes received"
 
 # Make some graphs
-"""ticks = len(v) / nNeurons
 
-if v != None:
+if v is not None:
+    ticks = len(v) / nNeurons
     pylab.figure()
     pylab.xlabel('Time/ms')
     pylab.ylabel('v')
     pylab.title('v')
     for pos in range(0, nNeurons, 20):
         v_for_neuron = v[pos * ticks : (pos + 1) * ticks]
-        pylab.plot([i[1] for i in v_for_neuron],
+        pylab.plot([i[1] for i in v_for_neuron], 
                 [i[2] for i in v_for_neuron])
     pylab.show()
 
-if gsyn != None:
+if gsyn is not None:
+    ticks = len(gsyn) / nNeurons
     pylab.figure()
     pylab.xlabel('Time/ms')
     pylab.ylabel('gsyn')
     pylab.title('gsyn')
     for pos in range(0, nNeurons, 20):
         gsyn_for_neuron = gsyn[pos * ticks : (pos + 1) * ticks]
-        pylab.plot([i[1] for i in gsyn_for_neuron],
+        pylab.plot([i[1] for i in gsyn_for_neuron], 
                 [i[2] for i in gsyn_for_neuron])
     pylab.show()
-"""
-p.end()
+
+p.end(stop_on_board=True)

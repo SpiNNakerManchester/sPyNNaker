@@ -42,6 +42,7 @@ class SpynnakerConfiguration(object):
         #main objects
         self._partitionable_graph = PartitionableGraph(label=graph_label)
         self._partitioned_graph = None
+        self._key_register = None
         self._graph_mapper = None
         self._no_machine_time_steps = None
         self._placements = None
@@ -72,7 +73,7 @@ class SpynnakerConfiguration(object):
 
         #database objects
         self._create_database = False
-        self._database_thread = None
+        self._database_interface = None
 
     def _set_up_output_application_data_specifics(self):
         where_to_write_application_data_files = \
@@ -203,7 +204,6 @@ class SpynnakerConfiguration(object):
         self._iptags = list()
         self._app_id = config.getint("Machine", "appID")
 
-
     def _set_up_executable_specifics(self):
         #loading and running config params
         self._do_load = True
@@ -213,6 +213,9 @@ class SpynnakerConfiguration(object):
         self._do_run = True
         if config.has_option("Execute", "run"):
             self._do_run = config.getboolean("Execute", "run")
+
+        self._use_re_injection = \
+            config.getboolean("Execute", "use_re_injection_support")
 
     def _set_up_pacman_algorthms_listings(self):
          #algorithum lists
