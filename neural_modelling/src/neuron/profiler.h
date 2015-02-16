@@ -13,8 +13,9 @@
 #define PROFILER_EXIT           0
 
 // Profiler tags
-#define PROFILER_TIMER          0
-#define PROFILER_DMA            1
+#define PROFILER_TIMER                    0
+#define PROFILER_DMA_READ                 1
+#define PROFILER_INCOMING_SPIKE           2
 
 #ifdef PROFILER_ENABLED
 
@@ -44,14 +45,25 @@ static inline void profiler_write_entry(uint32_t tag)
 {
   if(profiler_samples_remaining > 0)
   {
-    // **NOTE** calling this from multiple ISRs causes 
-    // issues which disabling interrupts doesn't fix!
-    //uint sr = spin1_irq_disable();
     *profiler_output++ = tc[T2_COUNT];
     *profiler_output++ = tag;
     profiler_samples_remaining--;
-    //spin1_mode_restore(sr);
   }
+}
+
+static inline void profiler_write_entry_disable_irq_fiq(uint32_t tag)
+{
+  uint sr = spin1_irq_disable();
+  spin1_fiq_disable();
+  profiler_write_entry(tag);
+  spin1_mode_restore(sr);
+}
+
+static inline void profiler_write_entry_disable_fiq(uint32_t tag)
+{
+  uint sr = spin1_fiq_disable();
+  profiler_write_entry(tag);
+  spin1_mode_restore(sr);
 }
 #else // PROFILER_ENABLED
 
@@ -59,6 +71,8 @@ static inline void profiler_write_entry(uint32_t tag)
 #define profiler_finalise() skip()
 #define profiler_init() skip()
 #define profiler_write_entry(tag) skip()
+#define profiler_write_entry_disable_irq_fiq(tag) skip()
+#define profiler_write_entry_disable_fiq(tag) skip()
 
 #endif  // PROFILER_ENABLED
 

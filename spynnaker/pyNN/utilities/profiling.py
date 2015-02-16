@@ -2,7 +2,12 @@ import numpy as np
 
 MS_SCALE = (1.0 / 200032.4)
 
-def plot_profile_data(data):
+def process_core_profile_data(data):
+    # If there's no data, return an empty dictionary
+    if len(data) == 0:
+        print("No samples recorded")
+        return {}
+    
     # Create 32-bit view of data and slice this to seperate times, tags and flags
     data_view = data.view(np.uint32)
     sample_times = data_view[::2]
@@ -27,7 +32,7 @@ def plot_profile_data(data):
     exit_times_ms = sample_times_ms[sample_exit_indices]
 
     # Loop through unique tags
-    tag_dictionary = dict()
+    tag_dictionary = {}
     unique_tags = np.unique(sample_tags)
     for tag in unique_tags:
         # Get indices where these tags occur
@@ -55,3 +60,14 @@ def plot_profile_data(data):
         tag_dictionary[tag] = (tag_entry_times_ms, tag_durations_ms)
         
     return tag_dictionary
+
+def time_filter_core_profiling_data(profile_data, min_time, max_time):
+    filtered_tag_dictionary = {}
+    for tag, times in profile_data.iteritems():
+        # Get indices of entry times which fall within time range
+        filtered_indices = np.where((times[0] >= float(min_time)) & (times[0] < float(max_time)))
+        
+        # Add entry times and durations, filtered by new indices to filtered tag dictionary
+        filtered_tag_dictionary[tag] = (times[0][filtered_indices], times[1][filtered_indices])
+    
+    return filtered_tag_dictionary

@@ -1,4 +1,3 @@
-#include "spin-neuron-impl.h"
 #include "profiler.h"
 
 #ifdef PROFILER_ENABLED
