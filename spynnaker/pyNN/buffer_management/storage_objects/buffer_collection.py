@@ -93,19 +93,6 @@ class BufferCollection(object):
                 "try again".format(region_id))
         self._buffers_to_use[region_id].set_region_size(region_size)
 
-    def is_region_empty(self, region_id):
-        """ checks if a region is empty or not (updates buffer if the last
-        timer tic is after what was expected
-
-        :param buffered_packet:
-        :return:
-        """
-        if region_id not in self._buffers_to_use.keys():
-            raise exceptions.ConfigurationException(
-                "The region id {} is not being managed. Please rectify and "
-                "try again".format(region_id))
-        return self._buffers_to_use[region_id].is_region_empty()
-
     def get_region_base_address_for(self, region_id):
         """ get the base address of a region
 
@@ -132,17 +119,28 @@ class BufferCollection(object):
         return self._buffers_to_use[region_id].\
             set_region_base_address(new_value)
 
-    def get_buffer_for_region(self, region_id):
-        """ get the buffer for a given region
+    def get_next_timestamp(self, region_id):
+        if region_id not in self._buffers_to_use.keys():
+            raise exceptions.ConfigurationException(
+                "The region id {} is not being managed. Please rectify and "
+                "try again".format(region_id))
+        return self._buffers_to_use[region_id].get_next_timestamp()
 
-        :param region_id:
+    def is_region_empty(self, region_id):
+        """ checks if a region is empty or not (updates buffer if the last
+        timer tic is after what was expected
+
+        :param buffered_packet:
         :return:
         """
         if region_id not in self._buffers_to_use.keys():
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
-        return self._buffers_to_use[region_id].buffer
+        return self._buffers_to_use[region_id].is_region_empty() or self._buffers_sent[region_id].is_empty()
+
+    def is_region_managed(self, region_id):
+        return self.contains_key(region_id)
 
     def contains_key(self, region_id):
         """ checks if a region is being managed so far
@@ -153,6 +151,36 @@ class BufferCollection(object):
         if region_id in self._buffers_to_use.keys():
             return True
         return False
+
+    def is_more_elements_for_timestamp(self, region_id, timestamp):
+        return self._buffers_to_use[region_id].is_timestamp_empty(timestamp)
+
+    def get_next_element(self, region_id):
+        return self._buffers_to_use[region_id].get_next_entry()
+
+    def add_sent_packet(self, packet, region_id):
+        if region_id not in self._buffers_sent.keys():
+            self._buffers_sent[region_id] = BuffersSentDeque()
+        self._buffers_sent[region_id].add_packet(packet)
+
+    def add_sent_packets(self, packets, region_id):
+        if isinstance(packets, list):
+            for packet in packets:
+                self.add_sent_packet(packet, region_id)
+        else:
+            raise  # error in call parameter: packets needs to be a list
+
+    def remove_packets_in_region_up_to_seq_no(self, region_id, sequence_no):
+        self._buffers_sent[region_id].remove_packets_up_to_seq_no(sequence_no)
+
+    def get_sent_packets(self, region_id):
+        return self._buffers_sent[region_id].get_packets()
+
+    def is_sent_packet_list_empty(self, region_id):
+        return self._buffers_sent[region_id].is_empty()
+
+    def get_next_sequence_no_for_region(self, region_id):
+        return self._buffers_to_use[region_id].get_next_sequence_no()
 
     # def get_region_absolute_region_address(self, region_id):
     #     """gets the regions absolute region address
@@ -208,14 +236,14 @@ class BufferCollection(object):
     #             " shouldnt have been requested")
     #     return self._managed_vertex.process_buffered_packet(buffered_packet)
 
-    def add_packet_sent(self, packet, region_id):
-        if region_id not in self._buffers_sent.keys():
-            self._buffers_sent[region_id] = BuffersSentDeque()
-        self._buffers_sent[region_id].add_packet(packet)
-
-    def get_next_timestamp(self, region_id):
-        if region_id not in self._buffers_to_use.keys():
-            raise exceptions.ConfigurationException(
-                "The region id {} is not being managed. Please rectify and "
-                "try again".format(region_id))
-        return self._buffers_to_use[region_id].get_next_timestamp()
+    # def get_buffer_for_region(self, region_id):
+    #     """ get the buffer for a given region
+    #
+    #     :param region_id:
+    #     :return:
+    #     """
+    #     if region_id not in self._buffers_to_use.keys():
+    #         raise exceptions.ConfigurationException(
+    #             "The region id {} is not being managed. Please rectify and "
+    #             "try again".format(region_id))
+    #     return self._buffers_to_use[region_id].buffer

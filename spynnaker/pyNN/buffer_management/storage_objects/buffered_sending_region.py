@@ -13,6 +13,7 @@ class BufferedSendingRegion(object):
         self._read_position_in_region = 0
         self._region_size = None
         self._region_base_address = None
+        self._sequence_number = 0
 
     def add_entry_to_buffer(self, buffer_key, data_piece):
         if buffer_key not in self.buffer.keys():
@@ -60,12 +61,20 @@ class BufferedSendingRegion(object):
         else:
             return False
 
+    def is_timestamp_empty(self, timestamp):
+        return timestamp in self._buffer.keys()
+
     def get_next_entry(self):
         timestamp = self.get_next_timestamp()
         value = self._buffer[timestamp].pop(0)
         if len(self._buffer[timestamp]):
             self._buffer.popitem(last=False)
         return value
+
+    def get_next_sequence_no(self):
+        next_seq_no = self._sequence_number
+        self._sequence_number = (self._sequence_number + 1) % 256
+        return next_seq_no
 
     @staticmethod
     def _memory_required_for_buffer(packet_buffer):
