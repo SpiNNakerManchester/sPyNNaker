@@ -15,8 +15,6 @@ class SpinnakerRequestReadData(EIEIOCommandPacket):
         self._region_id = region_id
         self._sequence_no = sequence_no
         self._space_available = space_available
-        cmd = spinnman_constants.EIEIO_COMMAND_IDS.SPINNAKER_REQUEST_READ_DATA.\
-            value
 
         self._data = bytearray()
         self._data.append(x)
@@ -35,6 +33,8 @@ class SpinnakerRequestReadData(EIEIOCommandPacket):
         self._data.append(space_byte3)
         self._data.append(space_byte4)
 
+        cmd = spinnman_constants.EIEIO_COMMAND_IDS.SPINNAKER_REQUEST_READ_DATA.\
+            value
         EIEIOCommandPacket.__init__(self, cmd, self._data)
 
     @property

@@ -14,6 +14,6 @@ class StartRequests(EIEIOCommandPacket):
         return True
 
     @staticmethod
-    def create_command_from_reader(byte_reader):
+    def create_command_from_reader(_):
         packet = StartRequests()
         return packet

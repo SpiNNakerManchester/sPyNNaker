@@ -14,6 +14,6 @@ class StopRequests(EIEIOCommandPacket):
         return True
 
     @staticmethod
-    def create_command_from_reader(byte_reader):
+    def create_command_from_reader(_):
         packet = StopRequests()
         return packet

@@ -1,7 +1,6 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
-import math
 
 from spynnaker.pyNN.buffer_management.buffer_data_objects.eieio_32bit.eieio_32bit_timed_payload_prefix_data_packet import \
     EIEIO32BitTimedPayloadPrefixDataPacket
@@ -9,7 +8,6 @@ from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data i
     HostSendSequencedData
 from spynnaker.pyNN.buffer_management.command_objects.event_stop_request \
     import EventStopRequest
-from spynnaker.pyNN.utilities import constants
 
 
 @add_metaclass(ABCMeta)
@@ -32,8 +30,10 @@ class AbstractBufferReceivablePartitionedVertex(object):
     def _add_host_send_sequenced_data_header(self, packets, region_id):
         sequenced_packets = list()
         for packet in packets:
-            sequence_no = self._buffers_to_send_collection.get_next_sequence_no_for_region(region_id)
-            sequenced_packet = HostSendSequencedData(packet, sequence_no)
+            sequence_no = self._buffers_to_send_collection.\
+                get_next_sequence_no_for_region(region_id)
+            sequenced_packet = HostSendSequencedData(
+                packet, region_id, sequence_no)
             sequenced_packets.append(sequenced_packet)
 
         return sequenced_packets
@@ -46,9 +46,13 @@ class AbstractBufferReceivablePartitionedVertex(object):
         if not self._buffers_to_send_collection.is_region_empty(region_id):
 
             if sequence_no is not None:
-                self._buffers_to_send_collection.remove_packets_in_region_up_to_seq_no(sequence_no)
-                if not self._buffers_to_send_collection.is_sent_packet_list_empty():
-                    previous_buffers_to_send = self._buffers_to_send_collection.get_sent_packets(region_id)
+                self._buffers_to_send_collection.\
+                    remove_packets_in_region_up_to_seq_no(sequence_no)
+                if not self._buffers_to_send_collection.\
+                        is_sent_packet_list_empty():
+                    previous_buffers_to_send = \
+                        self._buffers_to_send_collection.get_sent_packets(
+                            region_id)
                     send_requests.extend(previous_buffers_to_send)
 
                     # compute space used by packets
@@ -58,12 +62,15 @@ class AbstractBufferReceivablePartitionedVertex(object):
                     space_available -= used_space
 
             # get next set of packets to send
-            new_buffers_to_send = self._generate_buffers_for_transmission(space_available, region_id)
+            new_buffers_to_send = self._generate_buffers_for_transmission(
+                space_available, region_id)
 
             # add sequenced header if required - if is not the initial load
             if sequence_no is not None:
-                new_buffers_to_send = self._add_host_send_sequenced_data_header(new_buffers_to_send, region_id)
-                self._buffers_to_send_collection.add_sent_packets(new_buffers_to_send)
+                new_buffers_to_send = self._add_host_send_sequenced_data_header(
+                    new_buffers_to_send, region_id)
+                self._buffers_to_send_collection.add_sent_packets(
+                    new_buffers_to_send)
 
             # add set of packets to be sent to the list
             send_requests.extend(new_buffers_to_send)
@@ -83,7 +90,8 @@ class AbstractBufferReceivablePartitionedVertex(object):
         """
         space_used = 0
         send_requests = list()
-        timestamp = self._buffers_to_send_collection.get_next_timestamp(region_id)
+        timestamp = self._buffers_to_send_collection.get_next_timestamp(
+            region_id)
         packet = EIEIO32BitTimedPayloadPrefixDataPacket(timestamp)
 
         # check if there is enough space for a new packet
@@ -93,25 +101,32 @@ class AbstractBufferReceivablePartitionedVertex(object):
 
         while space_available > space_used:
 
-            # if there is no more space in the packet and/or if there are no more entries for the same timestamp
-            # queue the packet, and create a new one(if there is space), or return the current list of packets
+            # if there is no more space in the packet and/or if there are no
+            # more entries for the same timestamp queue the packet, and create
+            # a new one(if there is space), or return the current list of
+            # packets
             if (packet.get_available_count() == 0 or
-                    not self._buffers_to_send_collection.is_more_elements_for_timestamp(region_id, timestamp)):
+                    not self._buffers_to_send_collection.
+                    is_more_elements_for_timestamp(region_id, timestamp)):
                 send_requests.append(packet)
 
                 # check if there are more packets to be sent
-                if not self._buffers_to_send_collection.is_region_empty(region_id):
-                    timestamp = self._buffers_to_send_collection.get_next_timestamp(region_id)
+                if not self._buffers_to_send_collection.is_region_empty(
+                        region_id):
+                    timestamp = \
+                        self._buffers_to_send_collection.get_next_timestamp(
+                            region_id)
                     packet = EIEIO32BitTimedPayloadPrefixDataPacket(timestamp)
 
                     # check if there is enough space for a new packet
-                    if space_used + packet.length + packet.element_size >= space_available:
-
+                    if (space_used + packet.length + packet.element_size >=
+                            space_available):
                         return send_requests
 
                 # if there are no more events to be sent
                 else:
-                    self._buffers_to_send_collection.add_sent_packets(send_requests)
+                    self._buffers_to_send_collection.add_sent_packets(
+                        send_requests)
                     return send_requests
 
             event = self._buffers_to_send_collection.get_next_element(region_id)

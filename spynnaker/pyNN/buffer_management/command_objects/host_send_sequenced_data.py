@@ -1,3 +1,5 @@
+from spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
+    abstract_eieio_packet import AbstractEIEIOPacket
 from spynnaker.pyNN.buffer_management.command_objects.eieio_command_packet \
     import EIEIOCommandPacket
 from spynnaker.pyNN import exceptions
@@ -8,21 +10,27 @@ from spinnman import constants as spinnman_constants
 
 class HostSendSequencedData(EIEIOCommandPacket):
 
-    def __init__(self, eieio_data_packet, sequence_no):
-        if isinstance(eieio_data_packet, bytearray):
-            self._data_packet = EIEIOMessage.create_eieio_messages_from(
-                eieio_data_packet)
-            self._data = eieio_data_packet
-        elif isinstance(eieio_data_packet, EIEIOMessage):
-            self._data_packet = eieio_data_packet
-            self._data = eieio_data_packet.convert_to_byte_array()
-        else:
+    def __init__(self, eieio_data_packet, region_id, sequence_no):
+        if not isinstance(eieio_data_packet, (bytearray, AbstractEIEIOPacket)):
             raise exceptions.InvalidParameterType(
                 "Parameter eieio_data_packet is of an unknown type")
+        if isinstance(eieio_data_packet, AbstractEIEIOPacket):
+            eieio_data_packet = \
+                eieio_data_packet.get_eieio_message_as_byte_array()
+        self._sequence_no = sequence_no
+        self._region_id = region_id
+        self._data = bytearray()
+        self._data.append(region_id)
+        self._data.append(sequence_no)
+        self._data.extend(eieio_data_packet)
+        self._data_packet = EIEIOMessage.create_eieio_messages_from(self._data)
         EIEIOCommandPacket.__init__(
             self, spinnman_constants.EIEIO_COMMAND_IDS.NEW_BUFFERS.value,
             self._data)
-        self._sequence_no = sequence_no
+
+    @property
+    def region_id(self):
+        return self._region_id
 
     @property
     def sequence_no(self):
@@ -36,8 +44,8 @@ class HostSendSequencedData(EIEIOCommandPacket):
 
     @staticmethod
     def create_command_from_reader(byte_reader):
-        _ = byte_reader.read_byte()
+        region_id = (byte_reader.read_byte()) & 0x0F
         sequence_no = byte_reader.read_byte()
         data = byte_reader.read_bytes()
-        packet = HostSendSequencedData(data, sequence_no)
+        packet = HostSendSequencedData(data, region_id, sequence_no)
         return packet
