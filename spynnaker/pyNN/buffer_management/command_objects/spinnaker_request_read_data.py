@@ -8,12 +8,13 @@ from spinnman import constants as spinnman_constants
 
 class SpinnakerRequestReadData(EIEIOCommandPacket):
 
-    def __init__(self, x, y, p, region_id, sequence_no, space_available):
+    def __init__(self, x, y, p, region_id, sequence_no, start_address, space_available):
         self._x = x
         self._y = y
         self._p = p
         self._region_id = region_id
         self._sequence_no = sequence_no
+        self._start_address = start_address
         self._space_available = space_available
 
         self._data = bytearray()
@@ -80,5 +81,7 @@ class SpinnakerRequestReadData(EIEIOCommandPacket):
         _ = byte_reader.read_byte()
         region_id = byte_reader.read_byte() & 0xF
         sequence_no = byte_reader.read_byte()
-        space = byte_reader.read_int()
-        return SpinnakerRequestReadData(x, y, p, region_id, sequence_no, space)
+        start_address = byte_reader.read_int()
+        space_available = byte_reader.read_int()
+        return SpinnakerRequestReadData(x, y, p, region_id, sequence_no,
+                                        start_address, space_available)
