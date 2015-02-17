@@ -269,7 +269,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def _load_buffers_for_bufferable_vertices(self):
         progress_bar = \
             ProgressBar(len(self.partitionable_graph.vertices),
-                        "on initilising the buffer managers for vertices "
+                        "on initialising the buffer managers for vertices "
                         "which require buffering")
         for partitionable_vertex in self.partitionable_graph.vertices:
             # if the buffer manager for this port has not been built yet,

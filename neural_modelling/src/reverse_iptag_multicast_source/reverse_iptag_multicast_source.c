@@ -1,17 +1,24 @@
 #include "../common/common-impl.h"
+#include <sark.h>
 #include <string.h>
 
-#define EIEIO_ACK_CMD 1
-#define EVENT_PADDING 2
-#define EVENT_STOP 3
-#define SEQUENCED_EIEIO_PKT 4
-#define STOP_PACKET_REQUESTS 5
-#define START_PACKET_REQUESTS 6
+#define DATABASE_CONFIRMATION 1         // Database handshake with visualiser
+#define EVENT_PADDING 2                 // Fill in buffer area with padding
+#define EVENT_STOP 3                    // End of all buffers, stop execution
+#define STOP_SENDING_REQUESTS 4         // Stop complaining that there is sdram free space for buffers
+#define START_SENDING_REQUESTS 5        // Start complaining that there is sdram free space for buffers
+#define SPINNAKER_REQUEST_BUFFERS 6     // Spinnaker requesting new buffers for spike source population
+#define HOST_SEND_SEQUENCED_DATA 7      // Buffers being sent from host to SpiNNaker
+#define SPINNAKER_REQUEST_READ_DATA 8   // Buffers available to be read from a buffered out vertex
+#define HOST_DATA_READ 9                // Host confirming data being read form SpiNNaker memory
+
 
 #define BUFFER_OPERATION_READ 0
 #define BUFFER_OPERATION_WRITE 1
 
-#define INITIAL_PACKET_FSM_STATE 0xFF
+#define BUFFER_REGION 2
+
+#define LARGEST_FSM_STATE 0xFF // needs to be a power of 2, fitting in a byte
 
 #pragma pack(1)
 
@@ -27,7 +34,7 @@ typedef struct
 {
   uint16_t eieio_header_command;
   uint16_t chip_id;
-  uint16_t processor_command;
+  uint16_t processor;
   uint16_t region_sequence;
   uint32_t space_available;
 } req_packet_sdp_t;
@@ -37,12 +44,13 @@ bool multicast_source_data_filled(address_t base_address);
 bool system_load_dtcm(void);
 void timer_callback (uint unused0, uint unused1);
 void sdp_packet_callback(uint mailbox, uint port);
-void packet_handler_selector(eieio_msg_t eieio_msg_ptr);
-bool parse_event_pkt(eieio_msg_t eieio_msg_ptr);
-void parse_command_pkt(eieio_msg_t eieio_msg_ptr);
-void parse_stop_packet_reqs(eieio_msg_t eieio_msg_ptr);
-void parse_start_packet_reqs(eieio_msg_t eieio_msg_ptr);
-void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr);
+void packet_handler_selector(eieio_msg_t eieio_msg_ptr, uint16_t length);
+bool parse_event_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length);
+void parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length);
+void parse_stop_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length);
+void parse_start_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length);
+void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length);
+void signal_software_error(eieio_msg_t eieio_msg_ptr, uint16_t length, char* str);
 void send_buffer_request_pkt(void);
 uint32_t check_sdram_buffer_space_available(void);
 bool check_eieio_packets_available(void);
@@ -51,14 +59,12 @@ void fetch_and_process_packet(void);
 bool add_eieio_packet_to_sdram(eieio_msg_t eieio_msg_ptr);
 uint32_t extract_time_from_eieio_msg(eieio_msg_t eieio_msg_ptr);
 void packet_interpreter(eieio_msg_t eieio_msg_ptr);
-void process_16_bit_packets (void* event_pointer, bool pkt_format,
-                            uint32_t length, uint32_t pkt_prefix,
-                            uint32_t pkt_payload_prefix, bool payload,
-                            bool pkt_payload_prefix_apply);
-void process_32_bit_packets (void* event_pointer,
-                            uint32_t length, uint32_t pkt_prefix,
-                            uint32_t pkt_payload_prefix, bool payload,
-                            bool pkt_payload_prefix_apply);
+void process_16_bit_packets (
+    void* event_pointer, bool pkt_format, uint32_t length, uint32_t pkt_prefix,
+    uint32_t pkt_payload_prefix, bool payload, bool pkt_payload_prefix_apply);
+void process_32_bit_packets (
+    void* event_pointer, uint32_t length, uint32_t pkt_prefix,
+    uint32_t pkt_payload_prefix, bool payload, bool pkt_payload_prefix_apply);
 
 // Globals
 static uint32_t time;
@@ -118,7 +124,7 @@ bool multicast_source_data_filled(address_t base_address)
 {
   address_t region_address = region_start(1, base_address);
 
-  read_pointer = write_pointer = buffer_region = (uint8_t *) region_start(2, base_address);
+  read_pointer = write_pointer = buffer_region = (uint8_t *) region_start(BUFFER_REGION, base_address);
 
   // to write here retrieving the configuration of the population:
   // one 32 bit value which contains the three leftmost bits
@@ -140,7 +146,7 @@ bool multicast_source_data_filled(address_t base_address)
   incorrect_keys = 0;
   msg_from_sdram_in_use = 0;
   next_buffer_time = 0;
-  pkt_fsm = INITIAL_PACKET_FSM_STATE;
+  pkt_fsm = LARGEST_FSM_STATE;
   end_of_buffer_region = buffer_region + buffer_region_size;
   send_ack_last_state = 0;
   send_packet_reqs = 1;
@@ -161,10 +167,10 @@ bool multicast_source_data_filled(address_t base_address)
   req.dest_addr = 0;
   req.srce_addr = spin1_get_chip_id();
   req_ptr = (req_packet_sdp_t*) &(req.cmd_rc);
-  req_ptr -> eieio_header_command = 1 << 14 | EIEIO_ACK_CMD;
+  req_ptr -> eieio_header_command = 1 << 14 | SPINNAKER_REQUEST_BUFFERS;
   req_ptr -> chip_id = spin1_get_chip_id();
-  req_ptr -> processor_command = (spin1_get_core_id() << 11) | (1 << 7);
-  req_ptr -> region_sequence = (1 << 8);
+  req_ptr -> processor = (spin1_get_core_id() << 11);
+  req_ptr -> region_sequence = (BUFFER_REGION << 8);
 
 
   io_printf (IO_BUF, "apply_prefix: %d\n", apply_prefix);
@@ -208,7 +214,7 @@ void timer_callback (uint unused0, uint unused1)
   use(unused1);
   time++;
 
-  if ((simulation_ticks != UINT32_MAX) 
+  if ((simulation_ticks != UINT32_MAX)
     && (time >= simulation_ticks + timer_period))
   {
     log_info("Simulation complete.");
@@ -239,25 +245,25 @@ void sdp_packet_callback(uint mailbox, uint port)
 {
   use(port);
   sdp_msg_t *msg = (sdp_msg_t *) mailbox;
-
+  uint16_t length = msg -> length;
   eieio_msg_t eieio_msg_ptr = (eieio_msg_t) &(msg -> cmd_rc);
 
-  packet_handler_selector(eieio_msg_ptr);
+  packet_handler_selector(eieio_msg_ptr, length - 10);
 
   //free the message to stop overload
   spin1_msg_free(msg);
 }
 
-void packet_handler_selector(eieio_msg_t eieio_msg_ptr)
+void packet_handler_selector(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   uint16_t data_hdr_value = eieio_msg_ptr[0];
   bool pkt_apply_prefix = (bool) (data_hdr_value >> 15);
   bool pkt_mode = data_hdr_value >> 14;
 
   if (pkt_apply_prefix == 0 && pkt_mode == 1)
-    parse_command_pkt(eieio_msg_ptr);
+    parse_command_pkt(eieio_msg_ptr, length);
   else
-    parse_event_pkt(eieio_msg_ptr);
+    parse_event_pkt(eieio_msg_ptr, length);
 }
 
 //Utility functions
@@ -302,6 +308,7 @@ uint32_t check_sdram_buffer_space_available(void)
       return_value = buffer_region_size;
 
   io_printf (IO_BUF, "return value: %d\n", return_value);
+  return return_value;
 }
 
 bool check_eieio_packets_available(void)
@@ -320,44 +327,71 @@ bool check_eieio_packets_available(void)
     return 0;
 }
 
-void parse_command_pkt(eieio_msg_t eieio_msg_ptr)
+void parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   uint16_t data_hdr_value = eieio_msg_ptr[0];
   uint16_t pkt_command = data_hdr_value & (~0xC000);
 
   switch (pkt_command)
   {
-    case SEQUENCED_EIEIO_PKT:
-      parse_sequenced_eieio_pkt(eieio_msg_ptr);
+    case HOST_SEND_SEQUENCED_DATA:
+      parse_sequenced_eieio_pkt(eieio_msg_ptr, length);
       break;
-    case STOP_PACKET_REQUESTS:
-      parse_stop_packet_reqs(eieio_msg_ptr);
+    case STOP_SENDING_REQUESTS:
+      parse_stop_packet_reqs(eieio_msg_ptr, length);
       break;
-    case START_PACKET_REQUESTS:
-      parse_start_packet_reqs(eieio_msg_ptr);
+    case START_SENDING_REQUESTS:
+      parse_start_packet_reqs(eieio_msg_ptr, length);
+      break;
+    case EVENT_STOP:
+      time = simulation_ticks + timer_period;
       break;
     default:
       break;
   }
 }
 
-void parse_stop_packet_reqs(eieio_msg_t eieio_msg_ptr)
+void parse_stop_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   use(eieio_msg_ptr);
+  use(length);
   send_packet_reqs = 0;
 }
 
-void parse_start_packet_reqs(eieio_msg_t eieio_msg_ptr)
+void parse_start_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   use(eieio_msg_ptr);
+  use(length);
   send_packet_reqs = 1;
 }
 
-void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr)
+void signal_software_error(eieio_msg_t eieio_msg_ptr, uint16_t length, char* str)
 {
-  uint16_t sequence_value = eieio_msg_ptr[1];
-  uint8_t next_state_fsm = (pkt_fsm + 1) & 0xFF;
+  uint8_t *ptr = (uint8_t *) &eieio_msg_ptr;
+  uint16_t i = 0;
+
+  io_printf(IO_BUF, "%s\n", str);
+  io_printf(IO_BUF, "packet bytes:");
+
+  for (i=0; i<length; i++)
+  {
+    if ((i & 7) == 0)
+      io_printf(IO_BUF, "\n");
+    io_printf(IO_BUF, "%02x", ptr[i]);
+  }
+  rt_error(RTE_SWERR);
+}
+
+void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
+{
+  uint16_t sequence_value_region_id = eieio_msg_ptr[1];
+  uint16_t sequence_value = sequence_value_region_id & 0xFF;
+  uint16_t region_id = (sequence_value_region_id >> 8) & 0xFF;
+  uint8_t next_state_fsm = (pkt_fsm + 1) & LARGEST_FSM_STATE;
   eieio_msg_t eieio_event_pkt = &eieio_msg_ptr[2];
+
+  if (region_id != BUFFER_REGION)
+    signal_software_error(eieio_msg_ptr, length, "received sequenced eieio packet with invalid region id.\n");
 
   if (sequence_value != next_state_fsm)
     send_ack_last_state = 1;
@@ -365,8 +399,10 @@ void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr)
   {
     //parse_event_pkt returns false in case there is an error and the packet
     //is dropped (i.e. as it was never received)
-    if (parse_event_pkt(eieio_event_pkt))
+    if (parse_event_pkt(eieio_event_pkt, length))
       pkt_fsm = next_state_fsm;
+    else
+      signal_software_error(eieio_msg_ptr, length, "received sequenced eieio packet containing invalid data.\n");
   }
 }
 
@@ -419,8 +455,10 @@ uint16_t calculate_eieio_packet_size(eieio_msg_t eieio_msg_ptr)
   return total_size;
 }
 
-bool parse_event_pkt(eieio_msg_t eieio_msg_ptr)
+bool parse_event_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
+  use(length);
+
   uint16_t data_hdr_value = eieio_msg_ptr[0];
   bool pkt_timestamp = (bool) (data_hdr_value >> 12 & 0x1);
 
@@ -446,7 +484,7 @@ void fetch_and_process_packet(void)
   io_printf (IO_BUF, "padding_checker: %d\n", *padding_checker);
 
   while (
-    (!msg_from_sdram_in_use) && 
+    (!msg_from_sdram_in_use) &&
     check_eieio_packets_available() &&
     !(read_pointer == buffer_region && *padding_checker == 0))
   {
@@ -472,7 +510,7 @@ void fetch_and_process_packet(void)
     io_printf (IO_BUF, "current time: %d\n", time);
     if (next_buffer_time == time)
     {
-      packet_handler_selector(msg_from_sdram);
+      packet_handler_selector(msg_from_sdram, len);
       msg_from_sdram_in_use = 0;
     }
     io_printf (IO_BUF, "loop completed\n");
@@ -552,6 +590,8 @@ bool add_eieio_packet_to_sdram(eieio_msg_t eieio_msg_ptr)
       return 1;
     }
   }
+
+  return 0;
 }
 
 uint32_t extract_time_from_eieio_msg(eieio_msg_t eieio_msg_ptr)
@@ -732,7 +772,7 @@ void process_16_bit_packets (void* event_pointer, bool pkt_format,
 
 #ifdef DEBUG
       log_info("mc packet 16 key: %08x", key);
-      log_info("check before send packet: %d", 
+      log_info("check before send packet: %d",
                 (!check) || (check && ((key & mask) == key_space)));
 #endif
 
@@ -760,7 +800,7 @@ void process_16_bit_packets (void* event_pointer, bool pkt_format,
 
 #ifdef DEBUG
       log_info("mc packet 16 key: %08x, payload: %08x", key, payload);
-      log_info("check before send packet: %d", 
+      log_info("check before send packet: %d",
                 (!check) || (check && ((key & mask) == key_space)));
 #endif
 
@@ -789,7 +829,7 @@ void process_16_bit_packets (void* event_pointer, bool pkt_format,
 
 #ifdef DEBUG
       log_info("mc packet 16 key: %08x, payload: %08x", key, payload);
-      log_info("check before send packet: %d", 
+      log_info("check before send packet: %d",
                 (!check) || (check && ((key & mask) == key_space)));
 #endif
 
@@ -837,7 +877,7 @@ void process_32_bit_packets (void* event_pointer,
 
 #ifdef DEBUG
       log_info("mc packet 32 key: %08x", key);
-      log_info("check before send packet: %d", 
+      log_info("check before send packet: %d",
               (!check) || (check && ((key & mask) == key_space)));
 #endif
 
@@ -867,7 +907,7 @@ void process_32_bit_packets (void* event_pointer,
 
 #ifdef DEBUG
       log_info("mc packet 32 key: %08x, payload: %08x", key, payload);
-      log_info("check before send packet: %d", 
+      log_info("check before send packet: %d",
                 (!check) || (check && ((key & mask) == key_space)));
 #endif
 
@@ -902,7 +942,7 @@ void process_32_bit_packets (void* event_pointer,
 
 #ifdef DEBUG
       log_info("mc packet 32 key: %08x, payload: %08x", key, payload);
-      log_info("check before send packet: %d", 
+      log_info("check before send packet: %d",
               (!check) || (check && ((key & mask) == key_space)));
 #endif
 
