@@ -291,7 +291,8 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     #inhirrted from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_mapper, report_folder):
+                           routing_info, hostname, graph_mapper, report_folder,
+                           tag_infos):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.

@@ -39,9 +39,8 @@ class SpynnakerCommsFunctions(object):
     def __init__(self, reports_states, report_default_directory):
         self._reports_states = reports_states
         self._report_default_directory = report_default_directory
-        self._iptags = list()
-        self._reverse_iptags = list()
         self._machine = None
+        self._tag_infos = None
 
     def _setup_interfaces(self, hostname):
         """Set up the interfaces for communicating with the SpiNNaker board
@@ -83,30 +82,35 @@ class SpynnakerCommsFunctions(object):
             self._txrx.discover_scamp_connections()
             self._machine = self._txrx.get_machine_details()
         else:
-            virtual_x_dimension = conf.config.getint("Machine",
-                                                  "virutal_board_x_dimension")
-            virtual_y_dimension = conf.config.getint("Machine",
-                                                  "virutal_board_y_dimension")
-            requires_wrap_around = conf.config.getboolean("Machine",
-                                                   "requires_wrap_arounds")
+            virtual_x_dimension = \
+                conf.config.getint("Machine", "virutal_board_x_dimension")
+            virtual_y_dimension = \
+                conf.config.getint("Machine", "virutal_board_y_dimension")
+            requires_wrap_around = \
+                conf.config.getboolean("Machine", "requires_wrap_arounds")
             self._machine = VirtualMachine(
                 x_dimension=virtual_x_dimension,
                 y_dimension=virtual_y_dimension,
                 with_wrap_arounds=requires_wrap_around)
 
-    def _add_iptag(self, iptag):
-        self._iptags.append(iptag)
+    def _load_tags(self):
+        """ loads all the tags onto all the boards
 
-    def _add_reverse_tag(self, reverse_iptag):
-        self._reverse_iptags.append(reverse_iptag)
-
-    def _load_iptags(self):
-        for iptag in self._iptags:
-            self._txrx.set_ip_tag(iptag)
-
-    def _load_reverse_ip_tags(self):
-        for reverse_iptag in self._reverse_iptags:
-            self._txrx.set_reverse_ip_tag(reverse_iptag)
+        :return None: does not return anything
+        :raises SpinnmanInvalidParameterException:
+        when the board and connection are specified
+        """
+        for board_address in self._tag_infos.get_board_addresses_with_tags():
+            if self._tag_infos.has_iptags_for_board(board_address):
+                for iptag in \
+                        self._tag_infos.get_ip_tags_for_board(board_address):
+                    self._txrx.set_ip_tag(iptag, board_address=board_address)
+            if self._tag_infos.has_reverse_iptags_for_board(board_address):
+                for reverse_iptag in \
+                        self._tag_infos.get_reverse_ip_tags_for_board(
+                        board_address):
+                    self._txrx.set_reverse_ip_tag(reverse_iptag,
+                                                  board_address=board_address)
 
     def _retieve_provance_data_from_machine(
             self, executable_targets, routing_tables, machine):

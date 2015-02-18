@@ -33,7 +33,7 @@ class CommandSender(AbstractMultiCastSource):
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_subgraph_mapper,
-                           report_folder):
+                           report_folder, tag_info):
         """
         Model-specific construction of the data blocks necessary to build a
         single external retina device.

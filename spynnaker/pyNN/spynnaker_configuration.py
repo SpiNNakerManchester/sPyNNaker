@@ -46,7 +46,6 @@ class SpynnakerConfiguration(object):
         self._graph_mapper = None
         self._no_machine_time_steps = None
         self._placements = None
-        self._tag_infos = None
         self._router_tables = None
         self._routing_infos = None
         self._pruner_infos = None
@@ -205,7 +204,6 @@ class SpynnakerConfiguration(object):
         #communication objects
         self._iptags = list()
         self._app_id = config.getint("Machine", "appID")
-
 
     def _set_up_executable_specifics(self):
         #loading and running config params

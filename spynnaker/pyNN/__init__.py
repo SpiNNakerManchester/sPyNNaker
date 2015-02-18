@@ -95,6 +95,13 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
 #constraints
+from pacman.model.constraints.placer_constraints.\
+    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_maximum_size_constraint import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.placer_constraints.\
+    placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
 
 #note importing star is a bad thing to do.
 from pyNN.space import *

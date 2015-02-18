@@ -207,10 +207,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             if do_timing:
                 timer.start_timing()
 
-            logger.info("*** Loading Iptags ***")
-            self._load_iptags()
-            logger.info("*** Loading Reverse Iptags***")
-            self._load_reverse_ip_tags()
+            logger.info("*** Loading tags ***")
+            self._load_tags()
 
             if self._do_load is True:
                 logger.info("*** Loading data ***")
@@ -361,7 +359,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if (pacman_report_state is not None and
                 pacman_report_state.tag_allocation_report):
             pacman_reports.tag_allocator_report(
-            self._report_default_directory, self._tag_infos)
+                self._report_default_directory, self._tag_infos)
 
     def _execute_key_allocator(self, pacman_report_state):
         """ executes the key allocator
@@ -527,7 +525,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     associated_vertex, placement.subvertex, placement,
                     self._partitioned_graph, self._partitionable_graph,
                     self._routing_infos, self._hostname, self._graph_mapper,
-                    self._report_default_directory, progress_bar)
+                    self._report_default_directory, self._tag_infos,
+                    progress_bar)
                 data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start())
 

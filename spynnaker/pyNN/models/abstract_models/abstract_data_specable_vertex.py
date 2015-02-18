@@ -40,7 +40,7 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
     @abstractmethod
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_subgraph_mapper,
-                           report_folder):
+                           report_folder, tag_infos):
         """
         method to determine how to generate their data spec for a non neural
         application
