@@ -5,6 +5,7 @@ and implementation for the PyNN High-level API
 """
 
 import inspect
+from ._version import __version__, __version_month__, __version_year__
 
 # utility functions
 from spynnaker.pyNN.utilities import conf
@@ -208,9 +209,11 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     global _binary_search_paths
 
     logger.info(
-        "sPyNNaker   (c) 2014 APT Group, University of Manchester")
+        "sPyNNaker (c) {} APT Group, University of Manchester".format(
+            __version_year__))
     logger.info(
-        "                Release version 2015.003 - January 2015")
+        "Release version {} - {} {}".format(
+            __version__, __version_month__, __version_year__))
 
     if len(extra_params.keys()) > 1:
         logger.warn("Extra params has been applied which we do not consider")
