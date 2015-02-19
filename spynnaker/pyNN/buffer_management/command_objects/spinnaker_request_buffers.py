@@ -82,3 +82,7 @@ class SpinnakerRequestBuffers(EIEIOCommandPacket):
         sequence_no = byte_reader.read_byte()
         space = byte_reader.read_int()
         return SpinnakerRequestBuffers(x, y, p, region_id, sequence_no, space)
+
+    @staticmethod
+    def get_header_size():
+        return 8

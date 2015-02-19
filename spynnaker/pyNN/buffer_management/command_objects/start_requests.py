@@ -17,3 +17,7 @@ class StartRequests(EIEIOCommandPacket):
     def create_command_from_reader(_):
         packet = StartRequests()
         return packet
+
+    @staticmethod
+    def get_header_size():
+        return 2

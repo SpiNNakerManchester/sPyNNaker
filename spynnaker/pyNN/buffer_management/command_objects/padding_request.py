@@ -28,3 +28,7 @@ class PaddingRequest(EIEIOCommandPacket):
     def create_command_from_reader(byte_reader):
         data = byte_reader.read_bytes()
         return PaddingRequest(len(data))
+
+    @staticmethod
+    def get_header_size():
+        return 2

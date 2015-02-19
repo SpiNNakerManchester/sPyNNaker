@@ -35,6 +35,6 @@ class BuffersSentDeque(object):
 
     def is_empty(self):
         if self._buffers_sent:
-            return True
-        else:
             return False
+        else:
+            return True

@@ -1,6 +1,7 @@
 import threading
 import collections
 import logging
+from spinnman.messages.sdp.sdp_flag import SDPFlag
 
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_message import SDPMessage
@@ -91,7 +92,9 @@ class BufferSendThread(threading.Thread):
                 buffers.get_eieio_message_as_byte_array()
             sdp_header = SDPHeader(destination_chip_x=x,
                                    destination_chip_y=y,
-                                   destination_cpu=p)
+                                   destination_cpu=p,
+                                   flags=SDPFlag.REPLY_NOT_EXPECTED,
+                                   destination_port=1)
             sdp_message = \
                 SDPMessage(sdp_header, eieio_message_as_byte_array)
             self._transciever.send_sdp_message(sdp_message)

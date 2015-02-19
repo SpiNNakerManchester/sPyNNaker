@@ -229,11 +229,11 @@ class SpikeSourceArray(AbstractSpikeSource,
             real_spike_region_size = 4
 
         # Calculate memory requirements:
-        spikes_recording_region_size = \
-            self.get_recording_region_size(real_spike_region_size)
+        spikes_recording_region_size = self.get_recording_region_size(
+            self._buffer_region_memory_size)
 
         # set buffered knowledge of the size of the buffered regions (in + out)
-        self._buffer_region_memory_size = real_spike_region_size
+        #self._buffer_region_memory_size = real_spike_region_size
         self._threshold_for_reporting_bytes_written = math.floor(
             spikes_recording_region_size / self._no_buffers_for_recording)
 
@@ -244,21 +244,22 @@ class SpikeSourceArray(AbstractSpikeSource,
 
         # update the spike source partitioned vertex with its region sizes
         subvertex.set_buffered_region_size(
-            real_spike_region_size,
+            self._buffer_region_memory_size,
             self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value)
         # subvertex.set_sending_region_size(
         #    spikes_recording_region_size,
         #    self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
 
         self._write_setup_info(
-            spec, real_spike_region_size, spikes_recording_region_size)
+            spec, self._buffer_region_memory_size, spikes_recording_region_size)
 
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
 
     def get_binary_file_name(self):
-        return "spike_source_array.aplx"
+        return "reverse_iptag_multicast_source.aplx"
+        # return "spike_source_array.aplx"
 
     # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):

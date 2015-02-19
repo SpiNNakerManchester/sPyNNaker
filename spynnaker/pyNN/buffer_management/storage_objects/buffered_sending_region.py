@@ -67,7 +67,7 @@ class BufferedSendingRegion(object):
     def get_next_entry(self):
         timestamp = self.get_next_timestamp()
         value = self._buffer[timestamp].pop(0)
-        if len(self._buffer[timestamp]):
+        if len(self._buffer[timestamp]) == 0:
             self._buffer.popitem(last=False)
         return value
 

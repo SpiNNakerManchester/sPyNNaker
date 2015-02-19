@@ -54,19 +54,19 @@ class BufferManager(object):
         self._recieve_thread.stop()
         self._sender_thread.stop()
 
-    def receive_buffer_command_message(self, message):
+    def receive_buffer_command_message(self, packet):
         """ received a eieio message from the port which this manager manages
         and locates what requests are required from it.
 
-        :param message: the message received
-        :type message: spinnman.messages.eieio.eieio_message.EIEIOMessage
+        :param packet: the class related to the message received
+        :type packet:
         :return:
         """
-        byte_reader = LittleEndianByteArrayByteReader(message.data)
-        packet = create_class_from_reader(byte_reader)
-        key = (packet.x, packet.y, packet.p)
+        # byte_reader = LittleEndianByteArrayByteReader(message.data)
+        # packet = create_class_from_reader(byte_reader)
         
         if isinstance(packet, SpinnakerRequestBuffers):
+            key = (packet.x, packet.y, packet.p)
             if key in self._recieve_vertices.keys():
                 data_requests = \
                     self._recieve_vertices[key].get_next_set_of_packets(
@@ -78,7 +78,7 @@ class BufferManager(object):
                                         'x': packet.x,
                                         'y': packet.y,
                                         'p': packet.p}
-                        self._recieve_thread.add_request(data_request)
+                        self._sender_thread.add_request(data_request)
 
         elif isinstance(packet, SpinnakerRequestReadData):
             pass

@@ -17,3 +17,7 @@ class StopRequests(EIEIOCommandPacket):
     def create_command_from_reader(_):
         packet = StopRequests()
         return packet
+
+    @staticmethod
+    def get_header_size():
+        return 2

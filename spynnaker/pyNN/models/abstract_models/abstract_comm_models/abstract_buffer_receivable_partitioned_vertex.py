@@ -47,9 +47,10 @@ class AbstractBufferReceivablePartitionedVertex(object):
 
             if sequence_no is not None:
                 self._buffers_to_send_collection.\
-                    remove_packets_in_region_up_to_seq_no(sequence_no)
+                    remove_packets_in_region_up_to_seq_no(region_id,
+                                                          sequence_no)
                 if not self._buffers_to_send_collection.\
-                        is_sent_packet_list_empty():
+                        is_sent_packet_list_empty(region_id):
                     previous_buffers_to_send = \
                         self._buffers_to_send_collection.get_sent_packets(
                             region_id)
@@ -63,14 +64,14 @@ class AbstractBufferReceivablePartitionedVertex(object):
 
             # get next set of packets to send
             new_buffers_to_send = self._generate_buffers_for_transmission(
-                space_available, region_id)
+                space_available, region_id, sequence_no)
 
             # add sequenced header if required - if is not the initial load
             if sequence_no is not None:
                 new_buffers_to_send = self._add_host_send_sequenced_data_header(
                     new_buffers_to_send, region_id)
                 self._buffers_to_send_collection.add_sent_packets(
-                    new_buffers_to_send)
+                    new_buffers_to_send, region_id)
 
             # add set of packets to be sent to the list
             send_requests.extend(new_buffers_to_send)
@@ -83,7 +84,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
             send_requests.append(request)
             return send_requests
 
-    def _generate_buffers_for_transmission(self, space_available, region_id):
+    def _generate_buffers_for_transmission(self, space_available, region_id, sequence_no):
         """ creates a set of packets to be sent to the machine.
 
         :return:
@@ -94,46 +95,44 @@ class AbstractBufferReceivablePartitionedVertex(object):
             region_id)
         packet = EIEIO32BitTimedPayloadPrefixDataPacket(timestamp)
 
+        if sequence_no is not None:
+            space_header = HostSendSequencedData.get_header_size()
+        else:
+            space_header = 0
+
         # check if there is enough space for a new packet
-        if space_used + packet.length + packet.element_size >= space_available:
-            self._buffers_to_send_collection.add_sent_packets(send_requests)
+        if space_used + space_header + packet.length + packet.element_size >= space_available:
             return send_requests
 
-        while space_available > space_used:
+        while space_available > space_used + space_header + packet.length:
 
             # if there is no more space in the packet and/or if there are no
             # more entries for the same timestamp queue the packet, and create
             # a new one(if there is space), or return the current list of
             # packets
-            if (packet.get_available_count() == 0 or
-                    not self._buffers_to_send_collection.
-                    is_more_elements_for_timestamp(region_id, timestamp)):
+            available_count = packet.get_available_count()
+            more_elements = self._buffers_to_send_collection.is_more_elements_for_timestamp(region_id, timestamp)
+            if (available_count == 0 or not more_elements or space_available < space_used + space_header + packet.length + packet.element_size):
+                space_used += packet.length + space_header
                 send_requests.append(packet)
 
                 # check if there are more packets to be sent
-                if not self._buffers_to_send_collection.is_region_empty(
-                        region_id):
-                    timestamp = \
-                        self._buffers_to_send_collection.get_next_timestamp(
-                            region_id)
+                if not self._buffers_to_send_collection.is_region_empty(region_id):
+                    timestamp = self._buffers_to_send_collection.get_next_timestamp(region_id)
                     packet = EIEIO32BitTimedPayloadPrefixDataPacket(timestamp)
 
-                    # check if there is enough space for a new packet
-                    if (space_used + packet.length + packet.element_size >=
-                            space_available):
+                    # check if there is enough space for a new packet with at least one element
+                    if (space_used + space_header + packet.length + packet.element_size >= space_available):
                         return send_requests
 
                 # if there are no more events to be sent
                 else:
-                    self._buffers_to_send_collection.add_sent_packets(
-                        send_requests)
                     return send_requests
 
             event = self._buffers_to_send_collection.get_next_element(region_id)
-            packet.insert_key(event)
+            packet.insert_key(event.entry)
 
-            self._buffers_to_send_collection.add_sent_packets(send_requests)
-            return send_requests
+        return send_requests
 
     #     buffer_keys = list(buffers.keys())
     #     position_in_buffer = 0

@@ -39,6 +39,7 @@ class BufferCollection(object):
         """
         if region_id not in self._buffers_to_use.keys():
             self._buffers_to_use[region_id] = BufferedSendingRegion()
+            self._buffers_sent[region_id] = BuffersSentDeque()
         self._buffers_to_use[region_id].\
             add_entry_to_buffer(buffer_key, data_piece)
 
@@ -133,24 +134,44 @@ class BufferCollection(object):
         :param buffered_packet:
         :return:
         """
-        if region_id not in self._buffers_to_use.keys():
+        if not self.contains_key(region_id):
             raise exceptions.ConfigurationException(
                 "The region id {} is not being managed. Please rectify and "
                 "try again".format(region_id))
-        return self._buffers_to_use[region_id].is_region_empty() or self._buffers_sent[region_id].is_empty()
+        buffers_to_send_empty = False
+        buffers_sent_empty = False
+        if self.is_buffers_sent_for_region(region_id):
+            buffers_sent_empty = self._buffers_sent[region_id].is_empty()
+
+        if self.is_buffers_to_use_for_region(region_id):
+            buffers_to_send_empty = self._buffers_to_use[region_id].is_region_empty()
+
+        return buffers_sent_empty and buffers_to_send_empty
 
     def is_region_managed(self, region_id):
-        return self.contains_key(region_id)
+        return (self.is_buffers_sent_for_region(region_id) or
+                self.is_buffers_to_use_for_region(region_id))
 
     def contains_key(self, region_id):
         """ checks if a region is being managed so far
 
-        :param region_id: the region  id to check if being managed so far
-        :return:
+        :param region_id: the region id to check if being managed so far
         """
         if region_id in self._buffers_to_use.keys():
             return True
         return False
+
+    def is_buffers_sent_for_region(self, region_id):
+        if region_id in self._buffers_sent.keys():
+            return True
+        else:
+            return False
+
+    def is_buffers_to_use_for_region(self, region_id):
+        if region_id in self._buffers_to_use.keys():
+            return True
+        else:
+            return False
 
     def is_more_elements_for_timestamp(self, region_id, timestamp):
         return self._buffers_to_use[region_id].is_timestamp_empty(timestamp)
@@ -160,7 +181,7 @@ class BufferCollection(object):
 
     def add_sent_packet(self, packet, region_id):
         if region_id not in self._buffers_sent.keys():
-            self._buffers_sent[region_id] = BuffersSentDeque()
+            raise  # the sent packet deque should be created when the set of buffers in firstly inserted
         self._buffers_sent[region_id].add_packet(packet)
 
     def add_sent_packets(self, packets, region_id):
@@ -171,7 +192,10 @@ class BufferCollection(object):
             raise  # error in call parameter: packets needs to be a list
 
     def remove_packets_in_region_up_to_seq_no(self, region_id, sequence_no):
-        self._buffers_sent[region_id].remove_packets_up_to_seq_no(sequence_no)
+        if self.is_region_managed(region_id):
+            self._buffers_sent[region_id].remove_packets_up_to_seq_no(sequence_no)
+        else:
+            raise # the region is not managed
 
     def get_sent_packets(self, region_id):
         return self._buffers_sent[region_id].get_packets()

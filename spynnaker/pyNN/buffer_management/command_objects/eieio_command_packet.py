@@ -44,3 +44,7 @@ class EIEIOCommandPacket(AbstractEIEIOPacket):
         """
         data = byte_reader.read_bytes()
         return EIEIOCommandPacket(command_number, data)
+
+    @staticmethod
+    def get_header_size():
+        return 2

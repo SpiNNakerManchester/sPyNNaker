@@ -1,10 +1,11 @@
+from spinnman.data.little_endian_byte_array_byte_reader import \
+    LittleEndianByteArrayByteReader
 from spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
     abstract_eieio_packet import AbstractEIEIOPacket
 from spynnaker.pyNN.buffer_management.command_objects.eieio_command_packet \
     import EIEIOCommandPacket
 from spynnaker.pyNN import exceptions
 
-from spinnman.messages.eieio.eieio_message import EIEIOMessage
 from spinnman import constants as spinnman_constants
 
 
@@ -23,9 +24,8 @@ class HostSendSequencedData(EIEIOCommandPacket):
         self._data.append(region_id)
         self._data.append(sequence_no)
         self._data.extend(eieio_data_packet)
-        self._data_packet = EIEIOMessage.create_eieio_messages_from(self._data)
         EIEIOCommandPacket.__init__(
-            self, spinnman_constants.EIEIO_COMMAND_IDS.NEW_BUFFERS.value,
+            self, spinnman_constants.EIEIO_COMMAND_IDS.HOST_SEND_SEQUENCED_DATA.value,
             self._data)
 
     @property
@@ -49,3 +49,7 @@ class HostSendSequencedData(EIEIOCommandPacket):
         data = byte_reader.read_bytes()
         packet = HostSendSequencedData(data, region_id, sequence_no)
         return packet
+
+    @staticmethod
+    def get_header_size():
+        return 4

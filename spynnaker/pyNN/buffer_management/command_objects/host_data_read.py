@@ -53,3 +53,7 @@ class HostDataRead(EIEIOCommandPacket):
         space_read = byte_reader.read_int()
         packet = HostDataRead(region_id, sequence_no, space_read)
         return packet
+
+    @staticmethod
+    def get_header_size():
+        return 4

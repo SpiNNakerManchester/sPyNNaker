@@ -85,3 +85,7 @@ class SpinnakerRequestReadData(EIEIOCommandPacket):
         space_available = byte_reader.read_int()
         return SpinnakerRequestReadData(x, y, p, region_id, sequence_no,
                                         start_address, space_available)
+
+    @staticmethod
+    def get_header_size():
+        return 8
