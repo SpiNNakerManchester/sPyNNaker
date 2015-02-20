@@ -9,6 +9,14 @@ from pacman.operations.router_check_functionality.valid_routes_checker import \
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
+from pacman.model.constraints.key_allocator_fixed_mask_constraint \
+    import KeyAllocatorFixedMaskConstraint
+from pacman.model.constraints.key_allocator_same_keys_constraint \
+    import KeyAllocatorSameKeysConstraint
+from pacman.model.constraints.key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
+from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
+    import DictBasedPartitionedEdgeNKeysMap
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
     import BasicDijkstraRouting
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
@@ -134,7 +142,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._report_default_directory, self._partitionable_graph,
                 self._hostname)
 
-        # calcualte number of machien time steps
+        # calculate number of machine time steps
         if run_time is not None:
             self._no_machine_time_steps =\
                 int((run_time * 1000.0) / self._machine_time_step)
@@ -424,10 +432,35 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         else:
             self._key_allocator_algorithm = self._key_allocator_algorithm()
 
+        # Generate an n_keys map for the graph and add constraints
+        n_keys_map = DictBasedPartitionedEdgeNKeysMap()
+        for edge in self._partitioned_graph.subedges:
+            vertex_slice = self._graph_mapper.get_subvertex_slice(
+                edge.pre_subvertex)
+            n_keys_map.set_n_keys_for_patitioned_edge(edge,
+                                                      vertex_slice.n_atoms)
+
+            # Fix the mask for the edges and make sure the allocated keys are
+            # contiguous
+            edge.add_constraint(KeyAllocatorContiguousRangeContraint())
+            edge.add_constraint(KeyAllocatorFixedMaskConstraint(0xFFFFF800))
+
+        # Ensure that the keys allocated are the same for all subedges coming
+        # from the same subvertex
+        for vertex in self._partitioned_graph.subvertices:
+            first_edge = None
+            for edge in (self._partitioned_graph
+                             .outgoing_subedges_from_subvertex(vertex)):
+                if first_edge is None:
+                    first_edge = edge
+                else:
+                    edge.add_constraint(KeyAllocatorSameKeysConstraint(
+                        first_edge))
+
         # execute routing info generator
         self._routing_infos = \
             self._key_allocator_algorithm.allocate_routing_info(
-                self._partitioned_graph, self._placements)
+                self._partitioned_graph, self._placements, n_keys_map)
 
         # generate reports
         if (pacman_report_state is not None and

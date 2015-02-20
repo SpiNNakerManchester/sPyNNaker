@@ -21,8 +21,6 @@ from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 
-
-
 logger = logging.getLogger(__name__)
 
 

@@ -556,7 +556,9 @@ class AbstractSynapticManager(object):
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
         for subedge in in_proj_subedges:
-            key = routing_info.get_key_from_subedge(subedge)
+            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                subedge)
+            key = keys_and_masks[0].key
             x = packet_conversions.get_x_from_key(key)
             y = packet_conversions.get_y_from_key(key)
             p = packet_conversions.get_p_from_key(key)
@@ -719,7 +721,9 @@ class AbstractSynapticManager(object):
             if subedge.pre_subvertex == pre_subvertex:
                 routing_info = \
                     routing_infos.get_subedge_information_from_subedge(subedge)
-                incoming_key_combo = routing_info.key_mask_combo
+                keys_and_masks = routing_info.keys_and_masks
+                incoming_key_combo = keys_and_masks[0].key
+                break
 
         maxed_row_length, synaptic_block_base_address_offset = \
             self._master_pop_table_generator.\

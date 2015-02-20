@@ -159,19 +159,14 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         # Write header info to the memory region:
 
-        # TODO: This is for the future!
-        # if key is None, write boolean saying key is not to be used otherwise
-        # write bool saying key is to be used
-        # if key is None:
-        #    spec.write_value(data=0)
-        # else:
-        #    spec.write_value(data=1)
-        # Write Key info for this core:
-        # if key is None:
-        #    spec.write_value(data=0)
-        # else:
-        #    spec.write_value(data=key)
-        spec.write_value(data=key)
+        # Write whether the key is to be used, and then the key, or 0 if it
+        # isn't to be used
+        if key is None:
+            spec.write_value(data=0)
+            spec.write_value(data=0)
+        else:
+            spec.write_value(data=1)
+            spec.write_value(data=key)
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
@@ -279,14 +274,16 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         for partitioned_edge in in_partitioned_edges:
             partitioned_edge.weight_scales_setter(weight_scales)
 
-        # NOTE: using the first outgoing subedge to acquire the transmitting
-        # key; the assumption here is that all outgoing subedges use the same
-        # key This is true for pynn based populations, but may not hold for
-        # other models.
+        # Every outgoing edge from this vertex should have the same key
         key = None
         if len(subgraph.outgoing_subedges_from_subvertex(subvertex)) > 0:
-            key = routing_info.get_key_from_subedge(
+            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
                 subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+
+            # NOTE: using the first key assigned as the key.  Should in future
+            # get the list of keys and use one per neuron, to allow arbitrary
+            # key and mask assignments
+            key = keys_and_masks[0].key
 
         self.write_neuron_parameters(spec, key, subvertex,
                                      ring_buffer_shifts, vertex_slice)

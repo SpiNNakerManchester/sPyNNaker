@@ -324,12 +324,10 @@ class SpikeSourceArray(AbstractSpikeSource):
                                     spike_region_size, spike_history_region_sz)
         self.write_setup_info(spec, spike_history_region_sz)
 
-        # NOTE: using the first outgoing subedge to acquire the transmitting
-        # key; the assumption here is that all outgoing subedges use the same
-        # key. This is true for pynn based populations, but may not hold for
-        # other models.
-        key = routing_info.get_key_from_subedge(
+        # Every subedge should have the same key
+        keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
             subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+        key = keys_and_masks[0].key
 
         self.write_block_index_region(spec, key, num_neurons,
                                       table_entries)
