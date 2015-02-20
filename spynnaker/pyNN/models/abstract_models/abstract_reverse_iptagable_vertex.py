@@ -17,7 +17,8 @@ class AbstractReverseIPTagableVertex(AbstractTagableVertex):
     def __init__(self, tag, port, board_address, port_num):
         AbstractTagableVertex.__init__(self)
         #convert board address into a ip address (may already be in this state)
-        board_address = socket.gethostbyname(board_address)
+        if board_address is not None:
+            board_address = socket.gethostbyname(board_address)
         self.add_constraint(TagAllocatorRequireReverseIptagConstraint(
             tag_id=tag, board_address=board_address, port=port,
             port_num=port_num))
@@ -30,5 +31,9 @@ class AbstractReverseIPTagableVertex(AbstractTagableVertex):
         """
 
     def is_tagable_vertex(self):
+        """ helper method for is_instance
+
+        :return:
+        """
         return True
 

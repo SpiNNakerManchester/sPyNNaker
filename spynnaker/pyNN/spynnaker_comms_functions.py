@@ -5,7 +5,7 @@ from data_specification.file_data_reader import FileDataReader
 
 
 from pacman.utilities.progress_bar import ProgressBar
-from spinn_machine.diagnostic_filter import DiagnosticFilter
+
 
 from spinn_machine.sdram import SDRAM
 from spinn_machine.virutal_machine import VirtualMachine
@@ -18,6 +18,7 @@ from spinnman.data.file_data_reader import FileDataReader \
     as SpinnmanFileDataReader
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
+
 
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex

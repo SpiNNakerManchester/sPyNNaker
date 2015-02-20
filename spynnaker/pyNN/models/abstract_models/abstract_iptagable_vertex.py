@@ -17,14 +17,21 @@ class AbstractIPTagableVertex(AbstractTagableVertex):
     def __init__(self, tag, port, address, board_address, strip_sdp=False):
         AbstractTagableVertex.__init__(self)
         self._address = address
-        #convert board address into a ip address (may already be in this state)
-        board_address = socket.gethostbyname(board_address)
+
+        # convert board address into a ip address (may already be in this state)
+        if board_address is not None:
+            board_address = socket.gethostbyname(board_address)
         self.add_constraint(TagAllocatorRequireIptagConstraint(
             address=address, port=port, tag_id=tag, strip_sdp=strip_sdp,
             board_address=board_address))
 
     @property
     def address(self):
+        """ property to return the ipaddrtess that this iptagable vertex
+        is associated with (used in the generation of a iptag)
+
+        :return:
+        """
         return self._address
 
     @abstractmethod
@@ -35,4 +42,8 @@ class AbstractIPTagableVertex(AbstractTagableVertex):
         """
 
     def is_tagable_vertex(self):
+        """ helper method for is instance
+
+        :return:
+        """
         return True
