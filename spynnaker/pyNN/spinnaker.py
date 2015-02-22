@@ -6,6 +6,7 @@ from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
 from pacman.model.partitionable_graph.abstract_virtual_vertex import \
     AbstractVirtualVertex
+from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import AbstractSynapticManager
 from pacman.model.constraints.key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_fixed_mask_constraint \
@@ -462,27 +463,31 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             post_vertex = self._graph_mapper.get_vertex_from_subvertex(
                 edge.post_subvertex)
             if isinstance(vertex, AbstractProvidesKeysAndMasksVertex):
-                if isinstance(post_vertex, AbstractSynapticManager):
-                    keys_and_masks = \
-                        vertex.get_keys_and_masks_for_partitioned_edge(
-                            edge, self._graph_mapper)
-                    for key_and_mask in keys_and_masks:
-                        if key_and_mask.mask != 0xFFFFF800:
-                            raise ConfigurationException(
-                                "The current models are restricted to use the"
-                                "key 0xFFFFF800")
-                edge.add_constraint(KeyAllocatorFixedKeyAndMaskConstraint(
-                    keys_and_masks))
+                keys_and_masks = \
+                    vertex.get_keys_and_masks_for_partitioned_edge(
+                        edge, self._graph_mapper)
+
+                if keys_and_masks is not None:
+                    if isinstance(post_vertex, AbstractSynapticManager):
+                        for key_and_mask in keys_and_masks:
+                            if key_and_mask.mask != 0xFFFFF800:
+                                raise ConfigurationException(
+                                    "The current models are restricted to use "
+                                    "the key 0xFFFFF800")
+                    edge.add_constraint(KeyAllocatorFixedKeyAndMaskConstraint(
+                        keys_and_masks))
             if isinstance(vertex, AbstractProvidesFixedMaskVertex):
                 fixed_mask = vertex.get_fixed_mask_for_patitioned_edge(
                     edge, self._graph_mapper)
-                if (isinstance(post_vertex, AbstractSynapticManager)
-                        and fixed_mask != 0xFFFFF800):
-                    raise ConfigurationException(
-                        "The current models are restricted to use the"
-                        "key 0xFFFFF800")
-                edge.add_constraint(KeyAllocatorFixedMaskConstraint(
-                    fixed_mask))
+                if fixed_mask is not None:
+                    if (isinstance(post_vertex, AbstractSynapticManager)
+                            and fixed_mask != 0xFFFFF800):
+                        raise ConfigurationException(
+                            "The current models are restricted to use the"
+                            "key 0xFFFFF800")
+                    if not isinstance(post_vertex, AbstractSynapticManager):
+                        edge.add_constraint(KeyAllocatorFixedMaskConstraint(
+                            fixed_mask))
 
             # Fix the mask for the edges and make sure the allocated keys are
             # contiguously

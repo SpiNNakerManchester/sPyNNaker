@@ -23,8 +23,9 @@ class AbstractProvidesKeysAndMasksVertex(object):
                     associated partitionable edge
         :type graph_mapper:\
                     :py:class:`pacman.model.graph_mapper.graph_mapper.GraphMapper`
-        :return: The keys and masks to be send down the given edge
-        :rtype: iterable of\
+        :return: The keys and masks to be send down the given edge, or None\
+                    if no keys and masks are to be fixed for the given edge
+        :rtype: None, or iterable of\
                     :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
         """
         pass

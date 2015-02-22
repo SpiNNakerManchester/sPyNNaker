@@ -21,7 +21,7 @@ class AbstractProvidesFixedMaskVertex(object):
                     associated partitionable edge
         :type graph_mapper:\
                     :py:class:`pacman.model.graph_mapper.graph_mapper.GraphMapper`
-        :return: The fixed mask
-        :rtype: int
+        :return: The fixed mask or None if no mask is to be fixed for this edge
+        :rtype: int or None
         """
         pass
