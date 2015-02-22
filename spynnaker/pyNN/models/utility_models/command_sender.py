@@ -4,9 +4,13 @@ from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
 from spynnaker.pyNN.utilities import constants
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_keys_and_masks_vertex import \
+    AbstractProvidesKeysAndMasksVertex
 
 
-class CommandSender(AbstractMultiCastSource):
+class CommandSender(AbstractMultiCastSource,
+                    AbstractProvidesKeysAndMasksVertex):
 
     SYSTEM_REGION = 0
     COMMANDS = 1
@@ -24,11 +28,6 @@ class CommandSender(AbstractMultiCastSource):
         self._edge_map = dict()
         self._commands = list()
 
-        routing_key_constraint =\
-            KeyAllocatorRoutingConstraint(self.generate_routing_info,
-                                          self._generate_routing_neuron_id_keys)
-        self.add_constraint(routing_key_constraint)
-
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_subgraph_mapper,
                            report_folder):
@@ -45,15 +44,15 @@ class CommandSender(AbstractMultiCastSource):
 
         spec.comment("\n*** Spec for multi case source ***\n\n")
 
-        #reserve regions
+        # reserve regions
         self.reserve_memory_regions(spec, self._memory_requirements)
 
-        #write system region
+        # write system region
         spec.switch_write_focus(region=self.SYSTEM_REGION)
         self._write_basic_setup_info(spec, 0xBEEF0000)
         spec.write_value(data=0)
 
-        #write commands to memory
+        # write commands to memory
         spec.switch_write_focus(region=self.COMMANDS)
         for write_command in self._writes:
             spec.write_value(data=write_command)
@@ -63,56 +62,72 @@ class CommandSender(AbstractMultiCastSource):
         data_writer.close()
 
     def _calculate_memory_requirements(self):
-        #sorts commands by timer tic
+
+        # sorts commands by timer tic
         commands = sorted(self._commands, key=lambda tup: tup['t'])
-        #calculate size of region and the order of writes
+
+        # calculate size of region and the order of writes
         self._writes = list()
-        #add the extra memory requirements for the system region.
+
+        # add the extra memory requirements for the system region.
         #  (4 ints = 16 bytes)
         self._memory_requirements = 16
-        #temporary holder
+
+        # temporary holder
         commands_in_same_time_slot = list()
-        self._memory_requirements += 12  # 3 ints holding coutners of cp,
-                                        # cnp and t
+
+        # 3 ints holding counters of cp, cnp and t
+        self._memory_requirements += 12
         for start_command in commands:
-            # if first command, inltiise counter
+
+            # if first command, initialize counter
             if len(commands_in_same_time_slot) == 0:
-                #calculate mem cost of the command based off payload
-                self._memory_requirements += self.size_of_message(start_command)
+
+                # calculate mem cost of the command based off payload
+                self._memory_requirements += self.size_of_message(
+                    start_command)
                 commands_in_same_time_slot.append(start_command)
                 self._writes.append(start_command['t'])
             else:
+
                 # if the next mesage has the same time tic, add to list
                 if commands_in_same_time_slot[0]['t'] == start_command['t']:
                     commands_in_same_time_slot.append(start_command)
                     self._memory_requirements += \
                         self.size_of_message(start_command)
-                else:  # if not, then send all preivous messages to
-                       # region and restart count
+                else:
+
+                    # if not, then send all previous messages to
+                    # region and restart count
                     self.deal_with_command_block(commands_in_same_time_slot)
-                    #reset message tracker
+
+                    # reset message tracker
                     commands_in_same_time_slot = list()
                     commands_in_same_time_slot.append(start_command)
-                    self._memory_requirements += 12  # 3 ints holding coutners
-                                                     #  of cp, cnp and t
-                    self._memory_requirements += \
-                        self.size_of_message(start_command)
+
+                    # 3 ints holding coutners of cp, cnp and t
+                    self._memory_requirements += 12
+                    self._memory_requirements += self.size_of_message(
+                        start_command)
                     self._writes.append(start_command['t'])
+
         # write the last command block left from the loop
         self.deal_with_command_block(commands_in_same_time_slot)
-        #add a counter for the entire memory region
+
+        # add a counter for the entire memory region
         self._writes.insert(0, self._memory_requirements)
         self._memory_requirements += 4
 
-    def add_commands(self, commands, edge):
-        self._edge_map[edge] = commands
+    def add_commands(self, commands, commands_key, commands_mask, edge):
+        self._edge_map[edge] = (commands_key, commands_mask)
         self._commands += commands
 
     def deal_with_command_block(self, commands_in_same_time_slot):
         """
         writes a command block and keeps memory tracker
         """
-        #sort by cp
+
+        # sort by cp
         commands_in_same_time_slot = \
             sorted(commands_in_same_time_slot, key=lambda tup: tup['cp'])
 
@@ -140,20 +155,23 @@ class CommandSender(AbstractMultiCastSource):
             else:
                 self._writes.append(0)
             counter_messages += 1
+
         # if no payload messgages, still need to report it for c code
         if no_payload_messages == 0:
             self._writes.append(no_payload_messages)
 
-    def generate_routing_info(self, subedge):
-        """
-        overloaded from component vertex
-        """
-        if self._edge_map[subedge.edge] is not None:
-            return self._edge_map[subedge.edge][0]['key'], 0xFFFFFC00
+    def get_keys_and_masks_for_partitioned_edge(self, partitioned_edge,
+                                                graph_mapper):
+        edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
+            partitioned_edge)
+        if edge in self._edge_map:
+            (key, mask) = self._edge_map[edge]
+            return key, mask
         else:
             # if the subedge doesnt have any predefined messages to send,
-            # then treat them with the subedge routing key
-            return subedge.key_combo, self._app_mask
+            # then it shouldn't be here!
+            raise Exception("An unrecognised edge {} appears to come out of "
+                            "the command sender!".format(edge))
 
     def _generate_routing_neuron_id_keys(self, vertex_slice, vertex, placement,
                                          subedge):
@@ -247,8 +265,8 @@ class CommandSender(AbstractMultiCastSource):
                         new_combo = command['key'] & app_mask
                         if combo != new_combo:
                             raise exceptions.RallocException(
-                                "The keys going down a speicifc subedge are not"
-                                " consistant")
+                                "The keys going down a specific subedge are"
+                                " not consistent")
 
     @property
     def model_name(self):
@@ -257,7 +275,7 @@ class CommandSender(AbstractMultiCastSource):
         """
         return "command_sender_multi_cast_source"
 
-    #inhirrted from partitionable vertex
+    # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0
 

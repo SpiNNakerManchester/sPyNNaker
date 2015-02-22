@@ -1,14 +1,13 @@
 # pacman imports
-from pacman.model.constraints.\
-    vertex_requires_virtual_chip_in_machine_constraint import \
-    VertexRequiresVirtualChipInMachineConstraint
-from spynnaker.pyNN.utilities.data_generator_interface import \
-    DataGeneratorInterface
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
+from pacman.model.partitionable_graph.abstract_virtual_vertex import \
+    AbstractVirtualVertex
+from pacman.model.constraints.key_allocator_fixed_key_and_mask_constraint \
+    import KeyAllocatorFixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.constraints.key_allocator_same_keys_constraint \
@@ -23,7 +22,6 @@ from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 from pacman.operations.routing_info_allocator_algorithms.\
     basic_routing_info_allocator import BasicRoutingInfoAllocator
 from pacman.utilities.progress_bar import ProgressBar
-from pacman.utilities import utility_calls as pacman_utility_calls
 
 # spinnmachine imports
 from spinn_machine.sdram import SDRAM
@@ -34,6 +32,8 @@ from spinn_machine.chip import Chip
 
 # internal imports
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
+    AbstractSynapticManager
 from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_reverse_iptagable_vertex \
@@ -53,6 +53,15 @@ from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
+from spynnaker.pyNN.utilities.data_generator_interface import \
+    DataGeneratorInterface
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_keys_and_masks_vertex \
+    import AbstractProvidesKeysAndMasksVertex
+from spynnaker.pyNN.models.abstract_models.abstract_provides_fixed_mask_vertex\
+    import AbstractProvidesFixedMaskVertex
+from spynnaker.pyNN.exceptions import ConfigurationException
+
 
 # spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
@@ -297,6 +306,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._add_iptag(iptag)
 
     def _set_reverse_ip_tags(self):
+
         # extract reverse iptags required by the graph
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractReverseIPTagableVertex):
@@ -407,7 +417,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         pacman_report_state = \
             self._reports_states.generate_pacman_report_states()
 
-        self._check_if_theres_any_pre_placement_constraints_to_satisify()
+        self._add_virtual_chips()
 
         # execute partitioner
         self._execute_partitioner(pacman_report_state)
@@ -437,13 +447,49 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         for edge in self._partitioned_graph.subedges:
             vertex_slice = self._graph_mapper.get_subvertex_slice(
                 edge.pre_subvertex)
+            if vertex_slice.n_atoms > 2048:
+                raise ConfigurationException(
+                    "The current models can only support up to 2048 atoms"
+                    " per core (restricted by the supported key format)")
             n_keys_map.set_n_keys_for_patitioned_edge(edge,
                                                       vertex_slice.n_atoms)
 
+            # Check if the incoming vertex has any constraints of its own
+            # Currently, if the post-vertex uses AbstractSynapticManager,
+            # the vertex must meet the requirements of the manager
+            vertex = self._graph_mapper.get_vertex_from_subvertex(
+                edge.pre_subvertex)
+            post_vertex = self._graph_mapper.get_vertex_from_subvertex(
+                edge.post_subvertex)
+            if isinstance(vertex, AbstractProvidesKeysAndMasksVertex):
+                if isinstance(post_vertex, AbstractSynapticManager):
+                    keys_and_masks = \
+                        vertex.get_keys_and_masks_for_partitioned_edge(
+                            edge, self._graph_mapper)
+                    for key_and_mask in keys_and_masks:
+                        if key_and_mask.mask != 0xFFFFF800:
+                            raise ConfigurationException(
+                                "The current models are restricted to use the"
+                                "key 0xFFFFF800")
+                edge.add_constraint(KeyAllocatorFixedKeyAndMaskConstraint(
+                    keys_and_masks))
+            if isinstance(vertex, AbstractProvidesFixedMaskVertex):
+                fixed_mask = vertex.get_fixed_mask_for_patitioned_edge(
+                    edge, self._graph_mapper)
+                if (isinstance(post_vertex, AbstractSynapticManager)
+                        and fixed_mask != 0xFFFFF800):
+                    raise ConfigurationException(
+                        "The current models are restricted to use the"
+                        "key 0xFFFFF800")
+                edge.add_constraint(KeyAllocatorFixedMaskConstraint(
+                    fixed_mask))
+
             # Fix the mask for the edges and make sure the allocated keys are
-            # contiguous
-            edge.add_constraint(KeyAllocatorContiguousRangeContraint())
-            edge.add_constraint(KeyAllocatorFixedMaskConstraint(0xFFFFF800))
+            # contiguously
+            if isinstance(post_vertex, AbstractSynapticManager):
+                edge.add_constraint(KeyAllocatorContiguousRangeContraint())
+                edge.add_constraint(KeyAllocatorFixedMaskConstraint(
+                                    0xFFFFF800))
 
         # Ensure that the keys allocated are the same for all subedges coming
         # from the same subvertex
@@ -632,6 +678,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             timescale_factor=self._time_scale_factor)
 
     def _get_executable_path(self, executable_name):
+
         # Loop through search paths
         for path in self._binary_search_paths:
             # Rebuild filename
@@ -644,51 +691,40 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         # No executable found
         return None
 
-    def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
+    def _add_virtual_chips(self):
         for vertex in self._partitionable_graph.vertices:
-            virtual_chip_constraints = \
-                pacman_utility_calls.locate_constraints_of_type(
-                    vertex.constraints,
-                    VertexRequiresVirtualChipInMachineConstraint)
-            if len(virtual_chip_constraints) > 0:
-                for virtual_chip_constraint in virtual_chip_constraints:
+            if isinstance(vertex, AbstractVirtualVertex):
 
-                    # check if the virtual chip doesnt already exist
-                    if (self._machine.get_chip_at(
-                            virtual_chip_constraint.virtual_chip_coords['x'],
-                            virtual_chip_constraint.virtual_chip_coords['y'])
-                            is None):
-                        virutal_chip = \
-                            self._create_virtual_chip(virtual_chip_constraint)
-                        self._machine.add_chip(virutal_chip)
+                # check if the virtual chip doesn't already exist
+                if self._machine.get_chip_at(vertex.virtual_chip_x,
+                                             vertex.virtual_chip_y) is None:
+                    virutal_chip = self._create_virtual_chip(vertex)
+                    self._machine.add_chip(virutal_chip)
 
-    def _create_virtual_chip(self, virtual_chip_constraint):
+    def _create_virtual_chip(self, virtual_vertex):
         sdram_object = SDRAM()
 
         # creates the two links
+        virtual_link_id = (virtual_vertex
+                           .connected_to_real_chip_link_id + 3) % 6
         to_virtual_chip_link = Link(
-            destination_x=virtual_chip_constraint.virtual_chip_coords['x'],
-            destination_y=virtual_chip_constraint.virtual_chip_coords['y'],
-            source_x=virtual_chip_constraint.connected_to_chip_coords['x'],
-            source_y=virtual_chip_constraint.connected_to_chip_coords['y'],
-            multicast_default_from=(virtual_chip_constraint
-                                    .connected_to_chip_link_id + 3) % 6,
-            multicast_default_to=(virtual_chip_constraint
-                                  .connected_to_chip_link_id + 3) % 6,
-            source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
+            destination_x=virtual_vertex.virtual_chip_x,
+            destination_y=virtual_vertex.virtual_chip_y,
+            source_x=virtual_vertex.connected_to_real_chip_x,
+            source_y=virtual_vertex.connected_to_real_chip_y,
+            multicast_default_from=virtual_link_id,
+            multicast_default_to=virtual_link_id,
+            source_link_id=virtual_vertex.connected_to_real_chip_link_id)
 
         from_virtual_chip_link = Link(
-            destination_x=(virtual_chip_constraint
-                           .connected_to_chip_coords['x']),
-            destination_y=(virtual_chip_constraint
-                           .connected_to_chip_coords['y']),
-            source_x=virtual_chip_constraint.virtual_chip_coords['x'],
-            source_y=virtual_chip_constraint.virtual_chip_coords['y'],
-            multicast_default_from=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
-            multicast_default_to=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
-            source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
+            destination_x=virtual_vertex.connected_to_real_chip_x,
+            destination_y=virtual_vertex.connected_to_real_chip_y,
+            source_x=virtual_vertex.virtual_chip_x,
+            source_y=virtual_vertex.virtual_chip_y,
+            multicast_default_from=(virtual_vertex
+                                    .connected_to_real_chip_link_id),
+            multicast_default_to=virtual_vertex.connected_to_real_chip_link_id,
+            source_link_id=virtual_link_id)
 
         # create the router
         links = [from_virtual_chip_link]
@@ -707,15 +743,15 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         # connect the real chip with the virtual one
         connected_chip = self._machine.get_chip_at(
-            virtual_chip_constraint.connected_to_chip_coords['x'],
-            virtual_chip_constraint.connected_to_chip_coords['y'])
+            virtual_vertex.connected_to_real_chip_x,
+            virtual_vertex.connected_to_real_chip_y)
         connected_chip.router.add_link(to_virtual_chip_link)
 
         # return new v chip
         return Chip(
             processors=processors, router=router_object, sdram=sdram_object,
-            x=virtual_chip_constraint.virtual_chip_coords['x'],
-            y=virtual_chip_constraint.virtual_chip_coords['y'], virtual=True)
+            x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
+            virtual=True)
 
     def stop(self, app_id, stop_on_board=True):
         if stop_on_board:

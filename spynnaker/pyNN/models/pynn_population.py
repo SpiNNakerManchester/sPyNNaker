@@ -1,15 +1,14 @@
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
-from pacman.model.constraints.vertex_has_dependent_constraint import \
-    VertexHasDependentConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
-    import AbstractPopulationVertex
-from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
-    import VertexRequiresMultiCastSourceConstraint
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_send_me_multicast_commands_vertex import \
+    AbstractSendMeMulticastCommandsVertex
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_vertex_with_dependent_vertices import \
+    AbstractVertexWithEdgeToDependentVertices
 from pacman.model.partitionable_graph.partitionable_edge \
     import PartitionableEdge
-from pacman.utilities import utility_calls as pacman_utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 
@@ -89,14 +88,7 @@ class Population(object):
 
         self._spinnaker.add_vertex(self._vertex)
 
-        # check if the vertex is a cmd sender, if so store for future
-        require_multi_cast_source_constraints = \
-            pacman_utility_calls.locate_constraints_of_type(
-                self._vertex.constraints,
-                VertexRequiresMultiCastSourceConstraint)
-
-        for require_multi_cast_source_constraint \
-                in require_multi_cast_source_constraints:
+        if isinstance(self._vertex, AbstractSendMeMulticastCommandsVertex):
             if multi_cast_vertex is None:
                 multi_cast_vertex = CommandSender(
                     self._spinnaker.machine_time_step,
@@ -105,22 +97,19 @@ class Population(object):
             multi_cast_vertex = self._spinnaker.get_multi_cast_source
             edge = PartitionableEdge(multi_cast_vertex, self._vertex)
             multi_cast_vertex.add_commands(
-                require_multi_cast_source_constraint.commands, edge)
+                self._vertex.commands, self._vertex.commands_key,
+                self._vertex.commands_mask, edge)
             self._spinnaker.add_edge(edge)
 
         self._parameters = PyNNParametersSurrogate(self._vertex)
 
         # add any dependent edges and verts if needed
-        dependant_vertex_constraints = \
-            pacman_utility_calls.locate_constraints_of_type(
-                self._vertex.constraints, VertexHasDependentConstraint)
-
-        for dependant_vertex_constrant in dependant_vertex_constraints:
-            dependant_vertex = dependant_vertex_constrant.vertex
-            self._spinnaker.add_vertex(dependant_vertex)
-            dependant_edge = PartitionableEdge(pre_vertex=self._vertex,
-                                               post_vertex=dependant_vertex)
-            self._spinnaker.add_edge(dependant_edge)
+        if isinstance(self._vertex, AbstractVertexWithEdgeToDependentVertices):
+            for dependant_vertex in self._vertex.dependent_vertices:
+                self._spinnaker.add_vertex(dependant_vertex)
+                dependant_edge = PartitionableEdge(
+                    pre_vertex=self._vertex, post_vertex=dependant_vertex)
+                self._spinnaker.add_edge(dependant_edge)
 
         # initialize common stuff
         self._size = size
