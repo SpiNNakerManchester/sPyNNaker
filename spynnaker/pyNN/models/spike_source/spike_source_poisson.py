@@ -8,6 +8,8 @@ from spynnaker.pyNN.models.neural_properties.randomDistributions import \
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 
+from spynnaker.pyNN import exceptions
+
 
 from math import exp, ceil
 from enum import Enum
@@ -161,6 +163,10 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         # Write header info to the memory region:
 
         # Write Key info for this core:
+        if key is None:
+            raise exceptions.ConfigurationException(
+                "This spike source poisson does not send its spikes anywhere. "
+                "This is deemed to be an error. Please fix this and try again")
         spec.write_value(data=key)
 
         # Write the random seed (4 words), generated randomly!

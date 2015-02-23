@@ -151,9 +151,19 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
+        key = None
+        if len(sub_graph.outgoing_subedges_from_subvertex(subvertex)) > 0:
+            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                sub_graph.outgoing_subedges_from_subvertex(subvertex)[0])
+
+            # NOTE: using the first key assigned as the key.  Should in future
+            # get the list of keys and use one per neuron, to allow arbitrary
+            # key and mask assignments
+            key = keys_and_masks[0].key
+
         self.write_delay_parameters(spec, placement.x, placement.y,
                                     placement.p, subvertex, num_delay_blocks,
-                                    delay_blocks, vertex_slice)
+                                    delay_blocks, vertex_slice, key)
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
@@ -226,7 +236,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     def write_delay_parameters(self, spec, processor_chip_x, processor_chip_y,
                                processor_id, subvertex, num_delay_blocks,
-                               delay_block, vertex_slice):
+                               delay_block, vertex_slice, key):
         """
         Generate Delay Parameter data (region 2):
         """
@@ -243,11 +253,9 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         # Write header info to the memory region:
         # Write Key info for this core:
-        population_identity = \
-            packet_conversions.get_key_from_coords(processor_chip_x,
-                                                   processor_chip_y,
-                                                   processor_id)
-        spec.write_value(data=population_identity)
+        # Every outgoing edge from this vertex should have the same key
+
+        spec.write_value(data=key)
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)

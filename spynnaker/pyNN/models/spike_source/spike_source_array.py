@@ -1,6 +1,7 @@
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
+from spynnaker.pyNN import exceptions
 
 
 from data_specification.data_specification_generator import \
@@ -220,6 +221,10 @@ class SpikeSourceArray(AbstractSpikeSource):
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value)
 
+        if key is None:
+            raise exceptions.ConfigurationException(
+                "This spike source array does not send its spikes anywhere. "
+                "This is deemed to be an error. Please fix this and try again")
         spec.write_value(data=key)
 
         # Word 1 is the total number of 'neurons' (i.e. spike sources) in
