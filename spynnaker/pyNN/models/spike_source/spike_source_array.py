@@ -239,7 +239,8 @@ class SpikeSourceArray(AbstractSpikeSource,
 
         # Create the data regions for the spike source array:
         self._reserve_memory_regions(
-            spec, self._CONFIGURATION_REGION_SIZE, real_spike_region_size,
+            spec, self._CONFIGURATION_REGION_SIZE,
+            self._buffer_region_memory_size,
             spikes_recording_region_size)
 
         # update the spike source partitioned vertex with its region sizes

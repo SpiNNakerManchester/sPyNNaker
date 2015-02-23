@@ -1,6 +1,8 @@
 import threading
 import collections
 import logging
+from spinnman.connections.udp_packet_connections.udp_spinnaker_connection import \
+    UDPSpinnakerConnection
 from spinnman.messages.sdp.sdp_flag import SDPFlag
 
 from spinnman.messages.sdp.sdp_header import SDPHeader
@@ -29,6 +31,13 @@ class BufferSendThread(threading.Thread):
         self._done = False
         self._exited = False
         self.setDaemon(True)
+        connections = self._transciever.get_connections()
+        for connection in connections:
+            if isinstance(connection, UDPSpinnakerConnection):
+                self._connection = connection
+                break
+        if self._connection is None:
+            raise  # error, no connection found
 
     def stop(self):
         """
@@ -53,11 +62,14 @@ class BufferSendThread(threading.Thread):
         while not self._done:
             self._queue_condition.acquire()
             while len(self._queue) == 0 and not self._done:
+                print "about to wait"
                 self._queue_condition.wait()
+            print "finished waiting"
             request = None
             if not self._done:
                 request = self._queue.pop()
             self._queue_condition.release()
+            print "outside conditions", request
             if request is not None:
                 self._handle_request(request)
         self._queue.append(None)
@@ -67,17 +79,17 @@ class BufferSendThread(threading.Thread):
         self._queue_condition.release()
 
     def add_request(self, request):
-        """ adds a request to the tiger munching queue
-
-        :param request:
-        :return:
-        """
-        self._queue_condition.acquire()
-        self._queue.append(request)
-        self._queue_condition.notify()
-        self._queue_condition.release()
-
-    def _handle_request(self, request):
+    #     """ adds a request to the tiger munching queue
+    #
+    #     :param request:
+    #     :return:
+    #     """
+    #     self._queue_condition.acquire()
+    #     self._queue.append(request)
+    #     self._queue_condition.notify()
+    #     self._queue_condition.release()
+    #
+    # def _handle_request(self, request):
         """ handles a request from the munched queue by transmitting a chunk of
         memory to a buffer
 
@@ -98,6 +110,7 @@ class BufferSendThread(threading.Thread):
             sdp_message = \
                 SDPMessage(sdp_header, eieio_message_as_byte_array)
             self._transciever.send_sdp_message(sdp_message)
+            #self._connection.send_sdp_message(sdp_message)
         else:
             raise exceptions.ConfigurationException(
                 "this type of request is not suitable for this thread. Please "

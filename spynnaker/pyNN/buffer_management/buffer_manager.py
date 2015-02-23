@@ -72,6 +72,8 @@ class BufferManager(object):
                     self._recieve_vertices[key].get_next_set_of_packets(
                         packet.space_available, packet.region_id,
                         packet.sequence_no)
+                print "space available: {0:d}, data requests: {1:d}".format(
+                    packet.space_available, len(data_requests))
                 if len(data_requests) != 0:
                     for buffers in data_requests:
                         data_request = {'data': buffers,

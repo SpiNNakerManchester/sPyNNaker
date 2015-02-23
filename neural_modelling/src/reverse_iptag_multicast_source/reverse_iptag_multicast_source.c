@@ -18,6 +18,8 @@
 
 #define BUFFER_REGION 2
 
+#define MIN_BUFFER_SPACE 10
+
 #define LARGEST_FSM_STATE 0xFF // needs to be a power of 2, fitting in a byte
 
 #pragma pack(1)
@@ -34,8 +36,10 @@ typedef struct
 {
   uint16_t eieio_header_command;
   uint16_t chip_id;
-  uint16_t processor;
-  uint16_t region_sequence;
+  uint8_t processor;
+  uint8_t pad1;
+  uint8_t region;
+  uint8_t sequence;
   uint32_t space_available;
 } req_packet_sdp_t;
 
@@ -50,7 +54,7 @@ void parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length);
 void parse_stop_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length);
 void parse_start_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length);
 void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length);
-void signal_software_error(eieio_msg_t eieio_msg_ptr, uint16_t length, char* str);
+void signal_software_error(eieio_msg_t eieio_msg_ptr, uint16_t length);
 void send_buffer_request_pkt(void);
 uint32_t check_sdram_buffer_space_available(void);
 bool check_eieio_packets_available(void);
@@ -96,8 +100,23 @@ static bool send_ack_last_state;
 static bool send_packet_reqs;
 static bool last_buffer_operation;
 static uint8_t return_tag_id;
+static uint32_t last_space;
 
+void print_packet_bytes(eieio_msg_t eieio_msg_ptr, uint16_t length)
+{
+  uint8_t *ptr = (uint8_t *) eieio_msg_ptr;
+  uint16_t i = 0;
 
+  io_printf(IO_BUF, "received packet bytes: %d - full eieio packet:", length);
+
+  for (i=0; i<length; i++)
+  {
+    if ((i & 7) == 0)
+      io_printf(IO_BUF, "\n");
+    io_printf(IO_BUF, "%02x", ptr[i]);
+  }
+  io_printf(IO_BUF, "\n");
+}
 
 // Entry point
 void c_main (void)
@@ -159,7 +178,7 @@ bool multicast_source_data_filled(address_t base_address)
   //allocate a buffer size of the maximum SDP payload size
   msg_from_sdram = (eieio_msg_t) spin1_malloc(256);
 
-  req.length = 10 + sizeof(req_packet_sdp_t);
+  req.length = 8 + sizeof(req_packet_sdp_t);
   req.flags = 0x7;
   req.tag = return_tag_id;
   req.dest_port = 0xFF;
@@ -169,8 +188,9 @@ bool multicast_source_data_filled(address_t base_address)
   req_ptr = (req_packet_sdp_t*) &(req.cmd_rc);
   req_ptr -> eieio_header_command = 1 << 14 | SPINNAKER_REQUEST_BUFFERS;
   req_ptr -> chip_id = spin1_get_chip_id();
-  req_ptr -> processor = (spin1_get_core_id() << 11);
-  req_ptr -> region_sequence = (BUFFER_REGION << 8);
+  req_ptr -> processor = (spin1_get_core_id() << 3);
+  req_ptr -> pad1 = 0;
+  req_ptr -> region = BUFFER_REGION & 0x0F;
 
 
   io_printf (IO_BUF, "apply_prefix: %d\n", apply_prefix);
@@ -248,7 +268,7 @@ void sdp_packet_callback(uint mailbox, uint port)
   uint16_t length = msg -> length;
   eieio_msg_t eieio_msg_ptr = (eieio_msg_t) &(msg -> cmd_rc);
 
-  packet_handler_selector(eieio_msg_ptr, length - 10);
+  packet_handler_selector(eieio_msg_ptr, length - 8);
 
   //free the message to stop overload
   spin1_msg_free(msg);
@@ -258,7 +278,7 @@ void packet_handler_selector(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   uint16_t data_hdr_value = eieio_msg_ptr[0];
   bool pkt_apply_prefix = (bool) (data_hdr_value >> 15);
-  bool pkt_mode = data_hdr_value >> 14;
+  bool pkt_mode = (bool) (data_hdr_value >> 14);
 
   if (pkt_apply_prefix == 0 && pkt_mode == 1)
     parse_command_pkt(eieio_msg_ptr, length);
@@ -285,18 +305,22 @@ uint32_t check_sdram_buffer_space_available(void)
     uint32_t final_space = end_of_buffer_region_value - write_ptr_value;
     uint32_t initial_space = read_ptr_value - buffer_region_value;
 
-    if (final_space < 10 && initial_space < 10)
+    return_value = final_space + initial_space;
+    if (return_value < MIN_BUFFER_SPACE)
       return_value = 0;
-    else if (final_space < 10 && initial_space >= 10)
-      return_value = initial_space;
-    else if (final_space >= 10)
-      return_value = final_space;
+
+    // if (final_space < 10 && initial_space < 10)
+    //   return_value = 0;
+    // else if (final_space < 10 && initial_space >= 10)
+    //   return_value = initial_space;
+    // else if (final_space >= 10)
+    //   return_value = final_space;
   }
   else if (write_ptr_value < read_ptr_value)
   {
     uint32_t middle_space = read_ptr_value - write_ptr_value;
 
-    if (middle_space < 10)
+    if (middle_space < MIN_BUFFER_SPACE)
       return_value = 0;
     else
       return_value = middle_space;
@@ -307,7 +331,7 @@ uint32_t check_sdram_buffer_space_available(void)
     else
       return_value = buffer_region_size;
 
-  io_printf (IO_BUF, "return value: %d\n", return_value);
+  io_printf (IO_BUF, "buffer space available return value: %d\n", return_value);
   return return_value;
 }
 
@@ -365,13 +389,12 @@ void parse_start_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length)
   send_packet_reqs = 1;
 }
 
-void signal_software_error(eieio_msg_t eieio_msg_ptr, uint16_t length, char* str)
+void signal_software_error(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
-  uint8_t *ptr = (uint8_t *) &eieio_msg_ptr;
+  uint8_t *ptr = (uint8_t *) eieio_msg_ptr;
   uint16_t i = 0;
 
-  io_printf(IO_BUF, "%s\n", str);
-  io_printf(IO_BUF, "packet bytes:");
+  io_printf(IO_BUF, "%d packet bytes:", length);
 
   for (i=0; i<length; i++)
   {
@@ -379,20 +402,25 @@ void signal_software_error(eieio_msg_t eieio_msg_ptr, uint16_t length, char* str
       io_printf(IO_BUF, "\n");
     io_printf(IO_BUF, "%02x", ptr[i]);
   }
+  io_printf(IO_BUF, "\n");
   rt_error(RTE_SWERR);
 }
 
 void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   uint16_t sequence_value_region_id = eieio_msg_ptr[1];
-  uint16_t sequence_value = sequence_value_region_id & 0xFF;
-  uint16_t region_id = (sequence_value_region_id >> 8) & 0xFF;
+  uint16_t region_id = sequence_value_region_id & 0xFF; //remember little-endian vs big endian!!!
+  uint16_t sequence_value = (sequence_value_region_id >> 8) & 0xFF;
   uint8_t next_state_fsm = (pkt_fsm + 1) & LARGEST_FSM_STATE;
   eieio_msg_t eieio_event_pkt = &eieio_msg_ptr[2];
 
   if (region_id != BUFFER_REGION)
-    signal_software_error(eieio_msg_ptr, length, "received sequenced eieio packet with invalid region id.\n");
+  {
+    io_printf(IO_BUF, "received sequenced eieio packet with invalid region id: %d.\n", region_id);
+    signal_software_error(eieio_msg_ptr, length);
+  }
 
+  io_printf(IO_BUF, "Received packet sequence number: %d\n", sequence_value);
   if (sequence_value != next_state_fsm)
     send_ack_last_state = 1;
   else
@@ -400,19 +428,29 @@ void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
     //parse_event_pkt returns false in case there is an error and the packet
     //is dropped (i.e. as it was never received)
     if (parse_event_pkt(eieio_event_pkt, length))
+    {
       pkt_fsm = next_state_fsm;
+    }
     else
-      signal_software_error(eieio_msg_ptr, length, "received sequenced eieio packet containing invalid data.\n");
+    {
+      io_printf(IO_BUF, "received sequenced eieio packet containing invalid data.\n", region_id);
+      signal_software_error(eieio_msg_ptr, length);
+    }
   }
 }
 
 void send_buffer_request_pkt(void)
 {
-  req_ptr -> region_sequence |= pkt_fsm;
-  req_ptr -> space_available = check_sdram_buffer_space_available();
-  spin1_send_sdp_msg (&req, 1);
-  req_ptr -> region_sequence &= 0xFF00;
-  req_ptr -> space_available = 0;
+  uint32_t space = check_sdram_buffer_space_available();
+  if (space > 0 && space != last_space)
+  {
+    last_space = space;
+    req_ptr -> sequence |= pkt_fsm;
+    req_ptr -> space_available = space;
+    spin1_send_sdp_msg (&req, 1);
+    req_ptr -> sequence &= 0;
+    req_ptr -> space_available = 0;
+  }
 }
 
 uint16_t calculate_eieio_packet_size(eieio_msg_t eieio_msg_ptr)
@@ -459,16 +497,24 @@ bool parse_event_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   use(length);
 
+  print_packet_bytes(eieio_msg_ptr, length - 4);
+
   uint16_t data_hdr_value = eieio_msg_ptr[0];
   bool pkt_timestamp = (bool) (data_hdr_value >> 12 & 0x1);
 
   if (!pkt_timestamp || time == extract_time_from_eieio_msg(eieio_msg_ptr))
   {
+    io_printf(IO_BUF, "to packet_interpreter\n");
     packet_interpreter(eieio_msg_ptr);
     return 1;
   }
   else
-    return add_eieio_packet_to_sdram(eieio_msg_ptr);
+  {
+    io_printf(IO_BUF, "add_eieio_packet_to_sdram - ");
+    bool ret_value = add_eieio_packet_to_sdram(eieio_msg_ptr);
+    io_printf(IO_BUF, "return value: %d\n", ret_value);
+    return ret_value;
+  }
 }
 
 void fetch_and_process_packet(void)
@@ -480,30 +526,46 @@ void fetch_and_process_packet(void)
     return;
   }
 
-  uint16_t *padding_checker = (uint16_t *) read_pointer;
-  io_printf (IO_BUF, "padding_checker: %d\n", *padding_checker);
-
+//  while (
+//    (!msg_from_sdram_in_use) &&
+//    check_eieio_packets_available() &&
+//    !(read_pointer == buffer_region && *padding_checker == 0x4002))
   while (
     (!msg_from_sdram_in_use) &&
-    check_eieio_packets_available() &&
-    !(read_pointer == buffer_region && *padding_checker == 0))
+    check_eieio_packets_available())
   {
-    padding_checker = (uint16_t *) read_pointer;
-    io_printf (IO_BUF, "padding_checker: %d\n", *padding_checker);
-
-    if (*padding_checker == 0)
-      read_pointer = buffer_region;
+    uint16_t *padding_checker = (uint16_t *) read_pointer;
+    while (*padding_checker == 0x4002)
+    {
+      padding_checker = (uint16_t *) read_pointer;
+      io_printf (IO_BUF, "padding_checker: %d\n", *padding_checker);
+      padding_checker += 1;
+      read_pointer = (uint8_t *)padding_checker;
+      if (read_pointer >= end_of_buffer_region)
+        read_pointer = buffer_region;
+    }
 
     void *src_ptr = (void *) read_pointer;
     void *dst_ptr = (void *) msg_from_sdram;
     uint32_t len = calculate_eieio_packet_size((eieio_msg_t) read_pointer);
-
-    spin1_memcpy (dst_ptr, src_ptr, len);
+    uint32_t final_space = (end_of_buffer_region - read_pointer);
+    if (len > final_space)
+    {
+      uint32_t remaining_len = len - final_space;
+      spin1_memcpy(dst_ptr, src_ptr, final_space);
+      spin1_memcpy((dst_ptr + final_space), buffer_region, remaining_len);
+      read_pointer = buffer_region + remaining_len;
+    }
+    else
+    {
+      spin1_memcpy (dst_ptr, src_ptr, len);
+      read_pointer += len;
+      if (read_pointer >= end_of_buffer_region)
+        read_pointer -= buffer_region_size;
+    }
     last_buffer_operation = BUFFER_OPERATION_READ;
     msg_from_sdram_in_use = 1;
-    read_pointer += len;
-    if (read_pointer >= end_of_buffer_region)
-      read_pointer -= buffer_region_size;
+
 
     next_buffer_time = extract_time_from_eieio_msg(msg_from_sdram);
     io_printf (IO_BUF, "packet time: %d\n", next_buffer_time);
@@ -525,31 +587,32 @@ bool add_eieio_packet_to_sdram(eieio_msg_t eieio_msg_ptr)
   uint32_t read_ptr_value = (uint32_t) read_pointer;
   uint32_t end_of_buffer_region_value = (uint32_t) end_of_buffer_region;
 
+  if (len > check_sdram_buffer_space_available())
+    return 0;
+
   if (read_ptr_value < write_ptr_value)
   {
     uint32_t final_space = end_of_buffer_region_value - write_ptr_value;
     uint32_t initial_space = read_ptr_value - buffer_region_value;
 
-    if (final_space < len && initial_space < len)
-      return 0;
-    else if (final_space < len && initial_space >= len)
+    if (final_space <= len)
     {
-      //add final padding
-      for (; write_pointer < end_of_buffer_region; write_pointer++)
-        *write_pointer = 0;
-
-      //add packet at the beginning
-      write_pointer = buffer_region;
       spin1_memcpy(write_pointer, eieio_msg_ptr, len);
       write_pointer += len;
       last_buffer_operation = BUFFER_OPERATION_WRITE;
+      if (write_pointer == end_of_buffer_region)
+        write_pointer = buffer_region;
       return 1;
     }
-    else if (final_space >= len)
+    else
     {
-      //add packet at the end
-      spin1_memcpy(write_pointer, eieio_msg_ptr, len);
-      write_pointer += len;
+      uint32_t final_space = end_of_buffer_region_value - write_ptr_value;
+      uint32_t final_len = len - final_space;
+
+      spin1_memcpy(write_pointer, eieio_msg_ptr, final_space);
+      write_pointer = buffer_region;
+      spin1_memcpy(write_pointer, (eieio_msg_ptr + final_space), final_len);
+      write_pointer += final_len;
       last_buffer_operation = BUFFER_OPERATION_WRITE;
       if (write_pointer == end_of_buffer_region)
         write_pointer = buffer_region;
