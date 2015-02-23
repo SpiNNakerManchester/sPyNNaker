@@ -1,21 +1,16 @@
-from data_specification.file_data_writer import FileDataWriter
-
-
-from pacman.model.partitionable_graph.abstract_constrained_vertex \
-    import AbstractConstrainedVertex
-
-
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN import exceptions
-
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
-
 import tempfile
 import os
 import threading
+
+from data_specification.file_data_writer import FileDataWriter
+from pacman.model.abstract_classes.abstract_constrained_vertex \
+    import AbstractConstrainedVertex
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN import exceptions
 
 # used to stop file conflicts
 _lock_condition = threading.Condition()

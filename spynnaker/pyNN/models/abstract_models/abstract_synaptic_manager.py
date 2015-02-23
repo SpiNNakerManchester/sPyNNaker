@@ -1,14 +1,13 @@
 import logging
-import math
 import numpy
 import struct
 import sys
-
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 from scipy import special
 
+import math
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
@@ -22,8 +21,9 @@ from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import conf
 
+
 # pacman imports
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 # spinnman imports

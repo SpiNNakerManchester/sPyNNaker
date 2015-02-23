@@ -1,13 +1,13 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
+
 from spynnaker.pyNN.models.partitioned_models.partitioned_population_vertex import \
     PartitionedPopulationVertex
-
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 

@@ -238,11 +238,9 @@ class SpynnakerCommsFunctions(object):
             if len(successful_cores) != total_processors:
                 # break_down the successful cores and unsuccessful cores into
                 # string
-                # reps
-                break_down = \
-                    self.turn_break_downs_into_string(
-                        total_cores, successful_cores, unsucessful_cores,
-                        CPUState.SYNC0)
+                break_down = self.turn_break_downs_into_string(
+                    total_cores, successful_cores, unsucessful_cores,
+                    CPUState.SYNC0)
                 raise exceptions.ExecutableFailedToStartException(
                     "Only {} processors out of {} have sucessfully reached "
                     "sync0 with breakdown of: {}"
@@ -433,6 +431,11 @@ class SpynnakerCommsFunctions(object):
         # load each router table thats needed for the application to run into
         # the chips sdram
         for router_table in router_tables.routing_tables:
+            self._txrx.clear_multicast_routes(router_table.x,
+                                              router_table.y)
+            self._txrx.clear_router_diagnostic_counters(router_table.x,
+                                                        router_table.y)
+
             if len(router_table.multicast_routing_entries) > 0:
                 self._txrx.load_multicast_routes(
                     router_table.x, router_table.y,

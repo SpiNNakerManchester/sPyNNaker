@@ -1,17 +1,16 @@
-from math import ceil
 import copy
-import math
 import logging
-
 from enum import Enum
 
+from math import ceil
+import math
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge import \
     DelayPartitionableEdge
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from spynnaker.pyNN import exceptions
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \

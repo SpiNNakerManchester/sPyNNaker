@@ -4,9 +4,8 @@ from pacman.operations.router_check_functionality.valid_routes_checker import \
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
-from pacman.model.partitionable_graph.abstract_virtual_vertex import \
+from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import AbstractSynapticManager
 from pacman.model.constraints.key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
 from pacman.model.constraints.key_allocator_fixed_mask_constraint \
@@ -33,6 +32,8 @@ from spinn_machine.chip import Chip
 
 # internal imports
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.utility_models.\
+    delay_extension_vertex import DelayExtensionVertex
 from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
     AbstractSynapticManager
 from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
@@ -462,13 +463,18 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 edge.pre_subvertex)
             post_vertex = self._graph_mapper.get_vertex_from_subvertex(
                 edge.post_subvertex)
+
+            needs_fixed_mask = \
+                (isinstance(post_vertex, AbstractSynapticManager) or
+                 isinstance(post_vertex, DelayExtensionVertex))
+
             if isinstance(vertex, AbstractProvidesKeysAndMasksVertex):
                 keys_and_masks = \
                     vertex.get_keys_and_masks_for_partitioned_edge(
                         edge, self._graph_mapper)
 
                 if keys_and_masks is not None:
-                    if isinstance(post_vertex, AbstractSynapticManager):
+                    if needs_fixed_mask:
                         for key_and_mask in keys_and_masks:
                             if key_and_mask.mask != 0xFFFFF800:
                                 raise ConfigurationException(
@@ -480,18 +486,17 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 fixed_mask = vertex.get_fixed_mask_for_patitioned_edge(
                     edge, self._graph_mapper)
                 if fixed_mask is not None:
-                    if (isinstance(post_vertex, AbstractSynapticManager)
-                            and fixed_mask != 0xFFFFF800):
+                    if needs_fixed_mask and fixed_mask != 0xFFFFF800:
                         raise ConfigurationException(
                             "The current models are restricted to use the"
                             "key 0xFFFFF800")
-                    if not isinstance(post_vertex, AbstractSynapticManager):
+                    if not needs_fixed_mask:
                         edge.add_constraint(KeyAllocatorFixedMaskConstraint(
                             fixed_mask))
 
             # Fix the mask for the edges and make sure the allocated keys are
             # contiguously
-            if isinstance(post_vertex, AbstractSynapticManager):
+            if needs_fixed_mask:
                 edge.add_constraint(KeyAllocatorContiguousRangeContraint())
                 edge.add_constraint(KeyAllocatorFixedMaskConstraint(
                                     0xFFFFF800))
@@ -532,15 +537,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
 
-        if self._in_debug_mode:
-
-            # check that all routes are valid and no cycles exist
-            valid_route_checker = ValidRouteChecker(
-                placements=self._placements, routing_infos=self._routing_infos,
-                routing_tables=self._router_tables, machine=self._machine,
-                partitioned_graph=self._partitioned_graph)
-            valid_route_checker.validate_routes()
-
         if pacman_report_state is not None and \
                 pacman_report_state.router_report:
             pacman_reports.router_reports(
@@ -551,6 +547,15 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 include_dat_based=pacman_report_state.router_dat_based_report,
                 routing_tables=self._router_tables,
                 routing_info=self._routing_infos, machine=self._machine)
+
+        if self._in_debug_mode:
+
+            # check that all routes are valid and no cycles exist
+            valid_route_checker = ValidRouteChecker(
+                placements=self._placements, routing_infos=self._routing_infos,
+                routing_tables=self._router_tables, machine=self._machine,
+                partitioned_graph=self._partitioned_graph)
+            valid_route_checker.validate_routes()
 
     def _execute_partitioner(self, pacman_report_state):
 
