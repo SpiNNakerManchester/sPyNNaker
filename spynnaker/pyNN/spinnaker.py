@@ -675,9 +675,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                                                       router_table.y)
                     self._txrx.clear_router_diagnostic_counters(router_table.x,
                                                                 router_table.y)
-                    # self._txrx.\
-                    #    clear_router_diagnostic_non_default_positioned_filters(
-                    #        router_table.x, router_table.y)
             # self._txrx.send_signal(app_id, SCPSignal.STOP)
         if self._create_database:
             self._database_thread.stop()
