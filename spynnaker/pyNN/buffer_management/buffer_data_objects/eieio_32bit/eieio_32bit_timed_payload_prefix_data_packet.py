@@ -12,3 +12,8 @@ class EIEIO32BitTimedPayloadPrefixDataPacket(EIEIOWithoutPayloadDataPacket):
         EIEIOWithoutPayloadDataPacket.__init__(
             self, EIEIOTypeParam.KEY_32_BIT, payload_base=timestamp,
             is_time=True, data=data)
+
+    @staticmethod
+    def get_min_packet_length():
+        return EIEIOWithoutPayloadDataPacket.get_min_length(
+            EIEIOTypeParam.KEY_32_BIT, payload_base=0, is_time=True)

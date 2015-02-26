@@ -15,3 +15,9 @@ class EIEIO32BitWithPayloadPayloadPrefixUpperKeyPrefixDataPacket(
             self, EIEIOTypeParam.KEY_PAYLOAD_32_BIT, prefix_param=key_prefix,
             prefix_type=EIEIOPrefixType.UPPER_HALF_WORD,
             payload_base=payload_prefix, data=data)
+
+    @staticmethod
+    def get_min_packet_length():
+        return EIEIOWithPayloadDataPacket.get_min_length(
+            EIEIOTypeParam.KEY_PAYLOAD_32_BIT, prefix_param=0,
+            prefix_type=EIEIOPrefixType.UPPER_HALF_WORD, payload_base=0)

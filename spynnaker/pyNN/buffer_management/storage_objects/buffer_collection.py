@@ -191,9 +191,9 @@ class BufferCollection(object):
         else:
             raise  # error in call parameter: packets needs to be a list
 
-    def remove_packets_in_region_up_to_seq_no(self, region_id, sequence_no):
+    def remove_packets_in_region_in_seq_no_interval(self, region_id, min_seq_no, max_seq_no):
         if self.is_region_managed(region_id):
-            self._buffers_sent[region_id].remove_packets_up_to_seq_no(sequence_no)
+            self._buffers_sent[region_id].remove_packets_in_seq_no_interval(min_seq_no, max_seq_no)
         else:
             raise # the region is not managed
 
@@ -205,6 +205,12 @@ class BufferCollection(object):
 
     def get_next_sequence_no_for_region(self, region_id):
         return self._buffers_to_use[region_id].get_next_sequence_no()
+
+    def get_min_seq_no(self, region_id):
+        value = self._buffers_sent[region_id].get_min_seq_no()
+        if value is None:
+            value = self._buffers_to_use[region_id].sequence_number
+        return value
 
     # def get_region_absolute_region_address(self, region_id):
     #     """gets the regions absolute region address

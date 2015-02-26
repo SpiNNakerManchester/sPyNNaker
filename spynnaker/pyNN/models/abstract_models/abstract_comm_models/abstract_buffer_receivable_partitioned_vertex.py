@@ -8,6 +8,7 @@ from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data i
     HostSendSequencedData
 from spynnaker.pyNN.buffer_management.command_objects.event_stop_request \
     import EventStopRequest
+from spinnman import constants as spinnman_constants
 
 
 @add_metaclass(ABCMeta)
@@ -46,9 +47,18 @@ class AbstractBufferReceivablePartitionedVertex(object):
         if not self._buffers_to_send_collection.is_region_empty(region_id):
 
             if sequence_no is not None:
+                max_seq_no = sequence_no
+                min_seq_no = (max_seq_no - spinnman_constants.MAX_BUFFER_HISTORY) % spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE
+                if min_seq_no < max_seq_no:
+                    if sequence_no < min_seq_no or sequence_no > max_seq_no:
+                        print "dropping packet wth sequence number {0:d} and window in the range {1:d}, {2:d}".format(sequence_no, min_seq_no, max_seq_no)
+                        return send_requests
+                else:  # case of wrapping around interval
+                    if max_seq_no > sequence_no > min_seq_no:
+                        print "dropping packet wth sequence number {0:d} and window in the range {1:d}, {2:d}".format(sequence_no, min_seq_no, max_seq_no)
+                        return send_requests
                 self._buffers_to_send_collection.\
-                    remove_packets_in_region_up_to_seq_no(region_id,
-                                                          sequence_no)
+                    remove_packets_in_region_in_seq_no_interval(region_id, min_seq_no, sequence_no)
                 if not self._buffers_to_send_collection.\
                         is_sent_packet_list_empty(region_id):
                     previous_buffers_to_send = \
@@ -56,15 +66,18 @@ class AbstractBufferReceivablePartitionedVertex(object):
                             region_id)
                     send_requests.extend(previous_buffers_to_send)
 
-                    # compute space used by packets
-                    used_space = 0
-                    for packet in previous_buffers_to_send:
-                        used_space += packet.length
-                    space_available -= used_space
+            # compute space used by packets
+            used_space = 0
+            for packet in send_requests:
+                used_space += packet.length
+            print "historical packets: {0:d}, length: {1:d}, space available: {2:d}".format(len(send_requests), used_space, space_available)
+            space_available -= used_space
+            number_of_historical_packets = len(send_requests)
+            max_number_of_new_packets = spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE - number_of_historical_packets
 
             # get next set of packets to send
             new_buffers_to_send = self._generate_buffers_for_transmission(
-                space_available, region_id, sequence_no)
+                space_available, max_number_of_new_packets, region_id, sequence_no)
 
             # add sequenced header if required - if is not the initial load
             if sequence_no is not None:
@@ -72,6 +85,11 @@ class AbstractBufferReceivablePartitionedVertex(object):
                     new_buffers_to_send, region_id)
                 self._buffers_to_send_collection.add_sent_packets(
                     new_buffers_to_send, region_id)
+
+            new_space = 0
+            for packet in new_buffers_to_send:
+                new_space += packet.length
+            print "new packets: {0:d}, length: {1:d}, space available: {2:d}".format(len(new_buffers_to_send), new_space, space_available)
 
             # add set of packets to be sent to the list
             send_requests.extend(new_buffers_to_send)
@@ -84,7 +102,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
             send_requests.append(request)
             return send_requests
 
-    def _generate_buffers_for_transmission(self, space_available, region_id, sequence_no):
+    def _generate_buffers_for_transmission(self, space_available, max_number_of_new_packets, region_id, sequence_no):
         """ creates a set of packets to be sent to the machine.
 
         :return:
@@ -104,35 +122,63 @@ class AbstractBufferReceivablePartitionedVertex(object):
         if space_used + space_header + packet.length + packet.element_size >= space_available:
             return send_requests
 
-        while space_available > space_used + space_header + packet.length:
-
-            # if there is no more space in the packet and/or if there are no
-            # more entries for the same timestamp queue the packet, and create
-            # a new one(if there is space), or return the current list of
-            # packets
+        terminate = 0
+        while not terminate:
             available_count = packet.get_available_count()
             more_elements = self._buffers_to_send_collection.is_more_elements_for_timestamp(region_id, timestamp)
-            if (available_count == 0 or not more_elements or space_available < space_used + space_header + packet.length + packet.element_size):
-                space_used += packet.length + space_header
-                send_requests.append(packet)
+            space_going_to_be_used = space_used + space_header + packet.length + packet.element_size
 
-                # check if there are more packets to be sent
-                if not self._buffers_to_send_collection.is_region_empty(region_id):
+            if available_count > 0 and more_elements and space_available > space_going_to_be_used:
+                event = self._buffers_to_send_collection.get_next_element(region_id)
+                packet.insert_key(event.entry)
+            else:
+                send_requests.append(packet)
+                space_used += packet.length + space_header
+
+                space_going_to_be_used = space_used + space_header + EIEIO32BitTimedPayloadPrefixDataPacket.get_min_packet_length()
+                region_is_empty = self._buffers_to_send_collection.is_region_empty(region_id)
+
+                if len(send_requests) < max_number_of_new_packets and not region_is_empty and space_available > space_going_to_be_used:
                     timestamp = self._buffers_to_send_collection.get_next_timestamp(region_id)
                     packet = EIEIO32BitTimedPayloadPrefixDataPacket(timestamp)
-
-                    # check if there is enough space for a new packet with at least one element
-                    if (space_used + space_header + packet.length + packet.element_size >= space_available):
-                        return send_requests
-
-                # if there are no more events to be sent
                 else:
-                    return send_requests
-
-            event = self._buffers_to_send_collection.get_next_element(region_id)
-            packet.insert_key(event.entry)
+                    terminate = 1
 
         return send_requests
+
+        # while (space_available > space_used + space_header + packet.element_size + packet.length and len(send_requests) < max_number_of_new_packets):
+        #
+        #     # if there is no more space in the packet and/or if there are no
+        #     # more entries for the same timestamp queue the packet, and create
+        #     # a new one(if there is space), or return the current list of
+        #     # packets
+        #     available_count = packet.get_available_count()
+        #     more_elements = self._buffers_to_send_collection.is_more_elements_for_timestamp(region_id, timestamp)
+        #     # if (available_count == 0 or not more_elements or space_available < space_used + space_header + packet.length + packet.element_size):
+        #     if available_count == 0 or not more_elements:
+        #         space_used += packet.length + space_header
+        #         send_requests.append(packet)
+        #
+        #         # check if there are more packets to be sent
+        #         if not self._buffers_to_send_collection.is_region_empty(region_id):
+        #             timestamp = self._buffers_to_send_collection.get_next_timestamp(region_id)
+        #             packet = EIEIO32BitTimedPayloadPrefixDataPacket(timestamp)
+        #
+        #             # check if there is enough space for a new packet with at least one element
+        #             if (space_used + space_header + packet.length + packet.element_size >= space_available):
+        #                 return send_requests
+        #
+        #         # if there are no more events to be sent
+        #         else:
+        #             return send_requests
+        #
+        #     event = self._buffers_to_send_collection.get_next_element(region_id)
+        #     packet.insert_key(event.entry)
+        #
+        # if len(send_requests) < max_number_of_new_packets:
+        #     space_used += packet.length + space_header
+        #     send_requests.append(packet)
+        # return send_requests
 
     #     buffer_keys = list(buffers.keys())
     #     position_in_buffer = 0

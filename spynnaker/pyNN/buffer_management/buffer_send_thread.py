@@ -62,14 +62,14 @@ class BufferSendThread(threading.Thread):
         while not self._done:
             self._queue_condition.acquire()
             while len(self._queue) == 0 and not self._done:
-                print "about to wait"
+                # print "about to wait"
                 self._queue_condition.wait()
-            print "finished waiting"
+            # print "finished waiting"
             request = None
             if not self._done:
                 request = self._queue.pop()
             self._queue_condition.release()
-            print "outside conditions", request
+            # print "outside conditions", request
             if request is not None:
                 self._handle_request(request)
         self._queue.append(None)

@@ -119,6 +119,40 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
                 else:
                     yield key
 
+    @staticmethod
+    def get_min_length(type_param, tag_param=0, prefix_param=None,
+                       payload_base=None, prefix_type=None, is_time=False):
+        length = 2  # header size
+
+        if prefix_param is not None:
+            length += 2
+
+        if payload_base is not None:
+            if type_param == EIEIOTypeParam.KEY_PAYLOAD_16_BIT \
+                    or type_param == EIEIOTypeParam.KEY_16_BIT:
+                length += 2
+            else:
+                length += 4
+
+        if type_param == EIEIOTypeParam.KEY_16_BIT:
+            length += 2
+        elif type_param == EIEIOTypeParam.KEY_PAYLOAD_16_BIT:
+            length += 4
+        elif type_param == EIEIOTypeParam.KEY_32_BIT:
+            length += 4
+        elif type_param == EIEIOTypeParam.KEY_PAYLOAD_32_BIT:
+            length += 8
+        else:
+            raise spinnman_exceptions.SpinnmanInvalidPacketException(
+                "variable type_param", "unknown type")
+
+        return length
+
+    @staticmethod
+    @abstractmethod
+    def get_min_packet_length():
+        pass
+
     @property
     def length(self):
         return self._length

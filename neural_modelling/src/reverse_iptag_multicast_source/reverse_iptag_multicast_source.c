@@ -107,7 +107,7 @@ void print_packet_bytes(eieio_msg_t eieio_msg_ptr, uint16_t length)
   uint8_t *ptr = (uint8_t *) eieio_msg_ptr;
   uint16_t i = 0;
 
-  io_printf(IO_BUF, "received packet bytes: %d - full eieio packet:", length);
+  io_printf(IO_BUF, "packet bytes: %d - full eieio packet:", length);
 
   for (i=0; i<length; i++)
   {
@@ -243,6 +243,8 @@ void timer_callback (uint unused0, uint unused1)
     return;
   }
 
+  io_printf(IO_BUF, "timer_callback, current time: %d, next packet buffer time: %d\n", time, next_buffer_time);
+
   if (send_packet_reqs || send_ack_last_state)
     send_buffer_request_pkt();
 
@@ -306,8 +308,6 @@ uint32_t check_sdram_buffer_space_available(void)
     uint32_t initial_space = read_ptr_value - buffer_region_value;
 
     return_value = final_space + initial_space;
-    if (return_value < MIN_BUFFER_SPACE)
-      return_value = 0;
 
     // if (final_space < 10 && initial_space < 10)
     //   return_value = 0;
@@ -320,11 +320,11 @@ uint32_t check_sdram_buffer_space_available(void)
   {
     uint32_t middle_space = read_ptr_value - write_ptr_value;
 
-    if (middle_space < MIN_BUFFER_SPACE)
-      return_value = 0;
-    else
-      return_value = middle_space;
+    return_value = middle_space;
   }
+  // read pointer and write pointer are equal, therefore either the memory
+  // is completely full or completely empty, depending on the last operation
+  // performed
   else
     if (last_buffer_operation == BUFFER_OPERATION_WRITE)
       return_value = 0;
@@ -442,8 +442,9 @@ void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
 void send_buffer_request_pkt(void)
 {
   uint32_t space = check_sdram_buffer_space_available();
-  if (space > 0 && space != last_space)
+  if (space > MIN_BUFFER_SPACE && space != last_space)
   {
+    io_printf(IO_BUF, "sending request packet with space: %d and seq_no: %d\n", space, pkt_fsm);
     last_space = space;
     req_ptr -> sequence |= pkt_fsm;
     req_ptr -> space_available = space;
@@ -510,9 +511,9 @@ bool parse_event_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
   }
   else
   {
-    io_printf(IO_BUF, "add_eieio_packet_to_sdram - ");
+    io_printf(IO_BUF, "add_eieio_packet_to_sdram\n");
     bool ret_value = add_eieio_packet_to_sdram(eieio_msg_ptr);
-    io_printf(IO_BUF, "return value: %d\n", ret_value);
+    io_printf(IO_BUF, "add_eieio_packet_to_sdram return value: %d\n", ret_value);
     return ret_value;
   }
 }
@@ -545,19 +546,28 @@ void fetch_and_process_packet(void)
         read_pointer = buffer_region;
     }
 
-    void *src_ptr = (void *) read_pointer;
-    void *dst_ptr = (void *) msg_from_sdram;
+    uint8_t *src_ptr = (uint8_t *) read_pointer;
+    uint8_t *dst_ptr = (uint8_t *) msg_from_sdram;
     uint32_t len = calculate_eieio_packet_size((eieio_msg_t) read_pointer);
     uint32_t final_space = (end_of_buffer_region - read_pointer);
+
+    io_printf(IO_BUF, "packet with length %d, from address: %08x\n", len, (uint32_t) src_ptr);
+
     if (len > final_space)
     {
       uint32_t remaining_len = len - final_space;
+
+      io_printf (IO_BUF, "split packet\n");
+      io_printf (IO_BUF, "1 - reading packet to %08x from %08x length: %d\n", (uint32_t)dst_ptr, (uint32_t)src_ptr, final_space);
       spin1_memcpy(dst_ptr, src_ptr, final_space);
+      io_printf (IO_BUF, "2 - reading packet to %08x from %08x length: %d\n", (uint32_t)(dst_ptr + final_space), (uint32_t)buffer_region, remaining_len);
       spin1_memcpy((dst_ptr + final_space), buffer_region, remaining_len);
       read_pointer = buffer_region + remaining_len;
     }
     else
     {
+      io_printf (IO_BUF, "full packet\n");
+      io_printf (IO_BUF, "1 - reading packet to %08x from %08x length: %d\n", (uint32_t)dst_ptr, (uint32_t)src_ptr, len);
       spin1_memcpy (dst_ptr, src_ptr, len);
       read_pointer += len;
       if (read_pointer >= end_of_buffer_region)
@@ -566,6 +576,7 @@ void fetch_and_process_packet(void)
     last_buffer_operation = BUFFER_OPERATION_READ;
     msg_from_sdram_in_use = 1;
 
+    print_packet_bytes(msg_from_sdram, len);
 
     next_buffer_time = extract_time_from_eieio_msg(msg_from_sdram);
     io_printf (IO_BUF, "packet time: %d\n", next_buffer_time);
@@ -582,36 +593,44 @@ void fetch_and_process_packet(void)
 bool add_eieio_packet_to_sdram(eieio_msg_t eieio_msg_ptr)
 {
   uint32_t len = calculate_eieio_packet_size(eieio_msg_ptr);
-  uint32_t buffer_region_value = (uint32_t) buffer_region;
-  uint32_t write_ptr_value = (uint32_t) write_pointer;
-  uint32_t read_ptr_value = (uint32_t) read_pointer;
-  uint32_t end_of_buffer_region_value = (uint32_t) end_of_buffer_region;
+  uint8_t *msg_ptr = (uint8_t *) eieio_msg_ptr;
 
   if (len > check_sdram_buffer_space_available())
     return 0;
 
-  if (read_ptr_value < write_ptr_value)
-  {
-    uint32_t final_space = end_of_buffer_region_value - write_ptr_value;
-    uint32_t initial_space = read_ptr_value - buffer_region_value;
+  io_printf (IO_BUF, "add_eieio_packet_to_sdram: enough space available\n");
 
-    if (final_space <= len)
+  if ((read_pointer < write_pointer) || ( read_pointer == write_pointer && last_buffer_operation == BUFFER_OPERATION_READ))
+  {
+    uint32_t final_space = (uint32_t) end_of_buffer_region - (uint32_t) write_pointer;
+    //uint32_t initial_space = read_ptr_value - buffer_region_value;
+
+    if (read_pointer == write_pointer)
+      io_printf (IO_BUF, "pointers equal, last operation read\n");
+
+    io_printf (IO_BUF, "case 1\n");
+
+    if (final_space >= len)
     {
-      spin1_memcpy(write_pointer, eieio_msg_ptr, len);
+      io_printf(IO_BUF, "case 1-1\n");
+      io_printf (IO_BUF, "case 1-1: dest: %08x, source: %08x, len: %d\n", write_pointer, msg_ptr, len);
+      spin1_memcpy(write_pointer, msg_ptr, len);
       write_pointer += len;
       last_buffer_operation = BUFFER_OPERATION_WRITE;
-      if (write_pointer == end_of_buffer_region)
+      if (write_pointer >= end_of_buffer_region)
         write_pointer = buffer_region;
       return 1;
     }
     else
     {
-      uint32_t final_space = end_of_buffer_region_value - write_ptr_value;
+      io_printf(IO_BUF, "case 1-2\n");
       uint32_t final_len = len - final_space;
 
-      spin1_memcpy(write_pointer, eieio_msg_ptr, final_space);
+      io_printf (IO_BUF, "case 1-2: dest: %08x, source: %08x, len: %d\n", write_pointer, msg_ptr, final_space);
+      spin1_memcpy(write_pointer, msg_ptr, final_space);
       write_pointer = buffer_region;
-      spin1_memcpy(write_pointer, (eieio_msg_ptr + final_space), final_len);
+      io_printf (IO_BUF, "case 1-2: dest: %08x, source: %08x, len: %d\n", write_pointer, (msg_ptr + final_space), final_len);
+      spin1_memcpy(write_pointer, (msg_ptr + final_space), final_len);
       write_pointer += final_len;
       last_buffer_operation = BUFFER_OPERATION_WRITE;
       if (write_pointer == end_of_buffer_region)
@@ -619,33 +638,19 @@ bool add_eieio_packet_to_sdram(eieio_msg_t eieio_msg_ptr)
       return 1;
     }
   }
-  else if (write_ptr_value < read_ptr_value)
+  else if (write_pointer < read_pointer)
   {
-    uint32_t middle_space = read_ptr_value - write_ptr_value;
+    uint32_t middle_space = (uint32_t) read_pointer - (uint32_t) write_pointer;
+
+    io_printf (IO_BUF, "case 2\n");
 
     if (middle_space < len)
       return 0;
     else
     {
       //add packet in the middle space
-      spin1_memcpy(write_pointer, eieio_msg_ptr, len);
-      write_pointer += len;
-      last_buffer_operation = BUFFER_OPERATION_WRITE;
-      if (write_pointer == end_of_buffer_region)
-        write_pointer = buffer_region;
-      return 1;
-    }
-  }
-  else
-  // the two pointers may be equal, indicating that either the list
-  // is full or it is empty, depending on the last operation
-  {
-    if (last_buffer_operation == BUFFER_OPERATION_WRITE)
-      return 0;
-    else
-    {
-      //add packet in the space available
-      spin1_memcpy(write_pointer, eieio_msg_ptr, len);
+      io_printf (IO_BUF, "case 3: dest: %08x, source: %08x, len: %d\n", write_pointer, msg_ptr, len);
+      spin1_memcpy(write_pointer, msg_ptr, len);
       write_pointer += len;
       last_buffer_operation = BUFFER_OPERATION_WRITE;
       if (write_pointer == end_of_buffer_region)
@@ -654,6 +659,7 @@ bool add_eieio_packet_to_sdram(eieio_msg_t eieio_msg_ptr)
     }
   }
 
+  io_printf (IO_BUF, "case 4\n");
   return 0;
 }
 

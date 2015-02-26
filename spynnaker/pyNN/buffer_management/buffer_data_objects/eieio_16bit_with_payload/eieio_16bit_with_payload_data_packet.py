@@ -11,3 +11,8 @@ class EIEIO16BitWithPayloadDataPacket(EIEIOWithPayloadDataPacket):
 
         EIEIOWithPayloadDataPacket.__init__(
             self, EIEIOTypeParam.KEY_PAYLOAD_16_BIT, data=data)
+
+    @staticmethod
+    def get_min_packet_length():
+        return EIEIOWithPayloadDataPacket.get_min_length(
+            EIEIOTypeParam.KEY_PAYLOAD_16_BIT)

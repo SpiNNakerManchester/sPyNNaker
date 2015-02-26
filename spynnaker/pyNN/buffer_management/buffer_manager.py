@@ -1,4 +1,5 @@
 import struct
+import threading
 
 from pacman.utilities.progress_bar import ProgressBar
 from spinnman import exceptions as spinnman_exceptions
@@ -37,6 +38,7 @@ class BufferManager(object):
         self._recieve_thread = BufferRecieveThread(transciever)
         self._sender_thread.start()
         self._recieve_thread.start()
+        self._thread_lock = threading.Lock()
 
     @property
     def port(self):
@@ -64,30 +66,37 @@ class BufferManager(object):
         """
         # byte_reader = LittleEndianByteArrayByteReader(message.data)
         # packet = create_class_from_reader(byte_reader)
-        
-        if isinstance(packet, SpinnakerRequestBuffers):
-            key = (packet.x, packet.y, packet.p)
-            if key in self._recieve_vertices.keys():
-                data_requests = \
-                    self._recieve_vertices[key].get_next_set_of_packets(
-                        packet.space_available, packet.region_id,
-                        packet.sequence_no)
-                print "space available: {0:d}, data requests: {1:d}".format(
-                    packet.space_available, len(data_requests))
-                if len(data_requests) != 0:
-                    for buffers in data_requests:
-                        data_request = {'data': buffers,
-                                        'x': packet.x,
-                                        'y': packet.y,
-                                        'p': packet.p}
-                        self._sender_thread.add_request(data_request)
 
-        elif isinstance(packet, SpinnakerRequestReadData):
-            pass
-        else:
-            raise spinnman_exceptions.SpinnmanInvalidPacketException(
-                packet.__class__,
-                "The command packet is invalid for buffer management")
+        with self._thread_lock:
+            if isinstance(packet, SpinnakerRequestBuffers):
+                key = (packet.x, packet.y, packet.p)
+                if key in self._recieve_vertices.keys():
+                    print "received packet sequence: {1:d}, space available: {0:d}".format(
+                        packet.space_available, packet.sequence_no)
+                    data_requests = \
+                        self._recieve_vertices[key].get_next_set_of_packets(
+                            packet.space_available, packet.region_id,
+                            packet.sequence_no)
+                    space_used = 0
+                    for buffers in data_requests:
+                        print "packet to be sent length: {0:d}". format(buffers.length)
+                        space_used += buffers.length
+                    print "received packet sequence: {3:d}, space available: {0:d}, data requests: {1:d}, total length: {2:d}".format(
+                        packet.space_available, len(data_requests), space_used, packet.sequence_no)
+                    if len(data_requests) != 0:
+                        for buffers in data_requests:
+                            data_request = {'data': buffers,
+                                            'x': packet.x,
+                                            'y': packet.y,
+                                            'p': packet.p}
+                            self._sender_thread.add_request(data_request)
+
+            elif isinstance(packet, SpinnakerRequestReadData):
+                pass
+            else:
+                raise spinnman_exceptions.SpinnmanInvalidPacketException(
+                    packet.__class__,
+                    "The command packet is invalid for buffer management")
 
         # # if (message.eieio_command_header.command !=
         # #         spinnman_constants.EIEIO_COMMAND_IDS.BUFFER_MANAGEMENT):
@@ -228,6 +237,7 @@ class BufferManager(object):
         # send each data request
         for data_request in data_requests:
             # write memory to chip
+            print "writing one packet with length {0:d}".format(data_request.length)
             data_to_be_written = data_request.get_eieio_message_as_byte_array()
             self._transciever.write_memory(
                 placement_of_partitioned_vertex.x,
@@ -240,6 +250,7 @@ class BufferManager(object):
         length_to_be_padded = region_size - space_used
         padding_packet = PaddingRequest(length_to_be_padded)
         padding_packet_bytes = padding_packet.get_eieio_message_as_byte_array()
+        print "writing padding with length {0:d}".format(len(padding_packet_bytes))
         self._transciever.write_memory(
             placement_of_partitioned_vertex.x,
             placement_of_partitioned_vertex.y,

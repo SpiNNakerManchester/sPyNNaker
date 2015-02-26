@@ -13,7 +13,7 @@ class BufferedSendingRegion(object):
         self._read_position_in_region = 0
         self._region_size = None
         self._region_base_address = None
-        self._sequence_number = 0
+        self._sequence_number = spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE - 1
 
     def add_entry_to_buffer(self, buffer_key, data_piece):
         if buffer_key not in self.buffer.keys():
@@ -72,9 +72,9 @@ class BufferedSendingRegion(object):
         return value
 
     def get_next_sequence_no(self):
-        next_seq_no = self._sequence_number
-        self._sequence_number = (self._sequence_number + 1) % 256
-        return next_seq_no
+        self._sequence_number = ((self._sequence_number + 1) %
+                                 spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE)
+        return self._sequence_number
 
     @staticmethod
     def _memory_required_for_buffer(packet_buffer):
@@ -82,6 +82,10 @@ class BufferedSendingRegion(object):
             constants.TIMESTAMP_SPACE_REQUIREMENT
         memory_used += len(packet_buffer) * constants.KEY_SIZE
         return memory_used
+
+    @property
+    def sequence_number(self):
+        return self._sequence_number
 
     @property
     def position_in_region(self):
