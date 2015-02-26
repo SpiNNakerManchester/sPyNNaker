@@ -139,7 +139,8 @@ class DataBaseInterface(object):
             "machine_id))")
         cur.execute(
             "CREATE TABLE Routing_info("
-            "edge_id INTEGER PRIMARY KEY, key INT, mask INT, "
+            "edge_id INTEGER, key INT, mask INT, "
+            "PRIMARY KEY (edge_id, key, mask), "
             "FOREIGN KEY (edge_id) REFERENCES Partitioned_edges(edge_id))")
         cur.execute(
             "CREATE TABLE Routing_table("
@@ -457,13 +458,15 @@ class DataBaseInterface(object):
             connection = sqlite.connect(self._database_address)
             cur = connection.cursor()
             sub_edges = list(partitioned_graph.subedges)
+            data = routing_infos.all_subedge_info
             for routing_info in routing_infos.all_subedge_info:
-                cur.execute(
-                    "INSERT INTO Routing_info("
-                    "edge_id, key, mask) "
-                    "VALUES({}, {}, {})"
-                    .format(sub_edges.index(routing_info.subedge) + 1,
-                            routing_info.key, routing_info.mask))
+                for key_mask in routing_info.keys_and_masks:
+                    cur.execute(
+                        "INSERT INTO Routing_info("
+                        "edge_id, key, mask) "
+                        "VALUES({}, {}, {})"
+                        .format(sub_edges.index(routing_info.subedge) + 1,
+                                key_mask.key, key_mask.mask))
             connection.commit()
             connection.close()
             self._lock_condition.release()

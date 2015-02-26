@@ -1,3 +1,4 @@
+from pacman.model.routing_info.key_and_mask import KeyAndMask
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
     AbstractMultiCastSource
@@ -40,12 +41,13 @@ class CommandSender(AbstractMultiCastSource,
                 placement.x, placement.y, placement.p, hostname, report_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
-        self._write_basic_setup_info(spec, CommandSender.CORE_APP_IDENTIFER)
-
-        spec.comment("\n*** Spec for multi case source ***\n\n")
 
         # reserve regions
         self.reserve_memory_regions(spec, self._memory_requirements)
+
+        self._write_basic_setup_info(spec, CommandSender.CORE_APP_IDENTIFER)
+
+        spec.comment("\n*** Spec for multi case source ***\n\n")
 
         # write system region
         spec.switch_write_focus(region=self.SYSTEM_REGION)
@@ -60,6 +62,15 @@ class CommandSender(AbstractMultiCastSource,
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
+
+    def _write_basic_setup_info(self, spec, core_app_identifier):
+
+        # Write this to the system region (to be picked up by the simulation):
+        spec.switch_write_focus(
+            region=constants.POPULATION_BASED_REGIONS.SYSTEM.value)
+        spec.write_value(data=core_app_identifier)
+        spec.write_value(data=self._machine_time_step * self._timescale_factor)
+        spec.write_value(data=self._no_machine_time_steps + 1)
 
     def _calculate_memory_requirements(self):
 
@@ -139,7 +150,10 @@ class CommandSender(AbstractMultiCastSource,
         # write each command
         for command in commands_in_same_time_slot:
             if counter_messages < payload_mesages:
-                self._writes.append(command['key'])
+                if command['key'] == -1:
+                    self._writes.append(self._no_machine_time_steps)
+                else:
+                    self._writes.append(command['key'])
                 self._writes.append(command['payload'])
                 if command['repeat'] > 0:
                     command_line = (command['repeat'] << 8) | command['delay']
@@ -165,8 +179,8 @@ class CommandSender(AbstractMultiCastSource,
         edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
             partitioned_edge)
         if edge in self._edge_map:
-            (key, mask) = self._edge_map[edge]
-            return key, mask
+            key, mask = self._edge_map[edge]
+            return [KeyAndMask(key, mask)]
         else:
             # if the subedge doesnt have any predefined messages to send,
             # then it shouldn't be here!

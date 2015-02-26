@@ -41,5 +41,5 @@ class AbstractSendMeMulticastCommandsVertex(object):
         return self._commands_mask
 
     @abstractmethod
-    def sends_multicast_commands(self):
+    def recieves_multicast_commands(self):
         pass

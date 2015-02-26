@@ -12,7 +12,11 @@ class AbstractVertexWithEdgeToDependentVertices(object):
     def __init__(self, dependent_vertices):
         """
 
-        :param dependent_vertex: The vertex which this vertex depends upon
+        :param dependent_vertices: The vertex which this vertex depends upon
+        :type dependent_vertices: iterable of vertices
+        :return: None
+        :rtype: None
+        :raise None: this method does not raise any knwon exception
         """
         self._dependent_vertices = dependent_vertices
 

@@ -43,7 +43,6 @@ class SpynnakerConfiguration(object):
         # main objects
         self._partitionable_graph = PartitionableGraph(label=graph_label)
         self._partitioned_graph = None
-        self._key_register = None
         self._graph_mapper = None
         self._no_machine_time_steps = None
         self._placements = None

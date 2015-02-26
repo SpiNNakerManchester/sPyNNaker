@@ -1,8 +1,3 @@
-import logging
-import math
-
-import numpy
-
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 
@@ -20,6 +15,11 @@ from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge 
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
+
+import logging
+import math
+import numpy
+
 
 logger = logging.getLogger(__name__)
 

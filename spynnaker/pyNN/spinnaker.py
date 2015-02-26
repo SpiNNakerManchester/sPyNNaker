@@ -165,7 +165,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     "a factional number of machine runable time steps and "
                     "therefore spinnaker cannot determine how many to run for")
             for vertex in self._partitionable_graph.vertices:
-                vertex.set_no_machine_time_steps(self._no_machine_time_steps)
+                if isinstance(vertex, AbstractDataSpecableVertex):
+                    vertex.set_no_machine_time_steps(
+                        self._no_machine_time_steps)
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may"
@@ -482,8 +484,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                                     "the key 0xFFFFF800")
                     edge.add_constraint(KeyAllocatorFixedKeyAndMaskConstraint(
                         keys_and_masks))
+
             if isinstance(vertex, AbstractProvidesFixedMaskVertex):
-                fixed_mask = vertex.get_fixed_mask_for_patitioned_edge(
+                fixed_mask = vertex.get_fixed_mask_for_partitioned_edge(
                     edge, self._graph_mapper)
                 if fixed_mask is not None:
                     if needs_fixed_mask and fixed_mask != 0xFFFFF800:
@@ -522,8 +525,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if (pacman_report_state is not None and
                 pacman_report_state.routing_info_report):
             pacman_reports.routing_info_reports(
-                self._report_default_directory, self._hostname,
-                self._partitioned_graph, self._placements, self._routing_infos)
+                self._report_default_directory, self._partitioned_graph,
+                self._routing_infos)
 
     def _execute_router(self, pacman_report_state):
         # set up a default placer algorithm if none are specified
@@ -766,7 +769,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def stop(self, app_id, stop_on_board=True):
         if stop_on_board:
             for router_table in self._router_tables.routing_tables:
-                if len(router_table.multicast_routing_entries) > 0:
+                if (not self._machine.get_chip_at(router_table.x,
+                                                  router_table.y).virtual
+                        and len(router_table.multicast_routing_entries) > 0):
                     self._txrx.clear_multicast_routes(router_table.x,
                                                       router_table.y)
                     self._txrx.clear_router_diagnostic_counters(router_table.x,

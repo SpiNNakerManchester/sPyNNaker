@@ -3,20 +3,19 @@ from spynnaker.pyNN.models.spike_source.abstract_spike_source import \
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions import \
     generate_parameter
+from spynnaker.pyNN import exceptions
 
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 
-from spynnaker.pyNN import exceptions
-
 
 from math import exp, ceil
 from enum import Enum
 import numpy
-
 import logging
 from data_specification.enums.data_type import DataType
+
 logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 0.25

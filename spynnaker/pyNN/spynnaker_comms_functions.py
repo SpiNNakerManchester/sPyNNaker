@@ -431,20 +431,22 @@ class SpynnakerCommsFunctions(object):
         # load each router table thats needed for the application to run into
         # the chips sdram
         for router_table in router_tables.routing_tables:
-            self._txrx.clear_multicast_routes(router_table.x,
-                                              router_table.y)
-            self._txrx.clear_router_diagnostic_counters(router_table.x,
-                                                        router_table.y)
+            if not self._machine.get_chip_at(router_table.x,
+                                             router_table.y).virtual:
+                self._txrx.clear_multicast_routes(router_table.x,
+                                                  router_table.y)
+                self._txrx.clear_router_diagnostic_counters(router_table.x,
+                                                            router_table.y)
 
-            if len(router_table.multicast_routing_entries) > 0:
-                self._txrx.load_multicast_routes(
-                    router_table.x, router_table.y,
-                    router_table.multicast_routing_entries, app_id=app_id)
-                if self._reports_states.transciever_report:
-                    binary_folder = conf.config.get("SpecGeneration",
-                                                    "Binary_folder")
-                    reports.re_load_script_load_routing_tables(
-                        router_table, binary_folder, app_id)
+                if len(router_table.multicast_routing_entries) > 0:
+                    self._txrx.load_multicast_routes(
+                        router_table.x, router_table.y,
+                        router_table.multicast_routing_entries, app_id=app_id)
+                    if self._reports_states.transciever_report:
+                        binary_folder = conf.config.get("SpecGeneration",
+                                                        "Binary_folder")
+                        reports.re_load_script_load_routing_tables(
+                            router_table, binary_folder, app_id)
             progress_bar.update()
         progress_bar.end()
 

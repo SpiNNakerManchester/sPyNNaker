@@ -6,7 +6,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_reverse_iptagable_vertex import \
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_reverse_iptagable_vertex import \
     AbstractReverseIPTagableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -30,7 +31,7 @@ class AbstractSpikeInjector(
         AbstractPartitionableVertex.__init__(
             self, label="multi_cast_source_sender", n_atoms=1,
             max_atoms_per_core=1)
-        AbstractReverseIPTagableVertex.__init__(self, tag, port, address)
+        AbstractReverseIPTagableVertex.__init__(self, tag, port)
 
     def is_reverse_ip_tagable_vertex(self):
         return True
