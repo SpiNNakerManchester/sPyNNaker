@@ -14,6 +14,7 @@ class BufferedSendingRegion(object):
         self._region_size = None
         self._region_base_address = None
         self._sequence_number = spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE - 1
+        self._last_received_sequence_number = spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE - 1
 
     def add_entry_to_buffer(self, buffer_key, data_piece):
         if buffer_key not in self.buffer.keys():
@@ -47,7 +48,10 @@ class BufferedSendingRegion(object):
             % self._region_size
 
     def get_next_timestamp(self):
-        return self._buffer.items()[0][0]
+        if not self.is_region_empty():
+            return self._buffer.items()[0][0]
+        else:
+            return None
 
     def is_region_empty(self):
         """ checks if the region is empty based from the last timer tic given
@@ -75,6 +79,20 @@ class BufferedSendingRegion(object):
         self._sequence_number = ((self._sequence_number + 1) %
                                  spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE)
         return self._sequence_number
+
+    def check_sequence_number(self, sequence_no):
+        min_seq_no_acceptable = self._last_received_sequence_number
+        max_seq_no_acceptable = (min_seq_no_acceptable + spinnman_constants.MAX_BUFFER_HISTORY) % spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE
+
+        if min_seq_no_acceptable <= sequence_no <= max_seq_no_acceptable:
+            self._last_received_sequence_number = sequence_no
+            return True
+        elif max_seq_no_acceptable < min_seq_no_acceptable:
+            if 0 <= sequence_no <= max_seq_no_acceptable or min_seq_no_acceptable <= sequence_no <= spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE:
+                self._last_received_sequence_number = sequence_no
+                return True
+            else:
+                return False
 
     @staticmethod
     def _memory_required_for_buffer(packet_buffer):

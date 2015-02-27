@@ -1,5 +1,6 @@
 import struct
 import threading
+import time
 
 from pacman.utilities.progress_bar import ProgressBar
 from spinnman import exceptions as spinnman_exceptions

@@ -234,6 +234,8 @@ void timer_callback (uint unused0, uint unused1)
   use(unused1);
   time++;
 
+  io_printf(IO_BUF, "timer_callback, final time: %d, timer period: %d, current time: %d, next packet buffer time: %d\n", simulation_ticks, timer_period,  time, next_buffer_time);
+
   if ((simulation_ticks != UINT32_MAX)
     && (time >= simulation_ticks + timer_period))
   {
@@ -242,8 +244,6 @@ void timer_callback (uint unused0, uint unused1)
     spin1_exit(0);
     return;
   }
-
-  io_printf(IO_BUF, "timer_callback, current time: %d, next packet buffer time: %d\n", time, next_buffer_time);
 
   if (send_packet_reqs || send_ack_last_state)
     send_buffer_request_pkt();
@@ -369,6 +369,7 @@ void parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
       break;
     case EVENT_STOP:
       time = simulation_ticks + timer_period;
+      io_printf (IO_BUF, "stopping application - time: %d\n", time);
       break;
     default:
       break;
@@ -379,6 +380,7 @@ void parse_stop_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   use(eieio_msg_ptr);
   use(length);
+  io_printf (IO_BUF, "Stopping packet requests - parse_stop_packet_reqs\n");
   send_packet_reqs = 0;
 }
 
@@ -386,6 +388,7 @@ void parse_start_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   use(eieio_msg_ptr);
   use(length);
+  io_printf (IO_BUF, "Starting packet requests - parse_start_packet_reqs\n");
   send_packet_reqs = 1;
 }
 

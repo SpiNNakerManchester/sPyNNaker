@@ -1,4 +1,3 @@
-# from collections import deque
 from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data import \
     HostSendSequencedData
 from spinnman import constants as spinnman_constants
@@ -19,6 +18,9 @@ class BuffersSentDeque(object):
                 self.add_packet(packet)
 
     def remove_packets_in_seq_no_interval(self, min_seq_no, max_seq_no):
+        if self.is_empty():
+            return
+
         packet_set = range(len(self._buffers_sent) - 1, -1, -1)
         print "removing packets from seq_no {0:d} to seq_no {1:d}".format(min_seq_no, max_seq_no)
         print "range: ", packet_set

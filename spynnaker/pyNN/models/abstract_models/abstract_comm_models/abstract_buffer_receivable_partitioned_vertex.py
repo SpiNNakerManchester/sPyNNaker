@@ -9,6 +9,8 @@ from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data i
 from spynnaker.pyNN.buffer_management.command_objects.event_stop_request \
     import EventStopRequest
 from spinnman import constants as spinnman_constants
+from spynnaker.pyNN.buffer_management.command_objects.stop_requests import \
+    StopRequests
 
 
 @add_metaclass(ABCMeta)
@@ -44,8 +46,15 @@ class AbstractBufferReceivablePartitionedVertex(object):
             raise  # error: region not managed asked for managed packets
 
         send_requests = list()
-        if not self._buffers_to_send_collection.is_region_empty(region_id):
 
+        if sequence_no is not None:
+            check_value = self._buffers_to_send_collection.check_sequence_number(
+                region_id, sequence_no)
+            print "sequence number {0:d}, check_value {1:d}".format(sequence_no, check_value)
+            if not check_value:
+                return send_requests
+
+        if not self._buffers_to_send_collection.is_region_empty(region_id):
             if sequence_no is not None:
                 max_seq_no = sequence_no
                 min_seq_no = (max_seq_no - spinnman_constants.MAX_BUFFER_HISTORY) % spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE
@@ -73,7 +82,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
             print "historical packets: {0:d}, length: {1:d}, space available: {2:d}".format(len(send_requests), used_space, space_available)
             space_available -= used_space
             number_of_historical_packets = len(send_requests)
-            max_number_of_new_packets = spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE - number_of_historical_packets
+            max_number_of_new_packets = spinnman_constants.MAX_BUFFER_HISTORY - number_of_historical_packets
 
             # get next set of packets to send
             new_buffers_to_send = self._generate_buffers_for_transmission(
@@ -98,8 +107,12 @@ class AbstractBufferReceivablePartitionedVertex(object):
         # if the region has no more buffers to transmit, stop requests
         # coming from the machine
         else:
-            request = EventStopRequest()
+            request = StopRequests()
             send_requests.append(request)
+            request = EventStopRequest()
+            sequenced_request = self._add_host_send_sequenced_data_header(request, region_id)
+            self._buffers_to_send_collection.add_sent_packets(sequenced_request, region_id)
+            send_requests.append(sequenced_request)
             return send_requests
 
     def _generate_buffers_for_transmission(self, space_available, max_number_of_new_packets, region_id, sequence_no):
@@ -107,16 +120,26 @@ class AbstractBufferReceivablePartitionedVertex(object):
 
         :return:
         """
-        space_used = 0
         send_requests = list()
+        region_is_empty = self._buffers_to_send_collection.is_region_empty(region_id)
+
+        if region_is_empty or max_number_of_new_packets <= 0:
+            return send_requests
+
         timestamp = self._buffers_to_send_collection.get_next_timestamp(
             region_id)
+
+        if timestamp is None:
+            return send_requests
+
         packet = EIEIO32BitTimedPayloadPrefixDataPacket(timestamp)
 
         if sequence_no is not None:
             space_header = HostSendSequencedData.get_header_size()
         else:
             space_header = 0
+
+        space_used = 0
 
         # check if there is enough space for a new packet
         if space_used + space_header + packet.length + packet.element_size >= space_available:

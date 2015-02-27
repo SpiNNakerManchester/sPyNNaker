@@ -212,6 +212,9 @@ class BufferCollection(object):
             value = self._buffers_to_use[region_id].sequence_number
         return value
 
+    def check_sequence_number(self, region_id, sequence_no):
+        return self._buffers_to_use[region_id].check_sequence_number(sequence_no)
+
     # def get_region_absolute_region_address(self, region_id):
     #     """gets the regions absolute region address
     #
