@@ -48,9 +48,9 @@ bool multicast_source_data_filled(address_t base_address);
 bool system_load_dtcm(void);
 void timer_callback (uint unused0, uint unused1);
 void sdp_packet_callback(uint mailbox, uint port);
-void packet_handler_selector(eieio_msg_t eieio_msg_ptr, uint16_t length);
+bool packet_handler_selector(eieio_msg_t eieio_msg_ptr, uint16_t length);
 bool parse_event_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length);
-void parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length);
+bool parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length);
 void parse_stop_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length);
 void parse_start_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length);
 void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length);
@@ -59,6 +59,8 @@ void send_buffer_request_pkt(void);
 uint32_t check_sdram_buffer_space_available(void);
 bool check_eieio_packets_available(void);
 uint16_t calculate_eieio_packet_size(eieio_msg_t eieio_msg_ptr);
+uint16_t calculate_eieio_packet_event_size(eieio_msg_t eieio_msg_ptr);
+uint16_t calculate_eieio_packet_command_size(eieio_msg_t eieio_msg_ptr);
 void fetch_and_process_packet(void);
 bool add_eieio_packet_to_sdram(eieio_msg_t eieio_msg_ptr);
 uint32_t extract_time_from_eieio_msg(eieio_msg_t eieio_msg_ptr);
@@ -276,16 +278,26 @@ void sdp_packet_callback(uint mailbox, uint port)
   spin1_msg_free(msg);
 }
 
-void packet_handler_selector(eieio_msg_t eieio_msg_ptr, uint16_t length)
+bool packet_handler_selector(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
-  uint16_t data_hdr_value = eieio_msg_ptr[0];
-  bool pkt_apply_prefix = (bool) (data_hdr_value >> 15);
-  bool pkt_mode = (bool) (data_hdr_value >> 14);
+  io_printf (IO_BUF, "packet_handler_selector\n");
 
-  if (pkt_apply_prefix == 0 && pkt_mode == 1)
-    parse_command_pkt(eieio_msg_ptr, length);
+  uint16_t data_hdr_value = eieio_msg_ptr[0];
+  //bool pkt_apply_prefix = (bool) (data_hdr_value >> 15);
+  //bool pkt_mode = (bool) (data_hdr_value >> 14);
+  uint8_t pkt_type = (data_hdr_value >> 14) && 0x03;
+
+  //if (pkt_apply_prefix == 0 && pkt_mode == 1)
+  if (pkt_type == 0x01)
+  {
+    io_printf (IO_BUF, "parsing a command packet\n");
+    return parse_command_pkt(eieio_msg_ptr, length);
+  }
   else
-    parse_event_pkt(eieio_msg_ptr, length);
+  {
+    io_printf (IO_BUF, "parsing an event packet\n");
+    return parse_event_pkt(eieio_msg_ptr, length);
+  }
 }
 
 //Utility functions
@@ -351,7 +363,7 @@ bool check_eieio_packets_available(void)
     return 0;
 }
 
-void parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
+bool parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
 {
   uint16_t data_hdr_value = eieio_msg_ptr[0];
   uint16_t pkt_command = data_hdr_value & (~0xC000);
@@ -359,21 +371,25 @@ void parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
   switch (pkt_command)
   {
     case HOST_SEND_SEQUENCED_DATA:
+      io_printf (IO_BUF, "HOST_SEND_SEQUENCED_DATA\n", time);
       parse_sequenced_eieio_pkt(eieio_msg_ptr, length);
       break;
     case STOP_SENDING_REQUESTS:
+      io_printf (IO_BUF, "STOP_SENDING_REQUESTS\n", time);
       parse_stop_packet_reqs(eieio_msg_ptr, length);
       break;
     case START_SENDING_REQUESTS:
+      io_printf (IO_BUF, "START_SENDING_REQUESTS\n", time);
       parse_start_packet_reqs(eieio_msg_ptr, length);
       break;
     case EVENT_STOP:
       time = simulation_ticks + timer_period;
-      io_printf (IO_BUF, "stopping application - time: %d\n", time);
+      io_printf (IO_BUF, "EVENT_STOP - stopping application - time: %d\n", time);
       break;
     default:
       break;
   }
+  return 1;
 }
 
 void parse_stop_packet_reqs(eieio_msg_t eieio_msg_ptr, uint16_t length)
@@ -415,7 +431,7 @@ void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
   uint16_t region_id = sequence_value_region_id & 0xFF; //remember little-endian vs big endian!!!
   uint16_t sequence_value = (sequence_value_region_id >> 8) & 0xFF;
   uint8_t next_state_fsm = (pkt_fsm + 1) & LARGEST_FSM_STATE;
-  eieio_msg_t eieio_event_pkt = &eieio_msg_ptr[2];
+  eieio_msg_t eieio_content_pkt = &eieio_msg_ptr[2];
 
   if (region_id != BUFFER_REGION)
   {
@@ -430,13 +446,16 @@ void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
   {
     //parse_event_pkt returns false in case there is an error and the packet
     //is dropped (i.e. as it was never received)
-    if (parse_event_pkt(eieio_event_pkt, length))
+    io_printf(IO_BUF, "add_eieio_packet_to_sdram\n");
+    bool ret_value = add_eieio_packet_to_sdram(eieio_content_pkt);
+    io_printf(IO_BUF, "add_eieio_packet_to_sdram return value: %d\n", ret_value);
+    if (ret_value)
     {
       pkt_fsm = next_state_fsm;
     }
     else
     {
-      io_printf(IO_BUF, "received sequenced eieio packet containing invalid data.\n", region_id);
+      io_printf(IO_BUF, "unable to buffer sequenced data packet.\n");
       signal_software_error(eieio_msg_ptr, length);
     }
   }
@@ -458,6 +477,70 @@ void send_buffer_request_pkt(void)
 }
 
 uint16_t calculate_eieio_packet_size(eieio_msg_t eieio_msg_ptr)
+{
+  uint16_t data_hdr_value = eieio_msg_ptr[0];
+  uint8_t pkt_type = (data_hdr_value >> 14) && 0x03;
+  
+  if (pkt_type == 0x01)
+  {
+    io_printf (IO_BUF, "calculating size of a command packet\n");
+    return calculate_eieio_packet_command_size(eieio_msg_ptr);
+  }
+  else
+  {
+    io_printf (IO_BUF, "calculating size of an event packet\n");
+    return calculate_eieio_packet_event_size(eieio_msg_ptr);
+  }
+}
+
+uint16_t calculate_eieio_packet_command_size(eieio_msg_t eieio_msg_ptr)
+{
+  uint16_t data_hdr_value = eieio_msg_ptr[0];
+  uint16_t command_number = data_hdr_value & ~0xC000;
+  
+  uint16_t return_value;
+  
+  switch (command_number)
+  {
+    case DATABASE_CONFIRMATION:         // Database handshake with visualiser
+        return_value = 2;
+        break;
+    case EVENT_PADDING:                 // Fill in buffer area with padding
+        return_value = 2;
+        break;
+    case EVENT_STOP:                    // End of all buffers, stop execution
+        return_value = 2;
+        break;
+    case STOP_SENDING_REQUESTS:         // Stop complaining that there is sdram free space for buffers
+        return_value = 2;
+        break;
+    case START_SENDING_REQUESTS:        // Start complaining that there is sdram free space for buffers
+        return_value = 2;
+        break;
+    case SPINNAKER_REQUEST_BUFFERS:     // Spinnaker requesting new buffers for spike source population
+        //this should be handled as an error
+        return_value = 12;
+        break;
+    case HOST_SEND_SEQUENCED_DATA:      // Buffers being sent from host to SpiNNaker
+        //this should be handled as an error
+        return_value = 4; //does not include the eieio packet payload
+        break;
+    case SPINNAKER_REQUEST_READ_DATA:   // Buffers available to be read from a buffered out vertex
+        //this should be handled as an error
+        return_value = 16;
+        break;
+    case HOST_DATA_READ:                // Host confirming data being read form SpiNNaker memory
+        return_value = 8;
+        break;
+    default:
+        return_value = 0;
+        break;
+  }
+  
+  return return_value;
+}
+
+uint16_t calculate_eieio_packet_event_size(eieio_msg_t eieio_msg_ptr)
 {
   uint16_t data_hdr_value = eieio_msg_ptr[0];
   uint8_t pkt_type = (uint8_t) (data_hdr_value >> 10 & 0x3);
@@ -513,12 +596,7 @@ bool parse_event_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
     return 1;
   }
   else
-  {
-    io_printf(IO_BUF, "add_eieio_packet_to_sdram\n");
-    bool ret_value = add_eieio_packet_to_sdram(eieio_msg_ptr);
-    io_printf(IO_BUF, "add_eieio_packet_to_sdram return value: %d\n", ret_value);
-    return ret_value;
-  }
+      return 0;
 }
 
 void fetch_and_process_packet(void)
@@ -1025,3 +1103,4 @@ void process_32_bit_packets (void* event_pointer,
     }
   }
 }
+

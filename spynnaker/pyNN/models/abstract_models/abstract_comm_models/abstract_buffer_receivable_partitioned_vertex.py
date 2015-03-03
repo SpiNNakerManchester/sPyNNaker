@@ -55,6 +55,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
                 return send_requests
 
         if not self._buffers_to_send_collection.is_region_empty(region_id):
+            print "region {0:d} is not empty".format(region_id)
             if sequence_no is not None:
                 max_seq_no = sequence_no
                 min_seq_no = (max_seq_no - spinnman_constants.MAX_BUFFER_HISTORY) % spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE
@@ -76,6 +77,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
                     send_requests.extend(previous_buffers_to_send)
 
             # compute space used by packets
+            print "computing space used by {0:d} packets".format(len(send_requests))
             used_space = 0
             for packet in send_requests:
                 used_space += packet.length
@@ -107,12 +109,19 @@ class AbstractBufferReceivablePartitionedVertex(object):
         # if the region has no more buffers to transmit, stop requests
         # coming from the machine
         else:
-            request = StopRequests()
-            send_requests.append(request)
-            request = EventStopRequest()
-            sequenced_request = self._add_host_send_sequenced_data_header(request, region_id)
-            self._buffers_to_send_collection.add_sent_packets(sequenced_request, region_id)
-            send_requests.append(sequenced_request)
+            print "region {0:d} is empty".format(region_id)
+            if not self._buffers_to_send_collection.buffer_shutdown(region_id):
+                request = EventStopRequest()
+                send_requests.append(request)
+                send_requests = self._add_host_send_sequenced_data_header(send_requests, region_id)
+                self._buffers_to_send_collection.add_sent_packets(send_requests, region_id)
+                self._buffers_to_send_collection.set_buffer_shutdown(region_id)
+                print "sending buffered application shutdown command"
+            else:
+                request = StopRequests()
+                send_requests.append(request)
+                print "sending stop requests command"
+            print "returning {0:d} packets".format(len(send_requests))
             return send_requests
 
     def _generate_buffers_for_transmission(self, space_available, max_number_of_new_packets, region_id, sequence_no):

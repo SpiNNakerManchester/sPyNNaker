@@ -70,6 +70,12 @@ class BufferCollection(object):
         """
         return self._buffers_to_use.keys()
 
+    def buffer_shutdown(self, region_id):
+        return self._buffers_to_use[region_id].buffer_shutdown
+
+    def set_buffer_shutdown(self, region_id):
+        self._buffers_to_use[region_id].set_buffer_shutdown()
+
     def get_size_of_region(self, region_id):
         """ get the size of a region known by the buffer region
         :param region_id: the region id to check the size of

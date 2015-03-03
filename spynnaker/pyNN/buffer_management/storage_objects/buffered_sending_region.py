@@ -15,6 +15,7 @@ class BufferedSendingRegion(object):
         self._region_base_address = None
         self._sequence_number = spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE - 1
         self._last_received_sequence_number = spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE - 1
+        self._buffer_shutdown = False
 
     def add_entry_to_buffer(self, buffer_key, data_piece):
         if buffer_key not in self.buffer.keys():
@@ -124,3 +125,10 @@ class BufferedSendingRegion(object):
     @property
     def region_base_address(self):
         return self._region_base_address
+
+    @property
+    def buffer_shutdown(self):
+        return self._buffer_shutdown
+
+    def set_buffer_shutdown(self):
+        self._buffer_shutdown = True
