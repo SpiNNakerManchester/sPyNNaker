@@ -1,16 +1,13 @@
 import struct
 import threading
-import time
 
 from pacman.utilities.progress_bar import ProgressBar
 from spinnman import exceptions as spinnman_exceptions
 from spynnaker.pyNN import exceptions as spynnaker_exceptions
 from spinnman.data.little_endian_byte_array_byte_reader \
     import LittleEndianByteArrayByteReader
-from spynnaker.pyNN.buffer_management.abstract_eieio_packets.abstract_eieio_packet import \
-    AbstractEIEIOPacket
-from spynnaker.pyNN.buffer_management.abstract_eieio_packets.create_eieio_packets import \
-    create_class_from_reader
+from spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
+    create_eieio_packets import create_class_from_reader
 from spynnaker.pyNN.buffer_management.buffer_recieve_thread import \
     BufferRecieveThread
 from spynnaker.pyNN.buffer_management.buffer_send_thread import BufferSendThread
@@ -21,6 +18,9 @@ from spynnaker.pyNN.buffer_management.command_objects.spinnaker_request_read_dat
 from spynnaker.pyNN.buffer_management.command_objects.padding_request import \
     PaddingRequest
 from spynnaker.pyNN.utilities import utility_calls
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class BufferManager(object):
@@ -65,25 +65,29 @@ class BufferManager(object):
         :type packet:
         :return:
         """
-        # byte_reader = LittleEndianByteArrayByteReader(message.data)
-        # packet = create_class_from_reader(byte_reader)
-
         with self._thread_lock:
             if isinstance(packet, SpinnakerRequestBuffers):
                 key = (packet.x, packet.y, packet.p)
                 if key in self._recieve_vertices.keys():
-                    print "received packet sequence: {1:d}, space available: {0:d}".format(
-                        packet.space_available, packet.sequence_no)
+                    logger.debug("received packet sequence: {1:d}, "
+                                 "space available: {0:d}".format(
+                                     packet.space_available,
+                                     packet.sequence_no))
                     data_requests = \
                         self._recieve_vertices[key].get_next_set_of_packets(
                             packet.space_available, packet.region_id,
                             packet.sequence_no)
                     space_used = 0
                     for buffers in data_requests:
-                        print "packet to be sent length: {0:d}". format(buffers.length)
+                        logger.debug("packet to be sent length: {0:d}".format(
+                            buffers.length))
                         space_used += buffers.length
-                    print "received packet sequence: {3:d}, space available: {0:d}, data requests: {1:d}, total length: {2:d}".format(
-                        packet.space_available, len(data_requests), space_used, packet.sequence_no)
+                    logger.debug("received packet sequence: {3:d}, "
+                                 "space available: {0:d}, data requests: "
+                                 "{1:d}, total length: {2:d}".format(
+                                     packet.space_available,
+                                     len(data_requests),
+                                     space_used, packet.sequence_no))
                     if len(data_requests) != 0:
                         for buffers in data_requests:
                             data_request = {'data': buffers,
@@ -98,44 +102,6 @@ class BufferManager(object):
                 raise spinnman_exceptions.SpinnmanInvalidPacketException(
                     packet.__class__,
                     "The command packet is invalid for buffer management")
-
-        # # if (message.eieio_command_header.command !=
-        # #         spinnman_constants.EIEIO_COMMAND_IDS.BUFFER_MANAGEMENT):
-        # #     raise spinnman_exceptions.SpinnmanInvalidPacketException(
-        # #         "message.eieio_command_header.command",
-        # #         "The command id from this command packet is invalid for "
-        # #         "buffer management")
-        #
-        # # buffer_packets = list()
-        # # while not byte_reader.is_at_end():
-        # #     buffer_packets.append(
-        # #         BufferPacket.
-        # #         build_buffer_packet_from_byte_array_reader(byte_reader))
-        #
-        # # check that for each buffer packet request what is needed to be done
-        # for buffer_packet in buffer_packets:
-        #     key = (buffer_packet.chip_x, buffer_packet.chip_y,
-        #            buffer_packet.chip_p)
-        #
-        #     # if the vertex has receive requirements,
-        #     # check to see if any are needed
-        #     if (key in self._recieve_vertices.keys() and
-        #             buffer_packet.command ==
-        #             spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_RECEIVE):
-        #         receive_data_requests = \
-        #             self._recieve_vertices[key].process_buffered_packet()  # this should modify to get_next_set_of_packets (??)
-        #         if len(receive_data_requests) != 0:
-        #             for receive_data_request in receive_data_requests:
-        #                 self._recieve_thread.add_request(receive_data_request)
-        #     # if the vertex has send requirements, check to see if any are
-        #     # needed
-        #     if (key in self._sender_vertices.keys() and
-        #             buffer_packet.command ==
-        #             spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_SEND):
-        #         send_data_request = \
-        #             self._sender_vertices[key].process_buffered_packet()  # this should modify to get_next_set_of_packets (??)
-        #         if send_data_request is not None:
-        #             self._sender_thread.add_request(send_data_request)
 
     def add_received_vertex(self, manageable_vertex):
         """ adds a partitioned vertex into the managed list for vertices
@@ -211,14 +177,6 @@ class BufferManager(object):
         placement_of_partitioned_vertex = \
             self._placements.get_placement_of_subvertex(sender_vertex)
 
-        # buffered_packet = BufferPacket(
-        #     placement_of_partitioned_vertex.x,
-        #     placement_of_partitioned_vertex.y,
-        #     placement_of_partitioned_vertex.p,
-        #     spinnman_constants.RECEIVED_BUFFER_COMMAND_IDS.BUFFER_SEND,
-        #     region_id, region_size, None)
-        # data_requests = sender_vertex.process_buffered_packet(buffered_packet)
-
         # create a list of buffers to be loaded on the machine, given the region
         # the size and the sequence number
         data_requests = sender_vertex.get_next_set_of_packets(
@@ -238,7 +196,8 @@ class BufferManager(object):
         # send each data request
         for data_request in data_requests:
             # write memory to chip
-            print "writing one packet with length {0:d}".format(data_request.length)
+            logger.debug("writing one packet with length {0:d}".format(
+                data_request.length))
             data_to_be_written = data_request.get_eieio_message_as_byte_array()
             self._transciever.write_memory(
                 placement_of_partitioned_vertex.x,
@@ -251,7 +210,8 @@ class BufferManager(object):
         length_to_be_padded = region_size - space_used
         padding_packet = PaddingRequest(length_to_be_padded)
         padding_packet_bytes = padding_packet.get_eieio_message_as_byte_array()
-        print "writing padding with length {0:d}".format(len(padding_packet_bytes))
+        logger.debug("writing padding with length {0:d}".format(
+            len(padding_packet_bytes)))
         self._transciever.write_memory(
             placement_of_partitioned_vertex.x,
             placement_of_partitioned_vertex.y,
@@ -303,7 +263,6 @@ class BufferManager(object):
         """
         messages = list()
         while not buffer_data.is_at_end():
-            eieio_packet = AbstractEIEIOPacket.create_class_from_reader(
-                buffer_data)
+            eieio_packet = create_class_from_reader(buffer_data)
             messages.append(eieio_packet)
         return messages

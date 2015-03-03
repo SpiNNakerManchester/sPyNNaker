@@ -126,3 +126,21 @@ class BufferableRegionTooSmall(SpynnakerException):
     too small to contain any packet at all
     """
     pass
+
+
+class BufferedRegionNotPresent(SpynnakerException):
+    """ raised when trying to issue buffered packets for a region not managed
+    """
+    pass
+
+
+class InvalidParameterType(SpynnakerException):
+    """ raised when trying to issue buffered packets for a region not managed
+    """
+    pass
+
+
+class InvalidPacketType(SpynnakerException):
+    """ raised when trying to issue buffered packets for a region not managed
+    """
+    pass

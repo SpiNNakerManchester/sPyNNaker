@@ -320,13 +320,6 @@ uint32_t check_sdram_buffer_space_available(void)
     uint32_t initial_space = read_ptr_value - buffer_region_value;
 
     return_value = final_space + initial_space;
-
-    // if (final_space < 10 && initial_space < 10)
-    //   return_value = 0;
-    // else if (final_space < 10 && initial_space >= 10)
-    //   return_value = initial_space;
-    // else if (final_space >= 10)
-    //   return_value = final_space;
   }
   else if (write_ptr_value < read_ptr_value)
   {
@@ -355,12 +348,10 @@ bool check_eieio_packets_available(void)
   if (buffer_region_size == 0)
     return 0;
 
-  if (write_ptr_value != read_ptr_value)
-    return 1;
-  else if (last_buffer_operation == BUFFER_OPERATION_WRITE)
-    return 1;
+  if ((write_ptr_value == read_ptr_value) && (last_buffer_operation == BUFFER_OPERATION_READ))
+      return 0;
   else
-    return 0;
+      return 1;
 }
 
 bool parse_command_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
@@ -617,7 +608,7 @@ void fetch_and_process_packet(void)
     check_eieio_packets_available())
   {
     uint16_t *padding_checker = (uint16_t *) read_pointer;
-    while (*padding_checker == 0x4002)
+    if (*padding_checker == 0x4002)
     {
       padding_checker = (uint16_t *) read_pointer;
       io_printf (IO_BUF, "padding_checker: %d\n", *padding_checker);
@@ -626,48 +617,50 @@ void fetch_and_process_packet(void)
       if (read_pointer >= end_of_buffer_region)
         read_pointer = buffer_region;
     }
-
-    uint8_t *src_ptr = (uint8_t *) read_pointer;
-    uint8_t *dst_ptr = (uint8_t *) msg_from_sdram;
-    uint32_t len = calculate_eieio_packet_size((eieio_msg_t) read_pointer);
-    uint32_t final_space = (end_of_buffer_region - read_pointer);
-
-    io_printf(IO_BUF, "packet with length %d, from address: %08x\n", len, (uint32_t) src_ptr);
-
-    if (len > final_space)
-    {
-      uint32_t remaining_len = len - final_space;
-
-      io_printf (IO_BUF, "split packet\n");
-      io_printf (IO_BUF, "1 - reading packet to %08x from %08x length: %d\n", (uint32_t)dst_ptr, (uint32_t)src_ptr, final_space);
-      spin1_memcpy(dst_ptr, src_ptr, final_space);
-      io_printf (IO_BUF, "2 - reading packet to %08x from %08x length: %d\n", (uint32_t)(dst_ptr + final_space), (uint32_t)buffer_region, remaining_len);
-      spin1_memcpy((dst_ptr + final_space), buffer_region, remaining_len);
-      read_pointer = buffer_region + remaining_len;
-    }
     else
     {
-      io_printf (IO_BUF, "full packet\n");
-      io_printf (IO_BUF, "1 - reading packet to %08x from %08x length: %d\n", (uint32_t)dst_ptr, (uint32_t)src_ptr, len);
-      spin1_memcpy (dst_ptr, src_ptr, len);
-      read_pointer += len;
-      if (read_pointer >= end_of_buffer_region)
-        read_pointer -= buffer_region_size;
-    }
-    last_buffer_operation = BUFFER_OPERATION_READ;
-    msg_from_sdram_in_use = 1;
+      uint8_t *src_ptr = (uint8_t *) read_pointer;
+      uint8_t *dst_ptr = (uint8_t *) msg_from_sdram;
+      uint32_t len = calculate_eieio_packet_size((eieio_msg_t) read_pointer);
+      uint32_t final_space = (end_of_buffer_region - read_pointer);
 
-    print_packet_bytes(msg_from_sdram, len);
+      io_printf(IO_BUF, "packet with length %d, from address: %08x\n", len, (uint32_t) src_ptr);
 
-    next_buffer_time = extract_time_from_eieio_msg(msg_from_sdram);
-    io_printf (IO_BUF, "packet time: %d\n", next_buffer_time);
-    io_printf (IO_BUF, "current time: %d\n", time);
-    if (next_buffer_time == time)
-    {
-      packet_handler_selector(msg_from_sdram, len);
-      msg_from_sdram_in_use = 0;
+      if (len > final_space)
+      {
+        uint32_t remaining_len = len - final_space;
+
+        io_printf (IO_BUF, "split packet\n");
+        io_printf (IO_BUF, "1 - reading packet to %08x from %08x length: %d\n", (uint32_t)dst_ptr, (uint32_t)src_ptr, final_space);
+        spin1_memcpy(dst_ptr, src_ptr, final_space);
+        io_printf (IO_BUF, "2 - reading packet to %08x from %08x length: %d\n", (uint32_t)(dst_ptr + final_space), (uint32_t)buffer_region, remaining_len);
+        spin1_memcpy((dst_ptr + final_space), buffer_region, remaining_len);
+        read_pointer = buffer_region + remaining_len;
+      }
+      else
+      {
+        io_printf (IO_BUF, "full packet\n");
+        io_printf (IO_BUF, "1 - reading packet to %08x from %08x length: %d\n", (uint32_t)dst_ptr, (uint32_t)src_ptr, len);
+        spin1_memcpy (dst_ptr, src_ptr, len);
+        read_pointer += len;
+        if (read_pointer >= end_of_buffer_region)
+          read_pointer -= buffer_region_size;
+      }
+      last_buffer_operation = BUFFER_OPERATION_READ;
+      msg_from_sdram_in_use = 1;
+
+      print_packet_bytes(msg_from_sdram, len);
+
+      next_buffer_time = extract_time_from_eieio_msg(msg_from_sdram);
+      io_printf (IO_BUF, "packet time: %d\n", next_buffer_time);
+      io_printf (IO_BUF, "current time: %d\n", time);
+      if (next_buffer_time == time)
+      {
+        packet_handler_selector(msg_from_sdram, len);
+        msg_from_sdram_in_use = 0;
+      }
+      io_printf (IO_BUF, "loop completed\n");
     }
-    io_printf (IO_BUF, "loop completed\n");
   }
 }
 
