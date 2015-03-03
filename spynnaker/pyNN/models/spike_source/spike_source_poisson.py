@@ -107,11 +107,13 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
             size=setup_sz, label='setup')
         spec.reserve_memory_region(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value,
+            region=(self._POISSON_SPIKE_SOURCE_REGIONS
+                    .POISSON_PARAMS_REGION.value),
             size=poisson_params_sz, label='PoissonParams')
         if spike_hist_buff_sz > 0:
             spec.reserve_memory_region(
-                region=self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+                region=(self._POISSON_SPIKE_SOURCE_REGIONS
+                        .SPIKE_HISTORY_REGION.value),
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
                 empty=True)
 
@@ -155,8 +157,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
                      .format(num_neurons))
 
         # Set the focus to the memory region 2 (neuron parameters):
-        spec.switch_write_focus(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value)
+        spec.switch_write_focus(region=(self._POISSON_SPIKE_SOURCE_REGIONS
+                                        .POISSON_PARAMS_REGION.value))
 
         # Write header info to the memory region:
 
@@ -254,12 +256,12 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         return self._get_spikes(
             transciever=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
-            spike_recording_region=
-            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+            spike_recording_region=(self._POISSON_SPIKE_SOURCE_REGIONS
+                                    .SPIKE_HISTORY_REGION.value),
             sub_vertex_out_spike_bytes_function=
             sub_vertex_out_spike_bytes_function)
 
-    #inhirrtted from partionable vertex
+    # inherited from partionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
         method for calculating sdram usage
@@ -273,22 +275,17 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         method for caulculating dtcm usage for a coltection of atoms
         """
         return 0
-        #no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        #return (44 + (16 * 4)) * no_atoms
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the CPU requirements for a range of atoms
         """
         return 0
-        #no_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        #return 128 * no_atoms
 
-    #inhirrted from dataspecable vertex
-
+    # inherited from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_mapper, report_folder,
-                           tag_infos):
+                           ip_tags, reverse_ip_tags):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSourcePoisson on one core.

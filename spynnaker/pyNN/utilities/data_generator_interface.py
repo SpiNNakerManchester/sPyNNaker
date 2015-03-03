@@ -6,8 +6,8 @@ class DataGeneratorInterface(object):
 
     def __init__(self, associated_vertex, subvertex, placement,
                  partitioned_graph, partitionable_graph, routing_infos,
-                 hostname, graph_mapper, report_default_directory, tag_infos,
-                 progress_bar):
+                 hostname, graph_mapper, report_default_directory, ip_tags,
+                 reverse_ip_tags, progress_bar):
         self._associated_vertex = associated_vertex
         self._subvertex = subvertex
         self._placement = placement
@@ -17,7 +17,8 @@ class DataGeneratorInterface(object):
         self._hostname = hostname
         self._graph_mapper = graph_mapper
         self._report_default_directory = report_default_directory
-        self._tag_infos = tag_infos
+        self._ip_tags = ip_tags
+        self._reverse_ip_tags = reverse_ip_tags
         self._progress_bar = progress_bar
         self._done = False
         self._exception = None
@@ -30,7 +31,7 @@ class DataGeneratorInterface(object):
                 self._subvertex, self._placement, self._partitioned_graph,
                 self._partitionable_graph, self._routing_infos, self._hostname,
                 self._graph_mapper, self._report_default_directory,
-                self._tag_infos)
+                self._ip_tags, self._reverse_ip_tags)
             self._progress_bar.update()
             self._wait_condition.acquire()
             self._done = True

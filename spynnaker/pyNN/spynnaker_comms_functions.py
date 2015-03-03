@@ -5,8 +5,6 @@ from data_specification.file_data_reader import FileDataReader
 
 
 from pacman.utilities.progress_bar import ProgressBar
-
-
 from spinn_machine.sdram import SDRAM
 from spinn_machine.virutal_machine import VirtualMachine
 
@@ -41,7 +39,6 @@ class SpynnakerCommsFunctions(object):
         self._reports_states = reports_states
         self._report_default_directory = report_default_directory
         self._machine = None
-        self._tag_infos = None
 
     def _setup_interfaces(self, hostname):
         """Set up the interfaces for communicating with the SpiNNaker board
@@ -73,7 +70,7 @@ class SpynnakerCommsFunctions(object):
                 ignore_chips=ignored_chips,
                 ignore_cores=ignored_cores)
 
-            #do autoboot if possible
+            # do autoboot if possible
             machine_version = conf.config.get("Machine", "version")
             if machine_version is None:
                 raise exceptions.ConfigurationException(
@@ -94,28 +91,18 @@ class SpynnakerCommsFunctions(object):
                 y_dimension=virtual_y_dimension,
                 with_wrap_arounds=requires_wrap_around)
 
-    def _load_tags(self):
+    def _load_tags(self, tags):
         """ loads all the tags onto all the boards
-
-        :return None: does not return anything
-        :raises SpinnmanInvalidParameterException:
-        when the board and connection are specified
         """
-        for board_address in self._tag_infos.get_board_addresses_with_tags():
-            if self._tag_infos.has_iptags_for_board(board_address):
-                for iptag in \
-                        self._tag_infos.get_ip_tags_for_board(board_address):
-                    self._txrx.set_ip_tag(iptag, board_address=board_address)
-            if self._tag_infos.has_reverse_iptags_for_board(board_address):
-                for reverse_iptag in \
-                        self._tag_infos.get_reverse_ip_tags_for_board(
-                        board_address):
-                    self._txrx.set_reverse_ip_tag(reverse_iptag,
-                                                  board_address=board_address)
+        for ip_tag in tags.ip_tags:
+            self._txrx.set_ip_tag(ip_tag)
+        for reverse_ip_tag in tags.reverse_ip_tags:
+            self._txrx.set_reverse_ip_tag(reverse_ip_tag)
 
     def _retieve_provance_data_from_machine(
             self, executable_targets, routing_tables, machine):
-        #create writer to a report in reports
+
+        # create writer to a report in reports
         reports.generate_provance_routings(routing_tables, machine, self._txrx,
                                            self._report_default_directory)
 
@@ -135,7 +122,8 @@ class SpynnakerCommsFunctions(object):
                                                  graph_mapper):
         space_based_memory_tracker = dict()
         processor_to_app_data_base_address = dict()
-         #create a progress bar for end users
+
+        # create a progress bar for end users
         progress_bar = ProgressBar(len(list(placements.placements)),
                                    "on executing data specifications on the "
                                    "host machine")
@@ -157,14 +145,14 @@ class SpynnakerCommsFunctions(object):
                 data_spec_reader = FileDataReader(data_spec_file_path)
                 data_writer = FileDataWriter(app_data_file_path)
 
-                #locate current memory requirement
+                # locate current memory requirement
                 current_memory_available = SDRAM.DEFAULT_SDRAM_BYTES
                 memory_tracker_key = (placement.x, placement.y)
                 if memory_tracker_key in space_based_memory_tracker.keys():
                     current_memory_available = \
                         space_based_memory_tracker[memory_tracker_key]
 
-                #generate a file writer for dse report (app pointer table)
+                # generate a file writer for dse report (app pointer table)
                 report_writer = None
                 if conf.config.getboolean("Reports", "writeTextSpecs"):
                     new_report_directory = \
@@ -181,16 +169,16 @@ class SpynnakerCommsFunctions(object):
                                                     file_name)
                     report_writer = FileDataWriter(report_file_path)
 
-                #generate data spec executor
+                # generate data spec executor
                 host_based_data_spec_executor = DataSpecificationExecutor(
                     data_spec_reader, data_writer, current_memory_available,
                     report_writer)
 
-                #update memory calc and run data spec executor
+                # update memory calc and run data spec executor
                 bytes_used_by_spec, bytes_written_by_spec = \
                     host_based_data_spec_executor.execute()
 
-                #update base address mapper
+                # update base address mapper
                 processor_mapping_key = (placement.x, placement.y, placement.p)
                 processor_to_app_data_base_address[processor_mapping_key] = \
                     {'start_address':
@@ -202,7 +190,7 @@ class SpynnakerCommsFunctions(object):
                 space_based_memory_tracker[memory_tracker_key] = \
                     current_memory_available - bytes_used_by_spec
 
-            #update the progress bar
+            # update the progress bar
             progress_bar.update()
         # close the progress bar
         progress_bar.end()
@@ -275,8 +263,8 @@ class SpynnakerCommsFunctions(object):
                             "transmissions. Could be a sign of an error")
             else:
                 sucessful_cores, unsucessful_cores = \
-                    self._break_down_of_failure_to_reach_state(total_cores,
-                                                               CPUState.RUNNING)
+                    self._break_down_of_failure_to_reach_state(
+                        total_cores, CPUState.RUNNING)
                 # break_down the successful cores and unsuccessful cores into
                 # string reps
                 break_down = self.turn_break_downs_into_string(
@@ -294,12 +282,10 @@ class SpynnakerCommsFunctions(object):
             time.sleep(time_to_wait)
             processors_not_finished = processors_ready
             while processors_not_finished != 0:
-                processors_not_finished = \
-                    self._txrx.get_core_state_count(app_id,
-                                                    CPUState.RUNNING)
-                processors_rte = \
-                    self._txrx.get_core_state_count(app_id,
-                                                    CPUState.RUN_TIME_EXCEPTION)
+                processors_not_finished = self._txrx.get_core_state_count(
+                    app_id, CPUState.RUNNING)
+                processors_rte = self._txrx.get_core_state_count(
+                    app_id, CPUState.RUN_TIME_EXCEPTION)
                 if processors_rte > 0:
                     sucessful_cores, unsucessful_cores = \
                         self._break_down_of_failure_to_reach_state(
@@ -334,7 +320,8 @@ class SpynnakerCommsFunctions(object):
                         total_processors - processors_exited, break_down))
             logger.info("Application has run to completion")
         else:
-            logger.info("Application is set to run forever - PACMAN is exiting")
+            logger.info("Application is set to run forever "
+                        "- PACMAN is exiting")
 
     def _break_down_of_failure_to_reach_state(self, total_cores, state):
         sucessful_cores = list()
@@ -374,15 +361,14 @@ class SpynnakerCommsFunctions(object):
             self, placements, router_tables, vertex_to_subvertex_mapper,
             processor_to_app_data_base_address, hostname, app_id):
 
-        #if doing reload, start script
+        # if doing reload, start script
         if self._reports_states.transciever_report:
             reports.start_transceiver_rerun_script(
                 conf.config.get("SpecGeneration", "Binary_folder"), hostname,
                 conf.config.get("Machine", "version"))
 
-        #go through the placements and see if theres any application data to
+        # go through the placements and see if theres any application data to
         # load
-
         progress_bar = ProgressBar(len(list(placements.placements)),
                                    "Loading application data onto the machine")
         for placement in placements.placements:
@@ -405,10 +391,11 @@ class SpynnakerCommsFunctions(object):
                     SpinnmanFileDataReader(file_path_for_application_data)
                 logger.debug("writing application data for vertex {}"
                              .format(associated_vertex.label))
-                self._txrx.write_memory(placement.x, placement.y, start_address,
-                                        application_data_file_reader,
-                                        memory_written)
-                #update user 0 so that it points to the start of the \
+                self._txrx.write_memory(
+                    placement.x, placement.y, start_address,
+                    application_data_file_reader, memory_written)
+
+                # update user 0 so that it points to the start of the
                 # applications data region on sdram
                 logger.debug("writing user 0 address for vertex {}"
                              .format(associated_vertex.label))
@@ -418,7 +405,7 @@ class SpynnakerCommsFunctions(object):
                 self._txrx.write_memory(placement.x, placement.y,
                                         user_o_register_address, start_address)
 
-                #add lines to rerun_script if requested
+                # add lines to rerun_script if requested
                 if self._reports_states.transciever_report:
                     binary_folder = \
                         conf.config.get("SpecGeneration", "Binary_folder")
@@ -431,7 +418,8 @@ class SpynnakerCommsFunctions(object):
 
         progress_bar = ProgressBar(len(list(router_tables.routing_tables)),
                                    "Loading routing data onto the machine")
-        #load each router table thats needed for the application to run into
+
+        # load each router table thats needed for the application to run into
         # the chips sdram
         for router_table in router_tables.routing_tables:
             if len(router_table.multicast_routing_entries) > 0:
@@ -447,9 +435,9 @@ class SpynnakerCommsFunctions(object):
         progress_bar.end()
 
     def _load_executable_images(self, executable_targets, app_id):
-        """
-        go through the exeuctable targets and load each binary to everywhere and
-        then set each given core to sync0 that require it
+        """ Go through the exeuctable targets and load each binary to \
+            everywhere and then send a start request to the cores that \
+            actually use it
         """
         if self._reports_states.transciever_report:
             binary_folder = os.path.join(conf.config.get("SpecGeneration",

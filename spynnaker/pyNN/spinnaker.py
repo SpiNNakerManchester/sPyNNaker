@@ -1,11 +1,7 @@
-#pacman imports
-
-from pacman.model.constraints.utility_constraints.vertex_requires_virtual_chip_in_machine_constraint import \
+# pacman imports
+from pacman.model.constraints.utility_constraints\
+    .vertex_requires_virtual_chip_in_machine_constraint import \
     VertexRequiresVirtualChipInMachineConstraint
-from pacman.operations.abstract_algorithms.abstract_requires_placer import \
-    AbstractRequiresPlacer
-from pacman.operations.abstract_algorithms.abstract_requires_tag_allocator import \
-    AbstractRequiresTagAllocator
 from pacman.operations.tag_allocator_algorithms import BasicTagAllocator
 from spynnaker.pyNN.utilities.data_generator_interface import \
     DataGeneratorInterface
@@ -14,6 +10,7 @@ from pacman.operations.router_check_functionality.valid_routes_checker import \
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
+from spinn_machine.virutal_machine import VirtualMachine
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
     import BasicDijkstraRouting
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
@@ -23,7 +20,7 @@ from pacman.utilities.progress_bar import ProgressBar
 from pacman.utilities import utility_calls as pacman_utility_calls
 
 
-#spinnmachine imports
+# spinnmachine imports
 from spinn_machine.sdram import SDRAM
 from spinn_machine.router import Router as MachineRouter
 from spinn_machine.link import Link
@@ -31,7 +28,7 @@ from spinn_machine.processor import Processor
 from spinn_machine.chip import Chip
 
 
-#internal imports
+# internal imports
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
@@ -47,7 +44,7 @@ from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
 
-#spinnman imports
+# spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 
@@ -90,7 +87,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         logger.info("Setting appID to %d." % self._app_id)
 
-        #get the machine time step
+        # get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
@@ -103,14 +100,14 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         binary_path = os.path.abspath(os.path.join(binary_path, os.pardir))
         binary_path = os.path.join(binary_path, "model_binaries")
 
-        #add this default to end of list of search paths
+        # add this default to end of list of search paths
         self._binary_search_paths.append(binary_path)
         self._edge_count = 0
 
     def run(self, run_time):
         self._setup_interfaces(hostname=self._hostname)
 
-         #add database generation if requested
+        # add database generation if requested
         if self._create_database:
             execute_mapping = conf.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
@@ -121,13 +118,13 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 wait_on_confirmation)
             self._database_thread.start()
 
-        #create network report if needed
+        # create network report if needed
         if self._reports_states is not None:
-            reports.network_specification_report(self._report_default_directory,
-                                                 self._partitionable_graph,
-                                                 self._hostname)
+            reports.network_specification_report(
+                self._report_default_directory, self._partitionable_graph,
+                self._hostname)
 
-        #calcualte number of machien time steps
+        # calculate number of machine time steps
         if run_time is not None:
             self._no_machine_time_steps =\
                 int((run_time * 1000.0) / self._machine_time_step)
@@ -166,10 +163,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if do_timing:
             timer.take_sample()
 
-        #load database if needed
+        # load database if needed
         if self._create_database:
             self._database_thread.add_system_params(
-                self._time_scale_factor, self._machine_time_step, self._runtime)
+                self._time_scale_factor, self._machine_time_step,
+                self._runtime)
             self._database_thread.add_machine_objects(self._machine)
             self._database_thread.add_partitionable_vertices(
                 self._partitionable_graph)
@@ -179,7 +177,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._database_thread.add_routing_infos(self._routing_infos)
             self._database_thread.add_routing_tables(self._router_tables)
 
-        #execute data spec generation
+        # execute data spec generation
         if do_timing:
             timer.start_timing()
         logger.info("*** Generating Output *** ")
@@ -188,7 +186,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if do_timing:
             timer.take_sample()
 
-        #execute data spec execution
+        # execute data spec execution
         if do_timing:
             timer.start_timing()
         processor_to_app_data_base_address = \
@@ -203,12 +201,13 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if do_timing:
             timer.take_sample()
 
-        if conf.config.getboolean("Execute", "run_simulation"):
+        if (not isinstance(self._machine, VirtualMachine)
+                and conf.config.getboolean("Execute", "run_simulation")):
             if do_timing:
                 timer.start_timing()
 
             logger.info("*** Loading tags ***")
-            self._load_tags()
+            self._load_tags(self._tags)
 
             if self._do_load is True:
                 logger.info("*** Loading data ***")
@@ -238,9 +237,13 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._database_thread, self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
-                    #retrieve provance data
+
+                    # retrieve provance data
                     self._retieve_provance_data_from_machine(
                         executable_targets, self._router_tables, self._machine)
+        elif isinstance(self._machine, VirtualMachine):
+            logger.info(
+                "*** Using a Virtual Machine so no simulation will occur")
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
@@ -319,24 +322,24 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         self._check_if_theres_any_pre_placement_constraints_to_satisify()
 
-        #execute partitioner
+        # execute partitioner
         self._execute_partitioner(pacman_report_state)
 
-        #execute placer
+        # execute placer
         self._execute_placer(pacman_report_state)
 
-        #exeucte tag allocator
+        # exeucte tag allocator
         self._execute_tag_allocator(pacman_report_state)
 
-        #execute pynn subedge pruning
+        # execute pynn subedge pruning
         self._partitioned_graph, self._graph_mapper = \
             GraphEdgeFilter(self._report_default_directory)\
             .run(self._partitioned_graph, self._graph_mapper)
 
-        #execute key allocator
+        # execute key allocator
         self._execute_key_allocator(pacman_report_state)
 
-        #execute router
+        # execute router
         self._execute_router(pacman_report_state)
 
     def _execute_tag_allocator(self, pacman_report_state):
@@ -346,20 +349,19 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         :return:
         """
         if self._tag_allocator_algorithm is None:
-            self._tag_allocator_algorithm = BasicTagAllocator(self._machine)
+            self._tag_allocator_algorithm = BasicTagAllocator()
         else:
-            self._tag_allocator_algorithm =\
-                self._tag_allocator_algorithm(self._machine)
+            self._tag_allocator_algorithm = self._tag_allocator_algorithm()
 
         # execute tag allocation
-        self._tag_infos = \
-            self._tag_allocator_algorithm.allocate(self._placements)
+        self._tags = self._tag_allocator_algorithm.allocate_tags(
+            self._machine, self._placements)
 
         # generate reports
         if (pacman_report_state is not None and
                 pacman_report_state.tag_allocation_report):
             pacman_reports.tag_allocator_report(
-                self._report_default_directory, self._tag_infos)
+                self._report_default_directory, self._tags)
 
     def _execute_key_allocator(self, pacman_report_state):
         """ executes the key allocator
@@ -372,12 +374,12 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         else:
             self._key_allocator_algorithm = self._key_allocator_algorithm()
 
-        #execute routing info generator
+        # execute routing info generator
         self._routing_infos = \
             self._key_allocator_algorithm.allocate_routing_info(
                 self._partitioned_graph, self._placements)
 
-        #generate reports
+        # generate reports
         if (pacman_report_state is not None and
                 pacman_report_state.routing_info_report):
             pacman_reports.routing_info_reports(
@@ -390,7 +392,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         :param pacman_report_state:
         :return:
         """
-        #set up a default placer algorithm if none are specified
+
+        # set up a default placer algorithm if none are specified
         if self._router_algorithm is None:
             self._router_algorithm = BasicDijkstraRouting()
         else:
@@ -402,7 +405,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._partitioned_graph)
 
         if self._in_debug_mode:
-            #check that all routes are valid and no cycles exist
+
+            # check that all routes are valid and no cycles exist
             valid_route_checker = ValidRouteChecker(
                 placements=self._placements, routing_infos=self._routing_infos,
                 routing_tables=self._router_tables, machine=self._machine,
@@ -427,35 +431,19 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         :param pacman_report_state:
         :return:
         """
-        #execute partitioner or default partitioner (as seen fit)
+
+        # execute partitioner or default partitioner (as seen fit)
         if self._partitioner_algorithm is None:
-            self._partitioner_algorithm = \
-                BasicPartitioner(self._machine_time_step,
-                                 self._no_machine_time_steps)
+            self._partitioner_algorithm = BasicPartitioner()
         else:
-            self._partitioner_algorithm = \
-                self._partitioner_algorithm(self._machine_time_step,
-                                            self._no_machine_time_steps)
+            self._partitioner_algorithm = self._partitioner_algorithm()
 
-        # if algorithum needs a placer, add placer algorithum
-        if isinstance(self._partitioner_algorithm, AbstractRequiresPlacer):
-            partitioner_placement_algorithm = \
-                self._placer_algorithm(self._machine)
-                    # if the placer needs a tag allocator
-            if isinstance(partitioner_placement_algorithm,
-                          AbstractRequiresTagAllocator):
-                self._set_up_tag_allocator(partitioner_placement_algorithm)
-
-            #set the partitioner its placer
-            self._partitioner_algorithm.set_placer_algorithm(
-                partitioner_placement_algorithm)
-
-        #execute partitioner
+        # execute partitioner
         self._partitioned_graph, self._graph_mapper = \
             self._partitioner_algorithm.partition(self._partitionable_graph,
                                                   self._machine)
 
-        #execute reports
+        # execute reports
         if (pacman_report_state is not None and
                 pacman_report_state.partitioner_report):
             pacman_reports.partitioner_reports(
@@ -468,20 +456,18 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         :param pacman_report_state:
         :return:
         """
-        #execute placer or default placer (as seen fit)
-        if self._placer_algorithm is None:
-            self._placer_algorithm = BasicPlacer(self._machine)
-        else:
-            self._placer_algorithm = self._placer_algorithm(self._machine)
 
-        # if algorithum needs a tag allocator, add tag allocator algorithum
-        if isinstance(self._placer_algorithm, AbstractRequiresTagAllocator):
-            self._set_up_tag_allocator(self._placer_algorithm)
+        # execute placer or default placer (as seen fit)
+        if self._placer_algorithm is None:
+            self._placer_algorithm = BasicPlacer()
+        else:
+            self._placer_algorithm = self._placer_algorithm()
 
         # execute placer
-        self._placements = self._placer_algorithm.place(self._partitioned_graph)
+        self._placements = self._placer_algorithm.place(
+            self._partitioned_graph, self._machine)
 
-        #execute placer reports if needed
+        # execute placer reports if needed
         if (pacman_report_state is not None and
                 pacman_report_state.placer_report):
             pacman_reports.placer_reports(
@@ -490,28 +476,18 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 machine=self._machine, placements=self._placements,
                 report_folder=self._report_default_directory)
 
-    def _set_up_tag_allocator(self, placement_algorithum):
-        """ helper method for allocating tag allocator
-
-        :param placement_algorithum:
-        :return:
-        """
-        partitioner_placer_tag_allocator =\
-            self._tag_allocator_algorithm(self._machine)
-        placement_algorithum.\
-            set_tag_allocator(partitioner_placer_tag_allocator)
-
     def generate_data_specifications(self):
         """ generates the dsg for the graph.
 
         :return:
         """
-        #iterate though subvertexes and call generate_data_spec for each vertex
+        # iterate though subvertexes and call generate_data_spec for each
+        # vertex
         executable_targets = dict()
         no_processors = conf.config.getint("Threading", "dsg_threads")
         thread_pool = ThreadPool(processes=no_processors)
 
-        #create a progress bar for end users
+        # create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
         data_generator_interfaces = list()
@@ -519,13 +495,19 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
+
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
+
+                ip_tags = self._tags.get_ip_tags_for_vertex(
+                    placement.subvertex)
+                reverse_ip_tags = self._tags.get_reverse_ip_tags_for_vertex(
+                    placement.subvertex)
                 data_generator_interface = DataGeneratorInterface(
                     associated_vertex, placement.subvertex, placement,
                     self._partitioned_graph, self._partitionable_graph,
                     self._routing_infos, self._hostname, self._graph_mapper,
-                    self._report_default_directory, self._tag_infos,
+                    self._report_default_directory, ip_tags, reverse_ip_tags,
                     progress_bar)
                 data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start())
@@ -574,9 +556,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             structure=structure, label=label, spinnaker=self,
             multi_cast_vertex=self._multi_cast_vertex)
 
-    def create_projection(self, presynaptic_population, postsynaptic_population,
-                          connector, source, target, synapse_dynamics, label,
-                          rng):
+    def create_projection(
+            self, presynaptic_population, postsynaptic_population, connector,
+            source, target, synapse_dynamics, label, rng):
         if label is None:
             label = "Projection {}".format(self._edge_count)
             self._edge_count += 1
@@ -609,7 +591,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     VertexRequiresVirtualChipInMachineConstraint)
             if len(virtual_chip_constraints) > 0:
                 for virtual_chip_constraint in virtual_chip_constraints:
-                    #check if the virtual chip doesnt already exist
+
+                    # check if the virtual chip doesnt already exist
                     if (self._machine.get_chip_at(
                             virtual_chip_constraint.virtual_chip_coords['x'],
                             virtual_chip_constraint.virtual_chip_coords['y'])
@@ -620,61 +603,72 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def _create_virtual_chip(self, virtual_chip_constraint):
         sdram_object = SDRAM()
-        #creates the two links
+
+        # creates the two links
         to_virtual_chip_link = Link(
             destination_x=virtual_chip_constraint.virtual_chip_coords['x'],
             destination_y=virtual_chip_constraint.virtual_chip_coords['y'],
             source_x=virtual_chip_constraint.connected_to_chip_coords['x'],
             source_y=virtual_chip_constraint.connected_to_chip_coords['y'],
-            multicast_default_from=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
-            multicast_default_to=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
+            multicast_default_from=(virtual_chip_constraint
+                                    .connected_to_chip_link_id + 3) % 6,
+            multicast_default_to=(virtual_chip_constraint
+                                  .connected_to_chip_link_id + 3) % 6,
             source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
 
         from_virtual_chip_link = Link(
-            destination_x=virtual_chip_constraint.connected_to_chip_coords['x'],
-            destination_y=virtual_chip_constraint.connected_to_chip_coords['y'],
+            destination_x=(virtual_chip_constraint
+                           .connected_to_chip_coords['x']),
+            destination_y=(virtual_chip_constraint
+                           .connected_to_chip_coords['y']),
             source_x=virtual_chip_constraint.virtual_chip_coords['x'],
             source_y=virtual_chip_constraint.virtual_chip_coords['y'],
-            multicast_default_from=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
-            multicast_default_to=
-            (virtual_chip_constraint.connected_to_chip_link_id + 3) % 6,
+            multicast_default_from=(virtual_chip_constraint
+                                    .connected_to_chip_link_id + 3) % 6,
+            multicast_default_to=(virtual_chip_constraint
+                                  .connected_to_chip_link_id + 3) % 6,
             source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
 
-        #create the router
+        # create the router
         links = [from_virtual_chip_link]
         router_object = MachineRouter(
             links=links, emergency_routing_enabled=False,
             clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
-            n_available_multicast_entries=sys.maxint, diagnostic_filters=list())
+            n_available_multicast_entries=sys.maxint)
 
-        #create the processors
+        # create the processors
         processors = list()
         for virtual_core_id in range(0, 128):
             processors.append(Processor(virtual_core_id,
                                         Processor.CPU_AVAILABLE,
                                         virtual_core_id == 0))
-        #connect the real chip with the virtual one
+
+        # connect the real chip with the virtual one
         connected_chip = self._machine.get_chip_at(
             virtual_chip_constraint.connected_to_chip_coords['x'],
             virtual_chip_constraint.connected_to_chip_coords['y'])
         connected_chip.router.add_link(to_virtual_chip_link)
-        #return new v chip
+
+        # return new v chip
         return Chip(
             processors=processors, router=router_object, sdram=sdram_object,
             x=virtual_chip_constraint.virtual_chip_coords['x'],
             y=virtual_chip_constraint.virtual_chip_coords['y'], virtual=True)
 
-    def stop(self, app_id, stop_on_board=True):
+    def stop(self, stop_on_board=True):
         if stop_on_board:
             for router_table in self._router_tables.routing_tables:
                 if len(router_table.multicast_routing_entries) > 0:
-                    self._txrx.clear_multicast_routes(router_table.x,
-                                                      router_table.y)
                     self._txrx.clear_router_diagnostic_counters(router_table.x,
                                                                 router_table.y)
-            # self._txrx.send_signal(app_id, SCPSignal.STOP)
+            for ip_tag in self._tags.ip_tags:
+                self._txrx.clear_ip_tag(
+                    ip_tag.tag, board_address=ip_tag.board_address)
+            for reverse_ip_tag in self._tags.reverse_ip_tags:
+                self._txrx.clear_ip_tag(
+                    reverse_ip_tag.tag,
+                    board_address=reverse_ip_tag.board_address)
+
+            # self._txrx.stop_application(self._app_id)
         if self._create_database:
             self._database_thread.stop()
