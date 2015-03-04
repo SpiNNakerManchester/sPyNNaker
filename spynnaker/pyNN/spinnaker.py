@@ -653,7 +653,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         return Chip(
             processors=processors, router=router_object, sdram=sdram_object,
             x=virtual_chip_constraint.virtual_chip_coords['x'],
-            y=virtual_chip_constraint.virtual_chip_coords['y'], virtual=True)
+            y=virtual_chip_constraint.virtual_chip_coords['y'], virtual=True,
+            nearest_ethernet_x=0, nearest_ethernet_y=0)
 
     def stop(self, stop_on_board=True):
         if stop_on_board:
@@ -672,3 +673,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             # self._txrx.stop_application(self._app_id)
         if self._create_database:
             self._database_thread.stop()
+
+        # stop the transciever
+        self._txrx.close()
