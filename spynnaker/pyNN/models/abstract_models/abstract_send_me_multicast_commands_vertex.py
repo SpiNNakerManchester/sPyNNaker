@@ -9,15 +9,12 @@ class AbstractSendMeMulticastCommandsVertex(object):
         at fixed points in the simulation
     """
 
-    def __init__(self, commands, commands_key, commands_mask):
+    def __init__(self, commands, commands_mask):
         """
 
         :param commands: The commands that the vertex expects to be transmitted
         :type commands: iterable of \
                     py:class:`pacman.utility.multicastcommand.MultiCastCommand`
-        :param commands_key: A suitable key common between the commands to be\
-                    sent
-        :type commands_key: int
         :param commands_mask: A suitable mask for the commands, such that\
                     the 1s in the mask that are fixed cover the bits that\
                     are common to all the commands
@@ -25,7 +22,6 @@ class AbstractSendMeMulticastCommandsVertex(object):
         :raise None: does not raise any known exceptions
         """
         self._commands = commands
-        self._commands_key = commands_key
         self._commands_mask = commands_mask
 
     @property

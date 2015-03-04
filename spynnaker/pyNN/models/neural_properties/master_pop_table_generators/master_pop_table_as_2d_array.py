@@ -1,3 +1,10 @@
+from pacman.model.constraints.key_allocator_contiguous_range_constraint import \
+    KeyAllocatorContiguousRangeContraint
+from pacman.model.constraints.key_allocator_field_limitation_constraint import \
+    KeyAllocatorFieldLimitationConstraint
+from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
+    KeyAllocatorFixedMaskConstraint
+from pacman.utilities.field import Field
 from spynnaker.pyNN.models.abstract_models.abstract_master_pop_table_factory\
     import AbstractMasterPopTableFactory
 from spynnaker.pyNN.utilities import constants
@@ -97,3 +104,30 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         pass
+
+    def retrieve_receiver_edge_constraints(self):
+        """ overloaded from abstract master pop factory
+
+        :return:
+        """
+        constraints = list()
+        constraints.append(KeyAllocatorContiguousRangeContraint())
+        constraints.append(KeyAllocatorFixedMaskConstraint(0xFFFFF800))
+        fields = list()
+        # x field
+        fields.append(Field(0, 7, 0xFF000000))
+        # y field
+        fields.append(Field(0, 7, 0x00FF0000))
+        #p field
+        fields.append(Field(0, 17, 0x0000F800))
+        #n field
+        fields.append(Field(0, 2048, 0x000007FF))
+        constraints.append(KeyAllocatorFieldLimitationConstraint(fields))
+        return constraints
+
+    def retrieve_sender_edge_constraints(self):
+        """ overloaded from abstract master pop factory
+
+        :return:
+        """
+        return list()

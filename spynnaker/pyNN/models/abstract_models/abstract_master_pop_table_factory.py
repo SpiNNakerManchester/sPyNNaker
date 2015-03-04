@@ -27,7 +27,15 @@ class AbstractMasterPopTableFactory(object):
         """
         :param incoming_key: the source key which the synaptic matrix needs to \
         be mapped to
-        :param incoming_mask: the mask being used to create a key combo
+        :param master_pop_base_mem_address: the base address of the master pop
+        :param txrx: the transciever object from spinnman
+        :param chip_y: the y coordinate of the chip of this master pop
+        :param chip_x: the x coordinate of the chip of this master pop
+        :type incoming_key: int
+        :type master_pop_base_mem_address: int
+        :type chip_y: int
+        :type chip_x: int
+        :type txrx: spinnman.transciever.Transciever object
         :return: a synaptic matrix memory position.
         """
 
@@ -101,7 +109,7 @@ class AbstractMasterPopTableFactory(object):
         being read
         :type p: int
         :param transceiver: the transciever object
-        :type spinnman.transciever.Transciever object
+        :type transceiver: spinnman.transciever.Transciever object
         :param master_pop_table_region: the region to which the master pop\
          resides
          :type master_pop_table_region: int
@@ -120,7 +128,7 @@ class AbstractMasterPopTableFactory(object):
 
         master_region_base_address_address = \
             get_region_base_address_offset(app_data_base_address,
-                                                master_pop_region)
+                                           master_pop_region)
 
         master_region_base_address_offset = \
             self.read_and_convert(x, y, master_region_base_address_address,
@@ -136,3 +144,24 @@ class AbstractMasterPopTableFactory(object):
                                 hex(master_region_base_address)))
 
         return master_region_base_address, app_data_base_address
+
+    @abstractmethod
+    def retrieve_receiver_edge_constraints(self):
+        """ returns whatever constraints are needed by this master pop for edges
+        going into it
+
+        :return: a iterable of constraints
+        :rtype: iterable  pacman.model.constraints.abstract_constraint
+        :raise None: this method does not raise any knwon exceptions
+        """
+
+    @abstractmethod
+    def retrieve_sender_edge_constraints(self):
+        """returns whatever constraints are needed by this master pop for edges
+        going out of it
+
+        :return: a iterable of constraints
+        :rtype: iterable  pacman.model.constraints.abstract_constraint
+        :raise None: this method does not raise any knwon exceptions
+
+        """

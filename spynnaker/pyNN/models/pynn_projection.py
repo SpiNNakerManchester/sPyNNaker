@@ -1,8 +1,8 @@
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
-    import AbstractPopulationVertex
+from spynnaker.pyNN.models.abstract_models.abstract_requires_synaptic_manager_population_vertex \
+    import AbstractRequiresSynapticManagerPopulationVertex
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
@@ -57,7 +57,7 @@ class Projection(object):
         self._has_retrieved_synaptic_list_from_machine = False
 
         if isinstance(postsynaptic_population._get_vertex,
-                      AbstractPopulationVertex):
+                      AbstractRequiresSynapticManagerPopulationVertex):
             # Check that the "target" is an acceptable value
             targets = postsynaptic_population._get_vertex.get_synapse_targets()
             if target not in targets:
@@ -152,8 +152,31 @@ class Projection(object):
                     presynaptic_population, postsynaptic_population,
                     machine_time_step, synapse_list=synapse_list,
                     synapse_dynamics=synapse_dynamics, label=label)
+
+                # handle constraints of the edges based off higher data
+                # structures such as master pop
+                self._handle_edge_constraints(
+                    self._projection_edge, presynaptic_population,
+                    postsynaptic_population)
+
+                # add edge to the graph
                 spinnaker_control.add_edge(self._projection_edge)
                 self._projection_list_ranges = synapse_list.ranges()
+
+    @staticmethod
+    def _handle_edge_constraints(edge, pre_pop, post_pop):
+        """ handle constraints of the edges based off higher data
+         structures such as master pop
+         :param edge: the edge these constraints are going on to
+         :param pre_pop: the source pop to ask for sender constraints
+         :param post_pop: the dest pop to ask for reciever constraints
+        """
+        sender_edge_constraints = pre_pop._get_vertex.\
+            retrieve_edge_constraints_for_senders()
+        receiver_edge_constraints = post_pop.\
+            _get_vertex.retrieve_edge_constraints_for_receivers()
+        edge.add_constraints(sender_edge_constraints)
+        edge.add_constraints(receiver_edge_constraints)
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
         """ searches though the partitionable graph's edges to locate any
@@ -235,6 +258,12 @@ class Projection(object):
             remaining_edge = DelayAfferentPartitionableEdge(
                 presynaptic_population._get_vertex, delay_vertex,
                 label=new_label)
+
+            #handle edge constraints
+            self._handle_edge_constraints(
+                remaining_edge, presynaptic_population, postsynaptic_population)
+
+            # add to graph
             self._spinnaker.add_edge(remaining_edge)
 
         # Create a list of the connections with delay larger than that which
@@ -264,6 +293,13 @@ class Projection(object):
                 max_delay_per_neuron, synapse_list=remaining_sublist,
                 synapse_dynamics=synapse_dynamics, label=delay_label)
             self._delay_list_ranges = remaining_sublist.ranges()
+
+             #handle edge constraints
+            self._handle_edge_constraints(
+                self._delay_edge, presynaptic_population,
+                postsynaptic_population)
+
+            # add to graph
             self._spinnaker.add_edge(self._delay_edge)
 
     def describe(self, template='projection_default.txt', engine='default'):

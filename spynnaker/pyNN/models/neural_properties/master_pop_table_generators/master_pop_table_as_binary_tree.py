@@ -121,3 +121,17 @@ class MasterPopTableAsBinaryTree(AbstractMasterPopTableFactory):
             spec.write_value(pop_entry.key_combo)
             spec.write_value(pop_entry.mask)
             spec.write_value((pop_entry.address << 8) | pop_entry.row_index)
+
+    def retrieve_receiver_edge_constraints(self):
+        """ overloaded from abstract master pop factory
+
+        :return:
+        """
+        return list()
+
+    def retrieve_sender_edge_constraints(self):
+        """ overloaded from abstract master pop factory
+
+        :return:
+        """
+        return list()

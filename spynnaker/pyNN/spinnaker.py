@@ -1,19 +1,15 @@
 # pacman imports
+from pacman.model.constraints.key_allocator_fixed_n_keys_constraint import \
+    KeyAllocatorFixedNKeysConstraint
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
-from pacman.model.abstract_classes.abstract_virtual_vertex import \
+from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from pacman.model.constraints.key_allocator_fixed_key_and_mask_constraint \
-    import KeyAllocatorFixedKeyAndMaskConstraint
-from pacman.model.constraints.key_allocator_fixed_mask_constraint \
-    import KeyAllocatorFixedMaskConstraint
 from pacman.model.constraints.key_allocator_same_keys_constraint \
     import KeyAllocatorSameKeysConstraint
-from pacman.model.constraints.key_allocator_contiguous_range_constraint \
-    import KeyAllocatorContiguousRangeContraint
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
     import DictBasedPartitionedEdgeNKeysMap
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
@@ -22,6 +18,7 @@ from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 from pacman.operations.routing_info_allocator_algorithms.\
     basic_routing_info_allocator import BasicRoutingInfoAllocator
 from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities import utility_calls
 
 # spinnmachine imports
 from spinn_machine.sdram import SDRAM
@@ -32,10 +29,6 @@ from spinn_machine.chip import Chip
 
 # internal imports
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.utility_models.\
-    delay_extension_vertex import DelayExtensionVertex
-from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
-    AbstractSynapticManager
 from spynnaker.pyNN.models.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_reverse_iptagable_vertex \
@@ -57,12 +50,6 @@ from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
 from spynnaker.pyNN.utilities.data_generator_interface import \
     DataGeneratorInterface
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_keys_and_masks_vertex \
-    import AbstractProvidesKeysAndMasksVertex
-from spynnaker.pyNN.models.abstract_models.abstract_provides_fixed_mask_vertex\
-    import AbstractProvidesFixedMaskVertex
-from spynnaker.pyNN.exceptions import ConfigurationException
 
 
 # spinnman imports
@@ -452,57 +439,24 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             vertex_slice = self._graph_mapper.get_subvertex_slice(
                 edge.pre_subvertex)
             if vertex_slice.n_atoms > 2048:
-                raise ConfigurationException(
+                raise exceptions.ConfigurationException(
                     "The current models can only support up to 2048 atoms"
                     " per core (restricted by the supported key format)")
-            n_keys_map.set_n_keys_for_patitioned_edge(edge,
-                                                      vertex_slice.n_atoms)
+            fixed_n_keys_constraints = \
+                utility_calls.locate_constraints_of_type(
+                    edge.constraints, KeyAllocatorFixedNKeysConstraint)
 
-            # Check if the incoming vertex has any constraints of its own
-            # Currently, if the post-vertex uses AbstractSynapticManager,
-            # the vertex must meet the requirements of the manager
-            vertex = self._graph_mapper.get_vertex_from_subvertex(
-                edge.pre_subvertex)
-            post_vertex = self._graph_mapper.get_vertex_from_subvertex(
-                edge.post_subvertex)
-
-            needs_fixed_mask = \
-                (isinstance(post_vertex, AbstractSynapticManager) or
-                 isinstance(post_vertex, DelayExtensionVertex))
-
-            if isinstance(vertex, AbstractProvidesKeysAndMasksVertex):
-                keys_and_masks = \
-                    vertex.get_keys_and_masks_for_partitioned_edge(
-                        edge, self._graph_mapper)
-
-                if keys_and_masks is not None:
-                    if needs_fixed_mask:
-                        for key_and_mask in keys_and_masks:
-                            if key_and_mask.mask != 0xFFFFF800:
-                                raise ConfigurationException(
-                                    "The current models are restricted to use "
-                                    "the key 0xFFFFF800")
-                    edge.add_constraint(KeyAllocatorFixedKeyAndMaskConstraint(
-                        keys_and_masks))
-
-            if isinstance(vertex, AbstractProvidesFixedMaskVertex):
-                fixed_mask = vertex.get_fixed_mask_for_partitioned_edge(
-                    edge, self._graph_mapper)
-                if fixed_mask is not None:
-                    if needs_fixed_mask and fixed_mask != 0xFFFFF800:
-                        raise ConfigurationException(
-                            "The current models are restricted to use the"
-                            "key 0xFFFFF800")
-                    if not needs_fixed_mask:
-                        edge.add_constraint(KeyAllocatorFixedMaskConstraint(
-                            fixed_mask))
-
-            # Fix the mask for the edges and make sure the allocated keys are
-            # contiguously
-            if needs_fixed_mask:
-                edge.add_constraint(KeyAllocatorContiguousRangeContraint())
-                edge.add_constraint(KeyAllocatorFixedMaskConstraint(
-                                    0xFFFFF800))
+            if len(fixed_n_keys_constraints) > 1:
+                raise exceptions.ConfigurationException(
+                    "The current models can only support up to 1 "
+                    "fixed n keys constraint per model. "
+                    "Please rectify and try again.")
+            if len(fixed_n_keys_constraints) == 0:
+                n_keys_map.set_n_keys_for_patitioned_edge(edge,
+                                                          vertex_slice.n_atoms)
+            else:
+                n_keys_map.set_n_keys_for_patitioned_edge(
+                    edge, fixed_n_keys_constraints[0].n_keys)
 
         # Ensure that the keys allocated are the same for all subedges coming
         # from the same subvertex

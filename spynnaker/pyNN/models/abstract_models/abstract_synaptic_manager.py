@@ -21,7 +21,6 @@ from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import conf
 
-
 # pacman imports
 from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
@@ -38,18 +37,21 @@ logger = logging.getLogger(__name__)
 @add_metaclass(ABCMeta)
 class AbstractSynapticManager(object):
 
-    def __init__(self):
+    def __init__(self, master_pop_algorithm=None):
         self._stdp_checked = False
         self._stdp_mechanism = None
         self._master_pop_table_generator = None
-        algorithum_id = \
-            "MasterPopTableAs" + \
-            conf.config.get("MasterPopTable", "generator")
+
+        if master_pop_algorithm is None:
+            master_pop_algorithm = \
+                "MasterPopTableAs" + \
+                conf.config.get("MasterPopTable", "generator")
 
         algorithum_list = \
             conf.get_valid_components(master_pop_table_generators,
                                       "master_pop_table_as")
-        self._master_pop_table_generator = algorithum_list[algorithum_id]()
+        self._master_pop_table_generator = \
+            algorithum_list[master_pop_algorithm]()
 
     @staticmethod
     def write_synapse_row_info(sublist, row_io, spec, current_write_ptr,
@@ -608,7 +610,7 @@ class AbstractSynapticManager(object):
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
             post_subvertex, master_pop_table_region, synaptic_matrix_region,
-            synapse_io, subgraph, graph_mapper, routing_infos, weight_scales):
+            synapse_io, subgraph, routing_infos, weight_scales):
 
         synaptic_block, max_row_length = self._retrieve_synaptic_block(
             placements, transceiver, pre_subvertex, pre_n_atoms,
@@ -829,3 +831,21 @@ class AbstractSynapticManager(object):
             raise exceptions.SynapticBlockReadException(
                 "failed to read and translate a piece of memory due to a "
                 "unexpected response code exception in spinnman.")
+
+    def _retrieve_master_pop_receiver_edge_constraints(self):
+        """ returns the constraitns forced one dges by the master pop table for
+        spike retrival
+
+        :return: iterable of constraints
+        """
+        return \
+            self._master_pop_table_generator.retrieve_receiver_edge_constraints()
+
+    def _retrieve_master_pop_sender_edge_constraints(self):
+        """returns the constraints forced on edges by the master pop table for
+        sending spikes
+
+        :return: iterable of constraints
+        """
+        return \
+            self._master_pop_table_generator.retrieve_sender_edge_constraints()

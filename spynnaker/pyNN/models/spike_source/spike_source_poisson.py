@@ -324,3 +324,6 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
     def is_recordable(self):
         return True
+
+    def is_abstract_spike_source(self):
+        return True

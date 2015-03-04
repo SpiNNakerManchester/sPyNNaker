@@ -1,9 +1,11 @@
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
-    AbstractPopulationVertex
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_requires_synaptic_manager_population_vertex import \
+    AbstractRequiresSynapticManagerPopulationVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
@@ -14,7 +16,7 @@ from data_specification.enums.data_type import DataType
 
 class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
                                      AbstractIntegrateAndFireProperties,
-                                     AbstractPopulationVertex):
+                                     AbstractRequiresSynapticManagerPopulationVertex):
 
     CORE_APP_IDENTIFIER = constants.IF_CURRENT_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
@@ -33,7 +35,7 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             self, atoms=n_neurons, cm=cm, tau_m=tau_m, i_offset=i_offset,
             v_init=v_init, v_reset=v_reset, v_rest=v_rest, v_thresh=v_thresh,
             tau_refrac=tau_refrac)
-        AbstractPopulationVertex.__init__(
+        AbstractRequiresSynapticManagerPopulationVertex.__init__(
             self, n_neurons=n_neurons, n_params=10, label=label,
             binary="IF_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=(IFCurrentExponentialPopulation

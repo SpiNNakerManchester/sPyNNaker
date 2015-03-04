@@ -22,8 +22,9 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     def __init__(self, binary, n_neurons, label, constraints,
                  max_atoms_per_core, machine_time_step, timescale_factor,
-                 spikes_per_second, ring_buffer_sigma):
-        AbstractSynapticManager.__init__(self)
+                 spikes_per_second, ring_buffer_sigma,
+                 master_pop_algorithm=None):
+        AbstractSynapticManager.__init__(self, master_pop_algorithm)
         AbstractPartitionablePopulationVertex.__init__(
             self, n_atoms=n_neurons, label=label,
             machine_time_step=machine_time_step,

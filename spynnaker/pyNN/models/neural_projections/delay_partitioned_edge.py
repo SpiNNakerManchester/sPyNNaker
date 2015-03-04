@@ -11,8 +11,9 @@ logger = logging.getLogger(__name__)
 
 class DelayPartitionedEdge(ProjectionPartitionedEdge):
 
-    def __init__(self, presubvertex, postsubvertex):
-        ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex)
+    def __init__(self, presubvertex, postsubvertex, constraints):
+        ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex,
+                                           constraints)
         AbstractFilterableEdge.__init__(self)
         self._synapse_delay_rows = None
 

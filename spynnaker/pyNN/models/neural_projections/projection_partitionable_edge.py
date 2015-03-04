@@ -23,9 +23,9 @@ class ProjectionPartitionableEdge(PartitionableEdge):
     def __init__(self, presynaptic_population, postsynaptic_population,
                  machine_time_step, connector=None, synapse_list=None,
                  synapse_dynamics=None, label=None):
-        PartitionableEdge.__init__(self, presynaptic_population._get_vertex,
-                                   postsynaptic_population._get_vertex,
-                                   label=label)
+        PartitionableEdge.__init__(
+            self, presynaptic_population._get_vertex,
+            postsynaptic_population._get_vertex, label=label)
 
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
@@ -38,11 +38,16 @@ class ProjectionPartitionableEdge(PartitionableEdge):
         if synapse_dynamics is not None:
             self._synapse_row_io = synapse_dynamics.get_synapse_row_io()
 
-    def create_subedge(self, presubvertex, postsubvertex, label=None):
+    def create_subedge(self, presubvertex, postsubvertex, constraints=None,
+                       label=None):
         """
         Creates a subedge from this edge
         """
-        return ProjectionPartitionedEdge(presubvertex, postsubvertex)
+        if constraints is None:
+            constraints = list()
+        constraints.extend(self.constraints)
+        return ProjectionPartitionedEdge(presubvertex, postsubvertex,
+                                         constraints)
 
     def get_max_n_words(self, vertex_slice=None):
         """
@@ -111,7 +116,7 @@ class ProjectionPartitionableEdge(PartitionableEdge):
                     subedge.post_subvertex,
                     constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
                     constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-                    self._synapse_row_io, partitioned_graph, graph_mapper,
+                    self._synapse_row_io, partitioned_graph,
                     routing_infos, subedge.weight_scales).get_rows()
 
                 for i in range(len(rows)):

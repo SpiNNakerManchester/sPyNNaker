@@ -22,3 +22,17 @@ class MasterPopTableAsHashTable(AbstractMasterPopTableFactory):
     def __init__(self):
         AbstractMasterPopTableFactory.__init__(self)
         raise NotImplementedError
+
+    def retrieve_receiver_edge_constraints(self):
+        """ overloaded from abstract master pop factory
+
+        :return:
+        """
+        return list()
+
+    def retrieve_sender_edge_constraints(self):
+        """ overloaded from abstract master pop factory
+
+        :return:
+        """
+        return list()

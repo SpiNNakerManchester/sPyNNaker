@@ -4,8 +4,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
 
 
 class ProjectionPartitionedEdge(PartitionedEdge, AbstractFilterableEdge):
-    def __init__(self, presubvertex, postsubvertex):
-        PartitionedEdge.__init__(self, presubvertex, postsubvertex)
+    def __init__(self, presubvertex, postsubvertex, constraints):
+        PartitionedEdge.__init__(self, presubvertex, postsubvertex, constraints)
         AbstractFilterableEdge.__init__(self)
         self._synapse_sublist = None
         self._weight_scales = None

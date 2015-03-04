@@ -1,5 +1,6 @@
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
-    AbstractPopulationVertex
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_requires_synaptic_manager_population_vertex import \
+    AbstractRequiresSynapticManagerPopulationVertex
 from spynnaker.pyNN.utilities import constants
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
@@ -12,7 +13,7 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
 
 class IzhikevichCurrentExponentialPopulation(
         AbstractIzhikevichVertex, AbstractExponentialPopulationVertex,
-        AbstractPopulationVertex):
+        AbstractRequiresSynapticManagerPopulationVertex):
 
     CORE_APP_IDENTIFIER = constants.IZK_CURRENT_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
@@ -30,7 +31,7 @@ class IzhikevichCurrentExponentialPopulation(
         AbstractIzhikevichVertex.__init__(self, n_neurons, a=a, c=c, b=b, d=d,
                                           i_offset=i_offset, u_init=u_init,
                                           v_init=v_init)
-        AbstractPopulationVertex.__init__(
+        AbstractRequiresSynapticManagerPopulationVertex.__init__(
             self, n_neurons=n_neurons, n_params=10, label=label,
             binary="IZK_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=IzhikevichCurrentExponentialPopulation.
