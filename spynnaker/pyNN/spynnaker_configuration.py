@@ -1,5 +1,3 @@
-from pacman.model.partitionable_graph.partitionable_graph import \
-    PartitionableGraph
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN import exceptions
@@ -13,6 +11,8 @@ from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
 from pacman.operations import tag_allocator_algorithms
+from pacman.model.partitionable_graph.partitionable_graph import \
+    PartitionableGraph
 
 
 import os

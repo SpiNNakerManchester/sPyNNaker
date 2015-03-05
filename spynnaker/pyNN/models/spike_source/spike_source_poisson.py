@@ -9,13 +9,14 @@ from spynnaker.pyNN.models.neural_properties.randomDistributions import \
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 
+from data_specification.enums.data_type import DataType
 
-from math import exp, ceil
+import math
 from enum import Enum
 import numpy
-
 import logging
-from data_specification.enums.data_type import DataType
+
+
 logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 0.25
@@ -82,7 +83,8 @@ class SpikeSourcePoisson(AbstractSpikeSource):
             return 0
 
         bytes_per_time_step = int(
-            ceil((vertex_slice.hi_atom - vertex_slice.lo_atom + 1) / 32.0)) * 4
+            math.ceil((vertex_slice.hi_atom - vertex_slice.lo_atom + 1)
+                      / 32.0)) * 4
         return self.get_recording_region_size(bytes_per_time_step)
 
     @staticmethod
@@ -235,7 +237,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         #     unsigned long fract exp_minus_lambda;
         #   } fast_spike_source_t;
         for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
-            exp_minus_lamda = exp(-1.0 * spikes_per_tick)
+            exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = int(end_val * 1000.0 / self._machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
@@ -249,7 +251,7 @@ class SpikeSourcePoisson(AbstractSpikeSource):
         # Spike sources store spike vectors optimally so calculate min
         # words to represent
         sub_vertex_out_spike_bytes_function = \
-            lambda subvertex, subvertex_slice: int(ceil(
+            lambda subvertex, subvertex_slice: int(math.ceil(
                 subvertex_slice.n_atoms / 32.0)) * 4
 
         # Use standard behaviour to read spikes

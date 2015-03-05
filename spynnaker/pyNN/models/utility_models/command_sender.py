@@ -2,8 +2,12 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
     AbstractMultiCastSource
 from spynnaker.pyNN.utilities import constants
+
+
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_routing_constraint import KeyAllocatorRoutingConstraint
+
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 

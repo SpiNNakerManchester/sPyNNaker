@@ -654,7 +654,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             processors=processors, router=router_object, sdram=sdram_object,
             x=virtual_chip_constraint.virtual_chip_coords['x'],
             y=virtual_chip_constraint.virtual_chip_coords['y'], virtual=True,
-            nearest_ethernet_x=0, nearest_ethernet_y=0)
+            nearest_ethernet_x=None, nearest_ethernet_y=None)
 
     def stop(self, stop_on_board=True):
         if stop_on_board:
