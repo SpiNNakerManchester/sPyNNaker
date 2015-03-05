@@ -43,7 +43,7 @@ injectionConnection = [(0, 0, weight_to_spike, 1)]
 # spikeArray = {'spike_times': [[0]]}
 i = [a*100 for a in xrange(30)]
 spikeArray = {'spike_times': [i for _ in xrange(10)],
-              'max_on_chip_memory_usage_for_spikes_in_bytes': 128}
+              'max_on_chip_memory_usage_for_spikes_in_bytes': 100}
 
 populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
 
@@ -53,9 +53,9 @@ populations.append(p.Population(10, p.SpikeSourceArray, spikeArray, label='input
 projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
 
-populations[0].record_v()
-populations[0].record_gsyn()
-populations[0].record()
+#populations[0].record_v()
+#populations[0].record_gsyn()
+#populations[0].record()
 
 run_time = 10000
 print "Running for {} ms".format(run_time)
