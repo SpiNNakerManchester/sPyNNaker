@@ -1,23 +1,27 @@
-from math import ceil
-import copy
-import math
-import logging
-
-from enum import Enum
-
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge import \
     DelayPartitionableEdge
+
+
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from spynnaker.pyNN import exceptions
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
+
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
+
+
+import copy
+import logging
+from enum import Enum
+import math
 
 
 logger = logging.getLogger(__name__)
@@ -102,7 +106,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         """
         if not self._record:
             return 0
-        out_spikes_bytes = int(ceil((hi_atom - lo_atom + 1) / 32.0)) * 4
+        out_spikes_bytes = int(math.ceil((hi_atom - lo_atom + 1) / 32.0)) * 4
         return self.get_recording_region_size(out_spikes_bytes)
 
     @staticmethod
@@ -112,7 +116,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_mapper,
-                           report_folder):
+                           report_folder, ip_tags, reverse_ip_tags):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
@@ -134,7 +138,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         n_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        block_len_words = int(ceil(n_atoms / 32.0))
+        block_len_words = int(math.ceil(n_atoms / 32.0))
         num_delay_blocks, delay_blocks = self.get_delay_blocks(
             subvertex, sub_graph, graph_mapper)
         delay_params_sz = 4 * (delay_params_header_words
@@ -179,7 +183,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
 
-        num_words_per_row = int(ceil(n_atoms / 32.0))
+        num_words_per_row = int(math.ceil(n_atoms / 32.0))
         one_block = [0] * num_words_per_row
         delay_block = list()
         num_delay_blocks = 0

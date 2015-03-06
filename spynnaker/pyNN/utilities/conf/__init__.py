@@ -41,7 +41,8 @@ def _install_cfg():
 config = ConfigParser.RawConfigParser()
 default = os.path.join(os.path.dirname(spynnaker.__file__), "spynnaker.cfg")
 spynnaker_user = os.path.expanduser("~/.spynnaker.cfg")
-spynnaker_others = ("spynnaker.cfg", spynnaker_user)
+spynnaker_others = (spynnaker_user, "spynnaker.cfg")
+located_spynnaker = list()
 
 legacy_pacmans = (os.path.expanduser("~/.pacman.cfg"), "pacman.cfg")
 
@@ -49,18 +50,21 @@ found_spynnakers = False
 for possible_spynnaker_file in spynnaker_others:
     if os.path.isfile(possible_spynnaker_file):
         found_spynnakers = True
+        located_spynnaker.append(os.path.abspath(possible_spynnaker_file))
+
 
 found_pacmans = False
 for possible_pacman_file in legacy_pacmans:
     if os.path.isfile(possible_pacman_file):
         if found_spynnakers:
             raise exceptions.ConfigurationException(
-                "The configuration tools discovered a spynnaker.cfg in path \n"
-                "{}\n as well as a non-default spynnaker.cfg. Spynnaker does"
-                " not support integration of pacman.cfg and spynnaker.cfg."
-                " Please remove or merge these files. Recommendation is to"
-                " rename the merged file to spynnaker.cfg".format(
-                    possible_pacman_file))
+                "The configuration tools discovered a "
+                ".spynnaker.cfg/.pacman.cfg in path \n"
+                "{}\n as well as a non-default spynnaker.cfg in path {}."
+                " Spynnaker does not support integration of pacman.cfg and "
+                "spynnaker.cfg. Please remove or merge these files. "
+                "Recommendation is to rename the merged file to spynnaker.cfg"
+                .format(possible_pacman_file, located_spynnaker))
         else:
             found_pacmans = True
 
