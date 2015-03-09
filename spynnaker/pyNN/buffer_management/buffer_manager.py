@@ -6,17 +6,27 @@ from spinnman import exceptions as spinnman_exceptions
 from spynnaker.pyNN import exceptions as spynnaker_exceptions
 from spinnman.data.little_endian_byte_array_byte_reader \
     import LittleEndianByteArrayByteReader
+from spinnman.messages.sdp.sdp_header import SDPHeader
+from spinnman.messages.sdp.sdp_message import SDPMessage
+from spinnman.messages.sdp.sdp_flag import SDPFlag
 from spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
     create_eieio_packets import create_class_from_reader
 from spynnaker.pyNN.buffer_management.buffer_recieve_thread import \
     BufferRecieveThread
-from spynnaker.pyNN.buffer_management.buffer_send_thread import BufferSendThread
-from spynnaker.pyNN.buffer_management.command_objects.spinnaker_request_buffers import \
-    SpinnakerRequestBuffers
-from spynnaker.pyNN.buffer_management.command_objects.spinnaker_request_read_data import \
-    SpinnakerRequestReadData
+from spynnaker.pyNN.buffer_management.command_objects.\
+    spinnaker_request_buffers import SpinnakerRequestBuffers
+from spynnaker.pyNN.buffer_management.command_objects.\
+    spinnaker_request_read_data import SpinnakerRequestReadData
 from spynnaker.pyNN.buffer_management.command_objects.padding_request import \
     PaddingRequest
+from spynnaker.pyNN.buffer_management.command_objects.event_stop_request \
+    import EventStopRequest
+from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data\
+    import HostSendSequencedData
+from spynnaker.pyNN.buffer_management.command_objects.start_requests \
+    import StartRequests
+from spynnaker.pyNN.buffer_management.command_objects.stop_requests \
+    import StopRequests
 from spynnaker.pyNN.utilities import utility_calls
 
 import logging
@@ -35,9 +45,7 @@ class BufferManager(object):
         self._transciever = transciever
         self._recieve_vertices = dict()
         self._sender_vertices = dict()
-        self._sender_thread = BufferSendThread(transciever)
         self._recieve_thread = BufferRecieveThread(transciever)
-        self._sender_thread.start()
         self._recieve_thread.start()
         self._thread_lock = threading.Lock()
 
@@ -55,7 +63,6 @@ class BufferManager(object):
         :return:
         """
         self._recieve_thread.stop()
-        self._sender_thread.stop()
 
     def receive_buffer_command_message(self, packet):
         """ received a eieio message from the port which this manager manages
@@ -90,11 +97,13 @@ class BufferManager(object):
                                      space_used, packet.sequence_no))
                     if len(data_requests) != 0:
                         for buffers in data_requests:
-                            data_request = {'data': buffers,
-                                            'x': packet.x,
-                                            'y': packet.y,
-                                            'p': packet.p}
-                            self._sender_thread.add_request(data_request)
+                            self._add_request(
+                                packet.x, packet.y, packet.p, buffers)
+                            # data_request = {'data': buffers,
+                            #                 'x': packet.x,
+                            #                 'y': packet.y,
+                            #                 'p': packet.p}
+                            # self._add_request(data_request)
 
             elif isinstance(packet, SpinnakerRequestReadData):
                 pass
@@ -243,8 +252,8 @@ class BufferManager(object):
             region_offset_to_core_base = str(list(self._transciever.read_memory(
                 placement.x, placement.y,
                 region_offset_in_pointer_table, 4))[0])
-            base_address = struct.unpack("<I", region_offset_to_core_base)[0] + \
-                app_data_base_address
+            base_address = struct.unpack("<I", region_offset_to_core_base)[0] \
+                + app_data_base_address
             sender_vertex.receiver_buffer_collection.\
                 set_region_base_address_for(region_id, base_address)
 
@@ -266,3 +275,30 @@ class BufferManager(object):
             eieio_packet = create_class_from_reader(buffer_data)
             messages.append(eieio_packet)
         return messages
+
+    def _add_request(self, x, y, p, buffers):
+        """ handles a request from the munched queue by transmitting a chunk of
+        memory to a buffer
+
+        :param x:
+        :param y:
+        :param p:
+        :param buffers: the content of this message
+        :return:
+        """
+        if isinstance(buffers, (HostSendSequencedData, StopRequests,
+                                StartRequests, EventStopRequest)):
+            eieio_message_as_byte_array = \
+                buffers.get_eieio_message_as_byte_array()
+            sdp_header = SDPHeader(destination_chip_x=x,
+                                   destination_chip_y=y,
+                                   destination_cpu=p,
+                                   flags=SDPFlag.REPLY_NOT_EXPECTED,
+                                   destination_port=1)
+            sdp_message = \
+                SDPMessage(sdp_header, eieio_message_as_byte_array)
+            self._transciever.send_sdp_message(sdp_message)
+        else:
+            raise spynnaker_exceptions.ConfigurationException(
+                "this type of request is not suitable for this thread. Please "
+                "fix and try again")

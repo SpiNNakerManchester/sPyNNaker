@@ -13,6 +13,7 @@ from spinnman import constants as spinnman_constants
 from spynnaker.pyNN.buffer_management.command_objects.stop_requests import \
     StopRequests
 
+import math
 import logging
 logger = logging.getLogger(__name__)
 
@@ -173,9 +174,10 @@ class AbstractBufferReceivablePartitionedVertex(object):
             space_header = HostSendSequencedData.get_header_size()
         else:
             # the number of packet loaded at the first instance, when the
-            # system is still in a stop state, does not influence the
+            # system is still in a wait state, does not influence the
             # performance of the execution
-            max_number_of_new_packets = 1000000
+            max_number_of_new_packets = math.floor(
+                space_available / packet.get_min_packet_length())
             space_header = 0
 
         space_used = 0
