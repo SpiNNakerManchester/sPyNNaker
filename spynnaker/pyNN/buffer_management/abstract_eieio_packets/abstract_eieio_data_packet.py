@@ -1,4 +1,6 @@
+from abc import ABCMeta
 from abc import abstractmethod
+from six import add_metaclass
 from spinnman import exceptions as spinnman_exceptions
 from spinnman.data.little_endian_byte_array_byte_reader import \
     LittleEndianByteArrayByteReader
@@ -11,11 +13,40 @@ from spynnaker.pyNN.buffer_management.abstract_eieio_packets.abstract_eieio_pack
     AbstractEIEIOPacket
 
 
+@add_metaclass(ABCMeta)
 class AbstractEIEIODataPacket(AbstractEIEIOPacket):
+    """
+    This class represent a generic eieio data packet used in the communication
+    with the SpiNNaker machine
+    """
 
     def __init__(self, type_param, tag_param=0, prefix_param=None,
                  payload_base=None, prefix_type=None, is_time=False, data=None):
+        """
 
+        :param type_param: type of packet: 16- or 32-bit events with or
+                           without payload
+        :type type_param: spinnman.messages.eieio.eieio_type_param.\
+                          EIEIOTypeParam
+        :param tag_param: tag parameter of the eieio header (currently unused)
+        :type tag_param: 2-bit unsigned int
+        :param prefix_param: base value to be used in the construction of the \
+                             event to be multicasted
+        :type prefix_param: 16-bit unsigned int
+        :param payload_base: base value to be used in the construction of the \
+                             payload to the event to be multicasted
+        :param prefix_type: determines if the prefix_param value has to be \
+                            applied on the upper or lower part of the \
+                            multicast routing key
+        :type prefix_type: spinnman.spinnman.messages.eieio.eieio_prefix_type
+        :param is_time: determines if the payload represents a timestamp
+        :type is_time: bool
+        :param data: payload to be used in the initialization of the eieio \
+                     packet (if any)
+        :type data: bytearray or None
+        :return: None
+        :rtype: None
+        """
         AbstractEIEIOPacket.__init__(self)
 
         self._header = EIEIOHeader(
@@ -53,12 +84,36 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
         self._length = self._base_size + len(data)
 
     def _insert_key(self, key):
+        """
+        Insert a new key into the eieio packet
+
+        :param key: key to insert
+        :type key: 16- or 32- bit unsigned int
+        :return: None
+        :rtype: None
+        """
         self._message.write_data(key)
 
     def _insert_key_and_payload(self, key, payload):
+        """
+        Insert a new couple key, payload into the eieio packet
+
+        :param key: key to insert
+        :type key: 16- or 32- bit unsigned int
+        :param payload: payload to insert associated with the specified key
+        :type payload: 16- or 32- bit unsigned int
+        :return: None
+        :rtype: None
+        """
         self._message.write_data(key, payload)
 
     def get_available_count(self):
+        """
+        Returns the number of available entries in the eieio packet
+
+        :return: number of available entries in the packet
+        :rtype: unsigned int
+        """
         available_payload_space = (spinnman_constants.UDP_MESSAGE_MAX_SIZE -
                                    self._length)
         max_float = math.floor(available_payload_space / self._element_size)
@@ -67,8 +122,10 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
 
     def get_max_count(self):
         """
-        :return: maximum number of entries that this type of eieio packet type
-        can handle
+        Returns the maximum number of entries that a type of eieio packet type
+
+        :return: maximum number of entries that a type of eieio packet type
+        can have
         """
         available_payload_space = (spinnman_constants.UDP_MESSAGE_MAX_SIZE -
                                    self._base_size)
@@ -77,6 +134,13 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
         return max_count
 
     def get_next_element(self):
+        """
+        Returns the next element in the eieio packet. Depending on the type \
+        of packet, the element may include only a key or a couple key, payload
+
+        :return: key, [payload]
+        :rtype: unsigned int, [unsigned int]
+        """
         if self.has_key_prefix:
             key_prefix = self.key_prefix
         else:
