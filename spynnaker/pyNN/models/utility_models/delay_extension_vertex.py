@@ -1,13 +1,21 @@
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_incoming_edge_constraints \
+    import AbstractProvidesIncomingEdgeConstraints
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_population_outgoing_edge_restrictor \
+    import AbstractPopulationOutgoingEdgeRestrictor
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge import \
-    DelayPartitionableEdge
+from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
+    import DelayPartitionableEdge
 from spynnaker.pyNN import exceptions
 
 
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
+from pacman.model.constraints.key_allocator_fixed_mask_constraint \
+    import KeyAllocatorFixedMaskConstraint
 from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
@@ -26,7 +34,9 @@ logger = logging.getLogger(__name__)
 
 
 class DelayExtensionVertex(AbstractPartitionableVertex,
-                           AbstractDataSpecableVertex):
+                           AbstractDataSpecableVertex,
+                           AbstractProvidesIncomingEdgeConstraints,
+                           AbstractPopulationOutgoingEdgeRestrictor):
     """
     Instance of this class provide delays to incoming spikes in multiples
     of the maximum delays of a neuron (typically 16 or 32)
@@ -55,12 +65,17 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, label=label, n_atoms=n_neurons,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
+        AbstractProvidesIncomingEdgeConstraints.__init__(self)
+        AbstractPopulationOutgoingEdgeRestrictor.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0
         self._source_vertex = source_vertex
         joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
         self.add_constraint(joint_constrant)
+
+    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
+        return list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
 
     @property
     def model_name(self):
@@ -109,8 +124,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     @staticmethod
     def get_block_index_bytes(no_active_timesteps):
-        return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps
-                * constants.BLOCK_INDEX_ROW_WORDS)) * 4
+        return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps *
+                constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_mapper,
@@ -139,8 +154,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         block_len_words = int(math.ceil(n_atoms / 32.0))
         num_delay_blocks, delay_blocks = self.get_delay_blocks(
             subvertex, sub_graph, graph_mapper)
-        delay_params_sz = 4 * (delay_params_header_words
-                               + (num_delay_blocks * block_len_words))
+        delay_params_sz = 4 * (delay_params_header_words +
+                               (num_delay_blocks * block_len_words))
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
@@ -217,8 +232,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
             for (source_id, row) in zip(range(len(rows)), rows):
                 for delay in row.delays:
-                    stage = int(math.floor((delay - 1)
-                                           / self.max_delay_per_neuron)) - 1
+                    stage = int(math.floor((delay - 1) /
+                                           self.max_delay_per_neuron)) - 1
                     num_delay_blocks = max(stage + 1, num_delay_blocks)
                     if num_delay_blocks > self._max_stages:
                         raise Exception(

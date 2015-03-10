@@ -72,7 +72,7 @@ class AbstractRecordableVertex(object):
         """
         if self._no_machine_time_steps is None:
             raise Exception("This model cannot record this parameter"
-                            + " without a fixed run time")
+                            " without a fixed run time")
         return (constants.RECORDING_ENTRY_BYTE_SIZE +
                 (self._no_machine_time_steps * bytes_per_timestep))
 

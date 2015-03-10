@@ -1,7 +1,6 @@
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_requires_synaptic_manager_population_vertex import \
-    AbstractRequiresSynapticManagerPopulationVertex
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
+    AbstractPopulationVertex
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
@@ -17,7 +16,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
 class IFConductanceExponentialPopulation(
         AbstractExponentialPopulationVertex, AbstractConductanceVertex,
         AbstractIntegrateAndFireProperties,
-        AbstractRequiresSynapticManagerPopulationVertex):
+        AbstractPopulationVertex):
 
     CORE_APP_IDENTIFIER = constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
@@ -40,7 +39,7 @@ class IFConductanceExponentialPopulation(
             v_init=v_init, v_reset=v_reset, v_rest=v_rest, v_thresh=v_thresh,
             tau_refrac=tau_refrac)
 
-        AbstractRequiresSynapticManagerPopulationVertex.__init__(
+        AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, n_params=12, label=label,
             max_atoms_per_core=(IFConductanceExponentialPopulation
                                 ._model_based_max_atoms_per_core),

@@ -8,8 +8,6 @@ import threading
 from data_specification.file_data_writer import FileDataWriter
 from pacman.model.abstract_classes.abstract_constrained_vertex \
     import AbstractConstrainedVertex
-from pacman.model.constraints.key_allocator_contiguous_range_constraint import \
-    KeyAllocatorContiguousRangeContraint
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
@@ -148,21 +146,3 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
     @staticmethod
     def get_mem_write_base_address(processor_id):
         return 0xe5007000 + 128 * processor_id + 112
-
-    @staticmethod
-    def _retrieve_data_specable_edge_constraints_for_receivers():
-        """ overloaded from abstract population vertex
-
-        :return:
-        """
-        return list()
-
-    @staticmethod
-    def _retrieve_data_specable_edge_constraints_for_senders():
-        """ overloaded from abstract population vertex
-
-        :return:
-        """
-        constraints = list()
-        constraints.append(KeyAllocatorContiguousRangeContraint())
-        return constraints

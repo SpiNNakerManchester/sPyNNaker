@@ -1,6 +1,5 @@
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_requires_synaptic_manager_population_vertex import \
-    AbstractRequiresSynapticManagerPopulationVertex
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
+    AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN import exceptions
@@ -10,7 +9,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
 
 class IFConductanceAlphaPopulation(
         AbstractConductanceVertex, AbstractIntegrateAndFireProperties,
-        AbstractRequiresSynapticManagerPopulationVertex):
+        AbstractPopulationVertex):
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, timescale_factor,

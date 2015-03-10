@@ -1,21 +1,11 @@
 from pacman.model.constraints.abstract_constraint import AbstractConstraint
 from pacman.model.constraints.placer_chip_and_core_constraint import \
     PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_send_me_multicast_commands_vertex import \
-    AbstractSendMeMulticastCommandsVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_vertex_with_dependent_vertices import \
-    AbstractVertexWithEdgeToDependentVertices
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 
 from pyNN.space import Space
 
-from spynnaker.pyNN.models.utility_models.command_sender \
-    import CommandSender
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 from spynnaker.pyNN.utilities import conf
@@ -52,11 +42,11 @@ class Population(object):
     _non_labelled_vertex_count = 0
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
-                 multi_cast_vertex=None, structure=None):
+                 structure=None):
         """
         Instantiates a :py:object:`Population`.
         """
-        if size <= 0:
+        if size is not None and size <= 0:
             raise exceptions.ConfigurationException(
                 "A population cannot have a negative or zero size.")
 
@@ -88,28 +78,7 @@ class Population(object):
 
         self._spinnaker.add_vertex(self._vertex)
 
-        if isinstance(self._vertex, AbstractSendMeMulticastCommandsVertex):
-            if multi_cast_vertex is None:
-                multi_cast_vertex = CommandSender(
-                    self._spinnaker.machine_time_step,
-                    self._spinnaker.timescale_factor)
-                self._spinnaker.add_vertex(multi_cast_vertex)
-            multi_cast_vertex = self._spinnaker.get_multi_cast_source
-            edge = PartitionableEdge(multi_cast_vertex, self._vertex)
-            multi_cast_vertex.add_commands(
-                self._vertex.commands, self._vertex.commands_key,
-                self._vertex.commands_mask, edge)
-            self._spinnaker.add_edge(edge)
-
         self._parameters = PyNNParametersSurrogate(self._vertex)
-
-        # add any dependent edges and verts if needed
-        if isinstance(self._vertex, AbstractVertexWithEdgeToDependentVertices):
-            for dependant_vertex in self._vertex.dependent_vertices:
-                self._spinnaker.add_vertex(dependant_vertex)
-                dependant_edge = PartitionableEdge(
-                    pre_vertex=self._vertex, post_vertex=dependant_vertex)
-                self._spinnaker.add_edge(dependant_edge)
 
         # initialize common stuff
         self._size = size

@@ -1,6 +1,4 @@
 # pacman imports
-from pacman.model.constraints.key_allocator_fixed_n_keys_constraint import \
-    KeyAllocatorFixedNKeysConstraint
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
@@ -8,8 +6,22 @@ from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
 from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from pacman.model.constraints.key_allocator_same_keys_constraint \
-    import KeyAllocatorSameKeysConstraint
+from spynnaker.pyNN.models.abstract_models.abstract_provides_n_keys_for_edge\
+    import AbstractProvidesNKeysForEdge
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_outgoing_edge_constraints \
+    import AbstractProvidesOutgoingEdgeConstraints
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_incoming_edge_constraints \
+    import AbstractProvidesIncomingEdgeConstraints
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_send_me_multicast_commands_vertex \
+    import AbstractSendMeMulticastCommandsVertex
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_vertex_with_dependent_vertices \
+    import AbstractVertexWithEdgeToDependentVertices
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
     import DictBasedPartitionedEdgeNKeysMap
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
@@ -18,7 +30,6 @@ from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 from pacman.operations.routing_info_allocator_algorithms.\
     basic_routing_info_allocator import BasicRoutingInfoAllocator
 from pacman.utilities.progress_bar import ProgressBar
-from pacman.utilities import utility_calls
 
 # spinnmachine imports
 from spinn_machine.sdram import SDRAM
@@ -50,7 +61,6 @@ from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
 from spynnaker.pyNN.utilities.data_generator_interface import \
     DataGeneratorInterface
-
 
 # spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
@@ -348,6 +358,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         return self._machine_time_step
 
     @property
+    def no_machine_time_steps(self):
+        return self._no_machine_time_steps
+
+    @property
     def timescale_factor(self):
         return self._time_scale_factor
 
@@ -438,37 +452,32 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         for edge in self._partitioned_graph.subedges:
             vertex_slice = self._graph_mapper.get_subvertex_slice(
                 edge.pre_subvertex)
+            super_edge = (self._graph_mapper
+                          .get_partitionable_edge_from_partitioned_edge(edge))
             if vertex_slice.n_atoms > 2048:
                 raise exceptions.ConfigurationException(
                     "The current models can only support up to 2048 atoms"
                     " per core (restricted by the supported key format)")
-            fixed_n_keys_constraints = \
-                utility_calls.locate_constraints_of_type(
-                    edge.constraints, KeyAllocatorFixedNKeysConstraint)
 
-            if len(fixed_n_keys_constraints) > 1:
-                raise exceptions.ConfigurationException(
-                    "The current models can only support up to 1 "
-                    "fixed n keys constraint per model. "
-                    "Please rectify and try again.")
-            if len(fixed_n_keys_constraints) == 0:
+            if not isinstance(super_edge.pre_vertex,
+                              AbstractProvidesNKeysForEdge):
                 n_keys_map.set_n_keys_for_patitioned_edge(edge,
                                                           vertex_slice.n_atoms)
             else:
                 n_keys_map.set_n_keys_for_patitioned_edge(
-                    edge, fixed_n_keys_constraints[0].n_keys)
+                    super_edge.pre_vertex.get_n_keys_for_partitioned_edge(
+                        edge, self._graph_mapper))
 
-        # Ensure that the keys allocated are the same for all subedges coming
-        # from the same subvertex
-        for vertex in self._partitioned_graph.subvertices:
-            first_edge = None
-            for edge in (self._partitioned_graph
-                             .outgoing_subedges_from_subvertex(vertex)):
-                if first_edge is None:
-                    first_edge = edge
-                else:
-                    edge.add_constraint(KeyAllocatorSameKeysConstraint(
-                        first_edge))
+            if isinstance(super_edge.pre_vertex,
+                          AbstractProvidesOutgoingEdgeConstraints):
+                edge.add_constraints(
+                    super_edge.pre_vertex.get_outgoing_edge_constraints(
+                        edge, self._graph_mapper))
+            if isinstance(super_edge.post_vertex,
+                          AbstractProvidesIncomingEdgeConstraints):
+                edge.add_constraints(
+                    super_edge.post_vertex.get_incoming_edge_constraints(
+                        edge, self._graph_mapper))
 
         # execute routing info generator
         self._routing_infos = \
@@ -619,7 +628,26 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def add_vertex(self, vertex_to_add):
         if isinstance(vertex_to_add, CommandSender):
             self._multi_cast_vertex = vertex_to_add
+
         self._partitionable_graph.add_vertex(vertex_to_add)
+
+        if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
+            if self._multi_cast_vertex is None:
+                self._multi_cast_vertex = CommandSender(
+                    self._machine_time_step, self._time_scale_factor)
+                self.add_vertex(self._multi_cast_vertex)
+            edge = PartitionableEdge(self._multi_cast_vertex, vertex_to_add)
+            self._multi_cast_vertex.add_commands(vertex_to_add.commands, edge)
+            self.add_edge(edge)
+
+        # add any dependent edges and verts if needed
+        if isinstance(vertex_to_add,
+                      AbstractVertexWithEdgeToDependentVertices):
+            for dependant_vertex in vertex_to_add.dependent_vertices:
+                self.add_vertex(dependant_vertex)
+                dependant_edge = PartitionableEdge(
+                    pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
+                self.add_edge(dependant_edge)
 
     def add_edge(self, edge_to_add):
         self._partitionable_graph.add_edge(edge_to_add)
@@ -627,8 +655,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
-            structure=structure, label=label, spinnaker=self,
-            multi_cast_vertex=self._multi_cast_vertex)
+            structure=structure, label=label, spinnaker=self)
 
     def create_projection(self, presynaptic_population,
                           postsynaptic_population, connector, source, target,
@@ -724,8 +751,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         if stop_on_board:
             for router_table in self._router_tables.routing_tables:
                 if (not self._machine.get_chip_at(router_table.x,
-                                                  router_table.y).virtual
-                        and len(router_table.multicast_routing_entries) > 0):
+                                                  router_table.y).virtual and
+                        len(router_table.multicast_routing_entries) > 0):
                     self._txrx.clear_multicast_routes(router_table.x,
                                                       router_table.y)
                     self._txrx.clear_router_diagnostic_counters(router_table.x,

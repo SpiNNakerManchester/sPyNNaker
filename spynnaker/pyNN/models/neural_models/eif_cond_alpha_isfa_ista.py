@@ -1,7 +1,6 @@
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_requires_synaptic_manager_population_vertex import \
-    AbstractRequiresSynapticManagerPopulationVertex
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
+    AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
 from spynnaker.pyNN.models.abstract_models.\
@@ -17,7 +16,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
 class EIFConductanceAlphaPopulation(
         AbstractExponentialPopulationVertex, AbstractConductanceVertex,
         AbstractIntegrateAndFireProperties,
-        AbstractRequiresSynapticManagerPopulationVertex):
+        AbstractPopulationVertex):
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, timescale_factor,

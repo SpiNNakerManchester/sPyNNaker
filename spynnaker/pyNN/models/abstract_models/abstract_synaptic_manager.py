@@ -8,6 +8,9 @@ from six import add_metaclass
 from scipy import special
 
 import math
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_incoming_edge_constraints \
+    import AbstractProvidesIncomingEdgeConstraints
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
@@ -35,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractSynapticManager(object):
+class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
     def __init__(self, master_pop_algorithm=None):
         self._stdp_checked = False
@@ -84,16 +87,16 @@ class AbstractSynapticManager(object):
         # Write the synaptic block, tracking the word count:
         synaptic_rows = sublist.get_rows()
         data = numpy.zeros(
-            (fixed_row_length
-             + constants.SYNAPTIC_ROW_HEADER_WORDS)
-            * sublist.get_n_rows(), dtype="uint32")
+            (fixed_row_length +
+             constants.SYNAPTIC_ROW_HEADER_WORDS) *
+            sublist.get_n_rows(), dtype="uint32")
         data.fill(0xBBCCDDEE)
 
         row_no = 0
         for row in synaptic_rows:
-            data_pos = ((fixed_row_length
-                         + constants.SYNAPTIC_ROW_HEADER_WORDS)
-                        * row_no)
+            data_pos = ((fixed_row_length +
+                         constants.SYNAPTIC_ROW_HEADER_WORDS) *
+                        row_no)
 
             plastic_region = row_io.get_packed_plastic_region(
                 row, weight_scales, n_synapse_type_bits)
@@ -215,8 +218,8 @@ class AbstractSynapticManager(object):
             return True
         self._stdp_checked = True
         for in_edge in in_edges:
-            if (isinstance(in_edge, ProjectionPartitionableEdge)
-                    and in_edge.synapse_dynamics is not None):
+            if (isinstance(in_edge, ProjectionPartitionableEdge) and
+                    in_edge.synapse_dynamics is not None):
                 if in_edge.synapse_dynamics.fast is not None:
                     raise exceptions.SynapticConfigurationException(
                         "Fast synapse dynamics are not supported")
@@ -224,11 +227,11 @@ class AbstractSynapticManager(object):
                     if self._stdp_mechanism is None:
                         self._stdp_mechanism = in_edge.synapse_dynamics.slow
                     else:
-                        if not (self._stdp_mechanism
-                                == in_edge.synapse_dynamics.slow):
+                        if not (self._stdp_mechanism ==
+                                in_edge.synapse_dynamics.slow):
                             raise exceptions.SynapticConfigurationException(
                                 "Different STDP mechanisms on the same"
-                                + " vertex are not supported")
+                                " vertex are not supported")
 
     @abstractmethod
     def get_n_synapse_type_bits(self):
@@ -371,8 +374,9 @@ class AbstractSynapticManager(object):
 
         # E[ number of spikes ] in a timestep
         # x /1000000.0 = conversion between microsecond to second
-        average_spikes_per_timestep = (float(n_synapses_in * spikes_per_second)
-                                       * (float(machine_timestep) / 1000000.0))
+        average_spikes_per_timestep = (
+            float(n_synapses_in * spikes_per_second) *
+            (float(machine_timestep) / 1000000.0))
 
         # Exact variance contribution from inherent Poisson variation
         poisson_variance = average_spikes_per_timestep * (weight_mean ** 2)
@@ -380,8 +384,8 @@ class AbstractSynapticManager(object):
         # Upper end of range for Poisson summation required below
         # upper_bound needs to be an integer
         upper_bound = int(round(average_spikes_per_timestep +
-                                constants.POSSION_SIGMA_SUMMATION_LIMIT
-                                * math.sqrt(average_spikes_per_timestep)))
+                                constants.POSSION_SIGMA_SUMMATION_LIMIT *
+                                math.sqrt(average_spikes_per_timestep)))
 
         # Closed-form exact solution for summation that gives the variance
         # contributed by weight distribution variation when modulated by
@@ -400,23 +404,23 @@ class AbstractSynapticManager(object):
             gammai = special.gammaincc(1 + upper_bound,
                                        average_spikes_per_timestep)
 
-            big_ratio = (math.log(average_spikes_per_timestep) * upper_bound
-                         - lngamma)
+            big_ratio = (math.log(average_spikes_per_timestep) * upper_bound -
+                         lngamma)
 
             if big_ratio > -701.0 and big_ratio < 701.0 and big_ratio != 0.0:
 
                 log_weight_variance = (
-                    -average_spikes_per_timestep
-                    + math.log(average_spikes_per_timestep)
-                    + 2.0 * math.log(weight_std_dev)
-                    + math.log(math.exp(average_spikes_per_timestep) * gammai
-                               - math.exp(big_ratio)))
+                    -average_spikes_per_timestep +
+                    math.log(average_spikes_per_timestep) +
+                    2.0 * math.log(weight_std_dev) +
+                    math.log(math.exp(average_spikes_per_timestep) * gammai -
+                             math.exp(big_ratio)))
 
                 weight_variance = math.exp(log_weight_variance)
 
         # upper bound calculation -> mean + n * SD
-        return ((average_spikes_per_timestep * weight_mean)
-                + (sigma * math.sqrt(poisson_variance + weight_variance)))
+        return ((average_spikes_per_timestep * weight_mean) +
+                (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_totals(self, subvertex, sub_graph, graph_mapper):
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
@@ -475,9 +479,9 @@ class AbstractSynapticManager(object):
         # Calculate the standard deviation, clipping to avoid numerical errors
         weight_std_devs = numpy.sqrt(
             numpy.clip(numpy.divide(
-                total_square_weights
-                - numpy.divide(numpy.power(total_weights, 2),
-                               total_items),
+                total_square_weights -
+                numpy.divide(numpy.power(total_weights, 2),
+                             total_items),
                 total_items), a_min=0.0, a_max=numpy.finfo(float).max))
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
@@ -643,8 +647,8 @@ class AbstractSynapticManager(object):
 
             # new position in synpaptic block
             position_in_block = ((atom + 1) *
-                                 (max_row_length
-                                  + constants.SYNAPTIC_ROW_HEADER_WORDS))
+                                 (max_row_length +
+                                  constants.SYNAPTIC_ROW_HEADER_WORDS))
 
             bits_reserved_for_type = self.get_n_synapse_type_bits()
             synaptic_row = synapse_io.create_row_info_from_elements(
@@ -832,20 +836,6 @@ class AbstractSynapticManager(object):
                 "failed to read and translate a piece of memory due to a "
                 "unexpected response code exception in spinnman.")
 
-    def _retrieve_master_pop_receiver_edge_constraints(self):
-        """ returns the constraitns forced one dges by the master pop table for
-        spike retrival
-
-        :return: iterable of constraints
-        """
-        return \
-            self._master_pop_table_generator.retrieve_receiver_edge_constraints()
-
-    def _retrieve_master_pop_sender_edge_constraints(self):
-        """returns the constraints forced on edges by the master pop table for
-        sending spikes
-
-        :return: iterable of constraints
-        """
-        return \
-            self._master_pop_table_generator.retrieve_sender_edge_constraints()
+    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
+        return (self._master_pop_table_generator
+                .get_edge_constraints())

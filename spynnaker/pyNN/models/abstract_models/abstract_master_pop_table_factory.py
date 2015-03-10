@@ -3,7 +3,7 @@ from six import add_metaclass
 from abc import abstractmethod
 import logging
 
-#spinnman imports
+# spinnman imports
 from spinnman import exceptions as spinnman_exceptions
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
@@ -13,6 +13,7 @@ from spynnaker.pyNN.utilities.utility_calls \
 import struct
 
 logger = logging.getLogger(__name__)
+
 
 @add_metaclass(ABCMeta)
 class AbstractMasterPopTableFactory(object):
@@ -25,8 +26,8 @@ class AbstractMasterPopTableFactory(object):
             self, incoming_key, master_pop_base_mem_address, txrx, chip_x,
             chip_y):
         """
-        :param incoming_key: the source key which the synaptic matrix needs to \
-        be mapped to
+        :param incoming_key: the source key which the synaptic matrix needs to\
+                    be mapped to
         :param master_pop_base_mem_address: the base address of the master pop
         :param txrx: the transciever object from spinnman
         :param chip_y: the y coordinate of the chip of this master pop
@@ -47,10 +48,10 @@ class AbstractMasterPopTableFactory(object):
         :param spec: the spec to write the master pop entry to
         :param block_start_addr: the start address of the master pop table
         :param row_index: the row length index for the row_length table for \
-        this entry
-        :param key: the key being recieved to be stored in the master pop table,
-        :param master_pop_table_region: the region to which the master pop table\
-        is being stored
+                    this entry
+        :param key: the key being recieved to be stored in the master pop table
+        :param master_pop_table_region: the region to which the master pop\
+                    table is being stored
         :param mask: the mask being used to create a key combo
         :return:
         """
@@ -60,19 +61,20 @@ class AbstractMasterPopTableFactory(object):
         """ completes the master pop table in the spec
 
         :param spec: the spec to write the master pop entry to
-        :param master_pop_table_region: the region to which the master pop table\
-        is being stored
+        :param master_pop_table_region: the region to which the master pop\
+                    table is being stored
         :return:
         """
 
     @staticmethod
     def read_and_convert(x, y, address, length, data_format, transceiver):
         """
-        tries to read and convert a piece of memory. If it fails, it tries again
-        up to for 4 times, and then if still fails, throws an error.
+        tries to read and convert a piece of memory. If it fails, it tries
+        again up to for 4 times, and then if still fails, throws an error.
         """
         try:
-            #turn byte array into str for unpack to work.
+
+            # turn byte array into str for unpack to work.
             data = \
                 str(list(transceiver.read_memory(
                     x, y, address, length))[0])
@@ -137,7 +139,7 @@ class AbstractMasterPopTableFactory(object):
         master_region_base_address =\
             master_region_base_address_offset + app_data_base_address
 
-        #read in the master pop table and store in ram for future use
+        # read in the master pop table and store in ram for future use
         logger.debug("Reading {} ({}) bytes starting at {} + "
                      "4".format(constants.MASTER_POPULATION_TABLE_SIZE,
                                 hex(constants.MASTER_POPULATION_TABLE_SIZE),
@@ -146,22 +148,12 @@ class AbstractMasterPopTableFactory(object):
         return master_region_base_address, app_data_base_address
 
     @abstractmethod
-    def retrieve_receiver_edge_constraints(self):
-        """ returns whatever constraints are needed by this master pop for edges
-        going into it
+    def get_edge_constraints(self):
+        """ Gets the constraints for this table on edges coming in to a vertex
+            that uses
 
-        :return: a iterable of constraints
-        :rtype: iterable  pacman.model.constraints.abstract_constraint
-        :raise None: this method does not raise any knwon exceptions
-        """
-
-    @abstractmethod
-    def retrieve_sender_edge_constraints(self):
-        """returns whatever constraints are needed by this master pop for edges
-        going out of it
-
-        :return: a iterable of constraints
-        :rtype: iterable  pacman.model.constraints.abstract_constraint
-        :raise None: this method does not raise any knwon exceptions
-
+        :return: a list of constraints
+        :rtype: list of\
+                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+        :raise None: this method does not raise any known exceptions
         """
