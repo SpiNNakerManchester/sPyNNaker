@@ -70,8 +70,14 @@ def create_class_from_reader(reader):
     """
     Interprets the packet received and creates the appropriate class
 
-    :param reader:
-    :return:
+    :param reader: a bytereader object containing the packet from which the \
+                   corresponding class has to be created
+    :type reader: \
+        :py:class:`spinnman.data.abstract_byte_reader.AbstractByteReader`
+    :return: The class of the packet created
+    :rtype: a class inheriting from \
+        :py:class:`spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
+        abstract_eieio_packet.AbstractEIEIOPacket`
     """
     byte1 = reader.read_byte()
     byte2 = reader.read_byte()
@@ -85,6 +91,18 @@ def create_class_from_reader(reader):
 
 
 def create_data_from_reader(reader):
+    """
+    Interprets the data packet received and creates the appropriate class
+
+    :param reader: a bytereader object containing the data packet from which \
+                   the corresponding class has to be created
+    :type reader: \
+        :py:class:`spinnman.data.abstract_byte_reader.AbstractByteReader`
+    :return: The class of the data packet created
+    :rtype: a class inheriting from \
+        :py:class:`spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
+        abstract_eieio_data_packet.AbstractEIEIODataPacket`
+    """
     byte1 = reader.read_byte()
     byte2 = reader.read_byte()
     header_value = byte2 << 8 | byte1
@@ -202,13 +220,15 @@ def _create_data_from_reader(header_value, reader):
                 parsed_packet.eieio_header.payload_base,
                 data=parsed_packet.data)
     elif packet_type_number == 21:
-        packet = eieio_16bit_with_payload_payload_prefix_lower_key_prefix_data_packet.\
+        packet = \
+            eieio_16bit_with_payload_payload_prefix_lower_key_prefix_data_packet.\
             EIEIO16BitWithPayloadPayloadPrefixLowerKeyPrefixDataPacket(
                 parsed_packet.eieio_header.prefix_param,
                 parsed_packet.eieio_header.payload_base,
                 data=parsed_packet.data)
     elif packet_type_number == 23:
-        packet = eieio_16bit_with_payload_payload_prefix_upper_key_prefix_data_packet.\
+        packet = \
+            eieio_16bit_with_payload_payload_prefix_upper_key_prefix_data_packet.\
             EIEIO16BitWithPayloadPayloadPrefixUpperKeyPrefixDataPacket(
                 parsed_packet.eieio_header.prefix_param,
                 parsed_packet.eieio_header.payload_base,
@@ -293,13 +313,15 @@ def _create_data_from_reader(header_value, reader):
                 parsed_packet.eieio_header.payload_base,
                 data=parsed_packet.data)
     elif packet_type_number == 53:
-        packet = eieio_32bit_with_payload_payload_prefix_lower_key_prefix_data_packet.\
+        packet = \
+            eieio_32bit_with_payload_payload_prefix_lower_key_prefix_data_packet.\
             EIEIO32BitWithPayloadPayloadPrefixLowerKeyPrefixDataPacket(
                 parsed_packet.eieio_header.prefix_param,
                 parsed_packet.eieio_header.payload_base,
                 data=parsed_packet.data)
     elif packet_type_number == 55:
-        packet = eieio_32bit_with_payload_payload_prefix_upper_key_prefix_data_packet.\
+        packet = \
+            eieio_32bit_with_payload_payload_prefix_upper_key_prefix_data_packet.\
             EIEIO32BitWithPayloadPayloadPrefixUpperKeyPrefixDataPacket(
                 parsed_packet.eieio_header.prefix_param,
                 parsed_packet.eieio_header.payload_base,

@@ -35,6 +35,7 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
         :type prefix_param: 16-bit unsigned int
         :param payload_base: base value to be used in the construction of the \
                              payload to the event to be multicasted
+        :type payload_base: 16- or 32-bit value, depending on the packet type
         :param prefix_type: determines if the prefix_param value has to be \
                             applied on the upper or lower part of the \
                             multicast routing key
@@ -186,6 +187,34 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
     @staticmethod
     def get_min_length(type_param, tag_param=0, prefix_param=None,
                        payload_base=None, prefix_type=None, is_time=False):
+        """
+        Returns the minimum eieio data packet length in bytes, given the \
+        configuration of the packet. The minimum length includes one element, \
+        whether it consists of a key or a couple key, payload. The function \
+        parameters are compatible with the init function call.
+
+        :param type_param: type of packet: 16- or 32-bit events with or
+                           without payload
+        :type type_param: spinnman.messages.eieio.eieio_type_param.\
+                          EIEIOTypeParam
+        :param tag_param: tag parameter of the eieio header (currently unused)
+        :type tag_param: 2-bit unsigned int
+        :param prefix_param: base value to be used in the construction of the \
+                             event to be multicasted
+        :type prefix_param: 16-bit unsigned int
+        :param payload_base: base value to be used in the construction of the \
+                             payload to the event to be multicasted
+        :type payload_base: 16- or 32-bit value, depending on the packet type
+        :param prefix_type: determines if the prefix_param value has to be \
+                            applied on the upper or lower part of the \
+                            multicast routing key
+        :type prefix_type: spinnman.spinnman.messages.eieio.eieio_prefix_type
+        :param is_time: determines if the payload represents a timestamp
+        :type is_time: bool
+        :return: The minimum size in bytes of the packet with the specified \
+                 configuration
+        :rtype: unsigned int
+        """
         length = 2  # header size
 
         if prefix_param is not None:
@@ -215,37 +244,68 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
     @staticmethod
     @abstractmethod
     def get_min_packet_length():
+        """
+        Returns the minimum packet length in bytes for each specific type of \
+        eieio packet. The function is implemented in each of the inheriting \
+        class and references the spynnaker.pyNN.buffer_management.\
+        abstract_eieio_packets.abstract_eieio_data_packet.\
+        AbstractEIEIODataPacket#get_min_length function
+
+        :return: The minimum size in bytes of the packet
+        :rtype: unsigned int
+        """
         pass
 
     @property
     def length(self):
+        """
+        Returns the current length of the packet in bytes
+
+        :return: The current length of the packet in bytes
+        :rtype: unsigned int
+        """
         return self._length
 
     @property
     def element_size(self):
         """
-        :return: returns the size in bytes of each element in the packet \
+        Returns the size in bytes of each element in the packet  (including \
+        payload, if present)
+
+        :return: the size in bytes of each element in the packet \
         (including payload, if present)
+        :rtype: unsigned int
         """
         return self._element_size
 
     @property
     def key_size(self):
         """
-        :return: returns the size in bytes of the key used in the packet
+        Returns the size in bytes of the key format used in the packet
+
+        :return: the size in bytes of the key used in the packet
+        :rtype: unsigned int
         """
         return self._key_size
 
     @property
     def header_size(self):
         """
-        :return: returns the size in bytes of the header
+        Returns the size of the header in bytes
+
+        :return: the size of the header in bytes
+        :rtype: unsigned int
         """
         return self._base_size
 
     def get_eieio_message_as_byte_array(self):
         """
-        returns the eieio packet as a bytearray string
+        Returns the entire eieio packet as a bytearray string, including the \
+        header, keys and payload (if present), as specified by the eieio \
+        standard
+
+        :return: The eieio packet as a bytearray string
+        :rtype: bytearray
         """
         return self._message.convert_to_byte_array()
 
@@ -258,23 +318,60 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
     # query constructor parameters
     @property
     def prefix_param(self):
+        """
+        Returns the packet type, 16- or 32-bit, with or without payload.
+
+        :return: type of packet: 16- or 32-bit events with or without payload
+        :rtype: spinnman.messages.eieio.eieio_type_param.EIEIOTypeParam
+        """
         return self._header.prefix_param
 
     @property
     def payload_base(self):
+        """
+        Returns the base value to be used in the construction of the payload \
+        to the event to be multicasted
+
+        :return: base value to be used in the construction of the payload to \
+                 the event to be multicasted
+        :rtype: 16- or 32-bit unsigned value, depending on the packet type
+        """
         return self._header.payload_base
 
     @property
     def prefix_type(self):
+        """
+        Returns the configuration be which describes if the key prefix has to \
+        be applied to the upper or lower part of the multicast routing key
+
+        :return: determines if the prefix_param value has to be applied on the \
+                 upper or lower part of the multicast routing key
+        :rtype: spinnman.spinnman.messages.eieio.eieio_prefix_type
+        """
         return self._header.prefix_type
 
     @property
     def is_time(self):
+        """
+        Returns true if the payload of each key contained in the eieio packet \
+        represents a timestamp
+
+        :return: Boolean representing if the payload of each key contained in \
+                 the eieio packet represents a timestamp
+        :rtype: bool
+        """
         return self._header.is_time
 
     # user queries
     @property
     def has_payload(self):
+        """
+        Returns true if each key has a payload associated (including \
+        timestamp), whether constant or specific for each key
+
+        :return: if each key in the packet has a payload associated
+        :rtype: bool
+        """
         if (self._header.type_param == EIEIOTypeParam.KEY_PAYLOAD_16_BIT or
                 self._header.type_param == EIEIOTypeParam.KEY_PAYLOAD_32_BIT):
             return True
@@ -286,6 +383,12 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
 
     @property
     def has_payload_prefix(self):
+        """
+        Returns true if a payload prefix has been defined for the packet
+
+        :return: if a payload prefix has been defined for the packet
+        :rtype: bool
+        """
         if self.payload_base is not None:
             return False
         else:
@@ -293,13 +396,31 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
 
     @property
     def has_fixed_timestamp(self):
-        if self.is_time:
-            return self.has_payload_prefix
+        """
+        Returns true if the packet has been defined to contain timestamps and \
+        a payload prefix, and each key does not have a payload associated
+
+        :return: if the packet includes a fixed timestamp for all the keys in \
+                 the packet
+        :rtype: bool
+        """
+        if self.is_time and self.has_payload_prefix:
+            if (self._header.type_param == EIEIOTypeParam.KEY_16_BIT or
+                    self._header.type_param == EIEIOTypeParam.KEY_32_BIT):
+                return True
+            else:
+                return False
         else:
             return False
 
     @property
     def has_key_prefix(self):
+        """
+        Returns true if a key prefix has been defined for the packet
+
+        :return: if a key prefix has been defined for the packet
+        :rtype: bool
+        """
         if self.key_prefix is not None:
             return False
         else:
@@ -307,10 +428,23 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
 
     @property
     def is_timed(self):
+        """
+        Returns true if the payload associated to each key represents \
+        a timestamp
+
+        :return: if the payload associated to each key represents a timestamp
+        :rtype: bool
+        """
         return self.is_time
 
     @property
     def payload_prefix(self):
+        """
+        Returns true if a payload prefix has been defined for the packet
+
+        :return: if a payload prefix has been defined for the packet
+        :rtype: bool
+        """
         if self.has_payload_prefix:
             return self.payload_base
         else:
@@ -318,13 +452,26 @@ class AbstractEIEIODataPacket(AbstractEIEIOPacket):
 
     @property
     def timestamp(self):
-        if self.is_time:
+        """
+        Returns the timestamp in case the packet has a fixed timestamp for all\
+        the keys, or None
+
+        :return: timestamp associated with keys in the packet, or None
+        :rtype: unsigned int or None
+        """
+        if self.has_fixed_timestamp:
             return self.payload_prefix
         else:
             return None
 
     @property
     def key_prefix(self):
+        """
+        Returns the key prefix in case the packet defines it, or None
+
+        :return: the key prefix in case the packet defines it, or None
+        :rtype: 16-bit unsigned int or None
+        """
         if self.has_key_prefix:
             return self.prefix_param
         else:
