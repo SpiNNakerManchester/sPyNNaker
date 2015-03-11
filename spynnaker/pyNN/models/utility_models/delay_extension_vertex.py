@@ -14,7 +14,7 @@ from spynnaker.pyNN import exceptions
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.constraints.key_allocator_fixed_mask_constraint \
+from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex

@@ -1,9 +1,9 @@
 from spynnaker.pyNN.models.abstract_models\
     .abstract_provides_outgoing_edge_constraints \
     import AbstractProvidesOutgoingEdgeConstraints
-from pacman.model.constraints.key_allocator_contiguous_range_constraint \
+from pacman.model.constraints.key_allocator_constraints.key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
-from pacman.model.constraints.key_allocator_same_keys_constraint \
+from pacman.model.constraints.key_allocator_constraints.key_allocator_same_keys_constraint \
     import KeyAllocatorSameKeysConstraint
 
 

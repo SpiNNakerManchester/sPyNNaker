@@ -1,7 +1,7 @@
 from pacman.model.routing_info.key_and_mask import KeyAndMask
-from pacman.model.constraints.key_allocator_fixed_mask_constraint \
+from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
-from pacman.model.constraints.key_allocator_fixed_key_and_mask_constraint \
+from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_key_and_mask_constraint \
     import KeyAllocatorFixedKeyAndMaskConstraint
 from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex

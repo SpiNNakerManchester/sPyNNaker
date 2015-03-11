@@ -5,8 +5,8 @@ from abc import abstractmethod
 
 from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
-from pacman.model.constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 
 
 @add_metaclass(ABCMeta)
@@ -65,6 +65,6 @@ class AbstractVirtualVertex(AbstractPartitionableVertex):
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
-     # overlaoded method from partitionable vertex
+    # overlaoded method from partitionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         return 0

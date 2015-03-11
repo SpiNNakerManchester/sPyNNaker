@@ -1,4 +1,4 @@
-from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
+from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_mask_constraint import \
     KeyAllocatorFixedMaskConstraint
 from pacman.utilities.field import Field
 from spynnaker.pyNN.models.abstract_models.abstract_master_pop_table_factory\
