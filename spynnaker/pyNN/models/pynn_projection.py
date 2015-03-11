@@ -1,4 +1,5 @@
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
@@ -20,7 +21,6 @@ from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 import logging
 import math
 import numpy
-
 
 logger = logging.getLogger(__name__)
 

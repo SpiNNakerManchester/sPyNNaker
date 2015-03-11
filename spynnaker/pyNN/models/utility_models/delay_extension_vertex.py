@@ -11,24 +11,21 @@ from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
 from spynnaker.pyNN import exceptions
 
-
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 from pacman.model.constraints.key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
-
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-
 
 import copy
 import logging
 from enum import Enum
 import math
-
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +126,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_mapper,
-                           report_folder):
+                           report_folder, ip_tags, reverse_ip_tags):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.

@@ -1,5 +1,3 @@
-from pacman.model.partitionable_graph.partitionable_graph import \
-    PartitionableGraph
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN import exceptions
@@ -12,6 +10,9 @@ from pacman.operations import partition_algorithms
 from pacman.operations import placer_algorithms
 from pacman.operations import router_algorithms
 from pacman.operations import routing_info_allocator_algorithms
+from pacman.operations import tag_allocator_algorithms
+from pacman.model.partitionable_graph.partitionable_graph import \
+    PartitionableGraph
 
 
 import os
@@ -52,17 +53,19 @@ class SpynnakerConfiguration(object):
         self._has_ran = False
         self._reports_states = None
         self._app_id = None
+        self._tags = None
 
         # pacman mapping objects
         self._partitioner_algorithm = None
         self._placer_algorithm = None
+        self._tag_allocator_algorithm = None
         self._key_allocator_algorithm = None
         self._router_algorithm = None
         self._report_default_directory = None
         self._app_data_runtime_folder = None
-        self._this_run_time_string_repenstation = None
+        self._this_run_time_string = None
 
-        # exeuctable params
+        # executable params
         self._do_load = None
         self._do_run = None
         self._writeTextSpecs = None
@@ -103,9 +106,8 @@ class SpynnakerConfiguration(object):
             time_of_run_file_name = os.path.join(this_run_time_folder,
                                                  "time_stamp")
             writer = open(time_of_run_file_name, "w")
-            writer.writelines("app_{}_{}"
-                              .format(self._app_id,
-                                      self._this_run_time_string_repenstation))
+            writer.writelines("app_{}_{}".format(self._app_id,
+                                                 self._this_run_time_string))
             writer.flush()
             writer.close()
 
@@ -128,7 +130,7 @@ class SpynnakerConfiguration(object):
             writer = open(time_of_run_file_name, "w")
             writer.writelines("app_{}_{}"
                               .format(self._app_id,
-                                      self._this_run_time_string_repenstation))
+                                      self._this_run_time_string))
 
             if not os.path.exists(this_run_time_folder):
                 os.makedirs(this_run_time_folder)
@@ -175,18 +177,20 @@ class SpynnakerConfiguration(object):
                                        "latest")
         if not os.path.exists(app_folder_name):
                 os.makedirs(app_folder_name)
+
         # store timestamp in latest/time_stamp
         time_of_run_file_name = os.path.join(app_folder_name, "time_stamp")
         writer = open(time_of_run_file_name, "w")
 
         # determine the time slot for later
         this_run_time = datetime.datetime.now()
-        self._this_run_time_string_repenstation = \
-            str(this_run_time.date()) + "-" + str(this_run_time.hour) + "-" + \
-            str(this_run_time.minute) + "-" + str(this_run_time.second)
-        writer.writelines("app_{}_{}"
-                          .format(self._app_id,
-                                  self._this_run_time_string_repenstation))
+        self._this_run_time_string = (
+            "{:04}-{:02}-{:02}-{:02}-{:02}-{:02}".format(
+                this_run_time.year, this_run_time.month, this_run_time.day,
+                this_run_time.hour, this_run_time.minute,
+                this_run_time.second))
+        writer.writelines("app_{}_{}".format(self._app_id,
+                                             self._this_run_time_string))
         writer.flush()
         writer.close()
         self._report_default_directory = app_folder_name
@@ -229,6 +233,11 @@ class SpynnakerConfiguration(object):
             conf.get_valid_components(placer_algorithms, "Placer")
         self._placer_algorithm = \
             placer_algorithms_list[config.get("Placer", "algorithm")]
+
+        tag_allocator_list = \
+            conf.get_valid_components(tag_allocator_algorithms, "TagAllocator")
+        self._tag_allocator_algorithm = \
+            tag_allocator_list[config.get("TagAllocator", "algorithm")]
 
         # get common key allocator algorithms
         key_allocator_algorithms_list = \
@@ -347,6 +356,7 @@ class SpynnakerConfiguration(object):
                 file_path = os.path.join(app_folder_name, file_to_move)
                 shutil.move(file_path, new_app_folder)
             files_in_report_folder = os.listdir(starting_directory)
+
             # while theres more than the valid max, remove the oldest one
             while len(files_in_report_folder) > max_to_keep:
                 files_in_report_folder.sort(

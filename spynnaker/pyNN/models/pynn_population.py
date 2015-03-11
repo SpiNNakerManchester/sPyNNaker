@@ -1,10 +1,11 @@
-from pacman.model.constraints.abstract_constraint import AbstractConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
+from pyNN.space import Space
+
+from pacman.model.constraints.abstract_constraints.abstract_constraint \
+    import AbstractConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
-
-from pyNN.space import Space
 
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate

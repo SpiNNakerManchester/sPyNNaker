@@ -17,7 +17,6 @@ from spynnaker.pyNN.utilities.parameters_surrogate\
 # pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN import exceptions
-from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -30,8 +29,8 @@ from spynnaker.pyNN.models.neural_models.izk_curr_exp \
     import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
 
 # neural projections
-from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge \
-    import DelayAfferentPartitionableEdge
+from spynnaker.pyNN.models.neural_projections\
+    .delay_afferent_partitionable_edge import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
@@ -69,7 +68,7 @@ from spynnaker.pyNN.models.neural_projections.connectors.\
     DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
-from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
+from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector\
     import SmallWorldConnector
 
 # Mechanisms for synapse dynamics
@@ -92,10 +91,13 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
 # constraints
-from pacman.model.constraints.placer_chip_and_core_constraint \
-    import PlacerChipAndCoreConstraint
-from pacman.model.constraints.partitioner_maximum_size_constraint \
-    import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.placer_constraints.\
+    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_maximum_size_constraint import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.placer_constraints.\
+    placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
 
 # note importing star is a bad thing to do.
 from pyNN.random import *
@@ -129,7 +131,7 @@ def end(stop_on_board=True):
     Unregisters the controller
     """
     global _spinnaker
-    _spinnaker.stop(_spinnaker.app_id, stop_on_board)
+    _spinnaker.stop(stop_on_board)
     _spinnaker = None
 
 

@@ -126,7 +126,7 @@ class CommandSender(AbstractProvidesOutgoingEdgeConstraints,
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_mapper,
-                           report_folder):
+                           report_folder, ip_tags, reverse_ip_tags):
         """
         Model-specific construction of the data blocks necessary to build a
         single external retina device.
