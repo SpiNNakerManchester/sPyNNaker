@@ -205,6 +205,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._database_interface.add_routing_infos(
                 self._routing_infos, self._partitioned_graph)
             self._database_interface.add_routing_tables(self._router_tables)
+            self._database_interface.add_tags(self._partitioned_graph,
+                                              self._tags)
             execute_mapping = conf.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
             if execute_mapping:

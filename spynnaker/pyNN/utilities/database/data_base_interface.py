@@ -151,6 +151,18 @@ class DataBaseInterface(object):
             "CREATE TABLE configuration_parameters("
             "parameter_id TEXT, value REAL, "
             "PRIMARY KEY (parameter_id))")
+        cur.execute(
+            "CREATE TABLE IP_tags("
+            "vertex_id INTEGER PRIMARY KEY, tag INTEGER, board_address TEXT, "
+            "ip_address TEXT, port INTEGER, strip_sdp BOOLEAN"
+            "FOREIGN KEY (vertex_id) REFERENCES "
+            "Partitioned_vertices(vertex_id))")
+        cur.execute(
+            "CREATE TABLE Reverse_IP_tags("
+            "vertex_id INTEGER PRIMARY KEY, tag INTEGER, board_address TEXT, "
+            "port INTEGER, "
+            "FOREIGN KEY (vertex_id) REFERENCES "
+            "Partitioned_vertices(vertex_id))")
 
     # noinspection PyPep8
     def send_visualiser_notifcation(self):
@@ -458,7 +470,6 @@ class DataBaseInterface(object):
             connection = sqlite.connect(self._database_address)
             cur = connection.cursor()
             sub_edges = list(partitioned_graph.subedges)
-            data = routing_infos.all_subedge_info
             for routing_info in routing_infos.all_subedge_info:
                 for key_mask in routing_info.keys_and_masks:
                     cur.execute(
@@ -560,6 +571,46 @@ class DataBaseInterface(object):
                                         key_to_neuron_map[neuron_id],
                                         neuron_id))
                             inserted_keys.append(key_to_neuron_map[neuron_id])
+            connection.commit()
+            connection.close()
+            self._lock_condition.release()
+        except Exception:
+            traceback.print_exc()
+
+    def add_tags(self, partitioned_graph, tags):
+        self._thread_pool.apply_async(self._add_tags,
+                                      args=[partitioned_graph, tags])
+
+    def _add_tags(self, partitioned_graph, tags):
+        try:
+            self._lock_condition.acquire()
+            import sqlite3 as sqlite
+            self._lock_condition.acquire()
+            connection = sqlite.connect(self._database_address)
+            cur = connection.cursor()
+            index = 1
+            for partitioned_vertex in partitioned_graph.subvertices:
+                ip_tags = tags.get_ip_tags_for_vertex(partitioned_vertex)
+                if ip_tags is not None:
+                    for ip_tag in ip_tags:
+                        cur.execute(
+                            "INSERT INTO IP_tags(vertex_id, tag,"
+                            " board_address, ip_address, port, strip_sdp)"
+                            " VALUES ({}, {}, '{}', '{}', {}, {})"
+                            .format(index, ip_tag.tag, ip_tag.board_address,
+                                    ip_tag.ip_address, ip_tag.port,
+                                    ip_tag.strip_sdp))
+                reverse_ip_tags = tags.get_reverse_ip_tags_for_vertex(
+                    partitioned_vertex)
+                if reverse_ip_tags is not None:
+                    for reverse_ip_tag in reverse_ip_tags:
+                        cur.execute(
+                            "INSERT INTO Reverse_IP_tags(vertex_id, tag,"
+                            " board_address, port)"
+                            " VALUES ({}, {}, '{}', {}, {})"
+                            .format(index, reverse_ip_tag.tag,
+                                    reverse_ip_tag.board_address,
+                                    reverse_ip_tag.port))
             connection.commit()
             connection.close()
             self._lock_condition.release()
