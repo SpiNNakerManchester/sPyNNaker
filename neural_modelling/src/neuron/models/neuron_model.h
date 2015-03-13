@@ -15,7 +15,7 @@ void neuron_model_set_machine_timestep(timer_t microsecs);
 
 //! \Function that converts an input into the real value to be used by the
 //! neuron; Allows e.g. scaling of the neuron inputs for better precision
-//! \param[in] input ?????????
+//! \param[in] input the input buffer
 static input_t neuron_model_convert_input(input_t input);
 
 // primary function called in timer loop after synaptic updates

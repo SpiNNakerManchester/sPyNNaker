@@ -53,6 +53,8 @@ bool out_spikes_is_spike(index_t neuron_index) {
     return (bit_field_test(out_spikes, neuron_index));
 }
 
+//! \print method which only operates if the models are compiled in DEBUG mode.
+//! if in debug mode, this method prints the
 void out_spikes_print() {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("out_spikes:\n");
