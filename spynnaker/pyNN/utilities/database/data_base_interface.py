@@ -21,16 +21,20 @@ logger = logging.getLogger(__name__)
 
 class DataBaseInterface(object):
 
-    def __init__(self, database_directory, wait_for_vis, socket_addresses):
+    def __init__(self, database_directory, wait_for_read_confirmation,
+                 socket_addresses):
         self._socket_addresses = socket_addresses
         self._done = False
         self._database_directory = database_directory
+        self._database_path = None
 
-        # connection to vis stuff
-        self._wait_for_vis = wait_for_vis
+        # Determines whether to wait for confirmation that the database
+        # has been read before starting the simulation
+        self._wait_for_read_confirmation = wait_for_read_confirmation
+
+        # Thread pools
         self._thread_pool = ThreadPool(processes=1)
         self._wait_pool = ThreadPool(processes=1)
-        self._database_address = None
 
         # set up checks
         self._machine_id = 0
@@ -42,15 +46,15 @@ class DataBaseInterface(object):
     def initilisation(self):
         try:
             logger.debug("creating database and initial tables")
-            self._database_address = os.path.join(self._database_directory,
-                                                  "input_output_database.db")
+            self._database_path = os.path.join(self._database_directory,
+                                               "input_output_database.db")
             self._create_tables()
         except Exception:
             traceback.print_exc()
 
     def _create_tables(self):
         import sqlite3 as sqlite
-        connection = sqlite.connect(self._database_address)
+        connection = sqlite.connect(self._database_path)
         cur = connection.cursor()
         cur.execute(
             "CREATE TABLE Machine_layout("
@@ -154,7 +158,7 @@ class DataBaseInterface(object):
         cur.execute(
             "CREATE TABLE IP_tags("
             "vertex_id INTEGER PRIMARY KEY, tag INTEGER, board_address TEXT, "
-            "ip_address TEXT, port INTEGER, strip_sdp BOOLEAN"
+            "ip_address TEXT, port INTEGER, strip_sdp BOOLEAN,"
             "FOREIGN KEY (vertex_id) REFERENCES "
             "Partitioned_vertices(vertex_id))")
         cur.execute(
@@ -165,22 +169,22 @@ class DataBaseInterface(object):
             "Partitioned_vertices(vertex_id))")
 
     # noinspection PyPep8
-    def send_visualiser_notifcation(self):
-        self._wait_pool.apply_async(self._send_visualiser_notifcation)
+    def send_read_notification(self):
+        self._wait_pool.apply_async(self._send_read_notification)
 
-    def _send_visualiser_notifcation(self):
+    def _send_read_notification(self):
         try:
             self._sent_visualisation_confirmation = True
             self._thread_pool.close()
             self._thread_pool.join()
 
-            # after all writing, send notifcation to vis
-            if self._wait_for_vis:
-                self._notify_visualiser_and_wait()
+            # after all writing, send notification
+            if self._wait_for_read_confirmation:
+                self._send_notification_and_wait_for_response()
         except Exception:
             traceback.print_exc()
 
-    def _notify_visualiser_and_wait(self):
+    def _send_notification_and_wait_for_response(self):
 
         data_base_message_connections = list()
         for socket_address in self._socket_addresses:
@@ -197,15 +201,15 @@ class DataBaseInterface(object):
         # add file path to database into command message.
         # |------P------||------F-----|---------path----------|
         #        0              1               path
-        number_of_chars = len(self._database_address)
+        number_of_chars = len(self._database_path)
         if number_of_chars > spynnaker_constants.MAX_DATABASE_PATH_LENGTH:
             raise exceptions.ConfigurationException(
                 "The file path to the database is too large to be "
-                "transmitted to the visualiser via the command packet, "
-                "please set the file path in your visualiser manually and "
-                "turn off the .cfg parameter [Database] send_file_path "
+                "transmitted via the command packet, "
+                "please set the file path manually and "
+                "set the .cfg parameter [Database] send_file_path "
                 "to False")
-        eieio_command_message.add_data(self._database_address)
+        eieio_command_message.add_data(self._database_path)
 
         # Send command and wait for response
         logger.info("*** Notifying visualiser that the database is ready ***")
@@ -220,6 +224,23 @@ class DataBaseInterface(object):
         self._wait_pool.close()
         self._wait_pool.join()
 
+    def send_start_notification(self):
+        data_base_message_connections = list()
+        for socket_address in self._socket_addresses:
+            data_base_message_connection = EieioCommandConnection(
+                socket_address.listen_port,
+                socket_address.notify_host_name,
+                socket_address.notify_port_no)
+            data_base_message_connections.append(
+                data_base_message_connection)
+
+        eieio_command_header = EIEIOCommandHeader(
+            spinnman_constants.EIEIO_COMMAND_IDS
+            .DATABASE_CONFIRMATION.value)
+        eieio_command_message = EIEIOCommandMessage(eieio_command_header)
+        for connection in data_base_message_connections:
+            connection.send_eieio_command_message(eieio_command_message)
+
     def add_machine_objects(self, machine):
         self._thread_pool.apply_async(self._add_machine, args=[machine])
 
@@ -227,7 +248,7 @@ class DataBaseInterface(object):
         try:
             import sqlite3 as sqlite
             self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_address)
+            connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             x_di = machine.max_chip_x + 1
             y_di = machine.max_chip_y + 1
@@ -267,7 +288,7 @@ class DataBaseInterface(object):
             self._lock_condition.acquire()
             import sqlite3 as sqlite
             self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_address)
+            connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             # add vertices
             for vertex in partitionable_graph.vertices:
@@ -327,7 +348,7 @@ class DataBaseInterface(object):
         try:
             import sqlite3 as sqlite
             self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_address)
+            connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             # Done in 3 statements, as Windows seems to not support
             # multiple value sets in a single statement
@@ -361,7 +382,7 @@ class DataBaseInterface(object):
             self._lock_condition.acquire()
             import sqlite3 as sqlite
             self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_address)
+            connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             # add partitioned vertex
             for subvert in partitioned_graph.subvertices:
@@ -441,7 +462,7 @@ class DataBaseInterface(object):
             self._lock_condition.acquire()
             import sqlite3 as sqlite
             self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_address)
+            connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             subverts = list(partitioned_graph.subvertices)
             for placement in placements.placements:
@@ -467,7 +488,7 @@ class DataBaseInterface(object):
             self._lock_condition.acquire()
             import sqlite3 as sqlite
             self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_address)
+            connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             sub_edges = list(partitioned_graph.subedges)
             for routing_info in routing_infos.all_subedge_info:
@@ -493,7 +514,7 @@ class DataBaseInterface(object):
             self._lock_condition.acquire()
             import sqlite3 as sqlite
             self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_address)
+            connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             for routing_table in routing_tables.routing_tables:
                 counter = 0
@@ -530,7 +551,7 @@ class DataBaseInterface(object):
         try:
             import sqlite3 as sqlite
             self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_address)
+            connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             # create table
             self._done_mapping = True
@@ -544,33 +565,27 @@ class DataBaseInterface(object):
             # insert into table
             vertices = list(partitionable_graph.vertices)
             for partitioned_vertex in partitioned_graph.subvertices:
-                placement = \
-                    placements.get_placement_of_subvertex(partitioned_vertex)
-                out_going_edges = \
-                    partitioned_graph.outgoing_subedges_from_subvertex(
+                out_going_edges = (partitioned_graph
+                                   .outgoing_subedges_from_subvertex(
+                                       partitioned_vertex))
+                if len(out_going_edges) > 0:
+                    routing_info = (routing_infos
+                                    .get_subedge_information_from_subedge(
+                                        out_going_edges[0]))
+                    vertex = graph_mapper.get_vertex_from_subvertex(
                         partitioned_vertex)
-                inserted_keys = list()
-                for subedge in out_going_edges:
-                    routing_info = routing_infos.\
-                        get_subedge_information_from_subedge(subedge)
-                    vertex = graph_mapper.\
-                        get_vertex_from_subvertex(partitioned_vertex)
                     vertex_id = vertices.index(vertex) + 1
-                    vertex_slice = \
-                        graph_mapper.get_subvertex_slice(partitioned_vertex)
-                    key_to_neuron_map = \
-                        routing_info.key_with_atom_ids_function(
-                            vertex_slice, vertex, placement, subedge)
-                    for neuron_id in key_to_neuron_map.keys():
-                        if key_to_neuron_map[neuron_id] not in inserted_keys:
-                            cur.execute(
-                                "INSERT INTO key_to_neuron_mapping("
-                                "vertex_id, key, neuron_id) "
-                                "VALUES ({}, {}, {})"
-                                .format(vertex_id,
-                                        key_to_neuron_map[neuron_id],
-                                        neuron_id))
-                            inserted_keys.append(key_to_neuron_map[neuron_id])
+                    vertex_slice = graph_mapper.get_subvertex_slice(
+                        partitioned_vertex)
+                    keys = routing_info.get_keys(vertex_slice.n_atoms)
+                    neuron_id = vertex_slice.lo_atom
+                    for key in keys:
+                        cur.execute(
+                            "INSERT INTO key_to_neuron_mapping("
+                            "vertex_id, key, neuron_id) "
+                            "VALUES ({}, {}, {})"
+                            .format(vertex_id, key, neuron_id))
+                        neuron_id += 1
             connection.commit()
             connection.close()
             self._lock_condition.release()
@@ -586,7 +601,7 @@ class DataBaseInterface(object):
             self._lock_condition.acquire()
             import sqlite3 as sqlite
             self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_address)
+            connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             index = 1
             for partitioned_vertex in partitioned_graph.subvertices:
@@ -599,7 +614,7 @@ class DataBaseInterface(object):
                             " VALUES ({}, {}, '{}', '{}', {}, {})"
                             .format(index, ip_tag.tag, ip_tag.board_address,
                                     ip_tag.ip_address, ip_tag.port,
-                                    ip_tag.strip_sdp))
+                                    "1" if ip_tag.strip_sdp else "0"))
                 reverse_ip_tags = tags.get_reverse_ip_tags_for_vertex(
                     partitioned_vertex)
                 if reverse_ip_tags is not None:
@@ -607,7 +622,7 @@ class DataBaseInterface(object):
                         cur.execute(
                             "INSERT INTO Reverse_IP_tags(vertex_id, tag,"
                             " board_address, port)"
-                            " VALUES ({}, {}, '{}', {}, {})"
+                            " VALUES ({}, {}, '{}', {})"
                             .format(index, reverse_ip_tag.tag,
                                     reverse_ip_tag.board_address,
                                     reverse_ip_tag.port))

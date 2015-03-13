@@ -196,9 +196,10 @@ class SpynnakerCommsFunctions(object):
         progress_bar.end()
         return processor_to_app_data_base_address
 
-    def _start_execution_on_machine(self, executable_targets, app_id, runtime,
-                                    time_scaling, waiting_on_confirmation,
-                                    database_thread, in_debug_mode):
+    def _start_execution_on_machine(
+            self, executable_targets, app_id, runtime, time_scaling,
+            waiting_on_confirmation, send_start_notification, database_thread,
+            in_debug_mode):
         # deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
@@ -248,6 +249,8 @@ class SpynnakerCommsFunctions(object):
         # if correct, start applications
         logger.info("Starting application")
         self._txrx.send_signal(app_id, SCPSignal.SYNC0)
+        if send_start_notification:
+            database_thread.send_start_notification()
 
         # check all apps have gone into run state
         logger.info("Checking that the application has started")

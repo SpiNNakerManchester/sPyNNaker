@@ -216,7 +216,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     partitioned_graph=self._partitioned_graph,
                     routing_infos=self._routing_infos,
                     placements=self._placements)
-            self._database_interface.send_visualiser_notifcation()
+            self._database_interface.send_read_notification()
 
         # execute data spec generation
         if do_timing:
@@ -270,12 +270,15 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                         binary_folder, executable_targets, self._hostname,
                         self._app_id, run_time)
 
-                wait_on_confirmation = \
-                    conf.config.getboolean("Database", "wait_on_confirmation")
+                wait_on_confirmation = conf.config.getboolean(
+                    "Database", "wait_on_confirmation")
+                send_start_notification = conf.config.getboolean(
+                    "Database", "send_start_notification")
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
                     self._time_scale_factor, wait_on_confirmation,
-                    self._database_interface, self._in_debug_mode)
+                    send_start_notification, self._database_interface,
+                    self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
 
