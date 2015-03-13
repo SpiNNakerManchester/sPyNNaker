@@ -10,6 +10,8 @@ typedef enum recording_channel_e {
     e_recording_channel_max,
 } recording_channel_e;
 
+#define RECORDING_POSITION_IN_REGION 3
+
 //! \brief Reads the size of the recording regions - pass 0s for the region
 //!        size pointer when the value is not needed
 //!

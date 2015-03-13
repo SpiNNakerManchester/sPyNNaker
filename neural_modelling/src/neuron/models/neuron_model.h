@@ -6,13 +6,16 @@
 // forward declaration of neuron type
 typedef struct neuron_t* neuron_pointer_t;
 
-// setup function which needs to be called in main program before any neuron
-// code executes currently minimum 100, then in 100 steps...  if not called
-// then defaults to 1ms timestep
+//! \setup function which needs to be called in main program before any neuron
+//! code executes currently minimum 100, then in 100 steps...  if not called
+//! then defaults to 1ms timestep
+//! \param[in] microsecs the amount of time between timer tics in microseconds
+//! \return This method does not return anything
 void neuron_model_set_machine_timestep(timer_t microsecs);
 
-// Function that converts an input into the real value to be used by the neuron;
-// Allows e.g. scaling of the neuron inputs for better precision
+//! \Function that converts an input into the real value to be used by the
+//! neuron; Allows e.g. scaling of the neuron inputs for better precision
+//! \param[in] input ?????????
 static input_t neuron_model_convert_input(input_t input);
 
 // primary function called in timer loop after synaptic updates

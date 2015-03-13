@@ -296,8 +296,7 @@ bool initialize(uint32_t *timer_period) {
     address_t address = data_specification_get_data_address();
 
     // Read the header
-    uint32_t version;
-    if (!data_specification_read_header(address, &version)) {
+    if (!data_specification_read_header(address)) {
         return false;
     }
 

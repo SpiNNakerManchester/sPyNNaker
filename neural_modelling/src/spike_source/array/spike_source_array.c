@@ -1,4 +1,3 @@
-#include "../../common/key_conversion.h"
 #include "../../common/recording.h"
 
 #include <bit_field.h>
@@ -9,14 +8,30 @@
 
 #define APPLICATION_MAGIC_NUMBER 0xAC2
 
+// container to point to a specific point in SDRAM for a given block of spikes
+// that have to be transmitted at a given time-step. The memory address is a
+// relative pointer from the start of the spike_data region.
 typedef struct spike_block_t {
     uint32_t timestep;
     uint32_t block_offset_words;
 } spike_block_t;
 
+// spike source array state machine
 typedef enum state_e {
     e_state_inactive, e_state_dma_in_progress, e_state_spike_block_in_buffer,
 } state_e;
+
+// spike source array region ids in human readable form
+typedef enum region{
+	system, block_index, spike_data, spike_histroy,
+}region;
+
+// what each position in the block index region actually represent in terms of
+// data (each is a word)
+typedef enum block_index_parameters{
+	transmission_key, n_sources_to_simulate, num_spike_blocks_to_transmit,
+	size_of_data_in_block_region,
+}block_index_parameters;
 
 // Globals
 static spike_block_t *spike_blocks = NULL;
@@ -25,6 +40,7 @@ static uint32_t current_spike_block_index = 0;
 static uint32_t key = 0;
 static uint32_t n_sources = 0;
 static uint32_t recording_flags = 0;
+// TODO could likely be removed and use the timer count from the timer callback
 static uint32_t time;
 static uint32_t simulation_ticks = 0;
 
@@ -40,28 +56,37 @@ static uint32_t *dma_buffer = NULL;
 static uint32_t *empty_buffer = NULL;
 static state_e state = e_state_inactive;
 
+//! \locates the absolute memory address in SDRAM given the data structure which
+//! contains the relative position from the start of the spike data region.
+//! \param[in] *spike_block A pointer to a spike block strut to which the
+//! Absolute memory address is wanted
+//! \return the absolute memory address in SDRAM of the spike block strut.
 static inline address_t get_spike_block_start_address(
         const spike_block_t *spike_block) {
     return spike_vector_region_start + spike_block->block_offset_words;
 }
 
-static bool read_parameters(address_t address) {
+//! \takes the memory address of the block index region and interprets the data
+//! written in the region from the configuration process.
+//! \param[in] address The absolute memory address of the block index region
+//! \return boolean of True if it successfully reads the block index region.
+//! Otherwise returns False
+static bool read_block_index_region(address_t address) {
 
     log_info("read_parameters: starting");
 
-    key = address[0];
-    log_info("\tkey = %08x, (x: %u, y: %u) proc: %u", key,
-             key_x(key), key_y(key), key_p(key));
+    key = address[transmission_key];
+    log_info("\tkey = %08x", key);
 
-    n_sources = address[1];
-    num_spike_blocks = address[2];
+    n_sources = address[n_sources_to_simulate];
+    num_spike_blocks = address[num_spike_blocks_to_transmit];
 
     // Convert number of neurons to required number of blocks
     // **NOTE** in floating point terms this is ceil(num_neurons / 32)
     const uint32_t neurons_to_blocks_shift = 5;
     const uint32_t neurons_to_blocks_remainder =
         (1 << neurons_to_blocks_shift) - 1;
-    spike_vector_words = n_sources >> 5;
+    spike_vector_words = n_sources >> neurons_to_blocks_shift;
     if ((n_sources & neurons_to_blocks_remainder) != 0) {
         spike_vector_words++;
     }
@@ -81,7 +106,8 @@ static bool read_parameters(address_t address) {
         log_error("Failed to allocated spike blocks");
         return false;
     }
-    memcpy(spike_blocks, &address[3], num_spike_blocks * sizeof(spike_block_t));
+    memcpy(spike_blocks, &address[size_of_data_in_block_region],
+    	   num_spike_blocks * sizeof(spike_block_t));
 
     log_debug("\tSpike blocks:");
     for(uint32_t b = 0; b < num_spike_blocks; b++) {
@@ -106,31 +132,42 @@ static bool read_parameters(address_t address) {
     return true;
 }
 
+//! \takes the memory address of the spike data region and interprets the data
+//! written in the region from the configuration process.
+//! \param[in] address The absolute memory address of the spike data region
+//! \return boolean of True if it successfully reads the block index region.
+//! Otherwise returns False
 static bool read_spike_vector_region(address_t address) {
     log_info("read_spike_vector_region: starting");
 
-    spike_vector_region_start = &address[0];
+    // assign the base address, for future indirections for ease of access
+    spike_vector_region_start = address;
     log_info("\tStart address = %08x", spike_vector_region_start);
 
     log_info("read_spike_vector_region: completed successfully");
     return true;
 }
 
+//! \Initialises the model by reading in the regions and checking recording
+//! data.
+//! \param[in] *timer_period a pointer for the memory address where the timer
+//! period should be stored during the function.
+//! \return boolean of True if it successfully read all the regions and set up
+//! all its internal data structures. Otherwise returns False
 static bool initialize(uint32_t *timer_period) {
-    log_info("initialize: started");
+    log_info("Initialise: started");
 
-    // Get the address this core's DTCM data starts at from SRAM
+    // Get the address this core's DTCM data starts at from SDRAM
     address_t address = data_specification_get_data_address();
 
     // Read the header
-    uint32_t version;
-    if (!data_specification_read_header(address, &version)) {
+    if (!data_specification_read_header(address)) {
         return false;
     }
 
     // Get the timing details
     if (!simulation_read_timing_details(
-            data_specification_get_region(0, address),
+            data_specification_get_region(system, address),
             APPLICATION_MAGIC_NUMBER,
             timer_period, &simulation_ticks)) {
         return false;
@@ -139,28 +176,31 @@ static bool initialize(uint32_t *timer_period) {
     // Get the recording information
     uint32_t spike_history_region_size;
     recording_read_region_sizes(
-            &data_specification_get_region(0, address)[3], &recording_flags,
-            &spike_history_region_size, NULL, NULL);
+            &data_specification_get_region(system, address)
+			[RECORDING_POSITION_IN_REGION],
+			&recording_flags, &spike_history_region_size, NULL, NULL);
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
         if (!recording_initialze_channel(
-                data_specification_get_region(3, address),
+                data_specification_get_region(spike_histroy, address),
                 e_recording_channel_spike_history, spike_history_region_size)) {
             return false;
         }
     }
 
     // Setup regions that specify spike source array data
-    if (!read_parameters(data_specification_get_region(1, address))) {
+    if (!read_block_index_region(
+    		data_specification_get_region(block_index, address))) {
         return false;
     }
 
-    if (!read_spike_vector_region(data_specification_get_region(2, address))) {
+    if (!read_spike_vector_region(
+    		data_specification_get_region(spike_data, address))) {
         return false;
     }
 
     // If we have any spike blocks and the 1st spike block should be sent at
-    // the 1st timestep
+    // the 1st time step
     if ((num_spike_blocks > 0) && (spike_blocks[0].timestep == 0)) {
 
         // Synchronously copy block into dma buffer
@@ -171,13 +211,19 @@ static bool initialize(uint32_t *timer_period) {
         state = e_state_spike_block_in_buffer;
     }
 
-    log_info("initialize: completed successfully");
+    log_info("Initialise: completed successfully");
 
     return true;
 }
 
-void spike_source_dma_callback(uint unused, uint tag) {
-    use(unused);
+//! \The callback used when a DMA interrupt is set off. The result of this is
+//! to change the state in the state machine.
+//! \param[in] completed_id the id allocated to the dma. This is a value of
+//! how many dma's have been requested
+//! \param[in] tag The tag set by the DMA request (used for identification)
+//! \return None
+void spike_source_dma_callback(uint completed_id, uint tag) {
+    use(completed_id);
 
     if (tag != 0) {
         sentinel("tag (%d) = 0", tag);
@@ -193,9 +239,19 @@ void spike_source_dma_callback(uint unused, uint tag) {
     state = e_state_spike_block_in_buffer;
 }
 
-void timer_callback(uint unused0, uint unused1) {
-    use(unused0);
-    use(unused1);
+//! \The callback used when a timer tic interrupt is set off. The result of
+//! this is to transmit any spikes that need to be sent at this timer tic,
+//! update any recording, and update the state machine's states.
+//! If the timer tic is set to the end time, this method will call the
+//! spin1api stop command to allow clean exit of the executable.
+//! \param[in] timer_count the number of times this call back has been
+//! executed since start of simulation
+//! \param[in] unused for consistency sake of the API always returning two
+//! parameters, this parameter has no semantics currently and thus is set to 0
+//! \return None
+void timer_callback(uint timer_count, uint unused) {
+    use(timer_count);
+    use(unused);
     time++;
 
     log_debug("Timer tick %u", time);
@@ -279,7 +335,8 @@ void timer_callback(uint unused0, uint unused1) {
     }
 }
 
-// Entry point
+//! \The only entry point for this model. it initialises the model, sets up the
+//! Interrupts for the DMA and Timer tic and calls the spin1api for running.
 void c_main(void) {
 
     // Load DTCM data

@@ -14,6 +14,14 @@ typedef struct recording_channel_t {
     uint8_t *end;
 } recording_channel_t;
 
+// positions within the recording region definition for each type of event
+// Available to be recorded
+typedef enum recording_positions {
+    flags_for_recording, spikes_position, protential_position, gsyn_position,
+} recording_positions;
+
+
+
 //---------------------------------------
 // Globals
 //---------------------------------------
@@ -22,6 +30,10 @@ static recording_channel_t g_recording_channels[e_recording_channel_max];
 //---------------------------------------
 // Private API
 //---------------------------------------
+//! \????????????
+//! \param[in] channel the channel strut which represents the memory data for a
+//! given recording region
+//! \return boolean which is True ????????????? or false otherwise
 static inline bool recording_channel_in_use(recording_channel_e channel) {
     return (g_recording_channels[channel].start != NULL
             && g_recording_channels[channel].end != NULL);
@@ -30,31 +42,49 @@ static inline bool recording_channel_in_use(recording_channel_e channel) {
 //---------------------------------------
 // Public API
 //---------------------------------------
+//! \checks if a channel is expected to be producing recordings.
+//! \param[in] recording_flags the integer which contains the flags for the
+//! if an channel is enabled.
+//! \param[in] channel the channel strut which contains the memory data for a
+//! given channel
+//! \return boolean which is True if the channel is expected to produce
+//! recordings or false otherwise
 bool recording_is_channel_enabled(uint32_t recording_flags,
         recording_channel_e channel) {
     return (recording_flags & (1 << channel)) != 0;
 }
 
+//! \extracts the sizes of the recorded regions from SDRAM
+//! \param[in] region_start the absolute address in SDRAM
+//! \param[in] recording_flags the flag ids read from SDRAM
+//! \param[out] spike_history_region_size if this region is set to have
+//! data recorded into it, it will get set with the size of the spike
+//! recorder region
+//! \param[out] neuron_potential_region_size if this region is set to have
+//! data recorded into it, it will get set with the size of the potential
+//! recorder region
+//! \param[out] neuron_gysn_region_size
+//! \return This method does not return anything
 void recording_read_region_sizes(
         address_t region_start, uint32_t* recording_flags,
         uint32_t* spike_history_region_size,
         uint32_t* neuron_potential_region_size,
         uint32_t* neuron_gysn_region_size) {
-    *recording_flags = region_start[0];
+    *recording_flags = region_start[flags_for_recording];
     if (recording_is_channel_enabled(*recording_flags,
                 e_recording_channel_spike_history)
             && (spike_history_region_size != NULL)) {
-        *spike_history_region_size = region_start[1];
+        *spike_history_region_size = region_start[spikes_position];
     }
     if (recording_is_channel_enabled(*recording_flags,
                 e_recording_channel_neuron_potential)
             && (neuron_potential_region_size != NULL)) {
-        *neuron_potential_region_size = region_start[2];
+        *neuron_potential_region_size = region_start[protential_position];
     }
     if (recording_is_channel_enabled(*recording_flags,
                 e_recording_channel_neuron_gsyn)
             && (neuron_gysn_region_size != NULL)) {
-        *neuron_gysn_region_size = region_start[3];
+        *neuron_gysn_region_size = region_start[gsyn_position];
     }
 }
 
@@ -65,7 +95,7 @@ bool recording_initialze_channel(
     if (recording_channel_in_use(channel)) {
         log_error("Recording channel %u already configured", channel);
 
-        // CHANNEL already initialized
+        // CHANNEL already initialised
         return false;
     } else {
         recording_channel_t *recording_channel = &g_recording_channels[channel];

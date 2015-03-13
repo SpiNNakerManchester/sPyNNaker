@@ -1,5 +1,6 @@
+#include "../common/neuron-typedefs.h"
+
 #include "population_table.h"
-#include "../common/key_conversion.h"
 #include "synapse_row.h"
 #include <debug.h>
 #include <string.h>
@@ -70,12 +71,56 @@ bool population_table_initialise(address_t table_address,
     return true;
 }
 
+//! \helpful method for converting a key with the field ranges of:
+//! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
+//! core that transmitted the spike and n represents the atom id which that
+//! core has spiked with.
+//! \param[in] k The key that needs translating
+//! \return the x field of the key (assuming the key is in the format
+//! described above)
+static inline key_t _key_x(key_t k) {
+    return (k >> 24);
+}
+
+//! \helpful method for converting a key with the field ranges of:
+//! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
+//! core that transmitted the spike and n represents the atom id which that
+//! core has spiked with.
+//! \param[in] k The key that needs translating
+//! \return the y field of the key (assuming the key is in the format
+//! described above)
+static inline key_t _key_y(key_t k) {
+    return ((k >> 16) & 0xFF);
+}
+
+//! \helpful method for converting a key with the field ranges of:
+//! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
+//! core that transmitted the spike and n represents the atom id which that
+//! core has spiked with.
+//! \param[in] k The key that needs translating
+//! \return the p field of the key (assuming the key is in the format
+//! described above)
+static inline key_t _key_p(key_t k) {
+    return ((k >> 11) & 0x1F);
+}
+
+//! \helpful method for converting a key with the field ranges of:
+//! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
+//! core that transmitted the spike and n represents the atom id which that
+//! core has spiked with.
+//! \param[in] k The key that needs translating
+//! \return the n field of the key (assuming the key is in the format
+//! described above)
+static inline key_t _key_n(key_t k) {
+    return k & 0x7FF;
+}
+
 bool population_table_get_address(spike_t spike, address_t* row_address,
                                   size_t* n_bytes_to_transfer) {
 
-    uint32_t table_index = _get_table_index(key_x(spike), key_y(spike),
-                                            key_p(spike));
-    uint32_t neuron_id = key_n(spike);
+    uint32_t table_index = _get_table_index(_key_x(spike), _key_y(spike),
+                                            _key_p(spike));
+    uint32_t neuron_id = _key_n(spike);
 
     check((table_index < MASTER_POPULATION_MAX),
           "0 <= population_id (%u) < %u", table_index,

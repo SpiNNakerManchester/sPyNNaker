@@ -24,7 +24,6 @@
 #include "plasticity/synapse_dynamics.h"
 #include "../common/out_spikes.h"
 #include "../common/recording.h"
-#include "../common/key_conversion.h"
 #include <debug.h>
 #include <string.h>
 
@@ -43,7 +42,20 @@ static uint32_t recording_flags;
 // The input buffers - from synapses.c
 static input_t *input_buffers;
 
+// parameters that reside in the neuron_parameter_data_region in human
+// readable form
+typedef enum parmeters_in_neuron_parameter_data_region {
+    transmission_key, number_of_neurons_to_simulate, num_neuron_parameters,
+	the_machine_time_step_in_microseconds,
+	size_of_memory_which_contains_all_neural_parameters,
+} parmeters_in_neuron_parameter_data_region;
+
+
+//! private method for doing output debug data on the neurons
+//! \return nothing
 static inline void _print_neurons() {
+// only if the models are compiled in debug mode will this method contain
+// said lines.
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
@@ -54,20 +66,28 @@ static inline void _print_neurons() {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+//! \translate the data stored in the NEURON_PARAMS data region in SDRAM and
+//! converts it into c based objects for use.
+//! \param[in] address the absolute address in SDRAM for the start of the
+//!            NEURON_PARAMS data region in SDRAM
+//! \param[in] recording_flags_param the recordings parameters
+//!            (contains which regions are active and how big they are)
+//! \param[out] n_neurons_value The number of neurons this model is to emulate
+//! \return boolean which is True is the translation was successful
+//! otherwise False
 bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         uint32_t *n_neurons_value) {
     log_info("neuron_initialise: starting");
 
     // Read the spike key to use
-    key = address[0];
-    log_info("\tkey = %08x, (x: %u, y: %u) proc: %u", key, key_x(key),
-             key_y(key), key_p(key));
+    key = address[transmission_key];
+    log_info("\tkey = %08x", key);
 
     // Read the neuron details
-    n_neurons = address[1];
+    n_neurons = address[number_of_neurons_to_simulate];
     *n_neurons_value = n_neurons;
-    uint32_t n_params = address[2];
-    timer_t timestep = address[3];
+    uint32_t n_params = address[num_neuron_parameters];
+    timer_t timestep = address[the_machine_time_step_in_microseconds];
 
     log_info("\tneurons = %u, params = %u, time step = %u", n_neurons,
              n_params, timestep);
@@ -78,7 +98,9 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         log_error("Unable to allocate neuron array - Out of DTCM");
         return false;
     }
-    memcpy(neuron_array, &address[4], n_neurons * sizeof(neuron_t));
+    memcpy(neuron_array,
+    		&address[size_of_memory_which_contains_all_neural_parameters],
+			n_neurons * sizeof(neuron_t));
 
     // Set up the out spikes array
     if (!out_spikes_initialize(n_neurons)) {
@@ -93,13 +115,21 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     return true;
 }
 
+//! \setter for the internal input buffers
+//! \param[in] input_buffers_value the new input buffers
+//! \return None this method does not return anything.
 void neuron_set_input_buffers(input_t *input_buffers_value) {
     input_buffers = input_buffers_value;
 }
 
+//! \executes all the updates to neural parameters when a given timer period
+//! has occurred.
+//! \param[in] time the timer tic  value currently being executed
+//! \return nothing
 void neuron_do_timestep_update(timer_t time) {
     use(time);
 
+    // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
         neuron_pointer_t neuron = &neuron_array[neuron_index];
 
@@ -114,6 +144,7 @@ void neuron_do_timestep_update(timer_t time) {
         input_t external_bias =
             synapse_dynamics_get_intrinsic_bias(neuron_index);
 
+        // update neuron parameters (will inform us if the neuron should spike)
         bool spike = neuron_model_state_update(
             exc_neuron_input, inh_neuron_input, external_bias, neuron);
 
@@ -149,6 +180,7 @@ void neuron_do_timestep_update(timer_t time) {
         }
     }
 
+    // do logging stuff if required
     out_spikes_print();
     _print_neurons();
 

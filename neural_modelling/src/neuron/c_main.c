@@ -5,35 +5,11 @@
  *  This file contains the main function of the application framework, which
  *  the application programmer uses to configure and run applications.
  *
- * AUTHOR
- *    Thomas Sharp - thomas.sharp@cs.man.ac.uk
- *    Dave Lester (david.r.lester@manchester.ac.uk)
- *
- *  COPYRIGHT
- *    Copyright (c) Dave Lester and The University of Manchester, 2013.
- *    All rights reserved.
- *    SpiNNaker Project
- *    Advanced Processor Technologies Group
- *    School of Computer Science
- *    The University of Manchester
- *    Manchester M13 9PL, UK
- *
  *  DESCRIPTION
  *    A header file that can be used as the API for the spin-neuron.a library.
  *    To use the code is compiled with
  *
  *      #include "debug.h"
- *
- *  CREATION DATE
- *    21 July, 2013
- *
- *  HISTORY
- *    DETAILS
- *    Created on       : 27 July 2013
- *    Version          : $Revision$
- *    Last modified on : $Date$
- *    Last modified by : $Author$
- *    $Id$
  *
  */
 
@@ -48,6 +24,8 @@
 #include <simulation.h>
 #include <debug.h>
 
+/* validates that the model being compiled does indeed contain a application
+   magic number*/
 #ifndef APPLICATION_MAGIC_NUMBER
 #define APPLICATION_MAGIC_NUMBER 0
 #error APPLICATION_MAGIC_NUMBER was undefined.  Make sure you define this\
@@ -56,6 +34,7 @@
 
 #define N_RECORDING_CHANNELS 3
 
+// human readable definitions of each region in SDRAM
 typedef enum regions_e {
     SYSTEM_REGION,
     NEURON_PARAMS_REGION,
@@ -68,24 +47,24 @@ typedef enum regions_e {
     GSYN_RECORDING_REGION
 } regions_e;
 
+// Globals
 uint32_t time;
 static uint32_t simulation_ticks = 0;
 
-// Globals
-#ifdef SYNAPSE_BENCHMARK
-  uint32_t  num_fixed_pre_synaptic_events = 0;
-  uint32_t  num_plastic_pre_synaptic_events = 0;
-#endif  // SYNAPSE_BENCHMARK
-
+//! \Initialises the model by reading in the regions and checking recording
+//! data.
+//! \param[in] *timer_period a pointer for the memory address where the timer
+//! period should be stored during the function.
+//! \return boolean of True if it successfully read all the regions and set up
+//! all its internal data structures. Otherwise returns False
 static bool initialize(uint32_t *timer_period) {
-    log_info("initialize: started");
+    log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();
 
     // Read the header
-    uint32_t version;
-    if (!data_specification_read_header(address, &version)) {
+    if (!data_specification_read_header(address)) {
         return false;
     }
 
@@ -168,24 +147,31 @@ static bool initialize(uint32_t *timer_period) {
     return true;
 }
 
-void timer_callback(uint unused0, uint unused1) {
-    use(unused0);
-    use(unused1);
+//! \The callback used when a timer tic interrupt is set off. The result of
+//! this is to transmit any spikes that need to be sent at this timer tic,
+//! update any recording, and update the state machine's states.
+//! If the timer tic is set to the end time, this method will call the
+//! spin1api stop command to allow clean exit of the executable.
+//! \param[in] timer_count the number of times this call back has been
+//! executed since start of simulation
+//! \param[in] unused for consistency sake of the API always returning two
+//! parameters, this parameter has no semantics currently and thus is set to 0
+//! \return None
+void timer_callback(uint timer_count, uint unused) {
+    use(timer_count);
+    use(unused);
 
     time++;
 
     log_debug("Timer tick %u", time);
 
-    // if a fixed number of simulation ticks are specified and these have passed
+    /* if a fixed number of simulation ticks that were specified at startup
+       then do reporting for finishing */
     if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {
         log_info("Simulation complete.\n");
 
-#ifdef SYNAPSE_BENCHMARK
-        log_info("\t%u/%u fixed/plastic pre-synaptic events.\n",
-                 num_fixed_pre_synaptic_events,
-                 num_plastic_pre_synaptic_events);
-#endif  // SYNAPSE_BENCHMARK
-
+        // print statistics into logging region
+        synapses_print_pre_synaptic_events();
         synapses_print_saturation_count();
 
         // Finalise any recordings that are in progress, writing back the final
@@ -202,15 +188,19 @@ void timer_callback(uint unused0, uint unused1) {
         spin1_exit(0);
         return;
     }
-
+    // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time);
 }
 
+//! \The only entry point for this model. it initialises the model, sets up the
+//! Interrupts for the Timer tic and calls the spin1api for running.
 void c_main(void) {
 
     // Load DTCM data
     uint32_t timer_period;
+
+    // initialise the model
     initialize(&timer_period);
 
     // Start the time at "-1" so that the first tick will be 0

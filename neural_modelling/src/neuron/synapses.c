@@ -11,8 +11,9 @@
 #define RING_BUFFER_SIZE (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_TYPE_BITS\
                                 + SYNAPSE_INDEX_BITS))
 
+// Globals required for synapse benchmarking to work.
 #ifdef SYNAPSE_BENCHMARK
-  extern uint32_t num_fixed_pre_synaptic_events;
+    uint32_t  num_fixed_pre_synaptic_events = 0;
 #endif  // SYNAPSE_BENCHMARK
 
 // The number of neurons
@@ -341,4 +342,17 @@ void synapses_print_saturation_count() {
     if (saturation_count > 0) {
         log_warning("Ring buffer saturation events: %d\n", saturation_count);
     }
+}
+
+//! \either prints the counters for plastic and fixed pre synaptic events based
+//! on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or does
+//! nothing (the assumption being that a empty function will be removed by the
+//! compiler and therefore there is no code bloat)
+//! \return Nothing, this method does not return anything
+void synapses_print_pre_synaptic_events() {
+#ifdef SYNAPSE_BENCHMARK
+	log_info("\t%u fixed pre-synaptic events.\n",
+			num_fixed_pre_synaptic_events);
+	synapse_dynamics_print_plastic_pre_synaptic_events();
+#endif // SYNAPSE_BENCHMARK
 }

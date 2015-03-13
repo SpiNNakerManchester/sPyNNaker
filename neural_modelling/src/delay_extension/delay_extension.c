@@ -1,6 +1,5 @@
 #include "../common/neuron-typedefs.h"
 #include "../common/in_spikes.h"
-#include "../common/key_conversion.h"
 
 #include <bit_field.h>
 #include <data_specification.h>
@@ -45,8 +44,7 @@ static bool read_parameters(address_t address) {
 
     // changed from above for new file format 13-1-2014
     key = address[0];
-    log_info("\tkey = %08x, (x: %u, y: %u) proc: %u", key, key_x(key),
-            key_y(key), key_p(key));
+    log_info("\tkey = %08x", key);
 
     num_neurons = address[1];
     neuron_bit_field_words = get_bit_field_size(num_neurons);
@@ -112,8 +110,7 @@ static bool initialize(uint32_t *timer_period) {
     address_t address = data_specification_get_data_address();
 
     // Read the header
-    uint32_t version;
-    if (!data_specification_read_header(address, &version)) {
+    if (!data_specification_read_header(address)) {
         return false;
     }
 
@@ -149,6 +146,18 @@ void incoming_spike_callback(uint key, uint payload) {
     }
 }
 
+//! \helpful method for converting a key with the field ranges of:
+//! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
+//! core that transmitted the spike and n represents the atom id which that
+//! core has spiked with.
+//! \param[in] k The key that needs translating
+//! \return the n field of the key (assuming the key is in the format
+//! described above)
+// TODO: this needs to be removed to allow a true virtual key space
+static inline key_t _key_n(key_t k) {
+    return k & 0x7FF;
+}
+
 void spike_process(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
@@ -168,7 +177,7 @@ void spike_process(uint unused0, uint unused1) {
     while (in_spikes_get_next_spike(&s)) {
 
         // Mask out neuron id
-        uint32_t neuron_id = key_n(s);
+        uint32_t neuron_id = _key_n(s);
         if (neuron_id < num_neurons) {
 
             // Increment counter

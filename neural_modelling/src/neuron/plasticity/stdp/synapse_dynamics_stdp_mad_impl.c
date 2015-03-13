@@ -14,7 +14,7 @@
 #include <debug.h>
 
 #ifdef SYNAPSE_BENCHMARK
-extern uint32_t num_plastic_pre_synaptic_events;
+ uint32_t num_plastic_pre_synaptic_events;
 #endif  // SYNAPSE_BENCHMARK
 
 //---------------------------------------
@@ -297,4 +297,16 @@ void synapse_dynamics_process_post_synaptic_event(
 input_t synapse_dynamics_get_intrinsic_bias(index_t neuron_index) {
     use(neuron_index);
     return 0.0k;
+}
+
+//! \either prints the counters for plastic pre synaptic events based
+//! on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or does
+//! nothing (the assumption being that a empty function will be removed by the
+//! compiler and therefore there is no code bloat)
+//! \return Nothing, this method does not return anything
+void synapse_dynamics_print_plastic_pre_synaptic_events(){
+#ifdef SYNAPSE_BENCHMARK
+	log_info("\t%u plastic pre-synaptic events.\n",
+			 num_plastic_pre_synaptic_events);
+#endif  // SYNAPSE_BENCHMARK
 }
