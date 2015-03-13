@@ -1,9 +1,13 @@
-from spynnaker.pyNN.models.spike_source.abstract_spike_source import \
-    AbstractSpikeSource
 from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions import \
     generate_parameter
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
+    AbstractRecordableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
+    AbstractDataSpecableVertex
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_partitionable_population_vertex import AbstractPartitionableVertex
 
 
 from data_specification.data_specification_generator import \
@@ -24,7 +28,9 @@ PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
 
-class SpikeSourcePoisson(AbstractSpikeSource):
+class SpikeSourcePoisson(
+        AbstractRecordableVertex, AbstractPartitionableVertex,
+        AbstractDataSpecableVertex):
     """
     This class represents a Poisson Spike source object, which can represent
     a pynn_population.py of virtual neurons each with its own parameters.
@@ -40,16 +46,20 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma,
-                 contraints=None, label="SpikeSourcePoisson",
+                 constraints=None, label="SpikeSourcePoisson",
                  rate=1.0, start=0.0, duration=10000000000.0, seed=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
-        AbstractSpikeSource.__init__(self, label, n_neurons, contraints,
-                                     machine_time_step=machine_time_step,
-                                     timescale_factor=timescale_factor,
-                                     max_atoms_per_core=SpikeSourcePoisson.
-                                     _model_based_max_atoms_per_core)
+        AbstractPartitionableVertex.__init__(
+            self, n_atoms=n_neurons, label=label, constraints=constraints,
+            max_atoms_per_core=self._model_based_max_atoms_per_core)
+        AbstractRecordableVertex.__init__(
+            self, machine_time_step, label)
+        AbstractDataSpecableVertex.__init__(
+            self, label=label, n_atoms=n_neurons,
+            machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor)
         self._rate = rate
         self._start = start
         self._duration = duration

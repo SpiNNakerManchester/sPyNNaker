@@ -515,7 +515,7 @@ void parse_sequenced_eieio_pkt(eieio_msg_t eieio_msg_ptr, uint16_t length)
 void send_buffer_request_pkt(void)
 {
   uint32_t space = check_sdram_buffer_space_available();
-  if (space > MIN_BUFFER_SPACE && space != last_space)
+  if (space >= MIN_BUFFER_SPACE && space != last_space)
   {
 #ifdef DEBUG
     log_info("sending request packet with space: %d and seq_no: %d", space, pkt_fsm);
@@ -936,13 +936,14 @@ void packet_interpreter(eieio_msg_t eieio_msg_ptr)
 #endif
 
   bool pkt_apply_prefix = (bool) (data_hdr_value >> 15);
-  bool pkt_format = (bool) (data_hdr_value >> 14 & 0x1);
+  bool pkt_format = (bool) ((data_hdr_value >> 14) & 0x1);
   bool pkt_payload_prefix_apply = (bool) (data_hdr_value >> 13 & 0x1);
   uint8_t pkt_type = (uint8_t) (data_hdr_value >> 10 & 0x3);
   uint8_t pkt_len = (uint8_t) (data_hdr_value & 0xFF);
   bool payload_on = (bool) (pkt_type & 0x1);
   uint32_t pkt_key_prefix = prefix;
   uint32_t pkt_payload_prefix = 0;
+  bool payload_timestamp = (bool) ((data_hdr_value >> 12) & 0x1);
 
 #ifdef DEBUG
   bool pkt_timestamp = (bool) (data_hdr_value >> 12 & 0x1);
@@ -977,24 +978,32 @@ void packet_interpreter(eieio_msg_t eieio_msg_ptr)
       pkt_format = 0;
   }
 
-  if (pkt_payload_prefix_apply)
+  if (!payload_timestamp)
   {
-    if (!(pkt_type & 0x2)) //16 bit type packet
+    if (pkt_payload_prefix_apply)
     {
-      uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
-      event_pointer = (void*) (((uint16_t *) event_pointer) + 1);
+      if (!(pkt_type & 0x2)) //16 bit type packet
+      {
+        uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
+        event_pointer = (void*) (((uint16_t *) event_pointer) + 1);
 
-      pkt_payload_prefix = (uint32_t) payload_prefix_ptr[0];
-    }
-    else //32 bit type packet
-    {
-      uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
-      event_pointer = (void*) (((uint16_t *) event_pointer) + 2);
+        pkt_payload_prefix = (uint32_t) payload_prefix_ptr[0];
+      }
+      else //32 bit type packet
+      {
+        uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
+        event_pointer = (void*) (((uint16_t *) event_pointer) + 2);
 
-      uint32_t temp1 = payload_prefix_ptr[0];
-      uint32_t temp2 = payload_prefix_ptr[1];
-      pkt_payload_prefix = temp2 << 16 | temp1;
+        uint32_t temp1 = payload_prefix_ptr[0];
+        uint32_t temp2 = payload_prefix_ptr[1];
+        pkt_payload_prefix = temp2 << 16 | temp1;
+      }
     }
+  }
+  else
+  {
+    payload_on = 0;
+    pkt_payload_prefix_apply = 0;
   }
 
   if (pkt_type <= 1)
@@ -1151,7 +1160,12 @@ void process_32_bit_packets (void* event_pointer,
 #endif
 
       if ( (!check) || (check && ((key & mask) == key_space)))
+      {
         spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+#ifdef DEBUG
+      log_info("sent");
+#endif
+      }
       else
         incorrect_keys++;
     }

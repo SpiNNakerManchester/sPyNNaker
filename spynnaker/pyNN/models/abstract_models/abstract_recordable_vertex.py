@@ -1,19 +1,15 @@
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
-from spinnman.messages.eieio.eieio_message import EIEIOMessage
+
 
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
-    abstract_buffer_sendable_partitionable_vertex import AbstractBufferSendableVertex
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import constants
 
 from pacman.utilities import constants as pacman_constants
 
-from spinnman.data.little_endian_byte_array_byte_reader import \
-    LittleEndianByteArrayByteReader
 
 import logging
 import numpy
@@ -24,15 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractRecordableVertex(AbstractBufferSendableVertex):
+class AbstractRecordableVertex(object):
     """
     Underlying AbstractConstrainedVertex model for Neural Applications.
     """
 
-    def __init__(self, machine_time_step, label, tag, port, address,
-                 max_on_chip_memory_usage_for_recording, strip_sdp=False):
-        AbstractBufferSendableVertex.__init__(
-            self, tag, port, address, strip_sdp=strip_sdp)
+    def __init__(self, machine_time_step, label):
         self._record = False
         self._record_v = False
         self._record_gsyn = False
@@ -40,12 +33,6 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
         self._app_mask = pacman_constants.DEFAULT_MASK
         self._label = label
         self._machine_time_step = machine_time_step
-        self._max_on_chip_memory_usage_for_recording = \
-            max_on_chip_memory_usage_for_recording
-
-        self._will_send_buffers = None
-        self._recording_region_size_in_bytes = None
-
 
     @property
     def machine_time_step(self):
@@ -77,29 +64,19 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
     def set_record_gsyn(self, setted_value):
         self._record_gsyn = setted_value
 
-    def get_recording_region_size(self, spike_region_size,
-                                  bytes_per_timestep=0):
+    def get_recording_region_size(self, bytes_per_timestep):
         """
-        Gets the size of the spike buffer for a range of neurons and time steps
-        ASSUMES one spike per timer tic per neuron. Buffers can support more...
+        Gets the size of a recording region in bytes
         """
-        if not self._record or self._no_machine_time_steps is None:
-            return 0
-        else:
-            spike_region_size = \
-                constants.RECORDING_ENTRY_BYTE_SIZE + spike_region_size
-            if spike_region_size > self._max_on_chip_memory_usage_for_recording:
-                self._will_send_buffers = True
-                self._recording_region_size_in_bytes = \
-                    self._max_on_chip_memory_usage_for_recording
-                return self._max_on_chip_memory_usage_for_recording
-            else:
-                self._recording_region_size_in_bytes = spike_region_size
-                return spike_region_size
+        if self._no_machine_time_steps is None:
+            raise Exception("This model cannot record this parameter"
+                            + " without a fixed run time")
+        return (constants.RECORDING_ENTRY_BYTE_SIZE +
+                (self._no_machine_time_steps * bytes_per_timestep))
 
     def _get_spikes(
             self, graph_mapper, placements, transciever, compatible_output,
-            spike_recording_region, buffer_manager):
+            spike_recording_region, sub_vertex_out_spike_bytes_function):
         """
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
@@ -141,32 +118,50 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
 
-            if number_of_bytes_written > self._recording_region_size_in_bytes:
+            #check that the number of spikes written is smaller or the same as
+            #  the size of the memory region we allocated for spikes
+            out_spike_bytes = sub_vertex_out_spike_bytes_function(
+                subvertex, subvertex_slice)
+            size_of_region = self.get_recording_region_size(out_spike_bytes)
+
+            if number_of_bytes_written > size_of_region:
                 raise exceptions.MemReadException(
                     "the amount of memory written ({}) was larger than was "
                     "allocated for it ({})"
-                    .format(number_of_bytes_written,
-                            self._recording_region_size_in_bytes))
+                    .format(number_of_bytes_written, size_of_region))
 
             # Read the spikes
             logger.debug("Reading {} ({}) bytes starting at {} + 4"
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            buffer_data = transciever.read_memory_return_byte_array(
+            spike_data = transciever.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
-            # turn buffers into eieio data messages
-            little_endian_byte_reader =\
-                LittleEndianByteArrayByteReader(buffer_data)
-            eieio_messages = \
-                EIEIOMessage.create_eieio_messages_from(
-                    little_endian_byte_reader)
 
-            # interpret each message into spikes
-            for message in eieio_messages:
-                spikes = self._turn_message_info_spike_train(
-                    spikes, message,
-                    graph_mapper.get_subvertex_slice(subvertex).lo_atom)
+            # Extract number of spike bytes from subvertex
+            number_of_time_steps_written = \
+                number_of_bytes_written / out_spike_bytes
+
+            logger.debug("Processing {} timesteps"
+                         .format(number_of_time_steps_written))
+
+            current_word_count = 0
+            for block in spike_data:
+                read_pointer = 0
+                string_based_block = str(block)
+                words_in_block = int(math.ceil(len(string_based_block) / 4))
+                words_in_a_timer_tic = math.ceil(out_spike_bytes / 4)
+                for current_word_index in range(0, words_in_block):
+                    # Unpack the word containing the spikingness of 32 neurons
+                    spike_vector_word = struct.unpack_from(
+                        "<I", string_based_block, read_pointer)
+                    read_pointer += 4
+
+                    spikes = self._unpack_word_of_spikes(
+                        spikes, subvertex, current_word_count,
+                        spike_vector_word, words_in_a_timer_tic,
+                        graph_mapper=graph_mapper)
+                    current_word_count += 1
 
         if len(spikes) > 0:
             logger.debug("Arranging spikes as per output spec")
@@ -189,40 +184,40 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
         print("No spikes recorded")
         return None
 
-    def _turn_message_info_spike_train(self, spikes, message, lo_atom):
-        """ turns a message into a collection of spikes and appends to a
-        numpy array param
-
-        :param spikes: the numpy array to append to
-        :param message: the message to interpret
-        :type spikes: numpy array
-        :type message: a EIEIOMessage
-        :return: the appended numpi array
-        :rtype: numpy array
-        """
-        timer_tic = message.eieio_header.payload_base
-        # turn into numpy array of shorts (2 bytes, each representing neuron id)
-        core_based_neuron_ids = numpy.frombuffer(message.data, dtype="<i2")
-        # translate into the neuron id the pop understands
-        pop_based_neuron_ids = numpy.add(core_based_neuron_ids, lo_atom)
-        pop_based_neuron_ids_with_timer = \
-            numpy.zeros((len(pop_based_neuron_ids), 2))
-        pop_based_neuron_ids_with_timer[:, 1] = pop_based_neuron_ids
-        pop_based_neuron_ids_with_timer[:, 0].fill(timer_tic)
-        return spikes.append(pop_based_neuron_ids_with_timer)
+    @staticmethod
+    def _unpack_word_of_spikes(spikes, subvertex, current_word_count,
+                               spike_vector_word, words_in_a_timer_tic,
+                               graph_mapper):
+        # if the word is zero no spikes have been recorded
+        neurons_per_word = constants.BITS_PER_WORD  # each bit is a neuron
+        if spike_vector_word[0] != 0:
+            # Loop through each bit in this word
+            for neuron_bit_index in range(0, int(constants.BITS_PER_WORD)):
+                # If the bit is set
+                neuron_bit_mask = (1 << neuron_bit_index)
+                if (spike_vector_word[0] & neuron_bit_mask) != 0:
+                    # Calculate neuron ID
+                    out_word_index = int(current_word_count %
+                                         words_in_a_timer_tic)
+                    base_neuron_id = out_word_index * neurons_per_word
+                    lo_atom = \
+                        graph_mapper.get_subvertex_slice(subvertex).lo_atom
+                    neuron_id = (neuron_bit_index + base_neuron_id + lo_atom)
+                    # Add spike time and neuron ID to returned lists
+                    current_tic = int(math.floor(current_word_count /
+                                      words_in_a_timer_tic))
+                    spikes = numpy.append(spikes, [[current_tic, neuron_id]], 0)
+        return spikes
 
     def get_neuron_parameter(
             self, region, compatible_output, has_ran, graph_mapper, placements,
             txrx, machine_time_step):
         if not has_ran:
             raise exceptions.SpynnakerException(
-                "The simulation has not yet ran, therefore neuron param "
-                "cannot be retrieved")
+                "The simulation has not yet ran, therefore neuron param cannot "
+                "be retrieved")
 
-        times = numpy.zeros(0)
-        ids = numpy.zeros(0)
-        values = numpy.zeros(0)
-        ms_per_tick = self._machine_time_step / 1000.0
+        value = numpy.zeros((0, 3))
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
@@ -268,29 +263,53 @@ class AbstractRecordableVertex(AbstractBufferSendableVertex):
             number_of_time_steps_written = \
                 number_of_bytes_written / bytes_per_time_step
 
+            ms_per_timestep = machine_time_step / 1000.0
+
             logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
 
-            data_list = bytearray()
-            for data in neuron_param_region_data:
-                data_list.extend(data)
+            temp_buffer = bytearray()
 
-            numpy_data = numpy.asarray(data_list, dtype="uint8").view(
-                dtype="<i4") / 32767.0
-            values = numpy.append(values, numpy_data)
-            times = numpy.append(
-                times, numpy.repeat(range(numpy_data.size / n_atoms),
-                                    n_atoms) * ms_per_tick)
-            ids = numpy.append(ids, numpy.add(
-                numpy.arange(numpy_data.size) % n_atoms, vertex_slice.lo_atom))
+            current_pointer = 0
+            for region_block in neuron_param_region_data:
+                size = len(region_block)
+                temp_buffer.extend(region_block)
 
-        result = numpy.dstack((ids, times, values))[0]
-        result = result[numpy.lexsort((times, ids))]
-        return result
+            # Standard fixed-point 'accum' type scaling
+            size = len(temp_buffer) / 4
+            scale = numpy.zeros(size, dtype=numpy.float)
+            scale.fill(float(0x7FFF))
 
-    @abstractmethod
-    def is_recordable(self):
-        """helper method for is isinstance"""
+            # Add an array for time and neuron id
+            time = numpy.array([(int(i / n_atoms) * ms_per_timestep)
+                                for i in range(size)], dtype=numpy.float)
 
-    def is_buffer_sendable_vertex(self):
-        return True
+            lo_atom = vertex_slice.lo_atom
+            neuron_id = numpy.array([int(i % n_atoms) +
+                                     lo_atom for i in range(size)],
+                                    dtype=numpy.uint32)
+            # Get the values
+            # noinspection PyNoneFunctionAssignment
+            temp_value = numpy.frombuffer(temp_buffer, dtype="<i4")
+            # noinspection PyTypeChecker
+            temp_value = numpy.divide(temp_value, scale)
+            temp_array = numpy.dstack((time, neuron_id, temp_value))
+            temp_array = numpy.reshape(temp_array, newshape=(-1, 3))
+            value = numpy.append(value, temp_array, axis=0)
+
+        logger.debug("Arranging parameter output")
+        if compatible_output:
+
+            # Change the order to be neuronID : time (don't know why - this
+            # is how it was _done in the old code, so I am doing it here too)
+            value[:, [0, 1, 2]] = value[:, [1, 0, 2]]
+
+            # Sort by neuron ID and not by time
+            v_index = numpy.lexsort((value[:, 2], value[:, 1], value[:, 0]))
+            value = value[v_index]
+            return value
+
+        # If not compatible output, we will sort by time (as NEST seems to do)
+        v_index = numpy.lexsort((value[:, 2], value[:, 1], value[:, 0]))
+        value = value[v_index]
+        return value

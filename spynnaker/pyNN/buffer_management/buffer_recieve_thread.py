@@ -1,6 +1,7 @@
 import threading
 import collections
 import logging
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -36,21 +37,24 @@ class BufferRecieveThread(threading.Thread):
         runs by just pulling receive requests and executing them
         """
         logger.debug("[buffer recieve thread] starting")
-        while not self._done:
+        try:
+            while not self._done:
+                self._queue_condition.acquire()
+                while len(self._queue) == 0 and not self._done:
+                    self._queue_condition.wait()
+                request = None
+                if not self._done:
+                    request = self._queue.pop()
+                self._queue_condition.release()
+                if request is not None:
+                    self._handle_request(request)
+            self._queue.append(None)
             self._queue_condition.acquire()
-            while len(self._queue) == 0 and not self._done:
-                self._queue_condition.wait()
-            request = None
-            if not self._done:
-                request = self._queue.pop()
+            self._exited = True
+            self._queue_condition.notify()
             self._queue_condition.release()
-            if request is not None:
-                self._handle_request(request)
-        self._queue.append(None)
-        self._queue_condition.acquire()
-        self._exited = True
-        self._queue_condition.notify()
-        self._queue_condition.release()
+        except Exception:
+            traceback.print_exc()
 
     def add_request(self, request):
         """ adds a request to the tiger munching queue

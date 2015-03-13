@@ -1,9 +1,10 @@
-from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data import \
+import logging
+
+from spinnman.messages.eieio.command_objects.host_send_sequenced_data import \
     HostSendSequencedData
 from spinnman import constants as spinnman_constants
 from spynnaker.pyNN import exceptions
 
-import logging
 logger = logging.getLogger(__name__)
 
 

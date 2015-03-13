@@ -1,35 +1,36 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
-
-from spynnaker.pyNN.buffer_management.buffer_data_objects.eieio_32bit.\
-    eieio_32bit_timed_payload_prefix_data_packet import \
-    EIEIO32BitTimedPayloadPrefixDataPacket
-from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data import \
-    HostSendSequencedData
-from spynnaker.pyNN.buffer_management.command_objects.event_stop_request \
-    import EventStopRequest
-from spinnman import constants as spinnman_constants
-from spynnaker.pyNN.buffer_management.command_objects.stop_requests import \
-    StopRequests
-
 import math
 import logging
+
+from spinnman.messages.eieio.buffer_data_objects.eieio_32bit.\
+    eieio_32bit_timed_payload_prefix_data_packet import \
+    EIEIO32BitTimedPayloadPrefixDataPacket
+from spinnman.messages.eieio.command_objects.host_send_sequenced_data import \
+    HostSendSequencedData
+from spinnman.messages.eieio.command_objects.event_stop_request import \
+    EventStopRequest
+from spinnman import constants as spinnman_constants
+from spinnman.messages.eieio.command_objects.stop_requests import \
+    StopRequests
+
+
 logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractBufferReceivablePartitionedVertex(object):
+class AbstractSendsBuffersFromHostPartitionedVertex(object):
 
     def __init__(self, buffer_collection):
         self._buffers_to_send_collection = buffer_collection
 
     @property
-    def receiver_buffer_collection(self):
+    def sender_buffer_collection(self):
         return self._buffers_to_send_collection
 
     @abstractmethod
-    def is_bufferable_receivable_partitioned_vertex(self):
+    def is_sends_buffers_from_host_partitioned_vertex(self):
         """helper method for is instance
 
         :return:
@@ -46,7 +47,9 @@ class AbstractBufferReceivablePartitionedVertex(object):
 
         return sequenced_packets
 
-    def get_next_set_of_packets(self, space_available, region_id, sequence_no):
+    def get_next_set_of_packets(
+            self, space_available, region_id, sequence_no,
+            routing_infos, partitioned_graph):
         if not self._buffers_to_send_collection.is_region_managed(region_id):
             raise  # error: region not managed asked for managed packets
 
@@ -108,7 +111,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
             # get next set of packets to send
             new_buffers_to_send = self._generate_buffers_for_transmission(
                 space_available, max_number_of_new_packets, region_id,
-                sequence_no)
+                sequence_no, routing_infos, partitioned_graph)
 
             # add sequenced header if required - if is not the initial load
             if sequence_no is not None:
@@ -150,7 +153,7 @@ class AbstractBufferReceivablePartitionedVertex(object):
 
     def _generate_buffers_for_transmission(
             self, space_available, max_number_of_new_packets, region_id,
-            sequence_no):
+            sequence_no, routing_infos, partitioned_graph):
         """ creates a set of packets to be sent to the machine.
 
         :return:
@@ -176,15 +179,15 @@ class AbstractBufferReceivablePartitionedVertex(object):
             # the number of packet loaded at the first instance, when the
             # system is still in a wait state, does not influence the
             # performance of the execution
-            max_number_of_new_packets = math.floor(
-                space_available / packet.get_min_packet_length())
+            max_number_of_new_packets = int(math.ceil(
+                space_available / packet.get_min_packet_length()))
             space_header = 0
 
         space_used = 0
 
         # check if there is enough space for a new packet
         if (space_used + space_header + packet.length +
-                packet.element_size >= space_available):
+                packet.element_size > space_available):
             return send_requests
 
         terminate = 0
@@ -196,9 +199,15 @@ class AbstractBufferReceivablePartitionedVertex(object):
                                       packet.length + packet.element_size)
 
             if (available_count > 0 and more_elements and
-                    space_available > space_going_to_be_used):
+                    space_available >= space_going_to_be_used):
                 event = self._buffers_to_send_collection.get_next_element(
                     region_id)
+                # or the event with the base routing key
+                subvertex = self._buffers_to_send_collection.managed_vertex()
+                partitioned_graph.get_outgoing_edges
+                outgoing_subedges = subvertex.get_
+                key = routing_infos.get_key_from_subedge(subedge)
+                base_routing_key =
                 packet.insert_key(event.entry)
             else:
                 send_requests.append(packet)

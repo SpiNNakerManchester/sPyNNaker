@@ -209,7 +209,8 @@ class SpynnakerCommsFunctions(object):
         for buffer_manager_key in buffered_managers.keys():
             buffer_manager = buffered_managers[buffer_manager_key]
             if buffer_manager.contains_sender_vertices():
-                buffer_manager.load_initial_buffers()
+                buffer_manager.load_initial_buffers(
+                    self._routing_infos, self._partitioned_graph)
                 
         # deduce how many processors this application uses up
         total_processors = 0

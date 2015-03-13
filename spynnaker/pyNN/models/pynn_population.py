@@ -71,14 +71,6 @@ class Population(object):
         cellparams['label'] = cell_label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
-        #buffer details
-        if 'buffer_ip_tag_tag_id' not in cellparams.keys():
-            cellparams['buffer_ip_tag_tag_id'] = spinnaker.buffer_ip_tag
-        if 'buffer_ip_tag_address' not in cellparams.keys():
-            cellparams['buffer_ip_tag_address'] = spinnaker.buffer_ip_address
-        if 'buffer_ip_tag_port' not in cellparams.keys():
-            cellparams['buffer_ip_tag_port'] = spinnaker.buffer_ip_port
-
         cellparams['timescale_factor'] = spinnaker.timescale_factor
         cellparams['spikes_per_second'] = spinnaker.spikes_per_second
         cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
@@ -230,10 +222,8 @@ class Population(object):
             timer = Timer()
             timer.start_timing()
 
-        buffer_manager_key = self._vertex.get_ip_tag().string_representation()
-        buffer_manager = self._spinnaker.buffer_managers[buffer_manager_key]
         spikes = self._vertex.get_spikes(
-            txrx=self._spinnaker.transceiver, buffer_manager=buffer_manager,
+            txrx=self._spinnaker.transceiver,
             placements=self._spinnaker.placements,
             graph_mapper=self._spinnaker.graph_mapper,
             compatible_output=compatible_output)

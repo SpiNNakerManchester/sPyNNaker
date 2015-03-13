@@ -1,10 +1,12 @@
-from spinnman import constants as spinnman_constants
-
 import threading
 import os
 import logging
-from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
-from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
+
+from spinnman import constants as spinnman_constants
+from spinnman.messages.eieio.abstract_eieio_packets.eieio_command_header \
+    import EIEIOCommandHeader
+from spinnman.messages.eieio.abstract_eieio_packets.eieio_command_message \
+    import EIEIOCommandMessage
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 from spynnaker.pyNN.utilities.data_base_message_connection\
@@ -178,20 +180,20 @@ class DataBaseThread(threading.Thread):
         while not self._complete:
             self._lock_condition.acquire()
             while ((self._partitionable_graph is None and
-                    not self._done_paritioning)
-                   or (self._partitioned_graph is None and
-                       not self._done_partitioned)
-                   or (self._placements is None and not self._done_placements)
-                   or (self._routing_infos is None and
-                       not self._done_routing_info)
-                   or (self._routing_tables is None and
-                       not self._done_routing_tables)
-                   and not self._complete and self._machine is None):
+                    not self._done_paritioning) or
+                    (self._partitioned_graph is None and
+                     not self._done_partitioned) or
+                    (self._placements is None and not self._done_placements) or
+                    (self._routing_infos is None and
+                     not self._done_routing_info) or
+                    (self._routing_tables is None and
+                     not self._done_routing_tables) and
+                    not self._complete and self._machine is None):
                 self._lock_condition.wait()
             if (self._machine_time_step is not None and
                     self._time_scale_factor is not None and
-                    self._runtime is not None
-                    and not self._done_system_params):
+                    self._runtime is not None and
+                    not self._done_system_params):
                 self._lock_condition.release()
                 self._add_system_params()
             elif self._machine is not None and not self._done_machine:
@@ -221,10 +223,10 @@ class DataBaseThread(threading.Thread):
                 self._lock_condition.release()
                 self._add_routing_tables()
                 self._done_routing_tables = True
-            if (self._partitioned_graph is not None
-                    and self._graph_mapper is not None
-                    and self._placements is not None and self._execute_mapping
-                    and self._routing_infos is not None and
+            if (self._partitioned_graph is not None and
+                    self._graph_mapper is not None and
+                    self._placements is not None and self._execute_mapping and
+                    self._routing_infos is not None and
                     not self._done_mapping):
                 self._create_neuron_to_key_mapping()
                 self._execute_mapping = True

@@ -1,5 +1,6 @@
 import struct
 import threading
+import logging
 
 from pacman.utilities.progress_bar import ProgressBar
 from spinnman import exceptions as spinnman_exceptions
@@ -9,28 +10,29 @@ from spinnman.data.little_endian_byte_array_byte_reader \
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_message import SDPMessage
 from spinnman.messages.sdp.sdp_flag import SDPFlag
-from spynnaker.pyNN.buffer_management.abstract_eieio_packets.\
-    create_eieio_packets import create_class_from_reader
+from spinnman.messages.eieio.abstract_eieio_packets.create_eieio_packets \
+    import create_class_from_reader
 from spynnaker.pyNN.buffer_management.buffer_recieve_thread import \
     BufferRecieveThread
-from spynnaker.pyNN.buffer_management.command_objects.\
-    spinnaker_request_buffers import SpinnakerRequestBuffers
-from spynnaker.pyNN.buffer_management.command_objects.\
-    spinnaker_request_read_data import SpinnakerRequestReadData
-from spynnaker.pyNN.buffer_management.command_objects.padding_request import \
+from spinnman.messages.eieio.command_objects.spinnaker_request_buffers import \
+    SpinnakerRequestBuffers
+from spinnman.messages.eieio.command_objects.spinnaker_request_read_data \
+    import SpinnakerRequestReadData
+from spinnman.messages.eieio.command_objects.padding_request import \
     PaddingRequest
-from spynnaker.pyNN.buffer_management.command_objects.event_stop_request \
+from spinnman.messages.eieio.command_objects.event_stop_request \
     import EventStopRequest
-from spynnaker.pyNN.buffer_management.command_objects.host_send_sequenced_data\
+from spinnman.messages.eieio.command_objects.host_send_sequenced_data\
     import HostSendSequencedData
-from spynnaker.pyNN.buffer_management.command_objects.start_requests \
+from spinnman.messages.eieio.command_objects.start_requests \
     import StartRequests
-from spynnaker.pyNN.buffer_management.command_objects.stop_requests \
+from spinnman.messages.eieio.command_objects.stop_requests \
     import StopRequests
 from spynnaker.pyNN.utilities import utility_calls
 
-import logging
+
 logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
 
 class BufferManager(object):
@@ -48,6 +50,8 @@ class BufferManager(object):
         self._recieve_thread = BufferRecieveThread(transciever)
         self._recieve_thread.start()
         self._thread_lock = threading.Lock()
+        self._routing_infos = None
+        self._partitioned_graph = None
 
     @property
     def port(self):
@@ -75,15 +79,17 @@ class BufferManager(object):
         with self._thread_lock:
             if isinstance(packet, SpinnakerRequestBuffers):
                 key = (packet.x, packet.y, packet.p)
-                if key in self._recieve_vertices.keys():
+                if key in self._sender_vertices.keys():
                     logger.debug("received packet sequence: {1:d}, "
                                  "space available: {0:d}".format(
                                      packet.space_available,
                                      packet.sequence_no))
                     data_requests = \
-                        self._recieve_vertices[key].get_next_set_of_packets(
+                        self._sender_vertices[key].get_next_set_of_packets(
                             packet.space_available, packet.region_id,
-                            packet.sequence_no)
+                            packet.sequence_no, self._routing_infos,
+                            self._partitioned_graph)
+                    # data_requests = list()
                     space_used = 0
                     for buffers in data_requests:
                         logger.debug("packet to be sent length: {0:d}".format(
@@ -97,7 +103,7 @@ class BufferManager(object):
                                      space_used, packet.sequence_no))
                     if len(data_requests) != 0:
                         for buffers in data_requests:
-                            self._add_request(
+                            self._send_request(
                                 packet.x, packet.y, packet.p, buffers)
                             # data_request = {'data': buffers,
                             #                 'x': packet.x,
@@ -152,17 +158,19 @@ class BufferManager(object):
             return False
         return True
 
-    def load_initial_buffers(self):
+    def load_initial_buffers(self, routing_infos, partitioned_graph):
         """ takes all the sender vertices and loads the initial buffers
 
         :return:
         """
-        progress_bar = ProgressBar(len(self._recieve_vertices),
+        progress_bar = ProgressBar(len(self._sender_vertices),
                                    "on loading buffer dependant vertices")
-        for send_vertex_key in self._recieve_vertices.keys():
+        for send_vertex_key in self._sender_vertices.keys():
             sender_vertex = self._sender_vertices[send_vertex_key]
             for region_id in \
-                    sender_vertex.receiver_buffer_collection.regions_managed:
+                    sender_vertex.sender_buffer_collection.regions_managed:
+                self._routing_infos = routing_infos
+                self._partitioned_graph = partitioned_graph
                 self._handle_a_initial_buffer_for_region(
                     region_id, sender_vertex)
             progress_bar.update()
@@ -179,7 +187,7 @@ class BufferManager(object):
         :return:
         """
         region_size = \
-            sender_vertex.receiver_buffer_collection.get_size_of_region(
+            sender_vertex.sender_buffer_collection.get_size_of_region(
                 region_id)
 
         # create a buffer packet to emulate core asking for region data
@@ -189,7 +197,7 @@ class BufferManager(object):
         # create a list of buffers to be loaded on the machine, given the region
         # the size and the sequence number
         data_requests = sender_vertex.get_next_set_of_packets(
-            region_size, region_id, None)
+            region_size, region_id, None, self._routing_infos, self._partitioned_graph)
 
         # fetch region base address
         self._locate_region_address(region_id, sender_vertex)
@@ -200,7 +208,7 @@ class BufferManager(object):
                 "buffer region {0:d} in subvertex {1:s} is too small to "
                 "contain any type of packet".format(region_id, sender_vertex))
         space_used = 0
-        base_address = sender_vertex.receiver_buffer_collection.\
+        base_address = sender_vertex.sender_buffer_collection.\
             get_region_base_address_for(region_id)
         # send each data request
         for data_request in data_requests:
@@ -238,7 +246,7 @@ class BufferManager(object):
         :return: None
         """
         base_address = sender_vertex.\
-            receiver_buffer_collection.get_region_base_address_for(region_id)
+            sender_buffer_collection.get_region_base_address_for(region_id)
         if base_address is None:
             placement = \
                 self._placements.get_placement_of_subvertex(sender_vertex)
@@ -254,7 +262,7 @@ class BufferManager(object):
                 region_offset_in_pointer_table, 4))[0])
             base_address = struct.unpack("<I", region_offset_to_core_base)[0] \
                 + app_data_base_address
-            sender_vertex.receiver_buffer_collection.\
+            sender_vertex.sender_buffer_collection.\
                 set_region_base_address_for(region_id, base_address)
 
     # to be copied in the buffered in buffer manager
@@ -276,7 +284,7 @@ class BufferManager(object):
             messages.append(eieio_packet)
         return messages
 
-    def _add_request(self, x, y, p, buffers):
+    def _send_request(self, x, y, p, buffers):
         """ handles a request from the munched queue by transmitting a chunk of
         memory to a buffer
 

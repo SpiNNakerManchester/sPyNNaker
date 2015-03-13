@@ -231,3 +231,7 @@ class BufferCollection(object):
     def check_sequence_number(self, region_id, sequence_no):
         return self._buffers_to_use[region_id].check_sequence_number(
             sequence_no)
+
+    @property
+    def managed_vertex(self):
+        return self._managed_vertex

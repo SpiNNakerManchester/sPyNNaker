@@ -4,7 +4,7 @@ from spinnman.connections.abstract_classes.udp_senders.\
     abstract_udp_eieio_command_sender import AbstractUDPEIEIOCommandSender
 from spinnman.connections.abstract_classes.abstract_udp_connection\
     import AbstractUDPConnection
-from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
+from spinnman.messages.eieio.abstract_eieio_packets.eieio_command_message import EIEIOCommandMessage
 
 
 class DataBaseMessageConnection(AbstractUDPConnection,
