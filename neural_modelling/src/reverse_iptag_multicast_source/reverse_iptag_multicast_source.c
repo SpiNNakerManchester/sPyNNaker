@@ -978,29 +978,28 @@ void packet_interpreter(eieio_msg_t eieio_msg_ptr)
       pkt_format = 0;
   }
 
-  if (!payload_timestamp)
+
+  if (pkt_payload_prefix_apply)
   {
-    if (pkt_payload_prefix_apply)
+    if (!(pkt_type & 0x2)) //16 bit type packet
     {
-      if (!(pkt_type & 0x2)) //16 bit type packet
-      {
-        uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
-        event_pointer = (void*) (((uint16_t *) event_pointer) + 1);
+      uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
+      event_pointer = (void*) (((uint16_t *) event_pointer) + 1);
 
-        pkt_payload_prefix = (uint32_t) payload_prefix_ptr[0];
-      }
-      else //32 bit type packet
-      {
-        uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
-        event_pointer = (void*) (((uint16_t *) event_pointer) + 2);
+      pkt_payload_prefix = (uint32_t) payload_prefix_ptr[0];
+    }
+    else //32 bit type packet
+    {
+      uint16_t *payload_prefix_ptr = (uint16_t *) event_pointer;
+      event_pointer = (void*) (((uint16_t *) event_pointer) + 2);
 
-        uint32_t temp1 = payload_prefix_ptr[0];
-        uint32_t temp2 = payload_prefix_ptr[1];
-        pkt_payload_prefix = temp2 << 16 | temp1;
-      }
+      uint32_t temp1 = payload_prefix_ptr[0];
+      uint32_t temp2 = payload_prefix_ptr[1];
+      pkt_payload_prefix = temp2 << 16 | temp1;
     }
   }
-  else
+
+  if (payload_timestamp)
   {
     payload_on = 0;
     pkt_payload_prefix_apply = 0;
