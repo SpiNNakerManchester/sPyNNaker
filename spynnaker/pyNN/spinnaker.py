@@ -254,7 +254,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     executable_targets, self._app_id, self._runtime, 
                     self._buffer_managers, self._time_scale_factor,
                     wait_on_confirmation, self._database_thread,
-                    self._in_debug_mode)
+                    self._in_debug_mode, self._routing_infos,
+                    self._partitioned_graph)
                 self._has_ran = True
                 if self._retrieve_provance_data:
                     # retrieve provence data

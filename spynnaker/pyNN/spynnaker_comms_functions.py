@@ -200,17 +200,17 @@ class SpynnakerCommsFunctions(object):
         progress_bar.end()
         return processor_to_app_data_base_address
 
-    def _start_execution_on_machine(self, executable_targets, app_id, runtime,
-                                    buffered_managers, time_scaling,
-                                    waiting_on_confirmation, database_thread,
-                                    in_debug_mode):
+    def _start_execution_on_machine(
+            self, executable_targets, app_id, runtime, buffered_managers,
+            time_scaling, waiting_on_confirmation, database_thread,
+            in_debug_mode, routing_infos, partitioned_graph):
         # every thing is in sync0. if there are buffered managers with sendable
         # manageable vertices, load the initial buffers
         for buffer_manager_key in buffered_managers.keys():
             buffer_manager = buffered_managers[buffer_manager_key]
             if buffer_manager.contains_sender_vertices():
                 buffer_manager.load_initial_buffers(
-                    self._routing_infos, self._partitioned_graph)
+                    routing_infos, partitioned_graph)
                 
         # deduce how many processors this application uses up
         total_processors = 0

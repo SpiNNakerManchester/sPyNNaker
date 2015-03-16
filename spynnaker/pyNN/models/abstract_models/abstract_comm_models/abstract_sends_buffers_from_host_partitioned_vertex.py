@@ -203,12 +203,15 @@ class AbstractSendsBuffersFromHostPartitionedVertex(object):
                 event = self._buffers_to_send_collection.get_next_element(
                     region_id)
                 # or the event with the base routing key
-                subvertex = self._buffers_to_send_collection.managed_vertex()
-                partitioned_graph.get_outgoing_edges
-                outgoing_subedges = subvertex.get_
-                key = routing_infos.get_key_from_subedge(subedge)
-                base_routing_key =
-                packet.insert_key(event.entry)
+                subvertex = self._buffers_to_send_collection.managed_vertex
+                first_outgoing_edge = partitioned_graph.\
+                    outgoing_subedges_from_subvertex(subvertex)[0]
+                # subedge_routing_info = routing_infos.\
+                #     get_subedge_information_from_subedge(first_outgoing_edge)
+                base_routing_key = routing_infos.get_key_from_subedge(
+                    first_outgoing_edge)
+                final_routing_key = base_routing_key | event.entry
+                packet.insert_key(final_routing_key)
             else:
                 send_requests.append(packet)
                 space_used += packet.length + space_header
