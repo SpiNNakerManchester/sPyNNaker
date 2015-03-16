@@ -40,9 +40,9 @@ send_live_spikes = False
 #                          send an additional message just after starting
 #--------
 #create_database = False
-#wait_on_confirmation = False
-#create_routing_info_to_neuron_id_mapping = False
-#send_start_notification = False
+#wait_on_confirmation = True
+#create_routing_info_to_neuron_id_mapping = True
+#send_start_notification = True
 
 [Simulation]
 # Estimated maximum spikes per second of any neuron (spike rate in Hertz)
