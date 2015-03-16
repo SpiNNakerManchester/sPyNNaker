@@ -8,6 +8,7 @@ from spynnaker.pyNN.utilities.utility_calls \
 from spynnaker.pyNN.utilities import constants
 
 from pacman.utilities import constants as pacman_constants
+from pacman.utilities.progress_bar import ProgressBar
 
 
 import logging
@@ -92,6 +93,7 @@ class AbstractRecordableVertex(object):
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        progress_bar = ProgressBar(len(subvertices), "Getting spikes")
         for subvertex in subvertices:
             placement = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placement.x, placement.y, placement.p
@@ -156,7 +158,9 @@ class AbstractRecordableVertex(object):
                      for i in range(len(indices))]
             spike_ids.extend([item for sublist in indices for item in sublist])
             spike_times.extend([item for sublist in times for item in sublist])
+            progress_bar.update()
 
+        progress_bar.end()
         result = numpy.dstack((spike_ids, spike_times))[0]
         result = result[numpy.lexsort((spike_times, spike_ids))]
 
@@ -177,6 +181,7 @@ class AbstractRecordableVertex(object):
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        progress_bar = ProgressBar(len(subvertices), "Getting recorded data")
         for subvertex in subvertices:
             placment = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placment.x, placment.y, placment.p
@@ -234,7 +239,9 @@ class AbstractRecordableVertex(object):
                                     n_atoms) * ms_per_tick)
             ids = numpy.append(ids, numpy.add(
                 numpy.arange(numpy_data.size) % n_atoms, vertex_slice.lo_atom))
+            progress_bar.update()
 
+        progress_bar.end()
         result = numpy.dstack((ids, times, values))[0]
         result = result[numpy.lexsort((times, ids))]
         return result
