@@ -27,17 +27,22 @@ send_live_spikes = False
 #---------
 # This controls the generation of a database, which can be used by external
 # programs, e.g. visualisations of simulations
-# create_database: Whether to create the database
-# wait_on_configuration: Allows the external program to communicate with
-#                        us so it knows when the database is ready, and so we
-#                        know when the visualisation is ready
+# create_database: Whether to create the database.  If this is False, the other
+#                  parameters are ignored.
+# wait_on_configuration: Allows an external program to communicate with
+#                        sPyNNaker so it knows when the database is ready,
+#                        and then waits for the external program to tell
+#                        sPyNNaker when it is ready.
 # create_routing_info_to_neuron_id_mapping: If true, the database will include
 #                                           a map of routing key to population-
-#                                           based neuron id
+#                                           based neuron id.
+# send_start_notification: If true, the database notification connection will
+#                          send an additional message just after starting
 #--------
 #create_database = False
 #wait_on_confirmation = False
 #create_routing_info_to_neuron_id_mapping = False
+#send_start_notification = False
 
 [Simulation]
 # Estimated maximum spikes per second of any neuron (spike rate in Hertz)
