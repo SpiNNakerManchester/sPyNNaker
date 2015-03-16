@@ -15,10 +15,13 @@ class MasterPopTableAsHashTable(AbstractMasterPopTableFactory):
         raise NotImplementedError
 
     def extract_synaptic_matrix_data_location(self, incoming_key,
-                                              master_pop_base_mem_address, txrx,
-                                              chip_x, chip_y):
+                                              master_pop_base_mem_address,
+                                              txrx, chip_x, chip_y):
         raise NotImplementedError
 
     def __init__(self):
         AbstractMasterPopTableFactory.__init__(self)
         raise NotImplementedError
+
+    def get_edge_constraints(self):
+        return list()

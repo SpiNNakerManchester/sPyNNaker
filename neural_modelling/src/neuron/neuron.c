@@ -38,6 +38,7 @@ timer_t  time;
 
 // upper part of spike packet identifier for this core.
 uint32_t  key;
+bool use_key;
 uint32_t  num_neurons;
 uint32_t  num_params;
 uint32_t  ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT];
@@ -104,7 +105,7 @@ void neuron (index_t n)
   // If we should be recording gsyn
   if(system_data_test_bit(e_system_data_record_neuron_gsyn))
   {
-	  accum temp_record_input = exc_neuron_input - inh_neuron_input;  // waiting for neuron record API
+    accum temp_record_input = exc_neuron_input - inh_neuron_input;  // waiting for neuron record API
     // Record to correct recording channel
     // **NOTE** offset current is not currently exposed by neuron model
     recording_record(e_recording_channel_neuron_gsyn, &temp_record_input, sizeof(accum));
@@ -132,13 +133,14 @@ bool neural_data_filled (address_t address, uint32_t flags)
 
 
   // changed from above for new file format 13-1-2014
-  key   = address[0];
+  use_key = address[0];
+  key   = address[1];
   log_info("\tkey = %08x, (x: %u, y: %u) proc: %u",
     key, key_x (key), key_y (key), key_p (key));
 
-  num_neurons = address [1];
-  num_params  = address [2];
-  h           = address [3]; // number of micro seconds per time step.
+  num_neurons = address [2];
+  num_params  = address [3];
+  h           = address [4]; // number of micro seconds per time step.
 
    log_info("\tneurons = %u, params = %u, time step = %u",
      num_neurons, num_params, h);
@@ -146,7 +148,7 @@ bool neural_data_filled (address_t address, uint32_t flags)
   // Read ring buffer input shift for each synapse type
   for(index_t i = 0; i < SYNAPSE_TYPE_COUNT; i++)
   {
-    ring_buffer_to_input_left_shifts[i] = address[4 + i];
+    ring_buffer_to_input_left_shifts[i] = address[5 + i];
     log_info("\tsynapse type %u, ring buffer to input left shift %u", i, ring_buffer_to_input_left_shifts[i]);
   }
 
@@ -157,7 +159,7 @@ bool neural_data_filled (address_t address, uint32_t flags)
     sentinel("Unable to allocate neuron array - Out of DTCM");
   }
 
-  memcpy( neuron_array, &address[4 + SYNAPSE_TYPE_COUNT], num_neurons * sizeof(neuron_t) );
+  memcpy( neuron_array, &address[5 + SYNAPSE_TYPE_COUNT], num_neurons * sizeof(neuron_t) );
   initialize_out_spikes (num_neurons);
   //print_neurons();
 /*

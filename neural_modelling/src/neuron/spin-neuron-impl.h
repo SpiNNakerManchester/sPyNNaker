@@ -62,6 +62,7 @@ extern uint32_t   time;
 
 extern uint32_t num_neurons;
 extern uint32_t key; // upper part of spike packet identifier
+extern bool use_key;
 
 // Propagator multiplications
 

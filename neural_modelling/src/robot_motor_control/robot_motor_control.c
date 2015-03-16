@@ -24,34 +24,34 @@ static int delta_threshold;
 static uint32_t continue_if_not_different;
 
 static inline void send(uint32_t direction, uint32_t speed) {
-	uint32_t direction_key = direction | key;
-	while (!spin1_send_mc_packet(direction_key, speed, WITH_PAYLOAD)) {
-		spin1_delay_us(1);
-	}
-	if (delay_time > 0) {
-		spin1_delay_us(delay_time);
-	}
+    uint32_t direction_key = direction | key;
+    while (!spin1_send_mc_packet(direction_key, speed, WITH_PAYLOAD)) {
+        spin1_delay_us(1);
+    }
+    if (delay_time > 0) {
+        spin1_delay_us(delay_time);
+    }
 }
 
 static inline void do_motion(uint32_t direction_index, uint32_t opposite_index,
-		const char *direction, const char *opposite) {
+        const char *direction, const char *opposite) {
   int direction_count = (int) counters[direction_index - 1];
   int opposite_count = (int) counters[opposite_index - 1];
   int delta = direction_count - opposite_count;
   log_info("%s = %d, %s = %d, delta = %d, threshold = %u", direction,
-		  direction_count, opposite, opposite_count, delta, delta_threshold);
+        direction_count, opposite, opposite_count, delta, delta_threshold);
   if (delta >= delta_threshold)
   {
-	log_info("Moving %s", direction);
-	last_speed[direction_index - 1] = speed;
-	last_speed[opposite_index - 1] = 0;
-	send(direction_index, speed);
+    log_info("Moving %s", direction);
+    last_speed[direction_index - 1] = speed;
+    last_speed[opposite_index - 1] = 0;
+    send(direction_index, speed);
   }
   else if (delta <= -delta_threshold)
   {
-	log_info("Moving %s", direction);
-	last_speed[direction_index - 1] = 0;
-	last_speed[opposite_index - 1] = speed;
+    log_info("Moving %s", direction);
+    last_speed[direction_index - 1] = 0;
+    last_speed[opposite_index - 1] = speed;
     send(opposite_index, speed);
   }
   else if (continue_if_not_different == 0)
@@ -64,24 +64,24 @@ static inline void do_motion(uint32_t direction_index, uint32_t opposite_index,
 }
 
 static inline void do_update(uint32_t direction_index, uint32_t opposite_index,
-		const char *direction, const char *opposite) {
+        const char *direction, const char *opposite) {
   int direction_speed = (int) last_speed[direction_index - 1];
   int opposite_speed = (int) last_speed[opposite_index - 1];
   int delta = direction_speed - opposite_speed;
   if (delta > 0)
   {
-	log_info("Resending %s = %d", direction, direction_speed);
-	send(direction_index, direction_speed);
+    log_info("Resending %s = %d", direction, direction_speed);
+    send(direction_index, direction_speed);
   }
   else if (delta < 0)
   {
-	log_info("Resending %s = %d", opposite, opposite_speed);
-	send(opposite_index, opposite_speed);
+    log_info("Resending %s = %d", opposite, opposite_speed);
+    send(opposite_index, opposite_speed);
   }
   else
   {
-	log_info("Resending No Motion in the %s-%s direction", direction, opposite);
-	send(direction_index, 0);
+    log_info("Resending No Motion in the %s-%s direction", direction, opposite);
+    send(direction_index, 0);
   }
 }
 
@@ -93,16 +93,25 @@ void timer_callback (uint unused0, uint unused1)
   time++;
 
   log_info("Timer tick %d", time);
+  if (time == 0) {
+
+      // Set up the robot to respond to the key
+      for (uint32_t i = 0; i < N_COUNTERS; i++)
+      {
+        spin1_send_mc_packet(key | 0x400 | (i + 1), key | (i + 1),
+                             WITH_PAYLOAD);
+      }
+  }
 
 #ifdef DEBUG
   if (time == 0)
   {
-	log_info("Key = %d, speed = %d, sample_time = %d, update_time = %d, delay_time = %d, delta_threshold = %d, continue_if_not_different = %d",
-				key, speed, sample_time, update_time, delay_time, delta_threshold, continue_if_not_different);
+    log_info("Key = %d, speed = %d, sample_time = %d, update_time = %d, delay_time = %d, delta_threshold = %d, continue_if_not_different = %d",
+                key, speed, sample_time, update_time, delay_time, delta_threshold, continue_if_not_different);
   }
 #endif
 
-  if (simulation_ticks != UINT32_MAX && time == simulation_ticks + timer_period)
+  if (simulation_ticks != UINT32_MAX && time == simulation_ticks + 1)
   {
     log_info("Simulation complete.\n");
     spin1_exit(0);
@@ -127,64 +136,59 @@ void timer_callback (uint unused0, uint unused1)
   if ((time % sample_time) == 0)
   {
 
-	// Do motion in pairs
-	do_motion(MOTION_FORWARD, MOTION_BACK, "Forwards", "Backwards");
-	do_motion(MOTION_LEFT, MOTION_RIGHT, "Left", "Right");
-	do_motion(MOTION_CLOCKWISE, MOTION_C_CLKWISE, "Clockwise",
-			"Anti-clockwise");
+    // Do motion in pairs
+    do_motion(MOTION_FORWARD, MOTION_BACK, "Forwards", "Backwards");
+    do_motion(MOTION_LEFT, MOTION_RIGHT, "Left", "Right");
+    do_motion(MOTION_CLOCKWISE, MOTION_C_CLKWISE, "Clockwise",
+            "Anti-clockwise");
 
-	// Reset the counters
-	for (uint32_t i = 0; i < N_COUNTERS; i++)
-	{
-	  counters[i] = 0;
-	}
+    // Reset the counters
+    for (uint32_t i = 0; i < N_COUNTERS; i++)
+    {
+    counters[i] = 0;
+    }
   }
   else if ((time % update_time) == 0)
   {
 
-	// Do updates in pairs
+    // Do updates in pairs
     do_update(MOTION_FORWARD, MOTION_BACK, "Forwards", "Backwards");
     do_update(MOTION_LEFT, MOTION_RIGHT, "Left", "Right");
     do_update(MOTION_CLOCKWISE, MOTION_C_CLKWISE, "Clockwise",
-		"Anti-clockwise");
+        "Anti-clockwise");
   }
 }
 
 bool robot_source_data_filled(address_t base_address) {
-	address_t region_address = region_start(1, base_address);
-	log_info("Reading data from 0x%.8x", region_address);
-	key = region_address[0];
-	speed = region_address[1];
-	sample_time = region_address[2];
-	update_time = region_address[3];
-	delay_time = region_address[4];
-	delta_threshold = region_address[5];
-	continue_if_not_different = region_address[6];
+    address_t region_address = region_start(1, base_address);
+    log_info("Reading data from 0x%.8x", region_address);
+    key = region_address[0];
+    speed = region_address[1];
+    sample_time = region_address[2];
+    update_time = region_address[3];
+    delay_time = region_address[4];
+    delta_threshold = region_address[5];
+    continue_if_not_different = region_address[6];
 
-	// Allocate the space for the schedule
-	counters = (uint32_t*) spin1_malloc(N_COUNTERS * sizeof(uint32_t));
-	last_speed = (uint32_t*) spin1_malloc(N_COUNTERS * sizeof(uint32_t));
+    // Allocate the space for the schedule
+    counters = (uint32_t*) spin1_malloc(N_COUNTERS * sizeof(uint32_t));
+    last_speed = (uint32_t*) spin1_malloc(N_COUNTERS * sizeof(uint32_t));
 
-	for (uint32_t i = 0; i < N_COUNTERS; i++)
-	{
-	  counters[i] = 0;
-	  last_speed[i] = 0;
-	}
+    for (uint32_t i = 0; i < N_COUNTERS; i++)
+    {
+    counters[i] = 0;
+    last_speed[i] = 0;
+    }
 
-	return (true);
+    return (true);
 }
 
 void incoming_spike_callback (uint key, uint payload)
 {
   use(payload);
-
 #ifdef DEBUG
-  log_info("Received spike %x", key);
-#endif // DEBUG
-
-#ifdef SPIKE_DEBUG
   io_printf(IO_BUF, "Received spike %x at %d\n", key, time);
-#endif // SPIKE_DEBUG
+#endif // DEBUG
 
   // If there was space to add spike to incoming spike queue
   add_spike(key);
@@ -196,15 +200,17 @@ bool system_load_dtcm(void) {
   // Get the address this core's DTCM data starts at from SRAM
   address_t address = system_load_sram();
   system_load_params(region_start(0, address));
+  log_info("Timer period = %d, running for %d ticks", timer_period,
+           simulation_ticks);
 
   uint32_t version;
   uint32_t flags   = 0;
   if(!system_header_filled (address, &version, flags))
   {
-	return (false);
+    return (false);
   }
   if (!robot_source_data_filled(address)) {
-	return (false);
+    return (false);
   }
 
   return (true);

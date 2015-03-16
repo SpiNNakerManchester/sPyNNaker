@@ -76,7 +76,7 @@ class SpynnakerConfiguration(object):
 
         # database objects
         self._create_database = False
-        self._database_thread = None
+        self._database_interface = None
 
     def _set_up_output_application_data_specifics(self):
         where_to_write_application_data_files = \
@@ -243,6 +243,7 @@ class SpynnakerConfiguration(object):
         key_allocator_algorithms_list = \
             conf.get_valid_components(routing_info_allocator_algorithms,
                                       "RoutingInfoAllocator")
+
         # get pynn specific key allocator
         pynn_overloaded_allocator = \
             conf.get_valid_components(overridden_pacman_functions,

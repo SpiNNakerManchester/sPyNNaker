@@ -1,23 +1,12 @@
 from pyNN.space import Space
 
-from pacman.model.constraints.abstract_constraints.abstract_constraint\
+from pacman.model.constraints.abstract_constraints.abstract_constraint \
     import AbstractConstraint
-from pacman.model.constraints.utility_constraints.\
-    vertex_has_dependent_constraint import VertexHasDependentConstraint
-from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.constraints.utility_constraints.\
-    vertex_requires_multi_cast_source_constraint \
-    import VertexRequiresMultiCastSourceConstraint
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
-from pacman.utilities import utility_calls as pacman_utility_calls
-
-
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
-from spynnaker.pyNN.models.utility_models.command_sender \
-    import CommandSender
+
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 from spynnaker.pyNN.utilities import conf
@@ -25,10 +14,8 @@ from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
 
-
 import numpy
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -56,11 +43,11 @@ class Population(object):
     _non_labelled_vertex_count = 0
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
-                 multi_cast_vertex=None, structure=None):
+                 structure=None):
         """
         Instantiates a :py:object:`Population`.
         """
-        if size <= 0:
+        if size is not None and size <= 0:
             raise exceptions.ConfigurationException(
                 "A population cannot have a negative or zero size.")
 
@@ -92,38 +79,7 @@ class Population(object):
 
         self._spinnaker.add_vertex(self._vertex)
 
-        # check if the vertex is a cmd sender, if so store for future
-        require_multi_cast_source_constraints = \
-            pacman_utility_calls.locate_constraints_of_type(
-                self._vertex.constraints,
-                VertexRequiresMultiCastSourceConstraint)
-
-        for require_multi_cast_source_constraint \
-                in require_multi_cast_source_constraints:
-            if multi_cast_vertex is None:
-                multi_cast_vertex = CommandSender(
-                    self._spinnaker.machine_time_step,
-                    self._spinnaker.timescale_factor)
-                self._spinnaker.add_vertex(multi_cast_vertex)
-            multi_cast_vertex = self._spinnaker.get_multi_cast_source
-            edge = PartitionableEdge(multi_cast_vertex, self._vertex)
-            multi_cast_vertex.add_commands(
-                require_multi_cast_source_constraint.commands, edge)
-            self._spinnaker.add_edge(edge)
-
         self._parameters = PyNNParametersSurrogate(self._vertex)
-
-        # add any dependent edges and verts if needed
-        dependant_vertex_constraints = \
-            pacman_utility_calls.locate_constraints_of_type(
-                self._vertex.constraints, VertexHasDependentConstraint)
-
-        for dependant_vertex_constrant in dependant_vertex_constraints:
-            dependant_vertex = dependant_vertex_constrant.vertex
-            self._spinnaker.add_vertex(dependant_vertex)
-            dependant_edge = PartitionableEdge(pre_vertex=self._vertex,
-                                               post_vertex=dependant_vertex)
-            self._spinnaker.add_edge(dependant_edge)
 
         # initialize common stuff
         self._size = size

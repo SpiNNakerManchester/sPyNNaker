@@ -1,16 +1,20 @@
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
-    AbstractDataSpecableVertex
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_partitionable_population_vertex import AbstractPartitionableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
+    import AbstractRecordableVertex
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
 
 from enum import Enum
+from six import add_metaclass
+from abc import ABCMeta
+from abc import abstractmethod
 
 
-class AbstractSpikeSource(
-        AbstractRecordableVertex, AbstractPartitionableVertex,
-        AbstractDataSpecableVertex):
+@add_metaclass(ABCMeta)
+class AbstractSpikeSource(AbstractRecordableVertex,
+                          AbstractPartitionableVertex,
+                          AbstractDataSpecableVertex):
 
     _SPIKE_SOURCE_REGIONS = Enum(
         value="_SPIKE_SOURCE_REGIONS",
@@ -25,10 +29,16 @@ class AbstractSpikeSource(
             self, label=label, n_atoms=n_neurons,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
-        AbstractPartitionableVertex.__init__(
-            self, n_atoms=n_neurons, label=label, constraints=constraints,
-            max_atoms_per_core=max_atoms_per_core)
         AbstractRecordableVertex.__init__(self, machine_time_step, label)
+        AbstractPartitionableVertex.__init__(
+            self, n_neurons, label, max_atoms_per_core, constraints)
+
+    @abstractmethod
+    def is_abstract_spike_source(self):
+        """ helper method for is_instance
+
+        :return:
+        """
 
     def __str__(self):
         return "spike source with atoms {}".format(self.n_atoms)

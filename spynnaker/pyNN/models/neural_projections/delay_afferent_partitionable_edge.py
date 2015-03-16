@@ -9,7 +9,8 @@ class DelayAfferentPartitionableEdge(PartitionableEdge):
     def __init__(self, prevertex, delayvertex, label=None):
         PartitionableEdge.__init__(self, prevertex, delayvertex, label=label)
 
-    def create_subedge(self, pre_subvertex, post_subvertex, label=None):
+    def create_subedge(self, pre_subvertex, post_subvertex, constraints=None,
+                       label=None):
         """ Create a subedge between the pre_subvertex and the post_subvertex
 
         :param pre_subvertex: The subvertex at the start of the subedge
@@ -26,4 +27,8 @@ class DelayAfferentPartitionableEdge(PartitionableEdge):
         :rtype: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
         :raise None: does not raise any known exceptions
         """
-        return DelayAfferentPartitionedEdge(pre_subvertex, post_subvertex)
+        if constraints is None:
+            constraints = list()
+        constraints.extend(self.constraints)
+        return DelayAfferentPartitionedEdge(pre_subvertex, post_subvertex,
+                                            constraints)

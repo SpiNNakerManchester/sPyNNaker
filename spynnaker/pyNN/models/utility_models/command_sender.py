@@ -1,18 +1,34 @@
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_multi_cast_source import \
-    AbstractMultiCastSource
+from pacman.model.routing_info.key_and_mask import KeyAndMask
+from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_mask_constraint \
+    import KeyAllocatorFixedMaskConstraint
+from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_key_and_mask_constraint \
+    import KeyAllocatorFixedKeyAndMaskConstraint
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
+
+from data_specification.data_specification_generator \
+    import DataSpecificationGenerator
+
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_outgoing_edge_constraints \
+    import AbstractProvidesOutgoingEdgeConstraints
+
+from spynnaker.pyNN.exceptions import SpynnakerException
+
+_COMMAND_WITH_PAYLOAD_SIZE = 12
+
+_COMMAND_WITHOUT_PAYLOAD_SIZE = 8
 
 
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_routing_constraint import KeyAllocatorRoutingConstraint
-
-
-from data_specification.data_specification_generator import \
-    DataSpecificationGenerator
-
-
-class CommandSender(AbstractMultiCastSource):
+class CommandSender(AbstractProvidesOutgoingEdgeConstraints,
+                    AbstractPartitionableVertex,
+                    AbstractDataSpecableVertex):
+    """ A utility for sending commands to a vertex (possibily an external\
+        device) at fixed times in the simulation
+    """
 
     SYSTEM_REGION = 0
     COMMANDS = 1
@@ -20,22 +36,96 @@ class CommandSender(AbstractMultiCastSource):
     CORE_APP_IDENTIFER = constants.COMMAND_SENDER_CORE_APPLICATION_ID
 
     def __init__(self, machine_time_step, timescale_factor):
-        """
-        constructor that depends upon the Component vertex
-        """
-        AbstractMultiCastSource.__init__(
-            self, machine_time_step, timescale_factor)
-        self._writes = None
-        self._memory_requirements = None
-        self._edge_map = dict()
-        self._commands = list()
 
-        routing_key_constraint = KeyAllocatorRoutingConstraint(
-            self.generate_routing_info, self._generate_routing_neuron_id_keys)
-        self.add_constraint(routing_key_constraint)
+        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        AbstractPartitionableVertex.__init__(self, 1, "Command Sender", 1)
+        AbstractDataSpecableVertex.__init__(
+            self, 1, "Command Sender", machine_time_step, timescale_factor)
+
+        self._edge_constraints = dict()
+        self._command_edge = dict()
+        self._times_with_commands = set()
+        self._commands_with_payloads = dict()
+        self._commands_without_payloads = dict()
+
+    def add_commands(self, commands, edge):
+        """ Add commands to be sent down a given edge
+
+        :param commands: The commands to send
+        :type commands: iterable of\
+                    :py:class:`spynnaker.pyNN.utilities.multi_cast_command.MultiCastCommand`
+        :param edge: The edge down which the commands will be sent
+        :type edge:\
+                    :py:class:`pacman.model.partitionable_graph.partitionable_edge.PartitionableEdge`
+        :raise SpynnakerException: If the edge already has commands or if all\
+                    the commands masks are not 0xFFFFFFFF and there is no\
+                    commonality between the command masks
+        """
+
+        # Check if the edge already exists
+        if edge in self._edge_constraints:
+            raise SpynnakerException("The edge has already got commands")
+
+        # Go through the commands
+        command_keys = dict()
+        command_mask = 0
+        for command in commands:
+
+            # Add the command to the appropriate dictionary
+            dictionary = None
+            if command.is_payload:
+                dictionary = self._commands_with_payloads
+            else:
+                dictionary = self._commands_without_payloads
+            if command.time not in dictionary:
+                dictionary[command.time] = list()
+            dictionary[command.time].append(command)
+
+            # Add that there is a command at this time
+            self._times_with_commands.add(command.time)
+
+            # Add the edge associated with the command
+            self._command_edge[command] = edge
+
+            if command.key not in command_keys:
+
+                # If this command has not been seen before, add it
+                command_keys[command.key] = command.mask
+            else:
+
+                # Otherwise merge the current key mask with the current mask
+                command_keys[command.key] = (command_keys[command.key] |
+                                             command.mask)
+
+            # Keep track of the masks on all the commands
+            command_mask |= command.mask
+
+        if command_mask != 0xFFFFFFFF:
+
+            # If the final command mask contains don't cares, use this as a
+            # fixed mask
+            self._edge_constraints[edge] = list(
+                [KeyAllocatorFixedMaskConstraint(command_mask)])
+        else:
+
+            # If there is no mask consensus, check that all the masks are
+            # actually 0xFFFFFFFF, as otherwise it will not be possible
+            # to assign keys to the edge
+            for (key, mask) in command_keys:
+                if mask != 0xFFFFFFFF:
+                    raise SpynnakerException(
+                        "Command masks are too different to make a mask"
+                        " consistent with all the keys.  This can be resolved"
+                        " by either specifying a consistent mask, or by using"
+                        " the mask 0xFFFFFFFF and providing exact keys")
+
+            # If the keys are all fixed keys, keep them
+            self._edge_constraints[edge] = list(
+                KeyAllocatorFixedKeyAndMaskConstraint(
+                    [KeyAndMask(key, mask) for (key, mask) in command_keys]))
 
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
-                           routing_info, hostname, graph_subgraph_mapper,
+                           routing_info, hostname, graph_mapper,
                            report_folder, ip_tags, reverse_ip_tags):
         """
         Model-specific construction of the data blocks necessary to build a
@@ -46,168 +136,124 @@ class CommandSender(AbstractMultiCastSource):
                 placement.x, placement.y, placement.p, hostname, report_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
+
+        # reserve region - add a word for the region size
+        n_command_bytes = self._get_n_command_bytes()
+        self._reserve_memory_regions(spec, n_command_bytes + 4)
+
+        # Write system region
+        spec.comment("\n*** Spec for multi cast source ***\n\n")
         self._write_basic_setup_info(spec, CommandSender.CORE_APP_IDENTIFER)
 
-        spec.comment("\n*** Spec for multi case source ***\n\n")
+        # Go through the times and replace negative times with positive ones
+        new_times = set()
+        for time in self._times_with_commands:
+            if time < 0:
+                real_time = self._no_machine_time_steps + (time + 1)
+                if time in self._commands_with_payloads:
+                    if real_time in self._commands_with_payloads:
+                        self._commands_with_payloads[real_time].extend(
+                            self._commands_with_payloads[time])
+                    else:
+                        self._commands_with_payloads[real_time] = \
+                            self._commands_with_payloads[time]
+                    del self._commands_with_payloads[time]
+                if time in self._commands_without_payloads:
+                    if real_time in self._commands_without_payloads:
+                        self._commands_without_payloads[real_time].extend(
+                            self._commands_without_payloads[time])
+                    else:
+                        self._commands_without_payloads[real_time] = \
+                            self._commands_without_payloads[time]
+                    del self._commands_without_payloads[time]
+                new_times.add(real_time)
+            else:
+                new_times.add(time)
 
-        # reserve regions
-        self.reserve_memory_regions(spec, self._memory_requirements)
-
-        # write system region
-        spec.switch_write_focus(region=self.SYSTEM_REGION)
-        self._write_basic_setup_info(spec, 0xBEEF0000)
-        spec.write_value(data=0)
-
-        # write commands to memory
+        # write commands
         spec.switch_write_focus(region=self.COMMANDS)
-        for write_command in self._writes:
-            spec.write_value(data=write_command)
+        spec.write_value(n_command_bytes)
+        for time in sorted(new_times):
+
+            # Gather the different types of commands
+            with_payload = list()
+            if time in self._commands_with_payloads:
+                with_payload = self._commands_with_payloads[time]
+            without_payload = list()
+            if time in self._commands_without_payloads:
+                without_payload = self._commands_without_payloads[time]
+
+            spec.write_value(time)
+
+            spec.write_value(len(with_payload))
+            for command in with_payload:
+                spec.write_value(self._get_key(command, graph_mapper,
+                                               routing_info))
+                payload = command.get_payload(routing_info, sub_graph,
+                                              graph_mapper)
+                spec.write_value(payload)
+                spec.write_value(command.repeat << 16 |
+                                 command.delay_between_repeats)
+
+            spec.write_value(len(without_payload))
+            for command in without_payload:
+                spec.write_value(self._get_key(command, graph_mapper,
+                                               routing_info))
+                spec.write_value(command.repeat << 16 |
+                                 command.delay_between_repeats)
 
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
 
-    def _calculate_memory_requirements(self):
+    def _get_key(self, command, graph_mapper, routing_info):
 
-        # sorts commands by timer tic
-        commands = sorted(self._commands, key=lambda tup: tup['t'])
+        if command.mask == 0xFFFFFFFF:
+            return command.key
 
-        # calculate size of region and the order of writes
-        self._writes = list()
+        # Find the routing info for the edge.  Note that this assumes that
+        # all the partitioned edges have the same keys assigned
+        edge_for_command = self._command_edge[command]
+        partitioned_edge_for_command = iter(
+            graph_mapper.get_partitioned_edges_from_partitionable_edge(
+                edge_for_command)).next()
+        routing_info_for_edge = routing_info.get_keys_and_masks_from_subedge(
+            partitioned_edge_for_command)
 
-        # add the extra memory requirements for the system region.
-        #  (4 ints = 16 bytes)
-        self._memory_requirements = 16
+        # Assume there is only one key and mask
+        # TODO: Deal with multiple keys and masks
+        key_and_mask = routing_info_for_edge[0]
 
-        # temporary holder
-        commands_in_same_time_slot = list()
+        # Build the command by merging in the assigned key with the command
+        return key_and_mask.key | command.key
 
-        # 3 ints holding coutners of cp, cnp and t
-        self._memory_requirements += 12
-        for start_command in commands:
+    def _get_n_command_bytes(self):
+        n_bytes = 0
 
-            # if first command, inltiise counter
-            if len(commands_in_same_time_slot) == 0:
+        for time in self._times_with_commands:
 
-                # calculate mem cost of the command based off payload
-                self._memory_requirements += self.size_of_message(
-                    start_command)
-                commands_in_same_time_slot.append(start_command)
-                self._writes.append(start_command['t'])
-            else:
-                # if the next mesage has the same time tic, add to list
-                if commands_in_same_time_slot[0]['t'] == start_command['t']:
-                    commands_in_same_time_slot.append(start_command)
-                    self._memory_requirements += \
-                        self.size_of_message(start_command)
-                else:
+            # Add 3 words for count-with-command, count-without-command
+            # and time
+            n_bytes += 12
 
-                    # if not, then send all preivous messages to
-                    # region and restart count
-                    self.deal_with_command_block(commands_in_same_time_slot)
+            # Add the size of each command
+            if time in self._commands_with_payloads:
+                n_bytes += (len(self._commands_with_payloads[time]) *
+                            _COMMAND_WITH_PAYLOAD_SIZE)
+            if time in self._commands_without_payloads:
+                n_bytes += (len(self._commands_without_payloads[time]) *
+                            _COMMAND_WITHOUT_PAYLOAD_SIZE)
 
-                    # reset message tracker
-                    commands_in_same_time_slot = list()
-                    commands_in_same_time_slot.append(start_command)
+        return n_bytes
 
-                    # 3 ints holding coutners of cp, cnp and t
-                    self._memory_requirements += 12
-                    self._memory_requirements += \
-                        self.size_of_message(start_command)
-                    self._writes.append(start_command['t'])
+    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
+        edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
+            partitioned_edge)
+        if edge in self._edge_constraints:
+            return self._edge_constraints[edge]
+        return list()
 
-        # write the last command block left from the loop
-        self.deal_with_command_block(commands_in_same_time_slot)
-
-        # add a counter for the entire memory region
-        self._writes.insert(0, self._memory_requirements)
-        self._memory_requirements += 4
-
-    def add_commands(self, commands, edge):
-        self._edge_map[edge] = commands
-        self._commands += commands
-
-    def deal_with_command_block(self, commands_in_same_time_slot):
-        """
-        writes a command block and keeps memory tracker
-        """
-
-        # sort by cp
-        commands_in_same_time_slot = \
-            sorted(commands_in_same_time_slot, key=lambda tup: tup['cp'])
-
-        payload_mesages = \
-            self.calcaulate_no_payload_messages(commands_in_same_time_slot)
-        self._writes.append(payload_mesages)
-        no_payload_messages = len(commands_in_same_time_slot) - payload_mesages
-        counter_messages = 0
-        # write each command
-        for command in commands_in_same_time_slot:
-            if counter_messages < payload_mesages:
-                self._writes.append(command['key'])
-                self._writes.append(command['payload'])
-                if command['repeat'] > 0:
-                    command_line = (command['repeat'] << 8) | command['delay']
-                    self._writes.append(command_line)
-
-            elif counter_messages == payload_mesages:
-                self._writes.append(no_payload_messages)
-            elif counter_messages > payload_mesages:
-                self._writes.append(command['key'])
-                if command['repeat'] > 0:
-                    command_line = (command['repeat'] << 8) | command['delay']
-                    self._writes.append(command_line)
-            else:
-                self._writes.append(0)
-            counter_messages += 1
-        # if no payload messgages, still need to report it for c code
-        if no_payload_messages == 0:
-            self._writes.append(no_payload_messages)
-
-    def generate_routing_info(self, subedge):
-        """
-        overloaded from component vertex
-        """
-        if self._edge_map[subedge.edge] is not None:
-            return self._edge_map[subedge.edge][0]['key'], 0xFFFFFC00
-        else:
-            # if the subedge doesnt have any predefined messages to send,
-            # then treat them with the subedge routing key
-            return subedge.key_combo, self._app_mask
-
-    def _generate_routing_neuron_id_keys(self, vertex_slice, vertex, placement,
-                                         subedge):
-        """ generates a list of keys with neuron ids
-
-        :param vertex_slice: the vertex slice of this subvertex
-        :param vertex: the vertex this subvertex is associated with
-        :param placement: the placment of this subvertex
-        :param subedge: the subedge associated with this key
-        :return: list of keys with neuron ids
-        """
-        keys = dict()
-        for atom in range(0, vertex_slice.n_atoms):
-            key_with_neuron_id = self._get_key_with_neuron_id(subedge, atom)
-            keys[vertex_slice.lo_atom + atom] = key_with_neuron_id
-        return keys
-
-    def _get_key_with_neuron_id(self, subedge, atom):
-        """ generates a key with a neuron id based off the placement and atom
-
-        :param subedge: the subedge of the subvertex
-        :param atom: the aton of this subvertex
-        :return:the key with a neuron id added to it
-        """
-        if self._edge_map[subedge.edge] is not None:
-            key = self._edge_map[subedge.edge][0]['key']
-        else:
-            # if the subedge doesnt have any predefined messages to send,
-            # then treat them with the subedge routing key
-            key = subedge.key_combo
-        key += atom
-        return key
-
-    def reserve_memory_regions(self, spec, command_size):
+    def _reserve_memory_regions(self, spec, command_size):
         """
         Reserve SDRAM space for memory areas:
         1) Area for information on what data to record
@@ -218,57 +264,12 @@ class CommandSender(AbstractMultiCastSource):
 
         # Reserve memory:
         spec.reserve_memory_region(region=self.SYSTEM_REGION,
-                                   size=16,
+                                   size=12,
                                    label='setup')
         if command_size > 0:
             spec.reserve_memory_region(region=self.COMMANDS,
                                        size=command_size,
                                        label='commands')
-
-    @staticmethod
-    def size_of_message(start_command):
-        """
-        returns the expected size of the command message
-        """
-        count = 0
-        if start_command['payload'] is None:
-            count += 4
-        else:
-            count += 8
-        if start_command['repeat'] > 0:
-            count += 4
-        return count
-
-    @staticmethod
-    def calcaulate_no_payload_messages(messages):
-        """
-        iterates though a collection of commands and counts how many have
-         payloads
-        """
-        count = 0
-        for message in messages:
-            if message['payload'] is not None:
-                count += 1
-        return count
-
-    @staticmethod
-    def check_sub_edge_key_mask_consistancy(edge_map, app_mask):
-        """
-        check that all keys for a subedge are the same when masked
-        """
-        for subedge in edge_map.keys():
-            combo = None
-            commands = edge_map[subedge]
-            if commands is not None:
-                for command in commands:
-                    if combo is None:
-                        combo = command['key'] & app_mask
-                    else:
-                        new_combo = command['key'] & app_mask
-                        if combo != new_combo:
-                            raise exceptions.RallocException(
-                                "The keys going down a specific subedge are"
-                                " not consistent")
 
     @property
     def model_name(self):
@@ -282,18 +283,13 @@ class CommandSender(AbstractMultiCastSource):
         return 0
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        if self._memory_requirements is None:
-            self._calculate_memory_requirements()
-        return self._memory_requirements
+
+        # Add a word for the size of the command region,
+        # and the size of the system region
+        return self._get_n_command_bytes() + 4 + 12
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
     def get_binary_file_name(self):
         return 'command_sender_multicast_source.aplx'
-
-    def is_recordable(self):
-        return True
-
-    def is_multi_cast_source(self):
-        return True

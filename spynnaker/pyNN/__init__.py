@@ -29,8 +29,8 @@ from spynnaker.pyNN.models.neural_models.izk_curr_exp \
     import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
 
 # neural projections
-from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge \
-    import DelayAfferentPartitionableEdge
+from spynnaker.pyNN.models.neural_projections\
+    .delay_afferent_partitionable_edge import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
@@ -68,7 +68,7 @@ from spynnaker.pyNN.models.neural_projections.connectors.\
     DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
-from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
+from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector\
     import SmallWorldConnector
 
 # Mechanisms for synapse dynamics
@@ -100,6 +100,7 @@ from pacman.model.constraints.placer_constraints.\
     import PlacerRadialPlacementFromChipConstraint
 
 # note importing star is a bad thing to do.
+from pyNN.random import *
 from pyNN.space import *
 
 # traditional logger
@@ -184,7 +185,7 @@ def run(run_time=None):
 
 
 def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
-          **extra_params):
+          database_socket_addresses=None, **extra_params):
     """
     Should be called at the very beginning of a script.
     extra_params contains any keyword arguments that are required by a given
@@ -216,11 +217,12 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
         "Release version {} - {} {}".format(
             __version__, __version_month__, __version_year__))
 
-    if len(extra_params.keys()) > 1:
+    if len(extra_params) > 1:
         logger.warn("Extra params has been applied which we do not consider")
-    _spinnaker = Spinnaker(host_name=machine, timestep=timestep,
-                           min_delay=min_delay, max_delay=max_delay,
-                           binary_search_paths=_binary_search_paths)
+    _spinnaker = Spinnaker(
+        host_name=machine, timestep=timestep, min_delay=min_delay,
+        max_delay=max_delay, binary_search_paths=_binary_search_paths,
+        database_socket_addresses=database_socket_addresses)
     # Return None, simply because the PyNN API says something must be returned
     return None
 
