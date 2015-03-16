@@ -9,9 +9,9 @@ from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_iptagab
 @add_metaclass(ABCMeta)
 class AbstractSendsBuffersFromHostPartitionableVertex(AbstractIPTagableVertex):
 
-    def __init__(self, tag, port, address, strip_sdp=False):
+    def __init__(self, tag, port, address):
         AbstractIPTagableVertex.__init__(self, tag=tag, port=port,
-                                         address=address, strip_sdp=strip_sdp)
+                                         address=address, strip_sdp=True)
 
     @abstractmethod
     def is_sends_buffers_from_host_partitionable_vertex(self):
