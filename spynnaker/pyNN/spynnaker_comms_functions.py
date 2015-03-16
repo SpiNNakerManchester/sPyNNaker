@@ -185,9 +185,9 @@ class SpynnakerCommsFunctions(object):
                 # update base address mapper
                 processor_mapping_key = (placement.x, placement.y, placement.p)
                 processor_to_app_data_base_address[processor_mapping_key] = \
-                    {'start_address':
-                        ((SDRAM.DEFAULT_SDRAM_BYTES - current_memory_available)
-                         + constants.SDRAM_BASE_ADDR),
+                    {'start_address': ((SDRAM.DEFAULT_SDRAM_BYTES -
+                                        current_memory_available) +
+                                       constants.SDRAM_BASE_ADDR),
                      'memory_used': bytes_used_by_spec,
                      'memory_written': bytes_written_by_spec}
 

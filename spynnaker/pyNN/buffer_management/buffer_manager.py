@@ -13,7 +13,7 @@ from spinnman.messages.sdp.sdp_flag import SDPFlag
 from spinnman.messages.eieio.abstract_eieio_packets.create_eieio_packets \
     import create_class_from_reader
 from spynnaker.pyNN.buffer_management.buffer_recieve_thread import \
-    BufferRecieveThread
+    BufferReceiveThread
 from spinnman.messages.eieio.command_objects.spinnaker_request_buffers import \
     SpinnakerRequestBuffers
 from spinnman.messages.eieio.command_objects.spinnaker_request_read_data \
@@ -38,17 +38,17 @@ logger = logging.getLogger(__name__)
 class BufferManager(object):
 
     def __init__(self, placements, routing_key_infos, graph_mapper,
-                 port, local_host, transciever):
+                 port, local_host, transceiver):
         self._placements = placements
         self._routing_key_infos = routing_key_infos
         self._graph_mapper = graph_mapper
         self._port = port
         self._local_host = local_host
-        self._transciever = transciever
-        self._recieve_vertices = dict()
+        self._transceiver = transceiver
+        self._receive_vertices = dict()
         self._sender_vertices = dict()
-        self._recieve_thread = BufferRecieveThread(transciever)
-        self._recieve_thread.start()
+        self._receive_thread = BufferReceiveThread()
+        self._receive_thread.start()
         self._thread_lock = threading.Lock()
         self._routing_infos = None
         self._partitioned_graph = None
@@ -66,7 +66,7 @@ class BufferManager(object):
 
         :return:
         """
-        self._recieve_thread.stop()
+        self._receive_thread.stop()
 
     def receive_buffer_command_message(self, packet):
         """ received a eieio message from the port which this manager manages
@@ -130,7 +130,7 @@ class BufferManager(object):
         for vertex in vertices:
             placement = \
                 self._placements.get_placement_of_subvertex(vertex)
-            self._recieve_vertices[(placement.x, placement.y, placement.p)] = \
+            self._receive_vertices[(placement.x, placement.y, placement.p)] = \
                 vertex
 
     def add_sender_vertex(self, manageable_vertex):
@@ -159,18 +159,25 @@ class BufferManager(object):
         return True
 
     def load_initial_buffers(self, routing_infos, partitioned_graph):
-        """ takes all the sender vertices and loads the initial buffers
+        """ takes all the sender vertices and loads the initial buffers.
+            In addition stores the routing infos and the partitioned graph
+            objects, after they are generated, when loading the initial buffers
 
-        :return:
+        :param routing_infos:
+        :param partitioned_graph: A partitioned_graph of partitioned vertices \
+        and edges from the partitionable_graph
+        :type partitioned_graph: :py:class: \
+            `pacman.model.subgraph.subgraph.Subgraph`
+        :return: None
         """
+        self._routing_infos = routing_infos
+        self._partitioned_graph = partitioned_graph
         progress_bar = ProgressBar(len(self._sender_vertices),
                                    "on loading buffer dependant vertices")
         for send_vertex_key in self._sender_vertices.keys():
             sender_vertex = self._sender_vertices[send_vertex_key]
             for region_id in \
                     sender_vertex.sender_buffer_collection.regions_managed:
-                self._routing_infos = routing_infos
-                self._partitioned_graph = partitioned_graph
                 self._handle_a_initial_buffer_for_region(
                     region_id, sender_vertex)
             progress_bar.update()
@@ -216,7 +223,7 @@ class BufferManager(object):
             logger.debug("writing one packet with length {0:d}".format(
                 data_request.length))
             data_to_be_written = data_request.get_eieio_message_as_byte_array()
-            self._transciever.write_memory(
+            self._transceiver.write_memory(
                 placement_of_partitioned_vertex.x,
                 placement_of_partitioned_vertex.y,
                 base_address + space_used, data_to_be_written)
@@ -229,7 +236,7 @@ class BufferManager(object):
         padding_packet_bytes = padding_packet.get_eieio_message_as_byte_array()
         logger.debug("writing padding with length {0:d}".format(
             len(padding_packet_bytes)))
-        self._transciever.write_memory(
+        self._transceiver.write_memory(
             placement_of_partitioned_vertex.x,
             placement_of_partitioned_vertex.y,
             base_address + space_used, padding_packet_bytes)
@@ -251,13 +258,13 @@ class BufferManager(object):
             placement = \
                 self._placements.get_placement_of_subvertex(sender_vertex)
             app_data_base_address = \
-                self._transciever.get_cpu_information_from_core(
+                self._transceiver.get_cpu_information_from_core(
                     placement.x, placement.y, placement.p).user[0]
 
             # Get the position of the region in the pointer table
             region_offset_in_pointer_table = utility_calls.\
                 get_region_base_address_offset(app_data_base_address, region_id)
-            region_offset_to_core_base = str(list(self._transciever.read_memory(
+            region_offset_to_core_base = str(list(self._transceiver.read_memory(
                 placement.x, placement.y,
                 region_offset_in_pointer_table, 4))[0])
             base_address = struct.unpack("<I", region_offset_to_core_base)[0] \
@@ -305,7 +312,7 @@ class BufferManager(object):
                                    destination_port=1)
             sdp_message = \
                 SDPMessage(sdp_header, eieio_message_as_byte_array)
-            self._transciever.send_sdp_message(sdp_message)
+            self._transceiver.send_sdp_message(sdp_message)
         else:
             raise spynnaker_exceptions.ConfigurationException(
                 "this type of request is not suitable for this thread. Please "

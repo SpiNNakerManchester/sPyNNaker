@@ -6,13 +6,20 @@ import traceback
 logger = logging.getLogger(__name__)
 
 
-class BufferRecieveThread(threading.Thread):
+class BufferReceiveThread(threading.Thread):
+    """ This class represents a queue between the ethernet listener for eieio \
+        packets and the buffer manager which parses these packets and takes \
+        appropriate actions
+    """
 
-    def __init__(self, transciever):
+    def __init__(self):
+        """
+
+        :return: None
+        """
         threading.Thread.__init__(self)
         self._queue = collections.deque()
         self._queue_condition = threading.Condition()
-        self._transciever = transciever
         self._done = False
         self._exited = False
         self.setDaemon(True)
@@ -36,7 +43,7 @@ class BufferRecieveThread(threading.Thread):
         """
         runs by just pulling receive requests and executing them
         """
-        logger.debug("[buffer recieve thread] starting")
+        logger.debug("[buffer receive thread] starting")
         try:
             while not self._done:
                 self._queue_condition.acquire()
