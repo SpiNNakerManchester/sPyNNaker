@@ -2,8 +2,8 @@ from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
 
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models.abstract_iptagable_vertex import \
-    AbstractIPTagableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
+    abstract_iptagable_vertex import AbstractIPTagableVertex
 
 
 @add_metaclass(ABCMeta)
