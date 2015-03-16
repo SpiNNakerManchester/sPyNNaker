@@ -241,7 +241,7 @@ class SpynnakerCommsFunctions(object):
                     .format(processors_ready, total_processors, break_down))
 
         # wait till vis is ready for us to start if required
-        if waiting_on_confirmation:
+        if database_thread is not None and waiting_on_confirmation:
             logger.info("*** Awaiting for a response from the visualiser to "
                         "state its ready for the simulation to start ***")
             database_thread.wait_for_confirmation()
@@ -249,7 +249,7 @@ class SpynnakerCommsFunctions(object):
         # if correct, start applications
         logger.info("Starting application")
         self._txrx.send_signal(app_id, SCPSignal.SYNC0)
-        if send_start_notification:
+        if database_thread is not None and send_start_notification:
             database_thread.send_start_notification()
 
         # check all apps have gone into run state

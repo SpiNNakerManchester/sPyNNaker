@@ -626,6 +626,7 @@ class DataBaseInterface(object):
                             .format(index, reverse_ip_tag.tag,
                                     reverse_ip_tag.board_address,
                                     reverse_ip_tag.port))
+                index += 1
             connection.commit()
             connection.close()
             self._lock_condition.release()
