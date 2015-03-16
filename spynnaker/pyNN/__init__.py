@@ -217,7 +217,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
         "Release version {} - {} {}".format(
             __version__, __version_month__, __version_year__))
 
-    if len(extra_params.keys()) > 1:
+    if len(extra_params) > 1:
         logger.warn("Extra params has been applied which we do not consider")
     _spinnaker = Spinnaker(
         host_name=machine, timestep=timestep, min_delay=min_delay,

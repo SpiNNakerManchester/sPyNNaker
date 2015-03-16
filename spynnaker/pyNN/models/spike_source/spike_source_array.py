@@ -356,7 +356,7 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
         spike_dict = self.get_spikes_per_timestep(vertex_slice)
-        no_active_timesteps = len(spike_dict.keys())
+        no_active_timesteps = len(spike_dict)
         spike_block_row_length = self.get_spike_block_row_length(
             ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1))
         spike_region_sz = self.get_spike_region_bytes(spike_block_row_length,

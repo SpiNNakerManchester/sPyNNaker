@@ -147,7 +147,7 @@ class SpynnakerCommsFunctions(object):
                 # locate current memory requirement
                 current_memory_available = SDRAM.DEFAULT_SDRAM_BYTES
                 memory_tracker_key = (placement.x, placement.y)
-                if memory_tracker_key in space_based_memory_tracker.keys():
+                if memory_tracker_key in space_based_memory_tracker:
                     current_memory_available = \
                         space_based_memory_tracker[memory_tracker_key]
 
@@ -203,8 +203,7 @@ class SpynnakerCommsFunctions(object):
         # deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
-        executable_keys = executable_targets.keys()
-        for executable_target in executable_keys:
+        for executable_target in executable_targets:
             core_subsets = executable_targets[executable_target]
             for core_subset in core_subsets:
                 for _ in core_subset.processor_ids:
@@ -454,9 +453,9 @@ class SpynnakerCommsFunctions(object):
             reports.re_load_script_load_executables_init(binary_folder,
                                                          executable_targets)
 
-        progress_bar = ProgressBar(len(executable_targets.keys()),
+        progress_bar = ProgressBar(len(executable_targets),
                                    "Loading executables onto the machine")
-        for exectuable_target_key in executable_targets.keys():
+        for exectuable_target_key in executable_targets:
             file_reader = SpinnmanFileDataReader(exectuable_target_key)
             core_subset = executable_targets[exectuable_target_key]
 

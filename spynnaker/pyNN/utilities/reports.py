@@ -100,7 +100,7 @@ def write_memory_map_report(report_default_directory,
         logger.error("Generate_placement_reports: Can't open file"
                      " {} for writing.".format(file_name))
 
-    for key in processor_to_app_data_base_address.keys():
+    for key in processor_to_app_data_base_address:
         output.write(str(key) + ": ")
         data = processor_to_app_data_base_address[key]
         output.write(
@@ -151,7 +151,7 @@ def network_specification_report(report_folder, graph, hostname):
             constraint_str = constraint.label
             f_network_specification.write("constraint: {}\n"
                                           .format(constraint_str))
-        #if params is None or len(params.keys()) == 0:
+        #if params is None or len(params) == 0:
         #    f_network_specification.write("  Parameters: None\n\n")
         #else:
         #    f_network_specification.write("  Parameters: %s\n\n" % params)
@@ -175,7 +175,7 @@ def network_specification_report(report_folder, graph, hostname):
                                          post_v_label, post_v_sz)
         f_network_specification.write(edge_str)
         f_network_specification.write("  Model: {}\n".format(model))
-        #if params is None or len(params.keys()) == 0:
+        #if params is None or len(params) == 0:
         #    f_network_specification.write("  Parameters: None\n\n")
         #else:
         #    f_network_specification.write("  Parameters: %s\n\n" % params)
@@ -358,7 +358,7 @@ def generate_provance_routings(routing_tables, machine, txrx,
     root = etree.Element("root")
     doc = etree.SubElement(root, "router_counters")
     expected_routers = etree.SubElement(doc, "Used_Routers")
-    for router_diagnostic_coords in router_diagnostics.keys():
+    for router_diagnostic_coords in router_diagnostics:
         _write_router_diag(
             expected_routers, router_diagnostic_coords,
             router_diagnostics[router_diagnostic_coords])
@@ -366,7 +366,7 @@ def generate_provance_routings(routing_tables, machine, txrx,
     for chip in machine.chips:
         if not chip.virtual:
             coords = (chip.x, chip.y)
-            if coords not in router_diagnostics.keys():
+            if coords not in router_diagnostics:
                 router_diagnostic = \
                     txrx.get_router_diagnostics(chip.x, chip.y)
                 if (router_diagnostic.n_dropped_multicast_packets != 0 or

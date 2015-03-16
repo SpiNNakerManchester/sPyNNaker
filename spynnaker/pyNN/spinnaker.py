@@ -600,7 +600,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 if binary_path is None:
                     raise exceptions.ExecutableNotFoundException(binary_name)
 
-                if binary_path in executable_targets.keys():
+                if binary_path in executable_targets:
                     executable_targets[binary_path].add_processor(placement.x,
                                                                   placement.y,
                                                                   placement.p)
