@@ -7,7 +7,7 @@ except ImportError:
 
 import os
 
-__version__ = "2015.004-alpha-04"
+__version__ = "2015.004-alpha-05"
 
 class CustomInstall(install):
 
@@ -27,7 +27,7 @@ class CustomInstall(install):
         if not os.path.exists(self._spinnaker_init):
             spinn_file = open(self._spinnaker_init, "w")
             spinn_file.write("from spynnaker.pyNN import *\n")
-            spinn_file.write("__version__ = {}\n".format(__version__))
+            spinn_file.write("__version__ = \"{}\"\n".format(__version__))
             spinn_file.close()
             print "Created", self._spinnaker_init
 
