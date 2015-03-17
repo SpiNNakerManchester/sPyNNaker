@@ -65,10 +65,12 @@ uint32_t extract_time_from_eieio_msg(eieio_msg_t eieio_msg_ptr);
 void packet_interpreter(eieio_msg_t eieio_msg_ptr);
 void process_16_bit_packets (
     void* event_pointer, bool pkt_format, uint32_t length, uint32_t pkt_prefix,
-    uint32_t pkt_payload_prefix, bool payload, bool pkt_payload_prefix_apply);
+    uint32_t pkt_payload_prefix, bool payload, bool pkt_payload_prefix_apply,
+    bool payload_timestamp);
 void process_32_bit_packets (
     void* event_pointer, uint32_t length, uint32_t pkt_prefix,
-    uint32_t pkt_payload_prefix, bool payload, bool pkt_payload_prefix_apply);
+    uint32_t pkt_payload_prefix, bool payload, bool pkt_payload_prefix_apply,
+    bool payload_timestamp);
 
 // Globals
 static uint32_t time;
@@ -999,26 +1001,21 @@ void packet_interpreter(eieio_msg_t eieio_msg_ptr)
     }
   }
 
-  if (payload_timestamp)
-  {
-    payload_on = 0;
-    pkt_payload_prefix_apply = 0;
-  }
-
   if (pkt_type <= 1)
     process_16_bit_packets (event_pointer, pkt_format, pkt_len, pkt_key_prefix,
                             pkt_payload_prefix, payload_on,
-                            pkt_payload_prefix_apply);
+                            pkt_payload_prefix_apply, payload_timestamp);
   else
     process_32_bit_packets (event_pointer, pkt_len, pkt_key_prefix,
                             pkt_payload_prefix, payload_on,
-                            pkt_payload_prefix_apply);
+                            pkt_payload_prefix_apply, payload_timestamp);
 }
 
 void process_16_bit_packets (void* event_pointer, bool pkt_format,
                             uint32_t length, uint32_t pkt_prefix,
                             uint32_t pkt_payload_prefix, bool payload,
-                            bool pkt_payload_prefix_apply)
+                            bool pkt_payload_prefix_apply,
+                            bool payload_timestamp)
 {
   uint32_t i;
 
@@ -1082,7 +1079,12 @@ void process_16_bit_packets (void* event_pointer, bool pkt_format,
 #endif
 
       if ( (!check) || (check && ((key & mask) == key_space)))
-        spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+      {
+        if (!payload_timestamp)
+          spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+        else
+          spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+      }
       else
         incorrect_keys++;
     }
@@ -1111,7 +1113,12 @@ void process_16_bit_packets (void* event_pointer, bool pkt_format,
 #endif
 
       if ( (!check) || (check && ((key & mask) == key_space)))
-        spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+      {
+        if (!payload_timestamp)
+          spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+        else
+          spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+      }
       else
         incorrect_keys++;
     }
@@ -1121,7 +1128,8 @@ void process_16_bit_packets (void* event_pointer, bool pkt_format,
 void process_32_bit_packets (void* event_pointer,
                             uint32_t length, uint32_t pkt_prefix,
                             uint32_t pkt_payload_prefix, bool payload,
-                            bool pkt_payload_prefix_apply)
+                            bool pkt_payload_prefix_apply,
+                            bool payload_timestamp)
 {
   uint32_t i;
 
@@ -1194,7 +1202,12 @@ void process_32_bit_packets (void* event_pointer,
 #endif
 
       if ( (!check) || (check && ((key & mask) == key_space)))
-        spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+      {
+        if (!payload_timestamp)
+          spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+        else
+          spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+      }
       else
         incorrect_keys++;
     }
@@ -1229,7 +1242,12 @@ void process_32_bit_packets (void* event_pointer,
 #endif
 
       if ( (!check) || (check && ((key & mask) == key_space)))
-        spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+      {
+        if (!payload_timestamp)
+          spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+        else
+          spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+      }
       else
         incorrect_keys++;
     }
