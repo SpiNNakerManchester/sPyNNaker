@@ -375,6 +375,9 @@ class SpynnakerConfiguration(object):
                 files_in_report_folder.remove(oldest_file)
 
     def _set_up_buffer_requirements(self):
-        self._default_buffer_ip_address = config.get("Buffers", "receve_buffer_host")
-        self._default_buffer_ip_port = config.getint("Buffers", "receve_buffer_port")
-        self._default_buffer_ip_tag = config.getint("Buffers", "receve_buffer_tag")
+        self._default_buffer_ip_address = config.get(
+            "Buffers", "receive_buffer_host")
+        self._default_buffer_ip_port = config.getint(
+            "Buffers", "receive_buffer_port")
+        self._default_buffer_ip_tag = config.getint(
+            "Buffers", "receive_buffer_tag")

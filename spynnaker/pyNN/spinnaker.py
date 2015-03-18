@@ -4,6 +4,10 @@ from pacman.operations.router_check_functionality.valid_routes_checker import \
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
+from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
+from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
+    abstract_sends_buffers_from_host_partitionable_vertex import \
+    AbstractSendsBuffersFromHostPartitionableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
     AbstractVirtualVertex
 from spynnaker.pyNN.models.abstract_models.abstract_provides_n_keys_for_edge\
@@ -22,8 +26,8 @@ from spynnaker.pyNN.models.abstract_models\
     import AbstractVertexWithEdgeToDependentVertices
 from pacman.operations.tag_allocator_algorithms.basic_tag_allocator \
     import BasicTagAllocator
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
+from pacman.model.partitionable_graph.abstract_partitionable_edge \
+    import AbstractPartitionableEdge
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
     import DictBasedPartitionedEdgeNKeysMap
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
@@ -64,6 +68,7 @@ from spynnaker.pyNN.utilities.data_generator_interface import \
 # spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
+import spinnman.constants as spinnman_constants
 
 import logging
 import math
@@ -703,7 +708,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._multi_cast_vertex = CommandSender(
                     self._machine_time_step, self._time_scale_factor)
                 self.add_vertex(self._multi_cast_vertex)
-            edge = PartitionableEdge(self._multi_cast_vertex, vertex_to_add)
+            edge = AbstractPartitionableEdge(
+                self._multi_cast_vertex, vertex_to_add)
             self._multi_cast_vertex.add_commands(vertex_to_add.commands, edge)
             self.add_edge(edge)
 
@@ -712,7 +718,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                       AbstractVertexWithEdgeToDependentVertices):
             for dependant_vertex in vertex_to_add.dependent_vertices:
                 self.add_vertex(dependant_vertex)
-                dependant_edge = PartitionableEdge(
+                dependant_edge = AbstractPartitionableEdge(
                     pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
                 self.add_edge(dependant_edge)
 

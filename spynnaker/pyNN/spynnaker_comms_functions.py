@@ -240,7 +240,7 @@ class SpynnakerCommsFunctions(object):
                 # break_down the successful cores and unsuccessful cores into
                 # string
                 break_down = self.turn_break_downs_into_string(
-                    total_cores, successful_cores, unsucessful_cores,
+                    total_cores, successful_cores, unsuccessful_cores,
                     CPUState.SYNC0)
                 raise exceptions.ExecutableFailedToStartException(
                     "Only {} processors out of {} have successfully reached "

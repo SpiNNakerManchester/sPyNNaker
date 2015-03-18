@@ -1,6 +1,8 @@
 from spinnman import constants as spinnman_constants
-from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
-from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
+from spinnman.messages.eieio.abstract_eieio_packets.eieio_command_header \
+    import EIEIOCommandHeader
+from spinnman.messages.eieio.abstract_eieio_packets.eieio_command_message \
+    import EIEIOCommandMessage
 from spinnman.connections.udp_packet_connections.eieio_command_connection \
     import EieioCommandConnection
 

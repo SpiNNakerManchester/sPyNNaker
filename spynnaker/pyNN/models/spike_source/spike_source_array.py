@@ -1,17 +1,15 @@
-from pacman.model.partitionable_graph.abstract_partitionable_vertex import \
+from pacman.model.abstract_classes.abstract_partitionable_vertex import \
     AbstractPartitionableVertex
 from spynnaker.pyNN.buffer_management.storage_objects.buffer_collection import \
     BufferCollection
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
     abstract_sends_buffers_from_host_partitionable_vertex import \
     AbstractSendsBuffersFromHostPartitionableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
-    AbstractDataSpecableVertex
-from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex import \
-    SpikeSourceArrayPartitionedVertex
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
+from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex \
+    import SpikeSourceArrayPartitionedVertex
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.spike_source.abstract_spike_source \
-    import AbstractSpikeSource
 
 from spynnaker.pyNN import exceptions
 
@@ -21,7 +19,6 @@ from data_specification.data_specification_generator import \
 from spinnman import constants as spinnman_constants
 
 import math
-from collections import defaultdict
 import logging
 from enum import Enum
 
@@ -126,8 +123,9 @@ class SpikeSourceArray(AbstractPartitionableVertex,
                     time_stamp_in_ticks, neuron_list)
                 number_of_spikes_transmitted += vertex_slice.n_atoms
 
-        memory_used = ((no_buffers * (spinnman_constants.EIEIO_DATA_HEADER_SIZE
-                        + constants.TIMESTAMP_SPACE_REQUIREMENT)) +
+        memory_used = ((no_buffers *
+                        (spinnman_constants.EIEIO_DATA_HEADER_SIZE +
+                         constants.TIMESTAMP_SPACE_REQUIREMENT)) +
                        (number_of_spikes_transmitted * constants.KEY_SIZE))
         return memory_used, buffer_collection
 
@@ -142,7 +140,8 @@ class SpikeSourceArray(AbstractPartitionableVertex,
             return 0
 
         out_spike_spikes = \
-            int(math.ceil((vert_slice.hi_atom - vert_slice.lo_atom + 1) / 32.0)) * 4
+            int(math.ceil((vert_slice.hi_atom - vert_slice.lo_atom + 1) /
+                          32.0)) * 4
         return self.get_recording_region_size(out_spike_spikes)
 
     def _reserve_memory_regions(self, spec, spike_region_size):
@@ -222,7 +221,8 @@ class SpikeSourceArray(AbstractPartitionableVertex,
 
     # inherited from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_mapper, report_folder):
+                           routing_info, hostname, graph_mapper, report_folder,
+                           ip_tags, reverse_ip_tags):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
@@ -319,22 +319,22 @@ class SpikeSourceArray(AbstractPartitionableVertex,
         """
         return 0
 
-    def create_subvertex(self, resources_required, vertex_slice, label=None,
-                         additional_constraints=list()):
+    def create_subvertex(self, vertex_slice, resources_required, label=None,
+                         constraints=list()):
         """ overloaded method from abstract partitionable vertex. used to hand
         a partitioned spike source array its own buffer_collection
 
         :param resources_required:
         :param vertex_slice:
         :param label:
-        :param additional_constraints:
+        :param constraints:
         :return:
         """
         size, buffer_collection = self._get_spikes_per_timestep(vertex_slice)
         partitioned_vertex = SpikeSourceArrayPartitionedVertex(
             buffer_collection=buffer_collection, label=label,
             resources_used=resources_required,
-            additional_constraints=additional_constraints)
+            additional_constraints=constraints)
         buffer_collection.set_partitioned_vertex(partitioned_vertex)
         return partitioned_vertex
 
