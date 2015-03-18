@@ -1,46 +1,78 @@
+/*
+ * interface for all types of synapses shaping functions.
+ */
+
 #ifndef _SYNAPSE_TYPES_H_
 #define _SYNAPSE_TYPES_H_
 
 #include "../../common/neuron-typedefs.h"
 #include "../synapse_row.h"
 
+//! \brief helper method which returns the buffer index to which a given type
+//! of synapses are stored for a given neuron being simulated by the model.
+//! \param[in] synapse_type_index the in the synapse row table which
+//! corresponds to which type of synapse to look for.
+//! NOTE: implementation HERE
+//! \param[in] neuron_index the index of the neuron currently being considered
+//! \return the position within a input buffer which contains the spikes that
+//! will stimulate this neuron which are of a given synapse type.
 static inline index_t synapse_types_get_input_buffer_index(
         index_t synapse_type_index, index_t neuron_index) {
     return ((synapse_type_index << SYNAPSE_INDEX_BITS) | neuron_index);
 }
 
+//! \brief decays the stuff thats sitting in the input buffers
+//! (to compensate for the valve behaviour of a synapse
+//! in biology (spike goes in, synapse opens, then closes slowly)).
+//! as these have not yet been processed and applied to the neuron.
+//! \param[in] input_buffers the pointer to the input buffers
+//! \param[in] neuron_index the index in the neuron states which represent the
+//! neuron currently being processed
+//! \param[in] parameters the parameters retrieved from SDRAM which cover how
+//! to initialise the synapse shaping rules.
+//! \return nothing
 static void synapse_types_shape_input(
     input_t *input_buffers, index_t neuron_index, synapse_param_t** parameters);
 
-
+//! \brief adds the inputs for a give timer period to a given neuron that is
+//! being simulated by this model
+//! \param[in] input_buffers the input buffers which contain the input feed for
+//! the given neuron being updated
+//! \param[in] synapse_type_index the type of input that this input is to be
+//! considered (aka excitatory or inhibitory etc)
+//! \param[in] neuron_index the neuron that is being updated currently.
+//! \param[in] parameters the neuron shaping parameters for this given neuron
+//! being updated.
+//! \param[in] input the inputs for that given synapse_type.
+//! \return None
 static void synapse_types_add_neuron_input(
     input_t *input_buffers, index_t synapse_type_index, index_t neuron_index,
     synapse_param_t** parameters, input_t input);
 
-//! \extracts the excitatory input buffers from the buffers available for a
-//! given neuron id
+//! \brief extracts the excitatory input buffers from the buffers available
+//! for a given neuron id
 //! \param[in] input_buffers the input buffers available
 //! \param[in] neuron_index the neuron id currently being considered
 //! \return the excitatory input buffers for a given neuron id.
 static input_t synapse_types_get_excitatory_input(
     input_t *input_buffers, index_t neuron_index);
 
-//! \extracts the inhibitory input buffers from the buffers available for a
-//! given neuron id
+//! \brief extracts the inhibitory input buffers from the buffers available
+//! for a given neuron id
 //! \param[in] input_buffers the input buffers available
 //! \param[in] neuron_index the neuron id currently being considered
 //! \return the inhibitory input buffers for a given neuron id.
 static input_t synapse_types_get_inhibitory_input(
     input_t *input_buffers, index_t neuron_index);
 
-//! \returns a human readable character for the type of synapse. examples would
-//! be X = excitatory types, I = inhibitory types etc etc.
+//! \brief returns a human readable character for the type of synapse.
+//! examples would be X = excitatory types, I = inhibitory types etc etc.
 //! \param[in] synapse_type_index the synapse type index
 //! (there is a specific index interpretation in each synapse type)
 //! \return a human readable character representing the synapse type.
 static const char *synapse_types_get_type_char(index_t synapse_type_index);
 
-//! \ prints the input for a neuron id given the available inputs
+//! \brief prints the input for a neuron id given the available inputs
 //! currently only executed when the models are in debug mode, as the prints are
 //! controlled from the synapses.c _print_inputs method.
 //! \param[in] input_buffers the input buffers available

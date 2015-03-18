@@ -96,7 +96,7 @@ static bool initialize(uint32_t *timer_period) {
     for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
         if (recording_is_channel_enabled(recording_flags,
                                          channels_to_record[i])) {
-            if (!recording_initialze_channel(
+            if (!recording_initialse_channel(
                     data_specification_get_region(regions_to_record[i],
                                                   address),
                     channels_to_record[i], region_sizes[i])) {

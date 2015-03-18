@@ -187,7 +187,7 @@ static bool initialize(uint32_t *timer_period) {
         &spike_history_region_size, NULL, NULL);
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
-        if (!recording_initialze_channel(
+        if (!recording_initialse_channel(
                 data_specification_get_region(spike_history, address),
                 e_recording_channel_spike_history, spike_history_region_size)) {
             return false;

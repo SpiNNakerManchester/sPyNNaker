@@ -28,15 +28,32 @@ typedef enum recording_positions {
 static recording_channel_t g_recording_channels[e_recording_channel_max];
 
 //---------------------------------------
-// Private API
+// Private method
 //---------------------------------------
-//! \????????????
+//! \brief checks that a channel has been initialised or is still awaiting
+//! initialisation
 //! \param[in] channel the channel strut which represents the memory data for a
 //! given recording region
-//! \return boolean which is True ????????????? or false otherwise
-static inline bool recording_channel_in_use(recording_channel_e channel) {
+//! \return boolean which is True if the channel has been initialised or false
+//! otherwise
+static inline bool has_been_initialsed(recording_channel_e channel) {
     return (g_recording_channels[channel].start != NULL
             && g_recording_channels[channel].end != NULL);
+}
+
+//----------------------------------------
+//  Private method
+//----------------------------------------
+//! \brief closes a channel so that future records fail as the channel has
+//! been closed
+//! \param[in] channel the channel strut which represents the memory data for a
+//! given recording region, which is to be closed.
+//! \return boolean which is True is the channel was successfully closed and
+//! False otherwise.
+static inline bool close_channel(recording_channel_e channel) {
+	g_recording_channels[channel].start = NULL;
+	g_recording_channels[channel].end = NULL;
+	return true;
 }
 
 //---------------------------------------
@@ -88,11 +105,20 @@ void recording_read_region_sizes(
     }
 }
 
-bool recording_initialze_channel(
+//! \brief initialises a channel with the start, end, size and current position
+//! in SDRAM for the channel handed in.
+//! \param[in] output_region the absolute memory address in SDRAM for the
+//!recording region
+//! \param[out] channel the channel to which we are initialising the
+//! parameters of.
+// \param[out] size_bytes the size of memory that the channel can put data into
+//! \return boolean which is True if the channel was successfully initialised
+//! or False otherwise.
+bool recording_initialse_channel(
         address_t output_region, recording_channel_e channel,
         uint32_t size_bytes) {
 
-    if (recording_channel_in_use(channel)) {
+    if (has_been_initialsed(channel)) {
         log_error("Recording channel %u already configured", channel);
 
         // CHANNEL already initialised
@@ -106,8 +132,8 @@ bool recording_initialze_channel(
 
         // Calculate pointers to the start, current position and end of this
         // memory block
-        recording_channel->start = recording_channel->current =
-            (uint8_t*) &output_region[1];
+        recording_channel->start = (uint8_t*) &output_region[1];
+        recording_channel->current = (uint8_t*) &output_region[1];
         recording_channel->end = recording_channel->start + size_bytes;
 
         log_info("Recording channel %u configured to use %u byte memory block"
@@ -117,9 +143,15 @@ bool recording_initialze_channel(
     }
 }
 
+//! \brief records some data into a specific recording channel.
+//! \param[in] channel the channel to store the data into.
+//! \param[in] data the data to store into the channel.
+//! \param[in] size_bytes the number of bytes that this data will take up.
+//! \return boolean which is True if the data has been stored in the channel,
+//! False otherwise.
 bool recording_record(
         recording_channel_e channel, void *data, uint32_t size_bytes) {
-    if (recording_channel_in_use(channel)) {
+    if (has_been_initialsed(channel)) {
         recording_channel_t *recording_channel = &g_recording_channels[channel];
 
         // If there's space to record
@@ -143,13 +175,17 @@ bool recording_record(
 
 }
 
+//! \brief updated the first word in the recording channel's memory region with
+//! the number of bytes that was actually written to SDRAM and then closes the
+//! channel so that future records fail.
+//! \return nothing
 void recording_finalise() {
     log_info("Finalising recording channels");
 
     // Loop through channels
     for (uint32_t channel = 0; channel < e_recording_channel_max; channel++) {
         // If this channel's in use
-        if (recording_channel_in_use(channel)) {
+        if (has_been_initialsed(channel)) {
             recording_channel_t *recording_channel =
                 &g_recording_channels[channel];
 
@@ -162,6 +198,15 @@ void recording_finalise() {
                 channel, num_bytes_written + sizeof(uint32_t),
                 recording_channel->counter);
             *recording_channel->counter = num_bytes_written;
+            if(!close_channel(channel)){
+            	log_error("could not close channel %u.", channel);
+            }
+            else{
+            	log_info("closed channel %u.", channel);
+            }
+        }
+        else{
+        	log_error("channel %u is already closed.", channel);
         }
     }
 }

@@ -17,19 +17,38 @@ static uint32_t	refractory_time_update = 10;
 }
 */
 
+/* if the model has been compiled for CORRECT_FOR_THRESHOLD_GRANULARITY, then
+* a new array is built refract_threshold_correction to contain tweaks
+*/
 #ifdef CORRECT_FOR_THRESHOLD_GRANULARITY
     static uint8_t refract_threshold_correction[3];
 #endif
+/* if the model has been compiled for SIMPLE_COMBINED_GRANULARITY, then
+* a new uint8_t is built simple_thresh_update to support this functionality
+*/
 #ifdef SIMPLE_COMBINED_GRANULARITY
     static uint8_t  simple_thresh_update;
 #endif
 
-static inline REAL _correct_for_refractory_granularity(neuron_pointer_t neuron,
-        int32_t neg_refract_timer_now) {
+//! \brief method which deals with the effects from the fact that a spike can
+//! fire mid way though a timer tick. This method can therefore adjust its time.
+//! before the refractory period finishes to compensate for the missing time.
+//! If the model is compiled with CORRECT_FOR_REFRACTORY_GRANULARITY this method
+//! does?????????????????
+//! if the model is compiled with SIMPLE_COMBINED_GRANULARITY this method does
+//! ?????????????
+//! \param[in] neuron the neuron strut which contains the parameters for a
+//! given neuron being simulated by this model
+//! \param[in] neg_refract_timer_now ??????????
+//! \return returns ???????????????
+static inline REAL _correct_for_refractory_granularity(
+		neuron_pointer_t neuron, int32_t neg_refract_timer_now) {
     use(neg_refract_timer_now);
     REAL this_eTC = neuron->exp_TC;
+// if the code is compiled for CORRECT_FOR_REFRACTORY_GRANULARITY, this block is
+// added for ????????????
 #ifdef CORRECT_FOR_REFRACTORY_GRANULARITY
-    //  within-timestep correction for when neuron came out of refractory period
+    // within-timestep correction for when neuron came out of refractory period
     // breaks timestep into thirds
     // - average error from approximation = 1/12th of a timestep
     log_debug("ref time %d  ", neg_refract_timer_now);
@@ -56,7 +75,8 @@ static inline REAL _correct_for_refractory_granularity(neuron_pointer_t neuron,
                   this_eTC);
     }
 #endif // CORRECT_FOR_REFRACTORY_GRANULARITY
-
+// if the code is compiled for SIMPLE_COMBINED_GRANULARITY, this block is
+// added for ????????????
 #ifdef SIMPLE_COMBINED_GRANULARITY
 
     // only used if it just came out of refractory period this timestep
@@ -68,8 +88,9 @@ static inline REAL _correct_for_refractory_granularity(neuron_pointer_t neuron,
 }
 
 // simple Leaky I&F ODE - discrete changes elsewhere -  assumes 1ms timestep?
-static inline void _lif_neuron_closed_form(neuron_pointer_t neuron, REAL V_prev,
-        int32_t neg_refract_timer_now, input_t input_this_timestep) {
+static inline void _lif_neuron_closed_form(
+		neuron_pointer_t neuron, REAL V_prev, int32_t neg_refract_timer_now,
+		input_t input_this_timestep) {
 
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 

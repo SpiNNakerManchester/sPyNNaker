@@ -92,8 +92,10 @@ neuron_pointer_t neuron_model_lif_curr_impl_create(
 
 //! \function that converts the input into the real value to be used by the
 //! neuron
-//! \param[in] input ?????????
-//! \return ????????
+//! \param[in] input the input buffer that needs converting for use by the
+//! neuron
+//! \return the converted input buffer which has been converted for use by the
+//! neuron
 static inline input_t neuron_model_convert_input(input_t input) {
     return input;
 }

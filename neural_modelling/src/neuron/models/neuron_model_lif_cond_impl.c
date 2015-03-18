@@ -19,6 +19,8 @@ static uint32_t refractory_time_update = 10;
 #ifdef CORRECT_FOR_THRESHOLD_GRANULARITY
     static uint8_t refract_threshold_correction[3];
 #endif
+
+
 #ifdef SIMPLE_COMBINED_GRANULARITY
     static uint8_t  simple_thresh_update;
 #endif
