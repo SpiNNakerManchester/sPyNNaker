@@ -87,7 +87,7 @@ void timer_callback (uint unused0, uint unused1)
   // Record output spikes if required
   record_out_spikes();
 
-  if (nonempty_out_spikes ())
+  if (nonempty_out_spikes () && use_key)
   {
     print_out_spikes ();
     for (index_t i = 0; i < num_neurons; i++)
@@ -231,7 +231,7 @@ void incoming_spike_callback (uint key, uint payload)
       {
         dma_busy = TRUE;
       } else {
-    	io_printf(IO_BUF, "\t[WARNING] Could not trigger user event\n");
+        io_printf(IO_BUF, "\t[WARNING] Could not trigger user event\n");
       }
     }
   } else {

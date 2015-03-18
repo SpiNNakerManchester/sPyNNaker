@@ -10,14 +10,19 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import 
 from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex import \
     SpikeSourceArrayPartitionedVertex
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.spike_source.abstract_spike_source \
+    import AbstractSpikeSource
+
 from spynnaker.pyNN import exceptions
+
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 
 from spinnman import constants as spinnman_constants
 
-import logging
 import math
+from collections import defaultdict
+import logging
 from enum import Enum
 
 
@@ -92,6 +97,7 @@ class SpikeSourceArray(AbstractPartitionableVertex,
         no_buffers = 0
         number_of_spikes_transmitted = 0
         if isinstance(self._spike_times[0], list):
+
             # This is in SpiNNaker 'list of lists' format:
             for neuron in range(vertex_slice.lo_atom,
                                 vertex_slice.hi_atom + 1):
@@ -106,6 +112,7 @@ class SpikeSourceArray(AbstractPartitionableVertex,
                         time_stamp_in_ticks, neuron)
                     number_of_spikes_transmitted += 1
         else:
+
             # This is in official PyNN format, all neurons use the same list:
             neuron_list = range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
             for timeStamp in sorted(self._spike_times):
@@ -204,6 +211,7 @@ class SpikeSourceArray(AbstractPartitionableVertex,
 
     def get_spikes(self, txrx, placements, graph_mapper, buffer_manager,
                    compatible_output=False):
+
         # Use standard behaviour to read spikes
         return self._get_spikes(
             transciever=txrx, placements=placements,

@@ -89,7 +89,7 @@ class IzhikevichCurrentExponentialPopulation(
             NeuronParameter(self._v_init, DataType.S1615),
             NeuronParameter(self._u_init, DataType.S1615),
             NeuronParameter(self.ioffset(self._machine_time_step),
-                    DataType.S1615),
+                            DataType.S1615),
             NeuronParameter(0, DataType.S1615)
         ]
 

@@ -1,14 +1,14 @@
 from setuptools import setup
+exec(open("spynnaker/pyNN/_version.py").read())
 
 setup(
     name="sPyNNaker",
-    version="2015.001",
+    version=__version__,
     description="Spinnaker implementation of PyNN",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=['spynnaker',
               'spynnaker.pyNN',
               'spynnaker.pyNN.buffer_management',
-              'spynnaker.pyNN.buffer_management.command_objects',
               'spynnaker.pyNN.buffer_management.storage_objects',
               'spynnaker.pyNN.data_storage',
               'spynnaker.pyNN.models',
@@ -27,13 +27,15 @@ setup(
               'spynnaker.pyNN.models.utility_models',
               'spynnaker.pyNN.overridden_pacman_functions',
               'spynnaker.pyNN.utilities',
-              'spynnaker.pyNN.utilities.conf'],
+              'spynnaker.pyNN.utilities.conf',
+              'spynnaker.pyNN.utilities.database',
+              'spynnaker.pyNN.utilities.connections'],
     package_data={'spynnaker.pyNN': ['model_binaries/*.aplx'],
                   'spynnaker': ['spynnaker.cfg'],
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template']},
-    install_requires=['SpiNNMachine >= 2015.001',
-                      'SpiNNMan >= 2015.001',
-                      'SpiNNaker_PACMAN >= 2015.001',
-                      'SpiNNaker_DataSpecification >= 2015.001',
-                      'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'pacman']
+    install_requires=['SpiNNMachine >= 2015.002',
+                      'SpiNNMan >= 2015.002',
+                      'SpiNNaker_PACMAN >= 2015.003-alpha-01',
+                      'SpiNNaker_DataSpecification >= 2015.002',
+                      'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
 )

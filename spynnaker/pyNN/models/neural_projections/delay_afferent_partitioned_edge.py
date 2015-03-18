@@ -10,8 +10,9 @@ logger = logging.getLogger(__name__)
 class DelayAfferentPartitionedEdge(ProjectionPartitionedEdge,
                                    AbstractFilterableEdge):
 
-    def __init__(self, presubvertex, postsubvertex):
-        ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex)
+    def __init__(self, presubvertex, postsubvertex, constraints):
+        ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex,
+                                           constraints)
         AbstractFilterableEdge.__init__(self)
 
     def filter_sub_edge(self, graph_mapper, common_report_folder):

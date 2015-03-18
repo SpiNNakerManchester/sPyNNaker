@@ -6,17 +6,22 @@ from spinnman import constants as spinnman_constants
 from enum import Enum
 import math
 
-POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 # Some constants
-SETUP_SIZE = 28  # Single word of info with flags, etc.
-                 # plus the lengths of each of the output buffer
-                 # regions in bytes
+POSSION_SIGMA_SUMMATION_LIMIT = 3.0
+
+# Single word of info with flags, etc.
+# plus the lengths of each of the output buffer
+# regions in bytes
+SETUP_SIZE = 28
 
 NO_PARAMS = 10
 PARAMS_HEADER_SIZE = 3  # Number of 32-bit words in header of params block
 PARAMS_BASE_SIZE = 4 * (PARAMS_HEADER_SIZE + NO_PARAMS)
 BLOCK_INDEX_HEADER_WORDS = 3
 BLOCK_INDEX_ROW_WORDS = 2
+
+# database cap file path
+MAX_DATABASE_PATH_LENGTH = 50000
 
 RECORD_SPIKE_BIT = 1 << 0
 RECORD_STATE_BIT = 1 << 1
@@ -34,10 +39,11 @@ GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
 
 INFINITE_SIMULATION = 4294967295
 
-#from synaptic manager
-SYNAPTIC_ROW_HEADER_WORDS = 2 + 1   # Words - 2 for row lenth and number of
-                                        #  rows and 1 for plastic region size
-                                        # (which might be 0)
+# from synaptic manager
+# Words - 2 for row lenth and number of
+#  rows and 1 for plastic region size
+# (which might be 0)
+SYNAPTIC_ROW_HEADER_WORDS = 2 + 1
 
 ROW_LEN_TABLE_ENTRIES = [0, 1, 8, 16, 32, 64, 128, 256]
 ROW_LEN_TABLE_SIZE = 4 * len(ROW_LEN_TABLE_ENTRIES)
@@ -63,27 +69,26 @@ X_CHIPS = 8
 Y_CHIPS = 8
 CORES_PER_CHIP = 18
 MASTER_POPULATION_ENTRIES = (X_CHIPS * Y_CHIPS * CORES_PER_CHIP)
-MASTER_POPULATION_TABLE_SIZE = 2 * MASTER_POPULATION_ENTRIES  # 2 bytes per
-                                                              # entry
+
+# 2 bytes per entry
+MASTER_POPULATION_TABLE_SIZE = 2 * MASTER_POPULATION_ENTRIES
 NA_TO_PA_SCALE = 1000.0
 SDRAM_BASE_ADDR = 0x70000000
-####might not be used
 WEIGHT_FLOAT_TO_FIXED_SCALE = 16.0
 SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
-####
 
-#natively supported delays for all models
+# natively supported delays for all models
 MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 
-#debug filter positions
-#multicast packets which are sent from a local chip where the local router has
+# debug filter positions
+# multicast packets which are sent from a local chip where the local router has
 # router entry for it (this is default routed to the monitor core which
-#currently drops the packet).
+# currently drops the packet).
 MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
 
-#Model Names
+# Model Names
 APP_MONITOR_CORE_APPLICATION_ID = 0xAC0
 IF_CURRENT_EXP_CORE_APPLICATION_ID = 0xAC1
 SPIKESOURCEARRAY_CORE_APPLICATION_ID = 0xAC2

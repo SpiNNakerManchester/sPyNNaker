@@ -1,22 +1,12 @@
-from pacman.model.constraints.abstract_constraint import AbstractConstraint
-from pacman.model.constraints.vertex_has_dependent_constraint import \
-    VertexHasDependentConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
-    import AbstractPopulationVertex
-from pacman.model.constraints.vertex_requires_multi_cast_source_constraint \
-    import VertexRequiresMultiCastSourceConstraint
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
-    import MultiCastPartitionableEdge
-from pacman.utilities import utility_calls as pacman_utility_calls
+from pyNN.space import Space
+
+from pacman.model.constraints.abstract_constraints.abstract_constraint \
+    import AbstractConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
     AbstractRecordableVertex
 
-from pyNN.space import Space
-
-from spynnaker.pyNN.models.utility_models.command_sender \
-    import CommandSender
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 from spynnaker.pyNN.utilities import conf
@@ -53,11 +43,11 @@ class Population(object):
     _non_labelled_vertex_count = 0
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
-                 multi_cast_vertex=None, structure=None):
+                 structure=None):
         """
         Instantiates a :py:object:`Population`.
         """
-        if size <= 0:
+        if size is not None and size <= 0:
             raise exceptions.ConfigurationException(
                 "A population cannot have a negative or zero size.")
 
@@ -89,38 +79,7 @@ class Population(object):
 
         self._spinnaker.add_vertex(self._vertex)
 
-        # check if the vertex is a cmd sender, if so store for future
-        require_multi_cast_source_constraints = \
-            pacman_utility_calls.locate_constraints_of_type(
-                self._vertex.constraints,
-                VertexRequiresMultiCastSourceConstraint)
-
-        for require_multi_cast_source_constraint \
-                in require_multi_cast_source_constraints:
-            if multi_cast_vertex is None:
-                multi_cast_vertex = CommandSender(
-                    self._spinnaker.machine_time_step,
-                    self._spinnaker.timescale_factor)
-                self._spinnaker.add_vertex(multi_cast_vertex)
-            multi_cast_vertex = self._spinnaker.get_multi_cast_source
-            edge = MultiCastPartitionableEdge(multi_cast_vertex, self._vertex)
-            multi_cast_vertex.add_commands(
-                require_multi_cast_source_constraint.commands, edge)
-            self._spinnaker.add_edge(edge)
-
         self._parameters = PyNNParametersSurrogate(self._vertex)
-
-        # add any dependent edges and verts if needed
-        dependant_vertex_constraints = \
-            pacman_utility_calls.locate_constraints_of_type(
-                self._vertex.constraints, VertexHasDependentConstraint)
-
-        for dependant_vertex_constrant in dependant_vertex_constraints:
-            dependant_vertex = dependant_vertex_constrant.vertex
-            self._spinnaker.add_vertex(dependant_vertex)
-            dependant_edge = MultiCastPartitionableEdge(
-                pre_vertex=self._vertex, post_vertex=dependant_vertex)
-            self._spinnaker.add_edge(dependant_edge)
 
         # initialize common stuff
         self._size = size
@@ -200,36 +159,36 @@ class Population(object):
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
         """
-        # TODO: add a check to not extract twice the spikes from the same source
-        if not gather:
-            logger.warn("Spynnaker only supports gather = true, will execute as"
-                        "if gather was true anyhow")
-        timer = None
+        if self._spikes is None:
 
-        if not self._vertex.record:
-            raise exceptions.ConfigurationException(
-                "This population has not been set to record spikes. Therefore "
-                "spikes cannot be retrieved. Please set this vertex to record "
-                "spikes before running this command.")
+            if not gather:
+                logger.warn("Spynnaker only supports gather = true, will "
+                            " execute as if gather was true anyhow")
+            timer = None
 
-        if not self._spinnaker.has_ran:
-            raise exceptions.SpynnakerException(
-                "The simulation has not yet ran, therefore spikes cannot be "
-                "retrieved. Please execute the simulation before running this "
-                "command")
+            if not self._vertex.record:
+                raise exceptions.ConfigurationException(
+                    "This population has not been set to record spikes. "
+                    "Therefore spikes cannot be retrieved. Please set this "
+                    "vertex to record spikes before running this command.")
 
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer = Timer()
-            timer.start_timing()
+            if not self._spinnaker.has_ran:
+                raise exceptions.SpynnakerException(
+                    "The simulation has not yet ran, therefore spikes cannot "
+                    "be retrieved. Please execute the simulation before "
+                    "running this command")
 
-        spikes = self._vertex.get_spikes(
-            txrx=self._spinnaker.transceiver,
-            placements=self._spinnaker.placements,
-            graph_mapper=self._spinnaker.graph_mapper,
-            compatible_output=compatible_output)
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer.take_sample()
-        return spikes
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer = Timer()
+                timer.start_timing()
+            self._spikes = self._vertex.get_spikes(
+                txrx=self._spinnaker.transceiver,
+                placements=self._spinnaker.placements,
+                graph_mapper=self._spinnaker.graph_mapper,
+                compatible_output=compatible_output)
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer.take_sample()
+        return self._spikes
 
     def get_spike_counts(self, gather=True):
         """
@@ -406,24 +365,14 @@ class Population(object):
         triggering spike time recording.
         """
 
-        record_spikes_on_sdram = conf.config.getboolean(
-            "Recording", "record_spikes_on_sdram")
-        send_live_spikes = conf.config.getboolean(
-            "Recording", "send_live_spikes")
-        if not record_spikes_on_sdram and not send_live_spikes:
-            logger.warn("Neither record_spikes_on_sdram nor send_live_spikes"
-                        " are set, so no spikes will be recorded or sent")
+        if not isinstance(self._vertex, AbstractRecordableVertex):
+            raise Exception("This population does not support recording!")
 
-        if record_spikes_on_sdram:
+        # Tell the vertex to record spikes
+        self._vertex.set_record(True)
 
-            if not isinstance(self._vertex, AbstractRecordableVertex):
-                raise Exception("This population does not support recording!")
-
-            # Tell the vertex to record spikes
-            self._vertex.set_record(True)
-
-            # set the file to store the spikes in once retrieved
-            self._record_spike_file = to_file
+        # set the file to store the spikes in once retrieved
+        self._record_spike_file = to_file
 
     def record_gsyn(self, to_file=None):
         """

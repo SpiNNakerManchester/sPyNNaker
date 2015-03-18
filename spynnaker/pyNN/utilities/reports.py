@@ -100,7 +100,7 @@ def write_memory_map_report(report_default_directory,
         logger.error("Generate_placement_reports: Can't open file"
                      " {} for writing.".format(file_name))
 
-    for key in processor_to_app_data_base_address.keys():
+    for key in processor_to_app_data_base_address:
         output.write(str(key) + ": ")
         data = processor_to_app_data_base_address[key]
         output.write(
@@ -151,7 +151,7 @@ def network_specification_report(report_folder, graph, hostname):
             constraint_str = constraint.label
             f_network_specification.write("constraint: {}\n"
                                           .format(constraint_str))
-        #if params is None or len(params.keys()) == 0:
+        #if params is None or len(params) == 0:
         #    f_network_specification.write("  Parameters: None\n\n")
         #else:
         #    f_network_specification.write("  Parameters: %s\n\n" % params)
@@ -175,7 +175,7 @@ def network_specification_report(report_folder, graph, hostname):
                                          post_v_label, post_v_sz)
         f_network_specification.write(edge_str)
         f_network_specification.write("  Model: {}\n".format(model))
-        #if params is None or len(params.keys()) == 0:
+        #if params is None or len(params) == 0:
         #    f_network_specification.write("  Parameters: None\n\n")
         #else:
         #    f_network_specification.write("  Parameters: %s\n\n" % params)
@@ -308,3 +308,74 @@ def re_load_script_running_aspects(
                  "executable_targets, {}, {})".format(app_id,
                                                       runtime))
     _append_to_rerun_script(binary_folder, lines)
+
+
+def _write_router_diag(parent_xml_element, router_diagnostic_coords,
+                       router_diagnostic):
+    from lxml import etree
+    router = \
+        etree.SubElement(
+            parent_xml_element, "router_at_chip_{}_{}"
+                                .format(router_diagnostic_coords[0],
+                                        router_diagnostic_coords[1]))
+    etree.SubElement(router, "Loc__MC").text = \
+        str(router_diagnostic.n_local_multicast_packets)
+    etree.SubElement(router, "Ext__MC").text = \
+        str(router_diagnostic.n_external_multicast_packets)
+    etree.SubElement(router, "Dump_MC").text = \
+        str(router_diagnostic.n_dropped_multicast_packets)
+    etree.SubElement(router, "Loc__PP").text = \
+        str(router_diagnostic.n_local_peer_to_peer_packets)
+    etree.SubElement(router, "Ext__PP")\
+        .text = str(router_diagnostic.n_external_peer_to_peer_packets)
+    etree.SubElement(router, "Dump_PP")\
+        .text = str(router_diagnostic.n_dropped_peer_to_peer_packets)
+    etree.SubElement(router, "Loc__NN")\
+        .text = str(router_diagnostic.n_local_nearest_neighbour_packets)
+    etree.SubElement(router, "Ext__NN")\
+        .text = str(router_diagnostic.n_external_nearest_neighbour_packets)
+    etree.SubElement(router, "Dump_NN")\
+        .text = str(router_diagnostic.n_dropped_nearest_neighbour_packets)
+    etree.SubElement(router, "Loc__FR").text = \
+        str(router_diagnostic.n_local_fixed_route_packets)
+    etree.SubElement(router, "Ext__FR")\
+        .text = str(router_diagnostic.n_external_fixed_route_packets)
+    etree.SubElement(router, "Dump_FR")\
+        .text = str(router_diagnostic.n_dropped_fixed_route_packets)
+
+
+def generate_provance_routings(routing_tables, machine, txrx,
+                               report_default_directory):
+    #acquire diagnostic data
+    router_diagnostics = dict()
+    for router_table in routing_tables.routing_tables:
+        if not machine.get_chip_at(router_table.x, router_table.y).virtual:
+            router_diagnostic = txrx.\
+                get_router_diagnostics(router_table.x, router_table.y)
+            router_diagnostics[router_table.x, router_table.y] = \
+                router_diagnostic
+    from lxml import etree
+    root = etree.Element("root")
+    doc = etree.SubElement(root, "router_counters")
+    expected_routers = etree.SubElement(doc, "Used_Routers")
+    for router_diagnostic_coords in router_diagnostics:
+        _write_router_diag(
+            expected_routers, router_diagnostic_coords,
+            router_diagnostics[router_diagnostic_coords])
+    unexpected_routers = etree.SubElement(doc, "Unexpected_Routers")
+    for chip in machine.chips:
+        if not chip.virtual:
+            coords = (chip.x, chip.y)
+            if coords not in router_diagnostics:
+                router_diagnostic = \
+                    txrx.get_router_diagnostics(chip.x, chip.y)
+                if (router_diagnostic.n_dropped_multicast_packets != 0 or
+                        router_diagnostic.n_local_multicast_packets != 0 or
+                        router_diagnostic.n_external_multicast_packets != 0):
+                    _write_router_diag(
+                        unexpected_routers, router_diagnostic_coords,
+                        router_diagnostics[router_diagnostic_coords])
+    file_path = \
+        os.path.join(report_default_directory, "provance_data.xml")
+    writer = open(file_path, "w")
+    writer.write(etree.tostring(root, pretty_print=True))

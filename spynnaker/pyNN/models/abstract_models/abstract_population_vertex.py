@@ -15,19 +15,17 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationVertex(AbstractRecordableVertex,
-                               AbstractPopulationDataSpec):
+class AbstractPopulationVertex(
+        AbstractRecordableVertex, AbstractPopulationDataSpec):
     """
     Underlying AbstractConstrainedVertex model for Neural Populations.
     """
 
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
-                 machine_time_step, timescale_factor,
-                 spikes_per_second, ring_buffer_sigma, weight_scale=1.0,
-                 constraints=None):
+                 machine_time_step, timescale_factor, spikes_per_second,
+                 ring_buffer_sigma, weight_scale=1.0, constraints=None):
 
-        AbstractRecordableVertex.__init__(
-            self, machine_time_step, label)
+        AbstractRecordableVertex.__init__(self, machine_time_step, label)
         AbstractPopulationDataSpec.__init__(
             self, binary, n_neurons, label, constraints,
             machine_time_step=machine_time_step,
@@ -38,7 +36,6 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
         self._n_params = n_params
         self._weight_scale = weight_scale
 
-
     @property
     def weight_scale(self):
         return self._weight_scale
@@ -46,20 +43,15 @@ class AbstractPopulationVertex(AbstractRecordableVertex,
     def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
 
-        # Spike sources store spike vectors optimally
-        # so calculate min words to represent
-        out_spike_bytes_function = \
-            lambda subvertex, subvertex_slice: int(ceil(
-                subvertex_slice.n_atoms / 32.0)) * 4
-
         # Use standard behaviour to read spikes
         return self._get_spikes(
             graph_mapper=graph_mapper, placements=placements, transciever=txrx,
             compatible_output=compatible_output,
-            sub_vertex_out_spike_bytes_function=
-            out_spike_bytes_function,
-            spike_recording_region=
-            constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
+            sub_vertex_out_spike_bytes_function=(
+                lambda subvertex, subvertex_slice: int(ceil(
+                    subvertex_slice.n_atoms / 32.0)) * 4),
+            spike_recording_region=(constants.POPULATION_BASED_REGIONS
+                                    .SPIKE_HISTORY.value))
 
     def get_v(self, has_ran, graph_mapper, placements,
               txrx, machine_time_step, compatible_output=False):

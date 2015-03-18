@@ -2,10 +2,13 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 
+
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+
+
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 
@@ -78,7 +81,8 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
     @abstractmethod
     def set_model_max_atoms_per_core(new_value):
         """
-        enforces other neural models to support model based max atoms contraints
+        enforces other neural models to support model based max atoms
+        constraints
         """
 
     # noinspection PyUnusedLocal

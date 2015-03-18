@@ -7,9 +7,9 @@ from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_co
     import AbstractConductanceVertex
 
 
-class IFConductanceAlphaPopulation(AbstractConductanceVertex,
-                                   AbstractIntegrateAndFireProperties,
-                                   AbstractPopulationVertex):
+class IFConductanceAlphaPopulation(
+        AbstractConductanceVertex, AbstractIntegrateAndFireProperties,
+        AbstractPopulationVertex):
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, timescale_factor,

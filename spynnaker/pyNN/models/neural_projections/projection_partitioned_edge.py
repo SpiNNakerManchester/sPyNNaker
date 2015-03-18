@@ -7,8 +7,9 @@ from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
 class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
                                 AbstractFilterableEdge):
 
-    def __init__(self, presubvertex, postsubvertex):
-        MultiCastPartitionedEdge.__init__(self, presubvertex, postsubvertex)
+    def __init__(self, presubvertex, postsubvertex, constraints):
+        MultiCastPartitionedEdge.__init__(
+            self, presubvertex, postsubvertex, constraints)
         AbstractFilterableEdge.__init__(self)
         self._synapse_sublist = None
         self._weight_scales = None
@@ -59,7 +60,8 @@ class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
             self._post_subvertex)
         edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(self)
 
-        return not edge.synapse_list.is_connected(pre_vertex_slice,                                             post_vertex_slice)
+        return not edge.synapse_list.is_connected(pre_vertex_slice,
+                                                  post_vertex_slice)
 
     @property
     def synapse_sublist(self):
