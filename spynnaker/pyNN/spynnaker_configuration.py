@@ -36,7 +36,6 @@ class SpynnakerConfiguration(object):
 
         # specific utility vertexes
         self._multi_cast_vertex = None
-        self._txrx = None
 
         # debug flag
         self._in_debug_mode = None
