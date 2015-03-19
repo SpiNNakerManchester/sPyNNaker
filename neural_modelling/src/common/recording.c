@@ -33,11 +33,17 @@ static inline bool recording_channel_in_use(recording_channel_e channel)
 bool recording_data_filled(address_t output_region, uint32_t flags, recording_channel_e channel, uint32_t size_bytes)
 {
   use(flags);
-  
+  if (size_bytes == 0)
+  {
+
+    // Channel is not enabled really
+    return true;
+  }
+
   if(recording_channel_in_use(channel))
   {
     log_info("Recording channel %u already configured", channel);
-    
+
     // CHANNEL already initialized
     return false;
   }
@@ -52,7 +58,7 @@ bool recording_data_filled(address_t output_region, uint32_t flags, recording_ch
     // Calculate pointers to the start, current position and end of this memory block
     recording_channel->start = recording_channel->current = (uint8_t*)&output_region[1];
     recording_channel->end = recording_channel->start + size_bytes;
-    
+
     log_info("Recording channel %u configured to use %u byte memory block starting at %08x", channel, size_bytes, recording_channel->start);
     return true;
   }
@@ -69,7 +75,7 @@ bool recording_record(recording_channel_e channel, void *data, uint32_t size_byt
     {
       // Copy data into recording channel
       memcpy(recording_channel->current, data, size_bytes);
-      
+
       // Update current pointer
       recording_channel->current += size_bytes;
       return true;
@@ -83,7 +89,7 @@ bool recording_record(recording_channel_e channel, void *data, uint32_t size_byt
   else
   {
     log_info("ERROR: recording channel %u not in use", channel);
-   
+
     return false;
   }
 
@@ -106,6 +112,6 @@ void recording_finalise()
       uint32_t num_bytes_written = recording_channel->current - recording_channel->start;
       log_info("\tFinalising channel %u - %x bytes of data starting at %08x", channel, num_bytes_written + sizeof(uint32_t), recording_channel->counter);
       *recording_channel->counter = num_bytes_written;
-    }	
+    }
   }
 }
