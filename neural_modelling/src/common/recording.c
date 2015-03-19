@@ -1,3 +1,9 @@
+/*! \file
+ *
+ *  \brief implementation of recording.h
+ *
+ */
+
 #include "recording.h"
 
 // Standard includes
@@ -7,6 +13,7 @@
 //---------------------------------------
 // Structures
 //---------------------------------------
+//! structure that defines a channel in memory.
 typedef struct recording_channel_t {
     address_t counter;
     uint8_t *start;
@@ -14,8 +21,8 @@ typedef struct recording_channel_t {
     uint8_t *end;
 } recording_channel_t;
 
-// positions within the recording region definition for each type of event
-// Available to be recorded
+//! positions within the recording region definition for each type of event
+//! Available to be recorded
 typedef enum recording_positions {
     flags_for_recording, spikes_position, protential_position, gsyn_position,
 } recording_positions;
@@ -25,6 +32,7 @@ typedef enum recording_positions {
 //---------------------------------------
 // Globals
 //---------------------------------------
+//! array containing all possible channels.
 static recording_channel_t g_recording_channels[e_recording_channel_max];
 
 //---------------------------------------

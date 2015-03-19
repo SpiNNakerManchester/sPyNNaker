@@ -1,3 +1,37 @@
+/*! \file
+ *
+ *  \brief utility class which ensures that format of spikes being recorded is
+ *   done in a standard way
+ *
+ *
+ *  \details The API includes:
+ *     - out_spikes_reset
+ *          clears the memory used as a tracker for the next set of spikes
+ *          which will be recorded to SDRAM at some point
+ *     - out_spikes_initialize
+ *          initialises a piece of memory which can contain a flag to say if
+ *          any source has spiked between resets
+ *     - out_spikes_record
+ *          records the current set of flags for each spike source into the
+ *          spike recording region in SDRAM (flags to deduce which regions are
+ *           active are handed to this method due to recording not containing
+ *           them itself). TODO change the recording.h and recording.c to
+ *           contain the channels itself.
+ *     - out_spikes_is_empty
+ *          helper method which checks if the current spikes flags have any
+ *          recorded for use.
+ *     - out_spikes_is_spike
+ *          helper method which checks if a given source has spiked since the
+ *           last reset.
+ *     - out_spikes_print
+ *          a debug function that when the model is compiled in DEBUG mode will
+            record into SDRAM the spikes that are currently been recorded as
+            having spiked since the last reset command
+ *     - out_spikes_set_spike
+ *          helper method which allows models to state that a given spike source
+            has spiked since the last reset.
+ */
+
 #ifndef _OUT_SPIKES_H_
 #define _OUT_SPIKES_H_
 

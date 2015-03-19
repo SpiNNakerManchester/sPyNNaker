@@ -1,45 +1,76 @@
+/*!
+ * \file
+ * \brief implementation for handling the processing of synapse rows.
+ * \details
+ * Synapse Row Representation:
+ * |       Weight      |       Delay      |  Synapse Type   |   Neuron Index   |
+ * |-------------------|------------------|-----------------|------------------|
+ * |SYNAPSE_WEIGHT_BITS|SYNAPSE_DELAY_BITS|SYNAPSE_TYPE_BITS|SYNAPSE_INDEX_BITS|
+ * |                   |                  |       SYNAPSE_TYPE_INDEX_BITS      |
+ * The API interface supports:
+ * - synapse_row_plastic_size(row)
+ * - synapse_row_plastic_write_back_address(row)
+ * - synapse_row_plastic_region(row)
+ * - synapse_row_fixed_region(row)
+ * - synapse_row_originating_spike(row)
+ * - synapse_row_num_fixed_synapses(fixed)
+ * - synapse_row_num_plastic_controls(fixed)
+ * - synapse_row_plastic_controls(fixed)
+ * - synapse_row_fixed_weight_controls(fixed)
+ * - synapse_row_sparse_index(x)
+ * - synapse_row_sparse_type(x)
+ * - synapse_row_sparse_type_index(x)
+ * - synapse_row_sparse_delay(x)
+ * - synapse_row_sparse_weight(x)
+ *  */
+
 #ifndef _SYNAPSE_ROW_H_
 #define _SYNAPSE_ROW_H_
 
 #include "../common/neuron-typedefs.h"
 
-// Synapse Row Representation:
-// |       Weight      |       Delay      |  Synapse Type   |   Neuron Index   |
-// |-------------------|------------------|-----------------|------------------|
-// |SYNAPSE_WEIGHT_BITS|SYNAPSE_DELAY_BITS|SYNAPSE_TYPE_BITS|SYNAPSE_INDEX_BITS|
-// |                   |                  |       SYNAPSE_TYPE_INDEX_BITS      |
-// |-------------------|------------------|------------------------------------|
-
+//! how many bits the synapse weight will take
 #ifndef SYNAPSE_WEIGHT_BITS
 #define SYNAPSE_WEIGHT_BITS 16
 #endif
 
+//! how many bits the synapse delay will take
 #ifndef SYNAPSE_DELAY_BITS
 #define SYNAPSE_DELAY_BITS 4
 #endif
 
 #ifndef SYNAPSE_TYPE_BITS
+//! how many bits the synapse type will take
+//! (is expected to be done by implementations of synapse shapers)
 #define SYNAPSE_TYPE_BITS 1
 #error SYNAPSE_TYPE_BITS was undefined.  It should be defined by a synapse\
        shaping include
 #endif
 
 #ifndef SYNAPSE_TYPE_COUNT
+//! how many types of synapses will be supported
+//! (is expected to be done by implementations of synapse shapers)
 #define SYNAPSE_TYPE_COUNT 2
 #error SYNAPSE_TYPE_COUNT was undefined.  It should be defined by a synapse\
        shaping include
 #endif
 
+//! how many bits the synapse can support to represent the neuron id.
 #ifndef SYNAPSE_INDEX_BITS
 #define SYNAPSE_INDEX_BITS 8
 #endif
 
+//! how many bits the synapse type will need (includes the neuron id size)
 #define SYNAPSE_TYPE_INDEX_BITS (SYNAPSE_TYPE_BITS + SYNAPSE_INDEX_BITS)
 
 // Create some masks based on the number of bits
+//! the mask for the synapse delay in the row
 #define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
+//! the mask for the synapse type in the row
 #define SYNAPSE_TYPE_MASK       ((1 << SYNAPSE_TYPE_BITS) - 1)
+//! the mask for the synapse index in the row
 #define SYNAPSE_INDEX_MASK      ((1 << SYNAPSE_INDEX_BITS) - 1)
+//! the mask for the synapse type index in the row
 #define SYNAPSE_TYPE_INDEX_MASK ((1 << SYNAPSE_TYPE_INDEX_BITS) - 1)
 
 // Define the type of the weights

@@ -1,10 +1,11 @@
-// Delta_shaping
-//
-// This is used to give a simple exponential decay to synapses.
-//
-// If we have combined excitatory/inhibitory synapses it will be
-// because both excitatory and inhibitory synaptic time-constants
-// (and thus propogators) are identical.
+/*! \file
+*
+* \brief  implementation of synapse_types.h for a delta decay to synapses.
+*
+* If we have combined excitatory/inhibitory synapses it will be
+* because both excitatory and inhibitory synaptic time-constants
+* (and thus propogators) are identical.
+*/
 
 
 #ifndef _SYNAPSE_TYPES_DELTA_IMPL_H_

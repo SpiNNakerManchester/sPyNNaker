@@ -1,10 +1,12 @@
-// Exponential shaping
-//
-// This is used to give a simple exponential decay to synapses.
-//
-// If we have combined excitatory/inhibitory synapses it will be
-// because both excitatory and inhibitory synaptic time-constants
-// (and thus propogators) are identical.
+/*! \file
+ * \brief implementation of synapse_types.h for Exponential shaping
+*
+* \details This is used to give a simple exponential decay to synapses.
+*
+* If we have combined excitatory/inhibitory synapses it will be
+* because both excitatory and inhibitory synaptic time-constants
+* (and thus propogators) are identical.
+*/
 
 
 #ifndef _SYNAPSE_TYPES_EXPONENTIAL_IMPL_H_

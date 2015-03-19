@@ -1,20 +1,6 @@
-/* neuron.c
+/*! \file
  *
- * Dave Lester, Yuri , Abigail...
- *
- *  CREATION DATE
- *    1 August, 2013
- *
- *  HISTORY
- * *  DETAILS
- *    Created on       : 1 August 2013
- *    Version          : $Revision: 1.1 $
- *    Last modified on : $Date: 2013/08/06 15:55:57 $
- *    Last modified by : $Author: dave $
- *    $Id: neuron.c,v 1.1 2013/08/06 15:55:57 dave Exp dave $
- *
- *    $Log$
- *
+ * \brief implementation of the neuron.h interface.
  *
  */
 
@@ -27,23 +13,23 @@
 #include <debug.h>
 #include <string.h>
 
-// Array of neuron states
+//! Array of neuron states
 static neuron_pointer_t neuron_array;
 
-// The key to be used for this core (will be ORed with neuron id)
+//! The key to be used for this core (will be ORed with neuron id)
 static key_t key;
 
-// The number of neurons on the core
+//! The number of neurons on the core
 static uint32_t n_neurons;
 
-// The recording flags
+//! The recording flags
 static uint32_t recording_flags;
 
-// The input buffers - from synapses.c
+//! The input buffers - from synapses.c
 static input_t *input_buffers;
 
-// parameters that reside in the neuron_parameter_data_region in human
-// readable form
+//! parameters that reside in the neuron_parameter_data_region in human
+//! readable form
 typedef enum parmeters_in_neuron_parameter_data_region {
     transmission_key, number_of_neurons_to_simulate, num_neuron_parameters,
 	the_machine_time_step_in_microseconds,
@@ -54,8 +40,8 @@ typedef enum parmeters_in_neuron_parameter_data_region {
 //! private method for doing output debug data on the neurons
 //! \return nothing
 static inline void _print_neurons() {
-// only if the models are compiled in debug mode will this method contain
-// said lines.
+//! only if the models are compiled in debug mode will this method contain
+//! said lines.
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {

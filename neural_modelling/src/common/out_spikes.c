@@ -1,3 +1,8 @@
+/*! \file
+ *
+ *  \brief the implementation of the out_spikes.h interface.
+ */
+
 #include "out_spikes.h"
 #include "recording.h"
 

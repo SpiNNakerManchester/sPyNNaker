@@ -1,3 +1,9 @@
+/*! \file
+ *  \brief This file contains the main functions for a playback spike generator.
+ *
+ *
+ */
+
 #include "../../common/recording.h"
 
 #include <bit_field.h>
@@ -8,26 +14,26 @@
 
 #define APPLICATION_MAGIC_NUMBER 0xAC2
 
-// container to point to a specific point in SDRAM for a given block of spikes
-// that have to be transmitted at a given time-step. The memory address is a
-// relative pointer from the start of the spike_data region.
+//! container to point to a specific point in SDRAM for a given block of spikes
+//! that have to be transmitted at a given time-step. The memory address is a
+//! relative pointer from the start of the spike_data region.
 typedef struct spike_block_t {
     uint32_t timestep;
     uint32_t block_offset_words;
 } spike_block_t;
 
-// spike source array state machine
+//! spike source array state machine
 typedef enum state_e {
     e_state_inactive, e_state_dma_in_progress, e_state_spike_block_in_buffer,
 } state_e;
 
-// spike source array region ids in human readable form
+//! spike source array region ids in human readable form
 typedef enum region{
 	system, block_index, spike_data, spike_histroy,
 }region;
 
-// what each position in the block index region actually represent in terms of
-// data (each is a word)
+//! what each position in the block index region actually represent in terms of
+//! data (each is a word)
 typedef enum block_index_parameters{
 	transmission_key, n_sources_to_simulate, num_spike_blocks_to_transmit,
 	size_of_data_in_block_region,
@@ -341,7 +347,10 @@ void c_main(void) {
 
     // Load DTCM data
     uint32_t timer_period;
-    initialize(&timer_period);
+
+    if(!initialize(&timer_period)){
+    	return;
+    }
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;

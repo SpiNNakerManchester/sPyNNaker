@@ -1,3 +1,8 @@
+/*! \file
+ *
+ *  \brief a interface
+ */
+
 #ifndef _NEURON_MODEL_H_
 #define _NEURON_MODEL_H_
 

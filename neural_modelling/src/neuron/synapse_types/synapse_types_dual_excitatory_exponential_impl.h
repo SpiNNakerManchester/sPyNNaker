@@ -1,10 +1,12 @@
-// Exponential shaping
-//
-// This is used to give a simple exponential decay to synapses.
-//
-// If we have combined excitatory/inhibitory synapses it will be
-// because both excitatory and inhibitory synaptic time-constants
-// (and thus propogators) are identical.
+/*! \file
+*
+* \brief implementation of synapse_types.h for a simple duel exponential decay
+* to synapses.
+*
+* \details If we have combined excitatory_one/excitatory_two/inhibitory
+* synapses it will be because both excitatory and inhibitory synaptic
+* time-constants (and thus propogators) are identical.
+*/
 
 
 #ifndef _SYNAPSE_TYPES_DUAL_EXCITATORY_EXPONENTIAL_IMPL_H_
@@ -29,6 +31,8 @@ typedef struct synapse_param_t {
 
 #include "synapse_types.h"
 
+//! human readable definition for the positions in the input regions for the
+//! different synapse types.
 typedef enum input_buffer_regions {
 	EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY,
 } input_buffer_regions;

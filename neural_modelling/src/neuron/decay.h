@@ -1,10 +1,35 @@
+/*! \file
+ *
+ *  \brief utility method for decaying a value by a given amount
+ *
+ *
+ *
+ *    The API includes:
+ *
+ *     - decay_s1615 (x, decay)
+ *         decays a s1615 value x by a given decay amount
+ *     - decay_u1616(x, decay)
+ *         decays a u1616 value x by a given decay amount
+ *     - decay_s015(x, decay)
+ *         decays a s015 value x by a given decay amount
+ *     - decay_u016(x, decay)
+ *     	   decays a u016 value x by a given decay amount
+ *     - decay(x, d)
+ *         is suppose to deduce the x value's type and call one of the above
+ *         methods to decay it by a given decay amount.
+ *
+ *
+ *
+ */
+
 #ifndef _DECAY_H_
 #define _DECAY_H_
 
 #include "../common/maths-util.h"
 #include "../common/neuron-typedefs.h"
 
-// this is a redefine of the ufract into
+//! this is a redefine of the ufract into a decay for easier conversions in
+//! the future if the type is redefined
 typedef UFRACT decay_t;
 
 //! \brief this method takes a s1615 and decays it by a given amount

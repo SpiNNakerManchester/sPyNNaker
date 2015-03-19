@@ -1,15 +1,16 @@
-/*
- * c_main.c
+/*!\file
  *
  * SUMMARY
- *  This file contains the main function of the application framework, which
- *  the application programmer uses to configure and run applications.
+ *  \brief This file contains the main function of the application framework,
+ *  which the application programmer uses to configure and run applications.
  *
- *  DESCRIPTION
- *    A header file that can be used as the API for the spin-neuron.a library.
- *    To use the code is compiled with
  *
- *      #include "debug.h"
+ * This is the main entrance class for most of the neural models. The following
+ * Figure shows how all of the c code interacts with each other and what classes
+ * are used to represent over arching logic
+ * (such as plasticity, spike processing, utilities, synapse types, models)
+ *
+ * @image html spynnaker_c_code_flow.png
  *
  */
 
@@ -32,9 +33,11 @@
        constant
 #endif
 
+//! the number of channels all standard models contain (spikes, voltage, gsyn)
+//! for recording
 #define N_RECORDING_CHANNELS 3
 
-// human readable definitions of each region in SDRAM
+//! human readable definitions of each region in SDRAM
 typedef enum regions_e {
     SYSTEM_REGION,
     NEURON_PARAMS_REGION,
@@ -48,7 +51,12 @@ typedef enum regions_e {
 } regions_e;
 
 // Globals
+
+//! the current timer tick value TODO this might be able to be removed with
+//! the timer tick callback returning the same value.
 uint32_t time;
+//! global parameter which contains the number of timer ticks to run for before
+//! being expected to exit
 static uint32_t simulation_ticks = 0;
 
 //! \Initialises the model by reading in the regions and checking recording
@@ -201,7 +209,9 @@ void c_main(void) {
     uint32_t timer_period;
 
     // initialise the model
-    initialize(&timer_period);
+    if (!initialize(&timer_period)){
+    	return;
+    }
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;

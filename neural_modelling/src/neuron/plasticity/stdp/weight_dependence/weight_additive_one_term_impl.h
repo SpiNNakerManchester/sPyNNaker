@@ -5,7 +5,7 @@
 #include "../../common/maths.h"
 #include "../../common/stdp_typedefs.h"
 #include "../../../synapse_row.h"
-
+#include <stdfix-full-iso.h>
 #include <debug.h>
 
 //---------------------------------------
@@ -79,7 +79,7 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
                          - scaled_a2_minus;
 
     // Clamp new weight
-    new_weight = MIN(new_state.weight_region->max_weight,
+    new_weight = min(new_state.weight_region->max_weight,
                      MAX(new_weight, new_state.weight_region->min_weight));
 
     log_debug("\told_weight:%u, a2+:%d, a2-:%d, scaled a2+:%d, scaled a2-:%d,"

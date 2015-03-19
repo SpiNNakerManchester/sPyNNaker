@@ -1,3 +1,18 @@
+/*! \file
+ *
+ *  \brief interface for neurons
+ *
+ *  The API contains:
+ *    - neuron_initialise(address, recording_flags, n_neurons_value):
+ *         translate the data stored in the NEURON_PARAMS data region in SDRAM
+ *         and converts it into c based objects for use.
+ *    - neuron_set_input_buffers(input_buffers_value):
+ *         setter for the internal input buffers
+ *    - neuron_do_timestep_update(time):
+ *         executes all the updates to neural parameters when a given timer
+ *         period has occurred.
+ */
+
 #ifndef _NEURON_H_
 #define _NEURON_H_
 

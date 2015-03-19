@@ -1,37 +1,11 @@
-/*
+/*! \file
+ *
+ *
  * neuron-typedefs.h
  *
  *
  *  SUMMARY
- *    Data type definitions for SpiNNaker Neuron-modelling
- *
- *  AUTHOR
- *    Dave Lester (david.r.lester@manchester.ac.uk)
- *
- *  COPYRIGHT
- *    Copyright (c) Dave Lester and The University of Manchester, 2013.
- *    All rights reserved.
- *    SpiNNaker Project
- *    Advanced Processor Technologies Group
- *    School of Computer Science
- *    The University of Manchester
- *    Manchester M13 9PL, UK
- *
- *  DESCRIPTION
- *
- *
- *  CREATION DATE
- *    10 December, 2013
- *
- *  HISTORY
- * *  DETAILS
- *    Created on       : 10 December 2013
- *    Version          : $Revision$
- *    Last modified on : $Date$
- *    Last modified by : $Author$
- *    $Id$
- *
- *    $Log$
+ * \brief   Data type definitions for SpiNNaker Neuron-modelling
  *
  */
 
@@ -57,10 +31,17 @@ typedef uint32_t payload_t;
 
 typedef uint64_t spike_t;
 
+//! \brief helper method to retrieve the key from a spike
+//! \param[in] s: the spike to get the key from
+//! \return key_t: the key from the spike
 static inline key_t spike_key(spike_t s) {
     return ((key_t)(s >> 32));
 }
 
+//! \brief helper method to retrieve the pay-load from a spike
+//! \param[in] s: the spike to get the pay-load from
+//! \return payload_t: the pay-load from the spike (only used if the model
+//! is compiled with SPIKES_WITH_PAYLOADS)
 static inline payload_t spike_payload (spike_t s) {
     return ((payload_t)(s & UINT32_MAX));
 }
@@ -69,9 +50,18 @@ static inline payload_t spike_payload (spike_t s) {
 
 typedef uint32_t spike_t;
 
+//! \brief helper method to retrieve the key from a spike
+//! \param[in] s: the spike to get the key from
+//! \return key_t: the key from the spike
 static inline key_t spike_key(spike_t s) {
     return (s);
 }
+
+//! \brief helper method to retrieve the pay-load from a spike
+//! \param[in] s: the spike to get the pay-load from
+//! \return payload_t: the pay-load from the spike (default-ly set to zero if
+//!                    the model is not compiled with SPIKES_WITH_PAYLOADS)
+
 static inline payload_t spike_payload(spike_t s) {
     use(s);
     return (0);
@@ -84,6 +74,8 @@ typedef address_t synaptic_row_t;
 
 // The type of an input
 typedef REAL input_t;
+
+
 
 // The type of a state variable
 typedef REAL state_t;

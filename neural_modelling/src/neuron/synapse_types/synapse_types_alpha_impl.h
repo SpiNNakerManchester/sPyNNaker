@@ -1,29 +1,34 @@
-// shape alpha:
-//
-// Default values (iaf_psc_alpha.cpp/iaf_cond_exp.c)
-//
-// tau_x = 2.0ms  0.2ms
-// tau_i = 2.0ms  2.0ms
-//
-// h /* current time step size in ms */
-//
-// p11x = p22x = exp (-h/tau_x)
-// p11i = p22i = exp (-h/tau_i)
-//
-// p21x = h * p11x
-// p21i = h * p11i
-//
-// y2x  = p21x * y1x + p22x * y2x;
-// y1x *= p11x
-//
-// y2i  = p21i * y1i + p22i * y2i;
-// y1i *= p11i
-//
-// then add in current ring_buffer inputs..
-//
-// y1x += /* scale* ? */ ring [n, x]
-// y1i +=/* scale* ? */  ring [n, i]
-// with scale 1/tau_x or tau_i as appropriate?
+/*! \file
+*  \brief implementation of synapse_types.h for a alpha synpase shaping
+*  (NOT TESTED)
+*
+*
+*  Default values (iaf_psc_alpha.cpp/iaf_cond_exp.c)
+*
+* tau_x = 2.0ms  0.2ms
+* tau_i = 2.0ms  2.0ms
+*
+* h current time step size in ms
+*
+* p11x = p22x = exp (-h/tau_x)
+* p11i = p22i = exp (-h/tau_i)
+*
+* p21x = h * p11x
+* p21i = h * p11i
+*
+* y2x  = p21x * y1x + p22x * y2x;
+* y1x *= p11x
+*
+* y2i  = p21i * y1i + p22i * y2i;
+* y1i *= p11i
+*
+* then add in current ring_buffer inputs..
+*
+* y1x +=  scale* ?  ring [n, x]
+* y1i += scale* ?   ring [n, i]
+* with scale 1/tau_x or tau_i as appropriate?
+*/
+
 
 #ifndef _SYNAPSE_TYPES_ALPHA_IMPL_H_
 #define _SYNAPSE_TYPES_ALPHA_IMPL_H_

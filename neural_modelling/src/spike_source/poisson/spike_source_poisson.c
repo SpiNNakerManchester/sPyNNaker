@@ -1,3 +1,10 @@
+/*! \file
+ *
+ *  \brief This file contains the main functions for a poisson spike generator.
+ *
+ *
+ */
+
 #include "../../common/out_spikes.h"
 #include "../../common/recording.h"
 #include "../../common/maths-util.h"
@@ -9,11 +16,13 @@
 #include <spin1_api.h>
 #include <string.h>
 
+//! the magic number thats expected when reading data from SDRAM during
+//! Initialisation to verify that the data is for this model type.
 #define APPLICATION_MAGIC_NUMBER 0xAC3
 
-// data structure for spikes which have multiple timer tick between firings
-// this is separated from spikes which fire at least once every timer tick as
-// there are separate algorithms for each type.
+//! data structure for spikes which have multiple timer tick between firings
+//! this is separated from spikes which fire at least once every timer tick as
+//! there are separate algorithms for each type.
 typedef struct slow_spike_source_t {
     uint32_t neuron_id;
     uint32_t start_ticks;
@@ -23,9 +32,9 @@ typedef struct slow_spike_source_t {
     REAL time_to_spike_ticks;
 } slow_spike_source_t;
 
-// data structure for spikes which have at least one spike fired per timer tick
-// this is separated from spikes which have multiple timer ticks between firings
-// as there are separate algorithms for each type.
+//! data structure for spikes which have at least one spike fired per timer tick
+//! this is separated from spikes which have multiple timer ticks between firings
+//! as there are separate algorithms for each type.
 typedef struct fast_spike_source_t {
     uint32_t neuron_id;
     uint32_t start_ticks;
@@ -33,27 +42,40 @@ typedef struct fast_spike_source_t {
     UFRACT exp_minus_lambda;
 } fast_spike_source_t;
 
-// spike source array region ids in human readable form
+//! spike source array region ids in human readable form
 typedef enum region{
 	system, poisson_params, spike_history,
 }region;
 
-// what each position in the poisson parameter region actually represent in
-// terms of data (each is a word)
+//! what each position in the poisson parameter region actually represent in
+//! terms of data (each is a word)
 typedef enum poisson_region_parameters{
 	transmission_key, parameter_seed_start_position,
 }poisson_region_parameters;
 
 // Globals
+//! global variable which contains all the data for neurons which are expected
+//! to exhibit slow spike generation (less than 1 per timer tick)
+//! (separated for efficiently purposes)
 static slow_spike_source_t *slow_spike_source_array = NULL;
+//! global variable which contains all the data for neurons which are expected
+//! to exhibit fast spike generation (more than than 1 per timer tick)
+//! (separated for efficiently purposes)
 static fast_spike_source_t *fast_spike_source_array = NULL;
+//! counter for how many neurons exhibit slow spike generation
 static uint32_t num_slow_spike_sources = 0;
+//! counter for how many neurons exhibit fast spike generation
 static uint32_t num_fast_spike_sources = 0;
+//! a variable that will contain the seed to initiate the poisson generator.
 static mars_kiss64_seed_t spike_source_seed;
+//! A variable that contains the key value that this model should transmit with
 static uint32_t key;
+//! keeps track of which types of recording should be done to this model.
 static uint32_t recording_flags = 0;
-// TODO this variable could be removed and use the timer tick callback timer value.
+//! the time interval parameter TODO this variable could be removed and use the
+//! timer tick callback timer value.
 static uint32_t time;
+//! the number of timer tics that this model should run for before exiting.
 static uint32_t simulation_ticks = 0;
 
 //! \deduces the time in timer ticks until the next spike is to occur given a

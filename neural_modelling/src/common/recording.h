@@ -1,3 +1,28 @@
+/*! \file
+ *  \brief interface for recording data into "channels" on the SDRAM in a
+ *  standard way for neural models.
+ *
+ *  \details
+ *  the API is:
+ *  - recording_read_region_sizes(region_start, recording_flags,
+ *            spike_history_region_size, neuron_potential_region_size,
+ *            neuron_gysn_region_size):
+ *      Reads the size of the recording regions - pass 0s for the region
+ *       size pointer when the value is not needed
+ *  - recording_is_channel_enabled(recording_flags, channel):
+ *      Determines if the given channel has been initialised yet.
+ *  - recording_initialse_channel(output_region, channel, size_bytes)
+ *      initialises a channel with the start, end, size and current position
+ *       in SDRAM for the channel handed in.
+ *  - recording_record(channel, data, size_bytes);
+ *      records some data into a specific recording channel.
+ *  -recording_finalise():
+ *      updated the first word in the recording channel's memory region with
+ *       the number of bytes that was actually written to SDRAM and then closes
+ *       the channel so that future records fail.
+ *
+ */
+
 #ifndef _RECORDING_H_
 #define _RECORDING_H_
 
@@ -10,6 +35,7 @@
 
 #include "neuron-typedefs.h"
 
+//! human readable forms of the different channels supported for neural models.
 typedef enum recording_channel_e {
     e_recording_channel_spike_history,
     e_recording_channel_neuron_potential,
@@ -17,6 +43,7 @@ typedef enum recording_channel_e {
     e_recording_channel_max,
 } recording_channel_e;
 
+//! max number of recordable channels supported by the neural models
 #define RECORDING_POSITION_IN_REGION 3
 
 //! \brief Reads the size of the recording regions - pass 0s for the region
