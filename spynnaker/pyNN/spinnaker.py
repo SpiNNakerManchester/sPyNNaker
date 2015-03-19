@@ -316,12 +316,14 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             if not isinstance(partitionable_vertex,
                               AbstractSendsBuffersFromHostPartitionableVertex):
                 continue
-            key = partitionable_vertex.get_ip_tag().string_representation()
+            key = partitionable_vertex
             if key not in self._buffer_managers.keys():
+                subvertex = next(iter(
+                    self._graph_mapper.get_subvertices_from_vertex(key)))
+                tag = self._tags.get_ip_tags_for_vertex(subvertex)[0]
                 self._buffer_managers[key] = BufferManager(
                     self._placements, self._routing_infos, self.graph_mapper,
-                    partitionable_vertex.get_ip_tag().port,
-                    partitionable_vertex.get_ip_tag().address, self._txrx)
+                    tag.port, tag.ip_address, self._txrx)
 
             # locate vertices which need to be buffer receiving managed
             if isinstance(partitionable_vertex,
@@ -411,10 +413,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def set_runtime(self, value):
         self._runtime = value
-
-    @property
-    def buffer_ip_tag(self):
-        return self._default_buffer_ip_tag
 
     @property
     def buffer_ip_address(self):

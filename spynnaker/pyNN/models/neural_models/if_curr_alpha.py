@@ -1,6 +1,6 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
-from spynnaker.pyNN.models.abstract_models.\
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
     abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN import exceptions

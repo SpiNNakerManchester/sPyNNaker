@@ -1,5 +1,3 @@
-from pacman.model.abstract_classes.abstract_partitionable_vertex import \
-    AbstractPartitionableVertex
 from spynnaker.pyNN.buffer_management.storage_objects.buffer_collection import \
     BufferCollection
 from spynnaker.pyNN.models.abstract_models.abstract_comm_models.\
@@ -26,8 +24,7 @@ from enum import Enum
 logger = logging.getLogger(__name__)
 
 
-class SpikeSourceArray(AbstractPartitionableVertex,
-                       AbstractDataSpecableVertex,
+class SpikeSourceArray(AbstractDataSpecableVertex,
                        AbstractSendsBuffersFromHostPartitionableVertex):
 
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID
@@ -44,7 +41,7 @@ class SpikeSourceArray(AbstractPartitionableVertex,
 
     def __init__(
             self, n_neurons, spike_times, machine_time_step, spikes_per_second,
-            ring_buffer_sigma, timescale_factor, port=18250, tag=3,
+            ring_buffer_sigma, timescale_factor, port=18250, tag=None,
             address='0.0.0.0',
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
             no_buffers_for_recording=constants.NO_BUFFERS_FOR_TRANSMITTING,
@@ -52,15 +49,14 @@ class SpikeSourceArray(AbstractPartitionableVertex,
         """
         Creates a new SpikeSourceArray Object.
         """
-        AbstractPartitionableVertex.__init__(
-            self, n_atoms=n_neurons, label=label, constraints=constraints,
-            max_atoms_per_core=self._model_based_max_atoms_per_core)
         AbstractDataSpecableVertex.__init__(
             self, label=label, n_atoms=n_neurons,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractSendsBuffersFromHostPartitionableVertex.__init__(
-            self, tag=tag, port=port, address=address)
+            self, n_atoms=n_neurons, label=label, constraints=constraints,
+            max_atoms_per_core=self._model_based_max_atoms_per_core,
+            tag=tag, port=port, address=address)
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
@@ -164,7 +160,7 @@ class SpikeSourceArray(AbstractPartitionableVertex,
             region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
             size=spike_region_size, label='SpikeDataRegion', empty=True)
 
-    def _write_setup_info(self, spec, spike_buffer_region_size):
+    def _write_setup_info(self, spec, spike_buffer_region_size, ip_tags):
         """
         Write information used to control the simulation and gathering of
         results. Currently, this means the flag word used to signal whether
@@ -206,7 +202,9 @@ class SpikeSourceArray(AbstractPartitionableVertex,
         spec.write_value(data=0)
         spec.write_value(data=spike_buffer_region_size)
         spec.write_value(data=self._threshold_for_reporting_bytes_written)
-        spec.write_value(data=self._tag)
+
+        ip_tag = iter(ip_tags).next()
+        spec.write_value(data=ip_tag.tag)
 
     def get_spikes(self, txrx, placements, graph_mapper, buffer_manager,
                    compatible_output=False):
@@ -250,7 +248,7 @@ class SpikeSourceArray(AbstractPartitionableVertex,
             self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value)
 
         self._write_setup_info(
-            spec, self._buffer_region_memory_size)
+            spec, self._buffer_region_memory_size, ip_tags)
 
         # End-of-Spec:
         spec.end_specification()

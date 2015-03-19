@@ -75,7 +75,6 @@ class SpynnakerConfiguration(object):
         self._current_max_tag_value = 0
 
         # comms stuff
-        self._default_buffer_ip_tag = None
         self._default_buffer_ip_port = None
         self._default_buffer_ip_address = None
         self._buffer_managers = dict()
@@ -379,5 +378,3 @@ class SpynnakerConfiguration(object):
             "Buffers", "receive_buffer_host")
         self._default_buffer_ip_port = config.getint(
             "Buffers", "receive_buffer_port")
-        self._default_buffer_ip_tag = config.getint(
-            "Buffers", "receive_buffer_tag")
