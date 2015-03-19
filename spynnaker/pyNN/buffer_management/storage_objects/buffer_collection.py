@@ -1,11 +1,7 @@
-from spinnman import exceptions as spinnman_exceptions
-from spinnman import constants as spinnman_constants
-
 from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region \
     import BufferedSendingRegion
-from spynnaker.pyNN.buffer_management.storage_objects.buffers_sent_deque import \
-    BuffersSentDeque
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.buffer_management.storage_objects.buffers_sent_deque \
+    import BuffersSentDeque
 from spynnaker.pyNN import exceptions
 
 
