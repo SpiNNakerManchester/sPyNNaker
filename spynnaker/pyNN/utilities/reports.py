@@ -102,7 +102,7 @@ def write_memory_map_report(report_default_directory,
         logger.error("Generate_placement_reports: Can't open file"
                      " {} for writing.".format(file_name))
 
-    for key in processor_to_app_data_base_address.keys():
+    for key in processor_to_app_data_base_address:
         output.write(str(key) + ": ")
         data = processor_to_app_data_base_address[key]
         output.write(
@@ -153,7 +153,7 @@ def network_specification_report(report_folder, graph, hostname):
             constraint_str = constraint.label
             f_network_specification.write("constraint: {}\n"
                                           .format(constraint_str))
-        #if params is None or len(params.keys()) == 0:
+        #if params is None or len(params) == 0:
         #    f_network_specification.write("  Parameters: None\n\n")
         #else:
         #    f_network_specification.write("  Parameters: %s\n\n" % params)
@@ -177,7 +177,7 @@ def network_specification_report(report_folder, graph, hostname):
                                          post_v_label, post_v_sz)
         f_network_specification.write(edge_str)
         f_network_specification.write("  Model: {}\n".format(model))
-        #if params is None or len(params.keys()) == 0:
+        #if params is None or len(params) == 0:
         #    f_network_specification.write("  Parameters: None\n\n")
         #else:
         #    f_network_specification.write("  Parameters: %s\n\n" % params)
@@ -248,8 +248,7 @@ def re_load_script_application_data_load(
     lines = list()
     lines.append("application_data_file_reader = "
                  "SpinnmanFileDataReader(\"{}\")"
-                 .format(ntpath.basename(
-                 file_path_for_application_data)))
+                 .format(ntpath.basename(file_path_for_application_data)))
 
     lines.append("txrx.write_memory({}, {}, {}, application_data_file_reader,"
                  " {})".format(placement.x, placement.y, start_address,
@@ -350,10 +349,10 @@ def _write_router_diag(parent_xml_element, router_diagnostic_coords,
 
 def generate_provance_routings(routing_tables, machine, txrx,
                                report_default_directory):
-    #acquire diagnostic data
+    # acquire diagnostic data
     router_diagnostics = dict()
     for router_table in routing_tables.routing_tables:
-        if router_table.number_of_entries > 0:
+        if not machine.get_chip_at(router_table.x, router_table.y).virtual:
             router_diagnostic = txrx.\
                 get_router_diagnostics(router_table.x, router_table.y)
             router_diagnostics[router_table.x, router_table.y] = \
@@ -362,27 +361,33 @@ def generate_provance_routings(routing_tables, machine, txrx,
     root = etree.Element("root")
     doc = etree.SubElement(root, "router_counters")
     expected_routers = etree.SubElement(doc, "Used_Routers")
-    for coords in router_diagnostics.keys():
-        re_inject_counter = _get_chips_re_injector_counter(coords, txrx)
-        _write_router_diag(expected_routers, coords, router_diagnostics[coords],
-                           re_inject_counter)
+    for router_diagnostic_coords in router_diagnostics:
+        re_inject_counter = _get_chips_re_injector_counter(
+            router_diagnostic_coords, txrx)
+        _write_router_diag(
+            expected_routers, router_diagnostic_coords,
+            router_diagnostics[router_diagnostic_coords],
+            re_inject_counter)
     unexpected_routers = etree.SubElement(doc, "Unexpected_Routers")
     for chip in machine.chips:
-        coords = (chip.x, chip.y)
-        if coords not in router_diagnostics.keys():
-            router_diagnostic = \
-                txrx.get_router_diagnostics(chip.x, chip.y)
-            if (router_diagnostic.n_dropped_multicast_packets != 0 or
-                    router_diagnostic.n_local_multicast_packets != 0 or
-                    router_diagnostic.n_external_multicast_packets != 0):
-                re_inject_counter = _get_chips_re_injector_counter(coords, txrx)
-                _write_router_diag(
-                    unexpected_routers, coords, router_diagnostic,
-                    re_inject_counter)
+        if not chip.virtual:
+            coords = (chip.x, chip.y)
+            if coords not in router_diagnostics:
+                router_diagnostic = \
+                    txrx.get_router_diagnostics(chip.x, chip.y)
+                if (router_diagnostic.n_dropped_multicast_packets != 0 or
+                        router_diagnostic.n_local_multicast_packets != 0 or
+                        router_diagnostic.n_external_multicast_packets != 0):
+                    re_inject_counter = _get_chips_re_injector_counter(
+                        coords, txrx)
+                    _write_router_diag(
+                        unexpected_routers, coords, router_diagnostic,
+                        re_inject_counter)
     file_path = \
         os.path.join(report_default_directory, "provance_data.xml")
     writer = open(file_path, "w")
     writer.write(etree.tostring(root, pretty_print=True))
+
 
 def _get_chips_re_injector_counter(router_diagnostic_coords, txrx):
     """ helper method that checks for the re_injector core and reads its

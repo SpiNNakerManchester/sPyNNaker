@@ -1,13 +1,10 @@
 from data_specification.file_data_writer import FileDataWriter
 
-
-from pacman.model.partitionable_graph.abstract_constrained_vertex \
-    import AbstractConstrainedVertex
-
-
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
+
+from pacman.model.abstract_constrained_vertex import AbstractConstrainedVertex
 
 from abc import ABCMeta
 from six import add_metaclass
@@ -17,8 +14,9 @@ import tempfile
 import os
 import threading
 
-#used to stop file conflicts
+# used to stop file conflicts
 _lock_condition = threading.Condition()
+
 
 @add_metaclass(ABCMeta)
 class AbstractDataSpecableVertex(AbstractConstrainedVertex):
@@ -43,11 +41,12 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
     @abstractmethod
     def generate_data_spec(self, subvertex, placement, sub_graph, graph,
                            routing_info, hostname, graph_subgraph_mapper,
-                           report_folder):
+                           report_folder, ip_tags, reverse_ip_tags):
         """
         method to determine how to generate their data spec for a non neural
         application
         """
+        pass
 
     @abstractmethod
     def get_binary_file_name(self):
@@ -90,8 +89,9 @@ class AbstractDataSpecableVertex(AbstractConstrainedVertex):
             AbstractDataSpecableVertex.get_data_spec_file_path(
                 processor_chip_x, processor_chip_y, processor_id, hostname)
         data_writer = FileDataWriter(binary_file_path)
-        #check if text reports are needed and if so initilise the reprot writer
-        #to send down to dsg
+
+        # check if text reports are needed and if so initilise the report
+        # writer to send down to dsg
         report_writer = None
         if config.getboolean("Reports", "writeTextSpecs"):
             new_report_directory = os.path.join(report_directory,

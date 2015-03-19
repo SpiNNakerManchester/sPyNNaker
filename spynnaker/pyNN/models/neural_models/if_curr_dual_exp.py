@@ -1,13 +1,10 @@
-from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
-    KeyAllocatorFixedMaskConstraint
-import pacman.utilities.constants as pacman_constants
-
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_dual_exponential_vertex \
     import AbstractDualExponentialVertex
-from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
@@ -41,16 +38,14 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, n_params=10, label=label,
             binary="IF_curr_exp_dual.aplx", constraints=constraints,
-            max_atoms_per_core=
-            IFCurrentDualExponentialPopulation._model_based_max_atoms_per_core,
+            max_atoms_per_core=(IFCurrentDualExponentialPopulation
+                                ._model_based_max_atoms_per_core),
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma)
         self._executable_constant = \
             IFCurrentDualExponentialPopulation.CORE_APP_IDENTIFIER
-        self.add_constraint(KeyAllocatorFixedMaskConstraint(
-            pacman_constants.DEFAULT_MASK))
 
     @property
     def model_name(self):

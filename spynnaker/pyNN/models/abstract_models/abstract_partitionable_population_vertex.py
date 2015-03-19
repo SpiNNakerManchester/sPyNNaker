@@ -1,13 +1,14 @@
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
-from spynnaker.pyNN.models.partitioned_models.partitioned_population_vertex import \
-    PartitionedPopulationVertex
+
 
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+
+
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 
@@ -80,7 +81,8 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
     @abstractmethod
     def set_model_max_atoms_per_core(new_value):
         """
-        enforces other neural models to support model based max atoms contraints
+        enforces other neural models to support model based max atoms
+        constraints
         """
 
     # noinspection PyUnusedLocal
@@ -118,22 +120,3 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
             ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1) * \
             constants.GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON
         return self.get_recording_region_size(size_per_time_step)
-
-    def create_subvertex(self, vertex_slice, resources_required, label=None,
-                         additional_constraints=list()):
-        """ overloaded from abstract_partitionable_vertex so that partitioned
-        vertices has a n_atoms (used in key-allocator algorithums)
-
-        :param vertex_slice: the slice of atoms from the partitionable vertex
-        to the partitioned vertex
-        :param resources_required: the resources used by thsi partitioned vertex
-        :param label: the string represnetation of this vertex
-        :param additional_constraints: any additional constraints used by
-        future mapping algorithums.
-        :return: a instance of a partitioned_vertex
-        """
-        partitioned_vertex = PartitionedPopulationVertex(
-            n_atoms=vertex_slice.n_atoms, label=label,
-            resources_required=resources_required,
-            constraints=additional_constraints)
-        return partitioned_vertex

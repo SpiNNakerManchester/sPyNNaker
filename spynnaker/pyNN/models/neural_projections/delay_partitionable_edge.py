@@ -65,11 +65,15 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
         """
         return self._synapse_list.get_n_rows() * self._pre_vertex.max_stages
 
-    def create_subedge(self, presubvertex, postsubvertex, label=None):
+    def create_subedge(self, presubvertex, postsubvertex, constraints=None,
+                       label=None):
         """
         Creates a subedge from this edge
         """
-        return DelayPartitionedEdge(presubvertex, postsubvertex)
+        if constraints is None:
+            constraints = list()
+        constraints.extend(self._constraints)
+        return DelayPartitionedEdge(presubvertex, postsubvertex, constraints)
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):
@@ -109,7 +113,7 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
                     subedge.post_subvertex,
                     constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
                     constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-                    self._synapse_row_io, partitioned_graph, graph_mapper,
+                    self._synapse_row_io, partitioned_graph,
                     routing_infos, subedge.weight_scales).get_rows()
 
                 for i in range(len(rows)):

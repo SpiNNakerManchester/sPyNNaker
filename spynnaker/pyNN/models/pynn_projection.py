@@ -1,9 +1,5 @@
-import logging
-import math
-
-import numpy
-
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
@@ -15,13 +11,16 @@ from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge \
+from spynnaker.pyNN.models.neural_projections\
+    .delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 
-
+import logging
+import math
+import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -110,8 +109,8 @@ class Projection(object):
             constants.MAX_DELAY_BLOCKS * \
             constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
 
-        if max_delay > (natively_supported_delay_for_models
-                        + delay_extention_max_supported_delay):
+        if max_delay > (natively_supported_delay_for_models +
+                        delay_extention_max_supported_delay):
             raise exceptions.ConfigurationException(
                 "the max delay for projection {} is not supported by the "
                 "pacman toolchain".format(max_delay))
@@ -154,6 +153,8 @@ class Projection(object):
                     presynaptic_population, postsynaptic_population,
                     machine_time_step, synapse_list=synapse_list,
                     synapse_dynamics=synapse_dynamics, label=label)
+
+                # add edge to the graph
                 spinnaker_control.add_edge(self._projection_edge)
                 self._projection_list_ranges = synapse_list.ranges()
 
@@ -173,8 +174,8 @@ class Projection(object):
         """
         graph_edges = self._spinnaker.partitionable_graph.edges
         for edge in graph_edges:
-            if ((edge.pre_vertex == presynaptic_vertex)
-                    and (edge.post_vertex == postsynaptic_vertex)):
+            if ((edge.pre_vertex == presynaptic_vertex) and
+                    (edge.post_vertex == postsynaptic_vertex)):
                 return edge
         return None
 
@@ -237,6 +238,8 @@ class Projection(object):
             remaining_edge = DelayAfferentPartitionableEdge(
                 presynaptic_population._get_vertex, delay_vertex,
                 label=new_label)
+
+            # add to graph
             self._spinnaker.add_edge(remaining_edge)
 
         # Create a list of the connections with delay larger than that which
@@ -247,8 +250,8 @@ class Projection(object):
         # Create a special DelayEdge from the delay vertex to the outgoing
         # pynn_population.py, with the same set of connections
         delay_label = "DE to {}".format(label)
-        num_blocks = int(math.floor(float(max_delay_for_projection - 1)
-                                    / float(max_delay_per_neuron)))
+        num_blocks = int(math.floor(float(max_delay_for_projection - 1) /
+                                    float(max_delay_per_neuron)))
         if num_blocks > delay_vertex.max_stages:
             delay_vertex.max_stages = num_blocks
 
@@ -266,6 +269,8 @@ class Projection(object):
                 max_delay_per_neuron, synapse_list=remaining_sublist,
                 synapse_dynamics=synapse_dynamics, label=delay_label)
             self._delay_list_ranges = remaining_sublist.ranges()
+
+            # add to graph
             self._spinnaker.add_edge(self._delay_edge)
 
     def describe(self, template='projection_default.txt', engine='default'):
@@ -319,8 +324,8 @@ class Projection(object):
             row = rows[pre_atom]
             for i in xrange(len(row.target_indices)):
                 post_atom = row.target_indices[i]
-                delay = (float(row.delays[i])
-                         * (float(self._spinnaker.machine_time_step) / 1000.0))
+                delay = (float(row.delays[i]) *
+                         (float(self._spinnaker.machine_time_step) / 1000.0))
                 delays[pre_atom][post_atom] = delay
         return delays
 

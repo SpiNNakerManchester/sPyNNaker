@@ -1,14 +1,11 @@
-from pacman.model.constraints.key_allocator_fixed_mask_constraint import \
-    KeyAllocatorFixedMaskConstraint
-import pacman.utilities.constants as pacman_constants
-
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
     import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
@@ -16,10 +13,10 @@ from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
     import AbstractConductanceVertex
 
 
-class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
-                                         AbstractConductanceVertex,
-                                         AbstractIntegrateAndFireProperties,
-                                         AbstractPopulationVertex):
+class IFConductanceExponentialPopulation(
+        AbstractExponentialPopulationVertex, AbstractConductanceVertex,
+        AbstractIntegrateAndFireProperties,
+        AbstractPopulationVertex):
 
     CORE_APP_IDENTIFIER = constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
@@ -33,7 +30,7 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
 
         # Instantiate the parent classes
         AbstractConductanceVertex.__init__(self, n_neurons, e_rev_E=e_rev_E,
-                                          e_rev_I=e_rev_I)
+                                           e_rev_I=e_rev_I)
         AbstractExponentialPopulationVertex.__init__(
             self, n_neurons=n_neurons, tau_syn_E=tau_syn_E,
             tau_syn_I=tau_syn_I, machine_time_step=machine_time_step)
@@ -44,8 +41,8 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, n_params=12, label=label,
-            max_atoms_per_core=
-            IFConductanceExponentialPopulation._model_based_max_atoms_per_core,
+            max_atoms_per_core=(IFConductanceExponentialPopulation
+                                ._model_based_max_atoms_per_core),
             binary="IF_cond_exp.aplx", constraints=constraints,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor,
@@ -54,8 +51,6 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
             weight_scale=AbstractConductanceVertex.WEIGHT_SCALE)
         self._executable_constant = \
             IFConductanceExponentialPopulation.CORE_APP_IDENTIFIER
-        self.add_constraint(KeyAllocatorFixedMaskConstraint(
-            pacman_constants.DEFAULT_MASK))
 
     @property
     def model_name(self):
@@ -78,9 +73,9 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
         """
 
         # Get the parameters
-        #typedef struct neuron_t {
+        # typedef struct neuron_t {
         #
-        #// nominally 'fixed' parameters
+        # // nominally 'fixed' parameters
         #    REAL     V_thresh;
         # // membrane voltage threshold at which neuron spikes [mV]
         #    REAL     V_reset;    // post-spike reset membrane voltage    [mV]
@@ -92,26 +87,26 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
         #    REAL        V_rev_I;
         # // reversal voltage - Inhibitory    [mV]
         #
-        #// variable-state parameter
+        # // variable-state parameter
         #    REAL     V_membrane; // membrane voltage [mV]
         #
-        #// late entry! Jan 2014 (trickle current)
+        # // late entry! Jan 2014 (trickle current)
         #    REAL        I_offset;
         #  // offset current [nA] but take care because actually
         #     'per timestep charge'
         #
-        #// 'fixed' computation parameter - time constant multiplier for
+        # // 'fixed' computation parameter - time constant multiplier for
         #                                   closed-form solution
         #    REAL     exp_TC;
         # // exp( -(machine time step in ms)/(R * C) ) [.]
         #
-        #// for ODE solution only
+        # // for ODE solution only
         #    REAL      one_over_tauRC;
         # // [kHz!] only necessary if one wants to use ODE solver because
         #           allows * and host double prec to calc - UNSIGNED ACCUM &
         #           unsigned fract much slower
         #
-        #// refractory time information
+        # // refractory time information
         #    int32_t refract_timer; // countdown to end of next refractory
         #                              period [ms/10] - 3 secs limit do we
         #                              need more? Jan 2014
@@ -121,14 +116,14 @@ class IFConductanceExponentialPopulation(AbstractExponentialPopulationVertex,
             NeuronParameter(self._v_reset, DataType.S1615),
             NeuronParameter(self._v_rest, DataType.S1615),
             NeuronParameter(self.r_membrane(self._machine_time_step),
-                    DataType.S1615),
+                            DataType.S1615),
             NeuronParameter(self._e_rev_E, DataType.S1615),
             NeuronParameter(self._e_rev_I, DataType.S1615),
             NeuronParameter(self._v_init, DataType.S1615),
             NeuronParameter(self.ioffset(self._machine_time_step),
-                    DataType.S1615),
+                            DataType.S1615),
             NeuronParameter(self.exp_tc(self._machine_time_step),
-                    DataType.S1615),
+                            DataType.S1615),
             NeuronParameter(self._one_over_tau_rc, DataType.S1615),
             NeuronParameter(self._refract_timer, DataType.UINT32),
             NeuronParameter(self._scaled_t_refract(), DataType.UINT32),

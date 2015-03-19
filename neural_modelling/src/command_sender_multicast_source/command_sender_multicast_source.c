@@ -16,8 +16,8 @@ void timer_callback (uint unused0, uint unused1)
   time++;
 
   if ((next_pos >= schedule_size)
-		  && (simulation_ticks != UINT32_MAX)
-		  && (time >= simulation_ticks + timer_period))
+        && (simulation_ticks != UINT32_MAX)
+        && (time >= simulation_ticks + 1))
   {
     log_info("Simulation complete.\n");
     spin1_exit(0);
@@ -25,76 +25,78 @@ void timer_callback (uint unused0, uint unused1)
   }
 
   if ((next_pos < schedule_size) && schedule[next_pos] == time) {
-	  uint32_t with_payload_count = schedule[++next_pos];
-	  log_info("Sending %d packets with payloads at time %d",
-			  with_payload_count, time);
-	  for (uint32_t i = 0; i < with_payload_count; i++) {
-		  uint32_t key = schedule[++next_pos];
-		  uint32_t payload = schedule[++next_pos];
-		  //check for delays and repeats
-		  uint32_t delay_and_repeat_data = schedule[++next_pos];
-		  if (delay_and_repeat_data != 0){
-		      uint16_t repeat = delay_and_repeat_data >> 8;
-		      uint16_t delay = delay_and_repeat_data & 0x0000ffff;
-		      log_info("Sending %d, %d at time %d with %d repeats and %d delay ",
-		           key, payload, time, repeat, delay);
-		      for(uint16_t repeat_count=0; repeat_count < repeat; repeat_count++) {
-		          spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
-		          if(delay > 0){// if the delay is 0, dont call delay
+    uint32_t with_payload_count = schedule[++next_pos];
+    log_info("Sending %d packets with payloads at time %d",
+            with_payload_count, time);
+    for (uint32_t i = 0; i < with_payload_count; i++) {
+        uint32_t key = schedule[++next_pos];
+        uint32_t payload = schedule[++next_pos];
+        //check for delays and repeats
+        uint32_t delay_and_repeat_data = schedule[++next_pos];
+        if (delay_and_repeat_data != 0){
+            uint16_t repeat = delay_and_repeat_data >> 16;
+            uint16_t delay = delay_and_repeat_data & 0x0000ffff;
+            log_info("Sending %d, %d at time %d with %d repeats and %d delay ",
+                key, payload, time, repeat, delay);
+            for(uint16_t repeat_count=0; repeat_count < repeat; repeat_count++) {
+                spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+                if(delay > 0){// if the delay is 0, dont call delay
                       spin1_delay_us(delay);
                 }
             }
-		  }
-		  else{//if no repeats, then just sned the message
-		    spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
-		  }
-	  }
+        }
+        else{//if no repeats, then just sned the message
+            spin1_send_mc_packet(key, payload, WITH_PAYLOAD);
+        }
+    }
 
-	  uint32_t without_payload_count = schedule[++next_pos];
-	  log_info("Sending %d packets without payloads at time %d",
-			  without_payload_count, time);
-	  for (uint32_t i = 0; i < without_payload_count; i++) {
-		  uint32_t key = schedule[++next_pos];
-		  log_info("Sending %d", key);
-		  //check for delays and repeats
-		  uint32_t delay_and_repeat_data = schedule[++next_pos];
-		  if (delay_and_repeat_data != 0){
-		      uint16_t repeat = delay_and_repeat_data >> 8;
-		      uint16_t delay = delay_and_repeat_data & 0x0000ffff;
-		      for(uint16_t repeat_count=0; repeat_count < repeat; repeat_count++) {
-		          spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
-		          if(delay > 0){// if the delay is 0, dont call delay
+    uint32_t without_payload_count = schedule[++next_pos];
+    log_info("Sending %d packets without payloads at time %d",
+            without_payload_count, time);
+    for (uint32_t i = 0; i < without_payload_count; i++) {
+        uint32_t key = schedule[++next_pos];
+        log_info("Sending %d", key);
+        //check for delays and repeats
+        uint32_t delay_and_repeat_data = schedule[++next_pos];
+        if (delay_and_repeat_data != 0){
+            uint16_t repeat = delay_and_repeat_data >> 16;
+            uint16_t delay = delay_and_repeat_data & 0x0000ffff;
+            for(uint16_t repeat_count=0; repeat_count < repeat; repeat_count++) {
+                spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+                if(delay > 0){// if the delay is 0, dont call delay
                       spin1_delay_us(delay);
                 }
             }
-		  }
-		  else{//if no repeats, then just sned the message
-		    spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
-		  }
+        }
+        else{//if no repeats, then just sned the message
+            spin1_send_mc_packet(key, NULL, NO_PAYLOAD);
+        }
 
-	  }
-	  ++next_pos;
+    }
+    ++next_pos;
 
-	  if (next_pos < schedule_size) {
-	      log_info("Next packets will be sent at %d", schedule[next_pos]);
-	  } else {
-		  log_info("End of Schedule");
-	  }
+    if (next_pos < schedule_size) {
+        log_info("Next packets will be sent at %d (pos=%d)",
+                 schedule[next_pos], next_pos);
+    } else {
+        log_info("End of Schedule");
+    }
   }
 }
 
 bool multicast_source_data_filled(address_t base_address) {
-	address_t region_address = region_start(1, base_address);
-	schedule_size = region_address[0] >> 2;
+    address_t region_address = region_start(1, base_address);
+    schedule_size = region_address[0] >> 2;
 
-	// Allocate the space for the schedule
-	schedule = (uint32_t*) spin1_malloc(schedule_size * sizeof(uint32_t));
-	memcpy(schedule, &region_address[1], schedule_size * sizeof(uint32_t));
+    // Allocate the space for the schedule
+    schedule = (uint32_t*) spin1_malloc(schedule_size * sizeof(uint32_t));
+    memcpy(schedule, &region_address[1], schedule_size * sizeof(uint32_t));
 
-	next_pos = 0;
-	log_info("Schedule starts at time %d", schedule[0]);
+    next_pos = 0;
+    log_info("Schedule starts at time %d, and the size is %d", schedule[0],
+            schedule_size);
 
-	return (true);
+    return (true);
 }
 
 bool system_load_dtcm(void) {
@@ -108,10 +110,10 @@ bool system_load_dtcm(void) {
   uint32_t flags   = 0;
   if(!system_header_filled (address, &version, flags))
   {
-	return (false);
+    return (false);
   }
   if (!multicast_source_data_filled(address)) {
-	return (false);
+    return (false);
   }
 
   return (true);
