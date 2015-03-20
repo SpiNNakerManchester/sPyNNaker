@@ -19,6 +19,7 @@ from spinnman import constants as spinnman_constants
 import math
 import logging
 from enum import Enum
+from spynnaker.pyNN.utilities.conf import config
 
 
 logger = logging.getLogger(__name__)
