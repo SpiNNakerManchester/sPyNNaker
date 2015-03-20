@@ -103,8 +103,8 @@ void timer_callback (uint unused0, uint unused1)
         }
       }
     }
-    reset_out_spikes ();
   }
+  reset_out_spikes ();
 
   /*for (n = 0; n < num_neurons; n++) {
     iaf_psc_exp_dynamics(n);
