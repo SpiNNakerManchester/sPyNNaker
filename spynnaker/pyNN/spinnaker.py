@@ -244,13 +244,12 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
         if (not isinstance(self._machine, VirtualMachine) and
                 conf.config.getboolean("Execute", "run_simulation")):
-            if do_timing:
-                timer.start_timing()
-
-            logger.info("*** Loading tags ***")
-            self._load_tags(self._tags)
 
             if self._do_load is True:
+                if do_timing:
+                    timer.start_timing()
+                logger.info("*** Loading tags ***")
+                self._load_tags(self._tags)
                 logger.info("*** Loading data ***")
                 self._load_application_data(
                     self._placements, self._router_tables, self._graph_mapper,
@@ -258,17 +257,12 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._app_id)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
-            if do_timing:
-                timer.take_sample()
+                if do_timing:
+                    timer.take_sample()
+                self._finish_loading()
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
-                if self._reports_states.transciever_report:
-                    binary_folder = conf.config.get("SpecGeneration",
-                                                    "Binary_folder")
-                    reports.re_load_script_running_aspects(
-                        binary_folder, executable_targets, self._hostname,
-                        self._app_id, run_time)
 
                 wait_on_confirmation = conf.config.getboolean(
                     "Database", "wait_on_confirmation")

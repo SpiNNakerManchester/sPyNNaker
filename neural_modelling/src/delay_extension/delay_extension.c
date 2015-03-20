@@ -160,8 +160,7 @@ void spike_process(uint unused0, uint unused1)
       log_info("Incrementing counter %u = %u\n", neuron_id, current_time_slot_spike_counters[neuron_id]);
     }
     else
-    {
-      log_info("Invalid neuron ID %u", neuron_id);
+    {      log_info("Invalid neuron ID %u", neuron_id);
     }
   }
 

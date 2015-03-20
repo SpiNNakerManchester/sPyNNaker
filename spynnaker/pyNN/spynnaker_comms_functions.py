@@ -22,8 +22,9 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import reports
+from spynnaker.pyNN.utilities.reload.reload_script import ReloadScript
+from spynnaker.pyNN import exceptions
 
 
 import time
@@ -38,7 +39,9 @@ class SpynnakerCommsFunctions(object):
     def __init__(self, reports_states, report_default_directory):
         self._reports_states = reports_states
         self._report_default_directory = report_default_directory
+        self._reload_script = None
         self._machine = None
+        self._txrx = None
 
     def _setup_interfaces(self, hostname):
         """Set up the interfaces for communicating with the SpiNNaker board
@@ -78,7 +81,14 @@ class SpynnakerCommsFunctions(object):
                     "file (pacman.cfg or pacman.cfg)")
             self._txrx.ensure_board_is_ready(int(machine_version))
             self._txrx.discover_scamp_connections()
+            self._txrx.enable_dropped_packet_reinjection()
             self._machine = self._txrx.get_machine_details()
+
+            if self._reports_states.transciever_report:
+                binary_directory = conf.config.get(
+                    "SpecGeneration", "Binary_folder")
+                self._reload_script = ReloadScript(
+                    binary_directory, hostname, machine_version)
         else:
             virtual_x_dimension = conf.config.getint(
                 "Machine", "virutal_board_x_dimension")
@@ -96,8 +106,12 @@ class SpynnakerCommsFunctions(object):
         """
         for ip_tag in tags.ip_tags:
             self._txrx.set_ip_tag(ip_tag)
+            if self._reports_states.transciever_report:
+                self._reload_script.add_ip_tag(ip_tag)
         for reverse_ip_tag in tags.reverse_ip_tags:
             self._txrx.set_reverse_ip_tag(reverse_ip_tag)
+            if self._reports_states.transciever_report:
+                self._reload_script.add_reverse_ip_tag(reverse_ip_tag)
 
     def _retieve_provance_data_from_machine(
             self, executable_targets, routing_tables, machine):
@@ -195,6 +209,10 @@ class SpynnakerCommsFunctions(object):
         # close the progress bar
         progress_bar.end()
         return processor_to_app_data_base_address
+
+    def _finish_loading(self):
+        if self._reports_states.transciever_report:
+            self._reload_script.close()
 
     def _start_execution_on_machine(
             self, executable_targets, app_id, runtime, time_scaling,
@@ -362,12 +380,6 @@ class SpynnakerCommsFunctions(object):
             self, placements, router_tables, vertex_to_subvertex_mapper,
             processor_to_app_data_base_address, hostname, app_id):
 
-        # if doing reload, start script
-        if self._reports_states.transciever_report:
-            reports.start_transceiver_rerun_script(
-                conf.config.get("SpecGeneration", "Binary_folder"), hostname,
-                conf.config.get("Machine", "version"))
-
         # go through the placements and see if there's any application data to
         # load
         progress_bar = ProgressBar(len(list(placements.placements)),
@@ -408,12 +420,9 @@ class SpynnakerCommsFunctions(object):
 
                 # add lines to rerun_script if requested
                 if self._reports_states.transciever_report:
-                    binary_folder = \
-                        conf.config.get("SpecGeneration", "Binary_folder")
-                    reports.re_load_script_application_data_load(
+                    self._reload_script.add_application_data(
                         file_path_for_application_data, placement,
-                        start_address, memory_written, user_o_register_address,
-                        binary_folder)
+                        start_address)
             progress_bar.update()
         progress_bar.end()
 
@@ -435,10 +444,7 @@ class SpynnakerCommsFunctions(object):
                         router_table.x, router_table.y,
                         router_table.multicast_routing_entries, app_id=app_id)
                     if self._reports_states.transciever_report:
-                        binary_folder = conf.config.get("SpecGeneration",
-                                                        "Binary_folder")
-                        reports.re_load_script_load_routing_tables(
-                            router_table, binary_folder, app_id)
+                        self._reload_script.add_routing_table(router_table)
             progress_bar.update()
         progress_bar.end()
 
@@ -447,11 +453,6 @@ class SpynnakerCommsFunctions(object):
             everywhere and then send a start request to the cores that \
             actually use it
         """
-        if self._reports_states.transciever_report:
-            binary_folder = os.path.join(conf.config.get("SpecGeneration",
-                                                         "Binary_folder"))
-            reports.re_load_script_load_executables_init(binary_folder,
-                                                         executable_targets)
 
         progress_bar = ProgressBar(len(executable_targets),
                                    "Loading executables onto the machine")
@@ -467,9 +468,7 @@ class SpynnakerCommsFunctions(object):
                                      size)
 
             if self._reports_states.transciever_report:
-                binary_folder = os.path.join(conf.config.get("SpecGeneration",
-                                                             "Binary_folder"))
-                reports.re_load_script_load_executables_individual(
-                    binary_folder, exectuable_target_key, app_id, size)
+                self._reload_script.add_binary(
+                    exectuable_target_key, core_subset)
             progress_bar.update()
         progress_bar.end()

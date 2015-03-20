@@ -50,11 +50,11 @@ void flush_spikes (void)
 
 	  g_spike_message.length = sizeof (sdp_hdr_t) + header_len + spike_count * spike_size;
 
-//	  io_printf(IO_BUF, "===========Packet============\n");
-//	  uint8_t *print_ptr = (uint8_t *) &g_spike_message;
-//	  for (uint8_t i = 0; i < g_spike_message.length + 8; i++)
-//		io_printf(IO_BUF, "%02x ", print_ptr[i]);
-//	  io_printf(IO_BUF, "\n");
+	  io_printf(IO_BUF, "===========Packet============\n");
+	  uint8_t *print_ptr = (uint8_t *) &g_spike_message;
+	  for (uint8_t i = 0; i < g_spike_message.length + 8; i++)
+		io_printf(IO_BUF, "%02x ", print_ptr[i]);
+	  io_printf(IO_BUF, "\n");
 
 	  if (payload_apply_prefix && payload_timestamp)
 	  {
@@ -70,11 +70,11 @@ void flush_spikes (void)
 		}
 	  }
 
-//	  io_printf(IO_BUF, "===========Packet============\n");
-//	  print_ptr = (uint8_t *) sdp_msg_aer_data;
-//	  for (uint8_t i = 0; i < buffer_index * spike_size; i++)
-//		io_printf(IO_BUF, "%02x ", print_ptr[i]);
-//	  io_printf(IO_BUF, "\n");
+	  io_printf(IO_BUF, "===========Packet============\n");
+	  print_ptr = (uint8_t *) sdp_msg_aer_data;
+	  for (uint8_t i = 0; i < buffer_index * spike_size; i++)
+		io_printf(IO_BUF, "%02x ", print_ptr[i]);
+	  io_printf(IO_BUF, "\n");
 
 	  spin1_send_sdp_msg(&g_spike_message, 1);
 	  packets_sent ++;
