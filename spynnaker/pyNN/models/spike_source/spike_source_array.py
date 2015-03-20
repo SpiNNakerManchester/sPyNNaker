@@ -41,14 +41,21 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
     def __init__(
             self, n_neurons, spike_times, machine_time_step, spikes_per_second,
-            ring_buffer_sigma, timescale_factor, port=18250, tag=None,
-            address='0.0.0.0',
+            ring_buffer_sigma, timescale_factor, port=None, tag=None,
+            address=None,
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
             no_buffers_for_recording=constants.NO_BUFFERS_FOR_TRANSMITTING,
             constraints=None, label="SpikeSourceArray"):
         """
         Creates a new SpikeSourceArray Object.
         """
+        if address is None:
+            address = config.get(
+                "Buffers", "receive_buffer_host")
+        if tag is None:
+            port = config.getint(
+                "Buffers", "receive_buffer_port")
+
         AbstractDataSpecableVertex.__init__(
             self, label=label, n_atoms=n_neurons,
             machine_time_step=machine_time_step,
