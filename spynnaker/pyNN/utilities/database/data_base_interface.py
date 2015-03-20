@@ -213,12 +213,17 @@ class DataBaseInterface(object):
 
         # Send command and wait for response
         logger.info("*** Notifying visualiser that the database is ready ***")
-        for connection in data_base_message_connections:
-            connection.send_eieio_command_message(eieio_command_message)
+        try:
+            for connection in data_base_message_connections:
+                connection.send_eieio_command_message(eieio_command_message)
 
-        for connection in data_base_message_connections:
-            connection.receive_eieio_command_message()
-        logger.info("*** Confirmation received, continuing ***")
+            for connection in data_base_message_connections:
+                connection.receive_eieio_command_message()
+            logger.info("*** Confirmation received, continuing ***")
+        except:
+            logger.warning("*** Failed to notify external application about"
+                           " the database - continuing ***")
+        
 
     def wait_for_confirmation(self):
         self._wait_pool.close()
