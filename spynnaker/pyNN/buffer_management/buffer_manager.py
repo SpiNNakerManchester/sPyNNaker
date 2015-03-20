@@ -204,7 +204,8 @@ class BufferManager(object):
         # create a list of buffers to be loaded on the machine, given the region
         # the size and the sequence number
         data_requests = sender_vertex.get_next_set_of_packets(
-            region_size, region_id, None, self._routing_infos, self._partitioned_graph)
+            region_size, region_id, None, self._routing_infos,
+            self._partitioned_graph)
 
         # fetch region base address
         self._locate_region_address(region_id, sender_vertex)
