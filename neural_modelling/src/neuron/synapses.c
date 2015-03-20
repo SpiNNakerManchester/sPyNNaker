@@ -2,6 +2,7 @@
 #include "spike_processing.h"
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
+#include "profiler.h"
 #include <debug.h>
 #include <spin1_api.h>
 #include <string.h>
@@ -334,10 +335,13 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
         address_t plastic_region_address = synapse_row_plastic_region(row);
 
         // Process any plastic synapses
+        profiler_write_entry_disable_fiq(PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
         if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
                 fixed_region_address, ring_buffers, time)) {
             return false;
         }
+        profiler_write_entry_disable_fiq(PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
+
 
         // Perform DMA write back
         if (write) {
