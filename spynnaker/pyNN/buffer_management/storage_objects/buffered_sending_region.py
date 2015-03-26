@@ -1,139 +1,118 @@
-from collections import OrderedDict
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.buffer_management.storage_objects.buffer_element import \
-    BufferElement
-from spynnaker.pyNN.utilities import constants
-from spinnman import constants as spinnman_constants
+import bisect
 
 
 class BufferedSendingRegion(object):
+    """ A set of keys to be sent at given timestamps for a given region of\
+        data.  Note that keys must be added in timestamp order or else an\
+        exception will be raised
+    """
 
-    def __init__(self):
-        self._buffer = OrderedDict()
-        self._read_position_in_region = 0
-        self._region_size = None
-        self._region_base_address = None
-        self._sequence_number = spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE - 1
-        self._last_received_sequence_number = \
-            spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE - 1
-        self._buffer_shutdown = False
+    def __init__(self, buffer_size):
+        """
 
-    def add_entry_to_buffer(self, buffer_key, data_piece):
-        if buffer_key not in self.buffer.keys():
-            self._buffer[buffer_key] = list()
-        self._buffer[buffer_key].append(BufferElement(data_piece))
+        :param buffer_size: The size of the buffer for this region
+        :type buffer_size: int
+        """
 
-    def add_entries_to_buffer(self, buffer_key, data_pieces):
-        for element in data_pieces:
-            self.add_entry_to_buffer(buffer_key, element)
+        # A dictionary of timestamp -> list of keys
+        self._buffer = dict()
 
-    def set_region_base_address(self, new_value):
-        if self._region_base_address is None:
-            self._region_base_address = new_value
-        else:
-            raise exceptions.ConfigurationException(
-                "tried to set the base address of a buffer data storage region "
-                "twice, this is a error due to the immutability of this "
-                "parameter, please fix this issue and retry")
+        # A list of timestamps
+        self._timestamps = list()
 
-    def set_region_size(self, new_size):
-        if self._region_size is None:
-            self._region_size = new_size
-        else:
-            raise exceptions.ConfigurationException(
-                "cannot change the region size of the region being managed by "
-                "this buffered region once it has been set. ")
+        # The current position in the list of timestamps
+        self._current_timestamp_pos = 0
 
-    def _add_to_pointer(self, number_of_bytes_moved):
-        self._read_position_in_region = \
-            (self._read_position_in_region + number_of_bytes_moved) \
-            % self._region_size
+        self._buffer_size = buffer_size
 
-    def get_next_timestamp(self):
-        if not self.is_region_empty():
-            return self._buffer.items()[0][0]
-        else:
-            return None
+    @property
+    def buffer_size(self):
+        return self._buffer_size
 
-    def is_region_empty(self):
-        """ checks if the region is empty based from the last timer tic given
-         by the core. If the last timer tic has moved, the buffer is updated
-          accordingly
-        :return: true if the buffer is empty, false otherwise
+    def add_key(self, timestamp, key):
+        """ Add a key to be sent at a given time
+
+        :param timestamp: The time at which the key is to be sent
+        :type timestamp: int
+        :param key: The key to send
+        :type key: int
+        """
+        if timestamp not in self._buffer:
+            bisect.insort(self._timestamps, timestamp)
+            self._buffer[timestamp] = list()
+        self._buffer[timestamp].append(key)
+
+    def add_keys(self, timestamp, keys):
+        """ Add a set of keys to be sent at the given time
+
+        :param timestamp: The time at which the keys are to be sent
+        :type timestamp: int
+        :param keys: The keys to send
+        :type keys: iterable of int
+        """
+        for key in keys:
+            self.add_key(timestamp, key)
+
+    @property
+    def n_timestamps(self):
+        """ The number of timestamps available
+
+        :rtype: int
+        """
+        return len(self._timestamps)
+
+    @property
+    def timestamps(self):
+        """ The timestamps for which there are keys
+
+        :rtype: iterable of int
+        """
+        return self._timestamps
+
+    def get_n_keys(self, timestamp):
+        """ Get the number of keys for a given timestamp
+        """
+        if timestamp in self._buffer:
+            return len(self._buffer[timestamp])
+        return 0
+
+    @property
+    def is_next_timestamp(self):
+        """ Determines if the region is empty
+        :return: True if the region is empty, false otherwise
         :rtype: bool
         """
-        if len(self._buffer) == 0:
-            return True
-        else:
-            return False
-
-    def is_timestamp_empty(self, timestamp):
-        return timestamp in self._buffer.keys()
-
-    def get_next_entry(self):
-        timestamp = self.get_next_timestamp()
-        value = self._buffer[timestamp].pop(0)
-        if len(self._buffer[timestamp]) == 0:
-            self._buffer.popitem(last=False)
-        return value
-
-    def get_next_sequence_no(self):
-        self._sequence_number = ((self._sequence_number + 1) %
-                                 spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE)
-        return self._sequence_number
-
-    def check_sequence_number(self, sequence_no):
-        min_seq_no_acceptable = self._last_received_sequence_number
-        max_seq_no_acceptable = (
-            (min_seq_no_acceptable + spinnman_constants.MAX_BUFFER_HISTORY) %
-            spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE)
-
-        if min_seq_no_acceptable <= sequence_no <= max_seq_no_acceptable:
-            self._last_received_sequence_number = sequence_no
-            return True
-        elif max_seq_no_acceptable < min_seq_no_acceptable:
-            if (0 <= sequence_no <= max_seq_no_acceptable or
-                    min_seq_no_acceptable <= sequence_no <=
-                    spinnman_constants.SEQUENCE_NUMBER_MAX_VALUE):
-                self._last_received_sequence_number = sequence_no
-                return True
-            else:
-                return False
-
-    @staticmethod
-    def _memory_required_for_buffer(packet_buffer):
-        memory_used = spinnman_constants.EIEIO_DATA_HEADER_SIZE + \
-            constants.TIMESTAMP_SPACE_REQUIREMENT
-        memory_used += len(packet_buffer) * constants.KEY_SIZE
-        return memory_used
+        return self._current_timestamp_pos < len(self._timestamps)
 
     @property
-    def sequence_number(self):
-        return self._sequence_number
+    def next_timestamp(self):
+        """ The next timestamp of the data to be sent, or None if no more data
+
+        :rtype: int or None
+        """
+        if self.is_next_timestamp:
+            return self._timestamps[self._current_timestamp_pos]
+        return None
+
+    def is_next_key(self, timestamp):
+        """ Determine if there is another key for the given timestamp
+
+        :rtype: bool
+        """
+        if timestamp in self._buffer:
+            return len(self._buffer[timestamp]) > 0
+        return False
 
     @property
-    def position_in_region(self):
-        return self._read_position_in_region
+    def next_key(self):
+        """ The next key to be sent
 
-    @property
-    def current_absolute_address(self):
-        return self._region_base_address + self._read_position_in_region
-
-    @property
-    def buffer(self):
-        return self._buffer
-
-    @property
-    def region_size(self):
-        return self._region_size
-
-    @property
-    def region_base_address(self):
-        return self._region_base_address
-
-    @property
-    def buffer_shutdown(self):
-        return self._buffer_shutdown
-
-    def set_buffer_shutdown(self):
-        self._buffer_shutdown = True
+        :rtype: int
+        """
+        next_timestamp = self.next_timestamp
+        keys = self._buffer[next_timestamp]
+        key = keys.pop()
+        if len(keys) == 0:
+            del self._buffer[next_timestamp]
+            self._current_timestamp_pos += 1
+        return key

@@ -51,10 +51,10 @@ weight_to_spike = 2
 #delay = 3.1
 delay = 1
 
-loopConnections = list()
+connections = list()
 for i in range(0, nNeurons):
     singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
-    loopConnections.append(singleConnection)
+    connections.append(singleConnection)
 
 injectionConnection = [(0, 0, weight_to_spike, delay)]
 spikeArray = {'spike_times': [[0]]}
@@ -75,7 +75,7 @@ populations[0].set('i_offset', i_off)
 
 #populations[0].set_mapping_constraint({"x": 1, "y": 0})
 
-projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
+projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(connections)))
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
 
 populations[0].record_v()

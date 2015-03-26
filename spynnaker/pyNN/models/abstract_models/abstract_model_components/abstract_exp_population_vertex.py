@@ -6,7 +6,8 @@ from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
 
-NUM_SYNAPSE_PARAMS = 4  # tau_syn_E and tau_syn_I, and initial multipiers
+# tau_syn_E and tau_syn_I, and initial multipiers
+NUM_SYNAPSE_PARAMS = 4
 
 
 @add_metaclass(ABCMeta)

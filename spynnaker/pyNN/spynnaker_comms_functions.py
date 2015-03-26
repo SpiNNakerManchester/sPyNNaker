@@ -197,17 +197,10 @@ class SpynnakerCommsFunctions(object):
         return processor_to_app_data_base_address
 
     def _start_execution_on_machine(
-            self, executable_targets, app_id, runtime, buffered_managers,
+            self, executable_targets, app_id, runtime,
             time_scaling, waiting_on_confirmation, send_start_notification,
-            database_thread, in_debug_mode, routing_infos, partitioned_graph):
-        # every thing is in sync0. if there are buffered managers with sendable
-        # manageable vertices, load the initial buffers
-        for buffer_manager_key in buffered_managers.keys():
-            buffer_manager = buffered_managers[buffer_manager_key]
-            if buffer_manager.contains_sender_vertices():
-                buffer_manager.load_initial_buffers(
-                    routing_infos, partitioned_graph)
-                
+            database_thread, in_debug_mode):
+
         # deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
@@ -332,17 +325,14 @@ class SpynnakerCommsFunctions(object):
             logger.info("Application is set to run forever "
                         "- PACMAN is exiting")
 
-        # turn off buffers threads, as they are no longer needed
-        for buffered_manager_key in buffered_managers.keys():
-            buffered_managers[buffered_manager_key].kill_threads()
-
     def _break_down_of_failure_to_reach_state(self, total_cores, state):
         successful_cores = list()
         unsuccessful_cores = dict()
         core_infos = self._txrx.get_cpu_information(total_cores)
         for core_info in core_infos:
             if core_info.state == state:
-                successful_cores.append((core_info.x, core_info.y, core_info.p))
+                successful_cores.append((core_info.x, core_info.y,
+                                         core_info.p))
             else:
                 unsuccessful_cores[(core_info.x, core_info.y, core_info.p)] = \
                     core_info.state.name

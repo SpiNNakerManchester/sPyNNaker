@@ -1,23 +1,21 @@
-from spynnaker.pyNN.utilities import packet_conversions
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_properties.randomDistributions import \
-    generate_parameter
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex import \
-    AbstractDataSpecableVertex
+from spynnaker.pyNN.models.neural_properties.randomDistributions\
+    import generate_parameter
+from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex\
+    import AbstractRecordableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex\
+    import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex import AbstractPartitionableVertex
 from spynnaker.pyNN import exceptions
 
 
-from data_specification.data_specification_generator import \
-    DataSpecificationGenerator
-
+from data_specification.data_specification_generator\
+    import DataSpecificationGenerator
 from data_specification.enums.data_type import DataType
 
-import math
 from enum import Enum
+import math
 import numpy
 import logging
 
@@ -59,8 +57,7 @@ class SpikeSourcePoisson(
         AbstractRecordableVertex.__init__(
             self, machine_time_step, label)
         AbstractDataSpecableVertex.__init__(
-            self, label=label, n_atoms=n_neurons,
-            machine_time_step=machine_time_step,
+            self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         self._rate = rate
         self._start = start
@@ -333,7 +330,4 @@ class SpikeSourcePoisson(
         return "spike_source_poisson.aplx"
 
     def is_recordable(self):
-        return True
-
-    def is_abstract_spike_source(self):
         return True

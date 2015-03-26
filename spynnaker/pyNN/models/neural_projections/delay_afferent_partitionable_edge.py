@@ -22,7 +22,8 @@ class DelayAfferentPartitionableEdge(MultiCastPartitionableEdge):
                     :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
         :param label: The label to give the edge.  If not specified, and the\
                     edge has no label, the subedge will have no label.  If not\
-                    specified and the edge has a label, a label will be provided
+                    specified and the edge has a label, a label will be\
+                    provided
         :type label: str
         :return: The created subedge
         :rtype: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`

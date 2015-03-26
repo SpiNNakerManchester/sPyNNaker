@@ -8,7 +8,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 
 
-from pacman.model.abstract_classes.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 
@@ -19,8 +19,8 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
     def __init__(self, n_atoms, label, max_atoms_per_core, machine_time_step,
                  timescale_factor, constraints=None):
         AbstractDataSpecableVertex.__init__(
-            self, n_atoms, label, machine_time_step=machine_time_step,
-            timescale_factor=timescale_factor, constraints=constraints)
+            self, machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor)
         AbstractPartitionableVertex.__init__(
             self, n_atoms, label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
@@ -30,8 +30,8 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         Gets the size of the neuron parameters for a range of neurons
         """
         return (constants.PARAMS_BASE_SIZE +
-                (4 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
-                 * self._n_params))
+                (4 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1) *
+                 self._n_params))
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
@@ -40,17 +40,17 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
 
         # noinspection PyTypeChecker
         return (constants.SETUP_SIZE +
-                self.get_neuron_params_size(vertex_slice)
-                + self.get_synapse_parameter_size(vertex_slice)
-                + self.get_stdp_parameter_size(
-                    graph.incoming_edges_to_vertex(self))
-                + constants.ROW_LEN_TABLE_SIZE
-                + constants.MASTER_POPULATION_TABLE_SIZE
-                + self.get_synaptic_blocks_memory_size(
-                    vertex_slice, graph.incoming_edges_to_vertex(self))
-                + self.get_spike_buffer_size(vertex_slice)
-                + self.get_v_buffer_size(vertex_slice)
-                + self.get_g_syn_buffer_size(vertex_slice))
+                self.get_neuron_params_size(vertex_slice) +
+                self.get_synapse_parameter_size(vertex_slice) +
+                self.get_stdp_parameter_size(
+                    graph.incoming_edges_to_vertex(self)) +
+                constants.ROW_LEN_TABLE_SIZE +
+                constants.MASTER_POPULATION_TABLE_SIZE +
+                self.get_synaptic_blocks_memory_size(
+                    vertex_slice, graph.incoming_edges_to_vertex(self)) +
+                self.get_spike_buffer_size(vertex_slice) +
+                self.get_v_buffer_size(vertex_slice) +
+                self.get_g_syn_buffer_size(vertex_slice))
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """

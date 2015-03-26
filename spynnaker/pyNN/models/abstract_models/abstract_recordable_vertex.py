@@ -20,8 +20,7 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractRecordableVertex(object):
-    """
-    Underlying AbstractConstrainedVertex model for Neural Applications.
+    """ Underlying recordable vertex
     """
 
     def __init__(self, machine_time_step, label):

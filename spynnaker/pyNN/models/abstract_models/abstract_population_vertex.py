@@ -17,8 +17,7 @@ logger = logging.getLogger(__name__)
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
         AbstractRecordableVertex, AbstractPopulationDataSpec):
-    """
-    Underlying AbstractConstrainedVertex model for Neural Populations.
+    """ Underlying vertex model for Neural Populations.
     """
 
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
@@ -93,17 +92,6 @@ class AbstractPopulationVertex(
             compatible_output=compatible_output, has_ran=has_ran,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
             placements=placements, txrx=txrx)
-
-    def get_synaptic_data(self, presubvertex, pre_n_atoms, postsubvertex,
-                          synapse_io):
-        """
-        helper method to add other data for get weights via synaptic manager
-        """
-        return self._get_synaptic_data(
-            presubvertex, pre_n_atoms, postsubvertex,
-            constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
-            synapse_io,
-            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
     def is_recordable(self):
         """ helper method for is instance

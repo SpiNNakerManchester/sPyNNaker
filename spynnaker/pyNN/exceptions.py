@@ -14,14 +14,6 @@ class ConfigurationException(SpynnakerException):
     pass
 
 
-class InvalidParameterType(SpynnakerException):
-    """raised when a the type of a parameter passed to a function is unhandled
-
-    :raise None: does not raise any known exceptions
-    """
-    pass
-
-
 class MemReadException(SpynnakerException):
     """raised when the pynn front end fails to read a certain memory region
 

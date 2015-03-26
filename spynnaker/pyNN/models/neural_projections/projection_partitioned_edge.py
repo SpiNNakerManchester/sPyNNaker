@@ -66,6 +66,6 @@ class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
     @property
     def synapse_sublist(self):
         return self._synapse_sublist
-    
+
     def is_multi_cast_partitioned_edge(self):
         return True

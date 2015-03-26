@@ -74,11 +74,6 @@ class SpynnakerConfiguration(object):
         # helper data stores
         self._current_max_tag_value = 0
 
-        # comms stuff
-        self._default_buffer_ip_port = None
-        self._default_buffer_ip_address = None
-        self._buffer_managers = dict()
-
         # database objects
         self._create_database = False
         self._database_interface = None
@@ -304,8 +299,8 @@ class SpynnakerConfiguration(object):
                 config.add_section("Model")
             config.set("Model", "max_delay", (max_delay * 1000) / timestep)
 
-        if (config.has_option("Machine", "timeScaleFactor")
-                and config.get("Machine", "timeScaleFactor") != "None"):
+        if (config.has_option("Machine", "timeScaleFactor") and
+                config.get("Machine", "timeScaleFactor") != "None"):
             self._time_scale_factor = \
                 config.getint("Machine", "timeScaleFactor")
             if timestep * self._time_scale_factor < 1000:
@@ -372,9 +367,3 @@ class SpynnakerConfiguration(object):
                 shutil.rmtree(os.path.join(starting_directory, oldest_file),
                               ignore_errors=True)
                 files_in_report_folder.remove(oldest_file)
-
-    def _set_up_buffer_requirements(self):
-        self._default_buffer_ip_address = config.get(
-            "Buffers", "receive_buffer_host")
-        self._default_buffer_ip_port = config.getint(
-            "Buffers", "receive_buffer_port")

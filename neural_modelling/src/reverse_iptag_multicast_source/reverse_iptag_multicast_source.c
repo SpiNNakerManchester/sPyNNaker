@@ -83,10 +83,8 @@ static uint32_t incorrect_keys;
 static uint32_t incorrect_packets;
 static uint32_t key_left_shift;
 
-static uint32_t recording_info;
-static uint32_t recording_region_size;
 static uint32_t buffer_region_size;
-static uint32_t size_of_buffer_to_read_in_bytes;
+static uint32_t space_before_read_request;
 
 static uint8_t *buffer_region;
 static uint8_t *end_of_buffer_region;
@@ -179,11 +177,9 @@ bool multicast_source_data_filled(address_t base_address)
   check = region_address[3];
   key_space = region_address[4];
   mask = region_address[5];
-  recording_info = region_address[6];
-  recording_region_size = region_address[7];
-  buffer_region_size = region_address[8];
-  size_of_buffer_to_read_in_bytes = region_address[9];
-  return_tag_id = region_address[10];
+  buffer_region_size = region_address[6];
+  space_before_read_request = region_address[7];
+  return_tag_id = region_address[8];
 
   incorrect_keys = 0;
   incorrect_packets = 0;
@@ -223,10 +219,8 @@ bool multicast_source_data_filled(address_t base_address)
   log_info("check: %d", check);
   log_info("key_space: 0x%08x", key_space);
   log_info("mask: 0x%08x", mask);
-  log_info("recording_info: 0x%08x", recording_info);
-  log_info("recording_region_size: %d", recording_region_size);
   log_info("buffer_region_size: %d", buffer_region_size);
-  log_info("size_of_buffer_to_read_in_bytes: %d", size_of_buffer_to_read_in_bytes);
+  log_info("space_before_read_request: %d", space_before_read_request);
   log_info("return_tag_id: %d", return_tag_id);
 #endif
 
@@ -536,7 +530,7 @@ uint16_t calculate_eieio_packet_size(eieio_msg_t eieio_msg_ptr)
 {
   uint16_t data_hdr_value = eieio_msg_ptr[0];
   uint8_t pkt_type = (data_hdr_value >> 14) && 0x03;
-  
+
   if (pkt_type == 0x01)
   {
 #ifdef DEBUG
@@ -559,9 +553,9 @@ uint16_t calculate_eieio_packet_command_size(eieio_msg_t eieio_msg_ptr)
 {
   uint16_t data_hdr_value = eieio_msg_ptr[0];
   uint16_t command_number = data_hdr_value & ~0xC000;
-  
+
   uint16_t return_value;
-  
+
   switch (command_number)
   {
     case DATABASE_CONFIRMATION:         // Database handshake with visualiser
@@ -599,7 +593,7 @@ uint16_t calculate_eieio_packet_command_size(eieio_msg_t eieio_msg_ptr)
         return_value = 0;
         break;
   }
-  
+
   return return_value;
 }
 
@@ -907,7 +901,7 @@ uint32_t extract_time_from_eieio_msg(eieio_msg_t eieio_msg_ptr)
     return payload_prefix_time | payload_time;
   }
   else
-    return 0;
+    return time;
 }
 
 void packet_interpreter(eieio_msg_t eieio_msg_ptr)

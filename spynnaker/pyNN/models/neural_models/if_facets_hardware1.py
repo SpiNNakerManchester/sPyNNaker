@@ -22,24 +22,20 @@ class IFFacetsConductancePopulation(AbstractConductanceVertex,
         Leaky integrate and fire model with conductance-based synapses and \
         fixed threshold as it is resembled by the FACETS Hardware Stage 1.
         """
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def model_name(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_parameters(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def is_population_vertex(self):
         return True

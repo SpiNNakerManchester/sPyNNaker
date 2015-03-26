@@ -19,27 +19,23 @@ class IFConductanceAlphaPopulation(
                  v_rest=-65.0, v_reset=-65.0, v_thresh=-50.0, tau_syn_E=0.3,
                  tau_syn_I=0.5, tau_refrac=0.1, i_offset=0, v_init=None):
         """
-        Leaky integrate and fire model with fixed threshold and alpha-function-\
-        shaped post-synaptic conductance.
+        Leaky integrate and fire model with fixed threshold and alpha-function\
+        -shaped post-synaptic conductance.
         """
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def model_name(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_parameters(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):

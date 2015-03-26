@@ -27,24 +27,20 @@ class EIFConductanceAlphaPopulation(
         Exponential integrate and fire neuron with spike triggered and \
         sub-threshold adaptation currents (isfa, ista reps.)
         """
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def model_name(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_parameters(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
