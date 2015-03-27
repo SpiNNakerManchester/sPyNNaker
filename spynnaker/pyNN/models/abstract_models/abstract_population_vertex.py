@@ -1,14 +1,14 @@
-from abc import ABCMeta, abstractmethod
-from math import ceil
-from six import add_metaclass
-import logging
-
 from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
 from spynnaker.pyNN.models.abstract_models.abstract_population_data_spec \
     import AbstractPopulationDataSpec
 from spynnaker.pyNN import exceptions as local_exceptions
 from spynnaker.pyNN.utilities import constants
+
+from abc import ABCMeta, abstractmethod
+from math import ceil
+from six import add_metaclass
+import logging
 
 
 logger = logging.getLogger(__name__)
@@ -48,19 +48,15 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
     def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
 
-        # Spike sources store spike vectors optimally
-        # so calculate min words to represent
-        out_spike_bytes_function = \
-            lambda subvertex, subvertex_slice: int(ceil(
-                subvertex_slice.n_atoms / 32.0)) * 4
-
         # Use standard behaviour to read spikes
         return self._get_spikes(
             graph_mapper=graph_mapper, placements=placements, transciever=txrx,
             compatible_output=compatible_output,
-            sub_vertex_out_spike_bytes_function=out_spike_bytes_function,
-            spike_recording_region=constants.POPULATION_BASED_REGIONS
-                                            .SPIKE_HISTORY.value)
+            sub_vertex_out_spike_bytes_function=(
+                lambda subvertex, subvertex_slice: int(ceil(
+                    subvertex_slice.n_atoms / 32.0)) * 4),
+            spike_recording_region=(constants.POPULATION_BASED_REGIONS
+                                    .SPIKE_HISTORY.value))
 
     def get_v(self, has_ran, graph_mapper, placements,
               txrx, machine_time_step, compatible_output=False):

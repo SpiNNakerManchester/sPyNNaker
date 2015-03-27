@@ -1,13 +1,18 @@
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
+
 from spinn_front_end_common.utilities import packet_conversions
 
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager import \
-    AbstractSynapticManager
+from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager \
+    import AbstractSynapticManager
 from spynnaker.pyNN.models.abstract_models.\
-    abstract_partitionable_population_vertex import \
-    AbstractPartitionablePopulationVertex
+    abstract_partitionable_population_vertex \
+    import AbstractPartitionablePopulationVertex
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_population_outgoing_edge_restrictor \
+    import AbstractPopulationOutgoingEdgeRestrictor
+
 
 import os
 import logging
@@ -20,17 +25,23 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractPopulationDataSpec(AbstractSynapticManager,
-                                 AbstractPartitionablePopulationVertex):
+                                 AbstractPartitionablePopulationVertex,
+                                 AbstractPopulationOutgoingEdgeRestrictor):
+    """
+    AbstractPopulationDataSpec
+    """
 
     def __init__(self, binary, n_neurons, label, constraints,
                  max_atoms_per_core, machine_time_step, timescale_factor,
-                 spikes_per_second, ring_buffer_sigma):
-        AbstractSynapticManager.__init__(self)
+                 spikes_per_second, ring_buffer_sigma,
+                 master_pop_algorithm=None):
+        AbstractSynapticManager.__init__(self, master_pop_algorithm)
         AbstractPartitionablePopulationVertex.__init__(
             self, n_atoms=n_neurons, label=label,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
+        AbstractPopulationOutgoingEdgeRestrictor.__init__(self)
         self._binary = binary
         self._executable_constant = None
         self._spikes_per_second = spikes_per_second
@@ -149,8 +160,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         """
 
     def _write_neuron_parameters(
-            self, spec, processor_chip_x, processor_chip_y, processor_id,
-            subvertex, vertex_slice):
+            self, spec, key, subvertex, ring_buffer_to_input_left_shifts, 
+            vertex_slice):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} "
@@ -161,12 +172,15 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write header info to the memory region:
-        # Write Key info for this core:
-        population_identity = \
-            packet_conversions.get_key_from_coords(processor_chip_x,
-                                                   processor_chip_y,
-                                                   processor_id)
-        spec.write_value(data=population_identity)
+
+        # Write whether the key is to be used, and then the key, or 0 if it
+        # isn't to be used
+        if key is None:
+            spec.write_value(data=0)
+            spec.write_value(data=0)
+        else:
+            spec.write_value(data=1)
+            spec.write_value(data=key)
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
@@ -179,6 +193,9 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         # Write machine time step: (Integer, expressed in microseconds)
         spec.write_value(data=self._machine_time_step)
+
+        # Write ring_buffer_to_input_left_shift
+        spec.write_array(ring_buffer_to_input_left_shifts)
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
@@ -204,10 +221,10 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                 spec.write_value(data=value, data_type=datatype)
         # End the loop over the neurons:
 
-    def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_mapper,
-                           report_folder, write_text_specs,
-                           application_run_time_folder):
+    def generate_data_spec(
+            self, subvertex, placement, subgraph, graph, routing_info, hostname, 
+            graph_mapper, report_folder, ip_tags, reverse_ip_tags, 
+            write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to
         build a group of IF_curr_exp neurons resident on a single core.
@@ -264,7 +281,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             subgraph.incoming_subedges_from_subvertex(subvertex)
         for partitioned_edge in in_partitioned_edges:
             partitioned_edge.weight_scales_setter(weight_scales)
-
+            
         # Construct the data images needed for the Neuron:
         self._reserve_population_based_memory_regions(
             spec, neuron_params_sz, synapse_params_sz,
@@ -276,9 +293,19 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                                potential_hist_buff_sz, gsyn_hist_buff_sz,
                                self._executable_constant)
 
-        self._write_neuron_parameters(
-            spec, placement.x, placement.y, placement.p, subvertex,
-            vertex_slice)
+        # Every outgoing edge from this vertex should have the same key
+        key = None
+        if len(subgraph.outgoing_subedges_from_subvertex(subvertex)) > 0:
+            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+
+            # NOTE: using the first key assigned as the key.  Should in future
+            # get the list of keys and use one per neuron, to allow arbitrary
+            # key and mask assignments
+            key = keys_and_masks[0].key
+
+        self.write_neuron_parameters(spec, key, subvertex,
+                                     ring_buffer_shifts, vertex_slice)
 
         self.write_synapse_parameters(spec, subvertex, vertex_slice)
         spec.write_array(ring_buffer_shifts)
@@ -304,6 +331,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     # inherited from data specable vertex
     def get_binary_file_name(self):
+
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)
 

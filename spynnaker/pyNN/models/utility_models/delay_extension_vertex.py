@@ -1,35 +1,48 @@
-from math import ceil
-import copy
-import math
-import logging
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.neural_projections.\
+    delay_partitionable_edge import DelayPartitionableEdge
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_incoming_edge_constraints \
+    import AbstractProvidesIncomingEdgeConstraints
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_population_outgoing_edge_restrictor \
+    import AbstractPopulationOutgoingEdgeRestrictor
 
-from enum import Enum
-
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
 from spinn_front_end_common.utilities import packet_conversions
 from spinn_front_end_common.utilities import constants as common_constants
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
 
-from spynnaker.pyNN.utilities import constants
 
-from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge import \
-    DelayPartitionableEdge
-from spynnaker.pyNN import exceptions
-
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
+from pacman.model.constraints.key_allocator_constraints.\
+    key_allocator_fixed_mask_constraint \
+    import KeyAllocatorFixedMaskConstraint
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
+
 
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
+
+
+import math 
+import copy
+import logging
+from enum import Enum
 
 
 logger = logging.getLogger(__name__)
 
 
 class DelayExtensionVertex(AbstractPartitionableVertex,
-                           AbstractDataSpecableVertex):
+                           AbstractDataSpecableVertex,
+                           AbstractProvidesIncomingEdgeConstraints,
+                           AbstractPopulationOutgoingEdgeRestrictor):
     """
     Instance of this class provide delays to incoming spikes in multiples
     of the maximum delays of a neuron (typically 16 or 32)
@@ -58,12 +71,17 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, label=label, n_atoms=n_neurons,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
+        AbstractProvidesIncomingEdgeConstraints.__init__(self)
+        AbstractPopulationOutgoingEdgeRestrictor.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0
         self._source_vertex = source_vertex
         joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
         self.add_constraint(joint_constrant)
+
+    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
+        return list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
 
     @property
     def model_name(self):
@@ -107,18 +125,18 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         """
         if not self._record:
             return 0
-        out_spikes_bytes = int(ceil((hi_atom - lo_atom + 1) / 32.0)) * 4
+        out_spikes_bytes = int(math.ceil((hi_atom - lo_atom + 1) / 32.0)) * 4
         return self.get_recording_region_size(out_spikes_bytes)
 
     @staticmethod
     def get_block_index_bytes(no_active_timesteps):
-        return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps
-                * constants.BLOCK_INDEX_ROW_WORDS)) * 4
+        return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps *
+                constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
-    def generate_data_spec(self, subvertex, placement, sub_graph, graph,
-                           routing_info, hostname, graph_mapper, report_folder,
-                           write_text_specs,
-                           application_run_time_folder):
+    def generate_data_spec(
+            self, subvertex, placement, sub_graph, graph, routing_info, 
+            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags, 
+            write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
@@ -141,11 +159,11 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         n_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        block_len_words = int(ceil(n_atoms / 32.0))
+        block_len_words = int(math.ceil(n_atoms / 32.0))
         num_delay_blocks, delay_blocks = self.get_delay_blocks(
             subvertex, sub_graph, graph_mapper)
-        delay_params_sz = 4 * (delay_params_header_words
-                               + (num_delay_blocks * block_len_words))
+        delay_params_sz = 4 * (delay_params_header_words +
+                               (num_delay_blocks * block_len_words))
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
@@ -163,6 +181,19 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         self.write_delay_parameters(
             spec, placement.x, placement.y, placement.p, subvertex,
             num_delay_blocks, delay_blocks, vertex_slice)
+        key = None
+        if len(sub_graph.outgoing_subedges_from_subvertex(subvertex)) > 0:
+            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                sub_graph.outgoing_subedges_from_subvertex(subvertex)[0])
+
+            # NOTE: using the first key assigned as the key.  Should in future
+            # get the list of keys and use one per neuron, to allow arbitrary
+            # key and mask assignments
+            key = keys_and_masks[0].key
+
+        self.write_delay_parameters(spec, placement.x, placement.y,
+                                    placement.p, subvertex, num_delay_blocks,
+                                    delay_blocks, vertex_slice, key)
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
@@ -182,7 +213,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
 
-        num_words_per_row = int(ceil(n_atoms / 32.0))
+        num_words_per_row = int(math.ceil(n_atoms / 32.0))
         one_block = [0] * num_words_per_row
         delay_block = list()
         num_delay_blocks = 0
@@ -208,8 +239,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
             for (source_id, row) in zip(range(len(rows)), rows):
                 for delay in row.delays:
-                    stage = int(math.floor((delay - 1)
-                                           / self.max_delay_per_neuron)) - 1
+                    stage = int(math.floor((delay - 1) /
+                                           self.max_delay_per_neuron)) - 1
                     num_delay_blocks = max(stage + 1, num_delay_blocks)
                     if num_delay_blocks > self._max_stages:
                         raise Exception(
@@ -230,7 +261,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     def write_delay_parameters(self, spec, processor_chip_x, processor_chip_y,
                                processor_id, subvertex, num_delay_blocks,
-                               delay_block, vertex_slice):
+                               delay_block, vertex_slice, key):
         """
         Generate Delay Parameter data (region 2):
         """
@@ -247,11 +278,9 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         # Write header info to the memory region:
         # Write Key info for this core:
-        population_identity = \
-            packet_conversions.get_key_from_coords(processor_chip_x,
-                                                   processor_chip_y,
-                                                   processor_id)
-        spec.write_value(data=population_identity)
+        # Every outgoing edge from this vertex should have the same key
+
+        spec.write_value(data=key)
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)

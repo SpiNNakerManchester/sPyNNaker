@@ -7,6 +7,8 @@ except ImportError:
 
 import os
 
+__version__ = "2015.004-alpha-05"
+
 class CustomInstall(install):
 
     def initialize_options(self):
@@ -24,7 +26,8 @@ class CustomInstall(install):
             os.mkdir(self._spinnaker_dir)
         if not os.path.exists(self._spinnaker_init):
             spinn_file = open(self._spinnaker_init, "w")
-            spinn_file.write("from spynnaker.pyNN import *")
+            spinn_file.write("from spynnaker.pyNN import *\n")
+            spinn_file.write("__version__ = \"{}\"\n".format(__version__))
             spinn_file.close()
             print "Created", self._spinnaker_init
 
@@ -37,11 +40,11 @@ class CustomInstall(install):
 
 setup(
     name="pyNN-spiNNaker",
-    version="2015.003",
+    version=__version__,
     description="Tools for the SpiNNaker platform.",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=[],
     install_requires=['pyNN >= 0.7, < 0.8',
-                      'sPyNNaker == 2015.003'],
+                      'sPyNNaker == 2015.004-alpha-04'],
     cmdclass={'install': CustomInstall}
 )

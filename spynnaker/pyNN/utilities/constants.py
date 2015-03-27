@@ -10,6 +10,9 @@ POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 BLOCK_INDEX_HEADER_WORDS = 3
 BLOCK_INDEX_ROW_WORDS = 2
 
+# database cap file path
+MAX_DATABASE_PATH_LENGTH = 50000
+
 RECORD_SPIKE_BIT = 1 << 0
 RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
@@ -36,7 +39,6 @@ NA_TO_PA_SCALE = 1000.0
 # might not be used
 WEIGHT_FLOAT_TO_FIXED_SCALE = 16.0
 SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
-####
 
 # natively supported delays for all abstract_models
 MAX_SUPPORTED_DELAY_TICS = 16
@@ -57,6 +59,8 @@ DELAY_EXTENSION_CORE_APPLICATION_ID = 0xAC4
 MUNICH_MOTOR_CONTROL_CORE_APPLICATION_ID = 0xAC5
 IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID = 0xAC7
 IZK_CURRENT_EXP_CORE_APPLICATION_ID = 0xAC8
+# please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
+# for other core application ids. 
 
 EDGES = Enum(
     value="EDGES",

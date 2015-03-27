@@ -1,14 +1,32 @@
 # pacman imports
-from pacman.model.constraints.\
-    vertex_requires_virtual_chip_in_machine_constraint import \
-    VertexRequiresVirtualChipInMachineConstraint
-from spynnaker.pyNN import model_binaries
 import exceptions
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
+from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
+    AbstractVirtualVertex
+from spynnaker.pyNN.models.abstract_models.abstract_provides_n_keys_for_edge\
+    import AbstractProvidesNKeysForEdge
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_outgoing_edge_constraints \
+    import AbstractProvidesOutgoingEdgeConstraints
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_incoming_edge_constraints \
+    import AbstractProvidesIncomingEdgeConstraints
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_send_me_multicast_commands_vertex \
+    import AbstractSendMeMulticastCommandsVertex
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_vertex_with_dependent_vertices \
+    import AbstractVertexWithEdgeToDependentVertices
+from pacman.operations.tag_allocator_algorithms.basic_tag_allocator \
+    import BasicTagAllocator
+from pacman.model.partitionable_graph.partitionable_edge \
+    import PartitionableEdge
+from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
+    import DictBasedPartitionedEdgeNKeysMap
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
     import BasicDijkstraRouting
 from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
@@ -23,10 +41,11 @@ from spinn_machine.router import Router as MachineRouter
 from spinn_machine.link import Link
 from spinn_machine.processor import Processor
 from spinn_machine.chip import Chip
+from spinn_machine.virutal_machine import VirtualMachine
 
 # common front end imports
-from spinn_front_end_common.utilities import exceptions as common_exceptions, \
-    reports
+from spinn_front_end_common.utilities import exceptions 
+from spinn_front_end_common.utilities import reports
 from spinn_front_end_common.abstract_models.abstract_iptagable_vertex import \
     AbstractIPTagableVertex
 from spinn_front_end_common.abstract_models.abstract_reverse_iptagable_vertex \
@@ -44,7 +63,9 @@ from spinn_front_end_common.interface.data_generator_interface import \
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 
 # local front end imports
-from spynnaker.pyNN.utilities.data_base_thread import DataBaseThread
+from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
+from spynnaker.pyNN.utilities.database.data_base_interface \
+    import DataBaseInterface
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
@@ -52,11 +73,11 @@ from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
 from spynnaker.pyNN.spynnaker_configurations import \
     SpynnakerConfigurationFunctions
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN import model_binaries
 
 # spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
-from spinnman.model.iptag.reverse_iptag import ReverseIPTag
 
 import logging
 import math
@@ -72,13 +93,35 @@ executable_finder = ExecutableFinder()
 class Spinnaker(FrontEndCommonConfigurationFunctions,
                 FrontEndCommonInterfaceFunctions,
                 SpynnakerConfigurationFunctions):
+    """
+    Spinnaker
+    """
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
-                 max_delay=None, graph_label=None):
+                 max_delay=None, graph_label=None, 
+                 database_socket_addresses=None):
         FrontEndCommonConfigurationFunctions.__init__(self, host_name,
                                                       graph_label)
         SpynnakerConfigurationFunctions.__init__(self)
-
+        
+        if database_socket_addresses is None:
+            database_socket_addresses = list()
+            listen_port = config.getint("Database", "listen_port")
+            notify_port = config.getint("Database", "notify_port")
+            noftiy_hostname = config.get("Database", "notify_hostname")
+            database_socket_addresses.append(
+                SocketAddress(noftiy_hostname, notify_port, listen_port))
+        self._database_socket_addresses = database_socket_addresses
+        
+        if database_socket_addresses is None:
+            database_socket_addresses = list()
+            listen_port = conf.config.getint("Database", "listen_port")
+            notify_port = conf.config.getint("Database", "notify_port")
+            noftiy_hostname = conf.config.get("Database", "notify_hostname")
+            database_socket_addresses.append(
+                SocketAddress(noftiy_hostname, notify_port, listen_port))
+        self._database_socket_addresses = database_socket_addresses
+        
         if self._app_id is None:
             self._set_up_main_objects(
                 app_id=config.getint("Machine", "appID"),
@@ -155,8 +198,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # Determine default executable folder location
         # and add this default to end of list of search paths
-        executable_finder.add_path(os.path.dirname(
-            model_binaries.__file__))
+        executable_finder.add_path(os.path.dirname(model_binaries.__file__))
         self._edge_count = 0
 
     def run(self, run_time):
@@ -176,14 +218,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # add database generation if requested
         if self._create_database:
-            execute_mapping = config.getboolean(
-                "Database", "create_routing_info_to_neuron_id_mapping")
             wait_on_confirmation = \
-                config.getboolean("Database", "wait_on_confirmation")
-            self._database_thread = DataBaseThread(
-                self._app_data_runtime_folder, execute_mapping,
-                wait_on_confirmation)
-            self._database_thread.start()
+                config.config.getboolean("Database", "wait_on_confirmation")
+            self._database_interface = DataBaseInterface(
+                self._app_data_runtime_folder, wait_on_confirmation,
+                self._database_socket_addresses)
 
         # create network report if needed
         if self._reports_states is not None:
@@ -203,7 +242,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     "a factional number of machine runable time steps and "
                     "therefore spinnaker cannot determine how many to run for")
             for vertex in self._partitionable_graph.vertices:
-                vertex.set_no_machine_time_steps(self._no_machine_time_steps)
+                if isinstance(vertex, AbstractDataSpecableVertex):
+                    vertex.set_no_machine_time_steps(
+                        self._no_machine_time_steps)
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may"
@@ -232,17 +273,32 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # load database if needed
         if self._create_database:
-            self._database_thread.add_system_params(
+            self._database_interface.add_system_params(
                 self._time_scale_factor, self._machine_time_step,
                 self._runtime)
-            self._database_thread.add_machine_objects(self._machine)
-            self._database_thread.add_partitionable_vertices(
+            self._database_interface.add_machine_objects(self._machine)
+            self._database_interface.add_partitionable_vertices(
                 self._partitionable_graph)
-            self._database_thread.add_partitioned_vertices(
-                self._partitioned_graph, self._graph_mapper)
-            self._database_thread.add_placements(self._placements)
-            self._database_thread.add_routing_infos(self._routing_infos)
-            self._database_thread.add_routing_tables(self._router_tables)
+            self._database_interface.add_partitioned_vertices(
+                self._partitioned_graph, self._graph_mapper,
+                self._partitionable_graph)
+            self._database_interface.add_placements(self._placements,
+                                                    self._partitioned_graph)
+            self._database_interface.add_routing_infos(
+                self._routing_infos, self._partitioned_graph)
+            self._database_interface.add_routing_tables(self._router_tables)
+            self._database_interface.add_tags(self._partitioned_graph,
+                                              self._tags)
+            execute_mapping = conf.config.getboolean(
+                "Database", "create_routing_info_to_neuron_id_mapping")
+            if execute_mapping:
+                self._database_interface.create_neuron_to_key_mapping(
+                    graph_mapper=self._graph_mapper,
+                    partitionable_graph=self._partitionable_graph,
+                    partitioned_graph=self._partitioned_graph,
+                    routing_infos=self._routing_infos,
+                    placements=self._placements)
+            self._database_interface.send_read_notification()
 
         # extract iptags required by the graph
         self._set_iptags()
@@ -275,14 +331,13 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if do_timing:
             timer.take_sample()
 
-        if config.getboolean("Execute", "run_simulation"):
+        if (not isinstance(self._machine, VirtualMachine) and
+                config.getboolean("Execute", "run_simulation")):
             if do_timing:
                 timer.start_timing()
 
-            logger.info("*** Loading Iptags ***")
-            self._load_iptags()
-            logger.info("*** Loading Reverse Iptags***")
-            self._load_reverse_ip_tags()
+            logger.info("*** Loading tags ***")
+            self._load_tags(self._tags)
 
             if self._do_load is True:
                 logger.info("*** Loading data ***")
@@ -306,20 +361,25 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         self._app_data_runtime_folder, executable_targets,
                         self._hostname, self._app_id, run_time)
 
-                wait_on_confirmation = \
-                    config.getboolean("Database", "wait_on_confirmation")
+                wait_on_confirmation = config.getboolean(
+                    "Database", "wait_on_confirmation")
+                send_start_notification = config.getboolean(
+                    "Database", "send_start_notification")
+                
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
                     self._time_scale_factor, wait_on_confirmation,
-                    self._database_thread, self._in_debug_mode)
+                    send_start_notification, self._database_interface,
+                    self._in_debug_mode)
                 self._has_ran = True
                 if self._retrieve_provance_data:
 
                     # retrieve provenance data
                     self._retieve_provance_data_from_machine(
                         executable_targets, self._router_tables, self._machine)
-        else:
-            logger.info("*** No simulation requested: Stopping. ***")
+        elif isinstance(self._machine, VirtualMachine):
+            logger.info(
+                "*** Using a Virtual Machine so no simulation will occur")
 
     def _set_iptags(self):
         for vertex in self._partitionable_graph.vertices:
@@ -389,6 +449,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         return self._machine_time_step
 
     @property
+    def no_machine_time_steps(self):
+        return self._no_machine_time_steps
+
+    @property
     def timescale_factor(self):
         return self._time_scale_factor
 
@@ -449,13 +513,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         pacman_report_state = \
             self._reports_states.generate_pacman_report_states()
 
-        self._check_if_theres_any_pre_placement_constraints_to_satisify()
+        self._add_virtual_chips()
 
         # execute partitioner
         self._execute_partitioner(pacman_report_state)
 
         # execute placer
         self._execute_placer(pacman_report_state)
+        
+        # exeucte tag allocator
+        self._execute_tag_allocator(pacman_report_state)
 
         # execute pynn subedge pruning
         self._partitioned_graph, self._graph_mapper = \
@@ -468,25 +535,89 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # execute router
         self._execute_router(pacman_report_state)
 
+    def _execute_tag_allocator(self, pacman_report_state):
+        """
+
+        :param pacman_report_state:
+        :return:
+        """
+        if self._tag_allocator_algorithm is None:
+            self._tag_allocator_algorithm = BasicTagAllocator()
+        else:
+            self._tag_allocator_algorithm = self._tag_allocator_algorithm()
+
+        # execute tag allocation
+        self._tags = self._tag_allocator_algorithm.allocate_tags(
+            self._machine, self._placements)
+
+        # generate reports
+        if (pacman_report_state is not None and
+                pacman_report_state.tag_allocation_report):
+            pacman_reports.tag_allocator_report(
+                self._report_default_directory, self._tags)
+
     def _execute_key_allocator(self, pacman_report_state):
+        """ executes the key allocator
+
+        :param pacman_report_state:
+        :return:
+        """
         if self._key_allocator_algorithm is None:
             self._key_allocator_algorithm = BasicRoutingInfoAllocator()
         else:
             self._key_allocator_algorithm = self._key_allocator_algorithm()
 
         # execute routing info generator
+        # Generate an n_keys map for the graph and add constraints
+        n_keys_map = DictBasedPartitionedEdgeNKeysMap()
+        for edge in self._partitioned_graph.subedges:
+            vertex_slice = self._graph_mapper.get_subvertex_slice(
+                edge.pre_subvertex)
+            super_edge = (self._graph_mapper
+                          .get_partitionable_edge_from_partitioned_edge(edge))
+            if vertex_slice.n_atoms > 2048:
+                raise exceptions.ConfigurationException(
+                    "The current models can only support up to 2048 atoms"
+                    " per core (restricted by the supported key format)")
+
+            if not isinstance(super_edge.pre_vertex,
+                              AbstractProvidesNKeysForEdge):
+                n_keys_map.set_n_keys_for_patitioned_edge(edge,
+                                                          vertex_slice.n_atoms)
+            else:
+                n_keys_map.set_n_keys_for_patitioned_edge(
+                    super_edge.pre_vertex.get_n_keys_for_partitioned_edge(
+                        edge, self._graph_mapper))
+
+            if isinstance(super_edge.pre_vertex,
+                          AbstractProvidesOutgoingEdgeConstraints):
+                edge.add_constraints(
+                    super_edge.pre_vertex.get_outgoing_edge_constraints(
+                        edge, self._graph_mapper))
+            if isinstance(super_edge.post_vertex,
+                          AbstractProvidesIncomingEdgeConstraints):
+                edge.add_constraints(
+                    super_edge.post_vertex.get_incoming_edge_constraints(
+                        edge, self._graph_mapper))
+
+        # execute routing info generator
         self._routing_infos = \
             self._key_allocator_algorithm.allocate_routing_info(
-                self._partitioned_graph, self._placements)
+                self._partitioned_graph, self._placements, n_keys_map)
 
         # generate reports
         if (pacman_report_state is not None and
                 pacman_report_state.routing_info_report):
             pacman_reports.routing_info_reports(
-                self._report_default_directory, self._hostname,
-                self._partitioned_graph, self._placements, self._routing_infos)
+                self._report_default_directory, self._partitioned_graph,
+                self._routing_infos)
 
     def _execute_router(self, pacman_report_state):
+        """ exectes the router algorithum
+
+        :param pacman_report_state:
+        :return:
+        """
 
         # set up a default placer algorithm if none are specified
         if self._router_algorithm is None:
@@ -519,26 +650,24 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 routing_info=self._routing_infos, machine=self._machine)
 
     def _execute_partitioner(self, pacman_report_state):
+        """ executes the partitioner function
+
+        :param pacman_report_state:
+        :return:
+        """
 
         # execute partitioner or default partitioner (as seen fit)
         if self._partitioner_algorithm is None:
-            self._partitioner_algorithm = \
-                BasicPartitioner(self._machine_time_step,
-                                 self._no_machine_time_steps)
+            self._partitioner_algorithm = BasicPartitioner()
         else:
-            self._partitioner_algorithm = \
-                self._partitioner_algorithm(self._machine_time_step,
-                                            self._no_machine_time_steps)
+            self._partitioner_algorithm = self._partitioner_algorithm()
 
-        # if algorithm needs a placer, add placer algorithm
-        if hasattr(self._partitioner_algorithm, "set_placer_algorithm"):
-            self._partitioner_algorithm.set_placer_algorithm(
-                self._placer_algorithm, self._machine)
-
+        # execute partitioner
         self._partitioned_graph, self._graph_mapper = \
             self._partitioner_algorithm.partition(self._partitionable_graph,
                                                   self._machine)
 
+        # execute reports
         if (pacman_report_state is not None and
                 pacman_report_state.partitioner_report):
             pacman_reports.partitioner_reports(
@@ -546,14 +675,21 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._partitionable_graph, self._graph_mapper)
 
     def _execute_placer(self, pacman_report_state):
+        """ executes the placer
+
+        :param pacman_report_state:
+        :return:
+        """
 
         # execute placer or default placer (as seen fit)
         if self._placer_algorithm is None:
-            self._placer_algorithm = BasicPlacer(self._machine)
+            self._placer_algorithm = BasicPlacer()
         else:
-            self._placer_algorithm = self._placer_algorithm(self._machine)
+            self._placer_algorithm = self._placer_algorithm()
+
+        # execute placer
         self._placements = self._placer_algorithm.place(
-            self._partitioned_graph)
+            self._partitioned_graph, self._machine)
 
         # execute placer reports if needed
         if (pacman_report_state is not None and
@@ -565,6 +701,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 report_folder=self._report_default_directory)
 
     def generate_data_specifications(self):
+        """ generates the dsg for the graph.
+
+        :return:
+        """
+
         # iterate though subvertexes and call generate_data_spec for each
         # vertex
         executable_targets = dict()
@@ -579,17 +720,23 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
+
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
+
+                ip_tags = self._tags.get_ip_tags_for_vertex(
+                    placement.subvertex)
+                reverse_ip_tags = self._tags.get_reverse_ip_tags_for_vertex(
+                    placement.subvertex)
                 data_generator_interface = DataGeneratorInterface(
                     associated_vertex, placement.subvertex, placement,
                     self._partitioned_graph, self._partitionable_graph,
                     self._routing_infos, self._hostname, self._graph_mapper,
-                    self._report_default_directory,
-                    config.getboolean("Reports", "writeTextSpecs"),
-                    self._app_data_runtime_folder, progress_bar)
+                    self._report_default_directory, 
+                    config.getboolean("Reports", "writeTextSpecs"), ip_tags, 
+                    reverse_ip_tags, progress_bar)
                 data_generator_interfaces.append(data_generator_interface)
-                thread_pool.apply_async(data_generator_interface.start())
+                thread_pool.apply_async(data_generator_interface.start)
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
@@ -600,7 +747,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if binary_path is None:
                     raise exceptions.ExecutableNotFoundException(binary_name)
 
-                if binary_path in executable_targets.keys():
+                if binary_path in executable_targets:
                     executable_targets[binary_path].add_processor(placement.x,
                                                                   placement.y,
                                                                   placement.p)
@@ -625,7 +772,26 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
     def add_vertex(self, vertex_to_add):
         if isinstance(vertex_to_add, CommandSender):
             self._multi_cast_vertex = vertex_to_add
+
         self._partitionable_graph.add_vertex(vertex_to_add)
+
+        if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
+            if self._multi_cast_vertex is None:
+                self._multi_cast_vertex = CommandSender(
+                    self._machine_time_step, self._time_scale_factor)
+                self.add_vertex(self._multi_cast_vertex)
+            edge = PartitionableEdge(self._multi_cast_vertex, vertex_to_add)
+            self._multi_cast_vertex.add_commands(vertex_to_add.commands, edge)
+            self.add_edge(edge)
+
+        # add any dependent edges and verts if needed
+        if isinstance(vertex_to_add,
+                      AbstractVertexWithEdgeToDependentVertices):
+            for dependant_vertex in vertex_to_add.dependent_vertices:
+                self.add_vertex(dependant_vertex)
+                dependant_edge = PartitionableEdge(
+                    pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
+                self.add_edge(dependant_edge)
 
     def add_edge(self, edge_to_add):
         self._partitionable_graph.add_edge(edge_to_add)
@@ -633,12 +799,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
     def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
-            structure=structure, label=label, spinnaker=self,
-            multi_cast_vertex=self._multi_cast_vertex)
+            structure=structure, label=label, spinnaker=self)
 
-    def create_projection(self, presynaptic_population,
-                          postsynaptic_population, connector, source, target,
-                          synapse_dynamics, label, rng):
+    def create_projection(
+            self, presynaptic_population, postsynaptic_population, connector,
+            source, target, synapse_dynamics, label, rng):
         if label is None:
             label = "Projection {}".format(self._edge_count)
             self._edge_count += 1
@@ -650,59 +815,61 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             machine_time_step=self._machine_time_step,
             timescale_factor=self._time_scale_factor)
 
-    def _check_if_theres_any_pre_placement_constraints_to_satisify(self):
+    def _get_executable_path(self, executable_name):
+
+        # Loop through search paths
+        for path in self._binary_search_paths:
+            # Rebuild filename
+            potential_filename = os.path.join(path, executable_name)
+
+            # If this filename exists, return it
+            if os.path.isfile(potential_filename):
+                return potential_filename
+
+        # No executable found
+        return None
+
+    def _add_virtual_chips(self):
         for vertex in self._partitionable_graph.vertices:
-            virtual_chip_constraints = \
-                pacman_utility_calls.locate_constraints_of_type(
-                    vertex.constraints,
-                    VertexRequiresVirtualChipInMachineConstraint)
-            if len(virtual_chip_constraints) > 0:
-                for virtual_chip_constraint in virtual_chip_constraints:
+            if isinstance(vertex, AbstractVirtualVertex):
 
-                    # check if the virtual chip doesnt already exist
-                    if (self._machine.get_chip_at(
-                            virtual_chip_constraint.virtual_chip_coords['x'],
-                            virtual_chip_constraint.virtual_chip_coords['y'])
-                            is None):
-                        virutal_chip = \
-                            self._create_virtual_chip(virtual_chip_constraint)
-                        self._machine.add_chip(virutal_chip)
+                # check if the virtual chip doesn't already exist
+                if self._machine.get_chip_at(vertex.virtual_chip_x,
+                                             vertex.virtual_chip_y) is None:
+                    virutal_chip = self._create_virtual_chip(vertex)
+                    self._machine.add_chip(virutal_chip)
 
-    def _create_virtual_chip(self, virtual_chip_constraint):
+    def _create_virtual_chip(self, virtual_vertex):
         sdram_object = SDRAM()
 
         # creates the two links
+        virtual_link_id = (virtual_vertex
+                           .connected_to_real_chip_link_id + 3) % 6
         to_virtual_chip_link = Link(
-            destination_x=virtual_chip_constraint.virtual_chip_coords['x'],
-            destination_y=virtual_chip_constraint.virtual_chip_coords['y'],
-            source_x=virtual_chip_constraint.connected_to_chip_coords['x'],
-            source_y=virtual_chip_constraint.connected_to_chip_coords['y'],
-            multicast_default_from=(virtual_chip_constraint
-                                    .connected_to_chip_link_id + 3) % 6,
-            multicast_default_to=(virtual_chip_constraint
-                                  .connected_to_chip_link_id + 3) % 6,
-            source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
+            destination_x=virtual_vertex.virtual_chip_x,
+            destination_y=virtual_vertex.virtual_chip_y,
+            source_x=virtual_vertex.connected_to_real_chip_x,
+            source_y=virtual_vertex.connected_to_real_chip_y,
+            multicast_default_from=virtual_link_id,
+            multicast_default_to=virtual_link_id,
+            source_link_id=virtual_vertex.connected_to_real_chip_link_id)
 
         from_virtual_chip_link = Link(
-            destination_x=(virtual_chip_constraint
-                           .connected_to_chip_coords['x']),
-            destination_y=(virtual_chip_constraint
-                           .connected_to_chip_coords['y']),
-            source_x=virtual_chip_constraint.virtual_chip_coords['x'],
-            source_y=virtual_chip_constraint.virtual_chip_coords['y'],
-            multicast_default_from=(virtual_chip_constraint
-                                    .connected_to_chip_link_id + 3) % 6,
-            multicast_default_to=(virtual_chip_constraint
-                                  .connected_to_chip_link_id + 3) % 6,
-            source_link_id=virtual_chip_constraint.connected_to_chip_link_id)
+            destination_x=virtual_vertex.connected_to_real_chip_x,
+            destination_y=virtual_vertex.connected_to_real_chip_y,
+            source_x=virtual_vertex.virtual_chip_x,
+            source_y=virtual_vertex.virtual_chip_y,
+            multicast_default_from=(virtual_vertex
+                                    .connected_to_real_chip_link_id),
+            multicast_default_to=virtual_vertex.connected_to_real_chip_link_id,
+            source_link_id=virtual_link_id)
 
         # create the router
         links = [from_virtual_chip_link]
         router_object = MachineRouter(
             links=links, emergency_routing_enabled=False,
             clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
-            n_available_multicast_entries=sys.maxint,
-            diagnostic_filters=list())
+            n_available_multicast_entries=sys.maxint)
 
         # create the processors
         processors = list()
@@ -713,27 +880,35 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # connect the real chip with the virtual one
         connected_chip = self._machine.get_chip_at(
-            virtual_chip_constraint.connected_to_chip_coords['x'],
-            virtual_chip_constraint.connected_to_chip_coords['y'])
+            virtual_vertex.connected_to_real_chip_x,
+            virtual_vertex.connected_to_real_chip_y)
         connected_chip.router.add_link(to_virtual_chip_link)
 
         # return new v chip
         return Chip(
             processors=processors, router=router_object, sdram=sdram_object,
-            x=virtual_chip_constraint.virtual_chip_coords['x'],
-            y=virtual_chip_constraint.virtual_chip_coords['y'], virtual=True)
+            x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
+            virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
 
-    def stop(self, app_id, stop_on_board=True):
+    def stop(self, stop_on_board=True):
         if stop_on_board:
             for router_table in self._router_tables.routing_tables:
-                if len(router_table.multicast_routing_entries) > 0:
-                    self._txrx.clear_multicast_routes(router_table.x,
-                                                      router_table.y)
+                if (not self._machine.get_chip_at(router_table.x,
+                                                  router_table.y).virtual and
+                        len(router_table.multicast_routing_entries) > 0):
                     self._txrx.clear_router_diagnostic_counters(router_table.x,
                                                                 router_table.y)
-                    # self._txrx.\
-                    #    clear_router_diagnostic_non_default_positioned_filters(
-                    #        router_table.x, router_table.y)
-            # self._txrx.send_signal(app_id, SCPSignal.STOP)
+            for ip_tag in self._tags.ip_tags:
+                self._txrx.clear_ip_tag(
+                    ip_tag.tag, board_address=ip_tag.board_address)
+            for reverse_ip_tag in self._tags.reverse_ip_tags:
+                self._txrx.clear_ip_tag(
+                    reverse_ip_tag.tag,
+                    board_address=reverse_ip_tag.board_address)
+
+            # self._txrx.stop_application(self._app_id)
         if self._create_database:
-            self._database_thread.stop()
+            self._database_interface.stop()
+
+        # stop the transciever
+        self._txrx.close()

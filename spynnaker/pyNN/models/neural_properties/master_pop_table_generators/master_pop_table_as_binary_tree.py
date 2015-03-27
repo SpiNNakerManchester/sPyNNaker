@@ -43,18 +43,21 @@ class MasterPopTableAsBinaryTree(AbstractMasterPopTableFactory):
         self.entries = list()
 
     def extract_synaptic_matrix_data_location(
-            self, incoming_key_combo, master_pop_base_mem_address, txrx, chip_x,
-            chip_y):
+            self, incoming_key_combo, master_pop_base_mem_address, txrx,
+            chip_x, chip_y):
 
-        #get no_entries in master pop
+        # get no_entries in master pop
         no_entries = txrx.read_memory(chip_x, chip_y,
                                       master_pop_base_mem_address, 4)
-        top_position = (no_entries * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
-        #read in master pop structure
+        top_position = (no_entries *
+                        _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
+
+        # read in master pop structure
         master_pop_structure = \
             txrx.read_memory(chip_x, chip_y, master_pop_base_mem_address + 4,
                              top_position)
-        #convert into a numpy array
+
+        # convert into a numpy array
         master_pop_structure = \
             numpy.frombuffer(dtype='uint8',
                              buffer=master_pop_structure).view(dtype='<u4')
@@ -73,7 +76,8 @@ class MasterPopTableAsBinaryTree(AbstractMasterPopTableFactory):
 
         :param incoming_key_combo:
         :param master_pop_structure:
-        :return: the entry of the binary tree associated with the incoming keycombo
+        :return: the entry of the binary tree associated with the incoming \
+                    keycombo
         :rtype: a _masterpopEntry object
         """
         middle_offset = (top_position - bottom_position) / 2
@@ -82,9 +86,11 @@ class MasterPopTableAsBinaryTree(AbstractMasterPopTableFactory):
             middle_offset -= middle_offset % 3
 
         middle_position = bottom_position + middle_offset
-        #retrieve entry
+
+        # retrieve entry
         entry = master_pop_structure[middle_position - 1:middle_position + 2]
-        #check if correct entry, or move to new section of binary search
+
+        # check if correct entry, or move to new section of binary search
         if (incoming_key_combo & entry[1]) == entry[0]:
             return _MasterPopEntry(mask=entry[1], key_combo=entry[0],
                                    address=(entry[2] >> 8),
@@ -107,16 +113,22 @@ class MasterPopTableAsBinaryTree(AbstractMasterPopTableFactory):
                                             block_start_addr, row_index))
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
-        #locate the number of entries to be written to the master pop
+        # locate the number of entries to be written to the master pop
         no_entries = len(self.entries)
         spec.switch_write_focus(region=master_pop_table_region)
-        #write no entries first so that the tree can be read in easily.
+
+        # write no entries first so that the tree can be read in easily.
         spec.write_value(no_entries)
-        #sort out entries based off key_combo
+
+        # sort out entries based off key_combo
         sorted(self.entries,
                key=lambda pop_table_entry: pop_table_entry.key_combo)
-        #add each entry
+
+        # add each entry
         for pop_entry in self.entries:
             spec.write_value(pop_entry.key_combo)
             spec.write_value(pop_entry.mask)
             spec.write_value((pop_entry.address << 8) | pop_entry.row_index)
+
+    def get_edge_constraints(self):
+        return list()

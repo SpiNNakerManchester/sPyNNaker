@@ -5,8 +5,13 @@ and implementation for the PyNN High-level API
 """
 
 import inspect
+from ._version import __version__, __version_month__, __version_year__
+
+# spinnman imports
+from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 # utility functions
+from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
@@ -16,7 +21,6 @@ from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN.spinnaker import executable_finder
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
-from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -29,8 +33,8 @@ from spynnaker.pyNN.models.neural_models.izk_curr_exp \
     import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
 
 # neural projections
-from spynnaker.pyNN.models.neural_projections.delay_afferent_partitionable_edge \
-    import DelayAfferentPartitionableEdge
+from spynnaker.pyNN.models.neural_projections\
+    .delay_afferent_partitionable_edge import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
@@ -90,6 +94,15 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
+# constraints
+from pacman.model.constraints.placer_constraints.\
+    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_maximum_size_constraint import PartitionerMaximumSizeConstraint
+from pacman.model.constraints.placer_constraints.\
+    placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
+
 # note importing star is a bad thing to do.
 from pyNN.random import *
 from pyNN.space import *
@@ -99,6 +112,9 @@ logger = logging.getLogger(__name__)
 
 # global controller / spinnaker object that does everything
 _spinnaker = None
+
+# List of binary search paths
+_binary_search_paths = []
 
 
 def register_binary_search_path(search_path):
@@ -172,7 +188,7 @@ def run(run_time=None):
 
 
 def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
-          **extra_params):
+          database_socket_addresses=None, **extra_params):
     """
     Should be called at the very beginning of a script.
     extra_params contains any keyword arguments that are required by a given
@@ -195,16 +211,21 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     ignore them because they have no bearing on the on-chip simulation code.
     """
     global _spinnaker
+    global _binary_search_paths
 
     logger.info(
-        "sPyNNaker   (c) 2014 APT Group, University of Manchester")
+        "sPyNNaker (c) {} APT Group, University of Manchester".format(
+            __version_year__))
     logger.info(
-        "                Release version 2015.003 - January 2015")
+        "Release version {} - {} {}".format(
+            __version__, __version_month__, __version_year__))
 
-    if len(extra_params.keys()) > 1:
+    if len(extra_params) > 1:
         logger.warn("Extra params has been applied which we do not consider")
-    _spinnaker = Spinnaker(host_name=machine, timestep=timestep,
-                           min_delay=min_delay, max_delay=max_delay)
+    _spinnaker = Spinnaker(
+        host_name=machine, timestep=timestep, min_delay=min_delay,
+        max_delay=max_delay, binary_search_paths=_binary_search_paths,
+        database_socket_addresses=database_socket_addresses)
     # Return None, simply because the PyNN API says something must be returned
     return None
 

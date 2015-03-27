@@ -1,14 +1,16 @@
+from spynnaker.pyNN.utilities import constants
+
+
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
+
+
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
+
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
-from math import ceil
-
-from spynnaker.pyNN.utilities import constants
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
-
 
 @add_metaclass(ABCMeta)
 class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
@@ -31,17 +33,6 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         return (constants.POPULATION_NEURON_PARAMS_HEADER_BYTES +
                 (4 * vertex_slice.n_atoms * self._n_params))
 
-    @abstractmethod
-    def get_n_synapse_parameters_per_synapse_type(self):
-        """ Get the number of synapse parameters per synapse type per neuron
-            (assumed to be 1 word each)
-        """
-
-    @abstractmethod
-    def get_n_synapse_types(self):
-        """ Get the number of synapse types
-        """
-
     def get_synapse_parameter_size(self, vertex_slice):
         """ Get the size of the synapse parameters for a given set of atoms
         """
@@ -53,28 +44,6 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         return ((4 * self.get_n_synapse_parameters_per_synapse_type()
                  * self.get_n_synapse_types() * vertex_slice.n_atoms)
                 + (4 * self.get_n_synapse_types()))
-
-    @abstractmethod
-    def get_population_table_size(self, vertex_slice, in_edges):
-        """ Get the size of a population table for a range of atoms
-        """
-
-    @abstractmethod
-    def get_synaptic_blocks_memory_size(self, vertex_slice, in_edges):
-        """ Get the memory size of the synapse blocks for a given set of atoms
-        """
-
-    @abstractmethod
-    def get_synapse_dynamics_parameter_size(self, in_edges):
-        """ Get the size of the synapse dynamics parameters for a given set
-            of atoms
-        """
-
-    @abstractmethod
-    def get_recording_region_size(self, bytes_per_timestep):
-        """ Get the size of a recording region given the number of bytes per
-            timestep
-        """
 
     def get_spike_buffer_size(self, vertex_slice):
         """ Get the size of the spike buffer for a range of neurons and
@@ -138,4 +107,37 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
     def set_model_max_atoms_per_core(new_value):
         """ enforce other neural models to support model based max atoms
             contraints
+            :param new_value: setting of the model max atoms per core
+        """
+        
+    @abstractmethod
+    def get_n_synapse_parameters_per_synapse_type(self):
+        """ Get the number of synapse parameters per synapse type per neuron
+            (assumed to be 1 word each)
+        """
+
+    @abstractmethod
+    def get_n_synapse_types(self):
+        """ Get the number of synapse types"""
+
+    @abstractmethod
+    def get_population_table_size(self, vertex_slice, in_edges):
+        """ Get the size of a population table for a range of atoms
+        """
+
+    @abstractmethod
+    def get_synaptic_blocks_memory_size(self, vertex_slice, in_edges):
+        """ Get the memory size of the synapse blocks for a given set of atoms
+        """
+
+    @abstractmethod
+    def get_synapse_dynamics_parameter_size(self, in_edges):
+        """ Get the size of the synapse dynamics parameters for a given set
+            of atoms
+        """
+
+    @abstractmethod
+    def get_recording_region_size(self, bytes_per_timestep):
+        """ Get the size of a recording region given the number of bytes per
+            timestep
         """

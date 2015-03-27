@@ -1,6 +1,10 @@
+"""
+SpikeSourceArray
+"""
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.spike_source.abstract_spike_source \
     import AbstractSpikeSource
+from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
 
 from spinn_front_end_common.utilities import packet_conversions
@@ -19,6 +23,9 @@ logger = logging.getLogger(__name__)
 
 
 class SpikeSourceArray(AbstractSpikeSource):
+    """
+    SpikeSourceArray model (represnets a play backable model)
+    """
 
     CORE_APP_IDENTIFIER = constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
@@ -46,6 +53,11 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
+        """
+        
+        :param new_value: 
+        :return:
+        """
         SpikeSourceArray.\
             _model_based_max_atoms_per_core = new_value
 
@@ -61,6 +73,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         """
         spike_dict = defaultdict(list)
         if isinstance(self._spike_times[0], list):
+
             # This is in SpiNNaker 'list of lists' format:
             for neuron in range(vertex_slice.lo_atom,
                                 vertex_slice.hi_atom + 1):
@@ -69,6 +82,7 @@ class SpikeSourceArray(AbstractSpikeSource):
                         int((timeStamp * 1000.0) / self._machine_time_step)
                     spike_dict[time_stamp_in_ticks].append(neuron)
         else:
+
             # This is in official PyNN format, all neurons use the same list:
             neuron_list = list(range(vertex_slice.n_atoms))
             for timeStamp in self._spike_times:
@@ -81,11 +95,22 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     @staticmethod
     def get_spike_block_row_length(n_atoms):
+        """
+        
+        :param n_atoms: 
+        :return:
+        """
         return int(math.ceil(n_atoms
                              / front_end_common_constants.BITS_PER_WORD))
 
     @staticmethod
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
+        """
+        
+        :param spike_block_row_length: 
+        :param no_active_timesteps: 
+        :return:
+        """
         return spike_block_row_length * no_active_timesteps * 4
 
     def get_spike_buffer_size(self, vert_slice):
@@ -105,8 +130,8 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     @staticmethod
     def get_block_index_bytes(no_active_timesteps):
-        return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps
-                * constants.BLOCK_INDEX_ROW_WORDS)) * 4
+        return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps *
+                constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
     def process_spike_array_info(self, subvertex, graph_mapper):
         """
@@ -138,12 +163,15 @@ class SpikeSourceArray(AbstractSpikeSource):
         spike_block_start_addr = 0
         for timeStamp in time_keys:
             current_spike_block = list()
+
             # Create tableEntry:
             table_entries.append([timeStamp, spike_block_start_addr])
+
             # Construct spikeBlock:
             list_of_spike_indices = spike_dict[timeStamp]
             for spikeIndex in list_of_spike_indices:
                 current_spike_block.append(spikeIndex - vertex_slice.lo_atom)
+
             # Add the spike block for this time step to the spike blocks list:
             spike_blocks.append(current_spike_block)
             spike_block_start_addr += spike_block_row_length
@@ -178,7 +206,7 @@ class SpikeSourceArray(AbstractSpikeSource):
 
     def write_setup_info(self, spec, spike_history_region_sz):
         """
-        Write information used to control the simulationand gathering of
+        Write information used to control the simulation and gathering of
         results. Currently, this means the flag word used to signal whether
         information on neuron firing and neuron potential is either stored
         locally in a buffer or passed out of the simulation for storage/display
@@ -202,13 +230,14 @@ class SpikeSourceArray(AbstractSpikeSource):
         if (spike_history_region_sz > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
+
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
 
-    def write_block_index_region(self, spec, placement,
+    def write_block_index_region(self, spec, key,
                                  num_neurons, table_entries):
         """
         Spike block index table. Gives address of each block of spikes.
@@ -222,11 +251,12 @@ class SpikeSourceArray(AbstractSpikeSource):
         """
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.BLOCK_INDEX_REGION.value)
-        # Word 0 is the key (x, y, p) for this core:
-        chip_x, chip_y, chip_p = placement.x, placement.y, placement.p
-        population_identity = \
-            packet_conversions.get_key_from_coords(chip_x, chip_y, chip_p)
-        spec.write_value(data=population_identity)
+
+        if key is None:
+            raise exceptions.ConfigurationException(
+                "This spike source array does not send its spikes anywhere. "
+                "This is deemed to be an error. Please fix this and try again")
+        spec.write_value(data=key)
 
         # Word 1 is the total number of 'neurons' (i.e. spike sources) in
         # the pynn_population.py:
@@ -238,8 +268,12 @@ class SpikeSourceArray(AbstractSpikeSource):
 
         # Write individual entries:
         for entry in table_entries:
-            time_stamp = entry[0]   # Time in ticks when this block is used
-            address = entry[1]   # Address into spikeBlock region
+
+            # Time in ticks when this block is used
+            time_stamp = entry[0]
+
+            # Address into spikeBlock region
+            address = entry[1]
             spec.write_value(data=time_stamp)
             spec.write_value(data=address)
         return
@@ -259,6 +293,7 @@ class SpikeSourceArray(AbstractSpikeSource):
         vector_len = int(math.ceil(num_neurons / 32.0))
         for block in spike_blocks:
             spike_bit_vectors = [0] * vector_len
+
             # Process this block of spike indices, setting a bit corresponding
             # to this index for each spiking neuron source:
             for index in block:
@@ -268,34 +303,52 @@ class SpikeSourceArray(AbstractSpikeSource):
 
                 # Set the target bit:
                 spike_bit_vectors[word_num] |= or_mask
+
             # Write this to spikeBlock region:
             for i in range(vector_len):
                 spec.write_value(data=spike_bit_vectors[i])
 
     def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
-
-        # Spike sources store spike vectors optimally so calculate min
-        # words to represent
-        out_spike_bytes_function = \
-            lambda subvertex, subvertex_slice: int(math.ceil(
-                subvertex_slice.n_atoms / 32.0)) * 4
-
+        """
+        
+        :param txrx: 
+        :param placements: 
+        :param graph_mapper: 
+        :param compatible_output: 
+        :return:
+        """
         # Use standard behaviour to read spikes
         return self._get_spikes(
             transciever=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
             spike_recording_region=self._SPIKE_SOURCE_REGIONS
                                        .SPIKE_HISTORY_REGION.value,
-            sub_vertex_out_spike_bytes_function=out_spike_bytes_function)
+            sub_vertex_out_spike_bytes_function=(
+                lambda subvertex, subvertex_slice:
+                    int(math.ceil(subvertex_slice.n_atoms / 32.0)) * 4))
 
     # inherited from dataspecable vertex
-    def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_mapper, report_folder,
-                           write_text_specs, application_run_time_folder):
+    def generate_data_spec(
+            self, subvertex, placement, subgraph, graph, routing_info, hostname, 
+            graph_mapper, report_folder, ip_tags, reverse_ip_tags, 
+            write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
+        :param subvertex: 
+        :param placement: 
+        :param subgraph: 
+        :param graph: 
+        :param routing_info: 
+        :param hostname: 
+        :param graph_mapper: 
+        :param report_folder: 
+        :param ip_tags: 
+        :param reverse_ip_tags: 
+        :param write_text_specs: 
+        :param application_run_time_folder: 
+        :return:
         """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
@@ -334,7 +387,12 @@ class SpikeSourceArray(AbstractSpikeSource):
             spike_history_region_sz)
         self.write_setup_info(spec, spike_history_region_sz)
 
-        self.write_block_index_region(spec, placement, num_neurons,
+        # Every subedge should have the same key
+        keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+            subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+        key = keys_and_masks[0].key
+
+        self.write_block_index_region(spec, key, num_neurons,
                                       table_entries)
         self.write_spike_data_region(spec, num_neurons, spike_blocks)
 
@@ -343,24 +401,37 @@ class SpikeSourceArray(AbstractSpikeSource):
         data_writer.close()
 
     def get_binary_file_name(self):
-        # Rebuild executable name
-        binary_name = os.path.join(os.path.dirname(model_binaries.__file__),
-                                   'spike_source_array.aplx')
-        return binary_name
+        """
+        
+        :return:
+        """
+        return "spike_source_array.aplx"
 
     # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
+        """
+        
+        :param vertex_slice: 
+        :param graph: 
+        :return:
+        """
         return 0
 
     def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
+        """
+        
+        :param vertex_slice: 
+        :param vertex_in_edges: 
+        :return:
+        """
         spike_dict = self.get_spikes_per_timestep(vertex_slice)
-        no_active_timesteps = len(spike_dict.keys())
+        no_active_timesteps = len(spike_dict)
         spike_block_row_length = self.get_spike_block_row_length(
             ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1))
         spike_region_sz = self.get_spike_region_bytes(spike_block_row_length,
                                                       no_active_timesteps)
-        block_index_region_size = \
-            self.get_block_index_bytes(no_active_timesteps)
+        block_index_region_size = self.get_block_index_bytes(
+            no_active_timesteps)
 
         spike_history_region_sz = self.get_spike_buffer_size(vertex_slice)
         return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4)
@@ -368,7 +439,24 @@ class SpikeSourceArray(AbstractSpikeSource):
                 + spike_history_region_sz)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
+        """
+        
+        :param vertex_slice: 
+        :param graph: 
+        :return:
+        """
         return 0
 
     def is_recordable(self):
+        """
+        
+        :return:
+        """
+        return True
+
+    def is_abstract_spike_source(self):
+        """
+        
+        :return:
+        """
         return True

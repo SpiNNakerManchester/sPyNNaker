@@ -1,19 +1,21 @@
-from abc import ABCMeta
-from six import add_metaclass
-from abc import abstractmethod
-
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
-from spinn_front_end_common.utilities import constants
 from spynnaker.pyNN.utilities import constants as local_constants
 
+from spinn_front_end_common.utilities import constants
+
 from pacman.utilities import constants as pacman_constants
+from pacman.utilities.progress_bar import ProgressBar
 
 
 import logging
 import numpy
 import struct
+from abc import ABCMeta
+from six import add_metaclass
+from abc import abstractmethod
+
 
 logger = logging.getLogger(__name__)
 
@@ -72,8 +74,8 @@ class AbstractPopulationRecordableVertex(object):
         Gets the size of a recording region in bytes
         """
         if self._no_machine_time_steps is None:
-            raise Exception("This model cannot record this parameter"
-                            + " without a fixed run time")
+            raise Exception("This model cannot record this parameter" +
+                            " without a fixed run time")
         return (local_constants.RECORDING_ENTRY_BYTE_SIZE +
                 (self._no_machine_time_steps * bytes_per_timestep))
 
@@ -93,6 +95,7 @@ class AbstractPopulationRecordableVertex(object):
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        progress_bar = ProgressBar(len(subvertices), "Getting spikes")
         for subvertex in subvertices:
             placement = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placement.x, placement.y, placement.p
@@ -157,7 +160,9 @@ class AbstractPopulationRecordableVertex(object):
                      for i in range(len(indices))]
             spike_ids.extend([item for sublist in indices for item in sublist])
             spike_times.extend([item for sublist in times for item in sublist])
+            progress_bar.update()
 
+        progress_bar.end()
         result = numpy.dstack((spike_ids, spike_times))[0]
         result = result[numpy.lexsort((spike_times, spike_ids))]
 
@@ -178,6 +183,7 @@ class AbstractPopulationRecordableVertex(object):
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        progress_bar = ProgressBar(len(subvertices), "Getting recorded data")
         for subvertex in subvertices:
             placment = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placment.x, placment.y, placment.p
@@ -235,7 +241,9 @@ class AbstractPopulationRecordableVertex(object):
                                     n_atoms) * ms_per_tick)
             ids = numpy.append(ids, numpy.add(
                 numpy.arange(numpy_data.size) % n_atoms, vertex_slice.lo_atom))
+            progress_bar.update()
 
+        progress_bar.end()
         result = numpy.dstack((ids, times, values))[0]
         result = result[numpy.lexsort((times, ids))]
         return result

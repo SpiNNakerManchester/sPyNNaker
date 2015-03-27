@@ -1,8 +1,9 @@
 from setuptools import setup
+exec(open("spynnaker/pyNN/_version.py").read())
 
 setup(
     name="sPyNNaker",
-    version="2015.003",
+    version=__version__,
     description="Spinnaker implementation of PyNN",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=['spynnaker',
@@ -22,13 +23,14 @@ setup(
               'spynnaker.pyNN.models.utility_models',
               'spynnaker.pyNN.overridden_pacman_functions',
               'spynnaker.pyNN.utilities',
-              'spynnaker.pyNN.utilities.conf'],
+              'spynnaker.pyNN.utilities.conf',
+              'spynnaker.pyNN.utilities.database'],
     package_data={'spynnaker.pyNN': ['model_binaries/*.aplx'],
                   'spynnaker': ['spynnaker.cfg'],
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template']},
-    install_requires=['SpiNNMachine >= 2015.002',
-                      'SpiNNMan >= 2015.002',
-                      'SpiNNaker_PACMAN >= 2015.002',
-                      'SpiNNaker_DataSpecification >= 2015.002',
-                      'pyNN >= 0.7, < 0.8', 'numpy', 'scipy']
+    install_requires=['SpiNNMachine >= 2015.003-alpha-01',
+                      'SpiNNMan >= 2015.003-alpha-01',
+                      'SpiNNaker_PACMAN >= 2015.003-alpha-02',
+                      'SpiNNaker_DataSpecification >= 2015.003-alpha-01',
+                      'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
 )
