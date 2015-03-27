@@ -7,7 +7,7 @@ class BufferedSendingRegion(object):
         exception will be raised
     """
 
-    def __init__(self, buffer_size):
+    def __init__(self):
         """
 
         :param buffer_size: The size of the buffer for this region
@@ -23,11 +23,15 @@ class BufferedSendingRegion(object):
         # The current position in the list of timestamps
         self._current_timestamp_pos = 0
 
-        self._buffer_size = buffer_size
+        self._buffer_size = 0
 
     @property
     def buffer_size(self):
         return self._buffer_size
+
+    @buffer_size.setter
+    def buffer_size(self, buffer_size):
+        self._buffer_size = buffer_size
 
     def add_key(self, timestamp, key):
         """ Add a key to be sent at a given time

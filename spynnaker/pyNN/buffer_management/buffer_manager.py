@@ -2,6 +2,7 @@ import struct
 import threading
 import logging
 import traceback
+import math
 
 from pacman.utilities.progress_bar import ProgressBar
 
@@ -42,6 +43,10 @@ logger = logging.getLogger(__name__)
 _MIN_MESSAGE_SIZE = (EIEIO32BitTimedPayloadPrefixDataMessage
                      .get_min_packet_length())
 
+# The size of the header of a message
+_HEADER_SIZE = EIEIODataHeader.get_header_size(EIEIOType.KEY_32_BIT,
+                                               is_payload_base=True)
+
 # The number of bytes in each key to be sent
 _N_BYTES_PER_KEY = EIEIOType.KEY_32_BIT.key_bytes
 
@@ -49,9 +54,7 @@ _N_BYTES_PER_KEY = EIEIOType.KEY_32_BIT.key_bytes
 # additional header)
 _N_KEYS_PER_MESSAGE = (constants.UDP_MESSAGE_MAX_SIZE -
                        (HostSendSequencedData.get_min_packet_length() +
-                        EIEIODataHeader.get_header_size(
-                            EIEIOType.KEY_32_BIT, is_payload_base=True)) /
-                       _N_BYTES_PER_KEY)
+                        _HEADER_SIZE) / _N_BYTES_PER_KEY)
 
 
 class BufferManager(object):
@@ -132,9 +135,10 @@ class BufferManager(object):
         if (tag.ip_address, tag.port) not in self._seen_tags:
             self._seen_tags.add((tag.ip_address, tag.port))
             self._transceiver.register_listener(
-                self.receive_buffer_command_message, tag.port, tag.ip_address,
+                self.receive_buffer_command_message, tag.port,
                 constants.CONNECTION_TYPE.UDP_IPTAG,
-                constants.TRAFFIC_TYPE.EIEIO_COMMAND)
+                constants.TRAFFIC_TYPE.EIEIO_COMMAND,
+                hostname=tag.ip_address)
 
     def load_initial_buffers(self):
         """ Load the initial buffers for the senders using mem writes
@@ -196,6 +200,20 @@ class BufferManager(object):
         return message
 
     @staticmethod
+    def get_n_bytes(n_keys):
+        """ Get the number of bytes used by a given number of keys
+
+        :param n_keys: The number of keys
+        :type n_keys: int
+        """
+
+        # Get the total number of messages
+        n_messages = int(math.ceil(float(n_keys) / _N_KEYS_PER_MESSAGE))
+
+        # Add up the bytes
+        return (_HEADER_SIZE * n_messages) + (n_keys * _N_BYTES_PER_KEY)
+
+    @staticmethod
     def _get_message_as_bytes(message):
         writer = LittleEndianByteArrayByteWriter()
         message.write_eieio_message(writer)
@@ -236,9 +254,10 @@ class BufferManager(object):
 
             # Write the message to the memory
             data = BufferManager._get_message_as_bytes(next_message)
-            logger.debug("Writing initial buffer of {} bytes to {} on chip"
-                         " {}, {}".format(len(data), hex(region_base_address),
-                                          placement.x, placement.y))
+            logger.debug("Writing initial buffer of {} bytes to {} on"
+                         " {}, {}, {}".format(
+                             len(data), hex(region_base_address),
+                             placement.x, placement.y, placement.p))
             self._transceiver.write_memory(
                 placement.x, placement.y, region_base_address, data)
             sent_message = True
@@ -258,9 +277,9 @@ class BufferManager(object):
             n_packets = bytes_to_go / padding_packet.get_min_packet_length()
             data = BufferManager._get_message_as_bytes(padding_packet)
             data *= n_packets
-            logger.debug("Writing padding of length {} to {} on chip {}, {}"
+            logger.debug("Writing padding of length {} to {} on {}, {}, {}"
                          .format(len(data), hex(region_base_address),
-                                 placement.x, placement.y))
+                                 placement.x, placement.y, placement.p))
             self._transceiver.write_memory(
                 placement.x, placement.y, region_base_address, data)
 

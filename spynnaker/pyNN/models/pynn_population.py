@@ -307,6 +307,10 @@ class Population(object):
         return self._size
 
     @property
+    def label(self):
+        return self._vertex.label
+
+    @property
     def local_size(self):
         """
         returns the number of local cells ???

@@ -4,6 +4,7 @@ from spynnaker.pyNN.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models\
     .abstract_population_outgoing_edge_restrictor\
     import AbstractPopulationOutgoingEdgeRestrictor
+from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
 from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex \
@@ -85,6 +86,9 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
                 " a negative value for a memory usage. Please correct and"
                 " try again")
 
+        # Keep track of any previously generated buffers
+        self._send_buffers = dict()
+
     @property
     def model_name(self):
         """
@@ -96,11 +100,6 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
     def set_model_max_atoms_per_core(new_value):
         SpikeSourceArray.\
             _model_based_max_atoms_per_core = new_value
-
-    def get_regions(self):
-
-        # The buffered region is the spike data region
-        return [SpikeSourceArray._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value]
 
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          constraints=list()):
@@ -120,27 +119,43 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         1) Official PyNN format - single list that is used for all neurons
         2) SpiNNaker format - list of lists, one per neuron
         """
-        send_buffer = BufferedSendingRegion(
-            self._max_on_chip_memory_usage_for_spikes)
-        if isinstance(self._spike_times[0], list):
+        send_buffer = None
+        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
+        if key not in self._send_buffers:
+            send_buffer = BufferedSendingRegion()
+            if isinstance(self._spike_times[0], list):
 
-            # This is in SpiNNaker 'list of lists' format:
-            for neuron in range(vertex_slice.lo_atom,
-                                vertex_slice.hi_atom + 1):
-                for timeStamp in sorted(self._spike_times[neuron]):
+                # This is in SpiNNaker 'list of lists' format:
+                for neuron in range(vertex_slice.lo_atom,
+                                    vertex_slice.hi_atom + 1):
+                    for timeStamp in sorted(self._spike_times[neuron]):
+                        time_stamp_in_ticks = int((timeStamp * 1000.0) /
+                                                  self._machine_time_step)
+                        send_buffer.add_key(time_stamp_in_ticks, neuron)
+            else:
+
+                # This is in official PyNN format, all neurons use the
+                # same list:
+                neuron_list = range(vertex_slice.lo_atom,
+                                    vertex_slice.hi_atom + 1)
+                for timeStamp in sorted(self._spike_times):
                     time_stamp_in_ticks = int((timeStamp * 1000.0) /
                                               self._machine_time_step)
-                    send_buffer.add_key(time_stamp_in_ticks, neuron)
+
+                    # add to send_buffer collection
+                    send_buffer.add_keys(time_stamp_in_ticks, neuron_list)
+
+            # Update the size
+            total_size = 0
+            for timestamp in send_buffer.timestamps:
+                n_keys = send_buffer.get_n_keys(timestamp)
+                total_size += BufferManager.get_n_bytes(n_keys)
+            if total_size > self._max_on_chip_memory_usage_for_spikes:
+                total_size = self._max_on_chip_memory_usage_for_spikes
+            send_buffer.buffer_size = total_size
+            self._send_buffers[key] = send_buffer
         else:
-
-            # This is in official PyNN format, all neurons use the same list:
-            neuron_list = range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
-            for timeStamp in sorted(self._spike_times):
-                time_stamp_in_ticks = int((timeStamp * 1000.0) /
-                                          self._machine_time_step)
-
-                # add to send_buffer collection
-                send_buffer.add_keys(time_stamp_in_ticks, neuron_list)
+            send_buffer = self._send_buffers[key]
         return send_buffer
 
     def _reserve_memory_regions(self, spec, spike_region_size):
@@ -231,11 +246,12 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         spec.comment("\nReserving memory space for spike data region:\n\n")
 
         # Create the data regions for the spike source array:
-        self._reserve_memory_regions(
-            spec, self._max_on_chip_memory_usage_for_spikes)
+        spike_buffer = self._get_spike_send_buffer(
+            graph_mapper.get_subvertex_slice(subvertex))
+        self._reserve_memory_regions(spec, spike_buffer.buffer_size)
 
         self._write_setup_info(
-            spec, self._max_on_chip_memory_usage_for_spikes, ip_tags)
+            spec, spike_buffer.buffer_size, ip_tags)
 
         # End-of-Spec:
         spec.end_specification()
@@ -263,7 +279,9 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         :param vertex_in_edges:
         :return:
         """
-        return constants.SETUP_SIZE + self._max_on_chip_memory_usage_for_spikes
+        send_buffer = self._get_spike_send_buffer(vertex_slice)
+        send_size = send_buffer.buffer_size
+        return constants.SETUP_SIZE + send_size
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """ assumed that correct dtcm usage is not required
