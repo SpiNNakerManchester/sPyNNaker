@@ -1,8 +1,12 @@
+"""
+AbstractPopulationDataSpec
+"""
+
+# data specable imports
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 
-from spinn_front_end_common.utilities import packet_conversions
-
+# spynnaker imports
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager \
     import AbstractSynapticManager
@@ -14,6 +18,7 @@ from spynnaker.pyNN.models.abstract_models\
     import AbstractPopulationOutgoingEdgeRestrictor
 
 
+# general imports
 import os
 import logging
 from abc import ABCMeta
@@ -28,7 +33,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
                                  AbstractPartitionablePopulationVertex,
                                  AbstractPopulationOutgoingEdgeRestrictor):
     """
-    AbstractPopulationDataSpec
+    AbstractPopulationDataSpec: provides functioanlity on how neural models
+    generate their data spec files
     """
 
     def __init__(self, binary, n_neurons, label, constraints,
@@ -194,9 +200,6 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         # Write machine time step: (Integer, expressed in microseconds)
         spec.write_value(data=self._machine_time_step)
 
-        # Write ring_buffer_to_input_left_shift
-        spec.write_array(ring_buffer_to_input_left_shifts)
-
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
         for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
@@ -228,6 +231,19 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         """
         Model-specific construction of the data blocks necessary to
         build a group of IF_curr_exp neurons resident on a single core.
+        :param subvertex:
+        :param placement:
+        :param subgraph:
+        :param graph:
+        :param routing_info:
+        :param hostname:
+        :param graph_mapper:
+        :param report_folder:
+        :param ip_tags:
+        :param reverse_ip_tags:
+        :param write_text_specs:
+        :param application_run_time_folder:
+        :return:
         """
         # Create new DataSpec for this processor:
         data_writer, report_writer = \
@@ -304,8 +320,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             # key and mask assignments
             key = keys_and_masks[0].key
 
-        self.write_neuron_parameters(spec, key, subvertex,
-                                     ring_buffer_shifts, vertex_slice)
+        self._write_neuron_parameters(spec, key, subvertex,
+                                      ring_buffer_shifts, vertex_slice)
 
         self.write_synapse_parameters(spec, subvertex, vertex_slice)
         spec.write_array(ring_buffer_shifts)
@@ -331,6 +347,10 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
     # inherited from data specable vertex
     def get_binary_file_name(self):
+        """
+
+        :return:
+        """
 
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)

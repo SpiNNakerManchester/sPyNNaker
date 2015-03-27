@@ -1,12 +1,16 @@
 """
 MasterPopTableAs2dArray
 """
+
+# pacman imports
 from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_mask_constraint import \
-    KeyAllocatorFixedMaskConstraint
+    key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
 from pacman.utilities.field import Field
-from spynnaker.pyNN.models.abstract_models.abstract_master_pop_table_factory\
-    import AbstractMasterPopTableFactory
+from pacman.utilities import constants as pacman_constants
+
+# spynnaker imports
+from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
+    abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 
@@ -14,12 +18,11 @@ from spynnaker.pyNN import exceptions
 from spinn_front_end_common.utilities import packet_conversions
 from spinn_front_end_common.utilities import helpful_functions
 
-# pacman constants
-from pacman.utilities import constants as pacman_constants
-
 # dsg imports
 from data_specification.enums.data_type import DataType
 
+
+# general imports
 import logging
 import math
 
@@ -108,7 +111,6 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         :param in_edges: 
         :return:
         """
-
         # 2 bytes per entry + row length table
         return (2 * MASTER_POPULATION_ENTRIES) + ROW_LEN_TABLE_SIZE
 
@@ -170,7 +172,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         return (p + (18 * y) + (18 * 8 * x)) * 2
 
     def update_master_population_table(self, spec, block_start_addr,
-                                       row_length, key, mask,
+                                       row_length, keys_and_mask, mask,
                                        master_pop_table_region):
         """
         Writes an entry in the Master Population Table for the newly
@@ -185,8 +187,16 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
                     start of the block. This is 1K bytes aligned, so
                     the true value is found by shifting left by 7 bits
                     then adding the start address of the memory region.
+        :param spec:
+        :param block_start_addr:
+        :param row_length:
+        :param keys_and_mask:
+        :param mask:
+        :param master_pop_table_region:
+        :return:
         """
         # Which core has this projection arrived from?
+        key = keys_and_mask[0].key
         x = packet_conversions.get_x_from_key(key)
         y = packet_conversions.get_y_from_key(key)
         p = packet_conversions.get_p_from_key(key)

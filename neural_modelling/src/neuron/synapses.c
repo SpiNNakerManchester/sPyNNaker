@@ -39,7 +39,7 @@ static uint32_t saturation_count = 0;
 
 static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
 #if LOG_LEVEL >= LOG_DEBUG
-    log_debug("\nSynaptic row, at address %08x Num plastic words:%u\n",
+    log_debug("Synaptic row, at address %08x Num plastic words:%u\n",
               (uint32_t )synaptic_row, synapse_row_plastic_size(synaptic_row));
     if (synaptic_row == NULL) {
         return;

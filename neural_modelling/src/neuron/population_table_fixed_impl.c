@@ -48,13 +48,19 @@ bool population_table_initialise(address_t table_address,
                                  uint32_t *row_max_n_words) {
     log_info("population_table_initialise: starting");
     // Copy the master population table
+    log_debug("reading master pop table from address 0x%.8x", table_address);
     memcpy(master_population_table, table_address,
            MASTER_POPULATION_MAX * sizeof(uint16_t));
 
     // Store the base address
+    log_debug("the stored synaptic matrix base address is located at: 0x%.8x",
+              synapse_rows_address);
     synaptic_rows_base_address = synapse_rows_address;
 
     // Copy the row size table
+    log_debug("reading row length table of %d bytes from mem address 0x%.8x",
+              ROW_SIZE_TABLE_MAX * sizeof(uint32_t),
+              table_address + ((MASTER_POPULATION_MAX * sizeof(uint16_t)) / 4));
     memcpy(row_size_table,
            table_address + ((MASTER_POPULATION_MAX * sizeof(uint16_t)) / 4),
            ROW_SIZE_TABLE_MAX * sizeof(uint32_t));

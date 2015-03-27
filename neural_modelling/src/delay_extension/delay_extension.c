@@ -266,7 +266,7 @@ void c_main(void) {
     uint32_t timer_period = 0;
     if (!initialize(&timer_period)) {
         log_error("Error in initialisation - exiting!");
-        return;
+         rt_error(RTE_SWERR);
     }
 
     // Start the time at "-1" so that the first tick will be 0
@@ -274,7 +274,7 @@ void c_main(void) {
 
     // Initialize the incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(256)) {
-        return;
+         rt_error(RTE_SWERR);
     }
 
     // Set timer tick (in microseconds)

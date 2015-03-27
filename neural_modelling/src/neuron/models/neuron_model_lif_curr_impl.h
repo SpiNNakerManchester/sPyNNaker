@@ -41,6 +41,7 @@ typedef struct neuron_t {
 	// [kHz!] only necessary if one wants to use ODE solver because allows
 	// multiply and host double prec to calc
 	// - UNSIGNED ACCUM & unsigned fract much slower
+	// TODO remove  as we no longer use a ODE
 	REAL  	 one_over_tauRC;
 
 	// countdown to end of next refractory period [ms/10]
@@ -49,28 +50,6 @@ typedef struct neuron_t {
 
 	// refractory time of neuron [ms/10]
 	int32_t  T_refract;
-
-#ifdef SIMPLE_COMBINED_GRANULARITY
-
-	// store the 3 internal timestep to avoid granularity
-	REAL	 eTC[3];
-#endif
-#ifdef CORRECT_FOR_THRESHOLD_GRANULARITY
-
-	// which period previous spike happened to approximate threshold crossing
-	uint8_t	prev_spike_code;
-
-	// store the 3 internal timestep to avoid granularity
-	REAL	 eTC[3];
-#endif
-#ifdef CORRECT_FOR_REFRACTORY_GRANULARITY
-
-	// approx corrections for release from refractory period
-	uint8_t	 ref_divisions[2];
-
-	// store the 3 internal timestep to avoid granularity
-	REAL	 eTC[3];
-#endif
 
 } neuron_t;
 

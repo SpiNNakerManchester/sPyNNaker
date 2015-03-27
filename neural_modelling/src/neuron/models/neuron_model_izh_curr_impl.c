@@ -7,6 +7,10 @@ static REAL machine_timestep = REAL_CONST(1.0);
 
 static const REAL V_threshold = REAL_CONST(30.0);
 
+/*! \brief For linear membrane voltages, 1.5 is the correct value. However
+ * with actual membrane voltage behaviour and tested over an wide range of
+ * use cases 1.85 gives slightly better spike timings.
+ */
 static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
 
 /////////////////////////////////////////////////////////////
@@ -30,8 +34,13 @@ static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
     dstateVar_dt[2] = neuron->A * (neuron->B * V_now - U_now);
 } */
 
-/*
- best balance between speed and accuracy so far from ODE solve comparison work
+/*!
+ * \brief Midpoint is best balance between speed and accuracy so far from
+ * ODE solve comparison work paper shows that Trapezoid version gives better
+ * accuracy at small speed cost
+ * \param[in] h
+ * \param[in] neuron
+ * \param[in] input_this_timestep
  */
 static inline void _rk2_kernel_midpoint(REAL h, neuron_pointer_t neuron,
                                         REAL input_this_timestep) {
@@ -77,11 +86,27 @@ bool neuron_model_state_update(input_t exc_input, input_t inh_input,
                                input_t external_bias, neuron_pointer_t neuron) {
 
     // Get the input in nA
+	/* TODO
+	 * this is where the abstracted create_input_current() function will be used
+	 *      static inline REAL create_input_current( REAL exc_input,
+	 *                                               REAL inh_input,
+	 *                                               REAL i_offset );
+	 *   to generalise current and conductance input i.e.
+	 *   input_this_timestep = create_input_current( exc_input, inh_input,
+	 *                                               neuron->I_offset );
+	 */
     input_t input_this_timestep = exc_input - inh_input
                                   + external_bias + neuron->I_offset;
 
     // the best AR update so far
     _rk2_kernel_midpoint(neuron->this_h, neuron, input_this_timestep);
+
+    /* TODO
+     * this is where the abstracted test_threshold() function will be used
+     *     static inline bool test_threshold( accum membrane, accum threshold );
+     * to allow stochastic neurons if necessary i.e.
+     * bool spike = test_threshold( neuron->V, V_threshold );
+     */
 
     bool spike = REAL_COMPARE(neuron->V, >=, V_threshold);
 

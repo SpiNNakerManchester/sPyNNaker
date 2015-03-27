@@ -349,7 +349,7 @@ void c_main(void) {
     uint32_t timer_period;
 
     if(!initialize(&timer_period)){
-    	return;
+    	 rt_error(RTE_SWERR);
     }
 
     // Start the time at "-1" so that the first tick will be 0

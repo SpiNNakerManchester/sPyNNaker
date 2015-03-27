@@ -9,15 +9,13 @@ from spynnaker.pyNN.models.abstract_models\
     .abstract_population_outgoing_edge_restrictor \
     import AbstractPopulationOutgoingEdgeRestrictor
 
-from spinn_front_end_common.utilities import packet_conversions
 from spinn_front_end_common.utilities import constants as common_constants
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 
 
-from pacman.model.abstract_classes.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
-from pacman.model.constraints.partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_mask_constraint \
@@ -178,9 +176,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
-        self.write_delay_parameters(
-            spec, placement.x, placement.y, placement.p, subvertex,
-            num_delay_blocks, delay_blocks, vertex_slice)
         key = None
         if len(sub_graph.outgoing_subedges_from_subvertex(subvertex)) > 0:
             keys_and_masks = routing_info.get_keys_and_masks_from_subedge(

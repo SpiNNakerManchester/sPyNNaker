@@ -1,3 +1,6 @@
+"""
+IFCurrentExponentialPopulation
+"""
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
@@ -16,6 +19,10 @@ from data_specification.enums.data_type import DataType
 class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
                                      AbstractIntegrateAndFireProperties,
                                      AbstractPopulationVertex):
+    """
+    IFCurrentExponentialPopulation: model which represents a leaky intergate
+    and fire model with a exponetial decay curve and based off current.
+    """
 
     CORE_APP_IDENTIFIER = constants.IF_CURRENT_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
@@ -48,14 +55,29 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
 
     @property
     def model_name(self):
+        """
+
+        :return:
+        """
         return "IF_curr_exp"
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
+        """
+
+        :param new_value:
+        :return:
+        """
         IFCurrentExponentialPopulation.\
             _model_based_max_atoms_per_core = new_value
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
+        """
+
+        :param vertex_slice:
+        :param graph:
+        :return:
+        """
         return 781 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
     def get_parameters(self):
@@ -80,13 +102,29 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             NeuronParameter(self._scaled_t_refract(), DataType.UINT32)]
 
     def is_population_vertex(self):
+        """
+
+        :return:
+        """
         return True
 
     def is_integrate_and_fire_vertex(self):
+        """
+
+        :return:
+        """
         return True
 
     def is_exp_vertex(self):
+        """
+
+        :return:
+        """
         return True
 
     def is_recordable(self):
+        """
+
+        :return:
+        """
         return True

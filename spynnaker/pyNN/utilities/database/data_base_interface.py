@@ -1,14 +1,23 @@
+"""
+DataBaseInterface.py
+"""
+
+# spinnman imports
 from spinnman import constants as spinnman_constants
 from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
 from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
 from spinnman.connections.udp_packet_connections.eieio_command_connection \
     import EieioCommandConnection
 
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
+# spynnaker imports
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_population_recordable_vertex import \
+    AbstractPopulationRecordableVertex
 from spynnaker.pyNN.utilities import constants as spynnaker_constants
 from spynnaker.pyNN import exceptions
 
+
+# general imports
 from multiprocessing.pool import ThreadPool
 import threading
 import os
@@ -20,6 +29,9 @@ logger = logging.getLogger(__name__)
 
 
 class DataBaseInterface(object):
+    """
+    DataBaseInterface: the interface for the database system
+    """
 
     def __init__(self, database_directory, wait_for_read_confirmation,
                  socket_addresses):
@@ -44,6 +56,11 @@ class DataBaseInterface(object):
         self.initilisation()
 
     def initilisation(self):
+        """
+        sets up the database and creates the intiial tables
+        :return:
+        """
+        # noinspection PyBroadException
         try:
             logger.debug("creating database and initial tables")
             self._database_path = os.path.join(self._database_directory,
@@ -170,9 +187,14 @@ class DataBaseInterface(object):
 
     # noinspection PyPep8
     def send_read_notification(self):
+        """
+
+        :return:
+        """
         self._wait_pool.apply_async(self._send_read_notification)
 
     def _send_read_notification(self):
+        # noinspection PyBroadException
         try:
             self._sent_visualisation_confirmation = True
             self._thread_pool.close()
@@ -221,10 +243,18 @@ class DataBaseInterface(object):
         logger.info("*** Confirmation received, continuing ***")
 
     def wait_for_confirmation(self):
+        """
+
+        :return:
+        """
         self._wait_pool.close()
         self._wait_pool.join()
 
     def send_start_notification(self):
+        """
+
+        :return:
+        """
         data_base_message_connections = list()
         for socket_address in self._socket_addresses:
             data_base_message_connection = EieioCommandConnection(
@@ -242,9 +272,15 @@ class DataBaseInterface(object):
             connection.send_eieio_command_message(eieio_command_message)
 
     def add_machine_objects(self, machine):
+        """
+
+        :param machine:
+        :return:
+        """
         self._thread_pool.apply_async(self._add_machine, args=[machine])
 
     def _add_machine(self, machine):
+        # noinspection PyBroadException
         try:
             import sqlite3 as sqlite
             self._lock_condition.acquire()
@@ -280,10 +316,16 @@ class DataBaseInterface(object):
             traceback.print_exc()
 
     def add_partitionable_vertices(self, partitionable_graph):
+        """
+
+        :param partitionable_graph:
+        :return:
+        """
         self._thread_pool.apply_async(self._add_partitionable_vertices,
                                       args=[partitionable_graph])
 
     def _add_partitionable_vertices(self, partitionable_graph):
+        # noinspection PyBroadException
         try:
             self._lock_condition.acquire()
             import sqlite3 as sqlite
@@ -292,7 +334,7 @@ class DataBaseInterface(object):
             cur = connection.cursor()
             # add vertices
             for vertex in partitionable_graph.vertices:
-                if isinstance(vertex, AbstractRecordableVertex):
+                if isinstance(vertex, AbstractPopulationRecordableVertex):
                     cur.execute(
                         "INSERT INTO Partitionable_vertices("
                         "vertex_label, no_atoms, max_atom_constrant, recorded)"
@@ -339,12 +381,20 @@ class DataBaseInterface(object):
             traceback.print_exc()
 
     def add_system_params(self, time_scale_factor, machine_time_step, runtime):
+        """
+
+        :param time_scale_factor:
+        :param machine_time_step:
+        :param runtime:
+        :return:
+        """
         self._thread_pool.apply_async(
             self._add_system_params,
             args=[time_scale_factor, machine_time_step, runtime])
 
     def _add_system_params(self, time_scale_factor, machine_time_step,
                            runtime):
+        # noinspection PyBroadException
         try:
             import sqlite3 as sqlite
             self._lock_condition.acquire()
@@ -372,12 +422,20 @@ class DataBaseInterface(object):
 
     def add_partitioned_vertices(self, partitioned_graph, graph_mapper,
                                  partitionable_graph):
+        """
+
+        :param partitioned_graph:
+        :param graph_mapper:
+        :param partitionable_graph:
+        :return:
+        """
         self._thread_pool.apply_async(self._add_partitioned_vertices,
                                       args=[partitioned_graph, graph_mapper,
                                             partitionable_graph])
 
     def _add_partitioned_vertices(self, partitioned_graph, graph_mapper,
                                   partitionable_graph):
+        # noinspection PyBroadException
         try:
             self._lock_condition.acquire()
             import sqlite3 as sqlite
@@ -454,10 +512,17 @@ class DataBaseInterface(object):
             traceback.print_exc()
 
     def add_placements(self, placements, partitioned_graph):
+        """
+
+        :param placements:
+        :param partitioned_graph:
+        :return:
+        """
         self._thread_pool.apply_async(self._add_placements,
                                       args=[placements, partitioned_graph])
 
     def _add_placements(self, placements, partitioned_graph):
+        # noinspection PyBroadException
         try:
             self._lock_condition.acquire()
             import sqlite3 as sqlite
@@ -480,10 +545,17 @@ class DataBaseInterface(object):
             traceback.print_exc()
 
     def add_routing_infos(self, routing_infos, partitioned_graph):
+        """
+
+        :param routing_infos:
+        :param partitioned_graph:
+        :return:
+        """
         self._thread_pool.apply_async(self._add_routing_infos,
                                       args=[routing_infos, partitioned_graph])
 
     def _add_routing_infos(self, routing_infos, partitioned_graph):
+        # noinspection PyBroadException
         try:
             self._lock_condition.acquire()
             import sqlite3 as sqlite
@@ -506,10 +578,16 @@ class DataBaseInterface(object):
             traceback.print_exc()
 
     def add_routing_tables(self, routing_tables):
+        """
+
+        :param routing_tables:
+        :return:
+        """
         self._thread_pool.apply_async(self._add_routing_tables,
                                       args=[routing_tables])
 
     def _add_routing_tables(self, routing_tables):
+        # noinspection PyBroadException
         try:
             self._lock_condition.acquire()
             import sqlite3 as sqlite
@@ -539,15 +617,24 @@ class DataBaseInterface(object):
 
     def create_neuron_to_key_mapping(
             self, partitionable_graph, partitioned_graph, routing_infos,
-            graph_mapper, placements):
+            graph_mapper):
+        """
+
+        :param partitionable_graph:
+        :param partitioned_graph:
+        :param routing_infos:
+        :param graph_mapper:
+        :return:
+        """
         self._thread_pool.apply_async(
             self._create_neuron_to_key_mapping,
             args=[partitionable_graph, partitioned_graph, routing_infos,
-                  graph_mapper, placements])
+                  graph_mapper])
 
     def _create_neuron_to_key_mapping(
             self, partitionable_graph, partitioned_graph, routing_infos,
-            graph_mapper, placements):
+            graph_mapper):
+        # noinspection PyBroadException
         try:
             import sqlite3 as sqlite
             self._lock_condition.acquire()
@@ -593,10 +680,17 @@ class DataBaseInterface(object):
             traceback.print_exc()
 
     def add_tags(self, partitioned_graph, tags):
+        """
+
+        :param partitioned_graph:
+        :param tags:
+        :return:
+        """
         self._thread_pool.apply_async(self._add_tags,
                                       args=[partitioned_graph, tags])
 
     def _add_tags(self, partitioned_graph, tags):
+        # noinspection PyBroadException
         try:
             self._lock_condition.acquire()
             import sqlite3 as sqlite
@@ -634,5 +728,9 @@ class DataBaseInterface(object):
             traceback.print_exc()
 
     def stop(self):
+        """
+
+        :return:
+        """
         logger.debug("[data_base_thread] Stopping")
         self._wait_pool.close()

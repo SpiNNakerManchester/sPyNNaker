@@ -87,7 +87,7 @@ void out_spikes_print() {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("out_spikes:\n");
 
-    if (out_spikes_is_nonempty()) {
+    if (!out_spikes_is_empty()) {
         log_debug("-----------\n");
         print_bit_field(out_spikes, out_spikes_size);
         log_debug("-----------\n");

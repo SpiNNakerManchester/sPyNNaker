@@ -88,12 +88,12 @@ POPULATION_BASED_REGIONS = Enum(
 N_POPULATION_RECORDING_REGIONS = 3
 
 # The size of the system region (+1 for flags) for a population
-POPULATION_SYSTEM_REGION_BYTES = (DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS
-                                  + N_POPULATION_RECORDING_REGIONS + 1) * 4
+POPULATION_SYSTEM_REGION_BYTES = (DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS +
+                                  N_POPULATION_RECORDING_REGIONS + 1) * 4
 
 # The size of the headers of a population neuron region
-# (1 word each for key, n_neurons, n_params, ODE timestep)
-POPULATION_NEURON_PARAMS_HEADER_BYTES = 16
+# (1 word each for has_key, key, n_neurons, n_params, ODE timestep)
+POPULATION_NEURON_PARAMS_HEADER_BYTES = 20
 
 # The default routing mask to use
 DEFAULT_MASK = 0xfffff800

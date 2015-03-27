@@ -23,7 +23,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 0.25
-PARAMS_BASE_WORDS = 3
+# two for has key, key,
+PARAMS_BASE_WORDS = 4
 PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
@@ -185,10 +186,13 @@ class SpikeSourcePoisson(AbstractSpikeSource):
 
         # Write Key info for this core:
         if key is None:
-            raise exceptions.ConfigurationException(
-                "This spike source poisson does not send its spikes anywhere. "
-                "This is deemed to be an error. Please fix this and try again")
-        spec.write_value(data=key)
+            # if theres no key, then two falses will cover it.
+            spec.write_value(data=0)
+            spec.write_value(data=0)
+        else:
+            # has a key, thus set has key to 1 and then add key
+            spec.write_value(data=1)
+            spec.write_value(data=key)
 
         # Write the random seed (4 words), generated randomly!
         if self._seed is None:

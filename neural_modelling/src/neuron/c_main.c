@@ -151,7 +151,7 @@ static bool initialize(uint32_t *timer_period) {
     if (!spike_processing_initialise(row_max_n_words)) {
         return false;
     }
-
+    log_info("Initialise: finished");
     return true;
 }
 
@@ -171,7 +171,7 @@ void timer_callback(uint timer_count, uint unused) {
 
     time++;
 
-    log_debug("Timer tick %u", time);
+    log_debug("Timer tick %u \n", time);
 
     /* if a fixed number of simulation ticks that were specified at startup
        then do reporting for finishing */
@@ -210,13 +210,15 @@ void c_main(void) {
 
     // initialise the model
     if (!initialize(&timer_period)){
-    	return;
+    	rt_error(RTE_API);
     }
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
+    log_info("setting timer tic callback for %d microseconds",
+              timer_period);
     spin1_set_timer_tick(timer_period);
 
     // Set up the timer tick callback (others are handled elsewhere)

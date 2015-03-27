@@ -1,26 +1,13 @@
+"""
+Spinnaker
+"""
+
 # pacman imports
-import exceptions
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
-from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
-    AbstractVirtualVertex
-from spynnaker.pyNN.models.abstract_models.abstract_provides_n_keys_for_edge\
-    import AbstractProvidesNKeysForEdge
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_outgoing_edge_constraints \
-    import AbstractProvidesOutgoingEdgeConstraints
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_incoming_edge_constraints \
-    import AbstractProvidesIncomingEdgeConstraints
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_send_me_multicast_commands_vertex \
-    import AbstractSendMeMulticastCommandsVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_vertex_with_dependent_vertices \
-    import AbstractVertexWithEdgeToDependentVertices
 from pacman.operations.tag_allocator_algorithms.basic_tag_allocator \
     import BasicTagAllocator
 from pacman.model.partitionable_graph.partitionable_edge \
@@ -33,7 +20,6 @@ from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
 from pacman.operations.routing_info_allocator_algorithms.\
     basic_routing_info_allocator import BasicRoutingInfoAllocator
 from pacman.utilities.progress_bar import ProgressBar
-from pacman.utilities import utility_calls as pacman_utility_calls
 
 # spinnmachine imports
 from spinn_machine.sdram import SDRAM
@@ -44,12 +30,8 @@ from spinn_machine.chip import Chip
 from spinn_machine.virutal_machine import VirtualMachine
 
 # common front end imports
-from spinn_front_end_common.utilities import exceptions 
+from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities import reports
-from spinn_front_end_common.abstract_models.abstract_iptagable_vertex import \
-    AbstractIPTagableVertex
-from spinn_front_end_common.abstract_models.abstract_reverse_iptagable_vertex \
-    import AbstractReverseIPTagableVertex
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.interface.front_end_common_interface_functions \
     import FrontEndCommonInterfaceFunctions
@@ -73,7 +55,24 @@ from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
 from spynnaker.pyNN.spynnaker_configurations import \
     SpynnakerConfigurationFunctions
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
+from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
+    AbstractVirtualVertex
+from spynnaker.pyNN.models.abstract_models.abstract_provides_n_keys_for_edge\
+    import AbstractProvidesNKeysForEdge
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_outgoing_edge_constraints \
+    import AbstractProvidesOutgoingEdgeConstraints
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_provides_incoming_edge_constraints \
+    import AbstractProvidesIncomingEdgeConstraints
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_send_me_multicast_commands_vertex \
+    import AbstractSendMeMulticastCommandsVertex
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_vertex_with_dependent_vertices \
+    import AbstractVertexWithEdgeToDependentVertices
 
 # spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
@@ -115,9 +114,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         
         if database_socket_addresses is None:
             database_socket_addresses = list()
-            listen_port = conf.config.getint("Database", "listen_port")
-            notify_port = conf.config.getint("Database", "notify_port")
-            noftiy_hostname = conf.config.get("Database", "notify_hostname")
+            listen_port = config.getint("Database", "listen_port")
+            notify_port = config.getint("Database", "notify_port")
+            noftiy_hostname = config.get("Database", "notify_hostname")
             database_socket_addresses.append(
                 SocketAddress(noftiy_hostname, notify_port, listen_port))
         self._database_socket_addresses = database_socket_addresses
@@ -147,7 +146,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     "Reports", "writeRouterInfoReport"),
                 in_debug_mode=config.get("Mode", "mode") == "Debug",
                 create_database=config.getboolean(
-                    "Database", "create_database"))
+                    "Database", "create_database"),
+                generate_tag_report=config.getboolean(
+                    "Reports", "writeTagAllocationReports"))
 
             self._set_up_pacman_algorthms_listings(
                 partitioner_algorithm=config.get("Partitioner", "algorithm"),
@@ -202,6 +203,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._edge_count = 0
 
     def run(self, run_time):
+        """
+
+        :param run_time:
+        :return:
+        """
         self._setup_interfaces(
             hostname=self._hostname,
             virtual_x_dimension=config.get("Machine",
@@ -219,7 +225,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # add database generation if requested
         if self._create_database:
             wait_on_confirmation = \
-                config.config.getboolean("Database", "wait_on_confirmation")
+                config.getboolean("Database", "wait_on_confirmation")
             self._database_interface = DataBaseInterface(
                 self._app_data_runtime_folder, wait_on_confirmation,
                 self._database_socket_addresses)
@@ -289,20 +295,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._database_interface.add_routing_tables(self._router_tables)
             self._database_interface.add_tags(self._partitioned_graph,
                                               self._tags)
-            execute_mapping = conf.config.getboolean(
+            execute_mapping = config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
             if execute_mapping:
                 self._database_interface.create_neuron_to_key_mapping(
                     graph_mapper=self._graph_mapper,
                     partitionable_graph=self._partitionable_graph,
                     partitioned_graph=self._partitioned_graph,
-                    routing_infos=self._routing_infos,
-                    placements=self._placements)
+                    routing_infos=self._routing_infos)
             self._database_interface.send_read_notification()
-
-        # extract iptags required by the graph
-        self._set_iptags()
-        self._set_reverse_ip_tags()
 
         # execute data spec generation
         if do_timing:
@@ -337,7 +338,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 timer.start_timing()
 
             logger.info("*** Loading tags ***")
-            self._load_tags(self._tags)
+            self._load_iptags()
+            self._load_reverse_ip_tags()
 
             if self._do_load is True:
                 logger.info("*** Loading data ***")
@@ -381,124 +383,131 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             logger.info(
                 "*** Using a Virtual Machine so no simulation will occur")
 
-    def _set_iptags(self):
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractIPTagableVertex):
-                iptag = vertex.get_ip_tag()
-                if iptag.tag is not None:
-                    if iptag.tag > self._current_max_tag_value:
-                        self._current_max_tag_value = iptag.tag
-                self._add_iptag(iptag)
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractIPTagableVertex):
-                iptag = vertex.get_ip_tag()
-                if iptag.tag is None:
-                    iptag.set_tag(self._current_max_tag_value + 1)
-                    vertex.set_tag(self._current_max_tag_value + 1)
-                    self._current_max_tag_value += 1
-                    self._add_iptag(iptag)
-
-    def _set_reverse_ip_tags(self):
-        # extract reverse iptags required by the graph
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractReverseIPTagableVertex):
-                reverse_iptag = vertex.get_reverse_ip_tag()
-                if reverse_iptag.tag is not None:
-                    if reverse_iptag.tag > self._current_max_tag_value:
-                        self._current_max_tag_value = reverse_iptag.tag
-                    reverse_iptag = self._create_reverse_iptag_from_iptag(
-                        reverse_iptag, vertex)
-                    self._add_reverse_tag(reverse_iptag)
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractReverseIPTagableVertex):
-                reverse_iptag = vertex.get_reverse_ip_tag()
-                if reverse_iptag.tag is None:
-                    reverse_iptag.set_tag(self._current_max_tag_value + 1)
-                    vertex.set_reverse_iptag_tag(
-                        self._current_max_tag_value + 1)
-                    self._current_max_tag_value += 1
-                    reverse_iptag = self._create_reverse_iptag_from_iptag(
-                        reverse_iptag, vertex)
-                    self._add_reverse_tag(reverse_iptag)
-
-    def _create_reverse_iptag_from_iptag(self, reverse_iptag, vertex):
-        subverts = self._graph_mapper.get_subvertices_from_vertex(vertex)
-        if len(subverts) > 1:
-            raise common_exceptions.ConfigurationException(
-                "reverse iptaggable populations can only be supported if they"
-                " are partitoned in a 1 to 1 ratio. Please reduce the number "
-                "of neurons per core, or the max-atoms per core to support a "
-                "one core mapping for your iptaggable population.")
-        subvert = next(iter(subverts))
-        placement = self._placements.get_placement_of_subvertex(subvert)
-        return ReverseIPTag(
-            port=reverse_iptag.port, tag=reverse_iptag.tag,
-            destination_x=placement.x, destination_y=placement.y,
-            destination_p=placement.p)
-
     @property
     def app_id(self):
+        """
+
+        :return:
+        """
         return self._app_id
 
     @property
     def has_ran(self):
+        """
+
+        :return:
+        """
         return self._has_ran
 
     @property
     def machine_time_step(self):
+        """
+
+        :return:
+        """
         return self._machine_time_step
 
     @property
     def no_machine_time_steps(self):
+        """
+
+        :return:
+        """
         return self._no_machine_time_steps
 
     @property
     def timescale_factor(self):
+        """
+
+        :return:
+        """
         return self._time_scale_factor
 
     @property
     def spikes_per_second(self):
+        """
+
+        :return:
+        """
         return self._spikes_per_second
 
     @property
     def ring_buffer_sigma(self):
+        """
+
+        :return:
+        """
         return self._ring_buffer_sigma
 
     @property
     def get_multi_cast_source(self):
+        """
+
+        :return:
+        """
         return self._multi_cast_vertex
 
     @property
     def partitioned_graph(self):
+        """
+
+        :return:
+        """
         return self._partitioned_graph
 
     @property
     def partitionable_graph(self):
+        """
+
+        :return:
+        """
         return self._partitionable_graph
 
     @property
     def placements(self):
+        """
+
+        :return:
+        """
         return self._placements
 
     @property
     def transceiver(self):
+        """
+
+        :return:
+        """
         return self._txrx
 
     @property
     def graph_mapper(self):
+        """
+
+        :return:
+        """
         return self._graph_mapper
 
     @property
     def routing_infos(self):
+        """
+
+        :return:
+        """
         return self._routing_infos
 
     def set_app_id(self, value):
+        """
+
+        :param value:
+        :return:
+        """
         self._app_id = value
 
-    def set_runtime(self, value):
-        self._runtime = value
-
     def get_current_time(self):
+        """
+
+        :return:
+        """
         if self._has_ran:
             return float(self._runtime)
         return 0.0
@@ -576,7 +585,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             super_edge = (self._graph_mapper
                           .get_partitionable_edge_from_partitioned_edge(edge))
             if vertex_slice.n_atoms > 2048:
-                raise exceptions.ConfigurationException(
+                raise common_exceptions.ConfigurationException(
                     "The current models can only support up to 2048 atoms"
                     " per core (restricted by the supported key format)")
 
@@ -586,6 +595,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                                           vertex_slice.n_atoms)
             else:
                 n_keys_map.set_n_keys_for_patitioned_edge(
+                    edge,
                     super_edge.pre_vertex.get_n_keys_for_partitioned_edge(
                         edge, self._graph_mapper))
 
@@ -694,7 +704,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # execute placer reports if needed
         if (pacman_report_state is not None and
                 pacman_report_state.placer_report):
-            pacman_reports.placer_reports(
+            pacman_reports.placer_reports_with_partitionable_graph(
                 graph=self._partitionable_graph,
                 graph_mapper=self._graph_mapper, hostname=self._hostname,
                 machine=self._machine, placements=self._placements,
@@ -732,9 +742,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     associated_vertex, placement.subvertex, placement,
                     self._partitioned_graph, self._partitionable_graph,
                     self._routing_infos, self._hostname, self._graph_mapper,
-                    self._report_default_directory, 
-                    config.getboolean("Reports", "writeTextSpecs"), ip_tags, 
-                    reverse_ip_tags, progress_bar)
+                    self._report_default_directory, ip_tags, reverse_ip_tags,
+                    self._writeTextSpecs, self._app_data_runtime_folder,
+                    progress_bar)
                 data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start)
 
@@ -770,6 +780,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         return executable_targets
 
     def add_vertex(self, vertex_to_add):
+        """
+
+        :param vertex_to_add:
+        :return:
+        """
         if isinstance(vertex_to_add, CommandSender):
             self._multi_cast_vertex = vertex_to_add
 
@@ -794,9 +809,23 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self.add_edge(dependant_edge)
 
     def add_edge(self, edge_to_add):
+        """
+
+        :param edge_to_add:
+        :return:
+        """
         self._partitionable_graph.add_edge(edge_to_add)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
+        """
+
+        :param size:
+        :param cellclass:
+        :param cellparams:
+        :param structure:
+        :param label:
+        :return:
+        """
         return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
@@ -804,6 +833,18 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,
             source, target, synapse_dynamics, label, rng):
+        """
+
+        :param presynaptic_population:
+        :param postsynaptic_population:
+        :param connector:
+        :param source:
+        :param target:
+        :param synapse_dynamics:
+        :param label:
+        :param rng:
+        :return:
+        """
         if label is None:
             label = "Projection {}".format(self._edge_count)
             self._edge_count += 1
@@ -814,20 +855,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step,
             timescale_factor=self._time_scale_factor)
-
-    def _get_executable_path(self, executable_name):
-
-        # Loop through search paths
-        for path in self._binary_search_paths:
-            # Rebuild filename
-            potential_filename = os.path.join(path, executable_name)
-
-            # If this filename exists, return it
-            if os.path.isfile(potential_filename):
-                return potential_filename
-
-        # No executable found
-        return None
 
     def _add_virtual_chips(self):
         for vertex in self._partitionable_graph.vertices:
@@ -890,7 +917,14 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
             virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
 
-    def stop(self, stop_on_board=True):
+    def stop(self, app_id, stop_on_board=True):
+        """
+
+        :param stop_on_board: boolean which decides if the board should have
+        its router tables and tags cleared
+        :param app_id: the application id whcih needs to be stopped
+        :return:
+        """
         if stop_on_board:
             for router_table in self._router_tables.routing_tables:
                 if (not self._machine.get_chip_at(router_table.x,

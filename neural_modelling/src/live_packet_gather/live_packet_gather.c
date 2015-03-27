@@ -455,12 +455,12 @@ void c_main(void) {
     // Configure system
     uint32_t timer_period = 0;
     if (!initialize(&timer_period)) {
-        return;
+         rt_error(RTE_SWERR);
     }
 
     // Configure SDP message
     if (!configure_sdp_msg()) {
-        return;
+         rt_error(RTE_SWERR);
     }
 
     // Set timer_callback

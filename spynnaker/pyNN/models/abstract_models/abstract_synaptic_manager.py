@@ -1,3 +1,6 @@
+"""
+synaptic manager file
+"""
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities import packet_conversions
 
@@ -17,12 +20,11 @@ from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import conf
 
+
 # pacman imports
 from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
-# spinnman imports
-from spinnman import exceptions as spinnman_exceptions
 
 # dsg imports
 from data_specification.enums.data_type import DataType
@@ -44,6 +46,9 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
+    """
+    a synaptic manager that handles synatpic matrix's and master pops
+    """
 
     def __init__(self, master_pop_algorithm=None):
         self._stdp_checked = False
@@ -79,6 +84,15 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         """
         Write this synaptic block to the designated synaptic matrix region at
         its current write pointer.
+        :param sublist:
+        :param row_io:
+        :param spec:
+        :param current_write_ptr:
+        :param fixed_row_length:
+        :param region:
+        :param weight_scales:
+        :param n_synapse_type_bits:
+        :return:
         """
 
         # Switch focus to the synaptic matrix memory region:
@@ -154,6 +168,12 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
     def get_exact_synaptic_block_memory_size(self, graph_mapper,
                                              subvertex_in_edges):
+        """
+
+        :param graph_mapper:
+        :param subvertex_in_edges:
+        :return:
+        """
         memory_size = 0
 
         # Go through the subedges and add up the memory
@@ -178,6 +198,12 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         return memory_size
 
     def get_synaptic_blocks_memory_size(self, vertex_slice, in_edges):
+        """
+
+        :param vertex_slice:
+        :param in_edges:
+        :return:
+        """
         self._check_synapse_dynamics(in_edges)
         memory_size = 0
 
@@ -211,6 +237,12 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
     def _calculate_all_synaptic_block_size(self, synaptic_sub_list,
                                            max_n_words):
+        """
+
+        :param synaptic_sub_list:
+        :param max_n_words:
+        :return:
+        """
         # Gets smallest possible (i.e. supported by row length
         # Table structure) that can contain max_row_length
         row_length = self._master_pop_table_generator.get_allowed_row_length(
@@ -221,6 +253,11 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         return syn_block_sz * num_rows
 
     def _check_synapse_dynamics(self, in_edges):
+        """
+
+        :param in_edges:
+        :return:
+        """
         if self._stdp_checked:
             return True
         self._stdp_checked = True
@@ -249,8 +286,12 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
     @abstractmethod
     def write_synapse_parameters(self, spec, subvertex, vertex_slice):
-        """forced method for dealing with writing synapse params
-
+        """
+        forced method for dealing with writing synapse params
+        :param spec:
+        :param subvertex:
+        :param vertex_slice:
+        :return:
         """
 
     @staticmethod
@@ -265,6 +306,8 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         """
         Returns the numeric identifier of a synapse, given its name.  This
         is used by the neuron models.
+        :param target_name:
+        :return:
         """
         if target_name == "excitatory":
             return 0
@@ -273,6 +316,11 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         return None
 
     def get_synapse_dynamics_parameter_size(self, in_edges):
+        """
+
+        :param in_edges:
+        :return:
+        """
         self._check_synapse_dynamics(in_edges)
         if self._stdp_mechanism is not None:
             return self._stdp_mechanism.get_params_size(
@@ -281,6 +329,14 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
     def write_synapse_dynamics_parameters(self, spec, machine_time_step,
                                           region, weight_scales):
+        """
+
+        :param spec:
+        :param machine_time_step:
+        :param region:
+        :param weight_scales:
+        :return:
+        """
         if self._stdp_mechanism is not None:
             self._stdp_mechanism.write_plastic_params(spec, region,
                                                       machine_time_step,
@@ -292,6 +348,9 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         Return the amount to scale the weights by to convert them from floating
         point values to 16-bit fixed point numbers which can be shifted left by
         ring_buffer_to_input_left_shift to produce an s1615 fixed point number
+
+        :param ring_buffer_to_input_left_shift:
+        :return:
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
@@ -299,7 +358,6 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
     def _ring_buffer_expected_upper_bound(
             weight_mean, weight_std_dev, spikes_per_second,
             machine_timestep, n_synapses_in, sigma):
-
         """
         Provides expected upper bound on accumulated values in a ring buffer
         element.
@@ -359,7 +417,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
             big_ratio = (math.log(average_spikes_per_timestep) * upper_bound -
                          lngamma)
 
-            if big_ratio > -701.0 and big_ratio < 701.0 and big_ratio != 0.0:
+            if -701.0 < big_ratio < 701.0 and big_ratio != 0.0:
 
                 log_weight_variance = (
                     -average_spikes_per_timestep +
@@ -415,6 +473,16 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
     def get_ring_buffer_to_input_left_shifts(
             self, subvertex, sub_graph, graph_mapper, spikes_per_second,
             machine_timestep, sigma):
+        """
+
+        :param subvertex:
+        :param sub_graph:
+        :param graph_mapper:
+        :param spikes_per_second:
+        :param machine_timestep:
+        :param sigma:
+        :return:
+        """
 
         total_weights, total_square_weights, total_items, abs_max_weights =\
             self._get_ring_buffer_totals(subvertex, sub_graph, graph_mapper)
@@ -489,6 +557,16 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         Each block contains one row for each arriving axon.
         Each row contains a header of two words and then one 32-bit word for
         each synapse. The row contents depend on the connector type.
+        :param spec:
+        :param subvertex:
+        :param all_syn_block_sz:
+        :param weight_scales:
+        :param master_pop_table_region:
+        :param synaptic_matrix_region:
+        :param routing_info:
+        :param graph_mapper:
+        :param subgraph:
+        :return:
         """
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
@@ -502,43 +580,6 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         in_proj_subedges = [e for e in in_subedges
                             if isinstance(e, ProjectionPartitionedEdge)]
 
-        # Get all combinations of these edges
-        proj_subedges_to_remove = []
-        for (a, b) in itertools.combinations(in_proj_subedges, 2):
-            a_key = routing_info.get_key_from_subedge(a)
-            b_key = routing_info.get_key_from_subedge(b)
-
-            if a_key == b_key:
-
-                # Extract both projection edges synapse sublists
-                a_sublist = a.get_synapse_sublist(graph_mapper)
-                b_sublist = b.get_synapse_sublist(graph_mapper)
-
-                # From these get rows
-                a_rows = a_sublist.get_rows()
-                b_rows = b_sublist.get_rows()
-
-                if len(a_rows) != len(b_rows):
-                    raise Exception("Incoming projection subedges have"
-                                    " different row lengths")
-
-                # Merge synaptic rows
-                for a_row, b_row in zip(a_rows, b_rows):
-                    # **TODO** use proper merge functionality
-                    a_row.append(b_row)
-
-                # Add projection edge b to list to remove
-                proj_subedges_to_remove.append(b)
-
-        # If there are any projection subedges to remove
-        if len(proj_subedges_to_remove) > 0:
-            logger.debug("Merged %u incoming projection sub-edges" % len(
-                         proj_subedges_to_remove))
-
-            # Rebuild incoming projection list
-            in_proj_subedges = [i for i in in_proj_subedges
-                                if i not in proj_subedges_to_remove]
-
         # Set up the master population table
         self._master_pop_table_generator.initialise_table(
             spec, master_pop_table_region)
@@ -546,23 +587,14 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
         for subedge in in_proj_subedges:
-            if next_block_start_addr >= all_syn_block_sz:
-                raise exceptions.SynapticBlockGenerationException(
-                    "Too much synapse memory consumed (used {} of {})!"
-                    .format(next_block_start_addr, all_syn_block_sz))
-
-            key = routing_info.get_key_from_subedge(subedge)
-            x = packet_conversions.get_x_from_key(key)
-            y = packet_conversions.get_y_from_key(key)
-            p = packet_conversions.get_p_from_key(key)
+            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                subedge)
             spec.comment(
-                "\nWriting matrix for subedge from {}, {}, {}\n".format(
-                    x, y, p))
-
+                "\nWriting matrix for subedge:{}\n".format(subedge.label))
             sublist = subedge.get_synapse_sublist(graph_mapper)
-            associated_edge = (graph_mapper
-                               .get_partitionable_edge_from_partitioned_edge(
-                                   subedge))
+            associated_edge = \
+                graph_mapper.get_partitionable_edge_from_partitioned_edge(
+                    subedge)
             row_io = associated_edge.get_synapse_row_io()
 
             # Get the maximum row length in words, excluding headers
@@ -600,7 +632,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                     n_synapse_type_bits)
 
             self._master_pop_table_generator.update_master_population_table(
-                spec, block_start_addr, row_length, key,
+                spec, block_start_addr, row_length, keys_and_masks,
                 constants.DEFAULT_MASK, master_pop_table_region)
 
         self._master_pop_table_generator.finish_master_pop_table(
@@ -610,6 +642,20 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
             post_subvertex, synapse_io, subgraph, graph_mapper, routing_infos,
             weight_scales):
+        """
+
+        :param placements:
+        :param transceiver:
+        :param pre_subvertex:
+        :param pre_n_atoms:
+        :param post_subvertex:
+        :param synapse_io:
+        :param subgraph:
+        :param graph_mapper:
+        :param routing_infos:
+        :param weight_scales:
+        :return:
+        """
 
         synaptic_block, max_row_length = self._retrieve_synaptic_block(
             placements, transceiver, pre_subvertex, pre_n_atoms,
@@ -723,20 +769,22 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         incoming_key_combo = None
         for subedge in incoming_edges:
             if subedge.pre_subvertex == pre_subvertex:
-                routing_info = (routing_infos
-                                .get_subedge_information_from_subedge(subedge))
-                incoming_key_combo = routing_info.key_mask_combo
+                routing_info = \
+                    routing_infos.get_subedge_information_from_subedge(subedge)
+                keys_and_masks = routing_info.keys_and_masks
+                incoming_key_combo = keys_and_masks[0].key
+                break
 
-        max_row_length, synaptic_block_base_address_offset = \
-            self._master_pop_table_generator\
-                .extract_synaptic_matrix_data_location(
-                    incoming_key_combo, master_pop_base_mem_address,
-                    transceiver, post_x, post_y)
+        maxed_row_length, synaptic_block_base_address_offset = \
+            self._master_pop_table_generator.\
+            extract_synaptic_matrix_data_location(
+                incoming_key_combo, master_pop_base_mem_address,
+                transceiver, post_x, post_y)
 
         # calculate the synaptic block size in words
-        synaptic_block_size = (pre_n_atoms * 4
-                               * (constants.SYNAPTIC_ROW_HEADER_WORDS
-                                  + max_row_length))
+        synaptic_block_size = (pre_n_atoms * 4 *
+                               (constants.SYNAPTIC_ROW_HEADER_WORDS +
+                                maxed_row_length))
 
         # read in the base address of the synaptic matrix in the app region
         # table
@@ -751,9 +799,9 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
         # the base address of the synaptic block in absolute terms is the app
         # base, plus the synaptic matrix base plus the offset
-        synaptic_block_base_address = (app_data_base_address
-                                       + synapse_region_base_address
-                                       + synaptic_block_base_address_offset)
+        synaptic_block_base_address = (app_data_base_address +
+                                       synapse_region_base_address +
+                                       synaptic_block_base_address_offset)
 
         # read in and return the synaptic block
         blocks = list(transceiver.read_memory(
@@ -767,10 +815,11 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
             raise exceptions.SynapticBlockReadException(
                 "Not enough data has been read"
                 " (aka, something funkky happened)")
-        return block, max_row_length
+        return block, maxed_row_length
 
-    def _locate_master_pop_table_base_address(self, app_data_base_address,
-                                              x, y, transceiver):
+    @staticmethod
+    def _locate_master_pop_table_base_address(
+            app_data_base_address, x, y, transceiver):
         """ Find the master population table
 
         :param x: x coord for the chip to which this master pop table is \
@@ -780,10 +829,10 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         being read
         :type y: int
         :param transceiver: the transceiver object
-        :type spinnman.transciever.Transciever object
-        :param master_pop_table_region: the region to which the master pop\
+        :type transceiver: spinnman.transciever.Transciever object
+        :param app_data_base_address : the region to which the master pop\
          resides
-        :type master_pop_table_region: int
+        :type app_data_base_address: int
 
         :return: the master pop table address
         """
@@ -799,3 +848,13 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
             master_region_base_address_offset + app_data_base_address
 
         return master_region_base_address
+
+    # inhirrted from AbstractProvidesIncomingEdgeConstraints
+    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
+        """
+
+        :param partitioned_edge:
+        :param graph_mapper:
+        :return:
+        """
+        return self._master_pop_table_generator.get_edge_constraints()

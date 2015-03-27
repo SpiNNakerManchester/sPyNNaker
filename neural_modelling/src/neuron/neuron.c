@@ -19,6 +19,10 @@ static neuron_pointer_t neuron_array;
 //! The key to be used for this core (will be ORed with neuron id)
 static key_t key;
 
+//! A checker that says if this model should be transmitting. If set to false
+//! by the data region, then this model should not have a key.
+static bool use_key;
+
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
@@ -31,8 +35,8 @@ static input_t *input_buffers;
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parmeters_in_neuron_parameter_data_region {
-    transmission_key, number_of_neurons_to_simulate, num_neuron_parameters,
-	the_machine_time_step_in_microseconds,
+    has_key, transmission_key, number_of_neurons_to_simulate,
+    num_neuron_parameters, the_machine_time_step_in_microseconds,
 	size_of_memory_which_contains_all_neural_parameters,
 } parmeters_in_neuron_parameter_data_region;
 
@@ -65,9 +69,18 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         uint32_t *n_neurons_value) {
     log_info("neuron_initialise: starting");
 
+    // Check if theres a key to use
+    use_key = address[has_key];
     // Read the spike key to use
     key = address[transmission_key];
-    log_info("\tkey = %08x", key);
+
+    // output if this model is expecting to transmit
+    if (!use_key){
+        log_info("\tThis model is not expecting to transmit as it has no key");
+    }
+    else{
+        log_info("\tThis model is expected to transmit with key = %08x", key);
+    }
 
     // Read the neuron details
     n_neurons = address[number_of_neurons_to_simulate];
@@ -152,7 +165,8 @@ void neuron_do_timestep_update(timer_t time) {
 
         // If the neuron has spiked
         if (spike) {
-
+            log_debug("the neuron %d has been determined to spike",
+                      neuron_index);
             // Do any required synapse processing
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
@@ -163,6 +177,10 @@ void neuron_do_timestep_update(timer_t time) {
             while (!spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
                 spin1_delay_us(1);
             }
+        }
+        else{
+            log_debug("the neuron %d has been determined to not spike",
+                      neuron_index);
         }
     }
 
