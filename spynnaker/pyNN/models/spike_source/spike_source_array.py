@@ -141,7 +141,6 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
                 # add to send_buffer collection
                 send_buffer.add_keys(time_stamp_in_ticks, neuron_list)
-        print sorted(send_buffer._buffer.iteritems(), key=lambda item: item[0])
         return send_buffer
 
     def _reserve_memory_regions(self, spec, spike_region_size):
