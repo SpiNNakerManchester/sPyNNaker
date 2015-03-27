@@ -5,7 +5,7 @@ from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
 from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models\
+from spynnaker.pyNN.models.abstract_models.buffer_models\
     .abstract_sends_buffers_from_host_partitioned_vertex\
     import AbstractSendsBuffersFromHostPartitionedVertex
 from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \

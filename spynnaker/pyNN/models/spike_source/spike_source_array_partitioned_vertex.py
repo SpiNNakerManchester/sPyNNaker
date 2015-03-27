@@ -1,4 +1,4 @@
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models\
+from spynnaker.pyNN.models.abstract_models.buffer_models\
     .sends_buffers_from_host_partitioned_vertex_pre_buffered_impl\
     import SendsBuffersFromHostPartitionedVertexPreBufferedImpl
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex

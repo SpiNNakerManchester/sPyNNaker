@@ -1,4 +1,4 @@
-from spynnaker.pyNN.models.abstract_models.abstract_comm_models\
+from spynnaker.pyNN.models.abstract_models.buffer_models\
     .abstract_sends_buffers_from_host_partitioned_vertex\
     import AbstractSendsBuffersFromHostPartitionedVertex
 
