@@ -1,19 +1,21 @@
+import math
+import copy
+import logging
+
+from enum import Enum
+
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
     delay_partitionable_edge import DelayPartitionableEdge
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_incoming_edge_constraints \
+from spinn_front_end_common.abstract_models.abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
 from spynnaker.pyNN.models.abstract_models\
     .abstract_population_outgoing_edge_restrictor \
     import AbstractPopulationOutgoingEdgeRestrictor
-
 from spinn_front_end_common.utilities import constants as common_constants
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-
-
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -22,16 +24,8 @@ from pacman.model.constraints.key_allocator_constraints.\
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-
-
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
-
-
-import math 
-import copy
-import logging
-from enum import Enum
 
 
 logger = logging.getLogger(__name__)

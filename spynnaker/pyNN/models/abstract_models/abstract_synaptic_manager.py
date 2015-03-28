@@ -1,13 +1,14 @@
 """
 synaptic manager file
 """
+
+# spinn front end imports
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utilities import packet_conversions
-
-
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_incoming_edge_constraints \
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
+
+# synnaker imports
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
@@ -20,22 +21,18 @@ from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import conf
 
-
 # pacman imports
 from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
-
 # dsg imports
 from data_specification.enums.data_type import DataType
 
-import itertools
+# general imports
 import logging
 import math
 import numpy
-import struct
 import sys
-
 from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass

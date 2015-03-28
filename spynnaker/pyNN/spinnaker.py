@@ -59,13 +59,13 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from spynnaker.pyNN.models.abstract_models.abstract_provides_n_keys_for_edge\
+from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
     import AbstractProvidesNKeysForEdge
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_outgoing_edge_constraints \
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints \
     import AbstractProvidesOutgoingEdgeConstraints
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_incoming_edge_constraints \
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
 from spynnaker.pyNN.models.abstract_models\
     .abstract_send_me_multicast_commands_vertex \
@@ -210,16 +210,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         """
         self._setup_interfaces(
             hostname=self._hostname,
-            virtual_x_dimension=config.get("Machine",
-                                           "virutal_board_x_dimension"),
-            virtual_y_dimension=config.get("Machine",
-                                           "virutal_board_y_dimension"),
+            virtual_x_dimension=config.getint("Machine",
+                                              "virutal_board_x_dimension"),
+            virtual_y_dimension=config.getint("Machine",
+                                              "virutal_board_y_dimension"),
             downed_chips=config.get("Machine", "down_chips"),
             downed_cores=config.get("Machine", "down_cores"),
             requires_virtual_board=config.getboolean("Machine",
                                                      "virtual_board"),
-            requires_wrap_around=config.get("Machine",
-                                            "requires_wrap_arounds"),
+            requires_wrap_around=config.getboolean("Machine",
+                                                   "requires_wrap_arounds"),
             machine_version=config.getint("Machine", "version"))
 
         # add database generation if requested

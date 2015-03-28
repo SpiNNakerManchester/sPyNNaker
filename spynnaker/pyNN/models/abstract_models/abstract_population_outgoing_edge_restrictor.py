@@ -1,5 +1,4 @@
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_outgoing_edge_constraints \
+from spinn_front_end_common.abstract_models.abstract_provides_outgoing_edge_constraints \
     import AbstractProvidesOutgoingEdgeConstraints
 from pacman.model.constraints.key_allocator_constraints.key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
