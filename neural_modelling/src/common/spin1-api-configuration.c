@@ -58,11 +58,6 @@ address_t system_load_sram()
 bool system_runs_to_completion()
 {
   spin1_start(SYNC_WAIT);
-  if (leadAp) {
-//#ifndef DEBUG
-      rtr_free_id(sark_app_id(), 1);
-//#endif // n DEBUG
-  }
   return (true);
 }
 

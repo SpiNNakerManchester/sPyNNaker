@@ -780,13 +780,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def stop(self, stop_on_board=True):
         if stop_on_board:
-            for router_table in self._router_tables.routing_tables:
-                if (not self._machine.get_chip_at(router_table.x,
-                                                  router_table.y).virtual and
-                        len(router_table.multicast_routing_entries) > 0):
-                    self._txrx.clear_router_diagnostic_counters(router_table.x,
-                                                                router_table.y)
-
             for ip_tag in self._tags.ip_tags:
                 self._txrx.clear_ip_tag(
                     ip_tag.tag, board_address=ip_tag.board_address)

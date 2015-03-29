@@ -296,11 +296,6 @@ class BufferManager(object):
         if not sent_messages.update_last_received_sequence_number(sequence_no):
             return list()
 
-        # If there are no more messages, turn off requests for more messages
-        if not vertex.is_next_timestamp(region) and sent_messages.is_empty():
-            logger.debug("Sending stop")
-            self._send_request(vertex, StopRequests())
-
         # Add messages up to the limits
         bytes_to_go = size
         while (vertex.is_next_timestamp(region) and
@@ -324,6 +319,11 @@ class BufferManager(object):
                 not vertex.is_next_timestamp(region) and
                 bytes_to_go >= EventStopRequest.get_min_packet_length()):
             sent_messages.send_stop_message()
+
+        # If there are no more messages, turn off requests for more messages
+        if not vertex.is_next_timestamp(region) and sent_messages.is_empty():
+            logger.debug("Sending stop")
+            self._send_request(vertex, StopRequests())
 
         # Send the messages
         for message in sent_messages.messages:
