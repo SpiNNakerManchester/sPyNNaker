@@ -271,6 +271,18 @@ class BufferManager(object):
                 "The buffer size {} is too small for any data to be added for"
                 " region {} of vertex {}".format(bytes_to_go, region, vertex))
 
+        # If there are no more messages and there is space, add a stop request
+        if (not vertex.is_next_timestamp(region) and
+                bytes_to_go >= EventStopRequest.get_min_packet_length()):
+            data = BufferManager._get_message_as_bytes(EventStopRequest())
+            logger.debug("Writing stop message of {} bytes to {} on"
+                         " {}, {}, {}".format(
+                             len(data), hex(region_base_address),
+                             placement.x, placement.y, placement.p))
+            self._transceiver.write_memory(
+                placement.x, placement.y, region_base_address, data)
+            bytes_to_go -= len(data)
+
         # If there is any space left, add padding
         if bytes_to_go > 0:
             padding_packet = PaddingRequest()
