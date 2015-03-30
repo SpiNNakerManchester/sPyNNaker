@@ -25,7 +25,7 @@ from spynnaker.pyNN.utilities.utility_calls \
 from spynnaker.pyNN.utilities import conf
 
 # pacman imports
-from pacman.model.abstract_classes.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 # spinnman imports

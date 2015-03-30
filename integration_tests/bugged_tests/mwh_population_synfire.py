@@ -27,7 +27,7 @@ projections = list()
 weight_to_spike = 1.5
 delay = 5
 
-loopConnections = list()
+connections = list()
 for i in range(0, nPopulations):
     populations.append(p.Population(nNeurons,p.IF_curr_exp,cell_params_lif, label='pop_'+ str(i)))
     print "++++++++++++++++"

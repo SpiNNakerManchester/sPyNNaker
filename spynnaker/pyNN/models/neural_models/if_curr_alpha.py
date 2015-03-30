@@ -1,6 +1,6 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
-from spynnaker.pyNN.models.abstract_models.\
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
     abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN import exceptions
@@ -16,27 +16,23 @@ class IFCurrentAlphaPopulation(AbstractIntegrateAndFireProperties,
                  v_thresh=-50.0, tau_syn_E=0.5, tau_syn_I=0.5, tau_refrac=0.1,
                  i_offset=0, v_init=None):
         """
-        Leaky integrate and fire model with fixed threshold and alpha-function-\
-        shaped post-synaptic current.
+        Leaky integrate and fire model with fixed threshold and alpha-function\
+        -shaped post-synaptic current.
         """
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def model_name(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_parameters(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def is_population_vertex(self):
         return True

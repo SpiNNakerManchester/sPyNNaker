@@ -142,9 +142,10 @@ def network_specification_report(report_folder, graph, hostname):
         label = vertex.label
         model = vertex.model_name
         size = vertex.n_atoms
-        #params = vertex.parameters
+
+        # params = vertex.parameters
         constraints = vertex.constraints
-        f_network_specification.write("AbstractConstrainedVertex {}, size: {}\n"
+        f_network_specification.write("Vertex {}, size: {}\n"
                                       .format(label, size))
         f_network_specification.write("Model: {}\n".format(model))
         for constraint in constraints:

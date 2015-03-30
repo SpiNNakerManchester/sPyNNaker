@@ -17,14 +17,12 @@ logger = logging.getLogger(__name__)
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
         AbstractRecordableVertex, AbstractPopulationDataSpec):
-    """
-    Underlying AbstractConstrainedVertex model for Neural Populations.
+    """ Underlying vertex model for Neural Populations.
     """
 
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
                  machine_time_step, timescale_factor, spikes_per_second,
-                 ring_buffer_sigma, weight_scale=1.0, constraints=None,
-                 ):
+                 ring_buffer_sigma, weight_scale=1.0, constraints=None):
 
         AbstractRecordableVertex.__init__(self, machine_time_step, label)
         AbstractPopulationDataSpec.__init__(
@@ -36,10 +34,6 @@ class AbstractPopulationVertex(
             ring_buffer_sigma=ring_buffer_sigma)
         self._n_params = n_params
         self._weight_scale = weight_scale
-
-    @abstractmethod
-    def is_population_vertex(self):
-        pass
 
     @property
     def weight_scale(self):
@@ -98,6 +92,17 @@ class AbstractPopulationVertex(
             compatible_output=compatible_output, has_ran=has_ran,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
             placements=placements, txrx=txrx)
+
+    def is_recordable(self):
+        """ helper method for is instance
+
+        :return:
+        """
+        return True
+
+    @abstractmethod
+    def is_population_vertex(self):
+        pass
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

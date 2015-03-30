@@ -1,9 +1,10 @@
 from pacman.model.routing_info.key_and_mask import KeyAndMask
-from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_mask_constraint \
-    import KeyAllocatorFixedMaskConstraint
-from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_key_and_mask_constraint \
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_fixed_key_and_mask_constraint\
     import KeyAllocatorFixedKeyAndMaskConstraint
-from pacman.model.abstract_classes.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 from data_specification.data_specification_generator \
@@ -40,7 +41,7 @@ class CommandSender(AbstractProvidesOutgoingEdgeConstraints,
         AbstractProvidesOutgoingEdgeConstraints.__init__(self)
         AbstractPartitionableVertex.__init__(self, 1, "Command Sender", 1)
         AbstractDataSpecableVertex.__init__(
-            self, 1, "Command Sender", machine_time_step, timescale_factor)
+            self, machine_time_step, timescale_factor)
 
         self._edge_constraints = dict()
         self._command_edge = dict()

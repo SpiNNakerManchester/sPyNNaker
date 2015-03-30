@@ -39,6 +39,7 @@ class FilterableException(SpynnakerException):
     """
     pass
 
+
 class SynapticConfigurationException(ConfigurationException):
     """raised when the synaptic manager fails to handle a synaptic dynamic
 
@@ -81,6 +82,7 @@ class DelayExtensionException(ConfigurationException):
     """
     pass
 
+
 class ExecutableNotFoundException(SpynnakerException):
     """ raised when a suitable executable cannot be found
     to load onto SpiNNaker for a particular vertex
@@ -89,7 +91,8 @@ class ExecutableNotFoundException(SpynnakerException):
     :raise None: does not raise any known exceptions
     """
     pass
-    
+
+
 class ExecutableFailedToStartException(SpynnakerException):
     """ raised when the messgaes from the trnasicever state that some or all the
     application images pushed to the board have failed to start when asked
@@ -106,5 +109,30 @@ class ExecutableFailedToStopException(SpynnakerException):
 
 
     :raise None: does not raise any known exceptions
+    """
+    pass
+
+
+class BufferableRegionTooSmall(SpynnakerException):
+    """ raised when the SDRAM space of the region for buffered packets is
+    too small to contain any packet at all
+    """
+    pass
+
+
+class BufferedRegionNotPresent(SpynnakerException):
+    """ raised when trying to issue buffered packets for a region not managed
+    """
+    pass
+
+
+class InvalidParameterType(SpynnakerException):
+    """ raised when trying to issue buffered packets for a region not managed
+    """
+    pass
+
+
+class InvalidPacketType(SpynnakerException):
+    """ raised when trying to issue buffered packets for a region not managed
     """
     pass

@@ -81,9 +81,9 @@ class SpynnakerCommsFunctions(object):
             self._machine = self._txrx.get_machine_details()
         else:
             virtual_x_dimension = conf.config.getint(
-                "Machine", "virutal_board_x_dimension")
+                "Machine", "virtual_board_x_dimension")
             virtual_y_dimension = conf.config.getint(
-                "Machine", "virutal_board_y_dimension")
+                "Machine", "virtual_board_y_dimension")
             requires_wrap_around = conf.config.getboolean(
                 "Machine", "requires_wrap_arounds")
             self._machine = VirtualMachine(
@@ -109,16 +109,16 @@ class SpynnakerCommsFunctions(object):
     def execute_data_specification_execution(
             self, host_based_execution, hostname, placements, graph_mapper):
         if host_based_execution:
-            return self.host_based_data_specificiation_execution(
+            return self.host_based_data_specification_execution(
                 hostname, placements, graph_mapper)
         else:
-            return self._chip_based_data_specificiation_execution(hostname)
+            return self._chip_based_data_specification_execution(hostname)
 
-    def _chip_based_data_specificiation_execution(self, hostname):
+    def _chip_based_data_specification_execution(self, hostname):
         raise NotImplementedError
 
-    def host_based_data_specificiation_execution(self, hostname, placements,
-                                                 graph_mapper):
+    def host_based_data_specification_execution(self, hostname, placements,
+                                                graph_mapper):
         space_based_memory_tracker = dict()
         processor_to_app_data_base_address = dict()
 
@@ -197,9 +197,10 @@ class SpynnakerCommsFunctions(object):
         return processor_to_app_data_base_address
 
     def _start_execution_on_machine(
-            self, executable_targets, app_id, runtime, time_scaling,
-            waiting_on_confirmation, send_start_notification, database_thread,
-            in_debug_mode):
+            self, executable_targets, app_id, runtime,
+            time_scaling, waiting_on_confirmation, send_start_notification,
+            database_thread, in_debug_mode):
+
         # deduce how many processors this application uses up
         total_processors = 0
         total_cores = list()
@@ -224,7 +225,7 @@ class SpynnakerCommsFunctions(object):
                                                            CPUState.SYNC0)
 
         if processors_ready != total_processors:
-            successful_cores, unsucessful_cores = \
+            successful_cores, unsuccessful_cores = \
                 self._break_down_of_failure_to_reach_state(total_cores,
                                                            CPUState.SYNC0)
             # last chance to slip out of error check
@@ -232,10 +233,10 @@ class SpynnakerCommsFunctions(object):
                 # break_down the successful cores and unsuccessful cores into
                 # string
                 break_down = self.turn_break_downs_into_string(
-                    total_cores, successful_cores, unsucessful_cores,
+                    total_cores, successful_cores, unsuccessful_cores,
                     CPUState.SYNC0)
                 raise exceptions.ExecutableFailedToStartException(
-                    "Only {} processors out of {} have sucessfully reached "
+                    "Only {} processors out of {} have successfully reached "
                     "sync0 with breakdown of: {}"
                     .format(processors_ready, total_processors, break_down))
 
@@ -262,14 +263,14 @@ class SpynnakerCommsFunctions(object):
                 logger.warn("some processors finished between signal "
                             "transmissions. Could be a sign of an error")
             else:
-                sucessful_cores, unsucessful_cores = \
+                successful_cores, unsuccessful_cores = \
                     self._break_down_of_failure_to_reach_state(
                         total_cores, CPUState.RUNNING)
 
                 # break_down the successful cores and unsuccessful cores into
                 # string reps
                 break_down = self.turn_break_downs_into_string(
-                    total_cores, sucessful_cores, unsucessful_cores,
+                    total_cores, successful_cores, unsuccessful_cores,
                     CPUState.RUNNING)
                 raise exceptions.ExecutableFailedToStartException(
                     "Only {} of {} processors started with breakdown {}"
@@ -288,13 +289,13 @@ class SpynnakerCommsFunctions(object):
                 processors_rte = self._txrx.get_core_state_count(
                     app_id, CPUState.RUN_TIME_EXCEPTION)
                 if processors_rte > 0:
-                    sucessful_cores, unsucessful_cores = \
+                    successful_cores, unsuccessful_cores = \
                         self._break_down_of_failure_to_reach_state(
                             total_cores, CPUState.RUNNING)
                     # break_down the successful cores and unsuccessful cores
                     # into string reps
                     break_down = self.turn_break_downs_into_string(
-                        total_cores, sucessful_cores, unsucessful_cores,
+                        total_cores, successful_cores, unsuccessful_cores,
                         CPUState.RUNNING)
                     raise exceptions.ExecutableFailedToStopException(
                         "{} cores have gone into a run time error state with "
@@ -307,13 +308,13 @@ class SpynnakerCommsFunctions(object):
                 self._txrx.get_core_state_count(app_id, CPUState.FINSHED)
 
             if processors_exited < total_processors:
-                sucessful_cores, unsucessful_cores = \
+                successful_cores, unsuccessful_cores = \
                     self._break_down_of_failure_to_reach_state(
                         total_cores, CPUState.RUNNING)
                 # break_down the successful cores and unsuccessful cores into
                 #  string reps
                 break_down = self.turn_break_downs_into_string(
-                    total_cores, sucessful_cores, unsucessful_cores,
+                    total_cores, successful_cores, unsuccessful_cores,
                     CPUState.RUNNING)
                 raise exceptions.ExecutableFailedToStopException(
                     "{} of the processors failed to exit successfully with"
@@ -325,16 +326,17 @@ class SpynnakerCommsFunctions(object):
                         "- PACMAN is exiting")
 
     def _break_down_of_failure_to_reach_state(self, total_cores, state):
-        sucessful_cores = list()
-        unsucessful_cores = dict()
+        successful_cores = list()
+        unsuccessful_cores = dict()
         core_infos = self._txrx.get_cpu_information(total_cores)
         for core_info in core_infos:
             if core_info.state == state:
-                sucessful_cores.append((core_info.x, core_info.y, core_info.p))
+                successful_cores.append((core_info.x, core_info.y,
+                                         core_info.p))
             else:
-                unsucessful_cores[(core_info.x, core_info.y, core_info.p)] = \
+                unsuccessful_cores[(core_info.x, core_info.y, core_info.p)] = \
                     core_info.state.name
-        return sucessful_cores, unsucessful_cores
+        return successful_cores, unsuccessful_cores
 
     @staticmethod
     def turn_break_downs_into_string(total_cores, successful_cores,
@@ -344,7 +346,7 @@ class SpynnakerCommsFunctions(object):
             for processor_id in core_info.processor_ids:
                 core_coord = (core_info.x, core_info.y, processor_id)
                 if core_coord in successful_cores:
-                    break_down += "{}:{}:{} sucessfully in state {}{}"\
+                    break_down += "{}:{}:{} successfully in state {}{}"\
                         .format(core_info.x, core_info.y, processor_id,
                                 state.name, os.linesep)
                 else:
@@ -420,7 +422,7 @@ class SpynnakerCommsFunctions(object):
         progress_bar = ProgressBar(len(list(router_tables.routing_tables)),
                                    "Loading routing data onto the machine")
 
-        # load each router table thats needed for the application to run into
+        # load each router table that is needed for the application to run into
         # the chips sdram
         for router_table in router_tables.routing_tables:
             if not self._machine.get_chip_at(router_table.x,
@@ -443,7 +445,7 @@ class SpynnakerCommsFunctions(object):
         progress_bar.end()
 
     def _load_executable_images(self, executable_targets, app_id):
-        """ Go through the exeuctable targets and load each binary to \
+        """ Go through the executable targets and load each binary to \
             everywhere and then send a start request to the cores that \
             actually use it
         """
@@ -455,11 +457,11 @@ class SpynnakerCommsFunctions(object):
 
         progress_bar = ProgressBar(len(executable_targets),
                                    "Loading executables onto the machine")
-        for exectuable_target_key in executable_targets:
-            file_reader = SpinnmanFileDataReader(exectuable_target_key)
-            core_subset = executable_targets[exectuable_target_key]
+        for executable_target_key in executable_targets:
+            file_reader = SpinnmanFileDataReader(executable_target_key)
+            core_subset = executable_targets[executable_target_key]
 
-            file_to_read_in = open(exectuable_target_key, 'rb')
+            file_to_read_in = open(executable_target_key, 'rb')
             buf = file_to_read_in.read()
             size = (len(buf))
 
@@ -470,6 +472,6 @@ class SpynnakerCommsFunctions(object):
                 binary_folder = os.path.join(conf.config.get("SpecGeneration",
                                                              "Binary_folder"))
                 reports.re_load_script_load_executables_individual(
-                    binary_folder, exectuable_target_key, app_id, size)
+                    binary_folder, executable_target_key, app_id, size)
             progress_bar.update()
         progress_bar.end()

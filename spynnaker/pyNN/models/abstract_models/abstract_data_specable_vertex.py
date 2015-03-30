@@ -4,8 +4,6 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 
-from pacman.model.abstract_constrained_vertex import AbstractConstrainedVertex
-
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
@@ -19,11 +17,9 @@ _lock_condition = threading.Condition()
 
 
 @add_metaclass(ABCMeta)
-class AbstractDataSpecableVertex(AbstractConstrainedVertex):
+class AbstractDataSpecableVertex(object):
 
-    def __init__(self, n_atoms, label, machine_time_step, timescale_factor,
-                 constraints=None):
-        AbstractConstrainedVertex.__init__(self, label, constraints)
+    def __init__(self, machine_time_step, timescale_factor):
         self._machine_time_step = machine_time_step
         self._timescale_factor = timescale_factor
         self._application_runtime = None

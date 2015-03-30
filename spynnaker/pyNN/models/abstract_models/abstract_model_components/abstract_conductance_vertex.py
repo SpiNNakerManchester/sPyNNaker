@@ -41,6 +41,6 @@ class AbstractConductanceVertex(object):
         self._e_rev_I = new_value
 
     @abstractmethod
-    def is_conductive(self):
+    def is_conductance(self):
         """helper method for is_instance
         """

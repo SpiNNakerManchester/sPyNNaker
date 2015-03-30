@@ -299,14 +299,14 @@ class SpynnakerConfiguration(object):
                 config.add_section("Model")
             config.set("Model", "max_delay", (max_delay * 1000) / timestep)
 
-        if (config.has_option("Machine", "timeScaleFactor")
-                and config.get("Machine", "timeScaleFactor") != "None"):
+        if (config.has_option("Machine", "timeScaleFactor") and
+                config.get("Machine", "timeScaleFactor") != "None"):
             self._time_scale_factor = \
                 config.getint("Machine", "timeScaleFactor")
             if timestep * self._time_scale_factor < 1000:
                 logger.warn("the combination of machine time step and the "
                             "machine time scale factor results in a real "
-                            "timer tic that is currently not reliably "
+                            "timer tick that is currently not reliably "
                             "supported by the spinnaker machine.")
         else:
             self._time_scale_factor = max(1,

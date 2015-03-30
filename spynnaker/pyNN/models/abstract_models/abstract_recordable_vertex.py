@@ -20,8 +20,7 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractRecordableVertex(object):
-    """
-    Underlying AbstractConstrainedVertex model for Neural Applications.
+    """ Underlying recordable vertex
     """
 
     def __init__(self, machine_time_step, label):
@@ -125,7 +124,7 @@ class AbstractRecordableVertex(object):
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
 
             # check that the number of spikes written is smaller or the same as
-            #  the size of the memory region we allocated for spikes
+            # the size of the memory region we allocated for spikes
             out_spike_bytes = sub_vertex_out_spike_bytes_function(
                 subvertex, subvertex_slice)
             size_of_region = self.get_recording_region_size(out_spike_bytes)

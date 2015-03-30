@@ -4,6 +4,23 @@ from pacman.operations.router_check_functionality.valid_routes_checker import \
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
+    import MultiCastPartitionableEdge
+from pacman.operations.tag_allocator_algorithms.basic_tag_allocator \
+    import BasicTagAllocator
+from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
+    import DictBasedPartitionedEdgeNKeysMap
+from pacman.operations.router_algorithms.basic_dijkstra_routing \
+    import BasicDijkstraRouting
+from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
+from pacman.operations.routing_info_allocator_algorithms.\
+    basic_routing_info_allocator import BasicRoutingInfoAllocator
+from pacman.utilities.progress_bar import ProgressBar
+
+from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
+from spynnaker.pyNN.models.abstract_models.buffer_models\
+    .abstract_sends_buffers_from_host_partitioned_vertex\
+    import AbstractSendsBuffersFromHostPartitionedVertex
 from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
     AbstractVirtualVertex
 from spynnaker.pyNN.models.abstract_models.abstract_provides_n_keys_for_edge\
@@ -20,18 +37,6 @@ from spynnaker.pyNN.models.abstract_models\
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
-from pacman.operations.tag_allocator_algorithms.basic_tag_allocator \
-    import BasicTagAllocator
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
-from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
-    import DictBasedPartitionedEdgeNKeysMap
-from pacman.operations.router_algorithms.basic_dijkstra_routing \
-    import BasicDijkstraRouting
-from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
-from pacman.operations.routing_info_allocator_algorithms.\
-    basic_routing_info_allocator import BasicRoutingInfoAllocator
-from pacman.utilities.progress_bar import ProgressBar
 
 # spinnmachine imports
 from spinn_machine.sdram import SDRAM
@@ -130,6 +135,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         # add this default to end of list of search paths
         self._binary_search_paths.append(binary_path)
         self._edge_count = 0
+
+        # Manager of buffered sending
+        self._send_buffer_manager = None
 
     def run(self, run_time):
         self._setup_interfaces(hostname=self._hostname)
@@ -258,6 +266,10 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._app_id)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(executable_targets, self._app_id)
+                logger.info("*** Loading buffers ***")
+                self._set_up_send_buffering()
+
+            # end of entire loading setup
             if do_timing:
                 timer.take_sample()
 
@@ -269,6 +281,9 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     reports.re_load_script_running_aspects(
                         binary_folder, executable_targets, self._hostname,
                         self._app_id, run_time)
+
+                # every thing is in sync0. load the initial buffers
+                self._send_buffer_manager.load_initial_buffers()
 
                 wait_on_confirmation = conf.config.getboolean(
                     "Database", "wait_on_confirmation")
@@ -290,6 +305,26 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 "*** Using a Virtual Machine so no simulation will occur")
         else:
             logger.info("*** No simulation requested: Stopping. ***")
+
+    def _set_up_send_buffering(self):
+        progress_bar = ProgressBar(
+            len(self.partitionable_graph.vertices),
+            "on initialising the buffer managers for vertices which require"
+            " buffering")
+
+        # Create the buffer manager
+        self._send_buffer_manager = BufferManager(
+            self._placements, self._routing_infos, self._tags, self._txrx)
+
+        for partitioned_vertex in self.partitioned_graph.subvertices:
+            if isinstance(partitioned_vertex,
+                          AbstractSendsBuffersFromHostPartitionedVertex):
+
+                # Add the vertex to the managed vertices
+                self._send_buffer_manager.add_sender_vertex(
+                    partitioned_vertex)
+            progress_bar.update()
+        progress_bar.end()
 
     @property
     def app_id(self):
@@ -633,7 +668,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._multi_cast_vertex = CommandSender(
                     self._machine_time_step, self._time_scale_factor)
                 self.add_vertex(self._multi_cast_vertex)
-            edge = PartitionableEdge(self._multi_cast_vertex, vertex_to_add)
+            edge = MultiCastPartitionableEdge(
+                self._multi_cast_vertex, vertex_to_add)
             self._multi_cast_vertex.add_commands(vertex_to_add.commands, edge)
             self.add_edge(edge)
 
@@ -642,7 +678,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                       AbstractVertexWithEdgeToDependentVertices):
             for dependant_vertex in vertex_to_add.dependent_vertices:
                 self.add_vertex(dependant_vertex)
-                dependant_edge = PartitionableEdge(
+                dependant_edge = MultiCastPartitionableEdge(
                     pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
                 self.add_edge(dependant_edge)
 
@@ -745,12 +781,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def stop(self, stop_on_board=True):
         if stop_on_board:
-            for router_table in self._router_tables.routing_tables:
-                if (not self._machine.get_chip_at(router_table.x,
-                                                  router_table.y).virtual and
-                        len(router_table.multicast_routing_entries) > 0):
-                    self._txrx.clear_router_diagnostic_counters(router_table.x,
-                                                                router_table.y)
             for ip_tag in self._tags.ip_tags:
                 self._txrx.clear_ip_tag(
                     ip_tag.tag, board_address=ip_tag.board_address)
