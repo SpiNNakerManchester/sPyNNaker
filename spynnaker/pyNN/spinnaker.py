@@ -402,7 +402,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
     def _set_up_send_buffering(self):
         progress_bar = ProgressBar(
-            len(self.partitionable_graph.vertices),
+            len(self.partitioned_graph.subvertices),
             "on initialising the buffer managers for vertices which require"
             " buffering")
 
