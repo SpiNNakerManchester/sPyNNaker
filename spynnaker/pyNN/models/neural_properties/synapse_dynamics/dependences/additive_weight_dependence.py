@@ -19,12 +19,12 @@ class AdditiveWeightDependence(AbstractWeightDependency):
         if (other is None) or (not isinstance(other,
                                               AdditiveWeightDependence)):
             return False
-        return ((self._w_min == other.w_min)
-                and (self._w_max == other.w_max)
-                and (self._A_plus == other.A_plus)
-                and (self._A_minus == other.A_minus)
-                and (self._A3_plus == other.A3_plus)
-                and (self._A3_minus == other.A3_minus))
+        return ((self._w_min == other.w_min) and
+                (self._w_max == other.w_max) and
+                (self._A_plus == other.A_plus) and
+                (self._A_minus == other.A_minus) and
+                (self._A3_plus == other.A3_plus) and
+                (self._A3_minus == other.A3_minus))
 
     def get_params_size_bytes(self, num_synapse_types, num_terms):
         if num_terms == 1:
@@ -51,24 +51,24 @@ class AdditiveWeightDependence(AbstractWeightDependency):
             #                   /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self._A_plus * self._w_max * w
-                               * global_weight_scale)),
+                data=int(round(self._A_plus * self._w_max * w *
+                               global_weight_scale)),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._A_minus * self._w_max * w
-                               * global_weight_scale)),
+                data=int(round(self._A_minus * self._w_max * w *
+                               global_weight_scale)),
                 data_type=DataType.INT32)
 
             # If triplet term is required, write A3+ and A3-, also multiplied
             # by Wmax
             if num_terms == 2:
                 spec.write_value(
-                    data=int(round(self._A3_plus * self._w_max * w
-                                   * global_weight_scale)),
+                    data=int(round(self._A3_plus * self._w_max * w *
+                                   global_weight_scale)),
                     data_type=DataType.INT32)
                 spec.write_value(
-                    data=int(round(self._A3_minus * self._w_max * w
-                                   * global_weight_scale)),
+                    data=int(round(self._A3_minus * self._w_max * w *
+                                   global_weight_scale)),
                     data_type=DataType.INT32)
             elif num_terms != 1:
                 raise NotImplementedError("Additive weight dependence only"

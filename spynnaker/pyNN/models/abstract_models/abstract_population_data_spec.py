@@ -166,7 +166,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         """
 
     def _write_neuron_parameters(
-            self, spec, key, subvertex, ring_buffer_to_input_left_shifts, 
+            self, spec, key, subvertex, ring_buffer_to_input_left_shifts,
             vertex_slice):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -225,8 +225,8 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         # End the loop over the neurons:
 
     def generate_data_spec(
-            self, subvertex, placement, subgraph, graph, routing_info, hostname, 
-            graph_mapper, report_folder, ip_tags, reverse_ip_tags, 
+            self, subvertex, placement, subgraph, graph, routing_info,
+            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
             write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to
@@ -297,7 +297,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             subgraph.incoming_subedges_from_subvertex(subvertex)
         for partitioned_edge in in_partitioned_edges:
             partitioned_edge.weight_scales_setter(weight_scales)
-            
+
         # Construct the data images needed for the Neuron:
         self._reserve_population_based_memory_regions(
             spec, neuron_params_sz, synapse_params_sz,

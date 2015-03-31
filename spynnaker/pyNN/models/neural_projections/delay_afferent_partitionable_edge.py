@@ -1,13 +1,14 @@
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge import \
+    MultiCastPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_partitioned_edge \
     import DelayAfferentPartitionedEdge
 
 
-class DelayAfferentPartitionableEdge(PartitionableEdge):
-    
+class DelayAfferentPartitionableEdge(MultiCastPartitionableEdge):
+
     def __init__(self, prevertex, delayvertex, label=None):
-        PartitionableEdge.__init__(self, prevertex, delayvertex, label=label)
+        MultiCastPartitionableEdge.__init__(self, prevertex, delayvertex,
+                                            label=label)
 
     def create_subedge(self, pre_subvertex, post_subvertex, constraints=None,
                        label=None):
@@ -21,7 +22,8 @@ class DelayAfferentPartitionableEdge(PartitionableEdge):
                     :py:class:`pacman.model.partitioned_graph.subvertex.PartitionedVertex`
         :param label: The label to give the edge.  If not specified, and the\
                     edge has no label, the subedge will have no label.  If not\
-                    specified and the edge has a label, a label will be provided
+                    specified and the edge has a label, a label will be\
+                    provided
         :type label: str
         :return: The created subedge
         :rtype: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
@@ -32,3 +34,10 @@ class DelayAfferentPartitionableEdge(PartitionableEdge):
         constraints.extend(self.constraints)
         return DelayAfferentPartitionedEdge(pre_subvertex, post_subvertex,
                                             constraints)
+
+    def is_multi_cast_partitionable_edge(self):
+        """helper method for isinstance
+
+        :return:
+        """
+        return True

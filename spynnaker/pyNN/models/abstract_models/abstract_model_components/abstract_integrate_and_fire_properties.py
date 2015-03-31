@@ -17,10 +17,9 @@ class AbstractIntegrateAndFireProperties(object):
         self._atoms = atoms
         self._v_rest = utility_calls.convert_param_to_numpy(v_rest, atoms)
         self._v_reset = utility_calls.convert_param_to_numpy(v_reset, atoms)
-        self._v_thresh = \
-            utility_calls.convert_param_to_numpy(v_thresh, atoms)
-        self._tau_refrac = \
-            utility_calls.convert_param_to_numpy(tau_refrac, atoms)
+        self._v_thresh = utility_calls.convert_param_to_numpy(v_thresh, atoms)
+        self._tau_refrac = utility_calls.convert_param_to_numpy(
+            tau_refrac, atoms)
 
         # if v_init is not set to v_rest then set to v_init
         self._v_init = v_rest

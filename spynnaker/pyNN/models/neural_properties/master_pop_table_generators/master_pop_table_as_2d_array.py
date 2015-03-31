@@ -6,12 +6,10 @@ MasterPopTableAs2dArray
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
 from pacman.utilities.field import Field
-from pacman.utilities import constants as pacman_constants
 
 # spynnaker imports
 from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
     abstract_master_pop_table_factory import AbstractMasterPopTableFactory
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 
 # spinn front end common inports
@@ -50,9 +48,9 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     def initialise_table(self, spec, master_population_table_region):
         """
-        
-        :param spec: 
-        :param master_population_table_region: 
+
+        :param spec:
+        :param master_population_table_region:
         :return:
         """
         # Zero all entries in the Master Population Table so that all unused
@@ -72,12 +70,12 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
             self, incoming_key, master_pop_base_mem_address, txrx, chip_x,
             chip_y):
         """
-        
-        :param incoming_key: 
-        :param master_pop_base_mem_address: 
-        :param txrx: 
-        :param chip_x: 
-        :param chip_y: 
+
+        :param incoming_key:
+        :param master_pop_base_mem_address:
+        :param txrx:
+        :param chip_x:
+        :param chip_y:
         :return:
         """
 
@@ -87,8 +85,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         pre_p = packet_conversions.get_p_from_key(incoming_key)
         table_slot_addr = self._get_table_address_from_coords(
             pre_x, pre_y, pre_p)
-        master_table_pop_entry_address = (table_slot_addr
-                                          + master_pop_base_mem_address)
+        master_table_pop_entry_address = (table_slot_addr +
+                                          master_pop_base_mem_address)
 
         # read in entry
         master_pop_entry = helpful_functions.read_and_convert(
@@ -106,9 +104,9 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     def get_master_population_table_size(self, vertex_slice, in_edges):
         """
-        
-        :param vertex_slice: 
-        :param in_edges: 
+
+        :param vertex_slice:
+        :param in_edges:
         :return:
         """
         # 2 bytes per entry + row length table
@@ -116,8 +114,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     def get_allowed_row_length(self, row_length):
         """
-        
-        :param row_length: 
+
+        :param row_length:
         :return:
         """
 
@@ -139,8 +137,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     def _get_row_length_table_index(self, row_length):
         """
-        
-        :param row_length: 
+
+        :param row_length:
         :return:
         """
         for i in range(len(ROW_LEN_TABLE_ENTRIES)):
@@ -150,8 +148,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     def get_next_allowed_address(self, next_address):
         """
-        
-        :param next_address: 
+
+        :param next_address:
         :return:
         """
 
@@ -163,10 +161,10 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     def _get_table_address_from_coords(self, x, y, p):
         """
-        
-        :param x: 
-        :param y: 
-        :param p: 
+
+        :param x:
+        :param y:
+        :param p:
         :return:
         """
         return (p + (18 * y) + (18 * 8 * x)) * 2
@@ -231,16 +229,16 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """
-        
-        :param spec: 
-        :param master_pop_table_region: 
+
+        :param spec:
+        :param master_pop_table_region:
         :return:
         """
         pass
 
     def get_edge_constraints(self):
         """
-        
+
         :return:
         """
 

@@ -3,8 +3,6 @@ from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 from spynnaker.pyNN.utilities import constants as local_constants
 
-from spinn_front_end_common.utilities import constants
-
 from pacman.utilities import constants as pacman_constants
 from pacman.utilities.progress_bar import ProgressBar
 
@@ -22,8 +20,7 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractPopulationRecordableVertex(object):
-    """
-    Underlying AbstractConstrainedVertex model for Neural Applications.
+    """ Neural recording
     """
 
     def __init__(self, machine_time_step, label):
@@ -74,7 +71,7 @@ class AbstractPopulationRecordableVertex(object):
         Gets the size of a recording region in bytes
         """
         if self._no_machine_time_steps is None:
-            raise Exception("This model cannot record this parameter" +
+            raise Exception("This model cannot record this parameter"
                             " without a fixed run time")
         return (local_constants.RECORDING_ENTRY_BYTE_SIZE +
                 (self._no_machine_time_steps * bytes_per_timestep))
@@ -127,7 +124,7 @@ class AbstractPopulationRecordableVertex(object):
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
 
             # check that the number of spikes written is smaller or the same as
-            #  the size of the memory region we allocated for spikes
+            # the size of the memory region we allocated for spikes
             out_spike_bytes = sub_vertex_out_spike_bytes_function(
                 subvertex, subvertex_slice)
             size_of_region = self.get_recording_region_size(out_spike_bytes)

@@ -1,12 +1,13 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
-    import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_integrate_and_fire_properties \
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
+    abstract_exp_population_vertex import AbstractExponentialPopulationVertex
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
+    abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
-    import AbstractConductanceVertex
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
+    abstract_conductance_vertex import AbstractConductanceVertex
 
 
 class EIFConductanceExponentialPopulation(
@@ -26,24 +27,20 @@ class EIFConductanceExponentialPopulation(
         Exponential integrate and fire neuron with spike triggered and \
         sub-threshold adaptation currents (isfa, ista reps.)
         """
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def model_name(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_parameters(self):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        raise exceptions.SpynnakerException("This neuron model is currently not"
-                                            " supported by the tool chain....."
-                                            "watch this space")
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
 
     def is_population_vertex(self):
         return True
@@ -51,7 +48,7 @@ class EIFConductanceExponentialPopulation(
     def is_integrate_and_fire_vertex(self):
         pass
 
-    def is_conductive(self):
+    def is_conductance(self):
         pass
 
     def is_exp_vertex(self):

@@ -27,17 +27,16 @@ logger = logging.getLogger(__name__)
 class Population(object):
     """
     A collection neuron of the same types. It encapsulates a type of
-    :class:`pacman103.lib.partitionable_graph.AbstractConstrainedVertex`
-    used with Spiking Neural Networks, comprising n cells (atoms)
-    of the same :py:mod:`pacman103.front.pynn.abstract_models` type.
+    vertex used with Spiking Neural Networks, comprising n cells (atoms)
+    of the same model type.
 
     :param int size:
         size (number of cells) of the Population.
-    :param `pacman103.front.pynn.abstract_models` cellclass:
+    :param cellclass:
         specifies the neural model to use for the Population
     :param dict cellparams:
         a dictionary containing model specific parameters and values
-    :param `pyNN.space` structure:
+    :param structure:
         a spatial structure
     :param string label:
         a label identifying the Population
@@ -274,7 +273,7 @@ class Population(object):
         initialize_attr = \
             getattr(self._vertex, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("AbstractConstrainedVertex does not support "
+            raise Exception("Vertex does not support "
                             "initialization of parameter {%s}".format(
                                 variable))
 
@@ -309,6 +308,10 @@ class Population(object):
         Returns the total number of cells in the population.
         """
         return self._size
+
+    @property
+    def label(self):
+        return self._vertex.label
 
     @property
     def local_size(self):
@@ -384,7 +387,7 @@ class Population(object):
         triggering gsyn value recording.
         """
         if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
-            raise Exception("AbstractConstrainedVertex does not support "
+            raise Exception("Vertex does not support "
                             "recording of gsyn")
 
         self._vertex.set_record_gsyn(True)
@@ -397,7 +400,7 @@ class Population(object):
         triggering potential recording.
         """
         if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
-            raise Exception("AbstractConstrainedVertex does not support "
+            raise Exception("Vertex does not support "
                             "recording of potential")
 
         self._vertex.set_record_v(True)

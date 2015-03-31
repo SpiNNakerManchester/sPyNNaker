@@ -70,8 +70,8 @@ class FixedNumberPreConnector(AbstractConnector):
         for pre_atom in pre_synaptic_neurons:
 
             present = numpy.ones(postvertex.n_atoms, dtype=numpy.uint32)
-            if (not self._allow_self_connections
-                    and presynaptic_population == postsynaptic_population):
+            if (not self._allow_self_connections and
+                    presynaptic_population == postsynaptic_population):
                 present[pre_atom] = 0
                 n_present = postvertex.n_atoms - 1
             else:

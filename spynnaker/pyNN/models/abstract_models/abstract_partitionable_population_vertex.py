@@ -10,7 +10,7 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 
 # pacman imports
-from pacman.model.abstract_classes.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 # general imports
@@ -18,6 +18,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 import math
+
 
 @add_metaclass(ABCMeta)
 class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
@@ -31,8 +32,8 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
     def __init__(self, n_atoms, label, max_atoms_per_core, machine_time_step,
                  timescale_factor, constraints=None):
         AbstractDataSpecableVertex.__init__(
-            self, n_atoms, label, machine_time_step=machine_time_step,
-            timescale_factor=timescale_factor, constraints=constraints)
+            self, machine_time_step=machine_time_step,
+            timescale_factor=timescale_factor)
         AbstractPartitionableVertex.__init__(
             self, n_atoms, label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
@@ -141,7 +142,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
             contraints
             :param new_value: setting of the model max atoms per core
         """
-        
+
     @abstractmethod
     def get_n_synapse_parameters_per_synapse_type(self):
         """ Get the number of synapse parameters per synapse type per neuron

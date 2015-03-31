@@ -1,11 +1,6 @@
-"""
-DataBaseInterface.py
-"""
-
 # spinnman imports
-from spinnman import constants as spinnman_constants
-from spinnman.messages.eieio.eieio_command_header import EIEIOCommandHeader
-from spinnman.messages.eieio.eieio_command_message import EIEIOCommandMessage
+from spinnman.messages.eieio.command_messages.database_confirmation\
+    import DatabaseConfirmation
 from spinnman.connections.udp_packet_connections.eieio_command_connection \
     import EieioCommandConnection
 
@@ -215,14 +210,7 @@ class DataBaseInterface(object):
                 socket_address.notify_port_no)
             data_base_message_connections.append(data_base_message_connection)
 
-        # create complete message for vis to pick up
-        eieio_command_header = EIEIOCommandHeader(
-            spinnman_constants.EIEIO_COMMAND_IDS.DATABASE_CONFIRMATION.value)
-        eieio_command_message = EIEIOCommandMessage(eieio_command_header)
-
         # add file path to database into command message.
-        # |------P------||------F-----|---------path----------|
-        #        0              1               path
         number_of_chars = len(self._database_path)
         if number_of_chars > spynnaker_constants.MAX_DATABASE_PATH_LENGTH:
             raise exceptions.ConfigurationException(
@@ -231,7 +219,7 @@ class DataBaseInterface(object):
                 "please set the file path manually and "
                 "set the .cfg parameter [Database] send_file_path "
                 "to False")
-        eieio_command_message.add_data(self._database_path)
+        eieio_command_message = DatabaseConfirmation(self._database_path)
 
         # Send command and wait for response
         logger.info("*** Notifying visualiser that the database is ready ***")
@@ -264,10 +252,7 @@ class DataBaseInterface(object):
             data_base_message_connections.append(
                 data_base_message_connection)
 
-        eieio_command_header = EIEIOCommandHeader(
-            spinnman_constants.EIEIO_COMMAND_IDS
-            .DATABASE_CONFIRMATION.value)
-        eieio_command_message = EIEIOCommandMessage(eieio_command_header)
+        eieio_command_message = DatabaseConfirmation()
         for connection in data_base_message_connections:
             connection.send_eieio_command_message(eieio_command_message)
 

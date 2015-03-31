@@ -54,23 +54,23 @@ class SynapseRowInfo(object):
 
         if vertex_slice is None and lo_delay is None and hi_delay is None:
             return self.target_indices.size
-        
+
         if vertex_slice is not None and lo_delay is None and hi_delay is None:
-            mask = ((self.target_indices >= vertex_slice.lo_atom)
-                    & (self.target_indices <= vertex_slice.hi_atom))
+            mask = ((self.target_indices >= vertex_slice.lo_atom) &
+                    (self.target_indices <= vertex_slice.hi_atom))
             return np.sum(mask)
 
-        if (vertex_slice is None and lo_delay is not None
-                and hi_delay is not None):
-            mask = ((self.delays >= lo_delay)
-                    & (self.delays <= hi_delay))
+        if (vertex_slice is None and lo_delay is not None and
+                hi_delay is not None):
+            mask = ((self.delays >= lo_delay) &
+                    (self.delays <= hi_delay))
             return np.sum(mask)
 
-        mask = ((self.target_indices >= vertex_slice.lo_atom)
-                & (self.target_indices <= vertex_slice.hi_atom)
-                & (self.delays >= lo_delay) & (self.delays <= hi_delay))
+        mask = ((self.target_indices >= vertex_slice.lo_atom) &
+                (self.target_indices <= vertex_slice.hi_atom) &
+                (self.delays >= lo_delay) & (self.delays <= hi_delay))
         return np.sum(mask)
-    
+
     def get_min_delay(self):
         """
         Returns the minimum delay in the row
@@ -94,8 +94,8 @@ class SynapseRowInfo(object):
         """
         if self.target_indices.size == 0:
             return type(self)([], [], [], [])
-        mask = ((self.target_indices >= lo_atom)
-                & (self.target_indices <= hi_atom))
+        mask = ((self.target_indices >= lo_atom) &
+                (self.target_indices <= hi_atom))
         return type(self)(self.target_indices[mask] - lo_atom,
                           self.weights[mask], self.delays[mask],
                           self.synapse_types[mask])

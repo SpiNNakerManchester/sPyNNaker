@@ -31,10 +31,10 @@ projections = list()
 weight_to_spike = 2.0
 delay = 1
 
-loopConnections = list()
+connections = list()
 for i in range(0, nNeurons - 1):
     singleConnection = (i, i + 1, weight_to_spike, delay)
-    loopConnections.append(singleConnection)
+    connections.append(singleConnection)
 
 
 pop_jump_connection = [(nNeurons - 1, 0, weight_to_spike, 1)]
@@ -52,7 +52,7 @@ populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
 
 for i in range(0, n_pops):
     projections.append(p.Projection(populations[i], populations[i],
-                                    p.FromListConnector(loopConnections)))
+                                    p.FromListConnector(connections)))
     projections.append(p.Projection(populations[i], populations[((i + 1) % n_pops)],
                                     p.FromListConnector(pop_jump_connection)))
 

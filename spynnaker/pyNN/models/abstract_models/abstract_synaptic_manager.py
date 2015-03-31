@@ -22,7 +22,7 @@ from spynnaker.pyNN.utilities.utility_calls \
 from spynnaker.pyNN.utilities import conf
 
 # pacman imports
-from pacman.model.abstract_classes.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 # dsg imports
@@ -66,9 +66,9 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
     # Implementation for AbstractPartitionablePopulationVertex
     def get_population_table_size(self, vertex_slice, in_edges):
         """
-        
-        :param vertex_slice: 
-        :param in_edges: 
+
+        :param vertex_slice:
+        :param in_edges:
         :return:
         """
         return self._master_pop_table_generator\

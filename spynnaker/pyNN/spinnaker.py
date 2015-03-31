@@ -1,17 +1,13 @@
-"""
-Spinnaker
-"""
-
 # pacman imports
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
+    import MultiCastPartitionableEdge
 from pacman.operations.tag_allocator_algorithms.basic_tag_allocator \
     import BasicTagAllocator
-from pacman.model.partitionable_graph.partitionable_edge \
-    import PartitionableEdge
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
     import DictBasedPartitionedEdgeNKeysMap
 from pacman.operations.router_algorithms.basic_dijkstra_routing \
@@ -35,7 +31,7 @@ from spinn_front_end_common.utilities import reports
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.interface.front_end_common_interface_functions \
     import FrontEndCommonInterfaceFunctions
-from spinn_front_end_common.interface.front_end_common_configuration_functions \
+from spinn_front_end_common.interface.front_end_common_configuration_functions\
     import FrontEndCommonConfigurationFunctions
 from spinn_front_end_common.utilities.timer import Timer
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
@@ -43,6 +39,14 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.interface.data_generator_interface import \
     DataGeneratorInterface
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
+from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
+    import AbstractProvidesNKeysForEdge
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints \
+    import AbstractProvidesOutgoingEdgeConstraints
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_incoming_edge_constraints \
+    import AbstractProvidesIncomingEdgeConstraints
 
 # local front end imports
 from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
@@ -59,20 +63,16 @@ from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
     AbstractVirtualVertex
-from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
-    import AbstractProvidesNKeysForEdge
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints \
-    import AbstractProvidesOutgoingEdgeConstraints
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_incoming_edge_constraints \
-    import AbstractProvidesIncomingEdgeConstraints
 from spynnaker.pyNN.models.abstract_models\
     .abstract_send_me_multicast_commands_vertex \
     import AbstractSendMeMulticastCommandsVertex
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
+from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
+from spynnaker.pyNN.models.abstract_models.buffer_models\
+    .abstract_sends_buffers_from_host_partitioned_vertex\
+    import AbstractSendsBuffersFromHostPartitionedVertex
 
 # spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
@@ -97,12 +97,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
     """
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
-                 max_delay=None, graph_label=None, 
+                 max_delay=None, graph_label=None,
                  database_socket_addresses=None):
         FrontEndCommonConfigurationFunctions.__init__(self, host_name,
                                                       graph_label)
         SpynnakerConfigurationFunctions.__init__(self)
-        
+
         if database_socket_addresses is None:
             database_socket_addresses = list()
             listen_port = config.getint("Database", "listen_port")
@@ -111,16 +111,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             database_socket_addresses.append(
                 SocketAddress(noftiy_hostname, notify_port, listen_port))
         self._database_socket_addresses = database_socket_addresses
-        
-        if database_socket_addresses is None:
-            database_socket_addresses = list()
-            listen_port = config.getint("Database", "listen_port")
-            notify_port = config.getint("Database", "notify_port")
-            noftiy_hostname = config.get("Database", "notify_hostname")
-            database_socket_addresses.append(
-                SocketAddress(noftiy_hostname, notify_port, listen_port))
-        self._database_socket_addresses = database_socket_addresses
-        
+
         if self._app_id is None:
             self._set_up_main_objects(
                 app_id=config.getint("Machine", "appID"),
@@ -200,7 +191,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # Determine default executable folder location
         # and add this default to end of list of search paths
         executable_finder.add_path(os.path.dirname(model_binaries.__file__))
-        self._edge_count = 0
+
+        # Manager of buffered sending
+        self._send_buffer_manager = None
 
     def run(self, run_time):
         """
@@ -236,7 +229,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._report_default_directory, self._partitionable_graph,
                 self._hostname)
 
-        # calcualte number of machien time steps
+        # calculate number of machine time steps
         if run_time is not None:
             self._no_machine_time_steps =\
                 int((run_time * 1000.0) / self._machine_time_step)
@@ -338,8 +331,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 timer.start_timing()
 
             logger.info("*** Loading tags ***")
-            self._load_iptags()
-            self._load_reverse_ip_tags()
+            self._load_tags(self._tags)
 
             if self._do_load is True:
                 logger.info("*** Loading data ***")
@@ -353,6 +345,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._load_executable_images(
                     executable_targets, self._app_id,
                     app_data_folder=self._app_data_runtime_folder)
+                logger.info("*** Loading buffers ***")
+                self._set_up_send_buffering()
+
+            # end of entire loading setup
             if do_timing:
                 timer.take_sample()
 
@@ -363,11 +359,14 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         self._app_data_runtime_folder, executable_targets,
                         self._hostname, self._app_id, run_time)
 
+                # every thing is in sync0. load the initial buffers
+                self._send_buffer_manager.load_initial_buffers()
+
                 wait_on_confirmation = config.getboolean(
                     "Database", "wait_on_confirmation")
                 send_start_notification = config.getboolean(
                     "Database", "send_start_notification")
-                
+
                 self._start_execution_on_machine(
                     executable_targets, self._app_id, self._runtime,
                     self._time_scale_factor, wait_on_confirmation,
@@ -382,6 +381,28 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         elif isinstance(self._machine, VirtualMachine):
             logger.info(
                 "*** Using a Virtual Machine so no simulation will occur")
+        else:
+            logger.info("*** No simulation requested: Stopping. ***")
+
+    def _set_up_send_buffering(self):
+        progress_bar = ProgressBar(
+            len(self.partitionable_graph.vertices),
+            "on initialising the buffer managers for vertices which require"
+            " buffering")
+
+        # Create the buffer manager
+        self._send_buffer_manager = BufferManager(
+            self._placements, self._routing_infos, self._tags, self._txrx)
+
+        for partitioned_vertex in self.partitioned_graph.subvertices:
+            if isinstance(partitioned_vertex,
+                          AbstractSendsBuffersFromHostPartitionedVertex):
+
+                # Add the vertex to the managed vertices
+                self._send_buffer_manager.add_sender_vertex(
+                    partitioned_vertex)
+            progress_bar.update()
+        progress_bar.end()
 
     @property
     def app_id(self):
@@ -529,7 +550,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # execute placer
         self._execute_placer(pacman_report_state)
-        
+
         # exeucte tag allocator
         self._execute_tag_allocator(pacman_report_state)
 
@@ -640,14 +661,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._routing_infos, self._placements, self._machine,
                 self._partitioned_graph)
 
-        if self._in_debug_mode:
-            # check that all routes are valid and no cycles exist
-            valid_route_checker = ValidRouteChecker(
-                placements=self._placements, routing_infos=self._routing_infos,
-                routing_tables=self._router_tables, machine=self._machine,
-                partitioned_graph=self._partitioned_graph)
-            valid_route_checker.validate_routes()
-
         if pacman_report_state is not None and \
                 pacman_report_state.router_report:
             pacman_reports.router_reports(
@@ -658,6 +671,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 include_dat_based=pacman_report_state.router_dat_based_report,
                 routing_tables=self._router_tables,
                 routing_info=self._routing_infos, machine=self._machine)
+
+        if self._in_debug_mode:
+
+            # check that all routes are valid and no cycles exist
+            valid_route_checker = ValidRouteChecker(
+                placements=self._placements, routing_infos=self._routing_infos,
+                routing_tables=self._router_tables, machine=self._machine,
+                partitioned_graph=self._partitioned_graph)
+            valid_route_checker.validate_routes()
 
     def _execute_partitioner(self, pacman_report_state):
         """ executes the partitioner function
@@ -795,7 +817,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._multi_cast_vertex = CommandSender(
                     self._machine_time_step, self._time_scale_factor)
                 self.add_vertex(self._multi_cast_vertex)
-            edge = PartitionableEdge(self._multi_cast_vertex, vertex_to_add)
+            edge = MultiCastPartitionableEdge(
+                self._multi_cast_vertex, vertex_to_add)
             self._multi_cast_vertex.add_commands(vertex_to_add.commands, edge)
             self.add_edge(edge)
 
@@ -804,7 +827,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                       AbstractVertexWithEdgeToDependentVertices):
             for dependant_vertex in vertex_to_add.dependent_vertices:
                 self.add_vertex(dependant_vertex)
-                dependant_edge = PartitionableEdge(
+                dependant_edge = MultiCastPartitionableEdge(
                     pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
                 self.add_edge(dependant_edge)
 
@@ -926,12 +949,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         :return:
         """
         if stop_on_board:
-            for router_table in self._router_tables.routing_tables:
-                if (not self._machine.get_chip_at(router_table.x,
-                                                  router_table.y).virtual and
-                        len(router_table.multicast_routing_entries) > 0):
-                    self._txrx.clear_router_diagnostic_counters(router_table.x,
-                                                                router_table.y)
             for ip_tag in self._tags.ip_tags:
                 self._txrx.clear_ip_tag(
                     ip_tag.tag, board_address=ip_tag.board_address)

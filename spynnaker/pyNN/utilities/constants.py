@@ -60,7 +60,7 @@ MUNICH_MOTOR_CONTROL_CORE_APPLICATION_ID = 0xAC5
 IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID = 0xAC7
 IZK_CURRENT_EXP_CORE_APPLICATION_ID = 0xAC8
 # please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
-# for other core application ids. 
+# for other core application ids.
 
 EDGES = Enum(
     value="EDGES",

@@ -15,7 +15,6 @@ from spynnaker.pyNN.exceptions import ConfigurationException
 
 import logging
 import numpy
-import math
 
 logger = logging.getLogger(__name__)
 
@@ -110,8 +109,8 @@ class DistanceDependentProbabilityConnector(FromListConnector):
         prevertex = presynaptic_population._get_vertex
         postvertex = postsynaptic_population._get_vertex
 
-        if (presynaptic_population.structure is None
-                or postsynaptic_population.structure is None):
+        if (presynaptic_population.structure is None or
+                postsynaptic_population.structure is None):
             raise ValueError("Attempted to create a"
                              "DistanceDependentProbabilityConnector"
                              "with un-structured populations")
@@ -130,8 +129,8 @@ class DistanceDependentProbabilityConnector(FromListConnector):
                                          postsynaptic_population.positions)
         connections = self._dd_is_there_a_connection(
             d_expression=self.d_expression, distances=distances)
-        if (not self.allow_self_connections
-                and presynaptic_population == postsynaptic_population):
+        if (not self.allow_self_connections and
+                presynaptic_population == postsynaptic_population):
             numpy.fill_diagonal(connections, False)
         weights = numpy.fromfunction(function=self._distance_dependence,
                                      shape=distances.shape, dtype=int,

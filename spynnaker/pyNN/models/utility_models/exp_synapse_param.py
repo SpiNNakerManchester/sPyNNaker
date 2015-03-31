@@ -26,8 +26,8 @@ def write_exp_synapse_param(tau, machine_time_step, vertex_slice, spec):
             spec.write_value(data=rescaled_init[0])
 
     # Otherwise, if we have generated decays and inits for each atom
-    elif (rescaled_decay.size > vertex_slice.hi_atom
-            and rescaled_init.size > vertex_slice.hi_atom):
+    elif (rescaled_decay.size > vertex_slice.hi_atom and
+            rescaled_init.size > vertex_slice.hi_atom):
 
         # Interleave into one array
         interleaved_params = numpy.empty(vertex_slice.n_atoms * 2)

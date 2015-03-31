@@ -6,7 +6,6 @@ import logging
 # spinnman imports
 from spinnman import exceptions as spinnman_exceptions
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.utility_calls \
     import get_region_base_address_offset
 
@@ -143,12 +142,6 @@ class AbstractMasterPopTableFactory(object):
 
         master_region_base_address =\
             master_region_base_address_offset + app_data_base_address
-
-        # read in the master pop table and store in ram for future use
-        logger.debug("Reading {} ({}) bytes starting at {} + "
-                     "4".format(constants.MASTER_POPULATION_TABLE_SIZE,
-                                hex(constants.MASTER_POPULATION_TABLE_SIZE),
-                                hex(master_region_base_address)))
 
         return master_region_base_address, app_data_base_address
 

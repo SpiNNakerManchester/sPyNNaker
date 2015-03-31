@@ -8,7 +8,8 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
     delay_partitionable_edge import DelayPartitionableEdge
-from spinn_front_end_common.abstract_models.abstract_provides_incoming_edge_constraints \
+from spinn_front_end_common.abstract_models\
+    .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
 from spynnaker.pyNN.models.abstract_models\
     .abstract_population_outgoing_edge_restrictor \
@@ -22,10 +23,10 @@ from pacman.model.constraints.partitioner_constraints.\
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
-from pacman.model.abstract_classes.abstract_partitionable_vertex \
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from data_specification.data_specification_generator import \
-    DataSpecificationGenerator
+from data_specification.data_specification_generator\
+    import DataSpecificationGenerator
 
 
 logger = logging.getLogger(__name__)
@@ -60,8 +61,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
                                              label=label,
                                              max_atoms_per_core=256)
         AbstractDataSpecableVertex.__init__(
-            self, label=label, n_atoms=n_neurons,
-            machine_time_step=machine_time_step,
+            self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractProvidesIncomingEdgeConstraints.__init__(self)
         AbstractPopulationOutgoingEdgeRestrictor.__init__(self)
@@ -126,8 +126,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
                 constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
     def generate_data_spec(
-            self, subvertex, placement, sub_graph, graph, routing_info, 
-            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags, 
+            self, subvertex, placement, sub_graph, graph, routing_info,
+            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
             write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a

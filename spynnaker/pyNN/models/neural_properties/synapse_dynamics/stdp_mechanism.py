@@ -42,8 +42,8 @@ class STDPMechanism(object):
         self._dendritic_delay_fraction = dendritic_delay_fraction
         self._mad = mad
 
-        if (self._dendritic_delay_fraction < 0.5
-                or self._dendritic_delay_fraction > 1.0):
+        if (self._dendritic_delay_fraction < 0.5 or
+                self._dendritic_delay_fraction > 1.0):
             raise NotImplementedError("SpiNNaker only supports dendritic delay"
                                       " fractions in the interval [0.5, 1.0]")
 
@@ -80,13 +80,12 @@ class STDPMechanism(object):
         if (other is None) or (not isinstance(other, self.__class__)):
             return False
 
-        return ((self._timing_dependence == other.timing_dependence)
-                and (self._weight_dependence == other.weight_dependence)
-                and (self._voltage_dependence == other.voltage_dependence)
-                and (self._dendritic_delay_fraction
-                     == other.dendritic_delay_fraction)
-
-                and self.equals(other))
+        return ((self._timing_dependence == other.timing_dependence) and
+                (self._weight_dependence == other.weight_dependence) and
+                (self._voltage_dependence == other.voltage_dependence) and
+                (self._dendritic_delay_fraction ==
+                 other.dendritic_delay_fraction) and
+                self.equals(other))
 
     def get_synapse_row_io(self):
         if self.timing_dependence is not None:
@@ -94,15 +93,15 @@ class STDPMechanism(object):
             # pre-trace
             if self._mad:
                 synaptic_row_header_bytes = (
-                    TIME_STAMP_BYTES
-                    + self.timing_dependence.pre_trace_size_bytes)
+                    TIME_STAMP_BYTES +
+                    self.timing_dependence.pre_trace_size_bytes)
             # Otherwise, headers consist of a counter followed by
             # NUM_PRE_SYNAPTIC_EVENTS timestamps and pre-traces
             else:
                 synaptic_row_header_bytes = (
-                    4 + (NUM_PRE_SYNAPTIC_EVENTS
-                         * (TIME_STAMP_BYTES
-                            + self.timing_dependence.pre_trace_size_bytes)))
+                    4 + (NUM_PRE_SYNAPTIC_EVENTS *
+                         (TIME_STAMP_BYTES +
+                          self.timing_dependence.pre_trace_size_bytes)))
 
             # Convert to words, rounding up to take into account word
             # alignement

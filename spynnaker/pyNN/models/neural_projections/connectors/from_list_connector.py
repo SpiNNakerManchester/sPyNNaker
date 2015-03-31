@@ -74,13 +74,13 @@ class FromListConnector(AbstractConnector):
                 len_list.append(len(conn[1]))
             else:
                 len_list.append(1)
-            if isinstance(conn[2], list) and (isinstance(conn[0], list)
-                                              or isinstance(conn[1], list)):
+            if isinstance(conn[2], list) and (isinstance(conn[0], list) or
+                                              isinstance(conn[1], list)):
                 len_list.append(len(conn[2]))
             else:
                 len_list.append(1)
-            if isinstance(conn[3], list) and (isinstance(conn[0], list)
-                                              or isinstance(conn[1], list)):
+            if isinstance(conn[3], list) and (isinstance(conn[0], list) or
+                                              isinstance(conn[1], list)):
                 len_list.append(len(conn[3]))
             else:
                 len_list.append(1)
@@ -104,9 +104,9 @@ class FromListConnector(AbstractConnector):
                     weight_lists[pre_atom].append(weight)
                     delay_lists[pre_atom].append(delay)
                     type_lists[pre_atom].append(synapse_type)
-            
+
         connection_list = [SynapseRowInfo(id_lists[i], weight_lists[i],
                            delay_lists[i], type_lists[i])
                            for i in range(0, prevertex.n_atoms)]
-        
+
         return SynapticList(connection_list)

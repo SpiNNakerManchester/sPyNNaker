@@ -29,7 +29,7 @@ def _install_cfg():
           " after \"machineName\" to the hostname or IP address of your"
           " SpiNNaker board, and change \"None\" after \"version\" to the"
           " version of SpiNNaker hardware you are running on:".format(
-                  home_cfg))
+              home_cfg))
     print "[Machine]"
     print "machineName = None"
     print "version = None"
@@ -85,8 +85,8 @@ read.append(default)
 # creates a directory if needed, or deletes it and rebuilds it
 def create_directory(directory):
     """
-    
-    :param directory: 
+
+    :param directory:
     :return:
     """
     if not os.path.exists(directory):

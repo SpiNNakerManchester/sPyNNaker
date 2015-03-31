@@ -1,13 +1,10 @@
 import logging
 
-from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities import constants
 
-from pacman.operations import routing_info_allocator_algorithms
 
 from spinn_front_end_common.utilities import exceptions
-from spinn_front_end_common.utilities import helpful_functions
 import math
 
 
@@ -19,26 +16,11 @@ class SpynnakerConfigurationFunctions(object):
     def __init__(self):
         pass
 
-    @staticmethod
-    def get_pynn_specific_key_allocator():
-
-        #get common key allocator algorithms
-        key_allocator_algorithms_list = \
-            helpful_functions.get_valid_components(
-                routing_info_allocator_algorithms, "RoutingInfoAllocator")
-        #get pynn specific key allocator
-        pynn_overloaded_allocator = \
-            helpful_functions.get_valid_components(overridden_pacman_functions,
-                                                   "RoutingInfoAllocator")
-        key_allocator_algorithms_list.update(pynn_overloaded_allocator)
-
-        return key_allocator_algorithms_list[config.get("KeyAllocator",
-                                                        "algorithm")]
-
     def _set_up_machine_specifics(self, timestep, min_delay, max_delay,
                                   hostname):
         self._machine_time_step = config.getint("Machine", "machineTimeStep")
-        #deal with params allowed via the setup optimals
+
+        # deal with params allowed via the setup optimals
         if timestep is not None:
             timestep *= 1000  # convert into ms from microseconds
             config.set("Machine", "machineTimeStep", timestep)
@@ -74,15 +56,15 @@ class SpynnakerConfigurationFunctions(object):
                 config.add_section("Model")
             config.set("Model", "max_delay", (max_delay * 1000) / timestep)
 
-        if (config.has_option("Machine", "timeScaleFactor")
-                and config.get("Machine", "timeScaleFactor") != "None"):
+        if (config.has_option("Machine", "timeScaleFactor") and
+                config.get("Machine", "timeScaleFactor") != "None"):
             self._time_scale_factor = \
                 config.getint("Machine", "timeScaleFactor")
             if timestep * self._time_scale_factor < 1000:
                 logger.warn("the combination of machine time step and the "
-                            "machine time scale factor results in a real timer "
-                            "tic that is currently not reliably supported by "
-                            "the spinnaker machine.")
+                            "machine time scale factor results in a real "
+                            "timer tick that is currently not reliably "
+                            "supported by the spinnaker machine.")
         else:
             self._time_scale_factor = max(1,
                                           math.ceil(1000.0 / float(timestep)))
