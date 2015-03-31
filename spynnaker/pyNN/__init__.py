@@ -7,9 +7,6 @@ and implementation for the PyNN High-level API
 import inspect
 from ._version import __version__, __version_month__, __version_year__
 
-# spinnman imports
-from spinnman.messages.eieio.eieio_type_param import EIEIOTypeParam
-
 # utility functions
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
@@ -72,7 +69,7 @@ from spynnaker.pyNN.models.neural_projections.connectors.\
     DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
-from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector \
+from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector\
     import SmallWorldConnector
 
 # Mechanisms for synapse dynamics

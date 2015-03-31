@@ -1,7 +1,7 @@
-from pacman.model.constraints.abstract_constraint import AbstractConstraint
-from pacman.model.constraints.placer_chip_and_core_constraint import \
-    PlacerChipAndCoreConstraint
-
+from pacman.model.constraints.abstract_constraints.abstract_constraint\
+    import AbstractConstraint
+from pacman.model.constraints.placer_constraints\
+    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \

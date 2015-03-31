@@ -144,13 +144,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._set_up_pacman_algorthms_listings(
                 partitioner_algorithm=config.get("Partitioner", "algorithm"),
                 placer_algorithm=config.get("Placer", "algorithm"),
-                key_allocator_algorithm=None,
+                key_allocator_algorithm=config.get(
+                    "KeyAllocator", "algorithm"),
                 routing_algorithm=config.get("Routing", "algorithm"))
-
-            # get the pynn specific key allocator algorithm
-            #  (overloaded from common call)
-            self._key_allocator_algorithm = \
-                self.get_pynn_specific_key_allocator()
 
             # set up exeuctable specifics
             self._set_up_executable_specifics()
@@ -195,6 +191,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # Manager of buffered sending
         self._send_buffer_manager = None
 
+        self._edge_count = 0
+
     def run(self, run_time):
         """
 
@@ -204,9 +202,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._setup_interfaces(
             hostname=self._hostname,
             virtual_x_dimension=config.getint("Machine",
-                                              "virutal_board_x_dimension"),
+                                              "virtual_board_x_dimension"),
             virtual_y_dimension=config.getint("Machine",
-                                              "virutal_board_y_dimension"),
+                                              "virtual_board_y_dimension"),
             downed_chips=config.get("Machine", "down_chips"),
             downed_cores=config.get("Machine", "down_cores"),
             requires_virtual_board=config.getboolean("Machine",
@@ -367,11 +365,29 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 send_start_notification = config.getboolean(
                     "Database", "send_start_notification")
 
-                self._start_execution_on_machine(
-                    executable_targets, self._app_id, self._runtime,
-                    self._time_scale_factor, wait_on_confirmation,
-                    send_start_notification, self._database_interface,
-                    self._in_debug_mode)
+                self._wait_for_cores_to_be_ready(executable_targets,
+                                                 self._app_id)
+
+                # wait till external app is ready for us to start if required
+                if (self._database_interface is not None and
+                        wait_on_confirmation):
+                    logger.info(
+                        "*** Awaiting for a response from an external source "
+                        "to state its ready for the simulation to start ***")
+                    self._database_interface.wait_for_confirmation()
+
+                self._start_all_cores(executable_targets, self._app_id)
+
+                if (self._database_interface is not None and
+                        send_start_notification):
+                    self._database_interface.send_start_notification()
+
+                if self._runtime is None:
+                    logger.info("Application is set to run forever - exiting")
+                else:
+                    self._wait_for_execution_to_complete(
+                        executable_targets, self._app_id, self._runtime,
+                        self._time_scale_factor)
                 self._has_ran = True
                 if self._retrieve_provance_data:
 
