@@ -166,8 +166,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         """
 
     def _write_neuron_parameters(
-            self, spec, key, subvertex, ring_buffer_to_input_left_shifts,
-            vertex_slice):
+            self, spec, key, subvertex, vertex_slice):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} "
@@ -320,8 +319,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             # key and mask assignments
             key = keys_and_masks[0].key
 
-        self._write_neuron_parameters(spec, key, subvertex,
-                                      ring_buffer_shifts, vertex_slice)
+        self._write_neuron_parameters(spec, key, subvertex, vertex_slice)
 
         self.write_synapse_parameters(spec, subvertex, vertex_slice)
         spec.write_array(ring_buffer_shifts)

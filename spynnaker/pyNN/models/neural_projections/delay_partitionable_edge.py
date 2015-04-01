@@ -10,7 +10,6 @@ from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
     import DelayPartitionedEdge
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import conf
 
 # spinn front end common imports
@@ -45,6 +44,7 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
                                              synapse_dynamics=synapse_dynamics,
                                              label=label)
         self._pre_vertex = presynaptic_population._internal_delay_vertex
+        self._stored_synaptic_data_from_machine = None
 
     @property
     def num_delay_stages(self):
@@ -143,8 +143,6 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
                 rows = sub_edge_post_vertex.get_synaptic_list_from_machine(
                     placements, transceiver, subedge.pre_subvertex, n_rows,
                     subedge.post_subvertex,
-                    constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value,
-                    constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                     self._synapse_row_io, partitioned_graph,
                     routing_infos, subedge.weight_scales).get_rows()
 

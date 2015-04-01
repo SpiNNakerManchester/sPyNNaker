@@ -2,7 +2,7 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 from pacman.utilities.progress_bar import ProgressBar
 
-
+from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
@@ -11,6 +11,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 
+from spinn_front_end_common.utilities.timer import Timer
 
 import logging
 logger = logging.getLogger(__name__)
@@ -29,6 +30,7 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         self._synapse_dynamics = synapse_dynamics
         self._synapse_list = synapse_list
         self._synapse_row_io = FixedSynapseRowIO()
+        self._stored_synaptic_data_from_machine = None
 
         # If there are synapse dynamics for this connector, create a plastic
         # synapse list
@@ -81,39 +83,50 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         Get synaptic data for all connections in this Projection from the
         machine.
         """
-        logger.debug("Reading synapse data for edge between {} and {}"
-                     .format(self._pre_vertex.label,
-                             self._post_vertex.label))
-        subedges = \
-            graph_mapper.get_partitioned_edges_from_partitionable_edge(
-                self)
+        if self._stored_synaptic_data_from_machine is None:
+            timer = None
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer = Timer()
+                timer.start_timing()
 
-        synaptic_list = [SynapseRowInfo([], [], [], [])
-                         for _ in range(self._pre_vertex.n_atoms)]
-        progress_bar = ProgressBar(
-            len(subedges), "progress on reading back synaptic matrix")
-        for subedge in subedges:
-            n_rows = subedge.get_n_rows(graph_mapper)
-            pre_vertex_slice = \
-                graph_mapper.get_subvertex_slice(subedge.pre_subvertex)
-            post_vertex_slice = \
-                graph_mapper.get_subvertex_slice(subedge.post_subvertex)
+            logger.debug("Reading synapse data for edge between {} and {}"
+                         .format(self._pre_vertex.label,
+                                 self._post_vertex.label))
+            subedges = \
+                graph_mapper.get_partitioned_edges_from_partitionable_edge(
+                    self)
 
-            sub_edge_post_vertex = \
-                graph_mapper.get_vertex_from_subvertex(
-                    subedge.post_subvertex)
-            rows = sub_edge_post_vertex.get_synaptic_list_from_machine(
-                placements, transceiver, subedge.pre_subvertex, n_rows,
-                subedge.post_subvertex, self._synapse_row_io,
-                partitioned_graph, graph_mapper, routing_infos,
-                subedge.weight_scales).get_rows()
+            synaptic_list = [SynapseRowInfo([], [], [], [])
+                             for _ in range(self._pre_vertex.n_atoms)]
+            progress_bar = ProgressBar(
+                len(subedges), "progress on reading back synaptic matrix")
+            for subedge in subedges:
+                n_rows = subedge.get_n_rows(graph_mapper)
+                pre_vertex_slice = \
+                    graph_mapper.get_subvertex_slice(subedge.pre_subvertex)
+                post_vertex_slice = \
+                    graph_mapper.get_subvertex_slice(subedge.post_subvertex)
 
-            for i in range(len(rows)):
-                synaptic_list[i + pre_vertex_slice.lo_atom].append(
-                    rows[i], lo_atom=post_vertex_slice.lo_atom)
-            progress_bar.update()
-        progress_bar.end()
-        return SynapticList(synaptic_list)
+                sub_edge_post_vertex = \
+                    graph_mapper.get_vertex_from_subvertex(
+                        subedge.post_subvertex)
+                rows = sub_edge_post_vertex.get_synaptic_list_from_machine(
+                    placements, transceiver, subedge.pre_subvertex, n_rows,
+                    subedge.post_subvertex,
+                    self._synapse_row_io, partitioned_graph,
+                    routing_infos, subedge.weight_scales).get_rows()
+
+                for i in range(len(rows)):
+                    synaptic_list[i + pre_vertex_slice.lo_atom].append(
+                        rows[i], lo_atom=post_vertex_slice.lo_atom)
+                progress_bar.update()
+            progress_bar.end()
+            self._stored_synaptic_data_from_machine = SynapticList(
+                synaptic_list)
+            if conf.config.getboolean("Reports", "outputTimesForSections"):
+                timer.take_sample()
+
+        return self._stored_synaptic_data_from_machine
 
     @property
     def synapse_dynamics(self):

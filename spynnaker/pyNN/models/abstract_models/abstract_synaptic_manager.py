@@ -637,7 +637,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
-            post_subvertex, synapse_io, subgraph, graph_mapper, routing_infos,
+            post_subvertex, synapse_io, subgraph, routing_infos,
             weight_scales):
         """
 
@@ -648,7 +648,6 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         :param post_subvertex:
         :param synapse_io:
         :param subgraph:
-        :param graph_mapper:
         :param routing_infos:
         :param weight_scales:
         :return:
@@ -750,16 +749,12 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         post_x, post_y, post_p = \
             post_placement.x, post_placement.y, post_placement.p
 
-        # Get the App Data base address for the core
-        # (location where this cores memory starts in
-        # sdram and region table)
-        app_data_base_address = transceiver.get_cpu_information_from_core(
-            post_x, post_y, post_p).user[0]
-
         # either read in the master pop table or retrieve it from storage
-        master_pop_base_mem_address = \
-            self._locate_master_pop_table_base_address(
-                app_data_base_address, post_x, post_y, transceiver)
+        master_pop_base_mem_address, app_data_base_address = \
+            self._master_pop_table_generator.\
+            locate_master_pop_table_base_address(
+                post_x, post_y, post_p, transceiver,
+                constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
 
         incoming_edges = subgraph.incoming_subedges_from_subvertex(
             post_subvertex)
@@ -813,38 +808,6 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                 "Not enough data has been read"
                 " (aka, something funkky happened)")
         return block, maxed_row_length
-
-    @staticmethod
-    def _locate_master_pop_table_base_address(
-            app_data_base_address, x, y, transceiver):
-        """ Find the master population table
-
-        :param x: x coord for the chip to which this master pop table is \
-        being read
-        :type x: int
-        :param y: y coord for the chip to which this master pop table is \
-        being read
-        :type y: int
-        :param transceiver: the transceiver object
-        :type transceiver: spinnman.transciever.Transciever object
-        :param app_data_base_address : the region to which the master pop\
-         resides
-        :type app_data_base_address: int
-
-        :return: the master pop table address
-        """
-
-        master_region_base_address_address = get_region_base_address_offset(
-            app_data_base_address,
-            constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
-
-        master_region_base_address_offset = helpful_functions.read_and_convert(
-            x, y, master_region_base_address_address, 4, "<I", transceiver)
-
-        master_region_base_address =\
-            master_region_base_address_offset + app_data_base_address
-
-        return master_region_base_address
 
     # inhirrted from AbstractProvidesIncomingEdgeConstraints
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):

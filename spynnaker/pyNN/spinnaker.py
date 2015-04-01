@@ -187,11 +187,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # Determine default executable folder location
         # and add this default to end of list of search paths
         executable_finder.add_path(os.path.dirname(model_binaries.__file__))
+        self._edge_count = 0
 
         # Manager of buffered sending
         self._send_buffer_manager = None
-
-        self._edge_count = 0
 
     def run(self, run_time):
         """
@@ -956,12 +955,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
             virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
 
-    def stop(self, app_id, stop_on_board=True):
+    def stop(self, stop_on_board=True):
         """
 
         :param stop_on_board: boolean which decides if the board should have
         its router tables and tags cleared
-        :param app_id: the application id whcih needs to be stopped
         :return:
         """
         if stop_on_board:
