@@ -59,9 +59,9 @@ static inline bool has_been_initialsed(recording_channel_e channel) {
 //! \return boolean which is True is the channel was successfully closed and
 //! False otherwise.
 static inline bool close_channel(recording_channel_e channel) {
-	g_recording_channels[channel].start = NULL;
-	g_recording_channels[channel].end = NULL;
-	return true;
+    g_recording_channels[channel].start = NULL;
+    g_recording_channels[channel].end = NULL;
+    return true;
 }
 
 //---------------------------------------
@@ -165,6 +165,7 @@ bool recording_record(
         // If there's space to record
         if (recording_channel->current
                 < (recording_channel->end - size_bytes)) {
+
             // Copy data into recording channel
             memcpy(recording_channel->current, data, size_bytes);
 
@@ -207,14 +208,14 @@ void recording_finalise() {
                 recording_channel->counter);
             *recording_channel->counter = num_bytes_written;
             if(!close_channel(channel)){
-            	log_error("could not close channel %u.", channel);
+                log_error("could not close channel %u.", channel);
             }
             else{
-            	log_info("closed channel %u.", channel);
+                log_info("closed channel %u.", channel);
             }
         }
         else{
-        	log_error("channel %u is already closed.", channel);
+            log_error("channel %u is already closed.", channel);
         }
     }
 }

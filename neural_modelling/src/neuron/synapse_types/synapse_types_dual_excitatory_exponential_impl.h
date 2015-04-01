@@ -34,7 +34,7 @@ typedef struct synapse_param_t {
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.
 typedef enum input_buffer_regions {
-	EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY,
+    EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY,
 } input_buffer_regions;
 
 //---------------------------------------
@@ -77,7 +77,7 @@ static inline index_t _in_offset(index_t neuron_index) {
 //! Corresponds to the parameters of the neuron currently being considered.
 //! \return the decay amount for the excitatory one input
 static inline decay_t _ex1_decay(
-		synapse_param_t **parameters, index_t neuron_index) {
+        synapse_param_t **parameters, index_t neuron_index) {
     return (parameters[EXCITATORY_ONE][neuron_index].neuron_synapse_decay);
 }
 
@@ -90,7 +90,7 @@ static inline decay_t _ex1_decay(
 //! Corresponds to the parameters of the neuron currently being considered.
 //! \return the decay amount for the excitatory two input
 static inline decay_t _ex2_decay(
-		synapse_param_t **parameters, index_t neuron_index) {
+        synapse_param_t **parameters, index_t neuron_index) {
     return (parameters[EXCITATORY_TWO][neuron_index].neuron_synapse_decay);
 }
 
@@ -103,7 +103,7 @@ static inline decay_t _ex2_decay(
 //! Corresponds to the parameters of the neuron currently being considered.
 //! \return the decay amount for the inhibitory input
 static inline decay_t _in_decay(
-		synapse_param_t **parameters, index_t neuron_index) {
+        synapse_param_t **parameters, index_t neuron_index) {
     return (parameters[INHIBITORY][neuron_index].neuron_synapse_decay);
 }
 
@@ -119,8 +119,8 @@ static inline decay_t _in_decay(
 //! to initialise the synapse shaping rules.
 //! \return nothing
 static inline void synapse_types_shape_input(
-		input_t *input_buffers, index_t neuron_index,
-		synapse_param_t** parameters) {
+        input_t *input_buffers, index_t neuron_index,
+        synapse_param_t** parameters) {
     input_buffers[_ex1_offset(neuron_index)] = decay_s1615(
             input_buffers[_ex1_offset(neuron_index)],
             _ex1_decay(parameters, neuron_index));
@@ -144,8 +144,8 @@ static inline void synapse_types_shape_input(
 //! \param[in] input the inputs for that given synapse_type.
 //! \return None
 static inline void synapse_types_add_neuron_input(
-		input_t *input_buffers, index_t synapse_type_index,
-		index_t neuron_index, synapse_param_t** parameters, input_t input) {
+        input_t *input_buffers, index_t synapse_type_index,
+        index_t neuron_index, synapse_param_t** parameters, input_t input) {
     input_buffers[synapse_types_get_input_buffer_index(synapse_type_index,
         neuron_index)] += decay_s1615(input,
             parameters[synapse_type_index][neuron_index].neuron_synapse_init);
@@ -183,10 +183,11 @@ static inline const char *synapse_types_get_type_char(
         return "X1";
     } else if (synapse_type_index == EXCITATORY_TWO) {
         return "X2";
-    } else if (synapse_type_index == INHIBITORY){
+    } else if (synapse_type_index == INHIBITORY) {
         return "I";
-    } else{
-    	log_debug("did not recognise synapse type %i", synapse_type_index);
+    } else {
+        log_debug("did not recognise synapse type %i", synapse_type_index);
+        return "?";
     }
 }
 

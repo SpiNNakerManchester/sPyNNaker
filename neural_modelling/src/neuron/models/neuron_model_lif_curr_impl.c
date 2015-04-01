@@ -8,14 +8,13 @@ static uint32_t	refractory_time_update = 10;
 
 // simple Leaky I&F ODE - discrete changes elsewhere -  assumes 1ms timestep?
 static inline void _lif_neuron_closed_form(
-		neuron_pointer_t neuron, REAL V_prev, int32_t neg_refract_timer_now,
-		input_t input_this_timestep) {
+        neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
 
-	REAL 	alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest,
-	      this_eTC = neuron->exp_TC;  // this is always the default
+    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
+    REAL this_eTC = neuron->exp_TC;
 
     // update membrane voltage
-	neuron->V_membrane = 	alpha - this_eTC * ( alpha - V_prev );
+    neuron->V_membrane = alpha - (this_eTC * (alpha - V_prev));
 }
 
 // ODE solver has just set neuron->V which is current state of membrane voltage
@@ -34,49 +33,41 @@ static inline void _neuron_discrete_changes(neuron_pointer_t neuron) {
 // MUST BE: minimum 100, then in 100usec steps...
 void neuron_model_set_machine_timestep(timer_t microsecs) {
 
-	const uint16_t time_step_divider = 100;
+    const uint16_t time_step_divider = 100;
 
-	// 10 for 1ms time step, 1 for 0.1ms time step which is minimum
-	refractory_time_update = microsecs / time_step_divider;
+    // 10 for 1ms time step, 1 for 0.1ms time step which is minimum
+    refractory_time_update = microsecs / time_step_divider;
 }
 
-
-// .277 ms
 bool neuron_model_state_update(input_t exc_input, input_t inh_input,
                                input_t external_bias, neuron_pointer_t neuron) {
 
-	bool spike = false;
-	REAL V_last = neuron->V_membrane;
+    bool spike = false;
+    REAL V_last = neuron->V_membrane;
 
-	// countdown refractory timer
-	neuron->refract_timer -= refractory_time_update;
+    // countdown refractory timer
+    neuron->refract_timer -= refractory_time_update;
 
-	// If outside of the refractory period
-	if (neuron->refract_timer <= 0) {
+    // If outside of the refractory period
+    if (neuron->refract_timer <= 0) {
 
-	    // Get the input in nA
-		input_t input_this_timestep = exc_input - inh_input
-		                              + external_bias + neuron->I_offset;
+        // Get the input in nA
+        input_t input_this_timestep = exc_input - inh_input
+                                    + external_bias + neuron->I_offset;
 
-		_lif_neuron_closed_form(neuron, V_last, -neuron->refract_timer,
-		                        input_this_timestep);
+        _lif_neuron_closed_form(neuron, V_last, input_this_timestep);
 
-		// has it spiked?
-		log_debug("comparing values %d and %d\n",
-		          neuron->V_membrane, neuron->V_thresh);
+        spike = REAL_COMPARE(neuron->V_membrane, >=, neuron->V_thresh);
 
-		spike = REAL_COMPARE(neuron->V_membrane, >=, neuron->V_thresh);
-
-		// works for both no correction and simple correction case
-		if (spike) {
-		    _neuron_discrete_changes( neuron );
-		}
-	}
-	return spike;
+        if (spike) {
+            _neuron_discrete_changes(neuron);
+        }
+    }
+    return spike;
 }
 
 state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
-	return neuron->V_membrane;
+    return neuron->V_membrane;
 }
 
 
@@ -132,6 +123,3 @@ neuron_pointer_t neuron_model_lif_curr_impl_create(REAL V_thresh, REAL V_reset,
 
     return neuron;
 }
-
-
-
