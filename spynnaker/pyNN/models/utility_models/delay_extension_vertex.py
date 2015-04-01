@@ -296,3 +296,10 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     def get_binary_file_name(self):
         return "delay_extension.aplx"
+
+    def is_data_specable(self):
+        """
+        helper method for isinstance
+        :return:
+        """
+        return True
