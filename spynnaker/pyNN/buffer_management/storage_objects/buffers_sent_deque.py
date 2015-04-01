@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 _N_SEQUENCES = 256
 
 # The number of sequence numbers allowed in a single transmission
-_N_SEQUENCES_PER_TRANSMISSION = 4
+_N_SEQUENCES_PER_TRANSMISSION = 16
 
 
 class BuffersSentDeque(object):
