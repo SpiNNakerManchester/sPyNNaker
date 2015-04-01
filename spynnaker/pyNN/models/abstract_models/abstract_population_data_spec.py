@@ -363,3 +363,10 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
 
         # Reunite title and extension and return
         return binary_title + binary_extension
+
+    def is_data_specable(self):
+        """
+        helper method for isinstance
+        :return:
+        """
+        return True

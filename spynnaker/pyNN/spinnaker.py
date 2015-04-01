@@ -223,7 +223,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # create network report if needed
         if self._reports_states is not None:
-            reports.network_specification_report(
+            reports.network_specification_partitionable_report(
                 self._report_default_directory, self._partitionable_graph,
                 self._hostname)
 

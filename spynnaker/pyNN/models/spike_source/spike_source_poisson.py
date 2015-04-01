@@ -396,3 +396,10 @@ class SpikeSourcePoisson(
         :return:
         """
         return True
+
+    def is_data_specable(self):
+        """
+        helper method for isinstance
+        :return:
+        """
+        return True
