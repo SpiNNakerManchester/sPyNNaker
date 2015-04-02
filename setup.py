@@ -10,7 +10,7 @@ setup(
               'spynnaker.pyNN',
               'spynnaker.pyNN.buffer_management',
               'spynnaker.pyNN.buffer_management.storage_objects',
-              'spynnaker.pyNN.model_binaries'
+              'spynnaker.pyNN.model_binaries',
               'spynnaker.pyNN.models',
               'spynnaker.pyNN.models.abstract_models',
               'spynnaker.pyNN.models.abstract_models.abstract_model_components',
