@@ -1,18 +1,23 @@
+"""
+SpikeSourceArray
+"""
+from spynnaker.pyNN.utilities import constants
+
+from spinn_front_end_common.abstract_models\
+    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
+    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
+from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
+    import SpikeSourceArrayPartitionedVertex
 from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region\
     import BufferedSendingRegion
-from spynnaker.pyNN.exceptions import ConfigurationException
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_population_outgoing_edge_restrictor\
-    import AbstractPopulationOutgoingEdgeRestrictor
 from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spinnman.messages.eieio.command_messages.event_stop_request\
-    import EventStopRequest
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+
+from spinn_front_end_common.utilities import constants as \
+    front_end_common_constants
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex \
-    import SpikeSourceArrayPartitionedVertex
-from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.utilities import constants
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
@@ -23,22 +28,26 @@ from pacman.model.constraints.tag_allocator_constraints\
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 
+from spinnman.messages.eieio.command_messages.event_stop_request\
+    import EventStopRequest
+
 from enum import Enum
 import logging
-
+import sys
 
 logger = logging.getLogger(__name__)
 
 
 class SpikeSourceArray(AbstractDataSpecableVertex,
                        AbstractPartitionableVertex,
-                       AbstractPopulationOutgoingEdgeRestrictor):
+                       AbstractOutgoingEdgeSameContiguousKeysRestrictor):
 
-    CORE_APP_IDENTIFIER = constants.SPIKE_INJECTOR_CORE_APPLICATION_ID
+    CORE_APP_IDENTIFIER = (front_end_common_constants
+                           .SPIKE_INJECTOR_CORE_APPLICATION_ID)
     _CONFIGURATION_REGION_SIZE = 36
 
     # limited to the n of the x,y,p,n key format
-    _model_based_max_atoms_per_core = 2048
+    _model_based_max_atoms_per_core = sys.maxint
 
     _SPIKE_SOURCE_REGIONS = Enum(
         value="_SPIKE_SOURCE_REGIONS",
@@ -64,7 +73,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             self, n_atoms=n_neurons, label=label,
             max_atoms_per_core=self._model_based_max_atoms_per_core,
             constraints=constraints)
-        AbstractPopulationOutgoingEdgeRestrictor.__init__(self)
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
@@ -75,13 +84,10 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             tag_id=tag))
 
         if self._max_on_chip_memory_usage_for_spikes is None:
-            self._max_on_chip_memory_usage_for_spikes = \
-                constants.DEFAULT_MEG_LIMIT
+            self._max_on_chip_memory_usage_for_spikes = 8 * 1024 * 1024
 
         # check the values do not conflict with chip memory limit
-        if (self._max_on_chip_memory_usage_for_spikes >
-                constants.MAX_MEG_LIMIT or
-                self._max_on_chip_memory_usage_for_spikes < 0):
+        if self._max_on_chip_memory_usage_for_spikes < 0:
             raise ConfigurationException(
                 "The memory usage on chip is either beyond what is supportable"
                 " on the spinnaker board being supported or you have requested"
@@ -100,8 +106,12 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        SpikeSourceArray.\
-            _model_based_max_atoms_per_core = new_value
+        """
+
+        :param new_value:
+        :return:
+        """
+        SpikeSourceArray._model_based_max_atoms_per_core = new_value
 
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          constraints=list()):
@@ -162,16 +172,13 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         return send_buffer
 
     def _reserve_memory_regions(self, spec, spike_region_size):
-        """
-        *** Modified version of same routine in models.py These could be
-        combined to form a common routine, perhaps by passing a list of
-        entries. ***
-        Reserve memory for the system, indices and spike data regions.
-        The indices region will be copied to DTCM by the executable.
+        """ Reserve memory for the system, indices and spike data regions.
+            The indices region will be copied to DTCM by the executable.
         """
         spec.reserve_memory_region(
             region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
-            size=12, label='systemInfo')
+            size=constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
+            label='systemInfo')
 
         spec.reserve_memory_region(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value,
@@ -199,11 +206,10 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             Bit 5: Output neuron potential
             Bit 6: Output spike rate
         """
-        # What recording commands were set for the parent pynn_population.py?
-        self._write_basic_setup_info(spec,
-                                     SpikeSourceArray.CORE_APP_IDENTIFIER)
+        self._write_basic_setup_info(
+            spec, SpikeSourceArray.CORE_APP_IDENTIFIER,
+            self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
 
-        # add the params saying how big each
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value)
 
@@ -228,16 +234,31 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         spec.write_value(data=ip_tag.tag)
 
     # inherited from dataspecable vertex
-    def generate_data_spec(self, subvertex, placement, subgraph, graph,
-                           routing_info, hostname, graph_mapper, report_folder,
-                           ip_tags, reverse_ip_tags):
+    def generate_data_spec(
+            self, subvertex, placement, subgraph, graph, routing_info,
+            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
+            write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
+        :param subvertex:
+        :param placement:
+        :param subgraph:
+        :param graph:
+        :param routing_info:
+        :param hostname:
+        :param graph_mapper:
+        :param report_folder:
+        :param ip_tags:
+        :param reverse_ip_tags:
+        :param write_text_specs:
+        :param application_run_time_folder:
+        :return:
         """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
-                placement.x, placement.y, placement.p, hostname, report_folder)
+                placement.x, placement.y, placement.p, hostname, report_folder,
+                write_text_specs, application_run_time_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
@@ -245,10 +266,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-
         spec.comment("\nReserving memory space for spike data region:\n\n")
-
-        # Create the data regions for the spike source array:
         spike_buffer = self._get_spike_send_buffer(
             graph_mapper.get_subvertex_slice(subvertex))
         self._reserve_memory_regions(spec, spike_buffer.buffer_size)
@@ -261,11 +279,15 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         data_writer.close()
 
     def get_binary_file_name(self):
+        """
+
+        :return:
+        """
         return "reverse_iptag_multicast_source.aplx"
 
     # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        """ assumed correct cpu usage is not important
+        """
 
         :param vertex_slice:
         :param graph:
@@ -284,13 +306,21 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         """
         send_buffer = self._get_spike_send_buffer(vertex_slice)
         send_size = send_buffer.buffer_size
-        return constants.SETUP_SIZE + send_size
+        return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+                SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
-        """ assumed that correct dtcm usage is not required
+        """
 
         :param vertex_slice:
         :param graph:
         :return:
         """
         return 0
+
+    def is_data_specable(self):
+        """
+        helper method for isinstance
+        :return:
+        """
+        return True

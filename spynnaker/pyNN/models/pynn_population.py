@@ -1,18 +1,22 @@
-from pyNN.space import Space
-
-from pacman.model.constraints.abstract_constraints.abstract_constraint \
+from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
 
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_population_recordable_vertex import \
+    AbstractPopulationRecordableVertex
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN import exceptions as local_exceptions
+
+
+from spinn_front_end_common.utilities.timer import Timer
+from spinn_front_end_common.utilities import exceptions
+
+from pyNN.space import Space
 
 import numpy
 import logging
@@ -28,11 +32,11 @@ class Population(object):
 
     :param int size:
         size (number of cells) of the Population.
-    :param `pacman103.front.pynn.models` cellclass:
+    :param cellclass:
         specifies the neural model to use for the Population
     :param dict cellparams:
         a dictionary containing model specific parameters and values
-    :param `pyNN.space` structure:
+    :param structure:
         a spatial structure
     :param string label:
         a label identifying the Population
@@ -172,11 +176,10 @@ class Population(object):
                     "vertex to record spikes before running this command.")
 
             if not self._spinnaker.has_ran:
-                raise exceptions.SpynnakerException(
-                    "The simulation has not yet ran, therefore spikes cannot "
-                    "be retrieved. Please execute the simulation before "
-                    "running this command")
-
+                raise local_exceptions.SpynnakerException(
+                    "The simulation has not yet ran, therefore spikes cannot"
+                    " be retrieved. Please execute the simulation before"
+                    " running this command")
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
                 timer.start_timing()
@@ -368,7 +371,7 @@ class Population(object):
         triggering spike time recording.
         """
 
-        if not isinstance(self._vertex, AbstractRecordableVertex):
+        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
             raise Exception("This population does not support recording!")
 
         # Tell the vertex to record spikes
@@ -383,7 +386,7 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering gsyn value recording.
         """
-        if not isinstance(self._vertex, AbstractRecordableVertex):
+        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
             raise Exception("Vertex does not support "
                             "recording of gsyn")
 
@@ -396,7 +399,7 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering potential recording.
         """
-        if not isinstance(self._vertex, AbstractRecordableVertex):
+        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
             raise Exception("Vertex does not support "
                             "recording of potential")
 

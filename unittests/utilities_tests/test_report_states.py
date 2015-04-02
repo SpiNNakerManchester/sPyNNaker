@@ -1,6 +1,7 @@
 import unittest
+
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.utilities.report_states import ReportState
+from spinn_front_end_common.utilities.report_states import ReportState
 
 
 class TestReportStates(unittest.TestCase):

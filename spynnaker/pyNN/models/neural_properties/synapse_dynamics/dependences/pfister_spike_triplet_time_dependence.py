@@ -36,10 +36,10 @@ class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
         if (other is None) or (
                 not isinstance(other, PfisterSpikeTripletTimeDependence)):
             return False
-        return ((self._tau_plus == other.tau_plus)
-                and (self._tau_minus == other.tau_minus)
-                and (self._tau_x == other.tau_x)
-                and (self._tau_y == other.tau_y))
+        return ((self._tau_plus == other.tau_plus) and
+                (self._tau_minus == other.tau_minus) and
+                (self._tau_x == other.tau_x) and
+                (self._tau_y == other.tau_y))
 
     def create_synapse_row_io(
             self, synaptic_row_header_words, dendritic_delay_fraction):

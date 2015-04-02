@@ -1,230 +1,194 @@
-/* neuron.c
+/*! \file
  *
- * Dave Lester, Yuri , Abigail...
- *
- *  CREATION DATE
- *    1 August, 2013
- *
- *  HISTORY
- * *  DETAILS
- *    Created on       : 1 August 2013
- *    Version          : $Revision: 1.1 $
- *    Last modified on : $Date: 2013/08/06 15:55:57 $
- *    Last modified by : $Author: dave $
- *    $Id: neuron.c,v 1.1 2013/08/06 15:55:57 dave Exp dave $
- *
- *    $Log$
- *
+ * \brief implementation of the neuron.h interface.
  *
  */
 
-#include "spin-neuron-impl.h"
-
+#include "neuron.h"
+#include "models/neuron_model.h"
+#include "synapse_types/synapse_types.h"
+#include "plasticity/synapse_dynamics.h"
+#include "../common/out_spikes.h"
+#include "../common/recording.h"
+#include <debug.h>
 #include <string.h>
 
-// **NOTE** synapse shaping implementation and neuron headers gets included by compiler
+//! Array of neuron states
+static neuron_pointer_t neuron_array;
 
-#define REAL accum
-#define REAL_CONST(x)   x##k
+//! The key to be used for this core (will be ORed with neuron id)
+static key_t key;
 
-//REAL  global_I_this_timestep;
+//! A checker that says if this model should be transmitting. If set to false
+//! by the data region, then this model should not have a key.
+static bool use_key;
 
-uint32_t       h;        // number of micro-seconds per time-step
+//! The number of neurons on the core
+static uint32_t n_neurons;
 
-// Neuron modelling data
-neuron_pointer_t neuron_array;
+//! The recording flags
+static uint32_t recording_flags;
 
-timer_t  time;
+//! The input buffers - from synapses.c
+static input_t *input_buffers;
 
-// upper part of spike packet identifier for this core.
-uint32_t  key;
-bool use_key;
-uint32_t  num_neurons;
-uint32_t  num_params;
-uint32_t  ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT];
-
-/*static inline voltage_t voltage_from_scale (unsigned long fract x)
-{ return (decay (v_max-v_min,x) + v_min); }
-
-static inline resistance_t resistance_from_scale (unsigned long fract x)
-{ return (kbits (bitsulr (x) >> 17)); }
-
-void voltages (voltage_t* v, size_t n)
-{
-  index_t i;
-
-  for (i = 0; i < n; i++) v [i] = voltage_from_scale (((u032*) v) [i]);
-}*/
+//! parameters that reside in the neuron_parameter_data_region in human
+//! readable form
+typedef enum parmeters_in_neuron_parameter_data_region {
+    has_key, transmission_key, number_of_neurons_to_simulate,
+    num_neuron_parameters, the_machine_time_step_in_microseconds,
+    start_of_memory_which_contains_all_neural_parameters,
+} parmeters_in_neuron_parameter_data_region;
 
 
-
-//s1615 u032_to_s1615 (u032 x)
-//{}
-/*
-static inline void new_membrane_dynamics (index_t n)
-{
-  accum k = 0.997; // exp (-h/(r*c))
-  accum r = 1.6; // ?ohms
-  accum alpha = get_current (n) * r + voltage_to_accum (v_rest [n]);
-  accum next_v = alpha - k * (alpha - voltage_to_accum (v_membrane [n]));
-
-  v_membrane [n] = accum_to_voltage (next_v);
-}
-*/
-
-static bool record_neuron_param(recording_channel_e channel, uint8_t parameter, neuron_pointer_t neuron)
-{
-  // Get neuron parameter value
-  accum parameterValue = neuron_get_state(parameter, neuron );
-
-  // Return the result of recording accum value
-  return recording_record(channel, &parameterValue, sizeof(accum));
-}
-
-// The following is LIF...
-void neuron (index_t n)
-{
-  neuron_pointer_t neuron = &neuron_array[n];
-
-  // Get excitatory and inhibitory input from synapses
-  // **NOTE** this may be in either conductance or current units
-  accum exc_neuron_input = neuron_get_exc_input(get_exc_neuron_input(n));
-  accum inh_neuron_input = neuron_get_inh_input(get_inh_neuron_input(n));
-
-  // Get external bias from any source of intrinsic plasticity
-  accum external_bias = plasticity_get_intrinsic_bias(n);
-
-  bool spike = neuron_state_update( exc_neuron_input, inh_neuron_input, external_bias, neuron );
-
-  // If we should be recording potential, record this neuron parameter **YUCK** magic number
-  if(system_data_test_bit(e_system_data_record_neuron_potential))
-  {
-    record_neuron_param(e_recording_channel_neuron_potential, 1, neuron);
-  }
-
-  // If we should be recording gsyn
-  if(system_data_test_bit(e_system_data_record_neuron_gsyn))
-  {
-    accum temp_record_input = exc_neuron_input - inh_neuron_input;  // waiting for neuron record API
-    // Record to correct recording channel
-    // **NOTE** offset current is not currently exposed by neuron model
-    recording_record(e_recording_channel_neuron_gsyn, &temp_record_input, sizeof(accum));
-  }
-
-  if( spike )
-  {
-    plasticity_process_post_synaptic_event(n);
-    out_spike(n);
-  }
-}
-
-void constant_vector (address_t a, index_t n, uint32_t value)
-{
-  index_t i;
-
-  for (i = 0; i < n; i++) a[i] = value;
-}
-
-bool neural_data_filled (address_t address, uint32_t flags)
-{
-  use(flags);
-
-  log_info("neural_data_filled: starting");
-
-
-  // changed from above for new file format 13-1-2014
-  use_key = address[0];
-  key   = address[1];
-  log_info("\tkey = %08x, (x: %u, y: %u) proc: %u",
-    key, key_x (key), key_y (key), key_p (key));
-
-  num_neurons = address [2];
-  num_params  = address [3];
-  h           = address [4]; // number of micro seconds per time step.
-
-   log_info("\tneurons = %u, params = %u, time step = %u",
-     num_neurons, num_params, h);
-
-  // Read ring buffer input shift for each synapse type
-  for(index_t i = 0; i < SYNAPSE_TYPE_COUNT; i++)
-  {
-    ring_buffer_to_input_left_shifts[i] = address[5 + i];
-    log_info("\tsynapse type %u, ring buffer to input left shift %u", i, ring_buffer_to_input_left_shifts[i]);
-  }
-
-  // Allocate DTCM for new format neuron array and copy block of data
-  neuron_array = (neuron_t*)spin1_malloc( num_neurons * sizeof(neuron_t) );
-  if(neuron_array == NULL)
-  {
-    sentinel("Unable to allocate neuron array - Out of DTCM");
-  }
-
-  memcpy( neuron_array, &address[5 + SYNAPSE_TYPE_COUNT], num_neurons * sizeof(neuron_t) );
-  initialize_out_spikes (num_neurons);
-  //print_neurons();
-/*
-  a  =  configuration_reader_offset(address, 17);
-  if (!(vector_copied((uint32_t*)p21, num_neurons, a, flags))) {
-    log_info("vector copy failed");
-    return (false);
-  }
-*/
-  /*
-  // values from nest: iaf_psc_exp.cpp...
-
-  use(a);
-  hack_vector ((uint32_t*)v_membrane, num_neurons,  991146299); // -70mV
-  hack_vector ((uint32_t*)v_threshold,num_neurons, 1486719449); // -55mV
-  hack_vector ((uint32_t*)v_rest,     num_neurons,  991146299); // -70mV
-  hack_vector ((uint32_t*)v_reset,    num_neurons,  991146299); // -70mV
-
-  // h = 0.1ms
-  // tau_ex = 2.0
-  // tau_in = 2.0
-  // p11_ex = exp (-h/tau_ex);
-  // p11_in = exp (-h/tau_in); which equals above
-  hack_vector ((uint32_t*)p11,     num_neurons,  2605029347); // e(-0.5)  ~ 0.606..
-
-  // tau = 10ms
-  // p22 = exp (-h/tau);
-  hack_vector ((uint32_t*)p22,     num_neurons,  4252231657);
-                                                    // e(-0.01) ~ 0.990..
-
-  // C = 250pF
-  // p21 = tau/(C*(1 -tau/tau_ex)) * p11_ex * (1 - exp (h*(1/tau_ex - 1/tau)))
-  hack_vector ((uint32_t*)p21,     num_neurons,  42955); // ~ 0.0000100...
-
-  // p20 = tau/(C*(1 -p22))
-  hack_vector ((uint32_t*)p20,     num_neurons,  263457); // ~ 4.0200..
-  */
-
-  log_info("neural_data_filled: completed successfully");
-  return (true);
-}
-
-/*
-**NOTE** JK - commented out to prevent use as this data is no longer being read from neuron data
-accum voltage_to_accum (voltage_t v)
-{ return (decay_s1615 (v_max - v_min, v) + v_min); }*/
-
-#ifdef DEBUG
-
-void print_neurons (void)
-{
-  //bool    empty = true;
-  index_t n;
-
-  //for (n = 1; n < 2/*MAX_NEURON_SIZE*/; n ++)
-  //  empty = empty && (v_membrane [n] == v_rest [n]);
-
-  printf ("Neurons\n");
-
-  //if (!empty) {
-    printf ("-------------------------------------\n");
-    for (n = 0; n < 1/*MAX_NEURON_SIZE*/; n++)
-      neuron_print (&(neuron_array[n]));
-    printf ("-------------------------------------\n");
+//! private method for doing output debug data on the neurons
+//! \return nothing
+static inline void _print_neurons() {
+//! only if the models are compiled in debug mode will this method contain
+//! said lines.
+#if LOG_LEVEL >= LOG_DEBUG
+    log_debug("-------------------------------------\n");
+    for (index_t n = 0; n < n_neurons; n++) {
+        neuron_model_print(&(neuron_array[n]));
+    }
+    log_debug("-------------------------------------\n");
     //}
+#endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-#endif /*DEBUG*/
+//! \translate the data stored in the NEURON_PARAMS data region in SDRAM and
+//! converts it into c based objects for use.
+//! \param[in] address the absolute address in SDRAM for the start of the
+//!            NEURON_PARAMS data region in SDRAM
+//! \param[in] recording_flags_param the recordings parameters
+//!            (contains which regions are active and how big they are)
+//! \param[out] n_neurons_value The number of neurons this model is to emulate
+//! \return boolean which is True is the translation was successful
+//! otherwise False
+bool neuron_initialise(address_t address, uint32_t recording_flags_param,
+        uint32_t *n_neurons_value) {
+    log_info("neuron_initialise: starting");
+
+    // Check if theres a key to use
+    use_key = address[has_key];
+    // Read the spike key to use
+    key = address[transmission_key];
+
+    // output if this model is expecting to transmit
+    if (!use_key){
+        log_info("\tThis model is not expecting to transmit as it has no key");
+    }
+    else{
+        log_info("\tThis model is expected to transmit with key = %08x", key);
+    }
+
+    // Read the neuron details
+    n_neurons = address[number_of_neurons_to_simulate];
+    *n_neurons_value = n_neurons;
+    uint32_t n_params = address[num_neuron_parameters];
+    timer_t timestep = address[the_machine_time_step_in_microseconds];
+
+    log_info("\tneurons = %u, params = %u, time step = %u", n_neurons,
+             n_params, timestep);
+
+    // Allocate DTCM for new format neuron array and copy block of data
+    neuron_array = (neuron_t*) spin1_malloc(n_neurons * sizeof(neuron_t));
+    if (neuron_array == NULL) {
+        log_error("Unable to allocate neuron array - Out of DTCM");
+        return false;
+    }
+    memcpy(neuron_array,
+            &address[start_of_memory_which_contains_all_neural_parameters],
+            n_neurons * sizeof(neuron_t));
+
+    // Set up the out spikes array
+    if (!out_spikes_initialize(n_neurons)) {
+        return false;
+    }
+
+    // Set up the neuron model
+    neuron_model_set_machine_timestep(timestep);
+
+    recording_flags = recording_flags_param;
+
+    return true;
+}
+
+//! \setter for the internal input buffers
+//! \param[in] input_buffers_value the new input buffers
+//! \return None this method does not return anything.
+void neuron_set_input_buffers(input_t *input_buffers_value) {
+    input_buffers = input_buffers_value;
+}
+
+//! \executes all the updates to neural parameters when a given timer period
+//! has occurred.
+//! \param[in] time the timer tic  value currently being executed
+//! \return nothing
+void neuron_do_timestep_update(timer_t time) {
+    use(time);
+
+    // update each neuron individually
+    for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+        neuron_pointer_t neuron = &neuron_array[neuron_index];
+
+        // Get excitatory and inhibitory input from synapses
+        // **NOTE** this may be in either conductance or current units
+        input_t exc_neuron_input = neuron_model_convert_input(
+            synapse_types_get_excitatory_input(input_buffers, neuron_index));
+        input_t inh_neuron_input = neuron_model_convert_input(
+            synapse_types_get_inhibitory_input(input_buffers, neuron_index));
+
+        // Get external bias from any source of intrinsic plasticity
+        input_t external_bias =
+            synapse_dynamics_get_intrinsic_bias(neuron_index);
+
+        // update neuron parameters (will inform us if the neuron should spike)
+        bool spike = neuron_model_state_update(
+            exc_neuron_input, inh_neuron_input, external_bias, neuron);
+
+        // If we should be recording potential, record this neuron parameter
+        if (recording_is_channel_enabled(recording_flags,
+                e_recording_channel_neuron_potential)) {
+            state_t voltage = neuron_model_get_membrane_voltage(neuron);
+            recording_record(e_recording_channel_neuron_potential, &voltage,
+                             sizeof(state_t));
+        }
+
+        // If we should be recording gsyn, get the neuron input
+        if (recording_is_channel_enabled(recording_flags,
+                e_recording_channel_neuron_gsyn)) {
+            input_t temp_record_input = exc_neuron_input - inh_neuron_input;
+            recording_record(e_recording_channel_neuron_gsyn,
+                             &temp_record_input, sizeof(input_t));
+        }
+
+        // If the neuron has spiked
+        if (spike) {
+            log_debug("the neuron %d has been determined to spike",
+                      neuron_index);
+            // Do any required synapse processing
+            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
+
+            // Record the spike
+            out_spikes_set_spike(neuron_index);
+
+            // Send the spike
+            while (use_key &&
+                   !spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
+                spin1_delay_us(1);
+            }
+        } else {
+            log_debug("the neuron %d has been determined to not spike",
+                      neuron_index);
+        }
+    }
+
+    // do logging stuff if required
+    out_spikes_print();
+    _print_neurons();
+
+    // Record any spikes this timestep
+    out_spikes_record(recording_flags);
+    out_spikes_reset();
+}

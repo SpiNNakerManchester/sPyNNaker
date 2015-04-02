@@ -1,32 +1,33 @@
-from spynnaker.pyNN.models.abstract_models\
+import math
+import copy
+import logging
+
+from enum import Enum
+
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.neural_projections.\
+    delay_partitionable_edge import DelayPartitionableEdge
+from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_population_outgoing_edge_restrictor \
-    import AbstractPopulationOutgoingEdgeRestrictor
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
+from spinn_front_end_common.abstract_models\
+    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
+    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
+from spinn_front_end_common.utilities import constants as common_constants
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
-    import DelayPartitionableEdge
-from spynnaker.pyNN import exceptions
-
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_fixed_mask_constraint\
+from pacman.model.constraints.key_allocator_constraints.\
+    key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 
-import copy
-import logging
-from enum import Enum
-import math
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ logger = logging.getLogger(__name__)
 class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractDataSpecableVertex,
                            AbstractProvidesIncomingEdgeConstraints,
-                           AbstractPopulationOutgoingEdgeRestrictor):
+                           AbstractOutgoingEdgeSameContiguousKeysRestrictor):
     """
     Instance of this class provide delays to incoming spikes in multiples
     of the maximum delays of a neuron (typically 16 or 32)
@@ -63,7 +64,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractProvidesIncomingEdgeConstraints.__init__(self)
-        AbstractPopulationOutgoingEdgeRestrictor.__init__(self)
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0
@@ -104,7 +105,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     @staticmethod
     def get_spike_block_row_length(n_atoms):
-        return int(math.ceil(n_atoms / constants.BITS_PER_WORD))
+        return int(math.ceil(n_atoms / common_constants.BITS_PER_WORD))
 
     @staticmethod
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
@@ -124,16 +125,18 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps *
                 constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
-    def generate_data_spec(self, subvertex, placement, sub_graph, graph,
-                           routing_info, hostname, graph_mapper,
-                           report_folder, ip_tags, reverse_ip_tags):
+    def generate_data_spec(
+            self, subvertex, placement, sub_graph, graph, routing_info,
+            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
+            write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
         """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
-                placement.x, placement.y, placement.p, hostname, report_folder)
+                placement.x, placement.y, placement.p, hostname, report_folder,
+                write_text_specs, application_run_time_folder)
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
@@ -156,7 +159,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
-            size=constants.SETUP_SIZE, label='setup')
+            size=constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
+            label='setup')
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
@@ -186,16 +190,11 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     def write_setup_info(self, spec, spike_history_region_sz):
         """
         """
-        recording_info = 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
-        self._write_basic_setup_info(spec, self.CORE_APP_IDENTIFIER)
-        spec.switch_write_focus(
-            region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
-        spec.write_value(data=recording_info)
-        spec.write_value(data=spike_history_region_sz)
-        spec.write_value(data=0)
-        spec.write_value(data=0)
+        self._write_basic_setup_info(
+            spec, self.CORE_APP_IDENTIFIER,
+            self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
 
@@ -297,3 +296,10 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     def get_binary_file_name(self):
         return "delay_extension.aplx"
+
+    def is_data_specable(self):
+        """
+        helper method for isinstance
+        :return:
+        """
+        return True

@@ -16,10 +16,10 @@ class MultiplicativeWeightDependence(AbstractWeightDependency):
         if (other is None) or (not isinstance(other,
                                               MultiplicativeWeightDependence)):
             return False
-        return ((self.w_min == other.w_min)
-                and (self.w_max == other.w_max)
-                and (self.A_plus == other.A_plus)
-                and (self.A_minus == other.A_minus))
+        return ((self.w_min == other.w_min) and
+                (self.w_max == other.w_max) and
+                (self.A_plus == other.A_plus) and
+                (self.A_minus == other.A_minus))
 
     def get_params_size_bytes(self, num_synapse_types, num_terms):
         if num_terms != 1:

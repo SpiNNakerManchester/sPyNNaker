@@ -1,22 +1,23 @@
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_population_recordable_vertex\
+    import AbstractPopulationRecordableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_population_data_spec \
+    import AbstractPopulationDataSpec
+from spynnaker.pyNN import exceptions as local_exceptions
+from spynnaker.pyNN.utilities import constants
+
 from abc import ABCMeta, abstractmethod
 from math import ceil
 from six import add_metaclass
 import logging
-
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex \
-    import AbstractRecordableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_population_data_spec \
-    import AbstractPopulationDataSpec
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities import constants
 
 
 logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationVertex(
-        AbstractRecordableVertex, AbstractPopulationDataSpec):
+class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
+                               AbstractPopulationDataSpec):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -24,7 +25,8 @@ class AbstractPopulationVertex(
                  machine_time_step, timescale_factor, spikes_per_second,
                  ring_buffer_sigma, weight_scale=1.0, constraints=None):
 
-        AbstractRecordableVertex.__init__(self, machine_time_step, label)
+        AbstractPopulationRecordableVertex.__init__(
+            self, machine_time_step, label)
         AbstractPopulationDataSpec.__init__(
             self, binary, n_neurons, label, constraints,
             machine_time_step=machine_time_step,
@@ -65,7 +67,7 @@ class AbstractPopulationVertex(
         """
         logger.info("Getting v for {}".format(self.label))
         if not has_ran:
-            raise exceptions.SpynnakerException(
+            raise local_exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore v cannot be "
                 "retrieved")
         return self.get_neuron_parameter(
@@ -84,7 +86,7 @@ class AbstractPopulationVertex(
         """
         logger.info("Getting gsyn for {}".format(self.label))
         if not has_ran:
-            raise exceptions.SpynnakerException(
+            raise local_exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore gsyn cannot be "
                 "retrieved")
         return self.get_neuron_parameter(

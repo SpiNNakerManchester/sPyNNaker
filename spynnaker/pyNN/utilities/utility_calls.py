@@ -4,12 +4,10 @@ utility class containing simple helper methods
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import RandomDistribution
 from data_specification import constants as ds_constants
-from spynnaker.pyNN import exceptions
+from spinn_front_end_common.utilities import exceptions
 import numpy
-import math
 import os
 import logging
-import inspect
 
 
 logger = logging.getLogger(__name__)
@@ -36,6 +34,7 @@ def check_delay(delay):
 def get_region_base_address_offset(app_data_base_address, region):
     return (app_data_base_address +
             ds_constants.APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))
+
 
 def convert_param_to_numpy(param, no_atoms):
     """

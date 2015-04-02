@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 _N_SEQUENCES = 256
 
 # The number of sequence numbers allowed in a single transmission
-_N_SEQUENCES_PER_TRANSMISSION = 4
+_N_SEQUENCES_PER_TRANSMISSION = 16
 
 
 class BuffersSentDeque(object):
     """ A tracker of buffers sent / to send for a region
     """
 
-    def __init__(self, region):
+    def __init__(self, region, sent_stop_message=False):
         """
 
         :param region: The region being managed
@@ -44,7 +44,7 @@ class BuffersSentDeque(object):
         self._last_received_sequence_number = (_N_SEQUENCES - 1)
 
         # True if the stop message has been sent
-        self._sent_stop_message = False
+        self._sent_stop_message = sent_stop_message
 
     @property
     def is_full(self):

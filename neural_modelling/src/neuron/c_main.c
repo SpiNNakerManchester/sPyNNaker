@@ -1,131 +1,229 @@
-/*
- * c_main.c
+/*!\file
  *
  * SUMMARY
- *  This file contains the main function of the application framework, which
- *  the application programmer uses to configure and run applications.
+ *  \brief This file contains the main function of the application framework,
+ *  which the application programmer uses to configure and run applications.
  *
- * AUTHOR
- *    Thomas Sharp - thomas.sharp@cs.man.ac.uk
- *    Dave Lester (david.r.lester@manchester.ac.uk)
  *
- *  COPYRIGHT
- *    Copyright (c) Dave Lester and The University of Manchester, 2013.
- *    All rights reserved.
- *    SpiNNaker Project
- *    Advanced Processor Technologies Group
- *    School of Computer Science
- *    The University of Manchester
- *    Manchester M13 9PL, UK
+ * This is the main entrance class for most of the neural models. The following
+ * Figure shows how all of the c code interacts with each other and what classes
+ * are used to represent over arching logic
+ * (such as plasticity, spike processing, utilities, synapse types, models)
  *
- *  DESCRIPTION
- *    A header file that can be used as the API for the spin-neuron.a library.
- *    To use the code is compiled with
- *
- *      #include "debug.h"
- *
- *  CREATION DATE
- *    21 July, 2013
- *
- *  HISTORY
- *    DETAILS
- *    Created on       : 27 July 2013
- *    Version          : $Revision$
- *    Last modified on : $Date$
- *    Last modified by : $Author$
- *    $Id$
+ * @image html spynnaker_c_code_flow.png
  *
  */
 
-#include "spin-neuron-impl.h"
-#include "models/generic_neuron.h"
+#include "../common/in_spikes.h"
+#include "neuron.h"
+#include "synapses.h"
+#include "spike_processing.h"
+#include "population_table.h"
+#include "plasticity/synapse_dynamics.h"
 
-//extern neuron_t *neuron_array;
-/*
-#define PRINT_NEURON( i ) \
-  io_printf( IO_STD, "V_th=%k V_r=%k V_rt=%k R=%k V_m=%k I=%k etc=%k Tref=%d reft=%d\n",  \
-    neuron_array[i].V_thresh, \
-    neuron_array[i].V_reset, \
-    neuron_array[i].V_rest, \
-    neuron_array[i].R_membrane, \
-    neuron_array[i].V_membrane, \
-    neuron_array[i].I_offset, \
-    neuron_array[i].exp_TC, \
-    neuron_array[i].T_refract, \
-    neuron_array[i].refract_timer \
-  );
-*/
-// **TODO** move somewhere else!
-void initialize_buffers (void)
-{
-  //log_info("Initializing buffers");
+#include <data_specification.h>
+#include <simulation.h>
+#include <debug.h>
 
-  time = 0;
+/* validates that the model being compiled does indeed contain a application
+   magic number*/
+#ifndef APPLICATION_MAGIC_NUMBER
+#define APPLICATION_MAGIC_NUMBER 0
+#error APPLICATION_MAGIC_NUMBER was undefined.  Make sure you define this\
+       constant
+#endif
 
-  reset_ring_buffer ();
-  initialize_current_buffer ();
-  initialize_spike_buffer (IN_SPIKE_SIZE);
-  initialise_plasticity_buffers();
-  initialise_dma_buffers();
+//! the number of channels all standard models contain (spikes, voltage, gsyn)
+//! for recording
+#define N_RECORDING_CHANNELS 3
 
+//! human readable definitions of each region in SDRAM
+typedef enum regions_e {
+    SYSTEM_REGION,
+    NEURON_PARAMS_REGION,
+    SYNAPSE_PARAMS_REGION,
+    POPULATION_TABLE_REGION,
+    SYNAPTIC_MATRIX_REGION,
+    SYNAPSE_DYNAMICS_REGION,
+    SPIKE_RECORDING_REGION,
+    POTENTIAL_RECORDING_REGION,
+    GSYN_RECORDING_REGION
+} regions_e;
 
-  //log_info("resetting of buffers completed");
+// Globals
+
+//! the current timer tick value TODO this might be able to be removed with
+//! the timer tick callback returning the same value.
+uint32_t time;
+//! global parameter which contains the number of timer ticks to run for before
+//! being expected to exit
+static uint32_t simulation_ticks = 0;
+
+//! \Initialises the model by reading in the regions and checking recording
+//! data.
+//! \param[in] *timer_period a pointer for the memory address where the timer
+//! period should be stored during the function.
+//! \return boolean of True if it successfully read all the regions and set up
+//! all its internal data structures. Otherwise returns False
+static bool initialize(uint32_t *timer_period) {
+    log_info("Initialise: started");
+
+    // Get the address this core's DTCM data starts at from SRAM
+    address_t address = data_specification_get_data_address();
+
+    // Read the header
+    if (!data_specification_read_header(address)) {
+        return false;
+    }
+
+    // Get the timing details
+    address_t system_region = data_specification_get_region(
+        SYSTEM_REGION, address);
+    if (!simulation_read_timing_details(
+            system_region, APPLICATION_MAGIC_NUMBER, timer_period,
+            &simulation_ticks)) {
+        return false;
+    }
+
+    // Set up recording
+    recording_channel_e channels_to_record[] = {
+        e_recording_channel_spike_history,
+        e_recording_channel_neuron_potential,
+        e_recording_channel_neuron_gsyn
+    };
+    regions_e regions_to_record[] = {
+        SPIKE_RECORDING_REGION,
+        POTENTIAL_RECORDING_REGION,
+        GSYN_RECORDING_REGION
+    };
+    uint32_t region_sizes[N_RECORDING_CHANNELS];
+    uint32_t recording_flags;
+    recording_read_region_sizes(
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
+        &recording_flags, &region_sizes[0], &region_sizes[1], &region_sizes[2]);
+    for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
+        if (recording_is_channel_enabled(recording_flags,
+                                         channels_to_record[i])) {
+            if (!recording_initialse_channel(
+                    data_specification_get_region(regions_to_record[i],
+                                                  address),
+                    channels_to_record[i], region_sizes[i])) {
+                return false;
+            }
+        }
+    }
+
+    // Set up the neurons
+    uint32_t n_neurons;
+    if (!neuron_initialise(
+            data_specification_get_region(NEURON_PARAMS_REGION, address),
+            recording_flags, &n_neurons)) {
+        return false;
+    }
+
+    // Set up the synapses
+    input_t *input_buffers;
+    uint32_t *ring_buffer_to_input_buffer_left_shifts;
+    if (!synapses_initialise(
+            data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
+            n_neurons, &input_buffers,
+            &ring_buffer_to_input_buffer_left_shifts)) {
+        return false;
+    }
+    neuron_set_input_buffers(input_buffers);
+
+    // Set up the population table
+    uint32_t row_max_n_words;
+    if (!population_table_initialise(
+            data_specification_get_region(POPULATION_TABLE_REGION, address),
+            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
+            &row_max_n_words)) {
+        return false;
+    }
+
+    // Set up the synapse dynamics
+    if (!synapse_dynamics_initialise(
+            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address),
+            n_neurons, ring_buffer_to_input_buffer_left_shifts)) {
+        return false;
+    }
+
+    if (!spike_processing_initialise(row_max_n_words)) {
+        return false;
+    }
+    log_info("Initialise: finished");
+    return true;
 }
 
-void c_main (void)
-{
+//! \The callback used when a timer tic interrupt is set off. The result of
+//! this is to transmit any spikes that need to be sent at this timer tic,
+//! update any recording, and update the state machine's states.
+//! If the timer tic is set to the end time, this method will call the
+//! spin1api stop command to allow clean exit of the executable.
+//! \param[in] timer_count the number of times this call back has been
+//! executed since start of simulation
+//! \param[in] unused for consistency sake of the API always returning two
+//! parameters, this parameter has no semantics currently and thus is set to 0
+//! \return None
+void timer_callback(uint timer_count, uint unused) {
+    use(timer_count);
+    use(unused);
 
-#ifdef SPIN1_API_HARNESS
-  // Load DTCM data
-  system_load_dtcm();
+    time++;
 
-  initialize_buffers();
+    log_debug("Timer tick %u \n", time);
 
-  // setup function which needs to be called in main program before any neuron code executes
-  // currently minimum 100 microseconds, then in 100 steps...  if not called then defaults to 1ms(=1000us)
-  provide_machine_timestep( h );
+    /* if a fixed number of simulation ticks that were specified at startup
+       then do reporting for finishing */
+    if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {
+        log_info("Simulation complete.\n");
 
-  // Set timer tick (in microseconds)
-  spin1_set_timer_tick (timer_period);
+        // print statistics into logging region
+        synapses_print_pre_synaptic_events();
+        synapses_print_saturation_count();
 
-  // Register callbacks
-  spin1_callback_on (MC_PACKET_RECEIVED, incoming_spike_callback, -1);
-  spin1_callback_on (DMA_TRANSFER_DONE,  dma_callback,             0);
-  spin1_callback_on (USER_EVENT,         feed_dma_pipeline,        0);
-  spin1_callback_on (TIMER_TICK,         timer_callback,           2);
-  //spin1_callback_on (SDP_PACKET_RX,      sdp_packet_callback,      1);
+        // Finalise any recordings that are in progress, writing back the final
+        // amounts of samples recorded to SDRAM
+        recording_finalise();
 
-  log_info("Starting");
+        // Check for buffer overflow
+        uint spike_buffer_overflows = in_spikes_get_n_buffer_overflows();
+        if (spike_buffer_overflows > 0) {
+            io_printf(IO_STD, "\tWarning - %d spike buffers overflowed\n",
+                    spike_buffer_overflows);
+        }
 
-  // Start the time at "-1" so that the first tick will be 0
-  time = UINT32_MAX;
-  system_runs_to_completion();
-#else
-   uint32_t version;
+        spin1_exit(0);
+        return;
+    }
+    // otherwise do synapse and neuron time step updates
+    synapses_do_timestep_update(time);
+    neuron_do_timestep_update(time);
+}
 
-  if (dtcm_filled ((uint32_t*)(0x74000000), & version, 0))
-  {
-    log_info ("DTCM OK %u", num_neurons );
-  }
+//! \The only entry point for this model. it initialises the model, sets up the
+//! Interrupts for the Timer tic and calls the spin1api for running.
+void c_main(void) {
 
-  initialize_buffers ();
+    // Load DTCM data
+    uint32_t timer_period;
 
-  log_info ("Buffers OK");
-/*
-  for( index_t i = 0; i < num_neurons; i++ )
-  {
-    PRINT_NEURON( i );
+    // initialise the model
+    if (!initialize(&timer_period)){
+    	rt_error(RTE_API);
+    }
 
-    //		neuron_array[i].V_membrane = REAL_CONST( 0.0 );
-    neuron_array[i].T_refract = 25;
+    // Start the time at "-1" so that the first tick will be 0
+    time = UINT32_MAX;
 
-  }
-  */
-  add_spike (make_key (0, 0, key_p(key)));
+    // Set timer tick (in microseconds)
+    log_info("setting timer tic callback for %d microseconds",
+              timer_period);
+    spin1_set_timer_tick(timer_period);
 
-  log_info ("add_spike OK");
+    // Set up the timer tick callback (others are handled elsewhere)
+    spin1_callback_on(TIMER_TICK, timer_callback, 2);
 
-  harness ();
-
-#endif
+    log_info("Starting");
+    simulation_run();
 }

@@ -17,27 +17,6 @@ from pacman.operations.routing_info_allocator_algorithms.\
     basic_routing_info_allocator import BasicRoutingInfoAllocator
 from pacman.utilities.progress_bar import ProgressBar
 
-from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spynnaker.pyNN.models.abstract_models.buffer_models\
-    .abstract_sends_buffers_from_host_partitioned_vertex\
-    import AbstractSendsBuffersFromHostPartitionedVertex
-from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
-    AbstractVirtualVertex
-from spynnaker.pyNN.models.abstract_models.abstract_provides_n_keys_for_edge\
-    import AbstractProvidesNKeysForEdge
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_outgoing_edge_constraints \
-    import AbstractProvidesOutgoingEdgeConstraints
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_provides_incoming_edge_constraints \
-    import AbstractProvidesIncomingEdgeConstraints
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_send_me_multicast_commands_vertex \
-    import AbstractSendMeMulticastCommandsVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_vertex_with_dependent_vertices \
-    import AbstractVertexWithEdgeToDependentVertices
-
 # spinnmachine imports
 from spinn_machine.sdram import SDRAM
 from spinn_machine.router import Router as MachineRouter
@@ -46,25 +25,54 @@ from spinn_machine.processor import Processor
 from spinn_machine.chip import Chip
 from spinn_machine.virutal_machine import VirtualMachine
 
-# internal imports
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
-from spynnaker.pyNN.spynnaker_comms_functions import SpynnakerCommsFunctions
-from spynnaker.pyNN.spynnaker_configuration import SpynnakerConfiguration
-from spynnaker.pyNN.utilities import conf
+# common front end imports
+from spinn_front_end_common.utilities import exceptions as common_exceptions
+from spinn_front_end_common.utilities import reports
+from spinn_front_end_common.utility_models.command_sender import CommandSender
+from spinn_front_end_common.interface.front_end_common_interface_functions \
+    import FrontEndCommonInterfaceFunctions
+from spinn_front_end_common.interface.front_end_common_configuration_functions\
+    import FrontEndCommonConfigurationFunctions
+from spinn_front_end_common.utilities.timer import Timer
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
+from spinn_front_end_common.interface.data_generator_interface import \
+    DataGeneratorInterface
+from spinn_front_end_common.interface.executable_finder import ExecutableFinder
+from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
+    import AbstractProvidesNKeysForEdge
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints \
+    import AbstractProvidesOutgoingEdgeConstraints
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_incoming_edge_constraints \
+    import AbstractProvidesIncomingEdgeConstraints
+
+# local front end imports
+from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
 from spynnaker.pyNN.utilities.database.data_base_interface \
     import DataBaseInterface
-from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
-from spynnaker.pyNN.utilities.timer import Timer
-from spynnaker.pyNN.utilities import reports
-from spynnaker.pyNN.models.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
     import GraphEdgeFilter
-from spynnaker.pyNN.utilities.data_generator_interface import \
-    DataGeneratorInterface
+from spynnaker.pyNN.spynnaker_configurations import \
+    SpynnakerConfigurationFunctions
+from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN import model_binaries
+from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
+    AbstractVirtualVertex
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_send_me_multicast_commands_vertex \
+    import AbstractSendMeMulticastCommandsVertex
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_vertex_with_dependent_vertices \
+    import AbstractVertexWithEdgeToDependentVertices
+from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
+from spynnaker.pyNN.models.abstract_models.buffer_models\
+    .abstract_sends_buffers_from_host_partitioned_vertex\
+    import AbstractSendsBuffersFromHostPartitionedVertex
 
 # spinnman imports
 from spinnman.model.core_subsets import CoreSubsets
@@ -78,41 +86,93 @@ from multiprocessing.pool import ThreadPool
 
 logger = logging.getLogger(__name__)
 
+executable_finder = ExecutableFinder()
 
-class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
+
+class Spinnaker(FrontEndCommonConfigurationFunctions,
+                FrontEndCommonInterfaceFunctions,
+                SpynnakerConfigurationFunctions):
+    """
+    Spinnaker
+    """
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
-                 max_delay=None, graph_label=None, binary_search_paths=None,
+                 max_delay=None, graph_label=None,
                  database_socket_addresses=None):
-        SpynnakerConfiguration.__init__(self, host_name, graph_label)
-
-        if binary_search_paths is None:
-            binary_search_paths = []
+        FrontEndCommonConfigurationFunctions.__init__(self, host_name,
+                                                      graph_label)
+        SpynnakerConfigurationFunctions.__init__(self)
 
         if database_socket_addresses is None:
             database_socket_addresses = list()
-            listen_port = conf.config.getint("Database", "listen_port")
-            notify_port = conf.config.getint("Database", "notify_port")
-            noftiy_hostname = conf.config.get("Database", "notify_hostname")
+            listen_port = config.getint("Database", "listen_port")
+            notify_port = config.getint("Database", "notify_port")
+            noftiy_hostname = config.get("Database", "notify_hostname")
             database_socket_addresses.append(
                 SocketAddress(noftiy_hostname, notify_port, listen_port))
         self._database_socket_addresses = database_socket_addresses
+        self._database_interface = None
 
         if self._app_id is None:
-            self._set_up_main_objects()
-            self._set_up_pacman_algorthms_listings()
+            self._set_up_main_objects(
+                app_id=config.getint("Machine", "appID"),
+                execute_data_spec_report=config.getboolean(
+                    "Reports", "writeTextSpecs"),
+                execute_partitioner_report=config.getboolean(
+                    "Reports", "writePartitionerReports"),
+                execute_placer_report=config.getboolean(
+                    "Reports", "writePlacerReports"),
+                execute_router_dat_based_report=config.getboolean(
+                    "Reports", "writeRouterDatReport"),
+                reports_are_enabled=config.getboolean(
+                    "Reports", "reportsEnabled"),
+                generate_performance_measurements=config.getboolean(
+                    "Reports", "outputTimesForSections"),
+                execute_router_report=config.getboolean(
+                    "Reports", "writeRouterReports"),
+                execute_write_reload_steps=config.getboolean(
+                    "Reports", "writeReloadSteps"),
+                generate_transciever_report=config.getboolean(
+                    "Reports", "writeTransceiverReport"),
+                execute_routing_info_report=config.getboolean(
+                    "Reports", "writeRouterInfoReport"),
+                in_debug_mode=config.get("Mode", "mode") == "Debug",
+                generate_tag_report=config.getboolean(
+                    "Reports", "writeTagAllocationReports"))
+
+            self._set_up_pacman_algorthms_listings(
+                partitioner_algorithm=config.get("Partitioner", "algorithm"),
+                placer_algorithm=config.get("Placer", "algorithm"),
+                key_allocator_algorithm=config.get(
+                    "KeyAllocator", "algorithm"),
+                routing_algorithm=config.get("Routing", "algorithm"))
+
+            # set up exeuctable specifics
             self._set_up_executable_specifics()
-            self._set_up_report_specifics()
-            self._set_up_output_application_data_specifics()
+            self._set_up_report_specifics(
+                default_report_file_path=config.get(
+                    "Reports", "defaultReportFilePath"),
+                max_reports_kept=config.getint("Reports", "max_reports_kept"),
+                reports_are_enabled=config.getboolean(
+                    "Reports", "reportsEnabled"),
+                write_provance_data=config.getboolean(
+                    "Reports", "writeProvanceData"),
+                write_text_specs=config.getboolean(
+                    "Reports", "writeTextSpecs"))
+            self._set_up_output_application_data_specifics(
+                max_application_binaries_kept=config.getint(
+                    "Reports", "max_application_binaries_kept"),
+                where_to_write_application_data_files=config.get(
+                    "Reports", "defaultApplicationDataFilePath"))
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
-        self._spikes_per_second = float(conf.config.getfloat(
+        self._spikes_per_second = float(config.getfloat(
             "Simulation", "spikes_per_second"))
-        self._ring_buffer_sigma = float(conf.config.getfloat(
+        self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
 
-        SpynnakerCommsFunctions.__init__(self, self._reports_states,
-                                         self._report_default_directory)
+        FrontEndCommonInterfaceFunctions.__init__(
+            self, self._reports_states, self._report_default_directory)
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -123,36 +183,45 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
-        # Begin list of binary search paths
-        # With those passed to constructor
-        self._binary_search_paths = binary_search_paths
-
         # Determine default executable folder location
-        binary_path = os.path.abspath(exceptions.__file__)
-        binary_path = os.path.abspath(os.path.join(binary_path, os.pardir))
-        binary_path = os.path.join(binary_path, "model_binaries")
-
-        # add this default to end of list of search paths
-        self._binary_search_paths.append(binary_path)
+        # and add this default to end of list of search paths
+        executable_finder.add_path(os.path.dirname(model_binaries.__file__))
         self._edge_count = 0
 
         # Manager of buffered sending
         self._send_buffer_manager = None
 
     def run(self, run_time):
-        self._setup_interfaces(hostname=self._hostname)
+        """
+
+        :param run_time:
+        :return:
+        """
+        self._setup_interfaces(
+            hostname=self._hostname,
+            virtual_x_dimension=config.getint("Machine",
+                                              "virtual_board_x_dimension"),
+            virtual_y_dimension=config.getint("Machine",
+                                              "virtual_board_y_dimension"),
+            downed_chips=config.get("Machine", "down_chips"),
+            downed_cores=config.get("Machine", "down_cores"),
+            requires_virtual_board=config.getboolean("Machine",
+                                                     "virtual_board"),
+            requires_wrap_around=config.getboolean("Machine",
+                                                   "requires_wrap_arounds"),
+            machine_version=config.getint("Machine", "version"))
 
         # add database generation if requested
         if self._create_database:
             wait_on_confirmation = \
-                conf.config.getboolean("Database", "wait_on_confirmation")
+                config.getboolean("Database", "wait_on_confirmation")
             self._database_interface = DataBaseInterface(
                 self._app_data_runtime_folder, wait_on_confirmation,
                 self._database_socket_addresses)
 
         # create network report if needed
         if self._reports_states is not None:
-            reports.network_specification_report(
+            reports.network_specification_partitionable_report(
                 self._report_default_directory, self._partitionable_graph,
                 self._hostname)
 
@@ -163,7 +232,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             ceiled_machine_time_steps = \
                 math.ceil((run_time * 1000.0) / self._machine_time_step)
             if self._no_machine_time_steps != ceiled_machine_time_steps:
-                raise exceptions.ConfigurationException(
+                raise common_exceptions.ConfigurationException(
                     "The runtime and machine time step combination result in "
                     "a factional number of machine runable time steps and "
                     "therefore spinnaker cannot determine how many to run for")
@@ -178,12 +247,12 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
                 if vertex.is_set_to_record_spikes():
-                    raise exceptions.ConfigurationException(
+                    raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
                         "is not currently supportable in this tool chain."
                         "watch this space")
 
-        do_timing = conf.config.getboolean("Reports", "outputTimesForSections")
+        do_timing = config.getboolean("Reports", "outputTimesForSections")
         if do_timing:
             timer = Timer()
         else:
@@ -215,15 +284,14 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             self._database_interface.add_routing_tables(self._router_tables)
             self._database_interface.add_tags(self._partitioned_graph,
                                               self._tags)
-            execute_mapping = conf.config.getboolean(
+            execute_mapping = config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
             if execute_mapping:
                 self._database_interface.create_neuron_to_key_mapping(
                     graph_mapper=self._graph_mapper,
                     partitionable_graph=self._partitionable_graph,
                     partitioned_graph=self._partitioned_graph,
-                    routing_infos=self._routing_infos,
-                    placements=self._placements)
+                    routing_infos=self._routing_infos)
             self._database_interface.send_read_notification()
 
         # execute data spec generation
@@ -240,8 +308,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             timer.start_timing()
         processor_to_app_data_base_address = \
             self.execute_data_specification_execution(
-                conf.config.getboolean("SpecExecution", "specExecOnHost"),
-                self._hostname, self._placements, self._graph_mapper)
+                config.getboolean("SpecExecution", "specExecOnHost"),
+                self._hostname, self._placements, self._graph_mapper,
+                write_text_specs=config.getboolean(
+                    "Reports", "writeTextSpecs"),
+                runtime_application_data_folder=self._app_data_runtime_folder)
 
         if self._reports_states is not None:
             reports.write_memory_map_report(self._report_default_directory,
@@ -251,7 +322,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             timer.take_sample()
 
         if (not isinstance(self._machine, VirtualMachine) and
-                conf.config.getboolean("Execute", "run_simulation")):
+                config.getboolean("Execute", "run_simulation")):
             if do_timing:
                 timer.start_timing()
 
@@ -263,9 +334,13 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self._load_application_data(
                     self._placements, self._router_tables, self._graph_mapper,
                     processor_to_app_data_base_address, self._hostname,
-                    self._app_id)
+                    self._app_id,
+                    machine_version=config.getint("Machine", "version"),
+                    app_data_folder=self._app_data_runtime_folder)
                 logger.info("*** Loading executables ***")
-                self._load_executable_images(executable_targets, self._app_id)
+                self._load_executable_images(
+                    executable_targets, self._app_id,
+                    app_data_folder=self._app_data_runtime_folder)
                 logger.info("*** Loading buffers ***")
                 self._set_up_send_buffering()
 
@@ -276,28 +351,45 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
                 if self._reports_states.transciever_report:
-                    binary_folder = conf.config.get("SpecGeneration",
-                                                    "Binary_folder")
                     reports.re_load_script_running_aspects(
-                        binary_folder, executable_targets, self._hostname,
-                        self._app_id, run_time)
+                        self._app_data_runtime_folder, executable_targets,
+                        self._hostname, self._app_id, run_time)
 
                 # every thing is in sync0. load the initial buffers
                 self._send_buffer_manager.load_initial_buffers()
 
-                wait_on_confirmation = conf.config.getboolean(
+                wait_on_confirmation = config.getboolean(
                     "Database", "wait_on_confirmation")
-                send_start_notification = conf.config.getboolean(
+                send_start_notification = config.getboolean(
                     "Database", "send_start_notification")
-                self._start_execution_on_machine(
-                    executable_targets, self._app_id, self._runtime,
-                    self._time_scale_factor, wait_on_confirmation,
-                    send_start_notification, self._database_interface,
-                    self._in_debug_mode)
+
+                self._wait_for_cores_to_be_ready(executable_targets,
+                                                 self._app_id)
+
+                # wait till external app is ready for us to start if required
+                if (self._database_interface is not None and
+                        wait_on_confirmation):
+                    logger.info(
+                        "*** Awaiting for a response from an external source "
+                        "to state its ready for the simulation to start ***")
+                    self._database_interface.wait_for_confirmation()
+
+                self._start_all_cores(executable_targets, self._app_id)
+
+                if (self._database_interface is not None and
+                        send_start_notification):
+                    self._database_interface.send_start_notification()
+
+                if self._runtime is None:
+                    logger.info("Application is set to run forever - exiting")
+                else:
+                    self._wait_for_execution_to_complete(
+                        executable_targets, self._app_id, self._runtime,
+                        self._time_scale_factor)
                 self._has_ran = True
                 if self._retrieve_provance_data:
 
-                    # retrieve provance data
+                    # retrieve provenance data
                     self._retieve_provance_data_from_machine(
                         executable_targets, self._router_tables, self._machine)
         elif isinstance(self._machine, VirtualMachine):
@@ -308,7 +400,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     def _set_up_send_buffering(self):
         progress_bar = ProgressBar(
-            len(self.partitionable_graph.vertices),
+            len(self.partitioned_graph.subvertices),
             "on initialising the buffer managers for vertices which require"
             " buffering")
 
@@ -328,67 +420,129 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
 
     @property
     def app_id(self):
+        """
+
+        :return:
+        """
         return self._app_id
 
     @property
     def has_ran(self):
+        """
+
+        :return:
+        """
         return self._has_ran
 
     @property
     def machine_time_step(self):
+        """
+
+        :return:
+        """
         return self._machine_time_step
 
     @property
     def no_machine_time_steps(self):
+        """
+
+        :return:
+        """
         return self._no_machine_time_steps
 
     @property
     def timescale_factor(self):
+        """
+
+        :return:
+        """
         return self._time_scale_factor
 
     @property
     def spikes_per_second(self):
+        """
+
+        :return:
+        """
         return self._spikes_per_second
 
     @property
     def ring_buffer_sigma(self):
+        """
+
+        :return:
+        """
         return self._ring_buffer_sigma
 
     @property
     def get_multi_cast_source(self):
+        """
+
+        :return:
+        """
         return self._multi_cast_vertex
 
     @property
     def partitioned_graph(self):
+        """
+
+        :return:
+        """
         return self._partitioned_graph
 
     @property
     def partitionable_graph(self):
+        """
+
+        :return:
+        """
         return self._partitionable_graph
 
     @property
     def placements(self):
+        """
+
+        :return:
+        """
         return self._placements
 
     @property
     def transceiver(self):
+        """
+
+        :return:
+        """
         return self._txrx
 
     @property
     def graph_mapper(self):
+        """
+
+        :return:
+        """
         return self._graph_mapper
 
     @property
     def routing_infos(self):
+        """
+
+        :return:
+        """
         return self._routing_infos
 
     def set_app_id(self, value):
+        """
+
+        :param value:
+        :return:
+        """
         self._app_id = value
 
-    def set_runtime(self, value):
-        self._runtime = value
-
     def get_current_time(self):
+        """
+
+        :return:
+        """
         if self._has_ran:
             return float(self._runtime)
         return 0.0
@@ -457,6 +611,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         else:
             self._key_allocator_algorithm = self._key_allocator_algorithm()
 
+        # execute routing info generator
         # Generate an n_keys map for the graph and add constraints
         n_keys_map = DictBasedPartitionedEdgeNKeysMap()
         for edge in self._partitioned_graph.subedges:
@@ -464,10 +619,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 edge.pre_subvertex)
             super_edge = (self._graph_mapper
                           .get_partitionable_edge_from_partitioned_edge(edge))
-            if vertex_slice.n_atoms > 2048:
-                raise exceptions.ConfigurationException(
-                    "The current models can only support up to 2048 atoms"
-                    " per core (restricted by the supported key format)")
 
             if not isinstance(super_edge.pre_vertex,
                               AbstractProvidesNKeysForEdge):
@@ -475,6 +626,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                                                           vertex_slice.n_atoms)
             else:
                 n_keys_map.set_n_keys_for_patitioned_edge(
+                    edge,
                     super_edge.pre_vertex.get_n_keys_for_partitioned_edge(
                         edge, self._graph_mapper))
 
@@ -584,7 +736,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         # execute placer reports if needed
         if (pacman_report_state is not None and
                 pacman_report_state.placer_report):
-            pacman_reports.placer_reports(
+            pacman_reports.placer_reports_with_partitionable_graph(
                 graph=self._partitionable_graph,
                 graph_mapper=self._graph_mapper, hostname=self._hostname,
                 machine=self._machine, placements=self._placements,
@@ -599,7 +751,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         # iterate though subvertexes and call generate_data_spec for each
         # vertex
         executable_targets = dict()
-        no_processors = conf.config.getint("Threading", "dsg_threads")
+        no_processors = config.getint("Threading", "dsg_threads")
         thread_pool = ThreadPool(processes=no_processors)
 
         # create a progress bar for end users
@@ -623,6 +775,7 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                     self._partitioned_graph, self._partitionable_graph,
                     self._routing_infos, self._hostname, self._graph_mapper,
                     self._report_default_directory, ip_tags, reverse_ip_tags,
+                    self._writeTextSpecs, self._app_data_runtime_folder,
                     progress_bar)
                 data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start)
@@ -631,7 +784,8 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 binary_name = associated_vertex.get_binary_file_name()
 
                 # Attempt to find this within search paths
-                binary_path = self._get_executable_path(binary_name)
+                binary_path = executable_finder.get_executable_path(
+                    binary_name)
                 if binary_path is None:
                     raise exceptions.ExecutableNotFoundException(binary_name)
 
@@ -658,6 +812,11 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
         return executable_targets
 
     def add_vertex(self, vertex_to_add):
+        """
+
+        :param vertex_to_add:
+        :return:
+        """
         if isinstance(vertex_to_add, CommandSender):
             self._multi_cast_vertex = vertex_to_add
 
@@ -683,9 +842,23 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
                 self.add_edge(dependant_edge)
 
     def add_edge(self, edge_to_add):
+        """
+
+        :param edge_to_add:
+        :return:
+        """
         self._partitionable_graph.add_edge(edge_to_add)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
+        """
+
+        :param size:
+        :param cellclass:
+        :param cellparams:
+        :param structure:
+        :param label:
+        :return:
+        """
         return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
@@ -693,6 +866,18 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,
             source, target, synapse_dynamics, label, rng):
+        """
+
+        :param presynaptic_population:
+        :param postsynaptic_population:
+        :param connector:
+        :param source:
+        :param target:
+        :param synapse_dynamics:
+        :param label:
+        :param rng:
+        :return:
+        """
         if label is None:
             label = "Projection {}".format(self._edge_count)
             self._edge_count += 1
@@ -703,20 +888,6 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step,
             timescale_factor=self._time_scale_factor)
-
-    def _get_executable_path(self, executable_name):
-
-        # Loop through search paths
-        for path in self._binary_search_paths:
-            # Rebuild filename
-            potential_filename = os.path.join(path, executable_name)
-
-            # If this filename exists, return it
-            if os.path.isfile(potential_filename):
-                return potential_filename
-
-        # No executable found
-        return None
 
     def _add_virtual_chips(self):
         for vertex in self._partitionable_graph.vertices:
@@ -780,6 +951,12 @@ class Spinnaker(SpynnakerConfiguration, SpynnakerCommsFunctions):
             virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
 
     def stop(self, stop_on_board=True):
+        """
+
+        :param stop_on_board: boolean which decides if the board should have
+        its router tables and tags cleared
+        :return:
+        """
         if stop_on_board:
             for ip_tag in self._tags.ip_tags:
                 self._txrx.clear_ip_tag(

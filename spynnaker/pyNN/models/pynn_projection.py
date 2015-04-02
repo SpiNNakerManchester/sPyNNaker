@@ -4,7 +4,6 @@ from pacman.model.constraints.partitioner_constraints.\
 
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import AbstractPopulationVertex
-from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.utilities import conf
@@ -17,6 +16,9 @@ from spynnaker.pyNN.models.neural_projections\
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
+
+from spinn_front_end_common.utilities import exceptions
+
 
 import logging
 import math

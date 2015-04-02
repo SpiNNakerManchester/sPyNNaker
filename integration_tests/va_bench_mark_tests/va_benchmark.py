@@ -4,7 +4,7 @@ An implementation of benchmarks 1 and 2 from
 
     Brette et al. (2007) Journal of Computational Neuroscience 23: 349-398
 
-The IF network is based on the CUBA and COBA models of Vogels & Abbott
+The IF network is based on the CUBA and COBA abstract_models of Vogels & Abbott
 (J. Neurosci, 2005).  The model consists of a network of excitatory and
 inhibitory neurons, connected via current-based "exponential"
 synapses (instantaneous rise, exponential decay).

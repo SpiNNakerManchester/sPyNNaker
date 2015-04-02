@@ -20,6 +20,9 @@ from spinnman.data.little_endian_byte_array_byte_writer\
     import LittleEndianByteArrayByteWriter
 from spinnman.exceptions import SpinnmanInvalidPacketException
 from spynnaker.pyNN.exceptions import SpynnakerException
+
+from spinnman.messages.eieio.data_messages.eieio_data_message \
+    import EIEIODataMessage
 from spinnman.messages.eieio.command_messages.spinnaker_request_buffers \
     import SpinnakerRequestBuffers
 from spinnman.messages.eieio.command_messages.padding_request\
@@ -282,6 +285,8 @@ class BufferManager(object):
             self._transceiver.write_memory(
                 placement.x, placement.y, region_base_address, data)
             bytes_to_go -= len(data)
+            self._sent_messages[vertex] = BuffersSentDeque(
+                region, sent_stop_message=True)
 
         # If there is any space left, add padding
         if bytes_to_go > 0:
@@ -308,8 +313,16 @@ class BufferManager(object):
         if not sent_messages.update_last_received_sequence_number(sequence_no):
             return list()
 
-        # Add messages up to the limits
+        # Remote the existing packets from the size available
         bytes_to_go = size
+        for message in sent_messages.messages:
+            if isinstance(message.eieio_data_message, EIEIODataMessage):
+                bytes_to_go -= (message.eieio_data_message.size)
+            else:
+                bytes_to_go -= (message.eieio_data_message
+                                .get_min_packet_length())
+
+        # Add messages up to the limits
         while (vertex.is_next_timestamp(region) and
                 not sent_messages.is_full and bytes_to_go > 0):
 
@@ -317,6 +330,8 @@ class BufferManager(object):
                 bytes_to_go,
                 constants.UDP_MESSAGE_MAX_SIZE -
                 HostSendSequencedData.get_min_packet_length())
+            logger.debug("Bytes to go {}, space available {}".format(
+                bytes_to_go, space_available))
             next_message = self._create_message_to_send(
                 space_available, vertex, region)
             if next_message is None:

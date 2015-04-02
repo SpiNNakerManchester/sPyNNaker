@@ -1,22 +1,12 @@
 """
 Utilities for accessing the location of memory regions on the board
 """
-from spinnman import constants as spinnman_constants
-
 from enum import Enum
-import math
+from spinn_front_end_common.utilities.constants import \
+    DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS
 
-# Some constants
 POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 
-# Single word of info with flags, etc.
-# plus the lengths of each of the output buffer
-# regions in bytes
-SETUP_SIZE = 28
-
-NO_PARAMS = 10
-PARAMS_HEADER_SIZE = 3  # Number of 32-bit words in header of params block
-PARAMS_BASE_SIZE = 4 * (PARAMS_HEADER_SIZE + NO_PARAMS)
 BLOCK_INDEX_HEADER_WORDS = 3
 BLOCK_INDEX_ROW_WORDS = 2
 
@@ -27,7 +17,7 @@ RECORD_SPIKE_BIT = 1 << 0
 RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
 RECORDING_ENTRY_BYTE_SIZE = 4
-BITS_PER_WORD = 32.0
+
 
 # From neuron common-typedefs.h
 SYNAPSE_INDEX_BITS = 8
@@ -40,55 +30,17 @@ GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
 INFINITE_SIMULATION = 4294967295
 
 # from synaptic manager
-# Words - 2 for row lenth and number of
-#  rows and 1 for plastic region size
+# Words - 2 for row lenth and number of rows and 1 for plastic region size
 # (which might be 0)
 SYNAPTIC_ROW_HEADER_WORDS = 2 + 1
 
-ROW_LEN_TABLE_ENTRIES = [0, 1, 8, 16, 32, 64, 128, 256]
-ROW_LEN_TABLE_SIZE = 4 * len(ROW_LEN_TABLE_ENTRIES)
-
-# buffered in and out constants
-# 8 mg in bytes
-DEFAULT_MEG_LIMIT = 8 * 1024 * 1024
-
-# only 120 meg is ever avilable for application usage
-MAX_MEG_LIMIT = 120 * 1024 * 1024
-
-# buffer fixed sizes in bytes
-TIMESTAMP_SPACE_REQUIREMENT = 4
-KEY_SIZE = 4
-NO_BUFFERS_FOR_TRANSMITTING = 5
-SEQUENCE_NO_SIZE = 1
-MAX_SEQUENCES_PER_TRANSMISSION = 16
-MAX_SEQUENCE_NO = math.pow(2, 8) - 1  # seq no is contianed in a 8 bit value
-MAX_EIEIO_ENTRIES_TO_STORE_IN_UDP = \
-    spinnman_constants.UDP_MESSAGE_MAX_SIZE - \
-    (spinnman_constants.EIEIO_DATA_HEADER_SIZE +
-     TIMESTAMP_SPACE_REQUIREMENT + SEQUENCE_NO_SIZE +
-     spinnman_constants.EIEIO_COMMAND_HEADER_SIZE)
-
-# max number of historical buffer packets
-MAX_BUFFER_HISTORY = 16
-
-# number of states of the sequence number for buffer packets
-# currently this is implemented in the code as an 8-bit number
-SEQUENCE_NUMBER_MAX_VALUE = 255
-
-
-X_CHIPS = 8
-Y_CHIPS = 8
-CORES_PER_CHIP = 18
-MASTER_POPULATION_ENTRIES = (X_CHIPS * Y_CHIPS * CORES_PER_CHIP)
-
-# 2 bytes per entry
-MASTER_POPULATION_TABLE_SIZE = 2 * MASTER_POPULATION_ENTRIES
 NA_TO_PA_SCALE = 1000.0
-SDRAM_BASE_ADDR = 0x70000000
+
+# might not be used
 WEIGHT_FLOAT_TO_FIXED_SCALE = 16.0
 SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
 
-# natively supported delays for all models
+# natively supported delays for all abstract_models
 MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
@@ -100,16 +52,15 @@ MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
 
 # Model Names
-APP_MONITOR_CORE_APPLICATION_ID = 0xAC0
 IF_CURRENT_EXP_CORE_APPLICATION_ID = 0xAC1
 SPIKESOURCEARRAY_CORE_APPLICATION_ID = 0xAC2
 SPIKESOURCEPOISSON_CORE_APPLICATION_ID = 0xAC3
 DELAY_EXTENSION_CORE_APPLICATION_ID = 0xAC4
 MUNICH_MOTOR_CONTROL_CORE_APPLICATION_ID = 0xAC5
-COMMAND_SENDER_CORE_APPLICATION_ID = 0xAC6
 IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID = 0xAC7
 IZK_CURRENT_EXP_CORE_APPLICATION_ID = 0xAC8
-SPIKE_INJECTOR_CORE_APPLICATION_ID = 0xAC9
+# please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
+# for other core application ids.
 
 EDGES = Enum(
     value="EDGES",
@@ -120,16 +71,29 @@ EDGES = Enum(
            ("SOUTH_WEST", 4),
            ("SOUTH", 5)])
 
-
+# Regions for populations
 POPULATION_BASED_REGIONS = Enum(
     value="POPULATION_BASED_REGIONS",
     names=[('SYSTEM', 0),
            ('NEURON_PARAMS', 1),
            ('SYNAPSE_PARAMS', 2),
-           ('ROW_LEN_TRANSLATION', 3),
-           ('MASTER_POP_TABLE', 4),
-           ('SYNAPTIC_MATRIX', 5),
-           ('STDP_PARAMS', 6),
-           ('SPIKE_HISTORY', 7),
-           ('POTENTIAL_HISTORY', 8),
-           ('GSYN_HISTORY', 9)])
+           ('POPULATION_TABLE', 3),
+           ('SYNAPTIC_MATRIX', 4),
+           ('SYNAPSE_DYNAMICS', 5),
+           ('SPIKE_HISTORY', 6),
+           ('POTENTIAL_HISTORY', 7),
+           ('GSYN_HISTORY', 8)])
+
+# The number of recording regions available for a population
+N_POPULATION_RECORDING_REGIONS = 3
+
+# The size of the system region (+1 for flags) for a population
+POPULATION_SYSTEM_REGION_BYTES = (DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS +
+                                  N_POPULATION_RECORDING_REGIONS + 1) * 4
+
+# The size of the headers of a population neuron region
+# (1 word each for has_key, key, n_neurons, n_params, ODE timestep)
+POPULATION_NEURON_PARAMS_HEADER_BYTES = 20
+
+# The default routing mask to use
+DEFAULT_MASK = 0xfffff800

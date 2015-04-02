@@ -1,3 +1,4 @@
+from spinn_front_end_common.utilities import exceptions
 
 
 class SpynnakerException(Exception):
@@ -40,7 +41,7 @@ class FilterableException(SpynnakerException):
     pass
 
 
-class SynapticConfigurationException(ConfigurationException):
+class SynapticConfigurationException(exceptions.ConfigurationException):
     """raised when the synaptic manager fails to handle a synaptic dynamic
 
     :raise None: does not raise any known exceptions
@@ -48,7 +49,7 @@ class SynapticConfigurationException(ConfigurationException):
     pass
 
 
-class SynapticBlockGenerationException(ConfigurationException):
+class SynapticBlockGenerationException(exceptions.ConfigurationException):
     """raised when the synaptic manager fails to generate a synaptic block
 
     :raise None: does not raise any known exceptions
@@ -56,7 +57,7 @@ class SynapticBlockGenerationException(ConfigurationException):
     pass
 
 
-class SynapticBlockReadException(ConfigurationException):
+class SynapticBlockReadException(exceptions.ConfigurationException):
     """raised when the synaptic manager fails to read a synaptic block or
         convert it into readable values
 
@@ -65,7 +66,8 @@ class SynapticBlockReadException(ConfigurationException):
     pass
 
 
-class SynapticMaxIncomingAtomsSupportException(ConfigurationException):
+class SynapticMaxIncomingAtomsSupportException(
+        exceptions.ConfigurationException):
     """raised when a synatpic sublist exceeds the max atoms possible to be
     supported
 
@@ -74,7 +76,7 @@ class SynapticMaxIncomingAtomsSupportException(ConfigurationException):
     pass
 
 
-class DelayExtensionException(ConfigurationException):
+class DelayExtensionException(exceptions.ConfigurationException):
     """raised when a delay extension vertex is given a subedge that is not from
     a delay DelayAfferentPartitionableEdge
 

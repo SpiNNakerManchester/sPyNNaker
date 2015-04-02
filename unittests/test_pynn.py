@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import unittest
+
 import spynnaker.pyNN.utilities.conf as conf
 
 
