@@ -11,9 +11,9 @@ from spynnaker.pyNN.models.neural_projections.\
 from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_population_outgoing_edge_restrictor \
-    import AbstractPopulationOutgoingEdgeRestrictor
+from spinn_front_end_common.abstract_models\
+    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
+    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.utilities import constants as common_constants
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractDataSpecableVertex,
                            AbstractProvidesIncomingEdgeConstraints,
-                           AbstractPopulationOutgoingEdgeRestrictor):
+                           AbstractOutgoingEdgeSameContiguousKeysRestrictor):
     """
     Instance of this class provide delays to incoming spikes in multiples
     of the maximum delays of a neuron (typically 16 or 32)
@@ -64,7 +64,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractProvidesIncomingEdgeConstraints.__init__(self)
-        AbstractPopulationOutgoingEdgeRestrictor.__init__(self)
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0

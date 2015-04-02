@@ -630,7 +630,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
             self._master_pop_table_generator.update_master_population_table(
                 spec, block_start_addr, row_length, keys_and_masks,
-                constants.DEFAULT_MASK, master_pop_table_region)
+                master_pop_table_region)
 
         self._master_pop_table_generator.finish_master_pop_table(
             spec, master_pop_table_region)

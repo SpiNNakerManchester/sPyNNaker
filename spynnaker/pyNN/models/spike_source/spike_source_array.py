@@ -2,9 +2,10 @@
 SpikeSourceArray
 """
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_population_outgoing_edge_restrictor\
-    import AbstractPopulationOutgoingEdgeRestrictor
+
+from spinn_front_end_common.abstract_models\
+    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
+    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
@@ -39,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(AbstractDataSpecableVertex,
                        AbstractPartitionableVertex,
-                       AbstractPopulationOutgoingEdgeRestrictor):
+                       AbstractOutgoingEdgeSameContiguousKeysRestrictor):
 
     CORE_APP_IDENTIFIER = (front_end_common_constants
                            .SPIKE_INJECTOR_CORE_APPLICATION_ID)
@@ -72,7 +73,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             self, n_atoms=n_neurons, label=label,
             max_atoms_per_core=self._model_based_max_atoms_per_core,
             constraints=constraints)
-        AbstractPopulationOutgoingEdgeRestrictor.__init__(self)
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes

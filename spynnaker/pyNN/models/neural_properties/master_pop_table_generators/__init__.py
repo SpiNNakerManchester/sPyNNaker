@@ -3,4 +3,4 @@ from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
 from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
     master_pop_table_as_hash_table import MasterPopTableAsHashTable
 from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
-    master_pop_table_as_binary_tree import MasterPopTableAsBinaryTree
+    master_pop_table_as_binary_search import MasterPopTableAsBinarySearch

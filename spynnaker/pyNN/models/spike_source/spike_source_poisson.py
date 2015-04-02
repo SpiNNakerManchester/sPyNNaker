@@ -9,6 +9,9 @@ from spynnaker.pyNN.models.abstract_models\
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
+from spinn_front_end_common.abstract_models\
+    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
+    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -30,7 +33,8 @@ RANDOM_SEED_WORDS = 4
 
 class SpikeSourcePoisson(
         AbstractPopulationRecordableVertex, AbstractPartitionableVertex,
-        AbstractDataSpecableVertex):
+        AbstractDataSpecableVertex,
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
     """
     This class represents a Poisson Spike source object, which can represent
     a pynn_population.py of virtual neurons each with its own parameters.
@@ -59,6 +63,7 @@ class SpikeSourcePoisson(
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         self._rate = rate
         self._start = start
         self._duration = duration
