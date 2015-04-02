@@ -285,6 +285,8 @@ class BufferManager(object):
             self._transceiver.write_memory(
                 placement.x, placement.y, region_base_address, data)
             bytes_to_go -= len(data)
+            self._sent_messages[vertex] = BuffersSentDeque(
+                region, sent_stop_message=True)
 
         # If there is any space left, add padding
         if bytes_to_go > 0:

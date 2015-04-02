@@ -245,7 +245,10 @@ void timer_callback(uint unused0, uint unused1) {
                     // Loop through counted spikes and send
                     for (uint32_t s = 0; s < delay_stage_spike_counters[n];
                             s++) {
-                        spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD);
+                        while (!spin1_send_mc_packet(spike_key, 0,
+                                                     NO_PAYLOAD)) {
+                            spin1_delay_us(1);
+                        }
                     }
                 }
             }

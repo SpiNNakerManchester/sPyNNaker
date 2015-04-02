@@ -37,7 +37,7 @@ static input_t *input_buffers;
 typedef enum parmeters_in_neuron_parameter_data_region {
     has_key, transmission_key, number_of_neurons_to_simulate,
     num_neuron_parameters, the_machine_time_step_in_microseconds,
-	size_of_memory_which_contains_all_neural_parameters,
+    start_of_memory_which_contains_all_neural_parameters,
 } parmeters_in_neuron_parameter_data_region;
 
 
@@ -98,8 +98,8 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         return false;
     }
     memcpy(neuron_array,
-    		&address[size_of_memory_which_contains_all_neural_parameters],
-			n_neurons * sizeof(neuron_t));
+            &address[start_of_memory_which_contains_all_neural_parameters],
+            n_neurons * sizeof(neuron_t));
 
     // Set up the out spikes array
     if (!out_spikes_initialize(n_neurons)) {
@@ -174,11 +174,11 @@ void neuron_do_timestep_update(timer_t time) {
             out_spikes_set_spike(neuron_index);
 
             // Send the spike
-            while (!spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
+            while (use_key &&
+                   !spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
                 spin1_delay_us(1);
             }
-        }
-        else{
+        } else {
             log_debug("the neuron %d has been determined to not spike",
                       neuron_index);
         }

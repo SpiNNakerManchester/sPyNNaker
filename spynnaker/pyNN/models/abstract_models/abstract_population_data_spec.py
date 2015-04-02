@@ -13,10 +13,10 @@ from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager \
 from spynnaker.pyNN.models.abstract_models.\
     abstract_partitionable_population_vertex \
     import AbstractPartitionablePopulationVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_population_outgoing_edge_restrictor \
-    import AbstractPopulationOutgoingEdgeRestrictor
 
+from spinn_front_end_common.abstract_models\
+    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
+    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 
 # general imports
 import os
@@ -29,9 +29,9 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationDataSpec(AbstractSynapticManager,
-                                 AbstractPartitionablePopulationVertex,
-                                 AbstractPopulationOutgoingEdgeRestrictor):
+class AbstractPopulationDataSpec(
+        AbstractSynapticManager, AbstractPartitionablePopulationVertex,
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
     """
     AbstractPopulationDataSpec: provides functioanlity on how neural models
     generate their data spec files
@@ -47,7 +47,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
-        AbstractPopulationOutgoingEdgeRestrictor.__init__(self)
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         self._binary = binary
         self._executable_constant = None
         self._spikes_per_second = spikes_per_second
@@ -166,8 +166,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
         """
 
     def _write_neuron_parameters(
-            self, spec, key, subvertex, ring_buffer_to_input_left_shifts,
-            vertex_slice):
+            self, spec, key, subvertex, vertex_slice):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} "
@@ -320,8 +319,7 @@ class AbstractPopulationDataSpec(AbstractSynapticManager,
             # key and mask assignments
             key = keys_and_masks[0].key
 
-        self._write_neuron_parameters(spec, key, subvertex,
-                                      ring_buffer_shifts, vertex_slice)
+        self._write_neuron_parameters(spec, key, subvertex, vertex_slice)
 
         self.write_synapse_parameters(spec, subvertex, vertex_slice)
         spec.write_array(ring_buffer_shifts)

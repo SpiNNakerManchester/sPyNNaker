@@ -133,7 +133,7 @@ def end(stop_on_board=True):
     Unregisters the controller
     """
     global _spinnaker
-    _spinnaker.stop(_spinnaker.app_id, stop_on_board)
+    _spinnaker.stop(stop_on_board)
     _spinnaker = None
 
 
@@ -180,7 +180,6 @@ def run(run_time=None):
      - :py:mod:`pacman103.core.control.Controller.generate_output`
      - :py:mod:`pacman103.core.control.Controller.load_executables`
      - :py:mod:`pacman103.core.control.Controller.run`
-     :param run_time:
     """
     global _spinnaker
     _spinnaker.run(run_time)

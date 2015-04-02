@@ -1,5 +1,3 @@
-#include "../common/neuron-typedefs.h"
-
 #include "population_table.h"
 #include "synapse_row.h"
 #include <debug.h>

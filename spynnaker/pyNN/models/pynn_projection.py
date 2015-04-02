@@ -17,8 +17,6 @@ from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 
-    
-from spinn_front_end_common.utilities.timer import Timer
 from spinn_front_end_common.utilities import exceptions
 
 
@@ -306,18 +304,10 @@ class Projection(object):
             exceptions.ConfigurationException(
                 "the gather param has no meaning for spinnaker when set to "
                 "false")
-            
-        timer = None
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer = Timer()
-            timer.start_timing()
 
         if (self._spinnaker.has_ran and not
                 self._has_retrieved_synaptic_list_from_machine):
             self._retrieve_synaptic_data_from_machine()
-            
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer.take_sample()
 
         if list_format == 'list':
             delays = list()
@@ -367,18 +357,10 @@ class Projection(object):
             exceptions.ConfigurationException(
                 "the gather param has no meaning for spinnaker when set to "
                 "false")
-            
-        timer = None
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer = Timer()
-            timer.start_timing()
 
         if (self._spinnaker.has_ran and not
                 self._has_retrieved_synaptic_list_from_machine):
             self._retrieve_synaptic_data_from_machine()
-            
-        if conf.config.getboolean("Reports", "outputTimesForSections"):
-            timer.take_sample()
 
         if format == 'list':
             weights = list()

@@ -169,9 +169,9 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         """
         return (p + (18 * y) + (18 * 8 * x)) * 2
 
-    def update_master_population_table(self, spec, block_start_addr,
-                                       row_length, keys_and_mask, mask,
-                                       master_pop_table_region):
+    def update_master_population_table(
+            self, spec, block_start_addr, row_length, keys_and_masks,
+            master_pop_table_region):
         """
         Writes an entry in the Master Population Table for the newly
         created synaptic block.
@@ -188,13 +188,13 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         :param spec:
         :param block_start_addr:
         :param row_length:
-        :param keys_and_mask:
+        :param keys_and_masks:
         :param mask:
         :param master_pop_table_region:
         :return:
         """
         # Which core has this projection arrived from?
-        key = keys_and_mask[0].key
+        key = keys_and_masks[0].key
         x = packet_conversions.get_x_from_key(key)
         y = packet_conversions.get_y_from_key(key)
         p = packet_conversions.get_p_from_key(key)
