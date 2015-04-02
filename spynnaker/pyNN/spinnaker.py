@@ -111,6 +111,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             database_socket_addresses.append(
                 SocketAddress(noftiy_hostname, notify_port, listen_port))
         self._database_socket_addresses = database_socket_addresses
+        self._database_interface = None
 
         if self._app_id is None:
             self._set_up_main_objects(
@@ -136,8 +137,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 execute_routing_info_report=config.getboolean(
                     "Reports", "writeRouterInfoReport"),
                 in_debug_mode=config.get("Mode", "mode") == "Debug",
-                create_database=config.getboolean(
-                    "Database", "create_database"),
                 generate_tag_report=config.getboolean(
                     "Reports", "writeTagAllocationReports"))
 
