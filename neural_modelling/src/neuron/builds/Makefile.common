@@ -18,8 +18,8 @@ ifndef PLASTIC_DEBUG
     PLASTIC_DEBUG = LOG_INFO
 endif
 
-POPULATION_TABLE_IMPL ?= fixed
-#POPULATION_TABLE_IMPL ?= binary_search
+#POPULATION_TABLE_IMPL ?= fixed
+POPULATION_TABLE_IMPL ?= binary_search
 
 OBJECTS = $(SOURCE_DIRS)/common/in_spikes.o $(SOURCE_DIRS)/common/out_spikes.o \
           $(SOURCE_DIRS)/common/recording.o $(SOURCE_DIRS)/neuron/c_main.o \
