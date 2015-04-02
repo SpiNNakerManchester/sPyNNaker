@@ -33,7 +33,7 @@ from spinnman.messages.eieio.command_messages.event_stop_request\
 
 from enum import Enum
 import logging
-
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
     _CONFIGURATION_REGION_SIZE = 36
 
     # limited to the n of the x,y,p,n key format
-    _model_based_max_atoms_per_core = 2048
+    _model_based_max_atoms_per_core = sys.maxint
 
     _SPIKE_SOURCE_REGIONS = Enum(
         value="_SPIKE_SOURCE_REGIONS",

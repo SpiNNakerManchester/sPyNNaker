@@ -620,10 +620,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 edge.pre_subvertex)
             super_edge = (self._graph_mapper
                           .get_partitionable_edge_from_partitioned_edge(edge))
-            # if vertex_slice.n_atoms > 2048:
-            #    raise common_exceptions.ConfigurationException(
-            #        "The current models can only support up to 2048 atoms"
-            #        " per core (restricted by the supported key format)")
 
             if not isinstance(super_edge.pre_vertex,
                               AbstractProvidesNKeysForEdge):
