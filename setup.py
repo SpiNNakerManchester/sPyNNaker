@@ -36,6 +36,6 @@ setup(
                       'SpiNNMan >= 2015.003-rc-02',
                       'SpiNNaker_PACMAN >= 2015.003-rc-01',
                       'SpiNNaker_DataSpecification >= 2015.003-rc-01',
-                      'SpiNNFrontEndCommon >= 2015.001-rc-01',
+                      'SpiNNFrontEndCommon >= 2015.001-rc-03',
                       'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
 )
