@@ -424,6 +424,10 @@ class Population(object):
     def printSpikes(self, filename, gather=True):
         """
         Write spike time information from the population to a given file.
+        :param filename: the absoluete file path for where the spikes are to be
+        printed in
+        :param gather: Supported from the PyNN language, but Spinnaker only does
+        gather = True.
         """
         if not gather:
             logger.warn("Spynnaker only supports gather = true, will execute"
@@ -436,12 +440,12 @@ class Population(object):
             last_id = self._vertex.n_atoms - 1
             utility_calls.check_directory_exists_and_create_if_not(filename)
             spike_file = open(filename, "w")
-            spike_file.write("# first_id = %d\n" % first_id)
-            spike_file.write("# n = %d\n" % num_neurons)
-            spike_file.write("# dimensions = [%d]\n" % dimensions)
-            spike_file.write("# last_id = %d\n" % last_id)
+            spike_file.write("# first_id = {}\n".format(first_id))
+            spike_file.write("# n = {}\n".format(num_neurons))
+            spike_file.write("# dimensions = [{}]\n".format(dimensions))
+            spike_file.write("# last_id = {}\n".format(last_id))
             for (neuronId, time) in spikes:
-                spike_file.write("%d\t%d\n" % (time, neuronId))
+                spike_file.write("{}\t{}\n".format(time, neuronId))
             spike_file.close()
 
     def print_gsyn(self, filename, gather=True):
@@ -456,14 +460,14 @@ class Population(object):
         dimensions = self._vertex.n_atoms
         utility_calls.check_directory_exists_and_create_if_not(filename)
         file_handle = open(filename, "w")
-        file_handle.write("# first_id = %d\n" % first_id)
-        file_handle.write("# n = %d\n" % num_neurons)
-        file_handle.write("# dt = %f\n" % time_step)
-        file_handle.write("# dimensions = [%d]\n" % dimensions)
-        file_handle.write("# last_id = {%d}\n".format(num_neurons - 1))
+        file_handle.write("# first_id = {}\n".format(first_id))
+        file_handle.write("# n = {}\n".format(num_neurons))
+        file_handle.write("# dt = {}\n".format(time_step))
+        file_handle.write("# dimensions = [{}]\n".format(dimensions))
+        file_handle.write("# last_id = {{}}\n".format(num_neurons - 1))
         file_handle = open(filename, "w")
         for (neuronId, time, value) in gsyn:
-            file_handle.write("%f\t%d\t%f\n" % (time, neuronId, value))
+            file_handle.write("{}\t{}\t{}\n".format(time, neuronId, value))
         file_handle.close()
 
     def print_v(self, filename, gather=True):
@@ -478,19 +482,21 @@ class Population(object):
         first_id = 0
         num_neurons = self._vertex.n_atoms
         dimensions = self._vertex.n_atoms
-        file_handle.write("# first_id = %d\n" % first_id)
-        file_handle.write("# n = %d\n" % num_neurons)
-        file_handle.write("# dt = %f\n" % time_step)
-        file_handle.write("# dimensions = [%d]\n" % dimensions)
-        file_handle.write("# last_id = %d\n" % (num_neurons - 1))
+        file_handle.write("# first_id = {}\n".format(first_id))
+        file_handle.write("# n = {}\n".format(num_neurons))
+        file_handle.write("# dt = {}\n".format(time_step))
+        file_handle.write("# dimensions = [{}]\n".format(dimensions))
+        file_handle.write("# last_id = {}\n".format(num_neurons - 1))
         for (neuronId, _, value) in v:
-            file_handle.write("%f\t%d\n" % (value, neuronId))
+            file_handle.write("{}\t{}\n".format(value, neuronId))
         file_handle.close()
 
     def rset(self, parametername, rand_distr):
         """
         'Random' set. Set the value of parametername to a value taken from
         rand_distr, which should be a RandomDistribution object.
+        :param parametername: the paramter to set
+        :param rand_distr: the random distrubtion object to set the paramter to
         """
         raise NotImplementedError
 
