@@ -82,7 +82,7 @@ class DataBaseInterface(object):
         cur.execute(
             "CREATE TABLE Processor("
             "chip_x INTEGER, chip_y INTEGER, machine_id INTEGER, "
-            "avilable_DTCM INT, avilable_CPU INT, physical_id INTEGER, "
+            "available_DTCM INT, available_CPU INT, physical_id INTEGER, "
             "PRIMARY KEY(chip_x, chip_y, machine_id, physical_id), "
             "FOREIGN KEY (chip_x, chip_y, machine_id) "
             "REFERENCES Machine_chip(chip_x, chip_y, machine_id))")
@@ -287,8 +287,8 @@ class DataBaseInterface(object):
                 for processor in chip.processors:
                     cur.execute(
                         "INSERT INTO Processor("
-                        "chip_x, chip_y, machine_id, avilable_DTCM, "
-                        "avilable_CPU, physical_id)"
+                        "chip_x, chip_y, machine_id, available_DTCM, "
+                        "available_CPU, physical_id)"
                         "VALUES({}, {}, {}, {}, {}, {})"
                         .format(chip.x, chip.y, self._machine_id,
                                 processor.dtcm_available,

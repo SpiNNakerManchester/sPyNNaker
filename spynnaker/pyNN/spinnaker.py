@@ -170,6 +170,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
+        self._create_database = config.getboolean("Database", "create_database")
 
         FrontEndCommonInterfaceFunctions.__init__(
             self, self._reports_states, self._report_default_directory)
