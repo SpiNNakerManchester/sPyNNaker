@@ -13,7 +13,6 @@ from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
 from spynnaker.pyNN import exceptions
 
 # spinn front end common inports
-from spinn_front_end_common.utilities import packet_conversions
 from spinn_front_end_common.utilities import helpful_functions
 
 # dsg imports
@@ -36,6 +35,65 @@ X_CHIPS = 8
 Y_CHIPS = 8
 CORES_PER_CHIP = 18
 MASTER_POPULATION_ENTRIES = (X_CHIPS * Y_CHIPS * CORES_PER_CHIP)
+
+
+def get_x_from_key(key):
+    """
+
+    :param key:
+    :return:
+    """
+    return key >> 24
+
+
+def get_y_from_key(key):
+    """
+
+    :param key:
+    :return:
+    """
+    return (key >> 16) & 0xFF
+
+
+def get_p_from_key(key):
+    """
+
+    :param key:
+    :return:
+    """
+    return (key >> 11) & 0x1F
+
+
+def get_nid_from_key(key):
+    """
+
+    :param key:
+    :return:
+    """
+    return key & 0x7FF
+
+
+def get_key_from_coords(chipX, chipY, chipP):
+    """
+
+    :param chipX:
+    :param chipY:
+    :param chipP:
+    :return:
+    """
+    return chipX << 24 | chipY << 16 | chipP << 11
+
+
+def get_mpt_sb_mem_addrs_from_coords(x, y, p):
+    """
+
+    :param x:
+    :param y:
+    :param p:
+    :return:
+    """
+    # two bytes per entry
+    return (p + (18 * y) + (18 * 8 * x)) * 2
 
 
 class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
@@ -80,9 +138,9 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         """
 
         # locate address of the synaptic block
-        pre_x = packet_conversions.get_x_from_key(incoming_key)
-        pre_y = packet_conversions.get_y_from_key(incoming_key)
-        pre_p = packet_conversions.get_p_from_key(incoming_key)
+        pre_x = get_x_from_key(incoming_key)
+        pre_y = get_y_from_key(incoming_key)
+        pre_p = get_p_from_key(incoming_key)
         table_slot_addr = self._get_table_address_from_coords(
             pre_x, pre_y, pre_p)
         master_table_pop_entry_address = (table_slot_addr +
@@ -195,9 +253,9 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         """
         # Which core has this projection arrived from?
         key = keys_and_masks[0].key
-        x = packet_conversions.get_x_from_key(key)
-        y = packet_conversions.get_y_from_key(key)
-        p = packet_conversions.get_p_from_key(key)
+        x = get_x_from_key(key)
+        y = get_y_from_key(key)
+        p = get_p_from_key(key)
 
         # Calculate the index into the master pynn_population.py table for
         # a projection from the given core:

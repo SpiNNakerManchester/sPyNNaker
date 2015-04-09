@@ -32,7 +32,7 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
 
         # If there are an odd number of synapses, round up number
         # Of control half-words so they will be word-aligned
-        num_fixed_plastic_words = math.ceil(num_synapses / 2)
+        num_fixed_plastic_words = int(math.ceil(num_synapses / 2))
 
         # As fixed-plastic and plastic regions both require this
         # Many half words, this is the number of words!

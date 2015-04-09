@@ -103,6 +103,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                                       graph_label)
         SpynnakerConfigurationFunctions.__init__(self)
 
+        # database objects
+        self._create_database = config.getboolean(
+            "Database", "create_database")
+
         if database_socket_addresses is None:
             database_socket_addresses = list()
             listen_port = config.getint("Database", "listen_port")
