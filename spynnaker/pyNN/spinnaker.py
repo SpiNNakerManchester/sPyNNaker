@@ -47,6 +47,12 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
+from spinn_front_end_common.interface.\
+    front_end_common_provanence_functions import \
+    FrontEndCommonProvanenceFunctions
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_provanence_data import \
+    AbstractProvidesProvanenceData
 
 # local front end imports
 from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
@@ -91,6 +97,7 @@ executable_finder = ExecutableFinder()
 
 class Spinnaker(FrontEndCommonConfigurationFunctions,
                 FrontEndCommonInterfaceFunctions,
+                FrontEndCommonProvanenceFunctions,
                 SpynnakerConfigurationFunctions):
     """
     Spinnaker
@@ -102,6 +109,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         FrontEndCommonConfigurationFunctions.__init__(self, host_name,
                                                       graph_label)
         SpynnakerConfigurationFunctions.__init__(self)
+        FrontEndCommonProvanenceFunctions.__init__(self)
 
         # database objects
         self._create_database = config.getboolean(
@@ -394,9 +402,25 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._has_ran = True
                 if self._retrieve_provance_data:
 
-                    # retrieve provenance data
-                    self._retieve_provance_data_from_machine(
-                        executable_targets, self._router_tables, self._machine)
+                    # retrieve provence data from central
+                    file_path = os.path.join(self._report_default_directory,
+                                             "provance_data")
+
+                    # check the directory doesnt already exist
+                    if not os.path.exists(file_path):
+                        os.mkdir(file_path)
+
+                    self._write_provanence_data_in_xml(file_path)
+
+                    # retrieve provenance data from any cores that provide data
+                    for placement in self._placements:
+                        if isinstance(placement.subvertex,
+                                      AbstractProvidesProvanenceData):
+                            file_path = os.path.join(
+                                self._report_default_directory,
+                                "Provanence_data_for_core:{}:{}:{}"
+                                .format(placement.x, placement.y, placement.p))
+
         elif isinstance(self._machine, VirtualMachine):
             logger.info(
                 "*** Using a Virtual Machine so no simulation will occur")
