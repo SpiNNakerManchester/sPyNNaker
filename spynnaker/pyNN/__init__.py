@@ -18,6 +18,7 @@ from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN.spinnaker import executable_finder
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \

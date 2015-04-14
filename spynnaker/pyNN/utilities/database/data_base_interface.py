@@ -682,9 +682,10 @@ class DataBaseInterface(object):
             self._lock_condition.acquire()
             connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
-            index = 1
+            vertices = list(partitioned_graph.subvertices)
             for partitioned_vertex in partitioned_graph.subvertices:
                 ip_tags = tags.get_ip_tags_for_vertex(partitioned_vertex)
+                index = vertices.index(partitioned_vertex) + 1
                 if ip_tags is not None:
                     for ip_tag in ip_tags:
                         cur.execute(
@@ -705,7 +706,6 @@ class DataBaseInterface(object):
                             .format(index, reverse_ip_tag.tag,
                                     reverse_ip_tag.board_address,
                                     reverse_ip_tag.port))
-                index += 1
             connection.commit()
             connection.close()
             self._lock_condition.release()

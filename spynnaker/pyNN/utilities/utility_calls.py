@@ -3,7 +3,6 @@ utility class containing simple helper methods
 """
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import RandomDistribution
-from data_specification import constants as ds_constants
 from spinn_front_end_common.utilities import exceptions
 import numpy
 import os
@@ -22,14 +21,6 @@ def check_directory_exists_and_create_if_not(filename):
     directory = os.path.dirname(filename)
     if not os.path.exists(directory):
         os.makedirs(directory)
-
-
-def check_weight(weight, synapse_type, is_conductance_type):
-    raise NotImplementedError
-
-
-def check_delay(delay):
-    raise NotImplementedError
 
 
 def convert_param_to_numpy(param, no_atoms):
@@ -56,3 +47,5 @@ def convert_param_to_numpy(param, no_atoms):
                                                 " of atoms in the vertex ")
     else:
         return numpy.array(param, dtype=float)
+
+
