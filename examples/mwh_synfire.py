@@ -11,8 +11,8 @@ import numpy, pylab
 p.setup(timestep=1.0, min_delay = 1.0, max_delay = 144.0)
 nNeurons = 10 # number of neurons in each population
 max_delay = 50
-#p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
-#p.set_number_of_neurons_per_core("DelayExtension", nNeurons / 2)
+#p.set_number_of_neurons_per_core("IF_curr_exp", n_neurons / 2)
+#p.set_number_of_neurons_per_core("DelayExtension", n_neurons / 2)
 
 
 cell_params_lif = {'cm'        : 0.25, # nF

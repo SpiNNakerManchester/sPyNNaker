@@ -14,13 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 def check_directory_exists_and_create_if_not(filename):
+    """
+    helper method for checking if a directory exists, and if not, create it
+    :param filename:
+    :return:
+    """
     directory = os.path.dirname(filename)
     if not os.path.exists(directory):
         os.makedirs(directory)
-
-
-def is_conductance(population):
-    raise NotImplementedError
 
 
 def check_weight(weight, synapse_type, is_conductance_type):
@@ -31,14 +32,12 @@ def check_delay(delay):
     raise NotImplementedError
 
 
-def get_region_base_address_offset(app_data_base_address, region):
-    return (app_data_base_address +
-            ds_constants.APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))
-
-
 def convert_param_to_numpy(param, no_atoms):
     """
     converts parameters into numpy arrays as needed
+    :param param: the param to convert
+    :param no_atoms: the number of atoms avilable for conversion of param
+    :return the converted param in whatever format it was given
     """
     if RandomDistribution is None:
         raise exceptions.ConfigurationException(

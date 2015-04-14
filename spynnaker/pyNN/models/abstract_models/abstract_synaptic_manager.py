@@ -17,8 +17,6 @@ from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties import master_pop_table_generators
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.utility_calls \
-    import get_region_base_address_offset
 from spynnaker.pyNN.utilities import conf
 
 # pacman imports
@@ -27,6 +25,7 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 
 # dsg imports
 from data_specification.enums.data_type import DataType
+from data_specification import utility_calls as dsg_utilities
 
 # general imports
 import logging
@@ -780,9 +779,10 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
         # read in the base address of the synaptic matrix in the app region
         # table
-        synapse_region_base_address_location = get_region_base_address_offset(
-            app_data_base_address,
-            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
+        synapse_region_base_address_location = \
+            dsg_utilities.get_region_base_address_offset(
+                app_data_base_address,
+                constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
         # read in the memory address of the synaptic_region base address
         synapse_region_base_address = helpful_functions.read_and_convert(

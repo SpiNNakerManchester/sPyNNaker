@@ -1,10 +1,10 @@
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities.utility_calls \
-    import get_region_base_address_offset
 from spynnaker.pyNN.utilities import constants as local_constants
 
 from pacman.utilities import constants as pacman_constants
 from pacman.utilities.progress_bar import ProgressBar
+
+from data_specification import utility_calls as dsg_utility_calls
 
 
 import logging
@@ -107,8 +107,8 @@ class AbstractPopulationRecordableVertex(object):
 
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
-                get_region_base_address_offset(app_data_base_address,
-                                               spike_recording_region)
+                dsg_utility_calls.get_region_base_address_offset(
+                    app_data_base_address, spike_recording_region)
             spike_region_base_address_buf = \
                 str(list(transciever.read_memory(
                     x, y, spike_region_base_address_offset, 4))[0])
@@ -191,7 +191,8 @@ class AbstractPopulationRecordableVertex(object):
 
             # Get the position of the value buffer
             neuron_param_region_base_address_offset = \
-                get_region_base_address_offset(app_data_base_address, region)
+                dsg_utility_calls.get_region_base_address_offset(
+                    app_data_base_address, region)
             neuron_param_region_base_address_buf = str(list(txrx.read_memory(
                 x, y, neuron_param_region_base_address_offset, 4))[0])
             neuron_param_region_base_address = \

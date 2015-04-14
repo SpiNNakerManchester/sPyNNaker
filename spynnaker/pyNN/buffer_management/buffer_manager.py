@@ -6,6 +6,8 @@ import math
 
 from pacman.utilities.progress_bar import ProgressBar
 
+from data_specification import utility_calls as dsg_utilities
+
 from spinnman import constants
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_message import SDPMessage
@@ -375,7 +377,7 @@ class BufferManager(object):
 
         # Get the position of the region in the pointer table
         region_offset_in_pointer_table = \
-            utility_calls.get_region_base_address_offset(
+            dsg_utilities.get_region_base_address_offset(
                 app_data_base_address, region)
         region_offset = str(list(self._transceiver.read_memory(
             placement.x, placement.y, region_offset_in_pointer_table, 4))[0])
