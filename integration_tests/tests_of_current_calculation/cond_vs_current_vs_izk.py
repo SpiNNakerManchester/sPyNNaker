@@ -53,14 +53,15 @@ cell_params_izk = {'a': 0.02,
 populations = list()
 projections = list()
 
-weight_to_spike = 0.035
+current_weight_to_spike = 2.0
+cond_weight_to_spike = 0.035
 delay = 17
 
 # different strangths of connection
-curr_injection_connection = [(0, 0, weight_to_spike, delay)]
-cond_injection_connection = [(0, 0, weight_to_spike, delay)]
-izk_injection_connection = [(0, 0, weight_to_spike, delay)]
-sinkConnection = [(0, 0, weight_to_spike, 1)]
+curr_injection_connection = [(0, 0, current_weight_to_spike, delay)]
+cond_injection_connection = [(0, 0, cond_weight_to_spike, delay)]
+izk_injection_connection = [(0, 0, current_weight_to_spike, delay)]
+sinkConnection = [(0, 0, 0, 1)]
 
 # spike time
 spikeArray = {'spike_times': [[0]]}
@@ -132,7 +133,7 @@ if len(curr_spikes) != 0:
     pylab.plot([i[1] for i in curr_spikes], [i[0] for i in curr_spikes], ".")
     pylab.xlabel('Time/ms')
     pylab.ylabel('spikes')
-    pylab.title('curr spikes')
+    pylab.title('lif curr spikes')
     pylab.show()
 else:
     print "No curr spikes received"
@@ -144,7 +145,7 @@ if len(cond_spikes) != 0:
     pylab.plot([i[1] for i in cond_spikes], [i[0] for i in cond_spikes], ".")
     pylab.xlabel('Time/ms')
     pylab.ylabel('spikes')
-    pylab.title('cond spikes')
+    pylab.title('lif cond spikes')
     pylab.show()
 else:
     print "No cond spikes received"
@@ -156,10 +157,52 @@ if len(izk_spikes) != 0:
     pylab.plot([i[1] for i in izk_spikes], [i[0] for i in izk_spikes], ".")
     pylab.xlabel('Time/ms')
     pylab.ylabel('spikes')
-    pylab.title('izk spikes')
+    pylab.title('izk curr spikes')
     pylab.show()
 else:
     print "No izk spikes received"
+
+# plot curr gsyn
+if len(curr_gsyn) != 0:
+    ticks = len(curr_gsyn) / nNeurons
+    pylab.figure()
+    pylab.xlabel('Time/ms')
+    pylab.ylabel('gsyn')
+    pylab.title('lif curr gsyn')
+    for pos in range(0, nNeurons, 20):
+        gsyn_for_neuron = curr_gsyn[pos * ticks: (pos + 1) * ticks]
+        pylab.plot([i[2] for i in gsyn_for_neuron])
+    pylab.show()
+else:
+    print "no curr gsyn received"
+
+# plot cond gsyn
+if len(cond_gsyn) != 0:
+    ticks = len(cond_gsyn) / nNeurons
+    pylab.figure()
+    pylab.xlabel('Time/ms')
+    pylab.ylabel('gsyn')
+    pylab.title('lif cond gsyn')
+    for pos in range(0, nNeurons, 20):
+        gsyn_for_neuron = cond_gsyn[pos * ticks: (pos + 1) * ticks]
+        pylab.plot([i[2] for i in gsyn_for_neuron])
+    pylab.show()
+else:
+    print "no cond gsyn received"
+
+# plot izk gsyn
+if len(izk_gsyn) != 0:
+    ticks = len(izk_gsyn) / nNeurons
+    pylab.figure()
+    pylab.xlabel('Time/ms')
+    pylab.ylabel('gsyn')
+    pylab.title('izk curr gsyn')
+    for pos in range(0, nNeurons, 20):
+        gsyn_for_neuron = izk_gsyn[pos * ticks: (pos + 1) * ticks]
+        pylab.plot([i[2] for i in gsyn_for_neuron])
+    pylab.show()
+else:
+    print "no izk gsyn received"
 
 # plot curr membrane voltage
 if len(curr_v) != 0:
@@ -167,7 +210,7 @@ if len(curr_v) != 0:
     pylab.figure()
     pylab.xlabel('Time/ms')
     pylab.ylabel('v')
-    pylab.title('curr v')
+    pylab.title('lif curr v')
     for pos in range(0, nNeurons, 20):
         v_for_neuron = curr_v[pos * ticks: (pos + 1) * ticks]
         pylab.plot([i[2] for i in v_for_neuron])
@@ -181,7 +224,7 @@ if len(cond_v) != 0:
     pylab.figure()
     pylab.xlabel('Time/ms')
     pylab.ylabel('v')
-    pylab.title('cond v')
+    pylab.title('lif cond v')
     for pos in range(0, nNeurons, 20):
         v_for_neuron = cond_v[pos * ticks: (pos + 1) * ticks]
         pylab.plot([i[2] for i in v_for_neuron])
@@ -196,55 +239,12 @@ if len(izk_v) != 0:
     pylab.figure()
     pylab.xlabel('Time/ms')
     pylab.ylabel('v')
-    pylab.title('izk v')
+    pylab.title('izk curr v')
     for pos in range(0, nNeurons, 20):
         v_for_neuron = izk_v[pos * ticks: (pos + 1) * ticks]
         pylab.plot([i[2] for i in v_for_neuron])
     pylab.show()
 else:
     print "no izk membrane voltage is recieved "
-
-
-# plot curr gsyn
-if len(curr_gsyn) != 0:
-    ticks = len(curr_gsyn) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('gsyn')
-    pylab.title('curr gsyn')
-    for pos in range(0, nNeurons, 20):
-        gsyn_for_neuron = curr_gsyn[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[2] for i in gsyn_for_neuron])
-    pylab.show()
-else:
-    print "no curr gsyn received"
-
-# plot cond gsyn
-if len(cond_gsyn) != 0:
-    ticks = len(cond_gsyn) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('gsyn')
-    pylab.title('cond gsyn')
-    for pos in range(0, nNeurons, 20):
-        gsyn_for_neuron = cond_gsyn[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[2] for i in gsyn_for_neuron])
-    pylab.show()
-else:
-    print "no cond gsyn received"
-
-# plot izk gsyn
-if len(izk_gsyn) != 0:
-    ticks = len(izk_gsyn) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('gsyn')
-    pylab.title('izk gsyn')
-    for pos in range(0, nNeurons, 20):
-        gsyn_for_neuron = izk_gsyn[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[2] for i in gsyn_for_neuron])
-    pylab.show()
-else:
-    print "no izk gsyn received"
 
 p.end()
