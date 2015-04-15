@@ -227,10 +227,12 @@ class Population(object):
         Return a 3-column numpy array containing cell ids, time, and Vm for
         recorded cells.
 
-        :param bool gather:
+        :param gather:
             not used - inserted to match PyNN specs
-        :param bool compatible_output:
+        :type gather: bool
+        :param compatible_output:
             not used - inserted to match PyNN specs
+        :type compatible_output: bool
         """
         if self._v is None:
             timer = None
@@ -451,7 +453,10 @@ class Population(object):
     def print_gsyn(self, filename, gather=True):
         """
         Write conductance information from the population to a given file.
-
+        :param filename: the absoluete file path for where the gsyn are to be
+        printed in
+        :param gather: Supported from the PyNN language, but Spinnaker only does
+        gather = True.
         """
         time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
         gsyn = self.get_gsyn(gather, compatible_output=True)
@@ -474,6 +479,10 @@ class Population(object):
         """
         Write membrane potential information from the population to a given
         file.
+        :param filename: the absoluete file path for where the voltage are to be
+        printed in
+        :param gather: Supported from the PyNN language, but Spinnaker only does
+        gather = True.
         """
         time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
         v = self.get_v(gather, compatible_output=True)
@@ -487,8 +496,8 @@ class Population(object):
         file_handle.write("# dt = {}\n".format(time_step))
         file_handle.write("# dimensions = [{}]\n".format(dimensions))
         file_handle.write("# last_id = {}\n".format(num_neurons - 1))
-        for (neuronId, _, value) in v:
-            file_handle.write("{}\t{}\n".format(value, neuronId))
+        for (neuronId, time, value) in v:
+            file_handle.write("{}\t{}\t{}\n".format(time, neuronId, value))
         file_handle.close()
 
     def rset(self, parametername, rand_distr):
