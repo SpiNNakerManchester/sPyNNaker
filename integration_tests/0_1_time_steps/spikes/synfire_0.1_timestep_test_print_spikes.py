@@ -67,10 +67,9 @@ class TestPrintSpikes(unittest.TestCase):
         current_file_path = os.path.join(current_file_path, "spikes.data")
         spike_file = populations[0].printSpikes(current_file_path)
 
-        spike_reader = p.SpikeSourceFromFile(
-            n_neurons, current_file_path, min_atom=0, max_atom=n_neurons,
-            min_time=0, max_time=500, machine_time_step=machine_time_step,
-            timescale_factor=1, ring_buffer_sigma=12, spikes_per_second=12)
+        spike_reader = p.utility_calls.read_spikes_from_file(
+            current_file_path, min_atom=0, max_atom=n_neurons,
+            min_time=0, max_time=500)
         read_in_spikes = spike_reader.spike_times
         p.end()
         os.remove(current_file_path)
