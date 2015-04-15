@@ -1,76 +1,90 @@
 """
 Synfirechain-like example
 """
-import pyNN.spiNNaker as p
-import pylab
+
+# spynnaker imports
+import spynnaker.pyNN as p
+
+# general imports
 import os
+import unittest
 
 
-p.setup(timestep=0.1, min_delay=1.0, max_delay=14.40)
-nNeurons = 200  # number of neurons in each population
-p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
+class TestPrintVoltage(unittest.TestCase):
+    """
+    tests the printing of print v given a simulation
+    """
 
+    def test_print_voltage(self):
+        """
+        test that tests the printing of v from a pre determined recording
+        :return:
+        """
+        p.setup(timestep=0.1, min_delay=1.0, max_delay=14.40)
+        n_neurons = 200  # number of neurons in each population
+        runtime = 500
+        p.set_number_of_neurons_per_core("IF_curr_exp", n_neurons / 2)
 
-cell_params_lif = {'cm': 0.25,
-                   'i_offset': 0.0,
-                   'tau_m': 20.0,
-                   'tau_refrac': 2.0,
-                   'tau_syn_E': 5.0,
-                   'tau_syn_I': 5.0,
-                   'v_reset': -70.0,
-                   'v_rest': -65.0,
-                   'v_thresh': -50.0
-                   }
+        cell_params_lif = {'cm': 0.25,
+                           'i_offset': 0.0,
+                           'tau_m': 20.0,
+                           'tau_refrac': 2.0,
+                           'tau_syn_E': 5.0,
+                           'tau_syn_I': 5.0,
+                           'v_reset': -70.0,
+                           'v_rest': -65.0,
+                           'v_thresh': -50.0
+                           }
 
-populations = list()
-projections = list()
+        populations = list()
+        projections = list()
 
-weight_to_spike = 2.0
-delay = 1.7
+        weight_to_spike = 2.0
+        delay = 1.7
 
-loopConnections = list()
-for i in range(0, nNeurons):
-    singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
-    loopConnections.append(singleConnection)
+        loop_connections = list()
+        for i in range(0, n_neurons):
+            single_connection = (i, ((i + 1) % n_neurons), weight_to_spike,
+                                 delay)
+            loop_connections.append(single_connection)
 
-injectionConnection = [(0, 0, weight_to_spike, 1)]
-spikeArray = {'spike_times': [[0]]}
-populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
-                   label='pop_1'))
-populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
-                   label='inputSpikes_1'))
+        injection_connection = [(0, 0, weight_to_spike, 1)]
+        spike_array = {'spike_times': [[0]]}
+        populations.append(p.Population(n_neurons, p.IF_curr_exp,
+                                        cell_params_lif,
+                           label='pop_1'))
+        populations.append(p.Population(1, p.SpikeSourceArray, spike_array,
+                           label='inputSpikes_1'))
 
-projections.append(p.Projection(populations[0], populations[0],
-                   p.FromListConnector(loopConnections)))
-projections.append(p.Projection(populations[1], populations[0],
-                   p.FromListConnector(injectionConnection)))
+        projections.append(p.Projection(populations[0], populations[0],
+                           p.FromListConnector(loop_connections)))
+        projections.append(p.Projection(populations[1], populations[0],
+                           p.FromListConnector(injection_connection)))
 
-populations[0].record_v()
-populations[0].record_gsyn()
-populations[0].record()
+        populations[0].record_v()
+        populations[0].record_gsyn()
+        populations[0].record()
 
-p.run(500)
+        p.run(runtime)
 
-v = None
-gsyn = None
-spikes = None
+        v = populations[0].get_v(compatible_output=True)
 
-v = populations[0].get_v(compatible_output=True)
+        current_file_path = os.path.dirname(os.path.abspath(__file__))
+        current_file_path = os.path.join(current_file_path, "v.data2")
+        populations[0].print_v(current_file_path)
 
-current_file_path = os.path.dirname(os.path.abspath(__file__))
-current_file_path = os.path.join(current_file_path, "v.data")
-v_file = populations[0].print_v(current_file_path)
+        read_in_v_values = p.utility_calls.read_in_data_from_file(
+            current_file_path, 0, n_neurons, 0, runtime)
 
+        os.remove(current_file_path)
 
-if v is not None:
-    ticks = len(v) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('v')
-    pylab.title('v')
-    for pos in range(0, nNeurons, 20):
-        v_for_neuron = v[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[2] for i in v_for_neuron])
-    pylab.show()
+        p.end()
 
-p.end()
+        for spike_element, read_element in zip(v, read_in_v_values):
+            self.assertEqual(round(spike_element[0], 1),
+                             round(read_element[0], 1))
+            self.assertEqual(round(spike_element[1], 1),
+                             round(read_element[1], 1))
+            self.assertEqual(round(spike_element[2], 1),
+                             round(read_element[2], 1))
+
