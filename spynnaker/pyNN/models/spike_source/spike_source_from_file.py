@@ -5,6 +5,7 @@ SpikeSourceFromFile
 # spynnaker imports
 from spynnaker.pyNN.models.spike_source.spike_source_array import \
     SpikeSourceArray
+from spynnaker.pyNN import utility_calls
 
 # general imports
 import numpy
@@ -24,9 +25,8 @@ class SpikeSourceFromFile(SpikeSourceArray):
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
             constraints=None, label="SpikeSourceArray"):
 
-        spike_times = self._read_spikes_from_file(
-            spike_time_file, min_atom, max_atom, min_time, max_time,
-            machine_time_step)
+        spike_times = utility_calls.read_spikes_from_file(
+            spike_time_file, min_atom, max_atom, min_time, max_time)
 
         SpikeSourceArray.__init__(
             self, n_neurons, spike_times, machine_time_step,
@@ -35,41 +35,6 @@ class SpikeSourceFromFile(SpikeSourceArray):
             max_on_chip_memory_usage_for_spikes_in_bytes=
             max_on_chip_memory_usage_for_spikes_in_bytes,
             constraints=constraints, label=label)
-
-    @staticmethod
-    def _read_spikes_from_file(
-            spike_time_file, min_atom, max_atom, min_time, max_time,
-            machine_time_step):
-        """
-
-        :param spike_time_file:
-        :param min_atom:
-        :param max_atom:
-        :param min_time:
-        :param max_time:
-        :param machine_time_step:
-        :return:
-        """
-        spike_times = list()
-        spike_ids = list()
-        with open(spike_time_file, 'r') as fsource:
-                read_data = fsource.readlines()
-
-        for line in read_data:
-            if not line.startswith('#'):
-                values = line.split("\t")
-                neuron_id = int(eval(values[1]))
-                time = float(eval(values[0]))
-                if (min_atom <= neuron_id < max_atom and
-                        min_time <= time < max_time):
-                    spike_times.append(time)
-                    spike_ids.append(neuron_id)
-                else:
-                    print "failed to enter {}:{}".format(neuron_id, time)
-
-        result = numpy.dstack((spike_ids, spike_times))[0]
-        result = result[numpy.lexsort((spike_times, spike_ids))]
-        return result
 
     @staticmethod
     def _subsample_spikes_by_time(spike_array, start, stop, step):

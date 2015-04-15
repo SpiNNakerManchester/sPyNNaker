@@ -61,7 +61,7 @@ def read_in_data_from_file(
     :param min_time: min time slot to read neurons values of.
     :param max_time:max time slot to read neurons values of.
     :return: a numpi destacked array containing time stamps, neuron id and the
-    gsyn value.
+    data value.
     """
     times = list()
     atom_ids = list()
@@ -86,6 +86,38 @@ def read_in_data_from_file(
 
     result = numpy.dstack((atom_ids, times, data_items))[0]
     result = result[numpy.lexsort((times, atom_ids))]
+    return result
+
+
+def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time):
+    """
+    helper method for reading spikes from a file
+    :param file_path: absolute filepath to a file where gsyn values have been
+    written
+    :param min_atom: min neuron id to which neurons to read in
+    :param max_atom: max neuron id to which neurons to read in
+    :param min_time: min time slot to read neurons values of.
+    :param max_time:max time slot to read neurons values of.
+    :return: a numpi destacked array containing time stamps, neuron id and the
+    spike times.
+    """
+    spike_times = list()
+    spike_ids = list()
+    with open(file_path, 'r') as fsource:
+            read_data = fsource.readlines()
+
+    for line in read_data:
+        if not line.startswith('#'):
+            values = line.split("\t")
+            neuron_id = int(eval(values[1]))
+            time = float(eval(values[0]))
+            if (min_atom <= neuron_id < max_atom and
+                    min_time <= time < max_time):
+                spike_times.append(time)
+                spike_ids.append(neuron_id)
+
+    result = numpy.dstack((spike_ids, spike_times))[0]
+    result = result[numpy.lexsort((spike_times, spike_ids))]
     return result
 
 
