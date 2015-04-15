@@ -304,6 +304,15 @@ def Projection(presynaptic_population, postsynaptic_population,
         target, synapse_dynamics, label, rng)
 
 
+def NativeRNG(seed_value):
+    """
+    fixes the rnadom number generators seed
+    :param seed_value:
+    :return:
+    """
+    numpy.random.seed(seed_value)
+
+
 def get_current_time():
     """
 
