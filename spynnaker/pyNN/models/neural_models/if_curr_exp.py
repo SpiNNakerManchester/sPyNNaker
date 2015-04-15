@@ -84,7 +84,6 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
         """
         Generate Neuron Parameter data (region 2):
         """
-
         # Get the parameters
         return [
             NeuronParameter(self._v_thresh, DataType.S1615),
@@ -98,8 +97,10 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             NeuronParameter(self.exp_tc(self._machine_time_step),
                             DataType.S1615),
             NeuronParameter(self._one_over_tau_rc, DataType.S1615),
-            NeuronParameter(self._refract_timer, DataType.UINT32),
-            NeuronParameter(self._scaled_t_refract(), DataType.UINT32)]
+            NeuronParameter(self._refract_timer, DataType.INT32),
+            # t refact used to be a uint32 but was changed to int32 to avoid
+            # clash of c and python variable typing.
+            NeuronParameter(self._scaled_t_refract(), DataType.INT32)]
 
     def is_population_vertex(self):
         """

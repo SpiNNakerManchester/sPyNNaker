@@ -81,7 +81,9 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                             DataType.S1615),
             NeuronParameter(self._one_over_tau_rc, DataType.S1615),
             NeuronParameter(self._refract_timer, DataType.UINT32),
-            NeuronParameter(self._scaled_t_refract(), DataType.UINT32)
+            # t refact used to be a uint32 but was changed to int32 to avoid
+            # clash of c and python variable typing.
+            NeuronParameter(self._scaled_t_refract(), DataType.INT32)
         ]
 
     def is_population_vertex(self):
