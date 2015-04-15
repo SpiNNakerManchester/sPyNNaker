@@ -8,7 +8,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_array import \
 
 # general imports
 import numpy
-import itertools
+
 
 class SpikeSourceFromFile(SpikeSourceArray):
     """
