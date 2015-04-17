@@ -6,7 +6,6 @@ Synfirechain-like example
 import spynnaker.pyNN as p
 
 # general imports
-import os
 import pylab
 import unittest
 
@@ -41,8 +40,8 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
         :return:
         """
         p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-        nNeurons = 128 * 128  # number of neurons in each population
-        p.set_number_of_neurons_per_core("IF_cond_exp", nNeurons / 2)
+        n_neurons = 128 * 128  # number of neurons in each population
+        p.set_number_of_neurons_per_core("IF_cond_exp", n_neurons / 2)
 
         cell_params_lif = {'cm': 0.25,
                            'i_offset': 0.0,
@@ -63,31 +62,21 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
         weight_to_spike = 0.035
         delay = 17
 
-        spikes = read_spikefile('test.spikes', nNeurons)
+        spikes = read_spikefile('test.spikes', n_neurons)
         print spikes
-        spikeArray = {'spike_times':  spikes}
+        spike_array = {'spike_times': spikes}
 
-
-        #populations.append(p.Population(nNeurons, p.SpikeSourceArray, spikeArray,
-         #                               label='inputSpikes_1'))
-        populations.append(p.Population(nNeurons, p.IF_cond_exp, cell_params_lif,
-                                        label='pop_1'))
-        #projections.append(p.Projection(populations[0], populations[1],
-         #                               p.OneToOneConnector(
-          #                                  weights= weight_to_spike,
-           #                                 delays = delay)))
-        #populations[0].record_v()
-        #populations[0].record_gsyn()
-      #  populations[1].record()
+        populations.append(p.Population(
+            n_neurons, p.SpikeSourceArray, spike_array, label='inputSpikes_1'))
+        populations.append(p.Population(
+            n_neurons, p.IF_cond_exp, cell_params_lif, label='pop_1'))
+        projections.append(p.Projection(
+            populations[0], populations[1], p.OneToOneConnector(
+                weights=weight_to_spike, delays=delay)))
+        populations[1].record()
 
         p.run(10000)
 
-        v = None
-        gsyn = None
-        spikes = None
-
-        #v = populations[0].get_v(compatible_output=True)
-        #gsyn = populations[0].get_gsyn(compatible_output=True)
         spikes = populations[1].getSpikes(compatible_output=True)
 
         if spikes is not None:
@@ -100,28 +89,6 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
             pylab.show()
         else:
             print "No spikes received"
-
-        if v is not None:
-            ticks = len(v) / nNeurons
-            pylab.figure()
-            pylab.xlabel('Time/ms')
-            pylab.ylabel('v')
-            pylab.title('v')
-            for pos in range(0, nNeurons, 20):
-                v_for_neuron = v[pos * ticks: (pos + 1) * ticks]
-                pylab.plot([i[2] for i in v_for_neuron])
-            pylab.show()
-
-        if gsyn is not None:
-            ticks = len(gsyn) / nNeurons
-            pylab.figure()
-            pylab.xlabel('Time/ms')
-            pylab.ylabel('gsyn')
-            pylab.title('gsyn')
-            for pos in range(0, nNeurons, 20):
-                gsyn_for_neuron = gsyn[pos * ticks: (pos + 1) * ticks]
-                pylab.plot([i[2] for i in gsyn_for_neuron])
-            pylab.show()
 
         p.end()
 
