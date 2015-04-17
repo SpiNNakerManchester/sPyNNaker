@@ -12,6 +12,12 @@ import unittest
 
 
 def read_spikefile(file_name, n_neurons):
+    """
+    helper method for reading in spike data
+    :param file_name:
+    :param n_neurons:
+    :return:
+    """
     spike_array = [[] for x in range(n_neurons)]
     with open(file_name) as f_spike:
         for line in f_spike:
@@ -22,6 +28,7 @@ def read_spikefile(file_name, n_neurons):
                 neuron_id = int(neuron)
                 spike_array[neuron_id].append(time_stamp)
     return spike_array
+
 
 class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
     """
