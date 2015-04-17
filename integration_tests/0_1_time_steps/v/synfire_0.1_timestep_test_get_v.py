@@ -82,3 +82,6 @@ class TestGetVoltage(unittest.TestCase):
                              round(read_element[1], 1))
             self.assertEqual(round(spike_element[2], 1),
                              round(read_element[2], 1))
+
+if __name__ == '__main__':
+    unittest.main()

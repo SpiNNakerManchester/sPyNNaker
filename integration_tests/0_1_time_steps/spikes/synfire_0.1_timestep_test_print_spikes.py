@@ -79,3 +79,6 @@ class TestPrintSpikes(unittest.TestCase):
                              round(read_element[0], 1))
             self.assertEqual(round(spike_element[1], 1),
                              round(read_element[1], 1))
+
+if __name__ == '__main__':
+    unittest.main()
