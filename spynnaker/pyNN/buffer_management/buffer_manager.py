@@ -7,6 +7,8 @@ import math
 from pacman.utilities.progress_bar import ProgressBar
 
 from spinnman import constants
+from spinnman.messages.eieio.command_messages.eieio_command_message import \
+    EIEIOCommandMessage
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_message import SDPMessage
 from spinnman.messages.sdp.sdp_flag import SDPFlag
@@ -120,6 +122,11 @@ class BufferManager(object):
                             packet.sequence_no)
                     except:
                         traceback.print_exc()
+            elif isinstance(packet, EIEIOCommandMessage):
+                raise SpinnmanInvalidPacketException(
+                    packet.__class__,
+                    "The command packet is invalid for buffer management: "
+                    "command id {0:d}".format(packet.eieio_header.command))
             else:
                 raise SpinnmanInvalidPacketException(
                     packet.__class__,
@@ -246,28 +253,31 @@ class BufferManager(object):
             raise SpynnakerException(
                 "The buffer region of {} must be divisible by 2".format(
                     vertex))
-        while (vertex.is_next_timestamp(region) and
-                bytes_to_go > (EIEIO32BitTimedPayloadPrefixDataMessage
-                               .get_min_packet_length())):
-            space_available = min(bytes_to_go, 255 * _N_BYTES_PER_KEY)
-            next_message = self._create_message_to_send(
-                space_available, vertex, region)
-            if next_message is None:
-                break
-
-            # Write the message to the memory
-            data = BufferManager._get_message_as_bytes(next_message)
-            logger.debug("Writing initial buffer of {} bytes to {} on"
-                         " {}, {}, {}".format(
-                             len(data), hex(region_base_address),
-                             placement.x, placement.y, placement.p))
-            self._transceiver.write_memory(
-                placement.x, placement.y, region_base_address, data)
+        if vertex.is_empty(region):
             sent_message = True
+        else:
+            while (vertex.is_next_timestamp(region) and
+                    bytes_to_go > (EIEIO32BitTimedPayloadPrefixDataMessage
+                                   .get_min_packet_length())):
+                space_available = min(bytes_to_go, 255 * _N_BYTES_PER_KEY)
+                next_message = self._create_message_to_send(
+                    space_available, vertex, region)
+                if next_message is None:
+                    break
 
-            # Update the positions
-            region_base_address += len(data)
-            bytes_to_go -= len(data)
+                # Write the message to the memory
+                data = BufferManager._get_message_as_bytes(next_message)
+                logger.debug("Writing initial buffer of {} bytes to {} on"
+                             " {}, {}, {}".format(
+                                 len(data), hex(region_base_address),
+                                 placement.x, placement.y, placement.p))
+                self._transceiver.write_memory(
+                    placement.x, placement.y, region_base_address, data)
+                sent_message = True
+
+                # Update the positions
+                region_base_address += len(data)
+                bytes_to_go -= len(data)
 
         if not sent_message:
             raise BufferableRegionTooSmall(
