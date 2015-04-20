@@ -1,8 +1,9 @@
 """
 SpikeSourceArray
 """
-from spynnaker.pyNN.utilities import constants
 
+# spynnaker imports
+from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models\
     .abstract_outgoing_edge_same_contiguous_keys_restrictor\
     import AbstractOutgoingEdgeSameContiguousKeysRestrictor
@@ -12,28 +13,34 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
 from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region\
     import BufferedSendingRegion
 from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
+
+# spinn front end common imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+# pacman imports
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from pacman.model.constraints.tag_allocator_constraints\
     .tag_allocator_require_iptag_constraint\
     import TagAllocatorRequireIptagConstraint
 
+# dsg imports
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 
+# spinnman imports
 from spinnman.messages.eieio.command_messages.event_stop_request\
     import EventStopRequest
 
+# general imports
 from enum import Enum
 import logging
 import sys
+
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +48,9 @@ logger = logging.getLogger(__name__)
 class SpikeSourceArray(AbstractDataSpecableVertex,
                        AbstractPartitionableVertex,
                        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
+    """
+    model for play back of spikes
+    """
 
     CORE_APP_IDENTIFIER = (front_end_common_constants
                            .SPIKE_INJECTOR_CORE_APPLICATION_ID)
@@ -115,6 +125,16 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          constraints=list()):
+        """
+        creates a partitioned vertex from a partitionable vertex
+        :param vertex_slice: the slice of partitionable atoms that the
+        new partitioned vertex will contain
+        :param resources_required: the reosurces used by the partitioned vertex
+        :param label: the label of the partitioned vertex
+        :param constraints: extra constraints added to the partitioned vertex
+        :return: a partitioned vertex
+        :rtype: SpikeSourceArrayPartitionedVertex
+        """
         send_buffer = self._get_spike_send_buffer(vertex_slice)
         partitioned_vertex = SpikeSourceArrayPartitionedVertex(
             {SpikeSourceArray._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value:

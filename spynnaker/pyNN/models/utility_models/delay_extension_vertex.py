@@ -1,9 +1,8 @@
-import math
 import copy
 import logging
-
 from enum import Enum
 
+import math
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
@@ -23,7 +22,7 @@ from pacman.model.constraints.partitioner_constraints.\
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+from pacman.model.abstract_classes.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator

@@ -34,8 +34,8 @@ class GraphEdgeFilter(object):
             associated_vertex = graph_mapper.get_vertex_from_subvertex(subvert)
             vertex_slice = graph_mapper.get_subvertex_slice(subvert)
             new_graph_mapper.add_subvertex(
-                subvertex=subvert, lo_atom=vertex_slice.lo_atom,
-                hi_atom=vertex_slice.hi_atom, vertex=associated_vertex)
+                subvertex=subvert, vertex_slice=vertex_slice,
+                vertex=associated_vertex)
             progress_bar.update()
 
         # start checking subedges to decide which ones need pruning....
