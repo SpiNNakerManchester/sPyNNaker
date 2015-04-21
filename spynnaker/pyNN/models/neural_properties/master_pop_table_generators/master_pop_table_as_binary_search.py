@@ -5,7 +5,8 @@ master pop entry
 # spynnaker imports
 from spynnaker.pyNN.models.neural_properties.master_pop_table_generators\
     .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
-from pacman.model.abstract_classes.abstract_partitionable_vertex \
+
+from pacman.model.partitionable_graph.abstract_partitionable_vertex\
     import AbstractPartitionableVertex
 
 # general imports
