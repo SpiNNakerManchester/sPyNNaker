@@ -39,9 +39,9 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
         test that tests the printing of v from a pre determined recording
         :return:
         """
-        p.setup(timestep=0.1, min_delay=1.0, max_delay=144.0)
+        p.setup(timestep=0.1, min_delay=1.0, max_delay=14.0)
         n_neurons = 128 * 128  # number of neurons in each population
-        p.set_number_of_neurons_per_core("IF_cond_exp", n_neurons / 2)
+        p.set_number_of_neurons_per_core("IF_cond_exp", 256)
 
         cell_params_lif = {'cm': 0.25,
                            'i_offset': 0.0,
@@ -60,7 +60,7 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
         projections = list()
 
         weight_to_spike = 0.035
-        delay = 17
+        delay = 1.7
 
         spikes = read_spikefile('test.spikes', n_neurons)
         print spikes
@@ -75,7 +75,7 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
                 weights=weight_to_spike, delays=delay)))
         populations[1].record()
 
-        p.run(10000)
+        p.run(100)
 
         spikes = populations[1].getSpikes(compatible_output=True)
 

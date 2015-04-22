@@ -75,7 +75,7 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
                 weights=weight_to_spike, delays=delay)))
         populations[1].record()
 
-        p.run(10000)
+        p.run(1000)
 
         spikes = populations[1].getSpikes(compatible_output=True)
 
