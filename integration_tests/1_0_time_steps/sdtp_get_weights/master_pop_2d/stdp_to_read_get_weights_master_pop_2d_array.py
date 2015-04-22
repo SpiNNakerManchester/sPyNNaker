@@ -84,7 +84,7 @@ class TestSTDPGetWeightsWith2dMasterPop(unittest.TestCase):
 
         # Get plastic spikes and save to disk
         plastic_spikes = plastic_ex_pop.getSpikes(compatible_output=True)
-        numpy.save("plastic_spikes.npy", plastic_spikes)
+        #numpy.save("plastic_spikes.npy", plastic_spikes)
 
         plastic_weights = plastic_ie_projection.getWeights(format="array")
         #  mean_weight = numpy.average(plastic_weights)
