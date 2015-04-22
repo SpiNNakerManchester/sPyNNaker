@@ -39,3 +39,6 @@ class SendsBuffersFromHostPartitionedVertexPreBufferedImpl(
 
     def get_next_key(self, region):
         return self._send_buffers[region].next_key
+
+    def is_empty(self, region):
+        return len(self._send_buffers[region].timestamps) == 0

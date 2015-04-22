@@ -75,3 +75,15 @@ class AbstractSendsBuffersFromHostPartitionedVertex(object):
         :return: The next key, or None if there are no more keys
         :rtype: int
         """
+
+    @abstractmethod
+    def is_empty(self, region):
+        """ Returns true if there are no spikes to be buffered for the
+            specified region
+
+        :param region: The region to get the next key from
+        :type region: int
+        :return: True if there are no keys to send for the region, False\
+                    otherwise
+        :rtype: bool
+        """
