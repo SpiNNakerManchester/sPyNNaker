@@ -73,7 +73,7 @@ class STDPMechanism(object):
         return self._voltage_dependence
 
     @property
-    def dentritic_delay_fraction(self):
+    def dendritic_delay_fraction(self):
         return self._dendritic_delay_fraction
 
     def __eq__(self, other):
@@ -84,8 +84,7 @@ class STDPMechanism(object):
                 (self._weight_dependence == other.weight_dependence) and
                 (self._voltage_dependence == other.voltage_dependence) and
                 (self._dendritic_delay_fraction ==
-                 other.dendritic_delay_fraction) and
-                self.equals(other))
+                 other.dendritic_delay_fraction))
 
     def get_synapse_row_io(self):
         if self.timing_dependence is not None:
@@ -113,12 +112,6 @@ class STDPMechanism(object):
                 synaptic_row_header_words, self._dendritic_delay_fraction)
         else:
             return None
-
-    def equals(self, other):
-        """
-        Determines if an object is equal to this object
-        """
-        raise NotImplementedError
 
     # **TODO** make property
     def are_weights_signed(self):

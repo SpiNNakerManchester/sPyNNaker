@@ -81,3 +81,7 @@ class SpikePairTimeDependency(AbstractTimeDependency):
     @property
     def tau_minus(self):
         return self._tau_minus
+
+    @property
+    def nearest(self):
+        return self._nearest
