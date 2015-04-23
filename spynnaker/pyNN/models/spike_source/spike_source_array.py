@@ -314,13 +314,15 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         """
         return 0
 
-    def get_sdram_usage_for_atoms(self, vertex_slice, vertex_in_edges):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """ calculates the total sdram usage of the spike source array. If the
         memory requirement is beyond what is deemed to be the usage of the
         processor, then it executes a buffered format.
 
-        :param vertex_slice:
-        :param vertex_in_edges:
+        :param vertex_slice: the slice of atoms this partitioned vertex will
+        represent from the partiionable vertex
+        :param graph: the partitionable graph which contains the high level
+        objects
         :return:
         """
         send_buffer = self._get_spike_send_buffer(vertex_slice)

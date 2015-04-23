@@ -19,7 +19,7 @@ conn_char_dist = 2.3
 min_weight = 0.1
 max_weight = 5.0
 weight_scale_ex_in = 0.25
-connection_dependence = "%f*math.exp(-(d**2)/(%f**2))"
+connection_dependence = "%f*numpy.exp(-(d**2)/(%f**2))"
 weight_dependence_n = RandomDistribution(distribution='uniform', parameters=[1.0+min_weight, 1.0+max_weight], rng=rng_weights)
 weight_dependence_e = RandomDistribution(distribution='uniform', parameters=[min_weight, max_weight], rng=rng_weights)
 weight_dependence_i = RandomDistribution(distribution='uniform', parameters=[-(max_weight*weight_scale_ex_in), -min_weight], rng=rng_weights)
