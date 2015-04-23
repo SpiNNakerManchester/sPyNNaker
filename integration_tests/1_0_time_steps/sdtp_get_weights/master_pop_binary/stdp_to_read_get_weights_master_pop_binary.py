@@ -5,19 +5,19 @@ import unittest
 
 # How large should the population of excitatory neurons be?
 # (Number of inhibitory neurons is proportional to this)
-NUM_EXCITATORY = 2000
+NUM_EXCITATORY = 20
 
 
 class TestSTDPGetWeightsWith2dMasterPop(unittest.TestCase):
     """
     tests the get spikes given a simulation at 0.1 ms time steps
     """
-    
+
     def build_network(self, dynamics, cell_params):
         """
         Function to build the basic network - dynamics should be a PyNN
          synapse dynamics object
-:param dynamics: 
+:param dynamics:
 :return:
         """
         # SpiNNaker setup
@@ -47,7 +47,7 @@ class TestSTDPGetWeightsWith2dMasterPop(unittest.TestCase):
             target='inhibitory', synapse_dynamics=dynamics)
 
         return ex_pop, ie_projection
-    
+
     def test_get_weights(self):
         # Population parameters
         cell_params = {
@@ -63,7 +63,7 @@ class TestSTDPGetWeightsWith2dMasterPop(unittest.TestCase):
         }
 
         # Reduce number of neurons to simulate on each core
-        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
+        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 10)
 
         # Build inhibitory plasticity  model
         stdp_model = sim.STDPMechanism(
@@ -76,11 +76,11 @@ class TestSTDPGetWeightsWith2dMasterPop(unittest.TestCase):
 
         # Build plastic network
         plastic_ex_pop, plastic_ie_projection =\
-            self.build_network(sim.SynapseDynamics(slow=stdp_model), 
+            self.build_network(sim.SynapseDynamics(slow=stdp_model),
                                cell_params)
 
         # Run simulation
-        sim.run(10000)
+        sim.run(1000)
 
         # Get plastic spikes and save to disk
         plastic_spikes = plastic_ex_pop.getSpikes(compatible_output=True)

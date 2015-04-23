@@ -186,7 +186,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                     for synapse_row in sublist.get_rows()])
 
             # check that the max_n_words is greater than zero
-            assert(max_n_words > 0)
+            #assert(max_n_words > 0)
             all_syn_block_sz = \
                 self._calculate_all_synaptic_block_size(sublist,
                                                         max_n_words)
@@ -600,32 +600,30 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
             # Get an entry in the row length table for this length
             row_length = (self._master_pop_table_generator
                               .get_allowed_row_length(max_row_length))
-            if max_row_length == 0 or row_length == 0:
-                raise exceptions.SynapticBlockGenerationException(
-                    "Generated a row length of zero; this is deemed an "
-                    "error and therefore the system will stop")
+            block_start_addr = 0
+            if max_row_length > 0:
 
-            # Determine where the next block will actually start
-            # and generate any required padding
-            next_block_allowed_addr = (self._master_pop_table_generator
-                                           .get_next_allowed_address(
-                                               next_block_start_addr))
-            if next_block_allowed_addr != next_block_start_addr:
+                # Determine where the next block will actually start
+                # and generate any required padding
+                next_block_allowed_addr = (self._master_pop_table_generator
+                                               .get_next_allowed_address(
+                                                   next_block_start_addr))
+                if next_block_allowed_addr != next_block_start_addr:
 
-                # Pad out data file with the added alignment bytes:
-                spec.switch_write_focus(synaptic_matrix_region)
-                spec.set_register_value(
-                    register_id=15,
-                    data=next_block_allowed_addr - next_block_start_addr)
-                spec.write_value(data=0xDD, repeats_register=15,
-                                 data_type=DataType.UINT8)
+                    # Pad out data file with the added alignment bytes:
+                    spec.switch_write_focus(synaptic_matrix_region)
+                    spec.set_register_value(
+                        register_id=15,
+                        data=next_block_allowed_addr - next_block_start_addr)
+                    spec.write_value(data=0xDD, repeats_register=15,
+                                     data_type=DataType.UINT8)
 
-            # Write the synaptic block for the sublist
-            (block_start_addr, next_block_start_addr) = \
-                self.write_synapse_row_info(
-                    sublist, row_io, spec, next_block_allowed_addr,
-                    row_length, synaptic_matrix_region, weight_scales,
-                    n_synapse_type_bits)
+                # Write the synaptic block for the sublist
+                (block_start_addr, next_block_start_addr) = \
+                    self.write_synapse_row_info(
+                        sublist, row_io, spec, next_block_allowed_addr,
+                        row_length, synaptic_matrix_region, weight_scales,
+                        n_synapse_type_bits)
 
             self._master_pop_table_generator.update_master_population_table(
                 spec, block_start_addr, row_length, keys_and_masks,
@@ -657,10 +655,14 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
             post_subvertex, routing_infos, subgraph)
 
         # translate the synaptic block into a sublist of synapse_row_infos
-        synapse_list = \
-            self._translate_synaptic_block_from_memory(
-                synaptic_block, pre_n_atoms, max_row_length, synapse_io,
-                weight_scales)
+        synapse_list = None
+        if max_row_length > 0:
+            synapse_list = \
+                self._translate_synaptic_block_from_memory(
+                    synaptic_block, pre_n_atoms, max_row_length, synapse_io,
+                    weight_scales)
+        else:
+            synapse_list = SynapticList([])
         return synapse_list
 
     def _translate_synaptic_block_from_memory(self, synaptic_block, n_atoms,
@@ -772,41 +774,44 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                 incoming_key_combo, master_pop_base_mem_address,
                 transceiver, post_x, post_y)
 
-        # calculate the synaptic block size in words
-        synaptic_block_size = (pre_n_atoms * 4 *
-                               (constants.SYNAPTIC_ROW_HEADER_WORDS +
-                                maxed_row_length))
+        block = None
+        if maxed_row_length > 0:
 
-        # read in the base address of the synaptic matrix in the app region
-        # table
-        synapse_region_base_address_location = \
-            dsg_utilities.get_region_base_address_offset(
-                app_data_base_address,
-                constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
+            # calculate the synaptic block size in words
+            synaptic_block_size = (pre_n_atoms * 4 *
+                                   (constants.SYNAPTIC_ROW_HEADER_WORDS +
+                                    maxed_row_length))
 
-        # read in the memory address of the synaptic_region base address
-        synapse_region_base_address = helpful_functions.read_and_convert(
-            post_x, post_y, synapse_region_base_address_location, 4,
-            "<I", transceiver)
+            # read in the base address of the synaptic matrix in the app region
+            # table
+            synapse_region_base_address_location = \
+                dsg_utilities.get_region_base_address_offset(
+                    app_data_base_address,
+                    constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
-        # the base address of the synaptic block in absolute terms is the app
-        # base, plus the synaptic matrix base plus the offset
-        synaptic_block_base_address = (app_data_base_address +
-                                       synapse_region_base_address +
-                                       synaptic_block_base_address_offset)
+            # read in the memory address of the synaptic_region base address
+            synapse_region_base_address = helpful_functions.read_and_convert(
+                post_x, post_y, synapse_region_base_address_location, 4,
+                "<I", transceiver)
 
-        # read in and return the synaptic block
-        blocks = list(transceiver.read_memory(
-            post_x, post_y, synaptic_block_base_address, synaptic_block_size))
+            # the base address of the synaptic block in absolute terms is the app
+            # base, plus the synaptic matrix base plus the offset
+            synaptic_block_base_address = (app_data_base_address +
+                                           synapse_region_base_address +
+                                           synaptic_block_base_address_offset)
 
-        block = bytearray()
-        for message_block in blocks:
-            block.extend(message_block)
+            # read in and return the synaptic block
+            blocks = list(transceiver.read_memory(
+                post_x, post_y, synaptic_block_base_address, synaptic_block_size))
 
-        if len(block) != synaptic_block_size:
-            raise exceptions.SynapticBlockReadException(
-                "Not enough data has been read"
-                " (aka, something funkky happened)")
+            block = bytearray()
+            for message_block in blocks:
+                block.extend(message_block)
+
+            if len(block) != synaptic_block_size:
+                raise exceptions.SynapticBlockReadException(
+                    "Not enough data has been read"
+                    " (aka, something funkky happened)")
         return block, maxed_row_length
 
     # inhirrted from AbstractProvidesIncomingEdgeConstraints

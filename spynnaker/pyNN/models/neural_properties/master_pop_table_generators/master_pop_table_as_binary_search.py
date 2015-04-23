@@ -2,6 +2,8 @@
 master pop entry
 """
 
+from spinn_front_end_common.utilities import helpful_functions
+
 # spynnaker imports
 from spynnaker.pyNN.models.neural_properties.master_pop_table_generators\
     .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
@@ -87,41 +89,38 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             self, incoming_key_combo, master_pop_base_mem_address, txrx,
             chip_x, chip_y):
 
-        if self._entries is None:
+        # get entries in master pop
+        n_entries = helpful_functions.read_and_convert(
+            chip_x, chip_y, master_pop_base_mem_address, 4, "<I", txrx)
+        n_bytes = (n_entries *
+                   _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
 
-            # get entries in master pop
-            n_entries = txrx.read_memory(chip_x, chip_y,
-                                         master_pop_base_mem_address, 4)[0]
-            n_bytes = (n_entries *
-                       _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
+        # read in master pop structure
+        master_pop_structure = txrx.read_memory(
+            chip_x, chip_y, master_pop_base_mem_address + 4, n_bytes)
+        full_data = bytearray()
+        for data in master_pop_structure:
+            full_data.extend(data)
 
-            # read in master pop structure
-            master_pop_structure = txrx.read_memory(
-                chip_x, chip_y, master_pop_base_mem_address + 4, n_bytes)
-            full_data = bytearray()
-            for data in master_pop_structure:
-                full_data.extend(data)
+        # convert into a numpy array
+        master_pop_structure = numpy.frombuffer(
+            dtype='uint8', buffer=full_data).view(dtype='<u4')
 
-            # convert into a numpy array
-            master_pop_structure = numpy.frombuffer(
-                dtype='uint8', buffer=full_data).view(dtype='<u4')[0]
+        entries = list()
+        for index in range(0, n_bytes / 4, 3):
+            key = master_pop_structure[index]
+            mask = master_pop_structure[index + 1]
+            address_and_row_length = master_pop_structure[index + 2]
+            entries.append(_MasterPopEntry(
+                key, mask, address_and_row_length >> 8,
+                address_and_row_length & 0xFF))
 
-            self._entries = list()
-            for index in range(0, n_bytes / 4, 3):
-                key = master_pop_structure[index]
-                mask = master_pop_structure[index + 1]
-                address_and_row_length = master_pop_structure[index + 2]
-                self._entries.append(_MasterPopEntry(
-                    key, mask, address_and_row_length >> 8,
-                    address_and_row_length & 0xFF))
-                print key, mask, address_and_row_length
-
-        entry = self._locate_entry(incoming_key_combo)
+        entry = self._locate_entry(entries, incoming_key_combo)
 
         max_row_size = entry.row_length
         return max_row_size, entry.address * 4
 
-    def _locate_entry(self, key):
+    def _locate_entry(self, entries, key):
         """ searches the binary tree structure for the correct entry.
 
         :param key: the key to search the master pop table for a given entry
@@ -130,11 +129,11 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :rtype: _MasterPopEntry
         """
         imin = 0
-        imax = len(self._entries)
+        imax = len(entries)
 
         while imin < imax:
             imid = (imax + imin) / 2
-            entry = self._entries[imid]
+            entry = entries[imid]
             if key & entry.mask == entry.key_combo:
                 return entry
             if key > entry.key_combo:
