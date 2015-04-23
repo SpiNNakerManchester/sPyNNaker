@@ -162,13 +162,13 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
                     for timeStamp in sorted(self._spike_times[neuron]):
                         time_stamp_in_ticks = int((timeStamp * 1000.0) /
                                                   self._machine_time_step)
-                        send_buffer.add_key(time_stamp_in_ticks, neuron)
+                        send_buffer.add_key(time_stamp_in_ticks,
+                                            neuron - vertex_slice.lo_atom)
             else:
 
                 # This is in official PyNN format, all neurons use the
                 # same list:
-                neuron_list = range(vertex_slice.lo_atom,
-                                    vertex_slice.hi_atom + 1)
+                neuron_list = range(vertex_slice.n_atoms)
                 for timeStamp in sorted(self._spike_times):
                     time_stamp_in_ticks = int((timeStamp * 1000.0) /
                                               self._machine_time_step)
