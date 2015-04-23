@@ -598,9 +598,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._execute_tag_allocator(pacman_report_state)
 
         # execute pynn subedge pruning
-        #self._partitioned_graph, self._graph_mapper = \
-        #    GraphEdgeFilter(self._report_default_directory)\
-        #    .run(self._partitioned_graph, self._graph_mapper)
+        self._partitioned_graph, self._graph_mapper = \
+            GraphEdgeFilter(self._report_default_directory)\
+            .run(self._partitioned_graph, self._graph_mapper)
 
         # execute key allocator
         self._execute_key_allocator(pacman_report_state)

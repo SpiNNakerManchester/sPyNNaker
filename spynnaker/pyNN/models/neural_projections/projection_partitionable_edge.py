@@ -95,6 +95,8 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
             subedges = \
                 graph_mapper.get_partitioned_edges_from_partitionable_edge(
                     self)
+            if subedges is None:
+                subedges = list()
 
             synaptic_list = [SynapseRowInfo([], [], [], [])
                              for _ in range(self._pre_vertex.n_atoms)]
