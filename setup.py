@@ -32,10 +32,10 @@ setup(
     package_data={'spynnaker.pyNN.model_binaries': ['*.aplx'],
                   'spynnaker': ['spynnaker.cfg'],
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template']},
-    install_requires=['SpiNNMachine >= 2015.003-rc-01',
-                      'SpiNNMan >= 2015.003-rc-02',
-                      'SpiNNaker_PACMAN >= 2015.003-rc-01',
-                      'SpiNNaker_DataSpecification >= 2015.003-rc-01',
-                      'SpiNNFrontEndCommon >= 2015.001-rc-03',
+    install_requires=['SpiNNMachine >= 2015.003',
+                      'SpiNNMan >= 2015.003',
+                      'SpiNNaker_PACMAN >= 2015.003',
+                      'SpiNNaker_DataSpecification >= 2015.003',
+                      'SpiNNFrontEndCommon >= 2015.001',
                       'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
 )
