@@ -84,6 +84,13 @@ bool population_table_get_address(spike_t spike, address_t* row_address,
             uint32_t neuron_id = _get_neuron_id(entry, spike);
             uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
             uint32_t neuron_offset = neuron_id * stride * sizeof(uint32_t);
+            if (row_length == 0) {
+                log_debug(
+                    "spike %u (= %x): population found in master population"
+                    "table but row length is 0",
+                    spike, spike);
+                return false;
+            }
             *row_address = (address_t) (block_address + neuron_offset);
             *n_bytes_to_transfer = stride * sizeof(uint32_t);
             log_debug("spike = %08x, entry_index = %u, block_address = 0x%.8x,"
