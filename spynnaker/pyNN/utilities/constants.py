@@ -62,6 +62,12 @@ IZK_CURRENT_EXP_CORE_APPLICATION_ID = 0xAC8
 # please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
 # for other core application ids.
 
+# master population table magic
+MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
+MASTER_POP_BINARY_SEARCH = 0xBB2
+
+
+
 EDGES = Enum(
     value="EDGES",
     names=[("EAST", 0),
