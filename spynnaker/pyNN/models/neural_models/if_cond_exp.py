@@ -1,24 +1,26 @@
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
-    AbstractPopulationVertex
+"""
+IFConductanceExponentialPopulation
+"""
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_population_vertex import AbstractPopulationVertex
 from data_specification.enums.data_type import DataType
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
-    abstract_exp_population_vertex import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
-    abstract_integrate_and_fire_properties \
-    import AbstractIntegrateAndFireProperties
+from spynnaker.pyNN.models.components.synapse_shape_components.\
+    exponential_component import ExponentialComponent
+from spynnaker.pyNN.models.components.model_components.\
+    integrate_and_fire_component import IntegrateAndFireComponent
+from spynnaker.pyNN.models.components.inputs_components.conductance_component \
+    import ConductanceComponent
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
-    abstract_conductance_vertex import AbstractConductanceVertex
 
 
 class IFConductanceExponentialPopulation(
-        AbstractExponentialPopulationVertex, AbstractConductanceVertex,
-        AbstractIntegrateAndFireProperties,
+        ExponentialComponent, ConductanceComponent, IntegrateAndFireComponent,
         AbstractPopulationVertex):
+    """
+    IFConductanceExponentialPopulation
+    """
 
-    CORE_APP_IDENTIFIER = constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
@@ -29,12 +31,12 @@ class IFConductanceExponentialPopulation(
                  tau_syn_I=5.0, tau_refrac=0.1, i_offset=0, v_init=None):
 
         # Instantiate the parent classes
-        AbstractConductanceVertex.__init__(self, n_neurons, e_rev_E=e_rev_E,
-                                           e_rev_I=e_rev_I)
-        AbstractExponentialPopulationVertex.__init__(
+        ConductanceComponent.__init__(
+            self, n_neurons, e_rev_E=e_rev_E, e_rev_I=e_rev_I)
+        ExponentialComponent.__init__(
             self, n_neurons=n_neurons, tau_syn_E=tau_syn_E,
             tau_syn_I=tau_syn_I, machine_time_step=machine_time_step)
-        AbstractIntegrateAndFireProperties.__init__(
+        IntegrateAndFireComponent.__init__(
             self, atoms=n_neurons, cm=cm, tau_m=tau_m, i_offset=i_offset,
             v_init=v_init, v_reset=v_reset, v_rest=v_rest, v_thresh=v_thresh,
             tau_refrac=tau_refrac)
@@ -48,22 +50,31 @@ class IFConductanceExponentialPopulation(
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
-            weight_scale=AbstractConductanceVertex.WEIGHT_SCALE)
-        self._executable_constant = \
-            IFConductanceExponentialPopulation.CORE_APP_IDENTIFIER
+            weight_scale=ConductanceComponent.WEIGHT_SCALE)
 
     @property
     def model_name(self):
+        """
+        human readable name for the model
+        :return:
+        """
         return "IF_cond_exp"
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
+        """
+        helper emthod for setting max atoms per core for a model
+        :param new_value:
+        :return:
+        """
         IFConductanceExponentialPopulation.\
             _model_based_max_atoms_per_core = new_value
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         """
         Gets the CPU requirements for a range of atoms
+        :param vertex_slice: the vertex slice of atoms for the cup usage
+        :param graph: the partitionable graph
         """
         return 781 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
@@ -132,16 +143,36 @@ class IFConductanceExponentialPopulation(
         ]
 
     def is_population_vertex(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True
 
     def is_integrate_and_fire_vertex(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True
 
     def is_conductance(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True
 
     def is_exp_vertex(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True
 
     def is_recordable(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True

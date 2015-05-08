@@ -5,7 +5,7 @@ from spinnman.connections.udp_packet_connections.eieio_command_connection \
     import EieioCommandConnection
 
 # spynnaker imports
-from spynnaker.pyNN.models.abstract_models.\
+from spynnaker.pyNN.models.components.neuron_components.\
     abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
 from spynnaker.pyNN.utilities import constants as spynnaker_constants

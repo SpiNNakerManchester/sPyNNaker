@@ -1,5 +1,6 @@
 #include "../common/neuron-typedefs.h"
 #include "../common/in_spikes.h"
+#include "../common/constants.h"
 
 #include <bit_field.h>
 #include <data_specification.h>
@@ -11,7 +12,6 @@
 
 // Constants
 #define DELAY_STAGE_LENGTH  16
-#define APPLICATION_MAGIC_NUMBER 0xAC4
 
 // Globals
 static uint32_t key = 0;
@@ -37,6 +37,13 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
     v++;
     return v;
 }
+
+//! human readable definitions of each region in SDRAM
+typedef enum regions_e {
+    TIMINGS_REGION,
+    COMPONENTS_REGION,
+    DELAY_PARAMS,
+} regions_e;
 
 static bool read_parameters(address_t address) {
 
@@ -116,13 +123,27 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details
     if (!simulation_read_timing_details(
-            data_specification_get_region(0, address),
-            APPLICATION_MAGIC_NUMBER, timer_period, &simulation_ticks)) {
+            data_specification_get_region(TIMINGS_REGION, address),
+            timer_period, &simulation_ticks)) {
+        return false;
+    }
+
+    // get the components that build up a delay extension
+    uint32_t components[1];
+    if (!simulation_read_components(
+            data_specification_get_region(COMPONENTS_REGION, address),
+            1, components)) {
+        return false;
+    }
+
+    // verify the components are correct
+    if (components[0] != DELAY_MAGIC_NUMBER){
         return false;
     }
 
     // Get the parameters
-    if (!read_parameters(data_specification_get_region(1, address))) {
+    if (!read_parameters(data_specification_get_region(DELAY_PARAMS,
+                                                       address))) {
         return false;
     }
 

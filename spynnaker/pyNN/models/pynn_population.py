@@ -3,7 +3,7 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint\
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 
-from spynnaker.pyNN.models.abstract_models.\
+from spynnaker.pyNN.models.components.neuron_components.\
     abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
 from spynnaker.pyNN.utilities.parameters_surrogate\

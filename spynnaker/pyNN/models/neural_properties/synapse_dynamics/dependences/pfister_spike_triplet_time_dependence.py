@@ -6,6 +6,8 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
     import plasticity_helpers
 
 import logging
+from spynnaker.pyNN.utilities import constants
+
 logger = logging.getLogger(__name__)
 
 # Constants
@@ -102,3 +104,11 @@ class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
     @property
     def tau_y(self):
         return self._tau_y
+
+    def get_component_magic_number_identifiers(self):
+        """
+        returns a iteraable of values that are unque identifiers for bits of a
+        compoent or its entire components.
+        :return:
+        """
+        return [constants.TIME_DEPENDENCY_PFISTER_SPIKE_TRIPLET_MAGIC_NUMBER]

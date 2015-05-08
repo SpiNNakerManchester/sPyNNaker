@@ -40,13 +40,13 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     of the maximum delays of a neuron (typically 16 or 32)
     """
 
-    CORE_APP_IDENTIFIER = constants.DELAY_EXTENSION_CORE_APPLICATION_ID
+    CORE_APP_IDENTIFIER = constants.DELAY_MAGIC_NUMBER
 
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
-        names=[('SYSTEM', 0),
-               ('DELAY_PARAMS', 1),
-               ('SPIKE_HISTORY', 2)])
+        names=[('TIMINGS', 0),
+               ('COMPONENTS', 1),
+               ('DELAY_PARAMS', 2)])
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
@@ -156,16 +156,26 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         delay_params_sz = 4 * (delay_params_header_words +
                                (num_delay_blocks * block_len_words))
 
+        component_indetifers = list()
+        component_indetifers.append(self.CORE_APP_IDENTIFIER)
+
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
-            size=constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
-            label='setup')
+            region=self._DELAY_EXTENSION_REGIONS.TIMINGS.value,
+            size=constants.POPULATION_TIMINGS_REGION_BYTES,
+            label="timings"
+        )
+
+        spec.reserve_memory_region(
+            region=self._DELAY_EXTENSION_REGIONS.COMPONENTS.value,
+            size=len(component_indetifers) * 4,
+            label="components"
+        )
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
-        self.write_setup_info(spec, 0)
+        self.write_setup_info(spec, component_indetifers)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -186,14 +196,16 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         spec.end_specification()
         data_writer.close()
 
-    def write_setup_info(self, spec, spike_history_region_sz):
+    def write_setup_info(self, spec, component_constants):
         """
         """
 
         # Write this to the system region (to be picked up by the simulation):
-        self._write_basic_setup_info(
-            spec, self.CORE_APP_IDENTIFIER,
-            self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
+        self._write_timings_region_info(
+            spec, self._DELAY_EXTENSION_REGIONS.TIMINGS.value)
+        self._write_component_to_region(
+            spec, self._DELAY_EXTENSION_REGIONS.COMPONENTS.value,
+            component_constants)
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
 

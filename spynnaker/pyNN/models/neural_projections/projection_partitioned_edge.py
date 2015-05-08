@@ -1,7 +1,7 @@
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
     MultiCastPartitionedEdge
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
-    AbstractFilterableEdge
+from spynnaker.pyNN.models.common_objects.abstract_filterable_edge\
+    import AbstractFilterableEdge
 
 
 class ProjectionPartitionedEdge(MultiCastPartitionedEdge,

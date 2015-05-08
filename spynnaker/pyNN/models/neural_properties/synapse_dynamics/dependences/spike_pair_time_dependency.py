@@ -6,6 +6,8 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
     import plasticity_helpers
 
 import logging
+from spynnaker.pyNN.utilities import constants
+
 logger = logging.getLogger(__name__)
 
 # Constants
@@ -85,3 +87,11 @@ class SpikePairTimeDependency(AbstractTimeDependency):
     @property
     def nearest(self):
         return self._nearest
+
+    def get_component_magic_number_identifiers(self):
+        """
+        returns a iteraable of values that are unque identifiers for bits of a
+        compoent or its entire components.
+        :return:
+        """
+        return [constants.TIME_DEPENDENCY_SPIKE_PAIR_MAGIC_NUMBER]

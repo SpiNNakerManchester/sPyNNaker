@@ -1,6 +1,7 @@
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_weight_dependency import AbstractWeightDependency
+from spynnaker.pyNN.utilities import constants
 
 
 class MultiplicativeWeightDependence(AbstractWeightDependency):
@@ -53,3 +54,11 @@ class MultiplicativeWeightDependence(AbstractWeightDependency):
     @property
     def vertex_executable_suffix(self):
         return "multiplicative"
+
+    def get_component_magic_number_identifiers(self):
+        """
+        returns a iteraable of values that are unque identifiers for bits of a
+        compoent or its entire components.
+        :return:
+        """
+        return [constants.WEIGHT_DEPENDENCY_MULTIPLICATIVE_MAGIC_NUMBER]

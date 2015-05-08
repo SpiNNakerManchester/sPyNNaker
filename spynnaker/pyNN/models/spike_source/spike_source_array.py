@@ -4,6 +4,7 @@ SpikeSourceArray
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import utility_calls
 from spinn_front_end_common.abstract_models\
     .abstract_outgoing_edge_same_contiguous_keys_restrictor\
     import AbstractOutgoingEdgeSameContiguousKeysRestrictor
@@ -52,7 +53,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
     """
 
     CORE_APP_IDENTIFIER = (front_end_common_constants
-                           .SPIKE_INJECTOR_CORE_APPLICATION_ID)
+                           .REVERSE_IP_TAG_MULTICAST_SOURCE_MAGIC_NUMBER)
     _CONFIGURATION_REGION_SIZE = 36
 
     # limited to the n of the x,y,p,n key format
@@ -70,6 +71,10 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             ip_address=None, board_address=None,
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
             constraints=None, label="SpikeSourceArray"):
+
+        utility_calls.unused(spikes_per_second)
+        utility_calls.unused(ring_buffer_sigma)
+
         if ip_address is None:
             ip_address = config.get("Buffers", "receive_buffer_host")
         if port is None:
@@ -116,9 +121,9 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
         """
-
-        :param new_value:
-        :return:
+        helper method for setting the models max atoms
+        :param new_value: the new value for max atoms per core for spike sources
+        :return: none
         """
         SpikeSourceArray._model_based_max_atoms_per_core = new_value
 
@@ -150,7 +155,6 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         1) Official PyNN format - single list that is used for all neurons
         2) SpiNNaker format - list of lists, one per neuron
         """
-        send_buffer = None
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         if key not in self._send_buffers:
             send_buffer = BufferedSendingRegion()
@@ -190,14 +194,14 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             send_buffer = self._send_buffers[key]
         return send_buffer
 
-    def _reserve_memory_regions(self, spec, spike_region_size):
+    def _reserve_memory_regions(self, spec, spike_region_size,
+                                system_region_size):
         """ Reserve memory for the system, indices and spike data regions.
             The indices region will be copied to DTCM by the executable.
         """
         spec.reserve_memory_region(
             region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
-            size=constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
-            label='systemInfo')
+            size=system_region_size, label='systemInfo')
 
         spec.reserve_memory_region(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value,
@@ -207,7 +211,8 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
             size=spike_region_size, label='SpikeDataRegion', empty=True)
 
-    def _write_setup_info(self, spec, spike_buffer_region_size, ip_tags):
+    def _write_setup_info(self, spec, spike_buffer_region_size, ip_tags,
+                          component_indetifers):
         """
         Write information used to control the simulation and gathering of
         results. Currently, this means the flag word used to signal whether
@@ -225,9 +230,11 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             Bit 5: Output neuron potential
             Bit 6: Output spike rate
         """
-        self._write_basic_setup_info(
-            spec, SpikeSourceArray.CORE_APP_IDENTIFIER,
-            self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+        self._write_timings_region_info(
+            spec, self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+        self._write_component_to_region(
+            spec, self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
+            component_indetifers)
 
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value)
@@ -259,20 +266,22 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
-        single SpikeSource Array on one core.
-        :param subvertex:
-        :param placement:
-        :param subgraph:
-        :param graph:
-        :param routing_info:
-        :param hostname:
-        :param graph_mapper:
-        :param report_folder:
-        :param ip_tags:
-        :param reverse_ip_tags:
-        :param write_text_specs:
-        :param application_run_time_folder:
-        :return:
+        single Application Monitor on one core.
+        :param subvertex: the partitioned vertex to write the dataspec for
+        :param placement: the placement object
+        :param subgraph: the partitioned graph object
+        :param graph: the partitionable graph object
+        :param routing_info: the routing infos object
+        :param hostname: the hostname of the machine
+        :param graph_mapper: the graph mapper
+        :param report_folder: the folder to write reports in
+        :param ip_tags: the iptags object
+        :param reverse_ip_tags: the reverse iptags object
+        :param write_text_specs: bool saying if we should write text
+        specifications
+        :param application_run_time_folder: where application data should
+         be written to
+        :return: nothing
         """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
@@ -288,10 +297,21 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         spec.comment("\nReserving memory space for spike data region:\n\n")
         spike_buffer = self._get_spike_send_buffer(
             graph_mapper.get_subvertex_slice(subvertex))
-        self._reserve_memory_regions(spec, spike_buffer.buffer_size)
+
+        # collect assoicated indentifers
+        component_indetifers = list()
+        component_indetifers.append(self.CORE_APP_IDENTIFIER)
+
+        # Calculate the size of the tables to be reserved in SDRAM:
+        system_region_size = \
+            (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS +
+             len(component_indetifers)) * 4
+
+        self._reserve_memory_regions(spec, spike_buffer.buffer_size,
+                                     system_region_size)
 
         self._write_setup_info(
-            spec, spike_buffer.buffer_size, ip_tags)
+            spec, spike_buffer.buffer_size, ip_tags, component_indetifers)
 
         # End-of-Spec:
         spec.end_specification()
@@ -299,18 +319,20 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
     def get_binary_file_name(self):
         """
-
-        :return:
+        return the name of the model binary as a string
         """
         return "reverse_iptag_multicast_source.aplx"
 
     # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        """
+        """ returns how much cpu is used by the model for a given number of
+         atoms
 
-        :param vertex_slice:
-        :param graph:
-        :return:
+        :param vertex_slice: the slice from the partitionable vertex that this
+         model needs to deduce how many reosruces itll use
+        :param graph: the partitionable graph
+        :return: the size of cpu this model si expecting to use for the
+        number of atoms.
         """
         return 0
 
@@ -331,11 +353,14 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
                 SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
-        """
+        """ returns how much dtcm is used by the model for a given number of
+         atoms
 
-        :param vertex_slice:
-        :param graph:
-        :return:
+        :param vertex_slice: the slice from the partitionable vertex that this
+         model needs to deduce how many reosruces itll use
+        :param graph: the partitionable graph
+        :return: the size of dtcm this model si expecting to use for the
+        number of atoms.
         """
         return 0
 

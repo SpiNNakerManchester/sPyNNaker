@@ -1,10 +1,10 @@
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions\
     import generate_parameter
-from spynnaker.pyNN.models.abstract_models.\
+from spynnaker.pyNN.models.components.neuron_components.\
     abstract_partitionable_population_vertex import AbstractPartitionableVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_population_recordable_vertex\
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_population_recordable_vertex\
     import AbstractPopulationRecordableVertex
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
@@ -40,7 +40,8 @@ class SpikeSourcePoisson(
     a pynn_population.py of virtual neurons each with its own parameters.
     """
 
-    CORE_APP_IDENTIFIER = constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
+    CORE_APP_IDENTIFIER = \
+        constants.SPIKE_SOURCE_POISSON_MAGIC_NUMBER
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="_POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
@@ -116,8 +117,8 @@ class SpikeSourcePoisson(
                 (((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1) *
                  PARAMS_WORDS_PER_NEURON)) * 4
 
-    def reserve_memory_regions(self, spec, setup_sz, poisson_params_sz,
-                               spike_hist_buff_sz):
+    def reserve_memory_regions(
+            self, spec, setup_sz, poisson_params_sz, spike_hist_buff_sz):
         """
         Reserve memory regions for poisson source parameters
         and output buffer.
@@ -144,7 +145,7 @@ class SpikeSourcePoisson(
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
                 empty=True)
 
-    def write_setup_info(self, spec, spike_history_region_sz):
+    def write_setup_info(self, spec, spike_history_region_sz, identifiers):
         """
         Write information used to control the simulationand gathering of
         results.
@@ -160,12 +161,15 @@ class SpikeSourcePoisson(
 
         :param spec:
         :param spike_history_region_sz:
+        :param identifiers:
         :return:
         """
 
-        self._write_basic_setup_info(
-            spec, SpikeSourcePoisson.CORE_APP_IDENTIFIER,
-            self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+        self._write_timings_region_info(
+            spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+        self._write_component_to_region(
+            spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
+            identifiers)
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
@@ -366,16 +370,20 @@ class SpikeSourcePoisson(
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
+        poisson_params_sz = self.get_params_bytes(vertex_slice)
+
+        component_indetifers = list()
+        component_indetifers.append(SpikeSourcePoisson.CORE_APP_IDENTIFIER)
+
         # Basic setup plus 8 bytes for recording flags and recording size
         setup_sz = ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) + 8)
-
-        poisson_params_sz = self.get_params_bytes(vertex_slice)
+        setup_sz += len(component_indetifers) * 4
 
         # Reserve SDRAM space for memory areas:
         self.reserve_memory_regions(
             spec, setup_sz, poisson_params_sz, spike_hist_buff_sz)
 
-        self.write_setup_info(spec, spike_hist_buff_sz)
+        self.write_setup_info(spec, spike_hist_buff_sz, component_indetifers)
 
         # Every subedge should have the same key
         keys_and_masks = routing_info.get_keys_and_masks_from_subedge(

@@ -5,6 +5,8 @@ from spynnaker.pyNN.models.neural_properties.master_pop_table_generators\
     .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 import logging
+from spynnaker.pyNN.utilities import constants
+
 logger = logging.getLogger(__name__)
 
 
@@ -22,8 +24,9 @@ class MasterPopTableAsHashTable(AbstractMasterPopTableFactory):
         """
         raise NotImplementedError
 
-    def update_master_population_table(self, spec, block_start_addr, row_index,
-                                       key, master_pop_table_region, mask):
+    def update_master_population_table(
+            self, spec, block_start_addr, row_length, keys_and_masks,
+            master_pop_table_region):
         """
 
         :param spec:
@@ -87,3 +90,11 @@ class MasterPopTableAsHashTable(AbstractMasterPopTableFactory):
         :return:
         """
         raise NotImplementedError
+
+    def get_component_magic_number_identifiers(self):
+        """
+        refer to
+        abstract_master_pop_table_factory.get_component_magic_number_identifier
+        :return:
+        """
+        return [constants.MASTER_POP_HASH_TABLE_MAGIC_NUMBER]

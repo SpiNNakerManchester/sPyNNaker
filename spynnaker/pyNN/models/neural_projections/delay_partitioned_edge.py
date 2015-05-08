@@ -1,11 +1,12 @@
+import logging
+
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
+from spynnaker.pyNN.models.common_objects.abstract_filterable_edge\
     import AbstractFilterableEdge
 
-import logging
 logger = logging.getLogger(__name__)
 
 

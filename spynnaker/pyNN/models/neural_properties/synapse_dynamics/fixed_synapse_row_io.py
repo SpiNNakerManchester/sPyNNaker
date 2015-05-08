@@ -1,17 +1,22 @@
-import numpy
-
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     abstract_rules.abstract_synapse_row_io import AbstractSynapseRowIo
 from spynnaker.pyNN.models.neural_properties.synapse_row_info import \
     SynapseRowInfo
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.common_objects.\
+    abstract_requires_component_magic_number import \
+    AbstractRequiresComponentMagicNumber
+from spynnaker.pyNN.utilities import constants
+
+import numpy
 
 # ABS the noinspections are due to a problem mapping from non static to static
 # methods. Current thoughts from rowley and i are that itll clean up in the
 # wash and that its just pycharm being stupid again
 
 
-class FixedSynapseRowIO(AbstractSynapseRowIo):
+class FixedSynapseRowIO(AbstractSynapseRowIo,
+                        AbstractRequiresComponentMagicNumber):
 
     zero_weight_error_displayed = False
 
@@ -120,3 +125,10 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
 
         return SynapseRowInfo(target_indices, weights, delays_in_ticks,
                               synapse_types)
+
+    def get_component_magic_number_identifiers(self):
+        """
+        override from AbstractRequiresComponentMagicNumber
+        :return:
+        """
+        return [constants.SYNAPSE_STRUCTURE_FIXED]

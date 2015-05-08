@@ -11,6 +11,7 @@ from pacman.utilities.field import Field
 from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
     abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities import constants
 
 # spinn front end common inports
 from spinn_front_end_common.utilities import helpful_functions
@@ -311,3 +312,11 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         fields.append(Field(0, 17, 0x0000F800))
         constraints.append(KeyAllocatorFixedMaskConstraint(0xFFFFF800, fields))
         return constraints
+
+    def get_component_magic_number_identifiers(self):
+        """
+        refer to
+        abstract_master_pop_table_factory.get_component_magic_number_identifier
+        :return:
+        """
+        return [constants.MASTER_POP_2DARRAY_MAGIC_NUMBER]

@@ -1,22 +1,28 @@
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
+"""
+IFCurrentDualExponentialPopulation
+"""
+from spynnaker.pyNN.models.components.inputs_components.\
+    current_component import CurrentComponent
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_population_vertex import \
     AbstractPopulationVertex
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
-    abstract_dual_exponential_vertex import AbstractDualExponentialVertex
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
-    abstract_integrate_and_fire_properties \
-    import AbstractIntegrateAndFireProperties
+from spynnaker.pyNN.models.components.synapse_shape_components.\
+    dual_exponential_component import DualExponentialComponent
+from spynnaker.pyNN.models.components.model_components.\
+    integrate_and_fire_component import IntegrateAndFireComponent
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 
 from data_specification.enums.data_type import DataType
 
 
-class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
-                                         AbstractIntegrateAndFireProperties,
-                                         AbstractPopulationVertex):
+class IFCurrentDualExponentialPopulation(
+        DualExponentialComponent, IntegrateAndFireComponent, CurrentComponent,
+        AbstractPopulationVertex):
+    """
+    IFCurrentDualExponentialPopulation
+    """
 
-    CORE_APP_IDENTIFIER = constants.IF_CURRENT_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
@@ -27,11 +33,12 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                  tau_refrac=0.1, i_offset=0, v_init=None):
 
         # Instantiate the parent classes
-        AbstractDualExponentialVertex.__init__(
+        CurrentComponent.__init__(self)
+        DualExponentialComponent.__init__(
             self, n_neurons=n_neurons, tau_syn_E=tau_syn_E,
             tau_syn_E2=tau_syn_E2, tau_syn_I=tau_syn_I,
             machine_time_step=machine_time_step)
-        AbstractIntegrateAndFireProperties.__init__(
+        IntegrateAndFireComponent.__init__(
             self, atoms=n_neurons, cm=cm, tau_m=tau_m, i_offset=i_offset,
             v_init=v_init, v_reset=v_reset, v_rest=v_rest, v_thresh=v_thresh,
             tau_refrac=tau_refrac)
@@ -44,15 +51,22 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma)
-        self._executable_constant = \
-            IFCurrentDualExponentialPopulation.CORE_APP_IDENTIFIER
 
     @property
     def model_name(self):
+        """
+        human readable name for the model
+        :return:
+        """
         return "IF_curr_dual_exp"
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
+        """
+        helper method for the max atoms per core for a model
+        :param new_value:
+        :return:
+        """
         IFCurrentDualExponentialPopulation.\
             _model_based_max_atoms_per_core = new_value
 
@@ -87,13 +101,36 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
         ]
 
     def is_population_vertex(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True
 
     def is_duel_exponential_vertex(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True
 
     def is_integrate_and_fire_vertex(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True
 
     def is_recordable(self):
+        """
+        helper method for isinstance
+        :return:
+        """
+        return True
+
+    def is_current_component(self):
+        """
+        helper method for isinstance
+        :return:
+        """
         return True

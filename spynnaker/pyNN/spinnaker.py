@@ -67,16 +67,16 @@ from spynnaker.pyNN.spynnaker_configurations import \
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
-    AbstractVirtualVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_send_me_multicast_commands_vertex \
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_virtual_vertex import AbstractVirtualVertex
+from spynnaker.pyNN.models.common_objects.\
+    abstract_send_me_multicast_commands_vertex \
     import AbstractSendMeMulticastCommandsVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_vertex_with_dependent_vertices \
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spynnaker.pyNN.models.abstract_models.buffer_models\
+from spynnaker.pyNN.models.buffer_models\
     .abstract_sends_buffers_from_host_partitioned_vertex\
     import AbstractSendsBuffersFromHostPartitionedVertex
 

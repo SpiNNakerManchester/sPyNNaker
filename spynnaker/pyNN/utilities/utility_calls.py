@@ -121,6 +121,12 @@ def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time):
     return result
 
 
-
+def unused(param):
+    """
+    helper method for stating params are not being used
+    :param param: the param to not use
+    :return:
+    """
+    pass
 
 

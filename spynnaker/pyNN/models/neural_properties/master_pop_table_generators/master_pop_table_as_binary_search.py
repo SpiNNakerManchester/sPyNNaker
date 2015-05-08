@@ -16,6 +16,7 @@ import logging
 import numpy
 import sys
 import math
+from spynnaker.pyNN.utilities import constants
 
 logger = logging.getLogger(__name__)
 
@@ -243,3 +244,12 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :return:
         """
         return list()
+
+
+    def get_component_magic_number_identifiers(self):
+        """
+        refer to
+        abstract_master_pop_table_factory.get_component_magic_number_identifier
+        :return:
+        """
+        return [constants.MASTER_POP_BINARY_SEARCH_MAGIC_NUMBER]

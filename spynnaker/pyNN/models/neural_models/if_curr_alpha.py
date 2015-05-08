@@ -1,15 +1,15 @@
 """
 IFCurrentAlphaPopulation
 """
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_population_vertex import \
     AbstractPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
-    abstract_integrate_and_fire_properties \
-    import AbstractIntegrateAndFireProperties
+from spynnaker.pyNN.models.components.model_components.\
+    integrate_and_fire_component import IntegrateAndFireComponent
 from spynnaker.pyNN import exceptions
 
 
-class IFCurrentAlphaPopulation(AbstractIntegrateAndFireProperties,
+class IFCurrentAlphaPopulation(IntegrateAndFireComponent,
                                AbstractPopulationVertex):
     """
     IFCurrentAlphaPopulation

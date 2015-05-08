@@ -1,6 +1,15 @@
+"""
+AbstractMasterPopTableFactory
+"""
+
 # spinnman imports
 from spinnman import exceptions as spinnman_exceptions
+
+# spynnaker imports
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.common_objects.\
+    abstract_requires_component_magic_number import \
+    AbstractRequiresComponentMagicNumber
 
 # dsg imports
 from data_specification import utility_calls as dsg_utility
@@ -12,11 +21,15 @@ from six import add_metaclass
 from abc import abstractmethod
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractMasterPopTableFactory(object):
+class AbstractMasterPopTableFactory(AbstractRequiresComponentMagicNumber):
+    """
+    factory class for all master pop tables.
+    """
 
     def __init__(self):
         pass

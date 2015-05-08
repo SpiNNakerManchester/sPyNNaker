@@ -8,6 +8,7 @@
 #include "../../common/out_spikes.h"
 #include "../../common/recording.h"
 #include "../../common/maths-util.h"
+#include "../../common/constants.h"
 
 #include <data_specification.h>
 #include <debug.h>
@@ -15,10 +16,6 @@
 #include <simulation.h>
 #include <spin1_api.h>
 #include <string.h>
-
-//! the magic number thats expected when reading data from SDRAM during
-//! Initialisation to verify that the data is for this model type.
-#define APPLICATION_MAGIC_NUMBER 0xAC3
 
 //! data structure for spikes which have multiple timer tick between firings
 //! this is separated from spikes which fire at least once every timer tick as
@@ -200,8 +197,19 @@ static bool initialize(uint32_t *timer_period) {
     // Get the timing details
     if (!simulation_read_timing_details(
             data_specification_get_region(system, address),
-            APPLICATION_MAGIC_NUMBER,
             timer_period, &simulation_ticks)) {
+        return false;
+    }
+
+     // get the components that build up a delay extension
+    uint32_t components[1];
+    if (!simulation_read_components(
+            data_specification_get_region(0, address), 1, components)) {
+        return false;
+    }
+
+    // verify the components are correct
+    if (components[0] != SPIKE_SOURCE_POISSON_MAGIC_NUMBER){
         return false;
     }
 

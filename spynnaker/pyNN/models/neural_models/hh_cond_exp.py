@@ -1,18 +1,16 @@
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
-    AbstractPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
-    abstract_exp_population_vertex import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
-    abstract_integrate_and_fire_properties \
-    import AbstractIntegrateAndFireProperties
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_population_vertex import AbstractPopulationVertex
+from spynnaker.pyNN.models.components.synapse_shape_components.\
+    exponential_component import ExponentialComponent
+from spynnaker.pyNN.models.components.model_components.\
+    integrate_and_fire_component import IntegrateAndFireComponent
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
-    abstract_conductance_vertex import AbstractConductanceVertex
+from spynnaker.pyNN.models.components.inputs_components.\
+    conductance_component import ConductanceComponent
 
 
 class HHConductanceExponentialPopulation(
-        AbstractExponentialPopulationVertex, AbstractConductanceVertex,
-        AbstractIntegrateAndFireProperties,
+        ExponentialComponent, ConductanceComponent,IntegrateAndFireComponent,
         AbstractPopulationVertex):
 
     # noinspection PyPep8Naming

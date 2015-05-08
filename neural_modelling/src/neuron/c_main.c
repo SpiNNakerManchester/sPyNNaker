@@ -15,6 +15,7 @@
  */
 
 #include "../common/in_spikes.h"
+#include "../common/constants.h"
 #include "neuron.h"
 #include "synapses.h"
 #include "spike_processing.h"
@@ -25,21 +26,15 @@
 #include <simulation.h>
 #include <debug.h>
 
-/* validates that the model being compiled does indeed contain a application
-   magic number*/
-#ifndef APPLICATION_MAGIC_NUMBER
-#define APPLICATION_MAGIC_NUMBER 0
-#error APPLICATION_MAGIC_NUMBER was undefined.  Make sure you define this\
-       constant
-#endif
-
 //! the number of channels all standard models contain (spikes, voltage, gsyn)
 //! for recording
 #define N_RECORDING_CHANNELS 3
 
 //! human readable definitions of each region in SDRAM
 typedef enum regions_e {
-    SYSTEM_REGION,
+    TIMINGS_REGION,
+    COMPONENTS_REGION,
+    RECORDING_DATA_REGION,
     NEURON_PARAMS_REGION,
     SYNAPSE_PARAMS_REGION,
     POPULATION_TABLE_REGION,
@@ -49,6 +44,19 @@ typedef enum regions_e {
     POTENTIAL_RECORDING_REGION,
     GSYN_RECORDING_REGION
 } regions_e;
+
+//! human readable definitions of each region in SDRAM
+typedef enum components_e {
+    NEURON_C_FILE_MAGIC_NUMBER,
+    INPUT_COMPONENT_MAGIC_NUMBER,
+    MODEL_COMPONENT_MAGIC_NUMBER,
+    SYNAPSE_SHAPE_COMPONENT,
+    MASTER_POP_MAGIC_NUMBER,
+    SYNAPSE_DYNAMICS,
+    SYNAPSE_STRUCTURE,
+    TIME_DEPENDENCY,
+    WEIGHT_DEPENDCY
+} components_e;
 
 // Globals
 
@@ -77,13 +85,28 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Get the timing details
-    address_t system_region = data_specification_get_region(
-        SYSTEM_REGION, address);
+    address_t timings_region = data_specification_get_region(
+        TIMINGS_REGION, address);
+
     if (!simulation_read_timing_details(
-            system_region, APPLICATION_MAGIC_NUMBER, timer_period,
-            &simulation_ticks)) {
+            timings_region, timer_period, &simulation_ticks)) {
         return false;
     }
+
+
+    // get the components that build up a delay extension
+    uint32_t components[8];
+    if (!simulation_read_components(
+            data_specification_get_region(COMPONENTS_REGION, address),
+            8, components)) {
+        return false;
+    }
+
+    // verify the components are correct
+    if (components[NEURON_C_FILE_MAGIC_NUMBER] != NEURON_MAGIC_NUMBER){
+        return false;
+    }
+
 
     // Set up recording
     recording_channel_e channels_to_record[] = {
@@ -96,11 +119,17 @@ static bool initialize(uint32_t *timer_period) {
         POTENTIAL_RECORDING_REGION,
         GSYN_RECORDING_REGION
     };
+
+    // get recording region stuff
     uint32_t region_sizes[N_RECORDING_CHANNELS];
     uint32_t recording_flags;
+    address_t recording_region =
+        data_specification_get_region(RECORDING_DATA_REGION, address);
+
     recording_read_region_sizes(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
-        &recording_flags, &region_sizes[0], &region_sizes[1], &region_sizes[2]);
+        recording_region, &recording_flags, &region_sizes[0], &region_sizes[1],
+        &region_sizes[2]);
+
     for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
         if (recording_is_channel_enabled(recording_flags,
                                          channels_to_record[i])) {

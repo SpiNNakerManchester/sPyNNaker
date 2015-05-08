@@ -1,4 +1,8 @@
 import math
+from spynnaker.pyNN.models.common_objects\
+    .abstract_requires_component_magic_number import \
+    AbstractRequiresComponentMagicNumber
+from spynnaker.pyNN.utilities import constants
 
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_time_dependency import AbstractTimeDependency
@@ -15,7 +19,7 @@ TIME_STAMP_BYTES = 4
 NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
-class STDPMechanism(object):
+class STDPMechanism(AbstractRequiresComponentMagicNumber):
 
     def __init__(self, timing_dependence=None, weight_dependence=None,
                  voltage_dependence=None, dendritic_delay_fraction=1.0,
@@ -51,6 +55,8 @@ class STDPMechanism(object):
             raise NotImplementedError("voltage_dependence not implemented")
 
         self._weight_scale = 1.0
+        self._synapse_row_io = self._get_synapse_row_io()
+
 
     @property
     def weight_scale(self):
@@ -86,7 +92,7 @@ class STDPMechanism(object):
                 (self._dendritic_delay_fraction ==
                  other.dendritic_delay_fraction))
 
-    def get_synapse_row_io(self):
+    def _get_synapse_row_io(self):
         if self.timing_dependence is not None:
             # If we're using MAD, the header contains a single timestamp and
             # pre-trace
@@ -112,6 +118,9 @@ class STDPMechanism(object):
                 synaptic_row_header_words, self._dendritic_delay_fraction)
         else:
             return None
+
+    def get_synapse_row_io(self):
+        return self._synapse_row_io
 
     # **TODO** make property
     def are_weights_signed(self):
@@ -170,3 +179,30 @@ class STDPMechanism(object):
             return self.weight_dependence.w_max
         else:
             return 0.0
+
+    def get_component_magic_number_identifiers(self):
+        """
+        forced by AbstractRequiresComponentMagicNumber
+        returns a iteraable of values that are unque identifiers for bits of a
+        compoent or its entire components.
+        :return:
+        """
+        components_identifiers = list()
+        # add synaptic dynamic check value
+        if self._mad:
+            components_identifiers.append(constants.SYNAPSE_DYNAMICS_STDP_MAD)
+        else:
+            components_identifiers.append(constants.SYNAPSE_DYNAMICS_STDP)
+        # add synapse structre component identifers
+        components_identifiers.extend(
+            self._synapse_row_io.get_component_magic_number_identifiers())
+        # add timing checks values
+        components_identifiers.extend(
+            self._timing_dependence.get_component_magic_number_identifiers())
+        # add weight checks values
+        components_identifiers.extend(
+            self.weight_dependence.get_component_magic_number_identifiers())
+        return components_identifiers
+
+
+

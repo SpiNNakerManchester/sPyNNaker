@@ -5,7 +5,7 @@ from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
 from pacman.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
+from spynnaker.pyNN.models.common_objects.abstract_filterable_edge \
     import AbstractFilterableEdge
 
 import logging

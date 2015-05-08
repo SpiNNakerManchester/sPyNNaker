@@ -1,14 +1,20 @@
-import numpy
-import math
-
+from spynnaker.pyNN.models.common_objects.\
+    abstract_requires_component_magic_number import \
+    AbstractRequiresComponentMagicNumber
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_synapse_row_io import AbstractSynapseRowIo
 from spynnaker.pyNN.models.neural_properties.\
     synapse_row_info import SynapseRowInfo
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities import constants
 
 
-class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
+import numpy
+import math
+
+
+class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo,
+                                       AbstractRequiresComponentMagicNumber):
 
     def __init__(self, num_header_words, dendritic_delay_fraction, signed):
         self._num_header_words = num_header_words
@@ -159,3 +165,10 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
 
         return SynapseRowInfo(target_indices, weights, delays_in_ticks,
                               synapse_types)
+
+    def get_component_magic_number_identifiers(self):
+        """
+        override from AbstractRequiresComponentMagicNumber
+        :return:
+        """
+        return [constants.SYNAPSE_STRUCTURE_WEIGHT_CONTROL]

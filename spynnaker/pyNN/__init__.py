@@ -33,7 +33,7 @@ from spynnaker.pyNN.models.neural_models.izk_curr_exp \
 # neural projections
 from spynnaker.pyNN.models.neural_projections\
     .delay_afferent_partitionable_edge import DelayAfferentPartitionableEdge
-from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
+from spynnaker.pyNN.models.delay_extension.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
