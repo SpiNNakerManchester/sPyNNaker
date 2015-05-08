@@ -9,6 +9,9 @@ from spinn_front_end_common.abstract_models.\
     import AbstractProvidesIncomingEdgeConstraints
 
 # synnaker imports
+from spynnaker.pyNN.models.common_objects.\
+    abstract_requires_component_magic_number import \
+    AbstractRequiresComponentMagicNumber
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
@@ -41,7 +44,9 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
+class AbstractSynapticManager(
+        AbstractProvidesIncomingEdgeConstraints,
+        AbstractRequiresComponentMagicNumber):
     """
     a synaptic manager that handles synatpic matrix's and master pops
     """
@@ -823,3 +828,26 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         :return:
         """
         return self._master_pop_table_generator.get_edge_constraints()
+
+    def get_component_magic_number_identifiers(self):
+        """
+        returns a value that is its unque identifier
+        :return:
+        """
+        core_identifiers = list()
+        core_identifiers.extend(
+            self._master_pop_table_generator.
+            get_component_magic_number_identifiers())
+        if self._stdp_mechanism is not None:
+            core_identifiers.extend(
+                self._stdp_mechanism.get_component_magic_number_identifiers())
+        else:
+            # if no stdp, then static dynamics and zeros for timing and weights.
+            # FIXME at moment, theres a built in assumption that all fixed
+            # FIXME sypanse sturcures use the SYNAPSE_STRUCTURE_FIXED. But becuase
+            # FIXME this is defined in the dge, its inpossible currently for the
+            # FIXME synaptic manager to determine if this is true.
+            core_identifiers.extend(
+                [constants.SYNAPSE_DYNAMICS_STATIC,
+                 constants.SYNAPSE_STRUCTURE_FIXED, 0, 0])
+        return core_identifiers

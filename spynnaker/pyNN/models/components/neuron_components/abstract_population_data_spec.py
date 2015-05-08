@@ -8,9 +8,10 @@ from data_specification.data_specification_generator import \
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_synaptic_manager \
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_synaptic_manager \
     import AbstractSynapticManager
-from spynnaker.pyNN.models.abstract_models.\
+from spynnaker.pyNN.models.components.neuron_components.\
     abstract_partitionable_population_vertex \
     import AbstractPartitionablePopulationVertex
 
@@ -57,7 +58,7 @@ class AbstractPopulationDataSpec(
             self, spec, neuron_params_sz, synapse_params_sz,
             master_pop_table_sz, all_syn_block_sz,
             spike_hist_buff_sz, potential_hist_buff_sz, gsyn_hist_buff_sz,
-            synapse_dynamics_params_sz):
+            synapse_dynamics_params_sz, components_bytes_requirments):
         """
         Reserve SDRAM space for memory areas:
         1) Area for information on what data to record
@@ -76,8 +77,21 @@ class AbstractPopulationDataSpec(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=constants.POPULATION_SYSTEM_REGION_BYTES, label='System')
+            region=constants.POPULATION_BASED_REGIONS.TIMINGS.value,
+            size=constants.POPULATION_TIMINGS_REGION_BYTES,
+            label="timings")
+
+        spec.reserve_memory_region(
+            region=constants.POPULATION_BASED_REGIONS.COMPONENTS.value,
+            size=components_bytes_requirments, label="components"
+        )
+
+        spec.reserve_memory_region(
+            region=constants.POPULATION_BASED_REGIONS.RECORDING_REGION.value,
+            size=(1 + constants.N_POPULATION_RECORDING_REGIONS) * 4,
+            label="Recordings"
+        )
+
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
             size=neuron_params_sz, label='NeuronParams')
@@ -122,7 +136,7 @@ class AbstractPopulationDataSpec(
 
     def _write_setup_info(self, spec, spike_history_region_sz,
                           neuron_potential_region_sz, gsyn_region_sz,
-                          executable_constant):
+                          component_indetifers):
         """
         Write information used to control the simulation and gathering of
         results.Currently, this means the flag word used to signal whether
@@ -151,13 +165,17 @@ class AbstractPopulationDataSpec(
         recording_info |= 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
-        self._write_basic_setup_info(
-            spec, executable_constant,
-            constants.POPULATION_BASED_REGIONS.SYSTEM.value)
-        spec.write_value(data=recording_info)
-        spec.write_value(data=spike_history_region_sz)
-        spec.write_value(data=neuron_potential_region_sz)
-        spec.write_value(data=gsyn_region_sz)
+        self._write_timings_region_info(
+            spec, constants.POPULATION_BASED_REGIONS.TIMINGS.value)
+
+        self._write_component_to_region(
+            spec, constants.POPULATION_BASED_REGIONS.COMPONENTS.value,
+            component_indetifers)
+
+        self._write_component_to_region(
+            spec, constants.POPULATION_BASED_REGIONS.RECORDING_REGION.value,
+            [recording_info, spike_history_region_sz,
+             neuron_potential_region_sz, gsyn_region_sz])
 
     @abstractmethod
     def get_parameters(self):
@@ -297,16 +315,19 @@ class AbstractPopulationDataSpec(
         for partitioned_edge in in_partitioned_edges:
             partitioned_edge.weight_scales_setter(weight_scales)
 
+        # collect assoicated indentifers
+        component_indetifers = self._get_components_magic_numbers()
+
         # Construct the data images needed for the Neuron:
         self._reserve_population_based_memory_regions(
             spec, neuron_params_sz, synapse_params_sz,
             master_pop_table_sz, all_syn_block_sz,
             spike_hist_buff_sz, potential_hist_buff_sz, gsyn_hist_buff_sz,
-            synapse_dynamics_region_sz)
+            synapse_dynamics_region_sz, len(component_indetifers) * 4)
 
         self._write_setup_info(spec, spike_hist_buff_sz,
                                potential_hist_buff_sz, gsyn_hist_buff_sz,
-                               self._executable_constant)
+                               component_indetifers)
 
         # Every outgoing edge from this vertex should have the same key
         key = None

@@ -115,15 +115,18 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         in_edges = graph.incoming_edges_to_vertex(self)
 
         # noinspection PyTypeChecker
-        return (constants.POPULATION_SYSTEM_REGION_BYTES +
-                self.get_neuron_params_size(vertex_slice) +
-                self.get_synapse_parameter_size(vertex_slice) +
-                self.get_population_table_size(vertex_slice, in_edges) +
-                self.get_synapse_dynamics_parameter_size(in_edges) +
-                self.get_synaptic_blocks_memory_size(vertex_slice, in_edges) +
-                self.get_spike_buffer_size(vertex_slice) +
-                self.get_v_buffer_size(vertex_slice) +
-                self.get_g_syn_buffer_size(vertex_slice))
+        value = (constants.POPULATION_TIMINGS_REGION_BYTES +
+                 len(self._get_components_magic_numbers()) * 4 +
+                 (1 + constants.N_POPULATION_RECORDING_REGIONS) * 4 +
+                 self.get_neuron_params_size(vertex_slice) +
+                 self.get_synapse_parameter_size(vertex_slice) +
+                 self.get_population_table_size(vertex_slice, in_edges) +
+                 self.get_synapse_dynamics_parameter_size(in_edges) +
+                 self.get_synaptic_blocks_memory_size(vertex_slice, in_edges) +
+                 self.get_spike_buffer_size(vertex_slice) +
+                 self.get_v_buffer_size(vertex_slice) +
+                 self.get_g_syn_buffer_size(vertex_slice))
+        return math.ceil(value)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """

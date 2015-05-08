@@ -161,8 +161,10 @@ class AbstractPopulationRecordableVertex(object):
 
         progress_bar.end()
         result = numpy.dstack((spike_ids, spike_times))[0]
-        result = result[numpy.lexsort((spike_times, spike_ids))]
-
+        # check before doing lexsort that theres data to sort,
+        # otherwise numpi blows up.
+        if len(spike_ids) > 1:
+            result = result[numpy.lexsort((spike_times, spike_ids))]
         return result
 
     def get_neuron_parameter(

@@ -127,9 +127,6 @@ POPULATION_BASED_REGIONS = Enum(
 # The number of recording regions available for a population
 N_POPULATION_RECORDING_REGIONS = 3
 
-# The number of bytes needed in the timings region
-POPULATION_TIMINGS_REGION_BYTES = 8  # time scale factor and no_iterations
-
 # The size of the headers of a population neuron region
 # (1 word each for has_key, key, n_neurons, n_params, ODE timestep)
 POPULATION_NEURON_PARAMS_HEADER_BYTES = 20

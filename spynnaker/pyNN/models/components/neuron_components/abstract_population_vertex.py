@@ -1,8 +1,11 @@
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_population_recordable_vertex\
+"""
+AbstractPopulationVertex
+"""
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_population_recordable_vertex \
     import AbstractPopulationRecordableVertex
-from spynnaker.pyNN.models.abstract_models.abstract_population_data_spec \
-    import AbstractPopulationDataSpec
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_population_data_spec import AbstractPopulationDataSpec
 from spynnaker.pyNN import exceptions as local_exceptions
 from spynnaker.pyNN.utilities import constants
 
@@ -18,7 +21,7 @@ logger = logging.getLogger(__name__)
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
                                AbstractPopulationDataSpec):
-    """ Underlying vertex model for Neural Populations.
+    """ Underlying vertex model for ALL Neural Populations.
     """
 
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
@@ -94,6 +97,21 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             compatible_output=compatible_output, has_ran=has_ran,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
             placements=placements, txrx=txrx)
+
+    def _get_components_magic_numbers(self):
+        """
+        collects all the components required from a pynn population
+        :return:
+        """
+        # collect assoicated indentifers
+        component_indetifers = list()
+        component_indetifers.append(constants.NEURON_MAGIC_NUMBER)
+        component_indetifers.append(self.get_input_magic_number())
+        component_indetifers.append(self.get_model_magic_number())
+        component_indetifers.append(self.get_synapse_shape_magic_number())
+        component_indetifers.extend(
+            self.get_component_magic_number_identifiers())
+        return component_indetifers
 
     def is_recordable(self):
         """ helper method for is instance
