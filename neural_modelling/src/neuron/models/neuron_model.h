@@ -19,6 +19,9 @@ typedef struct neuron_t* neuron_pointer_t;
 //! \return This method does not return anything
 void neuron_model_set_machine_timestep(timer_t microsecs);
 
+
+bool neuron_model_check_magic_number()
+
 //! \brief Function that converts an input into the real value to be used by the
 //! neuron; Allows e.g. scaling of the neuron inputs for better precision
 //! \param[in] input a pointer to the array of inputs received this timer tick
