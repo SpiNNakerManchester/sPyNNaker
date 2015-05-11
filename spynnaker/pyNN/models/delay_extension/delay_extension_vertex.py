@@ -387,11 +387,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         n_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         block_len_words = int(math.ceil(n_atoms / 32.0))
 
-        # FIXME ABS: THIS HARD CODED VALUE NEEDS FIXING, BUT ITS BETTER THAN 0
-        num_delay_blocks = 16
-
         delay_params_sz = 4 * (self._DELAY_PARAMS_HEADER_WORDS +
-                               (num_delay_blocks * block_len_words))
+                               (self._max_stages * block_len_words))
 
         return (front_end_common_imports.TIMINGS_REGION_BYTES +
                 ((len(self._get_components())) * 4) + delay_params_sz)
