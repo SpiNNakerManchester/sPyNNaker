@@ -8,6 +8,7 @@ from spynnaker.pyNN.utilities import constants
 # spinn front end imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+from spinn_front_end_common.utilities import constants as common_constants
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -115,7 +116,7 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         in_edges = graph.incoming_edges_to_vertex(self)
 
         # noinspection PyTypeChecker
-        value = (constants.POPULATION_TIMINGS_REGION_BYTES +
+        value = (common_constants.TIMINGS_REGION_BYTES +
                  len(self._get_components_magic_numbers()) * 4 +
                  (1 + constants.N_POPULATION_RECORDING_REGIONS) * 4 +
                  self.get_neuron_params_size(vertex_slice) +

@@ -1,4 +1,8 @@
+"""
+SpikeSourcePoisson
+"""
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties.randomDistributions\
     import generate_parameter
 from spynnaker.pyNN.models.components.neuron_components.\
@@ -12,6 +16,8 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
 from spinn_front_end_common.abstract_models\
     .abstract_outgoing_edge_same_contiguous_keys_restrictor\
     import AbstractOutgoingEdgeSameContiguousKeysRestrictor
+from spinn_front_end_common.utilities import constants as\
+    front_end_common_constants
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -44,9 +50,13 @@ class SpikeSourcePoisson(
         constants.SPIKE_SOURCE_POISSON_MAGIC_NUMBER
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="_POISSON_SPIKE_SOURCE_REGIONS",
-        names=[('SYSTEM_REGION', 0),
-               ('POISSON_PARAMS_REGION', 1),
-               ('SPIKE_HISTORY_REGION', 2)])
+        names=[('TIMINGS', 0),
+               ('COMPONENTS', 1),
+               ('RECORDING_DATA', 2),
+               ('POISSON_PARAMS_REGION', 3),
+               ('SPIKE_HISTORY_REGION', 4)])
+    _SPIKE_HISTROY_CONFIGURATION_SIZE = 8
+
     _model_based_max_atoms_per_core = 256
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
@@ -56,6 +66,9 @@ class SpikeSourcePoisson(
         """
         Creates a new SpikeSourcePoisson Object.
         """
+        utility_calls.unused(spikes_per_second)
+        utility_calls.unused(ring_buffer_sigma)
+
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=self._model_based_max_atoms_per_core)
@@ -118,12 +131,11 @@ class SpikeSourcePoisson(
                  PARAMS_WORDS_PER_NEURON)) * 4
 
     def reserve_memory_regions(
-            self, spec, setup_sz, poisson_params_sz, spike_hist_buff_sz):
+            self, spec, poisson_params_sz, spike_hist_buff_sz):
         """
         Reserve memory regions for poisson source parameters
         and output buffer.
         :param spec:
-        :param setup_sz:
         :param poisson_params_sz:
         :param spike_hist_buff_sz:
         :return:
@@ -132,8 +144,15 @@ class SpikeSourcePoisson(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            region=self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
-            size=setup_sz, label='setup')
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.TIMINGS.value,
+            size=front_end_common_constants.TIMINGS_REGION_BYTES, label='setup')
+        spec.reserve_memory_region(
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.COMPONENTS.value,
+            size=len(self._get_components()) * 4, label='components')
+        spec.reserve_memory_region(
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.RECORDING_DATA.value,
+            size=self._SPIKE_HISTROY_CONFIGURATION_SIZE, label='recording')
+
         spec.reserve_memory_region(
             region=self._POISSON_SPIKE_SOURCE_REGIONS
                        .POISSON_PARAMS_REGION.value,
@@ -166,10 +185,13 @@ class SpikeSourcePoisson(
         """
 
         self._write_timings_region_info(
-            spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+            spec, self._POISSON_SPIKE_SOURCE_REGIONS.TIMINGS.value)
         self._write_component_to_region(
-            spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
+            spec, self._POISSON_SPIKE_SOURCE_REGIONS.COMPONENTS.value,
             identifiers)
+
+        spec.switch_write_focus(
+            self._POISSON_SPIKE_SOURCE_REGIONS.RECORDING_DATA.value)
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
@@ -313,7 +335,9 @@ class SpikeSourcePoisson(
         """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
-        return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) + 8 +
+        return (front_end_common_constants.TIMINGS_REGION_BYTES +
+                (len(self._get_components()) * 4) +
+                self._SPIKE_HISTROY_CONFIGURATION_SIZE +
                 poisson_params_sz + spike_hist_buff_sz)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
@@ -334,6 +358,12 @@ class SpikeSourcePoisson(
         :return:
         """
         return 0
+
+    @staticmethod
+    def _get_components():
+        component_indetifers = list()
+        component_indetifers.append(SpikeSourcePoisson.CORE_APP_IDENTIFIER)
+        return component_indetifers
 
     # inherited from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
@@ -372,16 +402,11 @@ class SpikeSourcePoisson(
 
         poisson_params_sz = self.get_params_bytes(vertex_slice)
 
-        component_indetifers = list()
-        component_indetifers.append(SpikeSourcePoisson.CORE_APP_IDENTIFIER)
-
-        # Basic setup plus 8 bytes for recording flags and recording size
-        setup_sz = ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) + 8)
-        setup_sz += len(component_indetifers) * 4
+        component_indetifers = self._get_components()
 
         # Reserve SDRAM space for memory areas:
         self.reserve_memory_regions(
-            spec, setup_sz, poisson_params_sz, spike_hist_buff_sz)
+            spec, poisson_params_sz, spike_hist_buff_sz)
 
         self.write_setup_info(spec, spike_hist_buff_sz, component_indetifers)
 

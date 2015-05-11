@@ -2,8 +2,6 @@
 Utilities for accessing the location of memory regions on the board
 """
 from enum import Enum
-from spinn_front_end_common.utilities.constants import \
-    DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS
 
 POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 

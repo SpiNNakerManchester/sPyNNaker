@@ -256,6 +256,7 @@ class Population(object):
         """
         Given the ID(s) of cell(s) in the Population, return its (their) index
         (order in the Population).
+        :param cell_id:
         """
         raise NotImplementedError
 
@@ -263,6 +264,7 @@ class Population(object):
         """
         Given the ID(s) of cell(s) in the Population, return its (their) index
         (order in the Population), counting only cells on the local MPI node.
+        :param cell_id:
         """
         raise NotImplementedError
 

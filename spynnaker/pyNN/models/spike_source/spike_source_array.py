@@ -3,7 +3,6 @@ SpikeSourceArray
 """
 
 # spynnaker imports
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spinn_front_end_common.abstract_models\
     .abstract_outgoing_edge_same_contiguous_keys_restrictor\
@@ -14,13 +13,13 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
 from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region\
     import BufferedSendingRegion
 from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spinn_front_end_common.utilities import constants as \
-    front_end_common_constants
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities import constants as \
+    front_end_common_constants
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
@@ -61,9 +60,10 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
     _SPIKE_SOURCE_REGIONS = Enum(
         value="_SPIKE_SOURCE_REGIONS",
-        names=[('SYSTEM_REGION', 0),
-               ('CONFIGURATION_REGION', 1),
-               ('SPIKE_DATA_REGION', 2)])
+        names=[('TIMINGS', 0),
+               ('COMPONENTS', 1),
+               ('CONFIGURATION_REGION', 2),
+               ('SPIKE_DATA_REGION', 3)])
 
     def __init__(
             self, n_neurons, spike_times, machine_time_step, spikes_per_second,
@@ -194,15 +194,18 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             send_buffer = self._send_buffers[key]
         return send_buffer
 
-    def _reserve_memory_regions(self, spec, spike_region_size,
-                                system_region_size):
+    def _reserve_memory_regions(self, spec, spike_region_size):
         """ Reserve memory for the system, indices and spike data regions.
             The indices region will be copied to DTCM by the executable.
         """
         spec.reserve_memory_region(
-            region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
-            size=system_region_size, label='systemInfo')
-
+            region=self._SPIKE_SOURCE_REGIONS.TIMINGS.value,
+            size=front_end_common_constants.TIMINGS_REGION_BYTES,
+            label='timingsRegion')
+        spec.reserve_memory_region(
+            region=self._SPIKE_SOURCE_REGIONS.COMPONENTS.value,
+            size=len(self._get_components()) * 4,
+            label='componentsRegion')
         spec.reserve_memory_region(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value,
             size=self._CONFIGURATION_REGION_SIZE, label='configurationRegion')
@@ -231,9 +234,9 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             Bit 6: Output spike rate
         """
         self._write_timings_region_info(
-            spec, self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+            spec, self._SPIKE_SOURCE_REGIONS.TIMINGS.value)
         self._write_component_to_region(
-            spec, self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
+            spec, self._SPIKE_SOURCE_REGIONS.COMPONENTS.value,
             component_indetifers)
 
         spec.switch_write_focus(
@@ -258,6 +261,11 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
         ip_tag = iter(ip_tags).next()
         spec.write_value(data=ip_tag.tag)
+
+    def _get_components(self):
+        component_indetifers = list()
+        component_indetifers.append(self.CORE_APP_IDENTIFIER)
+        return component_indetifers
 
     # inherited from dataspecable vertex
     def generate_data_spec(
@@ -299,16 +307,9 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             graph_mapper.get_subvertex_slice(subvertex))
 
         # collect assoicated indentifers
-        component_indetifers = list()
-        component_indetifers.append(self.CORE_APP_IDENTIFIER)
+        component_indetifers = self._get_components()
 
-        # Calculate the size of the tables to be reserved in SDRAM:
-        system_region_size = \
-            (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS +
-             len(component_indetifers)) * 4
-
-        self._reserve_memory_regions(spec, spike_buffer.buffer_size,
-                                     system_region_size)
+        self._reserve_memory_regions(spec, spike_buffer.buffer_size)
 
         self._write_setup_info(
             spec, spike_buffer.buffer_size, ip_tags, component_indetifers)
@@ -349,7 +350,8 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         """
         send_buffer = self._get_spike_send_buffer(vertex_slice)
         send_size = send_buffer.buffer_size
-        return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+        return (front_end_common_constants.TIMINGS_REGION_BYTES +
+                ((len(self._get_components())) * 4) +
                 SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):

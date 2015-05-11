@@ -18,6 +18,7 @@ from spynnaker.pyNN.models.components.neuron_components.\
 from spinn_front_end_common.abstract_models\
     .abstract_outgoing_edge_same_contiguous_keys_restrictor\
     import AbstractOutgoingEdgeSameContiguousKeysRestrictor
+from spinn_front_end_common.utilities import constants as spinn_common_constants
 
 # general imports
 import os
@@ -78,7 +79,7 @@ class AbstractPopulationDataSpec(
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.TIMINGS.value,
-            size=constants.POPULATION_TIMINGS_REGION_BYTES,
+            size=spinn_common_constants.TIMINGS_REGION_BYTES,
             label="timings")
 
         spec.reserve_memory_region(
@@ -184,7 +185,7 @@ class AbstractPopulationDataSpec(
         """
 
     def _write_neuron_parameters(
-            self, spec, key, subvertex, vertex_slice):
+            self, spec, key, vertex_slice):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} "
@@ -340,7 +341,7 @@ class AbstractPopulationDataSpec(
             # key and mask assignments
             key = keys_and_masks[0].key
 
-        self._write_neuron_parameters(spec, key, subvertex, vertex_slice)
+        self._write_neuron_parameters(spec, key, vertex_slice)
 
         self.write_synapse_parameters(spec, subvertex, vertex_slice)
         spec.write_array(ring_buffer_shifts)

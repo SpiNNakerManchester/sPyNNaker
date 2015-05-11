@@ -1,12 +1,13 @@
-import copy
-import logging
-from enum import Enum
-
-import math
+"""
+DelayExtensionVertex
+"""
+# spynnaker imports
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
     delay_partitionable_edge import DelayPartitionableEdge
+
+# spinn front end common imports
 from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
@@ -16,6 +17,10 @@ from spinn_front_end_common.abstract_models\
 from spinn_front_end_common.utilities import constants as common_constants
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+from spinn_front_end_common.utilities import constants as \
+    front_end_common_imports
+
+# pacman imports
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -24,8 +29,16 @@ from pacman.model.constraints.key_allocator_constraints.\
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+
+# dsg imports
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
+
+# general improts
+import copy
+import logging
+from enum import Enum
+import math
 
 
 logger = logging.getLogger(__name__)
@@ -47,6 +60,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         names=[('TIMINGS', 0),
                ('COMPONENTS', 1),
                ('DELAY_PARAMS', 2)])
+    _DELAY_PARAMS_HEADER_WORDS = 3
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
@@ -72,6 +86,13 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         self.add_constraint(joint_constrant)
 
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
+        """
+        gets and constraints set to the incoming edges to the delay extension
+        :param partitioned_edge: the incoming edge
+        :param graph_mapper: the mapper between partitionable and
+         partitioned graphs
+        :return: iterable of constraints
+        """
         return list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
 
     @property
@@ -90,39 +111,64 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     @max_stages.setter
     def max_stages(self, max_stages):
+        """
+        setter method for max_stages
+        :param max_stages:
+        :return:
+        """
         self._max_stages = max_stages
 
     @property
     def max_delay_per_neuron(self):
+        """
+        property for max_delay_per_neuron
+        :return:
+        """
         return self._max_delay_per_neuron
-
-    # noinspection PyUnusedLocal
-    @staticmethod
-    def get_spikes_per_timestep(lo_atom, hi_atom, machine_time_step):
-        # TODO: More accurate calculation of bounds
-        return 200
 
     @staticmethod
     def get_spike_block_row_length(n_atoms):
+        """
+        returns how big in bytes the row info is for a number of atoms
+        :param n_atoms: the number of atoms to consider
+        :return: int
+        """
         return int(math.ceil(n_atoms / common_constants.BITS_PER_WORD))
 
     @staticmethod
     def get_spike_region_bytes(spike_block_row_length, no_active_timesteps):
+        """
+
+        :param spike_block_row_length:
+        :param no_active_timesteps:
+        :return:
+        """
         return spike_block_row_length * no_active_timesteps * 4
 
-    def get_spike_buffer_size(self, lo_atom, hi_atom):
+    def get_spike_buffer_size(self, vertex_slice):
         """
         Gets the size of the spike buffer for a range of neurons and time steps
+        :param vertex_slice: the slice of atoms from the partitionable vertex
         """
         if not self._record:
             return 0
-        out_spikes_bytes = int(math.ceil((hi_atom - lo_atom + 1) / 32.0)) * 4
+        out_spikes_bytes = int(math.ceil(vertex_slice.n_atoms / 32.0)) * 4
         return self.get_recording_region_size(out_spikes_bytes)
 
     @staticmethod
     def get_block_index_bytes(no_active_timesteps):
+        """
+
+        :param no_active_timesteps:
+        :return:
+        """
         return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps *
                 constants.BLOCK_INDEX_ROW_WORDS)) * 4
+
+    def _get_components(self):
+        component_indetifers = list()
+        component_indetifers.append(self.CORE_APP_IDENTIFIER)
+        return component_indetifers
 
     def generate_data_spec(
             self, subvertex, placement, sub_graph, graph, routing_info,
@@ -131,6 +177,19 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         """
         Model-specific construction of the data blocks necessary to build a
         single Delay Extension Block on one core.
+        :param subvertex:
+        :param placement:
+        :param sub_graph:
+        :param graph:
+        :param routing_info:
+        :param hostname:
+        :param graph_mapper:
+        :param report_folder:
+        :param ip_tags:
+        :param reverse_ip_tags:
+        :param write_text_specs:
+        :param application_run_time_folder:
+        :return:
         """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
@@ -145,23 +204,20 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         # ###################################################################
         # Reserve SDRAM space for memory areas:
 
-        delay_params_header_words = 3
-
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         n_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         block_len_words = int(math.ceil(n_atoms / 32.0))
         num_delay_blocks, delay_blocks = self.get_delay_blocks(
             subvertex, sub_graph, graph_mapper)
-        delay_params_sz = 4 * (delay_params_header_words +
+        delay_params_sz = 4 * (self._DELAY_PARAMS_HEADER_WORDS +
                                (num_delay_blocks * block_len_words))
 
-        component_indetifers = list()
-        component_indetifers.append(self.CORE_APP_IDENTIFIER)
+        component_indetifers = self._get_components()
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.TIMINGS.value,
-            size=constants.POPULATION_TIMINGS_REGION_BYTES,
+            size=front_end_common_imports.TIMINGS_REGION_BYTES,
             label="timings"
         )
 
@@ -189,8 +245,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             # key and mask assignments
             key = keys_and_masks[0].key
 
-        self.write_delay_parameters(spec, placement.x, placement.y,
-                                    placement.p, subvertex, num_delay_blocks,
+        self.write_delay_parameters(spec, num_delay_blocks,
                                     delay_blocks, vertex_slice, key)
         # End-of-Spec:
         spec.end_specification()
@@ -198,6 +253,11 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     def write_setup_info(self, spec, component_constants):
         """
+
+        :param spec: the dsg writer
+        :param component_constants: the component magic numebrs which represent
+        this model
+        :return:
         """
 
         # Write this to the system region (to be picked up by the simulation):
@@ -208,7 +268,13 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             component_constants)
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
+        """
 
+        :param subvertex:
+        :param sub_graph:
+        :param graph_mapper:
+        :return:
+        """
         # Create empty list of words to fill in with delay data:
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -259,11 +325,16 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         return num_delay_blocks, delay_block
 
-    def write_delay_parameters(self, spec, processor_chip_x, processor_chip_y,
-                               processor_id, subvertex, num_delay_blocks,
+    def write_delay_parameters(self, spec, num_delay_blocks,
                                delay_block, vertex_slice, key):
         """
         Generate Delay Parameter data (region 2):
+        :param spec:
+        :param num_delay_blocks:
+        :param delay_block:
+        :param vertex_slice:
+        :param key:
+        :return:
         """
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -294,18 +365,53 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
+        """
+        overridden from partitionable vertex
+        :param vertex_slice: the slice of atoms to consider
+        :param graph: the partitionable graph
+        :return: the size of cpu cycles used by this model will use for
+        this number of atoms
+        """
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        # TODO: Fill this in
-        return 0
+        """
+        overridden from partitionable vertex
+        :param vertex_slice: the slice of atoms to consider
+        :param graph: the partitionable graph
+        :return: the size of sdram (in bytes) used by this model will use for
+        this number of atoms
+        """
+
+        n_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
+        block_len_words = int(math.ceil(n_atoms / 32.0))
+
+        # FIXME ABS: THIS HARD CODED VALUE NEEDS FIXING, BUT ITS BETTER THAN 0
+        num_delay_blocks = 16
+
+        delay_params_sz = 4 * (self._DELAY_PARAMS_HEADER_WORDS +
+                               (num_delay_blocks * block_len_words))
+
+        return (front_end_common_imports.TIMINGS_REGION_BYTES +
+                ((len(self._get_components())) * 4) + delay_params_sz)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
+        """
+        overridden from partitionable vertex
+        :param vertex_slice: the slice of atoms to consider
+        :param graph: the partitionable graph
+        :return: the size of dtcm (in bytes) used by this model will use for
+        this number of atoms
+        """
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms
 
     def get_binary_file_name(self):
+        """
+        the name of the binary file for this model
+        :return:
+        """
         return "delay_extension.aplx"
 
     def is_data_specable(self):
