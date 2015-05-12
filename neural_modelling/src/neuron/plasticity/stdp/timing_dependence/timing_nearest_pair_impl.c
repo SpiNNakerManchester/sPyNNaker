@@ -11,6 +11,15 @@ int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 //---------------------------------------
 // Functions
 //---------------------------------------
+
+//! \brief the initialiser for the time deppendence which checks the
+//!        correct component was compiled in and the data is well formed in
+//!        SDRAM
+//! \param[in] address The SDRAM address where the timing params are stored
+//! \param[in] timing_magic_number the magic number which represents the
+//!            timing component being compiled in.
+//! \return a address pram which is NULL if the init failed, or the
+//!  the end of the timing region as an absolute SDRAM memory address,
 address_t timing_initialise(address_t address,
                             uint32_t time_dependency_magic_number) {
 
