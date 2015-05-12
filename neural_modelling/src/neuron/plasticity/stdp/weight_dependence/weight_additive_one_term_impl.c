@@ -1,4 +1,5 @@
 #include "weight_additive_one_term_impl.h"
+#include "../../../../common/constants.h"
 
 //---------------------------------------
 // Globals
@@ -10,12 +11,21 @@ plasticity_weight_region_data_t
 //---------------------------------------
 // Functions
 //---------------------------------------
-address_t weight_initialise(address_t address,
-                            uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+address_t weight_initialise(
+        address_t address, uint32_t *ring_buffer_to_input_buffer_left_shifts,
+        uint32_t weight_dependence_magic_number) {
     use(ring_buffer_to_input_buffer_left_shifts);
 
     log_info("weight_initialise: starting");
     log_info("\tSTDP additive one-term weight dependance");
+
+    if (weight_dependence_magic_number !=
+        WEIGHT_DEPENDENCY_ADDITIVE_MAGIC_NUMBER){
+        log_error("expected magic number 0x%x, got magic number 0x%x instead.",
+                  WEIGHT_DEPENDENCY_ADDITIVE_MAGIC_NUMBER,
+                  weight_dependence_magic_number);
+        return (address_t) NULL;
+    }
 
     // Copy plasticity region data from address
     // **NOTE** this seems somewhat safer than relying on sizeof

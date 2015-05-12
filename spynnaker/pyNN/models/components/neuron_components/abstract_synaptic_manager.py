@@ -848,6 +848,5 @@ class AbstractSynapticManager(
             # FIXME this is defined in the dge, its inpossible currently for the
             # FIXME synaptic manager to determine if this is true.
             core_identifiers.extend(
-                [constants.SYNAPSE_DYNAMICS_STATIC,
-                 constants.SYNAPSE_STRUCTURE_FIXED, 0, 0])
+                [constants.SYNAPSE_DYNAMICS_STATIC, 0, 0, 0])
         return core_identifiers

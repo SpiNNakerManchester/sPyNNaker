@@ -28,8 +28,9 @@
  * \return address_t: returns the end of the weight region as an absolute
  * SDRAM memory address.
  */
-address_t weight_initialise(address_t address,
-                            uint32_t *ring_buffer_to_input_buffer_left_shifts);
+address_t weight_initialise(
+        address_t address, uint32_t *ring_buffer_to_input_buffer_left_shifts,
+        uint32_t weight_dependence_magic_number);
 
 /*!
  * \brief

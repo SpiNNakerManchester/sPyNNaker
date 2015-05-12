@@ -1,6 +1,8 @@
 """
 IzhikevichCurrentExponentialPopulation
 """
+from spynnaker.pyNN.models.components.\
+    inputs_components.current_component import CurrentComponent
 from spynnaker.pyNN.models.components.neuron_components.\
     abstract_population_vertex import AbstractPopulationVertex
 from data_specification.enums.data_type import DataType
@@ -13,7 +15,8 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
 
 
 class IzhikevichCurrentExponentialPopulation(
-        IzhikevichComponent, ExponentialComponent, AbstractPopulationVertex):
+        CurrentComponent, IzhikevichComponent, ExponentialComponent,
+        AbstractPopulationVertex):
     """
     IzhikevichCurrentExponentialPopulation
     """
@@ -130,6 +133,13 @@ class IzhikevichCurrentExponentialPopulation(
     def is_izhikevich_vertex(self):
         """
         helper emthod for isinstance
+        :return:
+        """
+        return True
+
+    def is_current_component(self):
+        """
+        helper emthod for is instance
         :return:
         """
         return True

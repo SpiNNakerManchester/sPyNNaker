@@ -19,8 +19,13 @@ typedef struct neuron_t* neuron_pointer_t;
 //! \return This method does not return anything
 void neuron_model_set_machine_timestep(timer_t microsecs);
 
-
-bool neuron_model_check_magic_number()
+//! \brief setup function which needs to check that the magic numebrs work
+//! correctly
+//! \param[in] input_magic_number the input type magic number for the model
+//! \param[in] model_magic_number the model magic number for the model
+//! \return This method returns true if the magic numbers match, false otherwise
+bool neuron_model_check_magic_number(
+        uint32_t input_magic_number, uint32_t model_magic_number);
 
 //! \brief Function that converts an input into the real value to be used by the
 //! neuron; Allows e.g. scaling of the neuron inputs for better precision

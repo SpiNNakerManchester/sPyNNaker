@@ -171,4 +171,4 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo,
         override from AbstractRequiresComponentMagicNumber
         :return:
         """
-        return [constants.SYNAPSE_STRUCTURE_WEIGHT_CONTROL]
+        return [constants.SYNAPSE_PLASTIC_STRUCTURE_WEIGHT_CONTROL]

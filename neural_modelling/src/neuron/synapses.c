@@ -2,6 +2,7 @@
 #include "spike_processing.h"
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
+#include "../common/constants.h"
 #include <debug.h>
 #include <spin1_api.h>
 #include <string.h>
@@ -201,11 +202,18 @@ static inline void _process_fixed_synapses(address_t fixed_region_address,
 
 /* INTERFACE FUNCTIONS */
 
-bool synapses_initialise(address_t address, uint32_t n_neurons_value,
-                         input_t **input_buffers_value,
-                         uint32_t **ring_buffer_to_input_buffer_left_shifts) {
+bool synapses_initialise(
+        address_t address, uint32_t n_neurons_value,
+        input_t **input_buffers_value,
+         uint32_t **ring_buffer_to_input_buffer_left_shifts,
+         uint32_t synapse_shaping_magic_number) {
 
     log_info("synapses_initialise: starting");
+
+    if (!synapse_types_initialise(synapse_shaping_magic_number)){
+        return false;
+    }
+
     n_neurons = n_neurons_value;
     *input_buffers_value = input_buffers;
 

@@ -1,5 +1,6 @@
 #include "population_table.h"
 #include "synapse_row.h"
+#include "../common/constants.h"
 #include <debug.h>
 #include <string.h>
 
@@ -41,10 +42,17 @@ static inline void _print_master_population_table() {
     log_info("------------------------------------------\n");
 }
 
-bool population_table_initialise(address_t table_address,
-                                 address_t synapse_rows_address,
-                                 uint32_t *row_max_n_words) {
+bool population_table_initialise(
+        address_t table_address, address_t synapse_rows_address,
+        uint32_t *row_max_n_words, uint32_t master_pop_table_magic_number) {
     log_info("population_table_initialise: starting");
+
+    if (master_pop_table_magic_number != MASTER_POP_BINARY_SEARCH_MAGIC_NUMBER){
+        log_error("expected magic number 0x%x, got magic number 0x%x instead.",
+                  MASTER_POP_BINARY_SEARCH_MAGIC_NUMBER,
+                  master_pop_table_magic_number);
+        return false;
+    }
 
     master_population_table_length = table_address[0];
     uint32_t n_bytes = master_population_table_length *

@@ -94,4 +94,7 @@ class SpikePairTimeDependency(AbstractTimeDependency):
         compoent or its entire components.
         :return:
         """
-        return [constants.TIME_DEPENDENCY_SPIKE_PAIR_MAGIC_NUMBER]
+        if self._nearest:
+            return [constants.TIME_DEPENDENCY_SPIKE_PAIR_MAGIC_NUMBER]
+        else:
+            return [constants.TIME_DEPENDENCY_SPIKE_NEAREST_PAIR_MAGIC_NUMBER]

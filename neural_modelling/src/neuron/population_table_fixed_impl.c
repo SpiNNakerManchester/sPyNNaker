@@ -41,10 +41,19 @@ static inline uint32_t _get_table_index(key_t x, key_t y, key_t p) {
     return (((x << 3) + y) * 18 + p);
 }
 
-bool population_table_initialise(address_t table_address,
-                                 address_t synapse_rows_address,
-                                 uint32_t *row_max_n_words) {
+bool population_table_initialise(
+        address_t table_address, address_t synapse_rows_address,
+        uint32_t *row_max_n_words, master_pop_table_magic_number) {
     log_info("population_table_initialise: starting");
+
+    // check magic number
+    if (master_pop_table_magic_number != MASTER_POP_2DARRAY_MAGIC_NUMBER){
+        log_error("expected magic number 0x%x, got magic number 0x%x instead.",
+                  MASTER_POP_2DARRAY_MAGIC_NUMBER,
+                  master_pop_table_magic_number);
+        return false;
+    }
+
     // Copy the master population table
     log_debug("reading master pop table from address 0x%.8x", table_address);
     memcpy(master_population_table, table_address,

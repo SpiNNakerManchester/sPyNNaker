@@ -30,6 +30,23 @@
 //! for recording
 #define N_RECORDING_CHANNELS 3
 
+//! the number of components each neuron model is expected to contain.
+//! these come from the enum below
+#define NUM_COMPONENTS_MAGIC_NUMBERS 9
+
+//! human readable definitions of each component in the list
+typedef enum components_e {
+    NEURON_C_FILE_MAGIC_NUMBER,
+    INPUT_COMPONENT_MAGIC_NUMBER,
+    MODEL_COMPONENT_MAGIC_NUMBER,
+    SYNAPSE_SHAPE_COMPONENT,
+    MASTER_POP_MAGIC_NUMBER,
+    SYNAPSE_DYNAMICS,
+    SYNAPSE_STRUCTURE,
+    TIME_DEPENDENCY,
+    WEIGHT_DEPENDENCY
+} components_e;
+
 //! human readable definitions of each region in SDRAM
 typedef enum regions_e {
     TIMINGS_REGION,
@@ -44,19 +61,6 @@ typedef enum regions_e {
     POTENTIAL_RECORDING_REGION,
     GSYN_RECORDING_REGION
 } regions_e;
-
-//! human readable definitions of each region in SDRAM
-typedef enum components_e {
-    NEURON_C_FILE_MAGIC_NUMBER,
-    INPUT_COMPONENT_MAGIC_NUMBER,
-    MODEL_COMPONENT_MAGIC_NUMBER,
-    SYNAPSE_SHAPE_COMPONENT,
-    MASTER_POP_MAGIC_NUMBER,
-    SYNAPSE_DYNAMICS,
-    SYNAPSE_STRUCTURE,
-    TIME_DEPENDENCY,
-    WEIGHT_DEPENDCY
-} components_e;
 
 // Globals
 
@@ -95,10 +99,10 @@ static bool initialize(uint32_t *timer_period) {
 
 
     // get the components that build up a delay extension
-    uint32_t components[8];
+    uint32_t components[NUM_COMPONENTS_MAGIC_NUMBERS];
     if (!simulation_read_components(
             data_specification_get_region(COMPONENTS_REGION, address),
-            8, components)) {
+            NUM_COMPONENTS_MAGIC_NUMBERS, components)) {
         return false;
     }
 
@@ -146,7 +150,9 @@ static bool initialize(uint32_t *timer_period) {
     uint32_t n_neurons;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, address),
-            recording_flags, &n_neurons)) {
+            recording_flags, &n_neurons,
+            components[INPUT_COMPONENT_MAGIC_NUMBER],
+            components[MODEL_COMPONENT_MAGIC_NUMBER])) {
         return false;
     }
 
@@ -156,7 +162,8 @@ static bool initialize(uint32_t *timer_period) {
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
             n_neurons, &input_buffers,
-            &ring_buffer_to_input_buffer_left_shifts)) {
+            &ring_buffer_to_input_buffer_left_shifts,
+            components[SYNAPSE_SHAPE_COMPONENT])) {
         return false;
     }
     neuron_set_input_buffers(input_buffers);
@@ -166,14 +173,16 @@ static bool initialize(uint32_t *timer_period) {
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, address),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
-            &row_max_n_words)) {
+            &row_max_n_words, components[MASTER_POP_MAGIC_NUMBER])) {
         return false;
     }
 
     // Set up the synapse dynamics
     if (!synapse_dynamics_initialise(
             data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address),
-            n_neurons, ring_buffer_to_input_buffer_left_shifts)) {
+            n_neurons, ring_buffer_to_input_buffer_left_shifts,
+            components[SYNAPSE_DYNAMICS], components[SYNAPSE_STRUCTURE],
+            components[TIME_DEPENDENCY], components[WEIGHT_DEPENDENCY])) {
         return false;
     }
 

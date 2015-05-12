@@ -8,6 +8,9 @@
 #include "../common/maths.h"
 #include "../common/post_events.h"
 
+// constants
+#include "../../../common/constants.h"
+
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
 #include <string.h>
@@ -184,19 +187,54 @@ static inline index_t _sparse_axonal_delay(uint32_t x) {
     return ((x >> SYNAPSE_DELAY_TYPE_INDEX_BITS) & SYNAPSE_AXONAL_DELAY_MASK);
 }
 
+//! \brief initiliser for the plastic side of the model
+//! \param[in] address the address in SDRAM where the plastic data is stored
+//! \param[in] n_neurons the number of enurons this modle is expected to
+//!                     simulate
+//! \param[in] ring_buffer_to_input_buffer_left_shifts
+//!      how much binary left shift to move stuff in the ring buffer by
+//! \param[in] synapse_dynamics_magic_number the magic number for the dynamics
+//! for this model
+//! \param[in] synapse_plastic_strucutre the magic number for the way the
+//! plastic rows are stored.
+//! \param[in] time_dependency_magic_number the magic number for the timing
+//! depednecny which this model was compiled with
+//! \param[in] weight_dependency_magic_number the magic number for the
+//! weight dependency which this model was compiled with
+//! \return bool true if the initialiser succeds, false otherwise
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        uint32_t *ring_buffer_to_input_buffer_left_shifts,
+        uint32_t synapse_dynamics_magic_number,
+        uint32_t synapse_plastic_strucutre,
+        uint32_t time_dependency_magic_number,
+        uint32_t weight_dependency_magic_number) {
+
+    bool meets_dynamics_magic_number =
+        synapse_dynamics_magic_number == SYNAPSE_DYNAMICS_STDP_MAD;
+
+    bool meets_plastic_structure =
+        synapse_plastic_strucutre == SYNAPSE_PLASTIC_STRUCTURE_WEIGHT;
+
+    if (!meets_dynamics_magic_number || !meets_plastic_structure){
+        log_error("expected magic number 0x%x, 0x%x got magic number 0x%x, "
+                  " 0x%x instead.",
+                  SYNAPSE_DYNAMICS_STDP_MAD, SYNAPSE_PLASTIC_STRUCTURE_WEIGHT,
+                  synapse_dynamics_magic_number, synapse_plastic_strucutre);
+        return false;
+    }
 
     // Load timing dependence data
-    address_t weight_region_address = timing_initialise(address);
+    address_t weight_region_address =
+        timing_initialise(address, time_dependency_magic_number);
     if (address == NULL) {
         return false;
     }
 
     // Load weight dependence data
     address_t weight_result = weight_initialise(
-        weight_region_address, ring_buffer_to_input_buffer_left_shifts);
+        weight_region_address, ring_buffer_to_input_buffer_left_shifts,
+        weight_dependency_magic_number);
     if (weight_result == NULL) {
         return false;
     }

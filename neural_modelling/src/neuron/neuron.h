@@ -25,11 +25,15 @@
 //!            NEURON_PARAMS data region in SDRAM
 //! \param[in] recording_flags_param the recordings parameters
 //!            (contains which regions are active and how big they are)
+//! \param[in] input_magic_number the input type magic number for the model
+//! \param[in] model_magic_number the model magic number for the model
+//! \param[in] synapse_shape_magic_number the shaping magic number for the model
 //! \param[out] n_neurons_value The number of neurons this model is to emulate
 //! \return boolean which is True is the translation was successful
 //! otherwise False
-bool neuron_initialise(address_t address, uint32_t recording_flags,
-                       uint32_t *n_neurons_value);
+bool neuron_initialise(
+    address_t address, uint32_t recording_flags, uint32_t *n_neurons_value,
+    uint32_t input_component_magic_number,  uint32_t model_component);
 
 
 //! \setter for the internal input buffers

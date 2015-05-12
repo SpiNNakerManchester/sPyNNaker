@@ -45,9 +45,10 @@ static inline void synapses_print_weight(weight_t weight, uint32_t left_shift) {
         log_debug("      ");
 }
 
-bool synapses_initialise(address_t address, uint32_t n_neurons,
-                         input_t **input_buffers_value,
-                         uint32_t **ring_buffer_to_input_buffer_left_shifts);
+bool synapses_initialise(
+    address_t address, uint32_t n_neurons, input_t **input_buffers_value,
+    uint32_t **ring_buffer_to_input_buffer_left_shifts,
+    uint32_t synapse_shape_magic_number);
 
 void synapses_do_timestep_update(timer_t time);
 

@@ -3,7 +3,7 @@
 
 #include "../synapse_structure/synapse_structure.h"
 
-address_t timing_initialise(address_t address);
+address_t timing_initialise(address_t address, uint32_t timing_magic_number);
 
 static post_trace_t timing_get_initial_post_trace();
 

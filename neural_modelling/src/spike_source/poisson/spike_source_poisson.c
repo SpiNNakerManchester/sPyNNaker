@@ -41,7 +41,7 @@ typedef struct fast_spike_source_t {
 
 //! spike source array region ids in human readable form
 typedef enum region{
-    system, poisson_params, spike_history,
+    TIMINGS, COMPONENTS, RECORDING_DATA, POISSON_PARAMS, SPIKE_HISTORY,
 }region;
 
 //! what each position in the poisson parameter region actually represent in
@@ -196,7 +196,7 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details
     if (!simulation_read_timing_details(
-            data_specification_get_region(system, address),
+            data_specification_get_region(TIMINGS, address),
             timer_period, &simulation_ticks)) {
         return false;
     }
@@ -204,7 +204,8 @@ static bool initialize(uint32_t *timer_period) {
      // get the components that build up a delay extension
     uint32_t components[1];
     if (!simulation_read_components(
-            data_specification_get_region(0, address), 1, components)) {
+            data_specification_get_region(COMPONENTS, address), 1,
+            components)) {
         return false;
     }
 
@@ -216,13 +217,13 @@ static bool initialize(uint32_t *timer_period) {
     // Get the recording information
     uint32_t spike_history_region_size;
     recording_read_region_sizes(
-        &data_specification_get_region(system, address)
+        &data_specification_get_region(RECORDING_DATA, address)
         [RECORDING_POSITION_IN_REGION], &recording_flags,
         &spike_history_region_size, NULL, NULL);
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
         if (!recording_initialse_channel(
-                data_specification_get_region(spike_history, address),
+                data_specification_get_region(SPIKE_HISTORY, address),
                 e_recording_channel_spike_history, spike_history_region_size)) {
             return false;
         }
@@ -230,7 +231,7 @@ static bool initialize(uint32_t *timer_period) {
 
     // Setup regions that specify spike source array data
     if (!read_poisson_parameters(
-            data_specification_get_region(poisson_params, address))) {
+            data_specification_get_region(POISSON_PARAMS, address))) {
         return false;
     }
 

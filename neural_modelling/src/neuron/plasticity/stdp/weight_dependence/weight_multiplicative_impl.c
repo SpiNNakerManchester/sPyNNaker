@@ -1,4 +1,5 @@
 #include "weight_multiplicative_impl.h"
+#include "../../../../common/constants.h"
 
 //---------------------------------------
 // Globals
@@ -11,11 +12,20 @@ uint32_t weight_multiply_right_shift[SYNAPSE_TYPE_COUNT];
 //---------------------------------------
 // Functions
 //---------------------------------------
-uint32_t *weight_initialise(uint32_t *address,
-                            uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+uint32_t *weight_initialise(
+        uint32_t *address, uint32_t *ring_buffer_to_input_buffer_left_shifts,
+        uint32_t weight_dependence_magic_number) {
 
     log_info("weight_initialise: starting");
     log_info("\tSTDP multiplicative weight dependence");
+
+    if (weight_dependence_magic_number !=
+        WEIGHT_DEPENDENCY_MULTIPLICATIVE_MAGIC_NUMBER){
+        log_error("expected magic number 0x%x, got magic number 0x%x instead.",
+                  WEIGHT_DEPENDENCY_MULTIPLICATIVE_MAGIC_NUMBER,
+                  weight_dependence_magic_number);
+        return (address_t) NULL;
+    }
 
     // Copy plasticity region data from address
     // **NOTE** this seems somewhat safer than relying on sizeof

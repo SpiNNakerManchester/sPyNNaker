@@ -1,4 +1,5 @@
 #include "neuron_model_lif_curr_impl.h"
+#include "../../common/constants.h"
 
 #include <debug.h>
 
@@ -37,6 +38,36 @@ void neuron_model_set_machine_timestep(timer_t microsecs) {
 
     // 10 for 1ms time step, 1 for 0.1ms time step which is minimum
     refractory_time_update = microsecs / time_step_divider;
+}
+
+//! \brief setup function which needs to check that the magic numebrs work
+//! correctly
+//! \param[in] input_magic_number the input type magic number for the model
+//! \param[in] model_magic_number the model magic number for the model
+//! \return This method returns true if the magic numbers match, false otherwise
+bool neuron_model_check_magic_number(
+        uint32_t input_magic_number, uint32_t model_magic_number){
+
+    // check that the magic numbers are correct
+    bool meet_input_magic_number =
+        input_magic_number == INPUT_CURRENT_COMPONENT_MAGIC_NUMBER;
+    bool meet_model_magic_number =
+        model_magic_number == MODEL_COMPONENT_INTEGRATE_AND_FIRE_MAGIC_NUMBER;
+
+    // do comparision
+    if (meet_input_magic_number && meet_model_magic_number) {
+        return true;
+    }
+    else {
+        log_error(
+        "Was expecting magic numbers  0x%x, 0x%x \n "
+        "Got magic magic numbers 0x%x, 0x%x",
+        INPUT_CURRENT_COMPONENT_MAGIC_NUMBER,
+        MODEL_COMPONENT_INTEGRATE_AND_FIRE_MAGIC_NUMBER,
+        input_magic_number, model_magic_number);
+        return false;
+    }
+    return false;
 }
 
 bool neuron_model_state_update(input_t exc_input, input_t inh_input,

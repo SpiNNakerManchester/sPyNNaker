@@ -1,4 +1,5 @@
 #include "timing_nearest_pair_impl.h"
+#include "../../../../common/constants.h"
 
 //---------------------------------------
 // Globals
@@ -10,10 +11,20 @@ int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 //---------------------------------------
 // Functions
 //---------------------------------------
-address_t timing_initialise(address_t address) {
+address_t timing_initialise(address_t address,
+                            uint32_t time_dependency_magic_number) {
 
     log_info("timing_initialise: starting");
     log_info("\tSTDP nearest-pair rule");
+
+    if (time_dependency_magic_number !=
+        TIME_DEPENDENCY_SPIKE_NEAREST_PAIR_MAGIC_NUMBER){
+        log_error("expected magic number 0x%x, got magic number 0x%x instead.",
+                  TIME_DEPENDENCY_SPIKE_NEAREST_PAIR_MAGIC_NUMBER,
+                  time_dependency_magic_number);
+        return NULL;
+    }
+
     // **TODO** assert number of neurons is less than max
 
     // Copy LUTs from following memory

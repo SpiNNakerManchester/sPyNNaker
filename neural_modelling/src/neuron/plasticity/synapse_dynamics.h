@@ -6,7 +6,11 @@
 
 bool synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,
-    uint32_t *ring_buffer_to_input_buffer_left_shifts);
+    uint32_t *ring_buffer_to_input_buffer_left_shifts,
+    uint32_t synapse_dynamics_magic_number,
+    uint32_t synapse_plastic_strucutre,
+    uint32_t time_dependency_magic_number,
+    uint32_t weight_dependency_magic_number);
 
 void synapse_dynamics_process_plastic_synapses(
     address_t plastic_region_address, address_t fixed_region_address,
