@@ -11,7 +11,6 @@
 
 // Constants
 #define DELAY_STAGE_LENGTH  16
-#define APPLICATION_MAGIC_NUMBER 0xAC4
 
 // Globals
 static uint32_t key = 0;
@@ -117,7 +116,7 @@ static bool initialize(uint32_t *timer_period) {
     // Get the timing details
     if (!simulation_read_timing_details(
             data_specification_get_region(0, address),
-            APPLICATION_MAGIC_NUMBER, timer_period, &simulation_ticks)) {
+            APPLICATION_NAME_HASH, timer_period, &simulation_ticks)) {
         return false;
     }
 

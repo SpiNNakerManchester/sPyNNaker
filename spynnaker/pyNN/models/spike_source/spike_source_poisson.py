@@ -40,7 +40,6 @@ class SpikeSourcePoisson(
     a pynn_population.py of virtual neurons each with its own parameters.
     """
 
-    CORE_APP_IDENTIFIER = constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="_POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
@@ -164,8 +163,7 @@ class SpikeSourcePoisson(
         """
 
         self._write_basic_setup_info(
-            spec, SpikeSourcePoisson.CORE_APP_IDENTIFIER,
-            self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+            spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         recording_info = 0
         if (spike_history_region_sz > 0) and self._record:
             recording_info |= constants.RECORD_SPIKE_BIT
