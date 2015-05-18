@@ -7,11 +7,9 @@
 //!        correct component was compiled in and the data is well formed in
 //!        SDRAM
 //! \param[in] address The SDRAM address where the timing params are stored
-//! \param[in] timing_magic_number the magic number which represents the
-//!            timing component being compiled in.
 //! \return a address pram which is NULL if the init failed, or the
 //!  the end of the timing region as an absolute SDRAM memory address,
-address_t timing_initialise(address_t address, uint32_t timing_magic_number);
+address_t timing_initialise(address_t address);
 
 static post_trace_t timing_get_initial_post_trace();
 

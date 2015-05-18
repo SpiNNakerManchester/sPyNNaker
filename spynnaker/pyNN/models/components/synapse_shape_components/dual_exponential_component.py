@@ -9,6 +9,7 @@ from spynnaker.pyNN.utilities import utility_calls
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
+import hashlib
 
 # tau_syn_E, tau_syn_E2 and tau_syn_I and initializers
 NUM_SYNAPSE_PARAMS = 6
@@ -153,4 +154,5 @@ class DualExponentialComponent(AbstractSynapseShapeComponent,
         override from AbstractSynapseShapeComponent
         :return:
         """
-        return constants.SYNAPSE_SHAPING_DUEL_EXP_MAGIC_NUMBER
+        return [hashlib.md5(
+            "synapse_types_duel_excitatory_exponential_impl").hexdigest()[:8]]

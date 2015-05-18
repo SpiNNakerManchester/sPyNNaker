@@ -17,8 +17,8 @@ from data_specification.enums.data_type import DataType
 
 
 class IFCurrentExponentialPopulation(
-    ExponentialComponent, IntegrateAndFireComponent, CurrentComponent,
-    AbstractPopulationVertex):
+        ExponentialComponent, IntegrateAndFireComponent, CurrentComponent,
+        AbstractPopulationVertex):
     """
     IFCurrentExponentialPopulation: model which represents a leaky intergate
     and fire model with a exponetial decay curve and based off current.

@@ -6,7 +6,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
     import plasticity_helpers
 
 import logging
-from spynnaker.pyNN.utilities import constants
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +95,6 @@ class SpikePairTimeDependency(AbstractTimeDependency):
         :return:
         """
         if self._nearest:
-            return [constants.TIME_DEPENDENCY_SPIKE_NEAREST_PAIR_MAGIC_NUMBER]
+            return [hashlib.md5("timing_nearest_pair_impl.h").hexdigest()[:8]]
         else:
-            return [constants.TIME_DEPENDENCY_SPIKE_PAIR_MAGIC_NUMBER]
+            return [hashlib.md5("timing_pair_impl.h").hexdigest()[:8]]

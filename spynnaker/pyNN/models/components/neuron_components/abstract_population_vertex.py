@@ -13,6 +13,7 @@ from abc import ABCMeta, abstractmethod
 from math import ceil
 from six import add_metaclass
 import logging
+import hashlib
 
 
 logger = logging.getLogger(__name__)
@@ -105,10 +106,10 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
         """
         # collect assoicated indentifers
         component_indetifers = list()
-        component_indetifers.append(constants.NEURON_MAGIC_NUMBER)
-        component_indetifers.append(self.get_input_magic_number())
-        component_indetifers.append(self.get_model_magic_number())
-        component_indetifers.append(self.get_synapse_shape_magic_number())
+        component_indetifers.append(hashlib.md5("c_main.c").hexdigest()[:8])
+        component_indetifers.extend(self.get_input_magic_number())
+        component_indetifers.extend(self.get_model_magic_number())
+        component_indetifers.extend(self.get_synapse_shape_magic_number())
         component_indetifers.extend(
             self.get_component_magic_number_identifiers())
         return component_indetifers

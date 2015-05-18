@@ -21,6 +21,7 @@ from spynnaker.pyNN.models.neural_properties import master_pop_table_generators
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.utilities import utility_calls
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -32,6 +33,7 @@ from data_specification import utility_calls as dsg_utilities
 
 # general imports
 import logging
+# noinspection PyUnresolvedReferences
 import math
 import numpy
 import sys
@@ -39,6 +41,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from six import add_metaclass
 from scipy import special
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +194,7 @@ class AbstractSynapticManager(
                     for synapse_row in sublist.get_rows()])
 
             # check that the max_n_words is greater than zero
-            #assert(max_n_words > 0)
+            # assert(max_n_words > 0)
             all_syn_block_sz = \
                 self._calculate_all_synaptic_block_size(sublist,
                                                         max_n_words)
@@ -278,8 +281,9 @@ class AbstractSynapticManager(
                                 "Different STDP mechanisms on the same"
                                 " vertex are not supported")
 
+    @staticmethod
     @abstractmethod
-    def get_n_synapse_type_bits(self):
+    def get_n_synapse_type_bits():
         """
         Return the number of bits used to identify the synapse in the synaptic
         row
@@ -355,6 +359,7 @@ class AbstractSynapticManager(
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
+    # noinspection PyUnresolvedReferences
     @staticmethod
     def _ring_buffer_expected_upper_bound(
             weight_mean, weight_std_dev, spikes_per_second,
@@ -471,6 +476,7 @@ class AbstractSynapticManager(
         return (total_weights, total_square_weights, total_items,
                 absolute_max_weights)
 
+    # noinspection PyUnresolvedReferences
     def get_ring_buffer_to_input_left_shifts(
             self, subvertex, sub_graph, graph_mapper, spikes_per_second,
             machine_timestep, sigma):
@@ -569,6 +575,7 @@ class AbstractSynapticManager(
         :param subgraph:
         :return:
         """
+        utility_calls.unused(all_syn_block_sz)
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
 
@@ -660,7 +667,6 @@ class AbstractSynapticManager(
             post_subvertex, routing_infos, subgraph)
 
         # translate the synaptic block into a sublist of synapse_row_infos
-        synapse_list = None
         if max_row_length > 0:
             synapse_list = \
                 self._translate_synaptic_block_from_memory(
@@ -848,5 +854,6 @@ class AbstractSynapticManager(
             # FIXME this is defined in the dge, its inpossible currently for the
             # FIXME synaptic manager to determine if this is true.
             core_identifiers.extend(
-                [constants.SYNAPSE_DYNAMICS_STATIC, 0, 0, 0])
+                [hashlib.md5("synapse_dynamics_static_impl.c").hexdigest()[:8],
+                 0, 0])
         return core_identifiers

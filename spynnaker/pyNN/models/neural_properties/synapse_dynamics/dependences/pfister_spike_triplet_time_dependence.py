@@ -6,7 +6,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
     import plasticity_helpers
 
 import logging
-from spynnaker.pyNN.utilities import constants
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -111,4 +111,4 @@ class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
         compoent or its entire components.
         :return:
         """
-        return [constants.TIME_DEPENDENCY_PFISTER_SPIKE_TRIPLET_MAGIC_NUMBER]
+        return [hashlib.md5("timing_pfister_triplet_impl.h").hexdigest()[:8]]

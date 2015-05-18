@@ -3,10 +3,6 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
 from spynnaker.pyNN.models.neural_properties.synapse_row_info import \
     SynapseRowInfo
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.common_objects.\
-    abstract_requires_component_magic_number import \
-    AbstractRequiresComponentMagicNumber
-from spynnaker.pyNN.utilities import constants
 
 import numpy
 
@@ -15,8 +11,7 @@ import numpy
 # wash and that its just pycharm being stupid again
 
 
-class FixedSynapseRowIO(AbstractSynapseRowIo,
-                        AbstractRequiresComponentMagicNumber):
+class FixedSynapseRowIO(AbstractSynapseRowIo):
 
     zero_weight_error_displayed = False
 
@@ -125,10 +120,3 @@ class FixedSynapseRowIO(AbstractSynapseRowIo,
 
         return SynapseRowInfo(target_indices, weights, delays_in_ticks,
                               synapse_types)
-
-    def get_component_magic_number_identifiers(self):
-        """
-        override from AbstractRequiresComponentMagicNumber
-        :return:
-        """
-        return [constants.SYNAPSE_STRUCTURE_FIXED]

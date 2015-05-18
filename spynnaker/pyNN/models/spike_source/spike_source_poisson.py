@@ -27,6 +27,7 @@ from enum import Enum
 import math
 import numpy
 import logging
+import hashlib
 
 
 logger = logging.getLogger(__name__)
@@ -46,8 +47,7 @@ class SpikeSourcePoisson(
     a pynn_population.py of virtual neurons each with its own parameters.
     """
 
-    CORE_APP_IDENTIFIER = \
-        constants.SPIKE_SOURCE_POISSON_MAGIC_NUMBER
+    CORE_APP_IDENTIFIER = hashlib.md5("spike_source_poisson").hexdigest()[:8]
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="_POISSON_SPIKE_SOURCE_REGIONS",
         names=[('TIMINGS', 0),

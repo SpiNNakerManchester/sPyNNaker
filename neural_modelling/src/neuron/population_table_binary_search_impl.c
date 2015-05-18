@@ -49,21 +49,12 @@ static inline void _print_master_population_table() {
 //! \param[in] synapse_rows_address the address in SDRAM where synpase rows
 //!            start
 //! \param[in] row_max_n_words the max size a sybnapse row can be in words
-//! \param[in] master_pop_magic_number the magic number identifer for the
-//!            master pop data strcuture
 //! \return true if the initialiser is valid false otherwise
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
-        uint32_t *row_max_n_words, uint32_t master_pop_table_magic_number) {
-    log_info("population_table_initialise: starting");
+        uint32_t *row_max_n_words) {
 
-    if (master_pop_table_magic_number != MASTER_POP_BINARY_SEARCH_MAGIC_NUMBER){
-        log_error("expected magic number 0x%x, got magic number 0x%x instead.",
-                  MASTER_POP_BINARY_SEARCH_MAGIC_NUMBER,
-                  master_pop_table_magic_number);
-        return false;
-    }
-
+    log_info("population_table_binary_search_initialise: started");
     master_population_table_length = table_address[0];
     uint32_t n_bytes = master_population_table_length *
                        sizeof(master_population_table_entry);
@@ -83,7 +74,8 @@ bool population_table_initialise(
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
 
     _print_master_population_table();
-    log_info("population_table_initialise: completed successfully");
+    log_info("population_table_binary_search_initialise: "
+             "completed successfully");
     return true;
 }
 

@@ -1,6 +1,5 @@
 #include "../common/neuron-typedefs.h"
 #include "../common/in_spikes.h"
-#include "../common/constants.h"
 
 #include <bit_field.h>
 #include <data_specification.h>

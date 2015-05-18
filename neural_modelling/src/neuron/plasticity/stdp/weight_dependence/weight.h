@@ -25,14 +25,11 @@
  * \param[in] ring_buffer_to_input_buffer_left_shifts: how much a value needs
  * to be shifted in the left direction to support comprises with fixed point
  * arithmetic
- * \param[in] weight_dependence_magic_number the magic number which represents
- * which weight dedependence component this model is expected to use.
  * \return address_t: returns the end of the weight region as an absolute
  * SDRAM memory address, or NULL if the init failed.
  */
 address_t weight_initialise(
-        address_t address, uint32_t *ring_buffer_to_input_buffer_left_shifts,
-        uint32_t weight_dependence_magic_number);
+        address_t address, uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
 /*!
  * \brief

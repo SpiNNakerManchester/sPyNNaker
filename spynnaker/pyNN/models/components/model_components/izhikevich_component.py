@@ -4,11 +4,11 @@ IzhikevichComponent
 from spynnaker.pyNN.models.components.model_components.\
     abstract_model_component import AbstractModelComponent
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.utilities import constants
 
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
+import hashlib
 
 
 @add_metaclass(ABCMeta)
@@ -110,4 +110,4 @@ class IzhikevichComponent(AbstractModelComponent):
         override from AbstractModelComponent
         :return:
         """
-        return constants.MODEL_COMPONENT_IZHIKEVICH_MAGIC_NUMBER
+        return [hashlib.md5("neuron_model_lif_curr_impl.h").hexdigest()[:8]]

@@ -1,7 +1,7 @@
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_weight_dependency import AbstractWeightDependency
-from spynnaker.pyNN.utilities import constants
+import hashlib
 
 
 class AdditiveWeightDependence(AbstractWeightDependency):
@@ -12,6 +12,7 @@ class AdditiveWeightDependence(AbstractWeightDependency):
         AbstractWeightDependency.__init__(self, w_min=w_min, w_max=w_max,
                                           A_plus=A_plus, A_minus=A_minus,
                                           A3_plus=A3_plus, A3_minus=A3_minus)
+        self._num_terms = None
 
     def is_weight_dependance_rule_part(self):
         return True
@@ -74,6 +75,7 @@ class AdditiveWeightDependence(AbstractWeightDependency):
             elif num_terms != 1:
                 raise NotImplementedError("Additive weight dependence only"
                                           " supports one or two terms")
+            self._num_terms = num_terms
 
     @property
     def vertex_executable_suffix(self):
@@ -85,5 +87,10 @@ class AdditiveWeightDependence(AbstractWeightDependency):
         compoent or its entire components.
         :return:
         """
-        return [constants.WEIGHT_DEPENDENCY_ADDITIVE_MAGIC_NUMBER]
+        if self._num_terms == 2:
+            return [hashlib.md5(
+                "weight_additive_one_term_impl.h").hexdigest()[:8]]
+        else:
+            return [hashlib.md5(
+                "weight_additive_two_term_impl.h").hexdigest()[:8]]
 

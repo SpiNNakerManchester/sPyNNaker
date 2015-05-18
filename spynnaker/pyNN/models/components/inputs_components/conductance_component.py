@@ -5,11 +5,10 @@ AbstractConductanceVertex
 from spynnaker.pyNN.models.components.inputs_components.\
     abstract_input_type_component import AbstractInputTypeComponent
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.utilities import constants
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
-
+import hashlib
 
 @add_metaclass(ABCMeta)
 class ConductanceComponent(AbstractInputTypeComponent):
@@ -74,7 +73,7 @@ class ConductanceComponent(AbstractInputTypeComponent):
         over loaded from AbstractInputTypeComponent
         :return:
         """
-        return constants.INPUT_CONDUCTANCE_COMPONENT_MAGIC_NUMBER
+        return [hashlib.md5("0").hexdigest()[:8]]
 
     @abstractmethod
     def is_conductance(self):

@@ -16,24 +16,12 @@ int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 //!        correct component was compiled in and the data is well formed in
 //!        SDRAM
 //! \param[in] address The SDRAM address where the timing params are stored
-//! \param[in] timing_magic_number the magic number which represents the
-//!            timing component being compiled in.
 //! \return a address pram which is NULL if the init failed, or the
 //!  the end of the timing region as an absolute SDRAM memory address,
-address_t timing_initialise(
-        address_t address, uint32_t time_dependency_magic_number) {
+address_t timing_initialise(address_t address) {
 
     log_info("timing_initialise: starting");
     log_info("\tSTDP pair rule");
-    // **TODO** assert number of neurons is less than max
-
-    if (time_dependency_magic_number !=
-        TIME_DEPENDENCY_SPIKE_PAIR_MAGIC_NUMBER){
-        log_error("expected magic number 0x%x, got magic number 0x%x instead.",
-                  TIME_DEPENDENCY_SPIKE_PAIR_MAGIC_NUMBER,
-                  time_dependency_magic_number);
-        return NULL;
-    }
 
     // Copy LUTs from following memory
     address_t lut_address = maths_copy_int16_lut(&address[0], TAU_PLUS_SIZE,

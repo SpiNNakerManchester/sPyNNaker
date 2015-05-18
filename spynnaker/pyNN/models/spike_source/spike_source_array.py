@@ -37,6 +37,7 @@ from spinnman.messages.eieio.command_messages.event_stop_request\
 
 # general imports
 from enum import Enum
+import hashlib
 import logging
 import sys
 
@@ -51,8 +52,8 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
     model for play back of spikes
     """
 
-    CORE_APP_IDENTIFIER = (front_end_common_constants
-                           .REVERSE_IP_TAG_MULTICAST_SOURCE_MAGIC_NUMBER)
+    CORE_APP_IDENTIFIER = \
+        hashlib.md5("reverse_iptag_multicast_source").hexdigest()[:8]
     _CONFIGURATION_REGION_SIZE = 36
 
     # limited to the n of the x,y,p,n key format

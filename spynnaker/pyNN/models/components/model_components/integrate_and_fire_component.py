@@ -1,13 +1,12 @@
-import numpy
 from spynnaker.pyNN.models.components.model_components.\
     abstract_model_component import AbstractModelComponent
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.components.model_components.\
-    leaky_integrate_component.LeakyIntegrateComponent
+    leaky_integrate_component import LeakyIntegrateComponent
 from spynnaker.pyNN.utilities import utility_calls
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
+import hashlib
 
 
 @add_metaclass(ABCMeta)
@@ -91,4 +90,4 @@ class IntegrateAndFireComponent(
         override from AbstractModelComponent
         :return:
         """
-        return constants.MODEL_COMPONENT_INTEGRATE_AND_FIRE_MAGIC_NUMBER
+        return [hashlib.md5("0").hexdigest()[:8]]

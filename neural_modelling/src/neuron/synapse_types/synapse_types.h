@@ -118,7 +118,14 @@ static void synapse_types_print_input(
 //! \brief check that the magic number handed to the shaping code is valid
 //! \param[in] shaping_magic_number the magic number to check
 //! \return bool where true says its valid and false otherwise
-static bool synapse_types_initialise(
-        uint32_t shaping_magic_number);
+static inline bool synapse_types_initialise(
+        uint32_t shaping_magic_number){
+    if (shaping_magic_number == SYNAPSE_SHAPING_MAGIC_NUMBER){
+        return true;
+    }
+    log_error("expected magic number 0x%x, got magic number 0x%x instead.",
+                  SYNAPSE_SHAPING_MAGIC_NUMBER, shaping_magic_number);
+    return false;
+}
 
 #endif // _SYNAPSE_TYPES_H_

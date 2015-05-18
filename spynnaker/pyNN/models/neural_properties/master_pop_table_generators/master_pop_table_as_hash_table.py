@@ -5,7 +5,7 @@ from spynnaker.pyNN.models.neural_properties.master_pop_table_generators\
     .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 import logging
-from spynnaker.pyNN.utilities import constants
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -97,4 +97,4 @@ class MasterPopTableAsHashTable(AbstractMasterPopTableFactory):
         abstract_master_pop_table_factory.get_component_magic_number_identifier
         :return:
         """
-        return [constants.MASTER_POP_HASH_TABLE_MAGIC_NUMBER]
+        return [hashlib.md5("population_table_hash_impl").hexdigest()[:8]]

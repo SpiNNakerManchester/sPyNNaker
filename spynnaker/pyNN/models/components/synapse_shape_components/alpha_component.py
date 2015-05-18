@@ -10,6 +10,7 @@ from spynnaker.pyNN.utilities import constants
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
+import hashlib
 
 
 @add_metaclass(ABCMeta)
@@ -26,7 +27,7 @@ class AlphaComponent(AbstractSynapseShapeComponent):
         over ridden from AbstractSynapseShapeComponent
         :return:
         """
-        return constants.SYNAPSE_SHAPING_DELTA_MAGIC_NUMBER
+        return [hashlib.md5("synapse_types_alpha_impl").hexdigest()[:8]]
 
     @abstractmethod
     def is_alpha_shaped(self):

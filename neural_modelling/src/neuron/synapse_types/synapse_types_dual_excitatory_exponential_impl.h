@@ -38,20 +38,6 @@ typedef enum input_buffer_regions {
     EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY,
 } input_buffer_regions;
 
-
-//! \brief check that the magic number handed to the shaping code is valid
-//! \param[in] shaping_magic_number the magic number to check
-//! \return bool where true says its valid and false otherwise
-static inline bool synapse_types_initialise(
-        uint32_t shaping_magic_number){
-    if (shaping_magic_number == SYNAPSE_SHAPING_DUEL_EXP_MAGIC_NUMBER){
-        return true;
-    }
-    log_error("expected magic number 0x%x, got magic number 0x%x instead.",
-              SYNAPSE_SHAPING_DUEL_EXP_MAGIC_NUMBER, shaping_magic_number);
-    return false;
-}
-
 //---------------------------------------
 // Synapse shaping inline implementation
 //---------------------------------------

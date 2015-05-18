@@ -127,41 +127,14 @@ static inline pre_event_history_t *_plastic_event_history(
 //!            simulate
 //! \param[in] ring_buffer_to_input_buffer_left_shifts
 //!            how much binary left shift to move stuff in the ring buffer by
-//! \param[in] synapse_dynamics_magic_number the magic number which represetns
-//!            which type of plastisity this model is implimenting
-//! \param[in] synapse_plastic_strucutre_magic_number the magic number whihc
-//!            represetns the way the synapse row data is stored
-//! \param[in] time_dependency_magic_number the magic number which indicates
-//!            which time dependence component this model is expected to use
-//! \param[in] weight_dependency_magic_number the magic number which indicates
-//!            which weight dependence component this model is expected to use
 //! \return bool which is either true if all things were set up correctly or
 //!              false otherwise
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts,
-        uint32_t synapse_dynamics_magic_number,
-        uint32_t synapse_plastic_strucutre,
-        uint32_t time_dependency_magic_number,
-        uint32_t weight_dependency_magic_number) {
-
-    bool meets_dynamics_magic_number =
-        synapse_dynamics_magic_number == SYNAPSE_DYNAMICS_STDP;
-
-    bool meets_plastic_structure =
-        synapse_plastic_strucutre == SYNAPSE_PLASTIC_STRUCTURE_WEIGHT;
-
-    if (!meets_dynamics_magic_number || !meets_plastic_structure){
-        log_error("expected magic number 0x%x, 0x%x got magic number 0x%x, 0x%x"
-                  "instead.",
-                  SYNAPSE_DYNAMICS_STDP, SYNAPSE_PLASTIC_STRUCTURE_WEIGHT,
-                  synapse_dynamics_magic_number, synapse_plastic_strucutre);
-        return false;
-    }
+        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
     // Load timing dependence data
-    address_t weight_region_address =
-        timing_initialise(address, time_dependency_magic_number);
+    address_t weight_region_address =timing_initialise(address);
     if (weight_region_address == NULL) {
         return false;
     }

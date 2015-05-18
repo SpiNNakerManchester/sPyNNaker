@@ -39,7 +39,7 @@ import copy
 import logging
 from enum import Enum
 import math
-
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     of the maximum delays of a neuron (typically 16 or 32)
     """
 
-    CORE_APP_IDENTIFIER = constants.DELAY_MAGIC_NUMBER
+    CORE_APP_IDENTIFIER = hashlib.md5("delay_extension").hexdigest()[:8]
 
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
@@ -259,11 +259,12 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         this model
         :return:
         """
-
         # Write this to the system region (to be picked up by the simulation):
-        self._write_basic_setup_info(
-            spec, self.CORE_APP_IDENTIFIER,
-            self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
+        self._write_timings_region_info(
+            spec, self._DELAY_EXTENSION_REGIONS.TIMINGS.value)
+        self._write_component_to_region(
+            spec, self._DELAY_EXTENSION_REGIONS.COMPONENTS.value,
+            component_constants)
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
         """

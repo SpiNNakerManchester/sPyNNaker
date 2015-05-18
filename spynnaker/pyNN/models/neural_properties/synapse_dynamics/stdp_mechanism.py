@@ -12,6 +12,8 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_weight_dependency import AbstractWeightDependency
 
+import hashlib
+
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
 
@@ -190,12 +192,13 @@ class STDPMechanism(AbstractRequiresComponentMagicNumber):
         components_identifiers = list()
         # add synaptic dynamic check value
         if self._mad:
-            components_identifiers.append(constants.SYNAPSE_DYNAMICS_STDP_MAD)
+            components_identifiers.append(
+                hashlib.md5("synapse_dynamics_stdp_mad_impl").hexdigest()[:8]
+            )
         else:
-            components_identifiers.append(constants.SYNAPSE_DYNAMICS_STDP)
-        # add synapse structre component identifers
-        components_identifiers.extend(
-            self._synapse_row_io.get_component_magic_number_identifiers())
+            components_identifiers.append(
+                hashlib.md5("synapse_dynamics_stdp_impl").hexdigest()[:8]
+            )
         # add timing checks values
         components_identifiers.extend(
             self._timing_dependence.get_component_magic_number_identifiers())

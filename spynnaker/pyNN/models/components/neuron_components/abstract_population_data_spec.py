@@ -364,6 +364,14 @@ class AbstractPopulationDataSpec(
         spec.end_specification()
         data_writer.close()
 
+    @abstractmethod
+    def _get_components_magic_numbers(self):
+        """
+        helper method for getting components from a population:
+        implmented by abstract population vertex
+        :return:
+        """
+
     # inherited from data specable vertex
     def get_binary_file_name(self):
         """

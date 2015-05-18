@@ -1,3 +1,7 @@
+MD_FIVE_CONVERSION = md5sum | cut -c 1-8
+# md5sum | cut -c 1-8
+# $(shell echo -n "$(APP)" | md5sum | cut -c 1-8
+
 SYNAPSE_BENCHMARK = NO_SYNAPSE_BENCHMARKS
 
 ifeq ($(DEBUG), DEBUG)
@@ -18,49 +22,101 @@ ifndef PLASTIC_DEBUG
     PLASTIC_DEBUG = LOG_INFO
 endif
 
-#POPULATION_TABLE_IMPL ?= fixed
-POPULATION_TABLE_IMPL ?= binary_search
 
+#POPULATION_TABLE_IMPL ?= population_table_fixed_impl
+POPULATION_TABLE_IMPL ?= population_table_binary_search_impl
+
+# Run md5sum on master pop structure
+MASTER_POP_TABLE_DEFINITION = \
+     $(shell echo -n "basename $(POPULATION_TABLE_IMPL)" | $(MD_FIVE_CONVERSION))
+
+# run md5sum on main entrance file
+APPLICATION_MD5_HASH = \
+    $(shell echo -n "basename c_main" | $(MD_FIVE_CONVERSION))
+
+# Run md5sum on neural components
+INPUT_MD5_HASH = \
+    $(shell echo -n "basename 0" | $(MD_FIVE_CONVERSION))
+MODEL_MD5_HASH = \
+    $(shell echo -n "basename $(MODEL_PATH)" | $(MD_FIVE_CONVERSION))
+SYNAPSE_SHAPE_MD5_HASH = \
+    $(shell echo -n "basename $(SYNAPSE_TYPE_PATH)" | $(MD_FIVE_CONVERSION))
+
+# Run md5sum on synaptic components
+SYNAPSE_DYNAMICS_MD5_HASH = \
+    $(shell echo -n "basename $(SYNAPSE_DYNAMICS_PATH)" | $(MD_FIVE_CONVERSION))
+TIMING_DEPENDENCY_MD5_HASH = \
+    $(shell echo -n "basename $(STDP_TIMING_PATH)" | $(MD_FIVE_CONVERSION))
+WEIGHT_DEPENDENCY_MD5_HASH = \
+    $(shell echo -n "basename $(STDP_WEIGHT_PATH)" | $(MD_FIVE_CONVERSION))
+
+
+
+
+CFLAGS += -D$(SYNAPSE_BENCHMARK) \
+          -DMASTER_POP_MD5_HASH=0x$(MASTER_POP_TABLE_DEFINITION) \
+          -DSYNAPSE_SHAPE_MD5_HASH=0x$(SYNAPSE_SHAPE_MD5_HASH) \
+          -DSYNAPSE_DYNAMICS_MD5_HASH=0x$(SYNAPSE_DYNAMICS_MD5_HASH)\
+          -DTIMING_DEPENDENCY_MD5_HASH=0x$(TIMING_DEPENDENCY_MD5_HASH)\
+          -DWEIGHT_DEPENDENCY_MD5_HASH=0x$(WEIGHT_DEPENDENCY_MD5_HASH)\
+          -DMODEL_MD5_HASH=0x$(MODEL_MD5_HASH)\
+          -DINPUT_MD5_HASH=0x$(INPUT_MD5_HASH)\
+          -DAPPLICATION_NAME_HASH=0x$(APPLICATION_MD5_HASH)
+          
+MODEL_OBJS = $(MODEL_PATH).o $(SYNAPSE_DYNAMICS_PATH).o
+ifeq ($(USES_STDP), TRUE)
+    MODEL_OBJS += $(STDP_TIMING_PATH).o $(STDP_WEIGHT_PATH).o \
+                  $(SOURCE_DIRS)/neuron/plasticity/common/maths.o \
+                  $(SOURCE_DIRS)/neuron/plasticity/common/post_events.o
+endif
+
+# listing what objects are avilable?
 OBJECTS = $(SOURCE_DIRS)/common/in_spikes.o $(SOURCE_DIRS)/common/out_spikes.o \
           $(SOURCE_DIRS)/common/recording.o $(SOURCE_DIRS)/neuron/c_main.o \
           $(SOURCE_DIRS)/neuron/synapses.o  $(SOURCE_DIRS)/neuron/neuron.o \
 	      $(SOURCE_DIRS)/neuron/spike_processing.o \
 	      $(SOURCE_DIRS)/neuron/population_table_$(POPULATION_TABLE_IMPL)_impl.o $(MODEL_OBJS)
 
-SYNAPSE_TYPE_OBJECTS += $(BUILD_DIR)neuron/c_main.o \
-                        $(BUILD_DIR)neuron/synapses.o \
-                        $(BUILD_DIR)neuron/spike_processing.o \
-                        $(BUILD_DIR)neuron/population_table_fixed_impl.o \
-                        $(BUILD_DIR)neuron/population_table_binary_search_impl.o \
-                        $(BUILD_DIR)neuron/plasticity/synapse_dynamics_static_impl.o
-                       
+SYNAPSE_TYPE_PATH += $(BUILD_DIR)neuron/c_main.o \
+    $(BUILD_DIR)neuron/synapses.o \
+    $(BUILD_DIR)neuron/spike_processing.o \
+    $(BUILD_DIR)neuron/population_table_fixed_impl.o \
+    $(BUILD_DIR)neuron/population_table_binary_search_impl.o \
+    $(BUILD_DIR)neuron/plasticity/synapse_dynamics_static_impl.o
+
 STDP += $(BUILD_DIR)neuron/plasticity/stdp/synapse_dynamics_stdp_mad_impl.o \
         $(BUILD_DIR)neuron/plasticity/stdp/synapse_dynamics_stdp_impl.o \
         $(BUILD_DIR)neuron/plasticity/common/post_events.o
 
-STDP_WEIGHT_DEPENDENCE += $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.o \
-                          $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_additive_two_term_impl.o \
-                          $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.o
+STDP_WEIGHT_PATH += $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.o \
+    $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_additive_two_term_impl.o \
+    $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.o
 
-STDP_TIMING_DEPENDENCE += $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_nearest_pair_impl.o \
-                          $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pair_impl.o \
-                          $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pfister_triplet_impl.o
-
-CFLAGS += -D$(SYNAPSE_BENCHMARK)
+STDP_TIMING_PATH += $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_nearest_pair_impl.o \
+    $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pair_impl.o \
+    $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pfister_triplet_impl.o
 
 include ../../../Makefile.common
 
-$(SYNAPSE_TYPE_OBJECTS):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c $(SYNAPSE_TYPE_H)
+
+NEURON_MODEL_H = $(MODEL_PATH).h
+SYNAPSE_TYPE_H = $(SYNAPSE_TYPE_PATH).h
+TIMING_DEPENDENCE_H = $(STDP_TIMING_PATH).h
+WEIGHT_DEPENDENCE_H = $(STDP_WEIGHT_PATH).h
+PLASTIC_SYNAPSE_STRUCTURE_H = $(PLASTIC_STRUCTURE_PATH).h
+
+
+$(SYNAPSE_TYPE_PATH):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) \
 	                  -include $(SYNAPSE_TYPE_H) -o $@ $<
 	
-$(STDP_WEIGHT_DEPENDENCE):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c $(SYNAPSE_TYPE_H)
+$(STDP_WEIGHT_PATH):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	                  -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(STDP_TIMING_DEPENDENCE):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c \
+$(STDP_TIMING_PATH):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c \
                                            $(SYNAPSE_TYPE_H) \
                                            $(WEIGHT_DEPENDENCE_H) \
                                            $(PLASTIC_SYNAPSE_STRUCTURE_H)
@@ -84,19 +140,19 @@ $(BUILD_DIR)neuron/neuron.o: $(SOURCE_DIRS)/neuron/neuron.c $(NEURON_MODEL_H)\
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) -include $(NEURON_MODEL_H) \
 	                  -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(EXTRA_SYNAPSE_TYPE_OBJECTS):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c\
+$(EXTRA_SYNAPSE_TYPE_PATH):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c\
                               $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) \
 	                  -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(EXTRA_STDP_WEIGHT_DEPENDENCE):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c \
+$(EXTRA_STDP_WEIGHT_PATH):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c \
                                                  $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \ 
 	                  -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(EXTRA_STDP_TIMING_DEPENDENCE):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c \
+$(EXTRA_STDP_TIMING_PATH):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c \
                                 $(SYNAPSE_TYPE_H) $(WEIGHT_DEPENDENCE_H)\
                                 $(PLASTIC_SYNAPSE_STRUCTURE_H)
 	-mkdir -p $(dir $@)

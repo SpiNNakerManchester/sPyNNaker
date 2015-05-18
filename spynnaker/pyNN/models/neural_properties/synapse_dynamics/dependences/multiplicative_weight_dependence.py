@@ -1,8 +1,7 @@
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_weight_dependency import AbstractWeightDependency
-from spynnaker.pyNN.utilities import constants
-
+import hashlib
 
 class MultiplicativeWeightDependence(AbstractWeightDependency):
 
@@ -61,4 +60,4 @@ class MultiplicativeWeightDependence(AbstractWeightDependency):
         compoent or its entire components.
         :return:
         """
-        return [constants.WEIGHT_DEPENDENCY_MULTIPLICATIVE_MAGIC_NUMBER]
+        return [hashlib.md5("weight_multiplicative_impl.h").hexdigest()[:8]]

@@ -23,6 +23,7 @@ from data_specification.enums.data_type import DataType
 # general imports
 import logging
 import math
+import hashlib
 
 
 logger = logging.getLogger(__name__)
@@ -319,4 +320,4 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         abstract_master_pop_table_factory.get_component_magic_number_identifier
         :return:
         """
-        return [constants.MASTER_POP_2DARRAY_MAGIC_NUMBER]
+        return [hashlib.md5("population_table_fixed_impl").hexdigest()[:8]]
