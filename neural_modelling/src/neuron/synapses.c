@@ -235,34 +235,35 @@ bool synapses_initialise(
     }
 
     // Get the synapse shaping data
-    for (index_t synapse_index = 0; synapse_index < SYNAPSE_TYPE_COUNT;
-            synapse_index++) {
-        log_debug("\tCopying %u synapse type %u parameters of size %u",
-                n_neurons, synapse_index, sizeof(synapse_param_t));
+    if(sizeof(synapse_param_t) > 0) {
+        for (index_t synapse_index = 0; synapse_index < SYNAPSE_TYPE_COUNT;
+                synapse_index++) {
+            log_debug("\tCopying %u synapse type %u parameters of size %u",
+                    n_neurons, synapse_index, sizeof(synapse_param_t));
 
-        // Allocate block of memory for this synapse type'synapse_index
-        // pre-calculated per-neuron decay
-        neuron_synapse_shaping_params[synapse_index] =
-            (synapse_param_t *) spin1_malloc(
-                sizeof(synapse_param_t) * n_neurons);
+            // Allocate block of memory for this synapse type'synapse_index
+            // pre-calculated per-neuron decay
+            neuron_synapse_shaping_params[synapse_index] =
+                (synapse_param_t *) spin1_malloc(
+                    sizeof(synapse_param_t) * n_neurons);
 
-        // Check for success
-        if (neuron_synapse_shaping_params[synapse_index] == NULL) {
-            log_error("Cannot allocate neuron synapse parameters"
-                      "- Out of DTCM");
-            return false;
-        }
+            // Check for success
+            if (neuron_synapse_shaping_params[synapse_index] == NULL) {
+                log_error("Cannot allocate neuron synapse parameters"
+                          "- Out of DTCM");
+                return false;
+            }
 
-        log_debug(
-            "\tCopying %u bytes from %u", n_neurons * sizeof(synapse_param_t),
-            address + ((n_neurons * synapse_index
-                       * sizeof(synapse_param_t)) / 4));
-        memcpy(neuron_synapse_shaping_params[synapse_index],
+            log_debug(
+                "\tCopying %u bytes from %u", n_neurons * sizeof(synapse_param_t),
                 address + ((n_neurons * synapse_index
-                           * sizeof(synapse_param_t)) / 4),
-                n_neurons * sizeof(synapse_param_t));
+                          * sizeof(synapse_param_t)) / 4));
+            memcpy(neuron_synapse_shaping_params[synapse_index],
+                    address + ((n_neurons * synapse_index
+                              * sizeof(synapse_param_t)) / 4),
+                    n_neurons * sizeof(synapse_param_t));
+        }
     }
-
     // Get the ring buffer left shifts
     uint32_t ring_buffer_input_left_shifts_base =
         ((n_neurons * SYNAPSE_TYPE_COUNT * sizeof(synapse_param_t)) / 4);
@@ -270,6 +271,8 @@ bool synapses_initialise(
            synapse_index++) {
         ring_buffer_to_input_left_shifts[synapse_index] =
             address[ring_buffer_input_left_shifts_base + synapse_index];
+        log_info("synapse type %s, ring buffer to input left shift %u", 
+                 synapse_types_get_type_char(synapse_index), ring_buffer_to_input_left_shifts[synapse_index]);
     }
     *ring_buffer_to_input_buffer_left_shifts = ring_buffer_to_input_left_shifts;
 

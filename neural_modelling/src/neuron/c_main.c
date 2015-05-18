@@ -26,6 +26,7 @@
 #include <simulation.h>
 #include <debug.h>
 
+
 //! the number of channels all standard models contain (spikes, voltage, gsyn)
 //! for recording
 #define N_RECORDING_CHANNELS 3
@@ -107,7 +108,7 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // verify the components are correct
-    if (components[NEURON_C_FILE_MAGIC_NUMBER] != NEURON_MAGIC_NUMBER){
+    if (components[NEURON_C_FILE_MAGIC_NUMBER] != APPLICATION_NAME_HASH){
         return false;
     }
 

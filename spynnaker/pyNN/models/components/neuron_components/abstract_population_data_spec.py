@@ -51,7 +51,6 @@ class AbstractPopulationDataSpec(
             max_atoms_per_core=max_atoms_per_core)
         AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         self._binary = binary
-        self._executable_constant = None
         self._spikes_per_second = spikes_per_second
         self._ring_buffer_sigma = ring_buffer_sigma
 

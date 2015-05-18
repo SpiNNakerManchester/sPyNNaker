@@ -98,6 +98,13 @@ SYNAPSE_DYNAMICS_STDP = 0xFF1
 SYNAPSE_DYNAMICS_STDP_MAD = 0xFF2
 SYNAPSE_DYNAMICS_STATIC = 0xFF3
 
+# please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
+# and sPyNNakerExtraModelsPlugin/spynnaker_extra_pynn_models/constants.py
+# for other core application ids.
+# or alterantively, look at :
+# https://github.com/SpiNNakerManchester/SpiNNakerManchester.github.io/wiki/2015.005%3a-%22Arbitrary%22%3a-1.4%3a-Model-magic-numbers
+# for a complete listing.
+
 EDGES = Enum(
     value="EDGES",
     names=[("EAST", 0),

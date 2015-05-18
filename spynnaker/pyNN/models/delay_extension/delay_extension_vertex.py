@@ -261,11 +261,9 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         """
 
         # Write this to the system region (to be picked up by the simulation):
-        self._write_timings_region_info(
-            spec, self._DELAY_EXTENSION_REGIONS.TIMINGS.value)
-        self._write_component_to_region(
-            spec, self._DELAY_EXTENSION_REGIONS.COMPONENTS.value,
-            component_constants)
+        self._write_basic_setup_info(
+            spec, self.CORE_APP_IDENTIFIER,
+            self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
         """

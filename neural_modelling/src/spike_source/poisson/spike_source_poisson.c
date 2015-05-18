@@ -210,7 +210,7 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // verify the components are correct
-    if (components[0] != SPIKE_SOURCE_POISSON_MAGIC_NUMBER){
+    if (components[0] != APPLICATION_NAME_HASH){
         return false;
     }
 

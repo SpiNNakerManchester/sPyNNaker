@@ -333,7 +333,8 @@ void synapse_dynamics_process_post_synaptic_event(
                                                          last_post_trace));
 }
 
-input_t synapse_dynamics_get_intrinsic_bias(index_t neuron_index) {
+input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index) {
+    use(time);
     use(neuron_index);
     return 0.0k;
 }
