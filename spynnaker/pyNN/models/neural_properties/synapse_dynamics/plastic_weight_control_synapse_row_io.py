@@ -25,10 +25,7 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         """
         # Calculate number of half words that will be required for
         # Both the plastic weights and the fixed control words
-        num_synapses = len(synapse_row.target_indices)
-        if vertex_slice is not None:
-            num_synapses = \
-                len(synapse_row.target_indices[0:vertex_slice.n_atoms + 1])
+        num_synapses = synapse_row.get_n_connections(vertex_slice)
 
         # If there are an odd number of synapses, round up number
         # Of control half-words so they will be word-aligned
