@@ -25,14 +25,13 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         """
         # Calculate number of half words that will be required for
         # Both the plastic weights and the fixed control words
-        num_synapses = len(synapse_row.target_indices)
-        if vertex_slice is not None:
-            num_synapses = \
-                len(synapse_row.target_indices[0:vertex_slice.n_atoms + 1])
+        num_synapses = synapse_row.get_n_connections(vertex_slice)
 
         # If there are an odd number of synapses, round up number
         # Of control half-words so they will be word-aligned
-        num_fixed_plastic_words = int(math.ceil(num_synapses / 2))
+        num_fixed_plastic_words = num_synapses / 2
+        if (num_synapses % 2) != 0:
+            num_fixed_plastic_words += 1
 
         # As fixed-plastic and plastic regions both require this
         # Many half words, this is the number of words!
@@ -118,6 +117,7 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         # Combine together into plastic region and return
         plastic_region = numpy.asarray(numpy.append(
             pre_synaptic_event_buffer, padded_weights_view), dtype='uint32')
+        
         return plastic_region
 
     def create_row_info_from_elements(self, p_p_entries, f_f_entries,
