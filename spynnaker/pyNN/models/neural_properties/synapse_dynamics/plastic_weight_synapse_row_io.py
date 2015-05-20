@@ -21,7 +21,13 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
         """
         Returns the size of the fixed and plastic regions of the row in words
         """
-        return synapse_row.get_n_connections(vertex_slice)
+        num_half_words = synapse_row.get_n_connections(vertex_slice)
+        if (num_half_words % 2) != 0:
+            num_half_words += 1
+
+        # As fixed-plastic and plastic regions both require this
+        # Many half words, this is the number of words!
+        return num_half_words + self.num_header_words
 
     def get_packed_fixed_fixed_region(self, synapse_row, weight_scale,
                                       n_synapse_type_bits):
