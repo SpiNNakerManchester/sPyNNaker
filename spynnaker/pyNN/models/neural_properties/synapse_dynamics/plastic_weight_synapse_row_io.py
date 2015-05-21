@@ -21,7 +21,13 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
         """
         Returns the size of the fixed and plastic regions of the row in words
         """
+
+        # There is a half word in both the fixed-plastic
+        # And plastic region for each synapse
         num_half_words = synapse_row.get_n_connections(vertex_slice)
+
+        # As both of these regions are word aligned, if there are
+        # An odd number of half words, add one for padding
         if (num_half_words % 2) != 0:
             num_half_words += 1
 
