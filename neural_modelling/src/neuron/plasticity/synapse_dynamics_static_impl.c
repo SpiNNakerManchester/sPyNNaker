@@ -2,6 +2,15 @@
 #include "../../common/constants.h"
 #include <debug.h>
 
+bool synapse_dynamics_initialise(
+        address_t address, uint32_t n_neurons,
+        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+    use(address);
+    use(n_neurons);
+    use(ring_buffer_to_input_buffer_left_shifts);
+    return true;
+}
+
 //---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {

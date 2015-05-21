@@ -91,46 +91,40 @@ static bool initialize(uint32_t *timer_period) {
     // Get the timing details
     address_t timings_region = data_specification_get_region(
         TIMINGS_REGION, address);
+    address_t component_region = data_specification_get_region(
+        COMPONENTS_REGION, address);
 
-    if (!simulation_read_timing_details(
+    if (!simulation_read_header(
             timings_region, timer_period, &simulation_ticks)) {
         return false;
     }
 
-
-    // get the components that build up a delay extension
-    uint32_t components[NUM_COMPONENTS_MAGIC_NUMBERS];
-    if (!simulation_read_components(
-            data_specification_get_region(COMPONENTS_REGION, address),
-            NUM_COMPONENTS_MAGIC_NUMBERS, components)) {
-        return false;
-    }
-
     // verify the components are correct
-    if (components[NEURON_C_FILE_MAGIC_NUMBER] != APPLICATION_NAME_HASH){
+    if (component_region[NEURON_C_FILE_MAGIC_NUMBER] != APPLICATION_NAME_HASH){
         log_error("The c main md5 value does not match, therefore I'm reading"
                   " a applications memory which isnt my own. Please fix and "
                   "try again");
         return false;
     }
-    if (components[INPUT_COMPONENT_MAGIC_NUMBER] != INPUT_MD5_HASH ||
-            components[MODEL_MAGIC_NUMBER] != MODEL_MD5_HASH ||
-            components[SYNAPSE_SHAPE_MAGIC_NUMBER] != SYNAPSE_SHAPE_MD5_HASH){
+    if (component_region[INPUT_MAGIC_NUMBER] != INPUT_MD5_HASH ||
+            component_region[MODEL_MAGIC_NUMBER] != MODEL_MD5_HASH ||
+            component_region[SYNAPSE_SHAPE_MAGIC_NUMBER] !=
+                SYNAPSE_SHAPE_MD5_HASH){
         log_error("The neurons md5 values does not match, therefore I'm"
                   " reading a applications memory which isnt my own. Or I've"
                   " been misconfigured. Please fix and try again");
         return false;
     }
-    if (components[SYNAPSE_DYNAMICS] != SYNAPSE_DYNAMICS_MD5_HASH ||
-            components[TIME_DEPENDENCY] != TIMING_DEPENDENCY_MD5_HASH ||
-            components[WEIGHT_DEPENDENCY] != WEIGHT_DEPENDENCY_MD5_HASH){
+    if (component_region[SYNAPSE_DYNAMICS] != SYNAPSE_DYNAMICS_MD5_HASH ||
+            component_region[TIME_DEPENDENCY] != TIMING_DEPENDENCY_MD5_HASH ||
+            component_region[WEIGHT_DEPENDENCY] != WEIGHT_DEPENDENCY_MD5_HASH){
         log_error("The synapse md5 values does not match, therefore I'm"
                   " reading a applications memory which isnt my own. Or I've"
                   " been misconfigured. Please fix and try again");
         return false;
     }
 
-    if (components[MASTER_POP_MAGIC_NUMBER] != MASTER_POP_MD5_HASH){
+    if (component_region[MASTER_POP_MAGIC_NUMBER] != MASTER_POP_MD5_HASH){
         log_error("The master pop md5 value does not match, therefore I've"
                   " been conpiled with the wrong master pop table structure "
                   "for what im reading, please either recompile me with the "
@@ -194,7 +188,7 @@ static bool initialize(uint32_t *timer_period) {
 
     // Set up the population table
     uint32_t row_max_n_words;
-    if (!population_table_setup(
+    if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, address),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
             &row_max_n_words)) {

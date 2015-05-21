@@ -11,7 +11,7 @@
 //!            start
 //! \param[in] row_max_n_words the max size a sybnapse row can be in words
 //! \return true if the initialiser is valid false otherwise
-static bool population_table_initialise(
+bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         uint32_t *row_max_n_words);
 

@@ -208,20 +208,13 @@ static inline void _process_fixed_synapses(address_t fixed_region_address,
 //!            simulate
 //! \param[in] input_buffers_value ?????????????
 //! \param[in] ring_buffer_to_input_buffer_left_shifts ??????????????
-//! \param[in] synapse_shape_magic_number the magic number which represetns the
-//!            synapse shaping component of the neural model
 //! \return bool which is true if all init went well and false otehrwise
 bool synapses_initialise(
         address_t address, uint32_t n_neurons_value,
         input_t **input_buffers_value,
-         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-         uint32_t synapse_shaping_magic_number) {
+         uint32_t **ring_buffer_to_input_buffer_left_shifts){
 
     log_info("synapses_initialise: starting");
-
-    if (!synapse_types_initialise(synapse_shaping_magic_number)){
-        return false;
-    }
 
     n_neurons = n_neurons_value;
     *input_buffers_value = input_buffers;
