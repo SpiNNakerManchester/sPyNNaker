@@ -94,6 +94,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
+import spynnaker
 # constraints
 from pacman.model.constraints.placer_constraints.\
     placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
@@ -106,6 +107,7 @@ from pacman.model.constraints.placer_constraints.\
 # note importing star is a bad thing to do.
 from pyNN.random import *
 from pyNN.space import *
+import os
 
 # traditional logger
 logger = logging.getLogger(__name__)
@@ -225,9 +227,10 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     logger.info(
         "sPyNNaker (c) {} APT Group, University of Manchester".format(
             __version_year__))
+    parent_dir = os.path.split(os.path.split(spynnaker.__file__)[0])[0]
     logger.info(
-        "Release version {} - {} {}".format(
-            __version__, __version_month__, __version_year__))
+        "Release version {} - {} {}. Installed in folder {}".format(
+            __version__, __version_month__, __version_year__, parent_dir))
 
     if len(extra_params) > 1:
         logger.warn("Extra params has been applied which we do not consider")
