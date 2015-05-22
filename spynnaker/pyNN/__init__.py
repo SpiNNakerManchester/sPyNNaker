@@ -9,14 +9,16 @@ from ._version import __version__, __version_month__, __version_year__
 
 # utility functions
 from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 
 # pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
+from spynnaker.pyNN.spinnaker import executable_finder
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -43,10 +45,12 @@ from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 
 # spike sources
-from spynnaker.pyNN.models.spike_source.spike_source_array \
-    import SpikeSourceArray
 from spynnaker.pyNN.models.spike_source.spike_source_poisson\
     import SpikeSourcePoisson
+from spynnaker.pyNN.models.spike_source.spike_source_array \
+    import SpikeSourceArray
+from spynnaker.pyNN.models.spike_source.spike_source_from_file \
+    import SpikeSourceFromFile
 
 # connections
 from spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector\
@@ -114,18 +118,19 @@ _binary_search_paths = []
 
 
 def register_binary_search_path(search_path):
-    """Registers an additional binary search path for
-    for SpiNNaker executables. Should be called before
-    setup by sPyNNaker plugin modules
+    """
+    :param search_path:
+    Registers an additional binary search path for
+        for executables
 
-    :param string search_path:
     absolute search path for binaries
     """
-    _binary_search_paths.append(search_path)
+    executable_finder.add_path(search_path)
 
 
 def end(stop_on_board=True):
     """
+    :param stop_on_board:
     Do any necessary cleaning up before exiting.
 
     Unregisters the controller
@@ -206,6 +211,13 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
 
     NB: timestep, min_delay and max_delay are required by the PyNN API but we
     ignore them because they have no bearing on the on-chip simulation code.
+    :param timestep:
+    :param min_delay:
+    :param max_delay:
+    :param machine:
+    :param database_socket_addresses:
+    :param extra_params:
+    :return:
     """
     global _spinnaker
     global _binary_search_paths
@@ -221,7 +233,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
         logger.warn("Extra params has been applied which we do not consider")
     _spinnaker = Spinnaker(
         host_name=machine, timestep=timestep, min_delay=min_delay,
-        max_delay=max_delay, binary_search_paths=_binary_search_paths,
+        max_delay=max_delay,
         database_socket_addresses=database_socket_addresses)
     # Return None, simply because the PyNN API says something must be returned
     return None
@@ -235,6 +247,8 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     during the partition stage of the mapper.
     Note that each neuron type has a default value for this parameter that will
     be used if no override is given.
+    :param neuron_type:
+    :param max_permitted:
     """
     if not inspect.isclass(neuron_type):
         if neuron_type in globals():
@@ -242,18 +256,27 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
         else:
             neuron_type = None
         if neuron_type is None:
-            raise Exception("Unknown AbstractConstrainedVertex Type {}"
+            raise Exception("Unknown Vertex Type {}"
                             .format(neuron_type))
 
     if hasattr(neuron_type, "set_model_max_atoms_per_core"):
         neuron_type.set_model_max_atoms_per_core(max_permitted)
     else:
-        raise Exception("{} is not a AbstractConstrainedVertex type"
+        raise Exception("{} is not a Vertex type"
                         .format(neuron_type))
 
 
 # noinspection PyPep8Naming
 def Population(size, cellclass, cellparams, structure=None, label=None):
+    """
+
+    :param size:
+    :param cellclass:
+    :param cellparams:
+    :param structure:
+    :param label:
+    :return:
+    """
     global _spinnaker
     return _spinnaker.create_population(size, cellclass, cellparams,
                                         structure, label)
@@ -263,12 +286,37 @@ def Population(size, cellclass, cellparams, structure=None, label=None):
 def Projection(presynaptic_population, postsynaptic_population,
                connector, source=None, target='excitatory',
                synapse_dynamics=None, label=None, rng=None):
+    """
+
+    :param presynaptic_population:
+    :param postsynaptic_population:
+    :param connector:
+    :param source:
+    :param target:
+    :param synapse_dynamics:
+    :param label:
+    :param rng:
+    :return:
+    """
     global _spinnaker
     return _spinnaker.create_projection(
         presynaptic_population, postsynaptic_population, connector, source,
         target, synapse_dynamics, label, rng)
 
 
+def NativeRNG(seed_value):
+    """
+    fixes the rnadom number generators seed
+    :param seed_value:
+    :return:
+    """
+    numpy.random.seed(seed_value)
+
+
 def get_current_time():
+    """
+
+    :return:
+    """
     global _spinnaker
     return _spinnaker.get_current_time()

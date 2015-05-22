@@ -1,18 +1,22 @@
-from pyNN.space import Space
-
-from pacman.model.constraints.abstract_constraints.abstract_constraint \
+from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_recordable_vertex import \
-    AbstractRecordableVertex
 
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_population_recordable_vertex import \
+    AbstractPopulationRecordableVertex
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities.timer import Timer
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN import exceptions as local_exceptions
+
+
+from spinn_front_end_common.utilities.timer import Timer
+from spinn_front_end_common.utilities import exceptions
+
+from pyNN.space import Space
 
 import numpy
 import logging
@@ -23,17 +27,16 @@ logger = logging.getLogger(__name__)
 class Population(object):
     """
     A collection neuron of the same types. It encapsulates a type of
-    :class:`pacman103.lib.partitionable_graph.AbstractConstrainedVertex`
-    used with Spiking Neural Networks, comprising n cells (atoms)
-    of the same :py:mod:`pacman103.front.pynn.models` type.
+    vertex used with Spiking Neural Networks, comprising n cells (atoms)
+    of the same model type.
 
     :param int size:
         size (number of cells) of the Population.
-    :param `pacman103.front.pynn.models` cellclass:
+    :param cellclass:
         specifies the neural model to use for the Population
     :param dict cellparams:
         a dictionary containing model specific parameters and values
-    :param `pyNN.space` structure:
+    :param structure:
         a spatial structure
     :param string label:
         a label identifying the Population
@@ -173,11 +176,10 @@ class Population(object):
                     "vertex to record spikes before running this command.")
 
             if not self._spinnaker.has_ran:
-                raise exceptions.SpynnakerException(
-                    "The simulation has not yet ran, therefore spikes cannot "
-                    "be retrieved. Please execute the simulation before "
-                    "running this command")
-
+                raise local_exceptions.SpynnakerException(
+                    "The simulation has not yet ran, therefore spikes cannot"
+                    " be retrieved. Please execute the simulation before"
+                    " running this command")
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
                 timer.start_timing()
@@ -225,10 +227,12 @@ class Population(object):
         Return a 3-column numpy array containing cell ids, time, and Vm for
         recorded cells.
 
-        :param bool gather:
+        :param gather:
             not used - inserted to match PyNN specs
-        :param bool compatible_output:
+        :type gather: bool
+        :param compatible_output:
             not used - inserted to match PyNN specs
+        :type compatible_output: bool
         """
         if self._v is None:
             timer = None
@@ -271,7 +275,7 @@ class Population(object):
         initialize_attr = \
             getattr(self._vertex, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("AbstractConstrainedVertex does not support "
+            raise Exception("Vertex does not support "
                             "initialization of parameter {%s}".format(
                                 variable))
 
@@ -309,7 +313,7 @@ class Population(object):
 
     @property
     def label(self):
-        return self._get_vertex.label
+        return self._vertex.label
 
     @property
     def local_size(self):
@@ -369,7 +373,7 @@ class Population(object):
         triggering spike time recording.
         """
 
-        if not isinstance(self._vertex, AbstractRecordableVertex):
+        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
             raise Exception("This population does not support recording!")
 
         # Tell the vertex to record spikes
@@ -384,8 +388,8 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering gsyn value recording.
         """
-        if not isinstance(self._vertex, AbstractRecordableVertex):
-            raise Exception("AbstractConstrainedVertex does not support "
+        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
+            raise Exception("Vertex does not support "
                             "recording of gsyn")
 
         self._vertex.set_record_gsyn(True)
@@ -397,8 +401,8 @@ class Population(object):
         A flag is set for this population that is passed to the simulation,
         triggering potential recording.
         """
-        if not isinstance(self._vertex, AbstractRecordableVertex):
-            raise Exception("AbstractConstrainedVertex does not support "
+        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
+            raise Exception("Vertex does not support "
                             "recording of potential")
 
         self._vertex.set_record_v(True)
@@ -422,6 +426,10 @@ class Population(object):
     def printSpikes(self, filename, gather=True):
         """
         Write spike time information from the population to a given file.
+        :param filename: the absoluete file path for where the spikes are to be
+        printed in
+        :param gather: Supported from the PyNN language, but Spinnaker only does
+        gather = True.
         """
         if not gather:
             logger.warn("Spynnaker only supports gather = true, will execute"
@@ -434,18 +442,21 @@ class Population(object):
             last_id = self._vertex.n_atoms - 1
             utility_calls.check_directory_exists_and_create_if_not(filename)
             spike_file = open(filename, "w")
-            spike_file.write("# first_id = %d\n" % first_id)
-            spike_file.write("# n = %d\n" % num_neurons)
-            spike_file.write("# dimensions = [%d]\n" % dimensions)
-            spike_file.write("# last_id = %d\n" % last_id)
+            spike_file.write("# first_id = {}\n".format(first_id))
+            spike_file.write("# n = {}\n".format(num_neurons))
+            spike_file.write("# dimensions = [{}]\n".format(dimensions))
+            spike_file.write("# last_id = {}\n".format(last_id))
             for (neuronId, time) in spikes:
-                spike_file.write("%d\t%d\n" % (time, neuronId))
+                spike_file.write("{}\t{}\n".format(time, neuronId))
             spike_file.close()
 
     def print_gsyn(self, filename, gather=True):
         """
         Write conductance information from the population to a given file.
-
+        :param filename: the absoluete file path for where the gsyn are to be
+        printed in
+        :param gather: Supported from the PyNN language, but Spinnaker only does
+        gather = True.
         """
         time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
         gsyn = self.get_gsyn(gather, compatible_output=True)
@@ -454,20 +465,24 @@ class Population(object):
         dimensions = self._vertex.n_atoms
         utility_calls.check_directory_exists_and_create_if_not(filename)
         file_handle = open(filename, "w")
-        file_handle.write("# first_id = %d\n" % first_id)
-        file_handle.write("# n = %d\n" % num_neurons)
-        file_handle.write("# dt = %f\n" % time_step)
-        file_handle.write("# dimensions = [%d]\n" % dimensions)
-        file_handle.write("# last_id = {%d}\n".format(num_neurons - 1))
+        file_handle.write("# first_id = {}\n".format(first_id))
+        file_handle.write("# n = {}\n".format(num_neurons))
+        file_handle.write("# dt = {}\n".format(time_step))
+        file_handle.write("# dimensions = [{}]\n".format(dimensions))
+        file_handle.write("# last_id = {{}}\n".format(num_neurons - 1))
         file_handle = open(filename, "w")
         for (neuronId, time, value) in gsyn:
-            file_handle.write("%f\t%d\t%f\n" % (time, neuronId, value))
+            file_handle.write("{}\t{}\t{}\n".format(time, neuronId, value))
         file_handle.close()
 
     def print_v(self, filename, gather=True):
         """
         Write membrane potential information from the population to a given
         file.
+        :param filename: the absoluete file path for where the voltage are to be
+        printed in
+        :param gather: Supported from the PyNN language, but Spinnaker only does
+        gather = True.
         """
         time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
         v = self.get_v(gather, compatible_output=True)
@@ -476,19 +491,21 @@ class Population(object):
         first_id = 0
         num_neurons = self._vertex.n_atoms
         dimensions = self._vertex.n_atoms
-        file_handle.write("# first_id = %d\n" % first_id)
-        file_handle.write("# n = %d\n" % num_neurons)
-        file_handle.write("# dt = %f\n" % time_step)
-        file_handle.write("# dimensions = [%d]\n" % dimensions)
-        file_handle.write("# last_id = %d\n" % (num_neurons - 1))
-        for (neuronId, _, value) in v:
-            file_handle.write("%f\t%d\n" % (value, neuronId))
+        file_handle.write("# first_id = {}\n".format(first_id))
+        file_handle.write("# n = {}\n".format(num_neurons))
+        file_handle.write("# dt = {}\n".format(time_step))
+        file_handle.write("# dimensions = [{}]\n".format(dimensions))
+        file_handle.write("# last_id = {}\n".format(num_neurons - 1))
+        for (neuronId, time, value) in v:
+            file_handle.write("{}\t{}\t{}\n".format(time, neuronId, value))
         file_handle.close()
 
     def rset(self, parametername, rand_distr):
         """
         'Random' set. Set the value of parametername to a value taken from
         rand_distr, which should be a RandomDistribution object.
+        :param parametername: the paramter to set
+        :param rand_distr: the random distrubtion object to set the paramter to
         """
         raise NotImplementedError
 

@@ -16,13 +16,6 @@ version         = None
 #machineTimeStep = 1000
 #timeScaleFactor = 1
 
-[Recording]
-#---------
-# This controls the insertion of the Monitor into the graph
-# If enabled, the Monitor will capture spikes, and forward them back
-# (to port 17895 on current machine)
-send_live_spikes = False
-
 [Database]
 #---------
 # This controls the generation of a database, which can be used by external

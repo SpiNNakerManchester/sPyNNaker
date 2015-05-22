@@ -1,5 +1,4 @@
 import unittest
-from spynnaker.pyNN.models.utility_models.command_sender import CommandSender
 
 
 class MyTestCase(unittest.TestCase):

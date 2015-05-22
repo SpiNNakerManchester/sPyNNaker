@@ -5,7 +5,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import generate_parameter
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities import exceptions
 
 
 class OneToOneConnector(AbstractConnector):
@@ -38,9 +38,9 @@ class OneToOneConnector(AbstractConnector):
         postvertex = postsynaptic_population._get_vertex
 
         if prevertex.n_atoms != postvertex.n_atoms:
-            raise ConfigurationException("The two populations to be connected "
-                                         "with a One to One connector have to "
-                                         "have the same size")
+            raise exceptions.ConfigurationException(
+                "The two populations to be connected with a One to One "
+                "connector have to have the same size")
         connection_list = list()
         for pre_atom in range(0, prevertex.n_atoms):
             delay = generate_parameter(self._delays, pre_atom) * delay_scale

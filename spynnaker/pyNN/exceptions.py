@@ -1,3 +1,4 @@
+from spinn_front_end_common.utilities import exceptions
 
 
 class SpynnakerException(Exception):
@@ -39,7 +40,8 @@ class FilterableException(SpynnakerException):
     """
     pass
 
-class SynapticConfigurationException(ConfigurationException):
+
+class SynapticConfigurationException(exceptions.ConfigurationException):
     """raised when the synaptic manager fails to handle a synaptic dynamic
 
     :raise None: does not raise any known exceptions
@@ -47,7 +49,7 @@ class SynapticConfigurationException(ConfigurationException):
     pass
 
 
-class SynapticBlockGenerationException(ConfigurationException):
+class SynapticBlockGenerationException(exceptions.ConfigurationException):
     """raised when the synaptic manager fails to generate a synaptic block
 
     :raise None: does not raise any known exceptions
@@ -55,7 +57,7 @@ class SynapticBlockGenerationException(ConfigurationException):
     pass
 
 
-class SynapticBlockReadException(ConfigurationException):
+class SynapticBlockReadException(exceptions.ConfigurationException):
     """raised when the synaptic manager fails to read a synaptic block or
         convert it into readable values
 
@@ -64,7 +66,8 @@ class SynapticBlockReadException(ConfigurationException):
     pass
 
 
-class SynapticMaxIncomingAtomsSupportException(ConfigurationException):
+class SynapticMaxIncomingAtomsSupportException(
+        exceptions.ConfigurationException):
     """raised when a synatpic sublist exceeds the max atoms possible to be
     supported
 
@@ -73,13 +76,14 @@ class SynapticMaxIncomingAtomsSupportException(ConfigurationException):
     pass
 
 
-class DelayExtensionException(ConfigurationException):
+class DelayExtensionException(exceptions.ConfigurationException):
     """raised when a delay extension vertex is given a subedge that is not from
     a delay DelayAfferentPartitionableEdge
 
     :raise None: does not raise any known exceptions
     """
     pass
+
 
 class ExecutableNotFoundException(SpynnakerException):
     """ raised when a suitable executable cannot be found
@@ -89,7 +93,8 @@ class ExecutableNotFoundException(SpynnakerException):
     :raise None: does not raise any known exceptions
     """
     pass
-    
+
+
 class ExecutableFailedToStartException(SpynnakerException):
     """ raised when the messgaes from the trnasicever state that some or all the
     application images pushed to the board have failed to start when asked
@@ -106,5 +111,30 @@ class ExecutableFailedToStopException(SpynnakerException):
 
 
     :raise None: does not raise any known exceptions
+    """
+    pass
+
+
+class BufferableRegionTooSmall(SpynnakerException):
+    """ raised when the SDRAM space of the region for buffered packets is
+    too small to contain any packet at all
+    """
+    pass
+
+
+class BufferedRegionNotPresent(SpynnakerException):
+    """ raised when trying to issue buffered packets for a region not managed
+    """
+    pass
+
+
+class InvalidParameterType(SpynnakerException):
+    """ raised when trying to issue buffered packets for a region not managed
+    """
+    pass
+
+
+class InvalidPacketType(SpynnakerException):
+    """ raised when trying to issue buffered packets for a region not managed
     """
     pass

@@ -29,9 +29,9 @@ class SpikePairTimeDependency(AbstractTimeDependency):
     def __eq__(self, other):
         if (other is None) or (not isinstance(other, SpikePairTimeDependency)):
             return False
-        return ((self._tau_plus == other.tau_plus)
-                and (self._tau_minus == other.tau_minus)
-                and (self._nearest == other.nearest))
+        return ((self._tau_plus == other.tau_plus) and
+                (self._tau_minus == other.tau_minus) and
+                (self._nearest == other.nearest))
 
     def create_synapse_row_io(
             self, synaptic_row_header_words, dendritic_delay_fraction):
@@ -81,3 +81,7 @@ class SpikePairTimeDependency(AbstractTimeDependency):
     @property
     def tau_minus(self):
         return self._tau_minus
+
+    @property
+    def nearest(self):
+        return self._nearest

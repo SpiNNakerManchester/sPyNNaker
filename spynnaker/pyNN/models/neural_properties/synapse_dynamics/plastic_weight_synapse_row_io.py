@@ -45,13 +45,13 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
         return numpy.zeros(0)
 
     def get_packed_fixed_plastic_region(self, synapse_row, weight_scales,
-            n_synapse_type_bits):
+                                        n_synapse_type_bits):
         """
         Gets the plastic part of the fixed region of the row as an array
         of 16-bit words
         """
-        if (len(synapse_row.target_indices) > 0
-                and numpy.amax(synapse_row.target_indices) > 0xFF):
+        if (len(synapse_row.target_indices) > 0 and
+                numpy.amax(synapse_row.target_indices) > 0xFF):
             raise Exception("One or more target indices are too large")
 
         max_delay = (1 << (8 - n_synapse_type_bits)) - 1
@@ -60,22 +60,24 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
 
         # Use dendritic delay fraction to split delay into components
         float_delays = numpy.asarray(synapse_row.delays, dtype="float")
-        dendritic_delays = numpy.asarray(float_delays
-                * float(self.dendritic_delay_fraction), dtype="uint16")
-        axonal_delays = numpy.asarray(float_delays
-                * (1.0 - float(self.dendritic_delay_fraction)), dtype="uint16")
+        dendritic_delays = numpy.asarray(
+            float_delays * float(self.dendritic_delay_fraction),
+            dtype="uint16")
+        axonal_delays = numpy.asarray(
+            float_delays * (1.0 - float(self.dendritic_delay_fraction)),
+            dtype="uint16")
 
         ids = synapse_row.target_indices & 0xFF
-        shifted_dendritic_delays = (dendritic_delays
-                << (8 + n_synapse_type_bits))
+        shifted_dendritic_delays = (dendritic_delays <<
+                                    (8 + n_synapse_type_bits))
         shifted_axonal_delays = axonal_delays << (8 + 4 + n_synapse_type_bits)
         shifted_types = synapse_row.synapse_types << 8
 
-        return numpy.asarray(shifted_axonal_delays | shifted_dendritic_delays
-                | shifted_types | ids, dtype='uint16')
+        return numpy.asarray(shifted_axonal_delays | shifted_dendritic_delays |
+                             shifted_types | ids, dtype='uint16')
 
     def get_packed_plastic_region(self, synapse_row, weight_scales,
-            n_synapse_type_bits):
+                                  n_synapse_type_bits):
         """
         Gets the plastic region of the row as an array of 32-bit words
         """
@@ -84,20 +86,24 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
         weight_scales_numpy = numpy.array(weight_scales, dtype="float")
         synapse_weight_scales = weight_scales_numpy[synapse_row.synapse_types]
 
-         # Scale weights
+        # Scale weights
         abs_weights = numpy.abs(synapse_row.weights)
-        abs_scaled_weights = numpy.rint(abs_weights * synapse_weight_scales).astype("uint16")
+        abs_scaled_weights = numpy.rint(
+            abs_weights * synapse_weight_scales).astype("uint16")
 
         # Check zeros
         zero_float_weights = numpy.where(abs_weights == 0.0)[0]
         zero_scaled_weights = numpy.where(abs_scaled_weights == 0)[0]
-        if zero_float_weights.shape != zero_scaled_weights.shape or (zero_float_weights != zero_scaled_weights).any():
-            raise Exception("Weight scaling has reduced non-zero weights to zero")
+        if (zero_float_weights.shape != zero_scaled_weights.shape or
+                (zero_float_weights != zero_scaled_weights).any()):
+            raise Exception(
+                "Weight scaling has reduced non-zero weights to zero")
 
-        # As we're packing into uint32s, add extra weight if we have an odd number
+        # As we're packing into uint32s, add extra weight if we have an odd
+        # number
         if (len(abs_scaled_weights) % 2) != 0:
             abs_scaled_weights = numpy.asarray(numpy.append(
-                    abs_scaled_weights, 0), dtype='uint16')
+                abs_scaled_weights, 0), dtype='uint16')
 
         # Create view of weights as uint32s
         abs_scaled_weights_view = abs_scaled_weights.view(dtype='uint32')
@@ -107,8 +113,9 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
                                                 dtype='uint32')
 
         # Combine together into plastic region and return
-        plastic_region = numpy.asarray(numpy.append(pre_synaptic_event_buffer,
-            abs_scaled_weights_view), dtype='uint32')
+        plastic_region = numpy.asarray(numpy.append(
+            pre_synaptic_event_buffer, abs_scaled_weights_view),
+            dtype='uint32')
         return plastic_region
 
     def create_row_info_from_elements(self, p_p_entries, f_f_entries,
@@ -132,8 +139,8 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
 
         # Extract indices, delays and synapse types from fixed-plastic region
         target_indices = f_p_entries & 0xFF
-        delays_in_ticks = (((f_p_entries >> 8) + bits_reserved_for_type)
-                           & delay_mask)
+        delays_in_ticks = (((f_p_entries >> 8) + bits_reserved_for_type) &
+                           delay_mask)
         synapse_types = (f_p_entries >> 8) & synaptic_type_mask
 
         # Index out per-synapse weight scales

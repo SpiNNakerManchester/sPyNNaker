@@ -7,7 +7,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import generate_parameter
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities import exceptions
 import logging
 
 logger = logging.getLogger(__name__)
@@ -74,13 +74,13 @@ class FromListConnector(AbstractConnector):
                 len_list.append(len(conn[1]))
             else:
                 len_list.append(1)
-            if isinstance(conn[2], list) and (isinstance(conn[0], list)
-                                              or isinstance(conn[1], list)):
+            if isinstance(conn[2], list) and (isinstance(conn[0], list) or
+                                              isinstance(conn[1], list)):
                 len_list.append(len(conn[2]))
             else:
                 len_list.append(1)
-            if isinstance(conn[3], list) and (isinstance(conn[0], list)
-                                              or isinstance(conn[1], list)):
+            if isinstance(conn[3], list) and (isinstance(conn[0], list) or
+                                              isinstance(conn[1], list)):
                 len_list.append(len(conn[3]))
             else:
                 len_list.append(1)
@@ -91,11 +91,11 @@ class FromListConnector(AbstractConnector):
                     pre_atom = generate_parameter(conn[0], j)
                     post_atom = generate_parameter(conn[1], j)
                     if not 0 <= pre_atom < prevertex.n_atoms:
-                        raise ConfigurationException(
+                        raise exceptions.ConfigurationException(
                             "Invalid neuron id in presynaptic population {}"
                             .format(pre_atom))
                     if not 0 <= post_atom < postvertex.n_atoms:
-                        raise ConfigurationException(
+                        raise exceptions.ConfigurationException(
                             "Invalid neuron id in postsynaptic population {}"
                             .format(post_atom))
                     weight = generate_parameter(conn[2], j) * weight_scale

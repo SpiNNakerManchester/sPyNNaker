@@ -9,7 +9,7 @@ class PyNNParametersSurrogate(object):
     """
     Acts so that we can convert the ```dict``` nature of parameters in PyNN
     into the normal Python attributes.  Attempting to get a parameter will
-    redirect the request to the appropriate class, attempting to set a 
+    redirect the request to the appropriate class, attempting to set a
     parameter will do likewise.
 
     :param vertex_to_surrogate: The object for which to act as surrogate.
@@ -37,5 +37,6 @@ class PyNNParametersSurrogate(object):
         if not hasattr(self.vertex, key):
             raise Exception("Object '%s' does not have parameter '%s'." %
                             (self.vertex, key))
-        value = utility_calls.convert_param_to_numpy(value, self.vertex.n_atoms)
+        value = utility_calls.convert_param_to_numpy(value,
+                                                     self.vertex.n_atoms)
         setattr(self.vertex, key, value)

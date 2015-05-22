@@ -1,7 +1,7 @@
 import numpy
 
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
-    abstract_synapse_row_io import AbstractSynapseRowIo
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
+    abstract_rules.abstract_synapse_row_io import AbstractSynapseRowIo
 from spynnaker.pyNN.models.neural_properties.synapse_row_info import \
     SynapseRowInfo
 from spynnaker.pyNN import exceptions
@@ -47,21 +47,21 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         # Check zeros
         zero_float_weights = numpy.where(abs_weights == 0.0)[0]
         zero_scaled_weights = numpy.where(scaled_weights == 0)[0]
-        if (zero_float_weights.shape != zero_scaled_weights.shape
-                or (zero_float_weights != zero_scaled_weights).any()):
+        if (zero_float_weights.shape != zero_scaled_weights.shape or
+                (zero_float_weights != zero_scaled_weights).any()):
             if not FixedSynapseRowIO.zero_weight_error_displayed:
                 print ("WARNING: Weight scaling has reduced non-zero weights"
                        " to zero; the range of weights provided cannot be"
                        " represented with 16-bits!")
                 FixedSynapseRowIO.zero_weight_error_displayed = True
 
-        if ((len(synapse_row.target_indices) > 0)
-                and (numpy.amax(synapse_row.target_indices) > 0xFF)):
+        if ((len(synapse_row.target_indices) > 0) and
+                (numpy.amax(synapse_row.target_indices) > 0xFF)):
             raise Exception("One or more target indices are too large")
 
         max_delay = (1 << (8 - n_synapse_type_bits)) - 1
-        if ((len(synapse_row.delays) > 0)
-                and (max(synapse_row.delays) > max_delay)):
+        if ((len(synapse_row.delays) > 0) and
+                (max(synapse_row.delays) > max_delay)):
             raise Exception("One or more delays are too large for the row")
 
         ids = synapse_row.target_indices & 0xFF
@@ -69,8 +69,8 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
         shifted_delays = synapse_row.delays << (8 + n_synapse_type_bits)
         shifted_types = synapse_row.synapse_types << 8
 
-        return numpy.asarray(shifted_weights | shifted_delays
-                             | shifted_types | ids, dtype='uint32')
+        return numpy.asarray(shifted_weights | shifted_delays |
+                             shifted_types | ids, dtype='uint32')
 
     # noinspection PyMethodOverriding
     @staticmethod
@@ -106,8 +106,8 @@ class FixedSynapseRowIO(AbstractSynapseRowIo):
 
         # Extract indices, delays and synapse types from fixed-plastic region
         target_indices = f_f_entries & 0xFF
-        delays_in_ticks = ((f_f_entries >> 8 + bits_reserved_for_type)
-                           & delay_mask)
+        delays_in_ticks = ((f_f_entries >> 8 + bits_reserved_for_type) &
+                           delay_mask)
         synapse_types = (f_f_entries >> 8) & synaptic_type_mask
 
         # Convert per-synapse type weight scales to numpy and

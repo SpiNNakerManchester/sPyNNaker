@@ -27,7 +27,7 @@ populations = list()
 projections = list()
 
 weight_to_spike = 2.0
-delay = 17
+delay = 3
 
 loopConnections = list()
 for i in range(0, nNeurons):

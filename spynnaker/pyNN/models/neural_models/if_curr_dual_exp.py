@@ -1,9 +1,9 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_dual_exponential_vertex \
-    import AbstractDualExponentialVertex
-from spynnaker.pyNN.models.abstract_models.\
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
+    abstract_dual_exponential_vertex import AbstractDualExponentialVertex
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
     abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
@@ -81,7 +81,9 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                             DataType.S1615),
             NeuronParameter(self._one_over_tau_rc, DataType.S1615),
             NeuronParameter(self._refract_timer, DataType.UINT32),
-            NeuronParameter(self._scaled_t_refract(), DataType.UINT32)
+            # t refact used to be a uint32 but was changed to int32 to avoid
+            # clash of c and python variable typing.
+            NeuronParameter(self._scaled_t_refract(), DataType.INT32)
         ]
 
     def is_population_vertex(self):

@@ -47,8 +47,8 @@ class AllToAllConnector(AbstractConnector):
         connection_list = list()
         for pre_atom in range(0, prevertex.n_atoms):
             present = numpy.ones(postvertex.n_atoms, dtype=numpy.uint32)
-            if (not self._allow_self_connections
-                    and presynaptic_population == postsynaptic_population):
+            if (not self._allow_self_connections and
+                    presynaptic_population == postsynaptic_population):
                 present[pre_atom] = 0
                 n_present = postvertex.n_atoms - 1
             else:
@@ -59,8 +59,8 @@ class AllToAllConnector(AbstractConnector):
                 self._delays, n_present, present) * delay_scale)
             weights = (generate_parameter_array(
                 self._weights, n_present, present) * weight_scale)
-            synapse_types = (numpy.ones(len(ids), dtype='uint32')
-                             * synapse_type)
+            synapse_types = (numpy.ones(len(ids), dtype='uint32') *
+                             synapse_type)
 
             connection_list.append(SynapseRowInfo(ids, weights, delays,
                                    synapse_types))

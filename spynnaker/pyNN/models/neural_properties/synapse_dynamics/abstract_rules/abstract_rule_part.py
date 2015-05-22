@@ -2,6 +2,7 @@ from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod, abstractproperty
 
+
 @add_metaclass(ABCMeta)
 class AbstractRulePart(object):
 

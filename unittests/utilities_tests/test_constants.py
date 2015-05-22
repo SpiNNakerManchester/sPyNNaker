@@ -4,10 +4,7 @@ import spynnaker.pyNN.utilities.constants as constants
 
 class TestConstants(unittest.TestCase):
     def test_free_floating_constants(self):
-        self.assertEqual(constants.SETUP_SIZE, 28)
-        self.assertEqual(constants.NO_PARAMS, 10)
-        self.assertEqual(constants.PARAMS_HEADER_SIZE, 3)
-        self.assertEqual(constants.PARAMS_BASE_SIZE, 4 * (constants.PARAMS_HEADER_SIZE + constants.NO_PARAMS))
+        self.assertEqual(constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS, 3)
         self.assertEqual(constants.BLOCK_INDEX_HEADER_WORDS, 3)
         self.assertEqual(constants.BLOCK_INDEX_ROW_WORDS, 2)
 
@@ -15,7 +12,6 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(constants.RECORD_STATE_BIT, 1 << 1)
         self.assertEqual(constants.RECORD_GSYN_BIT, 1 << 2)
         self.assertEqual(constants.RECORDING_ENTRY_BYTE_SIZE, 4)
-        self.assertEqual(constants.BITS_PER_WORD, 32.0)
 
         self.assertEqual(constants.SYNAPSE_INDEX_BITS, 8)
         self.assertEqual(constants.MAX_NEURON_SIZE, (1 << constants.SYNAPSE_INDEX_BITS))
@@ -28,16 +24,7 @@ class TestConstants(unittest.TestCase):
 
         self.assertEqual(constants.SYNAPTIC_ROW_HEADER_WORDS, 2 + 1)
 
-        self.assertEqual(constants.ROW_LEN_TABLE_ENTRIES, [0, 1, 8, 16, 32, 64, 128, 256])
-        self.assertEqual(constants.ROW_LEN_TABLE_SIZE, 4 * len(constants.ROW_LEN_TABLE_ENTRIES))
-
-        self.assertEqual(constants.X_CHIPS, 8)
-        self.assertEqual(constants.Y_CHIPS, 8)
-        self.assertEqual(constants.CORES_PER_CHIP, 18)
-        self.assertEqual(constants.MASTER_POPULATION_ENTRIES, (constants.X_CHIPS * constants.Y_CHIPS * constants.CORES_PER_CHIP))
-        self.assertEqual(constants.MASTER_POPULATION_TABLE_SIZE, 2 * constants.MASTER_POPULATION_ENTRIES )
         self.assertEqual(constants.NA_TO_PA_SCALE, 1000.0)
-        self.assertEqual(constants.SDRAM_BASE_ADDR, 0x70000000)
 
         self.assertEqual(constants.WEIGHT_FLOAT_TO_FIXED_SCALE, 16.0)
         self.assertEqual(constants.SCALE, constants.WEIGHT_FLOAT_TO_FIXED_SCALE *constants. NA_TO_PA_SCALE)
@@ -46,7 +33,6 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(constants.MAX_DELAY_BLOCKS, 8)
         self.assertEqual(constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK, 16)
 
-        self.assertEqual(constants.APP_MONITOR_CORE_APPLICATION_ID, 0xAC0)
         self.assertEqual(constants.IF_CURRENT_EXP_CORE_APPLICATION_ID, 0xAC1)
         self.assertEqual(constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID, 0xAC2)
         self.assertEqual(constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID, 0xAC3)

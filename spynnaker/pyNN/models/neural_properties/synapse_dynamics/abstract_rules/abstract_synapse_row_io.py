@@ -24,7 +24,7 @@ class AbstractSynapseRowIo(object):
     def get_packed_fixed_plastic_region(self, synapse_row, weight_scale,
                                         n_synapse_type_bits):
         """
-        Gets the fixed part of the plastic region as an array of 16-bit 
+        Gets the fixed part of the plastic region as an array of 16-bit
         half-words
         """
 
@@ -40,8 +40,8 @@ class AbstractSynapseRowIo(object):
                                       f_p_entries, bits_reserved_for_type,
                                       weight_scale):
         """
-        takes a collection of entries for both fixed fixed, plastic plasitic and
-        fixed plastic and returns a synaptic row object for them
+        takes a collection of entries for both fixed fixed, plastic plasitic
+        and fixed plastic and returns a synaptic row object for them
 
         p_p_entries and f_p_entries are ignored due to this model dealing with
         fixed synapses

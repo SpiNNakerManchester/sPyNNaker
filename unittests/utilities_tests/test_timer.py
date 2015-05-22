@@ -1,5 +1,6 @@
 import unittest
-from spynnaker.pyNN.utilities.timer import Timer
+
+from spinn_front_end_common.utilities.timer import Timer
 from time import sleep
 
 

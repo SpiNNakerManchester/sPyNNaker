@@ -2,15 +2,15 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from data_specification.enums.data_type import DataType
-from spynnaker.pyNN.models.abstract_models.abstract_exp_population_vertex \
-    import AbstractExponentialPopulationVertex
-from spynnaker.pyNN.models.abstract_models.\
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
+    abstract_exp_population_vertex import AbstractExponentialPopulationVertex
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
     abstract_integrate_and_fire_properties \
     import AbstractIntegrateAndFireProperties
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
-from spynnaker.pyNN.models.abstract_models.abstract_conductance_vertex \
-    import AbstractConductanceVertex
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
+    abstract_conductance_vertex import AbstractConductanceVertex
 
 
 class IFConductanceExponentialPopulation(
@@ -125,8 +125,10 @@ class IFConductanceExponentialPopulation(
             NeuronParameter(self.exp_tc(self._machine_time_step),
                             DataType.S1615),
             NeuronParameter(self._one_over_tau_rc, DataType.S1615),
-            NeuronParameter(self._refract_timer, DataType.UINT32),
-            NeuronParameter(self._scaled_t_refract(), DataType.UINT32),
+            NeuronParameter(self._refract_timer, DataType.INT32),
+            # t refact used to be a uint32 but was changed to int32 to avoid
+            # clash of c and python variable typing.
+            NeuronParameter(self._scaled_t_refract(), DataType.INT32),
         ]
 
     def is_population_vertex(self):
@@ -135,7 +137,7 @@ class IFConductanceExponentialPopulation(
     def is_integrate_and_fire_vertex(self):
         return True
 
-    def is_conductive(self):
+    def is_conductance(self):
         return True
 
     def is_exp_vertex(self):

@@ -5,7 +5,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
 from spynnaker.pyNN.models.neural_properties.randomDistributions \
     import generate_parameter_array
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities import exceptions
 import numpy
 
 
@@ -43,8 +43,8 @@ class FixedProbabilityConnector(AbstractConnector):
         self._allow_self_connections = allow_self_connections
 
         if not 0 <= self._p_connect <= 1:
-            raise ConfigurationException("The probability should be between 0"
-                                         " and 1 (inclusive)")
+            raise exceptions.ConfigurationException(
+                "The probability should be between 0 and 1 (inclusive)")
 
     def generate_synapse_list(
             self, presynaptic_population, postsynaptic_population, delay_scale,
@@ -56,8 +56,8 @@ class FixedProbabilityConnector(AbstractConnector):
         rows = list()
         for pre_atom in range(0, prevertex.n_atoms):
             present = numpy.random.rand(postvertex.n_atoms) <= self._p_connect
-            if (not self._allow_self_connections
-                    and presynaptic_population == postsynaptic_population):
+            if (not self._allow_self_connections and
+                    presynaptic_population == postsynaptic_population):
                 present[pre_atom] = 0
 
             n_present = numpy.sum(present)
@@ -68,8 +68,8 @@ class FixedProbabilityConnector(AbstractConnector):
                 self._delays, n_present, present) * delay_scale)
             weights = (generate_parameter_array(
                 self._weights, n_present, present) * weight_scale)
-            synapse_types = (numpy.ones(len(ids), dtype='uint32')
-                             * synapse_type)
+            synapse_types = (numpy.ones(len(ids), dtype='uint32') *
+                             synapse_type)
 
             rows.append(SynapseRowInfo(ids, weights, delays, synapse_types))
         return SynapticList(rows)

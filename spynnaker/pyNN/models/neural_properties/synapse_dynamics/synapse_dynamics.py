@@ -1,14 +1,10 @@
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism\
-    import STDPMechanism
-
-
 class SynapseDynamics(object):
 
     def __init__(self, slow=None, fast=None):
         if fast is not None:
             raise NotImplementedError(
                 "Fast synapse dynamics are not currently supported")
-        
+
         self.fast = fast
         self.slow = slow
 
