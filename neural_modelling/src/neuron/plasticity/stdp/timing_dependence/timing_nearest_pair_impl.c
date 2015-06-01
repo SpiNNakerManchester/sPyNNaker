@@ -1,5 +1,4 @@
 #include "timing_nearest_pair_impl.h"
-#include "../../../../common/constants.h"
 
 //---------------------------------------
 // Globals

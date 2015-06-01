@@ -18,7 +18,9 @@ from spynnaker.pyNN.models.components.neuron_components.\
 from spinn_front_end_common.abstract_models\
     .abstract_outgoing_edge_same_contiguous_keys_restrictor\
     import AbstractOutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.utilities import constants as spinn_common_constants
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
+    import AbstractDataSpecableVertex
+
 
 # general imports
 import os
@@ -76,10 +78,8 @@ class AbstractPopulationDataSpec(
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        spec.reserve_memory_region(
-            region=constants.POPULATION_BASED_REGIONS.TIMINGS.value,
-            size=spinn_common_constants.TIMINGS_REGION_BYTES,
-            label="timings")
+        self._reserve_header_region(
+            spec, constants.POPULATION_BASED_REGIONS.HEADER.value)
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.COMPONENTS.value,
@@ -315,9 +315,6 @@ class AbstractPopulationDataSpec(
         for partitioned_edge in in_partitioned_edges:
             partitioned_edge.weight_scales_setter(weight_scales)
 
-        # collect assoicated indentifers
-        component_indetifers = self._get_components_magic_numbers()
-
         # Construct the data images needed for the Neuron:
         self._reserve_population_based_memory_regions(
             spec, neuron_params_sz, synapse_params_sz,
@@ -363,14 +360,6 @@ class AbstractPopulationDataSpec(
         # End the writing of this specification:
         spec.end_specification()
         data_writer.close()
-
-    @abstractmethod
-    def _get_components_magic_numbers(self):
-        """
-        helper method for getting components from a population:
-        implmented by abstract population vertex
-        :return:
-        """
 
     # inherited from data specable vertex
     def get_binary_file_name(self):

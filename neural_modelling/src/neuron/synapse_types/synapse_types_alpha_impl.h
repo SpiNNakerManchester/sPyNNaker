@@ -43,11 +43,11 @@
 
 #include "synapse_types.h"
 #include "../decay.h"
-#include "../../common/constants.h"
 
 typedef enum input_buffer_regions {
     EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY_ONE, INHIBITORY_TWO
 } input_buffer_regions;
+
 
 //---------------------------------------
 // Synapse shaping inline implementation

@@ -1,5 +1,4 @@
 #include "timing_pfister_triplet_impl.h"
-#include "../../../../common/constants.h"
 
 //---------------------------------------
 // Globals

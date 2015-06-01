@@ -61,10 +61,9 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
     _SPIKE_SOURCE_REGIONS = Enum(
         value="_SPIKE_SOURCE_REGIONS",
-        names=[('TIMINGS', 0),
-               ('COMPONENTS', 1),
-               ('CONFIGURATION_REGION', 2),
-               ('SPIKE_DATA_REGION', 3)])
+        names=[('HEADER', 0),
+               ('CONFIGURATION_REGION', 1),
+               ('SPIKE_DATA_REGION', 2)])
 
     def __init__(
             self, n_neurons, spike_times, machine_time_step, spikes_per_second,
@@ -200,7 +199,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             The indices region will be copied to DTCM by the executable.
         """
         spec.reserve_memory_region(
-            region=self._SPIKE_SOURCE_REGIONS.TIMINGS.value,
+            region=self._SPIKE_SOURCE_REGIONS.HEADER.value,
             size=front_end_common_constants.TIMINGS_REGION_BYTES,
             label='timingsRegion')
         spec.reserve_memory_region(
@@ -235,7 +234,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             Bit 6: Output spike rate
         """
         self._write_timings_region_info(
-            spec, self._SPIKE_SOURCE_REGIONS.TIMINGS.value)
+            spec, self._SPIKE_SOURCE_REGIONS.HEADER.value)
         self._write_component_to_region(
             spec, self._SPIKE_SOURCE_REGIONS.COMPONENTS.value,
             component_indetifers)

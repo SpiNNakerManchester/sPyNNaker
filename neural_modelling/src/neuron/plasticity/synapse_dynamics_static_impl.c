@@ -1,5 +1,4 @@
 #include "synapse_dynamics.h"
-#include "../../common/constants.h"
 #include <debug.h>
 
 bool synapse_dynamics_initialise(

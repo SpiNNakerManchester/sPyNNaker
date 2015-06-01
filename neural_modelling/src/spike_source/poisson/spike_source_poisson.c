@@ -8,7 +8,6 @@
 #include "../../common/out_spikes.h"
 #include "../../common/recording.h"
 #include "../../common/maths-util.h"
-#include "../../common/constants.h"
 
 #include <data_specification.h>
 #include <debug.h>
@@ -41,7 +40,7 @@ typedef struct fast_spike_source_t {
 
 //! spike source array region ids in human readable form
 typedef enum region{
-    TIMINGS, COMPONENTS, RECORDING_DATA, POISSON_PARAMS, SPIKE_HISTORY,
+    HEADER, RECORDING_DATA, POISSON_PARAMS, SPIKE_HISTORY,
 }region;
 
 //! what each position in the poisson parameter region actually represent in
@@ -196,7 +195,7 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details
     if (!simulation_read_header(
-            data_specification_get_region(TIMINGS, address),
+            data_specification_get_region(HEADER, address),
             timer_period, &simulation_ticks)) {
         return false;
     }

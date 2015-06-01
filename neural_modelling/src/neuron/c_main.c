@@ -31,25 +31,33 @@
 //! for recording
 #define N_RECORDING_CHANNELS 3
 
-//! the number of components each neuron model is expected to contain.
-//! these come from the enum below
-#define NUM_COMPONENTS_MAGIC_NUMBERS 8
+//! The name of the components that need to be checked
+static const char * components_e_name_table[] = {
+    "input type",
+    "neuron model",
+    "synapse shape",
+    "master population table",
+    "synapse dynamics",
+    "STDP time dependency",
+    "STDP weight dependency"
+};
 
-//! human readable definitions of each component in the list
-typedef enum components_e {
-    NEURON_C_FILE_MAGIC_NUMBER,
-    INPUT_MAGIC_NUMBER,
-    MODEL_MAGIC_NUMBER,
-    SYNAPSE_SHAPE_MAGIC_NUMBER,
-    MASTER_POP_MAGIC_NUMBER,
-    SYNAPSE_DYNAMICS,
-    TIME_DEPENDENCY,
-    WEIGHT_DEPENDENCY
-} components_e;
+//! The magic numbers of the components that need to be checked
+static const int components_magic_numbers[] = {
+    INPUT_MD5_HASH,
+    MODEL_MD5_HASH,
+    SYNAPSE_SHAPE_MD5_HASH,
+    MASTER_POP_MD5_HASH,
+    SYNAPSE_DYNAMICS_MD5_HASH,
+    TIME_DEPENDENCY_MD5_HASH,
+    WEIGHT_DEPENDENCY_MD5_HASH
+};
+
+# define N_COMPONENTS 7
 
 //! human readable definitions of each region in SDRAM
 typedef enum regions_e {
-    TIMINGS_REGION,
+    HEADER_REGION,
     COMPONENTS_REGION,
     RECORDING_DATA_REGION,
     NEURON_PARAMS_REGION,
@@ -71,6 +79,18 @@ uint32_t time;
 //! being expected to exit
 static uint32_t simulation_ticks = 0;
 
+static inline bool check_component_hash(
+        uint32_t expected_hash, uint32_t received_hash,
+        const char *component) {
+    if (expected_hash != received_hash) {
+        log_error("The component hash 0x%.8x did not match the expected hash"
+                  "0x%.8x for component %s", received_hash, expected_hash,
+                  component);
+        return false;
+    }
+    return true;
+}
+
 //! \Initialises the model by reading in the regions and checking recording
 //! data.
 //! \param[in] *timer_period a pointer for the memory address where the timer
@@ -89,48 +109,22 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Get the timing details
-    address_t timings_region = data_specification_get_region(
-        TIMINGS_REGION, address);
+    address_t header_region = data_specification_get_region(
+        HEADER_REGION, address);
+    if (!simulation_read_header(
+            header_region, timer_period, &simulation_ticks)) {
+        return false;
+    }
+
+    // Check the hash of the components
     address_t component_region = data_specification_get_region(
         COMPONENTS_REGION, address);
-
-    if (!simulation_read_header(
-            timings_region, timer_period, &simulation_ticks)) {
-        return false;
-    }
-
-    // verify the components are correct
-    if (component_region[NEURON_C_FILE_MAGIC_NUMBER] != APPLICATION_NAME_HASH){
-        log_error("The c main md5 value does not match, therefore I'm reading"
-                  " a applications memory which isnt my own. Please fix and "
-                  "try again");
-        return false;
-    }
-    if (component_region[INPUT_MAGIC_NUMBER] != INPUT_MD5_HASH ||
-            component_region[MODEL_MAGIC_NUMBER] != MODEL_MD5_HASH ||
-            component_region[SYNAPSE_SHAPE_MAGIC_NUMBER] !=
-                SYNAPSE_SHAPE_MD5_HASH){
-        log_error("The neurons md5 values does not match, therefore I'm"
-                  " reading a applications memory which isnt my own. Or I've"
-                  " been misconfigured. Please fix and try again");
-        return false;
-    }
-    if (component_region[SYNAPSE_DYNAMICS] != SYNAPSE_DYNAMICS_MD5_HASH ||
-            component_region[TIME_DEPENDENCY] != TIMING_DEPENDENCY_MD5_HASH ||
-            component_region[WEIGHT_DEPENDENCY] != WEIGHT_DEPENDENCY_MD5_HASH){
-        log_error("The synapse md5 values does not match, therefore I'm"
-                  " reading a applications memory which isnt my own. Or I've"
-                  " been misconfigured. Please fix and try again");
-        return false;
-    }
-
-    if (component_region[MASTER_POP_MAGIC_NUMBER] != MASTER_POP_MD5_HASH){
-        log_error("The master pop md5 value does not match, therefore I've"
-                  " been conpiled with the wrong master pop table structure "
-                  "for what im reading, please either recompile me with the "
-                  "correct master pop structure or reconfigure the python to "
-                  "write with the correct master pop structure");
-        return false;
+    for (int i = 0; i < N_COMPONENTS; i++) {
+        if (!check_component_hash(
+                component_region[i], components_magic_numbers[i],
+                components_e_name_table[i])) {
+            return false;
+        }
     }
 
     // Set up recording
@@ -260,11 +254,11 @@ void timer_callback(uint timer_count, uint unused) {
 void c_main(void) {
 
     // Load DTCM data
-    uint32_t timer_period;
+    uint32_t timer_period = 0;
 
     // initialise the model
     if (!initialize(&timer_period)){
-    	rt_error(RTE_API);
+        rt_error(RTE_API);
     }
 
     // Start the time at "-1" so that the first tick will be 0

@@ -30,7 +30,6 @@ typedef struct synapse_param_t {
 } synapse_param_t;
 
 #include "synapse_types.h"
-#include "../../common/constants.h"
 
 typedef enum input_buffer_regions {
     EXCITATORY, INHIBITORY,

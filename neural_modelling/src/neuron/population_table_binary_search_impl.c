@@ -1,6 +1,5 @@
 #include "population_table.h"
 #include "synapse_row.h"
-#include "../common/constants.h"
 #include <debug.h>
 #include <string.h>
 

@@ -61,7 +61,7 @@ EDGES = Enum(
 # Regions for populations
 POPULATION_BASED_REGIONS = Enum(
     value="POPULATION_BASED_REGIONS",
-    names=[("TIMINGS", 0),
+    names=[('HEADER', 0),
            ('COMPONENTS', 1),
            ('RECORDING_REGION', 2),
            ('NEURON_PARAMS', 3),

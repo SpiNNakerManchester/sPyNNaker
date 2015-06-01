@@ -39,8 +39,7 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
 
 //! human readable definitions of each region in SDRAM
 typedef enum regions_e {
-    TIMINGS_REGION,
-    COMPONENTS_REGION,
+    HEADER_REGION,
     DELAY_PARAMS,
 } regions_e;
 
@@ -122,7 +121,7 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details
     if (!simulation_read_header(
-            data_specification_get_region(TIMINGS_REGION, address),
+            data_specification_get_region(HEADER_REGION, address),
             timer_period, &simulation_ticks)) {
         return false;
     }

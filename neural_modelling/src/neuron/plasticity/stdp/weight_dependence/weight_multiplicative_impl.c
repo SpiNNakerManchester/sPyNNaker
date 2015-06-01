@@ -1,5 +1,4 @@
 #include "weight_multiplicative_impl.h"
-#include "../../../../common/constants.h"
 
 //---------------------------------------
 // Globals

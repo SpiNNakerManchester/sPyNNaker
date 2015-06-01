@@ -1,5 +1,4 @@
 #include "weight_additive_two_term_impl.h"
-#include "../../../../common/constants.h"
 
 //---------------------------------------
 // Globals

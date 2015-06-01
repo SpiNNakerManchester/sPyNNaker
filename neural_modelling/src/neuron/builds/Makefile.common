@@ -27,32 +27,28 @@ endif
 POPULATION_TABLE_IMPL ?= population_table_binary_search_impl
 
 # Run md5sum on master pop structure
-MASTER_POP_TABLE_DEFINITION = \
-     $(shell echo -n "basename $(POPULATION_TABLE_IMPL)" | $(MD_FIVE_CONVERSION))
-
-# run md5sum on main entrance file
-APPLICATION_MD5_HASH = \
-    $(shell echo -n "basename c_main" | $(MD_FIVE_CONVERSION))
+MASTER_POP_MD5_HASH = \
+     $(shell echo -n "$(POPULATION_TABLE_IMPL)" | $(MD_FIVE_CONVERSION))
 
 # Run md5sum on neural components
 INPUT_MD5_HASH = \
-    $(shell echo -n "basename 0" | $(MD_FIVE_CONVERSION))
+    $(shell echo -n "0" | $(MD_FIVE_CONVERSION))
 MODEL_MD5_HASH = \
-    $(shell echo -n "basename $(MODEL_PATH)" | $(MD_FIVE_CONVERSION))
+    $(shell echo -n "$(notdir $(MODEL_PATH))" | $(MD_FIVE_CONVERSION))
 SYNAPSE_SHAPE_MD5_HASH = \
-    $(shell echo -n "basename $(SYNAPSE_TYPE_PATH)" | $(MD_FIVE_CONVERSION))
+    $(shell echo -n "$(notdir $(SYNAPSE_TYPE_PATH))" | $(MD_FIVE_CONVERSION))
 
 # Run md5sum on synaptic components
 SYNAPSE_DYNAMICS_MD5_HASH = \
-    $(shell echo -n "basename $(SYNAPSE_DYNAMICS_PATH)" | $(MD_FIVE_CONVERSION))
+    $(shell echo -n "$(notdir $(SYNAPSE_DYNAMICS_PATH))" | $(MD_FIVE_CONVERSION))
 TIMING_DEPENDENCY_MD5_HASH = \
-    $(shell echo -n "basename $(STDP_TIMING_PATH)" | $(MD_FIVE_CONVERSION))
+    $(shell echo -n "$(notdir $(STDP_TIMING_PATH))" | $(MD_FIVE_CONVERSION))
 WEIGHT_DEPENDENCY_MD5_HASH = \
-    $(shell echo -n "basename $(STDP_WEIGHT_PATH)" | $(MD_FIVE_CONVERSION))
+    $(shell echo -n "$(notdir $(STDP_WEIGHT_PATH))" | $(MD_FIVE_CONVERSION))
 
 CFLAGS += -D$(SYNAPSE_BENCHMARK)
 
-MD5FLAGS = -DMASTER_POP_MD5_HASH=0x$(MASTER_POP_TABLE_DEFINITION) \
+MD5FLAGS = -DMASTER_POP_MD5_HASH=0x$(MASTER_POP_MD5_HASH) \
            -DSYNAPSE_SHAPE_MD5_HASH=0x$(SYNAPSE_SHAPE_MD5_HASH) \
            -DSYNAPSE_DYNAMICS_MD5_HASH=0x$(SYNAPSE_DYNAMICS_MD5_HASH)\
            -DTIMING_DEPENDENCY_MD5_HASH=0x$(TIMING_DEPENDENCY_MD5_HASH)\
@@ -72,7 +68,7 @@ ifeq ($(USES_STDP), TRUE)
     OBJECTS += $(STDP_TIMING_PATH).o $(STDP_WEIGHT_PATH).o \
                   $(SOURCE_DIRS)/neuron/plasticity/common/maths.o \
                   $(SOURCE_DIRS)/neuron/plasticity/common/post_events.o
-    STDP_DEP_OBJS += $(SYNAPSE_DYNAMICS_PATH).o \
+    STDP_DEP_OBJS += $(call convert_dirs, $(SYNAPSE_DYNAMICS_PATH).o) \
                      $(BUILD_DIR)neuron/plasticity/common/post_events.o
 endif
 
@@ -83,7 +79,6 @@ SYNAPSE_TYPE_DEP_OBJS += $(BUILD_DIR)neuron/synapses.o \
     $(BUILD_DIR)neuron/plasticity/synapse_dynamics_static_impl.o
 
 include ../../../Makefile.common
-
 
 NEURON_MODEL_H = $(MODEL_PATH).h
 SYNAPSE_TYPE_H = $(SYNAPSE_TYPE_PATH).h
@@ -116,12 +111,14 @@ $(EXTRA_SYNAPSE_TYPE_DEP_OBJS):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c\
 
 ifeq ($(USES_STDP), TRUE)
 
-$(STDP_WEIGHT_PATH).o: $(STDP_WEIGHT_PATH).c $(SYNAPSE_TYPE_H)
+$(call convert_dirs, $(STDP_WEIGHT_PATH).o): $(STDP_WEIGHT_PATH).c \
+                                             $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	                  -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(STDP_TIMING_PATH).o: $(STDP_TIMING_PATH).c $(SYNAPSE_TYPE_H) \
+$(call convert_dirs, $(STDP_TIMING_PATH).o): $(STDP_TIMING_PATH).c \
+                       $(SYNAPSE_TYPE_H) \
                        $(WEIGHT_DEPENDENCE_H) $(PLASTIC_SYNAPSE_STRUCTURE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -include $(SYNAPSE_TYPE_H)\

@@ -57,9 +57,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
-        names=[('TIMINGS', 0),
-               ('COMPONENTS', 1),
-               ('DELAY_PARAMS', 2)])
+        names=[('HEADER', 0),
+               ('DELAY_PARAMS', 1)])
     _DELAY_PARAMS_HEADER_WORDS = 3
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
@@ -165,11 +164,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return (constants.BLOCK_INDEX_HEADER_WORDS + (no_active_timesteps *
                 constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
-    def _get_components(self):
-        component_indetifers = list()
-        component_indetifers.append(self.CORE_APP_IDENTIFIER)
-        return component_indetifers
-
     def generate_data_spec(
             self, subvertex, placement, sub_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
@@ -213,25 +207,18 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         delay_params_sz = 4 * (self._DELAY_PARAMS_HEADER_WORDS +
                                (num_delay_blocks * block_len_words))
 
-        component_indetifers = self._get_components()
-
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.TIMINGS.value,
-            size=front_end_common_imports.TIMINGS_REGION_BYTES,
-            label="timings"
-        )
-
-        spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.COMPONENTS.value,
-            size=len(component_indetifers) * 4,
-            label="components"
+            region=self._DELAY_EXTENSION_REGIONS.HEADER.value,
+            size=AbstractDataSpecableVertex._HEADER_REGION_BYTES,
+            label="header"
         )
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
-        self.write_setup_info(spec, component_indetifers)
+        self._write_header_region(spec, "delay_extension", 
+                                  self._DELAY_EXTENSION_REGIONS.HEADER.value)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -250,21 +237,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
-
-    def write_setup_info(self, spec, component_constants):
-        """
-
-        :param spec: the dsg writer
-        :param component_constants: the component magic numebrs which represent
-        this model
-        :return:
-        """
-        # Write this to the system region (to be picked up by the simulation):
-        self._write_timings_region_info(
-            spec, self._DELAY_EXTENSION_REGIONS.TIMINGS.value)
-        self._write_component_to_region(
-            spec, self._DELAY_EXTENSION_REGIONS.COMPONENTS.value,
-            component_constants)
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
         """

@@ -2,7 +2,6 @@
 #include "spike_processing.h"
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
-#include "../common/constants.h"
 #include <debug.h>
 #include <spin1_api.h>
 #include <string.h>
@@ -212,7 +211,7 @@ static inline void _process_fixed_synapses(address_t fixed_region_address,
 bool synapses_initialise(
         address_t address, uint32_t n_neurons_value,
         input_t **input_buffers_value,
-         uint32_t **ring_buffer_to_input_buffer_left_shifts){
+         uint32_t **ring_buffer_to_input_buffer_left_shifts) {
 
     log_info("synapses_initialise: starting");
 
@@ -228,7 +227,7 @@ bool synapses_initialise(
     }
 
     // Get the synapse shaping data
-    if(sizeof(synapse_param_t) > 0) {
+    if (sizeof(synapse_param_t) > 0) {
         for (index_t synapse_index = 0; synapse_index < SYNAPSE_TYPE_COUNT;
                 synapse_index++) {
             log_debug("\tCopying %u synapse type %u parameters of size %u",
