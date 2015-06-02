@@ -115,19 +115,6 @@ class ExecutableFailedToStopException(SpynnakerException):
     pass
 
 
-class BufferableRegionTooSmall(SpynnakerException):
-    """ raised when the SDRAM space of the region for buffered packets is
-    too small to contain any packet at all
-    """
-    pass
-
-
-class BufferedRegionNotPresent(SpynnakerException):
-    """ raised when trying to issue buffered packets for a region not managed
-    """
-    pass
-
-
 class InvalidParameterType(SpynnakerException):
     """ raised when trying to issue buffered packets for a region not managed
     """

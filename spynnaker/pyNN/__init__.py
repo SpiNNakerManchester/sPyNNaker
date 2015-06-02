@@ -5,7 +5,9 @@ and implementation for the PyNN High-level API
 """
 
 import inspect
+
 from ._version import __version__, __version_month__, __version_year__
+
 
 # utility functions
 from spynnaker.pyNN.utilities import conf
@@ -18,7 +20,10 @@ from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN.spinnaker import executable_finder
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
+
+# notification protocol classes (stored in front end common)
+from spinn_front_end_common.utilities.notification_protocol.\
+    socket_address import SocketAddress
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -96,13 +101,6 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
 
 import spynnaker
 # constraints
-from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_maximum_size_constraint import PartitionerMaximumSizeConstraint
-from pacman.model.constraints.placer_constraints.\
-    placer_radial_placement_from_chip_constraint \
-    import PlacerRadialPlacementFromChipConstraint
 
 # note importing star is a bad thing to do.
 from pyNN.random import *

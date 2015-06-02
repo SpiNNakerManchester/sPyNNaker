@@ -18,6 +18,8 @@ from pacman.operations.routing_info_allocator_algorithms.\
 from pacman.utilities.progress_bar import ProgressBar
 
 # spinnmachine imports
+from spinn_front_end_common.utilities.executable_targets import \
+    ExecutableTargets
 from spinn_machine.sdram import SDRAM
 from spinn_machine.router import Router as MachineRouter
 from spinn_machine.link import Link
@@ -53,11 +55,15 @@ from spinn_front_end_common.interface.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_provanence_data import \
     AbstractProvidesProvanenceData
+from spinn_front_end_common.interface.buffer_management.buffer_manager \
+    import BufferManager
+from spinn_front_end_common.interface.buffer_management.buffer_models.\
+    abstract_sends_buffers_from_host_partitioned_vertex \
+    import AbstractSendsBuffersFromHostPartitionedVertex
 
 # local front end imports
-from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
-from spynnaker.pyNN.utilities.database.data_base_interface \
-    import DataBaseInterface
+from spinn_front_end_common.utilities.notification_protocol.\
+    socket_address import SocketAddress
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
@@ -75,20 +81,16 @@ from spynnaker.pyNN.models.abstract_models\
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
-from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spynnaker.pyNN.models.abstract_models.buffer_models\
-    .abstract_sends_buffers_from_host_partitioned_vertex\
-    import AbstractSendsBuffersFromHostPartitionedVertex
 
 # spinnman imports
-from spinnman.model.core_subsets import CoreSubsets
-from spinnman.model.core_subset import CoreSubset
 
 import logging
 import math
 import os
 import sys
 from multiprocessing.pool import ThreadPool
+from spynnaker.pyNN.utilities.database.spynnaker_data_base_interface import \
+    SpynnakerDataBaseInterface
 
 logger = logging.getLogger(__name__)
 
@@ -212,7 +214,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         :param run_time:
         :return:
         """
-        self._setup_interfaces(
+        self.setup_interfaces(
             hostname=self._hostname,
             virtual_x_dimension=config.getint("Machine",
                                               "virtual_board_x_dimension"),
@@ -230,9 +232,19 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if self._create_database:
             wait_on_confirmation = \
                 config.getboolean("Database", "wait_on_confirmation")
-            self._database_interface = DataBaseInterface(
+            self._database_interface = SpynnakerDataBaseInterface(
                 self._app_data_runtime_folder, wait_on_confirmation,
                 self._database_socket_addresses)
+
+            # if using a reload script, add if that needs to wait for confirmation
+            if self._reports_states.transciever_report:
+                self._reload_script.wait_on_confirmation(wait_on_confirmation)
+
+        # adds extra stuff needed by the reload script which cannot be given
+        # directly.
+        if self._reports_states.transciever_report:
+            self._reload_script.runtime = run_time
+            self._reload_script.time_scale_factor = self._time_scale_factor
 
         # create network report if needed
         if self._reports_states is not None:
@@ -342,20 +354,17 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 timer.start_timing()
 
             logger.info("*** Loading tags ***")
-            self._load_tags(self._tags)
+            self.load_tags(self._tags)
 
             if self._do_load is True:
                 logger.info("*** Loading data ***")
                 self._load_application_data(
-                    self._placements, self._router_tables, self._graph_mapper,
+                    self._placements, self._graph_mapper,
                     processor_to_app_data_base_address, self._hostname,
-                    self._app_id,
-                    machine_version=config.getint("Machine", "version"),
                     app_data_folder=self._app_data_runtime_folder)
+                self.load_routing_tables(self._router_tables, self._app_id)
                 logger.info("*** Loading executables ***")
-                self._load_executable_images(
-                    executable_targets, self._app_id,
-                    app_data_folder=self._app_data_runtime_folder)
+                self.load_executable_images(executable_targets, self._app_id)
                 logger.info("*** Loading buffers ***")
                 self._set_up_send_buffering()
 
@@ -374,8 +383,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 send_start_notification = config.getboolean(
                     "Database", "send_start_notification")
 
-                self._wait_for_cores_to_be_ready(executable_targets,
-                                                 self._app_id)
+                self.wait_for_cores_to_be_ready(executable_targets,
+                                                self._app_id)
 
                 # wait till external app is ready for us to start if required
                 if (self._database_interface is not None and
@@ -385,7 +394,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         "to state its ready for the simulation to start ***")
                     self._database_interface.wait_for_confirmation()
 
-                self._start_all_cores(executable_targets, self._app_id)
+                self.start_all_cores(executable_targets, self._app_id)
 
                 if (self._database_interface is not None and
                         send_start_notification):
@@ -394,7 +403,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if self._runtime is None:
                     logger.info("Application is set to run forever - exiting")
                 else:
-                    self._wait_for_execution_to_complete(
+                    self.wait_for_execution_to_complete(
                         executable_targets, self._app_id, self._runtime,
                         self._time_scale_factor)
                 self._has_ran = True
@@ -433,7 +442,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # Create the buffer manager
         self._send_buffer_manager = BufferManager(
-            self._placements, self._routing_infos, self._tags, self._txrx)
+            self._placements, self._tags, self._txrx, self._reports_states,
+            self._app_data_folder, self._reload_script)
 
         for partitioned_vertex in self.partitioned_graph.subvertices:
             if isinstance(partitioned_vertex,
@@ -777,7 +787,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # iterate though subvertexes and call generate_data_spec for each
         # vertex
-        executable_targets = dict()
+        executable_targets = ExecutableTargets()
         no_processors = config.getint("Threading", "dsg_threads")
         thread_pool = ThreadPool(processes=no_processors)
 
@@ -816,17 +826,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if binary_path is None:
                     raise exceptions.ExecutableNotFoundException(binary_name)
 
-                if binary_path in executable_targets:
-                    executable_targets[binary_path].add_processor(placement.x,
-                                                                  placement.y,
-                                                                  placement.p)
-                else:
-                    processors = [placement.p]
-                    initial_core_subset = CoreSubset(placement.x, placement.y,
-                                                     processors)
-                    list_of_core_subsets = [initial_core_subset]
-                    executable_targets[binary_path] = \
-                        CoreSubsets(list_of_core_subsets)
+                if not executable_targets.has_binary(binary_path):
+                    executable_targets.add_binary(binary_path)
+                executable_targets.add_processor(
+                    binary_path, placement.x, placement.y, placement.p)
 
         for data_generator_interface in data_generator_interfaces:
             data_generator_interface.wait_for_finish()
