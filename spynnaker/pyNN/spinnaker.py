@@ -238,7 +238,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
             # if using a reload script, add if that needs to wait for confirmation
             if self._reports_states.transciever_report:
-                self._reload_script.wait_on_confirmation(wait_on_confirmation)
+                self._reload_script.wait_on_confirmation = wait_on_confirmation
 
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
@@ -366,7 +366,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 logger.info("*** Loading executables ***")
                 self.load_executable_images(executable_targets, self._app_id)
                 logger.info("*** Loading buffers ***")
-                self._set_up_send_buffering()
+                self.set_up_send_buffering(self._partitioned_graph,
+                                           self._placements, self._tags)
 
             # end of entire loading setup
             if do_timing:
@@ -433,27 +434,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 "*** Using a Virtual Machine so no simulation will occur")
         else:
             logger.info("*** No simulation requested: Stopping. ***")
-
-    def _set_up_send_buffering(self):
-        progress_bar = ProgressBar(
-            len(self.partitioned_graph.subvertices),
-            "on initialising the buffer managers for vertices which require"
-            " buffering")
-
-        # Create the buffer manager
-        self._send_buffer_manager = BufferManager(
-            self._placements, self._tags, self._txrx, self._reports_states,
-            self._app_data_folder, self._reload_script)
-
-        for partitioned_vertex in self.partitioned_graph.subvertices:
-            if isinstance(partitioned_vertex,
-                          AbstractSendsBuffersFromHostPartitionedVertex):
-
-                # Add the vertex to the managed vertices
-                self._send_buffer_manager.add_sender_vertex(
-                    partitioned_vertex)
-            progress_bar.update()
-        progress_bar.end()
 
     @property
     def app_id(self):
