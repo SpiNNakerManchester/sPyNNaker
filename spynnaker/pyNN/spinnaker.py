@@ -239,6 +239,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             # if using a reload script, add if that needs to wait for confirmation
             if self._reports_states.transciever_report:
                 self._reload_script.wait_on_confirmation = wait_on_confirmation
+                for socket_address in self._database_socket_addresses:
+                    self._reload_script.add_socket_address(socket_address)
 
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
@@ -375,9 +377,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
-
+                if do_timing:
+                    timer.start_timing()
                 # every thing is in sync0. load the initial buffers
                 self._send_buffer_manager.load_initial_buffers()
+                if do_timing:
+                    timer.take_sample()
 
                 wait_on_confirmation = config.getboolean(
                     "Database", "wait_on_confirmation")
@@ -390,9 +395,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 # wait till external app is ready for us to start if required
                 if (self._database_interface is not None and
                         wait_on_confirmation):
-                    logger.info(
-                        "*** Awaiting for a response from an external source "
-                        "to state its ready for the simulation to start ***")
                     self._database_interface.wait_for_confirmation()
 
                 self.start_all_cores(executable_targets, self._app_id)
