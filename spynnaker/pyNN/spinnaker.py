@@ -1,3 +1,7 @@
+"""
+Spinnaker
+"""
+
 # pacman imports
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
@@ -84,6 +88,7 @@ from spynnaker.pyNN.models.abstract_models.buffer_models\
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 
+# general imports
 import logging
 import math
 import os
@@ -176,8 +181,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     "Reports", "max_application_binaries_kept"),
                 where_to_write_application_data_files=config.get(
                     "Reports", "defaultApplicationDataFilePath"))
-        self._set_up_machine_specifics(timestep, min_delay, max_delay,
-                                       host_name)
+        # set up spynnaker speicficis, such as setting the machineName from conf
+        self._set_up_machine_specifics(
+            timestep, min_delay, max_delay, host_name)
         self._spikes_per_second = float(config.getfloat(
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
@@ -222,7 +228,13 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                                      "virtual_board"),
             requires_wrap_around=config.getboolean("Machine",
                                                    "requires_wrap_arounds"),
-            machine_version=config.getint("Machine", "version"))
+            board_version=config.getint("Machine", "version"),
+            number_of_boards=config.getint("Machine", "number_of_boards"),
+            machines_bmp_hostnames=config.get("Machine", "bmp_machine_name"),
+            max_machines_x_dimension=config.get("Machine",
+                                                "machine_largest_x_dimension"),
+            max_machines_y_dimension=config.get("Machine",
+                                                "machine_largest_y_dimension"))
 
         # add database generation if requested
         if self._create_database:
