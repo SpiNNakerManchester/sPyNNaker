@@ -12,7 +12,7 @@ setup(
               'spynnaker.pyNN.models',
               'spynnaker.pyNN.models.abstract_models',
               'spynnaker.pyNN.models.abstract_models.abstract_model_components',
-              'spynnaker.pyNN.models.abstract_models.buffer_models',
+              'spynnaker.pyNN.models.buffer_models',
               'spynnaker.pyNN.models.common_objects',
               'spynnaker.pyNN.models.components',
               'spynnaker.pyNN.models.components.input_components',
