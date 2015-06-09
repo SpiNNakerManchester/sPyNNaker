@@ -991,14 +991,33 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
             virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
 
-    def stop(self, stop_on_board=True):
+    def stop(self, turn_off_machine=None, clear_routing_tables=None,
+             clear_tags=None):
+        """
+        :param turn_off_machine: decides if the machine should be powered down
+        after running the exeuction. Note that this powers down all boards
+        connected to the BMP connections given to the transciever
+        :type turn_off_machine: bool
+        :param clear_routing_tables: informs the tool chain if it
+        should turn off the clearing of the routing tables
+        :type clear_routing_tables: bool
+        :param clear_tags: informs the tool chain if it should clear the tags
+        off the machine at stop
+        :type clear_tags: boolean
+        :return: None
         """
 
-        :param stop_on_board: boolean which decides if the board should have
-        its router tables and tags cleared
-        :return:
-        """
-        if stop_on_board:
+        if turn_off_machine is None:
+            config.getboolean("Machine", "turn_off_machine")
+
+        if clear_routing_tables is None:
+            config.getboolean("Machine", "clear_routing_tables")
+
+        if clear_tags is None:
+            config.getboolean("Machine", "clear_tags")
+
+        # if stopping on machine, clear iptags and
+        if clear_tags:
             for ip_tag in self._tags.ip_tags:
                 self._txrx.clear_ip_tag(
                     ip_tag.tag, board_address=ip_tag.board_address)
@@ -1007,9 +1026,22 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     reverse_ip_tag.tag,
                     board_address=reverse_ip_tag.board_address)
 
-            # self._txrx.stop_application(self._app_id)
+        # if clearing routing table entries, clear
+        if clear_routing_tables:
+            for router_table in self._router_tables.routing_tables:
+                if not self._machine.get_chip_at(router_table.x,
+                                                 router_table.y).virtual:
+                    self._txrx.clear_multicast_routes(router_table.x,
+                                                      router_table.y)
+
+        # execute app stop
+        # self._txrx.stop_application(self._app_id)
         if self._create_database:
             self._database_interface.stop()
+
+        # if asked to turn off machine, power down each rack via bmp connections
+        if turn_off_machine:
+            self._txrx.power_off()
 
         # stop the transciever
         self._txrx.close()
