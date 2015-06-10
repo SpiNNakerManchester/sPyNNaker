@@ -1041,7 +1041,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # if asked to turn off machine, power down each rack via bmp connections
         if turn_off_machine:
-            self._txrx.power_off()
+            self._txrx.power_off_machine()
 
         # stop the transciever
         self._txrx.close()
