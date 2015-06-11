@@ -39,7 +39,6 @@ from spinnman.messages.eieio.command_messages.stop_requests \
     import StopRequests
 
 from spynnaker.pyNN.exceptions import BufferableRegionTooSmall
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.buffer_management.storage_objects.buffers_sent_deque\
     import BuffersSentDeque
 
@@ -140,7 +139,7 @@ class BufferManager(object):
 
         :param vertex: the vertex to be managed
         :type vertex:\
-                    :py:class:`spinnaker.pyNN.models.abstract_models.buffer_models.abstract_sends_buffers_from_host_partitioned_vertex.AbstractSendsBuffersFromHostPartitionedVertex`
+                    :py:class:`spynnaker.pyNN.buffer_management.abstract_sends_buffers_from_host_partitioned_vertex.AbstractSendsBuffersFromHostPartitionedVertex`
         """
         self._sender_vertices.add(vertex)
         tag = self._tags.get_ip_tags_for_vertex(vertex)[0]
@@ -170,7 +169,7 @@ class BufferManager(object):
         :type size: int
         :param vertex: The vertex to get the keys from
         :type vertex:\
-                    :py:class:`spynnaker.pyNN.models.abstract_models.buffer_models.abstract_sends_buffers_from_host_partitioned_vertex.AbstractSendsBuffersFromHostPartitionedVertex`
+                    :py:class:`spynnaker.pyNN.buffer_management.abstract_sends_buffers_from_host_partitioned_vertex.AbstractSendsBuffersFromHostPartitionedVertex`
         :param region: The region of the vertex to get keys from
         :type region: int
         :return: A new message, or None if no keys can be added
@@ -236,7 +235,7 @@ class BufferManager(object):
 
         :param vertex: The vertex to get the keys from
         :type vertex:\
-                    :py:class:`spynnaker.pyNN.models.abstract_models.buffer_models.abstract_sends_buffers_from_host_partitioned_vertex.AbstractSendsBuffersFromHostPartitionedVertex`
+                    :py:class:`spynnaker.pyNN.buffer_management.abstract_sends_buffers_from_host_partitioned_vertex.AbstractSendsBuffersFromHostPartitionedVertex`
         :param region: The region to get the keys from
         :type region: int
         :return: A list of messages
@@ -377,7 +376,7 @@ class BufferManager(object):
         :type region: int
         :param vertex: the vertex to load a buffer for
         :type vertex:\
-                    :py:class:`spynnaker.pyNN.models.abstract_models.buffer_models.abstract_sends_buffers_from_host_partitioned_vertex.AbstractSendsBuffersFromHostPartitionedVertex`
+                    :py:class:`spynnaker.pyNN.buffer_management.abstract_sends_buffers_from_host_partitioned_vertex.AbstractSendsBuffersFromHostPartitionedVertex`
         :return: None
         """
         placement = self._placements.get_placement_of_subvertex(vertex)

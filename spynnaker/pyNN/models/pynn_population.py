@@ -62,7 +62,7 @@ class Population(object):
                          .format(Population._non_labelled_vertex_count)
             Population._non_labelled_vertex_count += 1
         cellparams['label'] = cell_label
-        cellparams['n_neurons'] = size
+        cellparams['n_keys'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
         cellparams['spikes_per_second'] = spinnaker.spikes_per_second

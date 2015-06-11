@@ -1,7 +1,7 @@
 #include "synapses.h"
 #include "spike_processing.h"
 #include "synapse_types/synapse_types.h"
-#include "plasticity/synapse_dynamics.h"
+#include "synapse_dynamics/synapse_dynamics.h"
 #include <debug.h>
 #include <spin1_api.h>
 #include <string.h>
@@ -263,7 +263,7 @@ bool synapses_initialise(
            synapse_index++) {
         ring_buffer_to_input_left_shifts[synapse_index] =
             address[ring_buffer_input_left_shifts_base + synapse_index];
-        log_info("synapse type %s, ring buffer to input left shift %u", 
+        log_info("synapse type %s, ring buffer to input left shift %u",
                  synapse_types_get_type_char(synapse_index), ring_buffer_to_input_left_shifts[synapse_index]);
     }
     *ring_buffer_to_input_buffer_left_shifts = ring_buffer_to_input_left_shifts;
@@ -363,8 +363,8 @@ void synapses_print_saturation_count() {
 //! \return Nothing, this method does not return anything
 void synapses_print_pre_synaptic_events() {
 #ifdef SYNAPSE_BENCHMARK
-	log_info("\t%u fixed pre-synaptic events.\n",
-			num_fixed_pre_synaptic_events);
-	synapse_dynamics_print_plastic_pre_synaptic_events();
+    log_info("\t%u fixed pre-synaptic events.\n",
+            num_fixed_pre_synaptic_events);
+    synapse_dynamics_print_plastic_pre_synaptic_events();
 #endif // SYNAPSE_BENCHMARK
 }

@@ -76,8 +76,8 @@ from spynnaker.pyNN.models.components.neuron_components.\
     abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spynnaker.pyNN.models.buffer_models\
-    .abstract_sends_buffers_from_host_partitioned_vertex\
+from spynnaker.pyNN.buffer_management.\
+    abstract_sends_buffers_from_host_partitioned_vertex\
     import AbstractSendsBuffersFromHostPartitionedVertex
 
 # spinnman imports

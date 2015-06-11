@@ -7,7 +7,7 @@
 #include "neuron.h"
 #include "models/neuron_model.h"
 #include "synapse_types/synapse_types.h"
-#include "plasticity/synapse_dynamics.h"
+#include "synapse_dynamics/synapse_dynamics.h"
 #include "../common/out_spikes.h"
 #include "../common/recording.h"
 #include <debug.h>
@@ -142,7 +142,7 @@ void neuron_do_timestep_update(timer_t time) {
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
             synapse_dynamics_get_intrinsic_bias(time, neuron_index);
-        
+
         // update neuron parameters (will inform us if the neuron should spike)
         bool spike = neuron_model_state_update(
             exc_neuron_input, inh_neuron_input, external_bias, neuron);

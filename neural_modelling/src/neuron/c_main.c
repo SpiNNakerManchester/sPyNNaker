@@ -19,8 +19,8 @@
 #include "neuron.h"
 #include "synapses.h"
 #include "spike_processing.h"
-#include "population_table.h"
-#include "plasticity/synapse_dynamics.h"
+#include "population_tables/population_table.h"
+#include "synapse_dynamics/synapse_dynamics.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -49,7 +49,7 @@ static const int components_magic_numbers[] = {
     SYNAPSE_SHAPE_MD5_HASH,
     MASTER_POP_MD5_HASH,
     SYNAPSE_DYNAMICS_MD5_HASH,
-    TIME_DEPENDENCY_MD5_HASH,
+    TIMING_DEPENDENCY_MD5_HASH,
     WEIGHT_DEPENDENCY_MD5_HASH
 };
 

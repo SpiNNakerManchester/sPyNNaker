@@ -28,11 +28,11 @@ POPULATION_TABLE_IMPL ?= population_table_binary_search_impl
 
 # Run md5sum on master pop structure
 MASTER_POP_MD5_HASH = \
-     $(shell echo -n "$(POPULATION_TABLE_IMPL)" | $(MD_FIVE_CONVERSION))
+     $(shell echo -n "$(notdir $(POPULATION_TABLE_IMPL))" | $(MD_FIVE_CONVERSION))
 
 # Run md5sum on neural components
 INPUT_MD5_HASH = \
-    $(shell echo -n "0" | $(MD_FIVE_CONVERSION))
+    $(shell echo -n "" | $(MD_FIVE_CONVERSION))
 MODEL_MD5_HASH = \
     $(shell echo -n "$(notdir $(MODEL_PATH))" | $(MD_FIVE_CONVERSION))
 SYNAPSE_SHAPE_MD5_HASH = \
@@ -57,7 +57,7 @@ MD5FLAGS = -DMASTER_POP_MD5_HASH=0x$(MASTER_POP_MD5_HASH) \
            -DINPUT_MD5_HASH=0x$(INPUT_MD5_HASH)
 
 # listing what objects are avilable?
-OBJECTS += $(SOURCE_DIRS)/neuron/$(POPULATION_TABLE_IMPL).o \
+OBJECTS += $(SOURCE_DIRS)/neuron/population_tables/$(POPULATION_TABLE_IMPL).o \
 	       $(MODEL_PATH).o $(SYNAPSE_DYNAMICS_PATH).o \
            $(SOURCE_DIRS)/common/in_spikes.o $(SOURCE_DIRS)/common/out_spikes.o \
            $(SOURCE_DIRS)/common/recording.o $(SOURCE_DIRS)/neuron/c_main.o \
@@ -66,19 +66,20 @@ OBJECTS += $(SOURCE_DIRS)/neuron/$(POPULATION_TABLE_IMPL).o \
 
 ifeq ($(USES_STDP), TRUE)
     OBJECTS += $(STDP_TIMING_PATH).o $(STDP_WEIGHT_PATH).o \
-                  $(SOURCE_DIRS)/neuron/plasticity/common/maths.o \
-                  $(SOURCE_DIRS)/neuron/plasticity/common/post_events.o
+                  $(SOURCE_DIRS)/neuron/synapse_dynamics/stdp/common/maths.o \
+                  $(SOURCE_DIRS)/neuron/synapse_dynamics/stdp/common/post_events.o
     STDP_DEP_OBJS += $(call convert_dirs, $(SYNAPSE_DYNAMICS_PATH).o) \
-                     $(BUILD_DIR)neuron/plasticity/common/post_events.o
+                     $(BUILD_DIR)neuron/synapse_dynamics/stdp/common/post_events.o
 endif
 
 SYNAPSE_TYPE_DEP_OBJS += $(BUILD_DIR)neuron/synapses.o \
     $(BUILD_DIR)neuron/spike_processing.o \
-    $(BUILD_DIR)neuron/population_table_fixed_impl.o \
-    $(BUILD_DIR)neuron/population_table_binary_search_impl.o \
-    $(BUILD_DIR)neuron/plasticity/synapse_dynamics_static_impl.o
+    $(BUILD_DIR)neuron/population_tables/$(POPULATION_TABLE_IMPL).o \
+    $(BUILD_DIR)neuron/synapse_dynamics/synapse_dynamics_static_impl.o
 
 include ../../../Makefile.common
+
+#$(error $(OBJECTS))
 
 NEURON_MODEL_H = $(MODEL_PATH).h
 SYNAPSE_TYPE_H = $(SYNAPSE_TYPE_PATH).h

@@ -1,5 +1,5 @@
 #include "spike_processing.h"
-#include "population_table.h"
+#include "population_tables/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
 #include "../common/in_spikes.h"
@@ -16,15 +16,15 @@
 #define DMA_TAG_READ_SYNAPTIC_ROW 0
 #define DMA_TAG_WRITE_PLASTIC_REGION 1
 
-// DMA buffer structure combines the row read from SDRAM with 
+// DMA buffer structure combines the row read from SDRAM with
 typedef struct dma_buffer {
   // Address in SDRAM to write back plastic region to
   address_t sdram_writeback_address;
-  
-  // Key of originating spike 
+
+  // Key of originating spike
   // (used to allow row data to be re-used for multiple spikes)
   spike_t originating_spike;
-  
+
   // Row data
   uint32_t *row;
 } dma_buffer;
@@ -90,11 +90,11 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 
     // Get pointer to current buffer
     dma_buffer *buffer = &dma_buffers[dma_buffer_index];
-    
+
     // Get the number of plastic bytes and the writeback address from the
     // synaptic row
     size_t n_plastic_region_bytes = synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
-    
+
     log_debug("Writing back %u bytes of plastic region to %08x",
               n_plastic_region_bytes, buffer->sdram_writeback_address);
 
@@ -151,10 +151,10 @@ void _dma_complete_callback(uint unused, uint tag) {
         // Get pointer to current buffer
         uint32_t current_buffer_index = buffer_being_read;
         dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
-        
+
         // Start the next DMA transfer, so it is complete when we are finished
         _setup_synaptic_dma_read();
-        
+
         // Process synaptic row repeatedly
         bool subsequent_spikes;
         do {
