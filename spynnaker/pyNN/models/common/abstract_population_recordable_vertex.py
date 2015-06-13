@@ -1,5 +1,8 @@
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.common.abstract_spike_recordable_vertex \
+    import AbstractSpikeRecordableVertex
+
 
 from pacman.utilities.progress_bar import ProgressBar
 
@@ -8,21 +11,20 @@ from data_specification import utility_calls as dsg_utility_calls
 import logging
 import numpy
 import struct
-from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 
 
-class AbstractPopulationRecordableVertex(object):
+class AbstractPopulationRecordableVertex(AbstractSpikeRecordableVertex):
     """ Neural recording
     """
 
     def __init__(self, label, machine_time_step):
+        AbstractSpikeRecordableVertex.__init__(self, label, machine_time_step)
         self._record_v = False
         self._record_gsyn = False
         self._label = label
         self._machine_time_step = machine_time_step
-        self._population_recordable_subvertices = OrderedDict()
 
     @property
     def record_v(self):
@@ -42,7 +44,8 @@ class AbstractPopulationRecordableVertex(object):
         """ Used to keep track of the population recordable subvertices of this
             vertex, to allow the retrieving of the recorded data
         """
-        self._population_recordable_subvertices[subvertex] = vertex_slice
+        AbstractSpikeRecordableVertex.add_spike_recordable_subvertex(
+            self, subvertex, vertex_slice)
 
     @staticmethod
     def _get_parameter_recording_region_size(n_machine_time_steps,
@@ -75,9 +78,9 @@ class AbstractPopulationRecordableVertex(object):
 
         # Find all the sub-vertices that this pynn_population.py exists on
         progress_bar = ProgressBar(
-            len(self._population_recordable_subvertices),
+            len(self._spike_recordable_subvertices),
             "Getting {}".format(parameter_name))
-        for subvertex, vertex_slice in self._population_recordable_subvertices:
+        for subvertex, vertex_slice in self._spike_recordable_subvertices:
             placment = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placment.x, placment.y, placment.p
 

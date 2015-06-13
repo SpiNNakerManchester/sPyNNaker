@@ -2,9 +2,12 @@ from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
 
+from spynnaker.pyNN.models.common.abstract_spike_recordable_subvertex \
+    import AbstractSpikeRecordableSubvertex
+
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationRecordableSubvertex(object):
+class AbstractPopulationRecordableSubvertex(AbstractSpikeRecordableSubvertex):
     """ A subvertex of a population recordable vertex
     """
 
