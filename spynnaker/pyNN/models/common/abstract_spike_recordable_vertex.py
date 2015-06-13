@@ -1,6 +1,6 @@
 from pacman.utilities.progress_bar import ProgressBar
 
-from spynnaker.pyNN.utilities import constants as local_constants
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 
 from data_specification import utility_calls as dsg_utility_calls
@@ -36,18 +36,18 @@ class AbstractSpikeRecordableVertex(object):
         self._record = record
 
     @staticmethod
-    def _get_bytes_per_time_step(vertex_slice):
+    def _get_spike_bytes_per_time_step(vertex_slice):
         return int(math.ceil(vertex_slice.n_atoms / 32.0)) * 4
 
     @staticmethod
-    def get_recording_region_size(n_machine_time_steps,
-                                  vertex_slice):
+    def get_spike_recording_region_size(n_machine_time_steps,
+                                        vertex_slice):
         """ Get the size of the spike recording region in bytes
         """
         bytes_per_time_step = \
-            AbstractSpikeRecordableVertex._get_bytes_per_time_step(
+            AbstractSpikeRecordableVertex._get_spike_bytes_per_time_step(
                 vertex_slice)
-        return (local_constants.RECORDING_ENTRY_BYTE_SIZE +
+        return (constants.RECORDING_ENTRY_BYTE_SIZE +
                 (n_machine_time_steps * bytes_per_time_step))
 
     def add_spike_recordable_subvertex(self, subvertex, vertex_slice):
@@ -79,31 +79,29 @@ class AbstractSpikeRecordableVertex(object):
                          "lo_atom {}".format(x, y, p, lo_atom))
 
             # Get the App Data for the core
-            app_data_base_address = \
-                transciever.get_cpu_information_from_core(x, y, p).user[0]
+            app_data_base_address = transciever.get_cpu_information_from_core(
+                x, y, p).user[0]
 
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address, spike_recording_region)
-            spike_region_base_address_buf = \
-                str(list(transciever.read_memory(
-                    x, y, spike_region_base_address_offset, 4))[0])
-            spike_region_base_address = \
-                struct.unpack("<I", spike_region_base_address_buf)[0]
+            spike_region_base_address_buf = str(list(transciever.read_memory(
+                x, y, spike_region_base_address_offset, 4))[0])
+            spike_region_base_address = struct.unpack(
+                "<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
 
             # Read the spike data size
-            number_of_bytes_written_buf =\
-                str(list(transciever.read_memory(
-                    x, y, spike_region_base_address, 4))[0])
-            number_of_bytes_written = \
-                struct.unpack_from("<I", number_of_bytes_written_buf)[0]
+            number_of_bytes_written_buf = str(list(transciever.read_memory(
+                x, y, spike_region_base_address, 4))[0])
+            number_of_bytes_written = struct.unpack_from(
+                "<I", number_of_bytes_written_buf)[0]
 
             # check that the number of spikes written is smaller or the same as
             # the size of the memory region we allocated for spikes
             size_of_region = \
-                AbstractSpikeRecordableVertex.get_recording_region_size(
+                AbstractSpikeRecordableVertex.get_spike_recording_region_size(
                     n_machine_time_steps, subvertex_slice)
             if number_of_bytes_written > size_of_region:
                 raise exceptions.MemReadException(
@@ -126,8 +124,8 @@ class AbstractSpikeRecordableVertex(object):
             numpy_data = numpy.asarray(data_list, dtype="uint8").view(
                 dtype="<i4").byteswap().view("uint8")
             bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
-                (-1, 32))).reshape(
-                    (-1, self._get_bytes_per_time_step(subvertex_slice) * 8))
+                (-1, 32))).reshape((-1, self._get_spike_bytes_per_time_step(
+                    subvertex_slice) * 8))
             indices = [numpy.add(numpy.where(items)[0], lo_atom)
                        for items in bits]
             times = [numpy.repeat(i * ms_per_tick, len(indices[i]))

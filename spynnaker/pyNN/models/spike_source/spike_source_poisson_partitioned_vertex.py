@@ -41,6 +41,7 @@ class SpikeSourcePoissonPartitionedVertex(
 
     def __init__(self, spike_source_poisson, vertex_slice, machine_time_step,
                  timescale_factor, record):
+        self._spike_source_poisson = spike_source_poisson
         self._vertex_slice = vertex_slice
         self._machine_time_step = machine_time_step
         self._timescale_factor = timescale_factor
@@ -58,8 +59,9 @@ class SpikeSourcePoissonPartitionedVertex(
                 placement, report_folder)
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
-        spike_hist_buff_sz = self._spike_source_poisson.get_spike_buffer_size(
-            self._vertex_slice)
+        spike_hist_buff_sz = \
+            self._spike_source_poisson.get_spike_recording_region_size(
+                self.n_machine_timesteps, self._vertex_slice)
         poisson_params_sz = self._spike_source_poisson.get_params_bytes(
             self._vertex_slice)
 
