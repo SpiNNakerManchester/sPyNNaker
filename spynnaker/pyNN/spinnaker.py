@@ -216,6 +216,24 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         :param run_time:
         :return:
         """
+        # sort out config param to be valid types
+        max_machines_x_dimension = \
+            config.get("Machine", "machine_largest_x_dimension")
+        max_machines_y_dimension = \
+            config.get("Machine", "machine_largest_y_dimension")
+        if max_machines_x_dimension == "None":
+            max_machines_x_dimension = None
+        else:
+            max_machines_x_dimension = int(max_machines_x_dimension)
+        if max_machines_y_dimension == "None":
+            max_machines_y_dimension = None
+        else:
+            max_machines_y_dimension = int(max_machines_y_dimension)
+
+        number_of_boards = config.get("Machine", "number_of_boards")
+        if number_of_boards == "None":
+            number_of_boards = None
+
         self._setup_interfaces(
             hostname=self._hostname,
             virtual_x_dimension=config.getint("Machine",
@@ -229,12 +247,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             requires_wrap_around=config.getboolean("Machine",
                                                    "requires_wrap_arounds"),
             board_version=config.getint("Machine", "version"),
-            number_of_boards=config.getint("Machine", "number_of_boards"),
+            number_of_boards=number_of_boards,
             machines_bmp_hostnames=config.get("Machine", "bmp_names"),
-            max_machines_x_dimension=config.get("Machine",
-                                                "machine_largest_x_dimension"),
-            max_machines_y_dimension=config.get("Machine",
-                                                "machine_largest_y_dimension"))
+            max_machines_x_dimension=max_machines_x_dimension,
+            max_machines_y_dimension=max_machines_y_dimension)
 
         # add database generation if requested
         if self._create_database:
