@@ -6,6 +6,9 @@ from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from spinn_front_end_common.abstract_models.\
     abstract_data_specable_partitioned_vertex \
     import AbstractDataSpecablePartitionedVertex
+from spinn_front_end_common.abstract_models\
+    .abstract_outgoing_edge_same_contiguous_keys_restrictor \
+    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.interface.has_n_machine_timesteps \
     import HasNMachineTimesteps
 from spinn_front_end_common.utilities import data_spec_utilities
@@ -25,9 +28,10 @@ import math
 import copy
 
 
-class DelayExtensionSubvertex(AbstractDataSpecablePartitionedVertex,
-                              PartitionedVertex, HasNMachineTimesteps,
-                              AbstractExecutable):
+class DelayExtensionSubvertex(
+        AbstractDataSpecablePartitionedVertex, PartitionedVertex,
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor, HasNMachineTimesteps,
+        AbstractExecutable):
 
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
@@ -41,6 +45,7 @@ class DelayExtensionSubvertex(AbstractDataSpecablePartitionedVertex,
         AbstractDataSpecablePartitionedVertex.__init__(self)
         PartitionedVertex.__init__(self, resources_required, label,
                                    constraints=constraints)
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         HasNMachineTimesteps.__init__(self, n_machine_time_steps)
         AbstractExecutable.__init__(self)
         self._vertex_slice = vertex_slice

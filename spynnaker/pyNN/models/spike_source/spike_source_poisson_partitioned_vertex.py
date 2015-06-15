@@ -17,6 +17,10 @@ from spinn_front_end_common.utilities import simulation_utilities
 from spinn_front_end_common.abstract_models\
     .abstract_data_specable_partitioned_vertex \
     import AbstractDataSpecablePartitionedVertex
+from spinn_front_end_common.abstract_models\
+    .abstract_outgoing_edge_same_contiguous_keys_restrictor \
+    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
+
 
 from spynnaker.pyNN.utilities.randomDistributions import generate_parameter
 from spynnaker.pyNN.models.common.abstract_spike_recordable_subvertex \
@@ -28,7 +32,8 @@ SLOW_RATE_PER_TICK_CUTOFF = 0.25
 class SpikeSourcePoissonPartitionedVertex(
         PartitionedVertex, AbstractSpikeRecordableSubvertex,
         AbstractDataSpecablePartitionedVertex,
-        AbstractExecutable, HasNMachineTimesteps):
+        AbstractExecutable, HasNMachineTimesteps,
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
 
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="_POISSON_SPIKE_SOURCE_REGIONS",
@@ -39,8 +44,16 @@ class SpikeSourcePoissonPartitionedVertex(
 
     _SPIKE_HISTORY_CONFIGURATION_SIZE = 8
 
-    def __init__(self, spike_source_poisson, vertex_slice, machine_time_step,
+    def __init__(self, resources_required, label, constraints,
+                 spike_source_poisson, vertex_slice, machine_time_step,
                  timescale_factor, record):
+        PartitionedVertex.__init__(self, resources_required, label,
+                                   constraints)
+        AbstractSpikeRecordableSubvertex.__init__(self)
+        AbstractDataSpecablePartitionedVertex.__init__(self)
+        AbstractExecutable.__init__(self)
+        HasNMachineTimesteps.__init__(self)
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         self._spike_source_poisson = spike_source_poisson
         self._vertex_slice = vertex_slice
         self._machine_time_step = machine_time_step

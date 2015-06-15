@@ -79,7 +79,7 @@ class AbstractPopulationRecordableVertex(AbstractSpikeRecordableVertex):
         # Find all the sub-vertices that this pynn_population.py exists on
         progress_bar = ProgressBar(
             len(self._spike_recordable_subvertices),
-            "Getting {}".format(parameter_name))
+            "Getting {} for {}".format(parameter_name, self._label))
         for subvertex, vertex_slice in self._spike_recordable_subvertices:
             placment = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placment.x, placment.y, placment.p

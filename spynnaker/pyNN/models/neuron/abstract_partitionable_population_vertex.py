@@ -1,14 +1,10 @@
 """
-AbstractPartitionablePopulationVertex
 """
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
-
-# spinn front end imports
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
-from spinn_front_end_common.utilities import constants as common_constants
+from spynnaker.pyNN.models.neuron.abstract_population_recordable_vertex \
+    import AbstractPopulationRecordableVertex
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -22,39 +18,41 @@ import math
 
 
 @add_metaclass(ABCMeta)
-class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
-                                            AbstractPartitionableVertex):
-    """
-    AbstractPartitionablePopulationVertex: provides functionality for the
-    partitioner aglortihums for neural populations. such as:
-    get_sdram usage
+class AbstractPartitionablePopulationVertex(
+        AbstractPartitionableVertex, AbstractPopulationRecordableVertex):
+    """ A partitionable vertex for neuron models
     """
 
-    def __init__(self, n_atoms, label, max_atoms_per_core, machine_time_step,
-                 timescale_factor, constraints=None):
-        AbstractDataSpecableVertex.__init__(
-            self, machine_time_step=machine_time_step,
-            timescale_factor=timescale_factor)
-        AbstractPartitionableVertex.__init__(
-            self, n_atoms, label, constraints=constraints,
-            max_atoms_per_core=max_atoms_per_core)
-
-    def get_neuron_params_size(self, vertex_slice):
+    def __init__(self, n_neurons, label, max_atoms_per_core, machine_time_step,
+                 timescale_factor, n_params, constraints=None):
         """
-        Get the size of the neuron parameters for a range of neurons
-        :param vertex_slice:
-        :return:
+
+        :param n_neurons: The number of neurons in the population
+        :param label: The label of the population
+        :param max_atoms_per_core: The absolute maximum number of atoms to be\
+                run on any core
+        :param machine_time_step: The number of microseconds per timestep
+        :param timescale_factor: The multiplier by which the machine is slowed\
+                down
+        :param n_params: The number of parameters in the neuron model
+        """
+        AbstractPartitionableVertex.__init__(
+            self, n_neurons, label, constraints=constraints,
+            max_atoms_per_core=max_atoms_per_core)
+        AbstractPopulationRecordableVertex.__init__(
+            self, label, machine_time_step)
+        self._n_params = n_params
+
+    def get_neuron_params_region_size(self, vertex_slice):
+        """ Get the size of the neuron parameters region
         """
 
         # NOTE: Assumes 4-bytes per neuron parameter
         return (constants.POPULATION_NEURON_PARAMS_HEADER_BYTES +
                 (4 * vertex_slice.n_atoms * self._n_params))
 
-    def get_synapse_parameter_size(self, vertex_slice):
-        """
-        Get the size of the synapse parameters for a given set of atoms
-        :param vertex_slice:
-        :return:
+    def get_synapse_params_region_size(self, vertex_slice):
+        """ Get the size of the synapse parameters region
         """
 
         # NOTE: Assumes 4-bytes per parameter
@@ -64,47 +62,6 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
         return ((4 * self.get_n_synapse_parameters_per_synapse_type() *
                  self.get_n_synapse_types() * vertex_slice.n_atoms) +
                 (4 * self.get_n_synapse_types()))
-
-    def get_spike_buffer_size(self, vertex_slice):
-        """Get the size of the spike buffer for a range of neurons and
-            time steps
-
-        :param vertex_slice:
-        :return:
-        """
-        if not self._record:
-            return 0
-
-        if self._no_machine_time_steps is None:
-            return 0
-
-        return self.get_recording_region_size(
-            int(math.ceil(vertex_slice.n_atoms / 32.0)) * 4)
-
-    def get_v_buffer_size(self, vertex_slice):
-        """
-        Gets the size of the v buffer for a range of neurons and time steps
-        :param vertex_slice:
-        :return:
-        """
-        if not self._record_v:
-            return 0
-        size_per_time_step = (vertex_slice.n_atoms *
-                              constants.V_BUFFER_SIZE_PER_TICK_PER_NEURON)
-        return self.get_recording_region_size(size_per_time_step)
-
-    def get_g_syn_buffer_size(self, vertex_slice):
-        """
-        Gets the size of the gsyn buffer for a range of neurons and time steps
-        :param vertex_slice:
-        :return:
-        """
-        if not self._record_gsyn:
-            return 0
-
-        size_per_time_step = (vertex_slice.n_atoms *
-                              constants.GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON)
-        return self.get_recording_region_size(size_per_time_step)
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """

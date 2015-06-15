@@ -7,9 +7,6 @@ from spynnaker.pyNN.models.delay_extension.delay_extension_subvertex \
 from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
-from spinn_front_end_common.abstract_models\
-    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
-    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.utilities import simulation_utilities
 from spinn_front_end_common.interface.has_n_machine_timesteps \
     import HasNMachineTimesteps
@@ -34,7 +31,6 @@ logger = logging.getLogger(__name__)
 
 class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractProvidesIncomingEdgeConstraints,
-                           AbstractOutgoingEdgeSameContiguousKeysRestrictor,
                            HasNMachineTimesteps):
     """ Provide delays to incoming spikes in multiples of the maximum delays \
         of a neuron (typically 16 or 32)
@@ -51,7 +47,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
                                              label=label,
                                              max_atoms_per_core=256)
         AbstractProvidesIncomingEdgeConstraints.__init__(self)
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
 
         self._machine_time_step = machine_time_step
         self._time_scale_factor = timescale_factor

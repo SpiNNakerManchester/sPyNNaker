@@ -19,9 +19,6 @@ from spinn_front_end_common.utilities import simulation_utilities
 from spinn_front_end_common.abstract_models.\
     abstract_data_specable_partitioned_vertex \
     import AbstractDataSpecablePartitionedVertex
-from spinn_front_end_common.abstract_models\
-    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
-    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +29,7 @@ RANDOM_SEED_WORDS = 4
 
 class SpikeSourcePoisson(
         AbstractSpikeRecordableVertex, AbstractPartitionableVertex,
-        AbstractDataSpecablePartitionedVertex,
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor,
-        HasNMachineTimesteps):
+        AbstractDataSpecablePartitionedVertex, HasNMachineTimesteps):
     """ A Poisson Spike source model
     """
 
@@ -54,7 +49,6 @@ class SpikeSourcePoisson(
             self, n_atoms=n_keys, label=label, constraints=constraints,
             max_atoms_per_core=self._model_based_max_atoms_per_core)
         AbstractDataSpecablePartitionedVertex.__init__(self)
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         HasNMachineTimesteps.__init__(self)
         self._rate = rate
         self._start = start
@@ -94,11 +88,10 @@ class SpikeSourcePoisson(
         """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         spike_hist_buff_sz = 0
-        if self._record:
-            spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
+        if self.record:
+            spike_hist_buff_sz = self.get_spike_recording_region_size(
+                self.n_machine_timesteps, vertex_slice)(vertex_slice)
         return (simulation_utilities.HEADER_REGION_BYTES +
-                (len(self._get_components()) * 4) +
-                self._SPIKE_HISTROY_CONFIGURATION_SIZE +
                 poisson_params_sz + spike_hist_buff_sz)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
@@ -114,6 +107,7 @@ class SpikeSourcePoisson(
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          constraints=None):
         subvertex = SpikeSourcePoissonPartitionedVertex(
+            resources_required, label, constraints,
             self, vertex_slice, self._machine_time_step,
             self._timescale_factor, self._record)
         AbstractSpikeRecordableVertex.add_spike_recordable_subvertex(
