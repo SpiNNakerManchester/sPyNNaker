@@ -21,20 +21,19 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
         """
         Returns the size of the fixed and plastic regions of the row in words
         """
-        # Calculate number of half words that will be required for
-        # Both the plastic weights and the fixed control words
-        num_half_words = len(synapse_row.target_indices)
-        if vertex_slice is not None:
-            num_half_words = \
-                len(synapse_row.target_indices[0:vertex_slice.n_atoms + 1])
+
+        # There is a half word in both the fixed-plastic
+        # And plastic region for each synapse
+        num_half_words = synapse_row.get_n_connections(vertex_slice)
+
+        # As both of these regions are word aligned, if there are
+        # An odd number of half words, add one for padding
         if (num_half_words % 2) != 0:
             num_half_words += 1
 
         # As fixed-plastic and plastic regions both require this
         # Many half words, this is the number of words!
-        num_words = num_half_words + self.num_header_words
-
-        return num_words
+        return num_half_words + self.num_header_words
 
     def get_packed_fixed_fixed_region(self, synapse_row, weight_scale,
                                       n_synapse_type_bits):
