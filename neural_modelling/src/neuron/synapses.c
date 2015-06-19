@@ -218,7 +218,7 @@ bool synapses_initialise(address_t address, uint32_t n_neurons_value,
     }
 
     // Get the synapse shaping data
-    if(sizeof(synapse_param_t) > 0) {
+    if (sizeof(synapse_param_t) > 0) {
         for (index_t synapse_index = 0; synapse_index < SYNAPSE_TYPE_COUNT;
                 synapse_index++) {
             log_debug("\tCopying %u synapse type %u parameters of size %u",
