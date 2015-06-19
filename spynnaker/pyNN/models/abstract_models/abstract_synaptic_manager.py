@@ -108,8 +108,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
             sublist.get_n_rows(), dtype="uint32")
         data.fill(0xBBCCDDEE)
 
-        row_no = 0
-        for row in synaptic_rows:
+        for row_no, row in enumerate(synaptic_rows):
             data_pos = ((fixed_row_length +
                          constants.SYNAPTIC_ROW_HEADER_WORDS) *
                         row_no)
@@ -153,7 +152,6 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                 dtype="uint32")
             data[data_pos:(data_pos + fixed_plastic_region_words.size)] = \
                 fixed_plastic_region_words
-            row_no += 1
 
         spec.write_array(data)
         write_ptr += data.size * 4
