@@ -602,11 +602,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             GraphEdgeFilter(self._report_default_directory)\
             .run(self._partitioned_graph, self._graph_mapper)
 
-        # execute key allocator
-        self._execute_key_allocator(pacman_report_state)
-
         # execute router
         self._execute_router(pacman_report_state)
+
+        # execute key allocator
+        self._execute_key_allocator(pacman_report_state)
 
     def _execute_tag_allocator(self, pacman_report_state):
         """
@@ -671,16 +671,28 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         edge, self._graph_mapper))
 
         # execute routing info generator
-        self._routing_infos = \
+        self._routing_infos, self._routing_tables = \
             self._key_allocator_algorithm.allocate_routing_info(
                 self._partitioned_graph, self._placements, n_keys_map)
+
+        # if in debug mode, this is the first position where routign tables have
+        # been generated and therefore we can test if everything has tied
+        # together correctly via a router search
+        if self._in_debug_mode:
+
+            # check that all routes are valid and no cycles exist
+            valid_route_checker = ValidRouteChecker(
+                placements=self._placements, routing_infos=self._routing_infos,
+                routing_tables=self._router_tables, machine=self._machine,
+                partitioned_graph=self._partitioned_graph)
+            valid_route_checker.validate_routes()
 
         # generate reports
         if (pacman_report_state is not None and
                 pacman_report_state.routing_info_report):
             pacman_reports.routing_info_reports(
                 self._report_default_directory, self._partitioned_graph,
-                self._routing_infos)
+                self._routing_infos, self._routing_tables)
 
     def _execute_router(self, pacman_report_state):
         """ exectes the router algorithum
@@ -695,30 +707,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         else:
             self._router_algorithm = self._router_algorithm()
 
-        self._router_tables = \
+        self._routing_paths = \
             self._router_algorithm.route(
-                self._routing_infos, self._placements, self._machine,
-                self._partitioned_graph)
+                self._placements, self._machine, self._partitioned_graph)
 
         if pacman_report_state is not None and \
                 pacman_report_state.router_report:
             pacman_reports.router_reports(
-                graph=self._partitionable_graph, hostname=self._hostname,
-                graph_to_sub_graph_mapper=self._graph_mapper,
-                placements=self._placements,
                 report_folder=self._report_default_directory,
-                include_dat_based=pacman_report_state.router_dat_based_report,
-                routing_tables=self._router_tables,
-                routing_info=self._routing_infos, machine=self._machine)
-
-        if self._in_debug_mode:
-
-            # check that all routes are valid and no cycles exist
-            valid_route_checker = ValidRouteChecker(
-                placements=self._placements, routing_infos=self._routing_infos,
-                routing_tables=self._router_tables, machine=self._machine,
-                partitioned_graph=self._partitioned_graph)
-            valid_route_checker.validate_routes()
+                routing_paths=self._routing_paths, hostname=self._hostname)
 
     def _execute_partitioner(self, pacman_report_state):
         """ executes the partitioner function
