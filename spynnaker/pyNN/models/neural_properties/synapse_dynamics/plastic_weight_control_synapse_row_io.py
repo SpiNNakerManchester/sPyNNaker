@@ -116,6 +116,7 @@ class PlasticWeightControlSynapseRowIo(AbstractSynapseRowIo):
         # Combine together into plastic region and return
         plastic_region = numpy.asarray(numpy.append(
             pre_synaptic_event_buffer, padded_weights_view), dtype='uint32')
+        
         return plastic_region
 
     def create_row_info_from_elements(self, p_p_entries, f_f_entries,

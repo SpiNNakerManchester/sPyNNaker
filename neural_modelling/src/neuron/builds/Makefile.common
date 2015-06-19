@@ -46,8 +46,7 @@ STDP_TIMING_DEPENDENCE += $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/t
                           $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pair_impl.o \
                           $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pfister_triplet_impl.o
 
-CFLAGS += -D$(SYNAPSE_BENCHMARK) \
-          -DAPPLICATION_MAGIC_NUMBER=$(APPLICATION_MAGIC_NUMBER)
+CFLAGS += -D$(SYNAPSE_BENCHMARK)
 
 include ../../../Makefile.common
 

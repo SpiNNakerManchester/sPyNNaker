@@ -14,7 +14,6 @@ class IzhikevichCurrentExponentialPopulation(
         AbstractIzhikevichVertex, AbstractExponentialPopulationVertex,
         AbstractPopulationVertex):
 
-    CORE_APP_IDENTIFIER = constants.IZK_CURRENT_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
@@ -39,8 +38,6 @@ class IzhikevichCurrentExponentialPopulation(
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma)
-        self._executable_constant = \
-            IzhikevichCurrentExponentialPopulation.CORE_APP_IDENTIFIER
 
     @property
     def model_name(self):

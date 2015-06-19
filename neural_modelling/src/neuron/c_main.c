@@ -27,9 +27,8 @@
 
 /* validates that the model being compiled does indeed contain a application
    magic number*/
-#ifndef APPLICATION_MAGIC_NUMBER
-#define APPLICATION_MAGIC_NUMBER 0
-#error APPLICATION_MAGIC_NUMBER was undefined.  Make sure you define this\
+#ifndef APPLICATION_NAME_HASH
+#error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
        constant
 #endif
 
@@ -80,7 +79,7 @@ static bool initialize(uint32_t *timer_period) {
     address_t system_region = data_specification_get_region(
         SYSTEM_REGION, address);
     if (!simulation_read_timing_details(
-            system_region, APPLICATION_MAGIC_NUMBER, timer_period,
+            system_region, APPLICATION_NAME_HASH, timer_period,
             &simulation_ticks)) {
         return false;
     }
