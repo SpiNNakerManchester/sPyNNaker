@@ -241,7 +241,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             downed_cores=config.get("Machine", "down_cores"),
             board_version=config.getint("Machine", "version"),
             number_of_boards=number_of_boards, width=width, height=height,
-            is_virtual_board=config.getboolean("Machine", "virtual_board"),
+            is_virtual=config.getboolean("Machine", "virtual_board"),
             virtual_has_wrap_arounds=config.getboolean(
                 "Machine", "requires_wrap_arounds"))
 
