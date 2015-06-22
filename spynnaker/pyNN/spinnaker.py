@@ -181,14 +181,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     "Reports", "max_application_binaries_kept"),
                 where_to_write_application_data_files=config.get(
                     "Reports", "defaultApplicationDataFilePath"))
-        # set up spynnaker speicficis, such as setting the machineName from conf
+
+        # set up spynnaker specifics, such as setting the machineName from conf
         self._set_up_machine_specifics(
             timestep, min_delay, max_delay, host_name)
         self._spikes_per_second = float(config.getfloat(
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
-        self._create_database = config.getboolean("Database", "create_database")
+        self._create_database = config.getboolean(
+            "Database", "create_database")
 
         FrontEndCommonInterfaceFunctions.__init__(
             self, self._reports_states, self._report_default_directory)
@@ -217,18 +219,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         :return:
         """
         # sort out config param to be valid types
-        max_machines_x_dimension = \
-            config.get("Machine", "machine_largest_x_dimension")
-        max_machines_y_dimension = \
-            config.get("Machine", "machine_largest_y_dimension")
-        if max_machines_x_dimension == "None":
-            max_machines_x_dimension = None
+        width = config.get("Machine", "width")
+        height = config.get("Machine", "height")
+        if width == "None":
+            width = None
         else:
-            max_machines_x_dimension = int(max_machines_x_dimension)
-        if max_machines_y_dimension == "None":
-            max_machines_y_dimension = None
+            width = int(width)
+        if height == "None":
+            height = None
         else:
-            max_machines_y_dimension = int(max_machines_y_dimension)
+            height = int(height)
 
         number_of_boards = config.get("Machine", "number_of_boards")
         if number_of_boards == "None":
@@ -236,26 +236,19 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         self._setup_interfaces(
             hostname=self._hostname,
-            virtual_x_dimension=config.getint("Machine",
-                                              "virtual_board_x_dimension"),
-            virtual_y_dimension=config.getint("Machine",
-                                              "virtual_board_y_dimension"),
+            bmp_details=config.get("Machine", "bmp_names"),
             downed_chips=config.get("Machine", "down_chips"),
             downed_cores=config.get("Machine", "down_cores"),
-            requires_virtual_board=config.getboolean("Machine",
-                                                     "virtual_board"),
-            requires_wrap_around=config.getboolean("Machine",
-                                                   "requires_wrap_arounds"),
             board_version=config.getint("Machine", "version"),
-            number_of_boards=number_of_boards,
-            machines_bmp_hostnames=config.get("Machine", "bmp_names"),
-            max_machines_x_dimension=max_machines_x_dimension,
-            max_machines_y_dimension=max_machines_y_dimension)
+            number_of_boards=number_of_boards, width=width, height=height,
+            is_virtual_board=config.getboolean("Machine", "virtual_board"),
+            virtual_has_wrap_arounds=config.getboolean(
+                "Machine", "requires_wrap_arounds"))
 
         # add database generation if requested
         if self._create_database:
-            wait_on_confirmation = \
-                config.getboolean("Database", "wait_on_confirmation")
+            wait_on_confirmation = config.getboolean(
+                "Database", "wait_on_confirmation")
             self._database_interface = DataBaseInterface(
                 self._app_data_runtime_folder, wait_on_confirmation,
                 self._database_socket_addresses)
@@ -1055,7 +1048,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if self._create_database:
             self._database_interface.stop()
 
-        # if asked to turn off machine, power down each rack via bmp connections
+        # if asked to turn off machine, power down each rack via bmp
+        # connections
         if turn_off_machine:
             self._txrx.power_off_machine()
 
