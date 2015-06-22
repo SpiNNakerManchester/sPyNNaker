@@ -693,7 +693,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 pacman_report_state.routing_info_report):
             pacman_reports.routing_info_reports(
                 self._report_default_directory, self._partitioned_graph,
-                self._routing_infos, self._routing_tables)
+                self._routing_infos, self._router_tables)
 
     def _execute_router(self, pacman_report_state):
         """ exectes the router algorithum
