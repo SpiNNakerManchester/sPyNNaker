@@ -134,9 +134,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         while imin < imax:
             imid = (imax + imin) / 2
             entry = entries[imid]
-            if key & entry.mask == entry.key_combo:
+            if key & entry.mask == entry.routing_entry_key:
                 return entry
-            if key > entry.key_combo:
+            if key > entry.routing_entry_key:
                 imin = imid + 1
             else:
                 imax = imid
@@ -228,11 +228,11 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         # sort out entries based off key_combo
         self._entries = sorted(
             self._entries,
-            key=lambda pop_table_entry: pop_table_entry.key_combo)
+            key=lambda pop_table_entry: pop_table_entry.routing_entry_key)
 
         # add each entry
         for pop_entry in self._entries:
-            spec.write_value(pop_entry.key_combo)
+            spec.write_value(pop_entry.routing_entry_key)
             spec.write_value(pop_entry.mask)
             spec.write_value((pop_entry.address << 8) | pop_entry.row_length)
 

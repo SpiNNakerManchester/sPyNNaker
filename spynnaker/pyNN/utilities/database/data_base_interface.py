@@ -592,7 +592,7 @@ class DataBaseInterface(object):
                         "chip_x, chip_y, position, key_combo, mask, route) "
                         "VALUES({}, {}, {}, {}, {}, {})"
                         .format(routing_table.x, routing_table.y, counter,
-                                entry.key_combo, entry.mask, route_entry))
+                                entry.routing_entry_key, entry.mask, route_entry))
                     counter += 1
             connection.commit()
             connection.close()

@@ -671,9 +671,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         edge, self._graph_mapper))
 
         # execute routing info generator
-        self._routing_infos, self._routing_tables = \
+        self._routing_infos, self._router_tables = \
             self._key_allocator_algorithm.allocate_routing_info(
-                self._partitioned_graph, self._placements, n_keys_map)
+                self._partitioned_graph, self._placements, n_keys_map,
+                self._routing_paths)
 
         # if in debug mode, this is the first position where routign tables have
         # been generated and therefore we can test if everything has tied
