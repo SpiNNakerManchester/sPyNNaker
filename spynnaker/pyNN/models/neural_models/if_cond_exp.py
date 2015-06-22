@@ -18,7 +18,6 @@ class IFConductanceExponentialPopulation(
         AbstractIntegrateAndFireProperties,
         AbstractPopulationVertex):
 
-    CORE_APP_IDENTIFIER = constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID
     _model_based_max_atoms_per_core = 256
 
     # noinspection PyPep8Naming
@@ -49,8 +48,6 @@ class IFConductanceExponentialPopulation(
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             weight_scale=AbstractConductanceVertex.WEIGHT_SCALE)
-        self._executable_constant = \
-            IFConductanceExponentialPopulation.CORE_APP_IDENTIFIER
 
     @property
     def model_name(self):

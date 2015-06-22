@@ -15,7 +15,7 @@ void synapse_dynamics_process_plastic_synapses(
 void synapse_dynamics_process_post_synaptic_event(
     uint32_t time, index_t neuron_index);
 
-input_t synapse_dynamics_get_intrinsic_bias(index_t neuron_index);
+input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index);
 
 void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
