@@ -1,9 +1,16 @@
+"""
+GraphEdgeFilter
+"""
+
+# pacman imports
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
     import MultiCastPartitionableEdge
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
 from pacman.utilities.progress_bar import ProgressBar
+
+# spynnaker imports
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
@@ -13,6 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 class GraphEdgeFilter(object):
+    """
+    the filterer
+    """
 
     def __init__(self, common_report_folder):
         self._common_report_folder = common_report_folder
@@ -39,16 +49,26 @@ class GraphEdgeFilter(object):
             progress_bar.update()
 
         # start checking subedges to decide which ones need pruning....
-        for subedge in subgraph.subedges:
-            if not self._is_filterable(subedge, graph_mapper):
-                logger.debug("this subedge was not pruned {}".format(subedge))
-                new_sub_graph.add_subedge(subedge)
-                associated_edge = graph_mapper.\
-                    get_partitionable_edge_from_partitioned_edge(subedge)
-                new_graph_mapper.add_partitioned_edge(subedge, associated_edge)
-            else:
-                logger.debug("this subedge was pruned {}".format(subedge))
-            progress_bar.update()
+        for subvert in subgraph.subvertices:
+            out_going_partitions = \
+                subgraph.outgoing_edges_partitions_from_vertex(subvert)
+            for partitioner_identifer in out_going_partitions:
+                for subedge in \
+                        out_going_partitions[partitioner_identifer].edges:
+                    if not self._is_filterable(subedge, graph_mapper):
+                        logger.debug("this subedge was not pruned {}"
+                                     .format(subedge))
+                        new_sub_graph.add_subedge(subedge,
+                                                  partitioner_identifer)
+                        associated_edge = graph_mapper.\
+                            get_partitionable_edge_from_partitioned_edge(
+                                subedge)
+                        new_graph_mapper.add_partitioned_edge(
+                            subedge, associated_edge)
+                    else:
+                        logger.debug("this subedge was pruned {}"
+                                     .format(subedge))
+                    progress_bar.update()
         progress_bar.end()
 
         # returned the pruned partitioned_graph and graph_mapper

@@ -868,13 +868,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
                 self.add_edge(dependant_edge)
 
-    def add_edge(self, edge_to_add):
+    def add_edge(self, edge_to_add, partition_identifier=None):
         """
 
         :param edge_to_add:
+        :param partition_identifier: the partition identfer for the outgoing
+        edge partition
         :return:
         """
-        self._partitionable_graph.add_edge(edge_to_add)
+        self._partitionable_graph.add_edge(edge_to_add, partition_identifier)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         """

@@ -1,3 +1,8 @@
+"""
+AbstractVertexWithEdgeToDependentVertices
+"""
+
+# general imports
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
@@ -22,8 +27,25 @@ class AbstractVertexWithEdgeToDependentVertices(object):
 
     @property
     def dependent_vertices(self):
+        """
+        returns the dependent vertices which this vertex depends upon
+        :return:
+        """
         return self._dependent_vertices
 
     @abstractmethod
     def has_dependent_vertices(self):
-        pass
+        """
+        helper method for isinstance
+        :return:
+        """
+
+    @abstractmethod
+    def partition_identifer_for_dependent_edge(self, dependent_edge):
+        """ helper emthod for the vertex to give semantic data of the partition
+        uidentifer type for each depdent vertex.
+
+        :param dependent_edge: the edge which coems from this to one of its
+        dependent vertices.
+        :return: the outgoing spike parittion identifer for this depdentent edge
+        """
