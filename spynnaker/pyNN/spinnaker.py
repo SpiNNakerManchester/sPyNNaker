@@ -1,3 +1,7 @@
+"""
+Spinnaker
+"""
+
 # pacman imports
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
@@ -84,6 +88,7 @@ from spynnaker.pyNN.models.abstract_models.buffer_models\
 from spinnman.model.core_subsets import CoreSubsets
 from spinnman.model.core_subset import CoreSubset
 
+# general imports
 import logging
 import math
 import os
@@ -176,13 +181,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     "Reports", "max_application_binaries_kept"),
                 where_to_write_application_data_files=config.get(
                     "Reports", "defaultApplicationDataFilePath"))
-        self._set_up_machine_specifics(timestep, min_delay, max_delay,
-                                       host_name)
+
+        # set up spynnaker specifics, such as setting the machineName from conf
+        self._set_up_machine_specifics(
+            timestep, min_delay, max_delay, host_name)
         self._spikes_per_second = float(config.getfloat(
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
-        self._create_database = config.getboolean("Database", "create_database")
+        self._create_database = config.getboolean(
+            "Database", "create_database")
 
         FrontEndCommonInterfaceFunctions.__init__(
             self, self._reports_states, self._report_default_directory)
@@ -210,24 +218,37 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         :param run_time:
         :return:
         """
+        # sort out config param to be valid types
+        width = config.get("Machine", "width")
+        height = config.get("Machine", "height")
+        if width == "None":
+            width = None
+        else:
+            width = int(width)
+        if height == "None":
+            height = None
+        else:
+            height = int(height)
+
+        number_of_boards = config.get("Machine", "number_of_boards")
+        if number_of_boards == "None":
+            number_of_boards = None
+
         self._setup_interfaces(
             hostname=self._hostname,
-            virtual_x_dimension=config.getint("Machine",
-                                              "virtual_board_x_dimension"),
-            virtual_y_dimension=config.getint("Machine",
-                                              "virtual_board_y_dimension"),
+            bmp_details=config.get("Machine", "bmp_names"),
             downed_chips=config.get("Machine", "down_chips"),
             downed_cores=config.get("Machine", "down_cores"),
-            requires_virtual_board=config.getboolean("Machine",
-                                                     "virtual_board"),
-            requires_wrap_around=config.getboolean("Machine",
-                                                   "requires_wrap_arounds"),
-            machine_version=config.getint("Machine", "version"))
+            board_version=config.getint("Machine", "version"),
+            number_of_boards=number_of_boards, width=width, height=height,
+            is_virtual=config.getboolean("Machine", "virtual_board"),
+            virtual_has_wrap_arounds=config.getboolean(
+                "Machine", "requires_wrap_arounds"))
 
         # add database generation if requested
         if self._create_database:
-            wait_on_confirmation = \
-                config.getboolean("Database", "wait_on_confirmation")
+            wait_on_confirmation = config.getboolean(
+                "Database", "wait_on_confirmation")
             self._database_interface = DataBaseInterface(
                 self._app_data_runtime_folder, wait_on_confirmation,
                 self._database_socket_addresses)
@@ -979,14 +1000,33 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
             virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
 
-    def stop(self, stop_on_board=True):
+    def stop(self, turn_off_machine=None, clear_routing_tables=None,
+             clear_tags=None):
+        """
+        :param turn_off_machine: decides if the machine should be powered down
+        after running the exeuction. Note that this powers down all boards
+        connected to the BMP connections given to the transciever
+        :type turn_off_machine: bool
+        :param clear_routing_tables: informs the tool chain if it
+        should turn off the clearing of the routing tables
+        :type clear_routing_tables: bool
+        :param clear_tags: informs the tool chain if it should clear the tags
+        off the machine at stop
+        :type clear_tags: boolean
+        :return: None
         """
 
-        :param stop_on_board: boolean which decides if the board should have
-        its router tables and tags cleared
-        :return:
-        """
-        if stop_on_board:
+        if turn_off_machine is None:
+            config.getboolean("Machine", "turn_off_machine")
+
+        if clear_routing_tables is None:
+            config.getboolean("Machine", "clear_routing_tables")
+
+        if clear_tags is None:
+            config.getboolean("Machine", "clear_tags")
+
+        # if stopping on machine, clear iptags and
+        if clear_tags:
             for ip_tag in self._tags.ip_tags:
                 self._txrx.clear_ip_tag(
                     ip_tag.tag, board_address=ip_tag.board_address)
@@ -995,9 +1035,23 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     reverse_ip_tag.tag,
                     board_address=reverse_ip_tag.board_address)
 
-            # self._txrx.stop_application(self._app_id)
+        # if clearing routing table entries, clear
+        if clear_routing_tables:
+            for router_table in self._router_tables.routing_tables:
+                if not self._machine.get_chip_at(router_table.x,
+                                                 router_table.y).virtual:
+                    self._txrx.clear_multicast_routes(router_table.x,
+                                                      router_table.y)
+
+        # execute app stop
+        # self._txrx.stop_application(self._app_id)
         if self._create_database:
             self._database_interface.stop()
+
+        # if asked to turn off machine, power down each rack via bmp
+        # connections
+        if turn_off_machine:
+            self._txrx.power_off_machine()
 
         # stop the transciever
         self._txrx.close()
