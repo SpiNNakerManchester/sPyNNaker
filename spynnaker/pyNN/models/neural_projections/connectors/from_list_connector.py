@@ -68,13 +68,14 @@ class FromListConnector(AbstractConnector):
         pre_counts = numpy.histogram(conn_list_numpy["i"],
                                      numpy.arange(prevertex.n_atoms + 1))[0]
 
-        # Convert these into cumulative counts
-        pre_conn_end_indices = numpy.cumsum(pre_counts)
-        pre_conn_start_indices = numpy.append(0, pre_conn_end_indices[:-1])
+        # Take cumulative sum of these counts to get start and end indices of
+        # the blocks of connections coming from each pre-synaptic neuron
+        pre_end_idxs = numpy.cumsum(pre_counts)
+        pre_start_idxs = numpy.append(0, pre_end_idxs[:-1])
 
         # Loop through slices of connections
         synaptic_rows = []
-        for n, (start, end) in enumerate(zip(pre_conn_start_indices, pre_conn_end_indices)):
+        for n, (start, end) in enumerate(zip(pre_start_idxs, pre_end_idxs)):
             # Get slice
             pre_conns = conn_list_numpy[start:end]
 
