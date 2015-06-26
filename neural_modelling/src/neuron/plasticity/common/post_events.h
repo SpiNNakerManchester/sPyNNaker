@@ -11,7 +11,7 @@
 //---------------------------------------
 // Macros
 //---------------------------------------
-#define MAX_POST_SYNAPTIC_EVENTS 32
+#define MAX_POST_SYNAPTIC_EVENTS 16
 
 //---------------------------------------
 // Structures
