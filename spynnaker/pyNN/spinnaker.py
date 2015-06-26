@@ -59,11 +59,6 @@ from spinn_front_end_common.interface.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_provanence_data import \
     AbstractProvidesProvanenceData
-from spinn_front_end_common.interface.buffer_management.buffer_manager \
-    import BufferManager
-from spinn_front_end_common.interface.buffer_management.buffer_models.\
-    abstract_sends_buffers_from_host_partitioned_vertex \
-    import AbstractSendsBuffersFromHostPartitionedVertex
 
 # local front end imports
 from spinn_front_end_common.utilities.notification_protocol.\
@@ -85,8 +80,6 @@ from spynnaker.pyNN.models.abstract_models\
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
-
-# spinnman imports
 
 # general imports
 import logging
@@ -238,7 +231,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if number_of_boards == "None":
             number_of_boards = None
 
-        self._setup_interfaces(
         self.setup_interfaces(
             hostname=self._hostname,
             bmp_details=config.get("Machine", "bmp_names"),
@@ -255,9 +247,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             wait_on_confirmation = \
                 config.getboolean("Database", "wait_on_confirmation")
             self._database_interface = SpynnakerDataBaseInterface(
-            wait_on_confirmation = config.getboolean(
-                "Database", "wait_on_confirmation")
-            self._database_interface = DataBaseInterface(
                 self._app_data_runtime_folder, wait_on_confirmation,
                 self._database_socket_addresses)
 
