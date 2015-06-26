@@ -2,20 +2,8 @@
 from pacman.model.partitionable_graph.partitionable_graph import \
     PartitionableGraph
 from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
-from pacman.utilities import reports as pacman_reports
-from pacman.operations.partition_algorithms.basic_partitioner import \
-    BasicPartitioner
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
-from pacman.operations.tag_allocator_algorithms.basic_tag_allocator \
-    import BasicTagAllocator
-from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
-    import DictBasedPartitionedEdgeNKeysMap
-from pacman.operations.router_algorithms.basic_dijkstra_routing \
-    import BasicDijkstraRouting
-from pacman.operations.placer_algorithms.basic_placer import BasicPlacer
-from pacman.operations.routing_info_allocator_algorithms.\
-    basic_routing_info_allocator import BasicRoutingInfoAllocator
 from pacman.utilities.progress_bar import ProgressBar
 
 # spinnmachine imports
@@ -41,14 +29,6 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.interface.data_generator_interface import \
     DataGeneratorInterface
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
-from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
-    import AbstractProvidesNKeysForEdge
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints \
-    import AbstractProvidesOutgoingEdgeConstraints
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_incoming_edge_constraints \
-    import AbstractProvidesIncomingEdgeConstraints
 from spinn_front_end_common.interface.\
     front_end_common_provanence_functions import \
     FrontEndCommonProvanenceFunctions
@@ -650,179 +630,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
     def __repr__(self):
         return "Spinnaker object for machine {}".format(self._hostname)
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def _execute_tag_allocator(self, pacman_report_state):
-        """
-
-        :param pacman_report_state:
-        :return:
-        """
-        if self._tag_allocator_algorithm is None:
-            self._tag_allocator_algorithm = BasicTagAllocator()
-        else:
-            self._tag_allocator_algorithm = self._tag_allocator_algorithm()
-
-        # execute tag allocation
-        self._tags = self._tag_allocator_algorithm.allocate_tags(
-            self._machine, self._placements)
-
-        # generate reports
-        if (pacman_report_state is not None and
-                pacman_report_state.tag_allocation_report):
-            pacman_reports.tag_allocator_report(
-                self._report_default_directory, self._tags)
-
-    def _execute_key_allocator(self, pacman_report_state):
-        """ executes the key allocator
-
-        :param pacman_report_state:
-        :return:
-        """
-        if self._key_allocator_algorithm is None:
-            self._key_allocator_algorithm = BasicRoutingInfoAllocator()
-        else:
-            self._key_allocator_algorithm = self._key_allocator_algorithm()
-
-        # execute routing info generator
-        # Generate an n_keys map for the graph and add constraints
-        n_keys_map = DictBasedPartitionedEdgeNKeysMap()
-        for edge in self._partitioned_graph.subedges:
-            vertex_slice = self._graph_mapper.get_subvertex_slice(
-                edge.pre_subvertex)
-            super_edge = (self._graph_mapper
-                          .get_partitionable_edge_from_partitioned_edge(edge))
-
-            if not isinstance(super_edge.pre_vertex,
-                              AbstractProvidesNKeysForEdge):
-                n_keys_map.set_n_keys_for_patitioned_edge(edge,
-                                                          vertex_slice.n_atoms)
-            else:
-                n_keys_map.set_n_keys_for_patitioned_edge(
-                    edge,
-                    super_edge.pre_vertex.get_n_keys_for_partitioned_edge(
-                        edge, self._graph_mapper))
-
-            if isinstance(super_edge.pre_vertex,
-                          AbstractProvidesOutgoingEdgeConstraints):
-                edge.add_constraints(
-                    super_edge.pre_vertex.get_outgoing_edge_constraints(
-                        edge, self._graph_mapper))
-            if isinstance(super_edge.post_vertex,
-                          AbstractProvidesIncomingEdgeConstraints):
-                edge.add_constraints(
-                    super_edge.post_vertex.get_incoming_edge_constraints(
-                        edge, self._graph_mapper))
-
-        # execute routing info generator
-        self._routing_infos, self._router_tables = \
-            self._key_allocator_algorithm.allocate_routing_info(
-                self._partitioned_graph, self._placements, n_keys_map,
-                self._routing_paths)
-
-        # if in debug mode, this is the first position where routign tables have
-        # been generated and therefore we can test if everything has tied
-        # together correctly via a router search
-        if self._in_debug_mode:
-
-            # check that all routes are valid and no cycles exist
-            valid_route_checker = ValidRouteChecker(
-                placements=self._placements, routing_infos=self._routing_infos,
-                routing_tables=self._router_tables, machine=self._machine,
-                partitioned_graph=self._partitioned_graph)
-            valid_route_checker.validate_routes()
-
-        # generate reports
-        if (pacman_report_state is not None and
-                pacman_report_state.routing_info_report):
-            pacman_reports.routing_info_reports(
-                self._report_default_directory, self._partitioned_graph,
-                self._routing_infos, self._router_tables)
-
-    def _execute_router(self, pacman_report_state):
-        """ exectes the router algorithum
-
-        :param pacman_report_state:
-        :return:
-        """
-
-        # set up a default placer algorithm if none are specified
-        if self._router_algorithm is None:
-            self._router_algorithm = BasicDijkstraRouting()
-        else:
-            self._router_algorithm = self._router_algorithm()
-
-        self._routing_paths = \
-            self._router_algorithm.route(
-                self._placements, self._machine, self._partitioned_graph)
-
-        if pacman_report_state is not None and \
-                pacman_report_state.router_report:
-            pacman_reports.router_reports(
-                report_folder=self._report_default_directory,
-                routing_paths=self._routing_paths, hostname=self._hostname)
-
-    def _execute_partitioner(self, pacman_report_state):
-        """ executes the partitioner function
-
-        :param pacman_report_state:
-        :return:
-        """
-
-        # execute partitioner or default partitioner (as seen fit)
-        if self._partitioner_algorithm is None:
-            self._partitioner_algorithm = BasicPartitioner()
-        else:
-            self._partitioner_algorithm = self._partitioner_algorithm()
-
-        # execute partitioner
-        self._partitioned_graph, self._graph_mapper = \
-            self._partitioner_algorithm.partition(self._partitionable_graph,
-                                                  self._machine)
-
-        # execute reports
-        if (pacman_report_state is not None and
-                pacman_report_state.partitioner_report):
-            pacman_reports.partitioner_reports(
-                self._report_default_directory, self._hostname,
-                self._partitionable_graph, self._graph_mapper)
-
-    def _execute_placer(self, pacman_report_state):
-        """ executes the placer
-
-        :param pacman_report_state:
-        :return:
-        """
-
-        # execute placer or default placer (as seen fit)
-        if self._placer_algorithm is None:
-            self._placer_algorithm = BasicPlacer()
-        else:
-            self._placer_algorithm = self._placer_algorithm()
-
-        # execute placer
-        self._placements = self._placer_algorithm.place(
-            self._partitioned_graph, self._machine)
-
-        # execute placer reports if needed
-        if (pacman_report_state is not None and
-                pacman_report_state.placer_report):
-            pacman_reports.placer_reports_with_partitionable_graph(
-                graph=self._partitionable_graph,
-                graph_mapper=self._graph_mapper, hostname=self._hostname,
-                machine=self._machine, placements=self._placements,
-                report_folder=self._report_default_directory)
 
     def generate_data_specifications(self):
         """ generates the dsg for the graph.
