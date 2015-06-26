@@ -1,6 +1,7 @@
 # pacman imports
-from pacman.operations.router_check_functionality.valid_routes_checker import \
-    ValidRouteChecker
+from pacman.model.partitionable_graph.partitionable_graph import \
+    PartitionableGraph
+from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
 from pacman.utilities import reports as pacman_reports
 from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
@@ -29,8 +30,9 @@ from spinn_machine.virutal_machine import VirtualMachine
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities import reports
 from spinn_front_end_common.utility_models.command_sender import CommandSender
-from spinn_front_end_common.interface.front_end_common_interface_functions \
-    import FrontEndCommonInterfaceFunctions
+from spinn_front_end_common.interface.\
+    front_end_common_spinnman_interface_functions \
+    import FrontEndCommonSpinnmanInterfaceFunctions
 from spinn_front_end_common.interface.front_end_common_configuration_functions\
     import FrontEndCommonConfigurationFunctions
 from spinn_front_end_common.utilities.timer import Timer
@@ -60,8 +62,7 @@ from spynnaker.pyNN.utilities.database.data_base_interface \
     import DataBaseInterface
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
-from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
-    import GraphEdgeFilter
+from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.spynnaker_configurations import \
     SpynnakerConfigurationFunctions
 from spynnaker.pyNN.utilities.conf import config
@@ -96,7 +97,7 @@ executable_finder = ExecutableFinder()
 
 
 class Spinnaker(FrontEndCommonConfigurationFunctions,
-                FrontEndCommonInterfaceFunctions,
+                FrontEndCommonSpinnmanInterfaceFunctions,
                 FrontEndCommonProvanenceFunctions,
                 SpynnakerConfigurationFunctions):
     """
@@ -110,6 +111,17 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                                       graph_label)
         SpynnakerConfigurationFunctions.__init__(self)
         FrontEndCommonProvanenceFunctions.__init__(self)
+
+        # pacman objects
+        self._partitionable_graph = None
+        self._partitioned_graph = None
+        self._graph_mapper = None
+        self._placements = None
+        self._router_tables = None
+        self._routing_infos = None
+        self._tags = None
+        # set up the pacman executor
+        self._pacman_exeuctor = None
 
         # database objects
         self._create_database = config.getboolean(
@@ -132,10 +144,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     "Reports", "writeTextSpecs"),
                 execute_partitioner_report=config.getboolean(
                     "Reports", "writePartitionerReports"),
-                execute_placer_report=config.getboolean(
-                    "Reports", "writePlacerReports"),
-                execute_router_dat_based_report=config.getboolean(
-                    "Reports", "writeRouterDatReport"),
+                execute_placer_report_with_partitionable_graph=
+                config.getboolean("Reports",
+                                  "writePlacerReportWithPartitionable"),
+                execute_placer_report_without_partitionable_graph=
+                config.getboolean("Reports",
+                                  "writePlacerReportWithoutPartitionable"),
                 reports_are_enabled=config.getboolean(
                     "Reports", "reportsEnabled"),
                 generate_performance_measurements=config.getboolean(
@@ -148,16 +162,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     "Reports", "writeTransceiverReport"),
                 execute_routing_info_report=config.getboolean(
                     "Reports", "writeRouterInfoReport"),
-                in_debug_mode=config.get("Mode", "mode") == "Debug",
                 generate_tag_report=config.getboolean(
                     "Reports", "writeTagAllocationReports"))
-
-            self._set_up_pacman_algorthms_listings(
-                partitioner_algorithm=config.get("Partitioner", "algorithm"),
-                placer_algorithm=config.get("Placer", "algorithm"),
-                key_allocator_algorithm=config.get(
-                    "KeyAllocator", "algorithm"),
-                routing_algorithm=config.get("Routing", "algorithm"))
 
             # set up exeuctable specifics
             self._set_up_executable_specifics()
@@ -176,6 +182,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     "Reports", "max_application_binaries_kept"),
                 where_to_write_application_data_files=config.get(
                     "Reports", "defaultApplicationDataFilePath"))
+
+        # initilise the partitionable graph
+        self._partitionable_graph = PartitionableGraph(label=graph_label)
+
+        # set up machine targetted data
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
         self._spikes_per_second = float(config.getfloat(
@@ -184,7 +195,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             "Simulation", "ring_buffer_sigma"))
         self._create_database = config.getboolean("Database", "create_database")
 
-        FrontEndCommonInterfaceFunctions.__init__(
+        FrontEndCommonSpinnmanInterfaceFunctions.__init__(
             self, self._reports_states, self._report_default_directory)
 
         logger.info("Setting time scale factor to {}."
@@ -203,6 +214,63 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # Manager of buffered sending
         self._send_buffer_manager = None
+
+        # holder for number of times the timer event should exuecte for the sim
+        self._no_machine_time_steps = None
+
+    def do_mapping(self):
+        """
+        sets up
+        :return:mapper executor for this front end
+        """
+        # set up the mapper executor side of the front end
+        # set up the pacman algorithms
+        inputs = list()
+        inputs.append("PartitionableGraph")
+        inputs.append('Machine')
+        inputs.append('File')
+        inputs.append('IPAddress')
+
+        xml_paths = config.get("Mapping", "extra_xmls_paths")
+        if xml_paths == "None":
+            xml_paths = list()
+        else:
+            xml_paths = xml_paths.split(",")
+        xml_paths.append(
+            os.path.join(os.path.dirname(overridden_pacman_functions.__file__),
+                         "algorithms_metadata.xml"))
+        pacman_report_state = \
+            self._reports_states.generate_pacman_report_states()
+        in_debug_mode = config.get("Mode", "mode") == "Debug"
+        required_outputs = ("Placements", "RoutingTables", "RoutingInfos",
+                            "Tags", "PartitionedGraph", "GraphMapper")
+
+        self._pacman_exeuctor = \
+            PACMANAlgorithmExecutor(pacman_report_state, in_debug_mode)
+        self._pacman_exeuctor.set_up_pacman_algorthms_listings(
+            algorithms=config.get("Mapping", "algorithms"), inputs=inputs,
+            xml_paths=xml_paths, required_outputs=required_outputs)
+
+        # define inputs
+        inputs = list()
+        inputs.append({'type': "PartitionableGraph",
+                       'value': self._partitionable_graph})
+        inputs.append({'type': 'Machine',
+                       'value': self._machine})
+        inputs.append({'type': "File", 'value': self._report_default_directory})
+        inputs.append({'type': "IPAddress", 'value': self._hostname})
+
+        # execute mapping process
+        self._pacman_exeuctor.execute_mapping(inputs)
+
+        # sort out outputs datas
+        self._placements = self._pacman_exeuctor.get_item("Placements")
+        self._router_tables = self._pacman_exeuctor.get_item("RoutingTables")
+        self._routing_infos = self._pacman_exeuctor.get_item("RoutingInfos")
+        self._tags = self._pacman_exeuctor.get_item("Tags")
+        self._graph_mapper = self._pacman_exeuctor.get_item("GraphMapper")
+        self._partitioned_graph = \
+            self._pacman_exeuctor.get_item("PartitionedGraph")
 
     def run(self, run_time):
         """
@@ -275,7 +343,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         logger.info("*** Running Mapper *** ")
         if do_timing:
             timer.start_timing()
-        self.map_model()
+        self._add_virtual_chips()
+
+        self.do_mapping()
+
+        # take timing measurements
         if do_timing:
             timer.take_sample()
 
@@ -579,34 +651,17 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
     def __repr__(self):
         return "Spinnaker object for machine {}".format(self._hostname)
 
-    def map_model(self):
-        """
-        executes the pacman compilation stack
-        """
-        pacman_report_state = \
-            self._reports_states.generate_pacman_report_states()
 
-        self._add_virtual_chips()
 
-        # execute partitioner
-        self._execute_partitioner(pacman_report_state)
 
-        # execute placer
-        self._execute_placer(pacman_report_state)
 
-        # exeucte tag allocator
-        self._execute_tag_allocator(pacman_report_state)
 
-        # execute pynn subedge pruning
-        self._partitioned_graph, self._graph_mapper = \
-            GraphEdgeFilter(self._report_default_directory)\
-            .run(self._partitioned_graph, self._graph_mapper)
 
-        # execute router
-        self._execute_router(pacman_report_state)
 
-        # execute key allocator
-        self._execute_key_allocator(pacman_report_state)
+
+
+
+
 
     def _execute_tag_allocator(self, pacman_report_state):
         """
@@ -919,6 +974,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             timescale_factor=self._time_scale_factor)
 
     def _add_virtual_chips(self):
+        """
+        add any virtual chips for virtual vertices as required
+        :return:
+        """
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractVirtualVertex):
 

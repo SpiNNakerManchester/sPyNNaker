@@ -24,10 +24,14 @@ class GraphEdgeFilter(object):
     the filterer
     """
 
-    def __init__(self, common_report_folder):
-        self._common_report_folder = common_report_folder
-
-    def run(self, subgraph, graph_mapper):
+    def __call__(self, subgraph, graph_mapper):
+        """
+        runs the graph edge filterer
+        :param subgraph: the subgraph whose edges are to be filtered
+        :param graph_mapper:
+        the graph mapper between partitionable and partitioned graphs.
+        :return: a new graph mapper and partitioned graph
+        """
         new_sub_graph = PartitionedGraph(label=subgraph.label)
         new_graph_mapper = GraphMapper(graph_mapper.first_graph_label,
                                        subgraph.label)
@@ -72,14 +76,15 @@ class GraphEdgeFilter(object):
         progress_bar.end()
 
         # returned the pruned partitioned_graph and graph_mapper
-        return new_sub_graph, new_graph_mapper
+        return {'new_sub_graph': new_sub_graph,
+                'new_graph_mapper': new_graph_mapper}
 
-    def _is_filterable(self, subedge, graph_mapper):
+    @staticmethod
+    def _is_filterable(subedge, graph_mapper):
         associated_edge = \
             graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
         if isinstance(subedge, AbstractFilterableEdge):
-            return subedge.filter_sub_edge(graph_mapper,
-                                           self._common_report_folder)
+            return subedge.filter_sub_edge(graph_mapper)
         elif isinstance(associated_edge, MultiCastPartitionableEdge):
             return False
         else:

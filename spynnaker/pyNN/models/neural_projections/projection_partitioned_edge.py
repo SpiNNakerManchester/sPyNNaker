@@ -49,7 +49,7 @@ class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
         """
         self._synapse_sublist = None
 
-    def filter_sub_edge(self, graph_mapper, common_report_folder):
+    def filter_sub_edge(self, graph_mapper):
         """determines if theres an actual connection in this subedge in temrs of
         synaptic data
 
