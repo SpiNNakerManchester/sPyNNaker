@@ -222,8 +222,8 @@ class AbstractPopulationDataSpec(
 
     def generate_data_spec(
             self, subvertex, placement, subgraph, graph, routing_info,
-            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
-            write_text_specs, application_run_time_folder):
+            hostname, graph_mapper, report_folder, write_text_specs, 
+            application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to
         build a group of IF_curr_exp neurons resident on a single core.

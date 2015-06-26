@@ -19,6 +19,7 @@ from spynnaker.pyNN.spinnaker import executable_finder
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
+from spinnman.messages.eieio.eieio_type import EIEIOType
 
 # neural models
 from spynnaker.pyNN.models.neural_models.if_cond_exp \
@@ -52,6 +53,12 @@ from spynnaker.pyNN.models.spike_source.spike_source_array \
 from spynnaker.pyNN.models.spike_source.spike_source_from_file \
     import SpikeSourceFromFile
 
+#utility parameters
+from spinn_front_end_common.utility_models.live_packet_gather_parameters \
+    import LivePacketGatherParameters
+from spinn_front_end_common.utility_models.reverse_ip_tag_parameters \
+    import ReverseIPTagParameters
+
 # connections
 from spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector\
     import AllToAllConnector
@@ -72,6 +79,8 @@ from spynnaker.pyNN.models.neural_projections.connectors.\
     DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
+from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
+    import FromFileConnector
 from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector\
     import SmallWorldConnector
 
@@ -115,7 +124,6 @@ _spinnaker = None
 
 # List of binary search paths
 _binary_search_paths = []
-
 
 def register_binary_search_path(search_path):
     """
@@ -306,7 +314,7 @@ def Projection(presynaptic_population, postsynaptic_population,
 
 def NativeRNG(seed_value):
     """
-    fixes the rnadom number generators seed
+    fixes the random number generators' seed
     :param seed_value:
     :return:
     """
