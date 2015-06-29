@@ -801,12 +801,9 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                                            synaptic_block_base_address_offset)
 
             # read in and return the synaptic block
-            blocks = list(transceiver.read_memory(
-                post_x, post_y, synaptic_block_base_address, synaptic_block_size))
-
-            block = bytearray()
-            for message_block in blocks:
-                block.extend(message_block)
+            block = transceiver.read_memory(
+                post_x, post_y, synaptic_block_base_address,
+                synaptic_block_size)
 
             if len(block) != synaptic_block_size:
                 raise exceptions.SynapticBlockReadException(

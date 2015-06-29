@@ -109,19 +109,17 @@ class AbstractPopulationRecordableVertex(object):
             spike_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address, spike_recording_region)
-            spike_region_base_address_buf = \
-                str(list(transciever.read_memory(
-                    x, y, spike_region_base_address_offset, 4))[0])
-            spike_region_base_address = \
-                struct.unpack("<I", spike_region_base_address_buf)[0]
+            spike_region_base_address_buf = transciever.read_memory(
+                x, y, spike_region_base_address_offset, 4)
+            spike_region_base_address = struct.unpack_from(
+                "<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
 
             # Read the spike data size
-            number_of_bytes_written_buf =\
-                str(list(transciever.read_memory(
-                    x, y, spike_region_base_address, 4))[0])
-            number_of_bytes_written = \
-                struct.unpack_from("<I", number_of_bytes_written_buf)[0]
+            number_of_bytes_written_buf = transciever.read_memory(
+                x, y, spike_region_base_address, 4)
+            number_of_bytes_written = struct.unpack_from(
+                "<I", number_of_bytes_written_buf)[0]
 
             # check that the number of spikes written is smaller or the same as
             # the size of the memory region we allocated for spikes
@@ -142,12 +140,7 @@ class AbstractPopulationRecordableVertex(object):
                                  hex(spike_region_base_address)))
             spike_data = transciever.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
-
-            data_list = bytearray()
-            for data in spike_data:
-                data_list.extend(data)
-
-            numpy_data = numpy.asarray(data_list, dtype="uint8").view(
+            numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
                 dtype="<i4").byteswap().view("uint8")
             bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
                 (-1, 32))).reshape((-1, out_spike_bytes * 8))
@@ -193,19 +186,18 @@ class AbstractPopulationRecordableVertex(object):
             neuron_param_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address, region)
-            neuron_param_region_base_address_buf = str(list(txrx.read_memory(
-                x, y, neuron_param_region_base_address_offset, 4))[0])
-            neuron_param_region_base_address = \
-                struct.unpack("<I", neuron_param_region_base_address_buf)[0]
+            neuron_param_region_base_address_buf = txrx.read_memory(
+                x, y, neuron_param_region_base_address_offset, 4)
+            neuron_param_region_base_address = struct.unpack_from(
+                "<I", neuron_param_region_base_address_buf)[0]
             neuron_param_region_base_address += app_data_base_address
 
             # Read the size
-            number_of_bytes_written_buf = \
-                str(list(txrx.read_memory(
-                    x, y, neuron_param_region_base_address, 4))[0])
+            number_of_bytes_written_buf = txrx.read_memory(
+                x, y, neuron_param_region_base_address, 4)
 
-            number_of_bytes_written = \
-                struct.unpack_from("<I", number_of_bytes_written_buf)[0]
+            number_of_bytes_written = struct.unpack_from(
+                "<I", number_of_bytes_written_buf)[0]
 
             # Read the values
             logger.debug("Reading {} ({}) bytes starting at {}".format(
@@ -227,12 +219,9 @@ class AbstractPopulationRecordableVertex(object):
             logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
 
-            data_list = bytearray()
-            for data in neuron_param_region_data:
-                data_list.extend(data)
-
-            numpy_data = numpy.asarray(data_list, dtype="uint8").view(
-                dtype="<i4") / 32767.0
+            numpy_data = (numpy.asarray(
+                neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
+                32767.0)
             values = numpy.append(values, numpy_data)
             times = numpy.append(
                 times, numpy.repeat(range(numpy_data.size / n_atoms),

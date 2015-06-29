@@ -78,10 +78,8 @@ class AbstractMasterPopTableFactory(object):
         try:
 
             # turn byte array into str for unpack to work.
-            data = \
-                str(list(transceiver.read_memory(
-                    x, y, address, length))[0])
-            result = struct.unpack(data_format, data)[0]
+            data = transceiver.read_memory(x, y, address, length)
+            result = struct.unpack_from(data_format, data)[0]
             return result
         except spinnman_exceptions.SpinnmanIOException:
             raise exceptions.SynapticBlockReadException(

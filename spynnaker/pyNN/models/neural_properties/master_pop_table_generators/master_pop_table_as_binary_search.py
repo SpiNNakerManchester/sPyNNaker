@@ -91,16 +91,13 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # get entries in master pop
         n_entries = helpful_functions.read_and_convert(
-            chip_x, chip_y, master_pop_base_mem_address, 4, "<I", txrx)
+            chip_x, chip_y, master_pop_base_mem_address, 4, "<I", txrx)[0]
         n_bytes = (n_entries *
                    _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
 
         # read in master pop structure
-        master_pop_structure = txrx.read_memory(
+        full_data = txrx.read_memory(
             chip_x, chip_y, master_pop_base_mem_address + 4, n_bytes)
-        full_data = bytearray()
-        for data in master_pop_structure:
-            full_data.extend(data)
 
         # convert into a numpy array
         master_pop_structure = numpy.frombuffer(
