@@ -140,12 +140,22 @@ class AbstractPopulationRecordableVertex(object):
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
+            sub_vertex_spike_data = bitarray(number_of_bytes_written number_of_bytes_written * 8, endian="little")
+            
             spike_data = transciever.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
 
-            data_list = bytearray()
+
+            sub_vertex_offset = 0
+
             for data in spike_data:
-                data_list.extend(data)
+                data_bit_array = bitarray(endian="little")
+                data_bit_array.frombytes(data)
+
+                sub_vertex_spike_data[offset:offset + data_bit_array.length()] = data_bit_array
+                sub_vertex_offset += data_bit_array.length()
+
+
 
             numpy_data = numpy.asarray(data_list, dtype="uint8").view(
                 dtype="<i4").byteswap().view("uint8")
