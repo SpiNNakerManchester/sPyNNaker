@@ -148,22 +148,33 @@ class AbstractPopulationRecordableVertex(object):
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
 
             # Loop through returned chunks
-            spike_byte_offset = 0
+            chunk_start_offset = 0
             for chunk_data in spike_data:
+                # Convert chunk to numpy array
                 chunk_numpy = numpy.asarray(chunk_data, dtype="uint8")
+
+                # Copy chunk into spike bytes
                 chunk_length = len(chunk_numpy)
-                spike_bytes[spike_byte_offset: spike_byte_offset + chunk_length] = chunk_numpy
-                spike_byte_offset += chunk_length
+                chunk_end_offset = chunk_start_offset + chunk_length
+                spike_bytes[chunk_start_offset:chunk_end_offset] = chunk_numpy
+                chunk_start_offset += chunk_length
 
             # Swap endianess
-            spike_bytes = spike_bytes.view(dtype="uint32").byteswap().view(dtype="uint8")
+            spike_bytes = (
+                spike_bytes
+                .view(dtype="uint32")
+                .byteswap()
+                .view(dtype="uint8")
+            )
 
             # Reshape the data into a out_spike_bytes column matrix
             spike_bytes = numpy.reshape(spike_bytes,
                                         (-1, out_spike_bytes))
 
             # Unpack to bits
-            spike_bits = numpy.fliplr(numpy.unpackbits(spike_bytes, axis=1))
+            spike_bits = numpy.fliplr(
+                numpy.unpackbits(spike_bytes, axis=1)
+            )
 
             # Find indices of where spikes have occurred
             spike_times, spike_ids = numpy.where(spike_bits == 1)
