@@ -29,7 +29,8 @@ void synapse_dynamics_process_plastic_synapses(address_t plastic_region_address,
 }
 
 //---------------------------------------
-input_t synapse_dynamics_get_intrinsic_bias(index_t neuron_index) {
+input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index) {
+    use(time);
     use(neuron_index);
     return REAL_CONST(0.0);
 }

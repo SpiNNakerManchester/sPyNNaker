@@ -25,7 +25,7 @@ import math
 import numpy
 
 logger = logging.getLogger(__name__)
-PARTITION_ID = "SPIKE"
+EDGE_PARTITION_ID = "SPIKE"
 
 
 # noinspection PyProtectedMember
@@ -158,7 +158,7 @@ class Projection(object):
                     synapse_dynamics=synapse_dynamics, label=label)
 
                 # add edge to the graph
-                spinnaker_control.add_edge(self._projection_edge, PARTITION_ID)
+                spinnaker_control.add_edge(self._projection_edge, EDGE_PARTITION_ID)
                 self._projection_list_ranges = synapse_list.ranges()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
@@ -212,7 +212,7 @@ class Projection(object):
                     presynaptic_population, postsynaptic_population,
                     self._spinnaker.machine_time_step,
                     synapse_list=direct_synaptic_sublist, label=label)
-                self._spinnaker.add_edge(direct_edge, PARTITION_ID)
+                self._spinnaker.add_edge(direct_edge, EDGE_PARTITION_ID)
                 self._projection_edge = direct_edge
                 self._projection_list_ranges = direct_synaptic_sublist.ranges()
 
@@ -243,7 +243,7 @@ class Projection(object):
                 label=new_label)
 
             # add to graph
-            self._spinnaker.add_edge(remaining_edge, PARTITION_ID)
+            self._spinnaker.add_edge(remaining_edge, EDGE_PARTITION_ID)
 
         # Create a list of the connections with delay larger than that which
         # can be handled by the neuron itself
@@ -274,7 +274,7 @@ class Projection(object):
             self._delay_list_ranges = remaining_sublist.ranges()
 
             # add to graph
-            self._spinnaker.add_edge(self._delay_edge)
+            self._spinnaker.add_edge(self._delay_edge, EDGE_PARTITION_ID)
 
     def describe(self, template='projection_default.txt', engine='default'):
         """

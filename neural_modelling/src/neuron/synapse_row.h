@@ -9,10 +9,8 @@
  * |                   |                  |       SYNAPSE_TYPE_INDEX_BITS      |
  * The API interface supports:
  * - synapse_row_plastic_size(row)
- * - synapse_row_plastic_write_back_address(row)
  * - synapse_row_plastic_region(row)
  * - synapse_row_fixed_region(row)
- * - synapse_row_originating_spike(row)
  * - synapse_row_num_fixed_synapses(fixed)
  * - synapse_row_num_plastic_controls(fixed)
  * - synapse_row_plastic_controls(fixed)
@@ -97,49 +95,26 @@ typedef uint16_t control_t;
 // the nature of the synaptic row structure is held in the lower
 // part of row[1].
 //
-//   0:  [ SDRAM address from which row is copied ] filled by DMA handler
-//   1:  [ Originating spike id                   ] filled by DMA handler
-//   2:  [ N = <plastic elements>         | <tag> ]
-//   3:  [ First word of plastic region           ]
+//   0:  [ N = <plastic elements>         | <tag> ]
+//   1:  [ First word of plastic region           ]
 //   ...
-// N+2:  [ Last word of plastic region            ]
-// N+3:  [ First word of fixed region             ]
+//   N:  [ Last word of plastic region            ]
+// N+1:  [ First word of fixed region             ]
 //   ...
 //  M:   [ Last word of fixed region              ]
 
-/*static inline tag_t plastic_tag(address_t row)
- {
- return ((tag_t)(row[2] & PLASTIC_TAG_MASK));
- }
-
- static inline size_t plastic_size(address_t row)
- {
- return ((size_t)(row[2] >> PLASTIC_TAG_BITS));
- }*/
-
 static inline size_t synapse_row_plastic_size(address_t row) {
-    return (size_t) row[2];
-}
-
-// The following uses the original SDRAM address (stored in row [0])
-// to calculate the start address in SDRAM for the write-back DMA.
-// **NOTE** The point of this is to get the address in SDRAM of row[1]
-static inline address_t synapse_row_plastic_write_back_address(address_t row) {
-    return ((address_t) (row[0]) + 1);
+    return (size_t) row[0];
 }
 
 // Returns the address of the plastic region
 static inline address_t synapse_row_plastic_region(address_t row) {
-    return ((address_t) (&(row[3])));
+    return ((address_t) (&(row[1])));
 }
 
 // Returns the address of the nonplastic (or fixed) region
 static inline address_t synapse_row_fixed_region(address_t row) {
-    return ((address_t) (&(row[synapse_row_plastic_size(row) + 3])));
-}
-
-static inline spike_t synapse_row_originating_spike(address_t row) {
-    return (spike_t) row[1];
+    return ((address_t) (&(row[synapse_row_plastic_size(row) + 1])));
 }
 
 // Within the fixed-region extracted using the above API, fixed[0]

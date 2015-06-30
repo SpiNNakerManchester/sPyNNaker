@@ -51,8 +51,6 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
     model for play back of spikes
     """
 
-    CORE_APP_IDENTIFIER = (front_end_common_constants
-                           .SPIKE_INJECTOR_CORE_APPLICATION_ID)
     _CONFIGURATION_REGION_SIZE = 36
 
     # limited to the n of the x,y,p,n key format
@@ -226,8 +224,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             Bit 6: Output spike rate
         """
         self._write_basic_setup_info(
-            spec, SpikeSourceArray.CORE_APP_IDENTIFIER,
-            self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+            spec, self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
 
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value)

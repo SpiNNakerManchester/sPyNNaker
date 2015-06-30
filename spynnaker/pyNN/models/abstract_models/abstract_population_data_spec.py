@@ -49,7 +49,6 @@ class AbstractPopulationDataSpec(
             max_atoms_per_core=max_atoms_per_core)
         AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         self._binary = binary
-        self._executable_constant = None
         self._spikes_per_second = spikes_per_second
         self._ring_buffer_sigma = ring_buffer_sigma
 
@@ -121,8 +120,7 @@ class AbstractPopulationDataSpec(
                 empty=True)
 
     def _write_setup_info(self, spec, spike_history_region_sz,
-                          neuron_potential_region_sz, gsyn_region_sz,
-                          executable_constant):
+                          neuron_potential_region_sz, gsyn_region_sz):
         """
         Write information used to control the simulation and gathering of
         results.Currently, this means the flag word used to signal whether
@@ -152,8 +150,7 @@ class AbstractPopulationDataSpec(
 
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
-            spec, executable_constant,
-            constants.POPULATION_BASED_REGIONS.SYSTEM.value)
+            spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_value(data=recording_info)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=neuron_potential_region_sz)
@@ -303,10 +300,10 @@ class AbstractPopulationDataSpec(
             master_pop_table_sz, all_syn_block_sz,
             spike_hist_buff_sz, potential_hist_buff_sz, gsyn_hist_buff_sz,
             synapse_dynamics_region_sz)
-
+    
+        # Remove extension to get application name
         self._write_setup_info(spec, spike_hist_buff_sz,
-                               potential_hist_buff_sz, gsyn_hist_buff_sz,
-                               self._executable_constant)
+                               potential_hist_buff_sz, gsyn_hist_buff_sz)
 
         # Every outgoing edge from this vertex should have the same key
         key = None
