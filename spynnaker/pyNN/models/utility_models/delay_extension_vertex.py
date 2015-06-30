@@ -39,9 +39,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     Instance of this class provide delays to incoming spikes in multiples
     of the maximum delays of a neuron (typically 16 or 32)
     """
-
-    CORE_APP_IDENTIFIER = constants.DELAY_EXTENSION_CORE_APPLICATION_ID
-
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
         names=[('SYSTEM', 0),
@@ -192,8 +189,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
-            spec, self.CORE_APP_IDENTIFIER,
-            self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
+            spec, self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
 
