@@ -11,9 +11,8 @@ import logging
 import numpy
 import struct
 from abc import ABCMeta
-from six import add_metaclass
 from abc import abstractmethod
-
+from six import add_metaclass
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +76,7 @@ class AbstractPopulationRecordableVertex(object):
                 (self._no_machine_time_steps * bytes_per_timestep))
 
     def _get_spikes(
-            self, graph_mapper, placements, transciever, compatible_output,
+            self, graph_mapper, placements, transceiver, compatible_output,
             spike_recording_region, sub_vertex_out_spike_bytes_function):
         """
         Return a 2-column numpy array containing cell ids and spike times for
@@ -86,8 +85,8 @@ class AbstractPopulationRecordableVertex(object):
 
         logger.info("Getting spikes for {}".format(self._label))
 
-        spike_times = list()
-        spike_ids = list()
+        vert_spike_times = list()
+        vert_spike_ids = list()
         ms_per_tick = self._machine_time_step / 1000.0
 
         # Find all the sub-vertices that this pynn_population.py exists on
@@ -103,14 +102,14 @@ class AbstractPopulationRecordableVertex(object):
 
             # Get the App Data for the core
             app_data_base_address = \
-                transciever.get_cpu_information_from_core(x, y, p).user[0]
+                transceiver.get_cpu_information_from_core(x, y, p).user[0]
 
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address, spike_recording_region)
             spike_region_base_address_buf = \
-                str(list(transciever.read_memory(
+                str(list(transceiver.read_memory(
                     x, y, spike_region_base_address_offset, 4))[0])
             spike_region_base_address = \
                 struct.unpack("<I", spike_region_base_address_buf)[0]
@@ -118,7 +117,7 @@ class AbstractPopulationRecordableVertex(object):
 
             # Read the spike data size
             number_of_bytes_written_buf =\
-                str(list(transciever.read_memory(
+                str(list(transceiver.read_memory(
                     x, y, spike_region_base_address, 4))[0])
             number_of_bytes_written = \
                 struct.unpack_from("<I", number_of_bytes_written_buf)[0]
@@ -140,40 +139,55 @@ class AbstractPopulationRecordableVertex(object):
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            sub_vertex_spike_data = bitarray(number_of_bytes_written number_of_bytes_written * 8, endian="little")
+
+            # Create numpy array to hold written data
+            spike_bytes = numpy.empty(number_of_bytes_written, dtype="uint8")
             
-            spike_data = transciever.read_memory(
+            # Start reading spike data
+            spike_data = transceiver.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
 
+            # Loop through returned chunks
+            spike_byte_offset = 0
+            for chunk_data in spike_data:
+                chunk_numpy = numpy.asarray(chunk_data, dtype="uint8")
+                chunk_length = len(chunk_numpy)
+                spike_bytes[spike_byte_offset: spike_byte_offset + chunk_length] = chunk_numpy
+                spike_byte_offset += chunk_length
 
-            sub_vertex_offset = 0
+            # Swap endianess
+            spike_bytes = spike_bytes.view(dtype="uint32").byteswap().view(dtype="uint8")
 
-            for data in spike_data:
-                data_bit_array = bitarray(endian="little")
-                data_bit_array.frombytes(data)
+            # Reshape the data into a out_spike_bytes column matrix
+            spike_bytes = numpy.reshape(spike_bytes,
+                                        (-1, out_spike_bytes))
 
-                sub_vertex_spike_data[offset:offset + data_bit_array.length()] = data_bit_array
-                sub_vertex_offset += data_bit_array.length()
+            # Unpack to bits
+            spike_bits = numpy.fliplr(numpy.unpackbits(spike_bytes, axis=1))
 
+            # Find indices of where spikes have occurred
+            spike_times, spike_ids = numpy.where(spike_bits == 1)
 
+            # Scale spike times by timescale and add lo_atom index to neurons
+            spike_times = spike_times * ms_per_tick
+            spike_ids = spike_ids + lo_atom
 
-            numpy_data = numpy.asarray(data_list, dtype="uint8").view(
-                dtype="<i4").byteswap().view("uint8")
-            bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
-                (-1, 32))).reshape((-1, out_spike_bytes * 8))
-            indices = [numpy.add(numpy.where(items)[0], lo_atom)
-                       for items in bits]
-            times = [numpy.repeat(i * ms_per_tick, len(indices[i]))
-                     for i in range(len(indices))]
-            spike_ids.extend([item for sublist in indices for item in sublist])
-            spike_times.extend([item for sublist in times for item in sublist])
+            # Add to lists for the whole vertex
+            vert_spike_times.append(spike_times)
+            vert_spike_ids.append(spike_ids)
             progress_bar.update()
 
         progress_bar.end()
-        result = numpy.dstack((spike_ids, spike_times))[0]
-        result = result[numpy.lexsort((spike_times, spike_ids))]
 
-        return result
+        # Stack together lists of spike times and ids
+        vert_spike_times = numpy.hstack(vert_spike_times)
+        vert_spike_ids = numpy.hstack(vert_spike_ids)
+
+        # Stack and rotate these two arrays into column format
+        result = numpy.dstack((vert_spike_ids, vert_spike_times))[0]
+
+        # Sort and return
+        return result[numpy.lexsort((vert_spike_times, vert_spike_ids))]
 
     def get_neuron_parameter(
             self, region, compatible_output, has_ran, graph_mapper, placements,
