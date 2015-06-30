@@ -1048,7 +1048,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if self._create_database:
             self._database_interface.stop()
 
-        # if asked to turn off machine, power down each rack via bmp
         # connections
         if turn_off_machine:
             self._txrx.power_off_machine()
