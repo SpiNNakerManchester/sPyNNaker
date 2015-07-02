@@ -1,13 +1,8 @@
-from spynnaker.pyNN.models.neural_projections.connectors.seed_info \
-    import SeedInfo
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
-from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import generate_parameter
-from spinn_front_end_common.utilities import exceptions
 import logging
 import numpy
 
@@ -48,14 +43,11 @@ class FromListConnector(AbstractConnector):
             weight_scale, synapse_type):
 
         prevertex = presynaptic_population._get_vertex
-        postvertex = postsynaptic_population._get_vertex
 
         # Convert connection list into numpy record array
-        conn_list_numpy = numpy.array(self._conn_list,
-                                      dtype=[("i", "uint32"),
-                                             ("j", "uint32"),
-                                             ("weight", "float"),
-                                             ("delay", "float")])
+        conn_list_numpy = numpy.array(
+            self._conn_list, dtype=[("i", "uint32"), ("j", "uint32"),
+                                    ("weight", "float"), ("delay", "float")])
 
         # Sort by pre-synaptic neuron
         conn_list_numpy = numpy.sort(conn_list_numpy, order="i")
@@ -65,8 +57,8 @@ class FromListConnector(AbstractConnector):
         conn_list_numpy["delay"] *= delay_scale
 
         # Count number of connections per pre-synaptic neuron
-        pre_counts = numpy.histogram(conn_list_numpy["i"],
-                                     numpy.arange(prevertex.n_atoms + 1))[0]
+        pre_counts = numpy.histogram(
+            conn_list_numpy["i"], numpy.arange(prevertex.n_atoms + 1))[0]
 
         # Take cumulative sum of these counts to get start and end indices of
         # the blocks of connections coming from each pre-synaptic neuron

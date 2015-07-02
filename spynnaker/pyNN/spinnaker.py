@@ -346,7 +346,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._hostname, self._placements, self._graph_mapper,
                 write_text_specs=config.getboolean(
                     "Reports", "writeTextSpecs"),
-                runtime_application_data_folder=self._app_data_runtime_folder)
+                runtime_application_data_folder=self._app_data_runtime_folder,
+            machine=self._machine)
 
         if self._reports_states is not None:
             reports.write_memory_map_report(self._report_default_directory,
