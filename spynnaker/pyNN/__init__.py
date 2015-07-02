@@ -320,3 +320,55 @@ def get_current_time():
     """
     global _spinnaker
     return _spinnaker.get_current_time()
+
+
+# ==============================================================================
+#   Low-level API for creating, connecting and recording from individual neurons
+# ==============================================================================
+
+def create(cellclass, cellparams=None, n=1):
+    """
+    Create n cells all of the same type.
+
+    If n > 1, return a list of cell ids/references.
+    If n==1, return just the single id.
+    """
+    return Population(n, cellclass, cellparams)
+
+
+def connect(source, target, weight=0.0, delay=None, synapse_type=None,
+            p=1, rng=None):
+        """
+        Connect a source of spikes to a synaptic target.
+
+        source and target can both be individual cells or lists of cells, in
+        which case all possible connections are made with probability p, using
+        either the random number generator supplied, or the default rng
+        otherwise. Weights should be in nA or µS.
+        """
+        connector = FixedProbabilityConnector(p_connect=p, weights=weight, delays=delay)
+        return Projection(source, target, connector, target=synapse_type, rng=rng)
+
+
+def set(cells, param, val=None):
+    """
+    Set one or more parameters of an individual cell or list of cells.
+
+    param can be a dict, in which case val should not be supplied, or a string
+    giving the parameter name, in which case val is the parameter value.
+    """
+    assert isinstance(cells, Population)
+    cells.set(param, val)
+
+
+def record(source, filename):  # to do
+    raise NotImplementedError
+
+
+def record_v(source, filename):  # to do
+    raise NotImplementedError
+
+
+def record_gsyn(source, filename):  # to do
+    raise NotImplementedError
+
