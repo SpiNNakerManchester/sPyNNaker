@@ -445,8 +445,10 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         for subedge in in_sub_edges:
             sublist = subedge.get_synapse_sublist(graph_mapper)
             sublist.sum_n_connections(total_items)
+            edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
+                subedge)
 
-            if stdp_max_weight is None:
+            if edge.synapse_dynamics is None:
 
                 # If there's no STDP maximum weight, sum the initial weights
                 sublist.max_weights(absolute_max_weights)

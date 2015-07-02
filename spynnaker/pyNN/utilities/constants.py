@@ -54,6 +54,12 @@ MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
 # please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
 # for other core application ids.
 
+# master population table magic
+MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
+MASTER_POP_BINARY_SEARCH = 0xBB2
+
+
+
 EDGES = Enum(
     value="EDGES",
     names=[("EAST", 0),
