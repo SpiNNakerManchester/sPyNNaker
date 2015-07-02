@@ -46,8 +46,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            graph_mapper=graph_mapper, placements=placements, transciever=txrx,
-            compatible_output=compatible_output,
+            graph_mapper=graph_mapper, placements=placements, transceiver=txrx,
             sub_vertex_out_spike_bytes_function=(
                 lambda subvertex, subvertex_slice: int(ceil(
                     subvertex_slice.n_atoms / 32.0)) * 4),
