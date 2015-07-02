@@ -76,7 +76,7 @@ class AbstractPopulationRecordableVertex(object):
                 (self._no_machine_time_steps * bytes_per_timestep))
 
     def _get_spikes(
-            self, graph_mapper, placements, transceiver, compatible_output,
+            self, graph_mapper, placements, transceiver,
             spike_recording_region, sub_vertex_out_spike_bytes_function):
         """
         Return a 2-column numpy array containing cell ids and spike times for
