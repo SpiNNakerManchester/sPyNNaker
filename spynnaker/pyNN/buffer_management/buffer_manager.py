@@ -22,7 +22,8 @@ from spinnman.messages.eieio.data_messages.eieio_data_header\
 from spinnman.messages.eieio.eieio_type import EIEIOType
 from spinnman.exceptions import SpinnmanInvalidPacketException
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spinnman.connections.udp_packet_connections.udp_sdp_connection import UDPSDPConnection
+from spinnman.connections.udp_packet_connections.udp_sdp_connection \
+    import UDPSDPConnection
 
 from spinnman.messages.eieio.data_messages.eieio_data_message \
     import EIEIODataMessage
@@ -381,7 +382,8 @@ class BufferManager(object):
                 app_data_base_address, region)
         region_offset = self._transceiver.read_memory(
             placement.x, placement.y, region_offset_in_pointer_table, 4)
-        return struct.unpack_from("<I", region_offset)[0]
+        return (struct.unpack_from("<I", region_offset)[0] +
+                app_data_base_address)
 
     def _send_request(self, vertex, message):
         """ Sends a request
