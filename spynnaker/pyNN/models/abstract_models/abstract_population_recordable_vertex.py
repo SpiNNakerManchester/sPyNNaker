@@ -141,22 +141,21 @@ class AbstractPopulationRecordableVertex(object):
             spike_data = transciever.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
             numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
-                dtype="<i4").byteswap().view("uint8")
+                dtype="uint32").byteswap().view("uint8")
             bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
                 (-1, 32))).reshape((-1, out_spike_bytes * 8))
-            indices = [numpy.add(numpy.where(items)[0], lo_atom)
-                       for items in bits]
-            times = [numpy.repeat(i * ms_per_tick, len(indices[i]))
-                     for i in range(len(indices))]
-            spike_ids.extend([item for sublist in indices for item in sublist])
-            spike_times.extend([item for sublist in times for item in sublist])
+            times, indices = numpy.where(bits == 1)
+            times = times * ms_per_tick
+            indices = indices + lo_atom
+            spike_ids.append(indices)
+            spike_times.append(times)
             progress_bar.update()
 
         progress_bar.end()
+        spike_ids = numpy.hstack(spike_ids)
+        spike_times = numpy.hstack(spike_times)
         result = numpy.dstack((spike_ids, spike_times))[0]
-        result = result[numpy.lexsort((spike_times, spike_ids))]
-
-        return result
+        return result[numpy.lexsort((spike_times, spike_ids))]
 
     def get_neuron_parameter(
             self, region, compatible_output, has_ran, graph_mapper, placements,
