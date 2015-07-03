@@ -235,8 +235,8 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
         host_name=machine, timestep=timestep, min_delay=min_delay,
         max_delay=max_delay,
         database_socket_addresses=database_socket_addresses)
-    # Return None, simply because the PyNN API says something must be returned
-    return None
+    # the PyNN API expects the MPI rank to be returned
+    return 0
 
 
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
