@@ -1,8 +1,8 @@
 # spinnman imports
 from spinnman.messages.eieio.command_messages.database_confirmation\
     import DatabaseConfirmation
-from spinnman.connections.udp_packet_connections.eieio_command_connection \
-    import EieioCommandConnection
+from spinnman.connections.udp_packet_connections.udp_eieio_connection \
+    import UDPEIEIOConnection
 
 # spynnaker imports
 from spynnaker.pyNN.models.abstract_models.\
@@ -205,7 +205,7 @@ class DataBaseInterface(object):
 
         data_base_message_connections = list()
         for socket_address in self._socket_addresses:
-            data_base_message_connection = EieioCommandConnection(
+            data_base_message_connection = UDPEIEIOConnection(
                 socket_address.listen_port, socket_address.notify_host_name,
                 socket_address.notify_port_no)
             data_base_message_connections.append(data_base_message_connection)
@@ -245,7 +245,7 @@ class DataBaseInterface(object):
         """
         data_base_message_connections = list()
         for socket_address in self._socket_addresses:
-            data_base_message_connection = EieioCommandConnection(
+            data_base_message_connection = UDPEIEIOConnection(
                 socket_address.listen_port,
                 socket_address.notify_host_name,
                 socket_address.notify_port_no)

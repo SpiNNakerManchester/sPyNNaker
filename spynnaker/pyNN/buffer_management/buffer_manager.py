@@ -20,10 +20,9 @@ from spinnman.messages.eieio.data_messages.eieio_32bit\
 from spinnman.messages.eieio.data_messages.eieio_data_header\
     import EIEIODataHeader
 from spinnman.messages.eieio.eieio_type import EIEIOType
-from spinnman.data.little_endian_byte_array_byte_writer\
-    import LittleEndianByteArrayByteWriter
 from spinnman.exceptions import SpinnmanInvalidPacketException
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spinnman.connections.udp_packet_connections.udp_sdp_connection import UDPSDPConnection
 
 from spinnman.messages.eieio.data_messages.eieio_data_message \
     import EIEIODataMessage
@@ -39,7 +38,6 @@ from spinnman.messages.eieio.command_messages.stop_requests \
     import StopRequests
 
 from spynnaker.pyNN.exceptions import BufferableRegionTooSmall
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.buffer_management.storage_objects.buffers_sent_deque\
     import BuffersSentDeque
 
@@ -146,11 +144,9 @@ class BufferManager(object):
         tag = self._tags.get_ip_tags_for_vertex(vertex)[0]
         if (tag.ip_address, tag.port) not in self._seen_tags:
             self._seen_tags.add((tag.ip_address, tag.port))
-            self._transceiver.register_listener(
-                self.receive_buffer_command_message, tag.port,
-                constants.CONNECTION_TYPE.UDP_IPTAG,
-                constants.TRAFFIC_TYPE.EIEIO_COMMAND,
-                hostname=tag.ip_address)
+            self._transceiver.register_udp_listener(
+                self.receive_buffer_command_message, UDPSDPConnection,
+                local_port=tag.port, local_host=tag.ip_address)
 
     def load_initial_buffers(self):
         """ Load the initial buffers for the senders using mem writes
@@ -225,12 +221,6 @@ class BufferManager(object):
         # Add up the bytes
         return (_HEADER_SIZE * n_messages) + (n_keys * _N_BYTES_PER_KEY)
 
-    @staticmethod
-    def _get_message_as_bytes(message):
-        writer = LittleEndianByteArrayByteWriter()
-        message.write_eieio_message(writer)
-        return writer.data
-
     def _send_initial_messages(self, vertex, region):
         """ Send the initial set of messages
 
@@ -268,7 +258,7 @@ class BufferManager(object):
                     break
 
                 # Write the message to the memory
-                data = BufferManager._get_message_as_bytes(next_message)
+                data = next_message.bytestring
                 logger.debug("Writing initial buffer of {} bytes to {} on"
                              " {}, {}, {}".format(
                                  len(data), hex(region_base_address),
@@ -289,7 +279,7 @@ class BufferManager(object):
         # If there are no more messages and there is space, add a stop request
         if (not vertex.is_next_timestamp(region) and
                 bytes_to_go >= EventStopRequest.get_min_packet_length()):
-            data = BufferManager._get_message_as_bytes(EventStopRequest())
+            data = EventStopRequest().bytestring
             logger.debug("Writing stop message of {} bytes to {} on"
                          " {}, {}, {}".format(
                              len(data), hex(region_base_address),
@@ -304,7 +294,7 @@ class BufferManager(object):
         if bytes_to_go > 0:
             padding_packet = PaddingRequest()
             n_packets = bytes_to_go / padding_packet.get_min_packet_length()
-            data = BufferManager._get_message_as_bytes(padding_packet)
+            data = padding_packet.bytestring
             data *= n_packets
             logger.debug("Writing padding of length {} to {} on {}, {}, {}"
                          .format(len(data), hex(region_base_address),
@@ -405,6 +395,5 @@ class BufferManager(object):
             destination_chip_x=placement.x, destination_chip_y=placement.y,
             destination_cpu=placement.p, flags=SDPFlag.REPLY_NOT_EXPECTED,
             destination_port=1)
-        data = BufferManager._get_message_as_bytes(message)
-        sdp_message = SDPMessage(sdp_header, data)
+        sdp_message = SDPMessage(sdp_header, message.bytestring)
         self._transceiver.send_sdp_message(sdp_message)
