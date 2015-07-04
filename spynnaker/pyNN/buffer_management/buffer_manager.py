@@ -22,8 +22,8 @@ from spinnman.messages.eieio.data_messages.eieio_data_header\
 from spinnman.messages.eieio.eieio_type import EIEIOType
 from spinnman.exceptions import SpinnmanInvalidPacketException
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spinnman.connections.udp_packet_connections.udp_sdp_connection \
-    import UDPSDPConnection
+from spinnman.connections.udp_packet_connections.udp_eieio_connection \
+    import UDPEIEIOConnection
 
 from spinnman.messages.eieio.data_messages.eieio_data_message \
     import EIEIODataMessage
@@ -146,7 +146,7 @@ class BufferManager(object):
         if (tag.ip_address, tag.port) not in self._seen_tags:
             self._seen_tags.add((tag.ip_address, tag.port))
             self._transceiver.register_udp_listener(
-                self.receive_buffer_command_message, UDPSDPConnection,
+                self.receive_buffer_command_message, UDPEIEIOConnection,
                 local_port=tag.port, local_host=tag.ip_address)
 
     def load_initial_buffers(self):
