@@ -148,7 +148,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
         # read in entry
         master_pop_entry = helpful_functions.read_and_convert(
-            chip_x, chip_y, master_table_pop_entry_address, 2, "<H", txrx)
+            chip_x, chip_y, master_table_pop_entry_address, 2, "<H", txrx)[0]
 
         synaptic_block_base_address = master_pop_entry >> 3  # in kilobytes
 
