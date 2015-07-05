@@ -206,8 +206,9 @@ class DataBaseInterface(object):
         data_base_message_connections = list()
         for socket_address in self._socket_addresses:
             data_base_message_connection = UDPEIEIOConnection(
-                socket_address.listen_port, socket_address.notify_host_name,
-                socket_address.notify_port_no)
+                local_port=socket_address.listen_port,
+                remote_host=socket_address.notify_host_name,
+                remote_port=socket_address.notify_port_no)
             data_base_message_connections.append(data_base_message_connection)
 
         # add file path to database into command message.
@@ -224,10 +225,10 @@ class DataBaseInterface(object):
         # Send command and wait for response
         logger.info("*** Notifying visualiser that the database is ready ***")
         for connection in data_base_message_connections:
-            connection.send_eieio_command_message(eieio_command_message)
+            connection.send_eieio_message(eieio_command_message)
 
         for connection in data_base_message_connections:
-            connection.receive_eieio_command_message()
+            connection.receive_eieio_message()
         logger.info("*** Confirmation received, continuing ***")
 
     def wait_for_confirmation(self):
@@ -246,15 +247,15 @@ class DataBaseInterface(object):
         data_base_message_connections = list()
         for socket_address in self._socket_addresses:
             data_base_message_connection = UDPEIEIOConnection(
-                socket_address.listen_port,
-                socket_address.notify_host_name,
-                socket_address.notify_port_no)
+                local_port=socket_address.listen_port,
+                remote_host=socket_address.notify_host_name,
+                remote_port=socket_address.notify_port_no)
             data_base_message_connections.append(
                 data_base_message_connection)
 
         eieio_command_message = DatabaseConfirmation()
         for connection in data_base_message_connections:
-            connection.send_eieio_command_message(eieio_command_message)
+            connection.send_eieio_message(eieio_command_message)
 
     def add_machine_objects(self, machine):
         """
