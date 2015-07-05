@@ -340,17 +340,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # execute data spec execution
         if do_timing:
             timer.start_timing()
-        processor_to_app_data_base_address = \
-            self.execute_data_specification_execution(
+
+        self.execute_data_specification_execution(
                 config.getboolean("SpecExecution", "specExecOnHost"),
                 self._hostname, self._placements, self._graph_mapper,
                 write_text_specs=config.getboolean(
                     "Reports", "writeTextSpecs"),
                 runtime_application_data_folder=self._app_data_runtime_folder)
 
-        if self._reports_states is not None:
-            reports.write_memory_map_report(self._report_default_directory,
-                                            processor_to_app_data_base_address)
+        self.load_router_table(self._router_tables, self._app_id,
+                app_data_folder=self._app_data_runtime_folder)
 
         if do_timing:
             timer.take_sample()
@@ -364,13 +363,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._load_tags(self._tags)
 
             if self._do_load is True:
-                logger.info("*** Loading data ***")
-                self._load_application_data(
-                    self._placements, self._router_tables, self._graph_mapper,
-                    processor_to_app_data_base_address, self._hostname,
-                    self._app_id,
-                    machine_version=config.getint("Machine", "version"),
-                    app_data_folder=self._app_data_runtime_folder)
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(
                     executable_targets, self._app_id,
