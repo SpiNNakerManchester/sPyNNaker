@@ -114,7 +114,6 @@ class AbstractPopulationRecordableVertex(object):
                     x, y, spike_region_base_address_offset, 4))[0])
             spike_region_base_address = \
                 struct.unpack("<I", spike_region_base_address_buf)[0]
-            spike_region_base_address += app_data_base_address
 
             # Read the spike data size
             number_of_bytes_written_buf =\
@@ -197,7 +196,6 @@ class AbstractPopulationRecordableVertex(object):
                 x, y, neuron_param_region_base_address_offset, 4))[0])
             neuron_param_region_base_address = \
                 struct.unpack("<I", neuron_param_region_base_address_buf)[0]
-            neuron_param_region_base_address += app_data_base_address
 
             # Read the size
             number_of_bytes_written_buf = \
