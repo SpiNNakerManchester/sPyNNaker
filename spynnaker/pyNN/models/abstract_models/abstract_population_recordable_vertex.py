@@ -6,14 +6,12 @@ from pacman.utilities.progress_bar import ProgressBar
 
 from data_specification import utility_calls as dsg_utility_calls
 
-
 import logging
 import numpy
 import struct
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
-
 
 logger = logging.getLogger(__name__)
 
