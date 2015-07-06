@@ -100,7 +100,7 @@ class AbstractPopulationRecordableVertex(object):
             hi_atom = subvertex_slice.hi_atom
             n_atoms = hi_atom - lo_atom + 1
 
-            print("Reading spikes from chip {}, {}, core {}, "
+            logger.debug("Reading spikes from chip {}, {}, core {}, "
                          "lo_atom {} hi_atom {}".format(x, y, p, lo_atom, hi_atom))
 
             # Get the App Data for the core
@@ -257,7 +257,7 @@ class AbstractPopulationRecordableVertex(object):
                 number_of_bytes_written)
 
             vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-            n_atoms = vertex_slice.hi_atom - vertex_n_atomsslice.lo_atom + 1
+            n_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
 
             bytes_per_time_step = n_atoms * 4
 
