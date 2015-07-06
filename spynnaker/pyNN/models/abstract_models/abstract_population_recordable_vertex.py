@@ -97,8 +97,11 @@ class AbstractPopulationRecordableVertex(object):
             (x, y, p) = placement.x, placement.y, placement.p
             subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
             lo_atom = subvertex_slice.lo_atom
-            logger.debug("Reading spikes from chip {}, {}, core {}, "
-                         "lo_atom {}".format(x, y, p, lo_atom))
+            hi_atom = subvertex_slice.hi_atom
+            n_atoms = hi_atom - lo_atom + 1
+
+            print("Reading spikes from chip {}, {}, core {}, "
+                         "lo_atom {} hi_atom {}".format(x, y, p, lo_atom, hi_atom))
 
             # Get the App Data for the core
             app_data_base_address = \
@@ -167,17 +170,19 @@ class AbstractPopulationRecordableVertex(object):
                 .view(dtype="uint8")
             )
 
-            # Reshape the data into a out_spike_bytes column matrix
-            spike_bytes = numpy.reshape(spike_bytes,
-                                        (-1, out_spike_bytes))
-
-            # Unpack to bits
+            # Unpack the bytes into bits, group these into words and flip order
             spike_bits = numpy.fliplr(
-                numpy.unpackbits(spike_bytes, axis=1)
+                numpy.reshape(numpy.unpackbits(spike_bytes), (-1, 32))
             )
 
+            # Reshape the data into a out_spike_bytes column matrix
+            spike_bits = numpy.reshape(spike_bits, (-1, out_spike_bytes * 8))
+
+            # Slice out neurons that actually exist
+            spike_bits = spike_bits[:,:n_atoms]
+
             # Find indices of where spikes have occurred
-            spike_times, spike_ids = numpy.where(spike_bits == 1)
+            spike_times, spike_ids = numpy.nonzero(spike_bits)
 
             # Scale spike times by timescale and add lo_atom index to neurons
             spike_times = spike_times * ms_per_tick
@@ -252,7 +257,7 @@ class AbstractPopulationRecordableVertex(object):
                 number_of_bytes_written)
 
             vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-            n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
+            n_atoms = vertex_slice.hi_atom - vertex_n_atomsslice.lo_atom + 1
 
             bytes_per_time_step = n_atoms * 4
 
