@@ -27,6 +27,9 @@ from pacman.model.constraints.tag_allocator_constraints\
     .tag_allocator_require_iptag_constraint\
     import TagAllocatorRequireIptagConstraint
 
+# spinn machine imports
+from spinn_machine.tags.user_iptag import UserIPTag
+
 # dsg imports
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
