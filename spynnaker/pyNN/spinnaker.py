@@ -281,9 +281,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # add database generation if requested
         needs_database = self._auto_detect_database(self._partitioned_graph)
-        user_create_database = config.getboolean("Database", "create_database")
-        if ((user_create_database is None and needs_database) or
-                user_create_database):
+        user_create_database = config.get("Database", "create_database")
+        if ((user_create_database == "None" and needs_database) or
+                user_create_database == "True"):
             wait_on_confirmation = config.getboolean(
                 "Database", "wait_on_confirmation")
             self._database_interface = DataBaseInterface(
