@@ -8,6 +8,8 @@ from spinnman.connections.udp_packet_connections.eieio_command_connection \
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
+from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
+    AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants as spynnaker_constants
 from spynnaker.pyNN import exceptions
 
@@ -89,12 +91,13 @@ class DataBaseInterface(object):
         cur.execute(
             "CREATE TABLE Partitionable_vertices("
             "vertex_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-            "vertex_label TEXT, no_atoms INT, max_atom_constrant INT,"
-            "recorded INT)")
+            "vertex_label TEXT, vertex_class TEXT, no_atoms INT, " 
+            "max_atom_constrant INT, recorded INT)")
         cur.execute(
             "CREATE TABLE Partitionable_edges("
             "edge_id INTEGER PRIMARY KEY AUTOINCREMENT, "
             "pre_vertex INTEGER, post_vertex INTEGER, edge_label TEXT, "
+            "post_target TEXT, post_synapse_dynamics TEXT, "
             "FOREIGN KEY (pre_vertex)"
             " REFERENCES Partitionable_vertices(vertex_id), "
             "FOREIGN KEY (post_vertex)"
@@ -322,30 +325,51 @@ class DataBaseInterface(object):
                 if isinstance(vertex, AbstractPopulationRecordableVertex):
                     cur.execute(
                         "INSERT INTO Partitionable_vertices("
-                        "vertex_label, no_atoms, max_atom_constrant, recorded)"
-                        " VALUES('{}', {}, {}, {});"
-                        .format(vertex.label, vertex.n_atoms,
-                                vertex.get_max_atoms_per_core(),
+                        "vertex_label, vertex_class, no_atoms, "
+                        "max_atom_constrant, recorded)"
+                        " VALUES('{}', '{}', {}, {}, {});"
+                        .format(vertex.label, vertex.__class__.__name__,
+                                vertex.n_atoms, vertex.get_max_atoms_per_core(),
                                 int(vertex.record)))
                 else:
                     cur.execute(
                         "INSERT INTO Partitionable_vertices("
-                        "vertex_label, no_atoms, max_atom_constrant, recorded)"
-                        " VALUES('{}', {}, {}, 0);"
-                        .format(vertex.label, vertex.n_atoms,
+                        "vertex_label, vertex_class, no_atoms, "
+                        "max_atom_constrant, recorded)"
+                        " VALUES('{}', '{}', {}, {}, 0);"
+                        .format(vertex.label, vertex.__class__.__name__, 
+                                vertex.n_atoms, 
                                 vertex.get_max_atoms_per_core()))
             # add edges
             vertices = partitionable_graph.vertices
             for vertex in partitionable_graph.vertices:
                 for edge in partitionable_graph.\
                         outgoing_edges_from_vertex(vertex):
-                    cur.execute(
-                        "INSERT INTO Partitionable_edges ("
-                        "pre_vertex, post_vertex, edge_label) "
-                        "VALUES({}, {}, '{}');"
-                        .format(vertices.index(edge.pre_vertex) + 1,
-                                vertices.index(edge.post_vertex) + 1,
-                                edge.label))
+                    if isinstance(edge.post_vertex, AbstractPopulationVertex):
+                       cur.execute(
+                           "INSERT INTO Partitionable_edges ("
+                           "pre_vertex, post_vertex, edge_label, "
+                           "post_target, post_synapse_dynamics) "
+                           "VALUES({}, {}, '{}', '{}', '{}');"
+                           .format(vertices.index(edge.pre_vertex) + 1,
+                                   vertices.index(edge.post_vertex) + 1,
+                                   edge.label, 
+                                   edge.post_vertex.get_synapse_targets()[
+                                   (next(row for row in edge.synapse_list.get_rows()
+                                    if len(row.synapse_types) > 0)).synapse_types[0]], 
+                                   None if edge.synapse_dynamics is None else 
+                                   edge.synapse_dynamics.get_vertex_executable_suffix()))
+                    else:
+                       cur.execute(
+                           "INSERT INTO Partitionable_edges ("
+                           "pre_vertex, post_vertex, edge_label, "
+                           "post_target, post_synapse_dynamics) "
+                           "VALUES({}, {}, '{}', '{}', '{}');"
+                           .format(vertices.index(edge.pre_vertex) + 1,
+                                   vertices.index(edge.post_vertex) + 1,
+                                   edge.label, 
+                                   None, 
+                                   None))
             # update graph
             edge_id_offset = 0
             for vertex in partitionable_graph.vertices:

@@ -805,17 +805,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             # if the vertex can generate a DSG, call it
             if isinstance(associated_vertex, AbstractDataSpecableVertex):
 
-                ip_tags = self._tags.get_ip_tags_for_vertex(
-                    placement.subvertex)
-                reverse_ip_tags = self._tags.get_reverse_ip_tags_for_vertex(
-                    placement.subvertex)
                 data_generator_interface = DataGeneratorInterface(
                     associated_vertex, placement.subvertex, placement,
                     self._partitioned_graph, self._partitionable_graph,
                     self._routing_infos, self._hostname, self._graph_mapper,
-                    self._report_default_directory, ip_tags, reverse_ip_tags,
-                    self._writeTextSpecs, self._app_data_runtime_folder,
-                    progress_bar)
+                    self._report_default_directory, self._writeTextSpecs,
+                    self._app_data_runtime_folder, progress_bar)
                 data_generator_interfaces.append(data_generator_interface)
                 thread_pool.apply_async(data_generator_interface.start)
 

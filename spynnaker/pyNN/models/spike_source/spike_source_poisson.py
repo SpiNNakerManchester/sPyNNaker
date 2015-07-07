@@ -48,7 +48,6 @@ class SpikeSourcePoisson(
     _model_based_max_atoms_per_core = 256
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
-                 spikes_per_second, ring_buffer_sigma,
                  constraints=None, label="SpikeSourcePoisson",
                  rate=1.0, start=0.0, duration=None, seed=None):
         """
@@ -332,8 +331,7 @@ class SpikeSourcePoisson(
     # inherited from dataspecable vertex
     def generate_data_spec(self, subvertex, placement, subgraph, graph,
                            routing_info, hostname, graph_mapper, report_folder,
-                           ip_tags, reverse_ip_tags, write_text_specs,
-                           application_run_time_folder):
+                           write_text_specs, application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSourcePoisson on one core.
@@ -345,8 +343,6 @@ class SpikeSourcePoisson(
         :param hostname:
         :param graph_mapper:
         :param report_folder:
-        :param ip_tags:
-        :param reverse_ip_tags:
         :param write_text_specs:
         :param application_run_time_folder:
         :return:

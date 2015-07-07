@@ -19,10 +19,9 @@ class SpikeSourceFromFile(SpikeSourceArray):
 
     def __init__(
             self, n_neurons, spike_time_file, machine_time_step,
-            spikes_per_second, ring_buffer_sigma, timescale_factor, port=None,
-            tag=None, ip_address=None, board_address=None, min_atom=None,
-            max_atom=None, min_time=None, max_time=None,
-            max_on_chip_memory_usage_for_spikes_in_bytes=None,
+            timescale_factor, port=None, tag=None, ip_address=None,
+            board_address=None, min_atom=None, max_atom=None, min_time=None, 
+            max_time=None, max_on_chip_memory_usage_for_spikes_in_bytes=None,
             constraints=None, label="SpikeSourceArray"):
 
         spike_times = utility_calls.read_spikes_from_file(
@@ -30,8 +29,8 @@ class SpikeSourceFromFile(SpikeSourceArray):
 
         SpikeSourceArray.__init__(
             self, n_neurons, spike_times, machine_time_step,
-            spikes_per_second, ring_buffer_sigma, timescale_factor, port=port,
-            tag=tag, ip_address=ip_address, board_address=board_address,
+            timescale_factor, port=port, tag=tag, ip_address=ip_address,
+            board_address=board_address,
             max_on_chip_memory_usage_for_spikes_in_bytes=
             max_on_chip_memory_usage_for_spikes_in_bytes,
             constraints=constraints, label=label)

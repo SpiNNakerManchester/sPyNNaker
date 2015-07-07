@@ -6,6 +6,12 @@ from pacman.model.constraints.placer_constraints\
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_population_data_spec import \
+    AbstractPopulationDataSpec
+
+from spinn_front_end_common.utility_models.live_packet_gather_parameters \
+    import LivePacketGatherParameters
 from spynnaker.pyNN.utilities.parameters_surrogate\
     import PyNNParametersSurrogate
 from spynnaker.pyNN.utilities import conf
@@ -65,8 +71,9 @@ class Population(object):
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
-        cellparams['spikes_per_second'] = spinnaker.spikes_per_second
-        cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
+        if issubclass(cellclass, AbstractPopulationDataSpec):
+            cellparams['spikes_per_second'] = spinnaker.spikes_per_second
+            cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
         self._delay_vertex = None
@@ -177,7 +184,7 @@ class Population(object):
 
             if not self._spinnaker.has_ran:
                 raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet ran, therefore spikes cannot"
+                    "The simulation has not yet run, therefore spikes cannot"
                     " be retrieved. Please execute the simulation before"
                     " running this command")
             if conf.config.getboolean("Reports", "outputTimesForSections"):
@@ -453,7 +460,7 @@ class Population(object):
     def print_gsyn(self, filename, gather=True):
         """
         Write conductance information from the population to a given file.
-        :param filename: the absoluete file path for where the gsyn are to be
+        :param filename: the absolute file path for where the gsyn's are to be
         printed in
         :param gather: Supported from the PyNN language, but Spinnaker only does
         gather = True.
@@ -479,7 +486,7 @@ class Population(object):
         """
         Write membrane potential information from the population to a given
         file.
-        :param filename: the absoluete file path for where the voltage are to be
+        :param filename: the absolute file path for where the voltages are to be
         printed in
         :param gather: Supported from the PyNN language, but Spinnaker only does
         gather = True.

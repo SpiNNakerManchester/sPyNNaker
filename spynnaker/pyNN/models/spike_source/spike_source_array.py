@@ -21,11 +21,14 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
+from pacman.model.partitionable_graph.ip_tagged_partitionable_vertex \
+    import IPTaggedPartitionableVertex
 from pacman.model.constraints.tag_allocator_constraints\
     .tag_allocator_require_iptag_constraint\
     import TagAllocatorRequireIptagConstraint
+
+# spinn machine imports
+from spinn_machine.tags.user_iptag import UserIPTag
 
 # dsg imports
 from data_specification.data_specification_generator\
@@ -45,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 
 class SpikeSourceArray(AbstractDataSpecableVertex,
-                       AbstractPartitionableVertex,
+                       IPTaggedPartitionableVertex,
                        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
     """
     model for play back of spikes
@@ -63,32 +66,33 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
                ('SPIKE_DATA_REGION', 2)])
 
     def __init__(
-            self, n_neurons, spike_times, machine_time_step, spikes_per_second,
-            ring_buffer_sigma, timescale_factor, port=None, tag=None,
-            ip_address=None, board_address=None,
+            self, n_neurons, spike_times, machine_time_step, timescale_factor, 
+            port=None, tag=None, ip_address=None, board_address=None,
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
             constraints=None, label="SpikeSourceArray"):
         if ip_address is None:
             ip_address = config.get("Buffers", "receive_buffer_host")
         if port is None:
             port = config.getint("Buffers", "receive_buffer_port")
+        tags=[UserIPTag(
+              ip_address=ip_address,
+              port=port,
+              tag=tag,
+              board=board_address,
+              strip_sdp=True)]
 
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
-        AbstractPartitionableVertex.__init__(
+        IPTaggedPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label,
             max_atoms_per_core=self._model_based_max_atoms_per_core,
-            constraints=constraints)
+            tags=tags, constraints=constraints)
         AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
         self._threshold_for_reporting_bytes_written = 0
-
-        self.add_constraint(TagAllocatorRequireIptagConstraint(
-            ip_address, port, strip_sdp=True, board_address=board_address,
-            tag_id=tag))
 
         if self._max_on_chip_memory_usage_for_spikes is None:
             self._max_on_chip_memory_usage_for_spikes = 8 * 1024 * 1024
@@ -252,8 +256,8 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
     # inherited from dataspecable vertex
     def generate_data_spec(
             self, subvertex, placement, subgraph, graph, routing_info,
-            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
-            write_text_specs, application_run_time_folder):
+            hostname, graph_mapper, report_folder, write_text_specs,
+            application_run_time_folder):
         """
         Model-specific construction of the data blocks necessary to build a
         single SpikeSource Array on one core.
@@ -265,8 +269,6 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         :param hostname:
         :param graph_mapper:
         :param report_folder:
-        :param ip_tags:
-        :param reverse_ip_tags:
         :param write_text_specs:
         :param application_run_time_folder:
         :return:
@@ -288,7 +290,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         self._reserve_memory_regions(spec, spike_buffer.buffer_size)
 
         self._write_setup_info(
-            spec, spike_buffer.buffer_size, ip_tags)
+            spec, spike_buffer.buffer_size, subvertex.ip_tags)
 
         # End-of-Spec:
         spec.end_specification()

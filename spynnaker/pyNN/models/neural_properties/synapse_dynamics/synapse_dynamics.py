@@ -15,3 +15,14 @@ class SynapseDynamics(object):
 
     def get_synapse_row_io(self):
         return self.slow.get_synapse_row_io()
+
+    def get_vertex_executable_suffix(self):
+        name = ""
+        if self.fast is not None:
+           name += self.fast.get_executable_suffix()
+           if self.slow is not None:
+              name += "_"
+        if self.slow is not None: 
+           name += self.slow.get_executable_suffix()                       
+        return name
+    
