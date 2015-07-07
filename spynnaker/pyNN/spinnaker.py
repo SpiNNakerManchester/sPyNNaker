@@ -59,7 +59,6 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesProvanenceData
 
 # local front end imports
-from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
 from spynnaker.pyNN.utilities.database.data_base_interface \
     import DataBaseInterface
 from spynnaker.pyNN.models.pynn_population import Population
@@ -116,19 +115,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         SpynnakerConfigurationFunctions.__init__(self)
         FrontEndCommonProvanenceFunctions.__init__(self)
 
-        # database objects
-        self._create_database = config.getboolean(
-            "Database", "create_database")
-
-        if database_socket_addresses is None:
-            database_socket_addresses = list()
-            listen_port = config.getint("Database", "listen_port")
-            notify_port = config.getint("Database", "notify_port")
-            noftiy_hostname = config.get("Database", "notify_hostname")
-            database_socket_addresses.append(
-                SocketAddress(noftiy_hostname, notify_port, listen_port))
-        self._database_socket_addresses = database_socket_addresses
+        self._database_socket_addresses = set()
         self._database_interface = None
+        self._create_database = None
 
         if self._app_id is None:
             self._set_up_main_objects(
@@ -189,8 +178,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
-        self._create_database = config.getboolean(
-            "Database", "create_database")
 
         FrontEndCommonInterfaceFunctions.__init__(
             self, self._reports_states, self._report_default_directory)
@@ -245,14 +232,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             virtual_has_wrap_arounds=config.getboolean(
                 "Machine", "requires_wrap_arounds"))
 
-        # add database generation if requested
-        if self._create_database:
-            wait_on_confirmation = config.getboolean(
-                "Database", "wait_on_confirmation")
-            self._database_interface = DataBaseInterface(
-                self._app_data_runtime_folder, wait_on_confirmation,
-                self._database_socket_addresses)
-
         # create network report if needed
         if self._reports_states is not None:
             reports.network_specification_partitionable_report(
@@ -300,8 +279,17 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if do_timing:
             timer.take_sample()
 
-        # load database if needed
-        if self._create_database:
+        # add database generation if requested
+        needs_database = self._auto_detect_database(self._partitioned_graph)
+        user_create_database = config.get("Database", "create_database")
+        if ((user_create_database == "None" and needs_database) or
+                user_create_database == "True"):
+            wait_on_confirmation = config.getboolean(
+                "Database", "wait_on_confirmation")
+            self._database_interface = DataBaseInterface(
+                self._app_data_runtime_folder, wait_on_confirmation,
+                self._database_socket_addresses)
+
             self._database_interface.add_system_params(
                 self._time_scale_factor, self._machine_time_step,
                 self._runtime)
@@ -1056,3 +1044,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # stop the transciever
         self._txrx.close()
+
+    def _add_socket_address(self, socket_address):
+        """
+
+        :param socket_address:
+        :return:
+        """
+        self._database_socket_addresses.add(socket_address)
