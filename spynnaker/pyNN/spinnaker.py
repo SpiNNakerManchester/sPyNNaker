@@ -942,25 +942,27 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         sdram_object = SDRAM()
 
         # creates the two links
-        virtual_link_id = (virtual_vertex
-                           .connected_to_real_chip_link_id + 3) % 6
+        spinnaker_link_id = virtual_vertex.get_spinnaker_link_id
+        spinnaker_link_data = \
+            self._machine.locate_connected_chips_coords_and_link(
+            config.getint("Machine", "version"), spinnaker_link_id)
+        virtual_link_id = (spinnaker_link_data.connected_link + 3) % 6
         to_virtual_chip_link = Link(
             destination_x=virtual_vertex.virtual_chip_x,
             destination_y=virtual_vertex.virtual_chip_y,
-            source_x=virtual_vertex.connected_to_real_chip_x,
-            source_y=virtual_vertex.connected_to_real_chip_y,
+            source_x=spinnaker_link_data.connected_chip_x,
+            source_y=spinnaker_link_data.connected_chip_y,
             multicast_default_from=virtual_link_id,
             multicast_default_to=virtual_link_id,
-            source_link_id=virtual_vertex.connected_to_real_chip_link_id)
+            source_link_id=spinnaker_link_data.connected_link)
 
         from_virtual_chip_link = Link(
-            destination_x=virtual_vertex.connected_to_real_chip_x,
-            destination_y=virtual_vertex.connected_to_real_chip_y,
+            destination_x=spinnaker_link_data.connected_chip_x,
+            destination_y=spinnaker_link_data.connected_chip_y,
             source_x=virtual_vertex.virtual_chip_x,
             source_y=virtual_vertex.virtual_chip_y,
-            multicast_default_from=(virtual_vertex
-                                    .connected_to_real_chip_link_id),
-            multicast_default_to=virtual_vertex.connected_to_real_chip_link_id,
+            multicast_default_from=(spinnaker_link_data.connected_link),
+            multicast_default_to=spinnaker_link_data.connected_link,
             source_link_id=virtual_link_id)
 
         # create the router
@@ -979,8 +981,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # connect the real chip with the virtual one
         connected_chip = self._machine.get_chip_at(
-            virtual_vertex.connected_to_real_chip_x,
-            virtual_vertex.connected_to_real_chip_y)
+            spinnaker_link_data.connected_chip_x,
+            spinnaker_link_data.connected_chip_y)
         connected_chip.router.add_link(to_virtual_chip_link)
 
         # return new v chip
