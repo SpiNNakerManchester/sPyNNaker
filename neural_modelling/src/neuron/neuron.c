@@ -27,7 +27,7 @@ static bool use_key;
 static uint32_t n_neurons;
 
 //! The recording flags
-static uint32_t recording_flags;
+uint32_t recording_flags;
 
 //! The input buffers - from synapses.c
 static input_t *input_buffers;
@@ -156,12 +156,12 @@ void neuron_do_timestep_update(timer_t time) {
         }
 
         // If we should be recording gsyn, get the neuron input
-        if (recording_is_channel_enabled(recording_flags,
+        /*if (recording_is_channel_enabled(recording_flags,
                 e_recording_channel_neuron_gsyn)) {
-            input_t temp_record_input = exc_neuron_input - inh_neuron_input;
+            input_t temp_record_input = neuron->I_Ca2;
             recording_record(e_recording_channel_neuron_gsyn,
                              &temp_record_input, sizeof(input_t));
-        }
+        }*/
 
         // If the neuron has spiked
         if (spike) {

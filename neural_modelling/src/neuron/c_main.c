@@ -56,7 +56,7 @@ typedef enum regions_e {
 uint32_t time;
 //! global parameter which contains the number of timer ticks to run for before
 //! being expected to exit
-static uint32_t simulation_ticks = 0;
+uint32_t simulation_ticks = 0;
 
 //! \Initialises the model by reading in the regions and checking recording
 //! data.
