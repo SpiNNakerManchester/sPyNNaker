@@ -246,6 +246,7 @@ class BufferManager(object):
             raise SpynnakerException(
                 "The buffer region of {} must be divisible by 2".format(
                     vertex))
+        all_data = b""
         if vertex.is_empty(region):
             sent_message = True
         else:
@@ -264,12 +265,10 @@ class BufferManager(object):
                              " {}, {}, {}".format(
                                  len(data), hex(region_base_address),
                                  placement.x, placement.y, placement.p))
-                self._transceiver.write_memory(
-                    placement.x, placement.y, region_base_address, data)
+                all_data += data
                 sent_message = True
 
                 # Update the positions
-                region_base_address += len(data)
                 bytes_to_go -= len(data)
 
         if not sent_message:
@@ -285,8 +284,7 @@ class BufferManager(object):
                          " {}, {}, {}".format(
                              len(data), hex(region_base_address),
                              placement.x, placement.y, placement.p))
-            self._transceiver.write_memory(
-                placement.x, placement.y, region_base_address, data)
+            all_data += data
             bytes_to_go -= len(data)
             self._sent_messages[vertex] = BuffersSentDeque(
                 region, sent_stop_message=True)
@@ -300,8 +298,11 @@ class BufferManager(object):
             logger.debug("Writing padding of length {} to {} on {}, {}, {}"
                          .format(len(data), hex(region_base_address),
                                  placement.x, placement.y, placement.p))
-            self._transceiver.write_memory(
-                placement.x, placement.y, region_base_address, data)
+            all_data += data
+
+        # Do the writing all at once for efficiency
+        self._transceiver.write_memory(
+            placement.x, placement.y, region_base_address, all_data)
 
     def _send_messages(self, size, vertex, region, sequence_no):
         """ Send a set of messages
