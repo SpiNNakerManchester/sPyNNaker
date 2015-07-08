@@ -46,7 +46,8 @@
 #include <debug.h>
 
 static spike_t* buffer;
-static uint32_t buffer_size;
+#define BUFFER_SIZE 256
+//static uint32_t buffer_size;
 
 static index_t output;
 static index_t input;
@@ -57,14 +58,14 @@ static counter_t underflows;
 //
 // Returns the number of buffer slots currently unallocated
 static inline counter_t unallocated() {
-    return ((input - output) % buffer_size);
+    return ((input - output) % BUFFER_SIZE);
 }
 
 // allocated
 //
 // Returns the number of buffer slots currently allocated
 static inline counter_t allocated() {
-    return ((output - input - 1) % buffer_size);
+    return ((output - input - 1) % BUFFER_SIZE);
 }
 
 // The following two functions are used to determine whether a
@@ -78,12 +79,12 @@ static inline bool non_full() {
 }
 
 bool in_spikes_initialize_spike_buffer(uint32_t size) {
-    buffer = (spike_t *) sark_alloc(1, size * sizeof(spike_t));
+    buffer = (spike_t *) sark_alloc(1, BUFFER_SIZE * sizeof(spike_t));
     if (buffer == NULL) {
         log_error("Cannot allocate in spikes buffer");
         return false;
     }
-    buffer_size = size;
+    //buffer_size = size;
     input = size - 1;
     output = 0;
     overflows = 0;
@@ -95,7 +96,7 @@ uint32_t in_spikes_n_spikes_in_buffer() {
     return allocated();
 }
 
-#define peek_next(a) ((a - 1) % buffer_size)
+#define peek_next(a) ((a - 1) % BUFFER_SIZE)
 
 #define next(a) do {(a) = peek_next(a);} while (false)
 
@@ -154,7 +155,7 @@ void in_spikes_print_buffer() {
     printf("------------------------------------------------\n");
 
     for (; n > 0; n--) {
-        a = (input + n) % buffer_size;
+        a = (input + n) % BUFFER_SIZE;
         log_debug("  %3u: %08x\n", a, buffer[a]);
     }
 
