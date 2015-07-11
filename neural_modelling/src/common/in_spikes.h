@@ -4,6 +4,8 @@
 #include "neuron-typedefs.h"
 #include <circular_buffer.h>
 
+static circular_buffer buffer;
+
 // initialize_spike_buffer
 //
 // This function initializes the input spike buffer.
@@ -16,23 +18,24 @@
 //
 // If underflows is ever non-zero, then there is a problem with this code.
 static inline bool in_spikes_initialize_spike_buffer(uint32_t size) {
-    return circular_buffer_initialize(size);
+    buffer = circular_buffer_initialize(size);
+    return buffer != 0;
 }
 
 static inline bool in_spikes_add_spike(spike_t spike) {
-    return circular_buffer_add(spike);
+    return circular_buffer_add(buffer, spike);
 }
 
 static inline bool in_spikes_get_next_spike(spike_t* spike) {
-    return circular_buffer_get_next(spike);
+    return circular_buffer_get_next(buffer, spike);
 }
 
 static inline bool in_spikes_is_next_spike_equal(spike_t spike) {
-    return circular_buffer_advance_if_next_equals(spike);
+    return circular_buffer_advance_if_next_equals(buffer, spike);
 }
 
 static inline counter_t in_spikes_get_n_buffer_overflows() {
-    return circular_buffer_get_n_buffer_overflows();
+    return circular_buffer_get_n_buffer_overflows(buffer);
 }
 
 static inline counter_t in_spikes_get_n_buffer_underflows() {
@@ -40,7 +43,7 @@ static inline counter_t in_spikes_get_n_buffer_underflows() {
 }
 
 static inline void in_spikes_print_buffer() {
-    circular_buffer_print_buffer();
+    circular_buffer_print_buffer(buffer);
 }
 
 #endif // _IN_SPIKES_H_
