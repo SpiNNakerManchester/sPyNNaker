@@ -1,3 +1,4 @@
+from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
@@ -43,14 +44,17 @@ class FromListConnector(AbstractConnector):
             weight_scale, synapse_type):
 
         prevertex = presynaptic_population._get_vertex
+        postvertex = postsynaptic_population._get_vertex
 
         # Convert connection list into numpy record array
         conn_list_numpy = numpy.array(
-            self._conn_list, dtype=[("i", "uint32"), ("j", "uint32"),
+            self._conn_list, dtype=[("source", "uint32"), ("target", "uint32"),
                                     ("weight", "float"), ("delay", "float")])
+        if (conn_list_numpy["target"] >= postvertex.n_atoms).any():
+            raise exceptions.ConfigurationException("Target atom out of range")
 
         # Sort by pre-synaptic neuron
-        conn_list_numpy = numpy.sort(conn_list_numpy, order="i")
+        conn_list_numpy = numpy.sort(conn_list_numpy, order="source")
 
         # Apply weight and delay scaling
         conn_list_numpy["weight"] *= weight_scale
@@ -58,7 +62,7 @@ class FromListConnector(AbstractConnector):
 
         # Count number of connections per pre-synaptic neuron
         pre_counts = numpy.histogram(
-            conn_list_numpy["i"], numpy.arange(prevertex.n_atoms + 1))[0]
+            conn_list_numpy["source"], numpy.arange(prevertex.n_atoms + 1))[0]
 
         # Take cumulative sum of these counts to get start and end indices of
         # the blocks of connections coming from each pre-synaptic neuron
@@ -67,7 +71,8 @@ class FromListConnector(AbstractConnector):
 
         # Loop through slices of connections
         synaptic_rows = []
-        for n, (start, end) in enumerate(zip(pre_start_idxs, pre_end_idxs)):
+        for _, (start, end) in enumerate(zip(pre_start_idxs, pre_end_idxs)):
+
             # Get slice
             pre_conns = conn_list_numpy[start:end]
 
@@ -78,7 +83,7 @@ class FromListConnector(AbstractConnector):
             # Combine post-synaptic neuron ids, weights, delays
             # and synapse types together into synaptic row
             synaptic_rows.append(
-                SynapseRowInfo(pre_conns["j"],
+                SynapseRowInfo(pre_conns["target"],
                                pre_conns["weight"],
                                pre_conns["delay"],
                                synapse_type_row))
