@@ -250,7 +250,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._app_data_runtime_folder, wait_on_confirmation,
                 self._database_socket_addresses)
 
-            # if using a reload script, add if that needs to wait for confirmation
+            # if using a reload script, add if that needs to wait for
+            # confirmation
             if self._reports_states.transciever_report:
                 self._reload_script.wait_on_confirmation = wait_on_confirmation
                 for socket_address in self._database_socket_addresses:

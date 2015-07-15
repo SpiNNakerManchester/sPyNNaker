@@ -10,9 +10,10 @@ from spinn_front_end_common.abstract_models\
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
-from spinn_front_end_common.interface.buffer_management.storage_objects.buffered_sending_region \
-    import BufferedSendingRegion
-from spinn_front_end_common.interface.buffer_management.buffer_manager import BufferManager
+from spinn_front_end_common.interface.buffer_management.storage_objects\
+    .buffered_sending_region import BufferedSendingRegion
+from spinn_front_end_common.interface.buffer_management.buffer_manager \
+    import BufferManager
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
 

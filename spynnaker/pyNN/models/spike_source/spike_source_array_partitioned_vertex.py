@@ -47,6 +47,6 @@ class SpikeSourceArrayPartitionedVertex(
         :param region_id: the regionid that contains sendable keys.
         :return:
         """
-        key = SendsBuffersFromHostPartitionedVertexPreBufferedImpl.get_next_key(
-            self, region_id)
+        key = SendsBuffersFromHostPartitionedVertexPreBufferedImpl\
+            .get_next_key(self, region_id)
         return key | self._base_key
