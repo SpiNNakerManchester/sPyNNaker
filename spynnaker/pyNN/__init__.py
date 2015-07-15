@@ -280,6 +280,19 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
                         .format(neuron_type))
 
 
+def register_database_notification_request(hostname, notify_port, ack_port):
+    """
+    Adds a socket system which is registered with the notification protocol
+
+    :param hostname:
+    :param notify_port:
+    :param ack_report:
+    :return:
+    """
+    _spinnaker._add_socket_address(
+        SocketAddress(hostname, notify_port, ack_port))
+
+
 # noinspection PyPep8Naming
 def Population(size, cellclass, cellparams, structure=None, label=None):
     """

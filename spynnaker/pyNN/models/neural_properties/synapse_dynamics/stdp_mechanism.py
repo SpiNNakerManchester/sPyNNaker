@@ -19,7 +19,7 @@ class STDPMechanism(object):
 
     def __init__(self, timing_dependence=None, weight_dependence=None,
                  voltage_dependence=None, dendritic_delay_fraction=1.0,
-                 mad=False):
+                 mad=True):
         if timing_dependence is not None and \
                 not isinstance(timing_dependence, AbstractTimeDependency):
             raise exceptions.ConfigurationException(
