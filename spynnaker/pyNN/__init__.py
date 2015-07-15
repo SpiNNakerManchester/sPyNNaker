@@ -1,3 +1,4 @@
+# encoding: utf-8
 """
 The :py:mod:`spynnaker.pynn` package contains the frontend specifications
 and implementation for the PyNN High-level API
@@ -5,6 +6,7 @@ and implementation for the PyNN High-level API
 """
 
 import inspect
+from collections import defaultdict
 from ._version import __version__, __version_month__, __version_year__
 
 # utility functions
@@ -116,6 +118,9 @@ _spinnaker = None
 # List of binary search paths
 _binary_search_paths = []
 
+# Populations recorded using the "low-level" API - record(), record_v(), etc.
+record_list = defaultdict(list)
+
 
 def register_binary_search_path(search_path):
     """
@@ -133,9 +138,16 @@ def end(stop_on_board=True):
     :param stop_on_board:
     Do any necessary cleaning up before exiting.
 
-    Unregisters the controller
+    Unregisters the controller,
+    prints any data recorded using the low-level API
     """
-    global _spinnaker
+    global _spinnaker, record_list
+    for population in record_list['spikes']:
+        population.printSpikes(population._record_spike_file)
+    for population in record_list['v']:
+        population.print_v(population._record_v_file)
+    for population in record_list['gsyn']:
+        population.print_gsyn(population._record_gsyn_file)
     _spinnaker.stop(stop_on_board)
     _spinnaker = None
 
@@ -221,6 +233,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     """
     global _spinnaker
     global _binary_search_paths
+    global record_list
 
     logger.info(
         "sPyNNaker (c) {} APT Group, University of Manchester".format(
@@ -235,8 +248,9 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
         host_name=machine, timestep=timestep, min_delay=min_delay,
         max_delay=max_delay,
         database_socket_addresses=database_socket_addresses)
-    # Return None, simply because the PyNN API says something must be returned
-    return None
+    record_list = defaultdict(list)
+    # the PyNN API expects the MPI rank to be returned
+    return rank()
 
 
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
@@ -333,3 +347,76 @@ def get_current_time():
     """
     global _spinnaker
     return _spinnaker.get_current_time()
+
+
+# ==============================================================================
+#   Low-level API for creating, connecting and recording from individual neurons
+# ==============================================================================
+
+def create(cellclass, cellparams=None, n=1):
+    """
+    Create n cells all of the same type.
+
+    If n > 1, return a list of cell ids/references.
+    If n==1, return just the single id.
+    """
+    return Population(n, cellclass, cellparams)
+
+
+def connect(source, target, weight=0.0, delay=None, synapse_type=None,
+            p=1, rng=None):
+    """
+    Connect a source of spikes to a synaptic target.
+
+    source and target can both be individual cells or lists of cells, in
+    which case all possible connections are made with probability p, using
+    either the random number generator supplied, or the default rng
+    otherwise. Weights should be in nA or µS.
+    """
+    connector = FixedProbabilityConnector(p_connect=p, weights=weight, delays=delay)
+    return Projection(source, target, connector, target=synapse_type, rng=rng)
+
+
+def set(cells, param, val=None):
+    """
+    Set one or more parameters of an individual cell or list of cells.
+
+    param can be a dict, in which case val should not be supplied, or a string
+    giving the parameter name, in which case val is the parameter value.
+    """
+    assert isinstance(cells, Population)
+    cells.set(param, val)
+
+
+def initialize(cells, variable, value):
+    cells.initialize(variable, value)
+
+
+def record(source, filename):
+    """
+    Record spikes to a file. source should be a Population.
+    """
+    global record_list
+    source.record(to_file=filename)
+    # record_list is used by end()
+    record_list['spikes'].append(source)
+
+
+def record_v(source, filename):
+    """
+    Record spikes to a file. source should be a Population.
+    """
+    global record_list
+    source.record_v(to_file=filename)
+    # record_list is used by end()
+    record_list['v'].append(source)
+
+
+def record_gsyn(source, filename):
+    """
+    Record spikes to a file. source should be a Population.
+    """
+    global record_list
+    source.record_gsyn(to_file=filename)
+    # record_list is used by end()
+    record_list['gsyn'].append(source)
