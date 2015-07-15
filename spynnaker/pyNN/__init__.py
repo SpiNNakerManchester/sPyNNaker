@@ -118,9 +118,6 @@ _spinnaker = None
 # List of binary search paths
 _binary_search_paths = []
 
-# Populations recorded using the "low-level" API - record(), record_v(), etc.
-record_list = defaultdict(list)
-
 
 def register_binary_search_path(search_path):
     """
@@ -141,13 +138,7 @@ def end(stop_on_board=True):
     Unregisters the controller,
     prints any data recorded using the low-level API
     """
-    global _spinnaker, record_list
-    for population in record_list['spikes']:
-        population.printSpikes(population._record_spike_file)
-    for population in record_list['v']:
-        population.print_v(population._record_v_file)
-    for population in record_list['gsyn']:
-        population.print_gsyn(population._record_gsyn_file)
+    global _spinnaker
     _spinnaker.stop(stop_on_board)
     _spinnaker = None
 
@@ -233,7 +224,6 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     """
     global _spinnaker
     global _binary_search_paths
-    global record_list
 
     logger.info(
         "sPyNNaker (c) {} APT Group, University of Manchester".format(
@@ -248,7 +238,6 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
         host_name=machine, timestep=timestep, min_delay=min_delay,
         max_delay=max_delay,
         database_socket_addresses=database_socket_addresses)
-    record_list = defaultdict(list)
     # the PyNN API expects the MPI rank to be returned
     return rank()
 
@@ -349,9 +338,9 @@ def get_current_time():
     return _spinnaker.get_current_time()
 
 
-# ==============================================================================
-#   Low-level API for creating, connecting and recording from individual neurons
-# ==============================================================================
+# =============================================================================
+#  Low-level API for creating, connecting and recording from individual neurons
+# =============================================================================
 
 def create(cellclass, cellparams=None, n=1):
     """
@@ -360,10 +349,12 @@ def create(cellclass, cellparams=None, n=1):
     If n > 1, return a list of cell ids/references.
     If n==1, return just the single id.
     """
+    if cellparams is None:
+        cellparams = {}
     return Population(n, cellclass, cellparams)
 
 
-def connect(source, target, weight=0.0, delay=None, synapse_type=None,
+def connect(source, target, weight=0.0, delay=None, synapse_type="excitatory",
             p=1, rng=None):
     """
     Connect a source of spikes to a synaptic target.
@@ -373,7 +364,8 @@ def connect(source, target, weight=0.0, delay=None, synapse_type=None,
     either the random number generator supplied, or the default rng
     otherwise. Weights should be in nA or µS.
     """
-    connector = FixedProbabilityConnector(p_connect=p, weights=weight, delays=delay)
+    connector = FixedProbabilityConnector(p_connect=p, weights=weight,
+                                          delays=delay)
     return Projection(source, target, connector, target=synapse_type, rng=rng)
 
 
@@ -396,27 +388,18 @@ def record(source, filename):
     """
     Record spikes to a file. source should be a Population.
     """
-    global record_list
     source.record(to_file=filename)
-    # record_list is used by end()
-    record_list['spikes'].append(source)
 
 
 def record_v(source, filename):
     """
     Record spikes to a file. source should be a Population.
     """
-    global record_list
     source.record_v(to_file=filename)
-    # record_list is used by end()
-    record_list['v'].append(source)
 
 
 def record_gsyn(source, filename):
     """
     Record spikes to a file. source should be a Population.
     """
-    global record_list
     source.record_gsyn(to_file=filename)
-    # record_list is used by end()
-    record_list['gsyn'].append(source)
