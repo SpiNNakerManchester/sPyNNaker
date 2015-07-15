@@ -101,7 +101,8 @@ class AbstractPopulationRecordableVertex(object):
             n_atoms = hi_atom - lo_atom + 1
 
             logger.debug("Reading spikes from chip {}, {}, core {}, "
-                         "lo_atom {} hi_atom {}".format(x, y, p, lo_atom, hi_atom))
+                         "lo_atom {} hi_atom {}".format(
+                             x, y, p, lo_atom, hi_atom))
 
             # Get the App Data for the core
             app_data_base_address = \
@@ -145,7 +146,7 @@ class AbstractPopulationRecordableVertex(object):
 
             # Create numpy array to hold written data
             spike_bytes = numpy.empty(number_of_bytes_written, dtype="uint8")
-            
+
             # Start reading spike data
             spike_data = transceiver.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
@@ -179,7 +180,7 @@ class AbstractPopulationRecordableVertex(object):
             spike_bits = numpy.reshape(spike_bits, (-1, out_spike_bytes * 8))
 
             # Slice out neurons that actually exist
-            spike_bits = spike_bits[:,:n_atoms]
+            spike_bits = spike_bits[:, :n_atoms]
 
             # Find indices of where spikes have occurred
             spike_times, spike_ids = numpy.nonzero(spike_bits)
