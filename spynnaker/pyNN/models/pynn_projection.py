@@ -367,17 +367,18 @@ class Projection(object):
             for row in self._host_based_synapse_list.get_rows():
                 weights.extend(row.weights / self._weight_scale)
             return weights
-
-        weights = numpy.zeros((self._projection_edge.pre_vertex.n_atoms,
-                               self._projection_edge.post_vertex.n_atoms))
-        rows = self._host_based_synapse_list.get_rows()
-        for pre_atom in range(len(rows)):
-            row = rows[pre_atom]
-            for i in xrange(len(row.target_indices)):
-                post_atom = row.target_indices[i]
-                weight = row.weights[i]
-                weights[pre_atom][post_atom] = weight / self._weight_scale
-        return weights
+        else:
+            weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
+                                self._projection_edge.post_vertex.n_atoms))
+            weights.fill(numpy.nan)
+            rows = self._host_based_synapse_list.get_rows()
+            for pre_atom in range(len(rows)):
+                row = rows[pre_atom]
+                for i in xrange(len(row.target_indices)):
+                    post_atom = row.target_indices[i]
+                    weight = row.weights[i]
+                    weights[pre_atom][post_atom] = weight / self._weight_scale
+            return weights
 
     def __len__(self):
         """Return the total number of local connections."""
