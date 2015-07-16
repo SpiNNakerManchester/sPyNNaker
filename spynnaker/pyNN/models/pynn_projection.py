@@ -68,7 +68,7 @@ class Projection(object):
                     "Target {} is not available in the post-synaptic "
                     "pynn_population.py (choices are {})"
                     .format(target, targets))
-            synapse_type = \
+            self._synapse_type = \
                 postsynaptic_population._get_vertex.get_synapse_id(target)
         else:
             raise exceptions.ConfigurationException(
@@ -80,7 +80,7 @@ class Projection(object):
             connector.generate_synapse_list(
                 presynaptic_population, postsynaptic_population,
                 1000.0 / machine_time_step,
-                postsynaptic_population._get_vertex.weight_scale, synapse_type)
+                postsynaptic_population._get_vertex.weight_scale, self._synapse_type)
         self._host_based_synapse_list = synapse_list
 
         # If there are some negative weights
@@ -143,7 +143,6 @@ class Projection(object):
                 presynaptic_population._get_vertex,
                 postsynaptic_population._get_vertex)
             if edge_to_merge is not None:
-
                 # If there is an existing edge, merge the lists
                 self._projection_list_ranges = \
                     edge_to_merge.synapse_list.merge(synapse_list)
@@ -375,6 +374,7 @@ class Projection(object):
             for pre_atom in range(len(rows)):
                 row = rows[pre_atom]
                 for i in xrange(len(row.target_indices)):
+                    assert row.synapse_types[i] == self._synapse_type
                     post_atom = row.target_indices[i]
                     weight = row.weights[i]
                     weights[pre_atom][post_atom] = weight / self._weight_scale
@@ -462,8 +462,11 @@ class Projection(object):
         elif synapse_list is not None:
             rows = synapse_list.get_rows()
             new_rows = list()
-            for i in range(len(rows)):
-                new_rows.append(rows[i][self._projection_list_ranges[i]])
+            for row in rows:
+                # **HACK** assumes merged projection edges differ by synapse type
+                synapse_type_mask = row.synapse_types == self._synapse_type
+                subrow = row[synapse_type_mask]
+                new_rows.append(subrow)
             self._host_based_synapse_list = SynapticList(new_rows)
 
         # Otherwise return the delay list (there should be at least one!)
