@@ -19,10 +19,10 @@ class SynapseDynamics(object):
     def get_vertex_executable_suffix(self):
         name = ""
         if self.fast is not None:
-           name += self.fast.get_executable_suffix()
+           name += self.fast.get_vertex_executable_suffix()
            if self.slow is not None:
               name += "_"
         if self.slow is not None: 
-           name += self.slow.get_executable_suffix()                       
+           name += self.slow.get_vertex_executable_suffix()                       
         return name
     
