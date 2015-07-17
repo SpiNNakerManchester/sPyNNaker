@@ -158,7 +158,8 @@ void neuron_do_timestep_update(timer_t time) {
         // If we should be recording gsyn, get the neuron input
         /*if (recording_is_channel_enabled(recording_flags,
                 e_recording_channel_neuron_gsyn)) {
-            input_t temp_record_input = neuron->I_Ca2;
+            //input_t temp_record_input = neuron->I_Ca2;
+            input_t temp_record_input = exc_neuron_input - inh_neuron_input;
             recording_record(e_recording_channel_neuron_gsyn,
                              &temp_record_input, sizeof(input_t));
         }*/
