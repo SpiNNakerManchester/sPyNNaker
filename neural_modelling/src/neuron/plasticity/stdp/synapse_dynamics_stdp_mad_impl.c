@@ -70,7 +70,7 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+        const post_event_history_t *post_event_history, bool flush) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -103,15 +103,17 @@ static inline final_state_t _plasticity_update_synapse(
         post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
 
-    const uint32_t delayed_pre_time = time + delay_axonal;
-    log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
-              delayed_pre_time, post_window.prev_time);
+    // If this isn't a flush, apply spike to state
+    if(!flush)
+    {
+        const uint32_t delayed_pre_time = time + delay_axonal;
+        log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
+                  delayed_pre_time, post_window.prev_time);
 
-    // Apply spike to state
-    // **NOTE** dendritic delay is subtracted
-    current_state = timing_apply_pre_spike(
-        delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-        post_window.prev_time, post_window.prev_trace, current_state);
+        current_state = timing_apply_pre_spike(
+            delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
+            post_window.prev_time, post_window.prev_trace, current_state);
+    }
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
@@ -211,7 +213,7 @@ bool synapse_dynamics_initialise(
 
 void synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
-        weight_t *ring_buffers, uint32_t time) {
+        weight_t *ring_buffers, uint32_t time, bool flush) {
 
     // Extract seperate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
@@ -235,10 +237,13 @@ void synapse_dynamics_process_plastic_synapses(
     const pre_trace_t last_pre_trace = event_history->prev_trace;
 
     // Update pre-synaptic trace
-    log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time = time;
-    event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
-                                                     last_pre_trace);
+    if(!flush)
+    {
+      log_debug("Adding pre-synaptic event to trace at time:%u", time);
+      event_history->prev_time = time;
+      event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
+                                                      last_pre_trace, flush);
+    }
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -263,17 +268,21 @@ void synapse_dynamics_process_plastic_synapses(
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
             delay_dendritic, delay_axonal, current_state,
-            &post_event_history[index]);
+            &post_event_history[index], flush);
 
-        // Convert into ring buffer offset
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                delay_axonal + delay_dendritic + time, type_index);
+        // If the initiating event wasn't a flush
+        if(!flush)
+        {
+            // Convert into ring buffer offset
+            uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+                    delay_axonal + delay_dendritic + time, type_index);
 
-        // Add weight to ring-buffer entry
-        // **NOTE** Dave suspects that this could be a
-        // potential location for overflow
-        ring_buffers[ring_buffer_index] += synapse_structure_get_final_weight(
-            final_state);
+            // Add weight to ring-buffer entry
+            // **NOTE** Dave suspects that this could be a
+            // potential location for overflow
+            ring_buffers[ring_buffer_index] += synapse_structure_get_final_weight(
+              final_state);
+        }
 
         // Write back updated synaptic word to plastic region
         *plastic_words++ = synapse_structure_get_final_synaptic_word(

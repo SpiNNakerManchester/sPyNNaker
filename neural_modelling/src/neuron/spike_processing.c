@@ -24,6 +24,10 @@ typedef struct dma_buffer {
   // Key of originating spike 
   // (used to allow row data to be re-used for multiple spikes)
   spike_t originating_spike;
+
+  // Is this spike a flush message
+  // (used to force an plasticity update)
+  bool flush;
   
   // Row data
   uint32_t *row;
@@ -68,6 +72,7 @@ static inline void _setup_synaptic_dma_read() {
             dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
             next_buffer->sdram_writeback_address = row_address + 1;
             next_buffer->originating_spike = spike;
+            next_buffer->flush = flush;
 
             // Start a DMA transfer to fetch this synaptic row into current
             // buffer
@@ -169,7 +174,8 @@ void _dma_complete_callback(uint unused, uint tag) {
             // it's going to be processed
             synapses_process_synaptic_row(time, current_buffer->row,
                                           !subsequent_spikes,
-                                          current_buffer_index);
+                                          current_buffer_index,
+                                          current_buffer->flush);
         } while (subsequent_spikes);
 
     } else if (tag == DMA_TAG_WRITE_PLASTIC_REGION) {

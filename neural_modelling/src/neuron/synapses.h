@@ -52,7 +52,8 @@ bool synapses_initialise(address_t address, uint32_t n_neurons,
 void synapses_do_timestep_update(timer_t time);
 
 void synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
-                                   bool write, uint32_t process_id);
+                                   bool write, uint32_t process_id,
+                                   bool flush);
 
 void synapses_print_saturation_count();
 

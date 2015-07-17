@@ -307,7 +307,8 @@ void synapses_do_timestep_update(timer_t time) {
 }
 
 void synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
-                                   bool write, uint32_t process_id) {
+                                   bool write, uint32_t process_id,
+                                   bool flush) {
 
     _print_synaptic_row(row);
 
@@ -325,7 +326,7 @@ void synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
 
         // Process any plastic synapses
         synapse_dynamics_process_plastic_synapses(plastic_region_address,
-                fixed_region_address, ring_buffers, time);
+                fixed_region_address, ring_buffers, time, flush);
 
         // Perform DMA writeback
         if (write) {
@@ -333,11 +334,14 @@ void synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
         }
     }
 
-    // Process any fixed synapses
+    // If this isn't a flush, process any fixed synapses
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
-    _process_fixed_synapses(fixed_region_address, time);
+    if(!flush)
+    {
+        _process_fixed_synapses(fixed_region_address, time);
+    }
     //}
 }
 
