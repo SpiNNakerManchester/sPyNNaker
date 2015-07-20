@@ -371,7 +371,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     processor_to_app_data_base_address, self._hostname,
                     self._app_id,
                     machine_version=config.getint("Machine", "version"),
-                    app_data_folder=self._app_data_runtime_folder)
+                    app_data_folder=self._app_data_runtime_folder,
+                    verify=config.getboolean("Mode", "verify_writes"))
                 logger.info("*** Loading executables ***")
                 self._load_executable_images(
                     executable_targets, self._app_id,
