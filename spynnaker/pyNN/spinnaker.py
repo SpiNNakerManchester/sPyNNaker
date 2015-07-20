@@ -40,8 +40,6 @@ from spinn_front_end_common.interface.front_end_common_configuration_functions\
 from spinn_front_end_common.utilities.timer import Timer
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from spinn_front_end_common.interface.data_generator_interface import \
-    DataGeneratorInterface
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
     import AbstractProvidesNKeysForEdge
@@ -93,7 +91,6 @@ import logging
 import math
 import os
 import sys
-from multiprocessing.pool import ThreadPool
 
 logger = logging.getLogger(__name__)
 
@@ -803,13 +800,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # iterate though subvertexes and call generate_data_spec for each
         # vertex
         executable_targets = dict()
-        no_processors = config.getint("Threading", "dsg_threads")
-        thread_pool = ThreadPool(processes=no_processors)
 
         # create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
-        data_generator_interfaces = list()
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
@@ -822,15 +816,13 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     placement.subvertex)
                 reverse_ip_tags = self._tags.get_reverse_ip_tags_for_vertex(
                     placement.subvertex)
-                data_generator_interface = DataGeneratorInterface(
-                    associated_vertex, placement.subvertex, placement,
-                    self._partitioned_graph, self._partitionable_graph,
-                    self._routing_infos, self._hostname, self._graph_mapper,
+                associated_vertex.generate_data_spec(
+                    placement.subvertex, placement, self._partitioned_graph,
+                    self._partitionable_graph, self._routing_infos,
+                    self._hostname, self._graph_mapper,
                     self._report_default_directory, ip_tags, reverse_ip_tags,
-                    self._writeTextSpecs, self._app_data_runtime_folder,
-                    progress_bar)
-                data_generator_interfaces.append(data_generator_interface)
-                thread_pool.apply_async(data_generator_interface.start)
+                    self._writeTextSpecs, self._app_data_runtime_folder)
+                progress_bar.update()
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
@@ -852,11 +844,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     list_of_core_subsets = [initial_core_subset]
                     executable_targets[binary_path] = \
                         CoreSubsets(list_of_core_subsets)
-
-        for data_generator_interface in data_generator_interfaces:
-            data_generator_interface.wait_for_finish()
-        thread_pool.close()
-        thread_pool.join()
 
         # finish the progress bar
         progress_bar.end()
