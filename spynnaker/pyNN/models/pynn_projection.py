@@ -369,8 +369,9 @@ class Projection(object):
                 weights.extend(row.weights / self._weight_scale)
             return weights
 
-        weights = numpy.zeros((self._projection_edge.pre_vertex.n_atoms,
+        weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
                                self._projection_edge.post_vertex.n_atoms))
+        weights.fill(numpy.nan)
         rows = self._host_based_synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]
