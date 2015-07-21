@@ -13,8 +13,6 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
 from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region\
     import BufferedSendingRegion
 from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spinn_front_end_common.utilities import constants as \
-    front_end_common_constants
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
@@ -39,7 +37,7 @@ from spinnman.messages.eieio.command_messages.event_stop_request\
 from enum import Enum
 import logging
 import sys
-
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -158,8 +156,9 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
                 for neuron in range(vertex_slice.lo_atom,
                                     vertex_slice.hi_atom + 1):
                     for timeStamp in sorted(self._spike_times[neuron]):
-                        time_stamp_in_ticks = int((timeStamp * 1000.0) /
-                                                  self._machine_time_step)
+                        time_stamp_in_ticks = int(
+                            math.ceil((timeStamp * 1000.0) /
+                                      self._machine_time_step))
                         send_buffer.add_key(time_stamp_in_ticks,
                                             neuron - vertex_slice.lo_atom)
             else:
@@ -168,8 +167,9 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
                 # same list:
                 neuron_list = range(vertex_slice.n_atoms)
                 for timeStamp in sorted(self._spike_times):
-                    time_stamp_in_ticks = int((timeStamp * 1000.0) /
-                                              self._machine_time_step)
+                    time_stamp_in_ticks = int(
+                        math.ceil((timeStamp * 1000.0) /
+                                  self._machine_time_step))
 
                     # add to send_buffer collection
                     send_buffer.add_keys(time_stamp_in_ticks, neuron_list)
