@@ -289,7 +289,7 @@ class SpikeSourcePoisson(
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            transciever=txrx, placements=placements,
+            transceiver=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
             spike_recording_region=self._POISSON_SPIKE_SOURCE_REGIONS
                                        .SPIKE_HISTORY_REGION.value,

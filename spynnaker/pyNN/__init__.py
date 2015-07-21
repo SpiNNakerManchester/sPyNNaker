@@ -1,3 +1,4 @@
+# encoding: utf-8
 """
 The :py:mod:`spynnaker.pynn` package contains the frontend specifications
 and implementation for the PyNN High-level API
@@ -5,6 +6,7 @@ and implementation for the PyNN High-level API
 """
 
 import inspect
+from collections import defaultdict
 from ._version import __version__, __version_month__, __version_year__
 
 # utility functions
@@ -133,7 +135,8 @@ def end(stop_on_board=True):
     :param stop_on_board:
     Do any necessary cleaning up before exiting.
 
-    Unregisters the controller
+    Unregisters the controller,
+    prints any data recorded using the low-level API
     """
     global _spinnaker
     _spinnaker.stop(stop_on_board)
@@ -235,8 +238,8 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
         host_name=machine, timestep=timestep, min_delay=min_delay,
         max_delay=max_delay,
         database_socket_addresses=database_socket_addresses)
-    # Return None, simply because the PyNN API says something must be returned
-    return None
+    # the PyNN API expects the MPI rank to be returned
+    return rank()
 
 
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
@@ -264,6 +267,19 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     else:
         raise Exception("{} is not a Vertex type"
                         .format(neuron_type))
+
+
+def register_database_notification_request(hostname, notify_port, ack_port):
+    """
+    Adds a socket system which is registered with the notification protocol
+
+    :param hostname:
+    :param notify_port:
+    :param ack_report:
+    :return:
+    """
+    _spinnaker._add_socket_address(
+        SocketAddress(hostname, notify_port, ack_port))
 
 
 # noinspection PyPep8Naming
@@ -320,3 +336,70 @@ def get_current_time():
     """
     global _spinnaker
     return _spinnaker.get_current_time()
+
+
+# =============================================================================
+#  Low-level API for creating, connecting and recording from individual neurons
+# =============================================================================
+
+def create(cellclass, cellparams=None, n=1):
+    """
+    Create n cells all of the same type.
+
+    If n > 1, return a list of cell ids/references.
+    If n==1, return just the single id.
+    """
+    if cellparams is None:
+        cellparams = {}
+    return Population(n, cellclass, cellparams)
+
+
+def connect(source, target, weight=0.0, delay=None, synapse_type="excitatory",
+            p=1, rng=None):
+    """
+    Connect a source of spikes to a synaptic target.
+
+    source and target can both be individual cells or lists of cells, in
+    which case all possible connections are made with probability p, using
+    either the random number generator supplied, or the default rng
+    otherwise. Weights should be in nA or µS.
+    """
+    connector = FixedProbabilityConnector(p_connect=p, weights=weight,
+                                          delays=delay)
+    return Projection(source, target, connector, target=synapse_type, rng=rng)
+
+
+def set(cells, param, val=None):
+    """
+    Set one or more parameters of an individual cell or list of cells.
+
+    param can be a dict, in which case val should not be supplied, or a string
+    giving the parameter name, in which case val is the parameter value.
+    """
+    assert isinstance(cells, Population)
+    cells.set(param, val)
+
+
+def initialize(cells, variable, value):
+    cells.initialize(variable, value)
+
+
+def record(source, filename):
+    """
+    Record spikes to a file. source should be a Population.
+    """
+    source.record(to_file=filename)
+
+
+def record_v(source, filename):
+    """
+    Record spikes to a file. source should be a Population.
+    """
+    source.record_v(to_file=filename)
+
+
+def record_gsyn(source, filename):
+    """
+    Record spikes to a file. source should be a Population.
+    """
+    source.record_gsyn(to_file=filename)

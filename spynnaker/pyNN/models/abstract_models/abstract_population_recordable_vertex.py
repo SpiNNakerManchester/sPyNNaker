@@ -96,8 +96,11 @@ class AbstractPopulationRecordableVertex(object):
             (x, y, p) = placement.x, placement.y, placement.p
             subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
             lo_atom = subvertex_slice.lo_atom
+            hi_atom = subvertex_slice.hi_atom
+
             logger.debug("Reading spikes from chip {}, {}, core {}, "
-                         "lo_atom {}".format(x, y, p, lo_atom))
+                         "lo_atom {} hi_atom {}".format(
+                             x, y, p, lo_atom, hi_atom))
 
             # Get the App Data for the core
             app_data_base_address = \
@@ -206,9 +209,8 @@ class AbstractPopulationRecordableVertex(object):
                 number_of_bytes_written)
 
             vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-            n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
 
-            bytes_per_time_step = n_atoms * 4
+            bytes_per_time_step = vertex_slice.n_atoms * 4
 
             number_of_time_steps_written = \
                 number_of_bytes_written / bytes_per_time_step
@@ -220,11 +222,12 @@ class AbstractPopulationRecordableVertex(object):
                 neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
                 32767.0)
             values = numpy.append(values, numpy_data)
-            times = numpy.append(
-                times, numpy.repeat(range(numpy_data.size / n_atoms),
-                                    n_atoms) * ms_per_tick)
+            times = numpy.append(times, numpy.repeat(
+                range(numpy_data.size / vertex_slice.n_atoms),
+                vertex_slice.n_atoms) * ms_per_tick)
             ids = numpy.append(ids, numpy.add(
-                numpy.arange(numpy_data.size) % n_atoms, vertex_slice.lo_atom))
+                numpy.arange(numpy_data.size) % vertex_slice.n_atoms,
+                vertex_slice.lo_atom))
             progress_bar.update()
 
         progress_bar.end()
