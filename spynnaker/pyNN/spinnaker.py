@@ -951,7 +951,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         spinnaker_link_id = virtual_vertex.get_spinnaker_link_id
         spinnaker_link_data = \
             self._machine.locate_connected_chips_coords_and_link(
-            config.getint("Machine", "version"), spinnaker_link_id)
+                config.getint("Machine", "version"), spinnaker_link_id)
         virtual_link_id = (spinnaker_link_data.connected_link + 3) % 6
         to_virtual_chip_link = Link(
             destination_x=virtual_vertex.virtual_chip_x,
