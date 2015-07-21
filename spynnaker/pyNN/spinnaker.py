@@ -118,6 +118,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._database_socket_addresses = set()
         self._database_interface = None
         self._create_database = None
+        self._populations = list()
 
         if self._app_id is None:
             self._set_up_main_objects(
@@ -281,9 +282,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # add database generation if requested
         needs_database = self._auto_detect_database(self._partitioned_graph)
-        user_create_database = config.getboolean("Database", "create_database")
-        if ((user_create_database is None and needs_database) or
-                user_create_database):
+        user_create_database = config.get("Database", "create_database")
+        if ((user_create_database == "None" and needs_database) or
+                user_create_database == "True"):
             wait_on_confirmation = config.getboolean(
                 "Database", "wait_on_confirmation")
             self._database_interface = DataBaseInterface(
@@ -902,6 +903,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
 
+    def _add_population(self, population):
+        """ Called by each population to add itself to the list
+        """
+        self._populations.append(population)
+
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,
             source, target, synapse_dynamics, label, rng):
@@ -994,18 +1000,20 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
         """
-        :param turn_off_machine: decides if the machine should be powered down
-        after running the exeuction. Note that this powers down all boards
-        connected to the BMP connections given to the transciever
+        :param turn_off_machine: decides if the machine should be powered down\
+            after running the exeuction. Note that this powers down all boards\
+            connected to the BMP connections given to the transciever
         :type turn_off_machine: bool
-        :param clear_routing_tables: informs the tool chain if it
-        should turn off the clearing of the routing tables
+        :param clear_routing_tables: informs the tool chain if it\
+            should turn off the clearing of the routing tables
         :type clear_routing_tables: bool
-        :param clear_tags: informs the tool chain if it should clear the tags
-        off the machine at stop
+        :param clear_tags: informs the tool chain if it should clear the tags\
+            off the machine at stop
         :type clear_tags: boolean
         :return: None
         """
+        for population in self._populations:
+            population._end()
 
         if turn_off_machine is None:
             config.getboolean("Machine", "turn_off_machine")
