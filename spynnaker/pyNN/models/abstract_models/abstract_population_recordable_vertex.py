@@ -75,7 +75,7 @@ class AbstractPopulationRecordableVertex(object):
                 (self._no_machine_time_steps * bytes_per_timestep))
 
     def _get_spikes(
-            self, graph_mapper, placements, transciever, compatible_output,
+            self, graph_mapper, placements, transceiver, compatible_output,
             spike_recording_region, sub_vertex_out_spike_bytes_function):
         """
         Return a 2-column numpy array containing cell ids and spike times for
@@ -104,20 +104,20 @@ class AbstractPopulationRecordableVertex(object):
 
             # Get the App Data for the core
             app_data_base_address = \
-                transciever.get_cpu_information_from_core(x, y, p).user[0]
+                transceiver.get_cpu_information_from_core(x, y, p).user[0]
 
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address, spike_recording_region)
-            spike_region_base_address_buf = transciever.read_memory(
+            spike_region_base_address_buf = transceiver.read_memory(
                 x, y, spike_region_base_address_offset, 4)
             spike_region_base_address = struct.unpack_from(
                 "<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
 
             # Read the spike data size
-            number_of_bytes_written_buf = transciever.read_memory(
+            number_of_bytes_written_buf = transceiver.read_memory(
                 x, y, spike_region_base_address, 4)
             number_of_bytes_written = struct.unpack_from(
                 "<I", number_of_bytes_written_buf)[0]
@@ -139,7 +139,7 @@ class AbstractPopulationRecordableVertex(object):
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            spike_data = transciever.read_memory(
+            spike_data = transceiver.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
             numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
                 dtype="uint32").byteswap().view("uint8")
