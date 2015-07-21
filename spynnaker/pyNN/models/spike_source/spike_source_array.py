@@ -14,8 +14,6 @@ from spinn_front_end_common.interface.buffer_management.storage_objects\
     .buffered_sending_region import BufferedSendingRegion
 from spinn_front_end_common.interface.buffer_management.buffer_manager \
     import BufferManager
-from spinn_front_end_common.utilities import constants as \
-    front_end_common_constants
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
