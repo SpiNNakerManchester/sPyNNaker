@@ -61,8 +61,6 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesProvanenceData
 
 # local front end imports
-from spinn_front_end_common.utilities.notification_protocol.\
-    socket_address import SocketAddress
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
@@ -111,19 +109,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         SpynnakerConfigurationFunctions.__init__(self)
         FrontEndCommonProvanenceFunctions.__init__(self)
 
-        # database objects
-        self._create_database = config.getboolean(
-            "Database", "create_database")
-
-        if database_socket_addresses is None:
-            database_socket_addresses = list()
-            listen_port = config.getint("Database", "listen_port")
-            notify_port = config.getint("Database", "notify_port")
-            noftiy_hostname = config.get("Database", "notify_hostname")
-            database_socket_addresses.append(
-                SocketAddress(noftiy_hostname, notify_port, listen_port))
-        self._database_socket_addresses = database_socket_addresses
+        self._database_socket_addresses = set()
         self._database_interface = None
+        self._create_database = None
+        self._populations = list()
 
         if self._app_id is None:
             self._set_up_main_objects(
@@ -184,8 +173,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
-        self._create_database = config.getboolean(
-            "Database", "create_database")
 
         # Determine default executable folder location
         # and add this default to end of list of search paths
@@ -310,8 +297,17 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if do_timing:
             timer.take_sample()
 
-        # load database if needed
-        if self._create_database:
+        # add database generation if requested
+        needs_database = self._auto_detect_database(self._partitioned_graph)
+        user_create_database = config.get("Database", "create_database")
+        if ((user_create_database == "None" and needs_database) or
+                user_create_database == "True"):
+            wait_on_confirmation = config.getboolean(
+                "Database", "wait_on_confirmation")
+            self._database_interface = SpynnakerDataBaseInterface(
+                self._app_data_runtime_folder, wait_on_confirmation,
+                self._database_socket_addresses)
+
             self._database_interface.add_system_params(
                 self._time_scale_factor, self._machine_time_step,
                 self._runtime)
@@ -356,7 +352,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._hostname, self._placements, self._graph_mapper,
                 write_text_specs=config.getboolean(
                     "Reports", "writeTextSpecs"),
-                runtime_application_data_folder=self._app_data_runtime_folder)
+                runtime_application_data_folder=self._app_data_runtime_folder,
+                machine=self._machine)
 
         if self._reports_states is not None:
             reports.write_memory_map_report(self._report_default_directory,
@@ -890,6 +887,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
 
+    def _add_population(self, population):
+        """ Called by each population to add itself to the list
+        """
+        self._populations.append(population)
+
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,
             source, target, synapse_dynamics, label, rng):
@@ -980,18 +982,20 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
         """
-        :param turn_off_machine: decides if the machine should be powered down
-        after running the exeuction. Note that this powers down all boards
-        connected to the BMP connections given to the transciever
+        :param turn_off_machine: decides if the machine should be powered down\
+            after running the exeuction. Note that this powers down all boards\
+            connected to the BMP connections given to the transciever
         :type turn_off_machine: bool
-        :param clear_routing_tables: informs the tool chain if it
-        should turn off the clearing of the routing tables
+        :param clear_routing_tables: informs the tool chain if it\
+            should turn off the clearing of the routing tables
         :type clear_routing_tables: bool
-        :param clear_tags: informs the tool chain if it should clear the tags
-        off the machine at stop
+        :param clear_tags: informs the tool chain if it should clear the tags\
+            off the machine at stop
         :type clear_tags: boolean
         :return: None
         """
+        for population in self._populations:
+            population._end()
 
         if turn_off_machine is None:
             config.getboolean("Machine", "turn_off_machine")
@@ -1032,3 +1036,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # stop the transciever
         self._txrx.close()
+
+    def _add_socket_address(self, socket_address):
+        """
+
+        :param socket_address:
+        :return:
+        """
+        self._database_socket_addresses.add(socket_address)
