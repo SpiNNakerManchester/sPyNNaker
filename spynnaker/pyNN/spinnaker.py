@@ -118,6 +118,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._database_socket_addresses = set()
         self._database_interface = None
         self._create_database = None
+        self._populations = list()
 
         if self._app_id is None:
             self._set_up_main_objects(
@@ -902,6 +903,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
 
+    def _add_population(self, population):
+        """ Called by each population to add itself to the list
+        """
+        self._populations.append(population)
+
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,
             source, target, synapse_dynamics, label, rng):
@@ -942,25 +948,27 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         sdram_object = SDRAM()
 
         # creates the two links
-        virtual_link_id = (virtual_vertex
-                           .connected_to_real_chip_link_id + 3) % 6
+        spinnaker_link_id = virtual_vertex.get_spinnaker_link_id
+        spinnaker_link_data = \
+            self._machine.locate_connected_chips_coords_and_link(
+                config.getint("Machine", "version"), spinnaker_link_id)
+        virtual_link_id = (spinnaker_link_data.connected_link + 3) % 6
         to_virtual_chip_link = Link(
             destination_x=virtual_vertex.virtual_chip_x,
             destination_y=virtual_vertex.virtual_chip_y,
-            source_x=virtual_vertex.connected_to_real_chip_x,
-            source_y=virtual_vertex.connected_to_real_chip_y,
+            source_x=spinnaker_link_data.connected_chip_x,
+            source_y=spinnaker_link_data.connected_chip_y,
             multicast_default_from=virtual_link_id,
             multicast_default_to=virtual_link_id,
-            source_link_id=virtual_vertex.connected_to_real_chip_link_id)
+            source_link_id=spinnaker_link_data.connected_link)
 
         from_virtual_chip_link = Link(
-            destination_x=virtual_vertex.connected_to_real_chip_x,
-            destination_y=virtual_vertex.connected_to_real_chip_y,
+            destination_x=spinnaker_link_data.connected_chip_x,
+            destination_y=spinnaker_link_data.connected_chip_y,
             source_x=virtual_vertex.virtual_chip_x,
             source_y=virtual_vertex.virtual_chip_y,
-            multicast_default_from=(virtual_vertex
-                                    .connected_to_real_chip_link_id),
-            multicast_default_to=virtual_vertex.connected_to_real_chip_link_id,
+            multicast_default_from=(spinnaker_link_data.connected_link),
+            multicast_default_to=spinnaker_link_data.connected_link,
             source_link_id=virtual_link_id)
 
         # create the router
@@ -979,8 +987,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # connect the real chip with the virtual one
         connected_chip = self._machine.get_chip_at(
-            virtual_vertex.connected_to_real_chip_x,
-            virtual_vertex.connected_to_real_chip_y)
+            spinnaker_link_data.connected_chip_x,
+            spinnaker_link_data.connected_chip_y)
         connected_chip.router.add_link(to_virtual_chip_link)
 
         # return new v chip
@@ -992,18 +1000,20 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
         """
-        :param turn_off_machine: decides if the machine should be powered down
-        after running the exeuction. Note that this powers down all boards
-        connected to the BMP connections given to the transciever
+        :param turn_off_machine: decides if the machine should be powered down\
+            after running the exeuction. Note that this powers down all boards\
+            connected to the BMP connections given to the transciever
         :type turn_off_machine: bool
-        :param clear_routing_tables: informs the tool chain if it
-        should turn off the clearing of the routing tables
+        :param clear_routing_tables: informs the tool chain if it\
+            should turn off the clearing of the routing tables
         :type clear_routing_tables: bool
-        :param clear_tags: informs the tool chain if it should clear the tags
-        off the machine at stop
+        :param clear_tags: informs the tool chain if it should clear the tags\
+            off the machine at stop
         :type clear_tags: boolean
         :return: None
         """
+        for population in self._populations:
+            population._end()
 
         if turn_off_machine is None:
             config.getboolean("Machine", "turn_off_machine")
