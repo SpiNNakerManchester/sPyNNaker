@@ -1,24 +1,27 @@
+"""
+ProjectionPartitionableEdge
+"""
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 from pacman.utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.utilities import conf
-import copy
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
-from spynnaker.pyNN.models.neural_properties.synapse_row_info \
-    import SynapseRowInfo
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 
 from spinn_front_end_common.utilities.timer import Timer
 
 import logging
+import copy
 logger = logging.getLogger(__name__)
 
 
 class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
+    """
+    the partitionable edge for a projection (high level edge)
+    """
 
     def __init__(self, presynaptic_population, postsynaptic_population,
                  machine_time_step, connector=None, synapse_list=None,

@@ -3,10 +3,7 @@ DelayPartitionableEdge
 """
 
 # spynnaker imports
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 import copy
-from spynnaker.pyNN.models.neural_properties.synapse_row_info \
-    import SynapseRowInfo
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \

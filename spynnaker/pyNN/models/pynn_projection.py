@@ -1,7 +1,9 @@
+"""
+Projection
+"""
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-import copy
 
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import AbstractPopulationVertex
@@ -24,6 +26,7 @@ from spinn_front_end_common.utilities import exceptions
 import logging
 import math
 import numpy
+import copy
 
 logger = logging.getLogger(__name__)
 
