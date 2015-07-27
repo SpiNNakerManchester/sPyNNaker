@@ -207,6 +207,17 @@ class Population(object):
 
         """
         if self._gsyn is None:
+            if not self._vertex.record_gsyn:
+                raise exceptions.ConfigurationException(
+                    "This population has not been set to record gsyn. "
+                    "Therefore gsyn cannot be retrieved. Please set this "
+                    "vertex to record gsyn before running this command.")
+
+            if not self._spinnaker.has_ran:
+                raise local_exceptions.SpynnakerException(
+                    "The simulation has not yet ran, therefore gsyn cannot"
+                    " be retrieved. Please execute the simulation before"
+                    " running this command")
             timer = None
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
@@ -236,6 +247,18 @@ class Population(object):
         :type compatible_output: bool
         """
         if self._v is None:
+            if not self._vertex.record_v:
+                raise exceptions.ConfigurationException(
+                    "This population has not been set to record v. "
+                    "Therefore v cannot be retrieved. Please set this "
+                    "vertex to record v before running this command.")
+
+            if not self._spinnaker.has_ran:
+                raise local_exceptions.SpynnakerException(
+                    "The simulation has not yet ran, therefore v cannot"
+                    " be retrieved. Please execute the simulation before"
+                    " running this command")
+
             timer = None
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
