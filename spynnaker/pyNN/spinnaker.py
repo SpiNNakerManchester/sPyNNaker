@@ -229,21 +229,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             virtual_has_wrap_arounds=config.getboolean(
                 "Machine", "requires_wrap_arounds"))
 
-        # add database generation if requested
-        if self._create_database:
-            wait_on_confirmation = \
-                config.getboolean("Database", "wait_on_confirmation")
-            self._database_interface = SpynnakerDataBaseInterface(
-                self._app_data_runtime_folder, wait_on_confirmation,
-                self._database_socket_addresses)
-
-            # if using a reload script, add if that needs to wait for
-            # confirmation
-            if self._reports_states.transciever_report:
-                self._reload_script.wait_on_confirmation = wait_on_confirmation
-                for socket_address in self._database_socket_addresses:
-                    self._reload_script.add_socket_address(socket_address)
-
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
         if self._reports_states.transciever_report:
@@ -302,6 +287,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         user_create_database = config.get("Database", "create_database")
         if ((user_create_database == "None" and needs_database) or
                 user_create_database == "True"):
+
             wait_on_confirmation = config.getboolean(
                 "Database", "wait_on_confirmation")
             self._database_interface = SpynnakerDataBaseInterface(
@@ -332,6 +318,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     partitionable_graph=self._partitionable_graph,
                     partitioned_graph=self._partitioned_graph,
                     routing_infos=self._routing_infos)
+            # if using a reload script, add if that needs to wait for
+            # confirmation
+            if self._reports_states.transciever_report:
+                self._reload_script.wait_on_confirmation = wait_on_confirmation
+                for socket_address in self._database_socket_addresses:
+                    self._reload_script.add_socket_address(socket_address)
             self._database_interface.send_read_notification()
 
         # execute data spec generation
