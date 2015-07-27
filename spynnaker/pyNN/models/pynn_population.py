@@ -178,7 +178,7 @@ class Population(object):
 
             if not self._spinnaker.has_ran:
                 raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet ran, therefore spikes cannot"
+                    "The simulation has not yet run, therefore spikes cannot"
                     " be retrieved. Please execute the simulation before"
                     " running this command")
             if conf.config.getboolean("Reports", "outputTimesForSections"):
@@ -215,7 +215,7 @@ class Population(object):
 
             if not self._spinnaker.has_ran:
                 raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet ran, therefore gsyn cannot"
+                    "The simulation has not yet run, therefore gsyn cannot"
                     " be retrieved. Please execute the simulation before"
                     " running this command")
             timer = None
@@ -255,7 +255,7 @@ class Population(object):
 
             if not self._spinnaker.has_ran:
                 raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet ran, therefore v cannot"
+                    "The simulation has not yet run, therefore v cannot"
                     " be retrieved. Please execute the simulation before"
                     " running this command")
 
