@@ -187,17 +187,15 @@ class AbstractPopulationDataSpec(
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
 
-        # Write the number of parameters per neuron (struct size in words):
-        params = self.get_parameters()
-
-        # noinspection PyTypeChecker
-        spec.write_value(data=len(params))
+        # Write flush time
+        spec.write_value(data=1000)
 
         # Write machine time step: (Integer, expressed in microseconds)
         spec.write_value(data=self._machine_time_step)
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
+        params = self.get_parameters()
         for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
             # Process the parameters
 

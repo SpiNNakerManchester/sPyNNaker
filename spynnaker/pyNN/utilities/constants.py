@@ -30,7 +30,7 @@ GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
 INFINITE_SIMULATION = 4294967295
 
 # from synaptic manager
-# Words - 2 for row lenth and number of rows and 1 for plastic region size
+# Words - 2 for row length and number of rows and 1 for plastic region size
 # (which might be 0)
 SYNAPTIC_ROW_HEADER_WORDS = 2 + 1
 
@@ -84,8 +84,9 @@ POPULATION_SYSTEM_REGION_BYTES = (DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS +
                                   N_POPULATION_RECORDING_REGIONS + 1) * 4
 
 # The size of the headers of a population neuron region
-# (1 word each for has_key, key, n_neurons, n_params, ODE timestep)
-POPULATION_NEURON_PARAMS_HEADER_BYTES = 20
+# (1 word apiece for use_key, key, num_neurons,
+# flush_time and sim_time_step_us)
+POPULATION_NEURON_PARAMS_HEADER_BYTES = (5 * 4)
 
 # The default routing mask to use
 DEFAULT_MASK = 0xfffff800

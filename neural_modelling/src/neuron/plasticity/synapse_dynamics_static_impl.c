@@ -18,12 +18,14 @@ void synapse_dynamics_process_post_synaptic_event(
 }
 
 //---------------------------------------
-void synapse_dynamics_process_plastic_synapses(address_t plastic_region_address,
-        address_t fixed_region_address, weight_t *ring_buffer, uint32_t time) {
+void synapse_dynamics_process_plastic_synapses(
+        address_t plastic_region_address, address_t fixed_region_address,
+        weight_t *ring_buffer, uint32_t time, bool flush) {
     use(plastic_region_address);
     use(fixed_region_address);
     use(ring_buffer);
     use(time);
+    use(flush);
 
     log_error("There should be no plastic synapses!");
 }

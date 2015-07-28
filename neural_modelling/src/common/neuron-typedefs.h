@@ -59,7 +59,7 @@ static inline key_t spike_key(spike_t s) {
 
 //! \brief helper method to retrieve the pay-load from a spike
 //! \param[in] s: the spike to get the pay-load from
-//! \return payload_t: the pay-load from the spike (default-ly set to zero if
+//! \return payload_t: the pay-load from the spike (defaults to zero if
 //!                    the model is not compiled with SPIKES_WITH_PAYLOADS)
 
 static inline payload_t spike_payload(spike_t s) {
@@ -69,15 +69,33 @@ static inline payload_t spike_payload(spike_t s) {
 #endif /*SPIKES_WITH_PAYLOADS*/
 #endif /*__SPIKE_T__*/
 
+#define FLUSH_BIT 0x80000
+
+//! \brief helper method to determine whether a spike is a flush event or not
+//! \param[in] key: the key from the spike
+//! \return bool: whether the spike is a flush or not
+static inline bool spike_is_flush(key_t key)
+{
+  return ((key & FLUSH_BIT) != 0);
+}
+
+//! \brief helper method to strip flush bit from spike key
+//! \param[in] key: the key from the spike
+//! \return key: the key with the flush bit cleared
+static inline key_t spike_clear_flush(key_t key)
+{
+  return (key & ~FLUSH_BIT);
+}
+
 // The type of a synaptic row
 typedef address_t synaptic_row_t;
 
 // The type of an input
 typedef REAL input_t;
 
-
-
 // The type of a state variable
 typedef REAL state_t;
+
+
 
 #endif /* __NEURON_TYPEDEFS_H__ */

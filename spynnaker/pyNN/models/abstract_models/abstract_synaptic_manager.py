@@ -22,6 +22,8 @@ from spynnaker.pyNN.utilities import conf
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_mask_constraint \
+    import KeyAllocatorFixedMaskConstraint
 
 # dsg imports
 from data_specification.enums.data_type import DataType
@@ -812,7 +814,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                     " (aka, something funkky happened)")
         return block, maxed_row_length
 
-    # inhirrted from AbstractProvidesIncomingEdgeConstraints
+    # inherited from AbstractProvidesIncomingEdgeConstraints
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
         """
 
@@ -820,4 +822,9 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         :param graph_mapper:
         :return:
         """
-        return self._master_pop_table_generator.get_edge_constraints()
+        # **HACK** fixed mask to allow flushing bit - correct
+        # solution is to allow addition of fixed bits to keyspace
+        fixed_mask = KeyAllocatorFixedMaskConstraint(mask=0x7FF00000)
+        constraints = self._master_pop_table_generator.get_edge_constraints()
+        constraints.append(fixed_mask)
+        return constraints

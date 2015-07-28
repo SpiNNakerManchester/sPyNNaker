@@ -236,13 +236,13 @@ void synapse_dynamics_process_plastic_synapses(
     const uint32_t last_pre_time = event_history->prev_time;
     const pre_trace_t last_pre_trace = event_history->prev_trace;
 
-    // Update pre-synaptic trace
+    // Update pre-synaptic trace if this isn't a flush event
     if(!flush)
     {
       log_debug("Adding pre-synaptic event to trace at time:%u", time);
       event_history->prev_time = time;
       event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
-                                                      last_pre_trace, flush);
+                                                       last_pre_trace);
     }
 
     // Loop through plastic synapses
@@ -273,7 +273,7 @@ void synapse_dynamics_process_plastic_synapses(
         // If the initiating event wasn't a flush
         if(!flush)
         {
-            // Convert into ring buffer offset
+            // Calculate delayed offset into ring buffer
             uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
                     delay_axonal + delay_dendritic + time, type_index);
 

@@ -51,17 +51,22 @@ static uint32_t buffer_being_read;
 
 static inline void _setup_synaptic_dma_read() {
 
-    // If there's more incoming spikes
-    spike_t spike;
+    // If there's more incoming events
+    spike_t key;
     uint32_t setup_done = false;
-    while (!setup_done && in_spikes_get_next_spike(&spike)) {
-        log_debug("Checking for row for spike 0x%.8x\n", spike);
+    while (!setup_done && in_spikes_get_next_spike(&key)) {
+        // Determine whether event was caused by a flush or not
+        bool flush = spike_is_flush(key);
 
-        // Decode spike to get address of destination synaptic row
+        // Strip out flush bit
+        key = spike_clear_flush(key);
+
+        log_info("Checking for row for spike 0x%.8x (flush:%u)\n", key, flush);
+
+        // Get address of synaptic row corresponding to source key
         address_t row_address;
         size_t n_bytes_to_transfer;
-
-        if (population_table_get_address(spike, &row_address,
+        if (population_table_get_address(key, &row_address,
                 &n_bytes_to_transfer)) {
 
             // **HACK** doesn't copy enough data for plastic rows so add some words!
@@ -71,7 +76,7 @@ static inline void _setup_synaptic_dma_read() {
             // Key of the originating spike to the beginning of dma buffer
             dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
             next_buffer->sdram_writeback_address = row_address + 1;
-            next_buffer->originating_spike = spike;
+            next_buffer->originating_spike = key;
             next_buffer->flush = flush;
 
             // Start a DMA transfer to fetch this synaptic row into current

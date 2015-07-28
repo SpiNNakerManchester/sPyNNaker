@@ -30,7 +30,7 @@ static bool use_key;
 static uint32_t flush_time;
 
 //! The number of neurons on the core
-static uint32_t n_neurons;
+static uint32_t num_neurons;
 
 //! The recording flags
 uint32_t recording_flags;
@@ -44,12 +44,12 @@ static uint16_t *time_since_last_spike = NULL;
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum neuron_region_params {
-    has_key,
-    transmission_key,
-    number_of_neurons_to_simulate,
-    flush_time,
-    machine_time_step_us,
-    params_start,
+    e_use_key,
+    e_key,
+    e_num_neurons,
+    e_flush_time,
+    e_sim_time_step_us,
+    e_params_start,
 } neuron_region_params;
 
 
@@ -71,17 +71,18 @@ static inline void _print_neurons() {
 //!            NEURON_PARAMS data region in SDRAM
 //! \param[in] recording_flags_param the recordings parameters
 //!            (contains which regions are active and how big they are)
-//! \param[out] n_neurons_value The number of neurons this model is to emulate
+//! \param[out] num_neurons_value The number of neurons this model is to emulate
 //! \return boolean which is True is the translation was successful
 //! otherwise False
 bool neuron_initialise(address_t address, uint32_t recording_flags_param,
-        uint32_t *n_neurons_value) {
+        uint32_t *num_neurons_value) {
     log_info("neuron_initialise: starting");
 
     // Check if theres a key to use
-    use_key = address[has_key];
+    use_key = address[e_use_key];
+
     // Read the spike key to use
-    key = address[transmission_key];
+    key = address[e_key];
 
     // output if this model is expecting to transmit
     if (!use_key){
@@ -92,44 +93,44 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     }
 
     // Read the neuron details
-    n_neurons = address[number_of_neurons_to_simulate];
-    flush_time = address[flush_time];
-    *n_neurons_value = n_neurons;
-    timer_t timestep = address[machine_time_step_us];
+    num_neurons = address[e_num_neurons];
+    flush_time = address[e_flush_time];
+    *num_neurons_value = num_neurons;
+    timer_t sim_time_step_us = address[e_sim_time_step_us];
 
-    log_info("\tneurons = %u, time step = %u, flush time = %u",
-             n_neurons, timestep, flush_time);
+    log_info("\tneurons = %u, simulations time step = %uus, flush time = %u",
+             num_neurons, sim_time_step_us, flush_time);
 
     // If a flush time is specified
     if(flush_time != UINT32_MAX)
     {
         // Allocate counter for each neuron
-        time_since_last_spike = (uint16_t*)spin1_malloc(n_neurons * sizeof(uint16_t));
+        time_since_last_spike = (uint16_t*)spin1_malloc(num_neurons * sizeof(uint16_t));
 
         if (time_since_last_spike == NULL) {
             log_error("Unable to allocate time since last spike array - Out of DTCM");
             return false;
         }
         // Zero counters
-        memset(time_since_last_spike, 0, n_neurons * sizeof(uint16_t));
+        memset(time_since_last_spike, 0, num_neurons * sizeof(uint16_t));
     }
 
     // Allocate DTCM for new format neuron array and copy block of data
-    neuron_array = (neuron_t*) spin1_malloc(n_neurons * sizeof(neuron_t));
+    neuron_array = (neuron_t*) spin1_malloc(num_neurons * sizeof(neuron_t));
     if (neuron_array == NULL) {
         log_error("Unable to allocate neuron array - Out of DTCM");
         return false;
     }
-    memcpy(neuron_array, &address[params_start],
-           n_neurons * sizeof(neuron_t));
+    memcpy(neuron_array, &address[e_params_start],
+           num_neurons * sizeof(neuron_t));
 
     // Set up the out spikes array
-    if (!out_spikes_initialize(n_neurons)) {
+    if (!out_spikes_initialize(num_neurons)) {
         return false;
     }
 
-    // Set up the neuron model
-    neuron_model_set_machine_timestep(timestep);
+    // Pass time step to neuron model
+    neuron_model_set_machine_timestep(sim_time_step_us);
 
     recording_flags = recording_flags_param;
 
@@ -151,7 +152,7 @@ void neuron_do_timestep_update(timer_t time) {
     use(time);
 
     // update each neuron individually
-    for (index_t n = 0; n < n; n++) {
+    for (index_t n = 0; n < num_neurons; n++) {
         neuron_pointer_t neuron = &neuron_array[n];
 
         // Get excitatory and inhibitory input from synapses
@@ -186,23 +187,34 @@ void neuron_do_timestep_update(timer_t time) {
                              &temp_record_input, sizeof(input_t));
         }*/
 
-        // If this neuron hasn't spiked and flushing is enabled
+        // If flushing is enabled
         bool flush = false;
-        if(time_since_last_spike != NULL && !spike)
+        if(time_since_last_spike != NULL)
         {
-            // Increment time since last spike
-            time_since_last_spike[n]++;
-
-            // If flush time has elapsed, set flag and clear timer
-            if(time_since_last_spike[n] > flush_time)
+            // If neuron's spiked, reset time since last spike
+            if(spike)
             {
-              flush = true;
-              time_since_last_spike = 0;
+                time_since_last_spike[n] = 0;
+            }
+            // Otherwise
+            else
+            {
+                // Increment time since last spike
+                time_since_last_spike[n]++;
+
+                // If flush time has elapsed, set flag and clear timer
+                if(time_since_last_spike[n] > flush_time)
+                {
+                  flush = true;
+                  time_since_last_spike[n] = 0;
+                }
             }
         }
 
         // If the neuron has spiked or a flush is required
         if (spike || flush) {
+            // Build source key
+            key_t neuron_key = key | n;
 
             if(spike)
             {
@@ -217,13 +229,15 @@ void neuron_do_timestep_update(timer_t time) {
             else
             {
                 log_debug("neuron %u flushing", n);
+
+                // Set flush bit in key
+                neuron_key |= FLUSH_BIT;
             }
 
             // If this neuron actually transmits, do so!
-            // **TODO** set flush bit in key
             if(use_key)
             {
-                while (!spin1_send_mc_packet(key | n, 0, NO_PAYLOAD)) {
+                while (!spin1_send_mc_packet(neuron_key, 0, NO_PAYLOAD)) {
                     spin1_delay_us(1);
                 }
             }
