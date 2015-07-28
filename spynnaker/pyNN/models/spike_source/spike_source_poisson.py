@@ -69,8 +69,7 @@ class SpikeSourcePoisson(
         self._seed = seed
 
         if duration is None:
-            self._duration = ((4294967295.0 - self._start) /
-                              (1000.0 * machine_time_step))
+            self._duration = 0xFFFFFFFF
 
     @property
     def model_name(self):
