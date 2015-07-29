@@ -39,7 +39,7 @@ class AbstractPopulationDataSpec(
 
     def __init__(self, binary, n_neurons, label, constraints,
                  max_atoms_per_core, machine_time_step, timescale_factor,
-                 spikes_per_second, ring_buffer_sigma,
+                 spikes_per_second, ring_buffer_sigma, flush_time,
                  master_pop_algorithm=None):
         AbstractSynapticManager.__init__(self, master_pop_algorithm)
         AbstractPartitionablePopulationVertex.__init__(
@@ -51,6 +51,7 @@ class AbstractPopulationDataSpec(
         self._binary = binary
         self._spikes_per_second = spikes_per_second
         self._ring_buffer_sigma = ring_buffer_sigma
+        self._flush_time = flush_time
 
     def _reserve_population_based_memory_regions(
             self, spec, neuron_params_sz, synapse_params_sz,
@@ -188,7 +189,7 @@ class AbstractPopulationDataSpec(
         spec.write_value(data=n_atoms)
 
         # Write flush time
-        spec.write_value(data=100)
+        spec.write_value(data=0xFFFFFFFF if self._flush_time is None else self._flush_time)
 
         # Write machine time step: (Integer, expressed in microseconds)
         spec.write_value(data=self._machine_time_step)

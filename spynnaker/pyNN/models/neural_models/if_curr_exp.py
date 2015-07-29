@@ -28,10 +28,10 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
-                 spikes_per_second, ring_buffer_sigma, constraints=None,
-                 label=None, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
-                 v_thresh=-50.0, tau_syn_E=5.0, tau_syn_I=5.0, tau_refrac=0.1,
-                 i_offset=0, v_init=None):
+                 spikes_per_second, ring_buffer_sigma, flush_time=None,
+                 constraints=None, label=None, tau_m=20.0, cm=1.0,
+                 v_rest=-65.0, v_reset=-65.0, v_thresh=-50.0, tau_syn_E=5.0,
+                 tau_syn_I=5.0, tau_refrac=0.1, i_offset=0, v_init=None):
         # Instantiate the parent classes
         AbstractExponentialPopulationVertex.__init__(
             self, n_neurons=n_neurons, tau_syn_E=tau_syn_E,
@@ -48,7 +48,8 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
-            ring_buffer_sigma=ring_buffer_sigma)
+            ring_buffer_sigma=ring_buffer_sigma,
+            flush_time=flush_time)
 
     @property
     def model_name(self):

@@ -23,7 +23,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
 
     def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
                  machine_time_step, timescale_factor, spikes_per_second,
-                 ring_buffer_sigma, weight_scale=1.0, constraints=None):
+                 ring_buffer_sigma, flush_time, weight_scale=1.0, constraints=None):
 
         AbstractPopulationRecordableVertex.__init__(
             self, machine_time_step, label)
@@ -33,6 +33,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             timescale_factor=timescale_factor,
             max_atoms_per_core=max_atoms_per_core,
             spikes_per_second=spikes_per_second,
+            flush_time=flush_time,
             ring_buffer_sigma=ring_buffer_sigma)
         self._n_params = n_params
         self._weight_scale = weight_scale

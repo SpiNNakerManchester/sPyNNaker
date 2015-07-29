@@ -18,9 +18,10 @@ class IzhikevichCurrentExponentialPopulation(
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
-                 spikes_per_second, ring_buffer_sigma, constraints=None,
-                 label=None, a=0.02, c=-65.0, b=0.2, d=2.0, i_offset=0,
-                 u_init=-14.0, v_init=-70.0, tau_syn_E=5.0, tau_syn_I=5.0):
+                 spikes_per_second, ring_buffer_sigma, flush_time=None,
+                 constraints=None, label=None, a=0.02, c=-65.0, b=0.2, d=2.0,
+                 i_offset=0, u_init=-14.0, v_init=-70.0, tau_syn_E=5.0,
+                 tau_syn_I=5.0):
 
         # Instantiate the parent classes
         AbstractExponentialPopulationVertex.__init__(
@@ -37,7 +38,8 @@ class IzhikevichCurrentExponentialPopulation(
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
-            ring_buffer_sigma=ring_buffer_sigma)
+            ring_buffer_sigma=ring_buffer_sigma,
+            flush_time=flush_time)
 
     @property
     def model_name(self):
