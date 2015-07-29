@@ -56,40 +56,40 @@ static inline post_trace_t timing_add_post_spike(
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
-    // Decay previous o1 and o2 traces
-    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(last_trace,
+    // Decay previous o1trace
+    int32_t new_o1_trace = STDP_FIXED_MUL_16X16(last_trace,
             DECAY_LOOKUP_TAU_MINUS(delta_time));
 
     // Add energy caused by new spike to trace
-    // **NOTE** o2 trace is pre-multiplied by a3_plus
-    int32_t new_o1_trace = decayed_o1_trace + STDP_FIXED_POINT_ONE;
+    new_o1_trace += STDP_FIXED_POINT_ONE;
 
     log_debug("\tdelta_time=%d, o1=%d\n", delta_time, new_o1_trace);
 
-    // Return new pre- synaptic event with decayed trace values with energy
-    // for new spike added
-    return (post_trace_t) new_o1_trace;
+    // Return new trace_value
+    return (post_trace_t)new_o1_trace;
 }
 
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(
-        uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
+        uint32_t time, uint32_t last_time, pre_trace_t last_trace, bool flush) {
 
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
-    // Decay previous r1 and r2 traces
-    int32_t decayed_r1_trace = STDP_FIXED_MUL_16X16(
+    // Decay previous r1 trace
+    int32_t new_r1_trace = STDP_FIXED_MUL_16X16(
         last_trace, DECAY_LOOKUP_TAU_PLUS(delta_time));
 
-    // Add energy caused by new spike to trace
-    int32_t new_r1_trace = decayed_r1_trace + STDP_FIXED_POINT_ONE;
+    // If this isn't a flush, add energy caused by new spike to trace
+    if(!flush)
+    {
+        new_r1_trace += STDP_FIXED_POINT_ONE;
+    }
 
     log_debug("\tdelta_time=%u, r1=%d\n", delta_time, new_r1_trace);
 
-    // Return new pre-synaptic event with decayed trace values with energy
-    // for new spike added
-    return (pre_trace_t) new_r1_trace;
+    // Return new trace_value
+    return (pre_trace_t)new_r1_trace;
 }
 
 //---------------------------------------

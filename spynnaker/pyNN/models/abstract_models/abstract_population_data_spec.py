@@ -188,7 +188,7 @@ class AbstractPopulationDataSpec(
         spec.write_value(data=n_atoms)
 
         # Write flush time
-        spec.write_value(data=1000)
+        spec.write_value(data=100)
 
         # Write machine time step: (Integer, expressed in microseconds)
         spec.write_value(data=self._machine_time_step)

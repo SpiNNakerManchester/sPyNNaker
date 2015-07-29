@@ -11,7 +11,7 @@ static post_trace_t timing_add_post_spike(uint32_t time, uint32_t last_time,
                                           post_trace_t last_trace);
 
 static pre_trace_t timing_add_pre_spike(uint32_t time, uint32_t last_time,
-                                        pre_trace_t last_trace);
+                                        pre_trace_t last_trace, bool flush);
 
 static update_state_t timing_apply_pre_spike(
     uint32_t time, pre_trace_t trace, uint32_t last_pre_time,

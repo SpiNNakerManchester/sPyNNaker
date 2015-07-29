@@ -61,7 +61,7 @@ static inline void _setup_synaptic_dma_read() {
         // Strip out flush bit
         key = spike_clear_flush(key);
 
-        log_info("Checking for row for spike 0x%.8x (flush:%u)\n", key, flush);
+        log_debug("Checking for row for spike 0x%.8x (flush:%u)\n", key, flush);
 
         // Get address of synaptic row corresponding to source key
         address_t row_address;
