@@ -76,6 +76,8 @@ static uint32_t recording_flags = 0;
 static uint32_t time;
 //! the number of timer tics that this model should run for before exiting.
 static uint32_t simulation_ticks = 0;
+//! the int that represnets the bool for if the run is infinte or not.
+static uint32_t infinite_run;
 
 //! \deduces the time in timer ticks until the next spike is to occur given a
 //! mean_isi_ticks
@@ -197,7 +199,7 @@ static bool initialize(uint32_t *timer_period) {
     if (!simulation_read_timing_details(
             data_specification_get_region(system, address),
             APPLICATION_NAME_HASH,
-            timer_period, &simulation_ticks)) {
+            timer_period, &simulation_ticks, &infinite_run)) {
         return false;
     }
 
@@ -245,7 +247,7 @@ void timer_callback(uint timer_count, uint unused) {
     log_debug("Timer tick %u", time);
 
     // If a fixed number of simulation ticks are specified and these have passed
-    if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {
+    if (infinite_run != TRUE && time >= simulation_ticks) {
         log_info("Simulation complete.\n");
 
         // Finalise any recordings that are in progress, writing back the final
