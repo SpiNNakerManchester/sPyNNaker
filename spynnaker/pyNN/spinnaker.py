@@ -262,7 +262,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         "cause the neural models to fail to partition "
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
-                if vertex.is_set_to_record_spikes():
+                if vertex.record:
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
                         "is not currently supportable in this tool chain."
