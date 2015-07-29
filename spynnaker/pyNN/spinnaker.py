@@ -424,16 +424,20 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     if not os.path.exists(file_path):
                         os.mkdir(file_path)
 
-                    self._write_provanence_data_in_xml(file_path)
+                    # write provanence data
+                    self.write_provanence_data_in_xml(file_path, self._txrx)
 
                     # retrieve provenance data from any cores that provide data
                     for placement in self._placements:
                         if isinstance(placement.subvertex,
                                       AbstractProvidesProvanenceData):
-                            file_path = os.path.join(
-                                self._report_default_directory,
-                                "Provanence_data_for_core:{}:{}:{}"
-                                .format(placement.x, placement.y, placement.p))
+                            core_file_path = os.path.join(
+                                file_path, "Provanence_data_for_{}:{}:{}:{}"
+                                .format(
+                                    placement.subvertex.label,
+                                    placement.x, placement.y, placement.p))
+                            placement.subvertex.write_provanence_data_in_xml(
+                                core_file_path, self.transceiver, placement)
 
         elif isinstance(self._machine, VirtualMachine):
             logger.info(
