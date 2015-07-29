@@ -54,11 +54,11 @@ from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
 from spinn_front_end_common.interface.\
-    front_end_common_provanence_functions import \
-    FrontEndCommonProvanenceFunctions
+    front_end_common_provenance_functions import \
+    FrontEndCommonProvenanceFunctions
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_provanence_data import \
-    AbstractProvidesProvanenceData
+    abstract_provides_provenance_data import \
+    AbstractProvidesProvenanceData
 
 # local front end imports
 from spynnaker.pyNN.models.pynn_population import Population
@@ -95,7 +95,7 @@ executable_finder = ExecutableFinder()
 
 class Spinnaker(FrontEndCommonConfigurationFunctions,
                 FrontEndCommonInterfaceFunctions,
-                FrontEndCommonProvanenceFunctions,
+                FrontEndCommonProvenanceFunctions,
                 SpynnakerConfigurationFunctions):
     """
     Spinnaker
@@ -107,7 +107,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         FrontEndCommonConfigurationFunctions.__init__(self, host_name,
                                                       graph_label)
         SpynnakerConfigurationFunctions.__init__(self)
-        FrontEndCommonProvanenceFunctions.__init__(self)
+        FrontEndCommonProvenanceFunctions.__init__(self)
 
         self._database_socket_addresses = set()
         self._database_interface = None
@@ -424,16 +424,20 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     if not os.path.exists(file_path):
                         os.mkdir(file_path)
 
-                    self._write_provanence_data_in_xml(file_path)
+                    # write provanence data
+                    self.write_provenance_data_in_xml(file_path, self._txrx)
 
                     # retrieve provenance data from any cores that provide data
                     for placement in self._placements:
                         if isinstance(placement.subvertex,
-                                      AbstractProvidesProvanenceData):
-                            file_path = os.path.join(
-                                self._report_default_directory,
-                                "Provanence_data_for_core:{}:{}:{}"
-                                .format(placement.x, placement.y, placement.p))
+                                      AbstractProvidesProvenanceData):
+                            core_file_path = os.path.join(
+                                file_path, "Provanence_data_for_{}:{}:{}:{}"
+                                .format(
+                                    placement.subvertex.label,
+                                    placement.x, placement.y, placement.p))
+                            placement.subvertex.write_provenance_data_in_xml(
+                                core_file_path, self.transceiver, placement)
 
         elif isinstance(self._machine, VirtualMachine):
             logger.info(
