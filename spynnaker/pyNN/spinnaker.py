@@ -778,8 +778,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # iterate though subvertexes and call generate_data_spec for each
         # vertex
         executable_targets = ExecutableTargets()
-        no_processors = config.getint("Threading", "dsg_threads")
-        thread_pool = ThreadPool(processes=no_processors)
 
         # create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
