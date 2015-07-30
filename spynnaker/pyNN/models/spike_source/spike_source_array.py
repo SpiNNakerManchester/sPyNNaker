@@ -10,11 +10,10 @@ from spinn_front_end_common.abstract_models\
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
-from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region\
-    import BufferedSendingRegion
-from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spinn_front_end_common.utilities import constants as \
-    front_end_common_constants
+from spinn_front_end_common.interface.buffer_management.storage_objects\
+    .buffered_sending_region import BufferedSendingRegion
+from spinn_front_end_common.interface.buffer_management.buffer_manager \
+    import BufferManager
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
@@ -132,11 +131,13 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         :return: a partitioned vertex
         :rtype: SpikeSourceArrayPartitionedVertex
         """
-        send_buffer = self._get_spike_send_buffer(vertex_slice)
-        partitioned_vertex = SpikeSourceArrayPartitionedVertex(
-            {SpikeSourceArray._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value:
-                send_buffer}, resources_required, label, constraints)
-        return partitioned_vertex
+        # map region id to the sned buffer for this partitioned vertex
+        send_buffer = dict()
+        send_buffer[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
+            self._get_spike_send_buffer(vertex_slice)
+        # create and return the partitioned vertex
+        return SpikeSourceArrayPartitionedVertex(
+            send_buffer, resources_required, label, constraints)
 
     def _get_spike_send_buffer(self, vertex_slice):
         """

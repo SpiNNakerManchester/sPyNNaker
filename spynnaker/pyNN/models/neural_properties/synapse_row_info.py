@@ -34,6 +34,28 @@ class SynapseRowInfo(object):
             self.synapse_types = np.append(self.synapse_types,
                                            row.synapse_types)
 
+    def set_slice_values(self, row, vertex_slice, lo_delay=0, hi_delay=None):
+        """ Sets the values in this row to the values in the given row slice
+
+        :param row: The row slice to set
+        :param vertex_slice: The vertex slice that the row is for
+        :param lo_delay: The lo delay of the delay slice that the row is for
+        :param hi_delay: The hi delay of the delay slice that the row is for
+        """
+        mask = None
+        if hi_delay is not None:
+            mask = ((self.target_indices >= vertex_slice.lo_atom) &
+                    (self.target_indices <= vertex_slice.hi_atom) &
+                    (self.delays >= lo_delay) & (self.delays <= hi_delay))
+        else:
+            mask = ((self.target_indices >= vertex_slice.lo_atom) &
+                    (self.target_indices <= vertex_slice.hi_atom))
+
+        self.target_indices[mask] = row.target_indices + vertex_slice.lo_atom
+        self.weights[mask] = row.weights
+        self.delays[mask] = row.delays + lo_delay
+        self.synapse_types[mask] = row.synapse_types
+
     def __getitem__(self, index):
         """
         This is a python method to support slicing of a synaptic list
