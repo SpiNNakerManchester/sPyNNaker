@@ -65,9 +65,6 @@ static inline void _setup_synaptic_dma_read() {
         if (population_table_get_address(spike, &row_address,
                 &n_bytes_to_transfer)) {
 
-            // **HACK** doesn't copy enough data for plastic rows so add some words!
-            // n_bytes_to_transfer += (5 * sizeof(uint32_t));
-
             // Write the SDRAM address of the plastic region and the
             // Key of the originating spike to the beginning of dma buffer
             dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];

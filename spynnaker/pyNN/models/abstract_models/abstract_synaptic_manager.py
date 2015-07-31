@@ -183,8 +183,6 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                      subedge).get_synapse_row_io().get_n_words(synapse_row)
                     for synapse_row in sublist.get_rows()])
 
-            # check that the max_n_words is greater than zero
-            # assert(max_n_words > 0)
             all_syn_block_sz = \
                 self._calculate_all_synaptic_block_size(sublist,
                                                         max_n_words)

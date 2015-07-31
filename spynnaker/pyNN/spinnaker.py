@@ -59,6 +59,9 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesProvenanceData
 
 # local front end imports
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_population_recordable_vertex import \
+    AbstractPopulationRecordableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
@@ -261,7 +264,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         "cause the neural models to fail to partition "
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
-                if vertex.record:
+                if (isinstance(vertex, AbstractPopulationRecordableVertex) and
+                        vertex.record):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
                         "is not currently supportable in this tool chain."
