@@ -38,12 +38,6 @@ typedef struct neuron_t {
 	// exp( -(machine time step in ms)/(R * C) ) [.]
 	REAL     exp_TC;
 
-	// [kHz!] only necessary if one wants to use ODE solver because allows
-	// multiply and host double prec to calc
-	// - UNSIGNED ACCUM & unsigned fract much slower
-	// TODO remove  as we no longer use a ODE
-	REAL  	 one_over_tauRC;
-
 	// countdown to end of next refractory period [ms/10]
 	// - 3 secs limit do we need more? Jan 2014
 	int32_t  refract_timer;
@@ -65,9 +59,9 @@ typedef struct neuron_t {
 //! \param[in] refract_timer count down to end of next refractory period [ms/10]
 //! \param[in] exp_tc time constant multiplier for closed-form solution
 //! \return the corresponding neuron_t with the correct parameters instantiated.
-neuron_pointer_t neuron_model_lif_curr_impl_create(
-    REAL V_thresh, REAL V_reset, REAL V_rest, REAL one_over_tauRC, REAL R,
-	int32_t T_refract, REAL V, REAL I, int32_t refract_timer, REAL exp_tc );
+neuron_pointer_t neuron_model_lif_curr_impl_create(REAL V_thresh,
+    REAL V_reset, REAL V_rest, REAL R, int32_t T_refract, REAL V, REAL I,
+    int32_t refract_timer, REAL exp_tc);
 
 //! \function that converts the input into the real value to be used by the
 //! neuron

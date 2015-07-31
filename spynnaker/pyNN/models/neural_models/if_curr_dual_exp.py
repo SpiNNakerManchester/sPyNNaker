@@ -36,7 +36,7 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
             v_init=v_init, v_reset=v_reset, v_rest=v_rest, v_thresh=v_thresh,
             tau_refrac=tau_refrac)
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, n_params=10, label=label,
+            self, n_neurons=n_neurons, n_params=9, label=label,
             binary="IF_curr_exp_dual.aplx", constraints=constraints,
             max_atoms_per_core=(IFCurrentDualExponentialPopulation
                                 ._model_based_max_atoms_per_core),
@@ -78,7 +78,6 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                             DataType.S1615),
             NeuronParameter(self.exp_tc(self._machine_time_step),
                             DataType.S1615),
-            NeuronParameter(self._one_over_tau_rc, DataType.S1615),
             NeuronParameter(self._refract_timer, DataType.UINT32),
             # t refact used to be a uint32 but was changed to int32 to avoid
             # clash of c and python variable typing.
