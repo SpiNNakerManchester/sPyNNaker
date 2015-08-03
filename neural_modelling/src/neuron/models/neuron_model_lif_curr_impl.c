@@ -86,25 +86,8 @@ void neuron_model_print(restrict neuron_pointer_t neuron) {
     log_debug("T refract     = %u microsecs", neuron->T_refract * 100);
 }
 
-// this is used to set up the eTC array if any TQ is being corrected for,
-// not currently used in production code
-//#define   TEST_0p1
-#define TQ_TEST_CODE \
-    #ifdef TEST_0p1 \
-        double scale = 0.1; \
-    #else \
-        double scale = 1.0; \
-    #endif   \
-    neuron->eTC[0] = (REAL) exp(-(double)one_over_tauRC * 1.16666667 * scale); \
-    neuron->eTC[1] = (REAL) exp(-(double)one_over_tauRC * 1.5 * scale); \
-    neuron->eTC[2] = (REAL) exp(-(double)one_over_tauRC * 1.83333333 * scale); \
-    neuron->exp_TC = (REAL) exp(-(double)one_over_tauRC * scale); \
-    log_debug("eTC  %9.5k %9.5k %9.5k \n", neuron->eTC[0], neuron->eTC[1], \
-              neuron->eTC[2]);
-
-//
 neuron_pointer_t neuron_model_lif_curr_impl_create(REAL V_thresh, REAL V_reset,
-        REAL V_rest, REAL one_over_tauRC, REAL R, int32_t T_refract, REAL V,
+        REAL V_rest, REAL R, int32_t T_refract, REAL V,
         REAL I, int32_t refract_timer, REAL exp_tc) {
     neuron_pointer_t neuron = spin1_malloc(sizeof(neuron_t));
 
@@ -115,7 +98,6 @@ neuron_pointer_t neuron_model_lif_curr_impl_create(REAL V_thresh, REAL V_reset,
 
     neuron->I_offset = I;
     neuron->R_membrane = R;
-    neuron->one_over_tauRC = one_over_tauRC;
     neuron->exp_TC = exp_tc;
 
     neuron->T_refract = T_refract;
