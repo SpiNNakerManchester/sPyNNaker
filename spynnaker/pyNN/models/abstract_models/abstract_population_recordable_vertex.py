@@ -9,11 +9,26 @@ from data_specification import utility_calls as dsg_utility_calls
 import logging
 import numpy
 import struct
+import os
+import tempfile
+import atexit
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
 
 logger = logging.getLogger(__name__)
+
+
+def delete_temp_dir(directory):
+    for filename in os.listdir(directory):
+        filepath = os.path.join(directory, filename)
+        if os.path.isfile(filepath):
+            os.remove(filepath)
+        elif os.path.isdir(filepath):
+            delete_temp_dir(filepath)
+
+temp_dir = tempfile.mkdtemp(prefix="synapse_rows")
+atexit.register(delete_temp_dir, temp_dir)
 
 
 @add_metaclass(ABCMeta)
@@ -160,16 +175,23 @@ class AbstractPopulationRecordableVertex(object):
 
     def get_neuron_parameter(
             self, region, compatible_output, has_ran, graph_mapper, placements,
-            txrx, machine_time_step):
+            txrx, machine_time_step, runtime):
         if not has_ran:
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore neuron param "
                 "cannot be retrieved")
 
-        times = numpy.zeros(0)
-        ids = numpy.zeros(0)
-        values = numpy.zeros(0)
         ms_per_tick = self._machine_time_step / 1000.0
+        n_timesteps = runtime / ms_per_tick
+
+        tempfilehandle = tempfile.NamedTemporaryFile(
+            delete=False, dir=temp_dir)
+        data = numpy.memmap(
+            tempfilehandle.file, shape=(3, self._n_atoms * n_timesteps),
+            dtype="float64")
+        data[0] = numpy.arange(self._n_atoms * n_timesteps) % self._n_atoms
+        data[1] = numpy.repeat(numpy.arange(
+            0, n_timesteps * ms_per_tick, ms_per_tick), self._n_atoms)
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
@@ -221,16 +243,10 @@ class AbstractPopulationRecordableVertex(object):
             numpy_data = (numpy.asarray(
                 neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
                 32767.0)
-            values = numpy.append(values, numpy_data)
-            times = numpy.append(times, numpy.repeat(
-                range(numpy_data.size / vertex_slice.n_atoms),
-                vertex_slice.n_atoms) * ms_per_tick)
-            ids = numpy.append(ids, numpy.add(
-                numpy.arange(numpy_data.size) % vertex_slice.n_atoms,
-                vertex_slice.lo_atom))
+            data_start = vertex_slice.lo_atom * n_timesteps
+            data_end = (vertex_slice.hi_atom + 1) * n_timesteps
+            data[2][data_start:data_end] = numpy_data
             progress_bar.update()
 
         progress_bar.end()
-        result = numpy.dstack((ids, times, values))[0]
-        result = result[numpy.lexsort((times, ids))]
-        return result
+        return data
