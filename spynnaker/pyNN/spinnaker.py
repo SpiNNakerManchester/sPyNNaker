@@ -61,7 +61,8 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesProvenanceData
 
 # local front end imports
-from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex import \
+from spynnaker.pyNN.models\
+    .abstract_models.abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
@@ -435,8 +436,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         if isinstance(placement.subvertex,
                                       AbstractProvidesProvenanceData):
                             core_file_path = os.path.join(
-                                file_path, "Provanence_data_for_{}:{}:{}:{}"
-                                .format(
+                                file_path,
+                                "Provanence_data_for_{}_{}_{}_{}.xml".format(
                                     placement.subvertex.label,
                                     placement.x, placement.y, placement.p))
                             placement.subvertex.write_provenance_data_in_xml(
