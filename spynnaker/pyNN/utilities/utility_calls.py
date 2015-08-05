@@ -119,8 +119,3 @@ def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time):
     result = numpy.dstack((spike_ids, spike_times))[0]
     result = result[numpy.lexsort((spike_times, spike_ids))]
     return result
-
-
-
-
-

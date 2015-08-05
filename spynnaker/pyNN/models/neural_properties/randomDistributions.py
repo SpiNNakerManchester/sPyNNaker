@@ -11,7 +11,7 @@ def generate_parameter(param_info, param_index=0):
     constant, list or distribution.
     """
     # Currently assume hard-coded value:
-    if isinstance(param_info, (int, float)):
+    if isinstance(param_info, (int, float, long)):
         return param_info
     elif RandomDistribution is not None and isinstance(param_info,
                                                        RandomDistribution):
