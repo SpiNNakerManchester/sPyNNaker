@@ -181,16 +181,11 @@ void timer_callback(uint timer_count, uint unused) {
         synapses_print_pre_synaptic_events();
         synapses_print_saturation_count();
 
+        spike_processing_print_buffer_overflows();
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
-
-        // Check for buffer overflow
-        uint spike_buffer_overflows = in_spikes_get_n_buffer_overflows();
-        if (spike_buffer_overflows > 0) {
-            io_printf(IO_STD, "\tWarning - %d spike buffers overflowed\n",
-                    spike_buffer_overflows);
-        }
 
         spin1_exit(0);
         return;
@@ -209,7 +204,7 @@ void c_main(void) {
 
     // initialise the model
     if (!initialize(&timer_period)){
-    	rt_error(RTE_API);
+        rt_error(RTE_API);
     }
 
     // Start the time at "-1" so that the first tick will be 0
