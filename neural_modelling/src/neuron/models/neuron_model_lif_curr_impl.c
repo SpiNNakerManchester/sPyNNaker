@@ -2,19 +2,14 @@
 
 #include <debug.h>
 
-// for general machine time steps
-// defaults to 1ms time step i.e. 10 x 1/10ths of a msec
-static uint32_t	refractory_time_update = 10;
-
 // simple Leaky I&F ODE - discrete changes elsewhere -  assumes 1ms timestep?
 static inline void _lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
 
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
-    REAL this_eTC = neuron->exp_TC;
 
     // update membrane voltage
-    neuron->V_membrane = alpha - (this_eTC * (alpha - V_prev));
+    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
 }
 
 // ODE solver has just set neuron->V which is current state of membrane voltage
@@ -27,16 +22,11 @@ static inline void _neuron_discrete_changes(neuron_pointer_t neuron) {
     neuron->refract_timer  = neuron->T_refract;
 }
 
+void neuron_model_set_global_neuron_params(
+        global_neuron_params_pointer_t params) {
+    use(params);
 
-// setup function which needs to be called in main program before any neuron
-// code executes
-// MUST BE: minimum 100, then in 100usec steps...
-void neuron_model_set_machine_timestep(timer_t microsecs) {
-
-    const uint16_t time_step_divider = 100;
-
-    // 10 for 1ms time step, 1 for 0.1ms time step which is minimum
-    refractory_time_update = microsecs / time_step_divider;
+    // Does Nothing - no params
 }
 
 bool neuron_model_state_update(input_t exc_input, input_t inh_input,
@@ -44,9 +34,6 @@ bool neuron_model_state_update(input_t exc_input, input_t inh_input,
 
     bool spike = false;
     REAL V_last = neuron->V_membrane;
-
-    // countdown refractory timer
-    neuron->refract_timer -= refractory_time_update;
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
@@ -62,6 +49,10 @@ bool neuron_model_state_update(input_t exc_input, input_t inh_input,
         if (spike) {
             _neuron_discrete_changes(neuron);
         }
+    } else {
+
+        // countdown refractory timer
+        neuron->refract_timer -= 1;
     }
     return spike;
 }
@@ -83,7 +74,7 @@ void neuron_model_print(restrict neuron_pointer_t neuron) {
 
     log_debug("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
 
-    log_debug("T refract     = %u microsecs", neuron->T_refract * 100);
+    log_debug("T refract     = %u timesteps", neuron->T_refract);
 }
 
 neuron_pointer_t neuron_model_lif_curr_impl_create(REAL V_thresh, REAL V_reset,

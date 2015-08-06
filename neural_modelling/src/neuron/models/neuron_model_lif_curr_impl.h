@@ -3,14 +3,6 @@
 
 #include "neuron_model.h"
 
-// only works properly for 1000, 700, 400 microsec timesteps
-//#define CORRECT_FOR_REFRACTORY_GRANULARITY
-
-//#define CORRECT_FOR_THRESHOLD_GRANULARITY
-
-// 9% slower than standard but inevitably more accurate(?) might over-compensate
-//#define SIMPLE_COMBINED_GRANULARITY
-
 /////////////////////////////////////////////////////////////
 // definition for LIF neuron parameters
 typedef struct neuron_t {
@@ -38,30 +30,31 @@ typedef struct neuron_t {
     // exp( -(machine time step in ms)/(R * C) ) [.]
     REAL     exp_TC;
 
-    // countdown to end of next refractory period [ms/10]
-    // - 3 secs limit do we need more? Jan 2014
+    // countdown to end of next refractory period [timesteps]
     int32_t  refract_timer;
 
-    // refractory time of neuron [ms/10]
+    // refractory time of neuron [timesteps]
     int32_t  T_refract;
 
 } neuron_t;
+
+typedef struct global_neuron_params_t {
+} global_neuron_params_t;
 
 //! \creates a neuron parameter strut given the neural parameters
 //! \param[in] V_thresh membrane voltage threshold at which neuron spikes [mV]
 //! \param[in] V_reset post-spike reset membrane voltage [mV]
 //! \param[in] V_rest membrane resting voltage [mV]
-//! \param[in] one_over_tauRC ???????
-//! \param[in] R ???????
+//! \param[in] R membrane resistance
 //! \param[in] T_refract refractory time of neuron [ms/10]
-//! \param[in] V ???????
-//! \param[in] I ???????????
-//! \param[in] refract_timer count down to end of next refractory period [ms/10]
+//! \param[in] V initial membrane voltage
+//! \param[in] I offset input current
+//! \param[in] refract_timer count down to end of next refractory period
 //! \param[in] exp_tc time constant multiplier for closed-form solution
 //! \return the corresponding neuron_t with the correct parameters instantiated.
 neuron_pointer_t neuron_model_lif_curr_impl_create(
     REAL V_thresh, REAL V_reset, REAL V_rest, REAL R,
-    int32_t T_refract, REAL V, REAL I, int32_t refract_timer, REAL exp_tc );
+    int32_t T_refract, REAL V, REAL I, int32_t refract_timer, REAL exp_tc);
 
 //! \function that converts the input into the real value to be used by the
 //! neuron

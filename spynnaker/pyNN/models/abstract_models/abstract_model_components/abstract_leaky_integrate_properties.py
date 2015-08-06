@@ -25,13 +25,8 @@ class AbstractLeakyIntegrateProperties(object):
     def initialize_v(self, value):
         self._v_init = utility_calls.convert_param_to_numpy(value, self._atoms)
 
-    def r_membrane(self, machine_time_step):
-        return self._tau_m / self._cm
-
-    def exp_tc(self, machine_time_step):
-        return numpy.exp(float(-machine_time_step) / (1000.0 * self._tau_m))
-
-    def ioffset(self, machine_time_step):
+    @property
+    def ioffset(self):
         return self._i_offset
 
     @property
@@ -54,10 +49,6 @@ class AbstractLeakyIntegrateProperties(object):
     def v_rest(self):
         return self._v_reset
 
-    @property
-    def _one_over_tau_rc(self):
-        return 1.0 / self._tau_m
-    
     @i_offset.setter
     def i_offset(self, new_value):
         self._i_offset = new_value
@@ -77,6 +68,17 @@ class AbstractLeakyIntegrateProperties(object):
     @cm.setter
     def cm(self, new_value):
         self._cm = new_value
+
+    @property
+    def _r_membrane(self):
+        return self._tau_m / self._cm
+
+    def _exp_tc(self, machine_time_step):
+        return numpy.exp(float(-machine_time_step) / (1000.0 * self._tau_m))
+
+    @property
+    def _one_over_tau_rc(self):
+        return 1.0 / self._tau_m
 
     @abstractmethod
     def is_leaky_integrate_vertex(self):
