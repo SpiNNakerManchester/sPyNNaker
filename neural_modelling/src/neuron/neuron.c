@@ -157,10 +157,6 @@ void neuron_do_timestep_update(timer_t time) {
         input_t external_bias =
             synapse_dynamics_get_intrinsic_bias(time, neuron_index);
 
-        // update neuron parameters (will inform us if the neuron should spike)
-        bool spike = neuron_model_state_update(
-            exc_neuron_input, inh_neuron_input, external_bias, neuron);
-
         // If we should be recording potential, record this neuron parameter
         if (recording_is_channel_enabled(recording_flags,
                 e_recording_channel_neuron_potential)) {
@@ -176,6 +172,10 @@ void neuron_do_timestep_update(timer_t time) {
             recording_record(e_recording_channel_neuron_gsyn,
                              &temp_record_input, sizeof(input_t));
         }
+
+        // update neuron parameters (will inform us if the neuron should spike)
+        bool spike = neuron_model_state_update(
+            exc_neuron_input, inh_neuron_input, external_bias, neuron);
 
         // If the neuron has spiked
         if (spike) {
