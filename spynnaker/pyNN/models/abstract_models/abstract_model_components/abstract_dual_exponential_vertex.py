@@ -116,13 +116,12 @@ class AbstractDualExponentialVertex(object):
         # Set the focus to the memory region 3 (synapse parameters):
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
-        spec.comment("\nWriting Synapse Parameters for {} Neurons:\n"
-                     .format(self._atoms))
+        spec.comment("\nWriting Synapse Parameters\n")
 
         # Write exponential synapse parameters
         write_exp_synapse_param(self._tau_syn_E, self._machine_time_step,
-                                vertex_slice, spec)
+                                spec)
         write_exp_synapse_param(self._tau_syn_E2, self._machine_time_step,
-                                vertex_slice, spec)
+                                spec)
         write_exp_synapse_param(self._tau_syn_I, self._machine_time_step,
-                                vertex_slice, spec)
+                                spec)

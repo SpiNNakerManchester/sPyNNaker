@@ -29,7 +29,7 @@ static uint32_t ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT];
 static input_t input_buffers[INPUT_BUFFER_SIZE];
 
 // The synapse shaping parameters
-static synapse_param_t *neuron_synapse_shaping_params[SYNAPSE_TYPE_COUNT];
+static synapse_param_t synapse_shaping_params[SYNAPSE_TYPE_COUNT];
 
 // Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
@@ -218,44 +218,18 @@ bool synapses_initialise(address_t address, uint32_t n_neurons_value,
     }
 
     // Get the synapse shaping data
-    if(sizeof(synapse_param_t) > 0) {
-        for (index_t synapse_index = 0; synapse_index < SYNAPSE_TYPE_COUNT;
-                synapse_index++) {
-            log_debug("\tCopying %u synapse type %u parameters of size %u",
-                    n_neurons, synapse_index, sizeof(synapse_param_t));
-
-            // Allocate block of memory for this synapse type'synapse_index
-            // pre-calculated per-neuron decay
-            neuron_synapse_shaping_params[synapse_index] =
-                (synapse_param_t *) spin1_malloc(
-                    sizeof(synapse_param_t) * n_neurons);
-
-            // Check for success
-            if (neuron_synapse_shaping_params[synapse_index] == NULL) {
-                log_error("Cannot allocate neuron synapse parameters"
-                          "- Out of DTCM");
-                return false;
-            }
-
-            log_debug(
-                "\tCopying %u bytes from %u", n_neurons * sizeof(synapse_param_t),
-                address + ((n_neurons * synapse_index
-                          * sizeof(synapse_param_t)) / 4));
-            memcpy(neuron_synapse_shaping_params[synapse_index],
-                    address + ((n_neurons * synapse_index
-                              * sizeof(synapse_param_t)) / 4),
-                    n_neurons * sizeof(synapse_param_t));
-        }
+    const uint32_t synapse_param_bytes = sizeof(synapse_param_t) * SYNAPSE_TYPE_COUNT;
+    const uint32_t synapse_param_words = synapse_param_bytes / 4;
+    if(synapse_param_bytes > 0) {
+        memcpy(&synapse_shaping_params[0], address, synapse_param_bytes);
     }
+
     // Get the ring buffer left shifts
-    uint32_t ring_buffer_input_left_shifts_base =
-        ((n_neurons * SYNAPSE_TYPE_COUNT * sizeof(synapse_param_t)) / 4);
-    for (index_t synapse_index = 0; synapse_index < SYNAPSE_TYPE_COUNT;
-           synapse_index++) {
-        ring_buffer_to_input_left_shifts[synapse_index] =
-            address[ring_buffer_input_left_shifts_base + synapse_index];
+    for (index_t s = 0; s < SYNAPSE_TYPE_COUNT; s++) {
+        ring_buffer_to_input_left_shifts[s] =
+            address[synapse_param_words + s];
         log_info("synapse type %s, ring buffer to input left shift %u", 
-                 synapse_types_get_type_char(synapse_index), ring_buffer_to_input_left_shifts[synapse_index]);
+                 synapse_types_get_type_char(s), ring_buffer_to_input_left_shifts[s]);
     }
     *ring_buffer_to_input_buffer_left_shifts = ring_buffer_to_input_left_shifts;
 
@@ -276,7 +250,7 @@ void synapses_do_timestep_update(timer_t time) {
 
         // Shape the existing input according to the included rule
         synapse_types_shape_input(input_buffers, neuron_index,
-                neuron_synapse_shaping_params);
+                synapse_shaping_params);
 
         // Loop through all synapse types
         for (uint32_t synapse_type_index = 0;
@@ -290,7 +264,7 @@ void synapses_do_timestep_update(timer_t time) {
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
             synapse_types_add_neuron_input(input_buffers, synapse_type_index,
-                    neuron_index, neuron_synapse_shaping_params,
+                    neuron_index, synapse_shaping_params,
                     synapses_convert_weight_to_input(
                         ring_buffers[ring_buffer_index],
                         ring_buffer_to_input_left_shifts[synapse_type_index]));

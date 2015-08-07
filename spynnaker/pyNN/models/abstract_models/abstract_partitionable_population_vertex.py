@@ -58,10 +58,10 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
 
         # NOTE: Assumes 4-bytes per parameter
         # This is the size of the synapse shaping parameters
-        #     (one per synapse type per neuron)
+        #     (one per synapse type)
         # + the size of the ring buffer left shifts (one per synapse type)
         return ((4 * self.get_n_synapse_parameters_per_synapse_type() *
-                 self.get_n_synapse_types() * vertex_slice.n_atoms) +
+                 self.get_n_synapse_types()) +
                 (4 * self.get_n_synapse_types()))
 
     def get_spike_buffer_size(self, vertex_slice):

@@ -76,9 +76,8 @@ static inline index_t _in_offset(index_t neuron_index) {
 //! \param[in] neuron_index the index in the neuron state array which
 //! Corresponds to the parameters of the neuron currently being considered.
 //! \return the decay amount for the excitatory one input
-static inline decay_t _ex1_decay(
-        synapse_param_t **parameters, index_t neuron_index) {
-    return (parameters[EXCITATORY_ONE][neuron_index].neuron_synapse_decay);
+static inline decay_t _ex1_decay(synapse_param_t *parameters) {
+    return (parameters[EXCITATORY_ONE].neuron_synapse_decay);
 }
 
 //! \brief method which deduces how much decay to put on a excitatory input
@@ -89,9 +88,8 @@ static inline decay_t _ex1_decay(
 //! \param[in] neuron_index the index in the neuron state array which
 //! Corresponds to the parameters of the neuron currently being considered.
 //! \return the decay amount for the excitatory two input
-static inline decay_t _ex2_decay(
-        synapse_param_t **parameters, index_t neuron_index) {
-    return (parameters[EXCITATORY_TWO][neuron_index].neuron_synapse_decay);
+static inline decay_t _ex2_decay(synapse_param_t *parameters) {
+    return (parameters[EXCITATORY_TWO].neuron_synapse_decay);
 }
 
 //! \brief method which deduces how much decay to put on a inhibitory input
@@ -102,9 +100,8 @@ static inline decay_t _ex2_decay(
 //! \param[in] neuron_index the index in the neuron state array which
 //! Corresponds to the parameters of the neuron currently being considered.
 //! \return the decay amount for the inhibitory input
-static inline decay_t _in_decay(
-        synapse_param_t **parameters, index_t neuron_index) {
-    return (parameters[INHIBITORY][neuron_index].neuron_synapse_decay);
+static inline decay_t _in_decay(synapse_param_t *parameters) {
+    return (parameters[INHIBITORY].neuron_synapse_decay);
 }
 
 //! \brief decays the stuff thats sitting in the input buffers
@@ -120,16 +117,16 @@ static inline decay_t _in_decay(
 //! \return nothing
 static inline void synapse_types_shape_input(
         input_t *input_buffers, index_t neuron_index,
-        synapse_param_t** parameters) {
+        synapse_param_t* parameters) {
     input_buffers[_ex1_offset(neuron_index)] = decay_s1615(
             input_buffers[_ex1_offset(neuron_index)],
-            _ex1_decay(parameters, neuron_index));
+            _ex1_decay(parameters));
     input_buffers[_ex2_offset(neuron_index)] = decay_s1615(
             input_buffers[_ex2_offset(neuron_index)],
-            _ex2_decay(parameters, neuron_index));
+            _ex2_decay(parameters));
     input_buffers[_in_offset(neuron_index)] = decay_s1615(
             input_buffers[_in_offset(neuron_index)],
-            _in_decay(parameters, neuron_index));
+            _in_decay(parameters));
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -145,10 +142,10 @@ static inline void synapse_types_shape_input(
 //! \return None
 static inline void synapse_types_add_neuron_input(
         input_t *input_buffers, index_t synapse_type_index,
-        index_t neuron_index, synapse_param_t** parameters, input_t input) {
+        index_t neuron_index, synapse_param_t* parameters, input_t input) {
     input_buffers[synapse_types_get_input_buffer_index(synapse_type_index,
         neuron_index)] += decay_s1615(input,
-            parameters[synapse_type_index][neuron_index].neuron_synapse_init);
+            parameters[synapse_type_index].neuron_synapse_init);
 }
 
 //! \brief extracts the excitatory input buffers from the buffers available

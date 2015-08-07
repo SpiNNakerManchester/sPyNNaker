@@ -3,7 +3,7 @@ import numpy
 from spynnaker.pyNN import exceptions
 
 
-def write_exp_synapse_param(tau, machine_time_step, vertex_slice, spec):
+def write_exp_synapse_param(tau, machine_time_step, spec):
 
     # Calculate decay and initialisation values
     decay = numpy.exp(numpy.divide(-float(machine_time_step),
@@ -18,25 +18,10 @@ def write_exp_synapse_param(tau, machine_time_step, vertex_slice, spec):
 
     # If we only generated a single param
     if rescaled_decay.size == 1 and rescaled_init.size == 1:
+        spec.write_value(data=rescaled_decay[0])
+        spec.write_value(data=rescaled_init[0])
 
-        # Copy for all atoms
-        # **YUCK** this is inefficient in terms of DSG
-        for _ in range(vertex_slice.n_atoms):
-            spec.write_value(data=rescaled_decay[0])
-            spec.write_value(data=rescaled_init[0])
-
-    # Otherwise, if we have generated decays and inits for each atom
-    elif (rescaled_decay.size > vertex_slice.hi_atom and
-            rescaled_init.size > vertex_slice.hi_atom):
-
-        # Interleave into one array
-        interleaved_params = numpy.empty(vertex_slice.n_atoms * 2)
-        interleaved_params[0::2] = \
-            rescaled_decay[vertex_slice.lo_atom:vertex_slice.hi_atom + 1]
-        interleaved_params[1::2] = \
-            rescaled_init[vertex_slice.lo_atom:vertex_slice.hi_atom + 1]
-
-        spec.write_array(interleaved_params)
+    # Otherwise, give an error
     else:
         raise exceptions.SynapticBlockGenerationException(
             "Cannot generate synapse parameters from %u values"

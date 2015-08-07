@@ -85,12 +85,10 @@ class AbstractExponentialPopulationVertex(object):
         spec.switch_write_focus(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
 
-        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        spec.comment("\nWriting Synapse Parameters for "
-                     "{} Neurons:\n".format(n_atoms))
+        spec.comment("\nWriting Synapse Parameters\n")
 
         # Write exponenential synapse parameters
         write_exp_synapse_param(self._tau_syn_E, self._machine_time_step,
-                                vertex_slice, spec)
+                                spec)
         write_exp_synapse_param(self._tau_syn_I, self._machine_time_step,
-                                vertex_slice, spec)
+                                spec)
