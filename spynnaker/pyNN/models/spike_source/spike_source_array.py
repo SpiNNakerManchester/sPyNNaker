@@ -66,6 +66,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             ring_buffer_sigma, timescale_factor, port=None, tag=None,
             ip_address=None, board_address=None,
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
+            space_before_notification=640,
             constraints=None, label="SpikeSourceArray"):
         if ip_address is None:
             ip_address = config.get("Buffers", "receive_buffer_host")
@@ -83,14 +84,14 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
-        self._threshold_for_reporting_bytes_written = 0
+        self._space_before_notification = space_before_notification
 
         self.add_constraint(TagAllocatorRequireIptagConstraint(
             ip_address, port, strip_sdp=True, board_address=board_address,
             tag_id=tag))
 
         if self._max_on_chip_memory_usage_for_spikes is None:
-            self._max_on_chip_memory_usage_for_spikes = 8 * 1024 * 1024
+            self._max_on_chip_memory_usage_for_spikes = 1 * 1024 * 1024
 
         # check the values do not conflict with chip memory limit
         if self._max_on_chip_memory_usage_for_spikes < 0:
@@ -247,7 +248,7 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
 
         # write configs for buffers
         spec.write_value(data=spike_buffer_region_size)
-        spec.write_value(data=self._threshold_for_reporting_bytes_written)
+        spec.write_value(data=self._space_before_notification)
 
         ip_tag = iter(ip_tags).next()
         spec.write_value(data=ip_tag.tag)

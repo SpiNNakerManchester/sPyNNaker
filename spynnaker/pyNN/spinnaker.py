@@ -420,6 +420,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._has_ran = True
                 if self._retrieve_provance_data:
 
+                    progress = ProgressBar(self._placements.n_placements + 1,
+                                           "getting provenance data")
+
                     # retrieve provence data from central
                     file_path = os.path.join(self._report_default_directory,
                                              "provance_data")
@@ -430,9 +433,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
                     # write provanence data
                     self.write_provenance_data_in_xml(file_path, self._txrx)
+                    progress.update()
 
                     # retrieve provenance data from any cores that provide data
-                    for placement in self._placements:
+                    for placement in self._placements.placements:
                         if isinstance(placement.subvertex,
                                       AbstractProvidesProvenanceData):
                             core_file_path = os.path.join(
@@ -442,6 +446,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                     placement.x, placement.y, placement.p))
                             placement.subvertex.write_provenance_data_in_xml(
                                 core_file_path, self.transceiver, placement)
+                    progress.update()
 
         elif isinstance(self._machine, VirtualMachine):
             logger.info(
