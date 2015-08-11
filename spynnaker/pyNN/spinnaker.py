@@ -446,7 +446,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                     placement.x, placement.y, placement.p))
                             placement.subvertex.write_provenance_data_in_xml(
                                 core_file_path, self.transceiver, placement)
-                    progress.update()
+                        progress.update()
+                    progress.end()
 
         elif isinstance(self._machine, VirtualMachine):
             logger.info(
