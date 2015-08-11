@@ -196,19 +196,19 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Get the timing details
+    address_t system_region = data_specification_get_region(
+            system, address);
     if (!simulation_read_timing_details(
-            data_specification_get_region(system, address),
-            APPLICATION_NAME_HASH,
-            timer_period, &simulation_ticks, &infinite_run)) {
+            system_region, APPLICATION_NAME_HASH, timer_period,
+            &simulation_ticks, &infinite_run)) {
         return false;
     }
 
     // Get the recording information
     uint32_t spike_history_region_size;
     recording_read_region_sizes(
-        &data_specification_get_region(system, address)
-        [RECORDING_POSITION_IN_REGION], &recording_flags,
-        &spike_history_region_size, NULL, NULL);
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
+        &recording_flags, &spike_history_region_size, NULL, NULL);
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
         if (!recording_initialse_channel(
@@ -254,6 +254,7 @@ void timer_callback(uint timer_count, uint unused) {
         // amounts of samples recorded to SDRAM
         recording_finalise();
         spin1_exit(0);
+        return;
     }
 
     // Loop through slow spike sources
