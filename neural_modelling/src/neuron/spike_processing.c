@@ -99,7 +99,8 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 
     // Get the number of plastic bytes and the writeback address from the
     // synaptic row
-    size_t n_plastic_region_bytes = synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
+    size_t n_plastic_region_bytes =
+        synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
 
     log_debug("Writing back %u bytes of plastic region to %08x",
               n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
@@ -187,15 +188,7 @@ void _dma_complete_callback(uint unused, uint tag) {
                     log_error("%u: 0x%.8x", i, current_buffer->row[i]);
                 }
 
-                // Don't go into real RTE here to allow proper debugging
-                vic[VIC_DISABLE] =
-                     (1 << CC_RDY_INT)   |
-                     (1 << TIMER1_INT)   |
-                     (1 << SOFTWARE_INT) |
-                     (1 << DMA_ERR_INT)  |
-                     (1 << DMA_DONE_INT);
-                sark.vcpu->rt_code = RTE_SWERR;
-                sark_cpu_state(CPU_STATE_RTE);
+                rt_error(RTE_SWERR);
             }
         } while (subsequent_spikes);
 

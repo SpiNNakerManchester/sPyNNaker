@@ -90,8 +90,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             chip_x, chip_y):
 
         # get entries in master pop
-        n_entries = helpful_functions.read_and_convert(
-            chip_x, chip_y, master_pop_base_mem_address, 4, "<I", txrx)[0]
+        n_entries = helpful_functions.read_data(
+            chip_x, chip_y, master_pop_base_mem_address, 4, "<I", txrx)
         n_bytes = (n_entries *
                    _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
 

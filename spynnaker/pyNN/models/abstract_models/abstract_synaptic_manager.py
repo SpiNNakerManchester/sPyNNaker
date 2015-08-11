@@ -788,9 +788,9 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                     constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
             # read in the memory address of the synaptic_region base address
-            synapse_region_base_address = helpful_functions.read_and_convert(
+            synapse_region_base_address = helpful_functions.read_data(
                 post_x, post_y, synapse_region_base_address_location, 4,
-                "<I", transceiver)[0]
+                "<I", transceiver)
 
             # the base address of the synaptic block in absolute terms is the app
             # base, plus the synaptic matrix base plus the offset

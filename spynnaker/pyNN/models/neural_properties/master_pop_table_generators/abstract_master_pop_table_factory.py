@@ -102,8 +102,8 @@ class AbstractMasterPopTableFactory(object):
             dsg_utility.get_region_base_address_offset(
                 app_data_base_address, master_pop_region)
 
-        master_region_base_address_offset = helpful_functions.read_and_convert(
-            x, y, master_region_base_address_address, 4, "<I", transceiver)[0]
+        master_region_base_address_offset = helpful_functions.read_data(
+            x, y, master_region_base_address_address, 4, "<I", transceiver)
 
         master_region_base_address =\
             master_region_base_address_offset + app_data_base_address
