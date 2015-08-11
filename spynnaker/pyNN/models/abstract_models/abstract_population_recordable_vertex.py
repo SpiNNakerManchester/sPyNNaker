@@ -9,6 +9,7 @@ from data_specification import utility_calls as dsg_utility_calls
 import logging
 import numpy
 import struct
+import tempfile
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
@@ -160,16 +161,24 @@ class AbstractPopulationRecordableVertex(object):
 
     def get_neuron_parameter(
             self, region, compatible_output, has_ran, graph_mapper, placements,
-            txrx, machine_time_step):
+            txrx, machine_time_step, runtime):
         if not has_ran:
             raise exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore neuron param "
                 "cannot be retrieved")
 
-        times = numpy.zeros(0)
-        ids = numpy.zeros(0)
-        values = numpy.zeros(0)
         ms_per_tick = self._machine_time_step / 1000.0
+        n_timesteps = runtime / ms_per_tick
+
+        tempfilehandle = tempfile.NamedTemporaryFile()
+        data = numpy.memmap(
+            tempfilehandle.file, shape=(n_timesteps, self._n_atoms),
+            dtype="float64,float64,float64")
+        data["f0"] = (numpy.arange(self._n_atoms * n_timesteps) %
+                      self._n_atoms).reshape((n_timesteps, self._n_atoms))
+        data["f1"] = numpy.repeat(numpy.arange(0, n_timesteps * ms_per_tick,
+                                  ms_per_tick), self._n_atoms).reshape(
+                                      (n_timesteps, self._n_atoms))
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
@@ -220,17 +229,19 @@ class AbstractPopulationRecordableVertex(object):
 
             numpy_data = (numpy.asarray(
                 neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
-                32767.0)
-            values = numpy.append(values, numpy_data)
-            times = numpy.append(times, numpy.repeat(
-                range(numpy_data.size / vertex_slice.n_atoms),
-                vertex_slice.n_atoms) * ms_per_tick)
-            ids = numpy.append(ids, numpy.add(
-                numpy.arange(numpy_data.size) % vertex_slice.n_atoms,
-                vertex_slice.lo_atom))
+                32767.0).reshape((n_timesteps, vertex_slice.n_atoms))
+            data["f2"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
+                numpy_data
             progress_bar.update()
 
         progress_bar.end()
-        result = numpy.dstack((ids, times, values))[0]
-        result = result[numpy.lexsort((times, ids))]
+        data.shape = self._n_atoms * n_timesteps
+
+        # Sort the data - apparently, using lexsort is faster, but it might
+        # consume more memory, so the option is left open for sort-in-place
+        order = numpy.lexsort((data["f1"], data["f0"]))
+        # data.sort(order=['f0', 'f1'], axis=0)
+
+        result = data.view(dtype="float64").reshape(
+            (self._n_atoms * n_timesteps, 3))[order]
         return result
