@@ -87,7 +87,6 @@ import logging
 import math
 import os
 import sys
-from multiprocessing.pool import ThreadPool
 
 
 logger = logging.getLogger(__name__)
