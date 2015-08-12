@@ -209,7 +209,7 @@ bool synapse_dynamics_initialise(
     return true;
 }
 
-void synapse_dynamics_process_plastic_synapses(
+bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
 
@@ -279,6 +279,7 @@ void synapse_dynamics_process_plastic_synapses(
         *plastic_words++ = synapse_structure_get_final_synaptic_word(
             final_state);
     }
+    return true;
 }
 
 void synapse_dynamics_process_post_synaptic_event(

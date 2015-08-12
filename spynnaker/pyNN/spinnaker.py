@@ -42,8 +42,6 @@ from spinn_front_end_common.interface.front_end_common_configuration_functions\
 from spinn_front_end_common.utilities.timer import Timer
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from spinn_front_end_common.interface.data_generator_interface import \
-    DataGeneratorInterface
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
     import AbstractProvidesNKeysForEdge
@@ -81,6 +79,8 @@ from spynnaker.pyNN.models.abstract_models\
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
+from spynnaker.pyNN.utilities.database.spynnaker_data_base_interface import \
+    SpynnakerDataBaseInterface
 
 # general imports
 import logging
@@ -88,8 +88,7 @@ import math
 import os
 import sys
 from multiprocessing.pool import ThreadPool
-from spynnaker.pyNN.utilities.database.spynnaker_data_base_interface import \
-    SpynnakerDataBaseInterface
+
 
 logger = logging.getLogger(__name__)
 
@@ -371,7 +370,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._load_application_data(
                     self._placements, self._graph_mapper,
                     processor_to_app_data_base_address, self._hostname,
-                    app_data_folder=self._app_data_runtime_folder)
+                    app_data_folder=self._app_data_runtime_folder, 
+                    verify=config.getboolean("Mode", "verify_writes"))
                 self.load_routing_tables(self._router_tables, self._app_id)
                 logger.info("*** Loading executables ***")
                 self.load_executable_images(executable_targets, self._app_id)
@@ -782,13 +782,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # iterate though subvertexes and call generate_data_spec for each
         # vertex
         executable_targets = ExecutableTargets()
-        no_processors = config.getint("Threading", "dsg_threads")
-        thread_pool = ThreadPool(processes=no_processors)
 
         # create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "on generating data specifications")
-        data_generator_interfaces = list()
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
@@ -801,15 +798,13 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     placement.subvertex)
                 reverse_ip_tags = self._tags.get_reverse_ip_tags_for_vertex(
                     placement.subvertex)
-                data_generator_interface = DataGeneratorInterface(
-                    associated_vertex, placement.subvertex, placement,
-                    self._partitioned_graph, self._partitionable_graph,
-                    self._routing_infos, self._hostname, self._graph_mapper,
+                associated_vertex.generate_data_spec(
+                    placement.subvertex, placement, self._partitioned_graph,
+                    self._partitionable_graph, self._routing_infos,
+                    self._hostname, self._graph_mapper,
                     self._report_default_directory, ip_tags, reverse_ip_tags,
-                    self._writeTextSpecs, self._app_data_runtime_folder,
-                    progress_bar)
-                data_generator_interfaces.append(data_generator_interface)
-                thread_pool.apply_async(data_generator_interface.start)
+                    self._writeTextSpecs, self._app_data_runtime_folder)
+                progress_bar.update()
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
@@ -824,11 +819,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     executable_targets.add_binary(binary_path)
                 executable_targets.add_processor(
                     binary_path, placement.x, placement.y, placement.p)
-
-        for data_generator_interface in data_generator_interfaces:
-            data_generator_interface.wait_for_finish()
-        thread_pool.close()
-        thread_pool.join()
 
         # finish the progress bar
         progress_bar.end()
