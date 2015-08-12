@@ -83,9 +83,10 @@ void neuron_model_print(restrict neuron_pointer_t neuron) {
 }
 
 //
-neuron_pointer_t neuron_model_lif_cond_impl_create(REAL V_thresh, REAL V_reset,
-        REAL V_rest, REAL V_rev_E, REAL V_rev_I, REAL R,
-        int32_t T_refract, REAL V, REAL I, int32_t refract_timer, REAL exp_tc) {
+neuron_pointer_t neuron_model_lif_cond_impl_create(
+        REAL V_thresh, REAL V_reset, REAL V_rest, REAL V_rev_E, REAL V_rev_I,
+        REAL R, int32_t T_refract, REAL V, REAL I, int32_t refract_timer,
+        REAL exp_tc) {
     neuron_pointer_t neuron = spin1_malloc(sizeof(neuron_t));
 
     neuron->V_membrane = V;
