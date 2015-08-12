@@ -53,23 +53,37 @@ class FixedProbabilityConnector(AbstractConnector):
         prevertex = presynaptic_population._get_vertex
         postvertex = postsynaptic_population._get_vertex
 
-        rows = list()
-        for pre_atom in range(0, prevertex.n_atoms):
-            present = numpy.random.rand(postvertex.n_atoms) <= self._p_connect
-            if (not self._allow_self_connections and
-                    presynaptic_population == postsynaptic_population):
-                present[pre_atom] = 0
+        present = (numpy.random.rand(postvertex.n_atoms * prevertex.n_atoms) <=
+                   self._p_connect)
+        ids = numpy.where(present)[0]
+        n_present = numpy.sum(present)
 
-            n_present = numpy.sum(present)
+        source_ids = ids / postvertex.n_atoms
+        source_ids.sort()
+        target_ids = ids % postvertex.n_atoms
+        delays = generate_parameter_array(
+            self._delays, n_present, present) * delay_scale
+        weights = generate_parameter_array(
+            self._weights, n_present, present) * weight_scale
 
-            ids = numpy.where(present)[0]
+        pre_counts = numpy.histogram(source_ids,
+                                     numpy.arange(prevertex.n_atoms + 1))[0]
+        pre_end_idxs = numpy.cumsum(pre_counts)
+        pre_start_idxs = numpy.append(0, pre_end_idxs[:-1])
 
-            delays = (generate_parameter_array(
-                self._delays, n_present, present) * delay_scale)
-            weights = (generate_parameter_array(
-                self._weights, n_present, present) * weight_scale)
-            synapse_types = (numpy.ones(len(ids), dtype='uint32') *
-                             synapse_type)
+        synaptic_rows = []
+        n_synapses = 0
+        for _, (start, end) in enumerate(zip(pre_start_idxs, pre_end_idxs)):
 
-            rows.append(SynapseRowInfo(ids, weights, delays, synapse_types))
-        return SynapticList(rows)
+            this_target_ids = target_ids[start:end]
+            this_weights = weights[start:end]
+            this_delays = delays[start:end]
+            this_synapes_types = numpy.ones(
+                len(this_target_ids), dtype="uint32") * synapse_type
+            n_synapses += len(this_target_ids)
+
+            synaptic_rows.append(SynapseRowInfo(
+                this_target_ids, this_weights, this_delays,
+                this_synapes_types))
+
+        return SynapticList(synaptic_rows)

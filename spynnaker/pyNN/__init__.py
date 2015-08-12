@@ -7,7 +7,8 @@ and implementation for the PyNN High-level API
 
 import inspect
 from collections import defaultdict
-from ._version import __version__, __version_month__, __version_year__
+from ._version import __version__, __version_name__, __version_month__,\
+    __version_year__
 
 # utility functions
 from spynnaker.pyNN.utilities import conf
@@ -228,8 +229,9 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
             __version_year__))
     parent_dir = os.path.split(os.path.split(spynnaker.__file__)[0])[0]
     logger.info(
-        "Release version {} - {} {}. Installed in folder {}".format(
-            __version__, __version_month__, __version_year__, parent_dir))
+        "Release version {}({}) - {} {}. Installed in folder {}".format(
+            __version__, __version_name__, __version_month__, __version_year__,
+            parent_dir))
 
     if len(extra_params) > 1:
         logger.warn("Extra params has been applied to the setup command which "

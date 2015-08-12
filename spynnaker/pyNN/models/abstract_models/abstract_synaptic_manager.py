@@ -183,8 +183,6 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                      subedge).get_synapse_row_io().get_n_words(synapse_row)
                     for synapse_row in sublist.get_rows()])
 
-            # check that the max_n_words is greater than zero
-            #assert(max_n_words > 0)
             all_syn_block_sz = \
                 self._calculate_all_synaptic_block_size(sublist,
                                                         max_n_words)
@@ -790,7 +788,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                     constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
             # read in the memory address of the synaptic_region base address
-            synapse_region_base_address = helpful_functions.read_and_convert(
+            synapse_region_base_address = helpful_functions.read_data(
                 post_x, post_y, synapse_region_base_address_location, 4,
                 "<I", transceiver)
 
@@ -801,12 +799,9 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                                            synaptic_block_base_address_offset)
 
             # read in and return the synaptic block
-            blocks = list(transceiver.read_memory(
-                post_x, post_y, synaptic_block_base_address, synaptic_block_size))
-
-            block = bytearray()
-            for message_block in blocks:
-                block.extend(message_block)
+            block = transceiver.read_memory(
+                post_x, post_y, synaptic_block_base_address,
+                synaptic_block_size)
 
             if len(block) != synaptic_block_size:
                 raise exceptions.SynapticBlockReadException(
