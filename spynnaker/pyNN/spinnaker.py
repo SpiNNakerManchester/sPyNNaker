@@ -228,7 +228,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             number_of_boards=number_of_boards, width=width, height=height,
             is_virtual=config.getboolean("Machine", "virtual_board"),
             virtual_has_wrap_arounds=config.getboolean(
-                "Machine", "requires_wrap_arounds"))
+                "Machine", "requires_wrap_arounds"),
+            auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"))
 
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
