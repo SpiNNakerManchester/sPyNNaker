@@ -19,7 +19,10 @@ from spinn_front_end_common.interface.buffer_management.buffer_manager \
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities import constants as \
+    front_end_common_constants
 
+# pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from pacman.model.constraints.tag_allocator_constraints\
@@ -91,7 +94,8 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             tag_id=tag))
 
         if self._max_on_chip_memory_usage_for_spikes is None:
-            self._max_on_chip_memory_usage_for_spikes = 1 * 1024 * 1024
+            self._max_on_chip_memory_usage_for_spikes = \
+                front_end_common_constants.MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
 
         # check the values do not conflict with chip memory limit
         if self._max_on_chip_memory_usage_for_spikes < 0:
