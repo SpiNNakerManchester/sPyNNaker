@@ -438,7 +438,8 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         stdp_max_weight = None
         if self._stdp_mechanism is not None:
             stdp_max_weight = self._stdp_mechanism.get_max_weight()
-            absolute_max_weights.fill(stdp_max_weight)
+            if stdp_max_weight is not None:
+                absolute_max_weights.fill(stdp_max_weight)
 
         total_weights = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
         total_square_weights = numpy.zeros(
