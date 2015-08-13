@@ -370,7 +370,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._load_application_data(
                     self._placements, self._graph_mapper,
                     processor_to_app_data_base_address, self._hostname,
-                    app_data_folder=self._app_data_runtime_folder, 
+                    app_data_folder=self._app_data_runtime_folder,
                     verify=config.getboolean("Mode", "verify_writes"))
                 self.load_routing_tables(self._router_tables, self._app_id)
                 logger.info("*** Loading executables ***")
