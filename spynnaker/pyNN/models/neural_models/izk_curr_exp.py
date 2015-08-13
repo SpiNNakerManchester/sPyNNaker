@@ -1,6 +1,5 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
-from spynnaker.pyNN.utilities import constants
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
     abstract_exp_population_vertex import AbstractExponentialPopulationVertex
@@ -85,9 +84,13 @@ class IzhikevichCurrentExponentialPopulation(
             NeuronParameter(self._d, DataType.S1615),
             NeuronParameter(self._v_init, DataType.S1615),
             NeuronParameter(self._u_init, DataType.S1615),
-            NeuronParameter(self.ioffset(self._machine_time_step),
-                            DataType.S1615),
-            NeuronParameter(0, DataType.S1615)
+            NeuronParameter(self.ioffset, DataType.S1615),
+            NeuronParameter(self._machine_time_step / 1000.0, DataType.S1615)
+        ]
+
+    def get_global_parameters(self):
+        return [
+            NeuronParameter(self._machine_time_step / 1000.0, DataType.S1615)
         ]
 
     def is_population_vertex(self):

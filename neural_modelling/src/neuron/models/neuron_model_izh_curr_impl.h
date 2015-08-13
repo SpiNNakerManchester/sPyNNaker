@@ -23,6 +23,10 @@ typedef struct neuron_t {
 
 } neuron_t;
 
+typedef struct global_neuron_params_t {
+    REAL machine_timestep_ms;
+} global_neuron_params_t;
+
 neuron_pointer_t neuron_model_izh_curr_impl_create(REAL A, REAL B, REAL C,
                                                    REAL D, REAL V, REAL U,
                                                    REAL I);
