@@ -7,8 +7,8 @@
 # Information about the target SpiNNaker board or machine:
 # machineName:      The name or IP address of the target board
 # version:          Version of the Spinnaker Hardware Board (1-5)
-# down_chips:       A list of chips that don't work, as x,y separated by ;
-# down_cores:       A list of cores that don't work, as x,y,p separated by ;
+# down_chips:       A list of chips that don't work, as x,y separated by :
+# down_cores:       A list of cores that don't work, as x,y,p separated by :
 # bmp_names:        A list of connected BMP IP addresses, separated by :
 # auto_detect_bmp:  True if the BMP IP address should be computed from the
                         machine IP address, False if no BMP should be used if
