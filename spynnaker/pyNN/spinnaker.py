@@ -228,7 +228,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             number_of_boards=number_of_boards, width=width, height=height,
             is_virtual=config.getboolean("Machine", "virtual_board"),
             virtual_has_wrap_arounds=config.getboolean(
-                "Machine", "requires_wrap_arounds"))
+                "Machine", "requires_wrap_arounds"),
+            auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"))
 
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
@@ -369,7 +370,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._load_application_data(
                     self._placements, self._graph_mapper,
                     processor_to_app_data_base_address, self._hostname,
-                    app_data_folder=self._app_data_runtime_folder, 
+                    app_data_folder=self._app_data_runtime_folder,
                     verify=config.getboolean("Mode", "verify_writes"))
                 self.load_routing_tables(self._router_tables, self._app_id)
                 logger.info("*** Loading executables ***")
