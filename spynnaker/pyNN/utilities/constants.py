@@ -2,8 +2,6 @@
 Utilities for accessing the location of memory regions on the board
 """
 from enum import Enum
-from spinn_front_end_common.utilities.constants import \
-    DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS
 
 POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 
@@ -48,10 +46,6 @@ MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 # currently drops the packet).
 MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
 
-# please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
-# for other core application ids.
-SPIKE_INJECTOR_CORE_APPLICATION_ID = 0xAC9
-
 # master population table magic
 MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
 MASTER_POP_BINARY_SEARCH = 0xBB2
@@ -68,22 +62,20 @@ EDGES = Enum(
 # Regions for populations
 POPULATION_BASED_REGIONS = Enum(
     value="POPULATION_BASED_REGIONS",
-    names=[('SYSTEM', 0),
-           ('NEURON_PARAMS', 1),
-           ('SYNAPSE_PARAMS', 2),
-           ('POPULATION_TABLE', 3),
-           ('SYNAPTIC_MATRIX', 4),
-           ('SYNAPSE_DYNAMICS', 5),
-           ('SPIKE_HISTORY', 6),
-           ('POTENTIAL_HISTORY', 7),
-           ('GSYN_HISTORY', 8)])
+    names=[('HEADER', 0),
+           ('COMPONENTS', 1),
+           ('RECORDING_REGION', 2),
+           ('NEURON_PARAMS', 3),
+           ('SYNAPSE_PARAMS', 4),
+           ('POPULATION_TABLE', 5),
+           ('SYNAPTIC_MATRIX', 6),
+           ('SYNAPSE_DYNAMICS', 7),
+           ('SPIKE_HISTORY', 8),
+           ('POTENTIAL_HISTORY', 9),
+           ('GSYN_HISTORY', 10)])
 
 # The number of recording regions available for a population
 N_POPULATION_RECORDING_REGIONS = 3
-
-# The size of the system region (+1 for flags) for a population
-POPULATION_SYSTEM_REGION_BYTES = (DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS +
-                                  N_POPULATION_RECORDING_REGIONS + 1) * 4
 
 # The size of the headers of a population neuron region
 # (1 word each for has_key, key, n_neurons, n_params, ODE timestep)

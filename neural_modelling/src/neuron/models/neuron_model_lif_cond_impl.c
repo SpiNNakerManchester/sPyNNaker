@@ -1,4 +1,5 @@
 #include "neuron_model_lif_cond_impl.h"
+#include "../../common/constants.h"
 
 #include <debug.h>
 

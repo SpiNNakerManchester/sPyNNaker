@@ -38,6 +38,12 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
     return v;
 }
 
+//! human readable definitions of each region in SDRAM
+typedef enum regions_e {
+    HEADER_REGION,
+    DELAY_PARAMS,
+} regions_e;
+
 static bool read_parameters(address_t address) {
 
     log_info("read_parameters: starting");
@@ -116,14 +122,15 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details
     if (!simulation_read_timing_details(
-            data_specification_get_region(0, address),
+            data_specification_get_region(HEADER_REGION, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
             &infinite_run)) {
         return false;
     }
 
     // Get the parameters
-    if (!read_parameters(data_specification_get_region(1, address))) {
+    if (!read_parameters(data_specification_get_region(DELAY_PARAMS,
+                                                       address))) {
         return false;
     }
 

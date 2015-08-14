@@ -5,9 +5,9 @@ from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
-    import AbstractPopulationVertex
-from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_population_vertex import AbstractPopulationVertex
+from spynnaker.pyNN.models.delay_extension.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants

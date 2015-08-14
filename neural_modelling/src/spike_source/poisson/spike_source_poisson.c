@@ -40,7 +40,7 @@ typedef struct fast_spike_source_t {
 
 //! spike source array region ids in human readable form
 typedef enum region{
-    system, poisson_params, spike_history,
+    HEADER, RECORDING_DATA, POISSON_PARAMS, SPIKE_HISTORY,
 }region;
 
 //! what each position in the poisson parameter region actually represent in
@@ -197,10 +197,10 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details
     address_t system_region = data_specification_get_region(
-            system, address);
+            HEADER, address);
     if (!simulation_read_timing_details(
-            system_region, APPLICATION_NAME_HASH, timer_period,
-            &simulation_ticks, &infinite_run)) {
+            system_region, APPLICATION_NAME_HASH,
+            timer_period, &simulation_ticks, &infinite_run)) {
         return false;
     }
 
@@ -212,7 +212,7 @@ static bool initialize(uint32_t *timer_period) {
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
         if (!recording_initialse_channel(
-                data_specification_get_region(spike_history, address),
+                data_specification_get_region(SPIKE_HISTORY, address),
                 e_recording_channel_spike_history, spike_history_region_size)) {
             return false;
         }
@@ -220,7 +220,7 @@ static bool initialize(uint32_t *timer_period) {
 
     // Setup regions that specify spike source array data
     if (!read_poisson_parameters(
-            data_specification_get_region(poisson_params, address))) {
+            data_specification_get_region(POISSON_PARAMS, address))) {
         return false;
     }
 

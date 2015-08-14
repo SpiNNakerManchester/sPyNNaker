@@ -7,7 +7,7 @@
 #include "neuron.h"
 #include "models/neuron_model.h"
 #include "synapse_types/synapse_types.h"
-#include "plasticity/synapse_dynamics.h"
+#include "synapse_dynamics/synapse_dynamics.h"
 #include "../common/out_spikes.h"
 #include "../common/recording.h"
 #include <debug.h>

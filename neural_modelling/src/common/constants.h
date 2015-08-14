@@ -1,0 +1,16 @@
+#ifndef _CONSTANTS_H_
+#define _CONSTANTS_H_
+
+//! definitions of input components magic numbers
+#define INPUT_CONDUCTANCE_COMPONENT_MAGIC_NUMBER 0xAA1
+#define INPUT_CURRENT_COMPONENT_MAGIC_NUMBER 0xAA2
+
+//! model components magic numbers
+#define MODEL_COMPONENT_INTEGRATE_AND_FIRE_MAGIC_NUMBER 0xAB1
+#define MODEL_COMPONENT_IZHIKEVICH_MAGIC_NUMBER 0xAB2
+
+//! synapse structure magic numbers
+#define SYNAPSE_PLASTIC_STRUCTURE_WEIGHT_CONTROL 0xEE1
+#define SYNAPSE_PLASTIC_STRUCTURE_WEIGHT 0xEE2
+
+#endif // _CONSTANTS_H_

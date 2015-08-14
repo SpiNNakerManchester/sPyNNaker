@@ -1,5 +1,5 @@
 #include "spike_processing.h"
-#include "population_table.h"
+#include "population_tables/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
 #include "../common/in_spikes.h"

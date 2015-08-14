@@ -3,7 +3,7 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint\
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 
-from spynnaker.pyNN.models.abstract_models.\
+from spynnaker.pyNN.models.components.neuron_components.\
     abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
 from spynnaker.pyNN.utilities.parameters_surrogate\
@@ -62,7 +62,7 @@ class Population(object):
                          .format(Population._non_labelled_vertex_count)
             Population._non_labelled_vertex_count += 1
         cellparams['label'] = cell_label
-        cellparams['n_neurons'] = size
+        cellparams['n_keys'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
         cellparams['spikes_per_second'] = spinnaker.spikes_per_second
@@ -282,6 +282,7 @@ class Population(object):
         """
         Given the ID(s) of cell(s) in the Population, return its (their) index
         (order in the Population).
+        :param cell_id:
         """
         raise NotImplementedError
 
@@ -289,6 +290,7 @@ class Population(object):
         """
         Given the ID(s) of cell(s) in the Population, return its (their) index
         (order in the Population), counting only cells on the local MPI node.
+        :param cell_id:
         """
         raise NotImplementedError
 

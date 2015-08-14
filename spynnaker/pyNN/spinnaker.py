@@ -71,13 +71,13 @@ from spynnaker.pyNN.spynnaker_configurations import \
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
-    AbstractVirtualVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_send_me_multicast_commands_vertex \
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_virtual_vertex import AbstractVirtualVertex
+from spynnaker.pyNN.models.common_objects.\
+    abstract_send_me_multicast_commands_vertex \
     import AbstractSendMeMulticastCommandsVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_vertex_with_dependent_vertices \
+from spynnaker.pyNN.models.components.neuron_components.\
+    abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities.database.spynnaker_data_base_interface import \
     SpynnakerDataBaseInterface

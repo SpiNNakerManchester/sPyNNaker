@@ -1,7 +1,7 @@
 #include "synapses.h"
 #include "spike_processing.h"
 #include "synapse_types/synapse_types.h"
-#include "plasticity/synapse_dynamics.h"
+#include "synapse_dynamics/synapse_dynamics.h"
 #include <debug.h>
 #include <spin1_api.h>
 #include <string.h>
@@ -200,12 +200,21 @@ static inline void _process_fixed_synapses(address_t fixed_region_address,
 
 
 /* INTERFACE FUNCTIONS */
-
-bool synapses_initialise(address_t address, uint32_t n_neurons_value,
-                         input_t **input_buffers_value,
-                         uint32_t **ring_buffer_to_input_buffer_left_shifts) {
+//! \brief the initialiser for the synapse shaping section of a neural model
+//! \param[in] address the address in SDRAM where synpase data per neuron is
+//!            stored
+//! \param[in] n_neurons the number of neurons this model is expected to
+//!            simulate
+//! \param[in] input_buffers_value ?????????????
+//! \param[in] ring_buffer_to_input_buffer_left_shifts ??????????????
+//! \return bool which is true if all init went well and false otehrwise
+bool synapses_initialise(
+        address_t address, uint32_t n_neurons_value,
+        input_t **input_buffers_value,
+         uint32_t **ring_buffer_to_input_buffer_left_shifts) {
 
     log_info("synapses_initialise: starting");
+
     n_neurons = n_neurons_value;
     *input_buffers_value = input_buffers;
 
@@ -254,7 +263,7 @@ bool synapses_initialise(address_t address, uint32_t n_neurons_value,
            synapse_index++) {
         ring_buffer_to_input_left_shifts[synapse_index] =
             address[ring_buffer_input_left_shifts_base + synapse_index];
-        log_info("synapse type %s, ring buffer to input left shift %u", 
+        log_info("synapse type %s, ring buffer to input left shift %u",
                  synapse_types_get_type_char(synapse_index), ring_buffer_to_input_left_shifts[synapse_index]);
     }
     *ring_buffer_to_input_buffer_left_shifts = ring_buffer_to_input_left_shifts;
@@ -357,8 +366,8 @@ void synapses_print_saturation_count() {
 //! \return Nothing, this method does not return anything
 void synapses_print_pre_synaptic_events() {
 #ifdef SYNAPSE_BENCHMARK
-	log_info("\t%u fixed pre-synaptic events.\n",
-			num_fixed_pre_synaptic_events);
-	synapse_dynamics_print_plastic_pre_synaptic_events();
+    log_info("\t%u fixed pre-synaptic events.\n",
+            num_fixed_pre_synaptic_events);
+    synapse_dynamics_print_plastic_pre_synaptic_events();
 #endif // SYNAPSE_BENCHMARK
 }

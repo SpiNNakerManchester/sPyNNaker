@@ -18,7 +18,7 @@ class SpikeSourceFromFile(SpikeSourceArray):
     """
 
     def __init__(
-            self, n_neurons, spike_time_file, machine_time_step,
+            self, n_keys, spike_time_file, machine_time_step,
             spikes_per_second, ring_buffer_sigma, timescale_factor, port=None,
             tag=None, ip_address=None, board_address=None, min_atom=None,
             max_atom=None, min_time=None, max_time=None,
@@ -29,7 +29,7 @@ class SpikeSourceFromFile(SpikeSourceArray):
             spike_time_file, min_atom, max_atom, min_time, max_time)
 
         SpikeSourceArray.__init__(
-            self, n_neurons, spike_times, machine_time_step,
+            self, n_keys, spike_times, machine_time_step,
             spikes_per_second, ring_buffer_sigma, timescale_factor, port=port,
             tag=tag, ip_address=ip_address, board_address=board_address,
             max_on_chip_memory_usage_for_spikes_in_bytes=

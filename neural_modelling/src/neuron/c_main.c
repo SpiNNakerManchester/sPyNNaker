@@ -15,30 +15,51 @@
  */
 
 #include "../common/in_spikes.h"
+#include "../common/constants.h"
 #include "neuron.h"
 #include "synapses.h"
 #include "spike_processing.h"
-#include "population_table.h"
-#include "plasticity/synapse_dynamics.h"
+#include "population_tables/population_table.h"
+#include "synapse_dynamics/synapse_dynamics.h"
 
 #include <data_specification.h>
 #include <simulation.h>
 #include <debug.h>
 
-/* validates that the model being compiled does indeed contain a application
-   magic number*/
-#ifndef APPLICATION_NAME_HASH
-#error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
-       constant
-#endif
 
 //! the number of channels all standard models contain (spikes, voltage, gsyn)
 //! for recording
 #define N_RECORDING_CHANNELS 3
 
+//! The name of the components that need to be checked
+static const char * components_e_name_table[] = {
+    "input type",
+    "neuron model",
+    "synapse shape",
+    "master population table",
+    "synapse dynamics",
+    "STDP time dependency",
+    "STDP weight dependency"
+};
+
+//! The magic numbers of the components that need to be checked
+static const int components_magic_numbers[] = {
+    INPUT_MD5_HASH,
+    MODEL_MD5_HASH,
+    SYNAPSE_SHAPE_MD5_HASH,
+    MASTER_POP_MD5_HASH,
+    SYNAPSE_DYNAMICS_MD5_HASH,
+    TIMING_DEPENDENCY_MD5_HASH,
+    WEIGHT_DEPENDENCY_MD5_HASH
+};
+
+# define N_COMPONENTS 7
+
 //! human readable definitions of each region in SDRAM
 typedef enum regions_e {
-    SYSTEM_REGION,
+    HEADER_REGION,
+    COMPONENTS_REGION,
+    RECORDING_DATA_REGION,
     NEURON_PARAMS_REGION,
     SYNAPSE_PARAMS_REGION,
     POPULATION_TABLE_REGION,
@@ -60,6 +81,18 @@ static uint32_t simulation_ticks = 0;
 //! global paramter which states if this model should run for infinite time
 static uint32_t infinite_run;
 
+static inline bool check_component_hash(
+        uint32_t expected_hash, uint32_t received_hash,
+        const char *component) {
+    if (expected_hash != received_hash) {
+        log_error("The component hash 0x%.8x did not match the expected hash"
+                  "0x%.8x for component %s", received_hash, expected_hash,
+                  component);
+        return false;
+    }
+    return true;
+}
+
 //! \Initialises the model by reading in the regions and checking recording
 //! data.
 //! \param[in] *timer_period a pointer for the memory address where the timer
@@ -78,12 +111,23 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Get the timing details
-    address_t system_region = data_specification_get_region(
-        SYSTEM_REGION, address);
+    address_t header_region = data_specification_get_region(
+        HEADER_REGION, address);
     if (!simulation_read_timing_details(
-            system_region, APPLICATION_NAME_HASH, timer_period,
+            header_region, APPLICATION_NAME_HASH, timer_period,
             &simulation_ticks, &infinite_run)) {
         return false;
+    }
+
+    // Check the hash of the components
+    address_t component_region = data_specification_get_region(
+        COMPONENTS_REGION, address);
+    for (int i = 0; i < N_COMPONENTS; i++) {
+        if (!check_component_hash(
+                component_region[i], components_magic_numbers[i],
+                components_e_name_table[i])) {
+            return false;
+        }
     }
 
     // Set up recording
@@ -97,11 +141,17 @@ static bool initialize(uint32_t *timer_period) {
         POTENTIAL_RECORDING_REGION,
         GSYN_RECORDING_REGION
     };
+
+    // get recording region stuff
     uint32_t region_sizes[N_RECORDING_CHANNELS];
     uint32_t recording_flags;
+    address_t recording_region =
+        data_specification_get_region(RECORDING_DATA_REGION, address);
+
     recording_read_region_sizes(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
-        &recording_flags, &region_sizes[0], &region_sizes[1], &region_sizes[2]);
+        recording_region, &recording_flags, &region_sizes[0], &region_sizes[1],
+        &region_sizes[2]);
+
     for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
         if (recording_is_channel_enabled(recording_flags,
                                          channels_to_record[i])) {
@@ -202,7 +252,7 @@ void timer_callback(uint timer_count, uint unused) {
 void c_main(void) {
 
     // Load DTCM data
-    uint32_t timer_period;
+    uint32_t timer_period = 0;
 
     // initialise the model
     if (!initialize(&timer_period)){

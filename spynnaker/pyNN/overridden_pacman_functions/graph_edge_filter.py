@@ -1,11 +1,8 @@
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
-    import MultiCastPartitionableEdge
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
 from pacman.utilities.progress_bar import ProgressBar
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
+from spynnaker.pyNN.models.common.abstract_filterable_edge \
     import AbstractFilterableEdge
 
 import logging
@@ -40,7 +37,7 @@ class GraphEdgeFilter(object):
 
         # start checking subedges to decide which ones need pruning....
         for subedge in subgraph.subedges:
-            if not self._is_filterable(subedge, graph_mapper):
+            if not self._is_filterable(subedge):
                 logger.debug("this subedge was not pruned {}".format(subedge))
                 new_sub_graph.add_subedge(subedge)
                 associated_edge = graph_mapper.\
@@ -54,15 +51,6 @@ class GraphEdgeFilter(object):
         # returned the pruned partitioned_graph and graph_mapper
         return new_sub_graph, new_graph_mapper
 
-    def _is_filterable(self, subedge, graph_mapper):
-        associated_edge = \
-            graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
+    def _is_filterable(self, subedge):
         if isinstance(subedge, AbstractFilterableEdge):
-            return subedge.filter_sub_edge(graph_mapper,
-                                           self._common_report_folder)
-        elif isinstance(associated_edge, MultiCastPartitionableEdge):
-            return False
-        else:
-            raise exceptions.FilterableException(
-                "cannot figure out if subedge {} is prunable or not"
-                .format(subedge))
+            return subedge.filter_sub_edge()
