@@ -933,8 +933,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._machine.add_chip(virutal_chip)
 
     def _create_virtual_chip(self, virtual_vertex):
-        """
-        creates a virutal chip as a real chip in the spinnmachine machine object
+        """ Create a virtual chip as a real chip in the spinnmachine machine\
+            object
         :param virtual_vertex: virutal vertex to convert into a real chip
         :return: the real chip
         """
