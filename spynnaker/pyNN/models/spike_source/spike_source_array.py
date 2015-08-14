@@ -3,16 +3,16 @@ SpikeSourceArray
 """
 
 # spynnaker imports
-from spynnaker.pyNN.utilities import utility_calls
 from spinn_front_end_common.abstract_models\
     .abstract_outgoing_edge_same_contiguous_keys_restrictor\
     import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
-from spynnaker.pyNN.buffer_management.storage_objects.buffered_sending_region\
-    import BufferedSendingRegion
-from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
+from spinn_front_end_common.interface.buffer_management.storage_objects\
+    .buffered_sending_region import BufferedSendingRegion
+from spinn_front_end_common.interface.buffer_management.buffer_manager \
+    import BufferManager
 
 # spinn front end common imports
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -22,10 +22,6 @@ from spinn_front_end_common.utility_models\
     .reverse_ip_tag_multicast_source_partitionable_vertex \
     import ReverseIPTagMulticastSourcePartitionableVertex
 
-# dsg imports
-from data_specification.data_specification_generator\
-    import DataSpecificationGenerator
-
 # spinnman imports
 from spinnman.messages.eieio.command_messages.event_stop_request\
     import EventStopRequest
@@ -33,7 +29,7 @@ from spinnman.messages.eieio.command_messages.event_stop_request\
 # general imports
 import logging
 import sys
-
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -51,10 +47,8 @@ class SpikeSourceArray(ReverseIPTagMulticastSourcePartitionableVertex,
             ring_buffer_sigma, timescale_factor, port=None, tag=None,
             ip_address=None, board_address=None,
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
+            space_before_notification=640,
             constraints=None, label="SpikeSourceArray"):
-
-        utility_calls.unused(spikes_per_second)
-        utility_calls.unused(ring_buffer_sigma)
 
         if ip_address is None:
             ip_address = config.get("Buffers", "receive_buffer_host")
@@ -68,10 +62,11 @@ class SpikeSourceArray(ReverseIPTagMulticastSourcePartitionableVertex,
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
-        self._threshold_for_reporting_bytes_written = 0
+        self._space_before_notification = space_before_notification
 
         if self._max_on_chip_memory_usage_for_spikes is None:
-            self._max_on_chip_memory_usage_for_spikes = 8 * 1024 * 1024
+            self._max_on_chip_memory_usage_for_spikes = \
+                front_end_common_constants.MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
 
         # check the values do not conflict with chip memory limit
         if self._max_on_chip_memory_usage_for_spikes < 0:
@@ -100,11 +95,13 @@ class SpikeSourceArray(ReverseIPTagMulticastSourcePartitionableVertex,
                          constraints=list()):
         """
         """
-        send_buffer = self._get_spike_send_buffer(vertex_slice)
-        partitioned_vertex = SpikeSourceArrayPartitionedVertex(
-            {SpikeSourceArray._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value:
-                send_buffer}, resources_required, label, constraints)
-        return partitioned_vertex
+        # map region id to the sned buffer for this partitioned vertex
+        send_buffer = dict()
+        send_buffer[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
+            self._get_spike_send_buffer(vertex_slice)
+        # create and return the partitioned vertex
+        return SpikeSourceArrayPartitionedVertex(
+            send_buffer, resources_required, label, constraints)
 
     def _get_spike_send_buffer(self, vertex_slice):
         """
@@ -118,8 +115,9 @@ class SpikeSourceArray(ReverseIPTagMulticastSourcePartitionableVertex,
                 for neuron in range(vertex_slice.lo_atom,
                                     vertex_slice.hi_atom + 1):
                     for timeStamp in sorted(self._spike_times[neuron]):
-                        time_stamp_in_ticks = int((timeStamp * 1000.0) /
-                                                  self._machine_time_step)
+                        time_stamp_in_ticks = int(
+                            math.ceil((timeStamp * 1000.0) /
+                                      self._machine_time_step))
                         send_buffer.add_key(time_stamp_in_ticks,
                                             neuron - vertex_slice.lo_atom)
             else:
@@ -128,8 +126,9 @@ class SpikeSourceArray(ReverseIPTagMulticastSourcePartitionableVertex,
                 # same list:
                 neuron_list = range(vertex_slice.n_atoms)
                 for timeStamp in sorted(self._spike_times):
-                    time_stamp_in_ticks = int((timeStamp * 1000.0) /
-                                              self._machine_time_step)
+                    time_stamp_in_ticks = int(
+                        math.ceil((timeStamp * 1000.0) /
+                                  self._machine_time_step))
 
                     # add to send_buffer collection
                     send_buffer.add_keys(time_stamp_in_ticks, neuron_list)

@@ -116,8 +116,7 @@ class AbstractSynapticManager(
             sublist.get_n_rows(), dtype="uint32")
         data.fill(0xBBCCDDEE)
 
-        row_no = 0
-        for row in synaptic_rows:
+        for row_no, row in enumerate(synaptic_rows):
             data_pos = ((fixed_row_length +
                          constants.SYNAPTIC_ROW_HEADER_WORDS) *
                         row_no)
@@ -161,7 +160,6 @@ class AbstractSynapticManager(
                 dtype="uint32")
             data[data_pos:(data_pos + fixed_plastic_region_words.size)] = \
                 fixed_plastic_region_words
-            row_no += 1
 
         spec.write_array(data)
         write_ptr += data.size * 4
@@ -187,14 +185,12 @@ class AbstractSynapticManager(
             if (memory_size & 0x3FF) != 0:
                 memory_size = (memory_size & 0xFFFFFC00) + 0x400
 
-            sublist = subedge.get_synapse_sublist()
+            sublist = subedge.get_synapse_sublist(graph_mapper)
             max_n_words = \
                 max([graph_mapper.get_partitionable_edge_from_partitioned_edge(
                      subedge).get_synapse_row_io().get_n_words(synapse_row)
                     for synapse_row in sublist.get_rows()])
 
-            # check that the max_n_words is greater than zero
-            # assert(max_n_words > 0)
             all_syn_block_sz = \
                 self._calculate_all_synaptic_block_size(sublist,
                                                         max_n_words)
@@ -281,9 +277,8 @@ class AbstractSynapticManager(
                                 "Different STDP mechanisms on the same"
                                 " vertex are not supported")
 
-    @staticmethod
     @abstractmethod
-    def get_n_synapse_type_bits():
+    def get_n_synapse_type_bits(self):
         """
         Return the number of bits used to identify the synapse in the synaptic
         row
@@ -359,7 +354,6 @@ class AbstractSynapticManager(
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
-    # noinspection PyUnresolvedReferences
     @staticmethod
     def _ring_buffer_expected_upper_bound(
             weight_mean, weight_std_dev, spikes_per_second,
@@ -455,10 +449,12 @@ class AbstractSynapticManager(
             (n_synapse_types, vertex_slice.n_atoms))
         total_items = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
         for subedge in in_sub_edges:
-            sublist = subedge.get_synapse_sublist()
+            sublist = subedge.get_synapse_sublist(graph_mapper)
             sublist.sum_n_connections(total_items)
+            edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
+                subedge)
 
-            if stdp_max_weight is None:
+            if edge.synapse_dynamics is None:
 
                 # If there's no STDP maximum weight, sum the initial weights
                 sublist.max_weights(absolute_max_weights)
@@ -476,7 +472,6 @@ class AbstractSynapticManager(
         return (total_weights, total_square_weights, total_items,
                 absolute_max_weights)
 
-    # noinspection PyUnresolvedReferences
     def get_ring_buffer_to_input_left_shifts(
             self, subvertex, sub_graph, graph_mapper, spikes_per_second,
             machine_timestep, sigma):
@@ -575,7 +570,6 @@ class AbstractSynapticManager(
         :param subgraph:
         :return:
         """
-        utility_calls.unused(all_syn_block_sz)
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
 
@@ -599,7 +593,7 @@ class AbstractSynapticManager(
                 subedge)
             spec.comment(
                 "\nWriting matrix for subedge:{}\n".format(subedge.label))
-            sublist = subedge.get_synapse_sublist()
+            sublist = subedge.get_synapse_sublist(graph_mapper)
             associated_edge = \
                 graph_mapper.get_partitionable_edge_from_partitioned_edge(
                     subedge)
@@ -667,6 +661,7 @@ class AbstractSynapticManager(
             post_subvertex, routing_infos, subgraph)
 
         # translate the synaptic block into a sublist of synapse_row_infos
+        synapse_list = None
         if max_row_length > 0:
             synapse_list = \
                 self._translate_synaptic_block_from_memory(
@@ -801,7 +796,7 @@ class AbstractSynapticManager(
                     constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
             # read in the memory address of the synaptic_region base address
-            synapse_region_base_address = helpful_functions.read_and_convert(
+            synapse_region_base_address = helpful_functions.read_data(
                 post_x, post_y, synapse_region_base_address_location, 4,
                 "<I", transceiver)
 
@@ -812,12 +807,9 @@ class AbstractSynapticManager(
                                            synaptic_block_base_address_offset)
 
             # read in and return the synaptic block
-            blocks = list(transceiver.read_memory(
-                post_x, post_y, synaptic_block_base_address, synaptic_block_size))
-
-            block = bytearray()
-            for message_block in blocks:
-                block.extend(message_block)
+            block = transceiver.read_memory(
+                post_x, post_y, synaptic_block_base_address,
+                synaptic_block_size)
 
             if len(block) != synaptic_block_size:
                 raise exceptions.SynapticBlockReadException(

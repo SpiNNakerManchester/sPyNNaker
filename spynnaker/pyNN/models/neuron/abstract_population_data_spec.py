@@ -41,13 +41,13 @@ class AbstractPopulationDataSpec(
     generate their data spec files
     """
 
-    def __init__(self, binary, n_keys, label, constraints,
+    def __init__(self, binary, n_neurons, label, constraints,
                  max_atoms_per_core, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma,
                  master_pop_algorithm=None):
         AbstractSynapticManager.__init__(self, master_pop_algorithm)
         AbstractPartitionablePopulationVertex.__init__(
-            self, n_atoms=n_keys, label=label,
+            self, n_atoms=n_neurons, label=label,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core)
@@ -179,8 +179,12 @@ class AbstractPopulationDataSpec(
 
     @abstractmethod
     def get_parameters(self):
+        """ Get any per-neuron parameters for a model
         """
-        method to return whatever params a model has
+
+    @abstractmethod
+    def get_global_parameters(self):
+        """ Get any global parameters for a model
         """
 
     def _write_neuron_parameters(
@@ -214,8 +218,11 @@ class AbstractPopulationDataSpec(
         # noinspection PyTypeChecker
         spec.write_value(data=len(params))
 
-        # Write machine time step: (Integer, expressed in microseconds)
-        spec.write_value(data=self._machine_time_step)
+        # Write the global parameters
+        global_params = self.get_global_parameters()
+        for param in global_params:
+            spec.write_value(data=param.get_value(),
+                             data_type=param.get_dataspec_datatype())
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:

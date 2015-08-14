@@ -25,7 +25,7 @@ class STDPMechanism(AbstractRequiresComponentMagicNumber):
 
     def __init__(self, timing_dependence=None, weight_dependence=None,
                  voltage_dependence=None, dendritic_delay_fraction=1.0,
-                 mad=False):
+                 mad=True):
         if timing_dependence is not None and \
                 not isinstance(timing_dependence, AbstractTimeDependency):
             raise exceptions.ConfigurationException(
@@ -57,8 +57,6 @@ class STDPMechanism(AbstractRequiresComponentMagicNumber):
             raise NotImplementedError("voltage_dependence not implemented")
 
         self._weight_scale = 1.0
-        self._synapse_row_io = self._get_synapse_row_io()
-
 
     @property
     def weight_scale(self):
@@ -94,7 +92,7 @@ class STDPMechanism(AbstractRequiresComponentMagicNumber):
                 (self._dendritic_delay_fraction ==
                  other.dendritic_delay_fraction))
 
-    def _get_synapse_row_io(self):
+    def get_synapse_row_io(self):
         if self.timing_dependence is not None:
             # If we're using MAD, the header contains a single timestamp and
             # pre-trace
@@ -120,9 +118,6 @@ class STDPMechanism(AbstractRequiresComponentMagicNumber):
                 synaptic_row_header_words, self._dendritic_delay_fraction)
         else:
             return None
-
-    def get_synapse_row_io(self):
-        return self._synapse_row_io
 
     # **TODO** make property
     def are_weights_signed(self):

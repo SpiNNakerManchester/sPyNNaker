@@ -1,8 +1,9 @@
 from spynnaker.pyNN.connectors.abstract_connector import AbstractConnector
 from spynnaker.pyNN.models.neuron.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neuron.synapse_row_info import SynapseRowInfo
-from spynnaker.pyNN.utilities.randomDistributions import generate_parameter
-import random
+from spynnaker.pyNN.models.neural_properties.randomDistributions \
+    import generate_parameter_array
+import numpy
 
 
 class MultapseConnector(AbstractConnector):
@@ -41,31 +42,34 @@ class MultapseConnector(AbstractConnector):
         prevertex = presynaptic_population._get_vertex
         postvertex = postsynaptic_population._get_vertex
 
-        id_lists = list()
-        weight_lists = list()
-        delay_lists = list()
-        type_lists = list()
-        for _ in range(0, prevertex.n_atoms):
-            id_lists.append(list())
-            weight_lists.append(list())
-            delay_lists.append(list())
-            type_lists.append(list())
+        source_ids = numpy.random.choice(
+            prevertex.n_atoms, size=self._num_synapses, replace=True)
+        source_ids.sort()
+        target_ids = numpy.random.choice(
+            postvertex.n_atoms, size=self._num_synapses, replace=True)
+        weights = generate_parameter_array(
+            self._weights, self._num_synapses, target_ids) * weight_scale
+        delays = generate_parameter_array(
+            self._delays, self._num_synapses, target_ids) * delay_scale
 
-        num_incoming_axons = prevertex.n_atoms
-        num_target_neurons = postvertex.n_atoms
+        pre_counts = numpy.histogram(source_ids,
+                                     numpy.arange(prevertex.n_atoms + 1))[0]
+        pre_end_idxs = numpy.cumsum(pre_counts)
+        pre_start_idxs = numpy.append(0, pre_end_idxs[:-1])
 
-        for _ in range(0, self._num_synapses):
-            source = int(random.random() * num_incoming_axons)
-            target = int(random.random() * num_target_neurons)
-            weight = generate_parameter(self._weights, target) * weight_scale
-            delay = generate_parameter(self._delays, target) * delay_scale
-            id_lists[source].append(target)
-            weight_lists[source].append(weight)
-            delay_lists[source].append(delay)
-            type_lists[source].append(synapse_type)
+        synaptic_rows = []
+        n_synapses = 0
+        for _, (start, end) in enumerate(zip(pre_start_idxs, pre_end_idxs)):
 
-        connection_list = [SynapseRowInfo(id_lists[i], weight_lists[i],
-                           delay_lists[i], type_lists[i])
-                           for i in range(0, prevertex.n_atoms)]
+            this_target_ids = target_ids[start:end]
+            this_weights = weights[start:end]
+            this_delays = delays[start:end]
+            this_synapes_types = numpy.ones(
+                len(this_target_ids), dtype="uint32") * synapse_type
+            n_synapses += len(this_target_ids)
 
-        return SynapticList(connection_list)
+            synaptic_rows.append(SynapseRowInfo(
+                this_target_ids, this_weights, this_delays,
+                this_synapes_types))
+
+        return SynapticList(synaptic_rows)

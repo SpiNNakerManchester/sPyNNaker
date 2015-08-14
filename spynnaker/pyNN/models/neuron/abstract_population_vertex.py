@@ -1,6 +1,3 @@
-"""
-AbstractPopulationVertex
-"""
 from spynnaker.pyNN.models.components.neuron_components.\
     abstract_population_recordable_vertex \
     import AbstractPopulationRecordableVertex
@@ -22,17 +19,17 @@ logger = logging.getLogger(__name__)
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
                                AbstractPopulationDataSpec):
-    """ Underlying vertex model for ALL Neural Populations.
+    """ Underlying vertex model for Neural Populations.
     """
 
-    def __init__(self, n_keys, n_params, binary, label, max_atoms_per_core,
+    def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
                  machine_time_step, timescale_factor, spikes_per_second,
                  ring_buffer_sigma, weight_scale=1.0, constraints=None):
 
         AbstractPopulationRecordableVertex.__init__(
             self, machine_time_step, label)
         AbstractPopulationDataSpec.__init__(
-            self, binary, n_keys, label, constraints,
+            self, binary, n_neurons, label, constraints,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor,
             max_atoms_per_core=max_atoms_per_core,
@@ -50,7 +47,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            graph_mapper=graph_mapper, placements=placements, transciever=txrx,
+            graph_mapper=graph_mapper, placements=placements, transceiver=txrx,
             compatible_output=compatible_output,
             sub_vertex_out_spike_bytes_function=(
                 lambda subvertex, subvertex_slice: int(ceil(

@@ -1,4 +1,3 @@
-from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common.abstract_spike_recordable_vertex \
     import AbstractSpikeRecordableVertex
@@ -11,6 +10,7 @@ from data_specification import utility_calls as dsg_utility_calls
 import logging
 import numpy
 import struct
+import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -69,12 +69,19 @@ class AbstractPopulationRecordableVertex(AbstractSpikeRecordableVertex):
 
     def _get_neuron_parameter(
             self, get_region_function, parameter_name, placements, transceiver,
-            compatible_output, n_machine_timesteps):
+            compatible_output, n_timesteps):
 
-        times = numpy.zeros(0)
-        ids = numpy.zeros(0)
-        values = numpy.zeros(0)
         ms_per_tick = self._machine_time_step / 1000.0
+
+        tempfilehandle = tempfile.NamedTemporaryFile()
+        data = numpy.memmap(
+            tempfilehandle.file, shape=(n_timesteps, self._n_atoms),
+            dtype="float64,float64,float64")
+        data["f0"] = (numpy.arange(self._n_atoms * n_timesteps) %
+                      self._n_atoms).reshape((n_timesteps, self._n_atoms))
+        data["f1"] = numpy.repeat(numpy.arange(0, n_timesteps * ms_per_tick,
+                                  ms_per_tick), self._n_atoms).reshape(
+                                      (n_timesteps, self._n_atoms))
 
         # Find all the sub-vertices that this pynn_population.py exists on
         progress_bar = ProgressBar(
@@ -93,30 +100,18 @@ class AbstractPopulationRecordableVertex(AbstractSpikeRecordableVertex):
             neuron_param_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address, region)
-            neuron_param_region_base_address_buf = str(list(
-                transceiver.read_memory(
-                    x, y, neuron_param_region_base_address_offset, 4))[0])
-            neuron_param_region_base_address = struct.unpack(
+            neuron_param_region_base_address_buf = transceiver.read_memory(
+                x, y, neuron_param_region_base_address_offset, 4)
+            neuron_param_region_base_address = struct.unpack_from(
                 "<I", neuron_param_region_base_address_buf)[0]
             neuron_param_region_base_address += app_data_base_address
 
             # Read the size
-            number_of_bytes_written_buf = str(list(transceiver.read_memory(
-                x, y, neuron_param_region_base_address, 4))[0])
+            number_of_bytes_written_buf = transceiver.read_memory(
+                x, y, neuron_param_region_base_address, 4)
 
             number_of_bytes_written = struct.unpack_from(
                 "<I", number_of_bytes_written_buf)[0]
-
-            # check that the number of bytes written is smaller or the same as
-            # the size of the memory region we allocated for recording
-            size_of_region = AbstractPopulationRecordableVertex.\
-                _get_parameter_recording_region_size(
-                    n_machine_timesteps, vertex_slice)
-            if number_of_bytes_written > size_of_region:
-                raise exceptions.MemReadException(
-                    "the amount of memory written ({}) was larger than was "
-                    "allocated for it ({})"
-                    .format(number_of_bytes_written, size_of_region))
 
             # Read the values
             logger.debug("Reading {} ({}) bytes starting at {}".format(
@@ -135,25 +130,23 @@ class AbstractPopulationRecordableVertex(AbstractSpikeRecordableVertex):
             logger.debug("Processing {} timesteps"
                          .format(number_of_time_steps_written))
 
-            data_list = bytearray()
-            for data in neuron_param_region_data:
-                data_list.extend(data)
-
-            numpy_data = numpy.asarray(data_list, dtype="uint8").view(
-                dtype="<i4") / 32767.0
-            values = numpy.append(values, numpy_data)
-            times = numpy.append(
-                times, numpy.repeat(range(numpy_data.size /
-                                          vertex_slice.n_atoms),
-                                    vertex_slice.n_atoms) * ms_per_tick)
-            ids = numpy.append(ids, numpy.add(
-                numpy.arange(numpy_data.size) % vertex_slice.n_atoms,
-                vertex_slice.lo_atom))
+            numpy_data = (numpy.asarray(
+                neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
+                32767.0).reshape((n_timesteps, vertex_slice.n_atoms))
+            data["f2"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
+                numpy_data
             progress_bar.update()
 
         progress_bar.end()
-        result = numpy.dstack((ids, times, values))[0]
-        result = result[numpy.lexsort((times, ids))]
+        data.shape = self._n_atoms * n_timesteps
+
+        # Sort the data - apparently, using lexsort is faster, but it might
+        # consume more memory, so the option is left open for sort-in-place
+        order = numpy.lexsort((data["f1"], data["f0"]))
+        # data.sort(order=['f0', 'f1'], axis=0)
+
+        result = data.view(dtype="float64").reshape(
+            (self._n_atoms * n_timesteps, 3))[order]
         return result
 
     def get_v(self, placements, transceiver, compatible_output,

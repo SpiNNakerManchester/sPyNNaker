@@ -125,8 +125,8 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
             if subedges is None:
                 subedges = list()
 
-            synaptic_list = [SynapseRowInfo([], [], [], [])
-                             for _ in range(self._pre_vertex.n_atoms)]
+            synaptic_list = copy.copy(self._synapse_list)
+            synaptic_list_rows = synaptic_list.get_rows()
             progress_bar = ProgressBar(
                 len(subedges), "progress on reading back synaptic matrix")
             for subedge in subedges:
@@ -150,14 +150,15 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
                         float(i) / float(pre_vertex_slice.n_atoms)) + 1
                     min_delay = (delay_stage *
                                  self.pre_vertex.max_delay_per_neuron)
-                    synaptic_list[(i % pre_vertex_slice.n_atoms) +
-                                  pre_vertex_slice.lo_atom]\
-                        .append(rows[i], lo_atom=post_vertex_slice.lo_atom,
-                                min_delay=min_delay)
+                    max_delay = (min_delay +
+                                 self.pre_vertex.max_delay_per_neuron - 1)
+                    synaptic_list_rows[
+                        (i % pre_vertex_slice.n_atoms) +
+                        pre_vertex_slice.lo_atom].set_slice_values(
+                            rows[i], post_vertex_slice, min_delay, max_delay)
                 progress_bar.update()
             progress_bar.end()
-            self._stored_synaptic_data_from_machine = SynapticList(
-                synaptic_list)
+            self._stored_synaptic_data_from_machine = synaptic_list
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer.take_sample()

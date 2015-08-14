@@ -315,7 +315,7 @@ void synapses_do_timestep_update(timer_t time) {
     spin1_mode_restore(state);
 }
 
-void synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
+bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
                                    bool write, uint32_t process_id) {
 
     _print_synaptic_row(row);
@@ -333,8 +333,10 @@ void synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
         address_t plastic_region_address = synapse_row_plastic_region(row);
 
         // Process any plastic synapses
-        synapse_dynamics_process_plastic_synapses(plastic_region_address,
-                fixed_region_address, ring_buffers, time);
+        if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
+                fixed_region_address, ring_buffers, time)) {
+            return false;
+        }
 
         // Perform DMA writeback
         if (write) {
@@ -348,6 +350,7 @@ void synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
     // that the DMA controller is ready to read next synaptic row afterwards
     _process_fixed_synapses(fixed_region_address, time);
     //}
+    return true;
 }
 
 void synapses_print_saturation_count() {

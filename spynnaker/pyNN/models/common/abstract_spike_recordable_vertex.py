@@ -56,7 +56,7 @@ class AbstractSpikeRecordableVertex(object):
         """
         self._spike_recordable_subvertices[subvertex] = vertex_slice
 
-    def get_spikes(self, placements, transciever, compatible_output,
+    def get_spikes(self, placements, transceiver, compatible_output,
                    n_machine_time_steps):
         """ Get a 2-column numpy array containing cell ids and spike times for
             recorded cells.\
@@ -76,25 +76,26 @@ class AbstractSpikeRecordableVertex(object):
             (x, y, p) = placement.x, placement.y, placement.p
             lo_atom = subvertex_slice.lo_atom
             logger.debug("Reading spikes from chip {}, {}, core {}, "
-                         "lo_atom {}".format(x, y, p, lo_atom))
+                         "lo_atom {} hi_atom {}".format(
+                             x, y, p, lo_atom, subvertex_slice.hi_atom))
 
             # Get the App Data for the core
-            app_data_base_address = transciever.get_cpu_information_from_core(
+            app_data_base_address = transceiver.get_cpu_information_from_core(
                 x, y, p).user[0]
 
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address, spike_recording_region)
-            spike_region_base_address_buf = str(list(transciever.read_memory(
-                x, y, spike_region_base_address_offset, 4))[0])
-            spike_region_base_address = struct.unpack(
+            spike_region_base_address_buf = transceiver.read_memory(
+                x, y, spike_region_base_address_offset, 4)
+            spike_region_base_address = struct.unpack_from(
                 "<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
 
             # Read the spike data size
-            number_of_bytes_written_buf = str(list(transciever.read_memory(
-                x, y, spike_region_base_address, 4))[0])
+            number_of_bytes_written_buf = transceiver.read_memory(
+                x, y, spike_region_base_address, 4)
             number_of_bytes_written = struct.unpack_from(
                 "<I", number_of_bytes_written_buf)[0]
 
@@ -114,31 +115,22 @@ class AbstractSpikeRecordableVertex(object):
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            spike_data = transciever.read_memory(
+            spike_data = transceiver.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
-
-            data_list = bytearray()
-            for data in spike_data:
-                data_list.extend(data)
-
-            numpy_data = numpy.asarray(data_list, dtype="uint8").view(
-                dtype="<i4").byteswap().view("uint8")
+            numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
+                dtype="uint32").byteswap().view("uint8")
             bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
                 (-1, 32))).reshape((-1, self._get_spike_bytes_per_time_step(
                     subvertex_slice) * 8))
-            indices = [numpy.add(numpy.where(items)[0], lo_atom)
-                       for items in bits]
-            times = [numpy.repeat(i * ms_per_tick, len(indices[i]))
-                     for i in range(len(indices))]
-            spike_ids.extend([item for sublist in indices for item in sublist])
-            spike_times.extend([item for sublist in times for item in sublist])
+            times, indices = numpy.where(bits == 1)
+            times = times * ms_per_tick
+            indices = indices + lo_atom
+            spike_ids.append(indices)
+            spike_times.append(times)
             progress_bar.update()
 
         progress_bar.end()
+        spike_ids = numpy.hstack(spike_ids)
+        spike_times = numpy.hstack(spike_times)
         result = numpy.dstack((spike_ids, spike_times))[0]
-
-        # check before doing lexsort that there is data to sort,
-        # otherwise numpy blows up.
-        if len(spike_ids) > 1:
-            result = result[numpy.lexsort((spike_times, spike_ids))]
-        return result
+        return result[numpy.lexsort((spike_times, spike_ids))]

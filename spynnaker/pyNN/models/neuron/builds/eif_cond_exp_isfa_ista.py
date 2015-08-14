@@ -1,6 +1,3 @@
-"""
-EIFConductanceExponentialPopulation
-"""
 from spynnaker.pyNN.models.components.neuron_components.\
     abstract_population_vertex import AbstractPopulationVertex
 from spynnaker.pyNN.models.components.synapse_shape_components.\
@@ -20,7 +17,7 @@ class EIFConductanceExponentialPopulation(
     """
 
     # noinspection PyPep8Naming
-    def __init__(self, n_keys, machine_time_step, timescale_factor,
+    def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma, constraints=None,
                  label=None, tau_m=9.3667, cm=0.281, v_rest=-70.6,
                  v_reset=-70.6, v_thresh=-50.0, tau_syn_E=5.0, tau_syn_I=0.5,
@@ -39,6 +36,10 @@ class EIFConductanceExponentialPopulation(
             "This neuron model is currently not supported by the tool chain")
 
     def get_parameters(self):
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
+
+    def get_global_parameters(self):
         raise exceptions.SpynnakerException(
             "This neuron model is currently not supported by the tool chain")
 

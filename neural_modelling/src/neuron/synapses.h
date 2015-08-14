@@ -59,7 +59,7 @@ bool synapses_initialise(
 
 void synapses_do_timestep_update(timer_t time);
 
-void synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
+bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
                                    bool write, uint32_t process_id);
 
 void synapses_print_saturation_count();

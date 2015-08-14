@@ -46,7 +46,7 @@ projections.append(p.Projection(populations[1], populations[0], p.FromListConnec
 #populations[0].record_gsyn()
 populations[0].record()
 
-p.run(5000)
+p.run(1000)
 
 v = None
 gsyn = None

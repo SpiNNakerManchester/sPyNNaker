@@ -78,6 +78,8 @@ uint32_t time;
 //! global parameter which contains the number of timer ticks to run for before
 //! being expected to exit
 static uint32_t simulation_ticks = 0;
+//! global paramter which states if this model should run for infinite time
+static uint32_t infinite_run;
 
 static inline bool check_component_hash(
         uint32_t expected_hash, uint32_t received_hash,
@@ -111,8 +113,9 @@ static bool initialize(uint32_t *timer_period) {
     // Get the timing details
     address_t header_region = data_specification_get_region(
         HEADER_REGION, address);
-    if (!simulation_read_header(
-            header_region, timer_period, &simulation_ticks)) {
+    if (!simulation_read_timing_details(
+            header_region, APPLICATION_NAME_HASH, timer_period,
+            &simulation_ticks, &infinite_run)) {
         return false;
     }
 
@@ -223,23 +226,18 @@ void timer_callback(uint timer_count, uint unused) {
 
     /* if a fixed number of simulation ticks that were specified at startup
        then do reporting for finishing */
-    if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {
+    if (infinite_run != TRUE && time >= simulation_ticks) {
         log_info("Simulation complete.\n");
 
         // print statistics into logging region
         synapses_print_pre_synaptic_events();
         synapses_print_saturation_count();
 
+        spike_processing_print_buffer_overflows();
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
-
-        // Check for buffer overflow
-        uint spike_buffer_overflows = in_spikes_get_n_buffer_overflows();
-        if (spike_buffer_overflows > 0) {
-            io_printf(IO_STD, "\tWarning - %d spike buffers overflowed\n",
-                    spike_buffer_overflows);
-        }
 
         spin1_exit(0);
         return;

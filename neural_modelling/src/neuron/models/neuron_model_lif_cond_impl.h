@@ -3,14 +3,6 @@
 
 #include "neuron_model.h"
 
-// only works properly for 1000, 700, 400 microsec timesteps
-//#define CORRECT_FOR_REFRACTORY_GRANULARITY
-
-//#define CORRECT_FOR_THRESHOLD_GRANULARITY
-
-// 9% slower than standard but inevitably more accurate(?) might over-compensate
-//#define SIMPLE_COMBINED_GRANULARITY
-
 /////////////////////////////////////////////////////////////
 // definition for LIF neuron
 typedef struct neuron_t {
@@ -44,47 +36,22 @@ typedef struct neuron_t {
     // exp( -(machine time step in ms)/(R * C) ) [.]
     REAL     exp_TC;
 
-    // [kHz!] only necessary if one wants to use ODE solver because allows
-    // multiply and host double prec to calc
-    // - UNSIGNED ACCUM & unsigned fract much slower
-    REAL     one_over_tauRC;
-
-    // countdown to end of next refractory period [ms/10]
-    // - 3 secs limit do we need more? Jan 2014
+    // countdown to end of next refractory period [timesteps]
     int32_t  refract_timer;
 
-    // refractory time of neuron [ms/10]
+    // refractory time of neuron [timesteps]
     int32_t  T_refract;
 
-#ifdef SIMPLE_COMBINED_GRANULARITY
-
-    // store the 3 internal timestep to avoid granularity
-    REAL     eTC[3];
-#endif
-#ifdef CORRECT_FOR_THRESHOLD_GRANULARITY
-
-    // which period previous spike happened to approximate threshold crossing
-    uint8_t prev_spike_code;
-
-    // store the 3 internal timestep to avoid granularity
-    REAL     eTC[3];
-#endif
-#ifdef CORRECT_FOR_REFRACTORY_GRANULARITY
-
-    // approx corrections for release from refractory period
-    uint8_t  ref_divisions[2];
-
-    // store the 3 internal timestep to avoid granularity
-    REAL     eTC[3];
-#endif
-
 } neuron_t;
+
+typedef struct global_neuron_params_t {
+} global_neuron_params_t;
 
 //
 neuron_pointer_t neuron_model_lif_cond_impl_create(
     REAL V_thresh, REAL V_reset, REAL V_rest, REAL V_rev_E, REAL V_rev_I,
-    REAL one_over_tauRC, REAL R, int32_t T_refract, REAL V, REAL I,
-    int32_t refract_timer, REAL exp_tc);
+    REAL R, int32_t T_refract, REAL V, REAL I, int32_t refract_timer,
+    REAL exp_tc);
 
 // function that converts the input into the real value to be used by the neuron
 inline input_t neuron_model_convert_input(input_t input) {

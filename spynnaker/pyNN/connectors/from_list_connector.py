@@ -1,10 +1,9 @@
-from spynnaker.pyNN.connectors.seed_info import SeedInfo
 from spynnaker.pyNN.connectors.abstract_connector import AbstractConnector
 from spynnaker.pyNN.models.neuron.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neuron.synapse_row_info import SynapseRowInfo
-from spynnaker.pyNN.utilities.randomDistributions import generate_parameter
 from spinn_front_end_common.utilities import exceptions
 import logging
+import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -37,9 +36,6 @@ class FromListConnector(AbstractConnector):
         if conn_list is None:
             conn_list = []
         self._conn_list = conn_list
-        self._delay_so_far = 0
-        self._weight_seeds = SeedInfo()
-        self._delay_seeds = SeedInfo()
 
     def generate_synapse_list(
             self, presynaptic_population, postsynaptic_population, delay_scale,
@@ -48,61 +44,47 @@ class FromListConnector(AbstractConnector):
         prevertex = presynaptic_population._get_vertex
         postvertex = postsynaptic_population._get_vertex
 
-        id_lists = list()
-        weight_lists = list()
-        delay_lists = list()
-        type_lists = list()
+        # Convert connection list into numpy record array
+        conn_list_numpy = numpy.array(
+            self._conn_list, dtype=[("source", "uint32"), ("target", "uint32"),
+                                    ("weight", "float"), ("delay", "float")])
+        if (conn_list_numpy["target"] >= postvertex.n_atoms).any():
+            raise exceptions.ConfigurationException("Target atom out of range")
 
-        for _ in range(0, prevertex.n_atoms):
-            id_lists.append(list())
-            weight_lists.append(list())
-            delay_lists.append(list())
-            type_lists.append(list())
+        # Sort by pre-synaptic neuron
+        conn_list_numpy = numpy.sort(conn_list_numpy, order="source")
 
-        for i in range(0, len(self._conn_list)):
-            conn = self._conn_list[i]
-            len_list = []
-            if isinstance(conn[0], list):
-                len_list.append(len(conn[0]))
-            else:
-                len_list.append(1)
-            if isinstance(conn[1], list):
-                len_list.append(len(conn[1]))
-            else:
-                len_list.append(1)
-            if isinstance(conn[2], list) and (isinstance(conn[0], list) or
-                                              isinstance(conn[1], list)):
-                len_list.append(len(conn[2]))
-            else:
-                len_list.append(1)
-            if isinstance(conn[3], list) and (isinstance(conn[0], list) or
-                                              isinstance(conn[1], list)):
-                len_list.append(len(conn[3]))
-            else:
-                len_list.append(1)
-            valid_len = reduce(lambda x, y: x if (y == 1 or y == x) else
-                               (y if x == 1 else 0), len_list, 1)
-            if (valid_len):
-                for j in range(valid_len):
-                    pre_atom = generate_parameter(conn[0], j)
-                    post_atom = generate_parameter(conn[1], j)
-                    if not 0 <= pre_atom < prevertex.n_atoms:
-                        raise exceptions.ConfigurationException(
-                            "Invalid neuron id in presynaptic population {}"
-                            .format(pre_atom))
-                    if not 0 <= post_atom < postvertex.n_atoms:
-                        raise exceptions.ConfigurationException(
-                            "Invalid neuron id in postsynaptic population {}"
-                            .format(post_atom))
-                    weight = generate_parameter(conn[2], j) * weight_scale
-                    delay = generate_parameter(conn[3], j) * delay_scale
-                    id_lists[pre_atom].append(post_atom)
-                    weight_lists[pre_atom].append(weight)
-                    delay_lists[pre_atom].append(delay)
-                    type_lists[pre_atom].append(synapse_type)
+        # Apply weight and delay scaling
+        conn_list_numpy["weight"] *= weight_scale
+        conn_list_numpy["delay"] *= delay_scale
 
-        connection_list = [SynapseRowInfo(id_lists[i], weight_lists[i],
-                           delay_lists[i], type_lists[i])
-                           for i in range(0, prevertex.n_atoms)]
+        # Count number of connections per pre-synaptic neuron
+        pre_counts = numpy.histogram(
+            conn_list_numpy["source"], numpy.arange(prevertex.n_atoms + 1))[0]
 
-        return SynapticList(connection_list)
+        # Take cumulative sum of these counts to get start and end indices of
+        # the blocks of connections coming from each pre-synaptic neuron
+        pre_end_idxs = numpy.cumsum(pre_counts)
+        pre_start_idxs = numpy.append(0, pre_end_idxs[:-1])
+
+        # Loop through slices of connections
+        synaptic_rows = []
+        for _, (start, end) in enumerate(zip(pre_start_idxs, pre_end_idxs)):
+
+            # Get slice
+            pre_conns = conn_list_numpy[start:end]
+
+            # Repeat synapse type correct number of times
+            synapse_type_row = numpy.empty(len(pre_conns), dtype="uint32")
+            synapse_type_row.fill(synapse_type)
+
+            # Combine post-synaptic neuron ids, weights, delays
+            # and synapse types together into synaptic row
+            synaptic_rows.append(
+                SynapseRowInfo(pre_conns["target"],
+                               pre_conns["weight"],
+                               pre_conns["delay"],
+                               synapse_type_row))
+
+        # Return full synaptic list
+        return SynapticList(synaptic_rows)

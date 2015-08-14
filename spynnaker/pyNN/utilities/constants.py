@@ -8,9 +8,6 @@ POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 BLOCK_INDEX_HEADER_WORDS = 3
 BLOCK_INDEX_ROW_WORDS = 2
 
-# database cap file path
-MAX_DATABASE_PATH_LENGTH = 50000
-
 RECORD_SPIKE_BIT = 1 << 0
 RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
@@ -48,6 +45,10 @@ MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 # router entry for it (this is default routed to the monitor core which
 # currently drops the packet).
 MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
+
+# master population table magic
+MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
+MASTER_POP_BINARY_SEARCH = 0xBB2
 
 EDGES = Enum(
     value="EDGES",

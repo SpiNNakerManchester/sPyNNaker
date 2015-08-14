@@ -8,10 +8,10 @@ from pacman.model.constraints.key_allocator_constraints.\
 from pacman.utilities.field import Field
 
 # spynnaker imports
-from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
-    abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.neuron.population_tables.\
+    abstract_master_pop_table_factory import AbstractMasterPopTableFactory
+
 
 # spinn front end common inports
 from spinn_front_end_common.utilities import helpful_functions
@@ -24,7 +24,6 @@ from data_specification.enums.data_type import DataType
 import logging
 import math
 import hashlib
-
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +148,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
                                           master_pop_base_mem_address)
 
         # read in entry
-        master_pop_entry = helpful_functions.read_and_convert(
+        master_pop_entry = helpful_functions.read_data(
             chip_x, chip_y, master_table_pop_entry_address, 2, "<H", txrx)
 
         synaptic_block_base_address = master_pop_entry >> 3  # in kilobytes

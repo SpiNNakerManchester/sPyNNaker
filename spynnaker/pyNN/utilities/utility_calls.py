@@ -19,7 +19,7 @@ def check_directory_exists_and_create_if_not(filename):
     :return:
     """
     directory = os.path.dirname(filename)
-    if not os.path.exists(directory):
+    if directory != "" and not os.path.exists(directory):
         os.makedirs(directory)
 
 

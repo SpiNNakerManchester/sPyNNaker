@@ -3,8 +3,7 @@
 
 #include <debug.h>
 
-// machine timestep in msecs
-static REAL machine_timestep = REAL_CONST(1.0);
+static global_neuron_params_pointer_t global_params;
 
 static const REAL V_threshold = REAL_CONST(30.0);
 
@@ -76,10 +75,9 @@ static inline void _neuron_discrete_changes(neuron_pointer_t neuron) {
     neuron->U += neuron->D;
 }
 
-void neuron_model_set_machine_timestep(timer_t microsecs) {
-
-    const double time_step_multiplier = 0.00100;
-    machine_timestep = (REAL) (microsecs * time_step_multiplier);
+void neuron_model_set_global_neuron_params(
+        global_neuron_params_pointer_t params) {
+    global_params = params;
 }
 
 //
@@ -87,15 +85,15 @@ bool neuron_model_state_update(input_t exc_input, input_t inh_input,
                                input_t external_bias, neuron_pointer_t neuron) {
 
     // Get the input in nA
-	/* TODO
-	 * this is where the abstracted create_input_current() function will be used
-	 *      static inline REAL create_input_current( REAL exc_input,
-	 *                                               REAL inh_input,
-	 *                                               REAL i_offset );
-	 *   to generalise current and conductance input i.e.
-	 *   input_this_timestep = create_input_current( exc_input, inh_input,
-	 *                                               neuron->I_offset );
-	 */
+    /* TODO
+    * this is where the abstracted create_input_current() function will be used
+    *      static inline REAL create_input_current( REAL exc_input,
+    *                                               REAL inh_input,
+    *                                               REAL i_offset );
+    *   to generalise current and conductance input i.e.
+    *   input_this_timestep = create_input_current( exc_input, inh_input,
+    *                                               neuron->I_offset );
+    */
     input_t input_this_timestep = exc_input - inh_input
                                   + external_bias + neuron->I_offset;
 
@@ -115,9 +113,9 @@ bool neuron_model_state_update(input_t exc_input, input_t inh_input,
         _neuron_discrete_changes(neuron);
 
         // simple threshold correction - next timestep (only) gets a bump
-        neuron->this_h = machine_timestep * SIMPLE_TQ_OFFSET;
+        neuron->this_h = global_params->machine_timestep_ms * SIMPLE_TQ_OFFSET;
     } else {
-        neuron->this_h = machine_timestep;
+        neuron->this_h = global_params->machine_timestep_ms;
     }
 
     return spike;
@@ -156,7 +154,7 @@ neuron_pointer_t neuron_model_izh_curr_impl_create(REAL A, REAL B, REAL C,
 
     neuron->I_offset = I;
 
-    neuron->this_h = machine_timestep * REAL_CONST(1.001);
+    neuron->this_h = global_params->machine_timestep_ms;
     neuron_model_print(neuron);
     log_debug("h = %11.4k ms\n", neuron->this_h);
 
