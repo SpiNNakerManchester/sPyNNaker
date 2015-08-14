@@ -3,8 +3,8 @@ Spinnaker
 """
 
 # pacman imports
-from pacman.operations.chip_id_allocator_algorithms.malloc_based_chip_id_allocator import \
-    MallocBasedChipIdAllocator
+from pacman.operations.chip_id_allocator_algorithms.\
+    malloc_based_chip_id_allocator import MallocBasedChipIdAllocator
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
