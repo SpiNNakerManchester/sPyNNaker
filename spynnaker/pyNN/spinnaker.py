@@ -3,6 +3,8 @@ Spinnaker
 """
 
 # pacman imports
+from pacman.operations.chip_id_allocator_algorithms.\
+    malloc_based_chip_id_allocator import MallocBasedChipIdAllocator
 from pacman.operations.router_check_functionality.valid_routes_checker import \
     ValidRouteChecker
 from pacman.utilities import reports as pacman_reports
@@ -71,7 +73,7 @@ from spynnaker.pyNN.spynnaker_configurations import \
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
+from pacman.model.abstract_classes.abstract_virtual_vertex import \
     AbstractVirtualVertex
 from spynnaker.pyNN.models.abstract_models\
     .abstract_send_me_multicast_commands_vertex \
@@ -915,6 +917,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             timescale_factor=self._time_scale_factor)
 
     def _add_virtual_chips(self):
+        # allocate chip ids to the virutal chips
+        chip_id_allocator = MallocBasedChipIdAllocator()
+        chip_id_allocator.allocate_chip_ids(self._partitionable_graph,
+                                            self._machine)
+
+        # add virtual chips to the machine object
         for vertex in self._partitionable_graph.vertices:
             if isinstance(vertex, AbstractVirtualVertex):
 
@@ -925,6 +933,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._machine.add_chip(virutal_chip)
 
     def _create_virtual_chip(self, virtual_vertex):
+        """ Create a virtual chip as a real chip in the spinnmachine machine\
+            object
+        :param virtual_vertex: virutal vertex to convert into a real chip
+        :return: the real chip
+        """
         sdram_object = SDRAM()
 
         # creates the two links
