@@ -7,7 +7,7 @@ except ImportError:
 
 import os
 
-__version__ = "2015.004"
+__version__ = "2015.005"
 
 class CustomInstall(install):
 
