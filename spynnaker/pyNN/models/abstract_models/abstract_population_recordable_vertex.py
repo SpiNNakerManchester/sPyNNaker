@@ -111,15 +111,15 @@ class AbstractPopulationRecordableVertex(object):
             spike_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address, spike_recording_region)
-            spike_region_base_address_buf = transceiver.read_memory(
-                x, y, spike_region_base_address_offset, 4)
+            spike_region_base_address_buf = buffer(transceiver.read_memory(
+                x, y, spike_region_base_address_offset, 4))
             spike_region_base_address = struct.unpack_from(
                 "<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
 
             # Read the spike data size
-            number_of_bytes_written_buf = transceiver.read_memory(
-                x, y, spike_region_base_address, 4)
+            number_of_bytes_written_buf = buffer(transceiver.read_memory(
+                x, y, spike_region_base_address, 4))
             number_of_bytes_written = struct.unpack_from(
                 "<I", number_of_bytes_written_buf)[0]
 
@@ -195,15 +195,15 @@ class AbstractPopulationRecordableVertex(object):
             neuron_param_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address, region)
-            neuron_param_region_base_address_buf = txrx.read_memory(
-                x, y, neuron_param_region_base_address_offset, 4)
+            neuron_param_region_base_address_buf = buffer(txrx.read_memory(
+                x, y, neuron_param_region_base_address_offset, 4))
             neuron_param_region_base_address = struct.unpack_from(
                 "<I", neuron_param_region_base_address_buf)[0]
             neuron_param_region_base_address += app_data_base_address
 
             # Read the size
-            number_of_bytes_written_buf = txrx.read_memory(
-                x, y, neuron_param_region_base_address, 4)
+            number_of_bytes_written_buf = buffer(txrx.read_memory(
+                x, y, neuron_param_region_base_address, 4))
 
             number_of_bytes_written = struct.unpack_from(
                 "<I", number_of_bytes_written_buf)[0]
