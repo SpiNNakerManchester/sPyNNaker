@@ -27,13 +27,4 @@ typedef struct global_neuron_params_t {
     REAL machine_timestep_ms;
 } global_neuron_params_t;
 
-neuron_pointer_t neuron_model_izh_curr_impl_create(REAL A, REAL B, REAL C,
-                                                   REAL D, REAL V, REAL U,
-                                                   REAL I);
-
-// function that converts the input into the real value to be used by the neuron
-inline input_t neuron_model_convert_input(input_t input) {
-    return input;
-}
-
 #endif   // _NEURON_MODEL_IZH_CURR_IMPL_H_

@@ -25,7 +25,9 @@ OBJECTS = $(SOURCE_DIRS)/common/out_spikes.o \
           $(SOURCE_DIRS)/common/recording.o $(SOURCE_DIRS)/neuron/c_main.o \
           $(SOURCE_DIRS)/neuron/synapses.o  $(SOURCE_DIRS)/neuron/neuron.o \
 	      $(SOURCE_DIRS)/neuron/spike_processing.o \
-	      $(SOURCE_DIRS)/neuron/population_table_$(POPULATION_TABLE_IMPL)_impl.o $(MODEL_OBJS)
+	      $(SOURCE_DIRS)/neuron/population_table_$(POPULATION_TABLE_IMPL)_impl.o \
+	      $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
+	      $(TIMING_DEPENDENCE) $(OTHER_OBJS)
 
 SYNAPSE_TYPE_OBJECTS += $(BUILD_DIR)neuron/c_main.o \
                         $(BUILD_DIR)neuron/synapses.o \
@@ -82,7 +84,8 @@ $(BUILD_DIR)neuron/neuron.o: $(SOURCE_DIRS)/neuron/neuron.c $(NEURON_MODEL_H)\
                              $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) -include $(NEURON_MODEL_H) \
-	                  -include $(SYNAPSE_TYPE_H) -o $@ $<
+	                  -include $(SYNAPSE_TYPE_H) -include $(INPUT_TYPE_H) \
+	                  -include $(THRESHOLD_TYPE_H) -o $@ $<
 
 $(EXTRA_SYNAPSE_TYPE_OBJECTS):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c\
                               $(SYNAPSE_TYPE_H)

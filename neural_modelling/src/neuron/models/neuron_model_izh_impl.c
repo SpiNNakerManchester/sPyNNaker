@@ -1,10 +1,8 @@
-#include "neuron_model_izh_curr_impl.h"
+#include "neuron_model_izh_impl.h"
 
 #include <debug.h>
 
 static global_neuron_params_pointer_t global_params;
-
-static const REAL V_threshold = REAL_CONST(30.0);
 
 /*! \brief For linear membrane voltages, 1.5 is the correct value. However
  * with actual membrane voltage behaviour and tested over an wide range of
@@ -64,60 +62,34 @@ static inline void _rk2_kernel_midpoint(REAL h, neuron_pointer_t neuron,
     neuron->U += a * h * (-lastU1 - beta + b * eta);
 }
 
-// ODE solver has just set neuron->V which is current state of membrane voltage
-static inline void _neuron_discrete_changes(neuron_pointer_t neuron) {
+void neuron_model_set_global_neuron_params(
+        global_neuron_params_pointer_t params) {
+    global_params = params;
+}
+
+state_t neuron_model_state_update(input_t exc_input, input_t inh_input,
+                               input_t external_bias, neuron_pointer_t neuron) {
+
+    input_t input_this_timestep = exc_input - inh_input
+                                  + external_bias + neuron->I_offset;
+
+    // the best AR update so far
+    _rk2_kernel_midpoint(neuron->this_h, neuron, input_this_timestep);
+    neuron->this_h = global_params->machine_timestep_ms;
+
+    return neuron->V;
+}
+
+void neuron_model_has_spiked(neuron_pointer_t neuron) {
 
     // reset membrane voltage
     neuron->V = neuron->C;
 
     // offset 2nd state variable
     neuron->U += neuron->D;
-}
 
-void neuron_model_set_global_neuron_params(
-        global_neuron_params_pointer_t params) {
-    global_params = params;
-}
-
-//
-bool neuron_model_state_update(input_t exc_input, input_t inh_input,
-                               input_t external_bias, neuron_pointer_t neuron) {
-
-    // Get the input in nA
-    /* TODO
-    * this is where the abstracted create_input_current() function will be used
-    *      static inline REAL create_input_current( REAL exc_input,
-    *                                               REAL inh_input,
-    *                                               REAL i_offset );
-    *   to generalise current and conductance input i.e.
-    *   input_this_timestep = create_input_current( exc_input, inh_input,
-    *                                               neuron->I_offset );
-    */
-    input_t input_this_timestep = exc_input - inh_input
-                                  + external_bias + neuron->I_offset;
-
-    // the best AR update so far
-    _rk2_kernel_midpoint(neuron->this_h, neuron, input_this_timestep);
-
-    /* TODO
-     * this is where the abstracted test_threshold() function will be used
-     *     static inline bool test_threshold( accum membrane, accum threshold );
-     * to allow stochastic neurons if necessary i.e.
-     * bool spike = test_threshold( neuron->V, V_threshold );
-     */
-
-    bool spike = REAL_COMPARE(neuron->V, >=, V_threshold);
-
-    if (spike) {
-        _neuron_discrete_changes(neuron);
-
-        // simple threshold correction - next timestep (only) gets a bump
-        neuron->this_h = global_params->machine_timestep_ms * SIMPLE_TQ_OFFSET;
-    } else {
-        neuron->this_h = global_params->machine_timestep_ms;
-    }
-
-    return spike;
+    // simple threshold correction - next timestep (only) gets a bump
+    neuron->this_h = global_params->machine_timestep_ms * SIMPLE_TQ_OFFSET;
 }
 
 state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
@@ -135,27 +107,4 @@ void neuron_model_print(restrict neuron_pointer_t neuron) {
     log_debug("U = %11.4k ", neuron->U);
 
     log_debug("I = %11.4k \n", neuron->I_offset);
-}
-
-//
-neuron_pointer_t neuron_model_izh_curr_impl_create(REAL A, REAL B, REAL C,
-                                                   REAL D, REAL V, REAL U,
-                                                   REAL I) {
-    neuron_pointer_t neuron = spin1_malloc(sizeof(neuron_t));
-
-    neuron->A = A;
-    neuron->B = B;
-    neuron->C = C;
-    neuron->D = D;
-
-    neuron->V = V;
-    neuron->U = U;
-
-    neuron->I_offset = I;
-
-    neuron->this_h = global_params->machine_timestep_ms;
-    neuron_model_print(neuron);
-    log_debug("h = %11.4k ms\n", neuron->this_h);
-
-    return neuron;
 }
