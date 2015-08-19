@@ -120,6 +120,14 @@ class Population(object):
         """
         raise NotImplementedError
 
+    @property
+    def default_parameters(self):
+        """
+        returns the default paramters of the vertex from this population
+        :return:
+        """
+        return self._vertex.default_parameters
+
     def describe(self, template='population_default.txt', engine='default'):
         """
         Returns a human-readable description of the population.

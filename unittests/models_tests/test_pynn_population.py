@@ -108,6 +108,26 @@ class TestingPopulation(unittest.TestCase):
         with self.assertRaises(ConfigurationException):
             pop.tset("cm", data)
 
+    def test_get_default_parameters_of_if_curr_exp(self):
+        pop = pyNN.Population(10, pyNN.IF_curr_exp, cell_params_lif,
+                              label="Constrained population")
+        default_params = pop.default_parameters
+        boxed_defaults = \
+            {'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
+             'v_thresh': -50.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
+             'tau_refrac': 0.1, 'i_offset': 0, 'v_init': -65.0}
+        for param in default_params.keys():
+            self.assertEqual(default_params[param], boxed_defaults[param])
+
+    def test_get_default_parameters_of_if_curr_exp_no_instaniation(self):
+        default_params = pyNN.IF_curr_exp.default_parameters
+        boxed_defaults = \
+            {'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
+             'v_thresh': -50.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
+             'tau_refrac': 0.1, 'i_offset': 0, 'v_init': -65.0}
+        for param in default_params.keys():
+            self.assertEqual(default_params[param], boxed_defaults[param])
+
 
 if __name__ == "__main__":
     unittest.main()
