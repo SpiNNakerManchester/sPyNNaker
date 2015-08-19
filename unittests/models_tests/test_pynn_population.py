@@ -4,6 +4,8 @@ import spynnaker.pyNN as pyNN
 from spynnaker.pyNN.models.neural_models.izk_curr_exp import \
     IzhikevichCurrentExponentialPopulation
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from pacman.model.constraints.placer_constraints.\
+    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 populations = list()
 cell_params_lif = {'cm': 0.25,
                    'i_offset': 0.0,
@@ -85,10 +87,26 @@ class TestingPopulation(unittest.TestCase):
     def test_set_constraint_to_population(self):
         pop = pyNN.Population(10, pyNN.IF_curr_exp, cell_params_lif,
                               label="Constrained population")
-        placer_constraint = pyNN.PlacerChipAndCoreConstraint(x=1, y=0)
+        placer_constraint = PlacerChipAndCoreConstraint(x=1, y=0)
         pop.set_constraint(placer_constraint)
         constraints = pop._get_vertex.constraints
         self.assertIn(placer_constraint, constraints)
+
+    def test_t_set(self):
+        pop = pyNN.Population(10, pyNN.IF_curr_exp, cell_params_lif,
+                              label="Constrained population")
+        data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        pop.tset("cm", data)
+        cm = pop.get("cm")
+        for index in range(0, len(data)):
+            self.assertEqual(cm[index], data[index])
+
+    def test_t_set_invalid(self):
+        pop = pyNN.Population(10, pyNN.IF_curr_exp, cell_params_lif,
+                              label="Constrained population")
+        data = [0, 1, 2, 3, 4, 5, 6, 7]
+        with self.assertRaises(ConfigurationException):
+            pop.tset("cm", data)
 
 
 if __name__ == "__main__":

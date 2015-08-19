@@ -140,7 +140,7 @@ class Population(object):
         """
         Get the values of a parameter for every local cell in the population.
         """
-        raise NotImplementedError
+        return self._parameters[paramter_name]
 
     def _get_cell_position(self, cell_id):
         """
@@ -667,7 +667,12 @@ class Population(object):
         'Topographic' set. Set the value of parametername to the values in
         value_array, which must have the same dimensions as the Population.
         """
-        raise NotImplementedError
+        if len(value_array) != self._vertex.n_atoms:
+            raise exceptions.ConfigurationException(
+                "To use Tset, you must have a array of values which matches the"
+                "size of the population. Please change this and try again. Or "
+                "Alternatively, use set()")
+        self.set(parametername, value_array)
 
     def _end(self):
         """ Do final steps at the end of the simulation
