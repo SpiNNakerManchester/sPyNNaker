@@ -2,6 +2,8 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_conductance_vertex import \
+    AbstractConductanceVertex
 
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \
@@ -415,9 +417,12 @@ class Population(object):
         triggering gsyn value recording.
         """
         if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
-            raise Exception("Vertex does not support "
-                            "recording of gsyn")
-
+            raise Exception("Vertex does not support recording of gsyn")
+        if not isinstance(self._vertex, AbstractConductanceVertex):
+            logger.warn(
+                "You are trying to record the conductance from a model which "
+                "does not contain conductance behaviour. You will recieve "
+                "current measurements instead. Sorry")
         self._vertex.set_record_gsyn(True)
         self._record_gsyn_file = to_file
 
