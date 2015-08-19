@@ -19,8 +19,9 @@ void neuron_model_set_global_neuron_params(
     // Does Nothing - no params
 }
 
-state_t neuron_model_state_update(input_t exc_input, input_t inh_input,
-                               input_t external_bias, neuron_pointer_t neuron) {
+state_t neuron_model_state_update(
+        input_t exc_input, input_t inh_input, input_t external_bias,
+        neuron_pointer_t neuron) {
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
