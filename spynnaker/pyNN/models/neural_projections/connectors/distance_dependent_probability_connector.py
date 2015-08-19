@@ -11,7 +11,8 @@ from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_properties.synapse_row_info \
     import SynapseRowInfo
-from spynnaker.pyNN.exceptions import ConfigurationException
+
+from spinn_front_end_common.utilities import exceptions
 
 import logging
 import numpy
@@ -155,11 +156,11 @@ class DistanceDependentProbabilityConnector(FromListConnector):
             pre_atom = generate_parameter(conn[0], i)
             post_atom = generate_parameter(conn[1], i)
             if not 0 <= pre_atom < prevertex.n_atoms:
-                raise ConfigurationException(
+                raise exceptions.ConfigurationException(
                     "Invalid neuron id in presynaptic population {}".format(
                         pre_atom))
             if not 0 <= post_atom < postvertex.n_atoms:
-                raise ConfigurationException(
+                raise exceptions.ConfigurationException(
                     "Invalid neuron id in postsynaptic population {}".format(
                         post_atom))
             weight = generate_parameter(conn[2], i) * weight_scale

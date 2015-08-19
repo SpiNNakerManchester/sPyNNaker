@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import unittest
 import spynnaker.pyNN as pyNN
-import spynnaker.pyNN.models.neural_models as models
 from spynnaker.pyNN.models.neural_models.izk_curr_exp import \
     IzhikevichCurrentExponentialPopulation
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 populations = list()
 cell_params_lif = {'cm': 0.25,
                    'i_offset': 0.0,

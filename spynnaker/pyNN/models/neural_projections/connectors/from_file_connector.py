@@ -1,6 +1,7 @@
 from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
     import FromListConnector
-from spynnaker.pyNN import exceptions
+
+from spinn_front_end_common.utilities import exceptions
 import re
 import logging
 
