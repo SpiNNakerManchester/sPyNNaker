@@ -128,6 +128,36 @@ class TestingPopulation(unittest.TestCase):
         for param in default_params.keys():
             self.assertEqual(default_params[param], boxed_defaults[param])
 
+    def test_spikes_per_second_setting_in_a_pop(self):
+        pop = pyNN.Population(
+            10, pyNN.IF_curr_exp, {'spikes_per_second': 3333},
+            label="Constrained population")
+        spikes_per_second = pop._get_vertex._spikes_per_second
+        self.assertEqual(spikes_per_second, 3333)
+
+    def test_spikes_per_second_not_set_in_a_pop(self):
+        pop = pyNN.Population(
+            10, pyNN.IF_curr_exp, cell_params_lif,
+            label="Constrained population")
+        spikes_per_second = pop._get_vertex._spikes_per_second
+        self.assertEqual(spikes_per_second, 30)
+
+    def test_ring_buffer_sigma_setting_in_a_pop(self):
+        pop = pyNN.Population(
+            10, pyNN.IF_curr_exp, {'ring_buffer_sigma': 3333},
+            label="Constrained population")
+        ring_buffer_sigma = pop._get_vertex._ring_buffer_sigma
+        self.assertEqual(ring_buffer_sigma, 3333)
+
+    def test_ring_buffer_sigma_not_set_in_a_pop(self):
+        pop = pyNN.Population(
+            10, pyNN.IF_curr_exp, cell_params_lif,
+            label="Constrained population")
+        ring_buffer_sigma = pop._get_vertex._ring_buffer_sigma
+        self.assertEqual(ring_buffer_sigma, 5.0)
+
+
+
 
 if __name__ == "__main__":
     unittest.main()

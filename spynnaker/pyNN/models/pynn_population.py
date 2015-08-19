@@ -67,8 +67,10 @@ class Population(object):
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
-        cellparams['spikes_per_second'] = spinnaker.spikes_per_second
-        cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
+        if 'spikes_per_second' not in cellparams:
+            cellparams['spikes_per_second'] = spinnaker.spikes_per_second
+        if 'ring_buffer_sigma' not in cellparams:
+            cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
         self._delay_vertex = None
