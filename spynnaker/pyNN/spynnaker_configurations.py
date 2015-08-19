@@ -24,7 +24,6 @@ class SpynnakerConfigurationFunctions(object):
         # deal with params allowed via the setup optimals
         if timestep is not None:
             timestep *= 1000  # convert into ms from microseconds
-            config.set("Machine", "machineTimeStep", timestep)
             self._machine_time_step = timestep
 
         if min_delay is not None and float(min_delay * 1000) < 1.0 * timestep:
@@ -49,18 +48,12 @@ class SpynnakerConfigurationFunctions(object):
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(0.144 * timestep))
         if min_delay is not None:
-            if not config.has_section("Model"):
-                config.add_section("Model")
-            config.set("Model", "min_delay", (min_delay * 1000) / timestep)
             self._min_supported_delay = \
                 math.ceil((min_delay * 1000.0) / timestep)
         else:
             self._min_supported_delay = timestep
 
         if max_delay is not None:
-            if not config.has_section("Model"):
-                config.add_section("Model")
-            config.set("Model", "max_delay", (max_delay * 1000) / timestep)
             self._max_supported_delay = (max_delay * 1000) / timestep
         else:
             self._max_supported_delay = \
