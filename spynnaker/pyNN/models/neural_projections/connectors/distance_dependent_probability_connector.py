@@ -17,6 +17,11 @@ from spinn_front_end_common.utilities import exceptions
 import logging
 import numpy
 
+# support for arbitary expression for the distance dependence
+from numpy import arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, \
+    fabs, floor, fmod, hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt,\
+    tan, tanh, maximum, minimum, e, pi
+
 logger = logging.getLogger(__name__)
 
 
