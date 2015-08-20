@@ -16,9 +16,9 @@ from spynnaker.pyNN.models.abstract_models.\
 logger = logging.getLogger(__name__)
 
 
-class SpynnakerDataBaseInterface(DatabaseWriter):
+class SpynnakerDataBaseWriter(DatabaseWriter):
     """
-    SpynnakerDataBaseInterface: the interface for the database system for the
+    SpynnakerDataBaseWriter: the interface for the database system for the
     spynnaker front end
     """
 
@@ -108,70 +108,6 @@ class SpynnakerDataBaseInterface(DatabaseWriter):
                         .format(vertices.index(vertex) + 1,
                                 edges.index(edge) + edge_id_offset))
                 edge_id_offset += len(edges)
-            connection.commit()
-            connection.close()
-            self._lock_condition.release()
-        except Exception:
-            traceback.print_exc()
-
-    def create_neuron_to_key_mapping(
-            self, partitionable_graph, partitioned_graph, routing_infos,
-            graph_mapper):
-        """
-
-        :param partitionable_graph:
-        :param partitioned_graph:
-        :param routing_infos:
-        :param graph_mapper:
-        :return:
-        """
-        self._thread_pool.apply_async(
-            self._create_neuron_to_key_mapping,
-            args=[partitionable_graph, partitioned_graph, routing_infos,
-                  graph_mapper])
-
-    def _create_neuron_to_key_mapping(
-            self, partitionable_graph, partitioned_graph, routing_infos,
-            graph_mapper):
-        # noinspection PyBroadException
-        try:
-            import sqlite3 as sqlite
-            self._lock_condition.acquire()
-            connection = sqlite.connect(self._database_path)
-            cur = connection.cursor()
-            # create table
-            self._done_mapping = True
-            cur.execute(
-                "CREATE TABLE key_to_neuron_mapping("
-                "vertex_id INTEGER, neuron_id INTEGER, "
-                "key INTEGER PRIMARY KEY, "
-                "FOREIGN KEY (vertex_id)"
-                " REFERENCES Partitioned_vertices(vertex_id))")
-
-            # insert into table
-            vertices = list(partitionable_graph.vertices)
-            for partitioned_vertex in partitioned_graph.subvertices:
-                out_going_edges = (partitioned_graph
-                                   .outgoing_subedges_from_subvertex(
-                                       partitioned_vertex))
-                if len(out_going_edges) > 0:
-                    routing_info = (routing_infos
-                                    .get_subedge_information_from_subedge(
-                                        out_going_edges[0]))
-                    vertex = graph_mapper.get_vertex_from_subvertex(
-                        partitioned_vertex)
-                    vertex_id = vertices.index(vertex) + 1
-                    vertex_slice = graph_mapper.get_subvertex_slice(
-                        partitioned_vertex)
-                    keys = routing_info.get_keys(vertex_slice.n_atoms)
-                    neuron_id = vertex_slice.lo_atom
-                    for key in keys:
-                        cur.execute(
-                            "INSERT INTO key_to_neuron_mapping("
-                            "vertex_id, key, neuron_id) "
-                            "VALUES ({}, {}, {})"
-                            .format(vertex_id, key, neuron_id))
-                        neuron_id += 1
             connection.commit()
             connection.close()
             self._lock_condition.release()
