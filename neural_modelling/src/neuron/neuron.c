@@ -99,7 +99,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     *num_neurons_value = num_neurons;
  
     log_info("\tneurons = %u, flush time = %u",
-             num_neurons, sim_time_step_us, flush_time);
+             num_neurons, flush_time);
 
     // If a flush time is specified
     if(flush_time != UINT32_MAX)
@@ -124,7 +124,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
                       "- Out of DTCM");
             return false;
         }
-        memcpy(global_parameters, &address[start_of_global_parameters],
+        memcpy(global_parameters, &address[e_global_params_start],
                sizeof(global_neuron_params_t));
     }
 
@@ -137,7 +137,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     memcpy(neuron_array,
             &address[e_global_params_start +
                      (sizeof(global_neuron_params_t) / 4)],
-            n_neurons * sizeof(neuron_t));
+            num_neurons * sizeof(neuron_t));
 
     // Set up the out spikes array
     if (!out_spikes_initialize(num_neurons)) {

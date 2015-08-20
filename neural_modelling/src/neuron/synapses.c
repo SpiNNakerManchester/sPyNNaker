@@ -280,7 +280,7 @@ void synapses_do_timestep_update(timer_t time) {
     spin1_mode_restore(state);
 }
 
-void synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
+bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
                                    bool write, uint32_t process_id,
                                    bool flush) {
 

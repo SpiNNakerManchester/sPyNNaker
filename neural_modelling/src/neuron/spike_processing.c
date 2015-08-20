@@ -191,7 +191,7 @@ void _dma_complete_callback(uint unused, uint tag) {
                     "(local=0x%.8x,flush=%u)",
                     current_buffer->originating_spike,
                     current_buffer->sdram_writeback_address,
-                    current_buffer->row, current_buffer->flus);
+                    current_buffer->row, current_buffer->flush);
 
                 // Print out the row for debugging
                 for (uint32_t i = 0;
