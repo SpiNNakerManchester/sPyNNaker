@@ -811,7 +811,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._partitionable_graph, self._routing_infos,
                     self._hostname, self._graph_mapper,
                     self._report_default_directory, ip_tags, reverse_ip_tags,
-                    self._writeTextSpecs, self._app_data_runtime_folder)
+                    self._write_text_specs, self._app_data_runtime_folder)
                 progress_bar.update()
 
                 # Get name of binary from vertex

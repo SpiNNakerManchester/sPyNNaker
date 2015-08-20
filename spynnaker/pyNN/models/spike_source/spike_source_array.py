@@ -3,6 +3,8 @@ SpikeSourceArray
 """
 
 # spynnaker imports
+from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex import \
+    AbstractPopulationRecordableVertex
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models\
     .abstract_outgoing_edge_same_contiguous_keys_restrictor\
@@ -46,9 +48,10 @@ import math
 logger = logging.getLogger(__name__)
 
 
-class SpikeSourceArray(AbstractDataSpecableVertex,
-                       AbstractPartitionableVertex,
-                       AbstractOutgoingEdgeSameContiguousKeysRestrictor):
+class SpikeSourceArray(
+        AbstractDataSpecableVertex, AbstractPartitionableVertex,
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor,
+        AbstractPopulationRecordableVertex):
     """
     model for play back of spikes
     """
@@ -62,7 +65,8 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         value="_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
                ('CONFIGURATION_REGION', 1),
-               ('SPIKE_DATA_REGION', 2)])
+               ('SPIKE_DATA_REGION', 2),
+               ('SPIKE_DATA_RECORDED_REGION', 3)])
 
     def __init__(
             self, n_neurons, spike_times, machine_time_step, spikes_per_second,
@@ -84,6 +88,8 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
             max_atoms_per_core=self._model_based_max_atoms_per_core,
             constraints=constraints)
         AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
+        AbstractPopulationRecordableVertex.__init__(
+            self, machine_time_step, label)
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
@@ -345,6 +351,13 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         return 0
 
     def is_data_specable(self):
+        """
+        helper method for isinstance
+        :return:
+        """
+        return True
+
+    def is_recordable(self):
         """
         helper method for isinstance
         :return:

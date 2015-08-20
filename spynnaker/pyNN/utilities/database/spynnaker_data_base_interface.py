@@ -3,7 +3,7 @@ SpynnakerDataBaseInterface
 """
 # front end common imports
 from spinn_front_end_common.utilities.database.\
-    front_end_common_data_base_interface import FrontEndCommonDataBaseInterface
+    data_base_writer import DatabaseWriter
 
 # general imports
 import logging
@@ -16,7 +16,7 @@ from spynnaker.pyNN.models.abstract_models.\
 logger = logging.getLogger(__name__)
 
 
-class SpynnakerDataBaseInterface(FrontEndCommonDataBaseInterface):
+class SpynnakerDataBaseInterface(DatabaseWriter):
     """
     SpynnakerDataBaseInterface: the interface for the database system for the
     spynnaker front end
@@ -24,7 +24,7 @@ class SpynnakerDataBaseInterface(FrontEndCommonDataBaseInterface):
 
     def __init__(self, database_directory, wait_for_read_confirmation,
                  socket_addresses):
-        FrontEndCommonDataBaseInterface.__init__(
+        DatabaseWriter.__init__(
             self, database_directory, wait_for_read_confirmation,
             socket_addresses)
 
