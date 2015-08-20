@@ -230,8 +230,7 @@ class Population(object):
                 placements=self._spinnaker.placements,
                 machine_time_step=self._spinnaker.machine_time_step,
                 graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output,
-                runtime=self._spinnaker._runtime)
+                compatible_output=compatible_output)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer.take_sample()
         return self._gsyn
@@ -272,8 +271,7 @@ class Population(object):
                 placements=self._spinnaker.placements,
                 machine_time_step=self._spinnaker.machine_time_step,
                 graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output,
-                runtime=self._spinnaker._runtime)
+                compatible_output=compatible_output)
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer.take_sample()

@@ -56,7 +56,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
                                     .SPIKE_HISTORY.value))
 
     def get_v(self, has_ran, graph_mapper, placements,
-              txrx, machine_time_step, runtime, compatible_output=False):
+              txrx, machine_time_step, compatible_output=False):
         """
         Return a 3-column numpy array containing cell ids, time, and Vm for
         recorded cells.
@@ -75,10 +75,10 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             region=constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
             compatible_output=compatible_output, has_ran=has_ran,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
-            placements=placements, txrx=txrx, runtime=runtime)
+            placements=placements, txrx=txrx)
 
     def get_gsyn(self, has_ran, graph_mapper, placements, txrx,
-                 machine_time_step, runtime, compatible_output=False):
+                 machine_time_step, compatible_output=False):
         """
         Return a 3-column numpy array containing cell ids and synaptic
         conductances for recorded cells.
@@ -94,7 +94,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             region=constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
             compatible_output=compatible_output, has_ran=has_ran,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
-            placements=placements, txrx=txrx, runtime=runtime)
+            placements=placements, txrx=txrx)
 
     def is_recordable(self):
         """ helper method for is instance
