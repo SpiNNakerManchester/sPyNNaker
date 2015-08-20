@@ -28,6 +28,7 @@ void synapse_dynamics_process_plastic_synapses(
     use(flush);
 
     log_error("There should be no plastic synapses!");
+    return false;
 }
 
 //---------------------------------------

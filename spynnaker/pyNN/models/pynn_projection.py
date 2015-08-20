@@ -1,3 +1,6 @@
+"""
+Projection
+"""
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -23,6 +26,7 @@ from spinn_front_end_common.utilities import exceptions
 import logging
 import math
 import numpy
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +72,7 @@ class Projection(object):
                     "Target {} is not available in the post-synaptic "
                     "pynn_population.py (choices are {})"
                     .format(target, targets))
-            self._synapse_type = \
+            synapse_type = \
                 postsynaptic_population._get_vertex.get_synapse_id(target)
         else:
             raise exceptions.ConfigurationException(
@@ -80,8 +84,8 @@ class Projection(object):
             connector.generate_synapse_list(
                 presynaptic_population, postsynaptic_population,
                 1000.0 / machine_time_step,
-                postsynaptic_population._get_vertex.weight_scale, self._synapse_type)
-        self._host_based_synapse_list = synapse_list
+                postsynaptic_population._get_vertex.weight_scale, synapse_type)
+        self._host_based_synapse_list = copy.deepcopy(synapse_list)
 
         # If there are some negative weights
         if synapse_list.get_min_weight() < 0:
@@ -143,6 +147,7 @@ class Projection(object):
                 presynaptic_population._get_vertex,
                 postsynaptic_population._get_vertex)
             if edge_to_merge is not None:
+
                 # If there is an existing edge, merge the lists
                 self._projection_list_ranges = \
                     edge_to_merge.synapse_list.merge(synapse_list)
@@ -291,7 +296,7 @@ class Projection(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getDelays(self, list_format='list', gather=True):
+    def getDelays(self, format='list', gather=True):
         """
         Get synaptic delays for all connections in this Projection.
 
@@ -308,7 +313,7 @@ class Projection(object):
                 self._has_retrieved_synaptic_list_from_machine):
             self._retrieve_synaptic_data_from_machine()
 
-        if list_format == 'list':
+        if format == 'list':
             delays = list()
             for row in self._host_based_synapse_list.get_rows():
                 delays.extend(
@@ -366,19 +371,18 @@ class Projection(object):
             for row in self._host_based_synapse_list.get_rows():
                 weights.extend(row.weights / self._weight_scale)
             return weights
-        else:
-            weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
-                                self._projection_edge.post_vertex.n_atoms))
-            weights.fill(numpy.nan)
-            rows = self._host_based_synapse_list.get_rows()
-            for pre_atom in range(len(rows)):
-                row = rows[pre_atom]
-                for i in xrange(len(row.target_indices)):
-                    assert row.synapse_types[i] == self._synapse_type
-                    post_atom = row.target_indices[i]
-                    weight = row.weights[i]
-                    weights[pre_atom][post_atom] = weight / self._weight_scale
-            return weights
+
+        weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
+                               self._projection_edge.post_vertex.n_atoms))
+        weights.fill(numpy.nan)
+        rows = self._host_based_synapse_list.get_rows()
+        for pre_atom in range(len(rows)):
+            row = rows[pre_atom]
+            for i in xrange(len(row.target_indices)):
+                post_atom = row.target_indices[i]
+                weight = row.weights[i]
+                weights[pre_atom][post_atom] = weight / self._weight_scale
+        return weights
 
     def __len__(self):
         """Return the total number of local connections."""
@@ -453,7 +457,7 @@ class Projection(object):
             delay_rows = delay_synapse_list.get_rows()
             combined_rows = list()
             for i in range(len(rows)):
-                combined_row = rows[i][self._projection_list_ranges]
+                combined_row = rows[i][self._projection_list_ranges[i]]
                 combined_row.append(delay_rows[i][self._delay_list_ranges[i]])
                 combined_rows.append(combined_row)
             self._host_based_synapse_list = SynapticList(combined_rows)
@@ -462,11 +466,8 @@ class Projection(object):
         elif synapse_list is not None:
             rows = synapse_list.get_rows()
             new_rows = list()
-            for row in rows:
-                # **HACK** assumes merged projection edges differ by synapse type
-                synapse_type_mask = row.synapse_types == self._synapse_type
-                subrow = row[synapse_type_mask]
-                new_rows.append(subrow)
+            for i in range(len(rows)):
+                new_rows.append(rows[i][self._projection_list_ranges[i]])
             self._host_based_synapse_list = SynapticList(new_rows)
 
         # Otherwise return the delay list (there should be at least one!)

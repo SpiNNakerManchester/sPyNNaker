@@ -76,6 +76,8 @@ static uint32_t recording_flags = 0;
 static uint32_t time;
 //! the number of timer tics that this model should run for before exiting.
 static uint32_t simulation_ticks = 0;
+//! the int that represnets the bool for if the run is infinte or not.
+static uint32_t infinite_run;
 
 //! \deduces the time in timer ticks until the next spike is to occur given a
 //! mean_isi_ticks
@@ -194,19 +196,19 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Get the timing details
+    address_t system_region = data_specification_get_region(
+            system, address);
     if (!simulation_read_timing_details(
-            data_specification_get_region(system, address),
-            APPLICATION_NAME_HASH,
-            timer_period, &simulation_ticks)) {
+            system_region, APPLICATION_NAME_HASH, timer_period,
+            &simulation_ticks, &infinite_run)) {
         return false;
     }
 
     // Get the recording information
     uint32_t spike_history_region_size;
     recording_read_region_sizes(
-        &data_specification_get_region(system, address)
-        [RECORDING_POSITION_IN_REGION], &recording_flags,
-        &spike_history_region_size, NULL, NULL);
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
+        &recording_flags, &spike_history_region_size, NULL, NULL);
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
         if (!recording_initialse_channel(
@@ -245,13 +247,14 @@ void timer_callback(uint timer_count, uint unused) {
     log_debug("Timer tick %u", time);
 
     // If a fixed number of simulation ticks are specified and these have passed
-    if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {
+    if (infinite_run != TRUE && time >= simulation_ticks) {
         log_info("Simulation complete.\n");
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
         spin1_exit(0);
+        return;
     }
 
     // Loop through slow spike sources

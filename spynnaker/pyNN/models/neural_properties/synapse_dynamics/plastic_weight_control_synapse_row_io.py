@@ -1,5 +1,4 @@
 import numpy
-import math
 
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.abstract_rules.\
     abstract_synapse_row_io import AbstractSynapseRowIo

@@ -57,6 +57,8 @@ uint32_t time;
 //! global parameter which contains the number of timer ticks to run for before
 //! being expected to exit
 uint32_t simulation_ticks = 0;
+//! global paramter which states if this model should run for infinite time
+uint32_t infinite_run;
 
 //! \Initialises the model by reading in the regions and checking recording
 //! data.
@@ -80,7 +82,7 @@ static bool initialize(uint32_t *timer_period) {
         SYSTEM_REGION, address);
     if (!simulation_read_timing_details(
             system_region, APPLICATION_NAME_HASH, timer_period,
-            &simulation_ticks)) {
+            &simulation_ticks, &infinite_run)) {
         return false;
     }
 
@@ -174,7 +176,7 @@ void timer_callback(uint timer_count, uint unused) {
 
     /* if a fixed number of simulation ticks that were specified at startup
        then do reporting for finishing */
-    if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {
+    if (infinite_run != TRUE && time >= simulation_ticks) {
         log_info("Simulation complete.\n");
 
         // print statistics into logging region

@@ -80,6 +80,7 @@ class Population(object):
         else:
             self._structure = None
 
+        self._spinnaker._add_population(self)
         self._spinnaker.add_vertex(self._vertex)
 
         self._parameters = PyNNParametersSurrogate(self._vertex)
@@ -88,7 +89,7 @@ class Population(object):
         self._size = size
         self._record_spike_file = None
         self._record_v_file = None
-        self._record_g_syn_file = None
+        self._record_gsyn_file = None
 
         self._spikes = None
         self._v = None
@@ -177,7 +178,7 @@ class Population(object):
 
             if not self._spinnaker.has_ran:
                 raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet ran, therefore spikes cannot"
+                    "The simulation has not yet run, therefore spikes cannot"
                     " be retrieved. Please execute the simulation before"
                     " running this command")
             if conf.config.getboolean("Reports", "outputTimesForSections"):
@@ -206,6 +207,17 @@ class Population(object):
 
         """
         if self._gsyn is None:
+            if not self._vertex.record_gsyn:
+                raise exceptions.ConfigurationException(
+                    "This population has not been set to record gsyn. "
+                    "Therefore gsyn cannot be retrieved. Please set this "
+                    "vertex to record gsyn before running this command.")
+
+            if not self._spinnaker.has_ran:
+                raise local_exceptions.SpynnakerException(
+                    "The simulation has not yet run, therefore gsyn cannot"
+                    " be retrieved. Please execute the simulation before"
+                    " running this command")
             timer = None
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
@@ -216,7 +228,8 @@ class Population(object):
                 placements=self._spinnaker.placements,
                 machine_time_step=self._spinnaker.machine_time_step,
                 graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output)
+                compatible_output=compatible_output,
+                runtime=self._spinnaker._runtime)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer.take_sample()
         return self._gsyn
@@ -235,6 +248,18 @@ class Population(object):
         :type compatible_output: bool
         """
         if self._v is None:
+            if not self._vertex.record_v:
+                raise exceptions.ConfigurationException(
+                    "This population has not been set to record v. "
+                    "Therefore v cannot be retrieved. Please set this "
+                    "vertex to record v before running this command.")
+
+            if not self._spinnaker.has_ran:
+                raise local_exceptions.SpynnakerException(
+                    "The simulation has not yet run, therefore v cannot"
+                    " be retrieved. Please execute the simulation before"
+                    " running this command")
+
             timer = None
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
@@ -245,7 +270,8 @@ class Population(object):
                 placements=self._spinnaker.placements,
                 machine_time_step=self._spinnaker.machine_time_step,
                 graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output)
+                compatible_output=compatible_output,
+                runtime=self._spinnaker._runtime)
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer.take_sample()
@@ -393,7 +419,7 @@ class Population(object):
                             "recording of gsyn")
 
         self._vertex.set_record_gsyn(True)
-        self._record_g_syn_file = to_file
+        self._record_gsyn_file = to_file
 
     def record_v(self, to_file=None):
         """
@@ -424,12 +450,10 @@ class Population(object):
 
     # noinspection PyPep8Naming
     def printSpikes(self, filename, gather=True):
-        """
-        Write spike time information from the population to a given file.
-        :param filename: the absoluete file path for where the spikes are to be
-        printed in
-        :param gather: Supported from the PyNN language, but Spinnaker only does
-        gather = True.
+        """ Write spike time information from the population to a given file.
+        :param filename: the absoluete file path for where the spikes are to\
+                    be printed in
+        :param gather: Supported from the PyNN language, but ignored here
         """
         if not gather:
             logger.warn("Spynnaker only supports gather = true, will execute"
@@ -451,12 +475,10 @@ class Population(object):
             spike_file.close()
 
     def print_gsyn(self, filename, gather=True):
-        """
-        Write conductance information from the population to a given file.
-        :param filename: the absoluete file path for where the gsyn are to be
-        printed in
-        :param gather: Supported from the PyNN language, but Spinnaker only does
-        gather = True.
+        """ Write conductance information from the population to a given file.
+        :param filename: the absoluete file path for where the gsyn are to be\
+                    printed in
+        :param gather: Supported from the PyNN language, but ignored here
         """
         time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
         gsyn = self.get_gsyn(gather, compatible_output=True)
@@ -476,13 +498,11 @@ class Population(object):
         file_handle.close()
 
     def print_v(self, filename, gather=True):
-        """
-        Write membrane potential information from the population to a given
-        file.
-        :param filename: the absoluete file path for where the voltage are to be
-        printed in
-        :param gather: Supported from the PyNN language, but Spinnaker only does
-        gather = True.
+        """ Write membrane potential information from the population to a\
+            given file.
+        :param filename: the absolute file path for where the voltage are to\
+                     be printed in
+        :param gather: Supported from the PyNN language, but ignored here
         """
         time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
         v = self.get_v(gather, compatible_output=True)
@@ -643,6 +663,16 @@ class Population(object):
         value_array, which must have the same dimensions as the Population.
         """
         raise NotImplementedError
+
+    def _end(self):
+        """ Do final steps at the end of the simulation
+        """
+        if self._record_spike_file is not None:
+            self.printSpikes(self._record_spike_file)
+        if self._record_v_file is not None:
+            self.print_v(self._record_v_file)
+        if self._record_gsyn_file is not None:
+            self.print_gsyn(self._record_gsyn_file)
 
     @property
     def _get_vertex(self):

@@ -10,9 +10,6 @@ POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 BLOCK_INDEX_HEADER_WORDS = 3
 BLOCK_INDEX_ROW_WORDS = 2
 
-# database cap file path
-MAX_DATABASE_PATH_LENGTH = 50000
-
 RECORD_SPIKE_BIT = 1 << 0
 RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
@@ -53,6 +50,11 @@ MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
 
 # please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
 # for other core application ids.
+SPIKE_INJECTOR_CORE_APPLICATION_ID = 0xAC9
+
+# master population table magic
+MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
+MASTER_POP_BINARY_SEARCH = 0xBB2
 
 EDGES = Enum(
     value="EDGES",

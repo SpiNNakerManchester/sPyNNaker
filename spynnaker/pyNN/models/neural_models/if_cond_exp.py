@@ -1,4 +1,3 @@
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
 from data_specification.enums.data_type import DataType
@@ -67,68 +66,60 @@ class IFConductanceExponentialPopulation(
         return 781 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
     def get_parameters(self):
-        """
-        Generate Neuron Parameter data (region 2):
-        """
 
-        # Get the parameters
-        # typedef struct neuron_t {
-        #
-        # // nominally 'fixed' parameters
-        #    REAL     V_thresh;
-        # // membrane voltage threshold at which neuron spikes [mV]
-        #    REAL     V_reset;    // post-spike reset membrane voltage    [mV]
-        #    REAL     V_rest;     // membrane resting voltage [mV]
-        #    REAL     R_membrane; // membrane resistance [MegaOhm]
-        #
-        #    REAL        V_rev_E;
-        # // reversal voltage - Excitatory    [mV]
-        #    REAL        V_rev_I;
-        # // reversal voltage - Inhibitory    [mV]
-        #
-        # // variable-state parameter
-        #    REAL     V_membrane; // membrane voltage [mV]
-        #
-        # // late entry! Jan 2014 (trickle current)
-        #    REAL        I_offset;
-        #  // offset current [nA] but take care because actually
-        #     'per timestep charge'
-        #
-        # // 'fixed' computation parameter - time constant multiplier for
-        #                                   closed-form solution
-        #    REAL     exp_TC;
-        # // exp( -(machine time step in ms)/(R * C) ) [.]
-        #
-        # // for ODE solution only
-        #    REAL      one_over_tauRC;
-        # // [kHz!] only necessary if one wants to use ODE solver because
-        #           allows * and host double prec to calc - UNSIGNED ACCUM &
-        #           unsigned fract much slower
-        #
-        # // refractory time information
-        #    int32_t refract_timer; // countdown to end of next refractory
-        #                              period [ms/10] - 3 secs limit do we
-        #                              need more? Jan 2014
-        #    int32_t T_refract;      // refractory time of neuron [ms/10]
         return [
+
+            # membrane voltage threshold at which neuron spikes [mV]
+            # REAL     V_thresh;
             NeuronParameter(self._v_thresh, DataType.S1615),
+
+            # post-spike reset membrane voltage [mV]
+            # REAL     V_reset;
             NeuronParameter(self._v_reset, DataType.S1615),
+
+            # membrane resting voltage [mV]
+            # REAL     V_rest;
             NeuronParameter(self._v_rest, DataType.S1615),
-            NeuronParameter(self.r_membrane(self._machine_time_step),
-                            DataType.S1615),
+
+            # membrane resistance [MOhm]
+            # REAL     R_membrane;
+            NeuronParameter(self._r_membrane, DataType.S1615),
+
+            # reversal voltage - Excitatory [mV]
+            # REAL     V_rev_E;
             NeuronParameter(self._e_rev_E, DataType.S1615),
+
+            # reversal voltage - Inhibitory [mV]
+            # REAL     V_rev_I;
             NeuronParameter(self._e_rev_I, DataType.S1615),
+
+            # membrane voltage [mV]
+            # REAL     V_membrane;
             NeuronParameter(self._v_init, DataType.S1615),
-            NeuronParameter(self.ioffset(self._machine_time_step),
+
+            # offset current [nA]
+            # REAL     I_offset;
+            NeuronParameter(self.ioffset, DataType.S1615),
+
+            # 'fixed' computation parameter - time constant multiplier for
+            # closed-form solution
+            # exp( -(machine time step in ms)/(R * C) )
+            # REAL     exp_TC;
+            NeuronParameter(self._exp_tc(self._machine_time_step),
                             DataType.S1615),
-            NeuronParameter(self.exp_tc(self._machine_time_step),
-                            DataType.S1615),
-            NeuronParameter(self._one_over_tau_rc, DataType.S1615),
+
+            # countdown to end of next refractory period [timesteps]
+            # int32_t  refract_timer;
             NeuronParameter(self._refract_timer, DataType.INT32),
-            # t refact used to be a uint32 but was changed to int32 to avoid
-            # clash of c and python variable typing.
-            NeuronParameter(self._scaled_t_refract(), DataType.INT32),
+
+            # refractory time of neuron [timesteps]
+            # int32_t  T_refract;
+            NeuronParameter(self._tau_refract_timesteps(
+                self._machine_time_step), DataType.INT32),
         ]
+
+    def get_global_parameters(self):
+        return []
 
     def is_population_vertex(self):
         return True

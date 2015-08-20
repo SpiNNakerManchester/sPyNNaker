@@ -54,6 +54,10 @@ class IFCurrentAlphaPopulation(AbstractIntegrateAndFireProperties,
         raise exceptions.SpynnakerException(
             "This neuron model is currently not supported by the tool chain")
 
+    def get_global_parameters(self):
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
+
     def is_population_vertex(self):
         """
 

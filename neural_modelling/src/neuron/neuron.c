@@ -16,6 +16,9 @@
 //! Array of neuron states
 static neuron_pointer_t neuron_array = NULL;
 
+//! Global parameters for the neurons
+static global_neuron_params_pointer_t global_parameters;
+
 //! The key to be used for this core (will be ORed with neuron id)
 static key_t key;
 
@@ -48,8 +51,7 @@ typedef enum neuron_region_params {
     e_key,
     e_num_neurons,
     e_flush_time,
-    e_sim_time_step_us,
-    e_params_start,
+    e_global_params_start,
 } neuron_region_params;
 
 
@@ -80,7 +82,6 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     // Check if theres a key to use
     use_key = address[e_use_key];
-
     // Read the spike key to use
     key = address[e_key];
 
@@ -96,9 +97,8 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     num_neurons = address[e_num_neurons];
     flush_time = address[e_flush_time];
     *num_neurons_value = num_neurons;
-    timer_t sim_time_step_us = address[e_sim_time_step_us];
-
-    log_info("\tneurons = %u, simulations time step = %uus, flush time = %u",
+ 
+    log_info("\tneurons = %u, flush time = %u",
              num_neurons, sim_time_step_us, flush_time);
 
     // If a flush time is specified
@@ -115,22 +115,37 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         memset(time_since_last_spike, 0, num_neurons * sizeof(uint16_t));
     }
 
+    // Read the global parameter details
+    if (sizeof(global_neuron_params_t) > 0) {
+        global_parameters = (global_neuron_params_t *) spin1_malloc(
+            sizeof(global_neuron_params_t));
+        if (global_parameters == NULL) {
+            log_error("Unable to allocate global neuron parameters"
+                      "- Out of DTCM");
+            return false;
+        }
+        memcpy(global_parameters, &address[start_of_global_parameters],
+               sizeof(global_neuron_params_t));
+    }
+
     // Allocate DTCM for new format neuron array and copy block of data
     neuron_array = (neuron_t*) spin1_malloc(num_neurons * sizeof(neuron_t));
     if (neuron_array == NULL) {
         log_error("Unable to allocate neuron array - Out of DTCM");
         return false;
     }
-    memcpy(neuron_array, &address[e_params_start],
-           num_neurons * sizeof(neuron_t));
+    memcpy(neuron_array,
+            &address[e_global_params_start +
+                     (sizeof(global_neuron_params_t) / 4)],
+            n_neurons * sizeof(neuron_t));
 
     // Set up the out spikes array
     if (!out_spikes_initialize(num_neurons)) {
         return false;
     }
 
-    // Pass time step to neuron model
-    neuron_model_set_machine_timestep(sim_time_step_us);
+    // Set up the neuron model
+    neuron_model_set_global_neuron_params(global_parameters);
 
     recording_flags = recording_flags_param;
 
@@ -165,10 +180,6 @@ void neuron_do_timestep_update(timer_t time) {
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
             synapse_dynamics_get_intrinsic_bias(time, n);
-        
-        // update neuron parameters (will inform us if the neuron should spike)
-        bool spike = neuron_model_state_update(
-            exc_neuron_input, inh_neuron_input, external_bias, neuron);
 
         // If we should be recording potential, record this neuron parameter
         if (recording_is_channel_enabled(recording_flags,
@@ -186,6 +197,11 @@ void neuron_do_timestep_update(timer_t time) {
             recording_record(e_recording_channel_neuron_gsyn,
                              &temp_record_input, sizeof(input_t));
         }*/
+
+        // update neuron parameters (will inform us if the neuron should spike)
+        bool spike = neuron_model_state_update(
+            exc_neuron_input, inh_neuron_input, external_bias, neuron);
+
 
         // If flushing is enabled
         bool flush = false;

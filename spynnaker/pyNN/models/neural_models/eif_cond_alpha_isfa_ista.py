@@ -38,6 +38,10 @@ class EIFConductanceAlphaPopulation(
         raise exceptions.SpynnakerException(
             "This neuron model is currently not supported by the tool chain")
 
+    def get_global_parameters(self):
+        raise exceptions.SpynnakerException(
+            "This neuron model is currently not supported by the tool chain")
+
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         raise exceptions.SpynnakerException(
             "This neuron model is currently not supported by the tool chain")

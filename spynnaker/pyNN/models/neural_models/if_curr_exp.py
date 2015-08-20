@@ -3,7 +3,6 @@ IFCurrentExponentialPopulation
 """
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
-from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
     abstract_exp_population_vertex import AbstractExponentialPopulationVertex
 from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
@@ -79,25 +78,51 @@ class IFCurrentExponentialPopulation(AbstractExponentialPopulationVertex,
         return 781 * ((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1)
 
     def get_parameters(self):
-        """
-        Generate Neuron Parameter data (region 2):
-        """
-        # Get the parameters
+
         return [
+
+            # membrane voltage threshold at which neuron spikes [mV]
+            # REAL     V_thresh;
             NeuronParameter(self._v_thresh, DataType.S1615),
+
+            # post-spike reset membrane voltage [mV]
+            # REAL     V_reset;
             NeuronParameter(self._v_reset, DataType.S1615),
+
+            # membrane resting voltage [mV]
+            # REAL     V_rest;
             NeuronParameter(self._v_rest, DataType.S1615),
-            NeuronParameter(self.r_membrane(self._machine_time_step),
-                            DataType.S1615),
+
+            # membrane resistance
+            # REAL     R_membrane;
+            NeuronParameter(self._r_membrane, DataType.S1615),
+
+            # membrane voltage [mV]
+            # REAL     V_membrane;
             NeuronParameter(self._v_init, DataType.S1615),
-            NeuronParameter(self.ioffset(self._machine_time_step),
+
+            # offset current [nA]
+            # REAL     I_offset;
+            NeuronParameter(self.ioffset, DataType.S1615),
+
+            # 'fixed' computation parameter - time constant multiplier for
+            # closed-form solution
+            # exp( -(machine time step in ms)/(R * C) ) [.]
+            # REAL     exp_TC;
+            NeuronParameter(self._exp_tc(self._machine_time_step),
                             DataType.S1615),
-            NeuronParameter(self.exp_tc(self._machine_time_step),
-                            DataType.S1615),
+
+            # countdown to end of next refractory period [timesteps]
+            # int32_t  refract_timer;
             NeuronParameter(self._refract_timer, DataType.INT32),
-            # t refact used to be a uint32 but was changed to int32 to avoid
-            # clash of c and python variable typing.
-            NeuronParameter(self._scaled_t_refract(), DataType.INT32)]
+
+            # refractory time of neuron [timesteps]
+            # int32_t  T_refract;
+            NeuronParameter(self._tau_refract_timesteps(
+                self._machine_time_step), DataType.INT32)]
+
+    def get_global_parameters(self):
+        return []
 
     def is_population_vertex(self):
         """

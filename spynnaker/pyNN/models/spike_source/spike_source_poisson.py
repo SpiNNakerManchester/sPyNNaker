@@ -68,9 +68,6 @@ class SpikeSourcePoisson(
         self._duration = duration
         self._seed = seed
 
-        if duration is None:
-            self._duration = 0xFFFFFFFF
-
     @property
     def model_name(self):
         """
@@ -221,7 +218,9 @@ class SpikeSourcePoisson(
             # Get the parameter values for source i:
             rate_val = generate_parameter(self._rate, i)
             start_val = generate_parameter(self._start, i)
-            end_val = generate_parameter(self._duration, i) + start_val
+            end_val = None
+            if self._duration is not None:
+                end_val = generate_parameter(self._duration, i) + start_val
 
             # Decide if it is a fast or slow source and
             spikes_per_tick = \
@@ -249,7 +248,9 @@ class SpikeSourcePoisson(
         for (neuron_id, rate_val, start_val, end_val) in slow_sources:
             isi_val = float(1000000.0 / (rate_val * self._machine_time_step))
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
-            end_scaled = int(end_val * 1000.0 / self._machine_time_step)
+            end_scaled = 0xFFFFFFFF
+            if end_val is not None:
+                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
@@ -268,7 +269,9 @@ class SpikeSourcePoisson(
         for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
             exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
-            end_scaled = int(end_val * 1000.0 / self._machine_time_step)
+            end_scaled = 0xFFFFFFFF
+            if end_val is not None:
+                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
@@ -288,7 +291,7 @@ class SpikeSourcePoisson(
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            transciever=txrx, placements=placements,
+            transceiver=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
             spike_recording_region=self._POISSON_SPIKE_SOURCE_REGIONS
                                        .SPIKE_HISTORY_REGION.value,
