@@ -51,8 +51,8 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             sub_vertex_out_spike_bytes_function=(
                 lambda subvertex, subvertex_slice: int(ceil(
                     subvertex_slice.n_atoms / 32.0)) * 4),
-            spike_recording_region=(constants.POPULATION_BASED_REGIONS
-                                    .SPIKE_HISTORY.value))
+            spike_recording_region=(
+                constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value))
 
     def get_v(self, has_ran, graph_mapper, placements,
               txrx, machine_time_step, runtime, compatible_output=False):

@@ -3,6 +3,7 @@ SpikeSourceArray
 """
 
 # spynnaker imports
+from spinnman.messages.eieio import create_eieio_data
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
@@ -59,7 +60,7 @@ class SpikeSourceArray(
     model for play back of spikes
     """
 
-    _CONFIGURATION_REGION_SIZE = 36
+    _CONFIGURATION_REGION_SIZE = 40
 
     # limited to the n of the x,y,p,n key format
     _model_based_max_atoms_per_core = sys.maxint
@@ -264,6 +265,12 @@ class SpikeSourceArray(
         ip_tag = iter(ip_tags).next()
         spec.write_value(data=ip_tag.tag)
 
+        # write flag for recording
+        if self._record:
+            spec.write_value(data=1)
+        else:
+            spec.write_value(data=0)
+
     # inherited from dataspecable vertex
     def generate_data_spec(
             self, subvertex, placement, subgraph, graph, routing_info,
@@ -372,23 +379,28 @@ class SpikeSourceArray(
         return True
 
     # TODO this needs to be dropped when BUFFERED OUT appears. Currently is a bodge to allow recording of spike soruce arrays if the memory allows it
-    def _get_spikes(
-            self, graph_mapper, placements, transceiver, compatible_output,
-            spike_recording_region, sub_vertex_out_spike_bytes_function):
+    def get_spikes(
+            self, transceiver, placements, graph_mapper,
+            compatible_output=False):
         """
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
+
+        :param transceiver:
+        :param placements:
+        :param graph_mapper:
+        :param compatible_output:
         """
 
         logger.info("Getting spikes for {}".format(self._label))
 
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = self._machine_time_step / 1000.0
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
         progress_bar = ProgressBar(len(subvertices), "Getting spikes")
+        result = numpy.ndarray(shape=(self.n_atoms, 2))
         for subvertex in subvertices:
             placement = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placement.x, placement.y, placement.p
@@ -407,7 +419,8 @@ class SpikeSourceArray(
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
-                    app_data_base_address, spike_recording_region)
+                    app_data_base_address,
+                    self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value)
             spike_region_base_address_buf = buffer(transceiver.read_memory(
                 x, y, spike_region_base_address_offset, 4))
             spike_region_base_address = struct.unpack_from(
@@ -422,36 +435,40 @@ class SpikeSourceArray(
 
             # check that the number of spikes written is smaller or the same as
             # the size of the memory region we allocated for spikes
-            out_spike_bytes = sub_vertex_out_spike_bytes_function(
-                subvertex, subvertex_slice)
-            size_of_region = self.get_recording_region_size(out_spike_bytes)
-
-            if number_of_bytes_written > size_of_region:
+            send_buffer = self._get_spike_send_buffer(subvertex_slice)
+            if number_of_bytes_written > send_buffer.max_buffer_size_possible:
                 raise exceptions.MemReadException(
                     "the amount of memory written ({}) was larger than was "
                     "allocated for it ({})"
-                    .format(number_of_bytes_written, size_of_region))
+                    .format(number_of_bytes_written,
+                            send_buffer.max_buffer_size_possible))
 
             # Read the spikes
             logger.debug("Reading {} ({}) bytes starting at {} + 4"
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            spike_data = transceiver.read_memory(
+            spike_data_block = transceiver.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
-            numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
-                dtype="uint32").byteswap().view("uint8")
-            bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
-                (-1, 32))).reshape((-1, out_spike_bytes * 8))
-            times, indices = numpy.where(bits == 1)
-            times = times * ms_per_tick
-            indices = indices + lo_atom
-            spike_ids.append(indices)
-            spike_times.append(times)
-            progress_bar.update()
 
+            # translate block of spikes into EIEIO messages
+            offset = 0
+            eieio_messages = list()
+            while offset <= number_of_bytes_written - 4:
+                eieio_data_message = create_eieio_data.read_eieio_data_message(
+                    spike_data_block, offset)
+                offset += eieio_data_message.size
+                eieio_messages.append(eieio_data_message)
+
+            # translate the eieo data packet into numpi arrays.
+            base_key = subvertex.base_key
+            for eieio_message in eieio_messages:
+                for element in range(0, eieio_message.eieio_header.count):
+                    key = eieio_message.next_element
+                    neuron_id = (key - base_key) + subvertex_slice.lo_atom
+                    time_stamp = eieio_message.eieio_header.payload_base
+                    result[neuron_id].append(time_stamp)
+            # complete the buffer
+            progress_bar.update()
         progress_bar.end()
-        spike_ids = numpy.hstack(spike_ids)
-        spike_times = numpy.hstack(spike_times)
-        result = numpy.dstack((spike_ids, spike_times))[0]
-        return result[numpy.lexsort((spike_times, spike_ids))]
+        return result
