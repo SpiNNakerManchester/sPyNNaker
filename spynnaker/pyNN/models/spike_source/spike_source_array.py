@@ -15,8 +15,6 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
 from spinn_front_end_common.interface.buffer_management.storage_objects\
     .buffered_sending_region import BufferedSendingRegion
-from spinn_front_end_common.interface.buffer_management.buffer_manager \
-    import BufferManager
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
@@ -36,15 +34,19 @@ from pacman.model.constraints.tag_allocator_constraints\
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 
-# spinnman imports
-from spinnman.messages.eieio.command_messages.event_stop_request\
-    import EventStopRequest
-
 # general imports
 from enum import Enum
 import logging
 import sys
 import math
+
+# imports needed for get_spikes
+# TODO the below imports can be removed once BUFFERED OUT apprears. These are tied to the bodge to support spike soruce arrays to be recorded if the memory allows.
+from pacman.utilities.progress_bar import ProgressBar
+import numpy
+from data_specification import utility_calls as dsg_utility_calls
+import struct
+from spynnaker.pyNN import exceptions
 
 logger = logging.getLogger(__name__)
 
@@ -195,7 +197,8 @@ class SpikeSourceArray(
             send_buffer = self._send_buffers[key]
         return send_buffer
 
-    def _reserve_memory_regions(self, spec, spike_region_size):
+    def _reserve_memory_regions(
+            self, spec, spike_region_size, recorded_region_size):
         """ Reserve memory for the system, indices and spike data regions.
             The indices region will be copied to DTCM by the executable.
         """
@@ -211,6 +214,11 @@ class SpikeSourceArray(
         spec.reserve_memory_region(
             region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value,
             size=spike_region_size, label='SpikeDataRegion', empty=True)
+
+        spec.reserve_memory_region(
+            region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value,
+            size=recorded_region_size, label="RecordedSpikeDataRegion",
+            empty=True)
 
     def _write_setup_info(self, spec, spike_buffer_region_size, ip_tags):
         """
@@ -292,7 +300,8 @@ class SpikeSourceArray(
         spec.comment("\nReserving memory space for spike data region:\n\n")
         spike_buffer = self._get_spike_send_buffer(
             graph_mapper.get_subvertex_slice(subvertex))
-        self._reserve_memory_regions(spec, spike_buffer.buffer_size)
+        self._reserve_memory_regions(spec, spike_buffer.buffer_size,
+                                     spike_buffer.max_buffer_size_possible)
 
         self._write_setup_info(
             spec, spike_buffer.buffer_size, ip_tags)
@@ -333,7 +342,7 @@ class SpikeSourceArray(
         send_size = send_buffer.buffer_size
         recorded_size = 0
         if self._record:
-            recorded_size = send_buffer.buffer_size
+            recorded_size = send_buffer.total_region_size
         return (
             (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
             SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size +
@@ -361,3 +370,88 @@ class SpikeSourceArray(
         :return:
         """
         return True
+
+    # TODO this needs to be dropped when BUFFERED OUT appears. Currently is a bodge to allow recording of spike soruce arrays if the memory allows it
+    def _get_spikes(
+            self, graph_mapper, placements, transceiver, compatible_output,
+            spike_recording_region, sub_vertex_out_spike_bytes_function):
+        """
+        Return a 2-column numpy array containing cell ids and spike times for
+        recorded cells.   This is read directly from the memory for the board.
+        """
+
+        logger.info("Getting spikes for {}".format(self._label))
+
+        spike_times = list()
+        spike_ids = list()
+        ms_per_tick = self._machine_time_step / 1000.0
+
+        # Find all the sub-vertices that this pynn_population.py exists on
+        subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        progress_bar = ProgressBar(len(subvertices), "Getting spikes")
+        for subvertex in subvertices:
+            placement = placements.get_placement_of_subvertex(subvertex)
+            (x, y, p) = placement.x, placement.y, placement.p
+            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            lo_atom = subvertex_slice.lo_atom
+            hi_atom = subvertex_slice.hi_atom
+
+            logger.debug("Reading spikes from chip {}, {}, core {}, "
+                         "lo_atom {} hi_atom {}".format(
+                             x, y, p, lo_atom, hi_atom))
+
+            # Get the App Data for the core
+            app_data_base_address = \
+                transceiver.get_cpu_information_from_core(x, y, p).user[0]
+
+            # Get the position of the spike buffer
+            spike_region_base_address_offset = \
+                dsg_utility_calls.get_region_base_address_offset(
+                    app_data_base_address, spike_recording_region)
+            spike_region_base_address_buf = buffer(transceiver.read_memory(
+                x, y, spike_region_base_address_offset, 4))
+            spike_region_base_address = struct.unpack_from(
+                "<I", spike_region_base_address_buf)[0]
+            spike_region_base_address += app_data_base_address
+
+            # Read the spike data size
+            number_of_bytes_written_buf = buffer(transceiver.read_memory(
+                x, y, spike_region_base_address, 4))
+            number_of_bytes_written = struct.unpack_from(
+                "<I", number_of_bytes_written_buf)[0]
+
+            # check that the number of spikes written is smaller or the same as
+            # the size of the memory region we allocated for spikes
+            out_spike_bytes = sub_vertex_out_spike_bytes_function(
+                subvertex, subvertex_slice)
+            size_of_region = self.get_recording_region_size(out_spike_bytes)
+
+            if number_of_bytes_written > size_of_region:
+                raise exceptions.MemReadException(
+                    "the amount of memory written ({}) was larger than was "
+                    "allocated for it ({})"
+                    .format(number_of_bytes_written, size_of_region))
+
+            # Read the spikes
+            logger.debug("Reading {} ({}) bytes starting at {} + 4"
+                         .format(number_of_bytes_written,
+                                 hex(number_of_bytes_written),
+                                 hex(spike_region_base_address)))
+            spike_data = transceiver.read_memory(
+                x, y, spike_region_base_address + 4, number_of_bytes_written)
+            numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
+                dtype="uint32").byteswap().view("uint8")
+            bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
+                (-1, 32))).reshape((-1, out_spike_bytes * 8))
+            times, indices = numpy.where(bits == 1)
+            times = times * ms_per_tick
+            indices = indices + lo_atom
+            spike_ids.append(indices)
+            spike_times.append(times)
+            progress_bar.update()
+
+        progress_bar.end()
+        spike_ids = numpy.hstack(spike_ids)
+        spike_times = numpy.hstack(spike_times)
+        result = numpy.dstack((spike_ids, spike_times))[0]
+        return result[numpy.lexsort((spike_times, spike_ids))]
