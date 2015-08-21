@@ -3,7 +3,8 @@ SpikeSourceArray
 """
 
 # spynnaker imports
-from spynnaker.pyNN.models.abstract_models.abstract_population_recordable_vertex import \
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models\
@@ -163,7 +164,8 @@ class SpikeSourceArray(
         send_buffer = None
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         if key not in self._send_buffers:
-            send_buffer = BufferedSendingRegion()
+            send_buffer = BufferedSendingRegion(
+                self._max_on_chip_memory_usage_for_spikes)
             if isinstance(self._spike_times[0], list):
 
                 # This is in SpiNNaker 'list of lists' format:
@@ -188,15 +190,6 @@ class SpikeSourceArray(
                     # add to send_buffer collection
                     send_buffer.add_keys(time_stamp_in_ticks, neuron_list)
 
-            # Update the size
-            total_size = 0
-            for timestamp in send_buffer.timestamps:
-                n_keys = send_buffer.get_n_keys(timestamp)
-                total_size += BufferManager.get_n_bytes(n_keys)
-            total_size += EventStopRequest.get_min_packet_length()
-            if total_size > self._max_on_chip_memory_usage_for_spikes:
-                total_size = self._max_on_chip_memory_usage_for_spikes
-            send_buffer.buffer_size = total_size
             self._send_buffers[key] = send_buffer
         else:
             send_buffer = self._send_buffers[key]
@@ -338,8 +331,13 @@ class SpikeSourceArray(
         """
         send_buffer = self._get_spike_send_buffer(vertex_slice)
         send_size = send_buffer.buffer_size
-        return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-                SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size)
+        recorded_size = 0
+        if self._record:
+            recorded_size = send_buffer.buffer_size
+        return (
+            (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+            SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size +
+            recorded_size)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
