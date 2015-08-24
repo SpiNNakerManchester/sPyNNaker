@@ -2,8 +2,8 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_conductance_vertex import \
-    AbstractConductanceVertex
+from spynnaker.pyNN.models.abstract_models.abstract_model_components\
+    .abstract_conductance_vertex import AbstractConductanceVertex
 
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \
@@ -67,8 +67,10 @@ class Population(object):
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
-        cellparams['spikes_per_second'] = spinnaker.spikes_per_second
-        cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
+        if 'spikes_per_second' not in cellparams:
+            cellparams['spikes_per_second'] = spinnaker.spikes_per_second
+        if 'ring_buffer_sigma' not in cellparams:
+            cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
         self._delay_vertex = None
@@ -120,6 +122,14 @@ class Population(object):
         """
         raise NotImplementedError
 
+    @property
+    def default_parameters(self):
+        """
+        returns the default paramters of the vertex from this population
+        :return:
+        """
+        return self._vertex.default_parameters
+
     def describe(self, template='population_default.txt', engine='default'):
         """
         Returns a human-readable description of the population.
@@ -140,7 +150,7 @@ class Population(object):
         """
         Get the values of a parameter for every local cell in the population.
         """
-        raise NotImplementedError
+        return self._parameters[paramter_name]
 
     def _get_cell_position(self, cell_id):
         """
@@ -667,7 +677,12 @@ class Population(object):
         'Topographic' set. Set the value of parametername to the values in
         value_array, which must have the same dimensions as the Population.
         """
-        raise NotImplementedError
+        if len(value_array) != self._vertex.n_atoms:
+            raise exceptions.ConfigurationException(
+                "To use Tset, you must have a array of values which matches "
+                "the size of the population. Please change this and try "
+                "again, or alternatively, use set()")
+        self.set(parametername, value_array)
 
     def _end(self):
         """ Do final steps at the end of the simulation

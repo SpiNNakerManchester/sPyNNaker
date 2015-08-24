@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 class SpynnakerConfigurationFunctions(object):
 
     def __init__(self):
-        pass
+        self._min_supported_delay = None
+        self._max_supported_delay = None
 
     def _set_up_machine_specifics(self, timestep, min_delay, max_delay,
                                   hostname):
@@ -23,13 +24,13 @@ class SpynnakerConfigurationFunctions(object):
         # deal with params allowed via the setup optimals
         if timestep is not None:
             timestep *= 1000  # convert into ms from microseconds
-            config.set("Machine", "machineTimeStep", timestep)
             self._machine_time_step = timestep
 
         if min_delay is not None and float(min_delay * 1000) < 1.0 * timestep:
             raise exceptions.ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
-                "current machine time step".format(1.0 * timestep))
+                "current machine time step"
+                .format(constants.MIN_SUPPORTED_DELAY * timestep))
 
         natively_supported_delay_for_models = \
             constants.MAX_SUPPORTED_DELAY_TICS
@@ -47,14 +48,15 @@ class SpynnakerConfigurationFunctions(object):
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(0.144 * timestep))
         if min_delay is not None:
-            if not config.has_section("Model"):
-                config.add_section("Model")
-            config.set("Model", "min_delay", (min_delay * 1000) / timestep)
+            self._min_supported_delay = min_delay
+        else:
+            self._min_supported_delay = timestep / 1000.0
 
         if max_delay is not None:
-            if not config.has_section("Model"):
-                config.add_section("Model")
-            config.set("Model", "max_delay", (max_delay * 1000) / timestep)
+            self._max_supported_delay = max_delay
+        else:
+            self._max_supported_delay = (max_delay_tics_supported *
+                                         (timestep / 1000.0))
 
         if (config.has_option("Machine", "timeScaleFactor") and
                 config.get("Machine", "timeScaleFactor") != "None"):
@@ -89,3 +91,19 @@ class SpynnakerConfigurationFunctions(object):
         if self._hostname == 'None' and not use_virtual_board:
             raise Exception("A SpiNNaker machine must be specified in "
                             "spynnaker.cfg.")
+
+    @property
+    def min_supported_delay(self):
+        """
+        the min supported delay based in milliseconds
+        :return:
+        """
+        return self._min_supported_delay
+
+    @property
+    def max_supported_delay(self):
+        """
+        the max supported delay based in milliseconds
+        :return:
+        """
+        return self._max_supported_delay

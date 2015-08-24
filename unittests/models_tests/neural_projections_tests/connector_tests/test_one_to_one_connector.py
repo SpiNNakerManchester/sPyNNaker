@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 import spynnaker.pyNN as pyNN
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from pprint import pprint as pp
 # Setup
 if pyNN._spinnaker is None:

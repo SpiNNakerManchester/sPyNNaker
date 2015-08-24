@@ -12,8 +12,8 @@ class TestPyNNSetup(unittest.TestCase):
                          None)
         self.assertEqual(conf.config.getint("Machine", "machineTimeStep"),
                          1 * 1000)
-        self.assertEqual(conf.config.get("Model", "min_delay"), 1)
-        self.assertEqual(conf.config.get("Model", "max_delay"), 15.0)
+        self.assertEqual(pynn.get_min_delay(), 1)
+        self.assertEqual(pynn.get_max_delay(), 15.0)
 
     # def test_setting_up_again(self):
     #     import spynnaker.pyNN as pynn

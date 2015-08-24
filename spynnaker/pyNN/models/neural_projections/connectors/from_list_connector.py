@@ -1,4 +1,4 @@
-from spynnaker.pyNN import exceptions
+from spinn_front_end_common.utilities import exceptions
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
