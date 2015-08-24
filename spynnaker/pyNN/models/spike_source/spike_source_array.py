@@ -60,7 +60,7 @@ class SpikeSourceArray(
     model for play back of spikes
     """
 
-    _CONFIGURATION_REGION_SIZE = 40
+    _CONFIGURATION_REGION_SIZE = 44
 
     # limited to the n of the x,y,p,n key format
     _model_based_max_atoms_per_core = sys.maxint
@@ -221,7 +221,8 @@ class SpikeSourceArray(
             size=recorded_region_size, label="RecordedSpikeDataRegion",
             empty=True)
 
-    def _write_setup_info(self, spec, spike_buffer_region_size, ip_tags):
+    def _write_setup_info(self, spec, spike_buffer_region_size, ip_tags,
+                          total_recording_region_size):
         """
         Write information used to control the simulation and gathering of
         results. Currently, this means the flag word used to signal whether
@@ -268,7 +269,9 @@ class SpikeSourceArray(
         # write flag for recording
         if self._record:
             spec.write_value(data=1)
+            spec.write_value(data=total_recording_region_size)
         else:
+            spec.write_value(data=0)
             spec.write_value(data=0)
 
     # inherited from dataspecable vertex
@@ -311,7 +314,8 @@ class SpikeSourceArray(
                                      spike_buffer.max_buffer_size_possible)
 
         self._write_setup_info(
-            spec, spike_buffer.buffer_size, ip_tags)
+            spec, spike_buffer.buffer_size, ip_tags,
+            spike_buffer.total_region_size)
 
         # End-of-Spec:
         spec.end_specification()
