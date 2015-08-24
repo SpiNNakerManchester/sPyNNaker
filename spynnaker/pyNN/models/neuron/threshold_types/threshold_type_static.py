@@ -13,6 +13,14 @@ class ThresholdTypeStatic(AbstractThresholdType):
         AbstractThresholdType.__init__(self)
         self._v_thresh = v_thresh
 
+    @property
+    def v_thresh(self):
+        return self._v_thresh
+
+    @v_thresh.setter
+    def v_thresh(self, v_thresh):
+        self._v_thresh = v_thresh
+
     def get_n_threshold_parameters(self):
         return 1
 
@@ -20,3 +28,8 @@ class ThresholdTypeStatic(AbstractThresholdType):
         return [
             NeuronParameter(self._v_thresh, DataType.S1615)
         ]
+
+    def get_n_cpu_cycles_per_neuron(self):
+
+        # Just a comparison, but 2 just in case!
+        return 2

@@ -18,7 +18,7 @@ typedef struct neuron_t {
     // offset current [nA]
     REAL I_offset;
 
-    // current timestep - simple correction for threshold in beta version
+    // current timestep - simple correction for threshold
     REAL this_h;
 
 } neuron_t;

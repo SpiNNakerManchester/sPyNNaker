@@ -59,7 +59,22 @@ static inline void _print_neurons() {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
-        neuron_model_print(&(neuron_array[n]));
+        neuron_model_print_state_variables(&(neuron_array[n]));
+    }
+    log_debug("-------------------------------------\n");
+    //}
+#endif // LOG_LEVEL >= LOG_DEBUG
+}
+
+//! private method for doing output debug data on the neurons
+//! \return nothing
+static inline void _print_neuron_parameters() {
+//! only if the models are compiled in debug mode will this method contain
+//! said lines.
+#if LOG_LEVEL >= LOG_DEBUG
+    log_debug("-------------------------------------\n");
+    for (index_t n = 0; n < n_neurons; n++) {
+        neuron_model_print_parameters(&(neuron_array[n]));
     }
     log_debug("-------------------------------------\n");
     //}
@@ -113,36 +128,45 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         next += sizeof(global_neuron_params_t) / 4;
     }
 
-    log_info("\tneurons = %u", n_neurons);
+    log_info("\tneurons = %u, params size = %u, input type size = %u,"
+             "threshold size = %u", n_neurons, sizeof(neuron_t),
+             sizeof(input_type_t), sizeof(threshold_type_t));
 
     // Allocate DTCM for neuron array and copy block of data
-    neuron_array = (neuron_t *) spin1_malloc(n_neurons * sizeof(neuron_t));
-    if (neuron_array == NULL) {
-        log_error("Unable to allocate neuron array - Out of DTCM");
-        return false;
+    if (sizeof(neuron_t) != 0) {
+        neuron_array = (neuron_t *) spin1_malloc(n_neurons * sizeof(neuron_t));
+        if (neuron_array == NULL) {
+            log_error("Unable to allocate neuron array - Out of DTCM");
+            return false;
+        }
+        memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
+        next += (n_neurons * sizeof(neuron_t)) / 4;
     }
-    memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
-    next += (n_neurons * sizeof(neuron_t)) / 4;
 
     // Allocate DTCM for input type array and copy block of data
-    input_type_array = (input_type_t *) spin1_malloc(
-        n_neurons * sizeof(input_type_t));
-    if (input_type_array == NULL) {
-        log_error("Unable to allocate input type array - Out of DTCM");
-        return false;
+    if (sizeof(input_type_t) != 0) {
+        input_type_array = (input_type_t *) spin1_malloc(
+            n_neurons * sizeof(input_type_t));
+        if (input_type_array == NULL) {
+            log_error("Unable to allocate input type array - Out of DTCM");
+            return false;
+        }
+        memcpy(input_type_array, &address[next],
+               n_neurons * sizeof(input_type_t));
+        next += (n_neurons * sizeof(input_type_t)) / 4;
     }
-    memcpy(input_type_array, &address[next], n_neurons * sizeof(input_type_t));
-    next += (n_neurons * sizeof(input_type_t)) / 4;
 
     // Allocate DTCM for threshold type array and copy block of data
-    threshold_type_array = (threshold_type_t *) spin1_malloc(
-        n_neurons * sizeof(threshold_type_t));
-    if (threshold_type_array == NULL) {
-        log_error("Unable to allocate threshold type array - Out of DTCM");
-        return false;
+    if (sizeof(threshold_type_t) != 0) {
+        threshold_type_array = (threshold_type_t *) spin1_malloc(
+            n_neurons * sizeof(threshold_type_t));
+        if (threshold_type_array == NULL) {
+            log_error("Unable to allocate threshold type array - Out of DTCM");
+            return false;
+        }
+        memcpy(threshold_type_array, &address[next],
+               n_neurons * sizeof(threshold_type_t));
     }
-    memcpy(threshold_type_array, &address[next],
-           n_neurons * sizeof(threshold_type_t));
 
     // Set up the out spikes array
     if (!out_spikes_initialize(n_neurons)) {
@@ -153,6 +177,8 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     neuron_model_set_global_neuron_params(global_parameters);
 
     recording_flags = recording_flags_param;
+
+    _print_neuron_parameters();
 
     return true;
 }

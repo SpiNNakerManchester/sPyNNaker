@@ -52,7 +52,37 @@ class AbstractSynapseType(object):
                 :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
         """
 
+    @abstractmethod
+    def get_n_cpu_cycles_per_neuron(self):
+        """ Get the total number of CPU cycles executed by\
+            synapse_types_shape_input, synapse_types_add_neuron_input,\
+            synapse_types_get_excitatory_input and \
+            synapse_types_get_inhibitory_input
+
+        :return: The number of CPU cycles
+        :rtype: int
+        """
+
     def get_n_synapse_type_bits(self):
         """ Get the number of bits required to represent the synapse types
+
+        :return: the number of bits
+        :rtype: int
         """
-        return math.ceil(math.log(self.get_n_synapse_types(), 2))
+        return int(math.ceil(math.log(self.get_n_synapse_types(), 2)))
+
+    def get_sdram_usage_per_neuron_in_bytes(self):
+        """ Get the SDRAM usage of the synapse type per neuron in bytes
+
+        :return: the number of bytes
+        :rtype: int
+        """
+        return self.get_n_synapse_type_parameters() * 4
+
+    def get_dtcm_usage_per_neuron_in_bytes(self):
+        """ Get the DTCM usage of the synapse type per neuron in bytes
+
+        :return: the number of bytes
+        :rtype: int
+        """
+        return self.get_n_synapse_type_parameters() * 4

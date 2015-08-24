@@ -53,8 +53,11 @@ state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
     return neuron->V_membrane;
 }
 
-void neuron_model_print(restrict neuron_pointer_t neuron) {
+void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
     log_debug("V membrane    = %11.4k mv", neuron->V_membrane);
+}
+
+void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     log_debug("V reset       = %11.4k mv", neuron->V_reset);
     log_debug("V rest        = %11.4k mv", neuron->V_rest);
 

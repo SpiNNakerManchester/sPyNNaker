@@ -17,3 +17,6 @@ class InputTypeCurrent(AbstractInputType):
 
     def get_input_type_parameters(self):
         return []
+
+    def get_n_cpu_cycles_per_neuron(self):
+        return 0

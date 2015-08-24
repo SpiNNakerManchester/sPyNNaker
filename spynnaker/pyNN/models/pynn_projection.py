@@ -5,7 +5,7 @@ from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
+from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
@@ -63,28 +63,27 @@ class Projection(object):
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
 
-        if isinstance(postsynaptic_population._get_vertex,
-                      AbstractPopulationVertex):
-            # Check that the "target" is an acceptable value
-            targets = postsynaptic_population._get_vertex.get_synapse_targets()
-            if target not in targets:
-                raise exceptions.ConfigurationException(
-                    "Target {} is not available in the post-synaptic "
-                    "pynn_population.py (choices are {})"
-                    .format(target, targets))
-            synapse_type = \
-                postsynaptic_population._get_vertex.get_synapse_id(target)
-        else:
+        if not isinstance(postsynaptic_population._get_vertex,
+                          AbstractPopulationVertex):
+
             raise exceptions.ConfigurationException(
                 "postsynaptic_population is not a supposal reciever of"
                 " synaptic projections")
 
+        # Check that the "target" is an acceptable value
+        synapse_type = postsynaptic_population._get_vertex.synapse_type
+        targets = synapse_type.get_synapse_targets()
+        if target not in targets:
+            raise exceptions.ConfigurationException(
+                "Target {} is not available in the post-synaptic population"
+                " (choices are {})".format(target, targets))
+        synapse_id = synapse_type.get_synapse_id_by_target(target)
+
         self._weight_scale = postsynaptic_population._get_vertex.weight_scale
-        synapse_list = \
-            connector.generate_synapse_list(
-                presynaptic_population, postsynaptic_population,
-                1000.0 / machine_time_step,
-                postsynaptic_population._get_vertex.weight_scale, synapse_type)
+        synapse_list = connector.generate_synapse_list(
+            presynaptic_population, postsynaptic_population,
+            1000.0 / machine_time_step,
+            postsynaptic_population._get_vertex.weight_scale, synapse_id)
         self._host_based_synapse_list = copy.deepcopy(synapse_list)
 
         # If there are some negative weights

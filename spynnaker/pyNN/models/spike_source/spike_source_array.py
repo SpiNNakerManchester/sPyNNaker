@@ -65,9 +65,8 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
                ('SPIKE_DATA_REGION', 2)])
 
     def __init__(
-            self, n_neurons, spike_times, machine_time_step, spikes_per_second,
-            ring_buffer_sigma, timescale_factor, port=None, tag=None,
-            ip_address=None, board_address=None,
+            self, n_neurons, spike_times, machine_time_step, timescale_factor,
+            port=None, tag=None, ip_address=None, board_address=None,
             max_on_chip_memory_usage_for_spikes_in_bytes=None,
             space_before_notification=640,
             constraints=None, label="SpikeSourceArray"):

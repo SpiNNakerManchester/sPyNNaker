@@ -13,8 +13,6 @@ from ._version import __version__, __version_name__, __version_month__,\
 # utility functions
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.utilities.parameters_surrogate\
-    import PyNNParametersSurrogate
 
 # pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
@@ -27,14 +25,14 @@ from spinn_front_end_common.utilities.notification_protocol.\
     socket_address import SocketAddress
 
 # neural models
-from spynnaker.pyNN.models.neural_models.if_cond_exp \
+from spynnaker.pyNN.models.neuron.builds.if_cond_exp \
     import IFConductanceExponentialPopulation as IF_cond_exp
-from spynnaker.pyNN.models.neural_models.if_curr_dual_exp \
-    import IFCurrentDualExponentialPopulation as IF_curr_dual_exp
-from spynnaker.pyNN.models.neural_models.if_curr_exp \
+#from spynnaker.pyNN.models.neural_models.if_curr_dual_exp \
+#    import IFCurrentDualExponentialPopulation as IF_curr_dual_exp
+from spynnaker.pyNN.models.neuron.builds.if_curr_exp \
     import IFCurrentExponentialPopulation as IF_curr_exp
-from spynnaker.pyNN.models.neural_models.izk_curr_exp \
-    import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
+#from spynnaker.pyNN.models.neural_models.izk_curr_exp \
+#    import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
 
 # neural projections
 from spynnaker.pyNN.models.neural_projections\
@@ -259,8 +257,6 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
         if neuron_type in globals():
             neuron_type = globals()[neuron_type]
         else:
-            neuron_type = None
-        if neuron_type is None:
             raise Exception("Unknown Vertex Type {}"
                             .format(neuron_type))
 

@@ -8,9 +8,9 @@ from spinn_front_end_common.utilities.database.\
 # general imports
 import logging
 import traceback
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_population_recordable_vertex import \
-    AbstractPopulationRecordableVertex
+
+from spynnaker.pyNN.models.common.abstract_spike_recordable \
+    import AbstractSpikeRecordable
 
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ class SpynnakerDataBaseInterface(FrontEndCommonDataBaseInterface):
                 "PRIMARY KEY (vertex_id, edge_id))")
             # add vertices
             for vertex in partitionable_graph.vertices:
-                if isinstance(vertex, AbstractPopulationRecordableVertex):
+                if isinstance(vertex, AbstractSpikeRecordable):
                     cur.execute(
                         "INSERT INTO Partitionable_vertices("
                         "vertex_label, no_atoms, max_atom_constrant, recorded)"

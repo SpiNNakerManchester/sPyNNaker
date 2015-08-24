@@ -12,6 +12,8 @@ from pacman.operations.partition_algorithms.basic_partitioner import \
     BasicPartitioner
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
+from spynnaker.pyNN.models.common.abstract_spike_recordable \
+    import AbstractSpikeRecordable
 from pacman.operations.tag_allocator_algorithms.basic_tag_allocator \
     import BasicTagAllocator
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map \
@@ -61,9 +63,6 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesProvenanceData
 
 # local front end imports
-from spynnaker.pyNN.models\
-    .abstract_models.abstract_population_recordable_vertex import \
-    AbstractPopulationRecordableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
@@ -266,7 +265,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         "cause the neural models to fail to partition "
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
-                if (isinstance(vertex, AbstractPopulationRecordableVertex) and
+                if (isinstance(vertex, AbstractSpikeRecordable) and
                         vertex.record):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "

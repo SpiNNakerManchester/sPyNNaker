@@ -1,254 +1,95 @@
-"""
-synaptic manager file
-"""
-
-# spinn front end imports
-from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_incoming_edge_constraints \
-    import AbstractProvidesIncomingEdgeConstraints
-
-# synnaker imports
-from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
-    import ProjectionPartitionableEdge
+from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.neural_properties import master_pop_table_generators
+from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.models.neural_properties import master_pop_table_generators
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
+    import ProjectionPartitionableEdge
 
-# pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
-# dsg imports
+from spinn_front_end_common.utilities import helpful_functions
+
 from data_specification.enums.data_type import DataType
-from data_specification import utility_calls as dsg_utilities
+import data_specification.utility_calls as dsg_utilities
 
-# general imports
-import logging
-import math
-import numpy
-import sys
-from abc import ABCMeta
-from abc import abstractmethod
-from six import add_metaclass
 from scipy import special
+import math
+import sys
+import numpy
 
-logger = logging.getLogger(__name__)
+# TODO: Make sure these values are correct (particularly CPU cycles)
+_SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
+_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
+_SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
+_SYNAPSES_BASE_N_CPU_CYCLES = 8
 
 
-@add_metaclass(ABCMeta)
-class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
+class SynapticManager(object):
+    """ Deals with synapses
     """
-    a synaptic manager that handles synatpic matrix's and master pops
-    """
 
-    def __init__(self, master_pop_algorithm=None):
+    def __init__(self, synapse_type, machine_time_step, ring_buffer_sigma,
+                 spikes_per_second, population_table_type=None):
+        self._synapse_type = synapse_type
+        self._ring_buffer_sigma = ring_buffer_sigma
+        self._spikes_per_second = spikes_per_second
+        self._machine_time_step = machine_time_step
+
+        # Get the type of population table
+        self._population_table_type = population_table_type
+        if population_table_type is None:
+            population_table_type = ("MasterPopTableAs" + conf.config.get(
+                "MasterPopTable", "generator"))
+            algorithms = helpful_functions.get_valid_components(
+                master_pop_table_generators, "master_pop_table_as")
+            self._population_table_type = algorithms[population_table_type]()
+
+        if self._ring_buffer_sigma is None:
+            self._ring_buffer_sigma = conf.config.getfloat(
+                "Simulation", "ring_buffer_sigma")
+
+        if self._spikes_per_second is None:
+            self._spikes_per_second = conf.config.getfloat(
+                "Simulation", "spikes_per_second")
+
+        # Prepare for dealing with STDP
         self._stdp_checked = False
         self._stdp_mechanism = None
-        self._master_pop_table_generator = None
 
-        if master_pop_algorithm is None:
-            master_pop_algorithm = \
-                "MasterPopTableAs" + \
-                conf.config.get("MasterPopTable", "generator")
+    @property
+    def synapse_type(self):
+        return self._synapse_type
 
-        algorithum_list = \
-            helpful_functions.get_valid_components(master_pop_table_generators,
-                                                   "master_pop_table_as")
-        self._master_pop_table_generator = \
-            algorithum_list[master_pop_algorithm]()
+    @property
+    def vertex_executable_suffix(self):
+        if self._stdp_mechanism is None:
+            return ""
+        return "_" + self._stdp_mechanism.get_vertex_executable_suffix()
 
-    # Implementation for AbstractPartitionablePopulationVertex
-    def get_population_table_size(self, vertex_slice, in_edges):
-        """
+    def get_n_cpu_cycles(self, vertex_slice, graph):
 
-        :param vertex_slice:
-        :param in_edges:
-        :return:
-        """
-        return self._master_pop_table_generator\
-                   .get_master_population_table_size(vertex_slice, in_edges)
+        # TODO: Calculate this correctly
+        return 0
 
-    @staticmethod
-    def write_synapse_row_info(sublist, row_io, spec, current_write_ptr,
-                               fixed_row_length, region, weight_scales,
-                               n_synapse_type_bits):
-        """
-        Write this synaptic block to the designated synaptic matrix region at
-        its current write pointer.
-        :param sublist:
-        :param row_io:
-        :param spec:
-        :param current_write_ptr:
-        :param fixed_row_length:
-        :param region:
-        :param weight_scales:
-        :param n_synapse_type_bits:
-        :return:
-        """
+    def get_dtcm_usage_in_bytes(self, vertex_slice, graph):
 
-        # Switch focus to the synaptic matrix memory region:
-        spec.switch_write_focus(region)
+        # TODO: Calculate this correctly
+        return 0
 
-        # Align the write pointer to the next 1Kbyte boundary using padding:
-        write_ptr = current_write_ptr
-
-        # Remember this aligned address, it's where this block will start:
-        block_start_addr = write_ptr
-
-        # Write the synaptic block, tracking the word count:
-        synaptic_rows = sublist.get_rows()
-        data = numpy.zeros(
-            (fixed_row_length +
-             constants.SYNAPTIC_ROW_HEADER_WORDS) *
-            sublist.get_n_rows(), dtype="uint32")
-        data.fill(0xBBCCDDEE)
-
-        for row_no, row in enumerate(synaptic_rows):
-            data_pos = ((fixed_row_length +
-                         constants.SYNAPTIC_ROW_HEADER_WORDS) *
-                        row_no)
-
-            plastic_region = row_io.get_packed_plastic_region(
-                row, weight_scales, n_synapse_type_bits)
-
-            # Write the size of the plastic region
-            data[data_pos] = plastic_region.size
-            data_pos += 1
-
-            # Write the plastic region
-            data[data_pos:(data_pos + plastic_region.size)] = plastic_region
-            data_pos += plastic_region.size
-
-            fixed_fixed_region = row_io.get_packed_fixed_fixed_region(
-                row, weight_scales, n_synapse_type_bits)
-            fixed_plastic_region = row_io.get_packed_fixed_plastic_region(
-                row, weight_scales, n_synapse_type_bits)
-
-            # Write the size of the fixed parts
-            data[data_pos] = fixed_fixed_region.size
-            data[data_pos + 1] = fixed_plastic_region.size
-            data_pos += 2
-
-            # Write the fixed fixed region
-            data[data_pos:(data_pos + fixed_fixed_region.size)] = \
-                fixed_fixed_region
-            data_pos += fixed_fixed_region.size
-
-            # As everything needs to be word aligned, add extra zero to
-            # fixed_plastic Region if it has an odd number of entries and build
-            # uint32 view of it
-            if (fixed_plastic_region.size % 2) != 0:
-                fixed_plastic_region = numpy.asarray(numpy.append(
-                    fixed_plastic_region, 0), dtype='uint16')
-            # does indeed return something (due to c fancy stuff in numpi) ABS
-
-            # noinspection PyNoneFunctionAssignment
-            fixed_plastic_region_words = fixed_plastic_region.view(
-                dtype="uint32")
-            data[data_pos:(data_pos + fixed_plastic_region_words.size)] = \
-                fixed_plastic_region_words
-
-        spec.write_array(data)
-        write_ptr += data.size * 4
-
-        # The current write pointer is where the next block could start:
-        next_block_start_addr = write_ptr
-        return block_start_addr, next_block_start_addr
-
-    def get_exact_synaptic_block_memory_size(self, graph_mapper,
-                                             subvertex_in_edges):
-        """
-
-        :param graph_mapper:
-        :param subvertex_in_edges:
-        :return:
-        """
-        memory_size = 0
-
-        # Go through the subedges and add up the memory
-        for subedge in subvertex_in_edges:
-
-            # pad the memory size to meet 1 k offsets
-            if (memory_size & 0x3FF) != 0:
-                memory_size = (memory_size & 0xFFFFFC00) + 0x400
-
-            sublist = subedge.get_synapse_sublist(graph_mapper)
-            max_n_words = \
-                max([graph_mapper.get_partitionable_edge_from_partitioned_edge(
-                     subedge).get_synapse_row_io().get_n_words(synapse_row)
-                    for synapse_row in sublist.get_rows()])
-
-            all_syn_block_sz = \
-                self._calculate_all_synaptic_block_size(sublist,
-                                                        max_n_words)
-            memory_size += all_syn_block_sz
-        return memory_size
-
-    def get_synaptic_blocks_memory_size(self, vertex_slice, in_edges):
-        """
-
-        :param vertex_slice:
-        :param in_edges:
-        :return:
-        """
-        self._check_synapse_dynamics(in_edges)
-        memory_size = 0
-
-        for in_edge in in_edges:
-            if isinstance(in_edge, ProjectionPartitionableEdge):
-
-                # Get maximum row length in this edge
-                max_n_words = in_edge.get_max_n_words(vertex_slice)
-                all_syn_block_sz = \
-                    self._calculate_all_synaptic_block_size(in_edge,
-                                                            max_n_words)
-
-                # TODO: Fix this to be more accurate!
-                # May require modification to the master pynn_population.py
-                # table
-                n_atoms = sys.maxint
-                edge_pre_vertex = in_edge.pre_vertex
-                if isinstance(edge_pre_vertex, AbstractPartitionableVertex):
-                    n_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-                if in_edge.pre_vertex.n_atoms < n_atoms:
-                    n_atoms = in_edge.pre_vertex.n_atoms
-
-                num_rows = in_edge.get_n_rows()
-                extra_mem = math.ceil(float(num_rows) / float(n_atoms)) * 1024
-                if extra_mem == 0:
-                    extra_mem = 1024
-                all_syn_block_sz += extra_mem
-                memory_size += all_syn_block_sz
-
-        return memory_size
-
-    def _calculate_all_synaptic_block_size(self, synaptic_sub_list,
-                                           max_n_words):
-        """
-
-        :param synaptic_sub_list:
-        :param max_n_words:
-        :return:
-        """
-        # Gets smallest possible (i.e. supported by row length
-        # Table structure) that can contain max_row_length
-        row_length = self._master_pop_table_generator.get_allowed_row_length(
-            max_n_words)
-        num_rows = synaptic_sub_list.get_n_rows()
-        syn_block_sz = \
-            4 * (constants.SYNAPTIC_ROW_HEADER_WORDS + row_length)
-        return syn_block_sz * num_rows
+    def _get_synapse_params_size(self, vertex_slice):
+        per_neuron_usage = (
+            self._synapse_type.get_sdram_usage_per_neuron_in_bytes())
+        return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
+                (per_neuron_usage * vertex_slice.n_atoms) +
+                (4 * self._synapse_type.get_n_synapse_types()))
 
     def _check_synapse_dynamics(self, in_edges):
-        """
-
-        :param in_edges:
-        :return:
+        """ Checks the synapse dynamics for all edges is the same
         """
         if self._stdp_checked:
             return True
@@ -269,82 +110,120 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                                 "Different STDP mechanisms on the same"
                                 " vertex are not supported")
 
-    @abstractmethod
-    def get_n_synapse_type_bits(self):
+    def _get_synaptic_block_size(self, synaptic_sub_list, max_n_words):
+        """ Get the size of a single block
         """
-        Return the number of bits used to identify the synapse in the synaptic
-        row
-        """
+        # Gets smallest possible (i.e. supported by row length
+        # Table structure) that can contain max_row_length
+        row_length = self._population_table_type.get_allowed_row_length(
+            max_n_words)
+        num_rows = synaptic_sub_list.get_n_rows()
+        syn_row_sz = 4 * (constants.SYNAPTIC_ROW_HEADER_WORDS + row_length)
+        return syn_row_sz * num_rows
 
-    @abstractmethod
-    def write_synapse_parameters(self, spec, subvertex, vertex_slice):
+    def _get_exact_synaptic_blocks_size(
+            self, graph_mapper, subvertex_in_edges):
+        """ Get the exact size all of the synaptic blocks
         """
-        forced method for dealing with writing synapse params
-        :param spec:
-        :param subvertex:
-        :param vertex_slice:
-        :return:
-        """
+        memory_size = 0
 
-    @staticmethod
-    def get_synapse_targets():
-        """
-        Gets the supported names of the synapse targets
-        """
-        return "excitatory", "inhibitory"
+        # Go through the subedges and add up the memory
+        for subedge in subvertex_in_edges:
 
-    @staticmethod
-    def get_synapse_id(target_name):
-        """
-        Returns the numeric identifier of a synapse, given its name.  This
-        is used by the neuron models.
-        :param target_name:
-        :return:
-        """
-        if target_name == "excitatory":
-            return 0
-        elif target_name == "inhibitory":
-            return 1
-        return None
+            # pad the memory size to meet 1 k offsets
+            if (memory_size & 0x3FF) != 0:
+                memory_size = (memory_size & 0xFFFFFC00) + 0x400
 
-    def get_synapse_dynamics_parameter_size(self, in_edges):
-        """
+            sublist = subedge.get_synapse_sublist(graph_mapper)
+            max_n_words = max([
+                graph_mapper.get_partitionable_edge_from_partitioned_edge(
+                    subedge).get_synapse_row_io().get_n_words(synapse_row)
+                for synapse_row in sublist.get_rows()])
 
-        :param in_edges:
-        :return:
+            all_syn_block_sz = self._get_synaptic_block_size(
+                sublist, max_n_words)
+            memory_size += all_syn_block_sz
+        return memory_size
+
+    def _get_estimate_synaptic_blocks_size(self, vertex_slice, in_edges):
+        """ Get an estimate of the synaptic blocks memory size
+        """
+        self._check_synapse_dynamics(in_edges)
+        memory_size = 0
+
+        for in_edge in in_edges:
+            if isinstance(in_edge, ProjectionPartitionableEdge):
+
+                # Get maximum row length in this edge
+                max_n_words = in_edge.get_max_n_words(vertex_slice)
+                all_syn_block_sz = self._get_synaptic_block_size(
+                    in_edge, max_n_words)
+
+                # TODO: Fix this to be more accurate!
+                # May require modification to the master population table
+                n_atoms = sys.maxint
+                edge_pre_vertex = in_edge.pre_vertex
+                if isinstance(edge_pre_vertex, AbstractPartitionableVertex):
+                    n_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
+                if in_edge.pre_vertex.n_atoms < n_atoms:
+                    n_atoms = in_edge.pre_vertex.n_atoms
+
+                num_rows = in_edge.get_n_rows()
+                extra_mem = math.ceil(float(num_rows) / float(n_atoms)) * 1024
+                if extra_mem == 0:
+                    extra_mem = 1024
+                all_syn_block_sz += extra_mem
+                memory_size += all_syn_block_sz
+
+        return memory_size
+
+    def _get_synapse_dynamics_parameter_size(self, in_edges):
+        """ Get the size of the synapse dynamics region
         """
         self._check_synapse_dynamics(in_edges)
         if self._stdp_mechanism is not None:
             return self._stdp_mechanism.get_params_size(
-                len(self.get_synapse_targets()))
+                len(self._synapse_type.get_synapse_targets()))
         return 0
 
-    def write_synapse_dynamics_parameters(self, spec, machine_time_step,
-                                          region, weight_scales):
-        """
+    def get_sdram_usage_in_bytes(self, vertex_slice, in_edges):
+        return (
+            self._get_synapse_params_size(vertex_slice) +
+            self._get_synapse_dynamics_parameter_size(in_edges) +
+            self._get_estimate_synaptic_blocks_size(vertex_slice, in_edges) +
+            self._population_table_type.get_master_population_table_size(
+                vertex_slice, in_edges))
 
-        :param spec:
-        :param machine_time_step:
-        :param region:
-        :param weight_scales:
-        :return:
-        """
-        if self._stdp_mechanism is not None:
-            self._stdp_mechanism.write_plastic_params(spec, region,
-                                                      machine_time_step,
-                                                      weight_scales)
+    def _reserve_memory_regions(
+            self, spec, vertex, vertex_slice, graph, all_syn_block_sz):
 
-    @staticmethod
-    def get_weight_scale(ring_buffer_to_input_left_shift):
-        """
-        Return the amount to scale the weights by to convert them from floating
-        point values to 16-bit fixed point numbers which can be shifted left by
-        ring_buffer_to_input_left_shift to produce an s1615 fixed point number
+        spec.reserve_memory_region(
+            region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
+            size=self._get_synapse_params_size(vertex_slice),
+            label='SynapseParams')
 
-        :param ring_buffer_to_input_left_shift:
-        :return:
-        """
-        return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
+        in_edges = graph.incoming_edges_to_vertex(vertex)
+        master_pop_table_sz = \
+            self._population_table_type.get_master_population_table_size(
+                vertex_slice, in_edges)
+        if master_pop_table_sz > 0:
+            spec.reserve_memory_region(
+                region=constants.POPULATION_BASED_REGIONS.POPULATION_TABLE
+                                                         .value,
+                size=master_pop_table_sz, label='PopTable')
+        if all_syn_block_sz > 0:
+            spec.reserve_memory_region(
+                region=constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX
+                                                         .value,
+                size=all_syn_block_sz, label='SynBlocks')
+
+        synapse_dynamics_sz = self._get_synapse_dynamics_parameter_size(
+            in_edges)
+        if synapse_dynamics_sz != 0:
+            spec.reserve_memory_region(
+                region=constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS
+                                                         .value,
+                size=synapse_dynamics_sz, label='synapseDynamicsParams')
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
@@ -427,7 +306,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
     def _get_ring_buffer_totals(self, subvertex, sub_graph, graph_mapper):
         in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-        n_synapse_types = len(self.get_synapse_targets())
+        n_synapse_types = len(self._synapse_type.get_synapse_targets())
         absolute_max_weights = numpy.zeros(n_synapse_types)
 
         # If we have an STDP mechanism, get the maximum plastic weight
@@ -464,18 +343,10 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         return (total_weights, total_square_weights, total_items,
                 absolute_max_weights)
 
-    def get_ring_buffer_to_input_left_shifts(
-            self, subvertex, sub_graph, graph_mapper, spikes_per_second,
-            machine_timestep, sigma):
-        """
-
-        :param subvertex:
-        :param sub_graph:
-        :param graph_mapper:
-        :param spikes_per_second:
-        :param machine_timestep:
-        :param sigma:
-        :return:
+    def _get_ring_buffer_to_input_left_shifts(
+            self, subvertex, sub_graph, graph_mapper, machine_timestep):
+        """ Get the scaling of the ring buffer to provide as much accuracy as\
+            possible without too much overflow
         """
 
         total_weights, total_square_weights, total_items, abs_max_weights =\
@@ -499,13 +370,13 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                 total_items), a_min=0.0, a_max=numpy.finfo(float).max))
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-        n_synapse_types = len(self.get_synapse_targets())
+        n_synapse_types = len(self._synapse_type.get_synapse_targets())
         expected_weights = numpy.fromfunction(
             numpy.vectorize(
                 lambda i, j: self._ring_buffer_expected_upper_bound(
                     weight_means[i][j], weight_std_devs[i][j],
-                    spikes_per_second, machine_timestep, total_items[i][j],
-                    sigma)),
+                    self._spikes_per_second, machine_timestep,
+                    total_items[i][j], self._ring_buffer_sigma)),
             (n_synapse_types, vertex_slice.n_atoms))
         expected_max_weights = [max(t) for t in expected_weights]
         max_weights = [min((w, e))
@@ -531,43 +402,129 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
         return max_weight_powers
 
-    def write_synaptic_matrix_and_master_population_table(
+    @staticmethod
+    def _get_weight_scale(ring_buffer_to_input_left_shift):
+        """ Return the amount to scale the weights by to convert them from \
+            floating point values to 16-bit fixed point numbers which can be \
+            shifted left by ring_buffer_to_input_left_shift to produce an\
+            s1615 fixed point number
+        """
+        return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
+
+    def _write_synapse_parameters(
+            self, spec, subvertex, subgraph, graph_mapper, vertex_slice):
+
+        # Get the ring buffer shifts and scaling factors
+        ring_buffer_shifts = self._get_ring_buffer_to_input_left_shifts(
+            subvertex, subgraph, graph_mapper, self._machine_time_step)
+        weight_scales = [self._get_weight_scale(r) for r in ring_buffer_shifts]
+
+        # update projections for future use
+        in_partitioned_edges = subgraph.incoming_subedges_from_subvertex(
+            subvertex)
+        for partitioned_edge in in_partitioned_edges:
+            partitioned_edge.weight_scales_setter(weight_scales)
+
+        spec.switch_write_focus(
+            region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
+        utility_calls.write_parameters_per_neuron(
+            spec, vertex_slice,
+            self._synapse_type.get_synapse_type_parameters())
+
+        spec.write_array(ring_buffer_shifts)
+
+        return weight_scales
+
+    @staticmethod
+    def _write_synapse_row_info(
+            sublist, row_io, spec, current_write_ptr, fixed_row_length, region,
+            weight_scales, n_synapse_type_bits):
+        """ Write this synaptic block to the designated synaptic matrix region\
+            at its current write pointer.
+        """
+
+        # Switch focus to the synaptic matrix memory region:
+        spec.switch_write_focus(region)
+
+        # Align the write pointer to the next 1Kbyte boundary using padding:
+        write_ptr = current_write_ptr
+
+        # Remember this aligned address, it's where this block will start:
+        block_start_addr = write_ptr
+
+        # Write the synaptic block, tracking the word count:
+        synaptic_rows = sublist.get_rows()
+        data = numpy.zeros(
+            (fixed_row_length +
+             constants.SYNAPTIC_ROW_HEADER_WORDS) *
+            sublist.get_n_rows(), dtype="uint32")
+        data.fill(0xBBCCDDEE)
+
+        for row_no, row in enumerate(synaptic_rows):
+            data_pos = ((fixed_row_length +
+                         constants.SYNAPTIC_ROW_HEADER_WORDS) *
+                        row_no)
+
+            plastic_region = row_io.get_packed_plastic_region(
+                row, weight_scales, n_synapse_type_bits)
+
+            # Write the size of the plastic region
+            data[data_pos] = plastic_region.size
+            data_pos += 1
+
+            # Write the plastic region
+            data[data_pos:(data_pos + plastic_region.size)] = plastic_region
+            data_pos += plastic_region.size
+
+            fixed_fixed_region = row_io.get_packed_fixed_fixed_region(
+                row, weight_scales, n_synapse_type_bits)
+            fixed_plastic_region = row_io.get_packed_fixed_plastic_region(
+                row, weight_scales, n_synapse_type_bits)
+
+            # Write the size of the fixed parts
+            data[data_pos] = fixed_fixed_region.size
+            data[data_pos + 1] = fixed_plastic_region.size
+            data_pos += 2
+
+            # Write the fixed fixed region
+            data[data_pos:(data_pos + fixed_fixed_region.size)] = \
+                fixed_fixed_region
+            data_pos += fixed_fixed_region.size
+
+            # As everything needs to be word aligned, add extra zero to
+            # fixed_plastic Region if it has an odd number of entries and build
+            # uint32 view of it
+            if (fixed_plastic_region.size % 2) != 0:
+                fixed_plastic_region = numpy.asarray(numpy.append(
+                    fixed_plastic_region, 0), dtype='uint16')
+            # does indeed return something (due to c fancy stuff in numpi) ABS
+
+            # noinspection PyNoneFunctionAssignment
+            fixed_plastic_region_words = fixed_plastic_region.view(
+                dtype="uint32")
+            data[data_pos:(data_pos + fixed_plastic_region_words.size)] = \
+                fixed_plastic_region_words
+
+        spec.write_array(data)
+        write_ptr += data.size * 4
+
+        # The current write pointer is where the next block could start:
+        next_block_start_addr = write_ptr
+        return block_start_addr, next_block_start_addr
+
+    def _write_synaptic_matrix_and_master_population_table(
             self, spec, subvertex, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region, routing_info,
             graph_mapper, subgraph):
-        """
-        Simultaneously generates both the master pynn_population.py table and
-        the synatic matrix.
-
-        Master Population Table (MPT):
-        Table of 1152 entries (one per numbered core on a 48-node board
-        arranged in an 8 x 8 grid) giving offset pointer to synapse rows
-        for that source pynn_population.py.
-
-        Synaptic Matrix:
-        One block for each projection in the network (sub_edge in the
-            partitionable_graph).
-        Blocks are always aligned to 1K boundaries (within the region).
-        Each block contains one row for each arriving axon.
-        Each row contains a header of two words and then one 32-bit word for
-        each synapse. The row contents depend on the connector type.
-        :param spec:
-        :param subvertex:
-        :param all_syn_block_sz:
-        :param weight_scales:
-        :param master_pop_table_region:
-        :param synaptic_matrix_region:
-        :param routing_info:
-        :param graph_mapper:
-        :param subgraph:
-        :return:
+        """ Simultaneously generates both the master population table and
+            the synatic matrix.
         """
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
 
         # Track writes inside the synaptic matrix region:
         next_block_start_addr = 0
-        n_synapse_type_bits = self.get_n_synapse_type_bits()
+        n_synapse_type_bits = self._synapse_type.get_n_synapse_type_bits()
 
         # Filtering incoming subedges
         in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
@@ -575,7 +532,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                             if isinstance(e, ProjectionPartitionedEdge)]
 
         # Set up the master population table
-        self._master_pop_table_generator.initialise_table(
+        self._population_table_type.initialise_table(
             spec, master_pop_table_region)
 
         # For each entry in subedge into the subvertex, create a
@@ -596,16 +553,16 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                                  for row in sublist.get_rows()])
 
             # Get an entry in the row length table for this length
-            row_length = (self._master_pop_table_generator
-                              .get_allowed_row_length(max_row_length))
+            row_length = self._population_table_type.get_allowed_row_length(
+                max_row_length)
             block_start_addr = 0
             if max_row_length > 0:
 
                 # Determine where the next block will actually start
                 # and generate any required padding
-                next_block_allowed_addr = (self._master_pop_table_generator
-                                               .get_next_allowed_address(
-                                                   next_block_start_addr))
+                next_block_allowed_addr = \
+                    self._population_table_type.get_next_allowed_address(
+                        next_block_start_addr)
                 if next_block_allowed_addr != next_block_start_addr:
 
                     # Pad out data file with the added alignment bytes:
@@ -618,17 +575,47 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
                 # Write the synaptic block for the sublist
                 (block_start_addr, next_block_start_addr) = \
-                    self.write_synapse_row_info(
+                    self._write_synapse_row_info(
                         sublist, row_io, spec, next_block_allowed_addr,
                         row_length, synaptic_matrix_region, weight_scales,
                         n_synapse_type_bits)
 
-            self._master_pop_table_generator.update_master_population_table(
+            self._population_table_type.update_master_population_table(
                 spec, block_start_addr, row_length, keys_and_masks,
                 master_pop_table_region)
 
-        self._master_pop_table_generator.finish_master_pop_table(
+        self._population_table_type.finish_master_pop_table(
             spec, master_pop_table_region)
+
+    def write_data_spec(
+            self, spec, vertex, vertex_slice, subvertex, placement, subgraph,
+            graph, routing_info, hostname, graph_mapper):
+
+        # Reserve the memory
+        subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        all_syn_block_sz = self._get_exact_synaptic_blocks_size(
+            graph_mapper, subvert_in_edges)
+        self._reserve_memory_regions(
+            spec, vertex, vertex_slice, graph, all_syn_block_sz)
+
+        weight_scales = self._write_synapse_parameters(
+            spec, subvertex, subgraph, graph_mapper, vertex_slice)
+
+        self._write_synaptic_matrix_and_master_population_table(
+            spec, subvertex, all_syn_block_sz, weight_scales,
+            constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            routing_info, graph_mapper, subgraph)
+
+        if self._stdp_mechanism is not None:
+            self._stdp_mechanism.write_plastic_params(
+                spec,
+                constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                self._machine_time_step, weight_scales)
+
+        # Free any additional memory
+        for subedge in subvert_in_edges:
+            subedge.free_sublist()
 
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
@@ -655,17 +642,16 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         # translate the synaptic block into a sublist of synapse_row_infos
         synapse_list = None
         if max_row_length > 0:
-            synapse_list = \
-                self._translate_synaptic_block_from_memory(
-                    synaptic_block, pre_n_atoms, max_row_length, synapse_io,
-                    weight_scales)
+            synapse_list = self._translate_synaptic_block_from_memory(
+                synaptic_block, pre_n_atoms, max_row_length, synapse_io,
+                weight_scales)
         else:
             synapse_list = SynapticList([])
         return synapse_list
 
-    def _translate_synaptic_block_from_memory(self, synaptic_block, n_atoms,
-                                              max_row_length, synapse_io,
-                                              weight_scales):
+    def _translate_synaptic_block_from_memory(
+            self, synaptic_block, n_atoms, max_row_length, synapse_io,
+            weight_scales):
         """
         translates a collection of memory into synaptic rows
         """
@@ -685,7 +671,8 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                                  (max_row_length +
                                   constants.SYNAPTIC_ROW_HEADER_WORDS))
 
-            bits_reserved_for_type = self.get_n_synapse_type_bits()
+            bits_reserved_for_type = \
+                self._synapse_type.get_n_synapse_type_bits()
             synaptic_row = synapse_io.create_row_info_from_elements(
                 p_p_entries, f_f_entries, f_p_entries, bits_reserved_for_type,
                 weight_scales)
@@ -736,10 +723,9 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         return plastic_plastic_entries, fixed_fixed_entries, \
             fixed_plastic_entries
 
-    def _retrieve_synaptic_block(self, placements, transceiver,
-                                 pre_subvertex, pre_n_atoms,
-                                 post_subvertex, routing_infos,
-                                 subgraph):
+    def _retrieve_synaptic_block(
+            self, placements, transceiver, pre_subvertex, pre_n_atoms,
+            post_subvertex, routing_infos, subgraph):
         """
         reads in a synaptic block from a given processor and subvertex on the
         machine.
@@ -750,8 +736,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
         # either read in the master pop table or retrieve it from storage
         master_pop_base_mem_address, app_data_base_address = \
-            self._master_pop_table_generator.\
-            locate_master_pop_table_base_address(
+            self._population_table_type.locate_master_pop_table_base_address(
                 post_x, post_y, post_p, transceiver,
                 constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
 
@@ -767,8 +752,7 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                 break
 
         maxed_row_length, synaptic_block_base_address_offset = \
-            self._master_pop_table_generator.\
-            extract_synaptic_matrix_data_location(
+            self._population_table_type.extract_synaptic_matrix_data_location(
                 incoming_key_combo, master_pop_base_mem_address,
                 transceiver, post_x, post_y)
 
@@ -792,8 +776,8 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
                 post_x, post_y, synapse_region_base_address_location, 4,
                 "<I", transceiver)
 
-            # the base address of the synaptic block in absolute terms is the app
-            # base, plus the synaptic matrix base plus the offset
+            # the base address of the synaptic block in absolute terms is the
+            # app base, plus the synaptic matrix base plus the offset
             synaptic_block_base_address = (app_data_base_address +
                                            synapse_region_base_address +
                                            synaptic_block_base_address_offset)
@@ -817,4 +801,4 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         :param graph_mapper:
         :return:
         """
-        return self._master_pop_table_generator.get_edge_constraints()
+        return self._population_table_type.get_edge_constraints()

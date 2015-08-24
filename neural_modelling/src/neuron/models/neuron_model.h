@@ -47,10 +47,15 @@ void neuron_model_has_spiked(neuron_pointer_t neuron);
 //!     parameters specified in neuron
 state_t neuron_model_get_membrane_voltage(restrict neuron_pointer_t neuron);
 
-//! \brief printout of neuron definition and state variables
+//! \brief printout of state variables i.e. those values that might change
+//! \param[in] neuron a pointer to a neuron parameter struct which contains all
+//!     the parameters for a specific neuron
+void neuron_model_print_state_variables(restrict neuron_pointer_t neuron);
+
+//! \brief printout of parameters i.e. those values that don't change
 //! \param[in] neuron a pointer to a neuron parameter struct which contains all
 //!     the parameters for a specific neuron
 //! \return None, this method does not return anything
-void neuron_model_print(restrict neuron_pointer_t neuron);
+void neuron_model_print_parameters(restrict neuron_pointer_t neuron);
 
 #endif // _NEURON_MODEL_H_
