@@ -231,7 +231,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             is_virtual=config.getboolean("Machine", "virtual_board"),
             virtual_has_wrap_arounds=config.getboolean(
                 "Machine", "requires_wrap_arounds"),
-            auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"))
+            auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"),
+            enable_reinjection=config.getboolean(
+                "Machine", "enable_reinjection"))
 
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
