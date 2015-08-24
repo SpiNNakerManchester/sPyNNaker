@@ -9,7 +9,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
@@ -48,10 +47,11 @@ class Projection(object):
     _projection_count = 0
 
     # noinspection PyUnusedLocal
-    def __init__(self, presynaptic_population, postsynaptic_population, label,
-                 connector, spinnaker_control, machine_time_step,
-                 timescale_factor, source=None, target='excitatory',
-                 synapse_dynamics=None, rng=None):
+    def __init__(
+            self, presynaptic_population, postsynaptic_population, label,
+            connector, spinnaker_control, machine_time_step, user_max_delay,
+            timescale_factor, source=None, target='excitatory',
+            synapse_dynamics=None, rng=None):
         """
         Instantiates a :py:object:`Projection`.
         """
@@ -121,9 +121,7 @@ class Projection(object):
                 "the max delay for projection {} is not supported by the "
                 "pacman toolchain".format(max_delay))
 
-        if conf.config.has_option("Model", "max_delay"):
-            user_max_delay = conf.config.get("Model", "max_delay")
-            if max_delay > user_max_delay:
+        if max_delay > (user_max_delay * (machine_time_step / 1000.0)):
                 logger.warn("The end user entered a max delay"
                             " for which the projection breaks")
 

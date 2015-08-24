@@ -159,7 +159,7 @@ class AbstractPopulationRecordableVertex(object):
         result = numpy.dstack((spike_ids, spike_times))[0]
         return result[numpy.lexsort((spike_times, spike_ids))]
 
-    def get_neuron_parameter(
+    def _get_v(
             self, region, compatible_output, has_ran, graph_mapper, placements,
             txrx, machine_time_step, runtime):
         if not has_ran:
@@ -244,4 +244,93 @@ class AbstractPopulationRecordableVertex(object):
 
         result = data.view(dtype="float64").reshape(
             (self._n_atoms * n_timesteps, 3))[order]
+        return result
+
+    def _get_gsyn(
+            self, region, compatible_output, has_ran, graph_mapper, placements,
+            txrx, machine_time_step, runtime):
+        if not has_ran:
+            raise exceptions.SpynnakerException(
+                "The simulation has not yet ran, therefore neuron param "
+                "cannot be retrieved")
+
+        ms_per_tick = self._machine_time_step / 1000.0
+        n_timesteps = runtime / ms_per_tick
+
+        tempfilehandle = tempfile.NamedTemporaryFile()
+        data = numpy.memmap(
+            tempfilehandle.file, shape=(n_timesteps, self._n_atoms),
+            dtype="float64,float64,float64,float64")
+        data["f0"] = (numpy.arange(self._n_atoms * n_timesteps) %
+                      self._n_atoms).reshape((n_timesteps, self._n_atoms))
+        data["f1"] = numpy.repeat(numpy.arange(0, n_timesteps * ms_per_tick,
+                                  ms_per_tick), self._n_atoms).reshape(
+                                      (n_timesteps, self._n_atoms))
+
+        # Find all the sub-vertices that this pynn_population.py exists on
+        subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        progress_bar = ProgressBar(len(subvertices), "Getting recorded data")
+        for subvertex in subvertices:
+            placment = placements.get_placement_of_subvertex(subvertex)
+            (x, y, p) = placment.x, placment.y, placment.p
+
+            # Get the App Data for the core
+            app_data_base_address = txrx.\
+                get_cpu_information_from_core(x, y, p).user[0]
+
+            # Get the position of the value buffer
+            neuron_param_region_base_address_offset = \
+                dsg_utility_calls.get_region_base_address_offset(
+                    app_data_base_address, region)
+            neuron_param_region_base_address_buf = buffer(txrx.read_memory(
+                x, y, neuron_param_region_base_address_offset, 4))
+            neuron_param_region_base_address = struct.unpack_from(
+                "<I", neuron_param_region_base_address_buf)[0]
+            neuron_param_region_base_address += app_data_base_address
+
+            # Read the size
+            number_of_bytes_written_buf = buffer(txrx.read_memory(
+                x, y, neuron_param_region_base_address, 4))
+
+            number_of_bytes_written = struct.unpack_from(
+                "<I", number_of_bytes_written_buf)[0]
+
+            # Read the values
+            logger.debug("Reading {} ({}) bytes starting at {}".format(
+                number_of_bytes_written, hex(number_of_bytes_written),
+                hex(neuron_param_region_base_address + 4)))
+
+            neuron_param_region_data = txrx.read_memory(
+                x, y, neuron_param_region_base_address + 4,
+                number_of_bytes_written)
+
+            vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+
+            bytes_per_time_step = vertex_slice.n_atoms * 4
+
+            number_of_time_steps_written = \
+                number_of_bytes_written / bytes_per_time_step
+
+            logger.debug("Processing {} timesteps"
+                         .format(number_of_time_steps_written))
+
+            numpy_data = (numpy.asarray(
+                neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
+                32767.0).reshape((n_timesteps, vertex_slice.n_atoms * 2))
+            data["f2"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
+                numpy_data[:, 0::2]
+            data["f3"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
+                numpy_data[:, 1::2]
+            progress_bar.update()
+
+        progress_bar.end()
+        data.shape = self._n_atoms * n_timesteps
+
+        # Sort the data - apparently, using lexsort is faster, but it might
+        # consume more memory, so the option is left open for sort-in-place
+        order = numpy.lexsort((data["f1"], data["f0"]))
+        # data.sort(order=['f0', 'f1'], axis=0)
+
+        result = data.view(dtype="float64").reshape(
+            (self._n_atoms * n_timesteps, 4))[order]
         return result

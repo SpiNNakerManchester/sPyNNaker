@@ -2,7 +2,7 @@
 import unittest
 import spynnaker.pyNN as pyNN
 from pprint import pprint as pp
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 # Setup
 if pyNN._spinnaker is None:
     pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)

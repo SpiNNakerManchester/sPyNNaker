@@ -916,7 +916,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             connector=connector, source=source, target=target,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step,
-            timescale_factor=self._time_scale_factor)
+            timescale_factor=self._time_scale_factor,
+            user_max_delay=self.max_supported_delay)
 
     def _add_virtual_chips(self):
         # allocate chip ids to the virutal chips

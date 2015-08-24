@@ -15,11 +15,21 @@ class IzhikevichCurrentExponentialPopulation(
 
     _model_based_max_atoms_per_core = 256
 
+    default_parameters = {
+        'a': 0.02, 'c': -65.0, 'b': 0.2, 'd': 2.0, 'i_offset': 0,
+        'u_init': -14.0, 'v_init': -70.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0}
+
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma, constraints=None,
-                 label=None, a=0.02, c=-65.0, b=0.2, d=2.0, i_offset=0,
-                 u_init=-14.0, v_init=-70.0, tau_syn_E=5.0, tau_syn_I=5.0):
+                 label=None, a=default_parameters['a'],
+                 c=default_parameters['c'], b=default_parameters['b'],
+                 d=default_parameters['d'],
+                 i_offset=default_parameters['i_offset'],
+                 u_init=default_parameters['u_init'],
+                 v_init=default_parameters['v_init'],
+                 tau_syn_E=default_parameters['tau_syn_E'],
+                 tau_syn_I=default_parameters['tau_syn_I']):
 
         # Instantiate the parent classes
         AbstractExponentialPopulationVertex.__init__(

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import unittest
-import spynnaker.pyNN.exceptions as exc
+import spinn_front_end_common.utilities.exceptions as exc
 import spynnaker.pyNN as pyNN
 from spynnaker.pyNN.models.pynn_projection import Projection
 
