@@ -349,7 +349,6 @@ def get_current_time():
         return _spinnaker.get_current_time()
 
 
-
 # =============================================================================
 #  Low-level API for creating, connecting and recording from individual neurons
 # =============================================================================
@@ -394,6 +393,7 @@ def get_time_step():
     else:
         return _spinnaker.machine_time_step
 
+
 def get_min_delay():
     """
     returns the minimum allowed synaptic delay.
@@ -407,6 +407,7 @@ def get_min_delay():
     else:
         return _spinnaker.min_supported_delay
 
+
 def get_max_delay():
     """
     return the maximum allowed synaptic delay.
@@ -419,6 +420,7 @@ def get_max_delay():
             "get_max_delay. thankyou")
     else:
         return _spinnaker.max_supported_delay
+
 
 def set(cells, param, val=None):
     """

@@ -48,16 +48,15 @@ class SpynnakerConfigurationFunctions(object):
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(0.144 * timestep))
         if min_delay is not None:
-            self._min_supported_delay = \
-                math.ceil((min_delay * 1000.0) / timestep)
+            self._min_supported_delay = min_delay
         else:
-            self._min_supported_delay = timestep
+            self._min_supported_delay = timestep / 1000.0
 
         if max_delay is not None:
-            self._max_supported_delay = (max_delay * 1000) / timestep
+            self._max_supported_delay = max_delay
         else:
-            self._max_supported_delay = \
-                (max_delay_tics_supported * 1000) / timestep
+            self._max_supported_delay = (max_delay_tics_supported *
+                                         (timestep / 1000.0))
 
         if (config.has_option("Machine", "timeScaleFactor") and
                 config.get("Machine", "timeScaleFactor") != "None"):

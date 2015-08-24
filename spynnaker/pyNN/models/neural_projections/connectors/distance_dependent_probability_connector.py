@@ -18,9 +18,19 @@ import logging
 import numpy
 
 # support for arbitary expression for the distance dependence
-from numpy import arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, \
-    fabs, floor, fmod, hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt,\
-    tan, tanh, maximum, minimum, e, pi
+# NOTE: Do NOT delete these to fix PEP8 issues
+
+# noinspection PyUnresolvedReferences
+from numpy import arccos, arcsin, arctan, arctan2, ceil, cos  # @UnusedImport
+
+# noinspection PyUnresolvedReferences
+from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp  # @UnusedImport
+
+# noinspection PyUnresolvedReferences
+from numpy import log, log10, modf, power, sin, sinh, sqrt  # @UnusedImport
+
+# noinspection PyUnresolvedReferences
+from numpy import tan, tanh, maximum, minimum, e, pi  # @UnusedImport
 
 logger = logging.getLogger(__name__)
 

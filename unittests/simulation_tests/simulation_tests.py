@@ -12,7 +12,7 @@ class TestgetMinDelay(unittest.TestCase):
         """
         p.setup(0.1)
         min_delay = p.get_min_delay()
-        self.assertEqual(min_delay, 100)
+        self.assertEqual(min_delay, 0.1)
 
     def test_get_min_delay_1_millisecond_timestep(self):
         """
@@ -21,7 +21,7 @@ class TestgetMinDelay(unittest.TestCase):
         """
         p.setup(1)
         min_delay = p.get_min_delay()
-        self.assertEqual(min_delay, 1000)
+        self.assertEqual(min_delay, 1)
 
     def test_invalid_min_delay_1_millisecond_timestep(self):
         """
@@ -47,7 +47,7 @@ class TestgetMinDelay(unittest.TestCase):
         """
         p.setup(0.1, min_delay=4)
         min_delay = p.get_min_delay()
-        self.assertEqual(min_delay, 40)
+        self.assertEqual(min_delay, 4)
 
     def test_valid_min_delay_0_1_millisecond_timestep_take_2(self):
         """
@@ -56,7 +56,7 @@ class TestgetMinDelay(unittest.TestCase):
         """
         p.setup(0.1, min_delay=0.4)
         min_delay = p.get_min_delay()
-        self.assertEqual(min_delay, 4)
+        self.assertEqual(min_delay, 0.4)
 
     def test_valid_max_delay_0_1_millisecond_timestep(self):
         """
@@ -65,7 +65,7 @@ class TestgetMinDelay(unittest.TestCase):
         """
         p.setup(0.1, max_delay=0.4)
         max_delay = p.get_max_delay()
-        self.assertEqual(max_delay, 4)
+        self.assertEqual(max_delay, 0.4)
 
     def test_max_delay_no_user_input_0_1_millisecond_timestep(self):
         """
@@ -74,7 +74,7 @@ class TestgetMinDelay(unittest.TestCase):
         """
         p.setup(0.1)
         max_delay = p.get_max_delay()
-        self.assertEqual(max_delay, 1440)
+        self.assertEqual(max_delay, 14.4)
 
     def test_max_delay_no_user_input_1_millisecond_timestep(self):
         """
