@@ -22,7 +22,7 @@ MAX_NEURON_SIZE = (1 << SYNAPSE_INDEX_BITS)
 OUT_SPIKE_SIZE = (MAX_NEURON_SIZE >> 5)  # The size of each output spike line
 OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * 4  # The number of bytes for each spike line
 V_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
-GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
+GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 8
 
 INFINITE_SIMULATION = 4294967295
 
@@ -41,7 +41,8 @@ SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
 MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
-# the miniumum supproted delay slot between two neurons
+
+# the miniumum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
 
 # debug filter positions

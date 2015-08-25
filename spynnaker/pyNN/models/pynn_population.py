@@ -2,8 +2,8 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_model_components.abstract_conductance_vertex import \
-    AbstractConductanceVertex
+from spynnaker.pyNN.models.abstract_models.abstract_model_components\
+    .abstract_conductance_vertex import AbstractConductanceVertex
 
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \
@@ -679,9 +679,9 @@ class Population(object):
         """
         if len(value_array) != self._vertex.n_atoms:
             raise exceptions.ConfigurationException(
-                "To use Tset, you must have a array of values which matches the"
-                "size of the population. Please change this and try again. Or "
-                "Alternatively, use set()")
+                "To use Tset, you must have a array of values which matches "
+                "the size of the population. Please change this and try "
+                "again, or alternatively, use set()")
         self.set(parametername, value_array)
 
     def _end(self):

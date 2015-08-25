@@ -70,7 +70,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             raise local_exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore v cannot be "
                 "retrieved")
-        return self.get_neuron_parameter(
+        return self._get_v(
             region=constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
             compatible_output=compatible_output, has_ran=has_ran,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
@@ -89,7 +89,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             raise local_exceptions.SpynnakerException(
                 "The simulation has not yet ran, therefore gsyn cannot be "
                 "retrieved")
-        return self.get_neuron_parameter(
+        return self._get_gsyn(
             region=constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
             compatible_output=compatible_output, has_ran=has_ran,
             machine_time_step=machine_time_step, graph_mapper=graph_mapper,
