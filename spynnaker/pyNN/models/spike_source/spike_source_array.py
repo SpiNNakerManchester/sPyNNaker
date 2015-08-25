@@ -60,7 +60,7 @@ class SpikeSourceArray(
     model for play back of spikes
     """
 
-    _CONFIGURATION_REGION_SIZE = 44
+    _CONFIGURATION_REGION_SIZE = 36
 
     # limited to the n of the x,y,p,n key format
     _model_based_max_atoms_per_core = sys.maxint
@@ -205,7 +205,7 @@ class SpikeSourceArray(
         """
         spec.reserve_memory_region(
             region=self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value,
-            size=constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
+            size=(constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) + 8,
             label='systemInfo')
 
         spec.reserve_memory_region(
@@ -243,6 +243,15 @@ class SpikeSourceArray(
         self._write_basic_setup_info(
             spec, self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
 
+        # write flag for recording
+        if self._record:
+            value = 1 | 0xBEEF0000
+            spec.write_value(data=value)
+            spec.write_value(data=total_recording_region_size)
+        else:
+            spec.write_value(data=0)
+            spec.write_value(data=0)
+
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value)
 
@@ -265,14 +274,6 @@ class SpikeSourceArray(
 
         ip_tag = iter(ip_tags).next()
         spec.write_value(data=ip_tag.tag)
-
-        # write flag for recording
-        if self._record:
-            spec.write_value(data=1)
-            spec.write_value(data=total_recording_region_size)
-        else:
-            spec.write_value(data=0)
-            spec.write_value(data=0)
 
     # inherited from dataspecable vertex
     def generate_data_spec(
@@ -384,8 +385,7 @@ class SpikeSourceArray(
 
     # TODO this needs to be dropped when BUFFERED OUT appears. Currently is a bodge to allow recording of spike soruce arrays if the memory allows it
     def get_spikes(
-            self, transceiver, placements, graph_mapper,
-            compatible_output=False):
+            self, txrx, placements, graph_mapper, compatible_output=False):
         """
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
@@ -418,21 +418,21 @@ class SpikeSourceArray(
 
             # Get the App Data for the core
             app_data_base_address = \
-                transceiver.get_cpu_information_from_core(x, y, p).user[0]
+                txrx.get_cpu_information_from_core(x, y, p).user[0]
 
             # Get the position of the spike buffer
             spike_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address,
                     self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value)
-            spike_region_base_address_buf = buffer(transceiver.read_memory(
+            spike_region_base_address_buf = buffer(txrx.read_memory(
                 x, y, spike_region_base_address_offset, 4))
             spike_region_base_address = struct.unpack_from(
                 "<I", spike_region_base_address_buf)[0]
             spike_region_base_address += app_data_base_address
 
             # Read the spike data size
-            number_of_bytes_written_buf = buffer(transceiver.read_memory(
+            number_of_bytes_written_buf = buffer(txrx.read_memory(
                 x, y, spike_region_base_address, 4))
             number_of_bytes_written = struct.unpack_from(
                 "<I", number_of_bytes_written_buf)[0]
@@ -452,7 +452,7 @@ class SpikeSourceArray(
                          .format(number_of_bytes_written,
                                  hex(number_of_bytes_written),
                                  hex(spike_region_base_address)))
-            spike_data_block = transceiver.read_memory(
+            spike_data_block = txrx.read_memory(
                 x, y, spike_region_base_address + 4, number_of_bytes_written)
 
             # translate block of spikes into EIEIO messages
