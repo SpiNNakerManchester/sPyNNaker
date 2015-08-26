@@ -218,7 +218,7 @@ class SpikeSourceArray(
 
         spec.reserve_memory_region(
             region=self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value,
-            size=recorded_region_size, label="RecordedSpikeDataRegion",
+            size=recorded_region_size + 4, label="RecordedSpikeDataRegion",
             empty=True)
 
     def _write_setup_info(self, spec, spike_buffer_region_size, ip_tags,
@@ -247,7 +247,7 @@ class SpikeSourceArray(
         if self._record:
             value = 1 | 0xBEEF0000
             spec.write_value(data=value)
-            spec.write_value(data=total_recording_region_size)
+            spec.write_value(data=(total_recording_region_size + 4))
         else:
             spec.write_value(data=0)
             spec.write_value(data=0)
@@ -358,7 +358,7 @@ class SpikeSourceArray(
         return (
             (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
             SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size +
-            recorded_size)
+            recorded_size + 4)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
@@ -404,7 +404,7 @@ class SpikeSourceArray(
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
         progress_bar = ProgressBar(len(subvertices), "Getting spikes")
-        result = numpy.ndarray(shape=(self.n_atoms, 2))
+        result = numpy.zeros(shape=(0, 2))
         for subvertex in subvertices:
             placement = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placement.x, placement.y, placement.p
@@ -468,11 +468,15 @@ class SpikeSourceArray(
             base_key = subvertex.base_key
             for eieio_message in eieio_messages:
                 for element in range(0, eieio_message.eieio_header.count):
-                    key = eieio_message.next_element
+                    key = eieio_message.next_element.key
                     neuron_id = (key - base_key) + subvertex_slice.lo_atom
                     time_stamp = eieio_message.eieio_header.payload_base
-                    result[neuron_id].append(time_stamp)
+                    time_stamp *= (self._machine_time_step / 1000.0)
+                    result = numpy.append(result, [[neuron_id, time_stamp]],
+                                          axis=0)
             # complete the buffer
             progress_bar.update()
         progress_bar.end()
+
+        result = result[numpy.lexsort((result[:, 1], result[:, 0]))]
         return result
