@@ -8,6 +8,8 @@ In addition to a standard Python installation, this package depends on:
  - DataSpecification
  - PACMAN
  - SpiNNMan
+ - SpiNNFrontEndCommon
+ - SpiNNMachine
  - PyNN
  - numpy
 
@@ -21,6 +23,8 @@ These dependencies, excluding numpy, can be installed using pip:
     pip install PACMAN
     pip install SpiNNMan
     pip install PyNN
+    pip install SpiNNFrontEndCommon
+    pip install SpiNNMachine
 
 To install the Visualiser, please see the Visualiser README, as this contains
 details of how to install GTK.
