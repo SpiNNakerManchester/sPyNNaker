@@ -42,7 +42,9 @@ import sys
 import math
 
 # imports needed for get_spikes
-# TODO the below imports can be removed once BUFFERED OUT apprears. These are tied to the bodge to support spike soruce arrays to be recorded if the memory allows.
+# TODO the below imports can be removed once BUFFERED OUT apprears.
+# These are tied to the bodge to support spike soruce arrays to be recorded
+# if the memory allows.
 from pacman.utilities.progress_bar import ProgressBar
 import numpy
 from data_specification import utility_calls as dsg_utility_calls
@@ -114,6 +116,11 @@ class SpikeSourceArray(
                 " on the spinnaker board being supported or you have requested"
                 " a negative value for a memory usage. Please correct and"
                 " try again")
+
+        if (self._max_on_chip_memory_usage_for_spikes <
+                self._space_before_notification):
+            self._space_before_notification =\
+                self._max_on_chip_memory_usage_for_spikes
 
         # Keep track of any previously generated buffers
         self._send_buffers = dict()
@@ -383,7 +390,8 @@ class SpikeSourceArray(
         """
         return True
 
-    # TODO this needs to be dropped when BUFFERED OUT appears. Currently is a bodge to allow recording of spike soruce arrays if the memory allows it
+    # TODO this needs to be dropped when BUFFERED OUT appears. Currently is a
+    # bodge to allow recording of spike soruce arrays if the memory allows it
     def get_spikes(
             self, txrx, placements, graph_mapper, compatible_output=False):
         """
@@ -397,9 +405,6 @@ class SpikeSourceArray(
         """
 
         logger.info("Getting spikes for {}".format(self._label))
-
-        spike_times = list()
-        spike_ids = list()
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
@@ -424,7 +429,8 @@ class SpikeSourceArray(
             spike_region_base_address_offset = \
                 dsg_utility_calls.get_region_base_address_offset(
                     app_data_base_address,
-                    self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value)
+                    self._SPIKE_SOURCE_REGIONS
+                    .SPIKE_DATA_RECORDED_REGION.value)
             spike_region_base_address_buf = buffer(txrx.read_memory(
                 x, y, spike_region_base_address_offset, 4))
             spike_region_base_address = struct.unpack_from(
@@ -467,10 +473,11 @@ class SpikeSourceArray(
             # translate the eieo data packet into numpi arrays.
             base_key = subvertex.base_key
             for eieio_message in eieio_messages:
-                for element in range(0, eieio_message.eieio_header.count):
-                    key = eieio_message.next_element.key
+                while eieio_message.is_next_element:
+                    element = eieio_message.next_element
+                    key = element.key
                     neuron_id = (key - base_key) + subvertex_slice.lo_atom
-                    time_stamp = eieio_message.eieio_header.payload_base
+                    time_stamp = element.payload
                     time_stamp *= (self._machine_time_step / 1000.0)
                     result = numpy.append(result, [[neuron_id, time_stamp]],
                                           axis=0)
