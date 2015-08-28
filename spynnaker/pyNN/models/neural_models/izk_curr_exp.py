@@ -13,7 +13,7 @@ class IzhikevichCurrentExponentialPopulation(
         AbstractIzhikevichVertex, AbstractExponentialPopulationVertex,
         AbstractPopulationVertex):
 
-    _model_based_max_atoms_per_core = 256
+    _model_based_max_atoms_per_core = 255
 
     default_parameters = {
         'a': 0.02, 'c': -65.0, 'b': 0.2, 'd': 2.0, 'i_offset': 0,
