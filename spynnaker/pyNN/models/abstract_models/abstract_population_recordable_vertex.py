@@ -83,15 +83,14 @@ class AbstractPopulationRecordableVertex(object):
         recorded cells.   This is read directly from the memory for the board.
         """
 
-        logger.info("Getting spikes for {}".format(self._label))
-
         spike_times = list()
         spike_ids = list()
         ms_per_tick = self._machine_time_step / 1000.0
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
-        progress_bar = ProgressBar(len(subvertices), "Getting spikes")
+        progress_bar = ProgressBar(
+            len(subvertices), "Getting spikes for {}".format(self._label))
         for subvertex in subvertices:
             placement = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placement.x, placement.y, placement.p
@@ -182,7 +181,8 @@ class AbstractPopulationRecordableVertex(object):
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
-        progress_bar = ProgressBar(len(subvertices), "Getting recorded data")
+        progress_bar = ProgressBar(
+            len(subvertices), "Getting recorded v for {}".format(self._label))
         for subvertex in subvertices:
             placment = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placment.x, placment.y, placment.p
@@ -269,7 +269,9 @@ class AbstractPopulationRecordableVertex(object):
 
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
-        progress_bar = ProgressBar(len(subvertices), "Getting recorded data")
+        progress_bar = ProgressBar(
+            len(subvertices), "Getting recorded gsyn for {}".format(
+                self._label))
         for subvertex in subvertices:
             placment = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placment.x, placment.y, placment.p
