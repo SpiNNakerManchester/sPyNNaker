@@ -378,9 +378,12 @@ class SpikeSourcePoisson(
         self.write_setup_info(spec, spike_hist_buff_sz)
 
         # Every subedge should have the same key
-        keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
-            subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
-        key = keys_and_masks[0].key
+        key = None
+        subedges = subgraph.outgoing_subedges_from_subvertex(subvertex)
+        if len(subedges) > 0:
+            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                subedges[0])
+            key = keys_and_masks[0].key
 
         self.write_poisson_parameters(spec, key, vertex_slice.n_atoms)
 

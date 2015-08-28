@@ -509,8 +509,9 @@ class Population(object):
         file_handle.write("# dimensions = [{}]\n".format(dimensions))
         file_handle.write("# last_id = {{}}\n".format(num_neurons - 1))
         file_handle = open(filename, "w")
-        for (neuronId, time, value) in gsyn:
-            file_handle.write("{}\t{}\t{}\n".format(time, neuronId, value))
+        for (neuronId, time, value_e, value_i) in gsyn:
+            file_handle.write("{}\t{}\t{}\t{}\n".format(
+                time, neuronId, value_e, value_i))
         file_handle.close()
 
     def print_v(self, filename, gather=True):
