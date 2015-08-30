@@ -39,7 +39,8 @@ class IzhikevichCurrentExponentialPopulation(
                                           i_offset=i_offset, u_init=u_init,
                                           v_init=v_init)
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, n_params=10, label=label,
+            self, n_neurons=n_neurons, n_params=8, n_global_params=1,
+            label=label,
             binary="IZK_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=IzhikevichCurrentExponentialPopulation.
             _model_based_max_atoms_per_core,

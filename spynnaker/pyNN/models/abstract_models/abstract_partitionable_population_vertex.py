@@ -47,7 +47,8 @@ class AbstractPartitionablePopulationVertex(AbstractDataSpecableVertex,
 
         # NOTE: Assumes 4-bytes per neuron parameter
         return (constants.POPULATION_NEURON_PARAMS_HEADER_BYTES +
-                (4 * vertex_slice.n_atoms * self._n_params))
+                (4 * vertex_slice.n_atoms * self._n_params) +
+                (4 * self._n_global_params))
 
     def get_synapse_parameter_size(self, vertex_slice):
         """

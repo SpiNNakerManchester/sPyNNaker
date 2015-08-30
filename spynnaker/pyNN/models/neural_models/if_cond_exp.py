@@ -51,7 +51,8 @@ class IFConductanceExponentialPopulation(
             tau_refrac=tau_refrac)
 
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, n_params=12, label=label,
+            self, n_neurons=n_neurons, n_params=12, n_global_params=0,
+            label=label,
             max_atoms_per_core=(IFConductanceExponentialPopulation
                                 ._model_based_max_atoms_per_core),
             binary="IF_cond_exp.aplx", constraints=constraints,
