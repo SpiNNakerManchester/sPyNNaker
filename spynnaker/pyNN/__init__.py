@@ -31,8 +31,8 @@ from spinn_front_end_common.utilities import exceptions as \
 # neural models
 from spynnaker.pyNN.models.neuron.builds.if_cond_exp \
     import IFCondExp as IF_cond_exp
-#from spynnaker.pyNN.models.neural_models.if_curr_dual_exp \
-#    import IFCurrentDualExponentialPopulation as IF_curr_dual_exp
+from spynnaker.pyNN.models.neuron.builds.if_curr_dual_exp \
+    import IFCurrDualExp as IF_curr_dual_exp
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp \
     import IFCurrExp as IF_curr_exp
 from spynnaker.pyNN.models.neuron.builds.izk_curr_exp \
