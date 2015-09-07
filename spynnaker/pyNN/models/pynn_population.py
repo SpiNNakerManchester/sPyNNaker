@@ -6,6 +6,7 @@ from pacman.model.constraints.placer_constraints\
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions as local_exceptions
+from spynnaker.pyNN.models.neuron.input_types.input_type_conductance import InputTypeConductance
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
@@ -115,6 +116,14 @@ class Population(object):
         """
         raise NotImplementedError
 
+    @property
+    def default_parameters(self):
+        """
+        returns the default paramters of the vertex from this population
+        :return:
+        """
+        return self._vertex.default_parameters
+
     def describe(self, template='population_default.txt', engine='default'):
         """
         Returns a human-readable description of the population.
@@ -135,7 +144,7 @@ class Population(object):
         """
         Get the values of a parameter for every local cell in the population.
         """
-        raise NotImplementedError
+        return self._parameters[paramter_name]
 
     def _get_cell_position(self, cell_id):
         """
@@ -185,7 +194,8 @@ class Population(object):
                 self._spinnaker.transceiver,
                 self._spinnaker.no_machine_time_steps)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+                logger.info("Time to get spikes: {}".format(
+                    timer.take_sample()))
         return self._spikes
 
     def get_spike_counts(self, gather=True):
@@ -221,7 +231,7 @@ class Population(object):
                 self._spinnaker.transceiver,
                 self._spinnaker.no_machine_time_steps)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+                logger.info("Time to get gsyn: {}".format(timer.take_sample()))
         return self._gsyn
 
     # noinspection PyUnusedLocal
@@ -259,7 +269,7 @@ class Population(object):
                 self._spinnaker.no_machine_time_steps)
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+                logger.info("Time to read v: {}".format(timer.take_sample()))
 
         return self._v
 
@@ -397,7 +407,11 @@ class Population(object):
         if not isinstance(self._vertex, AbstractGSynRecordable):
             raise Exception(
                 "This population does not support the recording of gsyn")
-
+        if not isinstance(self._vertex.input_type, InputTypeConductance):
+            logger.warn(
+                "You are trying to record the conductance from a model which "
+                "does not use conductance input.  You will receive "
+                "current measurements instead.")
         self._vertex.set_recording_gsyn()
         self._record_gsyn_file = to_file
 
@@ -473,8 +487,9 @@ class Population(object):
         file_handle.write("# dimensions = [{}]\n".format(dimensions))
         file_handle.write("# last_id = {{}}\n".format(num_neurons - 1))
         file_handle = open(filename, "w")
-        for (neuronId, time, value) in gsyn:
-            file_handle.write("{}\t{}\t{}\n".format(time, neuronId, value))
+        for (neuronId, time, value_e, value_i) in gsyn:
+            file_handle.write("{}\t{}\t{}\t{}\n".format(
+                time, neuronId, value_e, value_i))
         file_handle.close()
 
     def print_v(self, filename, gather=True):
@@ -644,7 +659,12 @@ class Population(object):
         'Topographic' set. Set the value of parametername to the values in
         value_array, which must have the same dimensions as the Population.
         """
-        raise NotImplementedError
+        if len(value_array) != self._vertex.n_atoms:
+            raise exceptions.ConfigurationException(
+                "To use Tset, you must have a array of values which matches "
+                "the size of the population. Please change this and try "
+                "again, or alternatively, use set()")
+        self.set(parametername, value_array)
 
     def _end(self):
         """ Do final steps at the end of the simulation

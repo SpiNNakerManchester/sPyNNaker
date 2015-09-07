@@ -15,14 +15,26 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                                          AbstractIntegrateAndFireProperties,
                                          AbstractPopulationVertex):
 
-    _model_based_max_atoms_per_core = 256
+    _model_based_max_atoms_per_core = 255
+    default_parameters = {
+        'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
+        'v_thresh': -50.0, 'tau_syn_E': 5.0, 'tau_syn_E2': 5.0,
+        'tau_syn_I': 5.0, 'tau_refrac': 0.1, 'i_offset': 0}
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma, constraints=None,
-                 label=None, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
-                 v_thresh=-50.0, tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0,
-                 tau_refrac=0.1, i_offset=0, v_init=None):
+                 label=None, tau_m=default_parameters['tau_m'],
+                 cm=default_parameters['cm'],
+                 v_rest=default_parameters['v_rest'],
+                 v_reset=default_parameters['v_reset'],
+                 v_thresh=default_parameters['v_thresh'],
+                 tau_syn_E=default_parameters['tau_syn_E'],
+                 tau_syn_E2=default_parameters['tau_syn_E2'],
+                 tau_syn_I=default_parameters['tau_syn_I'],
+                 tau_refrac=default_parameters['tau_refrac'],
+                 i_offset=default_parameters['i_offset'],
+                 v_init=None):
 
         # Instantiate the parent classes
         AbstractDualExponentialVertex.__init__(
@@ -34,7 +46,8 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
             v_init=v_init, v_reset=v_reset, v_rest=v_rest, v_thresh=v_thresh,
             tau_refrac=tau_refrac)
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, n_params=10, label=label,
+            self, n_neurons=n_neurons, n_params=10, n_global_params=0,
+            label=label,
             binary="IF_curr_exp_dual.aplx", constraints=constraints,
             max_atoms_per_core=(IFCurrentDualExponentialPopulation
                                 ._model_based_max_atoms_per_core),

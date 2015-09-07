@@ -230,7 +230,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             is_virtual=config.getboolean("Machine", "virtual_board"),
             virtual_has_wrap_arounds=config.getboolean(
                 "Machine", "requires_wrap_arounds"),
-            auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"))
+            auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"),
+            enable_reinjection=config.getboolean(
+                "Machine", "enable_reinjection"))
 
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
@@ -284,13 +286,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             timer.start_timing()
         self.map_model()
         if do_timing:
-            timer.take_sample()
+            logger.info("Time to map model: {}".format(timer.take_sample()))
 
         # add database generation if requested
         needs_database = self._auto_detect_database(self._partitioned_graph)
         user_create_database = config.get("Database", "create_database")
         if ((user_create_database == "None" and needs_database) or
                 user_create_database == "True"):
+
+            database_progress = ProgressBar(10, "Creating database")
 
             wait_on_confirmation = config.getboolean(
                 "Database", "wait_on_confirmation")
@@ -301,19 +305,27 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._database_interface.add_system_params(
                 self._time_scale_factor, self._machine_time_step,
                 self._runtime)
+            database_progress.update()
             self._database_interface.add_machine_objects(self._machine)
+            database_progress.update()
             self._database_interface.add_partitionable_vertices(
                 self._partitionable_graph)
+            database_progress.update()
             self._database_interface.add_partitioned_vertices(
                 self._partitioned_graph, self._graph_mapper,
                 self._partitionable_graph)
+            database_progress.update()
             self._database_interface.add_placements(self._placements,
                                                     self._partitioned_graph)
+            database_progress.update()
             self._database_interface.add_routing_infos(
                 self._routing_infos, self._partitioned_graph)
+            database_progress.update()
             self._database_interface.add_routing_tables(self._router_tables)
+            database_progress.update()
             self._database_interface.add_tags(self._partitioned_graph,
                                               self._tags)
+            database_progress.update()
             execute_mapping = config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
             if execute_mapping:
@@ -322,12 +334,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     partitionable_graph=self._partitionable_graph,
                     partitioned_graph=self._partitioned_graph,
                     routing_infos=self._routing_infos)
+            database_progress.update()
             # if using a reload script, add if that needs to wait for
             # confirmation
             if self._reports_states.transciever_report:
                 self._reload_script.wait_on_confirmation = wait_on_confirmation
                 for socket_address in self._database_socket_addresses:
                     self._reload_script.add_socket_address(socket_address)
+            database_progress.update()
+            database_progress.end()
             self._database_interface.send_read_notification()
 
         # execute data spec generation
@@ -337,7 +352,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         logger.debug("")
         executable_targets = self.generate_data_specifications()
         if do_timing:
-            timer.take_sample()
+            logger.info("Time to generate data: {}".format(
+                timer.take_sample()))
 
         # execute data spec execution
         if do_timing:
@@ -356,7 +372,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                             processor_to_app_data_base_address)
 
         if do_timing:
-            timer.take_sample()
+            logger.info("Time to execute data specifications: {}".format(
+                timer.take_sample()))
 
         if (not isinstance(self._machine, VirtualMachine) and
                 config.getboolean("Execute", "run_simulation")):
@@ -382,7 +399,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
             # end of entire loading setup
             if do_timing:
-                timer.take_sample()
+                logger.debug("Time to load: {}".format(timer.take_sample()))
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
@@ -391,7 +408,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 # every thing is in sync0. load the initial buffers
                 self._send_buffer_manager.load_initial_buffers()
                 if do_timing:
-                    timer.take_sample()
+                    logger.debug("Time to load buffers: {}".format(
+                        timer.take_sample()))
 
                 wait_on_confirmation = config.getboolean(
                     "Database", "wait_on_confirmation")
@@ -422,7 +440,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if self._retrieve_provance_data:
 
                     progress = ProgressBar(self._placements.n_placements + 1,
-                                           "getting provenance data")
+                                           "Getting provenance data")
 
                     # retrieve provence data from central
                     file_path = os.path.join(self._report_default_directory,
@@ -792,7 +810,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
-                                   "on generating data specifications")
+                                   "Generating data specifications")
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
@@ -811,7 +829,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._hostname, self._graph_mapper,
                     self._report_default_directory, ip_tags, reverse_ip_tags,
                     self._writeTextSpecs, self._app_data_runtime_folder)
-                progress_bar.update()
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
@@ -826,6 +843,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     executable_targets.add_binary(binary_path)
                 executable_targets.add_processor(
                     binary_path, placement.x, placement.y, placement.p)
+
+            progress_bar.update()
 
         # finish the progress bar
         progress_bar.end()
@@ -913,7 +932,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             connector=connector, source=source, target=target,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step,
-            timescale_factor=self._time_scale_factor)
+            timescale_factor=self._time_scale_factor,
+            user_max_delay=self.max_supported_delay)
 
     def _add_virtual_chips(self):
         # allocate chip ids to the virutal chips
@@ -1008,13 +1028,14 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             population._end()
 
         if turn_off_machine is None:
-            config.getboolean("Machine", "turn_off_machine")
+            turn_off_machine = config.getboolean("Machine", "turn_off_machine")
 
         if clear_routing_tables is None:
-            config.getboolean("Machine", "clear_routing_tables")
+            clear_routing_tables = config.getboolean(
+                "Machine", "clear_routing_tables")
 
         if clear_tags is None:
-            config.getboolean("Machine", "clear_tags")
+            clear_tags = config.getboolean("Machine", "clear_tags")
 
         # if stopping on machine, clear iptags and
         if clear_tags:
@@ -1039,13 +1060,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if self._create_database:
             self._database_interface.stop()
 
-        # if asked to turn off machine, power down each rack via bmp
-        # connections
-        if turn_off_machine:
-            self._txrx.power_off_machine()
-
         # stop the transciever
-        self._txrx.close()
+        if turn_off_machine:
+            logger.info("Turning off machine")
+        self._txrx.close(power_off_machine=turn_off_machine)
 
     def _add_socket_address(self, socket_address):
         """

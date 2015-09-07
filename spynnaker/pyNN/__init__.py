@@ -24,6 +24,10 @@ from spynnaker.pyNN.utilities.conf import config
 from spinn_front_end_common.utilities.notification_protocol.\
     socket_address import SocketAddress
 
+# front end common exceptions
+from spinn_front_end_common.utilities import exceptions as \
+    front_end_common_exceptions
+
 # neural models
 from spynnaker.pyNN.models.neuron.builds.if_cond_exp \
     import IFConductanceExponentialPopulation as IF_cond_exp
@@ -127,16 +131,15 @@ def register_binary_search_path(search_path):
     executable_finder.add_path(search_path)
 
 
-def end(stop_on_board=True):
+def end():
     """
-    :param stop_on_board:
     Do any necessary cleaning up before exiting.
 
     Unregisters the controller,
     prints any data recorded using the low-level API
     """
     global _spinnaker
-    _spinnaker.stop(stop_on_board)
+    _spinnaker.stop()
     _spinnaker = None
 
 
@@ -329,11 +332,16 @@ def NativeRNG(seed_value):
 
 def get_current_time():
     """
-
+    returns the machine time step defined in setup
     :return:
     """
     global _spinnaker
-    return _spinnaker.get_current_time()
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "get_current_time. thankyou")
+    else:
+        return _spinnaker.get_current_time()
 
 
 # =============================================================================
@@ -365,6 +373,48 @@ def connect(source, target, weight=0.0, delay=None, synapse_type="excitatory",
     connector = FixedProbabilityConnector(p_connect=p, weights=weight,
                                           delays=delay)
     return Projection(source, target, connector, target=synapse_type, rng=rng)
+
+
+def get_time_step():
+    """
+    returns the timestep assigned to the spinnaker backend
+    :return:
+    """
+    global _spinnaker
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "get_time_step. thankyou")
+    else:
+        return _spinnaker.machine_time_step
+
+
+def get_min_delay():
+    """
+    returns the minimum allowed synaptic delay.
+    :return:
+    """
+    global _spinnaker
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "get_min_delay. thankyou")
+    else:
+        return _spinnaker.min_supported_delay
+
+
+def get_max_delay():
+    """
+    return the maximum allowed synaptic delay.
+    :return:
+    """
+    global _spinnaker
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "get_max_delay. thankyou")
+    else:
+        return _spinnaker.max_supported_delay
 
 
 def set(cells, param, val=None):
