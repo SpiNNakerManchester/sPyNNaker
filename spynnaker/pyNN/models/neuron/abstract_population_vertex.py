@@ -363,6 +363,10 @@ class AbstractPopulationVertex(
     def synapse_type(self):
         return self._synapse_manager.synapse_type
 
+    @property
+    def input_type(self):
+        return self._input_type
+
     def get_value(self, key):
         """ Get a property of the overall model
         """

@@ -27,7 +27,7 @@ static inline input_t input_type_convert_excitatory_input_to_current(
 static inline input_t input_type_convert_inhibitory_input_to_current(
         input_t inh_input, input_type_pointer_t input_type,
         state_t membrane_voltage) {
-    return (inh_input * (input_type->V_rev_I - membrane_voltage));
+    return -(inh_input * (input_type->V_rev_I - membrane_voltage));
 }
 
 #endif // _INPUT_TYPE_CONDUCTANCE_H_
