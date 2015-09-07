@@ -202,7 +202,8 @@ class Population(object):
                 graph_mapper=self._spinnaker.graph_mapper,
                 compatible_output=compatible_output)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+                logger.info("Time to get spikes: {}".format(
+                    timer.take_sample()))
         return self._spikes
 
     def get_spike_counts(self, gather=True):
@@ -243,7 +244,7 @@ class Population(object):
                 compatible_output=compatible_output,
                 runtime=self._spinnaker._runtime)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+                logger.info("Time to get gsyn: {}".format(timer.take_sample()))
         return self._gsyn
 
     # noinspection PyUnusedLocal
@@ -286,7 +287,7 @@ class Population(object):
                 runtime=self._spinnaker._runtime)
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+                logger.info("Time to read v: {}".format(timer.take_sample()))
 
         return self._v
 
@@ -508,8 +509,9 @@ class Population(object):
         file_handle.write("# dimensions = [{}]\n".format(dimensions))
         file_handle.write("# last_id = {{}}\n".format(num_neurons - 1))
         file_handle = open(filename, "w")
-        for (neuronId, time, value) in gsyn:
-            file_handle.write("{}\t{}\t{}\n".format(time, neuronId, value))
+        for (neuronId, time, value_e, value_i) in gsyn:
+            file_handle.write("{}\t{}\t{}\t{}\n".format(
+                time, neuronId, value_e, value_i))
         file_handle.close()
 
     def print_v(self, filename, gather=True):

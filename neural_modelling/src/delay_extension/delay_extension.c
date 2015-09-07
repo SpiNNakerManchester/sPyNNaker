@@ -232,7 +232,7 @@ void timer_callback(uint unused0, uint unused1) {
 
                     // Calculate key all spikes coming from this neuron will be
                     // sent with
-                    uint32_t spike_key = ((d * num_neurons) + n) | key;
+                    uint32_t spike_key = ((d * num_neurons) + n) + key;
 
 #if LOG_LEVEL >= LOG_DEBUG
                     if (delay_stage_spike_counters[n] > 0) {

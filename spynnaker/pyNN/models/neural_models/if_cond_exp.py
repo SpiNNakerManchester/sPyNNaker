@@ -17,7 +17,7 @@ class IFConductanceExponentialPopulation(
         AbstractIntegrateAndFireProperties,
         AbstractPopulationVertex):
 
-    _model_based_max_atoms_per_core = 256
+    _model_based_max_atoms_per_core = 255
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'e_rev_E': 0.0, 'e_rev_I': -70.0,
         'v_rest': -65.0, 'v_reset': -65.0, 'v_thresh': -50.0,
@@ -51,7 +51,8 @@ class IFConductanceExponentialPopulation(
             tau_refrac=tau_refrac)
 
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, n_params=12, label=label,
+            self, n_neurons=n_neurons, n_params=12, n_global_params=0,
+            label=label,
             max_atoms_per_core=(IFConductanceExponentialPopulation
                                 ._model_based_max_atoms_per_core),
             binary="IF_cond_exp.aplx", constraints=constraints,

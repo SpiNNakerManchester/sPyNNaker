@@ -121,7 +121,7 @@ class Projection(object):
                 "the max delay for projection {} is not supported by the "
                 "pacman toolchain".format(max_delay))
 
-        if max_delay > (user_max_delay * (machine_time_step / 1000.0)):
+        if max_delay > (user_max_delay / (machine_time_step / 1000.0)):
                 logger.warn("The end user entered a max delay"
                             " for which the projection breaks")
 
