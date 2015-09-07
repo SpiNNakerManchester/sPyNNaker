@@ -30,13 +30,15 @@ from spinn_front_end_common.utilities import exceptions as \
 
 # neural models
 from spynnaker.pyNN.models.neuron.builds.if_cond_exp \
-    import IFConductanceExponentialPopulation as IF_cond_exp
+    import IFCondExp as IF_cond_exp
 #from spynnaker.pyNN.models.neural_models.if_curr_dual_exp \
 #    import IFCurrentDualExponentialPopulation as IF_curr_dual_exp
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp \
-    import IFCurrentExponentialPopulation as IF_curr_exp
-#from spynnaker.pyNN.models.neural_models.izk_curr_exp \
-#    import IzhikevichCurrentExponentialPopulation as IZK_curr_exp
+    import IFCurrExp as IF_curr_exp
+from spynnaker.pyNN.models.neuron.builds.izk_curr_exp \
+    import IzkCurrExp as IZK_curr_exp
+from spynnaker.pyNN.models.neuron.builds.izk_cond_exp \
+    import IzkCondExp as IZK_cond_exp
 
 # neural projections
 from spynnaker.pyNN.models.neural_projections\

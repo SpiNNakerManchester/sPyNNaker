@@ -1,6 +1,3 @@
-"""
-IFCurrentExponentialPopulation
-"""
 from spynnaker.pyNN.models.neuron.neuron_models\
     .neuron_model_leaky_integrate_and_fire \
     import NeuronModelLeakyIntegrateAndFire
@@ -14,9 +11,8 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 
 
-class IFConductanceExponentialPopulation(AbstractPopulationVertex):
-    """ IFConductanceExponentialPopulation: model which represents a leaky\
-        integrate and fire model with a exponetial decay curve and\
+class IFCondExp(AbstractPopulationVertex):
+    """ Leaky integrate and fire neuron with an exponentially decaying \
         conductance input
     """
 
@@ -53,8 +49,7 @@ class IFConductanceExponentialPopulation(AbstractPopulationVertex):
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IF_cond_exp.aplx", label=label,
-            max_atoms_per_core=(IFConductanceExponentialPopulation.
-                                _model_based_max_atoms_per_core),
+            max_atoms_per_core=(IFCondExp._model_based_max_atoms_per_core),
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
@@ -65,10 +60,4 @@ class IFConductanceExponentialPopulation(AbstractPopulationVertex):
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        """
-
-        :param new_value:
-        :return:
-        """
-        IFConductanceExponentialPopulation.\
-            _model_based_max_atoms_per_core = new_value
+        IFCondExp._model_based_max_atoms_per_core = new_value

@@ -100,7 +100,7 @@ class NeuronModelIzh(AbstractNeuronModel):
 
             # offset current [nA]
             # REAL I_offset;
-            NeuronParameter(self.ioffset, DataType.S1615),
+            NeuronParameter(self._i_offset, DataType.S1615),
 
             # current timestep - simple correction for threshold
             # REAL this_h;
