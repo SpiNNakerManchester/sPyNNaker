@@ -268,7 +268,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
                 if (isinstance(vertex, AbstractSpikeRecordable) and
-                        vertex.record):
+                        vertex.is_recording_spikes()):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
                         "is not currently supportable in this tool chain."
