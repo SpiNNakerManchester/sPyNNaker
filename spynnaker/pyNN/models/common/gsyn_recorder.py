@@ -74,11 +74,11 @@ class GsynRecorder(object):
             numpy_data = (numpy.asarray(
                 neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
                 32767.0).reshape(
-                    (n_machine_time_steps * 2, vertex_slice.n_atoms))
+                    (n_machine_time_steps, vertex_slice.n_atoms * 2))
             data["f2"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
-                numpy_data[0::2]
+                numpy_data[:, 0::2]
             data["f3"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
-                numpy_data[1::2]
+                numpy_data[:, 1::2]
             progress_bar.update()
 
         progress_bar.end()

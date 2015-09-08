@@ -1,9 +1,9 @@
+from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
+    import InputTypeConductance
 from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh \
     import NeuronModelIzh
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import SynapseTypeExponential
-from spynnaker.pyNN.models.neuron.input_types.input_type_current \
-    import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
@@ -40,11 +40,11 @@ class IzkCondExp(AbstractPopulationVertex):
             machine_time_step, a, b, c, d, v_init, u_init, i_offset)
         synapse_type = SynapseTypeExponential(
             machine_time_step, tau_syn_E, tau_syn_I)
-        input_type = InputTypeCurrent()
+        input_type = InputTypeConductance(e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(_IZK_THRESHOLD)
 
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IZK_curr_exp.aplx", label=label,
+            self, n_neurons=n_neurons, binary="IZK_cond_exp.aplx", label=label,
             max_atoms_per_core=(IzkCondExp._model_based_max_atoms_per_core),
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor,
