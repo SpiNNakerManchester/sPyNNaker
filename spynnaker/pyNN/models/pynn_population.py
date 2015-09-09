@@ -97,16 +97,19 @@ class Population(object):
         """
         merges populations
         """
+        # TODO: Remove?  Not in API...
         raise NotImplementedError
 
     def _add_recorder(self, variable):
-        """Create a new Recorder for the supplied variable."""
+        """ Create a new Recorder for the supplied variable."""
+        # TODO: Remove?  Not in API...
         raise NotImplementedError
 
     def all(self):
         """
         Iterator over cell ids on all nodes.
         """
+        # TODO: Need to work out what is to be returned
         raise NotImplementedError
 
     @property
@@ -114,7 +117,7 @@ class Population(object):
         """
         returns a boolean based on if the population is a conductance based pop
         """
-        raise NotImplementedError
+        return isinstance(self._vertex, AbstractConductanceVertex)
 
     @property
     def default_parameters(self):
@@ -134,10 +137,16 @@ class Population(object):
         If template is None, then a dictionary containing the template context
         will be returned.
         """
+        # TODO:
         raise NotImplementedError
 
     @property
     def grandparent(self):
+        # TODO: Remove? Not in API...
+        raise NotImplementedError
+
+    def __getitem__(self, index_or_slice):
+        # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 
     def get(self, paramter_name, gather=False):
@@ -150,6 +159,7 @@ class Population(object):
         """
         returns the position of a cell.
         """
+        # TODO: This isn't part of the API - is it ever used?
         if self._structure is None:
             raise ValueError("Attempted to get the position of a cell "
                              "in an un-structured population")
@@ -161,6 +171,7 @@ class Population(object):
         """
         set a given cells intial value
         """
+        # TODO: Remove?  This isn't in the API...
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -202,7 +213,13 @@ class Population(object):
         """
         Returns the number of spikes for each neuron.
         """
-        raise NotImplementedError
+        spikes = self.getSpikes(True, gather)
+        n_spikes = {}
+        for i in self._vertex.n_atoms:
+            n_spikes[i] = 0
+        for (neuron_id, _) in spikes:
+            n_spikes[neuron_id] += 1
+        return spikes
 
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
@@ -278,6 +295,8 @@ class Population(object):
         Given the ID(s) of cell(s) in the Population, return its (their) index
         (order in the Population).
         """
+
+        # TODO: Need __getitem__
         raise NotImplementedError
 
     def id_to_local_index(self, cell_id):
@@ -285,6 +304,7 @@ class Population(object):
         Given the ID(s) of cell(s) in the Population, return its (their) index
         (order in the Population), counting only cells on the local MPI node.
         """
+        # TODO: Need __getitem__
         raise NotImplementedError
 
     def initialize(self, variable, value):
@@ -301,23 +321,31 @@ class Population(object):
         Determine whether the cell with the given ID exists on the local
         MPI node.
         """
-        raise NotImplementedError
+
+        # Doesn't really mean anything on SpiNNaker
+        return True
 
     def can_record(self, variable):
         """ Determine whether `variable` can be recorded from this population.
         """
+
+        # TODO: Needs a more precise recording mechanism (coming soon)
         raise NotImplementedError
 
     def inject(self, current_source):
         """
         Connect a current source to all cells in the Population.
         """
+
+        # TODO:
         raise NotImplementedError
 
     def __iter__(self):
         """
         suppose to iterate over local cells
         """
+
+        # TODO:
         raise NotImplementedError
 
     def __len__(self):
@@ -333,15 +361,19 @@ class Population(object):
     @property
     def local_size(self):
         """
-        returns the number of local cells ???
+        returns the number of local cells
         """
-        raise NotImplementedError
+
+        # Doesn't make much sense on SpiNNaker
+        return self._size
 
     def mean_spike_count(self, gather=True):
         """
         Returns the mean number of spikes per neuron.
         """
-        raise NotImplementedError
+        spike_counts = self.get_spike_counts(gather)
+        total_spikes = sum(spike_counts.values())
+        return total_spikes / self._size
 
     def nearest(self, position):
         """
@@ -522,13 +554,15 @@ class Population(object):
         :param parametername: the paramter to set
         :param rand_distr: the random distrubtion object to set the paramter to
         """
-        raise NotImplementedError
+        self.set(parametername, rand_distr)
 
     def sample(self, n, rng=None):
         """
         returns a random selection fo neurons from a population in the form
         of a population view
         """
+
+        # TODO: Need PopulationView support
         raise NotImplementedError
 
     def save_positions(self, file_name):
@@ -548,12 +582,14 @@ class Population(object):
         """
         set a given cells intial value
         """
+        # TODO: Remove? Not part of API...
         raise NotImplementedError
 
     def _set_cell_position(self, cell_id, pos):
         """
         sets a cell to a given position
         """
+        # TODO: Remove?  This is never called
         if self._structure is None:
             raise ValueError("attempted to set a position for a cell "
                              "in an un-structured population")
@@ -565,6 +601,7 @@ class Population(object):
         """
         sets all the positions in the population.
         """
+        # TODO: Remove?  This is never used
         if self._structure is None:
             raise ValueError("attempted to set positions "
                              "in an un-structured population")

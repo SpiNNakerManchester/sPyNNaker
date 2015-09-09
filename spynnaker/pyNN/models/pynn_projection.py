@@ -286,10 +286,12 @@ class Projection(object):
         If template is None, then a dictionary containing the template context
         will be returned.
         """
+        # TODO
         raise NotImplementedError
 
     def __getitem__(self, i):
         """Return the `i`th connection within the Projection."""
+        # TODO: Need to work out what is being returned
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -339,6 +341,7 @@ class Projection(object):
         Get parameters of the dynamic synapses for all connections in this
         Projection.
         """
+        # TODO: Need to work out what is to be returned
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -383,6 +386,8 @@ class Projection(object):
 
     def __len__(self):
         """Return the total number of local connections."""
+
+        # TODO: Need to work out what this means
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -391,6 +396,7 @@ class Projection(object):
         Print synaptic weights to file. In the array format, zeros are printed
         for non-existent connections.
         """
+        # TODO:
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -399,6 +405,7 @@ class Projection(object):
         Print synaptic weights to file. In the array format, zeros are printed
         for non-existent connections.
         """
+        # TODO:
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -406,6 +413,7 @@ class Projection(object):
         """
         Set weights to random values taken from rand_distr.
         """
+        # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -413,6 +421,7 @@ class Projection(object):
         """
         Set delays to random values taken from rand_distr.
         """
+        # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -420,6 +429,7 @@ class Projection(object):
         """
         Set parameters of the synapse dynamics to values taken from rand_distr
         """
+        # TODO: Look at what this is randomizing
         raise NotImplementedError
 
     def __repr__(self):
@@ -483,6 +493,7 @@ class Projection(object):
         Save connections to file in a format suitable for reading in with a
         FromFileConnector.
         """
+        # TODO
         raise NotImplementedError
 
     def size(self, gather=True):
@@ -491,6 +502,7 @@ class Projection(object):
          - only local connections, if gather is False,
          - all connections, if gather is True (default)
         """
+        # TODO
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -501,6 +513,7 @@ class Projection(object):
         in the projection, or a 2D array with the same dimensions as the
         connectivity matrix (as returned by `getDelays(format='array')`).
         """
+        # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -509,6 +522,7 @@ class Projection(object):
         Set parameters of the dynamic synapses for all connections in this
         projection.
         """
+        # TODO: Need to set this in the edge
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -521,6 +535,8 @@ class Projection(object):
         Weights should be in nA for current-based and uS for conductance-based
         synapses.
         """
+
+        # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -530,4 +546,5 @@ class Projection(object):
         If min and max are not given, the minimum and maximum weights are
         calculated automatically.
         """
+        # TODO
         raise NotImplementedError
