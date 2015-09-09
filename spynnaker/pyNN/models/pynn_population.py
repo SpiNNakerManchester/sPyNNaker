@@ -6,7 +6,8 @@ from pacman.model.constraints.placer_constraints\
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions as local_exceptions
-from spynnaker.pyNN.models.neuron.input_types.input_type_conductance import InputTypeConductance
+from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
+    import InputTypeConductance
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
@@ -117,7 +118,7 @@ class Population(object):
         """
         returns a boolean based on if the population is a conductance based pop
         """
-        return isinstance(self._vertex, AbstractConductanceVertex)
+        return isinstance(self._vertex.input_type, InputTypeConductance)
 
     @property
     def default_parameters(self):
