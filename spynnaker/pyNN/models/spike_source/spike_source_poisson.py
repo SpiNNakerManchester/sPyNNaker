@@ -69,6 +69,38 @@ class SpikeSourcePoisson(
         self._seed = seed
 
     @property
+    def rate(self):
+        return self._rate
+
+    @rate.setter
+    def rate(self, rate):
+        self._rate = rate
+
+    @property
+    def start(self):
+        return self._start
+
+    @start.setter
+    def start(self, start):
+        self._start = start
+
+    @property
+    def duration(self):
+        return self._duration
+
+    @duration.setter
+    def duration(self, duration):
+        self._duration = duration
+
+    @property
+    def seed(self):
+        return self._seed
+
+    @seed.setter
+    def seed(self, seed):
+        self._seed = seed
+
+    @property
     def model_name(self):
         """
         Return a string representing a label for this class.

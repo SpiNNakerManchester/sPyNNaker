@@ -109,6 +109,14 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         self._send_buffers = dict()
 
     @property
+    def spike_times(self):
+        return self._spike_times
+
+    @spike_times.setter
+    def spike_times(self, spike_times):
+        self._spike_times = spike_times
+
+    @property
     def model_name(self):
         """
         Return a string representing a label for this class.
