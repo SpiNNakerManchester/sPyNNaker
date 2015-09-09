@@ -391,6 +391,14 @@ class AbstractPopulationVertex(
     def weight_scale(self):
         return self._input_type.get_global_weight_scale()
 
+    def get_synaptic_list_from_machine(
+            self, placements, transceiver, pre_subvertex, pre_n_atoms,
+            post_subvertex, synapse_io, subgraph, routing_infos,
+            weight_scales):
+        return self._synapse_manager.get_synaptic_list_from_machine(
+            placements, transceiver, pre_subvertex, pre_n_atoms,
+            post_subvertex, synapse_io, subgraph, routing_infos, weight_scales)
+
     def is_data_specable(self):
         return True
 
