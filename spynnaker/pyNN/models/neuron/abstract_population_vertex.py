@@ -384,8 +384,9 @@ class AbstractPopulationVertex(
                     self._threshold_type, self._synapse_manager.synapse_type]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
-        raise Exception("Population {} does not have parameter {}".format(
-            self.vertex, key))
+                return
+        raise Exception("Type {} does not have parameter {}".format(
+            self._model_name, key))
 
     @property
     def weight_scale(self):
