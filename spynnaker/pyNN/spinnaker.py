@@ -74,8 +74,8 @@ from spynnaker.pyNN.models.abstract_models\
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
-from spynnaker.pyNN.utilities.database.spynnaker_data_base_interface import \
-    SpynnakerDataBaseInterface
+from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
+    SpynnakerDataBaseWriter
 
 # general imports
 import logging
@@ -291,7 +291,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
             wait_on_confirmation = config.getboolean(
                 "Database", "wait_on_confirmation")
-            self._database_interface = SpynnakerDataBaseInterface(
+            self._database_interface = SpynnakerDataBaseWriter(
                 self._app_data_runtime_folder, wait_on_confirmation,
                 self._database_socket_addresses)
 
@@ -322,7 +322,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             execute_mapping = config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
             if execute_mapping:
-                self._database_interface.create_neuron_to_key_mapping(
+                self._database_interface.create_atom_to_event_id_mapping(
                     graph_mapper=self._graph_mapper,
                     partitionable_graph=self._partitionable_graph,
                     partitioned_graph=self._partitioned_graph,
@@ -821,7 +821,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._partitionable_graph, self._routing_infos,
                     self._hostname, self._graph_mapper,
                     self._report_default_directory, ip_tags, reverse_ip_tags,
-                    self._writeTextSpecs, self._app_data_runtime_folder)
+                    self._write_text_specs, self._app_data_runtime_folder)
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()

@@ -46,9 +46,9 @@ import math
 logger = logging.getLogger(__name__)
 
 
-class SpikeSourceArray(AbstractDataSpecableVertex,
-                       AbstractPartitionableVertex,
-                       AbstractOutgoingEdgeSameContiguousKeysRestrictor):
+class SpikeSourceArray(
+        AbstractDataSpecableVertex, AbstractPartitionableVertex,
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
     """
     model for play back of spikes
     """
@@ -62,7 +62,8 @@ class SpikeSourceArray(AbstractDataSpecableVertex,
         value="_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
                ('CONFIGURATION_REGION', 1),
-               ('SPIKE_DATA_REGION', 2)])
+               ('SPIKE_DATA_REGION', 2),
+               ('SPIKE_DATA_RECORDED_REGION', 3)])
 
     def __init__(
             self, n_neurons, spike_times, machine_time_step, spikes_per_second,
