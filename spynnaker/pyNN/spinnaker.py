@@ -81,7 +81,7 @@ from spynnaker.pyNN.models.abstract_models\
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
-from spynnaker.pyNN.utilities.database.spynnaker_data_base_writer import \
+from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
     SpynnakerDataBaseWriter
 
 # general imports
