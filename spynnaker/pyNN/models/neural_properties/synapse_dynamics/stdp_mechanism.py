@@ -167,6 +167,6 @@ class STDPMechanism(object):
     # **TODO** make property
     def get_max_weight(self):
         if self.weight_dependence is not None:
-            return self.weight_dependence.w_max
+            return self.weight_dependence.w_max * self._weight_scale
         else:
             return 0.0

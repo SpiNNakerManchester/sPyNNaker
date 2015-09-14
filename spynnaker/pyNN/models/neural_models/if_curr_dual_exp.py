@@ -15,7 +15,7 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
                                          AbstractIntegrateAndFireProperties,
                                          AbstractPopulationVertex):
 
-    _model_based_max_atoms_per_core = 256
+    _model_based_max_atoms_per_core = 255
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
         'v_thresh': -50.0, 'tau_syn_E': 5.0, 'tau_syn_E2': 5.0,
@@ -46,7 +46,8 @@ class IFCurrentDualExponentialPopulation(AbstractDualExponentialVertex,
             v_init=v_init, v_reset=v_reset, v_rest=v_rest, v_thresh=v_thresh,
             tau_refrac=tau_refrac)
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, n_params=10, label=label,
+            self, n_neurons=n_neurons, n_params=10, n_global_params=0,
+            label=label,
             binary="IF_curr_exp_dual.aplx", constraints=constraints,
             max_atoms_per_core=(IFCurrentDualExponentialPopulation
                                 ._model_based_max_atoms_per_core),

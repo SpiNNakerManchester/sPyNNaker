@@ -69,6 +69,38 @@ class SpikeSourcePoisson(
         self._seed = seed
 
     @property
+    def rate(self):
+        return self._rate
+
+    @rate.setter
+    def rate(self, rate):
+        self._rate = rate
+
+    @property
+    def start(self):
+        return self._start
+
+    @start.setter
+    def start(self, start):
+        self._start = start
+
+    @property
+    def duration(self):
+        return self._duration
+
+    @duration.setter
+    def duration(self, duration):
+        self._duration = duration
+
+    @property
+    def seed(self):
+        return self._seed
+
+    @seed.setter
+    def seed(self, seed):
+        self._seed = seed
+
+    @property
     def model_name(self):
         """
         Return a string representing a label for this class.
@@ -378,9 +410,12 @@ class SpikeSourcePoisson(
         self.write_setup_info(spec, spike_hist_buff_sz)
 
         # Every subedge should have the same key
-        keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
-            subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
-        key = keys_and_masks[0].key
+        key = None
+        subedges = subgraph.outgoing_subedges_from_subvertex(subvertex)
+        if len(subedges) > 0:
+            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                subedges[0])
+            key = keys_and_masks[0].key
 
         self.write_poisson_parameters(spec, key, vertex_slice.n_atoms)
 

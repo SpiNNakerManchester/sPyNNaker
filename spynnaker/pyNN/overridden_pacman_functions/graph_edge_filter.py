@@ -23,10 +23,9 @@ class GraphEdgeFilter(object):
                                        subgraph.label)
 
         # create progress bar
-        progress_bar = \
-            ProgressBar(len(subgraph.subvertices) + len(subgraph.subedges),
-                        "on checking which subedges are filterable given "
-                        "heuristics")
+        progress_bar = ProgressBar(
+            len(subgraph.subvertices) + len(subgraph.subedges),
+            "Filtering edges")
 
         # add the subverts directly, as they wont be pruned.
         for subvert in subgraph.subvertices:
