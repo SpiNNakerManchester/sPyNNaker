@@ -124,6 +124,7 @@ class SpikeSourceArray(
 
         # Keep track of any previously generated buffers
         self._send_buffers = dict()
+        self._spike_recording_region_size = None
 
     @property
     def spike_times(self):
@@ -329,9 +330,11 @@ class SpikeSourceArray(
         self._reserve_memory_regions(spec, spike_buffer.buffer_size,
                                      spike_buffer.max_buffer_size_possible)
 
+        if self._spike_recording_region_size is None:
+            self._spike_recording_region_size = spike_buffer.total_region_size
         self._write_setup_info(
             spec, spike_buffer.buffer_size, ip_tags,
-            spike_buffer.total_region_size)
+            self._spike_recording_region_size)
 
         # End-of-Spec:
         spec.end_specification()
@@ -367,13 +370,13 @@ class SpikeSourceArray(
         """
         send_buffer = self._get_spike_send_buffer(vertex_slice)
         send_size = send_buffer.buffer_size
-        recorded_size = 0
+        self._spike_recording_region_size = 0
         if self._record:
-            recorded_size = send_buffer.total_region_size
+            self._spike_recording_region_size = send_buffer.total_region_size
         return (
             (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
             SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size +
-            recorded_size + 4)
+            self._spike_recording_region_size + 4)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
@@ -454,12 +457,12 @@ class SpikeSourceArray(
             # check that the number of spikes written is smaller or the same as
             # the size of the memory region we allocated for spikes
             send_buffer = self._get_spike_send_buffer(subvertex_slice)
-            if number_of_bytes_written > send_buffer.max_buffer_size_possible:
+            if number_of_bytes_written > send_buffer.total_region_size:
                 raise exceptions.MemReadException(
                     "the amount of memory written ({}) was larger than was "
                     "allocated for it ({})"
                     .format(number_of_bytes_written,
-                            send_buffer.max_buffer_size_possible))
+                            send_buffer.total_region_size))
 
             # Read the spikes
             logger.debug("Reading {} ({}) bytes starting at {} + 4"
