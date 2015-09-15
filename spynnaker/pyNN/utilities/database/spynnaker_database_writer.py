@@ -3,7 +3,7 @@ SpynnakerDataBaseInterface
 """
 # front end common imports
 from spinn_front_end_common.utilities.database.\
-    data_base_writer import DatabaseWriter
+    database_writer import DatabaseWriter
 
 # general imports
 import logging

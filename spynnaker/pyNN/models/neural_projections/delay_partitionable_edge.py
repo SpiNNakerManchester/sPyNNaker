@@ -112,9 +112,6 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
         :return:
         """
         if self._stored_synaptic_data_from_machine is None:
-            logger.debug("Reading synapse data for edge between {} and {}"
-                         .format(self._pre_vertex.label,
-                                 self._post_vertex.label))
             timer = None
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
@@ -129,7 +126,10 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
             synaptic_list = copy.copy(self._synapse_list)
             synaptic_list_rows = synaptic_list.get_rows()
             progress_bar = ProgressBar(
-                len(subedges), "progress on reading back synaptic matrix")
+                len(subedges),
+                "Reading back synaptic matrix for delayed edge between"
+                " {} and {}".format(self._pre_vertex.label,
+                                    self._post_vertex.label))
             for subedge in subedges:
                 n_rows = subedge.get_n_rows(graph_mapper)
                 pre_vertex_slice = \
@@ -162,6 +162,7 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
             self._stored_synaptic_data_from_machine = synaptic_list
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+                logger.info("Time to read matrix: {}".format(
+                    timer.take_sample()))
 
         return self._stored_synaptic_data_from_machine

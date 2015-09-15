@@ -121,9 +121,11 @@ static inline void synapse_types_shape_input(
 static inline void synapse_types_add_neuron_input(
         input_t *input_buffers, index_t synapse_type_index,
         index_t neuron_index, synapse_param_t** parameters, input_t input) {
-    input_buffers[synapse_types_get_input_buffer_index(synapse_type_index,
-        neuron_index)] += decay_s1615(input,
-            parameters[synapse_type_index][neuron_index].neuron_synapse_init);
+    uint32_t index = synapse_types_get_input_buffer_index(synapse_type_index,
+                                                          neuron_index);
+    input_buffers[index] = input_buffers[index] + decay_s1615(
+        input,
+        parameters[synapse_type_index][neuron_index].neuron_synapse_init);
 }
 
 //! \brief extracts the excitatory input buffers from the buffers available

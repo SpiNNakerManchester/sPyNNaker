@@ -8,6 +8,14 @@ class SynapseDynamics(object):
         self.fast = fast
         self.slow = slow
 
+    @property
+    def weight_scale(self):
+        return self.slow.weight_scale
+
+    @weight_scale.setter
+    def weight_scale(self, weight_scale):
+        self.slow.weight_scale = weight_scale
+
     def __eq__(self, other):
         if (other is None) or (not isinstance(other, SynapseDynamics)):
             return False

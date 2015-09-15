@@ -26,11 +26,6 @@ from pacman.utilities.progress_bar import ProgressBar
 # spinnmachine imports
 from spinn_front_end_common.utilities.executable_targets import \
     ExecutableTargets
-from spinn_machine.sdram import SDRAM
-from spinn_machine.router import Router as MachineRouter
-from spinn_machine.link import Link
-from spinn_machine.processor import Processor
-from spinn_machine.chip import Chip
 from spinn_machine.virutal_machine import VirtualMachine
 
 # common front end imports
@@ -73,22 +68,19 @@ from spynnaker.pyNN.spynnaker_configurations import \
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
-from pacman.model.abstract_classes.abstract_virtual_vertex import \
-    AbstractVirtualVertex
 from spynnaker.pyNN.models.abstract_models\
     .abstract_send_me_multicast_commands_vertex \
     import AbstractSendMeMulticastCommandsVertex
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
-from spynnaker.pyNN.utilities.database.spynnaker_data_base_writer import \
+from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
     SpynnakerDataBaseWriter
 
 # general imports
 import logging
 import math
 import os
-import sys
 
 
 logger = logging.getLogger(__name__)
@@ -287,13 +279,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             timer.start_timing()
         self.map_model()
         if do_timing:
-            timer.take_sample()
+            logger.info("Time to map model: {}".format(timer.take_sample()))
 
         # add database generation if requested
         needs_database = self._auto_detect_database(self._partitioned_graph)
         user_create_database = config.get("Database", "create_database")
         if ((user_create_database == "None" and needs_database) or
                 user_create_database == "True"):
+
+            database_progress = ProgressBar(10, "Creating database")
 
             wait_on_confirmation = config.getboolean(
                 "Database", "wait_on_confirmation")
@@ -304,19 +298,27 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._database_interface.add_system_params(
                 self._time_scale_factor, self._machine_time_step,
                 self._runtime)
+            database_progress.update()
             self._database_interface.add_machine_objects(self._machine)
+            database_progress.update()
             self._database_interface.add_partitionable_vertices(
                 self._partitionable_graph)
+            database_progress.update()
             self._database_interface.add_partitioned_vertices(
                 self._partitioned_graph, self._graph_mapper,
                 self._partitionable_graph)
+            database_progress.update()
             self._database_interface.add_placements(self._placements,
                                                     self._partitioned_graph)
+            database_progress.update()
             self._database_interface.add_routing_infos(
                 self._routing_infos, self._partitioned_graph)
+            database_progress.update()
             self._database_interface.add_routing_tables(self._router_tables)
+            database_progress.update()
             self._database_interface.add_tags(self._partitioned_graph,
                                               self._tags)
+            database_progress.update()
             execute_mapping = config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
             if execute_mapping:
@@ -325,12 +327,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     partitionable_graph=self._partitionable_graph,
                     partitioned_graph=self._partitioned_graph,
                     routing_infos=self._routing_infos)
+            database_progress.update()
             # if using a reload script, add if that needs to wait for
             # confirmation
             if self._reports_states.transciever_report:
                 self._reload_script.wait_on_confirmation = wait_on_confirmation
                 for socket_address in self._database_socket_addresses:
                     self._reload_script.add_socket_address(socket_address)
+            database_progress.update()
+            database_progress.end()
             self._database_interface.send_read_notification()
 
         # execute data spec generation
@@ -340,7 +345,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         logger.debug("")
         executable_targets = self.generate_data_specifications()
         if do_timing:
-            timer.take_sample()
+            logger.info("Time to generate data: {}".format(
+                timer.take_sample()))
 
         # execute data spec execution
         if do_timing:
@@ -359,7 +365,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                             processor_to_app_data_base_address)
 
         if do_timing:
-            timer.take_sample()
+            logger.info("Time to execute data specifications: {}".format(
+                timer.take_sample()))
 
         if (not isinstance(self._machine, VirtualMachine) and
                 config.getboolean("Execute", "run_simulation")):
@@ -385,7 +392,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
             # end of entire loading setup
             if do_timing:
-                timer.take_sample()
+                logger.debug("Time to load: {}".format(timer.take_sample()))
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
@@ -394,7 +401,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 # every thing is in sync0. load the initial buffers
                 self._send_buffer_manager.load_initial_buffers()
                 if do_timing:
-                    timer.take_sample()
+                    logger.debug("Time to load buffers: {}".format(
+                        timer.take_sample()))
 
                 wait_on_confirmation = config.getboolean(
                     "Database", "wait_on_confirmation")
@@ -425,7 +433,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if self._retrieve_provance_data:
 
                     progress = ProgressBar(self._placements.n_placements + 1,
-                                           "getting provenance data")
+                                           "Getting provenance data")
 
                     # retrieve provence data from central
                     file_path = os.path.join(self._report_default_directory,
@@ -795,7 +803,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
-                                   "on generating data specifications")
+                                   "Generating data specifications")
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
@@ -814,7 +822,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._hostname, self._graph_mapper,
                     self._report_default_directory, ip_tags, reverse_ip_tags,
                     self._write_text_specs, self._app_data_runtime_folder)
-                progress_bar.update()
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
@@ -829,6 +836,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     executable_targets.add_binary(binary_path)
                 executable_targets.add_processor(
                     binary_path, placement.x, placement.y, placement.p)
+
+            progress_bar.update()
 
         # finish the progress bar
         progress_bar.end()
@@ -925,74 +934,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         chip_id_allocator.allocate_chip_ids(self._partitionable_graph,
                                             self._machine)
 
-        # add virtual chips to the machine object
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractVirtualVertex):
-
-                # check if the virtual chip doesn't already exist
-                if self._machine.get_chip_at(vertex.virtual_chip_x,
-                                             vertex.virtual_chip_y) is None:
-                    virutal_chip = self._create_virtual_chip(vertex)
-                    self._machine.add_chip(virutal_chip)
-
-    def _create_virtual_chip(self, virtual_vertex):
-        """ Create a virtual chip as a real chip in the spinnmachine machine\
-            object
-        :param virtual_vertex: virutal vertex to convert into a real chip
-        :return: the real chip
-        """
-        sdram_object = SDRAM()
-
-        # creates the two links
-        spinnaker_link_id = virtual_vertex.get_spinnaker_link_id
-        spinnaker_link_data = \
-            self._machine.locate_connected_chips_coords_and_link(
-                config.getint("Machine", "version"), spinnaker_link_id)
-        virtual_link_id = (spinnaker_link_data.connected_link + 3) % 6
-        to_virtual_chip_link = Link(
-            destination_x=virtual_vertex.virtual_chip_x,
-            destination_y=virtual_vertex.virtual_chip_y,
-            source_x=spinnaker_link_data.connected_chip_x,
-            source_y=spinnaker_link_data.connected_chip_y,
-            multicast_default_from=virtual_link_id,
-            multicast_default_to=virtual_link_id,
-            source_link_id=spinnaker_link_data.connected_link)
-
-        from_virtual_chip_link = Link(
-            destination_x=spinnaker_link_data.connected_chip_x,
-            destination_y=spinnaker_link_data.connected_chip_y,
-            source_x=virtual_vertex.virtual_chip_x,
-            source_y=virtual_vertex.virtual_chip_y,
-            multicast_default_from=(spinnaker_link_data.connected_link),
-            multicast_default_to=spinnaker_link_data.connected_link,
-            source_link_id=virtual_link_id)
-
-        # create the router
-        links = [from_virtual_chip_link]
-        router_object = MachineRouter(
-            links=links, emergency_routing_enabled=False,
-            clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
-            n_available_multicast_entries=sys.maxint)
-
-        # create the processors
-        processors = list()
-        for virtual_core_id in range(0, 128):
-            processors.append(Processor(virtual_core_id,
-                                        Processor.CPU_AVAILABLE,
-                                        virtual_core_id == 0))
-
-        # connect the real chip with the virtual one
-        connected_chip = self._machine.get_chip_at(
-            spinnaker_link_data.connected_chip_x,
-            spinnaker_link_data.connected_chip_y)
-        connected_chip.router.add_link(to_virtual_chip_link)
-
-        # return new v chip
-        return Chip(
-            processors=processors, router=router_object, sdram=sdram_object,
-            x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
-            virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
-
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
         """
@@ -1012,13 +953,14 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             population._end()
 
         if turn_off_machine is None:
-            config.getboolean("Machine", "turn_off_machine")
+            turn_off_machine = config.getboolean("Machine", "turn_off_machine")
 
         if clear_routing_tables is None:
-            config.getboolean("Machine", "clear_routing_tables")
+            clear_routing_tables = config.getboolean(
+                "Machine", "clear_routing_tables")
 
         if clear_tags is None:
-            config.getboolean("Machine", "clear_tags")
+            clear_tags = config.getboolean("Machine", "clear_tags")
 
         # if stopping on machine, clear iptags and
         if clear_tags:
@@ -1044,7 +986,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._database_interface.stop()
 
         # stop the transciever
-        self._txrx.close(turn_off_machine=turn_off_machine)
+        if turn_off_machine:
+            logger.info("Turning off machine")
+        self._txrx.close(power_off_machine=turn_off_machine)
 
     def _add_socket_address(self, socket_address):
         """

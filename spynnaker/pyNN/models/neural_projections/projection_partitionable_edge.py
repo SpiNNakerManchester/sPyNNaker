@@ -93,9 +93,6 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
                 timer = Timer()
                 timer.start_timing()
 
-            logger.debug("Reading synapse data for edge between {} and {}"
-                         .format(self._pre_vertex.label,
-                                 self._post_vertex.label))
             subedges = \
                 graph_mapper.get_partitioned_edges_from_partitionable_edge(
                     self)
@@ -105,7 +102,10 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
             synaptic_list = copy.copy(self._synapse_list)
             synaptic_list_rows = synaptic_list.get_rows()
             progress_bar = ProgressBar(
-                len(subedges), "progress on reading back synaptic matrix")
+                len(subedges),
+                "Reading back synaptic matrix for edge between"
+                " {} and {}".format(self._pre_vertex.label,
+                                    self._post_vertex.label))
             for subedge in subedges:
                 n_rows = subedge.get_n_rows(graph_mapper)
                 pre_vertex_slice = \
@@ -130,7 +130,8 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
             progress_bar.end()
             self._stored_synaptic_data_from_machine = synaptic_list
             if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+                logger.info("Time to read matrix: {}".format(
+                    timer.take_sample()))
 
         return self._stored_synaptic_data_from_machine
 
