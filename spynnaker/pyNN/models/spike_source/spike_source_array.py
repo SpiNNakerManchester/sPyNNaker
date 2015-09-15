@@ -327,11 +327,12 @@ class SpikeSourceArray(
         spec.comment("\nReserving memory space for spike data region:\n\n")
         spike_buffer = self._get_spike_send_buffer(
             graph_mapper.get_subvertex_slice(subvertex))
-        self._reserve_memory_regions(spec, spike_buffer.buffer_size,
-                                     spike_buffer.max_buffer_size_possible)
 
         if self._spike_recording_region_size is None:
             self._spike_recording_region_size = spike_buffer.total_region_size
+        self._reserve_memory_regions(spec, spike_buffer.buffer_size,
+                                     self._spike_recording_region_size)
+
         self._write_setup_info(
             spec, spike_buffer.buffer_size, ip_tags,
             self._spike_recording_region_size)
