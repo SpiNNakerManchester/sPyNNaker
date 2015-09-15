@@ -93,10 +93,6 @@ class Population(object):
         self._record_v_file = None
         self._record_gsyn_file = None
 
-        self._spikes = None
-        self._v = None
-        self._gsyn = None
-
     def __add__(self, other):
         """
         merges populations
@@ -165,35 +161,33 @@ class Population(object):
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
         """
-        if self._spikes is None:
+        if not gather:
+            logger.warn("Spynnaker only supports gather = true, will "
+                        " execute as if gather was true anyhow")
+        timer = None
 
-            if not gather:
-                logger.warn("Spynnaker only supports gather = true, will "
-                            " execute as if gather was true anyhow")
-            timer = None
+        if not self._vertex.record:
+            raise exceptions.ConfigurationException(
+                "This population has not been set to record spikes. "
+                "Therefore spikes cannot be retrieved. Please set this "
+                "vertex to record spikes before running this command.")
 
-            if not self._vertex.record:
-                raise exceptions.ConfigurationException(
-                    "This population has not been set to record spikes. "
-                    "Therefore spikes cannot be retrieved. Please set this "
-                    "vertex to record spikes before running this command.")
-
-            if not self._spinnaker.has_ran:
-                raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet run, therefore spikes cannot"
-                    " be retrieved. Please execute the simulation before"
-                    " running this command")
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer = Timer()
-                timer.start_timing()
-            self._spikes = self._vertex.get_spikes(
-                txrx=self._spinnaker.transceiver,
-                placements=self._spinnaker.placements,
-                graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output)
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
-        return self._spikes
+        if not self._spinnaker.has_ran:
+            raise local_exceptions.SpynnakerException(
+                "The simulation has not yet run, therefore spikes cannot"
+                " be retrieved. Please execute the simulation before"
+                " running this command")
+        if conf.config.getboolean("Reports", "outputTimesForSections"):
+            timer = Timer()
+            timer.start_timing()
+        spikes = self._vertex.get_spikes(
+            txrx=self._spinnaker.transceiver,
+            placements=self._spinnaker.placements,
+            graph_mapper=self._spinnaker.graph_mapper,
+            compatible_output=compatible_output)
+        if conf.config.getboolean("Reports", "outputTimesForSections"):
+            timer.take_sample()
+        return spikes
 
     def get_spike_counts(self, gather=True):
         """
@@ -208,32 +202,31 @@ class Population(object):
         conductances for recorded cells.
 
         """
-        if self._gsyn is None:
-            if not self._vertex.record_gsyn:
-                raise exceptions.ConfigurationException(
-                    "This population has not been set to record gsyn. "
-                    "Therefore gsyn cannot be retrieved. Please set this "
-                    "vertex to record gsyn before running this command.")
+        if not self._vertex.record_gsyn:
+            raise exceptions.ConfigurationException(
+                "This population has not been set to record gsyn. "
+                "Therefore gsyn cannot be retrieved. Please set this "
+                "vertex to record gsyn before running this command.")
 
-            if not self._spinnaker.has_ran:
-                raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet run, therefore gsyn cannot"
-                    " be retrieved. Please execute the simulation before"
-                    " running this command")
-            timer = None
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer = Timer()
-                timer.start_timing()
-            self._gsyn = self._vertex.get_gsyn(
-                has_ran=self._spinnaker.has_ran,
-                txrx=self._spinnaker.transceiver,
-                placements=self._spinnaker.placements,
-                machine_time_step=self._spinnaker.machine_time_step,
-                graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output)
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
-        return self._gsyn
+        if not self._spinnaker.has_ran:
+            raise local_exceptions.SpynnakerException(
+                "The simulation has not yet run, therefore gsyn cannot"
+                " be retrieved. Please execute the simulation before"
+                " running this command")
+        timer = None
+        if conf.config.getboolean("Reports", "outputTimesForSections"):
+            timer = Timer()
+            timer.start_timing()
+        gsyn = self._vertex.get_gsyn(
+            has_ran=self._spinnaker.has_ran,
+            txrx=self._spinnaker.transceiver,
+            placements=self._spinnaker.placements,
+            machine_time_step=self._spinnaker.machine_time_step,
+            graph_mapper=self._spinnaker.graph_mapper,
+            compatible_output=compatible_output)
+        if conf.config.getboolean("Reports", "outputTimesForSections"):
+            timer.take_sample()
+        return gsyn
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -248,35 +241,34 @@ class Population(object):
             not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
-        if self._v is None:
-            if not self._vertex.record_v:
-                raise exceptions.ConfigurationException(
-                    "This population has not been set to record v. "
-                    "Therefore v cannot be retrieved. Please set this "
-                    "vertex to record v before running this command.")
+        if not self._vertex.record_v:
+            raise exceptions.ConfigurationException(
+                "This population has not been set to record v. "
+                "Therefore v cannot be retrieved. Please set this "
+                "vertex to record v before running this command.")
 
-            if not self._spinnaker.has_ran:
-                raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet run, therefore v cannot"
-                    " be retrieved. Please execute the simulation before"
-                    " running this command")
+        if not self._spinnaker.has_ran:
+            raise local_exceptions.SpynnakerException(
+                "The simulation has not yet run, therefore v cannot"
+                " be retrieved. Please execute the simulation before"
+                " running this command")
 
-            timer = None
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer = Timer()
-                timer.start_timing()
-            self._v = self._vertex.get_v(
-                has_ran=self._spinnaker.has_ran,
-                txrx=self._spinnaker.transceiver,
-                placements=self._spinnaker.placements,
-                machine_time_step=self._spinnaker.machine_time_step,
-                graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output)
+        timer = None
+        if conf.config.getboolean("Reports", "outputTimesForSections"):
+            timer = Timer()
+            timer.start_timing()
+        v = self._vertex.get_v(
+            has_ran=self._spinnaker.has_ran,
+            txrx=self._spinnaker.transceiver,
+            placements=self._spinnaker.placements,
+            machine_time_step=self._spinnaker.machine_time_step,
+            graph_mapper=self._spinnaker.graph_mapper,
+            compatible_output=compatible_output)
 
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+        if conf.config.getboolean("Reports", "outputTimesForSections"):
+            timer.take_sample()
 
-        return self._v
+        return v
 
     def id_to_index(self, cell_id):
         """
