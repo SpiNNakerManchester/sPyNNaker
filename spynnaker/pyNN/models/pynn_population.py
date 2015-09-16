@@ -230,7 +230,7 @@ class Population(object):
         """
         spikes = self.getSpikes(True, gather)
         n_spikes = {}
-        for i in self._vertex.n_atoms:
+        for i in range(self._vertex.n_atoms):
             n_spikes[i] = 0
         for (neuron_id, _) in spikes:
             n_spikes[neuron_id] += 1
