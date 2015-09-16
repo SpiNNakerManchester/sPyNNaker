@@ -1,12 +1,8 @@
 import unittest
-from spynnaker.pyNN.models.spike_source.spike_source_poisson \
-    import SpikeSourcePoisson
 import spynnaker.pyNN as p
-import pylab
 
 
 class MyTestCase(unittest.TestCase):
-
 
     @unittest.skip("Not implemented")
     def test_something(self):
