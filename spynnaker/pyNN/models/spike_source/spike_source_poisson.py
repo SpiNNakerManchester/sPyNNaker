@@ -278,7 +278,11 @@ class SpikeSourcePoisson(
         #     accum time_to_spike_ticks;
         #   } slow_spike_source_t;
         for (neuron_id, rate_val, start_val, end_val) in slow_sources:
-            isi_val = float(1000000.0 / (rate_val * self._machine_time_step))
+            if rate_val == 0:
+                isi_val = 0
+            else:
+                isi_val = float(1000000.0 /
+                                (rate_val * self._machine_time_step))
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = 0xFFFFFFFF
             if end_val is not None:
@@ -299,7 +303,10 @@ class SpikeSourcePoisson(
         #     unsigned long fract exp_minus_lambda;
         #   } fast_spike_source_t;
         for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
-            exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
+            if spikes_per_tick == 0:
+                exp_minus_lamda = 0
+            else:
+                exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = 0xFFFFFFFF
             if end_val is not None:
