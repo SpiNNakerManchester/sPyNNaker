@@ -21,9 +21,10 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
     """ Underlying vertex model for Neural Populations.
     """
 
-    def __init__(self, n_neurons, n_params, binary, label, max_atoms_per_core,
-                 machine_time_step, timescale_factor, spikes_per_second,
-                 ring_buffer_sigma, weight_scale=1.0, constraints=None):
+    def __init__(self, n_neurons, n_params, n_global_params, binary, label,
+                 max_atoms_per_core, machine_time_step, timescale_factor,
+                 spikes_per_second, ring_buffer_sigma, weight_scale=1.0,
+                 constraints=None):
 
         AbstractPopulationRecordableVertex.__init__(
             self, machine_time_step, label)
@@ -35,6 +36,7 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma)
         self._n_params = n_params
+        self._n_global_params = n_global_params
         self._weight_scale = weight_scale
 
     @property
@@ -51,8 +53,8 @@ class AbstractPopulationVertex(AbstractPopulationRecordableVertex,
             sub_vertex_out_spike_bytes_function=(
                 lambda subvertex, subvertex_slice: int(ceil(
                     subvertex_slice.n_atoms / 32.0)) * 4),
-            spike_recording_region=(constants.POPULATION_BASED_REGIONS
-                                    .SPIKE_HISTORY.value))
+            spike_recording_region=(
+                constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value))
 
     def get_v(self, has_ran, graph_mapper, placements,
               txrx, machine_time_step, runtime, compatible_output=False):

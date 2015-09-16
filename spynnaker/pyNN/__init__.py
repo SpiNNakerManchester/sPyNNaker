@@ -133,16 +133,15 @@ def register_binary_search_path(search_path):
     executable_finder.add_path(search_path)
 
 
-def end(stop_on_board=True):
+def end():
     """
-    :param stop_on_board:
     Do any necessary cleaning up before exiting.
 
     Unregisters the controller,
     prints any data recorded using the low-level API
     """
     global _spinnaker
-    _spinnaker.stop(stop_on_board)
+    _spinnaker.stop()
     _spinnaker = None
 
 
