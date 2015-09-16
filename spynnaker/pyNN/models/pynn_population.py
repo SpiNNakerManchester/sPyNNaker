@@ -22,6 +22,7 @@ from pyNN.space import Space
 
 import numpy
 import logging
+import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -95,9 +96,9 @@ class Population(object):
         self._record_v_file = None
         self._record_gsyn_file = None
 
-        self._spikes = None
-        self._v = None
-        self._gsyn = None
+        self._spikes_cache_file = None
+        self._v_cache_file = None
+        self._gsyn_cache_file = None
 
     def __add__(self, other):
         """
@@ -186,7 +187,7 @@ class Population(object):
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
         """
-        if self._spikes is None:
+        if self._spikes_cache_file is None:
 
             if not gather:
                 logger.warn("Spynnaker only supports gather = true, will "
@@ -207,7 +208,7 @@ class Population(object):
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
                 timer.start_timing()
-            self._spikes = self._vertex.get_spikes(
+            spikes = self._vertex.get_spikes(
                 txrx=self._spinnaker.transceiver,
                 placements=self._spinnaker.placements,
                 graph_mapper=self._spinnaker.graph_mapper,
@@ -215,7 +216,13 @@ class Population(object):
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get spikes: {}".format(
                     timer.take_sample()))
-        return self._spikes
+            self._spikes_cache_file = tempfile.NamedTemporaryFile()
+            numpy.save(self._spikes_cache_file, spikes)
+            return spikes
+
+        # Load from the file
+        self._spikes_cache_file.seek(0)
+        return numpy.load(self._spikes_cache_file)
 
     def get_spike_counts(self, gather=True):
         """
@@ -236,7 +243,7 @@ class Population(object):
         conductances for recorded cells.
 
         """
-        if self._gsyn is None:
+        if self._gsyn_cache_file is None:
             if not self._vertex.record_gsyn:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record gsyn. "
@@ -252,7 +259,7 @@ class Population(object):
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
                 timer.start_timing()
-            self._gsyn = self._vertex.get_gsyn(
+            gsyn = self._vertex.get_gsyn(
                 has_ran=self._spinnaker.has_ran,
                 txrx=self._spinnaker.transceiver,
                 placements=self._spinnaker.placements,
@@ -262,7 +269,14 @@ class Population(object):
                 runtime=self._spinnaker._runtime)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get gsyn: {}".format(timer.take_sample()))
-        return self._gsyn
+
+            self._gsyn_cache_file = tempfile.NamedTemporaryFile()
+            numpy.save(self._gsyn_cache_file, gsyn)
+            return gsyn
+
+        # Reload the data
+        self._gsyn_cache_file.seek(0)
+        numpy.load(self._gsyn_cache_file)
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -277,7 +291,7 @@ class Population(object):
             not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
-        if self._v is None:
+        if self._v_cache_file is None:
             if not self._vertex.record_v:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record v. "
@@ -294,7 +308,7 @@ class Population(object):
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 timer = Timer()
                 timer.start_timing()
-            self._v = self._vertex.get_v(
+            v = self._vertex.get_v(
                 has_ran=self._spinnaker.has_ran,
                 txrx=self._spinnaker.transceiver,
                 placements=self._spinnaker.placements,
@@ -306,7 +320,13 @@ class Population(object):
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to read v: {}".format(timer.take_sample()))
 
-        return self._v
+            self._v_cache_file = tempfile.NamedTemporaryFile()
+            numpy.save(self._v_cache_file, v)
+            return v
+
+        # Reload the data
+        self._v_cache_file.seek(0)
+        return numpy.load(self._v_cache_file)
 
     def id_to_index(self, cell_id):
         """
