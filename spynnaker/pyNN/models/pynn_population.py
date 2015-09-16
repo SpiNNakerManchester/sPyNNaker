@@ -411,6 +411,9 @@ class Population(object):
         # Doesn't make much sense on SpiNNaker
         return self._size
 
+    def meanSpikeCount(self, gather=True):
+        return self.mean_spike_count(gather)
+
     def mean_spike_count(self, gather=True):
         """
         Returns the mean number of spikes per neuron.
