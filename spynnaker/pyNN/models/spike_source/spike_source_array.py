@@ -16,6 +16,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
 from spinn_front_end_common.interface.buffer_management.storage_objects\
     .buffered_sending_region import BufferedSendingRegion
+from spinnman.messages.eieio.data_messages.eieio_data_header import EIEIODataHeader
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
@@ -421,7 +422,7 @@ class SpikeSourceArray(
         # Find all the sub-vertices that this pynn_population.py exists on
         subvertices = graph_mapper.get_subvertices_from_vertex(self)
         progress_bar = ProgressBar(len(subvertices), "Getting spikes")
-        result = numpy.zeros(shape=(0, 2))
+        results = list()
         for subvertex in subvertices:
             placement = placements.get_placement_of_subvertex(subvertex)
             (x, y, p) = placement.x, placement.y, placement.p
@@ -475,27 +476,24 @@ class SpikeSourceArray(
 
             # translate block of spikes into EIEIO messages
             offset = 0
-            eieio_messages = list()
             while offset <= number_of_bytes_written - 4:
-                eieio_data_message = create_eieio_data.read_eieio_data_message(
+                eieio_header = EIEIODataHeader.from_bytestring(
                     spike_data_block, offset)
-                offset += eieio_data_message.size
-                eieio_messages.append(eieio_data_message)
+                offset += eieio_header.size
+                timestamps = numpy.repeat([eieio_header.payload_base],
+                                          eieio_header.count)
+                keys = numpy.frombuffer(
+                    spike_data_block, dtype="<u4", count=eieio_header.count,
+                    offset=offset)
+                neuron_ids = ((keys - subvertex.base_key) +
+                              subvertex_slice.lo_atom)
+                offset += eieio_header.count * 4
+                results.append(numpy.dstack((neuron_ids, timestamps))[0])
 
-            # translate the eieo data packet into numpi arrays.
-            base_key = subvertex.base_key
-            for eieio_message in eieio_messages:
-                while eieio_message.is_next_element:
-                    element = eieio_message.next_element
-                    key = element.key
-                    neuron_id = (key - base_key) + subvertex_slice.lo_atom
-                    time_stamp = element.payload
-                    time_stamp *= (self._machine_time_step / 1000.0)
-                    result = numpy.append(result, [[neuron_id, time_stamp]],
-                                          axis=0)
             # complete the buffer
             progress_bar.update()
         progress_bar.end()
 
+        result = numpy.vstack(results)
         result = result[numpy.lexsort((result[:, 1], result[:, 0]))]
         return result
