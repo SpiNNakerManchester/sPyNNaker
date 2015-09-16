@@ -3,7 +3,6 @@ SpikeSourceArray
 """
 
 # spynnaker imports
-from spinnman.messages.eieio import create_eieio_data
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
@@ -16,7 +15,8 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
 from spinn_front_end_common.interface.buffer_management.storage_objects\
     .buffered_sending_region import BufferedSendingRegion
-from spinnman.messages.eieio.data_messages.eieio_data_header import EIEIODataHeader
+from spinnman.messages.eieio.data_messages.eieio_data_header \
+    import EIEIODataHeader
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
