@@ -11,11 +11,8 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
 from pacman.utilities.progress_bar import ProgressBar
 
 # spinnmachine imports
-from spinn_machine.sdram import SDRAM
-from spinn_machine.router import Router as MachineRouter
-from spinn_machine.link import Link
-from spinn_machine.processor import Processor
-from spinn_machine.chip import Chip
+from spinn_front_end_common.utilities.executable_targets import \
+    ExecutableTargets
 from spinn_machine.virutal_machine import VirtualMachine
 
 # common front end imports
@@ -30,20 +27,18 @@ from spinn_front_end_common.interface.front_end_common_configuration_functions\
 from spinn_front_end_common.utilities.timer import Timer
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from spinn_front_end_common.interface.data_generator_interface import \
-    DataGeneratorInterface
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 from spinn_front_end_common.interface.\
-    front_end_common_provanence_functions import \
-    FrontEndCommonProvanenceFunctions
+    front_end_common_provenance_functions import \
+    FrontEndCommonProvenanceFunctions
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_provanence_data import \
-    AbstractProvidesProvanenceData
+    abstract_provides_provenance_data import \
+    AbstractProvidesProvenanceData
 
 # local front end imports
-from spynnaker.pyNN.utilities.database.socket_address import SocketAddress
-from spynnaker.pyNN.utilities.database.data_base_interface \
-    import DataBaseInterface
+from spynnaker.pyNN.models\
+    .abstract_models.abstract_population_recordable_vertex import \
+    AbstractPopulationRecordableVertex
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
@@ -52,29 +47,20 @@ from spynnaker.pyNN.spynnaker_configurations import \
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.models.abstract_models.abstract_virtual_vertex import \
-    AbstractVirtualVertex
 from spynnaker.pyNN.models.abstract_models\
     .abstract_send_me_multicast_commands_vertex \
     import AbstractSendMeMulticastCommandsVertex
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
-from spynnaker.pyNN.buffer_management.buffer_manager import BufferManager
-from spynnaker.pyNN.models.abstract_models.buffer_models\
-    .abstract_sends_buffers_from_host_partitioned_vertex\
-    import AbstractSendsBuffersFromHostPartitionedVertex
-
-# spinnman imports
-from spinnman.model.core_subsets import CoreSubsets
-from spinnman.model.core_subset import CoreSubset
+from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
+    SpynnakerDataBaseWriter
 
 # general imports
 import logging
 import math
 import os
-import sys
-from multiprocessing.pool import ThreadPool
+
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +69,7 @@ executable_finder = ExecutableFinder()
 
 class Spinnaker(FrontEndCommonConfigurationFunctions,
                 FrontEndCommonSpinnmanInterfaceFunctions,
-                FrontEndCommonProvanenceFunctions,
+                FrontEndCommonProvenanceFunctions,
                 SpynnakerConfigurationFunctions):
     """
     Spinnaker
@@ -95,7 +81,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         FrontEndCommonConfigurationFunctions.__init__(self, host_name,
                                                       graph_label)
         SpynnakerConfigurationFunctions.__init__(self)
-        FrontEndCommonProvanenceFunctions.__init__(self)
+        FrontEndCommonProvenanceFunctions.__init__(self)
 
         # pacman objects
         self._partitionable_graph = None
@@ -107,19 +93,13 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._tags = None
         # set up the pacman executor
         self._pacman_exeuctor = None
-
+        
         # database objects
-        self._create_database = config.getboolean(
-            "Database", "create_database")
-
-        if database_socket_addresses is None:
-            database_socket_addresses = list()
-            listen_port = config.getint("Database", "listen_port")
-            notify_port = config.getint("Database", "notify_port")
-            noftiy_hostname = config.get("Database", "notify_hostname")
-            database_socket_addresses.append(
-                SocketAddress(noftiy_hostname, notify_port, listen_port))
-        self._database_socket_addresses = database_socket_addresses
+        self._database_socket_addresses = set()
+        self._database_interface = None
+        self._create_database = None
+        self._populations = list()
+        
         self._database_interface = None
 
         if self._app_id is None:
@@ -178,8 +158,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
-        self._create_database = config.getboolean(
-            "Database", "create_database")
 
         FrontEndCommonSpinnmanInterfaceFunctions.__init__(
             self, self._reports_states, self._report_default_directory)
@@ -280,7 +258,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if number_of_boards == "None":
             number_of_boards = None
 
-        self._setup_interfaces(
+        self.setup_interfaces(
             hostname=self._hostname,
             bmp_details=config.get("Machine", "bmp_names"),
             downed_chips=config.get("Machine", "down_chips"),
@@ -289,15 +267,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             number_of_boards=number_of_boards, width=width, height=height,
             is_virtual=config.getboolean("Machine", "virtual_board"),
             virtual_has_wrap_arounds=config.getboolean(
-                "Machine", "requires_wrap_arounds"))
+                "Machine", "requires_wrap_arounds"),
+            auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"),
+            enable_reinjection=config.getboolean(
+                "Machine", "enable_reinjection"))
 
-        # add database generation if requested
-        if self._create_database:
-            wait_on_confirmation = config.getboolean(
-                "Database", "wait_on_confirmation")
-            self._database_interface = DataBaseInterface(
-                self._app_data_runtime_folder, wait_on_confirmation,
-                self._database_socket_addresses)
+        # adds extra stuff needed by the reload script which cannot be given
+        # directly.
+        if self._reports_states.transciever_report:
+            self._reload_script.runtime = run_time
+            self._reload_script.time_scale_factor = self._time_scale_factor
 
         # create network report if needed
         if self._reports_states is not None:
@@ -326,7 +305,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         "cause the neural models to fail to partition "
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
-                if vertex.is_set_to_record_spikes():
+                if (isinstance(vertex, AbstractPopulationRecordableVertex) and
+                        vertex.record):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
                         "is not currently supportable in this tool chain."
@@ -348,34 +328,63 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # take timing measurements
         if do_timing:
-            timer.take_sample()
+            logger.info("Time to map model: {}".format(timer.take_sample()))
 
-        # load database if needed
-        if self._create_database:
+        # add database generation if requested
+        needs_database = self._auto_detect_database(self._partitioned_graph)
+        user_create_database = config.get("Database", "create_database")
+        if ((user_create_database == "None" and needs_database) or
+                user_create_database == "True"):
+
+            database_progress = ProgressBar(10, "Creating database")
+
+            wait_on_confirmation = config.getboolean(
+                "Database", "wait_on_confirmation")
+            self._database_interface = SpynnakerDataBaseWriter(
+                self._app_data_runtime_folder, wait_on_confirmation,
+                self._database_socket_addresses)
+
             self._database_interface.add_system_params(
                 self._time_scale_factor, self._machine_time_step,
                 self._runtime)
+            database_progress.update()
             self._database_interface.add_machine_objects(self._machine)
+            database_progress.update()
             self._database_interface.add_partitionable_vertices(
                 self._partitionable_graph)
+            database_progress.update()
             self._database_interface.add_partitioned_vertices(
                 self._partitioned_graph, self._graph_mapper,
                 self._partitionable_graph)
+            database_progress.update()
             self._database_interface.add_placements(self._placements,
                                                     self._partitioned_graph)
+            database_progress.update()
             self._database_interface.add_routing_infos(
                 self._routing_infos, self._partitioned_graph)
+            database_progress.update()
             self._database_interface.add_routing_tables(self._router_tables)
+            database_progress.update()
             self._database_interface.add_tags(self._partitioned_graph,
                                               self._tags)
+            database_progress.update()
             execute_mapping = config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
             if execute_mapping:
-                self._database_interface.create_neuron_to_key_mapping(
+                self._database_interface.create_atom_to_event_id_mapping(
                     graph_mapper=self._graph_mapper,
                     partitionable_graph=self._partitionable_graph,
                     partitioned_graph=self._partitioned_graph,
                     routing_infos=self._routing_infos)
+            database_progress.update()
+            # if using a reload script, add if that needs to wait for
+            # confirmation
+            if self._reports_states.transciever_report:
+                self._reload_script.wait_on_confirmation = wait_on_confirmation
+                for socket_address in self._database_socket_addresses:
+                    self._reload_script.add_socket_address(socket_address)
+            database_progress.update()
+            database_progress.end()
             self._database_interface.send_read_notification()
 
         # execute data spec generation
@@ -385,7 +394,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         logger.debug("")
         executable_targets = self.generate_data_specifications()
         if do_timing:
-            timer.take_sample()
+            logger.info("Time to generate data: {}".format(
+                timer.take_sample()))
 
         # execute data spec execution
         if do_timing:
@@ -396,14 +406,16 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._hostname, self._placements, self._graph_mapper,
                 write_text_specs=config.getboolean(
                     "Reports", "writeTextSpecs"),
-                runtime_application_data_folder=self._app_data_runtime_folder)
+                runtime_application_data_folder=self._app_data_runtime_folder,
+                machine=self._machine)
 
         if self._reports_states is not None:
             reports.write_memory_map_report(self._report_default_directory,
                                             processor_to_app_data_base_address)
 
         if do_timing:
-            timer.take_sample()
+            logger.info("Time to execute data specifications: {}".format(
+                timer.take_sample()))
 
         if (not isinstance(self._machine, VirtualMachine) and
                 config.getboolean("Execute", "run_simulation")):
@@ -411,54 +423,50 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 timer.start_timing()
 
             logger.info("*** Loading tags ***")
-            self._load_tags(self._tags)
+            self.load_tags(self._tags)
 
             if self._do_load is True:
                 logger.info("*** Loading data ***")
                 self._load_application_data(
-                    self._placements, self._router_tables, self._graph_mapper,
+                    self._placements, self._graph_mapper,
                     processor_to_app_data_base_address, self._hostname,
-                    self._app_id,
-                    machine_version=config.getint("Machine", "version"),
-                    app_data_folder=self._app_data_runtime_folder)
+                    app_data_folder=self._app_data_runtime_folder,
+                    verify=config.getboolean("Mode", "verify_writes"))
+                self.load_routing_tables(self._router_tables, self._app_id)
                 logger.info("*** Loading executables ***")
-                self._load_executable_images(
-                    executable_targets, self._app_id,
-                    app_data_folder=self._app_data_runtime_folder)
+                self.load_executable_images(executable_targets, self._app_id)
                 logger.info("*** Loading buffers ***")
-                self._set_up_send_buffering()
+                self.set_up_send_buffering(self._partitioned_graph,
+                                           self._placements, self._tags)
 
             # end of entire loading setup
             if do_timing:
-                timer.take_sample()
+                logger.debug("Time to load: {}".format(timer.take_sample()))
 
             if self._do_run is True:
                 logger.info("*** Running simulation... *** ")
-                if self._reports_states.transciever_report:
-                    reports.re_load_script_running_aspects(
-                        self._app_data_runtime_folder, executable_targets,
-                        self._hostname, self._app_id, run_time)
-
+                if do_timing:
+                    timer.start_timing()
                 # every thing is in sync0. load the initial buffers
                 self._send_buffer_manager.load_initial_buffers()
+                if do_timing:
+                    logger.debug("Time to load buffers: {}".format(
+                        timer.take_sample()))
 
                 wait_on_confirmation = config.getboolean(
                     "Database", "wait_on_confirmation")
                 send_start_notification = config.getboolean(
                     "Database", "send_start_notification")
 
-                self._wait_for_cores_to_be_ready(executable_targets,
-                                                 self._app_id)
+                self.wait_for_cores_to_be_ready(executable_targets,
+                                                self._app_id)
 
                 # wait till external app is ready for us to start if required
                 if (self._database_interface is not None and
                         wait_on_confirmation):
-                    logger.info(
-                        "*** Awaiting for a response from an external source "
-                        "to state its ready for the simulation to start ***")
                     self._database_interface.wait_for_confirmation()
 
-                self._start_all_cores(executable_targets, self._app_id)
+                self.start_all_cores(executable_targets, self._app_id)
 
                 if (self._database_interface is not None and
                         send_start_notification):
@@ -467,11 +475,14 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if self._runtime is None:
                     logger.info("Application is set to run forever - exiting")
                 else:
-                    self._wait_for_execution_to_complete(
+                    self.wait_for_execution_to_complete(
                         executable_targets, self._app_id, self._runtime,
                         self._time_scale_factor)
                 self._has_ran = True
                 if self._retrieve_provance_data:
+
+                    progress = ProgressBar(self._placements.n_placements + 1,
+                                           "Getting provenance data")
 
                     # retrieve provence data from central
                     file_path = os.path.join(self._report_default_directory,
@@ -481,42 +492,29 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     if not os.path.exists(file_path):
                         os.mkdir(file_path)
 
-                    self._write_provanence_data_in_xml(file_path)
+                    # write provanence data
+                    self.write_provenance_data_in_xml(file_path, self._txrx)
+                    progress.update()
 
                     # retrieve provenance data from any cores that provide data
-                    for placement in self._placements:
+                    for placement in self._placements.placements:
                         if isinstance(placement.subvertex,
-                                      AbstractProvidesProvanenceData):
-                            file_path = os.path.join(
-                                self._report_default_directory,
-                                "Provanence_data_for_core:{}:{}:{}"
-                                .format(placement.x, placement.y, placement.p))
+                                      AbstractProvidesProvenanceData):
+                            core_file_path = os.path.join(
+                                file_path,
+                                "Provanence_data_for_{}_{}_{}_{}.xml".format(
+                                    placement.subvertex.label,
+                                    placement.x, placement.y, placement.p))
+                            placement.subvertex.write_provenance_data_in_xml(
+                                core_file_path, self.transceiver, placement)
+                        progress.update()
+                    progress.end()
 
         elif isinstance(self._machine, VirtualMachine):
             logger.info(
                 "*** Using a Virtual Machine so no simulation will occur")
         else:
             logger.info("*** No simulation requested: Stopping. ***")
-
-    def _set_up_send_buffering(self):
-        progress_bar = ProgressBar(
-            len(self.partitioned_graph.subvertices),
-            "on initialising the buffer managers for vertices which require"
-            " buffering")
-
-        # Create the buffer manager
-        self._send_buffer_manager = BufferManager(
-            self._placements, self._routing_infos, self._tags, self._txrx)
-
-        for partitioned_vertex in self.partitioned_graph.subvertices:
-            if isinstance(partitioned_vertex,
-                          AbstractSendsBuffersFromHostPartitionedVertex):
-
-                # Add the vertex to the managed vertices
-                self._send_buffer_manager.add_sender_vertex(
-                    partitioned_vertex)
-            progress_bar.update()
-        progress_bar.end()
 
     @property
     def app_id(self):
@@ -658,14 +656,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # iterate though subvertexes and call generate_data_spec for each
         # vertex
-        executable_targets = dict()
-        no_processors = config.getint("Threading", "dsg_threads")
-        thread_pool = ThreadPool(processes=no_processors)
+        executable_targets = ExecutableTargets()
 
         # create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
-                                   "on generating data specifications")
-        data_generator_interfaces = list()
+                                   "Generating data specifications")
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
@@ -678,15 +673,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     placement.subvertex)
                 reverse_ip_tags = self._tags.get_reverse_ip_tags_for_vertex(
                     placement.subvertex)
-                data_generator_interface = DataGeneratorInterface(
-                    associated_vertex, placement.subvertex, placement,
-                    self._partitioned_graph, self._partitionable_graph,
-                    self._routing_infos, self._hostname, self._graph_mapper,
+                associated_vertex.generate_data_spec(
+                    placement.subvertex, placement, self._partitioned_graph,
+                    self._partitionable_graph, self._routing_infos,
+                    self._hostname, self._graph_mapper,
                     self._report_default_directory, ip_tags, reverse_ip_tags,
-                    self._writeTextSpecs, self._app_data_runtime_folder,
-                    progress_bar)
-                data_generator_interfaces.append(data_generator_interface)
-                thread_pool.apply_async(data_generator_interface.start)
+                    self._write_text_specs, self._app_data_runtime_folder)
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
@@ -697,22 +689,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if binary_path is None:
                     raise exceptions.ExecutableNotFoundException(binary_name)
 
-                if binary_path in executable_targets:
-                    executable_targets[binary_path].add_processor(placement.x,
-                                                                  placement.y,
-                                                                  placement.p)
-                else:
-                    processors = [placement.p]
-                    initial_core_subset = CoreSubset(placement.x, placement.y,
-                                                     processors)
-                    list_of_core_subsets = [initial_core_subset]
-                    executable_targets[binary_path] = \
-                        CoreSubsets(list_of_core_subsets)
+                if not executable_targets.has_binary(binary_path):
+                    executable_targets.add_binary(binary_path)
+                executable_targets.add_processor(
+                    binary_path, placement.x, placement.y, placement.p)
 
-        for data_generator_interface in data_generator_interfaces:
-            data_generator_interface.wait_for_finish()
-        thread_pool.close()
-        thread_pool.join()
+            progress_bar.update()
 
         # finish the progress bar
         progress_bar.end()
@@ -773,6 +755,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
 
+    def _add_population(self, population):
+        """ Called by each population to add itself to the list
+        """
+        self._populations.append(population)
+
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,
             source, target, synapse_dynamics, label, rng):
@@ -797,97 +784,36 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             connector=connector, source=source, target=target,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step,
-            timescale_factor=self._time_scale_factor)
-
-    def _add_virtual_chips(self):
-        """
-        add any virtual chips for virtual vertices as required
-        :return:
-        """
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractVirtualVertex):
-
-                # check if the virtual chip doesn't already exist
-                if self._machine.get_chip_at(vertex.virtual_chip_x,
-                                             vertex.virtual_chip_y) is None:
-                    virutal_chip = self._create_virtual_chip(vertex)
-                    self._machine.add_chip(virutal_chip)
-
-    def _create_virtual_chip(self, virtual_vertex):
-        sdram_object = SDRAM()
-
-        # creates the two links
-        virtual_link_id = (virtual_vertex
-                           .connected_to_real_chip_link_id + 3) % 6
-        to_virtual_chip_link = Link(
-            destination_x=virtual_vertex.virtual_chip_x,
-            destination_y=virtual_vertex.virtual_chip_y,
-            source_x=virtual_vertex.connected_to_real_chip_x,
-            source_y=virtual_vertex.connected_to_real_chip_y,
-            multicast_default_from=virtual_link_id,
-            multicast_default_to=virtual_link_id,
-            source_link_id=virtual_vertex.connected_to_real_chip_link_id)
-
-        from_virtual_chip_link = Link(
-            destination_x=virtual_vertex.connected_to_real_chip_x,
-            destination_y=virtual_vertex.connected_to_real_chip_y,
-            source_x=virtual_vertex.virtual_chip_x,
-            source_y=virtual_vertex.virtual_chip_y,
-            multicast_default_from=(virtual_vertex
-                                    .connected_to_real_chip_link_id),
-            multicast_default_to=virtual_vertex.connected_to_real_chip_link_id,
-            source_link_id=virtual_link_id)
-
-        # create the router
-        links = [from_virtual_chip_link]
-        router_object = MachineRouter(
-            links=links, emergency_routing_enabled=False,
-            clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
-            n_available_multicast_entries=sys.maxint)
-
-        # create the processors
-        processors = list()
-        for virtual_core_id in range(0, 128):
-            processors.append(Processor(virtual_core_id,
-                                        Processor.CPU_AVAILABLE,
-                                        virtual_core_id == 0))
-
-        # connect the real chip with the virtual one
-        connected_chip = self._machine.get_chip_at(
-            virtual_vertex.connected_to_real_chip_x,
-            virtual_vertex.connected_to_real_chip_y)
-        connected_chip.router.add_link(to_virtual_chip_link)
-
-        # return new v chip
-        return Chip(
-            processors=processors, router=router_object, sdram=sdram_object,
-            x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
-            virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
+            timescale_factor=self._time_scale_factor,
+            user_max_delay=self.max_supported_delay)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
         """
-        :param turn_off_machine: decides if the machine should be powered down
-        after running the exeuction. Note that this powers down all boards
-        connected to the BMP connections given to the transciever
+        :param turn_off_machine: decides if the machine should be powered down\
+            after running the exeuction. Note that this powers down all boards\
+            connected to the BMP connections given to the transciever
         :type turn_off_machine: bool
-        :param clear_routing_tables: informs the tool chain if it
-        should turn off the clearing of the routing tables
+        :param clear_routing_tables: informs the tool chain if it\
+            should turn off the clearing of the routing tables
         :type clear_routing_tables: bool
-        :param clear_tags: informs the tool chain if it should clear the tags
-        off the machine at stop
+        :param clear_tags: informs the tool chain if it should clear the tags\
+            off the machine at stop
         :type clear_tags: boolean
         :return: None
         """
+        for population in self._populations:
+            population._end()
 
         if turn_off_machine is None:
-            config.getboolean("Machine", "turn_off_machine")
+            turn_off_machine = config.getboolean("Machine", "turn_off_machine")
 
         if clear_routing_tables is None:
-            config.getboolean("Machine", "clear_routing_tables")
+            clear_routing_tables = config.getboolean(
+                "Machine", "clear_routing_tables")
 
         if clear_tags is None:
-            config.getboolean("Machine", "clear_tags")
+            clear_tags = config.getboolean("Machine", "clear_tags")
 
         # if stopping on machine, clear iptags and
         if clear_tags:
@@ -912,9 +838,15 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if self._create_database:
             self._database_interface.stop()
 
-        # connections
-        if turn_off_machine:
-            self._txrx.power_off_machine()
-
         # stop the transciever
-        self._txrx.close()
+        if turn_off_machine:
+            logger.info("Turning off machine")
+        self._txrx.close(power_off_machine=turn_off_machine)
+
+    def _add_socket_address(self, socket_address):
+        """
+
+        :param socket_address:
+        :return:
+        """
+        self._database_socket_addresses.add(socket_address)

@@ -158,8 +158,12 @@ class AbstractPopulationDataSpec(
 
     @abstractmethod
     def get_parameters(self):
+        """ Get any per-neuron parameters for a model
         """
-        method to return whatever params a model has
+
+    @abstractmethod
+    def get_global_parameters(self):
+        """ Get any global parameters for a model
         """
 
     def _write_neuron_parameters(
@@ -193,8 +197,11 @@ class AbstractPopulationDataSpec(
         # noinspection PyTypeChecker
         spec.write_value(data=len(params))
 
-        # Write machine time step: (Integer, expressed in microseconds)
-        spec.write_value(data=self._machine_time_step)
+        # Write the global parameters
+        global_params = self.get_global_parameters()
+        for param in global_params:
+            spec.write_value(data=param.get_value(),
+                             data_type=param.get_dataspec_datatype())
 
         # TODO: NEEDS TO BE LOOKED AT PROPERLY
         # Create loop over number of neurons:
@@ -300,7 +307,7 @@ class AbstractPopulationDataSpec(
             master_pop_table_sz, all_syn_block_sz,
             spike_hist_buff_sz, potential_hist_buff_sz, gsyn_hist_buff_sz,
             synapse_dynamics_region_sz)
-    
+
         # Remove extension to get application name
         self._write_setup_info(spec, spike_hist_buff_sz,
                                potential_hist_buff_sz, gsyn_hist_buff_sz)

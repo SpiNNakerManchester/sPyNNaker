@@ -8,16 +8,17 @@
 
 #include "../../common/neuron-typedefs.h"
 
-/*! forward declaration of neuron type (creates a definition for a pointer to a
-   Neuron parameter struct*/
+//! Forward declaration of neuron type (creates a definition for a pointer to a
+//   Neuron parameter struct
 typedef struct neuron_t* neuron_pointer_t;
 
-//! \brief setup function which needs to be called in main program before any
-//! neuron code executes currently minimum 100, then in 100 steps...  if not
-//! called then defaults to 1ms time step
-//! \param[in] microsecs the amount of time between timer ticks in microseconds
-//! \return This method does not return anything
-void neuron_model_set_machine_timestep(timer_t microsecs);
+//! Forward declaration of global neuron parameters
+typedef struct global_neuron_params_t* global_neuron_params_pointer_t;
+
+//! \brief set the global neuron parameters
+//! \param[in] params The parameters to set
+void neuron_model_set_global_neuron_params(
+    global_neuron_params_pointer_t params);
 
 //! \brief Function that converts an input into the real value to be used by the
 //! neuron; Allows e.g. scaling of the neuron inputs for better precision

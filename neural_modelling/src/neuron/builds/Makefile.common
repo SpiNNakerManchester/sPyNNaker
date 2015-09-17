@@ -21,8 +21,8 @@ endif
 #POPULATION_TABLE_IMPL ?= fixed
 POPULATION_TABLE_IMPL ?= binary_search
 
-OBJECTS = $(SOURCE_DIRS)/common/in_spikes.o $(SOURCE_DIRS)/common/out_spikes.o \
-          $(SOURCE_DIRS)/common/recording.o $(SOURCE_DIRS)/neuron/c_main.o \
+OBJECTS = $(SOURCE_DIRS)/common/out_spikes.o \
+          $(SOURCE_DIRS)/neuron/c_main.o \
           $(SOURCE_DIRS)/neuron/synapses.o  $(SOURCE_DIRS)/neuron/neuron.o \
 	      $(SOURCE_DIRS)/neuron/spike_processing.o \
 	      $(SOURCE_DIRS)/neuron/population_table_$(POPULATION_TABLE_IMPL)_impl.o $(MODEL_OBJS)

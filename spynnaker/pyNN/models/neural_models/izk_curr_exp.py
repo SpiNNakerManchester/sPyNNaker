@@ -1,6 +1,5 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_vertex import \
     AbstractPopulationVertex
-from spynnaker.pyNN.utilities import constants
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.abstract_models.abstract_model_components.\
     abstract_exp_population_vertex import AbstractExponentialPopulationVertex
@@ -14,13 +13,23 @@ class IzhikevichCurrentExponentialPopulation(
         AbstractIzhikevichVertex, AbstractExponentialPopulationVertex,
         AbstractPopulationVertex):
 
-    _model_based_max_atoms_per_core = 256
+    _model_based_max_atoms_per_core = 255
+
+    default_parameters = {
+        'a': 0.02, 'c': -65.0, 'b': 0.2, 'd': 2.0, 'i_offset': 0,
+        'u_init': -14.0, 'v_init': -70.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0}
 
     # noinspection PyPep8Naming
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma, constraints=None,
-                 label=None, a=0.02, c=-65.0, b=0.2, d=2.0, i_offset=0,
-                 u_init=-14.0, v_init=-70.0, tau_syn_E=5.0, tau_syn_I=5.0):
+                 label=None, a=default_parameters['a'],
+                 c=default_parameters['c'], b=default_parameters['b'],
+                 d=default_parameters['d'],
+                 i_offset=default_parameters['i_offset'],
+                 u_init=default_parameters['u_init'],
+                 v_init=default_parameters['v_init'],
+                 tau_syn_E=default_parameters['tau_syn_E'],
+                 tau_syn_I=default_parameters['tau_syn_I']):
 
         # Instantiate the parent classes
         AbstractExponentialPopulationVertex.__init__(
@@ -30,7 +39,8 @@ class IzhikevichCurrentExponentialPopulation(
                                           i_offset=i_offset, u_init=u_init,
                                           v_init=v_init)
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, n_params=10, label=label,
+            self, n_neurons=n_neurons, n_params=8, n_global_params=1,
+            label=label,
             binary="IZK_curr_exp.aplx", constraints=constraints,
             max_atoms_per_core=IzhikevichCurrentExponentialPopulation.
             _model_based_max_atoms_per_core,
@@ -85,9 +95,13 @@ class IzhikevichCurrentExponentialPopulation(
             NeuronParameter(self._d, DataType.S1615),
             NeuronParameter(self._v_init, DataType.S1615),
             NeuronParameter(self._u_init, DataType.S1615),
-            NeuronParameter(self.ioffset(self._machine_time_step),
-                            DataType.S1615),
-            NeuronParameter(0, DataType.S1615)
+            NeuronParameter(self.ioffset, DataType.S1615),
+            NeuronParameter(self._machine_time_step / 1000.0, DataType.S1615)
+        ]
+
+    def get_global_parameters(self):
+        return [
+            NeuronParameter(self._machine_time_step / 1000.0, DataType.S1615)
         ]
 
     def is_population_vertex(self):

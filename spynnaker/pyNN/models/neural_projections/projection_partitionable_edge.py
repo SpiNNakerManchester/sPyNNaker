@@ -1,3 +1,6 @@
+"""
+ProjectionPartitionableEdge
+"""
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 from pacman.utilities.progress_bar import ProgressBar
@@ -7,17 +10,18 @@ from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
-from spynnaker.pyNN.models.neural_properties.synapse_row_info \
-    import SynapseRowInfo
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 
 from spinn_front_end_common.utilities.timer import Timer
 
 import logging
+import copy
 logger = logging.getLogger(__name__)
 
 
 class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
+    """
+    the partitionable edge for a projection (high level edge)
+    """
 
     def __init__(self, presynaptic_population, postsynaptic_population,
                  machine_time_step, connector=None, synapse_list=None,
@@ -89,19 +93,19 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
                 timer = Timer()
                 timer.start_timing()
 
-            logger.debug("Reading synapse data for edge between {} and {}"
-                         .format(self._pre_vertex.label,
-                                 self._post_vertex.label))
             subedges = \
                 graph_mapper.get_partitioned_edges_from_partitionable_edge(
                     self)
             if subedges is None:
                 subedges = list()
 
-            synaptic_list = [SynapseRowInfo([], [], [], [])
-                             for _ in range(self._pre_vertex.n_atoms)]
+            synaptic_list = copy.copy(self._synapse_list)
+            synaptic_list_rows = synaptic_list.get_rows()
             progress_bar = ProgressBar(
-                len(subedges), "progress on reading back synaptic matrix")
+                len(subedges),
+                "Reading back synaptic matrix for edge between"
+                " {} and {}".format(self._pre_vertex.label,
+                                    self._post_vertex.label))
             for subedge in subedges:
                 n_rows = subedge.get_n_rows(graph_mapper)
                 pre_vertex_slice = \
@@ -119,14 +123,15 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
                     routing_infos, subedge.weight_scales).get_rows()
 
                 for i in range(len(rows)):
-                    synaptic_list[i + pre_vertex_slice.lo_atom].append(
-                        rows[i], lo_atom=post_vertex_slice.lo_atom)
+                    synaptic_list_rows[
+                        i + pre_vertex_slice.lo_atom].set_slice_values(
+                            rows[i], vertex_slice=post_vertex_slice)
                 progress_bar.update()
             progress_bar.end()
-            self._stored_synaptic_data_from_machine = SynapticList(
-                synaptic_list)
+            self._stored_synaptic_data_from_machine = synaptic_list
             if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer.take_sample()
+                logger.info("Time to read matrix: {}".format(
+                    timer.take_sample()))
 
         return self._stored_synaptic_data_from_machine
 

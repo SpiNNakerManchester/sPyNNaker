@@ -9,12 +9,15 @@
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
 #include "../common/out_spikes.h"
-#include "../common/recording.h"
+#include "recording.h"
 #include <debug.h>
 #include <string.h>
 
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
+
+//! Global parameters for the neurons
+static global_neuron_params_pointer_t global_parameters;
 
 //! The key to be used for this core (will be ORed with neuron id)
 static key_t key;
@@ -36,8 +39,7 @@ static input_t *input_buffers;
 //! readable form
 typedef enum parmeters_in_neuron_parameter_data_region {
     has_key, transmission_key, number_of_neurons_to_simulate,
-    num_neuron_parameters, the_machine_time_step_in_microseconds,
-    start_of_memory_which_contains_all_neural_parameters,
+    num_neuron_parameters, start_of_global_parameters,
 } parmeters_in_neuron_parameter_data_region;
 
 
@@ -86,10 +88,21 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     n_neurons = address[number_of_neurons_to_simulate];
     *n_neurons_value = n_neurons;
     uint32_t n_params = address[num_neuron_parameters];
-    timer_t timestep = address[the_machine_time_step_in_microseconds];
 
-    log_info("\tneurons = %u, params = %u, time step = %u", n_neurons,
-             n_params, timestep);
+    // Read the global parameter details
+    if (sizeof(global_neuron_params_t) > 0) {
+        global_parameters = (global_neuron_params_t *) spin1_malloc(
+            sizeof(global_neuron_params_t));
+        if (global_parameters == NULL) {
+            log_error("Unable to allocate global neuron parameters"
+                      "- Out of DTCM");
+            return false;
+        }
+        memcpy(global_parameters, &address[start_of_global_parameters],
+               sizeof(global_neuron_params_t));
+    }
+
+    log_info("\tneurons = %u, params = %u", n_neurons, n_params);
 
     // Allocate DTCM for new format neuron array and copy block of data
     neuron_array = (neuron_t*) spin1_malloc(n_neurons * sizeof(neuron_t));
@@ -98,7 +111,8 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         return false;
     }
     memcpy(neuron_array,
-            &address[start_of_memory_which_contains_all_neural_parameters],
+            &address[start_of_global_parameters +
+                     (sizeof(global_neuron_params_t) / 4)],
             n_neurons * sizeof(neuron_t));
 
     // Set up the out spikes array
@@ -107,7 +121,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     }
 
     // Set up the neuron model
-    neuron_model_set_machine_timestep(timestep);
+    neuron_model_set_global_neuron_params(global_parameters);
 
     recording_flags = recording_flags_param;
 
@@ -142,10 +156,6 @@ void neuron_do_timestep_update(timer_t time) {
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
             synapse_dynamics_get_intrinsic_bias(time, neuron_index);
-        
-        // update neuron parameters (will inform us if the neuron should spike)
-        bool spike = neuron_model_state_update(
-            exc_neuron_input, inh_neuron_input, external_bias, neuron);
 
         // If we should be recording potential, record this neuron parameter
         if (recording_is_channel_enabled(recording_flags,
@@ -158,10 +168,15 @@ void neuron_do_timestep_update(timer_t time) {
         // If we should be recording gsyn, get the neuron input
         if (recording_is_channel_enabled(recording_flags,
                 e_recording_channel_neuron_gsyn)) {
-            input_t temp_record_input = exc_neuron_input - inh_neuron_input;
             recording_record(e_recording_channel_neuron_gsyn,
-                             &temp_record_input, sizeof(input_t));
+                             &exc_neuron_input, sizeof(input_t));
+            recording_record(e_recording_channel_neuron_gsyn,
+                             &inh_neuron_input, sizeof(input_t));
         }
+
+        // update neuron parameters (will inform us if the neuron should spike)
+        bool spike = neuron_model_state_update(
+            exc_neuron_input, inh_neuron_input, external_bias, neuron);
 
         // If the neuron has spiked
         if (spike) {

@@ -68,9 +68,37 @@ class SpikeSourcePoisson(
         self._duration = duration
         self._seed = seed
 
-        if duration is None:
-            self._duration = ((4294967295.0 - self._start) /
-                              (1000.0 * machine_time_step))
+    @property
+    def rate(self):
+        return self._rate
+
+    @rate.setter
+    def rate(self, rate):
+        self._rate = rate
+
+    @property
+    def start(self):
+        return self._start
+
+    @start.setter
+    def start(self, start):
+        self._start = start
+
+    @property
+    def duration(self):
+        return self._duration
+
+    @duration.setter
+    def duration(self, duration):
+        self._duration = duration
+
+    @property
+    def seed(self):
+        return self._seed
+
+    @seed.setter
+    def seed(self, seed):
+        self._seed = seed
 
     @property
     def model_name(self):
@@ -222,7 +250,9 @@ class SpikeSourcePoisson(
             # Get the parameter values for source i:
             rate_val = generate_parameter(self._rate, i)
             start_val = generate_parameter(self._start, i)
-            end_val = generate_parameter(self._duration, i) + start_val
+            end_val = None
+            if self._duration is not None:
+                end_val = generate_parameter(self._duration, i) + start_val
 
             # Decide if it is a fast or slow source and
             spikes_per_tick = \
@@ -248,9 +278,15 @@ class SpikeSourcePoisson(
         #     accum time_to_spike_ticks;
         #   } slow_spike_source_t;
         for (neuron_id, rate_val, start_val, end_val) in slow_sources:
-            isi_val = float(1000000.0 / (rate_val * self._machine_time_step))
+            if rate_val == 0:
+                isi_val = 0
+            else:
+                isi_val = float(1000000.0 /
+                                (rate_val * self._machine_time_step))
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
-            end_scaled = int(end_val * 1000.0 / self._machine_time_step)
+            end_scaled = 0xFFFFFFFF
+            if end_val is not None:
+                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
@@ -267,9 +303,14 @@ class SpikeSourcePoisson(
         #     unsigned long fract exp_minus_lambda;
         #   } fast_spike_source_t;
         for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
-            exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
+            if spikes_per_tick == 0:
+                exp_minus_lamda = 0
+            else:
+                exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
-            end_scaled = int(end_val * 1000.0 / self._machine_time_step)
+            end_scaled = 0xFFFFFFFF
+            if end_val is not None:
+                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
@@ -289,7 +330,7 @@ class SpikeSourcePoisson(
 
         # Use standard behaviour to read spikes
         return self._get_spikes(
-            transciever=txrx, placements=placements,
+            transceiver=txrx, placements=placements,
             graph_mapper=graph_mapper, compatible_output=compatible_output,
             spike_recording_region=self._POISSON_SPIKE_SOURCE_REGIONS
                                        .SPIKE_HISTORY_REGION.value,
@@ -376,9 +417,12 @@ class SpikeSourcePoisson(
         self.write_setup_info(spec, spike_hist_buff_sz)
 
         # Every subedge should have the same key
-        keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
-            subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
-        key = keys_and_masks[0].key
+        key = None
+        subedges = subgraph.outgoing_subedges_from_subvertex(subvertex)
+        if len(subedges) > 0:
+            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                subedges[0])
+            key = keys_and_masks[0].key
 
         self.write_poisson_parameters(spec, key, vertex_slice.n_atoms)
 
