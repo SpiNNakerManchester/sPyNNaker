@@ -28,11 +28,6 @@ from pacman.utilities.progress_bar import ProgressBar
 # spinnmachine imports
 from spinn_front_end_common.utilities.executable_targets import \
     ExecutableTargets
-from spinn_machine.sdram import SDRAM
-from spinn_machine.router import Router as MachineRouter
-from spinn_machine.link import Link
-from spinn_machine.processor import Processor
-from spinn_machine.chip import Chip
 from spinn_machine.virutal_machine import VirtualMachine
 
 # common front end imports
@@ -72,22 +67,19 @@ from spynnaker.pyNN.spynnaker_configurations import \
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
-from pacman.model.abstract_classes.abstract_virtual_vertex import \
-    AbstractVirtualVertex
 from spynnaker.pyNN.models.abstract_models\
     .abstract_send_me_multicast_commands_vertex \
     import AbstractSendMeMulticastCommandsVertex
 from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
-from spynnaker.pyNN.utilities.database.spynnaker_data_base_interface import \
-    SpynnakerDataBaseInterface
+from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
+    SpynnakerDataBaseWriter
 
 # general imports
 import logging
 import math
 import os
-import sys
 
 
 logger = logging.getLogger(__name__)
@@ -298,7 +290,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
             wait_on_confirmation = config.getboolean(
                 "Database", "wait_on_confirmation")
-            self._database_interface = SpynnakerDataBaseInterface(
+            self._database_interface = SpynnakerDataBaseWriter(
                 self._app_data_runtime_folder, wait_on_confirmation,
                 self._database_socket_addresses)
 
@@ -329,7 +321,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             execute_mapping = config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
             if execute_mapping:
-                self._database_interface.create_neuron_to_key_mapping(
+                self._database_interface.create_atom_to_event_id_mapping(
                     graph_mapper=self._graph_mapper,
                     partitionable_graph=self._partitionable_graph,
                     partitioned_graph=self._partitioned_graph,
@@ -828,7 +820,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self._partitionable_graph, self._routing_infos,
                     self._hostname, self._graph_mapper,
                     self._report_default_directory, ip_tags, reverse_ip_tags,
-                    self._writeTextSpecs, self._app_data_runtime_folder)
+                    self._write_text_specs, self._app_data_runtime_folder)
 
                 # Get name of binary from vertex
                 binary_name = associated_vertex.get_binary_file_name()
@@ -940,74 +932,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         chip_id_allocator = MallocBasedChipIdAllocator()
         chip_id_allocator.allocate_chip_ids(self._partitionable_graph,
                                             self._machine)
-
-        # add virtual chips to the machine object
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractVirtualVertex):
-
-                # check if the virtual chip doesn't already exist
-                if self._machine.get_chip_at(vertex.virtual_chip_x,
-                                             vertex.virtual_chip_y) is None:
-                    virutal_chip = self._create_virtual_chip(vertex)
-                    self._machine.add_chip(virutal_chip)
-
-    def _create_virtual_chip(self, virtual_vertex):
-        """ Create a virtual chip as a real chip in the spinnmachine machine\
-            object
-        :param virtual_vertex: virutal vertex to convert into a real chip
-        :return: the real chip
-        """
-        sdram_object = SDRAM()
-
-        # creates the two links
-        spinnaker_link_id = virtual_vertex.get_spinnaker_link_id
-        spinnaker_link_data = \
-            self._machine.locate_connected_chips_coords_and_link(
-                config.getint("Machine", "version"), spinnaker_link_id)
-        virtual_link_id = (spinnaker_link_data.connected_link + 3) % 6
-        to_virtual_chip_link = Link(
-            destination_x=virtual_vertex.virtual_chip_x,
-            destination_y=virtual_vertex.virtual_chip_y,
-            source_x=spinnaker_link_data.connected_chip_x,
-            source_y=spinnaker_link_data.connected_chip_y,
-            multicast_default_from=virtual_link_id,
-            multicast_default_to=virtual_link_id,
-            source_link_id=spinnaker_link_data.connected_link)
-
-        from_virtual_chip_link = Link(
-            destination_x=spinnaker_link_data.connected_chip_x,
-            destination_y=spinnaker_link_data.connected_chip_y,
-            source_x=virtual_vertex.virtual_chip_x,
-            source_y=virtual_vertex.virtual_chip_y,
-            multicast_default_from=(spinnaker_link_data.connected_link),
-            multicast_default_to=spinnaker_link_data.connected_link,
-            source_link_id=virtual_link_id)
-
-        # create the router
-        links = [from_virtual_chip_link]
-        router_object = MachineRouter(
-            links=links, emergency_routing_enabled=False,
-            clock_speed=MachineRouter.ROUTER_DEFAULT_CLOCK_SPEED,
-            n_available_multicast_entries=sys.maxint)
-
-        # create the processors
-        processors = list()
-        for virtual_core_id in range(0, 128):
-            processors.append(Processor(virtual_core_id,
-                                        Processor.CPU_AVAILABLE,
-                                        virtual_core_id == 0))
-
-        # connect the real chip with the virtual one
-        connected_chip = self._machine.get_chip_at(
-            spinnaker_link_data.connected_chip_x,
-            spinnaker_link_data.connected_chip_y)
-        connected_chip.router.add_link(to_virtual_chip_link)
-
-        # return new v chip
-        return Chip(
-            processors=processors, router=router_object, sdram=sdram_object,
-            x=virtual_vertex.virtual_chip_x, y=virtual_vertex.virtual_chip_y,
-            virtual=True, nearest_ethernet_x=None, nearest_ethernet_y=None)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):

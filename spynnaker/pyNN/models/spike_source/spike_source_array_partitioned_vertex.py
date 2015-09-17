@@ -50,3 +50,12 @@ class SpikeSourceArrayPartitionedVertex(
         key = SendsBuffersFromHostPartitionedVertexPreBufferedImpl\
             .get_next_key(self, region_id)
         return key | self._base_key
+
+    @property
+    def base_key(self):
+        """
+        returns the base key given to the keys in the sned buffer when they
+        were transmitted
+        :return:
+        """
+        return self._base_key

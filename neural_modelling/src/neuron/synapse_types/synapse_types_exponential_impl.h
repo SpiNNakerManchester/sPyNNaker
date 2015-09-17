@@ -124,10 +124,12 @@ static inline void synapse_types_add_neuron_input(
         input_t *input_buffers, index_t synapse_type_index,
         index_t neuron_index, synapse_param_t* parameters, input_t input) {
     if (synapse_type_index == EXCITATORY) {
-        input_buffers[_ex_offset(neuron_index)] += decay_s1615(
+        uint32_t index = _ex_offset(neuron_index);
+        input_buffers[index] = input_buffers[index] + decay_s1615(
             input, parameters[neuron_index].exc_init);
     } else if (synapse_type_index == INHIBITORY) {
-        input_buffers[_in_offset(neuron_index)] += decay_s1615(
+        uint32_t index = _in_offset(neuron_index);
+        input_buffers[index] = input_buffers[index] + decay_s1615(
             input, parameters[neuron_index].inh_init);
     }
 }

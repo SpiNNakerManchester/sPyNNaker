@@ -11,7 +11,7 @@
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
 #include "../common/out_spikes.h"
-#include "../common/recording.h"
+#include "recording.h"
 #include <debug.h>
 #include <string.h>
 

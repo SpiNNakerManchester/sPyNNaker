@@ -6,10 +6,10 @@
  */
 
 #include "../../common/out_spikes.h"
-#include "../../common/recording.h"
 #include "../../common/maths-util.h"
 
 #include <data_specification.h>
+#include <recording.h>
 #include <debug.h>
 #include <random.h>
 #include <simulation.h>
@@ -98,8 +98,13 @@ static inline REAL slow_spike_source_get_time_to_spike(
 //! this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
-    return poisson_dist_variate_exp_minus_lambda(
-        mars_kiss64_seed, spike_source_seed, exp_minus_lambda);
+    if (exp_minus_lambda == 0) {
+        return 0;
+    }
+    else {
+        return poisson_dist_variate_exp_minus_lambda(
+            mars_kiss64_seed, spike_source_seed, exp_minus_lambda);
+    }
 }
 
 //! \entry method for reading the parameters stored in poisson parameter region
@@ -263,7 +268,8 @@ void timer_callback(uint timer_count, uint unused) {
         // If this spike source is active this tick
         slow_spike_source_t *slow_spike_source = &slow_spike_source_array[s];
         if ((time >= slow_spike_source->start_ticks)
-                && (time < slow_spike_source->end_ticks)) {
+                && (time < slow_spike_source->end_ticks)
+                && (slow_spike_source->mean_isi_ticks != 0)) {
 
             // If this spike source should spike now
             if (slow_spike_source->time_to_spike_ticks <= REAL_CONST(0.0)) {
