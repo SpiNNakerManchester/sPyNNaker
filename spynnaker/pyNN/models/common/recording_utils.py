@@ -1,6 +1,10 @@
 from data_specification import utility_calls
 from spynnaker.pyNN import exceptions
+
 import struct
+import logging
+
+logger = logging.getLogger(__name__)
 
 _RECORDING_COUNT_SIZE = 4
 
@@ -16,8 +20,7 @@ def get_recording_region_size_in_bytes(
             (n_machine_time_steps * bytes_per_timestep))
 
 
-def get_data(transceiver, placement, region,
-             n_machine_time_steps, bytes_per_timestep):
+def get_data(transceiver, placement, region, region_size):
     """ Get the recorded data from a region
     """
 
@@ -37,12 +40,14 @@ def get_data(transceiver, placement, region,
         "<I", number_of_bytes_written_buf)[0]
 
     # Subtract 4 for the word representing the size itself
-    expected_size = get_recording_region_size_in_bytes(
-        n_machine_time_steps, bytes_per_timestep) - _RECORDING_COUNT_SIZE
-    if number_of_bytes_written != expected_size:
+    expected_size = region_size - _RECORDING_COUNT_SIZE
+    if number_of_bytes_written > expected_size:
         raise exceptions.MemReadException(
             "Expected {} bytes but read {}".format(
                 expected_size, number_of_bytes_written))
+    elif number_of_bytes_written < expected_size:
+        logger.warn("Only {} of {} bytes have been written in recording"
+                    " region".format(number_of_bytes_written, expected_size))
 
     return transceiver.read_memory(
         x, y, region_base_address + 4, number_of_bytes_written)

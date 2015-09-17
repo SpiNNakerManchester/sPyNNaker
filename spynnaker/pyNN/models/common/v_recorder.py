@@ -66,9 +66,10 @@ class VRecorder(object):
             "Getting membrane voltage for {}".format(label))
         for (placement, vertex_slice) in self._subvertex_information:
 
+            region_size = recording_utils.get_recording_region_size_in_bytes(
+                n_machine_time_steps, 4 * vertex_slice.n_atoms)
             neuron_param_region_data = recording_utils.get_data(
-                transceiver, placement, region, n_machine_time_steps,
-                4 * vertex_slice.n_atoms)
+                transceiver, placement, region, region_size)
 
             numpy_data = (numpy.asarray(
                 neuron_param_region_data, dtype="uint8").view(dtype="<i4") /

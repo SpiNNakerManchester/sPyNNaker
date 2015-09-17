@@ -60,9 +60,10 @@ class SpikeRecorder(object):
 
             # Read the spikes
             n_bytes = int(math.ceil(subvertex_slice.n_atoms / 32.0)) * 4
+            region_size = recording_utils.get_recording_region_size_in_bytes(
+                n_machine_time_steps, n_bytes)
             spike_data = recording_utils.get_data(
-                transceiver, placement, region, n_machine_time_steps,
-                n_bytes)
+                transceiver, placement, region, region_size)
             numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
                 dtype="uint32").byteswap().view("uint8")
             bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
