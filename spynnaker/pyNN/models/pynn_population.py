@@ -230,11 +230,10 @@ class Population(object):
         """
         spikes = self.getSpikes(True, gather)
         n_spikes = {}
+        counts = numpy.bincount(spikes[:, 0].astype(dtype="uint32"))
         for i in range(self._vertex.n_atoms):
-            n_spikes[i] = 0
-        for (neuron_id, _) in spikes:
-            n_spikes[neuron_id] += 1
-        return spikes
+            n_spikes[i] = counts[i]
+        return n_spikes
 
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
