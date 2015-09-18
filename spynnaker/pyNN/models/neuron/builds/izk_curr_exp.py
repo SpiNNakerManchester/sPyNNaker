@@ -34,11 +34,11 @@ class IzkCurrExp(AbstractPopulationVertex):
             tau_syn_I=default_parameters['tau_syn_I']):
 
         neuron_model = NeuronModelIzh(
-            machine_time_step, a, b, c, d, v_init, u_init, i_offset)
+            n_neurons, machine_time_step, a, b, c, d, v_init, u_init, i_offset)
         synapse_type = SynapseTypeExponential(
-            machine_time_step, tau_syn_E, tau_syn_I)
+            n_neurons, machine_time_step, tau_syn_E, tau_syn_I)
         input_type = InputTypeCurrent()
-        threshold_type = ThresholdTypeStatic(_IZK_THRESHOLD)
+        threshold_type = ThresholdTypeStatic(n_neurons, _IZK_THRESHOLD)
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IZK_curr_exp.aplx", label=label,

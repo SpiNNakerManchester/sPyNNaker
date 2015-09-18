@@ -37,11 +37,11 @@ class IzkCondExp(AbstractPopulationVertex):
             e_rev_I=default_parameters['e_rev_I']):
 
         neuron_model = NeuronModelIzh(
-            machine_time_step, a, b, c, d, v_init, u_init, i_offset)
+            n_neurons, machine_time_step, a, b, c, d, v_init, u_init, i_offset)
         synapse_type = SynapseTypeExponential(
-            machine_time_step, tau_syn_E, tau_syn_I)
-        input_type = InputTypeConductance(e_rev_E, e_rev_I)
-        threshold_type = ThresholdTypeStatic(_IZK_THRESHOLD)
+            n_neurons, machine_time_step, tau_syn_E, tau_syn_I)
+        input_type = InputTypeConductance(n_neurons, e_rev_E, e_rev_I)
+        threshold_type = ThresholdTypeStatic(n_neurons, _IZK_THRESHOLD)
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IZK_cond_exp.aplx", label=label,

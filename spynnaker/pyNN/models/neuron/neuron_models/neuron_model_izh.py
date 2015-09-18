@@ -2,23 +2,26 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
     import AbstractNeuronModel
+from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums.data_type import DataType
 
 
 class NeuronModelIzh(AbstractNeuronModel):
 
-    def __init__(self, machine_time_step, a, b, c, d, v_init, u_init,
-                 i_offset):
+    def __init__(self, n_neurons, machine_time_step, a, b, c, d, v_init,
+                 u_init, i_offset):
         AbstractNeuronModel.__init__(self)
+        self._n_neurons = n_neurons
         self._machine_time_step = machine_time_step
-        self._a = a
-        self._b = b
-        self._c = c
-        self._d = d
-        self._v_init = v_init
-        self._u_init = u_init
-        self._i_offset = i_offset
+        self._a = utility_calls.convert_param_to_numpy(a, n_neurons)
+        self._b = utility_calls.convert_param_to_numpy(b, n_neurons)
+        self._c = utility_calls.convert_param_to_numpy(c, n_neurons)
+        self._d = utility_calls.convert_param_to_numpy(d, n_neurons)
+        self._v_init = utility_calls.convert_param_to_numpy(v_init, n_neurons)
+        self._u_init = utility_calls.convert_param_to_numpy(u_init, n_neurons)
+        self._i_offset = utility_calls.convert_param_to_numpy(
+            i_offset, n_neurons)
 
     @property
     def a(self):
@@ -26,7 +29,7 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @a.setter
     def a(self, a):
-        self._a = a
+        self._a = utility_calls.convert_param_to_numpy(a, self._n_neurons)
 
     @property
     def b(self):
@@ -34,7 +37,7 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @b.setter
     def b(self, b):
-        self._b = b
+        self._b = utility_calls.convert_param_to_numpy(b, self._n_neurons)
 
     @property
     def c(self):
@@ -42,7 +45,7 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @c.setter
     def c(self, c):
-        self._c = c
+        self._c = utility_calls.convert_param_to_numpy(c, self._n_neurons)
 
     @property
     def d(self):
@@ -50,7 +53,7 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @d.setter
     def d(self, d):
-        self._d = d
+        self._d = utility_calls.convert_param_to_numpy(d, self._n_neurons)
 
     @property
     def v_init(self):
@@ -58,7 +61,8 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @v_init.setter
     def v_init(self, v_init):
-        self._v_init = v_init
+        self._v_init = utility_calls.convert_param_to_numpy(
+            v_init, self._n_neurons)
 
     @property
     def u_init(self):
@@ -66,13 +70,16 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @u_init.setter
     def u_init(self, u_init):
-        self._u_init = u_init
+        self._u_init = utility_calls.convert_param_to_numpy(
+            u_init, self._n_neurons)
 
     def initialize_v(self, v_init):
-        self._v_init = v_init
+        self._v_init = utility_calls.convert_param_to_numpy(
+            v_init, self._n_neurons)
 
     def initialize_u(self, u_init):
-        self._u_init = u_init
+        self._u_init = utility_calls.convert_param_to_numpy(
+            u_init, self._n_neurons)
 
     def get_n_neural_parameters(self):
         return 8

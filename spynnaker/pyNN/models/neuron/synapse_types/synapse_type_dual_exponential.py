@@ -5,17 +5,51 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
 from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type \
     import AbstractSynapseType
 
+from spynnaker.pyNN.utilities import utility_calls
+
 from data_specification.enums.data_type import DataType
 
 
 class SynapseTypeDualExponential(AbstractSynapseType):
 
-    def __init__(self, machine_time_step, tau_syn_E, tau_syn_E2, tau_syn_I):
+    def __init__(self, n_neurons, machine_time_step, tau_syn_E, tau_syn_E2,
+                 tau_syn_I):
         AbstractSynapseType.__init__(self)
-        self._tau_syn_E = tau_syn_E
-        self._tau_syn_E2 = tau_syn_E2
-        self._tau_syn_I = tau_syn_I
+        self._n_neurons = n_neurons
         self._machine_time_step = machine_time_step
+        self._tau_syn_E = utility_calls.convert_param_to_numpy(
+            tau_syn_E, n_neurons)
+        self._tau_syn_E2 = utility_calls.convert_param_to_numpy(
+            tau_syn_E2, n_neurons)
+        self._tau_syn_I = utility_calls.convert_param_to_numpy(
+            tau_syn_I, n_neurons)
+
+    @property
+    def tau_syn_E(self):
+        return self._tau_syn_E
+
+    @tau_syn_E.setter
+    def tau_syn_E(self, tau_syn_E):
+        self._tau_syn_E = utility_calls.convert_param_to_numpy(
+            tau_syn_E, self._n_neurons)
+
+    @property
+    def tau_syn_E2(self):
+        return self._tau_syn_E2
+
+    @tau_syn_E2.setter
+    def tau_syn_E2(self, tau_syn_E2):
+        self._tau_syn_E2 = utility_calls.convert_param_to_numpy(
+            tau_syn_E2, self._n_neurons)
+
+    @property
+    def tau_syn_I(self):
+        return self._tau_syn_I
+
+    @tau_syn_I.setter
+    def tau_syn_I(self, tau_syn_I):
+        self._tau_syn_E = utility_calls.convert_param_to_numpy(
+            tau_syn_I, self._n_neurons)
 
     def get_n_synapse_types(self):
         return 2

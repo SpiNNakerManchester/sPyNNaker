@@ -40,12 +40,12 @@ class IFCondExp(AbstractPopulationVertex):
             e_rev_I=default_parameters['e_rev_I'], v_init=None):
 
         neuron_model = NeuronModelLeakyIntegrateAndFire(
-            machine_time_step, v_init, v_rest, tau_m, cm, i_offset, v_reset,
-            tau_refrac)
+            n_neurons, machine_time_step, v_init, v_rest, tau_m, cm, i_offset,
+            v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
-            machine_time_step, tau_syn_E, tau_syn_I)
-        input_type = InputTypeConductance(e_rev_E, e_rev_I)
-        threshold_type = ThresholdTypeStatic(v_thresh)
+            n_neurons, machine_time_step, tau_syn_E, tau_syn_I)
+        input_type = InputTypeConductance(n_neurons, e_rev_E, e_rev_I)
+        threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IF_cond_exp.aplx", label=label,

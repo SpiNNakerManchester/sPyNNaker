@@ -37,12 +37,12 @@ class IFCurrExp(AbstractPopulationVertex):
             i_offset=default_parameters['i_offset'], v_init=None):
 
         neuron_model = NeuronModelLeakyIntegrateAndFire(
-            machine_time_step, v_init, v_rest, tau_m, cm, i_offset, v_reset,
-            tau_refrac)
+            n_neurons, machine_time_step, v_init, v_rest, tau_m, cm, i_offset,
+            v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
-            machine_time_step, tau_syn_E, tau_syn_I)
+            n_neurons, machine_time_step, tau_syn_E, tau_syn_I)
         input_type = InputTypeCurrent()
-        threshold_type = ThresholdTypeStatic(v_thresh)
+        threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IF_curr_exp.aplx", label=label,

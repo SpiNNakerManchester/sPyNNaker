@@ -2,6 +2,7 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
     import AbstractNeuronModel
+from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums.data_type import DataType
 
@@ -10,60 +11,68 @@ import numpy
 
 class NeuronModelLeakyIntegrate(AbstractNeuronModel):
 
-    def __init__(self, machine_time_step, v_init, v_rest, tau_m, cm, i_offset):
+    def __init__(self, n_neurons, machine_time_step, v_init, v_rest, tau_m, cm,
+                 i_offset):
         AbstractNeuronModel.__init__(self)
+        self._n_neurons = n_neurons
         self._machine_time_step = machine_time_step
-        self._v_init = v_init
-        self._v_rest = v_rest
-        self._tau_m = tau_m
-        self._cm = cm
-        self._i_offset = i_offset
+        self._v_init = utility_calls.convert_param_to_numpy(v_init, n_neurons)
+        self._v_rest = utility_calls.convert_param_to_numpy(v_rest, n_neurons)
+        self._tau_m = utility_calls.convert_param_to_numpy(tau_m, n_neurons)
+        self._cm = utility_calls.convert_param_to_numpy(cm, n_neurons)
+        self._i_offset = utility_calls.convert_param_to_numpy(
+            i_offset, n_neurons)
 
         if v_init is None:
             self._v_init = v_rest
 
     def initialize_v(self, v_init):
-        self._v_init = v_init
+        self._v_init = utility_calls.convert_param_to_numpy(
+            v_init, self._n_neurons)
 
     @property
     def v_init(self):
         return self._v_init
 
     @v_init.setter
-    def v_init(self, new_value):
-        self._v_init = new_value
+    def v_init(self, v_init):
+        self._v_init = utility_calls.convert_param_to_numpy(
+            v_init, self._n_neurons)
 
     @property
     def v_rest(self):
-        return self._v_reset
+        return self._v_rest
 
     @v_rest.setter
-    def v_rest(self, new_value):
-        self._v_rest = new_value
+    def v_rest(self, v_rest):
+        self._v_rest = utility_calls.convert_param_to_numpy(
+            v_rest, self._n_neurons)
 
     @property
     def tau_m(self):
         return self._tau_m
 
     @tau_m.setter
-    def tau_m(self, new_value):
-        self._tau_m = new_value
+    def tau_m(self, tau_m):
+        self._tau_m = utility_calls.convert_param_to_numpy(
+            tau_m, self._n_neurons)
 
     @property
     def cm(self):
         return self._cm
 
     @cm.setter
-    def cm(self, new_value):
-        self._cm = new_value
+    def cm(self, cm):
+        self._cm = utility_calls.convert_param_to_numpy(cm, self._n_neurons)
 
     @property
     def i_offset(self):
         return self._i_offset
 
     @i_offset.setter
-    def i_offset(self, new_value):
-        self._i_offset = new_value
+    def i_offset(self, i_offset):
+        self._i_offset = utility_calls.convert_param_to_numpy(
+            i_offset, self._n_neurons)
 
     @property
     def _r_membrane(self):
