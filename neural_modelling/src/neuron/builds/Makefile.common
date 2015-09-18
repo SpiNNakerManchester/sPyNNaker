@@ -38,6 +38,8 @@ STDP += $(BUILD_DIR)neuron/plasticity/stdp/synapse_dynamics_stdp_mad_impl.o \
         $(BUILD_DIR)neuron/plasticity/stdp/synapse_dynamics_stdp_impl.o \
         $(BUILD_DIR)neuron/plasticity/common/post_events.o
 
+STP += $(BUILD_DIR)neuron/plasticity/stp/synapse_dynamics_stp.o
+
 STDP_WEIGHT_DEPENDENCE += $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.o \
                           $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_additive_two_term_impl.o \
                           $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.o
@@ -45,6 +47,8 @@ STDP_WEIGHT_DEPENDENCE += $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/w
 STDP_TIMING_DEPENDENCE += $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_nearest_pair_impl.o \
                           $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pair_impl.o \
                           $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pfister_triplet_impl.o
+
+STP_RULES += $(BUILD_DIR)neuron/plasticity/stp/rules/tsodyks_markram.o
 
 CFLAGS += -D$(SYNAPSE_BENCHMARK)
 
@@ -77,6 +81,17 @@ $(STDP):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c $(SYNAPSE_TYPE_H) \
 	      -include $(WEIGHT_DEPENDENCE_H) \
 	      -include $(PLASTIC_SYNAPSE_STRUCTURE_H) \
 	      -include $(TIMING_DEPENDENCE_H) -o $@ $<
+
+$(STP_RULES):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c $(SYNAPSE_TYPE_H)
+	-mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	                  -include $(SYNAPSE_TYPE_H) -o $@ $<
+
+$(STP):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c $(SYNAPSE_TYPE_H) \
+                        $(STP_RULE_H)
+	-mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -include $(SYNAPSE_TYPE_H) \
+	      -include $(STP_RULE_H) -o $@ $<
 
 $(BUILD_DIR)neuron/neuron.o: $(SOURCE_DIRS)/neuron/neuron.c $(NEURON_MODEL_H)\
                              $(SYNAPSE_TYPE_H)
