@@ -14,7 +14,8 @@ from spinn_front_end_common.abstract_models\
     .abstract_outgoing_edge_same_contiguous_keys_restrictor\
     import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.utilities import constants as common_constants
-from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge import AbstractProvidesNKeysForEdge
+from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
+    import AbstractProvidesNKeysForEdge
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from pacman.model.constraints.partitioner_constraints.\
