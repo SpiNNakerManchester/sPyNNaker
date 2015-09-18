@@ -9,8 +9,8 @@ from spynnaker.pyNN import exceptions
 
 class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
 
-    def __init__(self, num_header_words, dendritic_delay_fraction):
-        self.num_header_words = num_header_words
+    def __init__(self, header_words, dendritic_delay_fraction):
+        self._header_words = numpy.asarray(header_words, dtype="uint32")
         self._dendritic_delay_fraction = dendritic_delay_fraction
 
     @property
@@ -33,7 +33,7 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
 
         # As fixed-plastic and plastic regions both require this
         # Many half words, this is the number of words!
-        return num_half_words + self.num_header_words
+        return num_half_words + len(self._header_words)
 
     def get_packed_fixed_fixed_region(self, synapse_row, weight_scale,
                                       n_synapse_type_bits):
@@ -107,13 +107,9 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
         # Create view of weights as uint32s
         abs_scaled_weights_view = abs_scaled_weights.view(dtype='uint32')
 
-        # Allocate memory for pre-synaptic event buffer
-        pre_synaptic_event_buffer = numpy.zeros(self.num_header_words,
-                                                dtype='uint32')
-
         # Combine together into plastic region and return
         plastic_region = numpy.asarray(numpy.append(
-            pre_synaptic_event_buffer, abs_scaled_weights_view),
+            self._header_words, abs_scaled_weights_view),
             dtype='uint32')
         return plastic_region
 
@@ -146,7 +142,7 @@ class PlasticWeightSynapseRowIo(AbstractSynapseRowIo):
         synapse_weight_scales = weight_scales_numpy[synapse_types]
 
         # Create a half-word view of plastic region without header
-        half_words = p_p_entries[self.num_header_words:].view(dtype="uint16")
+        half_words = p_p_entries[len(self._header_words):].view(dtype="uint16")
 
         # Trim off any extra half-words caused by padding
         half_words = half_words[:len(f_p_entries)]

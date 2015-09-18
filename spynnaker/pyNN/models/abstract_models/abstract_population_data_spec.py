@@ -356,11 +356,17 @@ class AbstractPopulationDataSpec(
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(self._binary)
 
-        # If we have an STDP mechanism, add it's executable suffic to title
-        if self._stdp_mechanism is not None:
+        # If we have a fast synapse dynamics mechanism, add it's executable suffic to title
+        if self._fast_synapse_dynamics is not None:
             binary_title = \
                 binary_title + "_" + \
-                self._stdp_mechanism.get_vertex_executable_suffix()
+                self._fast_synapse_dynamics.vertex_executable_suffix
+
+        # If we have a slow synapse dynamics mechanism, add it's executable suffic to title
+        if self._slow_synapse_dynamics is not None:
+            binary_title = \
+                binary_title + "_" + \
+                self._slow_synapse_dynamics.vertex_executable_suffix
 
         # Reunite title and extension and return
         return binary_title + binary_extension

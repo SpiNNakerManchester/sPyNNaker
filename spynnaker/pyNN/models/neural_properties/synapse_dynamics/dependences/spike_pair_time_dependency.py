@@ -6,6 +6,7 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
     import plasticity_helpers
 
 import logging
+import numpy
 logger = logging.getLogger(__name__)
 
 # Constants
@@ -36,7 +37,7 @@ class SpikePairTimeDependency(AbstractTimeDependency):
     def create_synapse_row_io(
             self, synaptic_row_header_words, dendritic_delay_fraction):
         return PlasticWeightSynapseRowIo(
-            synaptic_row_header_words, dendritic_delay_fraction)
+            numpy.zeros(synaptic_row_header_words), dendritic_delay_fraction)
 
     def get_params_size_bytes(self):
         return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)

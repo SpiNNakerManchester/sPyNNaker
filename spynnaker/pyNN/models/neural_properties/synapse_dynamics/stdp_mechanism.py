@@ -76,6 +76,15 @@ class STDPMechanism(object):
     def dendritic_delay_fraction(self):
         return self._dendritic_delay_fraction
 
+    @property
+    def vertex_executable_suffix(self):
+        name = "stdp_mad" if self._mad else "stdp"
+        if self.timing_dependence is not None:
+            name += "_" + self.timing_dependence.vertex_executable_suffix
+        if self.weight_dependence is not None:
+            name += "_" + self.weight_dependence.vertex_executable_suffix
+        return name
+    
     def __eq__(self, other):
         if (other is None) or (not isinstance(other, self.__class__)):
             return False
@@ -154,15 +163,6 @@ class STDPMechanism(object):
             self.weight_dependence.write_plastic_params(
                 spec, machine_time_step, weight_scales, self._weight_scale,
                 num_terms)
-
-    # **TODO** make property
-    def get_vertex_executable_suffix(self):
-        name = "stdp_mad" if self._mad else "stdp"
-        if self.timing_dependence is not None:
-            name += "_" + self.timing_dependence.vertex_executable_suffix
-        if self.weight_dependence is not None:
-            name += "_" + self.weight_dependence.vertex_executable_suffix
-        return name
 
     # **TODO** make property
     def get_max_weight(self):

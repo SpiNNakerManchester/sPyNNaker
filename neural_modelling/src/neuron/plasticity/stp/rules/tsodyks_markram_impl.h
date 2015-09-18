@@ -44,19 +44,19 @@ typedef struct
 #define TAU_SYN_LUT_SHIFT 0
 #define TAU_SYN_LUT_SIZE 256
 
-#define TAU_REC_LUT_SHIFT 0
-#define TAU_REC_LUT_SIZE 256
+#define TAU_REC_LUT_SHIFT 3
+#define TAU_REC_LUT_SIZE 1136
 
-#define TAU_FAC_LUT_SHIFT 0
-#define TAU_FAC_LUT_SIZE 256
+#define TAU_FAC_LUT_SHIFT 3
+#define TAU_FAC_LUT_SIZE 1136
 
 // Helper macros for looking up decays
 #define DECAY_TAU_SYN(t) \
     maths_lut_exponential_decay(t, TAU_SYN_LUT_SHIFT, TAU_SYN_LUT_SIZE, tau_syn_lut)
 #define DECAY_TAU_REC(t) \
-    maths_lut_exponential_decay(t, TAU_REC_LUT_SHIFT, TAU_REC_LUT_SIZE, tau_rec_lut)
+    maths_lut_exponential_decay_rounded(t, TAU_REC_LUT_SHIFT, TAU_REC_LUT_SIZE, tau_rec_lut)
 #define DECAY_TAU_FAC(t) \
-    maths_lut_exponential_decay(t, TAU_FAC_LUT_SHIFT, TAU_FAC_LUT_SIZE, tau_fac_lut)
+    maths_lut_exponential_decay_rounded(t, TAU_FAC_LUT_SHIFT, TAU_FAC_LUT_SIZE, tau_fac_lut)
 
 //---------------------------------------
 // Externals

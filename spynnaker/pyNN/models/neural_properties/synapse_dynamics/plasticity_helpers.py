@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 STDP_FIXED_POINT_ONE = (1 << 11)
 
 
-def float_to_fixed(value, fixed_point_one):
+def float_to_fixed(value, fixed_point_one=STDP_FIXED_POINT_ONE):
     return int(round(float(value) * float(fixed_point_one)))
 
 

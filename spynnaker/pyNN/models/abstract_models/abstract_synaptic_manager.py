@@ -49,8 +49,9 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
     """
 
     def __init__(self, master_pop_algorithm=None):
-        self._stdp_checked = False
-        self._stdp_mechanism = None
+        self._synapse_dynamics_checked = False
+        self._fast_synapse_dynamics = None
+        self._slow_synapse_dynamics = None
         self._master_pop_table_generator = None
 
         if master_pop_algorithm is None:
@@ -252,24 +253,31 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         :param in_edges:
         :return:
         """
-        if self._stdp_checked:
+        if self._synapse_dynamics_checked:
             return True
-        self._stdp_checked = True
+        self._synapse_dynamics_checked = True
         for in_edge in in_edges:
             if (isinstance(in_edge, ProjectionPartitionableEdge) and
                     in_edge.synapse_dynamics is not None):
                 if in_edge.synapse_dynamics.fast is not None:
-                    raise exceptions.SynapticConfigurationException(
-                        "Fast synapse dynamics are not supported")
-                elif in_edge.synapse_dynamics.slow is not None:
-                    if self._stdp_mechanism is None:
-                        self._stdp_mechanism = in_edge.synapse_dynamics.slow
+                    if self._fast_synapse_dynamics is None:
+                        self._fast_synapse_dynamics = in_edge.synapse_dynamics.fast
                     else:
-                        if not (self._stdp_mechanism ==
+                        if not (self._fast_synapse_dynamics ==
+                                in_edge.synapse_dynamics.fast):
+                            raise exceptions.SynapticConfigurationException(
+                                "Different fast dynamics on edges terminating"
+                                " at same vertex are not supported")
+
+                if in_edge.synapse_dynamics.slow is not None:
+                    if self._slow_synapse_dynamics is None:
+                        self._slow_synapse_dynamics = in_edge.synapse_dynamics.slow
+                    else:
+                        if not (self._slow_synapse_dynamics ==
                                 in_edge.synapse_dynamics.slow):
                             raise exceptions.SynapticConfigurationException(
-                                "Different STDP mechanisms on the same"
-                                " vertex are not supported")
+                                "Different slow dynamics on edges terminating"
+                                " at same vertex are not supported")
 
     @abstractmethod
     def get_n_synapse_type_bits(self):
@@ -316,10 +324,15 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         :return:
         """
         self._check_synapse_dynamics(in_edges)
-        if self._stdp_mechanism is not None:
-            return self._stdp_mechanism.get_params_size(
+
+        params_size = 0
+        if self._slow_synapse_dynamics is not None:
+            params_size += self._slow_synapse_dynamics.get_params_size(
                 len(self.get_synapse_targets()))
-        return 0
+
+        if self._fast_synapse_dynamics is not None:
+            params_size += self._fast_synapse_dynamics.get_params_size_bytes()
+        return params_size
 
     def write_synapse_dynamics_parameters(self, spec, machine_time_step,
                                           region, weight_scales):
@@ -331,10 +344,13 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
         :param weight_scales:
         :return:
         """
-        if self._stdp_mechanism is not None:
-            self._stdp_mechanism.write_plastic_params(spec, region,
-                                                      machine_time_step,
-                                                      weight_scales)
+        if self._slow_synapse_dynamics is not None:
+            self._slow_synapse_dynamics.write_plastic_params(
+                spec, region, machine_time_step, weight_scales)
+
+        if self._fast_synapse_dynamics is not None:
+            self._fast_synapse_dynamics.write_plastic_params(
+                spec, region, machine_time_step, self)
 
     @staticmethod
     def get_weight_scale(ring_buffer_to_input_left_shift):
@@ -434,8 +450,8 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
         # If we have an STDP mechanism, get the maximum plastic weight
         stdp_max_weight = None
-        if self._stdp_mechanism is not None:
-            stdp_max_weight = self._stdp_mechanism.get_max_weight()
+        if self._slow_synapse_dynamics is not None:
+            stdp_max_weight = self._slow_synapse_dynamics.get_max_weight()
             if stdp_max_weight is not None:
                 absolute_max_weights.fill(stdp_max_weight)
 
@@ -528,8 +544,8 @@ class AbstractSynapticManager(AbstractProvidesIncomingEdgeConstraints):
 
         # If we have an STDP mechanism that uses signed weights,
         # Add another bit of shift to prevent overflows
-        if self._stdp_mechanism is not None\
-                and self._stdp_mechanism.are_weights_signed():
+        if self._slow_synapse_dynamics is not None\
+                and self._slow_synapse_dynamics.are_weights_signed():
             max_weight_powers = [m + 1 for m in max_weight_powers]
 
         return max_weight_powers

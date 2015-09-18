@@ -45,7 +45,20 @@ static inline int32_t maths_lut_exponential_decay(
     // Return value from LUT
     return (lut_index < lut_size) ? lut[lut_index] : 0;
 }
+//---------------------------------------
+static inline int32_t maths_lut_exponential_decay_rounded(
+    uint32_t time, const uint32_t time_shift,
+    const uint32_t lut_size, const int16_t *lut)
+{
+  // Calculate lut index * 2
+  uint32_t double_lut_index = time >> (time_shift - 1);
 
+  // Use last bit to determine which entry we should use
+  uint32_t lut_index = (double_lut_index >> 1) + (double_lut_index & 0x1);
+
+  // Return value from LUT
+  return (lut_index < lut_size) ? lut[lut_index] : 0;
+}
 //---------------------------------------
 static inline int32_t maths_fixed_mul16(
         int32_t a, int32_t b, const int32_t fixed_point_position) {

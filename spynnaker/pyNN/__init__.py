@@ -100,6 +100,10 @@ from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
     spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
 
+# STP rules
+from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stp_rules.\
+    tsodyks_markram import TsodyksMarkramMechanism
+
 import spynnaker
 # constraints
 
