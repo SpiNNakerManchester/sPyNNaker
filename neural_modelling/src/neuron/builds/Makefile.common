@@ -64,20 +64,16 @@ $(STDP_WEIGHT_DEPENDENCE):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c $(SYNAPSE_TYPE_H)
 
 $(STDP_TIMING_DEPENDENCE):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c \
                                            $(SYNAPSE_TYPE_H) \
-                                           $(WEIGHT_DEPENDENCE_H) \
-                                           $(PLASTIC_SYNAPSE_STRUCTURE_H)
+                                           $(WEIGHT_DEPENDENCE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -include $(SYNAPSE_TYPE_H)\
-	                  -include $(WEIGHT_DEPENDENCE_H)\
-	                  -include $(PLASTIC_SYNAPSE_STRUCTURE_H) -o $@ $<
+	                  -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
 $(STDP):$(BUILD_DIR)%.o: $(SOURCE_DIRS)/%.c $(SYNAPSE_TYPE_H) \
-                         $(WEIGHT_DEPENDENCE_H) $(PLASTIC_SYNAPSE_STRUCTURE_H) \
-                         $(TIMING_DEPENDENCE_H)
+                         $(WEIGHT_DEPENDENCE_H) $(TIMING_DEPENDENCE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -include $(SYNAPSE_TYPE_H) \
 	      -include $(WEIGHT_DEPENDENCE_H) \
-	      -include $(PLASTIC_SYNAPSE_STRUCTURE_H) \
 	      -include $(TIMING_DEPENDENCE_H) -o $@ $<
 
 $(BUILD_DIR)neuron/neuron.o: $(SOURCE_DIRS)/neuron/neuron.c $(NEURON_MODEL_H)\
@@ -100,19 +96,15 @@ $(EXTRA_STDP_WEIGHT_DEPENDENCE):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c \
 	                  -include $(SYNAPSE_TYPE_H) -o $@ $<
 
 $(EXTRA_STDP_TIMING_DEPENDENCE):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c \
-                                $(SYNAPSE_TYPE_H) $(WEIGHT_DEPENDENCE_H)\
-                                $(PLASTIC_SYNAPSE_STRUCTURE_H)
+                                $(SYNAPSE_TYPE_H) $(WEIGHT_DEPENDENCE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -include $(SYNAPSE_TYPE_H) \
-	                  -include $(WEIGHT_DEPENDENCE_H) \
-	                  -include $(PLASTIC_SYNAPSE_STRUCTURE_H) -o $@ $<
+	                  -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
 $(EXTRA_STDP):$(BUILD_DIR)%.o: $(EXTRA_SRC_DIR)/%.c $(SYNAPSE_TYPE_H) \
                                $(WEIGHT_DEPENDENCE_H) \
-                               $(PLASTIC_SYNAPSE_STRUCTURE_H) \
                                $(TIMING_DEPENDENCE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -include $(SYNAPSE_TYPE_H) \
 	                  -include $(WEIGHT_DEPENDENCE_H) \
-	                  -include $(PLASTIC_SYNAPSE_STRUCTURE_H) \
 	                  -include $(TIMING_DEPENDENCE_H) -o $@ $<

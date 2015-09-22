@@ -5,13 +5,10 @@ NEURON_MODEL_H = $(SOURCE_DIRS)/neuron/models/neuron_model_lif_impl.h
 INPUT_TYPE_H = $(SOURCE_DIRS)/neuron/input_types/input_type_conductance.h
 THRESHOLD_TYPE_H = $(SOURCE_DIRS)/neuron/threshold_types/threshold_type_static.h
 SYNAPSE_TYPE_H = $(SOURCE_DIRS)/neuron/synapse_types/synapse_types_exponential_impl.h
-SYNAPSE_DYNAMICS = $(SOURCE_DIRS)/neuron/plasticity/stdp/synapse_dynamics_stdp_mad_impl.o \
-                   $(SOURCE_DIRS)/neuron/plasticity/common/post_events.o \
-                   $(SOURCE_DIRS)/neuron/plasticity/common/maths.o
+SYNAPSE_DYNAMICS = $(SOURCE_DIRS)/neuron/plasticity/stdp/synapse_dynamics_stdp_mad_impl.o
 TIMING_DEPENDENCE = $(SOURCE_DIRS)/neuron/plasticity/stdp/timing_dependence/timing_nearest_pair_impl.o
 TIMING_DEPENDENCE_H = $(SOURCE_DIRS)/neuron/plasticity/stdp/timing_dependence/timing_nearest_pair_impl.h
 WEIGHT_DEPENDENCE = $(SOURCE_DIRS)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.o
 WEIGHT_DEPENDENCE_H = $(SOURCE_DIRS)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.h
-PLASTIC_SYNAPSE_STRUCTURE_H = $(SOURCE_DIRS)/neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h
 
 include ../Makefile.common

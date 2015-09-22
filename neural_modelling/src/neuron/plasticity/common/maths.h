@@ -11,14 +11,22 @@
 #define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
 
 //---------------------------------------
-// Function declarations
-//---------------------------------------
-address_t maths_copy_int16_lut(address_t start_address, uint32_t num_entries,
-                               int16_t *lut);
-
-//---------------------------------------
 // Plasticity maths function inline implementation
 //---------------------------------------
+static inline address_t maths_copy_int16_lut(
+       address_t start_address, uint32_t num_entries, int16_t *lut) {
+
+    // Pad to number of words
+    const uint32_t num_words = (num_entries / 2)
+                               + (((num_entries & 1) != 0) ? 1 : 0);
+
+    // Copy entries to LUT
+    spin1_memcpy(lut, start_address, sizeof(int16_t) * num_entries);
+
+    // Return address after words
+    return start_address + num_words;
+}
+
 static inline int32_t maths_clamp_pot(int32_t x, uint32_t shift) {
     uint32_t y = x >> shift;
     if (y) {
