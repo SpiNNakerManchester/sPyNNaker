@@ -64,6 +64,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             timescale_factor=timescale_factor)
         AbstractProvidesIncomingEdgeConstraints.__init__(self)
         AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
+        AbstractProvidesNKeysForEdge.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0

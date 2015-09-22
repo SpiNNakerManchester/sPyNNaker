@@ -1,5 +1,8 @@
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
+from spinn_front_end_common.abstract_models\
+    .abstract_outgoing_edge_same_contiguous_keys_restrictor \
+    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
 
@@ -40,7 +43,8 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
-        AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable):
+        AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -56,6 +60,7 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
 
         self._binary = binary
         self._label = label
