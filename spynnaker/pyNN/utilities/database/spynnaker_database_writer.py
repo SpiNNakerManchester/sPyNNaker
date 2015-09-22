@@ -74,7 +74,7 @@ class SpynnakerDataBaseWriter(DatabaseWriter):
                         " VALUES('{}', {}, {}, {});"
                         .format(vertex.label, vertex.n_atoms,
                                 vertex.get_max_atoms_per_core(),
-                                int(vertex.record)))
+                                int(vertex.is_recording_spikes())))
                 else:
                     cur.execute(
                         "INSERT INTO Partitionable_vertices("
