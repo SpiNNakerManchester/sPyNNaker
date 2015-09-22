@@ -22,11 +22,12 @@ from enum import Enum
 import math
 import numpy
 import logging
+import sys
 
 
 logger = logging.getLogger(__name__)
 
-SLOW_RATE_PER_TICK_CUTOFF = 0.25
+SLOW_RATE_PER_TICK_CUTOFF = 1.0
 PARAMS_BASE_WORDS = 4
 PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
@@ -47,7 +48,10 @@ class SpikeSourcePoisson(
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
                ('SPIKE_HISTORY_REGION', 2)])
-    _model_based_max_atoms_per_core = 256
+
+    # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
+    # in terms of CPU (2900 at 10 times slowdown is fine, but not at realtime)
+    _model_based_max_atoms_per_core = 500
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  constraints=None, label="SpikeSourcePoisson",
@@ -68,7 +72,7 @@ class SpikeSourcePoisson(
         self._rate = rate
         self._start = start
         self._duration = duration
-        self._seed = seed
+        self._rng = numpy.random.RandomState(seed)
 
         # Prepare for recording, and to get spikes
         self._spike_recorder = SpikeRecorder(machine_time_step)
@@ -181,7 +185,7 @@ class SpikeSourcePoisson(
         self._write_basic_setup_info(
             spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         recording_info = 0
-        if (spike_history_region_sz > 0) and self._record:
+        if (spike_history_region_sz > 0) and self._spike_recorder.record:
             recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
 
@@ -218,16 +222,10 @@ class SpikeSourcePoisson(
             spec.write_value(data=key)
 
         # Write the random seed (4 words), generated randomly!
-        if self._seed is None:
-            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
-            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
-            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
-            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
-        else:
-            spec.write_value(data=self._seed[0])
-            spec.write_value(data=self._seed[1])
-            spec.write_value(data=self._seed[2])
-            spec.write_value(data=self._seed[3])
+        spec.write_value(data=self._rng.randint(sys.maxint))
+        spec.write_value(data=self._rng.randint(sys.maxint))
+        spec.write_value(data=self._rng.randint(sys.maxint))
+        spec.write_value(data=self._rng.randint(sys.maxint))
 
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
@@ -417,7 +415,7 @@ class SpikeSourcePoisson(
     def get_spikes(self, transceiver, n_machine_time_steps):
         return self._spike_recorder.get_spikes(
             self._label, transceiver,
-            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             n_machine_time_steps)
 
     def is_data_specable(self):
