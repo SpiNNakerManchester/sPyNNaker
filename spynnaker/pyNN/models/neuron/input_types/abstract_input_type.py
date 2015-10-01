@@ -34,9 +34,9 @@ class AbstractInputType(object):
         """
 
     @abstractmethod
-    def get_n_cpu_cycles_per_neuron(self):
+    def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         """ Get the number of CPU cycles executed by\
-            input_type_get_input_value twice, \
+            input_type_get_input_value once per synapse, \
             input_type_convert_excitatory_input_to_current and
             input_type_convert_inhibitory_input_to_current, per neuron
         """

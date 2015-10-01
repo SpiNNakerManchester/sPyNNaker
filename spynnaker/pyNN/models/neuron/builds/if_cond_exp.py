@@ -16,7 +16,7 @@ class IFCondExp(AbstractPopulationVertex):
         conductance input
     """
 
-    _model_based_max_atoms_per_core = 256
+    _model_based_max_atoms_per_core = 255
 
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'e_rev_E': 0.0, 'e_rev_I': -70.0,

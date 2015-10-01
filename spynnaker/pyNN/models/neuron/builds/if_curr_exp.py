@@ -16,7 +16,7 @@ class IFCurrExp(AbstractPopulationVertex):
         current input
     """
 
-    _model_based_max_atoms_per_core = 256
+    _model_based_max_atoms_per_core = 255
 
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,

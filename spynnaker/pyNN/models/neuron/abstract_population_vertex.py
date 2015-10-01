@@ -51,7 +51,8 @@ class AbstractPopulationVertex(
     def __init__(self, n_neurons, binary, label, max_atoms_per_core,
                  machine_time_step, timescale_factor, spikes_per_second,
                  ring_buffer_sigma, model_name, neuron_model, input_type,
-                 synapse_type, threshold_type, constraints=None):
+                 synapse_type, threshold_type, additional_input=None,
+                 constraints=None):
 
         AbstractPartitionableVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
@@ -71,6 +72,7 @@ class AbstractPopulationVertex(
         self._neuron_model = neuron_model
         self._input_type = input_type
         self._threshold_type = threshold_type
+        self._additional_input = additional_input
 
         # Set up for recording
         self._spike_recorder = SpikeRecorder(machine_time_step)
@@ -87,8 +89,12 @@ class AbstractPopulationVertex(
         per_neuron_cycles = (
             _NEURON_BASE_N_CPU_CYCLES_PER_NEURON +
             self._neuron_model.get_n_cpu_cycles_per_neuron() +
-            self._input_type.get_n_cpu_cycles_per_neuron() +
+            self._input_type.get_n_cpu_cycles_per_neuron(
+                self._synapse_manager.synapse_type.get_n_synapse_types()) +
             self._threshold_type.get_n_cpu_cycles_per_neuron())
+        if self._additional_input is not None:
+            per_neuron_cycles += \
+                self._additional_input.get_n_cpu_cycles_per_neuron()
         return (_NEURON_BASE_N_CPU_CYCLES +
                 _C_MAIN_BASE_N_CPU_CYCLES +
                 (per_neuron_cycles * vertex_slice.n_atoms) +
@@ -103,6 +109,9 @@ class AbstractPopulationVertex(
             self._neuron_model.get_dtcm_usage_per_neuron_in_bytes() +
             self._input_type.get_dtcm_usage_per_neuron_in_bytes() +
             self._threshold_type.get_dtcm_usage_per_neuron_in_bytes())
+        if self._additional_input is not None:
+            per_neuron_usage += \
+                self._additional_input.get_dtcm_usage_per_neuron_in_bytes()
         return (_NEURON_BASE_DTCM_USAGE_IN_BYTES +
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._spike_recorder.get_dtcm_usage_in_bytes() +
@@ -115,6 +124,9 @@ class AbstractPopulationVertex(
         per_neuron_usage = (
             self._input_type.get_sdram_usage_per_neuron_in_bytes() +
             self._threshold_type.get_sdram_usage_per_neuron_in_bytes())
+        if self._additional_input is not None:
+            per_neuron_usage += \
+                self._additional_input.get_sdram_usage_per_neuron_in_bytes()
         return (_NEURON_BASE_SDRAM_USAGE_IN_BYTES +
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._neuron_model.get_sdram_usage_in_bytes(
@@ -235,6 +247,11 @@ class AbstractPopulationVertex(
         # Write the input type parameters
         utility_calls.write_parameters_per_neuron(
             spec, vertex_slice, self._input_type.get_input_type_parameters())
+
+        # Write the additional input parameters
+        if self._additional_input is not None:
+            utility_calls.write_parameters_per_neuron(
+                spec, vertex_slice, self._additional_input.get_parameters())
 
         # Write the threshold type parameters
         utility_calls.write_parameters_per_neuron(
@@ -376,7 +393,8 @@ class AbstractPopulationVertex(
         """ Get a property of the overall model
         """
         for obj in [self._neuron_model, self._input_type,
-                    self._threshold_type, self._synapse_manager.synapse_type]:
+                    self._threshold_type, self._synapse_manager.synapse_type,
+                    self._additional_input]:
             if hasattr(obj, key):
                 return getattr(obj, key)
         raise Exception("Population {} does not have parameter {}".format(
@@ -386,7 +404,8 @@ class AbstractPopulationVertex(
         """ Set a property of the overall model
         """
         for obj in [self._neuron_model, self._input_type,
-                    self._threshold_type, self._synapse_manager.synapse_type]:
+                    self._threshold_type, self._synapse_manager.synapse_type,
+                    self._additional_input]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
                 return

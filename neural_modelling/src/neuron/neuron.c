@@ -7,6 +7,7 @@
 #include "neuron.h"
 #include "models/neuron_model.h"
 #include "input_types/input_type.h"
+#include "additional_inputs/additional_input.h"
 #include "threshold_types/threshold_type.h"
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
@@ -20,6 +21,9 @@ static neuron_pointer_t neuron_array;
 
 //! Input states array
 static input_type_pointer_t input_type_array;
+
+//! Additional input array
+static additional_input_pointer_t additional_input_array;
 
 //! Threshold states array
 static threshold_type_pointer_t threshold_type_array;
@@ -156,6 +160,20 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         next += (n_neurons * sizeof(input_type_t)) / 4;
     }
 
+    // Allocate DTCM for additional input array and copy block of data
+    if (sizeof(additional_input_t) != 0) {
+        additional_input_array = (additional_input_pointer_t) spin1_malloc(
+            n_neurons * sizeof(additional_input_t));
+        if (additional_input_array == NULL) {
+            log_error("Unable to allocate additional input array"
+                      " - Out of DTCM");
+            return false;
+        }
+        memcpy(additional_input_array, &address[next],
+               n_neurons * sizeof(additional_input_t));
+        next += (n_neurons * sizeof(additional_input_t)) / 4;
+    }
+
     // Allocate DTCM for threshold type array and copy block of data
     if (sizeof(threshold_type_t) != 0) {
         threshold_type_array = (threshold_type_t *) spin1_malloc(
@@ -205,6 +223,8 @@ void neuron_do_timestep_update(timer_t time) {
         input_type_pointer_t input_type = &input_type_array[neuron_index];
         threshold_type_pointer_t threshold_type =
             &threshold_type_array[neuron_index];
+        additional_input_pointer_t additional_input =
+            &additional_input_array[neuron_index];
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
         // If we should be recording potential, record this neuron parameter
@@ -229,7 +249,9 @@ void neuron_do_timestep_update(timer_t time) {
 
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
-            synapse_dynamics_get_intrinsic_bias(time, neuron_index);
+            synapse_dynamics_get_intrinsic_bias(time, neuron_index) +
+            additional_input_get_input_value_as_current(
+                additional_input, voltage);
 
         // If we should be recording input, record the values
         if (recording_is_channel_enabled(recording_flags,
@@ -254,6 +276,9 @@ void neuron_do_timestep_update(timer_t time) {
 
             // Tell the neuron model
             neuron_model_has_spiked(neuron);
+
+            // Tell the additional input
+            additional_input_has_spiked(additional_input);
 
             // Do any required synapse processing
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
