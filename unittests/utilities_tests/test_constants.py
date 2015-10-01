@@ -41,14 +41,6 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID, 0xAC7)
         self.assertEqual(constants.IZK_CURRENT_EXP_CORE_APPLICATION_ID, 0xAC8)
 
-    def test_edges_enum(self):
-        self.assertEqual(constants.EDGES.EAST.value, 0)
-        self.assertEqual(constants.EDGES.NORTH_EAST.value, 1)
-        self.assertEqual(constants.EDGES.NORTH.value, 2)
-        self.assertEqual(constants.EDGES.WEST.value, 3)
-        self.assertEqual(constants.EDGES.SOUTH_WEST.value, 4)
-        self.assertEqual(constants.EDGES.SOUTH.value, 5)
-
     def test_population_based_regions_enum(self):
         self.assertEqual(constants.POPULATION_BASED_REGIONS.SYSTEM.value, 0)
         self.assertEqual(constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value, 1)

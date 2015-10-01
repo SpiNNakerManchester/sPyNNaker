@@ -59,15 +59,6 @@ SPIKE_INJECTOR_CORE_APPLICATION_ID = 0xAC9
 MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
 MASTER_POP_BINARY_SEARCH = 0xBB2
 
-EDGES = Enum(
-    value="EDGES",
-    names=[("EAST", 0),
-           ("NORTH_EAST", 1),
-           ("NORTH", 2),
-           ("WEST", 3),
-           ("SOUTH_WEST", 4),
-           ("SOUTH", 5)])
-
 # Regions for populations
 POPULATION_BASED_REGIONS = Enum(
     value="POPULATION_BASED_REGIONS",

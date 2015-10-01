@@ -5,11 +5,11 @@
         <required_inputs>
             <parameter>
                 <param_name>subgraph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
-                <param_type>GraphMapper</param_type>
+                <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </required_inputs>
         <parameters>
@@ -17,11 +17,11 @@
         <produces_outputs>
             <parameter>
                 <param_name>new_sub_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>new_graph_mapper</param_name>
-                <param_type>GraphMapper</param_type>
+                <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>
@@ -31,11 +31,11 @@
         <required_inputs>
             <parameter>
                 <param_name>partitioned_graph</param_name>
-                <param_type>PartitionedGraph</param_type>
+                <param_type>MemoryPartitionedGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
-                <param_type>GraphMapper</param_type>
+                <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </required_inputs>
         <parameters>
@@ -43,7 +43,7 @@
         <produces_outputs>
             <parameter>
                 <param_name>n_keys_map</param_name>
-                <param_type>AbstractPartitionedEdgeNKeysMap</param_type>
+                <param_type>MemoryPartitionedEdgeNKeysMap</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>

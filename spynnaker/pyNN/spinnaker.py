@@ -160,7 +160,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             "Simulation", "ring_buffer_sigma"))
 
         FrontEndCommonSpinnmanInterfaceFunctions.__init__(
-            self, self._reports_states, self._report_default_directory)
+            self, self._reports_states, self._report_default_directory,
+        self._app_data_runtime_folder)
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -189,11 +190,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         """
         # set up the mapper executor side of the front end
         # set up the pacman algorithms
-        inputs = list()
-        inputs.append("PartitionableGraph")
-        inputs.append('Machine')
-        inputs.append('File')
-        inputs.append('IPAddress')
+        inputs = set()
+        inputs.add("MemoryPartitionableGraph")
+        inputs.add('MemoryMachine')
+        inputs.add('ReportFolder')
+        inputs.add('IPAddress')
+        inputs.add("Transciever")
 
         xml_paths = config.get("Mapping", "extra_xmls_paths")
         if xml_paths == "None":
@@ -206,8 +208,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         pacman_report_state = \
             self._reports_states.generate_pacman_report_states()
         in_debug_mode = config.get("Mode", "mode") == "Debug"
-        required_outputs = ("Placements", "RoutingTables", "RoutingInfos",
-                            "Tags", "PartitionedGraph", "GraphMapper")
+        required_outputs = (
+            "MemoryPlacements", "MemoryRoutingTables", "MemoryRoutingInfos",
+            "MemoryTags", "MemoryPartitionedGraph", "MemoryGraphMapper")
 
         self._pacman_exeuctor = \
             PACMANAlgorithmExecutor(pacman_report_state, in_debug_mode)
@@ -217,24 +220,30 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # define inputs
         inputs = list()
-        inputs.append({'type': "PartitionableGraph",
+        inputs.append({'type': "MemoryPartitionableGraph",
                        'value': self._partitionable_graph})
-        inputs.append({'type': 'Machine',
+        inputs.append({'type': 'MemoryMachine',
                        'value': self._machine})
-        inputs.append({'type': "File", 'value': self._report_default_directory})
+        inputs.append({'type': "ReportFolder",
+                       'value': self._report_default_directory})
+        inputs.append({'type': "ApplicationDataFolder",
+                       'value': self._app_data_runtime_folder})
         inputs.append({'type': "IPAddress", 'value': self._hostname})
+        inputs.append({'type': "MemoryTransciever", 'value': self._txrx})
 
         # execute mapping process
         self._pacman_exeuctor.execute_mapping(inputs)
 
         # sort out outputs datas
-        self._placements = self._pacman_exeuctor.get_item("Placements")
-        self._router_tables = self._pacman_exeuctor.get_item("RoutingTables")
-        self._routing_infos = self._pacman_exeuctor.get_item("RoutingInfos")
-        self._tags = self._pacman_exeuctor.get_item("Tags")
-        self._graph_mapper = self._pacman_exeuctor.get_item("GraphMapper")
+        self._placements = self._pacman_exeuctor.get_item("MemoryPlacements")
+        self._router_tables = \
+            self._pacman_exeuctor.get_item("MemoryRoutingTables")
+        self._routing_infos = \
+            self._pacman_exeuctor.get_item("MemoryRoutingInfos")
+        self._tags = self._pacman_exeuctor.get_item("MemoryTags")
+        self._graph_mapper = self._pacman_exeuctor.get_item("MemoryGraphMapper")
         self._partitioned_graph = \
-            self._pacman_exeuctor.get_item("PartitionedGraph")
+            self._pacman_exeuctor.get_item("MemoryPartitionedGraph")
 
     def run(self, run_time):
         """
@@ -322,7 +331,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         logger.info("*** Running Mapper *** ")
         if do_timing:
             timer.start_timing()
-        self._add_virtual_chips()
 
         self.do_mapping()
 
