@@ -56,6 +56,8 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesProvenanceData
 
 # local front end imports
+from spinnman.messages.sdp.sdp_header import SDPHeader
+from spinnman.messages.sdp.sdp_message import SDPMessage
 from spynnaker.pyNN.models\
     .abstract_models.abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
@@ -66,6 +68,7 @@ from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
 from spynnaker.pyNN.spynnaker_configurations import \
     SpynnakerConfigurationFunctions
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.models.abstract_models\
@@ -108,6 +111,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._database_interface = None
         self._create_database = None
         self._populations = list()
+        self._projections = list()
+        self._no_full_runs = 0
+        self._total_run_time_so_far = 0
 
         if self._app_id is None:
             self._set_up_main_objects(
@@ -213,47 +219,69 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if number_of_boards == "None":
             number_of_boards = None
 
-        self.setup_interfaces(
-            hostname=self._hostname,
-            bmp_details=config.get("Machine", "bmp_names"),
-            downed_chips=config.get("Machine", "down_chips"),
-            downed_cores=config.get("Machine", "down_cores"),
-            board_version=config.getint("Machine", "version"),
-            number_of_boards=number_of_boards, width=width, height=height,
-            is_virtual=config.getboolean("Machine", "virtual_board"),
-            virtual_has_wrap_arounds=config.getboolean(
-                "Machine", "requires_wrap_arounds"),
-            auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"),
-            enable_reinjection=config.getboolean(
-                "Machine", "enable_reinjection"))
+        if self._no_full_runs == 0:
+            self.setup_interfaces(
+                hostname=self._hostname,
+                bmp_details=config.get("Machine", "bmp_names"),
+                downed_chips=config.get("Machine", "down_chips"),
+                downed_cores=config.get("Machine", "down_cores"),
+                board_version=config.getint("Machine", "version"),
+                number_of_boards=number_of_boards, width=width, height=height,
+                is_virtual=config.getboolean("Machine", "virtual_board"),
+                virtual_has_wrap_arounds=config.getboolean(
+                    "Machine", "requires_wrap_arounds"),
+                auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"),
+                enable_reinjection=config.getboolean(
+                    "Machine", "enable_reinjection"))
+            self._no_full_runs += 1
 
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
         if self._reports_states.transciever_report:
-            self._reload_script.runtime = run_time
+            self._reload_script.runtime += run_time
             self._reload_script.time_scale_factor = self._time_scale_factor
 
+        # detect if the graph has changed since last run
+        changed = self._detect_if_graph_has_changed()
+        if changed:
+            logger.warn("The graph has changed since the original "
+                        "graph was loaded and ran. Therefore "
+                        "decisions made during the mapping process will be"
+                        " incorrect now, and therefore mapping needs to be"
+                        " redone. Sorry. \n\n\n PS. Once issue ")
+
         # create network report if needed
-        if self._reports_states is not None:
+        if changed or self._reports_states is not None:
             reports.network_specification_partitionable_report(
                 self._report_default_directory, self._partitionable_graph,
                 self._hostname)
 
-        # calculate number of machine time steps
-        if run_time is not None:
-            self._no_machine_time_steps =\
-                int((run_time * 1000.0) / self._machine_time_step)
-            ceiled_machine_time_steps = \
-                math.ceil((run_time * 1000.0) / self._machine_time_step)
-            if self._no_machine_time_steps != ceiled_machine_time_steps:
-                raise common_exceptions.ConfigurationException(
-                    "The runtime and machine time step combination result in "
-                    "a factional number of machine runable time steps and "
-                    "therefore spinnaker cannot determine how many to run for")
-            for vertex in self._partitionable_graph.vertices:
-                if isinstance(vertex, AbstractDataSpecableVertex):
-                    vertex.set_no_machine_time_steps(
-                        self._no_machine_time_steps)
+        # check if the runtime has been set before, and if so, validate stuff
+        if self._runtime is not None and self._runtime >= run_time:
+            if not changed:
+                self._deduce_machine_time_step(run_time)
+                for placement in self._placements:
+                    data = bytearray()
+                    data.append(constants.SDP_RUNTIME_ID_CODE)
+                    vertex = self._graph_mapper.get_vertex_from_subvertex(
+                        placement.subvertex)
+                    data.append(vertex.no_machine_time_steps)
+                    self._txrx.send_sdp_message(SDPMessage(SDPHeader(
+                        destination_cpu=placement.p,
+                        destination_chip_x=placement.x,
+                        destination_chip_y=placement.y), data=data))
+        elif self._runtime is not None and self._runtime < run_time:
+            # the timer is too large, so mapping has to take place again
+            changed = True
+            logger.warn("The runtime selected is bigger than the original "
+                        "runtime used during this simulation. Therefore "
+                        "decisions made during the mapping process will be"
+                        " incorrect now, and therefore mapping needs to be"
+                        " redone. Sorry. \n\n\n PS. Once issue ")
+
+        elif self._runtime is None and run_time is not None:
+            # calculate number of machine time steps
+            self._deduce_machine_time_step(run_time)
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may"
@@ -274,150 +302,167 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             timer = None
 
         self.set_runtime(run_time)
-        logger.info("*** Running Mapper *** ")
-        if do_timing:
-            timer.start_timing()
-        self.map_model()
-        if do_timing:
-            logger.info("Time to map model: {}".format(timer.take_sample()))
 
-        # add database generation if requested
-        needs_database = self._auto_detect_database(self._partitioned_graph)
-        user_create_database = config.get("Database", "create_database")
-        if ((user_create_database == "None" and needs_database) or
-                user_create_database == "True"):
+        if changed:
+            # stop the sync0 code so that new mapped stuff can run
+            self.stop(turn_off_machine=False, clear_tags=False,
+                      clear_routing_tables=False)
 
-            database_progress = ProgressBar(10, "Creating database")
-
-            wait_on_confirmation = config.getboolean(
-                "Database", "wait_on_confirmation")
-            self._database_interface = SpynnakerDataBaseWriter(
-                self._app_data_runtime_folder, wait_on_confirmation,
-                self._database_socket_addresses)
-
-            self._database_interface.add_system_params(
-                self._time_scale_factor, self._machine_time_step,
-                self._runtime)
-            database_progress.update()
-            self._database_interface.add_machine_objects(self._machine)
-            database_progress.update()
-            self._database_interface.add_partitionable_vertices(
-                self._partitionable_graph)
-            database_progress.update()
-            self._database_interface.add_partitioned_vertices(
-                self._partitioned_graph, self._graph_mapper,
-                self._partitionable_graph)
-            database_progress.update()
-            self._database_interface.add_placements(self._placements,
-                                                    self._partitioned_graph)
-            database_progress.update()
-            self._database_interface.add_routing_infos(
-                self._routing_infos, self._partitioned_graph)
-            database_progress.update()
-            self._database_interface.add_routing_tables(self._router_tables)
-            database_progress.update()
-            self._database_interface.add_tags(self._partitioned_graph,
-                                              self._tags)
-            database_progress.update()
-            execute_mapping = config.getboolean(
-                "Database", "create_routing_info_to_neuron_id_mapping")
-            if execute_mapping:
-                self._database_interface.create_atom_to_event_id_mapping(
-                    graph_mapper=self._graph_mapper,
-                    partitionable_graph=self._partitionable_graph,
-                    partitioned_graph=self._partitioned_graph,
-                    routing_infos=self._routing_infos)
-            database_progress.update()
-            # if using a reload script, add if that needs to wait for
-            # confirmation
-            if self._reports_states.transciever_report:
-                self._reload_script.wait_on_confirmation = wait_on_confirmation
-                for socket_address in self._database_socket_addresses:
-                    self._reload_script.add_socket_address(socket_address)
-            database_progress.update()
-            database_progress.end()
-            self._database_interface.send_read_notification()
-
-        # execute data spec generation
-        if do_timing:
-            timer.start_timing()
-        logger.info("*** Generating Output *** ")
-        logger.debug("")
-        executable_targets = self.generate_data_specifications()
-        if do_timing:
-            logger.info("Time to generate data: {}".format(
-                timer.take_sample()))
-
-        # execute data spec execution
-        if do_timing:
-            timer.start_timing()
-        processor_to_app_data_base_address = \
-            self.execute_data_specification_execution(
-                config.getboolean("SpecExecution", "specExecOnHost"),
-                self._hostname, self._placements, self._graph_mapper,
-                write_text_specs=config.getboolean(
-                    "Reports", "writeTextSpecs"),
-                runtime_application_data_folder=self._app_data_runtime_folder,
-                machine=self._machine)
-
-        if self._reports_states is not None:
-            reports.write_memory_map_report(self._report_default_directory,
-                                            processor_to_app_data_base_address)
-
-        if do_timing:
-            logger.info("Time to execute data specifications: {}".format(
-                timer.take_sample()))
-
-        if (not isinstance(self._machine, VirtualMachine) and
-                config.getboolean("Execute", "run_simulation")):
+            logger.info("*** Running Mapper *** ")
             if do_timing:
                 timer.start_timing()
-
-            logger.info("*** Loading tags ***")
-            self.load_tags(self._tags)
-
-            if self._do_load is True:
-                logger.info("*** Loading data ***")
-                self._load_application_data(
-                    self._placements, self._graph_mapper,
-                    processor_to_app_data_base_address, self._hostname,
-                    app_data_folder=self._app_data_runtime_folder,
-                    verify=config.getboolean("Mode", "verify_writes"))
-                self.load_routing_tables(self._router_tables, self._app_id)
-                logger.info("*** Loading executables ***")
-                self.load_executable_images(executable_targets, self._app_id)
-                logger.info("*** Loading buffers ***")
-                self.set_up_send_buffering(self._partitioned_graph,
-                                           self._placements, self._tags)
-
-            # end of entire loading setup
+            self.map_model()
             if do_timing:
-                logger.debug("Time to load: {}".format(timer.take_sample()))
+                logger.info("Time to map model: {}".format(timer.take_sample()))
 
-            if self._do_run is True:
-                logger.info("*** Running simulation... *** ")
-                if do_timing:
-                    timer.start_timing()
-                # every thing is in sync0. load the initial buffers
-                self._send_buffer_manager.load_initial_buffers()
-                if do_timing:
-                    logger.debug("Time to load buffers: {}".format(
-                        timer.take_sample()))
+            # add database generation if requested
+            needs_database = self._auto_detect_database(self._partitioned_graph)
+            user_create_database = config.get("Database", "create_database")
+            if ((user_create_database == "None" and needs_database) or
+                    user_create_database == "True"):
+
+                database_progress = ProgressBar(10, "Creating database")
 
                 wait_on_confirmation = config.getboolean(
                     "Database", "wait_on_confirmation")
-                send_start_notification = config.getboolean(
-                    "Database", "send_start_notification")
+                self._database_interface = SpynnakerDataBaseWriter(
+                    self._app_data_runtime_folder, wait_on_confirmation,
+                    self._database_socket_addresses)
 
-                self.wait_for_cores_to_be_ready(executable_targets,
-                                                self._app_id)
+                self._database_interface.add_system_params(
+                    self._time_scale_factor, self._machine_time_step,
+                    self._runtime)
+                database_progress.update()
+                self._database_interface.add_machine_objects(self._machine)
+                database_progress.update()
+                self._database_interface.add_partitionable_vertices(
+                    self._partitionable_graph)
+                database_progress.update()
+                self._database_interface.add_partitioned_vertices(
+                    self._partitioned_graph, self._graph_mapper,
+                    self._partitionable_graph)
+                database_progress.update()
+                self._database_interface.add_placements(self._placements,
+                                                        self._partitioned_graph)
+                database_progress.update()
+                self._database_interface.add_routing_infos(
+                    self._routing_infos, self._partitioned_graph)
+                database_progress.update()
+                self._database_interface.add_routing_tables(self._router_tables)
+                database_progress.update()
+                self._database_interface.add_tags(self._partitioned_graph,
+                                                  self._tags)
+                database_progress.update()
+                execute_mapping = config.getboolean(
+                    "Database", "create_routing_info_to_neuron_id_mapping")
+                if execute_mapping:
+                    self._database_interface.create_atom_to_event_id_mapping(
+                        graph_mapper=self._graph_mapper,
+                        partitionable_graph=self._partitionable_graph,
+                        partitioned_graph=self._partitioned_graph,
+                        routing_infos=self._routing_infos)
+                database_progress.update()
+                # if using a reload script, add if that needs to wait for
+                # confirmation
+                if self._reports_states.transciever_report:
+                    self._reload_script.wait_on_confirmation = \
+                        wait_on_confirmation
+                    for socket_address in self._database_socket_addresses:
+                        self._reload_script.add_socket_address(socket_address)
+                database_progress.update()
+                database_progress.end()
+                self._database_interface.send_read_notification()
+
+            # execute data spec generation
+            if do_timing:
+                timer.start_timing()
+            logger.info("*** Generating Output *** ")
+            logger.debug("")
+            executable_targets = self.generate_data_specifications()
+            if do_timing:
+                logger.info("Time to generate data: {}".format(
+                    timer.take_sample()))
+
+            # execute data spec execution
+            if do_timing:
+                timer.start_timing()
+            processor_to_app_data_base_address = \
+                self.execute_data_specification_execution(
+                    config.getboolean("SpecExecution", "specExecOnHost"),
+                    self._hostname, self._placements, self._graph_mapper,
+                    write_text_specs=config.getboolean(
+                        "Reports", "writeTextSpecs"),
+                    runtime_application_data_folder=
+                    self._app_data_runtime_folder,
+                    machine=self._machine)
+
+            if self._reports_states is not None:
+                reports.write_memory_map_report(
+                    self._report_default_directory,
+                    processor_to_app_data_base_address)
+
+            if do_timing:
+                logger.info("Time to execute data specifications: {}".format(
+                    timer.take_sample()))
+
+            wait_on_confirmation = False
+            send_start_notification = False
+            if (not isinstance(self._machine, VirtualMachine) and
+                    config.getboolean("Execute", "run_simulation")):
+                if do_timing:
+                    timer.start_timing()
+
+                logger.info("*** Loading tags ***")
+                self.load_tags(self._tags)
+
+                if self._do_load is True:
+                    logger.info("*** Loading data ***")
+                    self._load_application_data(
+                        self._placements, self._graph_mapper,
+                        processor_to_app_data_base_address, self._hostname,
+                        app_data_folder=self._app_data_runtime_folder,
+                        verify=config.getboolean("Mode", "verify_writes"))
+                    self.load_routing_tables(self._router_tables, self._app_id)
+                    logger.info("*** Loading executables ***")
+                    self.load_executable_images(
+                        executable_targets, self._app_id)
+                    logger.info("*** Loading buffers ***")
+                    self.set_up_send_buffering(self._partitioned_graph,
+                                               self._placements, self._tags)
+
+                # end of entire loading setup
+                if do_timing:
+                    logger.debug("Time to load: {}".format(timer.take_sample()))
+
+                if self._do_run is True:
+                    logger.info("*** Running simulation... *** ")
+                    if do_timing:
+                        timer.start_timing()
+                    # every thing is in sync0. load the initial buffers
+                    self._send_buffer_manager.load_initial_buffers()
+                    if do_timing:
+                        logger.debug("Time to load buffers: {}".format(
+                            timer.take_sample()))
+
+                    wait_on_confirmation = config.getboolean(
+                        "Database", "wait_on_confirmation")
+                    send_start_notification = config.getboolean(
+                        "Database", "send_start_notification")
+
+                self.wait_for_cores_to_be_ready(
+                    executable_targets, self._app_id, self._no_full_runs)
 
                 # wait till external app is ready for us to start if required
                 if (self._database_interface is not None and
                         wait_on_confirmation):
                     self._database_interface.wait_for_confirmation()
 
-                self.start_all_cores(executable_targets, self._app_id)
+            # if not a virtual machine
+            if (not isinstance(self._machine, VirtualMachine) and
+                    config.getboolean("Execute", "run_simulation")):
+
+                self.start_all_cores(executable_targets, self._app_id,
+                                     self._no_full_runs)
 
                 if (self._database_interface is not None and
                         send_start_notification):
@@ -467,117 +512,42 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         else:
             logger.info("*** No simulation requested: Stopping. ***")
 
-    @property
-    def app_id(self):
+    def _detect_if_graph_has_changed(self):
         """
-
+        iterates though the graph and looks for asks if they have changed
         :return:
         """
-        return self._app_id
+        changed = False
+        for population in self._populations:
+            if population.changed:
+                changed = True
+            population.changed = False
+        if changed:
+            return changed
+        for projection in self._projections:
+            if projection.changed:
+                changed = True
+        return changed
 
-    @property
-    def has_ran(self):
+    def _deduce_machine_time_step(self, run_time):
         """
-
-        :return:
+        deduces the machien time step per vertex
+        :param run_time: the runtime field
+        :return: None
         """
-        return self._has_ran
-
-    @property
-    def machine_time_step(self):
-        """
-
-        :return:
-        """
-        return self._machine_time_step
-
-    @property
-    def no_machine_time_steps(self):
-        """
-
-        :return:
-        """
-        return self._no_machine_time_steps
-
-    @property
-    def timescale_factor(self):
-        """
-
-        :return:
-        """
-        return self._time_scale_factor
-
-    @property
-    def spikes_per_second(self):
-        """
-
-        :return:
-        """
-        return self._spikes_per_second
-
-    @property
-    def ring_buffer_sigma(self):
-        """
-
-        :return:
-        """
-        return self._ring_buffer_sigma
-
-    @property
-    def get_multi_cast_source(self):
-        """
-
-        :return:
-        """
-        return self._multi_cast_vertex
-
-    @property
-    def partitioned_graph(self):
-        """
-
-        :return:
-        """
-        return self._partitioned_graph
-
-    @property
-    def partitionable_graph(self):
-        """
-
-        :return:
-        """
-        return self._partitionable_graph
-
-    @property
-    def placements(self):
-        """
-
-        :return:
-        """
-        return self._placements
-
-    @property
-    def transceiver(self):
-        """
-
-        :return:
-        """
-        return self._txrx
-
-    @property
-    def graph_mapper(self):
-        """
-
-        :return:
-        """
-        return self._graph_mapper
-
-    @property
-    def routing_infos(self):
-        """
-
-        :return:
-        """
-        return self._routing_infos
+        self._no_machine_time_steps =\
+            int((run_time * 1000.0) / self._machine_time_step)
+        ceiled_machine_time_steps = \
+            math.ceil((run_time * 1000.0) / self._machine_time_step)
+        if self._no_machine_time_steps != ceiled_machine_time_steps:
+            raise common_exceptions.ConfigurationException(
+                "The runtime and machine time step combination result in "
+                "a factional number of machine runable time steps and "
+                "therefore spinnaker cannot determine how many to run for")
+        for vertex in self._partitionable_graph.vertices:
+            if isinstance(vertex, AbstractDataSpecableVertex):
+                vertex.set_no_machine_time_steps(
+                    self._no_machine_time_steps)
 
     def set_app_id(self, value):
         """
@@ -901,6 +871,13 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         """
         self._populations.append(population)
 
+    def _add_projection(self, projection):
+        """ called by each projection to add itself to the list
+        :param projection:
+        :return:
+        """
+        self._projections.append(projection)
+
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,
             source, target, synapse_dynamics, label, rng):
@@ -933,6 +910,21 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         chip_id_allocator = MallocBasedChipIdAllocator()
         chip_id_allocator.allocate_chip_ids(self._partitionable_graph,
                                             self._machine)
+
+    def _tell_cores_to_exit(self):
+        """
+        iterates though placements and tells each core to exit
+        :return:
+        """
+        byte_data = bytearray()
+        byte_data.append(constants.SDP_STOP_ID_CODE)
+
+        for placement in self._placements:
+            self._txrx.send_sdp_message(SDPMessage(
+                sdp_header=SDPHeader(
+                    destination_cpu=placement.p,
+                    destination_chip_x=placement.x,
+                    destination_chip_y=placement.y), data=))
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
@@ -981,7 +973,14 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                                                       router_table.y)
 
         # execute app stop
-        # self._txrx.stop_application(self._app_id)
+        self._tell_cores_to_exit()
+
+        # clear values
+        self._no_full_runs = 0
+        self._total_run_time_so_far = 0
+
+        # app stop command (currently fucked)
+        #self._txrx.stop_application(self._app_id)
         if self._create_database:
             self._database_interface.stop()
 
@@ -997,3 +996,125 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         :return:
         """
         self._database_socket_addresses.add(socket_address)
+
+    @property
+    def app_id(self):
+        """
+
+        :return:
+        """
+        return self._app_id
+
+    @property
+    def has_ran(self):
+        """
+
+        :return:
+        """
+        return self._has_ran
+
+    @property
+    def machine_time_step(self):
+        """
+
+        :return:
+        """
+        return self._machine_time_step
+
+    @property
+    def no_machine_time_steps(self):
+        """
+
+        :return:
+        """
+        return self._no_machine_time_steps
+
+    @property
+    def timescale_factor(self):
+        """
+
+        :return:
+        """
+        return self._time_scale_factor
+
+    @property
+    def spikes_per_second(self):
+        """
+
+        :return:
+        """
+        return self._spikes_per_second
+
+    @property
+    def ring_buffer_sigma(self):
+        """
+
+        :return:
+        """
+        return self._ring_buffer_sigma
+
+    @property
+    def get_multi_cast_source(self):
+        """
+
+        :return:
+        """
+        return self._multi_cast_vertex
+
+    @property
+    def partitioned_graph(self):
+        """
+
+        :return:
+        """
+        return self._partitioned_graph
+
+    @property
+    def partitionable_graph(self):
+        """
+
+        :return:
+        """
+        return self._partitionable_graph
+
+    @property
+    def placements(self):
+        """
+
+        :return:
+        """
+        return self._placements
+
+    @property
+    def transceiver(self):
+        """
+
+        :return:
+        """
+        return self._txrx
+
+    @property
+    def _total_run_time_so_far(self):
+        """
+
+        :return:
+        """
+        return self._total_run_time_so_far
+
+    
+
+    @property
+    def graph_mapper(self):
+        """
+
+        :return:
+        """
+        return self._graph_mapper
+
+    @property
+    def routing_infos(self):
+        """
+
+        :return:
+        """
+        return self._routing_infos

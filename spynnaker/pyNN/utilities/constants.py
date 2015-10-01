@@ -94,3 +94,9 @@ POPULATION_NEURON_PARAMS_HEADER_BYTES = 20
 
 # The default routing mask to use
 DEFAULT_MASK = 0xfffff800
+
+# sdp packet id for stopping models
+SDP_STOP_ID_CODE = 123456789
+
+# sdp packet id for new runtime
+SDP_RUNTIME_ID_CODE = 987654321

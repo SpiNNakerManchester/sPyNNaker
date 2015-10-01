@@ -62,6 +62,7 @@ class Projection(object):
         self._delay_list_ranges = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
+        self._changed = True
 
         if isinstance(postsynaptic_population._get_vertex,
                       AbstractPopulationVertex):
@@ -161,6 +162,25 @@ class Projection(object):
                 # add edge to the graph
                 spinnaker_control.add_edge(self._projection_edge)
                 self._projection_list_ranges = synapse_list.ranges()
+        spinnaker_control._add_projection(self)
+
+    @property
+    def changed(self):
+        """
+        returns bool which returns if the population spec has changed since
+        changed was last changed.
+        :return: boolean
+        """
+        return self._changed
+
+    @changed.setter
+    def changed(self, new_value):
+        """
+        setter for the changed
+        :param new_value: the new vlaue of the changed
+        :return: None
+        """
+        self._changed = new_value
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
         """ searches though the partitionable graph's edges to locate any
