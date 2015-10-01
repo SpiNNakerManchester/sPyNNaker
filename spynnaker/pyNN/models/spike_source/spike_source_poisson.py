@@ -17,6 +17,10 @@ from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 from data_specification.enums.data_type import DataType
 
+from pacman.model.constraints.tag_allocator_constraints\
+    .tag_allocator_require_reverse_iptag_constraint \
+    import TagAllocatorRequireReverseIptagConstraint
+
 from enum import Enum
 import math
 import numpy
@@ -27,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 0.25
 PARAMS_BASE_WORDS = 4
-PARAMS_WORDS_PER_NEURON = 5
+PARAMS_WORDS_PER_NEURON = 6
 RANDOM_SEED_WORDS = 4
 
 
@@ -50,7 +54,7 @@ class SpikeSourcePoisson(
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
                  spikes_per_second, ring_buffer_sigma,
                  constraints=None, label="SpikeSourcePoisson",
-                 rate=1.0, start=0.0, duration=None, seed=None):
+                 rate=1.0, start=0.0, duration=None, seed=None, port=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
@@ -63,6 +67,10 @@ class SpikeSourcePoisson(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
+
+        if port is not None:
+            self.add_constraint(TagAllocatorRequireReverseIptagConstraint(
+                port))
         self._rate = rate
         self._start = start
         self._duration = duration
@@ -241,81 +249,45 @@ class SpikeSourcePoisson(
             spec.write_value(data=self._seed[2])
             spec.write_value(data=self._seed[3])
 
+        # Write the number of sources
+        spec.write_value(data=num_neurons)
+
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
-        slow_sources = list()
-        fast_sources = list()
         for i in range(0, num_neurons):
 
             # Get the parameter values for source i:
             rate_val = generate_parameter(self._rate, i)
             start_val = generate_parameter(self._start, i)
-            end_val = None
+            start_scaled = int(start_val * 1000.0 / self._machine_time_step)
+            end_scaled = 0xFFFFFFFF
             if self._duration is not None:
                 end_val = generate_parameter(self._duration, i) + start_val
+                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
 
             # Decide if it is a fast or slow source and
             spikes_per_tick = \
                 (float(rate_val) * (self._machine_time_step / 1000000.0))
-            if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
-                slow_sources.append([i, rate_val, start_val, end_val])
+            if spikes_per_tick == 0:
+                exp_minus_lamda = 0
             else:
-                fast_sources.append([i, spikes_per_tick, start_val, end_val])
+                exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
 
-        # Write the numbers of each type of source
-        spec.write_value(data=len(slow_sources))
-        spec.write_value(data=len(fast_sources))
+            is_fast_source = 1
+            if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
+                is_fast_source = 0
 
-        # Now write one struct for each slow source as follows
-        #
-        #   typedef struct slow_spike_source_t
-        #   {
-        #     uint32_t neuron_id;
-        #     uint32_t start_ticks;
-        #     uint32_t end_ticks;
-        #
-        #     accum mean_isi_ticks;
-        #     accum time_to_spike_ticks;
-        #   } slow_spike_source_t;
-        for (neuron_id, rate_val, start_val, end_val) in slow_sources:
             if rate_val == 0:
                 isi_val = 0
             else:
                 isi_val = float(1000000.0 /
                                 (rate_val * self._machine_time_step))
-            start_scaled = int(start_val * 1000.0 / self._machine_time_step)
-            end_scaled = 0xFFFFFFFF
-            if end_val is not None:
-                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
+            spec.write_value(data=is_fast_source, data_type=DataType.UINT32)
+            spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
             spec.write_value(data=isi_val, data_type=DataType.S1615)
             spec.write_value(data=0x0, data_type=DataType.UINT32)
-
-        # Now write
-        #   typedef struct fast_spike_source_t
-        #   {
-        #     uint32_t neuron_id;
-        #     uint32_t start_ticks;
-        #     uint32_t end_ticks;
-        #
-        #     unsigned long fract exp_minus_lambda;
-        #   } fast_spike_source_t;
-        for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
-            if spikes_per_tick == 0:
-                exp_minus_lamda = 0
-            else:
-                exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
-            start_scaled = int(start_val * 1000.0 / self._machine_time_step)
-            end_scaled = 0xFFFFFFFF
-            if end_val is not None:
-                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
-            spec.write_value(data=start_scaled, data_type=DataType.UINT32)
-            spec.write_value(data=end_scaled, data_type=DataType.UINT32)
-            spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
-        return
 
     def get_spikes(self, txrx, placements, graph_mapper,
                    compatible_output=False):
