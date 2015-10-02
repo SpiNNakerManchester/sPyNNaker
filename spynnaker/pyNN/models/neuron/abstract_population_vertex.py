@@ -416,6 +416,22 @@ class AbstractPopulationVertex(
     def weight_scale(self):
         return self._input_type.get_global_weight_scale()
 
+    @property
+    def ring_buffer_sigma(self):
+        return self._synapse_manager.ring_buffer_sigma
+
+    @ring_buffer_sigma.setter
+    def ring_buffer_sigma(self, ring_buffer_sigma):
+        self._synapse_manager.ring_buffer_sigma = ring_buffer_sigma
+
+    @property
+    def spikes_per_second(self):
+        return self._synapse_manager.spikes_per_second
+
+    @spikes_per_second.setter
+    def spikes_per_second(self, spikes_per_second):
+        self._synapse_manager.spikes_per_second = spikes_per_second
+
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
             post_subvertex, synapse_io, subgraph, routing_infos,

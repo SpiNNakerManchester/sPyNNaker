@@ -66,6 +66,22 @@ class SynapticManager(object):
         return self._synapse_type
 
     @property
+    def ring_buffer_sigma(self):
+        return self._ring_buffer_sigma
+
+    @ring_buffer_sigma.setter
+    def ring_buffer_sigma(self, ring_buffer_sigma):
+        self._ring_buffer_sigma = ring_buffer_sigma
+
+    @property
+    def spikes_per_second(self):
+        return self._spikes_per_second
+
+    @spikes_per_second.setter
+    def spikes_per_second(self, spikes_per_second):
+        self._spikes_per_second = spikes_per_second
+
+    @property
     def vertex_executable_suffix(self):
         if self._stdp_mechanism is None:
             return ""

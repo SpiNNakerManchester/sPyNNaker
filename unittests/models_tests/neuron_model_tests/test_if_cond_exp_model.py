@@ -1,9 +1,8 @@
 import unittest
-from spynnaker.pyNN.models.neural_models.if_cond_exp import \
-    IFConductanceExponentialPopulation
+from spynnaker.pyNN.models.neuron.builds.if_cond_exp import IFCondExp
 
 
-class TestIFCurrExpModel(unittest.TestCase):
+class TestIFCondExpModel(unittest.TestCase):
     def test_new_if_cond_exp_model(self):
         cell_params_lif = {'cm': 0.25,
                            'i_offset': 0.0,
@@ -29,9 +28,8 @@ class TestIFCurrExpModel(unittest.TestCase):
             'tau_refrac': 0.1,
             'i_offset': 0}
         n_neurons = 10
-        if_cond_exp = IFConductanceExponentialPopulation(
-            n_neurons, 1000, 1.0, 1, 1)
-        self.assertEqual(if_cond_exp.model_name, "IF_cond_exp")
+        if_cond_exp = IFCondExp(n_neurons, 1000, 1.0)
+        self.assertEqual(if_cond_exp.model_name(), "IF_cond_exp")
         self.assertEqual(len(if_cond_exp.get_parameters()), 12)
         self.assertEqual(if_cond_exp._v_thresh, cell_params_lif['v_thresh'])
         self.assertEqual(if_cond_exp._v_reset, [cell_params_lif['v_reset']])

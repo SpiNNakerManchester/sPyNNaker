@@ -151,11 +151,11 @@ class Population(object):
         # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 
-    def get(self, paramter_name, gather=False):
+    def get(self, parameter_name, gather=False):
         """
         Get the values of a parameter for every local cell in the population.
         """
-        return self._parameters[paramter_name]
+        return self._vertex.get_value(parameter_name)
 
     def _get_cell_position(self, cell_id):
         """
