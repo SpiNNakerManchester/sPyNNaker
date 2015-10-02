@@ -3,7 +3,6 @@ Synfirechain-like example
 """
 #!/usr/bin/python
 import spynnaker.pyNN as p
-import visualiser_framework.visualiser_constants as modes
 import numpy, pylab
 p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
 p.set_number_of_neurons_per_core("IF_curr_exp", 250)
