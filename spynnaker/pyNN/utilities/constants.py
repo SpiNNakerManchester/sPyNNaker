@@ -96,7 +96,7 @@ POPULATION_NEURON_PARAMS_HEADER_BYTES = 20
 DEFAULT_MASK = 0xfffff800
 
 # sdp packet id for stopping models
-SDP_STOP_ID_CODE = 123456789
+SDP_STOP_ID_CODE = 30
 
 # sdp packet id for new runtime
-SDP_RUNTIME_ID_CODE = 987654321
+SDP_RUNTIME_ID_CODE = 31
