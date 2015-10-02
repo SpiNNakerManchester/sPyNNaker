@@ -924,7 +924,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 sdp_header=SDPHeader(
                     destination_cpu=placement.p,
                     destination_chip_x=placement.x,
-                    destination_chip_y=placement.y), data=))
+                    destination_chip_y=placement.y), data=byte_data))
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
@@ -1094,14 +1094,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         return self._txrx
 
     @property
-    def _total_run_time_so_far(self):
+    def total_run_time_so_far(self):
         """
 
         :return:
         """
         return self._total_run_time_so_far
-
-    
 
     @property
     def graph_mapper(self):
