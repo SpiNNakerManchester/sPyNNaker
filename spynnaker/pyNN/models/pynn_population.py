@@ -99,6 +99,11 @@ class Population(object):
         self._spikes_cache_file = None
         self._v_cache_file = None
         self._gsyn_cache_file = None
+        self._runtime_offset = 0
+        self._last_runtime = None
+        self._needs_spike_gathering = True
+        self._needs_v_gathering = True
+        self._needs_gsyn_gathering = True
 
         # parameter
         self._changed = True
@@ -120,6 +125,20 @@ class Population(object):
         :return: None
         """
         self._changed = new_value
+
+    def notify_run(time):
+        """
+        notify this Population that it has been simulated for a certain amount 
+        of time (in ms). This tells it that spikes need to be gathered and
+        that any new spikes need to have a time offset applied to them.
+        :param time: the time for which the simulation ran
+        """
+        self._needs_spike_gathering = True
+        self._needs_gsyn_gathering = True
+        self._needs_v_gathering = True
+        if self._last_runtime is not None:
+            self._runtime_offset += self._last_runtime
+        self._last_runtime = time
 
     def __add__(self, other):
         """
@@ -203,13 +222,13 @@ class Population(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getSpikes(self, compatible_output=False, gather=True):
+    def getSpikes(self, compatible_output=False, gather=True,
+            only_last_run=False):
         """
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
         """
-        if self._spikes_cache_file is None:
-
+        if self._needs_spike_gathering:
             if not gather:
                 logger.warn("Spynnaker only supports gather = true, will "
                             " execute as if gather was true anyhow")
@@ -234,22 +253,28 @@ class Population(object):
                 placements=self._spinnaker.placements,
                 graph_mapper=self._spinnaker.graph_mapper,
                 compatible_output=compatible_output)
+            for spike in spikes:
+                spike[1] += self._runtime_offset
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get spikes: {}".format(
                     timer.take_sample()))
-            self._spikes_cache_file = tempfile.NamedTemporaryFile()
+            if self._spikes_cache_file is None:
+                self._spikes_cache_file = \
+                    tempfile.NamedTemporaryFile(mode='a+b')
             numpy.save(self._spikes_cache_file, spikes)
-            return spikes
+            self._needs_spike_gathering = False
+            if only_last_run:
+                return spikes
 
         # Load from the file
         self._spikes_cache_file.seek(0)
         return numpy.load(self._spikes_cache_file)
 
-    def get_spike_counts(self, gather=True):
+    def get_spike_counts(self, gather=True, only_last_run=False):
         """
         Returns the number of spikes for each neuron.
         """
-        spikes = self.getSpikes(True, gather)
+        spikes = self.getSpikes(True, gather, only_last_run)
         n_spikes = {}
         counts = numpy.bincount(spikes[:, 0].astype(dtype="uint32"))
         for i in range(self._vertex.n_atoms):
@@ -257,7 +282,8 @@ class Population(object):
         return n_spikes
 
     # noinspection PyUnusedLocal
-    def get_gsyn(self, gather=True, compatible_output=False):
+    def get_gsyn(self, gather=True, compatible_output=False,
+            only_last_run=False):
         """
         Return a 3-column numpy array containing cell ids and synaptic
         conductances for recorded cells.
