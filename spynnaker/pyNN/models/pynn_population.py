@@ -99,11 +99,9 @@ class Population(object):
         self._spikes_cache_file = None
         self._v_cache_file = None
         self._gsyn_cache_file = None
-        self._runtime_offset = 0
-        self._last_runtime = None
-        self._needs_spike_gathering = True
-        self._needs_v_gathering = True
-        self._needs_gsyn_gathering = True
+        self._last_spike_read = None
+        self._last_v_read = None
+        self._last_gsyn_read = None
 
         # parameter
         self._changed = True
@@ -125,20 +123,6 @@ class Population(object):
         :return: None
         """
         self._changed = new_value
-
-    def notify_run(time):
-        """
-        notify this Population that it has been simulated for a certain amount 
-        of time (in ms). This tells it that spikes need to be gathered and
-        that any new spikes need to have a time offset applied to them.
-        :param time: the time for which the simulation ran
-        """
-        self._needs_spike_gathering = True
-        self._needs_gsyn_gathering = True
-        self._needs_v_gathering = True
-        if self._last_runtime is not None:
-            self._runtime_offset += self._last_runtime
-        self._last_runtime = time
 
     def __add__(self, other):
         """
@@ -223,14 +207,14 @@ class Population(object):
 
     # noinspection PyPep8Naming
     def getSpikes(self, compatible_output=False, gather=True,
-            only_last_run=False):
+            only_last_run=False, runtime_offset=0):
         """
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
         Time is relative to the first start of the simulation, even if it was
         paused and restarted.
         """
-        if self._needs_spike_gathering:
+        if self._last_spike_read < self._spinnaker._no_full_runs:
             if not gather:
                 logger.warn("Spynnaker only supports gather = true, will "
                             " execute as if gather was true anyhow")
@@ -256,7 +240,7 @@ class Population(object):
                 graph_mapper=self._spinnaker.graph_mapper,
                 compatible_output=compatible_output)
             for spike in spikes:
-                spike[1] += self._runtime_offset
+                spike[1] += runtime_offset
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get spikes: {}".format(
                     timer.take_sample()))
@@ -264,7 +248,7 @@ class Population(object):
                 self._spikes_cache_file = \
                     tempfile.NamedTemporaryFile(mode='a+b')
             numpy.save(self._spikes_cache_file, spikes)
-            self._needs_spike_gathering = False
+            self._last_spike_read = self._spinnaker._no_full_runs
             if only_last_run:
                 return spikes
 
@@ -285,13 +269,13 @@ class Population(object):
 
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False,
-            only_last_run=False):
+            only_last_run=False, runtime_offset=0):
         """
         Return a 3-column numpy array containing cell ids and synaptic
         conductances for recorded cells.
 
         """
-        if self._needs_gsyn_gathering:
+        if self._last_gsyn_read < self._spinnaker._no_full_runs:
             if not self._vertex.record_gsyn:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record gsyn. "
@@ -316,14 +300,14 @@ class Population(object):
                 compatible_output=compatible_output,
                 runtime=self._spinnaker._runtime)
             for gsy in gsyn:
-                gsy[1] += self._runtime_offset
+                gsy[1] += runtime_offset
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get gsyn: {}".format(timer.take_sample()))
 
             if self._gsyn_cache_file is None:
                 self._gsyn_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
             numpy.save(self._gsyn_cache_file, gsyn)
-            self._needs_gsyn_gathering = False
+            self._last_gsyn_read = self._spinnaker._no_full_runs
             if only_last_run:
                 return gsyn
 
@@ -332,7 +316,8 @@ class Population(object):
         return numpy.load(self._gsyn_cache_file)
 
     # noinspection PyUnusedLocal
-    def get_v(self, gather=True, compatible_output=False, only_last_run=False):
+    def get_v(self, gather=True, compatible_output=False, only_last_run=False,
+        runtime_offset=0):
         """
         Return a 3-column numpy array containing cell ids, time, and Vm for
         recorded cells.
@@ -343,8 +328,15 @@ class Population(object):
         :param compatible_output:
             not used - inserted to match PyNN specs
         :type compatible_output: bool
+        :param only_last_run:
+            only return voltages collected since the most recent start of the 
+            simulation
+        :type only_last_run: bool
+        :param runtime_offset:
+            time offset to be applied to the voltages, this should be set to
+            the start time of the most recent run of the simulation
         """
-        if self._needs_v_gathering:
+        if self._last_v_read < self._spinnaker._no_full_runs:
             if not self._vertex.record_v:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record v. "
@@ -378,6 +370,7 @@ class Population(object):
             if self._v_cache_file is None:
                 self._v_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
             numpy.save(self._v_cache_file, v)
+            self._last_v_read = self._spinnaker._no_full_runs
             if only_last_run:
                 return v
 
