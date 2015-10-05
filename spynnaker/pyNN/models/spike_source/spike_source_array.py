@@ -54,6 +54,10 @@ from spynnaker.pyNN import exceptions
 
 logger = logging.getLogger(__name__)
 
+# Extra space in recording region in case of buffering sending more packets
+# than expected
+_RECORDING_OVERALLOCATION = 2000
+
 
 class SpikeSourceArray(
         AbstractDataSpecableVertex, AbstractPartitionableVertex,
@@ -330,7 +334,8 @@ class SpikeSourceArray(
             graph_mapper.get_subvertex_slice(subvertex))
 
         if self._spike_recording_region_size is None:
-            self._spike_recording_region_size = spike_buffer.total_region_size
+            self._spike_recording_region_size = (
+                spike_buffer.total_region_size + _RECORDING_OVERALLOCATION)
         self._reserve_memory_regions(spec, spike_buffer.buffer_size,
                                      self._spike_recording_region_size)
 
@@ -374,7 +379,8 @@ class SpikeSourceArray(
         send_size = send_buffer.buffer_size
         self._spike_recording_region_size = 0
         if self._record:
-            self._spike_recording_region_size = send_buffer.total_region_size
+            self._spike_recording_region_size = (
+                send_buffer.total_region_size + _RECORDING_OVERALLOCATION)
         return (
             (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
             SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size +
