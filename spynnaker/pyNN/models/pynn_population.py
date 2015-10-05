@@ -227,6 +227,8 @@ class Population(object):
         """
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells.   This is read directly from the memory for the board.
+        Time is relative to the first start of the simulation, even if it was
+        paused and restarted.
         """
         if self._needs_spike_gathering:
             if not gather:
@@ -289,7 +291,7 @@ class Population(object):
         conductances for recorded cells.
 
         """
-        if self._gsyn_cache_file is None:
+        if self._needs_gsyn_gathering:
             if not self._vertex.record_gsyn:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record gsyn. "
@@ -313,19 +315,24 @@ class Population(object):
                 graph_mapper=self._spinnaker.graph_mapper,
                 compatible_output=compatible_output,
                 runtime=self._spinnaker._runtime)
+            for gsy in gsyn:
+                gsy[1] += self._runtime_offset
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get gsyn: {}".format(timer.take_sample()))
 
-            self._gsyn_cache_file = tempfile.NamedTemporaryFile()
+            if self._gsyn_cache_file is None:
+                self._gsyn_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
             numpy.save(self._gsyn_cache_file, gsyn)
-            return gsyn
+            self._needs_gsyn_gathering = False
+            if only_last_run:
+                return gsyn
 
         # Reload the data
         self._gsyn_cache_file.seek(0)
-        numpy.load(self._gsyn_cache_file)
+        return numpy.load(self._gsyn_cache_file)
 
     # noinspection PyUnusedLocal
-    def get_v(self, gather=True, compatible_output=False):
+    def get_v(self, gather=True, compatible_output=False, only_last_run=False):
         """
         Return a 3-column numpy array containing cell ids, time, and Vm for
         recorded cells.
@@ -337,7 +344,7 @@ class Population(object):
             not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
-        if self._v_cache_file is None:
+        if self._needs_v_gathering:
             if not self._vertex.record_v:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record v. "
@@ -362,13 +369,17 @@ class Population(object):
                 graph_mapper=self._spinnaker.graph_mapper,
                 compatible_output=compatible_output,
                 runtime=self._spinnaker._runtime)
+            for vi in v:
+                vi[1] += self._runtime_offset
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to read v: {}".format(timer.take_sample()))
 
-            self._v_cache_file = tempfile.NamedTemporaryFile()
+            if self._v_cache_file is None:
+                self._v_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
             numpy.save(self._v_cache_file, v)
-            return v
+            if only_last_run:
+                return v
 
         # Reload the data
         self._v_cache_file.seek(0)
