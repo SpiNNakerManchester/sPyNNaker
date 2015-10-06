@@ -196,6 +196,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         inputs.add('ReportFolder')
         inputs.add('IPAddress')
         inputs.add("Transciever")
+        inputs.add("FileFormatFolderPath")
 
         xml_paths = config.get("Mapping", "extra_xmls_paths")
         if xml_paths == "None":
@@ -230,6 +231,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                        'value': self._app_data_runtime_folder})
         inputs.append({'type': "IPAddress", 'value': self._hostname})
         inputs.append({'type': "MemoryTransciever", 'value': self._txrx})
+        inputs.append({'type': "FileFormatFolderPath",
+                       'value': self._report_default_directory})
 
         # execute mapping process
         self._pacman_exeuctor.execute_mapping(inputs)

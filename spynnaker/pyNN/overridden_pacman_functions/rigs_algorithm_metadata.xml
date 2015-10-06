@@ -1,30 +1,4 @@
 <algorithms>
-    <algorithm name="RigPythonSAPlacer">
-        <python_module>reference_implementation</python_module>
-        <python_class>RigPlacerClass</python_class>
-        <required_inputs>
-            <parameter>
-                <param_name>graph</param_name>
-                <param_type>FilePartitionedGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>--machine</param_name>
-                <param_type>FileMachine</param_type>
-            </parameter>
-            <parameter>
-                <param_name>constraints</param_name>
-                <param_type>FileConstraints</param_type>
-            </parameter>
-        </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>placements</param_name>
-                <param_type>FilePlacements</param_type>
-            </parameter>
-        </produces_outputs>
-    </algorithm>
     <algorithm name="RigCommandLineSAPlacer">
         <command_line_args>
             <arg>python</arg>
@@ -33,7 +7,7 @@
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
             <arg>--machine={machine}</arg>
-            <arg>--placements={placements}</arg>
+
         </command_line_args>
          <required_inputs>
             <parameter>
