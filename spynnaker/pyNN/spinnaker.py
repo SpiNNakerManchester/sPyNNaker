@@ -196,7 +196,14 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         inputs.add('ReportFolder')
         inputs.add('IPAddress')
         inputs.add("Transciever")
-        inputs.add("FileFormatFolderPath")
+        # add paths for each file based version
+        inputs.add("FileCoreAllocationsFilePath")
+        inputs.add("FileSDRAMAllocationsFilePath")
+        inputs.add("FileMachineFilePath")
+        inputs.add("FilePartitionedGraphFilePath")
+        inputs.add("FilePlacementFilePath")
+        inputs.add("FileRouingPathsFilePath")
+        inputs.add("FileConstraintsFilePath")
 
         xml_paths = config.get("Mapping", "extra_xmls_paths")
         if xml_paths == "None":
@@ -231,8 +238,29 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                        'value': self._app_data_runtime_folder})
         inputs.append({'type': "IPAddress", 'value': self._hostname})
         inputs.append({'type': "MemoryTransciever", 'value': self._txrx})
-        inputs.append({'type': "FileFormatFolderPath",
-                       'value': self._report_default_directory})
+
+        # file paths for each json file
+        inputs.append({'type': "FileCoreAllocationsFilePath",
+                       'value': os.path.join(self._report_default_directory,
+                                             "core_allocations.json")})
+        inputs.append({'type': "FileSDRAMAllocationsFilePath",
+                       'value': os.path.join(self._report_default_directory,
+                                             "sdram_allocations.json")})
+        inputs.append({'type': "FileMachineFilePath",
+                       'value': os.path.join(self._report_default_directory,
+                                             "machine.json")})
+        inputs.append({'type': "FilePartitionedGraphFilePath",
+                       'value': os.path.join(self._report_default_directory,
+                                             "partitioned_graph.json")})
+        inputs.append({'type': "FilePlacementFilePath",
+                       'value': os.path.join(self._report_default_directory,
+                                             "placements.json")})
+        inputs.append({'type': "FileRouingPathsFilePath",
+                       'value': os.path.join(self._report_default_directory,
+                                             "routing_paths.json")})
+        inputs.append({'type': "FileConstraintsFilePath",
+                       'value': os.path.join(self._report_default_directory,
+                                             "constraints.json")})
 
         # execute mapping process
         self._pacman_exeuctor.execute_mapping(inputs)
