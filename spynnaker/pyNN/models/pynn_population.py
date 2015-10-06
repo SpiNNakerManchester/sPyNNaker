@@ -210,9 +210,20 @@ class Population(object):
             only_last_run=False, runtime_offset=0):
         """
         Return a 2-column numpy array containing cell ids and spike times for
-        recorded cells.   This is read directly from the memory for the board.
-        Time is relative to the first start of the simulation, even if it was
-        paused and restarted.
+        recorded cells. This is read directly from the memory for the board.
+        :param gather:
+            not used - inserted to match PyNN specs
+        :type gather: bool
+        :param compatible_output:
+            not used - inserted to match PyNN specs
+        :type compatible_output: bool
+        :param only_last_run:
+            only return spikes collected since the most recent start of the 
+            simulation
+        :type only_last_run: bool
+        :param runtime_offset:
+            time offset to be applied to the timestamps, this should be set to
+            the start time of the most recent run of the simulation
         """
         if self._last_spike_read < self._spinnaker._no_full_runs:
             if not gather:
@@ -254,7 +265,10 @@ class Population(object):
 
         # Load from the file
         self._spikes_cache_file.seek(0)
-        return numpy.load(self._spikes_cache_file)
+        lists = []
+        for i in range(self._spinnaker._no_full_runs):
+            lists.append(numpy.load(self._spikes_cache_file))
+        return numpy.concatenate(lists)
 
     def get_spike_counts(self, gather=True, only_last_run=False):
         """
@@ -271,9 +285,21 @@ class Population(object):
     def get_gsyn(self, gather=True, compatible_output=False,
             only_last_run=False, runtime_offset=0):
         """
-        Return a 3-column numpy array containing cell ids and synaptic
+        Return a 3-column numpy array containing cell ids, time and synaptic
         conductances for recorded cells.
-
+        :param gather:
+            not used - inserted to match PyNN specs
+        :type gather: bool
+        :param compatible_output:
+            not used - inserted to match PyNN specs
+        :type compatible_output: bool
+        :param only_last_run:
+            only return gsyn collected since the most recent start of the 
+            simulation
+        :type only_last_run: bool
+        :param runtime_offset:
+            time offset to be applied to the timestamps, this should be set to
+            the start time of the most recent run of the simulation
         """
         if self._last_gsyn_read < self._spinnaker._no_full_runs:
             if not self._vertex.record_gsyn:
@@ -311,9 +337,12 @@ class Population(object):
             if only_last_run:
                 return gsyn
 
-        # Reload the data
+        # Load from the file
         self._gsyn_cache_file.seek(0)
-        return numpy.load(self._gsyn_cache_file)
+        lists = []
+        for i in range(self._spinnaker._no_full_runs):
+            lists.append(numpy.load(self._gsyn_cache_file))
+        return numpy.concatenate(lists)
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False, only_last_run=False,
@@ -374,9 +403,12 @@ class Population(object):
             if only_last_run:
                 return v
 
-        # Reload the data
+        # Load from the file
         self._v_cache_file.seek(0)
-        return numpy.load(self._v_cache_file)
+        lists = []
+        for i in range(self._spinnaker._no_full_runs):
+            lists.append(numpy.load(self._v_cache_file))
+        return numpy.concatenate(lists)
 
     def id_to_index(self, cell_id):
         """

@@ -58,6 +58,7 @@ from spinn_front_end_common.abstract_models.\
 # local front end imports
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_message import SDPMessage
+from spinnman.messages.sdp.sdp_flag import SDPFlag
 from spynnaker.pyNN.models\
     .abstract_models.abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
@@ -84,7 +85,6 @@ from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
 import logging
 import math
 import os
-
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +113,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._populations = list()
         self._projections = list()
         self._no_full_runs = 0
-        self._total_run_time_so_far = 0
+        self._executable_tagets = None
 
         if self._app_id is None:
             self._set_up_main_objects(
@@ -219,6 +219,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if number_of_boards == "None":
             number_of_boards = None
 
+        needs_mapping = False
+
         if not self._has_ran:
             self.setup_interfaces(
                 hostname=self._hostname,
@@ -236,13 +238,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
             # Mapping needs to be done on the first run
             needs_mapping = True
-
-            # set all Populations to unchanged
-            self._detect_if_graph_has_changed()
         else:
             # detect if the graph has changed since last run
-            needs_mapping = self._detect_if_graph_has_changed()
+            changed = self._detect_if_graph_has_changed()
             if changed:
+                needs_mapping = True
                 logger.warn("The graph has changed since the original "
                             "graph was loaded and ran. Therefore "
                             "decisions made during the mapping process will be"
@@ -263,18 +263,23 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # check if the runtime has been set before, and if so, validate stuff
         if self._runtime is not None and self._runtime >= run_time \
-        and has_ran and not needs_mapping:
-            self._deduce_machine_time_step(run_time)
-            for placement in self._placements:
-                data = bytearray()
-                data.append(constants.SDP_RUNTIME_ID_CODE)
-                vertex = self._graph_mapper.get_vertex_from_subvertex(
-                    placement.subvertex)
-                data.append(vertex.no_machine_time_steps)
-                self._txrx.send_sdp_message(SDPMessage(SDPHeader(
-                    destination_cpu=placement.p,
-                    destination_chip_x=placement.x,
-                    destination_chip_y=placement.y), data=data))
+        and self._has_ran and not needs_mapping:
+            pass
+            # FIXME: send sdp packet with new runtime
+            #self._deduce_machine_time_step(run_time)
+            #for placement in self._placements:
+                #data = bytearray()
+                #data.append(constants.SDP_RUNTIME_ID_CODE)
+                #vertex = self._graph_mapper.get_vertex_from_subvertex(
+                #    placement.subvertex)
+                #steps = vertex.no_machine_time_steps
+                #data.append((steps >> 16) & 0xff)
+                #data.append((steps >> 8) & 0xff)
+                #data.append(steps & 0xff)
+                #self._txrx.send_sdp_message(SDPMessage(SDPHeader(
+                #    destination_cpu=placement.p,
+                #    destination_chip_x=placement.x,
+                #    destination_chip_y=placement.y), data=data))
         elif self._runtime is not None and self._runtime < run_time:
             # the timer is too large, so mapping has to take place again
             needs_mapping = True
@@ -287,7 +292,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         elif self._runtime is None and run_time is not None:
             # calculate number of machine time steps
             self._deduce_machine_time_step(run_time)
-            # FIXME: Send SDP_RUNTIME?
         else:
             self._no_machine_time_steps = None
             logger.warn("You have set a runtime that will never end, this may "
@@ -311,7 +315,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # Partitioning needs to be (re-)done
         if needs_mapping:
-            if self.has_ran:
+            if self._has_ran:
                 # stop the sync0 code so that new mapped stuff can run
                 self.stop(turn_off_machine=False, clear_tags=False,
                           clear_routing_tables=False)
@@ -386,7 +390,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 timer.start_timing()
             logger.info("*** Generating Output *** ")
             logger.debug("")
-            executable_targets = self.generate_data_specifications()
+            self._executable_targets = self.generate_data_specifications()
+
             if do_timing:
                 logger.info("Time to generate data: {}".format(
                     timer.take_sample()))
@@ -435,7 +440,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self.load_routing_tables(self._router_tables, self._app_id)
                     logger.info("*** Loading executables ***")
                     self.load_executable_images(
-                        executable_targets, self._app_id)
+                        self._executable_targets, self._app_id)
                     logger.info("*** Loading buffers ***")
                     self.set_up_send_buffering(self._partitioned_graph,
                                                self._placements, self._tags)
@@ -443,6 +448,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 # end of entire loading setup
                 if do_timing:
                     logger.debug("Time to load: {}".format(timer.take_sample()))
+
+            # set all Populations to unchanged
+            self._detect_if_graph_has_changed()
 
         # Run simulation
         if (not isinstance(self._machine, VirtualMachine) and
@@ -463,14 +471,14 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     "Database", "send_start_notification")
 
             self.wait_for_cores_to_be_ready(
-                executable_targets, self._app_id, self._no_full_runs)
+                self._executable_targets, self._app_id, self._no_full_runs)
 
             # wait till external app is ready for us to start if required
             if (self._database_interface is not None and
                     wait_on_confirmation):
                 self._database_interface.wait_for_confirmation()
 
-            self.start_all_cores(executable_targets, self._app_id,
+            self.start_all_cores(self._executable_targets, self._app_id,
                                  self._no_full_runs)
 
             if (self._database_interface is not None and
@@ -481,8 +489,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 logger.info("Application is set to run forever - exiting")
             else:
                 self.wait_for_execution_to_complete(
-                    executable_targets, self._app_id, self._runtime,
-                    self._time_scale_factor)
+                    self._executable_targets, self._app_id, self._runtime,
+                    self._time_scale_factor, self._no_full_runs)
 
             self._has_ran = True
             self._no_full_runs += 1
@@ -534,12 +542,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         for population in self._populations:
             if population.changed:
                 changed = True
-            population.changed = False
-        if changed:
-            return changed
+                population.changed = False
         for projection in self._projections:
             if projection.changed:
                 changed = True
+                projection.changed = False
         return changed
 
     def _deduce_machine_time_step(self, run_time):
@@ -935,6 +942,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         for placement in self._placements:
             self._txrx.send_sdp_message(SDPMessage(
                 sdp_header=SDPHeader(
+                    flags=SDPFlag.REPLY_NOT_EXPECTED,
+                    destination_port=1,
                     destination_cpu=placement.p,
                     destination_chip_x=placement.x,
                     destination_chip_y=placement.y), data=byte_data))
@@ -990,7 +999,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # clear values
         self._no_full_runs = 0
-        self._total_run_time_so_far = 0
 
         # app stop command (currently fucked)
         #self._txrx.stop_application(self._app_id)

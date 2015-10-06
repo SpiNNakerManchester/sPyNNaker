@@ -60,6 +60,36 @@ static uint32_t simulation_ticks = 0;
 //! global paramter which states if this model should run for infinite time
 static uint32_t infinite_run;
 
+uint32_t initialize_recording(address_t address, address_t system_region) {
+    recording_channel_e channels_to_record[] = {
+        e_recording_channel_spike_history,
+        e_recording_channel_neuron_potential,
+        e_recording_channel_neuron_gsyn
+    };
+    regions_e regions_to_record[] = {
+        SPIKE_RECORDING_REGION,
+        POTENTIAL_RECORDING_REGION,
+        GSYN_RECORDING_REGION
+    };
+    uint32_t region_sizes[N_RECORDING_CHANNELS];
+    uint32_t recording_flags;
+    recording_read_region_sizes(
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
+        &recording_flags, &region_sizes[0], &region_sizes[1], &region_sizes[2]);
+    for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
+        if (recording_is_channel_enabled(recording_flags,
+                                         channels_to_record[i])) {
+            if (!recording_initialse_channel(
+                    data_specification_get_region(regions_to_record[i],
+                                                  address),
+                    channels_to_record[i], region_sizes[i])) {
+                return 0;
+            }
+        }
+    }
+    return recording_flags;
+}
+
 //! \Initialises the model by reading in the regions and checking recording
 //! data.
 //! \param[in] *timer_period a pointer for the memory address where the timer
@@ -87,32 +117,7 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Set up recording
-    recording_channel_e channels_to_record[] = {
-        e_recording_channel_spike_history,
-        e_recording_channel_neuron_potential,
-        e_recording_channel_neuron_gsyn
-    };
-    regions_e regions_to_record[] = {
-        SPIKE_RECORDING_REGION,
-        POTENTIAL_RECORDING_REGION,
-        GSYN_RECORDING_REGION
-    };
-    uint32_t region_sizes[N_RECORDING_CHANNELS];
-    uint32_t recording_flags;
-    recording_read_region_sizes(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
-        &recording_flags, &region_sizes[0], &region_sizes[1], &region_sizes[2]);
-    for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
-        if (recording_is_channel_enabled(recording_flags,
-                                         channels_to_record[i])) {
-            if (!recording_initialse_channel(
-                    data_specification_get_region(regions_to_record[i],
-                                                  address),
-                    channels_to_record[i], region_sizes[i])) {
-                return false;
-            }
-        }
-    }
+    uint32_t recording_flags = initialize_recording(address, system_region);
 
     // Set up the neurons
     uint32_t n_neurons;
@@ -189,12 +194,35 @@ void timer_callback(uint timer_count, uint unused) {
         // amounts of samples recorded to SDRAM
         recording_finalise();
 
-        spin1_exit(0);
+        // Wait for the next run of the simulation
+        spin1_callback_off(TIMER_TICK);
+        event_wait();
+
+        // Prepare for the next run
+        time = UINT32_MAX;
+        
+        address_t address = data_specification_get_data_address();
+        address_t system_region = data_specification_get_region(
+        SYSTEM_REGION, address);
+        initialize_recording(address, system_region);
+        spin1_callback_on(TIMER_TICK, timer_callback, 2);
+
         return;
     }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time);
+}
+
+void sdp_message_callback(uint msg, uint port) {
+    use(port);
+
+    ushort cmd = msg >> 8;
+    if (cmd == CMD_STOP) {
+        spin1_exit(0);
+    } else if (cmd == CMD_RUNTIME) {
+        simulation_ticks = msg & 0xffffff;
+    }
 }
 
 //! \The only entry point for this model. it initialises the model, sets up the
@@ -219,6 +247,9 @@ void c_main(void) {
 
     // Set up the timer tick callback (others are handled elsewhere)
     spin1_callback_on(TIMER_TICK, timer_callback, 2);
+
+    // Set up callback listening to SDP messages
+    spin1_callback_on(SDP_PACKET_RX, sdp_message_callback, 2);
 
     log_info("Starting");
     simulation_run();
