@@ -247,28 +247,33 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         inputs.append({'type': "IPAddress", 'value': self._hostname})
         inputs.append({'type': "MemoryTransciever", 'value': self._txrx})
 
+        # make a folder for the json files to be stored in
+        json_folder = os.path.join(self._report_default_directory, "json_files")
+        if not os.path.isdir(json_folder):
+            os.mkdir(json_folder)
+
         # file paths for each json file
         inputs.append({'type': "FileCoreAllocationsFilePath",
-                       'value': os.path.join(self._report_default_directory,
-                                             "core_allocations.json")})
+                       'value': os.path.join(
+                           json_folder, "core_allocations.json")})
         inputs.append({'type': "FileSDRAMAllocationsFilePath",
-                       'value': os.path.join(self._report_default_directory,
-                                             "sdram_allocations.json")})
+                       'value': os.path.join(
+                           json_folder, "sdram_allocations.json")})
         inputs.append({'type': "FileMachineFilePath",
-                       'value': os.path.join(self._report_default_directory,
-                                             "machine.json")})
+                       'value': os.path.join(
+                           json_folder, "machine.json")})
         inputs.append({'type': "FilePartitionedGraphFilePath",
-                       'value': os.path.join(self._report_default_directory,
-                                             "partitioned_graph.json")})
+                       'value': os.path.join(
+                           json_folder, "partitioned_graph.json")})
         inputs.append({'type': "FilePlacementFilePath",
-                       'value': os.path.join(self._report_default_directory,
-                                             "placements.json")})
+                       'value': os.path.join(
+                           json_folder, "placements.json")})
         inputs.append({'type': "FileRouingPathsFilePath",
-                       'value': os.path.join(self._report_default_directory,
-                                             "routing_paths.json")})
+                       'value': os.path.join(
+                           json_folder, "routing_paths.json")})
         inputs.append({'type': "FileConstraintsFilePath",
-                       'value': os.path.join(self._report_default_directory,
-                                             "constraints.json")})
+                       'value': os.path.join(
+                           json_folder, "constraints.json")})
 
         # execute mapping process
         self._pacman_exeuctor.execute_mapping(inputs)
