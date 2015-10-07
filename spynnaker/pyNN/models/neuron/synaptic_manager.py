@@ -126,14 +126,13 @@ class SynapticManager(object):
                                 "Different STDP mechanisms on the same"
                                 " vertex are not supported")
 
-    def _get_synaptic_block_size(self, synaptic_sub_list, max_n_words):
+    def _get_synaptic_block_size(self, num_rows, max_n_words):
         """ Get the size of a single block
         """
         # Gets smallest possible (i.e. supported by row length
         # Table structure) that can contain max_row_length
         row_length = self._population_table_type.get_allowed_row_length(
             max_n_words)
-        num_rows = synaptic_sub_list.get_n_rows()
         syn_row_sz = 4 * (constants.SYNAPTIC_ROW_HEADER_WORDS + row_length)
         return syn_row_sz * num_rows
 
@@ -146,9 +145,9 @@ class SynapticManager(object):
         # Go through the subedges and add up the memory
         for subedge in subvertex_in_edges:
 
-            # pad the memory size to meet 1 k offsets
-            if (memory_size & 0x3FF) != 0:
-                memory_size = (memory_size & 0xFFFFFC00) + 0x400
+            # Pad memory allocation depending on the master population table
+            memory_size = self._master_pop_table_generator\
+                .get_next_allowed_address(memory_size)
 
             sublist = subedge.get_synapse_sublist(graph_mapper)
             max_n_words = max([
@@ -157,7 +156,7 @@ class SynapticManager(object):
                 for synapse_row in sublist.get_rows()])
 
             all_syn_block_sz = self._get_synaptic_block_size(
-                sublist, max_n_words)
+                sublist.get_n_rows(), max_n_words)
             memory_size += all_syn_block_sz
         return memory_size
 
@@ -172,24 +171,24 @@ class SynapticManager(object):
 
                 # Get maximum row length in this edge
                 max_n_words = in_edge.get_max_n_words(vertex_slice)
-                all_syn_block_sz = self._get_synaptic_block_size(
-                    in_edge, max_n_words)
 
-                # TODO: Fix this to be more accurate!
-                # May require modification to the master population table
+                # Get an estimate of the number of sub-vertices - clearly
+                # this will not be correct if the SDRAM usage is high!
                 n_atoms = sys.maxint
                 edge_pre_vertex = in_edge.pre_vertex
                 if isinstance(edge_pre_vertex, AbstractPartitionableVertex):
                     n_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < n_atoms:
                     n_atoms = in_edge.pre_vertex.n_atoms
+                n_sub_vertices = float(in_edge.get_n_rows()) / float(n_atoms)
+                atoms_per_subvertex = int(math.ceil(
+                    edge_pre_vertex.n_atoms / n_sub_vertices))
 
-                num_rows = in_edge.get_n_rows()
-                extra_mem = math.ceil(float(num_rows) / float(n_atoms)) * 1024
-                if extra_mem == 0:
-                    extra_mem = 1024
-                all_syn_block_sz += extra_mem
-                memory_size += all_syn_block_sz
+                for _ in range(int(math.ceil(n_sub_vertices))):
+                    memory_size = self._master_pop_table_generator\
+                        .get_next_allowed_address(memory_size)
+                    memory_size += self._get_synaptic_block_size(
+                        atoms_per_subvertex, max_n_words)
 
         return memory_size
 
