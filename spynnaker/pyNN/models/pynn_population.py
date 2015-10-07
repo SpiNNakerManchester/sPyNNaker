@@ -1,10 +1,15 @@
+import numpy
+import logging
+import tempfile
+
+from pyNN.space import Space
+
 from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from spynnaker.pyNN.models.abstract_models.abstract_model_components\
     .abstract_conductance_vertex import AbstractConductanceVertex
-
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
@@ -13,16 +18,8 @@ from spynnaker.pyNN.utilities.parameters_surrogate\
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions as local_exceptions
-
-
-from spinn_front_end_common.utilities.timer import Timer
+from pacman.utilities.utility_objs.timer import Timer
 from spinn_front_end_common.utilities import exceptions
-
-from pyNN.space import Space
-
-import numpy
-import logging
-import tempfile
 
 logger = logging.getLogger(__name__)
 

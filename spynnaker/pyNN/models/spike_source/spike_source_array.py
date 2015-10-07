@@ -46,7 +46,7 @@ import math
 # TODO the below imports can be removed once BUFFERED OUT apprears.
 # These are tied to the bodge to support spike soruce arrays to be recorded
 # if the memory allows.
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 import numpy
 from data_specification import utility_calls as dsg_utility_calls
 import struct

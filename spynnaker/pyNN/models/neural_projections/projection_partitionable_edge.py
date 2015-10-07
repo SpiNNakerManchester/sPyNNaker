@@ -1,20 +1,19 @@
 """
 ProjectionPartitionableEdge
 """
+import logging
+import copy
+
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
-from pacman.utilities.progress_bar import ProgressBar
-
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
+from pacman.utilities.utility_objs.timer import Timer
 
-from spinn_front_end_common.utilities.timer import Timer
-
-import logging
-import copy
 logger = logging.getLogger(__name__)
 
 

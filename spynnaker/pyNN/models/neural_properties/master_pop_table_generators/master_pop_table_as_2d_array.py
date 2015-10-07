@@ -5,7 +5,7 @@ MasterPopTableAs2dArray
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
-from pacman.utilities.field import Field
+from pacman.utilities.utility_objs.field import Field
 
 # spynnaker imports
 from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\

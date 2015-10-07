@@ -8,7 +8,7 @@ from pacman.model.partitionable_graph.partitionable_graph import \
 from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 # spinnmachine imports
 from spinn_front_end_common.utilities.executable_targets import \
@@ -24,15 +24,14 @@ from spinn_front_end_common.interface.\
     import FrontEndCommonSpinnmanInterfaceFunctions
 from spinn_front_end_common.interface.front_end_common_configuration_functions\
     import FrontEndCommonConfigurationFunctions
-from spinn_front_end_common.utilities.timer import Timer
+from pacman.utilities.utility_objs.timer import Timer
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 from spinn_front_end_common.interface.\
     front_end_common_provenance_functions import \
     FrontEndCommonProvenanceFunctions
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_provenance_data import \
+from pacman.interfaces.abstract_provides_provenance_data import \
     AbstractProvidesProvenanceData
 
 # local front end imports
@@ -183,9 +182,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # holder for number of times the timer event should exuecte for the sim
         self._no_machine_time_steps = None
 
-    def do_mapping(self):
+    def do_mapping(self, do_timings):
         """
         sets up
+        :param do_timings: bool which sattes if each algorithm should time itself
         :return:mapper executor for this front end
         """
         # set up the mapper executor side of the front end
@@ -205,26 +205,34 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         inputs.add("FileRouingPathsFilePath")
         inputs.add("FileConstraintsFilePath")
 
+        # explicitly define what outputs spynnaker expects
+        required_outputs = (
+            "MemoryPlacements", "MemoryRoutingTables", "MemoryRoutingInfos",
+            "MemoryTags", "MemoryPartitionedGraph", "MemoryGraphMapper")
+
+        # add the extra xml files from the cfg file
         xml_paths = config.get("Mapping", "extra_xmls_paths")
         if xml_paths == "None":
             xml_paths = list()
         else:
             xml_paths = xml_paths.split(",")
+
+        # add extra xml paths for pynn algorithms
         xml_paths.append(
             os.path.join(os.path.dirname(overridden_pacman_functions.__file__),
                          "algorithms_metadata.xml"))
+
+        # get report states
         pacman_report_state = \
             self._reports_states.generate_pacman_report_states()
         in_debug_mode = config.get("Mode", "mode") == "Debug"
-        required_outputs = (
-            "MemoryPlacements", "MemoryRoutingTables", "MemoryRoutingInfos",
-            "MemoryTags", "MemoryPartitionedGraph", "MemoryGraphMapper")
 
-        self._pacman_exeuctor = \
-            PACMANAlgorithmExecutor(pacman_report_state, in_debug_mode)
-        self._pacman_exeuctor.set_up_pacman_algorthms_listings(
-            algorithms=config.get("Mapping", "algorithms"), inputs=inputs,
-            xml_paths=xml_paths, required_outputs=required_outputs)
+        # create executor
+        self._pacman_exeuctor = PACMANAlgorithmExecutor(
+            reports_states=pacman_report_state, in_debug_mode=in_debug_mode,
+            do_timings=do_timings, inputs=inputs, xml_paths=xml_paths,
+            algorithms=config.get("Mapping", "algorithms"),
+            required_outputs=required_outputs)
 
         # define inputs
         inputs = list()
@@ -363,7 +371,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if do_timing:
             timer.start_timing()
 
-        self.do_mapping()
+        self.do_mapping(do_timing)
 
         # take timing measurements
         if do_timing:
@@ -520,7 +528,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 self._has_ran = True
                 if self._retrieve_provance_data:
 
-                    progress = ProgressBar(self._placements.n_placements + 1,
+                    progress = ProgressBar(self._placements.n_placements + 2,
                                            "Getting provenance data")
 
                     # retrieve provence data from central
@@ -534,6 +542,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     # write provanence data
                     self.write_provenance_data_in_xml(file_path, self._txrx)
                     progress.update()
+
+                    pacman_executor_file_path = os.path.join(
+                        file_path, "PACMAN_provancence_data.xml")
+                    self._pacman_exeuctor.write_provenance_data_in_xml(
+                        pacman_executor_file_path, self._txrx)
 
                     # retrieve provenance data from any cores that provide data
                     for placement in self._placements.placements:

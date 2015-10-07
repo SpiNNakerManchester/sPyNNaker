@@ -8,7 +8,7 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 # spynnaker imports
 from spynnaker.pyNN import exceptions

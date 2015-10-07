@@ -4,17 +4,19 @@ DelayPartitionableEdge
 
 # spynnaker imports
 import copy
+
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
     import DelayPartitionedEdge
 from spynnaker.pyNN.utilities import conf
 
+
 # spinn front end common imports
-from spinn_front_end_common.utilities.timer import Timer
+from pacman.utilities.utility_objs.timer import Timer
 
 # pacman imports
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 # general imports
 import math

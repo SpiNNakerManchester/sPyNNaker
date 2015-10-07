@@ -1,11 +1,3 @@
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities import constants as local_constants
-
-from pacman.utilities import constants as pacman_constants
-from pacman.utilities.progress_bar import ProgressBar
-
-from data_specification import utility_calls as dsg_utility_calls
-
 import logging
 import numpy
 import struct
@@ -13,6 +5,12 @@ import tempfile
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
+
+from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities import constants as local_constants
+from pacman.utilities import constants as pacman_constants
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from data_specification import utility_calls as dsg_utility_calls
 
 logger = logging.getLogger(__name__)
 
