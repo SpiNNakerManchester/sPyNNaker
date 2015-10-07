@@ -1,6 +1,3 @@
-"""
-ProjectionPartitionableEdge
-"""
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 from pacman.utilities.progress_bar import ProgressBar
@@ -19,20 +16,17 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
-    """
-    the partitionable edge for a projection (high level edge)
+    """ An edge which terminates on an AbstractPopulationVertex
     """
 
-    def __init__(self, presynaptic_population, postsynaptic_population,
-                 machine_time_step, connector=None, synapse_list=None,
-                 synapse_dynamics=None, label=None):
+    def __init__(
+            self, pre_vertex, post_vertex, connector, synapse_dynamics=None,
+            label=None):
         MultiCastPartitionableEdge.__init__(
-            self, presynaptic_population._get_vertex,
-            postsynaptic_population._get_vertex, label=label)
+            self, pre_vertex, post_vertex, label=label)
 
-        self._connector = connector
+        self._connectors = [connector]
         self._synapse_dynamics = synapse_dynamics
-        self._synapse_list = synapse_list
         self._synapse_row_io = FixedSynapseRowIO()
         self._stored_synaptic_data_from_machine = None
 
@@ -40,6 +34,9 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         # synapse list
         if synapse_dynamics is not None:
             self._synapse_row_io = synapse_dynamics.get_synapse_row_io()
+
+    def add_connector(self, connector):
+        self._connectors.append(connector)
 
     def create_subedge(self, presubvertex, postsubvertex, constraints=None,
                        label=None):

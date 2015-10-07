@@ -71,7 +71,6 @@ class Population(object):
         cellparams['timescale_factor'] = spinnaker.timescale_factor
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
-        self._delay_vertex = None
 
         # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
@@ -740,11 +739,3 @@ class Population(object):
     @property
     def _get_vertex(self):
         return self._vertex
-
-    @property
-    def _internal_delay_vertex(self):
-        return self._delay_vertex
-
-    @_internal_delay_vertex.setter
-    def _internal_delay_vertex(self, delay_vertex):
-        self._delay_vertex = delay_vertex

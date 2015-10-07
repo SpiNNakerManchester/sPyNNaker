@@ -1,7 +1,3 @@
-"""
-DelayPartitionableEdge
-"""
-
 # spynnaker imports
 import copy
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
@@ -25,23 +21,14 @@ logger = logging.getLogger(__name__)
 
 
 class DelayPartitionableEdge(ProjectionPartitionableEdge):
-    """
-    DelayPartitionableEdge
+    """ An edge between a DelayExtensionVertex and an AbstractPopulationVertex
     """
 
-    def __init__(self, presynaptic_population, postsynaptic_population,
-                 machine_time_step, num_delay_stages, max_delay_per_neuron,
-                 connector=None, synapse_list=None, synapse_dynamics=None,
-                 label=None):
-        ProjectionPartitionableEdge.__init__(self,
-                                             presynaptic_population,
-                                             postsynaptic_population,
-                                             machine_time_step,
-                                             connector=connector,
-                                             synapse_list=synapse_list,
-                                             synapse_dynamics=synapse_dynamics,
-                                             label=label)
-        self._pre_vertex = presynaptic_population._internal_delay_vertex
+    def __init__(self, delay_vertex, post_vertex, connector,
+                 synapse_dynamics=None, label=None):
+        ProjectionPartitionableEdge.__init__(
+            self, delay_vertex, post_vertex, connector,
+            synapse_dynamics=synapse_dynamics, label=label)
         self._stored_synaptic_data_from_machine = None
 
     @property

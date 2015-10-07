@@ -84,6 +84,17 @@ class AbstractPopulationVertex(
             synapse_type, machine_time_step, ring_buffer_sigma,
             spikes_per_second)
 
+        # Set up for delay management
+        self._delay_vertex = None
+
+    @property
+    def delay_vertex(self):
+        return self._delay_vertex
+
+    @delay_vertex.setter
+    def delay_vertex(self, delay_vertex):
+        self._delay_vertex = delay_vertex
+
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         per_neuron_cycles = (
