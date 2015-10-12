@@ -315,6 +315,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if scamp_socket_addresses == "None":
             scamp_socket_addresses = None
 
+        boot_port_num = config.get("Machine", "boot_connection_port_num")
+        if boot_port_num == "None":
+            boot_port_num = None
+        else:
+            boot_port_num = int(boot_port_num)
+
         self.setup_interfaces(
             hostname=self._hostname,
             bmp_details=config.get("Machine", "bmp_names"),
@@ -328,7 +334,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"),
             enable_reinjection=config.getboolean(
                 "Machine", "enable_reinjection"),
-            scamp_connection_data=scamp_socket_addresses)
+            scamp_connection_data=scamp_socket_addresses,
+            boot_port_num=boot_port_num)
 
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
