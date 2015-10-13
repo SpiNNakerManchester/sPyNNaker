@@ -1,9 +1,6 @@
 # spynnaker imports
-import copy
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
-    import DelayPartitionedEdge
 from spynnaker.pyNN.utilities import conf
 
 # spinn front end common imports
@@ -15,6 +12,7 @@ from pacman.utilities.progress_bar import ProgressBar
 # general imports
 import math
 import logging
+import copy
 
 
 logger = logging.getLogger(__name__)
@@ -24,67 +22,33 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
     """ An edge between a DelayExtensionVertex and an AbstractPopulationVertex
     """
 
-    def __init__(self, delay_vertex, post_vertex, connector,
-                 synapse_dynamics=None, label=None):
+    def __init__(self, delay_vertex, post_vertex, synapse_information,
+                 label=None):
         ProjectionPartitionableEdge.__init__(
-            self, delay_vertex, post_vertex, connector,
-            synapse_dynamics=synapse_dynamics, label=label)
+            self, delay_vertex, post_vertex, synapse_information,
+            label=label)
         self._stored_synaptic_data_from_machine = None
 
-    @property
-    def num_delay_stages(self):
-        """
+    def get_n_synapse_rows(self, pre_vertex_slice=None):
+        if pre_vertex_slice is not None:
+            return pre_vertex_slice.n_atoms * self._pre_vertex.max_stages
+        return self._pre_vertex.n_atoms * self._pre_vertex.max_stages
 
-        :return:
-        """
-        return self._pre_vertex.max_stages
+    def _get_delay_stage_max_n_words(
+            self, pre_vertex_slice, post_vertex_slice, stage):
+        min_delay = ((stage + 1) * self.pre_vertex.max_delay_per_neuron) + 1
+        max_delay = min_delay + self.pre_vertex.max_delay_per_neuron
+        for synapse_info in self.synapse_information:
+            synapse_dynamics = synapse_info.synapse_dynamics
+            connector = synapse_info.connector
+            return synapse_dynamics.get_delayed_synapses_sdram_usage_in_bytes(
+                connector, pre_vertex_slice, post_vertex_slice,
+                min_delay, max_delay)
 
-    @property
-    def max_delay_per_neuron(self):
-        """
-
-        :return:
-        """
-        return self._pre_vertex.max_delay_per_neuron
-
-    def _get_delay_stage_max_n_words(self, vertex_slice, stage):
-        min_delay = ((stage + 1) * self.max_delay_per_neuron) + 1
-        max_delay = min_delay + self.max_delay_per_neuron
-        conns = self.synapse_list.get_max_n_connections(
-            vertex_slice=vertex_slice, lo_delay=min_delay, hi_delay=max_delay)
-        return conns
-
-    def get_max_n_words(self, vertex_slice=None):
-        """
-        Gets the maximum number of words for a subvertex at the end of the
-        connection
-        :param vertex_slice: the vertex slice which represents which part
-                             of the partitionable vertex
-        :type vertex_slice: pacman.model.graph_mapper.slide
-        """
-        return max([self._get_delay_stage_max_n_words(vertex_slice, stage)
+    def get_synapses_size_in_bytes(self, pre_vertex_slice, post_vertex_slice):
+        return max([self._get_delay_stage_max_n_words(
+                    pre_vertex_slice, post_vertex_slice, stage)
                     for stage in range(self._pre_vertex.max_stages)])
-
-    def get_n_rows(self):
-        """
-        Gets the number of synaptic rows coming in to a vertex at the end of
-        the connection
-        """
-        return self._synapse_list.get_n_rows() * self._pre_vertex.max_stages
-
-    def create_subedge(self, presubvertex, postsubvertex, constraints=None,
-                       label=None):
-        """
-        Creates a subedge from this edge
-        :param postsubvertex:
-        :param presubvertex:
-        :param constraints:
-        :param label:
-        """
-        if constraints is None:
-            constraints = list()
-        constraints.extend(self._constraints)
-        return DelayPartitionedEdge(presubvertex, postsubvertex, constraints)
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):

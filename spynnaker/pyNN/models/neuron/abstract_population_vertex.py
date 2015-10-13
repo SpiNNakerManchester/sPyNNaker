@@ -443,6 +443,14 @@ class AbstractPopulationVertex(
     def spikes_per_second(self, spikes_per_second):
         self._synapse_manager.spikes_per_second = spikes_per_second
 
+    @property
+    def synapse_dynamics(self):
+        return self._synapse_manager.synapse_dynamics
+
+    @synapse_dynamics.setter
+    def synapse_dynamics(self, synapse_dynamics):
+        self._synapse_manager.synapse_dynamics = synapse_dynamics
+
     def get_synaptic_list_from_machine(
             self, placements, transceiver, pre_subvertex, pre_n_atoms,
             post_subvertex, synapse_io, subgraph, routing_infos,

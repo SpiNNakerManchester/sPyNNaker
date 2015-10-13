@@ -7,6 +7,7 @@ from spinn_front_end_common.utilities import exceptions
 import numpy
 import os
 import logging
+import scipy.stats
 
 
 logger = logging.getLogger(__name__)
@@ -133,3 +134,65 @@ def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time):
     result = numpy.dstack((spike_ids, spike_times))[0]
     result = result[numpy.lexsort((spike_times, spike_ids))]
     return result
+
+
+# Converts between a distribution name, and the appropriate scipy stats for\
+# that distribution
+_distribution_to_scipy_stats = {
+    'binomial': scipy.stats.binom,
+    'gamma': scipy.stats.gamma,
+    'exponential': scipy.stats.expon,
+    'lognormal': scipy.stats.lognorm,
+    'normal': scipy.stats.norm,
+    'poisson': scipy.stats.poisson,
+    'uniform': scipy.stats.uniform,
+    'randint': scipy.stats.randint,
+    'vonmises': scipy.stats.vonmises
+}
+
+
+def get_probability_within_range(dist, lower, upper):
+    """ Get the probability that a value will fall within the given range for\
+        a given RandomDistribution dist
+    """
+    scipy_stats = _distribution_to_scipy_stats[dist.name]
+    return scipy_stats.cdf(lower, *dist.parameters)
+
+
+def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
+    """ Get the likely maximum value of a RandomDistribution given a\
+        number of draws
+    """
+    scipy_stats = _distribution_to_scipy_stats[dist.name]
+    prob = 1.0 - (chance / float(n_items))
+    return scipy_stats.ppf(prob, *dist.parameters)
+
+
+def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
+    """ Get the likely minimum value of a RandomDistribution given a\
+        number of draws
+    """
+    scipy_stats = _distribution_to_scipy_stats[dist.name]
+    prob = chance / float(n_items)
+    return scipy_stats.ppf(prob, *dist.parameters)
+
+
+def get_mean(dist):
+    """ Get the mean of a RandomDistribution
+    """
+    scipy_stats = _distribution_to_scipy_stats[dist.name]
+    return scipy_stats.mean(*dist.parameters)
+
+
+def get_standard_deviation(dist):
+    """ Get the standard deviation of a RandomDistribution
+    """
+    scipy_stats = _distribution_to_scipy_stats[dist.name]
+    return scipy_stats.std(*dist.parameters)
+
+
+def get_variance(dist):
+    """ Get the variance of a RandomDistribution
+    """
+    scipy_stats = _distribution_to_scipy_stats[dist.name]
+    return scipy_stats.var(*dist.parameters)

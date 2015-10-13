@@ -4,17 +4,18 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_properties import master_pop_table_generators
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
-    import ProjectionPartitionedEdge
+from spynnaker.pyNN.utilities.running_stats import RunningStats
+from pacman.model.graph_mapper.slice import Slice
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
+    import SynapseDynamicsStatic
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 from spinn_front_end_common.utilities import helpful_functions
 
-from data_specification.enums.data_type import DataType
 import data_specification.utility_calls as dsg_utilities
 
 from scipy import special
@@ -58,8 +59,25 @@ class SynapticManager(object):
                 "Simulation", "spikes_per_second")
 
         # Prepare for dealing with STDP
-        self._stdp_checked = False
-        self._stdp_mechanism = None
+        self._synapse_dynamics = None
+
+    @property
+    def synapse_dynamics(self):
+        return self._synapse_dynamics
+
+    @synapse_dynamics.setter
+    def synapse_dynamics(self, synapse_dynamics):
+
+        # We can always override static dynamics or None
+        if self._synapse_dynamics is None or isinstance(
+                synapse_dynamics, SynapseDynamicsStatic):
+            self._synapse_dynamics = synapse_dynamics
+
+        # Otherwise, the dynamics must be equal
+        elif synapse_dynamics.is_same(self._synapse_dynamics):
+            raise exceptions.SynapticConfigurationException(
+                "Synapse dynamics must match exactly when using multiple edges"
+                "to the same population")
 
     @property
     def synapse_type(self):
@@ -83,9 +101,7 @@ class SynapticManager(object):
 
     @property
     def vertex_executable_suffix(self):
-        if self._stdp_mechanism is None:
-            return ""
-        return "_" + self._stdp_mechanism.get_vertex_executable_suffix()
+        self._synapse_dynamics.get_vertex_executable_suffix()
 
     def get_n_cpu_cycles(self, vertex_slice, graph):
 
@@ -104,28 +120,6 @@ class SynapticManager(object):
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 (4 * self._synapse_type.get_n_synapse_types()))
 
-    def _check_synapse_dynamics(self, in_edges):
-        """ Checks the synapse dynamics for all edges is the same
-        """
-        if self._stdp_checked:
-            return True
-        self._stdp_checked = True
-        for in_edge in in_edges:
-            if (isinstance(in_edge, ProjectionPartitionableEdge) and
-                    in_edge.synapse_dynamics is not None):
-                if in_edge.synapse_dynamics.fast is not None:
-                    raise exceptions.SynapticConfigurationException(
-                        "Fast synapse dynamics are not supported")
-                elif in_edge.synapse_dynamics.slow is not None:
-                    if self._stdp_mechanism is None:
-                        self._stdp_mechanism = in_edge.synapse_dynamics.slow
-                    else:
-                        if not (self._stdp_mechanism ==
-                                in_edge.synapse_dynamics.slow):
-                            raise exceptions.SynapticConfigurationException(
-                                "Different STDP mechanisms on the same"
-                                " vertex are not supported")
-
     def _get_synaptic_block_size(self, num_rows, max_n_words):
         """ Get the size of a single block
         """
@@ -137,7 +131,8 @@ class SynapticManager(object):
         return syn_row_sz * num_rows
 
     def _get_exact_synaptic_blocks_size(
-            self, graph_mapper, subvertex_in_edges):
+            self, post_vertex_slice, graph_mapper, subvertex,
+            subvertex_in_edges):
         """ Get the exact size all of the synaptic blocks
         """
         memory_size = 0
@@ -149,14 +144,16 @@ class SynapticManager(object):
             memory_size = self._master_pop_table_generator\
                 .get_next_allowed_address(memory_size)
 
-            sublist = subedge.get_synapse_sublist(graph_mapper)
-            max_n_words = max([
-                graph_mapper.get_partitionable_edge_from_partitioned_edge(
-                    subedge).get_synapse_row_io().get_n_words(synapse_row)
-                for synapse_row in sublist.get_rows()])
+            edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
+                subedge)
+            pre_vertex_slice = graph_mapper.get_subvertex_slice(
+                subedge.pre_subvertex)
+            max_n_words = edge.get_max_n_words(
+                pre_vertex_slice, post_vertex_slice)
+            n_rows = edge.get_n_synapse_rows(pre_vertex_slice)
 
             all_syn_block_sz = self._get_synaptic_block_size(
-                sublist.get_n_rows(), max_n_words)
+                n_rows, max_n_words)
             memory_size += all_syn_block_sz
         return memory_size
 
@@ -169,18 +166,22 @@ class SynapticManager(object):
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionPartitionableEdge):
 
-                # Get maximum row length in this edge
-                max_n_words = in_edge.get_max_n_words(vertex_slice)
+                # Get maximum row length for this edge
+                pre_vertex_slice = Slice(0, in_edge.prevertex.n_atoms)
+                total_n_bytes = in_edge.get_max_n_words(
+                    pre_vertex_slice, vertex_slice)
 
                 # Get an estimate of the number of sub-vertices - clearly
                 # this will not be correct if the SDRAM usage is high!
+                # TODO: Can be removed once we move to population-based keys
                 n_atoms = sys.maxint
                 edge_pre_vertex = in_edge.pre_vertex
                 if isinstance(edge_pre_vertex, AbstractPartitionableVertex):
                     n_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < n_atoms:
                     n_atoms = in_edge.pre_vertex.n_atoms
-                n_sub_vertices = float(in_edge.get_n_rows()) / float(n_atoms)
+                n_sub_vertices = (float(in_edge.get_n_synapse_rows()) /
+                                  float(n_atoms))
                 atoms_per_subvertex = int(math.ceil(
                     edge_pre_vertex.n_atoms / n_sub_vertices))
 
@@ -192,19 +193,18 @@ class SynapticManager(object):
 
         return memory_size
 
-    def _get_synapse_dynamics_parameter_size(self, in_edges):
+    def _get_synapse_dynamics_parameter_size(
+            self, vertex_slice, in_edges):
         """ Get the size of the synapse dynamics region
         """
         self._check_synapse_dynamics(in_edges)
-        if self._stdp_mechanism is not None:
-            return self._stdp_mechanism.get_params_size(
-                len(self._synapse_type.get_synapse_targets()))
-        return 0
+        return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
+            vertex_slice.n_atoms, self._synapse_type.get_n_synapse_types())
 
     def get_sdram_usage_in_bytes(self, vertex_slice, in_edges):
         return (
             self._get_synapse_params_size(vertex_slice) +
-            self._get_synapse_dynamics_parameter_size(in_edges) +
+            self._get_synapse_dynamics_parameter_size(vertex_slice, in_edges) +
             self._get_estimate_synaptic_blocks_size(vertex_slice, in_edges) +
             self._population_table_type.get_master_population_table_size(
                 vertex_slice, in_edges))
@@ -233,7 +233,7 @@ class SynapticManager(object):
                 size=all_syn_block_sz, label='SynBlocks')
 
         synapse_dynamics_sz = self._get_synapse_dynamics_parameter_size(
-            in_edges)
+            vertex_slice, in_edges)
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS
@@ -318,86 +318,56 @@ class SynapticManager(object):
         return ((average_spikes_per_timestep * weight_mean) +
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
-    def _get_ring_buffer_totals(self, subvertex, sub_graph, graph_mapper):
-        in_sub_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
-        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-        n_synapse_types = len(self._synapse_type.get_synapse_targets())
-        absolute_max_weights = numpy.zeros(n_synapse_types)
-
-        # If we have an STDP mechanism, get the maximum plastic weight
-        stdp_max_weight = None
-        if self._stdp_mechanism is not None:
-            stdp_max_weight = self._stdp_mechanism.get_max_weight()
-            absolute_max_weights.fill(stdp_max_weight)
-
-        total_weights = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
-        total_square_weights = numpy.zeros(
-            (n_synapse_types, vertex_slice.n_atoms))
-        total_items = numpy.zeros((n_synapse_types, vertex_slice.n_atoms))
-        for subedge in in_sub_edges:
-            sublist = subedge.get_synapse_sublist(graph_mapper)
-            sublist.sum_n_connections(total_items)
-            edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
-                subedge)
-
-            if edge.synapse_dynamics is None:
-
-                # If there's no STDP maximum weight, sum the initial weights
-                sublist.max_weights(absolute_max_weights)
-                sublist.sum_weights(total_weights)
-                sublist.sum_square_weights(total_square_weights)
-
-            else:
-
-                # Otherwise, sum the pathalogical case of all columns being
-                # at stdp_max_weight
-                sublist.sum_fixed_weight(total_weights, stdp_max_weight)
-                sublist.sum_fixed_weight(total_square_weights,
-                                         stdp_max_weight * stdp_max_weight)
-
-        return (total_weights, total_square_weights, total_items,
-                absolute_max_weights)
-
     def _get_ring_buffer_to_input_left_shifts(
-            self, subvertex, sub_graph, graph_mapper, machine_timestep):
+            self, subvertex, sub_graph, graph_mapper, post_vertex_slice,
+            machine_timestep):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
         """
+        n_synapse_types = len(self._synapse_type.get_n_synapse_types())
+        running_totals = [RunningStats() for _ in n_synapse_types]
+        total_weights = numpy.zeros(n_synapse_types)
+        biggest_weight = numpy.zeros(n_synapse_types)
+        weights_signed = False
 
-        total_weights, total_square_weights, total_items, abs_max_weights =\
-            self._get_ring_buffer_totals(subvertex, sub_graph, graph_mapper)
+        for subedge in sub_graph.incoming_subedges_from_subvertex(subvertex):
+            pre_vertex_slice = graph_mapper.get_subvertex_slice(
+                subedge.pre_subvertex)
+            for synapse_info in subedge.synapse_information:
+                synapse_type = synapse_info.synapse_type
+                synapse_dynamics = synapse_info.synapse_dynamics
+                connector = synapse_info.connector
+                weight_mean = synapse_dynamics.get_weight_mean(
+                    connector, pre_vertex_slice, post_vertex_slice)
+                n_connections = \
+                    synapse_dynamics.get_n_connections_to_post_vertex_maximum(
+                        connector, pre_vertex_slice, post_vertex_slice)
+                weight_variance = synapse_dynamics.get_weight_variance(
+                    connector, pre_vertex_slice, post_vertex_slice)
+                running_totals[synapse_type].add_items(
+                    weight_mean, weight_variance, n_connections)
 
-        # Get maximum weight that can go into each post-synaptic neuron per
-        # synapse-type
-        max_weights = [max(t) for t in total_weights]
+                weight_max = synapse_dynamics.get_weight_maximum(
+                    connector, pre_vertex_slice, post_vertex_slice)
+                biggest_weight[synapse_type] = max(
+                    biggest_weight[synapse_type], weight_max)
+                total_weights[synapse_type] += (
+                    weight_max * n_connections)
 
-        # Clip the total items to avoid problems finding the mean of nothing(!)
-        total_items = numpy.clip(total_items, a_min=1,
-                                 a_max=numpy.iinfo(int).max)
-        weight_means = total_weights / total_items
+                if synapse_dynamics.are_weights_signed():
+                    weights_signed = True
 
-        # Calculate the standard deviation, clipping to avoid numerical errors
-        weight_std_devs = numpy.sqrt(
-            numpy.clip(numpy.divide(
-                total_square_weights -
-                numpy.divide(numpy.power(total_weights, 2),
-                             total_items),
-                total_items), a_min=0.0, a_max=numpy.finfo(float).max))
-
-        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-        n_synapse_types = len(self._synapse_type.get_synapse_targets())
-        expected_weights = numpy.fromfunction(
-            numpy.vectorize(
-                lambda i, j: self._ring_buffer_expected_upper_bound(
-                    weight_means[i][j], weight_std_devs[i][j],
-                    self._spikes_per_second, machine_timestep,
-                    total_items[i][j], self._ring_buffer_sigma)),
-            (n_synapse_types, vertex_slice.n_atoms))
-        expected_max_weights = [max(t) for t in expected_weights]
-        max_weights = [min((w, e))
-                       for w, e in zip(max_weights, expected_max_weights)]
-        max_weights = [max((w, a))
-                       for w, a in zip(max_weights, abs_max_weights)]
+        max_weights = numpy.zeros(n_synapse_types)
+        for synapse_type in n_synapse_types:
+            stats = running_totals[synapse_type]
+            max_weights[synapse_type] = min(
+                self._ring_buffer_expected_upper_bound(
+                    stats.mean, stats.standard_deviation,
+                    self._spikes_per_second, machine_timestep, stats.n_items,
+                    self._ring_buffer_sigma),
+                total_weights[synapse_type])
+            max_weights[synapse_type] = max(
+                max_weights[synapse_type], biggest_weight[synapse_type])
 
         # Convert these to powers
         max_weight_powers = [0 if w <= 0
@@ -409,10 +379,9 @@ class SynapticManager(object):
         max_weight_powers = [w + 1 if (2 ** w) >= a else w
                              for w, a in zip(max_weight_powers, max_weights)]
 
-        # If we have an STDP mechanism that uses signed weights,
+        # If we have synapse dynamics that uses signed weights,
         # Add another bit of shift to prevent overflows
-        if self._stdp_mechanism is not None\
-                and self._stdp_mechanism.are_weights_signed():
+        if weights_signed:
             max_weight_powers = [m + 1 for m in max_weight_powers]
 
         return max_weight_powers
@@ -431,14 +400,8 @@ class SynapticManager(object):
 
         # Get the ring buffer shifts and scaling factors
         ring_buffer_shifts = self._get_ring_buffer_to_input_left_shifts(
-            subvertex, subgraph, graph_mapper, self._machine_time_step)
-        weight_scales = [self._get_weight_scale(r) for r in ring_buffer_shifts]
-
-        # update projections for future use
-        in_partitioned_edges = subgraph.incoming_subedges_from_subvertex(
-            subvertex)
-        for partitioned_edge in in_partitioned_edges:
-            partitioned_edge.weight_scales_setter(weight_scales)
+            subvertex, subgraph, graph_mapper, vertex_slice,
+            self._machine_time_step)
 
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
@@ -448,7 +411,7 @@ class SynapticManager(object):
 
         spec.write_array(ring_buffer_shifts)
 
-        return weight_scales
+        return ring_buffer_shifts
 
     @staticmethod
     def _write_synapse_row_info(
@@ -528,9 +491,9 @@ class SynapticManager(object):
         return block_start_addr, next_block_start_addr
 
     def _write_synaptic_matrix_and_master_population_table(
-            self, spec, subvertex, all_syn_block_sz, weight_scales,
-            master_pop_table_region, synaptic_matrix_region, routing_info,
-            graph_mapper, subgraph):
+            self, spec, n_slices, slice_idx, subvertex, post_vertex_slice,
+            all_syn_block_sz, weight_scales, master_pop_table_region,
+            synaptic_matrix_region, routing_info, graph_mapper, subgraph):
         """ Simultaneously generates both the master population table and
             the synatic matrix.
         """
@@ -541,10 +504,8 @@ class SynapticManager(object):
         next_block_start_addr = 0
         n_synapse_type_bits = self._synapse_type.get_n_synapse_type_bits()
 
-        # Filtering incoming subedges
+        # Get the edges
         in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
-        in_proj_subedges = [e for e in in_subedges
-                            if isinstance(e, ProjectionPartitionedEdge)]
 
         # Set up the master population table
         self._population_table_type.initialise_table(
@@ -552,52 +513,43 @@ class SynapticManager(object):
 
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
-        for subedge in in_proj_subedges:
-            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+        for subedge in in_subedges:
+
+            edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
-            spec.comment(
-                "\nWriting matrix for subedge:{}\n".format(subedge.label))
-            sublist = subedge.get_synapse_sublist(graph_mapper)
-            associated_edge = \
-                graph_mapper.get_partitionable_edge_from_partitioned_edge(
+            if isinstance(edge, ProjectionPartitionableEdge):
+                spec.comment("\nWriting matrix for subedge:{}\n".format(
+                    subedge.label))
+
+                pre_vertex_slice = graph_mapper.get_subvertex_slice(
+                    subedge.pre_subvertex)
+
+                synapse_data = list()
+                synapse_dynamics = None
+                index = 0
+                for synapse_information in edge.synapse_information:
+                    if synapse_dynamics is None or isinstance(
+                            synapse_dynamics, SynapseDynamicsStatic):
+                        synapse_dynamics = synapse_information.synapse_dynamics
+                    connector = synapse_information.connector
+                    block = connector.create_synaptic_block(
+                        n_slices, slice_idx, pre_vertex_slice,
+                        post_vertex_slice, synapse_information.synapse_type,
+                        index)
+                    synapse_data.append(block)
+                    index += 1
+
+                block_start_addr, next_block_start_addr, row_length = \
+                    synapse_dynamics.write_synapse_data(
+                        spec, synaptic_matrix_region, synapse_data,
+                        n_synapse_type_bits,
+                        self._population_table_type, next_block_start_addr)
+
+                keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
                     subedge)
-            row_io = associated_edge.get_synapse_row_io()
-
-            # Get the maximum row length in words, excluding headers
-            max_row_length = max([row_io.get_n_words(row)
-                                 for row in sublist.get_rows()])
-
-            # Get an entry in the row length table for this length
-            row_length = self._population_table_type.get_allowed_row_length(
-                max_row_length)
-            block_start_addr = 0
-            if max_row_length > 0:
-
-                # Determine where the next block will actually start
-                # and generate any required padding
-                next_block_allowed_addr = \
-                    self._population_table_type.get_next_allowed_address(
-                        next_block_start_addr)
-                if next_block_allowed_addr != next_block_start_addr:
-
-                    # Pad out data file with the added alignment bytes:
-                    spec.switch_write_focus(synaptic_matrix_region)
-                    spec.set_register_value(
-                        register_id=15,
-                        data=next_block_allowed_addr - next_block_start_addr)
-                    spec.write_value(data=0xDD, repeats_register=15,
-                                     data_type=DataType.UINT8)
-
-                # Write the synaptic block for the sublist
-                (block_start_addr, next_block_start_addr) = \
-                    self._write_synapse_row_info(
-                        sublist, row_io, spec, next_block_allowed_addr,
-                        row_length, synaptic_matrix_region, weight_scales,
-                        n_synapse_type_bits)
-
-            self._population_table_type.update_master_population_table(
-                spec, block_start_addr, row_length, keys_and_masks,
-                master_pop_table_region)
+                self._population_table_type.update_master_population_table(
+                    spec, block_start_addr, row_length, keys_and_masks,
+                    master_pop_table_region)
 
         self._population_table_type.finish_master_pop_table(
             spec, master_pop_table_region)
@@ -606,6 +558,10 @@ class SynapticManager(object):
             self, spec, vertex, vertex_slice, subvertex, placement, subgraph,
             graph, routing_info, hostname, graph_mapper):
 
+        subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        n_slices = len(subvertices)
+        slice_index = subvertices.index(subvertex)
+
         # Reserve the memory
         subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)
         all_syn_block_sz = self._get_exact_synaptic_blocks_size(
@@ -613,20 +569,20 @@ class SynapticManager(object):
         self._reserve_memory_regions(
             spec, vertex, vertex_slice, graph, all_syn_block_sz)
 
-        weight_scales = self._write_synapse_parameters(
+        ring_buffer_shifts = self._write_synapse_parameters(
             spec, subvertex, subgraph, graph_mapper, vertex_slice)
+        weight_scales = [self._get_weight_scale(r) for r in ring_buffer_shifts]
 
         self._write_synaptic_matrix_and_master_population_table(
-            spec, subvertex, all_syn_block_sz, weight_scales,
+            spec, n_slices, slice_index, subvertex, vertex_slice,
+            all_syn_block_sz, weight_scales,
             constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             routing_info, graph_mapper, subgraph)
 
-        if self._stdp_mechanism is not None:
-            self._stdp_mechanism.write_plastic_params(
-                spec,
-                constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-                self._machine_time_step, weight_scales)
+        self._synapse_dynamics.write_parameters(
+            spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+            self._machine_time_step, weight_scales)
 
         # Free any additional memory
         for subedge in subvert_in_edges:

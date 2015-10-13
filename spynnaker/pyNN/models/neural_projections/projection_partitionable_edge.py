@@ -3,10 +3,6 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
 from pacman.utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
-    import ProjectionPartitionedEdge
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
-    fixed_synapse_row_io import FixedSynapseRowIO
 
 from spinn_front_end_common.utilities.timer import Timer
 
@@ -20,63 +16,47 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
     """
 
     def __init__(
-            self, pre_vertex, post_vertex, connector, synapse_dynamics=None,
-            label=None):
+            self, pre_vertex, post_vertex, synapse_information, label=None):
         MultiCastPartitionableEdge.__init__(
             self, pre_vertex, post_vertex, label=label)
-
-        self._connectors = [connector]
-        self._synapse_dynamics = synapse_dynamics
-        self._synapse_row_io = FixedSynapseRowIO()
+        self._synapse_information = [synapse_information]
         self._stored_synaptic_data_from_machine = None
 
-        # If there are synapse dynamics for this connector, create a plastic
-        # synapse list
-        if synapse_dynamics is not None:
-            self._synapse_row_io = synapse_dynamics.get_synapse_row_io()
+    def add_synapse_information(self, synapse_information):
+        self._synapse_information.append(synapse_information)
 
-    def add_connector(self, connector):
-        self._connectors.append(connector)
+    @property
+    def synapse_information(self):
+        return self._synapse_information
 
-    def create_subedge(self, presubvertex, postsubvertex, constraints=None,
-                       label=None):
-        """
-        Creates a subedge from this edge
-        """
-        if constraints is None:
-            constraints = list()
-        constraints.extend(self.constraints)
-        return ProjectionPartitionedEdge(presubvertex, postsubvertex,
-                                         constraints)
+    def get_n_synapse_rows(self, pre_vertex_slice=None):
+        if pre_vertex_slice is not None:
+            return pre_vertex_slice.n_atoms
+        return self.pre_vertex.n_atoms
 
-    def get_max_n_words(self, vertex_slice=None):
+    def get_max_n_words(self, pre_vertex_slice, post_vertex_slice):
+        """ Get the maximum number of words that any row can contain
         """
-        Gets the maximum number of words for a subvertex at the end of the
-        connection
-        :param vertex_slice: the vertex slice for this vertex which contains \
-        the lo and hi atoms for this slice
-        """
-        if vertex_slice is None:
-            return max([self._synapse_row_io.get_n_words(
-                synapse_row)
-                for synapse_row in self._synapse_list.get_rows()])
-        else:
-            return max([self._synapse_row_io.get_n_words(
-                synapse_row, vertex_slice)
-                for synapse_row in self._synapse_list.get_rows()])
+        total_length = 0
+        for synapse_info in self._synapse_information:
+            synapse_dynamics = synapse_info.synapse_dynamics
+            synapse_structure = synapse_dynamics.get_synapse_structure()
+            connector = synapse_info.connector
+            total_length += synapse_structure.get_n_words_in_row(
+                synapse_dynamics.get_n_connections_from_pre_vertex_maximum(
+                    connector, pre_vertex_slice, post_vertex_slice))
+        return total_length
 
-    def get_n_rows(self):
+    def get_synapses_size_in_bytes(self, pre_vertex_slice, post_vertex_slice):
+        """ Get the total size of the synapses for this edge in bytes
         """
-        Gets the number of synaptic rows coming in to a subvertex at the end of
-        the connection
-        """
-        return self._synapse_list.get_n_rows()
-
-    def get_synapse_row_io(self):
-        """
-        Gets the row reader and writer
-        """
-        return self._synapse_row_io
+        total_size = 0
+        for synapse_info in self._synapse_information:
+            synapse_dynamics = synapse_info.synapse_dynamics
+            connector = synapse_info.connector
+            total_size += synapse_dynamics.get_synapses_sdram_usage_in_bytes(
+                connector, pre_vertex_slice, post_vertex_slice)
+        return total_size
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):
@@ -131,22 +111,6 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
                     timer.take_sample()))
 
         return self._stored_synaptic_data_from_machine
-
-    @property
-    def synapse_dynamics(self):
-        """
-
-        :return: returns the synapse_dynamics for the edge
-        """
-        return self._synapse_dynamics
-
-    @property
-    def synapse_list(self):
-        """
-
-        :return: returns the synaptic list for the edge
-        """
-        return self._synapse_list
 
     def is_multi_cast_partitionable_edge(self):
         return True

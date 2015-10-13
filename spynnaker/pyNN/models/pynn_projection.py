@@ -4,7 +4,11 @@ Projection
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
+from spynnaker.pyNN.models.neural_projections.synapse_information \
+    import SynapseInformation
 
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
+    import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
@@ -50,7 +54,6 @@ class Projection(object):
         self._spinnaker = spinnaker_control
         self._projection_edge = None
         self._delay_edge = None
-        self._connector = connector
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
 
@@ -61,14 +64,28 @@ class Projection(object):
                 "postsynaptic_population is not a supposed receiver of"
                 " synaptic projections")
 
-        max_delay = connector.get_maximum_delay()
+        synapse_type = postsynaptic_population._get_vertex\
+            .synapse_type.get_synapse_id_by_target(target)
+        if synapse_type is None:
+            raise exceptions.ConfigurationException(
+                "Synapse target {} not found in {}".format(
+                    target, postsynaptic_population.label))
+
+        if synapse_dynamics is None:
+            synapse_dynamics = SynapseDynamicsStatic()
+        postsynaptic_population._get_vertex.synapse_dynamics = synapse_dynamics
+
+        # Set and store information for future processing
+        self._synapse_information = SynapseInformation(
+            connector, synapse_dynamics, synapse_type)
+        connector.set_population_information(
+            presynaptic_population._get_vertex.n_atoms,
+            postsynaptic_population._get_vertex.n_atoms,
+            synapse_type)
+
+        max_delay = synapse_dynamics.get_delay_maximum(connector)
         if max_delay is None:
             max_delay = user_max_delay
-
-        # Set any weight scaling for STDP
-        if synapse_dynamics is not None:
-            synapse_dynamics.weight_scale =\
-                postsynaptic_population._get_vertex.weight_scale
 
         # check if all delays requested can fit into the natively supported
         # delays in the models
@@ -99,7 +116,7 @@ class Projection(object):
         if edge_to_merge is not None:
 
             # If there is an existing edge, add the connector
-            edge_to_merge.add_connector(connector)
+            edge_to_merge.add_synapse_information(self._synapse_information)
             self._projection_edge = edge_to_merge
         else:
 
@@ -107,7 +124,7 @@ class Projection(object):
             self._projection_edge = ProjectionPartitionableEdge(
                 presynaptic_population._get_vertex,
                 postsynaptic_population._get_vertex,
-                connector, synapse_dynamics=synapse_dynamics, label=label)
+                self._synapse_information, label=label)
 
             # add edge to the graph
             spinnaker_control.add_edge(self._projection_edge)
@@ -142,7 +159,7 @@ class Projection(object):
         return None
 
     def _add_delay_extension(
-            self, pre_vertex, post_vertex, connector,
+            self, pre_vertex, post_vertex,
             synapse_dynamics, label, max_delay_for_projection,
             max_delay_per_neuron, machine_time_step, timescale_factor):
         """
@@ -183,11 +200,12 @@ class Projection(object):
         existing_delay_edge = self._find_existing_edge(
             delay_vertex, post_vertex)
         if existing_delay_edge is not None:
-            existing_delay_edge.add_connector(connector)
+            existing_delay_edge.add_synapse_information(
+                self._synapse_information)
             self._delay_edge = existing_delay_edge
         else:
             self._delay_edge = DelayPartitionableEdge(
-                delay_vertex, post_vertex, connector,
+                delay_vertex, post_vertex, self._synapse_information,
                 synapse_dynamics=synapse_dynamics, label=delay_label)
             self._spinnaker.add_edge(self._delay_edge)
 
