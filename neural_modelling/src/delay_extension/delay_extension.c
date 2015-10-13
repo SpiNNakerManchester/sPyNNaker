@@ -204,7 +204,17 @@ void timer_callback(uint unused0, uint unused1) {
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
         log_info("Simulation complete.\n");
-        spin1_exit(0);
+
+        // Wait for the next run of the simulation
+        spin1_callback_off(TIMER_TICK);
+        event_wait();
+
+        // Prepare for the next run
+        time = UINT32_MAX;
+        
+        spin1_callback_on(TIMER_TICK, timer_callback, 2);
+
+        return;
     }
 
     // Loop through delay stages
@@ -263,6 +273,17 @@ void timer_callback(uint unused0, uint unused1) {
     memset(current_time_slot_spike_counters, 0, sizeof(uint8_t) * num_neurons);
 }
 
+void sdp_message_callback(uint msg, uint port) {
+    use(port);
+
+    ushort cmd = msg >> 8;
+    if (cmd == CMD_STOP) {
+        spin1_exit(0);
+    } else if (cmd == CMD_RUNTIME) {
+        simulation_ticks = msg & 0xffffff;
+    }
+}
+
 // Entry point
 void c_main(void) {
 
@@ -288,6 +309,9 @@ void c_main(void) {
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, -1);
     spin1_callback_on(USER_EVENT, spike_process, 1);
     spin1_callback_on(TIMER_TICK, timer_callback, 2);
+
+    // Set up callback listening to SDP messages
+    spin1_callback_on(SDP_PACKET_RX, sdp_message_callback, 2);
 
     log_info("Starting");
     simulation_run();
