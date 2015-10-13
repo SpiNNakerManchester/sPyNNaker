@@ -2,7 +2,7 @@
     <algorithm name="RigCommandLineSAPlacer">
         <command_line_args>
             <arg>python</arg>
-            <arg>/home/S06/stokesa6/spinniker/alpha_package_103_git/place-and-route-interchange-format/reference_implementation/rig_place.py</arg>
+            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_place.py</arg>
             <arg>--algorithm=sa</arg>
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
@@ -40,8 +40,46 @@
     <algorithm name="RigCommandLineHilbertPlacer">
         <command_line_args>
             <arg>python</arg>
-            <arg>/home/S06/stokesa6/spinniker/alpha_package_103_git/place-and-route-interchange-format/reference_implementation/rig_place.py</arg>
+            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_place.py</arg>
             <arg>--algorithm=hilbert</arg>
+            <arg>--graph={graph}</arg>
+            <arg>--constraints={constraints}</arg>
+            <arg>--machine={machine}</arg>
+            <arg>--placements={placements_path}</arg>
+
+        </command_line_args>
+         <required_inputs>
+            <parameter>
+                <param_name>graph</param_name>
+                <param_type>FilePartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>FileMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>constraints</param_name>
+                <param_type>FileConstraints</param_type>
+            </parameter>
+             <parameter>
+                <param_name>placements_path</param_name>
+                <param_type>FilePlacementFilePath</param_type>
+            </parameter>
+        </required_inputs>
+        <parameters>
+        </parameters>
+        <produces_outputs>
+            <parameter>
+                <param_name>FilePlacementFilePath</param_name>
+                <param_type>FilePlacements</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
+    <algorithm name="RigCommandLineRandomPlacer">
+        <command_line_args>
+            <arg>python</arg>
+            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_place.py</arg>
+            <arg>--algorithm=rand</arg>
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
             <arg>--machine={machine}</arg>
@@ -78,7 +116,7 @@
     <algorithm name="RigAllocator">
         <command_line_args>
             <arg>python</arg>
-            <arg>/home/S06/stokesa6/spinniker/alpha_package_103_git/place-and-route-interchange-format/reference_implementation/rig_allocate.py</arg>
+            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_allocate.py</arg>
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
             <arg>--machine={machine}</arg>
@@ -125,7 +163,7 @@
     <algorithm name="RigRouter">
         <command_line_args>
             <arg>python</arg>
-            <arg>/home/S06/stokesa6/spinniker/alpha_package_103_git/place-and-route-interchange-format/reference_implementation/rig_route.py</arg>
+            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_route.py</arg>
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
             <arg>--machine={machine}</arg>
