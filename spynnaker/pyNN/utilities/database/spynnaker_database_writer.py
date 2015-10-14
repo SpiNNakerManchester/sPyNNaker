@@ -4,13 +4,12 @@ SpynnakerDataBaseInterface
 # front end common imports
 from spinn_front_end_common.utilities.database.\
     database_writer import DatabaseWriter
+from spynnaker.pyNN.models.common.abstract_spike_recordable \
+    import AbstractSpikeRecordable
 
 # general imports
 import logging
 import traceback
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_population_recordable_vertex import \
-    AbstractPopulationRecordableVertex
 
 
 logger = logging.getLogger(__name__)
@@ -68,14 +67,14 @@ class SpynnakerDataBaseWriter(DatabaseWriter):
                 "PRIMARY KEY (vertex_id, edge_id))")
             # add vertices
             for vertex in partitionable_graph.vertices:
-                if isinstance(vertex, AbstractPopulationRecordableVertex):
+                if isinstance(vertex, AbstractSpikeRecordable):
                     cur.execute(
                         "INSERT INTO Partitionable_vertices("
                         "vertex_label, no_atoms, max_atom_constrant, recorded)"
                         " VALUES('{}', {}, {}, {});"
                         .format(vertex.label, vertex.n_atoms,
                                 vertex.get_max_atoms_per_core(),
-                                int(vertex.record)))
+                                int(vertex.is_recording_spikes())))
                 else:
                     cur.execute(
                         "INSERT INTO Partitionable_vertices("

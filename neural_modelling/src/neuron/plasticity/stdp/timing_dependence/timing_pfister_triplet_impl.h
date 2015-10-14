@@ -14,6 +14,7 @@ typedef struct pre_trace_t {
   int16_t r2;
 } pre_trace_t;
 
+#include "../synapse_structure/synapse_structure_weight_impl.h"
 #include "timing.h"
 #include "../weight_dependence/weight_two_term.h"
 
