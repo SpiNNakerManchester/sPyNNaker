@@ -214,15 +214,19 @@ void timer_callback(uint timer_count, uint unused) {
     neuron_do_timestep_update(time);
 }
 
-void sdp_message_callback(uint msg, uint port) {
+void sdp_message_callback(uint mailbox, uint port) {
     use(port);
 
-    ushort cmd = msg >> 8;
-    if (cmd == CMD_STOP) {
+    sdp_msg_t *msg = (sdp_msg_t *) mailbox;
+    uint16_t length = msg->length;
+
+    if (msg->cmd_rc == CMD_STOP) {
         spin1_exit(0);
-    } else if (cmd == CMD_RUNTIME) {
-        simulation_ticks = msg & 0xffffff;
+    } else if (msg->cmd_rc == CMD_RUNTIME) {
+        simulation_ticks = msg->arg1;
     }
+
+    spin1_msg_free(msg);
 }
 
 //! \The only entry point for this model. it initialises the model, sets up the
