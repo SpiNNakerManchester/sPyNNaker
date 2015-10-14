@@ -47,8 +47,9 @@ import math
 
 logger = logging.getLogger(__name__)
 
-# Space in case the buffering ends up pushing more packets than required
-_RECORD_OVERALLOCATION = 2000
+# Extra space in recording region in case of buffering sending more packets
+# than expected
+_RECORDING_OVERALLOCATION = 2000
 
 
 class SpikeSourceArray(
@@ -342,21 +343,24 @@ class SpikeSourceArray(
         spec.comment("\nReserving memory space for spike data region:\n\n")
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         spike_buffer = self._get_spike_send_buffer(vertex_slice)
-        recording_size = (spike_buffer.total_region_size + 4 +
-                          _RECORD_OVERALLOCATION)
 
+        if self._spike_recording_region_size is None:
+            self._spike_recording_region_size = (
+                spike_buffer.total_region_size + _RECORDING_OVERALLOCATION)
+            
         self._reserve_memory_regions(spec, spike_buffer.buffer_size,
-                                     recording_size)
+                                     self._spike_recording_region_size)
 
         self._write_setup_info(
-            spec, spike_buffer.buffer_size, ip_tags, recording_size)
+            spec, spike_buffer.buffer_size, ip_tags, 
+            self._spike_recording_region_size)
 
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
 
         # tell the subvertex its region size
-        subvertex.region_size = recording_size
+        subvertex.region_size = self._spike_recording_region_size
 
     def get_binary_file_name(self):
         """
@@ -388,14 +392,14 @@ class SpikeSourceArray(
         """
         send_buffer = self._get_spike_send_buffer(vertex_slice)
         send_size = send_buffer.buffer_size
-        record_size = 0
-        if self._spike_recorder.record:
-            record_size = (send_buffer.total_region_size + 4 +
-                           _RECORD_OVERALLOCATION)
+        self._spike_recording_region_size = 0
+        if self._record:
+            self._spike_recording_region_size = (
+                send_buffer.total_region_size + _RECORDING_OVERALLOCATION)
         return (
             (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
             SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size +
-            record_size)
+            self._spike_recording_region_size + 4)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
