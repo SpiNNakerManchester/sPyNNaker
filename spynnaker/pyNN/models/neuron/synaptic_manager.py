@@ -810,7 +810,7 @@ class SynapticManager(object):
         return block, maxed_row_length
 
     # inhirrted from AbstractProvidesIncomingEdgeConstraints
-    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
+    def get_incoming_edge_constraints(self):
         """
 
         :param partitioned_edge:

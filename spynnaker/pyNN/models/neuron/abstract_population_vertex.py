@@ -1,3 +1,5 @@
+from spinn_front_end_common.abstract_models.abstract_provides_incoming_edge_constraints import \
+    AbstractProvidesIncomingEdgeConstraints
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spinn_front_end_common.abstract_models\
@@ -44,7 +46,8 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
+        AbstractOutgoingEdgeSameContiguousKeysRestrictor,
+        AbstractProvidesIncomingEdgeConstraints):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -442,6 +445,15 @@ class AbstractPopulationVertex(
 
     def is_data_specable(self):
         return True
+
+    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
+        """
+
+        :param partitioned_edge:
+        :param graph_mapper:
+        :return:
+        """
+        return self._synapse_manager.get_incoming_edge_constraints()
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)
