@@ -388,7 +388,13 @@ class Population(object):
         # Doesn't make much sense on SpiNNaker
         return self._size
 
+    # noinspection PyPep8Naming
     def meanSpikeCount(self, gather=True):
+        """
+        Returns the mean number of spikes per neuron.
+        :param gather: gather has no meaning in spinnaker, always set to true
+        :return: an array whcih contains the avg spike rate per neuron
+        """
         return self.mean_spike_count(gather)
 
     def mean_spike_count(self, gather=True):
@@ -442,6 +448,7 @@ class Population(object):
         Record spikes from all cells in the Population.
         A flag is set for this population that is passed to the simulation,
         triggering spike time recording.
+        :param to_file: file to write the spike data to
         """
 
         if not isinstance(self._vertex, AbstractSpikeRecordable):
@@ -459,6 +466,7 @@ class Population(object):
         Record the synaptic conductance for all cells in the Population.
         A flag is set for this population that is passed to the simulation,
         triggering gsyn value recording.
+        :param to_file: the file to write the recorded gsyn to.
         """
         if not isinstance(self._vertex, AbstractGSynRecordable):
             raise Exception(
@@ -476,6 +484,7 @@ class Population(object):
         Record the membrane potential for all cells in the Population.
         A flag is set for this population that is passed to the simulation,
         triggering potential recording.
+        :param to_file: the file to write the recorded v to.
         """
         if not isinstance(self._vertex, AbstractVRecordable):
             raise Exception(
@@ -584,21 +593,24 @@ class Population(object):
         """
         returns a random selection fo neurons from a population in the form
         of a population view
+        :param n: the number of neurons to sample
+        :param rng: the random number generator to use.
         """
 
         # TODO: Need PopulationView support
         raise NotImplementedError
 
-    def save_positions(self, file_name):
+    def save_positions(self, file):
         """
         save positions to file. Added functionality 23 November 2014 ADR
+        :param file: the file to write the positions to.
         """
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
                              "for an un-structured population")
         elif self._positions is None:
             self._structure.generate_positions(self._vertex.n_atoms)
-        file_handle = open(file_name, "w")
+        file_handle = open(file, "w")
         file_handle.write(self._positions)
         file_handle.close()
 
@@ -643,6 +655,8 @@ class Population(object):
 
           p.set("tau_m", 20.0).
           p.set({'tau_m':20, 'v_rest':-65})
+        :param parameter: the parameter to set
+        :param value: the value of the parameter to set.
         """
         if type(parameter) is str:
             if value is None:
@@ -704,6 +718,11 @@ class Population(object):
 
     # NONE PYNN API CALL
     def set_model_based_max_atoms_per_core(self, new_value):
+        """
+        supports the setting of each models max atoms per core parameter
+        :param new_value: the new value for the max atoms per core.
+        :return:
+        """
         if hasattr(self._vertex, "set_model_max_atoms_per_core"):
             self._vertex.set_model_max_atoms_per_core(new_value)
         else:
@@ -713,12 +732,19 @@ class Population(object):
 
     @property
     def size(self):
+        """
+        propety method for the n atoms / size of the population
+        :return:
+        """
         return self._vertex.n_atoms
 
     def tset(self, parametername, value_array):
         """
         'Topographic' set. Set the value of parametername to the values in
         value_array, which must have the same dimensions as the Population.
+        :param parametername: the name of the parameter
+        :param value_array: the array of values which must have the correct
+        number of elements.
         """
         if len(value_array) != self._vertex.n_atoms:
             raise exceptions.ConfigurationException(

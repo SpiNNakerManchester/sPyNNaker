@@ -22,7 +22,6 @@ from enum import Enum
 import math
 import numpy
 import logging
-import sys
 
 
 logger = logging.getLogger(__name__)
@@ -185,7 +184,7 @@ class SpikeSourcePoisson(
         self._write_basic_setup_info(
             spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         recording_info = 0
-        if (spike_history_region_sz > 0) and self._spike_recorder.record:
+        if self._spike_recorder.record:
             recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
 
@@ -222,10 +221,10 @@ class SpikeSourcePoisson(
             spec.write_value(data=key)
 
         # Write the random seed (4 words), generated randomly!
-        spec.write_value(data=self._rng.randint(sys.maxint))
-        spec.write_value(data=self._rng.randint(sys.maxint))
-        spec.write_value(data=self._rng.randint(sys.maxint))
-        spec.write_value(data=self._rng.randint(sys.maxint))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
 
         # For each neuron, get the rate to work out if it is a slow
         # or fast source

@@ -305,6 +305,8 @@ class AbstractPopulationVertex(
         self._write_setup_info(
             spec, spike_history_sz, v_history_sz, gsyn_history_sz)
         self._write_neuron_parameters(spec, key, vertex_slice)
+
+        # allow the synaptic matrix to write its data specable data
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, subvertex, placement, subgraph, graph,
             routing_info, hostname, graph_mapper)

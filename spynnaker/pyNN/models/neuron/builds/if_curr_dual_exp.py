@@ -49,7 +49,7 @@ class IFCurrDualExp(AbstractPopulationVertex):
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IF_curr_dual_exp.aplx",
             label=label,
-            max_atoms_per_core=(IFCurrDualExp._model_based_max_atoms_per_core),
+            max_atoms_per_core=IFCurrDualExp._model_based_max_atoms_per_core,
             machine_time_step=machine_time_step,
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
