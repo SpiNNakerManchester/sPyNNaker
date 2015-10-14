@@ -36,17 +36,31 @@ def convert_param_to_numpy(param, no_atoms):
             "http://neuralensemble.org/PyNN/")
     if isinstance(param, RandomDistribution):
         if no_atoms > 1:
-            return numpy.asarray(param.next(n=no_atoms))
+            return numpy.asarray(param.next(n=no_atoms), dtype="float")
         else:
-            return numpy.array([param.next(n=no_atoms)])
+            return numpy.array([param.next(n=no_atoms)], dtype="float")
     elif not hasattr(param, '__iter__'):
-        return numpy.array([param], dtype=float)
+        return numpy.array([param] * no_atoms, dtype="float")
     elif len(param) != no_atoms:
         raise exceptions.ConfigurationException("The number of params does"
                                                 " not equal with the number"
                                                 " of atoms in the vertex ")
     else:
-        return numpy.array(param, dtype=float)
+        return numpy.array(param, dtype="float")
+
+
+def write_parameters_per_neuron(spec, vertex_slice, parameters):
+    for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+        for param in parameters:
+            value = param.get_value()
+            if hasattr(value, "__len__"):
+                if len(value) > 1:
+                    value = value[atom]
+                else:
+                    value = value[0]
+
+            spec.write_value(data=value,
+                             data_type=param.get_dataspec_datatype())
 
 
 def read_in_data_from_file(

@@ -1,17 +1,22 @@
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
+from spinn_front_end_common.abstract_models.\
+    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
+    OutgoingEdgeSameContiguousKeysRestrictor
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
+
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions\
     import generate_parameter
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_partitionable_population_vertex import AbstractPartitionableVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_population_recordable_vertex\
-    import AbstractPopulationRecordableVertex
+from spynnaker.pyNN.models.common.abstract_spike_recordable \
+    import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
-from spinn_front_end_common.abstract_models\
-    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
-    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
+
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -25,16 +30,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-SLOW_RATE_PER_TICK_CUTOFF = 0.25
+SLOW_RATE_PER_TICK_CUTOFF = 1.0
 PARAMS_BASE_WORDS = 4
 PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
 
 class SpikeSourcePoisson(
-        AbstractPopulationRecordableVertex, AbstractPartitionableVertex,
-        AbstractDataSpecableVertex,
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
+        AbstractPartitionableVertex, AbstractDataSpecableVertex,
+        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints):
     """
     This class represents a Poisson Spike source object, which can represent
     a pynn_population.py of virtual neurons each with its own parameters.
@@ -45,10 +49,12 @@ class SpikeSourcePoisson(
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
                ('SPIKE_HISTORY_REGION', 2)])
-    _model_based_max_atoms_per_core = 256
+
+    # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
+    # in terms of CPU (2900 at 10 times slowdown is fine, but not at realtime)
+    _model_based_max_atoms_per_core = 500
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
-                 spikes_per_second, ring_buffer_sigma,
                  constraints=None, label="SpikeSourcePoisson",
                  rate=1.0, start=0.0, duration=None, seed=None):
         """
@@ -57,16 +63,22 @@ class SpikeSourcePoisson(
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=self._model_based_max_atoms_per_core)
-        AbstractPopulationRecordableVertex.__init__(
-            self, machine_time_step, label)
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
+        AbstractSpikeRecordable.__init__(self)
+
+        # Store the parameters
         self._rate = rate
         self._start = start
         self._duration = duration
-        self._seed = seed
+        self._rng = numpy.random.RandomState(seed)
+
+        # Prepare for recording, and to get spikes
+        self._spike_recorder = SpikeRecorder(machine_time_step)
+
+        self._outgoing_edge_key_restrictor = \
+            OutgoingEdgeSameContiguousKeysRestrictor()
 
     @property
     def rate(self):
@@ -114,24 +126,7 @@ class SpikeSourcePoisson(
         :param new_value:
         :return:
         """
-        SpikeSourcePoisson.\
-            _model_based_max_atoms_per_core = new_value
-
-    def get_spike_buffer_size(self, vertex_slice):
-        """
-        Gets the size of the spike buffer for a range of neurons and time steps
-        :param vertex_slice:
-        """
-        if not self._record:
-            return 0
-
-        if self._no_machine_time_steps is None:
-            return 0
-
-        bytes_per_time_step = int(
-            math.ceil((vertex_slice.hi_atom - vertex_slice.lo_atom + 1) /
-                      32.0)) * 4
-        return self.get_recording_region_size(bytes_per_time_step)
+        SpikeSourcePoisson._model_based_max_atoms_per_core = new_value
 
     @staticmethod
     def get_params_bytes(vertex_slice):
@@ -193,7 +188,7 @@ class SpikeSourcePoisson(
         self._write_basic_setup_info(
             spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         recording_info = 0
-        if (spike_history_region_sz > 0) and self._record:
+        if self._spike_recorder.record:
             recording_info |= constants.RECORD_SPIKE_BIT
         recording_info |= 0xBEEF0000
 
@@ -230,16 +225,10 @@ class SpikeSourcePoisson(
             spec.write_value(data=key)
 
         # Write the random seed (4 words), generated randomly!
-        if self._seed is None:
-            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
-            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
-            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
-            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
-        else:
-            spec.write_value(data=self._seed[0])
-            spec.write_value(data=self._seed[1])
-            spec.write_value(data=self._seed[2])
-            spec.write_value(data=self._seed[3])
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
 
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
@@ -315,28 +304,12 @@ class SpikeSourcePoisson(
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
             spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
-        return
 
-    def get_spikes(self, txrx, placements, graph_mapper,
-                   compatible_output=False):
-        """
+    def is_recording_spikes(self):
+        return self._spike_recorder.record
 
-        :param txrx:
-        :param placements:
-        :param graph_mapper:
-        :param compatible_output:
-        :return:
-        """
-
-        # Use standard behaviour to read spikes
-        return self._get_spikes(
-            transceiver=txrx, placements=placements,
-            graph_mapper=graph_mapper, compatible_output=compatible_output,
-            spike_recording_region=self._POISSON_SPIKE_SOURCE_REGIONS
-                                       .SPIKE_HISTORY_REGION.value,
-            sub_vertex_out_spike_bytes_function=(
-                lambda subvertex, subvertex_slice:
-                    int(math.ceil(subvertex_slice.n_atoms / 32.0)) * 4))
+    def set_recording_spikes(self):
+        self._spike_recorder.record = True
 
     # inherited from partionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
@@ -347,7 +320,9 @@ class SpikeSourcePoisson(
         :return:
         """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
-        spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
+        spike_hist_buff_sz = \
+            self._spike_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self._no_machine_time_steps)
         return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) + 8 +
                 poisson_params_sz + spike_hist_buff_sz)
 
@@ -401,7 +376,8 @@ class SpikeSourcePoisson(
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
-        spike_hist_buff_sz = self.get_spike_buffer_size(vertex_slice)
+        spike_hist_buff_sz = self._spike_recorder.get_sdram_usage_in_bytes(
+            vertex_slice.n_atoms, self._no_machine_time_steps)
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
@@ -437,12 +413,24 @@ class SpikeSourcePoisson(
         """
         return "spike_source_poisson.aplx"
 
-    def is_recordable(self):
-        """
+    def get_spikes(self, transceiver, n_machine_time_steps, placements,
+                   graph_mapper):
+        return self._spike_recorder.get_spikes(
+            self._label, transceiver,
+            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+            n_machine_time_steps, placements, graph_mapper, self)
 
-        :return:
+    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
         """
-        return True
+        gets the constraints for edges going out of this vertex
+        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param graph_mapper: the graph mapper object
+        :return: list of constraints
+        """
+        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
+            partitioned_edge, graph_mapper)
+
+
 
     def is_data_specable(self):
         """

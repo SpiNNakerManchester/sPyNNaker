@@ -28,7 +28,7 @@ poisson_params = {'rate': 100, 'start':0, 'duration' : 100000000}
 poisson_params2 = {'rate': 10, 'start':0, 'duration' : 100000000}
 populations.append(p.Population(nNeurons, p.IF_curr_exp, neuron_parameters, label='pop_1'))
 populations.append(p.Population(nNeurons, p.IF_curr_exp, neuron_parameters, label='pop_2'))
-populations[1].set_constraint(p.PlacerChipAndCoreConstraint(x=1,y=0))#{"x": 1, "y": 0})
+populations[1].add_placement_constraint(x=1,y=0)#{"x": 1, "y": 0})
 #populations.append(p.Population(nSources, p.SpikeSourcePoisson, poisson_params, label='pois_1'))
 #populations.append(p.Population(nSources, p.SpikeSourcePoisson, poisson_params2, label='pois_2'))
 
@@ -58,7 +58,7 @@ v = populations[0].get_v()
 if spikes != None:
     print "Spikes:", spikes
     pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".") 
+    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
     pylab.xlabel('Time/ms')
     pylab.ylabel('spikes')
     pylab.title('spikes')
@@ -70,9 +70,9 @@ else:
 if v != None:
     v_per_neuron = [numpy.zeros((0, 2)) for neuronID in range(nNeurons)]
     for (nid, time, value) in v:
-        v_per_neuron[int(nid)] = numpy.append(v_per_neuron[int(nid)], 
+        v_per_neuron[int(nid)] = numpy.append(v_per_neuron[int(nid)],
                 [[time, value]], 0)
-    
+
     pylab.figure()
     pylab.xlabel('Time/ms')
     pylab.ylabel('v')
@@ -82,13 +82,13 @@ if v != None:
     pylab.show()
 else:
     print "No V"
-    
+
 if gsyn != None:
     gsyn_per_neuron = [numpy.zeros((0, 2)) for neuronID in range(nNeurons)]
     for (nid, time, value) in gsyn:
-        gsyn_per_neuron[int(nid)] = numpy.append(gsyn_per_neuron[int(nid)], 
+        gsyn_per_neuron[int(nid)] = numpy.append(gsyn_per_neuron[int(nid)],
                  [[time, value]], 0)
-    
+
     pylab.figure()
     pylab.xlabel('Time/ms')
     pylab.ylabel('gsyn')

@@ -54,9 +54,11 @@ typedef enum regions_e {
 //! the current timer tick value TODO this might be able to be removed with
 //! the timer tick callback returning the same value.
 uint32_t time;
+
 //! global parameter which contains the number of timer ticks to run for before
 //! being expected to exit
 static uint32_t simulation_ticks = 0;
+
 //! global paramter which states if this model should run for infinite time
 static uint32_t infinite_run;
 
