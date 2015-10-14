@@ -1,10 +1,14 @@
-from spinn_front_end_common.abstract_models.abstract_provides_incoming_edge_constraints import \
+from spinn_front_end_common.abstract_models.\
+    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
+    OutgoingEdgeSameContiguousKeysRestrictor
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_incoming_edge_constraints import \
     AbstractProvidesIncomingEdgeConstraints
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
-from spinn_front_end_common.abstract_models\
-    .abstract_outgoing_edge_same_contiguous_keys_restrictor \
-    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
 
@@ -46,7 +50,7 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor,
+        AbstractProvidesOutgoingEdgeConstraints,
         AbstractProvidesIncomingEdgeConstraints):
     """ Underlying vertex model for Neural Populations.
     """
@@ -64,7 +68,6 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -86,6 +89,10 @@ class AbstractPopulationVertex(
         self._synapse_manager = SynapticManager(
             synapse_type, machine_time_step, ring_buffer_sigma,
             spikes_per_second)
+
+        # set up continious restrictor
+        self._outgoing_edge_key_restrictor = \
+            OutgoingEdgeSameContiguousKeysRestrictor()
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -448,12 +455,22 @@ class AbstractPopulationVertex(
 
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
         """
-
-        :param partitioned_edge:
-        :param graph_mapper:
-        :return:
+        gets the constraints for edges going into this vertex
+        :param partitioned_edge: partitioned edge that goes into this vertex
+        :param graph_mapper: the graph mapper object
+        :return: list of constraints
         """
         return self._synapse_manager.get_incoming_edge_constraints()
+
+    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
+        """
+        gets the constraints for edges going out of this vertex
+        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param graph_mapper: the graph mapper object
+        :return: list of constraints
+        """
+        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
+            partitioned_edge, graph_mapper)
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

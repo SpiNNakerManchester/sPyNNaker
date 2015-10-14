@@ -3,6 +3,12 @@ SpikeSourceArray
 """
 
 # spynnaker imports
+from spinn_front_end_common.abstract_models.\
+    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
+    OutgoingEdgeSameContiguousKeysRestrictor
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
     import EIEIOSpikeRecorder
@@ -12,9 +18,6 @@ from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
 
-from spinn_front_end_common.abstract_models\
-    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
-    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.interface.buffer_management.storage_objects\
     .buffered_sending_region import BufferedSendingRegion
 
@@ -50,8 +53,7 @@ _RECORD_OVERALLOCATION = 2000
 
 class SpikeSourceArray(
         AbstractDataSpecableVertex, AbstractPartitionableVertex,
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor,
-        AbstractSpikeRecordable):
+        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints):
     """
     model for play back of spikes
     """
@@ -86,7 +88,6 @@ class SpikeSourceArray(
             self, n_atoms=n_neurons, label=label,
             max_atoms_per_core=self._model_based_max_atoms_per_core,
             constraints=constraints)
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
         AbstractSpikeRecordable.__init__(self)
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
@@ -118,7 +119,12 @@ class SpikeSourceArray(
         self._send_buffers = dict()
         self._spike_recording_region_size = None
 
+        # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
+
+        #handle outgoing constraints
+        self._outgoing_edge_key_restrictor = \
+            OutgoingEdgeSameContiguousKeysRestrictor()
 
     @property
     def spike_times(self):
@@ -399,6 +405,17 @@ class SpikeSourceArray(
         :return:
         """
         return 0
+
+    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
+        """
+        gets the constraints for edges going out of this vertex
+        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param graph_mapper: the graph mapper object
+        :return: list of constraints
+        """
+        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
+            partitioned_edge, graph_mapper)
+
 
     def is_data_specable(self):
         """
