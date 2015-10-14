@@ -45,9 +45,6 @@ def get_data(transceiver, placement, region, region_size):
         raise exceptions.MemReadException(
             "Expected {} bytes but read {}".format(
                 expected_size, number_of_bytes_written))
-    elif number_of_bytes_written < expected_size:
-        logger.warn("Only {} of {} bytes have been written in recording"
-                    " region".format(number_of_bytes_written, expected_size))
 
     return transceiver.read_memory(
         x, y, region_base_address + 4, number_of_bytes_written)

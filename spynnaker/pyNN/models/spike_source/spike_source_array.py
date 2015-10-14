@@ -134,10 +134,12 @@ class SpikeSourceArray(
     def set_recording_spikes(self):
         self._spike_recorder.record = True
 
-    def get_spikes(self, transceiver, n_machine_time_steps):
+    def get_spikes(self, transceiver, n_machine_time_steps, placements,
+                   graph_mapper):
         return self._spike_recorder.get_spikes(
             self.label, transceiver,
-            self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value)
+            self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value,
+            placements, graph_mapper, self)
 
     @property
     def model_name(self):
@@ -347,8 +349,8 @@ class SpikeSourceArray(
         spec.end_specification()
         data_writer.close()
 
-        self._spike_recorder.add_subvertex_information(
-            placement, vertex_slice, subvertex.base_key, recording_size)
+        # tell the subvertex its region size
+        subvertex.region_size = recording_size
 
     def get_binary_file_name(self):
         """

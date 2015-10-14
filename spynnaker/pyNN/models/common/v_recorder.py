@@ -12,9 +12,6 @@ class VRecorder(object):
         self._record_v = False
         self._machine_time_step = machine_time_step
 
-        # A list of tuples of (placement, vertex_slice)
-        self._subvertex_information = list()
-
     @property
     def record_v(self):
         return self._record_v
@@ -22,11 +19,6 @@ class VRecorder(object):
     @record_v.setter
     def record_v(self, record_v):
         self._record_v = record_v
-
-    def add_subvertex_information(self, placement, vertex_slice):
-        """ Add a subvertex for gsyn retrieval
-        """
-        self._subvertex_information.append((placement, vertex_slice))
 
     def get_sdram_usage_in_bytes(
             self, n_neurons, n_machine_time_steps):
@@ -46,7 +38,11 @@ class VRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_v(self, label, n_atoms, transceiver, region, n_machine_time_steps):
+    def get_v(self, label, n_atoms, transceiver, region, n_machine_time_steps,
+              placements, graph_mapper, partitionable_vertex):
+
+        subvertices = \
+            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
 
         ms_per_tick = self._machine_time_step / 1000.0
 
@@ -61,10 +57,14 @@ class VRecorder(object):
             0, n_machine_time_steps * ms_per_tick, ms_per_tick),
             n_atoms).reshape((n_machine_time_steps, n_atoms))
 
-        progress_bar = ProgressBar(
-            len(self._subvertex_information),
-            "Getting membrane voltage for {}".format(label))
-        for (placement, vertex_slice) in self._subvertex_information:
+        progress_bar = \
+            ProgressBar(len(subvertices),
+                        "Getting membrane voltage for {}".format(label))
+
+        for subvertex in subvertices:
+
+            vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            placement = placements.get_placement_of_subvertex(subvertex)
 
             region_size = recording_utils.get_recording_region_size_in_bytes(
                 n_machine_time_steps, 4 * vertex_slice.n_atoms)

@@ -12,9 +12,6 @@ class GsynRecorder(object):
         self._machine_time_step = machine_time_step
         self._record_gsyn = False
 
-        # A list of tuples of (placement, vertex_slice)
-        self._subvertex_information = list()
-
     @property
     def record_gsyn(self):
         return self._record_gsyn
@@ -22,11 +19,6 @@ class GsynRecorder(object):
     @record_gsyn.setter
     def record_gsyn(self, record_gsyn):
         self._record_gsyn = record_gsyn
-
-    def add_subvertex_information(self, placement, vertex_slice):
-        """ Add a subvertex for gsyn retrieval
-        """
-        self._subvertex_information.append((placement, vertex_slice))
 
     def get_sdram_usage_in_bytes(
             self, n_neurons, n_machine_time_steps):
@@ -47,9 +39,13 @@ class GsynRecorder(object):
         return n_neurons * 8
 
     def get_gsyn(self, label, n_atoms, transceiver, region,
-                 n_machine_time_steps):
+                 n_machine_time_steps, placements, graph_mapper,
+                 partitionable_vertex):
 
         ms_per_tick = self._machine_time_step / 1000.0
+
+        subvertices = \
+            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
 
         tempfilehandle = tempfile.NamedTemporaryFile()
         data = numpy.memmap(
@@ -63,9 +59,11 @@ class GsynRecorder(object):
             n_atoms).reshape((n_machine_time_steps, n_atoms))
 
         progress_bar = ProgressBar(
-            len(self._subvertex_information),
-            "Getting conductance for {}".format(label))
-        for placement, vertex_slice in self._subvertex_information:
+            len(subvertices), "Getting conductance for {}".format(label))
+        for subvertex in subvertices:
+
+            vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            placement = placements.get_placement_of_subvertex(subvertex)
 
             region_size = recording_utils.get_recording_region_size_in_bytes(
                 n_machine_time_steps, 8 * vertex_slice.n_atoms)

@@ -315,11 +315,6 @@ class AbstractPopulationVertex(
         spec.end_specification()
         data_writer.close()
 
-        # Add information to recording
-        self._spike_recorder.add_subvertex_information(placement, vertex_slice)
-        self._v_recorder.add_subvertex_information(placement, vertex_slice)
-        self._gsyn_recorder.add_subvertex_information(placement, vertex_slice)
-
     # @implements AbstractDataSpecableVertex.get_binary_file_name
     def get_binary_file_name(self):
 
@@ -339,11 +334,12 @@ class AbstractPopulationVertex(
         self._spike_recorder.record = True
 
     # @implements AbstractSpikeRecordable.get_spikes
-    def get_spikes(self, transceiver, n_machine_time_steps):
+    def get_spikes(self, transceiver, n_machine_time_steps, placements,
+                   graph_mapper):
         return self._spike_recorder.get_spikes(
             self._label, transceiver,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-            n_machine_time_steps)
+            n_machine_time_steps, placements, graph_mapper, self)
 
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
@@ -354,11 +350,12 @@ class AbstractPopulationVertex(
         self._v_recorder.record_v = True
 
     # @implements AbstractVRecordable.get_v
-    def get_v(self, transceiver, n_machine_time_steps):
+    def get_v(self, transceiver, n_machine_time_steps, placements,
+              graph_mapper):
         return self._v_recorder.get_v(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
-            n_machine_time_steps)
+            n_machine_time_steps, placements, graph_mapper, self)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
     def is_recording_gsyn(self):
@@ -369,11 +366,12 @@ class AbstractPopulationVertex(
         self._gsyn_recorder.record_gsyn = True
 
     # @implements AbstractGSynRecordable.get_gsyn
-    def get_gsyn(self, transceiver, n_machine_time_steps):
+    def get_gsyn(self, transceiver, n_machine_time_steps, placements,
+                 graph_mapper):
         return self._gsyn_recorder.get_gsyn(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
-            n_machine_time_steps)
+            n_machine_time_steps, placements, graph_mapper, self)
 
     def initialize(self, variable, value):
         initialize_attr = getattr(
