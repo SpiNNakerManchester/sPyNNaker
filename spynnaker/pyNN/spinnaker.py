@@ -35,9 +35,12 @@ from pacman.interfaces.abstract_provides_provenance_data import \
     AbstractProvidesProvenanceData
 
 # local front end imports
-from spynnaker.pyNN.models\
-    .abstract_models.abstract_population_recordable_vertex import \
-    AbstractPopulationRecordableVertex
+from spynnaker.pyNN.models.common.abstract_gsyn_recordable import \
+    AbstractGSynRecordable
+from spynnaker.pyNN.models.common.abstract_v_recordable import \
+    AbstractVRecordable
+from spynnaker.pyNN.models.common.abstract_spike_recordable \
+    import AbstractSpikeRecordable
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
@@ -370,8 +373,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         "cause the neural models to fail to partition "
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
-                if (isinstance(vertex, AbstractPopulationRecordableVertex) and
-                        vertex.record):
+                if ((isinstance(vertex, AbstractSpikeRecordable) and
+                        vertex.is_recording_spikes())
+                        or (isinstance(vertex, AbstractVRecordable) and
+                            vertex.is_recording_v())
+                        or (isinstance(vertex, AbstractGSynRecordable) and
+                            vertex.is_recording_gsyn)):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
                         "is not currently supportable in this tool chain."

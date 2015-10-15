@@ -19,7 +19,8 @@ def generate_parameter(param_info, param_index=0):
         if hasattr(val, "__len__"):
             return val[0]
         return val
-    elif isinstance(param_info, list):
+    # search for array like objects (lists or numpy arrays)
+    elif hasattr(param_info, "__len__") and (not isinstance(param_info, str)):
         if 0 <= param_index < len(param_info):
             return param_info[param_index]
         else:

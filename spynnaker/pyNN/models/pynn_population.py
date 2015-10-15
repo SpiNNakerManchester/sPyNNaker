@@ -1,25 +1,28 @@
-import numpy
-import logging
-import tempfile
-
-from pyNN.space import Space
-
 from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_model_components\
-    .abstract_conductance_vertex import AbstractConductanceVertex
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_population_recordable_vertex import \
-    AbstractPopulationRecordableVertex
-from spynnaker.pyNN.utilities.parameters_surrogate\
-    import PyNNParametersSurrogate
+
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions as local_exceptions
+from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
+    import InputTypeConductance
+from spynnaker.pyNN.models.common.abstract_spike_recordable \
+    import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
+    import AbstractGSynRecordable
+from spynnaker.pyNN.models.common.abstract_v_recordable \
+    import AbstractVRecordable
+
 from pacman.utilities.utility_objs.timer import Timer
 from spinn_front_end_common.utilities import exceptions
+
+from pyNN.space import Space
+
+import numpy
+import logging
+import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -58,17 +61,13 @@ class Population(object):
         # to PACMAN
         cell_label = label
         if label is None:
-            cell_label = "Population {}"\
-                         .format(Population._non_labelled_vertex_count)
+            cell_label = "Population {}".format(
+                Population._non_labelled_vertex_count)
             Population._non_labelled_vertex_count += 1
         cellparams['label'] = cell_label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
-        if 'spikes_per_second' not in cellparams:
-            cellparams['spikes_per_second'] = spinnaker.spikes_per_second
-        if 'ring_buffer_sigma' not in cellparams:
-            cellparams['ring_buffer_sigma'] = spinnaker.ring_buffer_sigma
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
         self._delay_vertex = None
@@ -84,8 +83,6 @@ class Population(object):
 
         self._spinnaker._add_population(self)
         self._spinnaker.add_vertex(self._vertex)
-
-        self._parameters = PyNNParametersSurrogate(self._vertex)
 
         # initialize common stuff
         self._size = size
@@ -121,7 +118,7 @@ class Population(object):
         """
         returns a boolean based on if the population is a conductance based pop
         """
-        return isinstance(self._vertex, AbstractConductanceVertex)
+        return isinstance(self._vertex.input_type, InputTypeConductance)
 
     @property
     def default_parameters(self):
@@ -153,11 +150,11 @@ class Population(object):
         # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 
-    def get(self, paramter_name, gather=False):
+    def get(self, parameter_name, gather=False):
         """
         Get the values of a parameter for every local cell in the population.
         """
-        return self._parameters[paramter_name]
+        return self._vertex.get_value(parameter_name)
 
     def _get_cell_position(self, cell_id):
         """
@@ -191,7 +188,7 @@ class Population(object):
                             " execute as if gather was true anyhow")
             timer = None
 
-            if not self._vertex.record:
+            if not self._vertex.is_recording_spikes():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record spikes. "
                     "Therefore spikes cannot be retrieved. Please set this "
@@ -206,10 +203,10 @@ class Population(object):
                 timer = Timer()
                 timer.start_timing()
             spikes = self._vertex.get_spikes(
-                txrx=self._spinnaker.transceiver,
-                placements=self._spinnaker.placements,
-                graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output)
+                self._spinnaker.transceiver,
+                self._spinnaker.no_machine_time_steps,
+                self._spinnaker.placements,
+                self._spinnaker.graph_mapper)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get spikes: {}".format(
                     timer.take_sample()))
@@ -227,11 +224,11 @@ class Population(object):
         """
         spikes = self.getSpikes(True, gather)
         n_spikes = {}
-        for i in self._vertex.n_atoms:
-            n_spikes[i] = 0
-        for (neuron_id, _) in spikes:
-            n_spikes[neuron_id] += 1
-        return spikes
+        counts = numpy.bincount(spikes[:, 0].astype(dtype="uint32"),
+                                minlength=self._vertex.n_atoms)
+        for i in range(self._vertex.n_atoms):
+            n_spikes[i] = counts[i]
+        return n_spikes
 
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
@@ -241,7 +238,7 @@ class Population(object):
 
         """
         if self._gsyn_cache_file is None:
-            if not self._vertex.record_gsyn:
+            if not self._vertex.is_recording_gsyn():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record gsyn. "
                     "Therefore gsyn cannot be retrieved. Please set this "
@@ -257,13 +254,10 @@ class Population(object):
                 timer = Timer()
                 timer.start_timing()
             gsyn = self._vertex.get_gsyn(
-                has_ran=self._spinnaker.has_ran,
-                txrx=self._spinnaker.transceiver,
-                placements=self._spinnaker.placements,
-                machine_time_step=self._spinnaker.machine_time_step,
-                graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output,
-                runtime=self._spinnaker._runtime)
+                self._spinnaker.transceiver,
+                self._spinnaker.no_machine_time_steps,
+                self._spinnaker.placements,
+                self._spinnaker.graph_mapper)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get gsyn: {}".format(timer.take_sample()))
 
@@ -289,7 +283,7 @@ class Population(object):
         :type compatible_output: bool
         """
         if self._v_cache_file is None:
-            if not self._vertex.record_v:
+            if not self._vertex.is_recording_v():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record v. "
                     "Therefore v cannot be retrieved. Please set this "
@@ -306,13 +300,10 @@ class Population(object):
                 timer = Timer()
                 timer.start_timing()
             v = self._vertex.get_v(
-                has_ran=self._spinnaker.has_ran,
-                txrx=self._spinnaker.transceiver,
-                placements=self._spinnaker.placements,
-                machine_time_step=self._spinnaker.machine_time_step,
-                graph_mapper=self._spinnaker.graph_mapper,
-                compatible_output=compatible_output,
-                runtime=self._spinnaker._runtime)
+                self._spinnaker.transceiver,
+                self._spinnaker.no_machine_time_steps,
+                self._spinnaker.placements,
+                self._spinnaker.graph_mapper)
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to read v: {}".format(timer.take_sample()))
@@ -348,14 +339,8 @@ class Population(object):
         this population.
 
         """
-        initialize_attr = \
-            getattr(self._vertex, "initialize_%s" % variable, None)
-        if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support "
-                            "initialization of parameter {%s}".format(
-                                variable))
-
-        initialize_attr(value)
+        self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
+            value, self._vertex.n_atoms))
 
     def is_local(self, cell_id):
         """
@@ -408,6 +393,15 @@ class Population(object):
         # Doesn't make much sense on SpiNNaker
         return self._size
 
+    # noinspection PyPep8Naming
+    def meanSpikeCount(self, gather=True):
+        """
+        Returns the mean number of spikes per neuron.
+        :param gather: gather has no meaning in spinnaker, always set to true
+        :return: an array whcih contains the avg spike rate per neuron
+        """
+        return self.mean_spike_count(gather)
+
     def mean_spike_count(self, gather=True):
         """
         Returns the mean number of spikes per neuron.
@@ -459,13 +453,15 @@ class Population(object):
         Record spikes from all cells in the Population.
         A flag is set for this population that is passed to the simulation,
         triggering spike time recording.
+        :param to_file: file to write the spike data to
         """
 
-        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
-            raise Exception("This population does not support recording!")
+        if not isinstance(self._vertex, AbstractSpikeRecordable):
+            raise Exception(
+                "This population does not support the recording of spikes!")
 
         # Tell the vertex to record spikes
-        self._vertex.set_record(True)
+        self._vertex.set_recording_spikes()
 
         # set the file to store the spikes in once retrieved
         self._record_spike_file = to_file
@@ -475,15 +471,17 @@ class Population(object):
         Record the synaptic conductance for all cells in the Population.
         A flag is set for this population that is passed to the simulation,
         triggering gsyn value recording.
+        :param to_file: the file to write the recorded gsyn to.
         """
-        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
-            raise Exception("Vertex does not support recording of gsyn")
-        if not isinstance(self._vertex, AbstractConductanceVertex):
+        if not isinstance(self._vertex, AbstractGSynRecordable):
+            raise Exception(
+                "This population does not support the recording of gsyn")
+        if not isinstance(self._vertex.input_type, InputTypeConductance):
             logger.warn(
                 "You are trying to record the conductance from a model which "
-                "does not contain conductance behaviour. You will recieve "
-                "current measurements instead. Sorry")
-        self._vertex.set_record_gsyn(True)
+                "does not use conductance input.  You will receive "
+                "current measurements instead.")
+        self._vertex.set_recording_gsyn()
         self._record_gsyn_file = to_file
 
     def record_v(self, to_file=None):
@@ -491,12 +489,13 @@ class Population(object):
         Record the membrane potential for all cells in the Population.
         A flag is set for this population that is passed to the simulation,
         triggering potential recording.
+        :param to_file: the file to write the recorded v to.
         """
-        if not isinstance(self._vertex, AbstractPopulationRecordableVertex):
-            raise Exception("Vertex does not support "
-                            "recording of potential")
+        if not isinstance(self._vertex, AbstractVRecordable):
+            raise Exception(
+                "This population does not support the recording of v")
 
-        self._vertex.set_record_v(True)
+        self._vertex.set_recording_v()
         self._record_v_file = to_file
 
     @property
@@ -599,21 +598,24 @@ class Population(object):
         """
         returns a random selection fo neurons from a population in the form
         of a population view
+        :param n: the number of neurons to sample
+        :param rng: the random number generator to use.
         """
 
         # TODO: Need PopulationView support
         raise NotImplementedError
 
-    def save_positions(self, file_name):
+    def save_positions(self, file):
         """
         save positions to file. Added functionality 23 November 2014 ADR
+        :param file: the file to write the positions to.
         """
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
                              "for an un-structured population")
         elif self._positions is None:
             self._structure.generate_positions(self._vertex.n_atoms)
-        file_handle = open(file_name, "w")
+        file_handle = open(file, "w")
         file_handle.write(self._positions)
         file_handle.close()
 
@@ -658,19 +660,23 @@ class Population(object):
 
           p.set("tau_m", 20.0).
           p.set({'tau_m':20, 'v_rest':-65})
+        :param parameter: the parameter to set
+        :param value: the value of the parameter to set.
         """
         if type(parameter) is str:
             if value is None:
                 raise Exception("Error: No value given in set() function for "
                                 "population parameter. Exiting.")
-            self._parameters[parameter] = value
+            self._vertex.set_value(parameter, value)
             return
         if type(parameter) is not dict:
                 raise Exception("Error: invalid parameter type for "
                                 "set() function for population parameter."
                                 " Exiting.")
+
         # Add a dictionary-structured set of new parameters to the current set:
-        self._parameters.update(parameter)
+        for (key, value) in parameter.iteritems():
+            self._vertex.set_value(key, value)
 
     @property
     def structure(self):
@@ -717,6 +723,11 @@ class Population(object):
 
     # NONE PYNN API CALL
     def set_model_based_max_atoms_per_core(self, new_value):
+        """
+        supports the setting of each models max atoms per core parameter
+        :param new_value: the new value for the max atoms per core.
+        :return:
+        """
         if hasattr(self._vertex, "set_model_max_atoms_per_core"):
             self._vertex.set_model_max_atoms_per_core(new_value)
         else:
@@ -726,12 +737,19 @@ class Population(object):
 
     @property
     def size(self):
+        """
+        propety method for the n atoms / size of the population
+        :return:
+        """
         return self._vertex.n_atoms
 
     def tset(self, parametername, value_array):
         """
         'Topographic' set. Set the value of parametername to the values in
         value_array, which must have the same dimensions as the Population.
+        :param parametername: the name of the parameter
+        :param value_array: the array of values which must have the correct
+        number of elements.
         """
         if len(value_array) != self._vertex.n_atoms:
             raise exceptions.ConfigurationException(

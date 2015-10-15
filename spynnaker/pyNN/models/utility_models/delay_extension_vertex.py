@@ -3,6 +3,12 @@ import logging
 from enum import Enum
 
 import math
+from spinn_front_end_common.abstract_models.\
+    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
+    OutgoingEdgeSameContiguousKeysRestrictor
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
@@ -10,11 +16,9 @@ from spynnaker.pyNN.models.neural_projections.\
 from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
-from spinn_front_end_common.abstract_models\
-    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
-    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.utilities import constants as common_constants
-from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge import AbstractProvidesNKeysForEdge
+from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
+    import AbstractProvidesNKeysForEdge
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from pacman.model.constraints.partitioner_constraints.\
@@ -35,7 +39,7 @@ logger = logging.getLogger(__name__)
 class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractDataSpecableVertex,
                            AbstractProvidesIncomingEdgeConstraints,
-                           AbstractOutgoingEdgeSameContiguousKeysRestrictor,
+                           AbstractProvidesOutgoingEdgeConstraints,
                            AbstractProvidesNKeysForEdge):
     """
     Instance of this class provide delays to incoming spikes in multiples
@@ -62,13 +66,15 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractProvidesIncomingEdgeConstraints.__init__(self)
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
+        AbstractProvidesNKeysForEdge.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0
         self._source_vertex = source_vertex
         joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
         self.add_constraint(joint_constrant)
+        self._outgoing_edge_key_restrictor = \
+            OutgoingEdgeSameContiguousKeysRestrictor()
 
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
         return list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
@@ -305,3 +311,13 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         vertex_slice = graph_mapper.get_subvertex_slice(
             partitioned_edge.pre_subvertex)
         return vertex_slice.n_atoms * self._max_stages
+
+    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
+        """
+        gets the constraints for edges going out of this vertex
+        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param graph_mapper: the graph mapper object
+        :return: list of constraints
+        """
+        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
+            partitioned_edge, graph_mapper)

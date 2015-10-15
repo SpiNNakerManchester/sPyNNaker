@@ -9,7 +9,6 @@
 #include "../common/post_events.h"
 
 #include "weight_dependence/weight.h"
-#include "synapse_structure/synapse_structure.h"
 #include "timing_dependence/timing.h"
 #include <string.h>
 #include <debug.h>
@@ -286,7 +285,7 @@ void synapse_dynamics_print_plastic_synapses(
 //! \return Nothing, this method does not return anything
 void synapse_dynamics_print_plastic_pre_synaptic_events(){
 #ifdef SYNAPSE_BENCHMARK
-	log_info("\t%u plastic pre-synaptic events.\n",
-			 num_plastic_pre_synaptic_events);
+    log_info("\t%u plastic pre-synaptic events.\n",
+            num_plastic_pre_synaptic_events);
 #endif  // SYNAPSE_BENCHMARK
 }

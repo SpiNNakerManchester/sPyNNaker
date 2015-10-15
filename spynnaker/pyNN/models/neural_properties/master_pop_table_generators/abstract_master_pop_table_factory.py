@@ -120,3 +120,8 @@ class AbstractMasterPopTableFactory(object):
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :raise None: this method does not raise any known exceptions
         """
+
+    @abstractmethod
+    def get_master_population_table_size(self, vertex_slice, in_edges):
+        """ Get the size of the master population table in SDRAM
+        """
