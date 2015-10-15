@@ -6,6 +6,7 @@ from spynnaker.pyNN.models.neural_properties import master_pop_table_generators
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from pacman.model.graph_mapper.slice import Slice
+from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
@@ -74,7 +75,7 @@ class SynapticManager(object):
             self._synapse_dynamics = synapse_dynamics
 
         # Otherwise, the dynamics must be equal
-        elif synapse_dynamics.is_same(self._synapse_dynamics):
+        elif not synapse_dynamics.is_same_as(self._synapse_dynamics):
             raise exceptions.SynapticConfigurationException(
                 "Synapse dynamics must match exactly when using multiple edges"
                 "to the same population")
@@ -120,16 +121,6 @@ class SynapticManager(object):
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 (4 * self._synapse_type.get_n_synapse_types()))
 
-    def _get_synaptic_block_size(self, num_rows, max_n_words):
-        """ Get the size of a single block
-        """
-        # Gets smallest possible (i.e. supported by row length
-        # Table structure) that can contain max_row_length
-        row_length = self._population_table_type.get_allowed_row_length(
-            max_n_words)
-        syn_row_sz = 4 * (constants.SYNAPTIC_ROW_HEADER_WORDS + row_length)
-        return syn_row_sz * num_rows
-
     def _get_exact_synaptic_blocks_size(
             self, post_vertex_slice, graph_mapper, subvertex,
             subvertex_in_edges):
@@ -148,13 +139,8 @@ class SynapticManager(object):
                 subedge)
             pre_vertex_slice = graph_mapper.get_subvertex_slice(
                 subedge.pre_subvertex)
-            max_n_words = edge.get_max_n_words(
+            memory_size += edge.get_synapses_size_in_bytes(
                 pre_vertex_slice, post_vertex_slice)
-            n_rows = edge.get_n_synapse_rows(pre_vertex_slice)
-
-            all_syn_block_sz = self._get_synaptic_block_size(
-                n_rows, max_n_words)
-            memory_size += all_syn_block_sz
         return memory_size
 
     def _get_estimate_synaptic_blocks_size(self, vertex_slice, in_edges):
@@ -168,7 +154,7 @@ class SynapticManager(object):
 
                 # Get maximum row length for this edge
                 pre_vertex_slice = Slice(0, in_edge.prevertex.n_atoms)
-                total_n_bytes = in_edge.get_max_n_words(
+                total_n_bytes = in_edge.get_synapses_size_in_bytes(
                     pre_vertex_slice, vertex_slice)
 
                 # Get an estimate of the number of sub-vertices - clearly
@@ -180,16 +166,14 @@ class SynapticManager(object):
                     n_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < n_atoms:
                     n_atoms = in_edge.pre_vertex.n_atoms
-                n_sub_vertices = (float(in_edge.get_n_synapse_rows()) /
+                n_sub_vertices = (float(in_edge.prevertex.n_atoms) /
                                   float(n_atoms))
-                atoms_per_subvertex = int(math.ceil(
-                    edge_pre_vertex.n_atoms / n_sub_vertices))
 
                 for _ in range(int(math.ceil(n_sub_vertices))):
                     memory_size = self._master_pop_table_generator\
                         .get_next_allowed_address(memory_size)
-                    memory_size += self._get_synaptic_block_size(
-                        atoms_per_subvertex, max_n_words)
+                    memory_size += int(math.ceil(total_n_bytes /
+                                                 n_sub_vertices))
 
         return memory_size
 
@@ -502,7 +486,7 @@ class SynapticManager(object):
 
         # Track writes inside the synaptic matrix region:
         next_block_start_addr = 0
-        n_synapse_type_bits = self._synapse_type.get_n_synapse_type_bits()
+        n_synapse_types = self._synapse_type.get_n_synapse_types()
 
         # Get the edges
         in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
@@ -518,32 +502,33 @@ class SynapticManager(object):
             edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
             if isinstance(edge, ProjectionPartitionableEdge):
+                next_block_allowed_addr = self._population_table_type\
+                    .get_next_allowed_address(next_block_start_addr)
+                if next_block_allowed_addr != next_block_start_addr:
+
+                    # Pad out data file with the added alignment bytes:
+                    spec.comment("\nWriting population table required"
+                                 " padding\n")
+                    spec.switch_write_focus(synaptic_matrix_region)
+                    spec.set_register_value(
+                        register_id=15,
+                        data=next_block_allowed_addr - next_block_start_addr)
+                    spec.write_value(
+                        data=0xDD, repeats_register=15,
+                        data_type=DataType.UINT8)
+
                 spec.comment("\nWriting matrix for subedge:{}\n".format(
                     subedge.label))
 
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
-
-                synapse_data = list()
-                synapse_dynamics = None
-                index = 0
-                for synapse_information in edge.synapse_information:
-                    if synapse_dynamics is None or isinstance(
-                            synapse_dynamics, SynapseDynamicsStatic):
-                        synapse_dynamics = synapse_information.synapse_dynamics
-                    connector = synapse_information.connector
-                    block = connector.create_synaptic_block(
-                        n_slices, slice_idx, pre_vertex_slice,
-                        post_vertex_slice, synapse_information.synapse_type,
-                        index)
-                    synapse_data.append(block)
-                    index += 1
-
-                block_start_addr, next_block_start_addr, row_length = \
-                    synapse_dynamics.write_synapse_data(
-                        spec, synaptic_matrix_region, synapse_data,
-                        n_synapse_type_bits,
-                        self._population_table_type, next_block_start_addr)
+                n_bytes_written, row_length = \
+                    edge.synapse_dynamics.write_synapse_data(
+                        spec, synaptic_matrix_region, edge.connectors,
+                        pre_vertex_slice, post_vertex_slice, n_synapse_types,
+                        self._population_table_type)
+                block_start_addr = next_block_start_addr
+                next_block_start_addr += n_bytes_written
 
                 keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
                     subedge)

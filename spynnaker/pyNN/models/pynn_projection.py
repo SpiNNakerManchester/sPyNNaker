@@ -80,8 +80,7 @@ class Projection(object):
             connector, synapse_dynamics, synapse_type)
         connector.set_population_information(
             presynaptic_population._get_vertex.n_atoms,
-            postsynaptic_population._get_vertex.n_atoms,
-            synapse_type)
+            postsynaptic_population._get_vertex.n_atoms)
 
         max_delay = synapse_dynamics.get_delay_maximum(connector)
         if max_delay is None:
@@ -92,8 +91,10 @@ class Projection(object):
         delay_extention_max_supported_delay = (
             constants.MAX_DELAY_BLOCKS *
             constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+        synapse_dynamics_max_supported_delay = \
+            synapse_dynamics.get_maximum_delay_supported()
 
-        if max_delay > (constants.MAX_SUPPORTED_DELAY_TICS +
+        if max_delay > (synapse_dynamics_max_supported_delay +
                         delay_extention_max_supported_delay):
             raise exceptions.ConfigurationException(
                 "The maximum delay {} for projection is not supported".format(
@@ -129,12 +130,12 @@ class Projection(object):
             # add edge to the graph
             spinnaker_control.add_edge(self._projection_edge)
 
-        if max_delay > constants.MAX_SUPPORTED_DELAY_TICS:
+        if max_delay > synapse_dynamics_max_supported_delay:
             self._add_delay_extension(
                 presynaptic_population._get_vertex,
                 postsynaptic_population._get_vertex,
-                connector, synapse_dynamics, label, max_delay,
-                constants.MAX_SUPPORTED_DELAY_TICS, machine_time_step,
+                label, max_delay,
+                synapse_dynamics_max_supported_delay, machine_time_step,
                 timescale_factor)
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
@@ -159,8 +160,7 @@ class Projection(object):
         return None
 
     def _add_delay_extension(
-            self, pre_vertex, post_vertex,
-            synapse_dynamics, label, max_delay_for_projection,
+            self, pre_vertex, post_vertex, label, max_delay_for_projection,
             max_delay_per_neuron, machine_time_step, timescale_factor):
         """
         Instantiate new delay extension component, connecting a new edge from
@@ -206,7 +206,7 @@ class Projection(object):
         else:
             self._delay_edge = DelayPartitionableEdge(
                 delay_vertex, post_vertex, self._synapse_information,
-                synapse_dynamics=synapse_dynamics, label=delay_label)
+                label=delay_label)
             self._spinnaker.add_edge(self._delay_edge)
 
     def describe(self, template='projection_default.txt', engine='default'):

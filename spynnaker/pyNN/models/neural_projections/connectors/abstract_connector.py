@@ -18,13 +18,11 @@ class AbstractConnector(object):
     def __init__(self):
         self._n_pre_neurons = None
         self._n_post_neurons = None
-        self._synapse_type = None
 
     def set_population_information(
-            self, n_pre_neurons, n_post_neurons, synapse_type):
+            self, n_pre_neurons, n_post_neurons):
         self._n_pre_neurons = n_pre_neurons
         self._n_post_neurons = n_post_neurons
-        self._synapse_type = synapse_type
 
     @staticmethod
     def _get_delay_maximum(delays, n_connections):

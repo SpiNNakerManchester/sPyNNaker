@@ -29,34 +29,11 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
     def synapse_information(self):
         return self._synapse_information
 
-    def get_n_synapse_rows(self, pre_vertex_slice=None):
-        if pre_vertex_slice is not None:
-            return pre_vertex_slice.n_atoms
-        return self.pre_vertex.n_atoms
-
-    def get_max_n_words(self, pre_vertex_slice, post_vertex_slice):
-        """ Get the maximum number of words that any row can contain
-        """
-        total_length = 0
-        for synapse_info in self._synapse_information:
-            synapse_dynamics = synapse_info.synapse_dynamics
-            synapse_structure = synapse_dynamics.get_synapse_structure()
-            connector = synapse_info.connector
-            total_length += synapse_structure.get_n_words_in_row(
-                synapse_dynamics.get_n_connections_from_pre_vertex_maximum(
-                    connector, pre_vertex_slice, post_vertex_slice))
-        return total_length
-
     def get_synapses_size_in_bytes(self, pre_vertex_slice, post_vertex_slice):
         """ Get the total size of the synapses for this edge in bytes
         """
-        total_size = 0
-        for synapse_info in self._synapse_information:
-            synapse_dynamics = synapse_info.synapse_dynamics
-            connector = synapse_info.connector
-            total_size += synapse_dynamics.get_synapses_sdram_usage_in_bytes(
-                connector, pre_vertex_slice, post_vertex_slice)
-        return total_size
+        return self._synapse_dynamics.get_synapses_sdram_usage_in_bytes(
+            self.connectors, pre_vertex_slice, post_vertex_slice)
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):

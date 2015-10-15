@@ -22,31 +22,23 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
     """ An edge between a DelayExtensionVertex and an AbstractPopulationVertex
     """
 
-    def __init__(self, delay_vertex, post_vertex, synapse_information,
+    def __init__(self, delay_vertex, post_vertex, connector, synapse_dynamics,
                  label=None):
         ProjectionPartitionableEdge.__init__(
-            self, delay_vertex, post_vertex, synapse_information,
+            self, delay_vertex, post_vertex, connector, synapse_dynamics,
             label=label)
         self._stored_synaptic_data_from_machine = None
 
-    def get_n_synapse_rows(self, pre_vertex_slice=None):
-        if pre_vertex_slice is not None:
-            return pre_vertex_slice.n_atoms * self._pre_vertex.max_stages
-        return self._pre_vertex.n_atoms * self._pre_vertex.max_stages
-
-    def _get_delay_stage_max_n_words(
+    def _get_delay_stage_sdram_usage_in_bytes(
             self, pre_vertex_slice, post_vertex_slice, stage):
         min_delay = ((stage + 1) * self.pre_vertex.max_delay_per_neuron) + 1
         max_delay = min_delay + self.pre_vertex.max_delay_per_neuron
-        for synapse_info in self.synapse_information:
-            synapse_dynamics = synapse_info.synapse_dynamics
-            connector = synapse_info.connector
-            return synapse_dynamics.get_delayed_synapses_sdram_usage_in_bytes(
-                connector, pre_vertex_slice, post_vertex_slice,
-                min_delay, max_delay)
+        return self.synapse_dynamics.get_delayed_synapses_sdram_usage_in_bytes(
+            self.connectors, pre_vertex_slice, post_vertex_slice,
+            min_delay, max_delay)
 
     def get_synapses_size_in_bytes(self, pre_vertex_slice, post_vertex_slice):
-        return max([self._get_delay_stage_max_n_words(
+        return sum([self._get_delay_stage_sdram_usage_in_bytes(
                     pre_vertex_slice, post_vertex_slice, stage)
                     for stage in range(self._pre_vertex.max_stages)])
 
