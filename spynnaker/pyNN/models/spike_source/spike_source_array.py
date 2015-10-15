@@ -126,6 +126,7 @@ class SpikeSourceArray(
         # Keep track of any previously generated buffers
         self._send_buffers = dict()
         self._spike_recording_region_size = None
+        self._partitioned_vertices = list()
 
     @property
     def spike_times(self):
@@ -134,6 +135,14 @@ class SpikeSourceArray(
     @spike_times.setter
     def spike_times(self, spike_times):
         self._spike_times = spike_times
+        if len(self._partitioned_vertices) != 0:
+            self._send_buffers.clear()
+            for (vertex_slice, vertex) in self._partitioned_vertices:
+                send_buffer = dict()
+                send_buffer[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
+                    self._get_spike_send_buffer(vertex_slice)
+                vertex.send_buffers = send_buffer
+
 
     @property
     def model_name(self):
@@ -168,8 +177,10 @@ class SpikeSourceArray(
         send_buffer[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
             self._get_spike_send_buffer(vertex_slice)
         # create and return the partitioned vertex
-        return SpikeSourceArrayPartitionedVertex(
+        partitioned_vertex =  SpikeSourceArrayPartitionedVertex(
             send_buffer, resources_required, label, constraints)
+        self._partitioned_vertices.append((vertex_slice, partitioned_vertex))
+        return partitioned_vertex
 
     def _get_spike_send_buffer(self, vertex_slice):
         """
