@@ -430,11 +430,17 @@ class SpikeSourcePoisson(
         return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
             partitioned_edge, graph_mapper)
 
-
-
     def is_data_specable(self):
         """
         helper method for isinstance
         :return:
         """
         return True
+
+    def get_value(self, key):
+        """ Get a property of the overall model
+        """
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise Exception("Population {} does not have parameter {}".format(
+            self, key))

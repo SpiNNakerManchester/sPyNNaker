@@ -198,7 +198,7 @@ class SpikeSourceArray(
         if key not in self._send_buffers:
             send_buffer = BufferedSendingRegion(
                 self._max_on_chip_memory_usage_for_spikes)
-            if isinstance(self._spike_times[0], list):
+            if hasattr(self._spike_times[0], "__len__"):
 
                 # This is in SpiNNaker 'list of lists' format:
                 for neuron in range(vertex_slice.lo_atom,
@@ -423,3 +423,11 @@ class SpikeSourceArray(
         :return:
         """
         return True
+
+    def get_value(self, key):
+        """ Get a property of the overall model
+        """
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise Exception("Population {} does not have parameter {}".format(
+            self, key))
