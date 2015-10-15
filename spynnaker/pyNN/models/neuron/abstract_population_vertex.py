@@ -1,5 +1,9 @@
-from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
+from abc import ABCMeta
+from six import add_metaclass
+import logging
+import os
+
+from spinn_front_end_common.utility_models.outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_edge_constraints import \
@@ -11,7 +15,6 @@ from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
-
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -26,11 +29,6 @@ from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
-
-from abc import ABCMeta
-from six import add_metaclass
-import logging
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -469,8 +467,8 @@ class AbstractPopulationVertex(
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
-            partitioned_edge, graph_mapper)
+        return self._outgoing_edge_key_restrictor.\
+            get_outgoing_edge_constraints()
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

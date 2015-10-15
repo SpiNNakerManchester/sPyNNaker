@@ -3,8 +3,7 @@ SpikeSourceArray
 """
 
 # spynnaker imports
-from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
+from spinn_front_end_common.utility_models.outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
@@ -34,7 +33,6 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.constraints.tag_allocator_constraints\
     .tag_allocator_require_iptag_constraint\
     import TagAllocatorRequireIptagConstraint
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 # dsg imports
 from data_specification.data_specification_generator\
@@ -414,8 +412,8 @@ class SpikeSourceArray(
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
-            partitioned_edge, graph_mapper)
+        return self._outgoing_edge_key_restrictor.\
+            get_outgoing_edge_constraints()
 
 
     def is_data_specable(self):
