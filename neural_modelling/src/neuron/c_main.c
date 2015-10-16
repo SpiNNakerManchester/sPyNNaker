@@ -62,7 +62,7 @@ static uint32_t infinite_run;
 //! keeps track of which types of recording should be done to this model.
 static uint32_t recording_flags = 0;
 
-bool initialize_recording() {
+bool initialise_recording() {
     address_t address = data_specification_get_data_address();
     address_t system_region = data_specification_get_region(
         SYSTEM_REGION, address);
@@ -121,7 +121,7 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     // Set up recording
-    if (!initialize_recording()) {
+    if (!initialise_recording()) {
         return false;
     }
 
@@ -181,7 +181,7 @@ void reinitialise(void) {
 
     // Recording has a pre-defined memory region, so we need to reset the
     // pointers
-    initialize_recording();
+    initialise_recording();
 
     // neuron_initialize mustn't be called again, as it calls malloc and we
     // would leak memory.
