@@ -50,8 +50,8 @@ static input_t *input_buffers;
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parmeters_in_neuron_parameter_data_region {
-    has_key, transmission_key, n_neurons_to_simulate,
-    start_of_global_parameters,
+    HAS_KEY, TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE,
+    START_OF_GLOBAL_PARAMETERS,
 } parmeters_in_neuron_parameter_data_region;
 
 
@@ -99,10 +99,10 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     log_info("neuron_initialise: starting");
 
     // Check if there is a key to use
-    use_key = address[has_key];
+    use_key = address[HAS_KEY];
 
     // Read the spike key to use
-    key = address[transmission_key];
+    key = address[TRANSMISSION_KEY];
 
     // output if this model is expecting to transmit
     if (!use_key){
@@ -113,10 +113,10 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     }
 
     // Read the neuron details
-    n_neurons = address[n_neurons_to_simulate];
+    n_neurons = address[N_NEURONS_TO_SIMULATE];
     *n_neurons_value = n_neurons;
 
-    uint32_t next = start_of_global_parameters;
+    uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     // Read the global parameter details
     if (sizeof(global_neuron_params_t) > 0) {

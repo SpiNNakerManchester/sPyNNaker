@@ -12,9 +12,6 @@ class SpikeRecorder(object):
         self._machine_time_step = machine_time_step
         self._record = False
 
-        # A list of tuples of (placement, vertex_slice)
-        self._subvertex_information = list()
-
     @property
     def record(self):
         return self._record
@@ -22,11 +19,6 @@ class SpikeRecorder(object):
     @record.setter
     def record(self, record):
         self._record = record
-
-    def add_subvertex_information(self, placement, vertex_slice):
-        """ Add a subvertex for spike retrieval
-        """
-        self._subvertex_information.append((placement, vertex_slice))
 
     def get_sdram_usage_in_bytes(
             self, n_neurons, n_machine_time_steps):
@@ -47,15 +39,23 @@ class SpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, transceiver, region, n_machine_time_steps):
+    def get_spikes(self, label, transceiver, region, n_machine_time_steps,
+                   placements, graph_mapper, partitionable_vertex):
 
         spike_times = list()
         spike_ids = list()
         ms_per_tick = self._machine_time_step / 1000.0
 
-        progress_bar = ProgressBar(len(self._subvertex_information),
+        subvertices = \
+            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
+
+        progress_bar = ProgressBar(len(subvertices),
                                    "Getting spikes for {}".format(label))
-        for (placement, subvertex_slice) in self._subvertex_information:
+        for subvertex in subvertices:
+
+            placement = placements.get_placement_of_subvertex(subvertex)
+            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+
             lo_atom = subvertex_slice.lo_atom
 
             # Read the spikes

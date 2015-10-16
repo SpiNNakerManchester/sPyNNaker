@@ -22,8 +22,13 @@ class AbstractVRecordable(object):
         """
 
     @abstractmethod
-    def get_v(self, transceiver, n_machine_time_steps):
+    def get_v(self, transceiver, n_machine_time_steps, placements,
+              graph_mapper):
         """ Get the recorded v from the object
+
+        :param transceiver: the python interface to the spinnaker machine
+        :param n_machine_time_steps: the number of timer tic exeuctions
+        when running on the machine
 
         :return: A numpy array of 3-element arrays of (neuron_id, time, v)\
                 ordered by time

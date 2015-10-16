@@ -1,8 +1,14 @@
+from spinn_front_end_common.abstract_models.\
+    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
+    OutgoingEdgeSameContiguousKeysRestrictor
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_incoming_edge_constraints import \
+    AbstractProvidesIncomingEdgeConstraints
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
-from spinn_front_end_common.abstract_models\
-    .abstract_outgoing_edge_same_contiguous_keys_restrictor \
-    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
 
@@ -44,7 +50,8 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor):
+        AbstractProvidesOutgoingEdgeConstraints,
+        AbstractProvidesIncomingEdgeConstraints):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -61,7 +68,6 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -83,6 +89,10 @@ class AbstractPopulationVertex(
         self._synapse_manager = SynapticManager(
             synapse_type, machine_time_step, ring_buffer_sigma,
             spikes_per_second)
+
+        # set up continious restrictor
+        self._outgoing_edge_key_restrictor = \
+            OutgoingEdgeSameContiguousKeysRestrictor()
 
         # Set up for delay management
         self._delay_vertex = None
@@ -316,6 +326,8 @@ class AbstractPopulationVertex(
         self._write_setup_info(
             spec, spike_history_sz, v_history_sz, gsyn_history_sz)
         self._write_neuron_parameters(spec, key, vertex_slice)
+
+        # allow the synaptic matrix to write its data specable data
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, subvertex, placement, subgraph, graph,
             routing_info, hostname, graph_mapper)
@@ -323,11 +335,6 @@ class AbstractPopulationVertex(
         # End the writing of this specification:
         spec.end_specification()
         data_writer.close()
-
-        # Add information to recording
-        self._spike_recorder.add_subvertex_information(placement, vertex_slice)
-        self._v_recorder.add_subvertex_information(placement, vertex_slice)
-        self._gsyn_recorder.add_subvertex_information(placement, vertex_slice)
 
     # @implements AbstractDataSpecableVertex.get_binary_file_name
     def get_binary_file_name(self):
@@ -348,11 +355,12 @@ class AbstractPopulationVertex(
         self._spike_recorder.record = True
 
     # @implements AbstractSpikeRecordable.get_spikes
-    def get_spikes(self, transceiver, n_machine_time_steps):
+    def get_spikes(self, transceiver, n_machine_time_steps, placements,
+                   graph_mapper):
         return self._spike_recorder.get_spikes(
             self._label, transceiver,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-            n_machine_time_steps)
+            n_machine_time_steps, placements, graph_mapper, self)
 
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
@@ -363,11 +371,12 @@ class AbstractPopulationVertex(
         self._v_recorder.record_v = True
 
     # @implements AbstractVRecordable.get_v
-    def get_v(self, transceiver, n_machine_time_steps):
+    def get_v(self, transceiver, n_machine_time_steps, placements,
+              graph_mapper):
         return self._v_recorder.get_v(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
-            n_machine_time_steps)
+            n_machine_time_steps, placements, graph_mapper, self)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
     def is_recording_gsyn(self):
@@ -378,11 +387,12 @@ class AbstractPopulationVertex(
         self._gsyn_recorder.record_gsyn = True
 
     # @implements AbstractGSynRecordable.get_gsyn
-    def get_gsyn(self, transceiver, n_machine_time_steps):
+    def get_gsyn(self, transceiver, n_machine_time_steps, placements,
+                 graph_mapper):
         return self._gsyn_recorder.get_gsyn(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
-            n_machine_time_steps)
+            n_machine_time_steps, placements, graph_mapper, self)
 
     def initialize(self, variable, value):
         initialize_attr = getattr(
@@ -461,6 +471,25 @@ class AbstractPopulationVertex(
 
     def is_data_specable(self):
         return True
+
+    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
+        """
+        gets the constraints for edges going into this vertex
+        :param partitioned_edge: partitioned edge that goes into this vertex
+        :param graph_mapper: the graph mapper object
+        :return: list of constraints
+        """
+        return self._synapse_manager.get_incoming_edge_constraints()
+
+    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
+        """
+        gets the constraints for edges going out of this vertex
+        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param graph_mapper: the graph mapper object
+        :return: list of constraints
+        """
+        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
+            partitioned_edge, graph_mapper)
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)
