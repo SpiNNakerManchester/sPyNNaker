@@ -59,8 +59,13 @@ uint32_t time;
 static uint32_t simulation_ticks = 0;
 //! global paramter which states if this model should run for infinite time
 static uint32_t infinite_run;
+//! keeps track of which types of recording should be done to this model.
+static uint32_t recording_flags = 0;
 
-uint32_t initialize_recording(address_t address, address_t system_region) {
+bool initialize_recording() {
+    address_t address = data_specification_get_data_address();
+    address_t system_region = data_specification_get_region(
+        SYSTEM_REGION, address);
     recording_channel_e channels_to_record[] = {
         e_recording_channel_spike_history,
         e_recording_channel_neuron_potential,
@@ -72,7 +77,6 @@ uint32_t initialize_recording(address_t address, address_t system_region) {
         GSYN_RECORDING_REGION
     };
     uint32_t region_sizes[N_RECORDING_CHANNELS];
-    uint32_t recording_flags;
     recording_read_region_sizes(
         &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
         &recording_flags, &region_sizes[0], &region_sizes[1], &region_sizes[2]);
@@ -83,11 +87,11 @@ uint32_t initialize_recording(address_t address, address_t system_region) {
                     data_specification_get_region(regions_to_record[i],
                                                   address),
                     channels_to_record[i], region_sizes[i])) {
-                return 0;
+                return false;
             }
         }
     }
-    return recording_flags;
+    return true;
 }
 
 //! \Initialises the model by reading in the regions and checking recording
@@ -96,7 +100,7 @@ uint32_t initialize_recording(address_t address, address_t system_region) {
 //! period should be stored during the function.
 //! \return boolean of True if it successfully read all the regions and set up
 //! all its internal data structures. Otherwise returns False
-static bool initialize(uint32_t *timer_period) {
+static bool initialise(uint32_t *timer_period) {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -117,7 +121,9 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Set up recording
-    uint32_t recording_flags = initialize_recording(address, system_region);
+    if (!initialize_recording()) {
+        return false;
+    }
 
     // Set up the neurons
     uint32_t n_neurons;
@@ -161,6 +167,43 @@ static bool initialize(uint32_t *timer_period) {
     return true;
 }
 
+
+//! \After a successful run of the simulation, certain structures need to be
+//! reinitialized before the simulation can be rerun.
+//! Currently, this only restarts recording and resets the time.
+void reinitialise(void) {
+    log_info("Reinitialise: started");
+
+    // Data specification header did not change, so doesn't need to be read
+    // again
+
+    // Timing details mustn't change, so don't need to be read again
+
+    // Recording has a pre-defined memory region, so we need to reset the
+    // pointers
+    initialize_recording();
+
+    // neuron_initialize mustn't be called again, as it calls malloc and we
+    // would leak memory.
+    // TODO: We should however probably reset neuron models. Currently, there is
+    // no interface for this.
+
+    // Synpase initialize also calls malloc, we just hope that this all works
+    // out. Since it uses ring buffers we should be fine.
+
+    // Population table has not changed (and would leak)
+
+    // Synaptic dynamics are currently static, so don't do anything.
+    // TODO: STDP would probably have to be reset here.
+
+    // Spike processing sets up its ring buffer (which shouldn't be done again)
+    // and sets up callbacks which crash the application if recalled.
+
+    // Reset the simulation time to -1, so the first step is 0
+    time = UINT32_MAX;
+    log_info("Reinitialise: finished");
+}
+
 //! \The callback used when a timer tic interrupt is set off. The result of
 //! this is to transmit any spikes that need to be sent at this timer tic,
 //! update any recording, and update the state machine's states.
@@ -197,14 +240,9 @@ void timer_callback(uint timer_count, uint unused) {
         // Wait for the next run of the simulation
         spin1_callback_off(TIMER_TICK);
         event_wait();
-
-        // Prepare for the next run
-        time = UINT32_MAX;
         
-        address_t address = data_specification_get_data_address();
-        address_t system_region = data_specification_get_region(
-        SYSTEM_REGION, address);
-        initialize_recording(address, system_region);
+        reinitialise();
+
         spin1_callback_on(TIMER_TICK, timer_callback, 2);
 
         return;
@@ -219,6 +257,7 @@ void sdp_message_callback(uint mailbox, uint port) {
 
     sdp_msg_t *msg = (sdp_msg_t *) mailbox;
     uint16_t length = msg->length;
+    use(length);
 
     if (msg->cmd_rc == CMD_STOP) {
         spin1_exit(0);
@@ -237,7 +276,7 @@ void c_main(void) {
     uint32_t timer_period;
 
     // initialise the model
-    if (!initialize(&timer_period)){
+    if (!initialise(&timer_period)){
         rt_error(RTE_API);
     }
 
