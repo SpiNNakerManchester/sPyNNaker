@@ -189,6 +189,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         spec.end_specification()
         data_writer.close()
 
+        return [data_writer.filename]
+
     def write_setup_info(self, spec, spike_history_region_sz):
         """
         """

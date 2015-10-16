@@ -323,6 +323,8 @@ class AbstractPopulationVertex(
         spec.end_specification()
         data_writer.close()
 
+        return [data_writer.filename]
+
     # @implements AbstractDataSpecableVertex.get_binary_file_name
     def get_binary_file_name(self):
 

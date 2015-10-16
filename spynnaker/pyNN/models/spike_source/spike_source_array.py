@@ -350,12 +350,16 @@ class SpikeSourceArray(
         self._write_setup_info(
             spec, spike_buffer.buffer_size, ip_tags, recording_size)
 
+        subvertex.set_routing_infos(routing_info)
+
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
 
         # tell the subvertex its region size
         subvertex.region_size = recording_size
+
+        return [data_writer.filename]
 
     def get_binary_file_name(self):
         """

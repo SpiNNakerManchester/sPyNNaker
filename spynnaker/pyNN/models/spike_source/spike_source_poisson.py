@@ -400,6 +400,8 @@ class SpikeSourcePoisson(
         spec.end_specification()
         data_writer.close()
 
+        return [data_writer.filename]
+
     def get_binary_file_name(self):
         """
 

@@ -42,7 +42,9 @@ class SpikeSourceArrayPartitionedVertex(
         :param subedge_routing_infos:
         :return:
         """
-        self._base_key = subedge_routing_infos[0].keys_and_masks[0].key
+        key_masks = \
+            subedge_routing_infos.get_key_and_masks_for_partitioned_vertex(self)
+        self._base_key = key_masks[0].key
 
     def get_next_key(self, region_id):
         """

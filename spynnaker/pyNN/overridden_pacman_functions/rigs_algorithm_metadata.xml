@@ -1,8 +1,7 @@
 <algorithms>
     <algorithm name="RigCommandLineSAPlacer">
         <command_line_args>
-            <arg>python</arg>
-            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_place.py</arg>
+            <arg>rig_place.py</arg>
             <arg>--algorithm=sa</arg>
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
@@ -39,8 +38,7 @@
     </algorithm>
     <algorithm name="RigCommandLineHilbertPlacer">
         <command_line_args>
-            <arg>python</arg>
-            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_place.py</arg>
+            <arg>rig_place.py</arg>
             <arg>--algorithm=hilbert</arg>
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
@@ -77,8 +75,7 @@
     </algorithm>
     <algorithm name="RigCommandLineRandomPlacer">
         <command_line_args>
-            <arg>python</arg>
-            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_place.py</arg>
+            <arg>rig_place.py</arg>
             <arg>--algorithm=rand</arg>
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
@@ -115,8 +112,7 @@
     </algorithm>
     <algorithm name="RigAllocator">
         <command_line_args>
-            <arg>python</arg>
-            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_allocate.py</arg>
+            <arg>rig_allocate.py</arg>
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
             <arg>--machine={machine}</arg>
@@ -162,8 +158,7 @@
     </algorithm>
     <algorithm name="RigRouter">
         <command_line_args>
-            <arg>python</arg>
-            <arg>/localhome/rowleya/tools/place-and-route-interchange-format/reference_implementation/rig_route.py</arg>
+            <arg>rig_route.py</arg>
             <arg>--graph={graph}</arg>
             <arg>--constraints={constraints}</arg>
             <arg>--machine={machine}</arg>
