@@ -766,3 +766,23 @@ class Population(object):
     @_internal_delay_vertex.setter
     def _internal_delay_vertex(self, delay_vertex):
         self._delay_vertex = delay_vertex
+
+    # NONE PYNN API CALL
+    def is_vertex_recording(self):
+        record_spikes = self._vertex.record
+        record_v = self._vertex.record_v
+        record_gsyn = self._vertex.record_gsyn
+        recording = record_spikes or record_v or record_gsyn
+        return recording
+
+    # NONE PYNN API CALL
+    def is_vertex_recording_spikes(self):
+        return self._vertex.record
+
+    # NONE PYNN API CALL
+    def is_vertex_recording_v(self):
+        return self._vertex.record_v
+
+    # NONE PYNN API CALL
+    def is_vertex_recording_gsyn(self):
+        return self._vertex.record_gsyn

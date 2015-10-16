@@ -22,6 +22,7 @@
 #include "plasticity/synapse_dynamics.h"
 
 #include <data_specification.h>
+#include <region_defs.h>
 #include <simulation.h>
 #include <debug.h>
 
@@ -36,19 +37,7 @@
 //! for recording
 #define N_RECORDING_CHANNELS 3
 
-//! human readable definitions of each region in SDRAM
-typedef enum regions_e {
-    SYSTEM_REGION,
-    NEURON_PARAMS_REGION,
-    SYNAPSE_PARAMS_REGION,
-    POPULATION_TABLE_REGION,
-    SYNAPTIC_MATRIX_REGION,
-    SYNAPSE_DYNAMICS_REGION,
-    BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
-    BUFFERING_OUT_GSYN_RECORDING_REGION,
-    BUFFERING_OUT_CONTROL_REGION
-} regions_e;
+
 
 // Globals
 
@@ -94,9 +83,9 @@ static bool initialize(uint32_t *timer_period) {
         e_recording_channel_neuron_gsyn
     };
     regions_e regions_to_record[] = {
-        SPIKE_RECORDING_REGION,
-        POTENTIAL_RECORDING_REGION,
-        GSYN_RECORDING_REGION
+        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+        BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
+        BUFFERING_OUT_GSYN_RECORDING_REGION
     };
     uint32_t region_sizes[N_RECORDING_CHANNELS];
     uint32_t recording_flags;
@@ -106,7 +95,7 @@ static bool initialize(uint32_t *timer_period) {
     for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
         if (recording_is_channel_enabled(recording_flags,
                                          channels_to_record[i])) {
-            if (!recording_initialse_channel(
+            if (!recording_initialise_channel(
                     data_specification_get_region(regions_to_record[i],
                                                   address),
                     channels_to_record[i], region_sizes[i])) {

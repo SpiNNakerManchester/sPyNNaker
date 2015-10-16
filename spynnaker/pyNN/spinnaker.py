@@ -387,8 +387,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 logger.info("*** Loading executables ***")
                 self.load_executable_images(executable_targets, self._app_id)
                 logger.info("*** Loading buffers ***")
-                self.set_up_send_buffering(self._partitioned_graph,
-                                           self._placements, self._tags)
+                self.set_up_buffering(
+                    self._partitioned_graph, self._graph_mapper,
+                    self._placements, self._tags)
 
             # end of entire loading setup
             if do_timing:

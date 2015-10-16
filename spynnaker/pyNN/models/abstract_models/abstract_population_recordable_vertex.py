@@ -4,6 +4,9 @@ from spynnaker.pyNN.utilities import constants as local_constants
 from pacman.utilities import constants as pacman_constants
 from pacman.utilities.progress_bar import ProgressBar
 
+from pacman.model.partitionable_graph.receive_buffers_to_host_partitionable_vertex import \
+    ReceiveBuffersToHostPartitionableVertex
+
 from data_specification import utility_calls as dsg_utility_calls
 
 import logging
@@ -18,11 +21,13 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationRecordableVertex(object):
+class AbstractPopulationRecordableVertex(
+        ReceiveBuffersToHostPartitionableVertex):
     """ Neural recording
     """
 
     def __init__(self, machine_time_step, label):
+        ReceiveBuffersToHostPartitionableVertex.__init__(self)
         self._record = False
         self._record_v = False
         self._record_gsyn = False
@@ -42,11 +47,6 @@ class AbstractPopulationRecordableVertex(object):
         """
         return self._record
 
-    def set_record(self, setted_value):
-        """
-        method that sets the vertex to be recordable, """
-        self._record = setted_value
-
     @property
     def record_v(self):
         return self._record_v
@@ -55,11 +55,19 @@ class AbstractPopulationRecordableVertex(object):
     def record_gsyn(self):
         return self._record_gsyn
 
+    def set_record(self, setted_value):
+        """
+        method that sets the vertex to be recordable, """
+        self._record = setted_value
+        self.set_buffering_output()
+
     def set_record_v(self, setted_value):
         self._record_v = setted_value
+        self.set_buffering_output()
 
     def set_record_gsyn(self, setted_value):
         self._record_gsyn = setted_value
+        self.set_buffering_output()
 
     @abstractmethod
     def is_recordable(self):
