@@ -1,7 +1,6 @@
-import math
 import numpy
 
-from spynnaker.pyNN.models.neuron.synapse_writers.abstract_synapse_io \
+from spynnaker.pyNN.models.neuron.synapse_io.abstract_synapse_io \
     import AbstractSynapseIO
 
 _N_HEADER_WORDS = 3
@@ -15,56 +14,74 @@ class SynapseIORowBased(AbstractSynapseIO):
         synapse dynamics of the connector.
     """
 
-    def __init__(self):
+    def __init__(self, machine_time_step):
         AbstractSynapseIO.__init__(self)
+        self._machine_time_step = machine_time_step
+
+    def get_maximum_delay_supported_in_ms(self):
+
+        # There are 16 slots, one per time step
+        return 16 * (self._machine_time_step / 1000.0)
 
     def get_sdram_usage_in_bytes(
             self, synapse_information, n_pre_slices, pre_slice_index,
             n_post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, ms_per_delay_stage, min_delay, max_delay):
+            post_vertex_slice, n_delay_stages):
 
         # Find the maximum row length - i.e. the maximum number of bytes
-        # that will be needed by any row
-        max_bytes = 0
+        # that will be needed by any row for both rows with delay extensions
+        # and rows without
+        undelayed_max_bytes = 0
+        delayed_max_bytes = 0
+        max_delay_supported = self.get_maximum_delay_supported_in_ms()
+        max_delay = max_delay_supported * (n_delay_stages + 1)
+
         for synapse_info in synapse_information:
+            max_undelayed_row_length = synapse_info.connector\
+                .get_n_connections_from_pre_vertex_maximum(
+                    pre_vertex_slice, post_vertex_slice, 0,
+                    max_delay_supported)
+            max_delayed_row_length = synapse_info.connector\
+                .get_n_connections_from_pre_vertex_maximum(
+                    pre_vertex_slice, post_vertex_slice,
+                    max_delay_supported + 1, max_delay)
 
-            max_bytes = max(
-                synapse_info.synapse_dynamics.get_max_bytes_per_source_neuron(
-                    synapse_info.connector, n_pre_slices, pre_slice_index,
-                    n_post_slices, post_slice_index, pre_vertex_slice,
-                    post_vertex_slice, ms_per_delay_stage,
-                    min_delay, max_delay),
-                max_bytes)
+            bytes_per_item = synapse_info.synapse_dynamics\
+                .get_n_bytes_per_connection()
 
-        # Work out how many rows there will be, given the delay stages
-        n_delay_stages = int(math.ceil(float(max_delay - min_delay) /
-                                       float(ms_per_delay_stage)))
-        if n_delay_stages == 0:
-            n_delay_stages = 1
-        n_rows = pre_vertex_slice.n_atoms * n_delay_stages
+            undelayed_max_bytes = max(
+                bytes_per_item * max_undelayed_row_length, undelayed_max_bytes)
+            delayed_max_bytes = max(
+                bytes_per_item * max_delayed_row_length, delayed_max_bytes)
 
         # Add on the header words and multiply by the number of rows in the
         # block
-        return _N_HEADER_WORDS + (max_bytes * n_rows)
+        n_bytes_undelayed = _N_HEADER_WORDS + (
+            undelayed_max_bytes * pre_vertex_slice.n_atoms)
+        n_bytes_delayed = 0
+        if n_delay_stages > 0:
+            n_bytes_delayed = _N_HEADER_WORDS + (
+                delayed_max_bytes * pre_vertex_slice.n_atoms * n_delay_stages)
+        return (n_bytes_undelayed, n_bytes_delayed)
 
-    def write_synapses(
-            self, spec, region, synapse_information, n_pre_slices,
-            pre_slice_index, n_post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, ms_per_delay_stage, min_delay, max_delay,
-            population_table, delay_scale, weight_scales):
+    def get_synapses(
+            self, synapse_information, n_pre_slices, pre_slice_index,
+            n_post_slices, post_slice_index, pre_vertex_slice,
+            post_vertex_slice, n_delay_stages, population_table,
+            weight_scales):
 
         # Gather the connectivity data
         fixed_fixed_data_items = list()
         fixed_plastic_data_items = list()
         plastic_plastic_data_items = list()
         for synapse_info in synapse_information:
-            synapse_dynamics = synapse_info.synapse_dynamics
+            connections = synapse_info.connector.create_synaptic_block(
+                n_pre_slices, pre_slice_index, n_post_slices,
+                post_slice_index, pre_vertex_slice, post_vertex_slice,
+                synapse_info.synapse_type)
+
             fixed_fixed_data, fixed_plastic_data, plastic_plastic_data =\
-                synapse_dynamics.get_synaptic_data_as_row_per_source_neuron(
-                    synapse_info.connector, n_pre_slices, pre_slice_index,
-                    n_post_slices, post_slice_index, pre_vertex_slice,
-                    post_vertex_slice, ms_per_delay_stage, min_delay,
-                    max_delay, delay_scale, weight_scales)
+                synapse_info.synapse_dynamics.get_synaptic_data(connections)
             fixed_fixed_data_items.append(fixed_fixed_data)
             fixed_plastic_data_items.append(fixed_plastic_data)
             plastic_plastic_data_items.append(plastic_plastic_data)

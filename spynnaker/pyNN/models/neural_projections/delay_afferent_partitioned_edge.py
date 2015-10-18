@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
-    import ProjectionPartitionedEdge
+from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
+    import MultiCastPartitionedEdge
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import\
     AbstractFilterableEdge
 
@@ -7,12 +7,12 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DelayAfferentPartitionedEdge(ProjectionPartitionedEdge,
+class DelayAfferentPartitionedEdge(MultiCastPartitionedEdge,
                                    AbstractFilterableEdge):
 
     def __init__(self, presubvertex, postsubvertex, constraints):
-        ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex,
-                                           constraints)
+        MultiCastPartitionedEdge.__init__(
+            self, presubvertex, postsubvertex, constraints=constraints)
         AbstractFilterableEdge.__init__(self)
 
     def filter_sub_edge(self, graph_mapper, common_report_folder):

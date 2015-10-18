@@ -105,6 +105,10 @@ class AbstractPopulationVertex(
     def delay_vertex(self, delay_vertex):
         self._delay_vertex = delay_vertex
 
+    @property
+    def maximum_delay_supported_in_ms(self):
+        return self._synapse_manager.maximum_delay_supported
+
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         per_neuron_cycles = (
@@ -488,8 +492,8 @@ class AbstractPopulationVertex(
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
-            partitioned_edge, graph_mapper)
+        return self._outgoing_edge_key_restrictor\
+            .get_outgoing_edge_constraints(partitioned_edge, graph_mapper)
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

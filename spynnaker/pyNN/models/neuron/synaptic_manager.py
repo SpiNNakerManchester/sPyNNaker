@@ -7,6 +7,8 @@ from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from pacman.model.graph_mapper.slice import Slice
 from data_specification.enums.data_type import DataType
+from spynnaker.pyNN.models.neuron.synapse_io.synapse_io_row_based \
+    import SynapseIORowBased
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
@@ -36,7 +38,8 @@ class SynapticManager(object):
     """
 
     def __init__(self, synapse_type, machine_time_step, ring_buffer_sigma,
-                 spikes_per_second, population_table_type=None):
+                 spikes_per_second, population_table_type=None,
+                 synapse_io=None):
         self._synapse_type = synapse_type
         self._ring_buffer_sigma = ring_buffer_sigma
         self._spikes_per_second = spikes_per_second
@@ -51,6 +54,11 @@ class SynapticManager(object):
                 master_pop_table_generators, "master_pop_table_as")
             self._population_table_type = algorithms[population_table_type]()
 
+        # Get the synapse IO
+        self._synapse_io = synapse_io
+        if synapse_io is None:
+            self._synapse_io = SynapseIORowBased(machine_time_step)
+
         if self._ring_buffer_sigma is None:
             self._ring_buffer_sigma = conf.config.getfloat(
                 "Simulation", "ring_buffer_sigma")
@@ -59,7 +67,8 @@ class SynapticManager(object):
             self._spikes_per_second = conf.config.getfloat(
                 "Simulation", "spikes_per_second")
 
-        # Prepare for dealing with STDP
+        # Prepare for dealing with STDP - there can only be one (non-static)
+        # synapse dynamics per vertex at present
         self._synapse_dynamics = None
 
     @property
@@ -101,6 +110,10 @@ class SynapticManager(object):
         self._spikes_per_second = spikes_per_second
 
     @property
+    def maximum_delay_supported_in_ms(self):
+        return self._synapse_io.get_maximum_delay_supported_in_ms()
+
+    @property
     def vertex_executable_suffix(self):
         self._synapse_dynamics.get_vertex_executable_suffix()
 
@@ -131,19 +144,25 @@ class SynapticManager(object):
         # Go through the subedges and add up the memory
         for subedge in subvertex_in_edges:
 
-            # Pad memory allocation depending on the master population table
-            memory_size = self._master_pop_table_generator\
-                .get_next_allowed_address(memory_size)
-
             edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
-            pre_vertex_slice = graph_mapper.get_subvertex_slice(
-                subedge.pre_subvertex)
-            memory_size += edge.get_synapses_size_in_bytes(
-                pre_vertex_slice, post_vertex_slice)
+            if isinstance(edge, ProjectionPartitionableEdge):
+
+                # Pad memory allocation depending on the master population
+                # table
+                memory_size = self._master_pop_table_generator\
+                    .get_next_allowed_address(memory_size)
+
+                # Add on the size of the tables to be generated
+                pre_vertex_slice = graph_mapper.get_subvertex_slice(
+                    subedge.pre_subvertex)
+                memory_size += edge.get_synapses_size_in_bytes(
+                    pre_vertex_slice, post_vertex_slice)
         return memory_size
 
-    def _get_estimate_synaptic_blocks_size(self, vertex_slice, in_edges):
+    def _get_estimate_synaptic_blocks_size(
+            self, n_post_slices, post_slice_index, post_vertex_slice,
+            in_edges):
         """ Get an estimate of the synaptic blocks memory size
         """
         self._check_synapse_dynamics(in_edges)
@@ -152,28 +171,31 @@ class SynapticManager(object):
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionPartitionableEdge):
 
-                # Get maximum row length for this edge
-                pre_vertex_slice = Slice(0, in_edge.prevertex.n_atoms)
-                total_n_bytes = in_edge.get_synapses_size_in_bytes(
-                    pre_vertex_slice, vertex_slice)
-
                 # Get an estimate of the number of sub-vertices - clearly
                 # this will not be correct if the SDRAM usage is high!
                 # TODO: Can be removed once we move to population-based keys
-                n_atoms = sys.maxint
-                edge_pre_vertex = in_edge.pre_vertex
-                if isinstance(edge_pre_vertex, AbstractPartitionableVertex):
-                    n_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-                if in_edge.pre_vertex.n_atoms < n_atoms:
-                    n_atoms = in_edge.pre_vertex.n_atoms
-                n_sub_vertices = (float(in_edge.prevertex.n_atoms) /
-                                  float(n_atoms))
+                n_atoms_per_subvertex = sys.maxint
+                if isinstance(in_edge.pre_vertex, AbstractPartitionableVertex):
+                    n_atoms_per_subvertex = \
+                        in_edge.pre_vertex.get_max_atoms_per_core()
+                if in_edge.pre_vertex.n_atoms < n_atoms_per_subvertex:
+                    n_atoms_per_subvertex = in_edge.pre_vertex.n_atoms
+                n_pre_slices = int(math.ceil(
+                    float(in_edge.pre_vertex.n_atoms) / n_atoms_per_subvertex))
 
-                for _ in range(int(math.ceil(n_sub_vertices))):
+                pre_slice_index = 0
+                for lo_atom in range(
+                        0, in_edge.pre_vertex.n_atoms, n_atoms_per_subvertex):
+                    pre_vertex_slice = Slice(
+                        lo_atom, lo_atom + n_atoms_per_subvertex - 1)
                     memory_size = self._master_pop_table_generator\
                         .get_next_allowed_address(memory_size)
-                    memory_size += int(math.ceil(total_n_bytes /
-                                                 n_sub_vertices))
+                    memory_size += in_edge.get_synapses_size_in_bytes(
+                        n_pre_slices, pre_slice_index, n_post_slices,
+                        post_slice_index, pre_vertex_slice, post_vertex_slice,
+                        self._synapse_io,
+                        self._synapse_io.get_max_delays_supported())
+                    pre_slice_index += 1
 
         return memory_size
 
@@ -317,7 +339,9 @@ class SynapticManager(object):
         for subedge in sub_graph.incoming_subedges_from_subvertex(subvertex):
             pre_vertex_slice = graph_mapper.get_subvertex_slice(
                 subedge.pre_subvertex)
-            for synapse_info in subedge.synapse_information:
+            edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
+                subedge)
+            for synapse_info in edge.synapse_information:
                 synapse_type = synapse_info.synapse_type
                 synapse_dynamics = synapse_info.synapse_dynamics
                 connector = synapse_info.connector

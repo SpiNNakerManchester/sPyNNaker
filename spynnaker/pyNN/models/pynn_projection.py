@@ -4,9 +4,11 @@ Projection
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
+from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
+    import MultiCastPartitionableEdge
+
 from spynnaker.pyNN.models.neural_projections.synapse_information \
     import SynapseInformation
-
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
     import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
@@ -19,8 +21,6 @@ from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
 from spynnaker.pyNN.models.neural_projections\
     .delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
-    import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
 
 from spinn_front_end_common.utilities import exceptions
@@ -53,7 +53,6 @@ class Projection(object):
         """
         self._spinnaker = spinnaker_control
         self._projection_edge = None
-        self._delay_edge = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
 
@@ -91,10 +90,10 @@ class Projection(object):
         delay_extention_max_supported_delay = (
             constants.MAX_DELAY_BLOCKS *
             constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
-        synapse_dynamics_max_supported_delay = \
-            synapse_dynamics.get_maximum_delay_supported()
+        post_vertex_max_supported_delay_ms = \
+            postsynaptic_population._get_vertex.maximum_delay_supported_in_ms
 
-        if max_delay > (synapse_dynamics_max_supported_delay +
+        if max_delay > (post_vertex_max_supported_delay_ms +
                         delay_extention_max_supported_delay):
             raise exceptions.ConfigurationException(
                 "The maximum delay {} for projection is not supported".format(
@@ -130,13 +129,14 @@ class Projection(object):
             # add edge to the graph
             spinnaker_control.add_edge(self._projection_edge)
 
-        if max_delay > synapse_dynamics_max_supported_delay:
-            self._add_delay_extension(
+        # If the delay exceeds the post vertex delay, add a delay extension
+        if max_delay > post_vertex_max_supported_delay_ms:
+            delay_edge = self._add_delay_extension(
                 presynaptic_population._get_vertex,
                 postsynaptic_population._get_vertex,
-                label, max_delay,
-                synapse_dynamics_max_supported_delay, machine_time_step,
-                timescale_factor)
+                label, max_delay, post_vertex_max_supported_delay_ms,
+                machine_time_step, timescale_factor)
+            self._projection_edge.delay_edge = delay_edge
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
         """ searches though the partitionable graph's edges to locate any
@@ -184,30 +184,24 @@ class Projection(object):
 
             # Add the edge
             delay_afferent_edge = DelayAfferentPartitionableEdge(
-                pre_vertex, delay_vertex, label="{}_to_DE".format(
+                pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
                     pre_vertex.label))
             self._spinnaker.add_edge(delay_afferent_edge)
 
-        # Create a special DelayEdge from the delay vertex to the outgoing
-        # population, with the same set of connections
-        delay_label = "{}_delayed".format(label)
-        num_blocks = int(math.floor(float(max_delay_for_projection - 1) /
+        # Ensure that the delay extension knows how many states it will support
+        num_stages = int(math.floor(float(max_delay_for_projection - 1) /
                                     float(max_delay_per_neuron)))
-        if num_blocks > delay_vertex.max_stages:
-            delay_vertex.max_stages = num_blocks
+        if num_stages > delay_vertex.max_stages:
+            delay_vertex.max_stages = num_stages
 
-        # Create the delay edge or merge with existing edge
-        existing_delay_edge = self._find_existing_edge(
-            delay_vertex, post_vertex)
-        if existing_delay_edge is not None:
-            existing_delay_edge.add_synapse_information(
-                self._synapse_information)
-            self._delay_edge = existing_delay_edge
-        else:
-            self._delay_edge = DelayPartitionableEdge(
-                delay_vertex, post_vertex, self._synapse_information,
-                label=delay_label)
-            self._spinnaker.add_edge(self._delay_edge)
+        # Create the delay edge if there isn't one already
+        delay_edge = self._find_existing_edge(delay_vertex, post_vertex)
+        if delay_edge is None:
+            delay_edge = MultiCastPartitionableEdge(
+                delay_vertex, post_vertex, label="{}_delayed_to_{}".format(
+                    pre_vertex.label, post_vertex.label))
+            self._spinnaker.add_edge(delay_edge)
+        return delay_edge
 
     def describe(self, template='projection_default.txt', engine='default'):
         """

@@ -1,17 +1,10 @@
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
-from spynnaker.pyNN.utilities.running_stats import RunningStats
 
 
 @add_metaclass(ABCMeta)
 class AbstractSynapseDynamics(object):
-
-    @abstractmethod
-    def get_maximum_delay_supported(self):
-        """ Get the maximum delay value that can be supported by the synaptic\
-            representation
-        """
 
     @abstractmethod
     def are_weights_signed(self):
@@ -34,10 +27,15 @@ class AbstractSynapseDynamics(object):
         """
 
     @abstractmethod
+    def get_n_bytes_per_connection(self):
+        """ Get the number of bytes per connection
+        """
+
+    @abstractmethod
     def get_max_bytes_per_source_neuron(
             self, connector, n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            ms_per_delay_stage, min_delay, max_delay):
+            min_delay, max_delay):
         """ Get the maximum number of bytes needed to represent the\
             connectivity out of the connections from the source neurons in\
             pre_vertex_slice to those in post_vertex_slice
@@ -66,18 +64,16 @@ class AbstractSynapseDynamics(object):
         return connector.get_delay_maximum()
 
     def get_n_connections_from_pre_vertex_maximum(
-            self, connections, pre_vertex_slice, post_vertex_slice):
+            self, connector, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum number of connections between those from each of\
             the neurons in the pre_vertex_slice (or all in the pre vertex if\
             pre_vertex_slice is None) to neurons in the post_vertex_slice
         """
-        return max([
-            connection.get_n_connections_from_pre_vertex_maximum(
-                pre_vertex_slice, post_vertex_slice)
-            for connection in connections])
+        return connector.get_n_connections_from_pre_vertex_maximum(
+            pre_vertex_slice, post_vertex_slice)
 
     def get_n_connections_from_pre_vertex_with_delay_maximum(
-            self, connections, pre_vertex_slice, post_vertex_slice,
+            self, connector, pre_vertex_slice, post_vertex_slice,
             min_delay, max_delay):
         """ Get the maximum number of connections between those from each of\
             the neurons in the pre_vertex_slice (or all in the pre vertex if\
@@ -85,47 +81,31 @@ class AbstractSynapseDynamics(object):
             for connections with a delay between min_delay and max_delay\
             (inclusive)
         """
-        return max([
-            connection.get_n_connections_from_pre_vertex_with_delay_maximum(
-                pre_vertex_slice, post_vertex_slice, min_delay, max_delay)
-            for connection in connections])
+        return connector.get_n_connections_from_pre_vertex_with_delay_maximum(
+            pre_vertex_slice, post_vertex_slice, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
-            self, connections, pre_vertex_slice, post_vertex_slice):
+            self, connector, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum number of connections between those to each of the\
             neurons in the post_vertex_slice from neurons in the\
             pre_vertex_slice
         """
-        return max([
-            connection.get_n_connections_to_post_vertex_maximum(
-                pre_vertex_slice, post_vertex_slice)
-            for connection in connections])
+        return connector.get_n_connections_to_post_vertex_maximum(
+            pre_vertex_slice, post_vertex_slice)
 
-    def get_weight_statistics_per_post_neuron(
-            self, connectors, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
-        """ Get the mean weight, weight variance, maximum weight, number of\
-            connections and the maximum total of all the weights for the\
-            given connectors with a given synapse type between the given\
-            pre and post vertex slices
+    def get_weight_mean(self, connector, pre_vertex_slice, post_vertex_slice):
+        """ Get the mean weight for the synapses
         """
-        running_stats = RunningStats()
-        biggest_weight = 0
-        for connector in connectors:
-            if connector.synapse_type == synapse_type:
-                weight_mean = connector.get_weight_mean(
-                    pre_vertex_slice, post_vertex_slice)
-                n_connections = \
-                    connector.get_n_connections_to_post_vertex_maximum(
-                        pre_vertex_slice, post_vertex_slice)
-                weight_variance = connector.get_weight_variance(
-                    pre_vertex_slice, post_vertex_slice)
-                running_stats.add_items(
-                    weight_mean, weight_variance, n_connections)
+        return connector.get_weight_mean()
 
-                weight_max = connector.get_weight_maximum(
-                    pre_vertex_slice, post_vertex_slice)
-                biggest_weight = max(biggest_weight, weight_max)
+    def get_weight_maximum(
+            self, connector, pre_vertex_slice, post_vertex_slice):
+        """ Get the maximum weight for the synapses
+        """
+        return connector.get_weight_maximum()
 
-        return (running_stats.mean, running_stats.variance, weight_max,
-                running_stats.n_items)
+    def get_weight_variance(
+            self, connector, pre_vertex_slice, post_vertex_slice):
+        """ Get the variance in weight for the synapses
+        """
+        return connector.get_weight_variance()

@@ -46,14 +46,6 @@ class AbstractConnector(object):
             unbounded
         """
 
-    @abstractmethod
-    def get_n_connections_from_pre_vertex_maximum(
-            self, pre_vertex_slice, post_vertex_slice):
-        """ Get the maximum number of connections between those from each of\
-            the neurons in the pre_vertex_slice (or all in the pre vertex if\
-            pre_vertex_slice is None) to neurons in the post_vertex_slice
-        """
-
     @staticmethod
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
             delays, n_connections, connection_slice, min_delay, max_delay):
@@ -74,13 +66,14 @@ class AbstractConnector(object):
                 if delay >= min_delay and delay <= max_delay])
 
     @abstractmethod
-    def get_n_connections_from_pre_vertex_with_delay_maximum(
-            self, pre_vertex_slice, post_vertex_slice, min_delay, max_delay):
+    def get_n_connections_from_pre_vertex_maximum(
+            self, pre_vertex_slice, post_vertex_slice,
+            min_delay=None, max_delay=None):
         """ Get the maximum number of connections between those from each of\
             the neurons in the pre_vertex_slice (or all in the pre vertex if\
             pre_vertex_slice is None) to neurons in the post_vertex_slice,\
             for connections with a delay between min_delay and max_delay\
-            (inclusive)
+            (inclusive) if specified (otherwise all connections)
         """
 
     @abstractmethod
@@ -153,7 +146,8 @@ class AbstractConnector(object):
 
     @abstractmethod
     def create_synaptic_block(
-            self, n_slices, slice_idx, pre_vertex_slice, post_vertex_slice,
-            synapse_type, index):
+            self, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type):
         """ Create a synaptic block from the data
         """

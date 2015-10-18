@@ -19,7 +19,15 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
             self, pre_vertex, post_vertex, synapse_information, label=None):
         MultiCastPartitionableEdge.__init__(
             self, pre_vertex, post_vertex, label=label)
+
+        # A list of all synapse information for all the projections that are
+        # represented by this edge
         self._synapse_information = [synapse_information]
+
+        # The edge from the delay extension of the pre_vertex to the
+        # post_vertex - this might be None if no long delays are present
+        self._delay_edge = None
+
         self._stored_synaptic_data_from_machine = None
 
     def add_synapse_information(self, synapse_information):
@@ -29,11 +37,13 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
     def synapse_information(self):
         return self._synapse_information
 
-    def get_synapses_size_in_bytes(self, pre_vertex_slice, post_vertex_slice):
-        """ Get the total size of the synapses for this edge in bytes
-        """
-        return self._synapse_dynamics.get_synapses_sdram_usage_in_bytes(
-            self.connectors, pre_vertex_slice, post_vertex_slice)
+    @property
+    def delay_edge(self):
+        return self._delay_edge
+
+    @delay_edge.setter
+    def delay_edge(self, delay_edge):
+        self._delay_edge = delay_edge
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):
