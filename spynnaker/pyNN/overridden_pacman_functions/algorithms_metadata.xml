@@ -125,5 +125,26 @@
             </parameter>
         </produces_outputs>
     </algorithm>
-
+    <algorithm name="SpynnakerProvenanceGatherer">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_provenance_gatherer</python_module>
+        <python_class>SpynnakerProvenanceGatherer</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>provenance_file_path</param_name>
+                <param_type>ProvenanceFilePath</param_type>
+            </parameter>
+            <parameter>
+                <param_name>transciever</param_name>
+                <param_type>MemoryTransciever</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>has_ran</param_name>
+                <param_type>RanToken</param_type>
+            </parameter>
+        </required_inputs>
+    </algorithm>
 </algorithms>
