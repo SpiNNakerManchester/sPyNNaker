@@ -7,6 +7,7 @@ from pacman.model.partitionable_graph.partitionable_graph import \
     PartitionableGraph
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
+from pacman.operations import algorithm_reports as pacman_algorithm_reports
 
 # common front end imports
 from spinn_front_end_common.utilities import exceptions as common_exceptions
@@ -250,14 +251,13 @@ class Spinnaker(object):
 
         inputs = self._create_pacman_executor_inputs()
         required_outputs = self._create_pacman_executor_outputs()
-        algorithms = self._create_algorithm_list()
+        algorithms = self._create_algorithm_list(
+            config.get("Mode", "mode") == "Debug")
         xml_paths = self._create_xml_paths()
 
         pacman_exeuctor = helpful_functions.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,
-            config.getboolean("Reports", "outputTimesForSections"),
-            config.get("Mode", "mode") == "Debug",
-            self._reports_states.generate_pacman_report_states())
+            config.getboolean("Reports", "outputTimesForSections"))
 
         # gather provenance data from the executor itself if needed
         if config.get("Reports", "writeProvanceData"):
@@ -294,13 +294,15 @@ class Spinnaker(object):
         xml_paths.append(
             os.path.join(os.path.dirname(overridden_pacman_functions.__file__),
                          "algorithms_metadata.xml"))
+        xml_paths.append(os.path.join(os.path.dirname(
+            pacman_algorithm_reports.__file__), "reports_metadata.xml"))
         return xml_paths
 
-    @staticmethod
-    def _create_algorithm_list():
+    def _create_algorithm_list(self, in_debug_mode):
         algorithms = ""
-        algorithms += config.get("Mapping", "algorithms") + "," + \
-                      config.get("Mapping", "interface_algorithms")
+        algorithms += \
+            config.get("Mapping", "algorithms") + "," + \
+            config.get("Mapping", "interface_algorithms")
 
         # if using virutal machine, add to list of algorithms the virtual
         # machine generator, otherwise add the standard machine generator
@@ -314,7 +316,6 @@ class Spinnaker(object):
             # provenance gatherers
             if config.get("Reports", "writeProvanceData"):
                 algorithms += ",FrontEndCommonProvenanceGatherer"
-                algorithms += ",SpynnakerProvenanceGatherer"
 
             # if the end user wants reload script, add the reload script
             # creator to the list
@@ -327,6 +328,30 @@ class Spinnaker(object):
         if config.getboolean("Reports", "writeNetworkSpecificationReport"):
             algorithms += \
                 ",FrontEndCommonNetworkSpecificationPartitionableReport"
+
+        # define mapping between output types and reports
+        if self._reports_states is not None \
+                and self._reports_states.tag_allocation_report:
+            algorithms += ",TagReport"
+        if self._reports_states is not None \
+                and self._reports_states.routing_info_report:
+            algorithms += ",routingInfoReports"
+        if self._reports_states is not None \
+                and self._reports_states.router_report:
+            algorithms += ",RouterReports"
+        if self._reports_states is not None \
+                and self._reports_states.partitioner_report:
+            algorithms += ",PartitionerReport"
+        if (self._reports_states is not None and
+                self._reports_states.placer_report_with_partitionable_graph):
+            algorithms += ",PlacerReportWithPartitionableGraph"
+        if (self._reports_states is not None and
+                self._reports_states.placer_report_without_partitionable_graph):
+            algorithms += ",PlacerReportWithoutPartitionableGraph"
+        # add debug algorithms if needed
+        if in_debug_mode:
+            algorithms += ",ValidRoutesChecker"
+
         return algorithms
 
     @staticmethod
