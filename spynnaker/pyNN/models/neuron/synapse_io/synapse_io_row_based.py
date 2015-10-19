@@ -71,20 +71,75 @@ class SynapseIORowBased(AbstractSynapseIO):
             weight_scales):
 
         # Gather the connectivity data
+        max_delay = self.get_maximum_delay_supported_in_ms()
         fixed_fixed_data_items = list()
         fixed_plastic_data_items = list()
         plastic_plastic_data_items = list()
+        delayed_fixed_fixed_data_items = list()
+        delayed_fixed_plastic_data_items = list()
+        delayed_plastic_plastic_data_items = list()
         for synapse_info in synapse_information:
+
+            # Get the actual connections
             connections = synapse_info.connector.create_synaptic_block(
                 n_pre_slices, pre_slice_index, n_post_slices,
                 post_slice_index, pre_vertex_slice, post_vertex_slice,
                 synapse_info.synapse_type)
 
+            # Split the connections up based on the delays
+            undelayed_connections = connections
+            delayed_connections = None
+            if max_delay is not None:
+                delay_mask = (connections["delay"] <= max_delay)
+                undelayed_connections = connections[numpy.where(delay_mask)]
+                delayed_connections = connections[numpy.where(~delay_mask)]
+
+            # Get which row each connection will go into
+            undelayed_row_indices = numpy.digitize(
+                undelayed_connections["source"], numpy.arange(
+                    pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1),
+                right=True)
+            delayed_row_indices = None
+            if delayed_connections is not None:
+
+                # Convert the delayed source indices into source index *
+                # delay stage
+                delayed_row_indices = numpy.digitize(
+                    delayed_connections["source"], numpy.arange(
+                        pre_vertex_slice.lo_atom,
+                        pre_vertex_slice.hi_atom + 1),
+                    right=True) * numpy.floor(
+                        (numpy.round(delayed_connections["delay"] - 1.0)) /
+                        max_delay) - 1
+
+            # Get the data for the connections
             fixed_fixed_data, fixed_plastic_data, plastic_plastic_data =\
-                synapse_info.synapse_dynamics.get_synaptic_data(connections)
-            fixed_fixed_data_items.append(fixed_fixed_data)
-            fixed_plastic_data_items.append(fixed_plastic_data)
-            plastic_plastic_data_items.append(plastic_plastic_data)
+                synapse_info.synapse_dynamics.get_synaptic_data(
+                    undelayed_connections)
+            fixed_fixed_data_items.append(
+                [fixed_fixed_data[undelayed_row_indices == i]
+                 for i in range(pre_vertex_slice)])
+            fixed_plastic_data_items.append(
+                [fixed_plastic_data[undelayed_row_indices == i]
+                 for i in range(pre_vertex_slice)])
+            plastic_plastic_data_items.append(
+                [plastic_plastic_data[undelayed_row_indices == i]
+                 for i in range(pre_vertex_slice)])
+
+            # Get the data for the delayed connections
+            if delayed_connections is not None:
+                fixed_fixed_data, fixed_plastic_data, plastic_plastic_data =\
+                    synapse_info.synapse_dynamics.get_synaptic_data(
+                        delayed_connections)
+                delayed_fixed_fixed_data_items.append(
+                    [fixed_fixed_data[delayed_row_indices == i]
+                     for i in range(pre_slice_index)])
+                delayed_fixed_plastic_data_items.append(
+                    [fixed_plastic_data[delayed_row_indices == i]
+                     for i in range(pre_slice_index)])
+                delayed_plastic_plastic_data_items.append(
+                    [plastic_plastic_data[delayed_row_indices == i]
+                     for i in range(pre_slice_index)])
 
         # Join up the individual connectivity data and get the lengths
         all_data = list()
@@ -113,6 +168,3 @@ class SynapseIORowBased(AbstractSynapseIO):
         rows = numpy.concatenate([numpy.pad(
             row, (0, max_length - row.size), mode="constant",
             constant_values=0xBBCCDDEE) for row in rows])
-
-        spec.switch_write_focus(region)
-        spec.write_array(rows)
