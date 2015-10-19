@@ -3,12 +3,6 @@ SpikeSourceArray
 """
 
 # spynnaker imports
-from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
     import EIEIOSpikeRecorder
@@ -27,6 +21,12 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
+from spinn_front_end_common.abstract_models.\
+    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
+    OutgoingEdgeSameContiguousKeysRestrictor
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -34,6 +34,9 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.constraints.tag_allocator_constraints\
     .tag_allocator_require_iptag_constraint\
     import TagAllocatorRequireIptagConstraint
+from pacman.model.partitionable_graph.\
+    receive_buffers_to_host_partitionable_vertex import \
+    ReceiveBuffersToHostPartitionableVertex
 
 # dsg imports
 from data_specification.data_specification_generator\
@@ -53,7 +56,8 @@ _RECORD_OVERALLOCATION = 2000
 
 class SpikeSourceArray(
         AbstractDataSpecableVertex, AbstractPartitionableVertex,
-        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints):
+        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
+        ReceiveBuffersToHostPartitionableVertex):
     """
     model for play back of spikes
     """
@@ -89,6 +93,8 @@ class SpikeSourceArray(
             max_atoms_per_core=self._model_based_max_atoms_per_core,
             constraints=constraints)
         AbstractSpikeRecordable.__init__(self)
+        ReceiveBuffersToHostPartitionableVertex.__init__(self)
+
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
@@ -122,7 +128,7 @@ class SpikeSourceArray(
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
 
-        #handle outgoing constraints
+        # handle outgoing constraints
         self._outgoing_edge_key_restrictor = \
             OutgoingEdgeSameContiguousKeysRestrictor()
 
@@ -138,6 +144,7 @@ class SpikeSourceArray(
         return self._spike_recorder.record
 
     def set_recording_spikes(self):
+        self.set_buffering_output()
         self._spike_recorder.record = True
 
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
@@ -416,7 +423,6 @@ class SpikeSourceArray(
         return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
             partitioned_edge, graph_mapper)
 
-
     def is_data_specable(self):
         """
         helper method for isinstance
@@ -431,3 +437,10 @@ class SpikeSourceArray(
             return getattr(self, key)
         raise Exception("Population {} does not have parameter {}".format(
             self, key))
+
+    def get_buffered_regions_list(self):
+        list_of_regions_buffering = list()
+        if self.is_recording_spikes():
+            list_of_regions_buffering.append(
+                self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY.value)
+        return list_of_regions_buffering

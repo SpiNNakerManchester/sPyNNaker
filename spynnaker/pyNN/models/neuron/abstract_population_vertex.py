@@ -1,3 +1,6 @@
+from pacman.model.partitionable_graph.\
+    receive_buffers_to_host_partitionable_vertex import \
+    ReceiveBuffersToHostPartitionableVertex
 from spinn_front_end_common.abstract_models.\
     abstract_outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
@@ -51,7 +54,8 @@ class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingEdgeConstraints,
-        AbstractProvidesIncomingEdgeConstraints):
+        AbstractProvidesIncomingEdgeConstraints,
+        ReceiveBuffersToHostPartitionableVertex):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -68,6 +72,7 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
+        ReceiveBuffersToHostPartitionableVertex.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -341,6 +346,7 @@ class AbstractPopulationVertex(
 
     # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
+        self.set_buffering_output()
         self._spike_recorder.record = True
 
     # @implements AbstractSpikeRecordable.get_spikes
@@ -357,6 +363,7 @@ class AbstractPopulationVertex(
 
     # @implements AbstractVRecordable.set_recording_v
     def set_recording_v(self):
+        self.set_buffering_output()
         self._v_recorder.record_v = True
 
     # @implements AbstractVRecordable.get_v
@@ -373,6 +380,7 @@ class AbstractPopulationVertex(
 
     # @implements AbstractGSynRecordable.set_recording_gsyn
     def set_recording_gsyn(self):
+        self.set_buffering_output()
         self._gsyn_recorder.record_gsyn = True
 
     # @implements AbstractGSynRecordable.get_gsyn
@@ -477,3 +485,16 @@ class AbstractPopulationVertex(
 
     def __repr__(self):
         return self.__str__()
+
+    def get_buffered_regions_list(self):
+        list_of_regions_buffering = list()
+        if self.is_recording_gsyn():
+            list_of_regions_buffering.append(
+                constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value)
+        if self.is_recording_v():
+            list_of_regions_buffering.append(
+                constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value)
+        if self.is_recording_spikes():
+            list_of_regions_buffering.append(
+                constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
+        return list_of_regions_buffering

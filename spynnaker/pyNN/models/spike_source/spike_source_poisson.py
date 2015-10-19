@@ -1,5 +1,8 @@
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from pacman.model.partitionable_graph.\
+    receive_buffers_to_host_partitionable_vertex import \
+    ReceiveBuffersToHostPartitionableVertex
 from spinn_front_end_common.abstract_models.\
     abstract_outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
@@ -38,7 +41,8 @@ RANDOM_SEED_WORDS = 4
 
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
-        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints):
+        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
+        ReceiveBuffersToHostPartitionableVertex):
     """
     This class represents a Poisson Spike source object, which can represent
     a pynn_population.py of virtual neurons each with its own parameters.
@@ -67,6 +71,7 @@ class SpikeSourcePoisson(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractSpikeRecordable.__init__(self)
+        ReceiveBuffersToHostPartitionableVertex.__init__(self)
 
         # Store the parameters
         self._rate = rate
@@ -309,6 +314,7 @@ class SpikeSourcePoisson(
         return self._spike_recorder.record
 
     def set_recording_spikes(self):
+        self.set_buffering_output()
         self._spike_recorder.record = True
 
     # inherited from partionable vertex
@@ -444,3 +450,10 @@ class SpikeSourcePoisson(
             return getattr(self, key)
         raise Exception("Population {} does not have parameter {}".format(
             self, key))
+
+    def get_buffered_regions_list(self):
+        list_of_regions_buffering = list()
+        if self.is_recording_spikes():
+            list_of_regions_buffering.append(
+                self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY.value)
+        return list_of_regions_buffering
