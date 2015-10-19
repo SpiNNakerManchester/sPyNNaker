@@ -1,9 +1,9 @@
-from integration_tests.bugged_tests import pynnBrunnelPlot as pblt
+import pynnBrunnelPlot as pblt
 
 simulator_Name = 'spiNNaker'
 exec('import pyNN.%s as pynn'%simulator_Name)
 
-import pylab as plt 
+import pylab as plt
 import numpy as np
 from pyNN.random import NumpyRNG, RandomDistribution
 
@@ -12,7 +12,7 @@ def poisson_generator(rate, rng,t_start=0.0, t_stop=1000.0,array=True,debug=Fals
     Returns a SpikeTrain whose spikes are a realization of a Poisson process
     with the given rate (Hz) and stopping time t_stop (milliseconds).
 
-    Note: t_start is always 0.0, thus all realizations are as if 
+    Note: t_start is always 0.0, thus all realizations are as if
     they spiked at t=0.0, though this spike is not included in the SpikeList.
 
     Inputs:
@@ -25,19 +25,19 @@ def poisson_generator(rate, rng,t_start=0.0, t_stop=1000.0,array=True,debug=Fals
     Examples:
         >> gen.poisson_generator(50, 0, 1000)
         >> gen.poisson_generator(20, 5000, 10000, array=True)
-     
+
     See also:
         inh_poisson_generator, inh_gamma_generator, inh_adaptingmarkov_generator
     """
 
     #number = int((t_stop-t_start)/1000.0*2.0*rate)
-    
+
     # less wasteful than double length method above
     n = (t_stop-t_start)/1000.0*rate
     number = np.ceil(n+3*np.sqrt(n))
     if number<100:
         number = min(5+np.ceil(2*n),100)
-    
+
     if number > 0:
         isi = rng.exponential(1.0/rate, number)*1000.0
         if number > 1:
@@ -53,13 +53,13 @@ def poisson_generator(rate, rng,t_start=0.0, t_stop=1000.0,array=True,debug=Fals
     extra_spikes = []
     if i==len(spikes):
         # ISI buf overrun
-        
+
         t_last = spikes[-1] + rng.exponential(1.0/rate, 1)[0]*1000.0
 
         while (t_last<t_stop):
             extra_spikes.append(t_last)
             t_last += rng.exponential(1.0/rate, 1)[0]*1000.0
-        
+
         spikes = np.concatenate((spikes,extra_spikes))
 
         if debug:
@@ -78,7 +78,7 @@ def poisson_generator(rate, rng,t_start=0.0, t_stop=1000.0,array=True,debug=Fals
 # Total number of neurons
 Neurons = 3000
 sim_time = 1000.0
-g = 5.0 
+g = 5.0
 eta = 2.0
 delay = 2.0
 epsilon = 0.1
@@ -89,7 +89,7 @@ v_reset = 10.0
 V_th = 20.0
 v_rest = 0.0
 tauSyn      = 1.0     # synaptic time constant [ms] set to 1ms to approximate a delta
-						# synapse
+                        # synapse
 
 N_E = int(round(Neurons * 0.8))
 N_I = int(round(Neurons * 0.2))
@@ -102,8 +102,8 @@ J_E = 0.1
 J_I = -g * J_E
 
 # The firing rate of a neuron in the external pop
-# is the product of eta time the threshold rate 
-# the steady state firing rate which is 
+# is the product of eta time the threshold rate
+# the steady state firing rate which is
 # needed to bring a neuron to threshold.
 nu_ex = eta*V_th/(J_E*C_E*tau_m)
 
@@ -111,7 +111,7 @@ nu_ex = eta*V_th/(J_E*C_E*tau_m)
 # With CE neurons the pop rate is simply the product
 # nu_ex*C_E  the factor 1000.0 changes the units from
 # spikes per ms to spikes per second.
-p_rate = 1000.0 * nu_ex * C_E 
+p_rate = 1000.0 * nu_ex * C_E
 
 print "Rate is: %f HZ" % (p_rate/1000)
 # Neural Parameters
@@ -229,7 +229,7 @@ if esp is not None:
     ts_ext=[x[1] for x in esp]
     ids_ext=[x[0] for x in esp]
     pblt._make_plot(ts_ext,ts_ext,ids_ext,ids_ext,True,5.0,False,'Raster Plot of the excitatory population in %s'%simulator_Name,'Simulation Time (ms)', total_time=sim_time, n_neurons=N_E)
-    
+
 if isp is not None:
     ts_inh=[x[1] for x in isp]
     ids_inh=[x[0] for x in isp]
@@ -248,7 +248,7 @@ if v_esp is not None:
     plt.title('v')
     for pos in range(0, 1):
         v_for_neuron = v_esp[pos * ticks : (pos + 1) * ticks]
-        plt.plot([i[1] for i in v_for_neuron], 
+        plt.plot([i[1] for i in v_for_neuron],
                 [i[2] for i in v_for_neuron])
 
 plt.show()

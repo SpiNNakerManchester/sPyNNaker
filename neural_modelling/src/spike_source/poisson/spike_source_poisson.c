@@ -98,7 +98,7 @@ static inline REAL slow_spike_source_get_time_to_spike(
 //! this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
-    if (exp_minus_lambda == 0) {
+    if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }
     else {
@@ -258,21 +258,25 @@ void timer_callback(uint timer_count, uint unused) {
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
+
         spin1_exit(0);
         return;
     }
 
     // Loop through slow spike sources
-    for (index_t s = 0; s < num_slow_spike_sources; s++) {
+    slow_spike_source_t *slow_spike_sources = slow_spike_source_array;
+    for (index_t s = num_slow_spike_sources; s > 0; s--) {
 
         // If this spike source is active this tick
-        slow_spike_source_t *slow_spike_source = &slow_spike_source_array[s];
+        slow_spike_source_t *slow_spike_source = slow_spike_sources++;
         if ((time >= slow_spike_source->start_ticks)
                 && (time < slow_spike_source->end_ticks)
-                && (slow_spike_source->mean_isi_ticks != 0)) {
+                && (REAL_COMPARE(slow_spike_source->mean_isi_ticks, !=,
+                    REAL_CONST(0.0)))) {
 
             // If this spike source should spike now
-            if (slow_spike_source->time_to_spike_ticks <= REAL_CONST(0.0)) {
+            if (REAL_COMPARE(slow_spike_source->time_to_spike_ticks, <=,
+                             REAL_CONST(0.0))) {
 
                 // Write spike to out spikes
                 out_spikes_set_spike(slow_spike_source->neuron_id);
@@ -302,10 +306,10 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Loop through fast spike sources
-    for (index_t f = 0; f < num_fast_spike_sources; f++) {
+    fast_spike_source_t *fast_spike_sources = fast_spike_source_array;
+    for (index_t f = num_fast_spike_sources; f > 0; f--) {
+        fast_spike_source_t *fast_spike_source = fast_spike_sources++;
 
-        // If this spike source is active this tick
-        fast_spike_source_t *fast_spike_source = &fast_spike_source_array[f];
         if (time >= fast_spike_source->start_ticks
                 && time < fast_spike_source->end_ticks) {
 
@@ -322,7 +326,7 @@ void timer_callback(uint timer_count, uint unused) {
 
                 // Send spikes
                 const uint32_t spike_key = key | fast_spike_source->neuron_id;
-                for (uint32_t s = 0; s < num_spikes; s++) {
+                for (uint32_t s = num_spikes; s > 0; s--) {
 
                     // if no key has been given, do not send spike to fabric.
                     if (has_been_given_key){

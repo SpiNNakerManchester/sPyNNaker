@@ -28,7 +28,7 @@ class TestingOneToOneConnector(unittest.TestCase):
                                             cell_params_lif, label="Second pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.OneToOneConnector(weight, delay)
         synaptic_list = connection.generate_synapse_list(
             first_population, second_population, 1, 1.0, synapse_type)
@@ -45,7 +45,7 @@ class TestingOneToOneConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.OneToOneConnector(weight, delay)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
