@@ -107,7 +107,7 @@ class AbstractPopulationVertex(
 
     @property
     def maximum_delay_supported_in_ms(self):
-        return self._synapse_manager.maximum_delay_supported
+        return self._synapse_manager.maximum_delay_supported_in_ms
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):

@@ -45,6 +45,12 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
     def delay_edge(self, delay_edge):
         self._delay_edge = delay_edge
 
+    @property
+    def n_delay_stages(self):
+        if self._delay_edge is None:
+            return 0
+        return self._delay_edge.pre_vertex.max_stages
+
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):
         """

@@ -5,7 +5,7 @@ master pop entry
 from spinn_front_end_common.utilities import helpful_functions
 
 # spynnaker imports
-from spynnaker.pyNN.models.neural_properties.master_pop_table_generators\
+from spynnaker.pyNN.models.neuron.master_pop_table_generators\
     .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 from pacman.model.partitionable_graph.abstract_partitionable_vertex\

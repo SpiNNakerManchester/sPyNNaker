@@ -29,7 +29,7 @@ class AbstractSynapseIO(object):
             self, synapse_information, n_pre_slices, pre_slice_index,
             n_post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
-            weight_scales):
+            n_synapse_types, weight_scales):
         """ Get the synapses as an array of words for undelayed synapses and\
             an array of words for delayed synapses
         """

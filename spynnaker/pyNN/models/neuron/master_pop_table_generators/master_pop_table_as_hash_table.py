@@ -1,7 +1,7 @@
 """
 MasterPopTableAsHashTable
 """
-from spynnaker.pyNN.models.neural_properties.master_pop_table_generators\
+from spynnaker.pyNN.models.neuron.master_pop_table_generators\
     .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 import logging

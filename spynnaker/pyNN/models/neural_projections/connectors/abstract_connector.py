@@ -67,13 +67,14 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_vertex_slice, post_vertex_slice,
+            self, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         """ Get the maximum number of connections between those from each of\
-            the neurons in the pre_vertex_slice (or all in the pre vertex if\
-            pre_vertex_slice is None) to neurons in the post_vertex_slice,\
-            for connections with a delay between min_delay and max_delay\
-            (inclusive) if specified (otherwise all connections)
+            the neurons in the pre_vertex_slice to neurons in the\
+            post_vertex_slice, for connections with a delay between min_delay\
+            and max_delay (inclusive) if both specified\
+            (otherwise all connections)
         """
 
     @abstractmethod

@@ -11,8 +11,6 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesOutgoingEdgeConstraints
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.neural_projections.\
-    delay_partitionable_edge import DelayPartitionableEdge
 from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
@@ -211,13 +209,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         num_delay_blocks = 0
 
         for subedge in sub_graph.outgoing_subedges_from_subvertex(subvertex):
-            subedge_assocated_edge = \
-                graph_mapper.get_partitionable_edge_from_partitioned_edge(
-                    subedge)
-            if not isinstance(subedge_assocated_edge, DelayPartitionableEdge):
-                raise exceptions.DelayExtensionException(
-                    "One of the incoming subedges is not a subedge of a"
-                    " DelayPartitionableEdge")
 
             # Loop through each possible delay block
             dest = subedge.post_subvertex

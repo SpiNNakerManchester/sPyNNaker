@@ -6,8 +6,8 @@ class SynapseInformation(object):
 
     def __init__(self, connector, synapse_dynamics, synapse_type):
         self._connector = connector
-        self._synapse_dynamics
-        self._synapse_type
+        self._synapse_dynamics = synapse_dynamics
+        self._synapse_type = synapse_type
         self._row_offsets = None
 
     @property

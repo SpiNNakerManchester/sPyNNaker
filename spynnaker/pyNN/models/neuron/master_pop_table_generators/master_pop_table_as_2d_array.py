@@ -8,7 +8,7 @@ from pacman.model.constraints.key_allocator_constraints.\
 from pacman.utilities.field import Field
 
 # spynnaker imports
-from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
+from spynnaker.pyNN.models.neuron.master_pop_table_generators.\
     abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 from spynnaker.pyNN import exceptions
 

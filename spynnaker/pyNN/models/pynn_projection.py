@@ -132,9 +132,8 @@ class Projection(object):
         # If the delay exceeds the post vertex delay, add a delay extension
         if max_delay > post_vertex_max_supported_delay_ms:
             delay_edge = self._add_delay_extension(
-                presynaptic_population._get_vertex,
-                postsynaptic_population._get_vertex,
-                label, max_delay, post_vertex_max_supported_delay_ms,
+                presynaptic_population, postsynaptic_population, label,
+                max_delay, post_vertex_max_supported_delay_ms,
                 machine_time_step, timescale_factor)
             self._projection_edge.delay_edge = delay_edge
 
@@ -160,8 +159,9 @@ class Projection(object):
         return None
 
     def _add_delay_extension(
-            self, pre_vertex, post_vertex, label, max_delay_for_projection,
-            max_delay_per_neuron, machine_time_step, timescale_factor):
+            self, presynaptic_population, postsynaptic_population, label,
+            max_delay_for_projection, max_delay_per_neuron, machine_time_step,
+            timescale_factor):
         """
         Instantiate new delay extension component, connecting a new edge from
         the source vertex to it and new edges from it to the target (given
@@ -171,13 +171,14 @@ class Projection(object):
         """
 
         # Create a delay extension vertex to do the extra delays
-        delay_vertex = pre_vertex.delay_vertex
+        delay_vertex = presynaptic_population._internal_delay_vertex
+        pre_vertex = presynaptic_population._get_vertex
         if delay_vertex is None:
             delay_name = "{}_delayed".format(pre_vertex.label)
             delay_vertex = DelayExtensionVertex(
                 pre_vertex.n_atoms, max_delay_per_neuron, pre_vertex,
                 machine_time_step, timescale_factor, label=delay_name)
-            pre_vertex.delay_vertex = delay_vertex
+            presynaptic_population._internal_delay_vertex = delay_vertex
             pre_vertex.add_constraint(
                 PartitionerSameSizeAsVertexConstraint(delay_vertex))
             self._spinnaker.add_vertex(delay_vertex)
@@ -195,6 +196,7 @@ class Projection(object):
             delay_vertex.max_stages = num_stages
 
         # Create the delay edge if there isn't one already
+        post_vertex = postsynaptic_population._get_vertex
         delay_edge = self._find_existing_edge(delay_vertex, post_vertex)
         if delay_edge is None:
             delay_edge = MultiCastPartitionableEdge(

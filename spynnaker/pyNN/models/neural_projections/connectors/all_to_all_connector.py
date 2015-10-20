@@ -45,19 +45,19 @@ class AllToAllConnector(AbstractConnector):
             self._delays, self._n_pre_neurons * self._n_post_neurons)
 
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_vertex_slice, post_vertex_slice):
-        return post_vertex_slice.n_atoms
+            self, pre_vertex_slice, post_vertex_slice,
+            min_delay=None, max_delay=None):
+        if min_delay is None or max_delay is None:
+            return post_vertex_slice.n_atoms
+        else:
+            n_connections = (pre_vertex_slice.n_atoms *
+                             post_vertex_slice.n_atoms)
+            connection_slice = self._connection_slice(
+                pre_vertex_slice, post_vertex_slice)
 
-    def get_n_connections_from_pre_vertex_with_delay_maximum(
-            self, pre_vertex_slice, post_vertex_slice, min_delay, max_delay):
-
-        n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
-        connection_slice = self._connection_slice(
-            pre_vertex_slice, post_vertex_slice)
-
-        return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, n_connections, connection_slice,
-            min_delay, max_delay)
+            return self._get_n_connections_from_pre_vertex_with_delay_maximum(
+                self._delays, n_connections, connection_slice,
+                min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_vertex_slice, post_vertex_slice):
@@ -85,8 +85,9 @@ class AllToAllConnector(AbstractConnector):
             self._weights, n_connections, connection_slice)
 
     def create_synaptic_block(
-            self, n_slices, slice_idx, pre_vertex_slice, post_vertex_slice,
-            synapse_type, index):
+            self, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type):
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         connection_slice = self._connection_slice(
             pre_vertex_slice, post_vertex_slice)
@@ -103,4 +104,3 @@ class AllToAllConnector(AbstractConnector):
         block["delays"] = self._generate_values(
             self._delays, n_connections, connection_slice)
         block["synapse_type"] = synapse_type
-        block["index"] = index
