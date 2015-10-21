@@ -72,7 +72,8 @@ class SpikeSourceArray(
         names=[('SYSTEM_REGION', 0),
                ('CONFIGURATION_REGION', 1),
                ('SPIKE_DATA_REGION', 2),
-               ('SPIKE_DATA_RECORDED_REGION', 3)])
+               ('SPIKE_DATA_RECORDED_REGION', 3),
+               ('BUFFERING_OUT_STATE', 4)])
 
     def __init__(
             self, n_neurons, spike_times, machine_time_step, timescale_factor,
@@ -147,11 +148,11 @@ class SpikeSourceArray(
         self.set_buffering_output()
         self._spike_recorder.record = True
 
-    def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
+    def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
-            self.label, transceiver,
+            self.label, buffer_manager,
             self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value,
+            self._SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)
 
     @property

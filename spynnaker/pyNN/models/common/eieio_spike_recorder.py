@@ -32,8 +32,8 @@ class EIEIOSpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, transceiver, region, placements, graph_mapper,
-                   partitionable_vertex):
+    def get_spikes(self, label, buffer_manager, region, state_region,
+                   placements, graph_mapper, partitionable_vertex):
 
         results = list()
         ms_per_tick = self._machine_time_step / 1000.0
@@ -47,9 +47,14 @@ class EIEIOSpikeRecorder(object):
             placement = placements.get_placement_of_subvertex(subvertex)
             subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
+            x = placement.x
+            y = placement.y
+            p = placement.p
             # Read the spikes
-            spike_data = recording_utils.get_data(
-                transceiver, placement, region, subvertex.region_size)
+#            spike_data = recording_utils.get_data(
+#                transceiver, placement, region, subvertex.region_size)
+            spike_data = buffer_manager.get_data_for_vertex(
+                x, y, p, region, state_region)
 
             number_of_bytes_written = len(spike_data)
 

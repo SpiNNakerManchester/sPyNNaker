@@ -22,8 +22,8 @@ class AbstractVRecordable(object):
         """
 
     @abstractmethod
-    def get_v(self, transceiver, n_machine_time_steps, placements,
-              graph_mapper):
+    def get_v(self, n_machine_time_steps, placements, graph_mapper,
+              buffer_manager):
         """ Get the recorded v from the object
 
         :param transceiver: the python interface to the spinnaker machine

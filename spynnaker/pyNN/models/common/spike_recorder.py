@@ -39,7 +39,7 @@ class SpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, transceiver, region, n_machine_time_steps,
+    def get_spikes(self, label, buffer_manager, region, state_region,
                    placements, graph_mapper, partitionable_vertex):
 
         spike_times = list()
@@ -56,14 +56,22 @@ class SpikeRecorder(object):
             placement = placements.get_placement_of_subvertex(subvertex)
             subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
+            x = placement.x
+            y = placement.y
+            p = placement.p
             lo_atom = subvertex_slice.lo_atom
 
             # Read the spikes
-            n_bytes = int(math.ceil(subvertex_slice.n_atoms / 32.0)) * 4
-            region_size = recording_utils.get_recording_region_size_in_bytes(
-                n_machine_time_steps, n_bytes)
-            spike_data = recording_utils.get_data(
-                transceiver, placement, region, region_size)
+#            n_bytes = int(math.ceil(subvertex_slice.n_atoms / 32.0)) * 4
+#            region_size = recording_utils.get_recording_region_size_in_bytes(
+#                n_machine_time_steps, n_bytes)
+#            spike_data = recording_utils.get_data(
+#                transceiver, placement, region, region_size)
+
+            # for buffering output info is taken form the buffer manager
+            spike_data = buffer_manager.get_data_for_vertex(
+                x, y, p, region, state_region)
+            n_bytes = len(spike_data)
             numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
                 dtype="uint32").byteswap().view("uint8")
             bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(

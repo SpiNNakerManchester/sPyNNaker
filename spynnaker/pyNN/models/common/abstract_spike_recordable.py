@@ -22,8 +22,7 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
+    def get_spikes(self, placements, graph_mapper, buffer_manager):
         """ Get the recorded spikes from the object
         :param transceiver: the python interface to the spinnaker machine
         :param n_machine_time_steps: the number of machine time steps the

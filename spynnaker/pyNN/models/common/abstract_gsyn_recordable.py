@@ -22,8 +22,8 @@ class AbstractGSynRecordable(object):
         """
 
     @abstractmethod
-    def get_gsyn(self, transceiver, n_machine_time_steps, placements,
-                 graph_mapper):
+    def get_gsyn(self, n_machine_time_steps, placements,
+              graph_mapper, buffer_manager):
         """ Get the recorded gsyn from the object
         :param transceiver: the python interface to the spinnaker machine
         :param n_machine_time_steps: the number of timer tics that will

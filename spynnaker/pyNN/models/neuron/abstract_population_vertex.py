@@ -350,12 +350,12 @@ class AbstractPopulationVertex(
         self._spike_recorder.record = True
 
     # @implements AbstractSpikeRecordable.get_spikes
-    def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
+    def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
-            self._label, transceiver,
+            self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
+            placements, graph_mapper, self)
 
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
@@ -367,11 +367,12 @@ class AbstractPopulationVertex(
         self._v_recorder.record_v = True
 
     # @implements AbstractVRecordable.get_v
-    def get_v(self, transceiver, n_machine_time_steps, placements,
-              graph_mapper):
+    def get_v(self, n_machine_time_steps, placements,
+              graph_mapper, buffer_manager):
         return self._v_recorder.get_v(
-            self._label, self.n_atoms, transceiver,
+            self._label, self.n_atoms, buffer_manager,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
+            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             n_machine_time_steps, placements, graph_mapper, self)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
@@ -384,11 +385,12 @@ class AbstractPopulationVertex(
         self._gsyn_recorder.record_gsyn = True
 
     # @implements AbstractGSynRecordable.get_gsyn
-    def get_gsyn(self, transceiver, n_machine_time_steps, placements,
-                 graph_mapper):
+    def get_gsyn(self, n_machine_time_steps, placements,
+              graph_mapper, buffer_manager):
         return self._gsyn_recorder.get_gsyn(
-            self._label, self.n_atoms, transceiver,
+            self._label, self.n_atoms, buffer_manager,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
+            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             n_machine_time_steps, placements, graph_mapper, self)
 
     def initialize(self, variable, value):

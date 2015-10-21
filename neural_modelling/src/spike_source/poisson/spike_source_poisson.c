@@ -41,7 +41,11 @@ typedef struct fast_spike_source_t {
 //! spike source array region ids in human readable form
 typedef enum region{
     system, poisson_params, spike_history,
+    BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    BUFFERING_OUT_CONTROL_REGION
 }region;
+
+#define NUMBER_OF_REGIONS_TO_RECORD 1
 
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
@@ -210,6 +214,19 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Get the recording information
+    uint8_t regions_to_record[] = {
+        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    };
+    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+    uint32_t *recording_flags_from_system_conf = &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+    uint8_t tag_id = recording_flags_from_system_conf[1];
+    uint32_t *region_sizes = &recording_flags_from_system_conf[2];
+    uint32_t recording_flags;
+    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
+
+    recording_initialize(n_regions_to_record, regions_to_record,
+                         region_sizes, state_region, tag_id, &recording_flags);
+/*
     uint32_t spike_history_region_size;
     recording_read_region_sizes(
         &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
@@ -222,6 +239,7 @@ static bool initialize(uint32_t *timer_period) {
             return false;
         }
     }
+*/
 
     // Setup regions that specify spike source array data
     if (!read_poisson_parameters(

@@ -52,7 +52,8 @@ class SpikeSourcePoisson(
         value="_POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
-               ('SPIKE_HISTORY_REGION', 2)])
+               ('SPIKE_HISTORY_REGION', 2),
+               ('BUFFERING_OUT_STATE', 3)])
 
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
     # in terms of CPU (2900 at 10 times slowdown is fine, but not at realtime)
@@ -419,12 +420,12 @@ class SpikeSourcePoisson(
         """
         return "spike_source_poisson.aplx"
 
-    def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
+    def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
-            self._label, transceiver,
+            self._label, buffer_manager,
             self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            self._POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value,
+            placements, graph_mapper, self)
 
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
         """

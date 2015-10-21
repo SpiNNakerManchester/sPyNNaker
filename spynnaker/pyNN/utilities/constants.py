@@ -79,7 +79,8 @@ POPULATION_BASED_REGIONS = Enum(
            ('SYNAPSE_DYNAMICS', 5),
            ('SPIKE_HISTORY', 6),
            ('POTENTIAL_HISTORY', 7),
-           ('GSYN_HISTORY', 8)])
+           ('GSYN_HISTORY', 8),
+           ('BUFFERING_OUT_STATE', 9)])
 
 # The number of recording regions available for a population
 N_POPULATION_RECORDING_REGIONS = 3

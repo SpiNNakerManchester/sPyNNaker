@@ -89,6 +89,17 @@ static bool initialize(uint32_t *timer_period) {
         BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
         BUFFERING_OUT_GSYN_RECORDING_REGION
     };
+    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+    uint32_t *recording_flags_from_system_conf = &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+    uint8_t tag_id = recording_flags_from_system_conf[1];
+    uint32_t *region_sizes = &recording_flags_from_system_conf[2];
+    uint32_t recording_flags;
+    regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
+
+    recording_initialize(n_regions_to_record, regions_to_record,
+                         region_sizes, state_region, tag_id, &recording_flags);
+
+    /*
     uint32_t region_sizes[N_RECORDING_CHANNELS];
     uint32_t recording_flags;
     recording_read_region_sizes(
@@ -105,6 +116,7 @@ static bool initialize(uint32_t *timer_period) {
             }
         }
     }
+    */
 
     // Set up the neurons
     uint32_t n_neurons;

@@ -38,7 +38,7 @@ class GsynRecorder(object):
             return 0
         return n_neurons * 8
 
-    def get_gsyn(self, label, n_atoms, transceiver, region,
+    def get_gsyn(self, label, n_atoms, buffer_manager, region, state_region,
                  n_machine_time_steps, placements, graph_mapper,
                  partitionable_vertex):
 
@@ -65,10 +65,18 @@ class GsynRecorder(object):
             vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
             placement = placements.get_placement_of_subvertex(subvertex)
 
-            region_size = recording_utils.get_recording_region_size_in_bytes(
-                n_machine_time_steps, 8 * vertex_slice.n_atoms)
-            neuron_param_region_data = recording_utils.get_data(
-                transceiver, placement, region, region_size)
+            x = placement.x
+            y = placement.y
+            p = placement.p
+
+#            region_size = recording_utils.get_recording_region_size_in_bytes(
+#                n_machine_time_steps, 8 * vertex_slice.n_atoms)
+#            neuron_param_region_data = recording_utils.get_data(
+#                transceiver, placement, region, region_size)
+
+            # for buffering output info is taken form the buffer manager
+            neuron_param_region_data = buffer_manager.get_data_for_vertex(
+                x, y, p, region, state_region)
 
             numpy_data = (numpy.asarray(
                 neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
