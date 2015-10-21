@@ -45,7 +45,8 @@ class AllToAllConnector(AbstractConnector):
             self._delays, self._n_pre_neurons * self._n_post_neurons)
 
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_vertex_slice, post_vertex_slice,
+            self, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         if min_delay is None or max_delay is None:
             return post_vertex_slice.n_atoms
@@ -78,11 +79,9 @@ class AllToAllConnector(AbstractConnector):
             self._weights, n_connections, connection_slice)
 
     def get_weight_variance(self, pre_vertex_slice, post_vertex_slice):
-        n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         connection_slice = self._connection_slice(
             pre_vertex_slice, post_vertex_slice)
-        return self._get_weight_variance(
-            self._weights, n_connections, connection_slice)
+        return self._get_weight_variance(self._weights, connection_slice)
 
     def create_synaptic_block(
             self, n_pre_slices, pre_slice_index, n_post_slices,
@@ -99,8 +98,9 @@ class AllToAllConnector(AbstractConnector):
         block["target"] = numpy.tile(numpy.arange(
             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
             pre_vertex_slice.n_atoms)
-        block["weights"] = self._generate_values(
+        block["weight"] = self._generate_values(
             self._weights, n_connections, connection_slice)
-        block["delays"] = self._generate_values(
+        block["delay"] = self._generate_values(
             self._delays, n_connections, connection_slice)
         block["synapse_type"] = synapse_type
+        return block

@@ -53,16 +53,18 @@ class AbstractSynapseDynamics(object):
     def get_weight_mean(self, connector, pre_vertex_slice, post_vertex_slice):
         """ Get the mean weight for the synapses
         """
-        return connector.get_weight_mean()
+        return connector.get_weight_mean(pre_vertex_slice, post_vertex_slice)
 
     def get_weight_maximum(
             self, connector, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum weight for the synapses
         """
-        return connector.get_weight_maximum()
+        return connector.get_weight_maximum(
+            pre_vertex_slice, post_vertex_slice)
 
     def get_weight_variance(
             self, connector, pre_vertex_slice, post_vertex_slice):
         """ Get the variance in weight for the synapses
         """
-        return connector.get_weight_variance()
+        return connector.get_weight_variance(
+            pre_vertex_slice, post_vertex_slice)

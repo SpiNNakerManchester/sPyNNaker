@@ -47,4 +47,4 @@ class SynapseDynamicsStatic(AbstractSynapseDynamics):
                        (connections["target"] & 0xFF))
 
         return (fixed_fixed.byteswap().view(dtype="uint8").reshape((-1, 4)),
-                [], [])
+                [numpy.zeros(0) for _ in range(connections.size)], numpy.zeros((0, 4)))

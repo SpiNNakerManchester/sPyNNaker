@@ -117,7 +117,7 @@ class SynapticManager(object):
 
     @property
     def vertex_executable_suffix(self):
-        self._synapse_dynamics.get_vertex_executable_suffix()
+        return self._synapse_dynamics.get_vertex_executable_suffix()
 
     def get_n_cpu_cycles(self, vertex_slice, graph):
 
@@ -153,10 +153,10 @@ class SynapticManager(object):
                 # Add on the size of the tables to be generated
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
-                pre_slices = graph_mapper.get_subvertices_from_vertex(
-                    edge.pre_vertex)
+                pre_slices = list(graph_mapper.get_subvertices_from_vertex(
+                    edge.pre_vertex))
                 n_pre_slices = len(pre_slices)
-                pre_slice_index = pre_slices.index(edge.pre_vertex)
+                pre_slice_index = pre_slices.index(subedge.pre_subvertex)
 
                 undelayed_size, delayed_size = \
                     self._synapse_io.get_sdram_usage_in_bytes(
@@ -167,18 +167,16 @@ class SynapticManager(object):
 
                 # Add population table required padding between blocks and
                 # add the block sizes
-                memory_size = self._master_pop_table_generator\
+                memory_size = self._population_table_type\
                     .get_next_allowed_address(memory_size)
                 memory_size += undelayed_size
-                memory_size = self._master_pop_table_generator\
+                memory_size = self._population_table_type\
                     .get_next_allowed_address(memory_size)
                 memory_size += delayed_size
 
         return memory_size
 
-    def _get_estimate_synaptic_blocks_size(
-            self, n_post_slices, post_slice_index, post_vertex_slice,
-            in_edges):
+    def _get_estimate_synaptic_blocks_size(self, post_vertex_slice, in_edges):
         """ Get an estimate of the synaptic blocks memory size
         """
         memory_size = 0
@@ -186,7 +184,16 @@ class SynapticManager(object):
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionPartitionableEdge):
 
-                # Get an estimate of the number of sub-vertices - clearly
+                # Get an estimate of the number of post sub-vertices by
+                # assuming that all of them are the same size as this one
+                n_post_slices = int(math.ceil(
+                    float(in_edge.pre_vertex.n_atoms) /
+                    float(post_vertex_slice.n_atoms)))
+                post_slice_index = int(math.floor(
+                    float(post_vertex_slice.lo_atom) /
+                    float(post_vertex_slice.n_atoms)))
+
+                # Get an estimate of the number of pre-sub-vertices - clearly
                 # this will not be correct if the SDRAM usage is high!
                 # TODO: Can be removed once we move to population-based keys
                 n_atoms_per_subvertex = sys.maxint
@@ -210,18 +217,17 @@ class SynapticManager(object):
                             pre_vertex_slice, post_vertex_slice,
                             in_edge.n_delay_stages)
 
-                    memory_size = self._master_pop_table_generator\
+                    memory_size = self._population_table_type\
                         .get_next_allowed_address(memory_size)
                     memory_size += undelayed_size
-                    memory_size = self._master_pop_table_generator\
+                    memory_size = self._population_table_type\
                         .get_next_allowed_address(memory_size)
                     memory_size += delayed_size
                     pre_slice_index += 1
 
         return memory_size
 
-    def _get_synapse_dynamics_parameter_size(
-            self, vertex_slice, in_edges):
+    def _get_synapse_dynamics_parameter_size(self, vertex_slice, in_edges):
         """ Get the size of the synapse dynamics region
         """
         return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
@@ -350,8 +356,8 @@ class SynapticManager(object):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
         """
-        n_synapse_types = len(self._synapse_type.get_n_synapse_types())
-        running_totals = [RunningStats() for _ in n_synapse_types]
+        n_synapse_types = self._synapse_type.get_n_synapse_types()
+        running_totals = [RunningStats()] * n_synapse_types
         total_weights = numpy.zeros(n_synapse_types)
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
@@ -386,7 +392,7 @@ class SynapticManager(object):
                     weights_signed = True
 
         max_weights = numpy.zeros(n_synapse_types)
-        for synapse_type in n_synapse_types:
+        for synapse_type in range(n_synapse_types):
             stats = running_totals[synapse_type]
             max_weights[synapse_type] = min(
                 self._ring_buffer_expected_upper_bound(
@@ -493,11 +499,11 @@ class SynapticManager(object):
 
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
-                pre_vertex_slices = graph_mapper.get_subvertices_from_vertex(
-                    edge.pre_subvertex)
+                pre_vertex_slices = list(
+                    graph_mapper.get_subvertices_from_vertex(edge.pre_vertex))
                 n_pre_slices = len(pre_vertex_slices)
                 pre_slice_index = pre_vertex_slices.index(
-                    subedge.edge.pre_subvertex)
+                    subedge.pre_subvertex)
 
                 row_data, row_length, delayed_row_data, delayed_row_length =\
                     self._synapse_io.get_synapses(
@@ -551,14 +557,15 @@ class SynapticManager(object):
                 delay_key_index[(subedge.pre_subvertex, pre_slice)] =\
                     routing_info.get_keys_and_masks_from_subedge(subedge)
 
-        subvertices = graph_mapper.get_subvertices_from_vertex(vertex)
+        subvertices = list(graph_mapper.get_subvertices_from_vertex(vertex))
         n_slices = len(subvertices)
         slice_index = subvertices.index(subvertex)
 
         # Reserve the memory
         subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)
         all_syn_block_sz = self._get_exact_synaptic_blocks_size(
-            graph_mapper, subvert_in_edges)
+            n_slices, slice_index, vertex_slice, graph_mapper, subvertex,
+            subvert_in_edges)
         self._reserve_memory_regions(
             spec, vertex, vertex_slice, graph, all_syn_block_sz)
 

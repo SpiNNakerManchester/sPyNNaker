@@ -39,11 +39,13 @@ class SynapseIORowBased(AbstractSynapseIO):
         for synapse_info in synapse_information:
             max_undelayed_row_length = synapse_info.connector\
                 .get_n_connections_from_pre_vertex_maximum(
-                    pre_vertex_slice, post_vertex_slice, 0,
-                    max_delay_supported)
+                    n_pre_slices, pre_slice_index, n_post_slices,
+                    post_slice_index, pre_vertex_slice, post_vertex_slice,
+                    0, max_delay_supported)
             max_delayed_row_length = synapse_info.connector\
                 .get_n_connections_from_pre_vertex_maximum(
-                    pre_vertex_slice, post_vertex_slice,
+                    n_pre_slices, pre_slice_index, n_post_slices,
+                    post_slice_index, pre_vertex_slice, post_vertex_slice,
                     max_delay_supported + 1, max_delay)
 
             bytes_per_item = synapse_info.synapse_dynamics\
@@ -140,13 +142,13 @@ class SynapseIORowBased(AbstractSynapseIO):
                         n_synapse_types, weight_scales)
                 fixed_fixed_data_items.append(numpy.ravel(
                     [fixed_fixed_data[undelayed_row_indices == i]
-                     for i in range(pre_vertex_slice)]))
+                     for i in pre_vertex_slice]))
                 fixed_plastic_data_items.append(numpy.ravel(
                     [fixed_plastic_data[undelayed_row_indices == i]
-                     for i in range(pre_vertex_slice)]))
+                     for i in pre_vertex_slice]))
                 plastic_plastic_data_items.append(numpy.ravel(
                     [plastic_plastic_data[undelayed_row_indices == i]
-                     for i in range(pre_vertex_slice)]))
+                     for i in pre_vertex_slice]))
 
             # Get the data for the delayed connections
             if len(delayed_connections) > 0:
