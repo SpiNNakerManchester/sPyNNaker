@@ -197,7 +197,7 @@ class AbstractPopulationVertex(
                 empty=True)
 
     def _write_setup_info(self, spec, spike_history_region_sz,
-                          neuron_potential_region_sz, gsyn_region_sz):
+                          neuron_potential_region_sz, gsyn_region_sz, tag_ids):
         """ Write information used to control the simulation and gathering of\
             results.
 
@@ -218,10 +218,15 @@ class AbstractPopulationVertex(
             recording_info |= constants.RECORD_GSYN_BIT
         recording_info |= 0xBEEF0000
 
+        tag_id = 0
+        if recording_info & 0xFFFF != 0:
+            tag_id = iter(tag_ids).next()
+
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
             spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_value(data=recording_info)
+        spec.write_value(data=tag_id.tag)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=neuron_potential_region_sz)
         spec.write_value(data=gsyn_region_sz)
@@ -318,7 +323,7 @@ class AbstractPopulationVertex(
 
         # Write the regions
         self._write_setup_info(
-            spec, spike_history_sz, v_history_sz, gsyn_history_sz)
+            spec, spike_history_sz, v_history_sz, gsyn_history_sz, ip_tags)
         self._write_neuron_parameters(spec, key, vertex_slice)
 
         # allow the synaptic matrix to write its data specable data

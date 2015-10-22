@@ -85,9 +85,10 @@ POPULATION_BASED_REGIONS = Enum(
 # The number of recording regions available for a population
 N_POPULATION_RECORDING_REGIONS = 3
 
-# The size of the system region (+1 for flags) for a population
+# The size of the system region (+1 for flags, +1 for buffering out iptag)
+# for a population
 POPULATION_SYSTEM_REGION_BYTES = (DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS +
-                                  N_POPULATION_RECORDING_REGIONS + 1) * 4
+                                  N_POPULATION_RECORDING_REGIONS + 2) * 4
 
 # The size of the headers of a population neuron region
 # (1 word each for has_key, key, n_neurons, n_params, ODE timestep)

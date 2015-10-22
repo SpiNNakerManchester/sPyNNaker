@@ -145,7 +145,9 @@ class SpikeSourceArray(
         return self._spike_recorder.record
 
     def set_recording_spikes(self):
-        self.set_buffering_output()
+        # already doing buffering in, therefore is already set up also for
+        # buffering out i.e. setting twice iptags might be catastrophic
+        # self.set_buffering_output()
         self._spike_recorder.record = True
 
     def get_spikes(self, placements, graph_mapper, buffer_manager):
@@ -282,12 +284,16 @@ class SpikeSourceArray(
         self._write_basic_setup_info(
             spec, self._SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
 
+        ip_tag = iter(ip_tags).next()
+
         # write flag for recording
         if self._spike_recorder.record:
             value = 1 | 0xBEEF0000
             spec.write_value(data=value)
+            spec.write_value(data=ip_tag.tag)
             spec.write_value(data=(total_recording_region_size + 4))
         else:
+            spec.write_value(data=0)
             spec.write_value(data=0)
             spec.write_value(data=0)
 

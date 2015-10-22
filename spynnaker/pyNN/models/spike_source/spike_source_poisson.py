@@ -172,7 +172,7 @@ class SpikeSourcePoisson(
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
                 empty=True)
 
-    def write_setup_info(self, spec, spike_history_region_sz):
+    def write_setup_info(self, spec, spike_history_region_sz, ip_tags):
         """
         Write information used to control the simulationand gathering of
         results.
@@ -194,12 +194,16 @@ class SpikeSourcePoisson(
         self._write_basic_setup_info(
             spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         recording_info = 0
+        tag_id = 0
         if self._spike_recorder.record:
             recording_info |= constants.RECORD_SPIKE_BIT
+            ip_tag = iter(ip_tags).next()
+            tag_id = ip_tag.tag
         recording_info |= 0xBEEF0000
 
         # Write this to the system region (to be picked up by the simulation):
         spec.write_value(data=recording_info)
+        spec.write_value(data=tag_id)
         spec.write_value(data=spike_history_region_sz)
 
     def write_poisson_parameters(self, spec, key, num_neurons):
@@ -397,7 +401,7 @@ class SpikeSourcePoisson(
         self.reserve_memory_regions(
             spec, setup_sz, poisson_params_sz, spike_hist_buff_sz)
 
-        self.write_setup_info(spec, spike_hist_buff_sz)
+        self.write_setup_info(spec, spike_hist_buff_sz, ip_tags)
 
         # Every subedge should have the same key
         key = None
