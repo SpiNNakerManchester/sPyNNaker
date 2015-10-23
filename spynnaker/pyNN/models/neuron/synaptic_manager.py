@@ -517,7 +517,7 @@ class SynapticManager(object):
                     next_block_start_addr = self._write_padding(
                         spec, synaptic_matrix_region, next_block_start_addr)
                     spec.switch_write_focus(synaptic_matrix_region)
-                    self.spec.write_array(row_data)
+                    spec.write_array(row_data)
                     keys_and_masks = \
                         routing_info.get_keys_and_masks_from_subedge(subedge)
                     self._population_table_type.update_master_population_table(
@@ -530,7 +530,7 @@ class SynapticManager(object):
                     next_block_start_addr = self._write_padding(
                         spec, synaptic_matrix_region, next_block_start_addr)
                     spec.switch_write_focus(synaptic_matrix_region)
-                    self.spec.write_array(delayed_row_data)
+                    spec.write_array(delayed_row_data)
                     keys_and_masks = delay_key_index[
                         (subedge.pre_subvertex, pre_vertex_slice)]
                     self._population_table_type.update_master_population_table(

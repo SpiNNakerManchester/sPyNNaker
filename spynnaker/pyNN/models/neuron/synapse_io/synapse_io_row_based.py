@@ -68,18 +68,28 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     @staticmethod
     def _convert_data(fixed_fixed_data_items, fixed_plastic_data_items,
-                      plastic_plastic_data_items):
+                      plastic_plastic_data_items, n_rows):
         all_data = list()
         all_data_lengths = list()
         for data in [fixed_fixed_data_items, fixed_plastic_data_items,
                      plastic_plastic_data_items]:
-            merged_data = [numpy.pad(
-                numpy.concatenate(items), (0, (4 - items.size % 4) & 0x3),
-                mode="constant", constant_values=0).view("uint32")
-                for items in zip(*data)]
-            all_data.append(merged_data)
-            all_data_lengths.append(numpy.array(
-                [items.size for items in merged_data]))
+            merged_data = None
+            if len(data) > 0:
+                merged_data = [numpy.concatenate(items)
+                               for items in zip(*data)]
+                merged_data = [numpy.pad(
+                    items, (0, (4 - items.size % 4) & 0x3), mode="constant",
+                    constant_values=0).view("uint32") for items in merged_data]
+                all_data.append(merged_data)
+                all_data_lengths.append(numpy.array([
+                    numpy.array([items.size], dtype="uint32")
+                    for items in merged_data]))
+            else:
+                all_data.append(numpy.array(
+                    [numpy.zeros(0, dtype="uint32")] * n_rows))
+                all_data_lengths.append(numpy.array(
+                    [numpy.zeros(1, dtype="uint32")] * n_rows))
+
         return all_data, all_data_lengths
 
     def get_synapses(
@@ -111,6 +121,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 delay_mask = (connections["delay"] <= max_delay)
                 undelayed_connections = connections[numpy.where(delay_mask)]
                 delayed_connections = connections[numpy.where(~delay_mask)]
+            del connections
 
             # Get which row each connection will go into
             undelayed_row_indices = []
@@ -140,15 +151,23 @@ class SynapseIORowBased(AbstractSynapseIO):
                     synapse_info.synapse_dynamics.get_synaptic_data(
                         undelayed_connections, self._machine_time_step,
                         n_synapse_types, weight_scales)
-                fixed_fixed_data_items.append(numpy.ravel(
-                    [fixed_fixed_data[undelayed_row_indices == i]
-                     for i in pre_vertex_slice]))
-                fixed_plastic_data_items.append(numpy.ravel(
-                    [fixed_plastic_data[undelayed_row_indices == i]
-                     for i in pre_vertex_slice]))
-                plastic_plastic_data_items.append(numpy.ravel(
-                    [plastic_plastic_data[undelayed_row_indices == i]
-                     for i in pre_vertex_slice]))
+                if fixed_fixed_data is not None:
+                    fixed_fixed_data_items.append([numpy.ravel(
+                        fixed_fixed_data[undelayed_row_indices == i])
+                        for i in range(pre_vertex_slice.lo_atom,
+                                       pre_vertex_slice.hi_atom + 1)])
+                if fixed_plastic_data is not None:
+                    fixed_plastic_data_items.append(numpy.ravel(
+                        [fixed_plastic_data[undelayed_row_indices == i]
+                         for i in range(pre_vertex_slice.lo_atom,
+                                        pre_vertex_slice.hi_atom + 1)]))
+                if plastic_plastic_data is not None:
+                    plastic_plastic_data_items.append(numpy.ravel(
+                        [plastic_plastic_data[undelayed_row_indices == i]
+                         for i in range(pre_vertex_slice.lo_atom,
+                                        pre_vertex_slice.hi_atom + 1)]))
+                del fixed_fixed_data, fixed_plastic_data, plastic_plastic_data
+            del undelayed_connections
 
             # Get the data for the delayed connections
             if len(delayed_connections) > 0:
@@ -156,65 +175,90 @@ class SynapseIORowBased(AbstractSynapseIO):
                     synapse_info.synapse_dynamics.get_synaptic_data(
                         delayed_connections, self._machine_time_step,
                         n_synapse_types, weight_scales)
-                delayed_fixed_fixed_data_items.append(numpy.ravel(
-                    [fixed_fixed_data[delayed_row_indices == i]
-                     for i in range(pre_slice_index)]))
-                delayed_fixed_plastic_data_items.append(numpy.ravel(
-                    [fixed_plastic_data[delayed_row_indices == i]
-                     for i in range(pre_slice_index)]))
-                delayed_plastic_plastic_data_items.append(numpy.ravel(
-                    [plastic_plastic_data[delayed_row_indices == i]
-                     for i in range(pre_slice_index)]))
+                if fixed_fixed_data is not None:
+                    delayed_fixed_fixed_data_items.append(numpy.ravel(
+                        [fixed_fixed_data[delayed_row_indices == i]
+                         for i in range(pre_vertex_slice.lo_atom,
+                                        pre_vertex_slice.hi_atom + 1)]))
+                if fixed_plastic_data is not None:
+                    delayed_fixed_plastic_data_items.append(numpy.ravel(
+                        [fixed_plastic_data[delayed_row_indices == i]
+                         for i in range(pre_vertex_slice.lo_atom,
+                                        pre_vertex_slice.hi_atom + 1)]))
+                if plastic_plastic_data is not None:
+                    delayed_plastic_plastic_data_items.append(numpy.ravel(
+                        [plastic_plastic_data[delayed_row_indices == i]
+                         for i in range(pre_vertex_slice.lo_atom,
+                                        pre_vertex_slice.hi_atom + 1)]))
+                del fixed_fixed_data, fixed_plastic_data, plastic_plastic_data
+            del delayed_connections
 
         # Join up the individual connectivity data and get the lengths
-        (fixed_fixed, fixed_plastic, plastic_plastic,
-         ff_size, fp_size, pp_size) = self._convert_data(
-            fixed_fixed_data_items, fixed_plastic_data_items,
-            plastic_plastic_data_items)
-        del fixed_fixed_data_items, fixed_plastic_data_items
-        del plastic_plastic_data_items
-
-        # Create the rows with the headers
-        items_to_join = [pp_size, plastic_plastic, ff_size, fp_size,
-                         fixed_fixed, fixed_plastic]
-        rows = [numpy.concatenate(items) for items in zip(*items_to_join)]
-        del fixed_fixed, fixed_plastic, plastic_plastic
-
-        # Pad the rows to make them all the same length as the biggest
-        row_lengths = [row.size for row in rows]
-        max_length = max(row_lengths)
         row_data = []
-        if max_length > 0:
-            max_length = population_table.get_allowed_row_length(max_length)
-            row_data = numpy.concatenate([numpy.pad(
-                row, (0, max_length - row.size), mode="constant",
-                constant_values=0xBBCCDDEE) for row in rows])
+        max_row_length = 0
+        if sum((len(fixed_fixed_data_items), len(fixed_plastic_data_items),
+                len(plastic_plastic_data_items))) > 0:
+            ((fixed_fixed, fixed_plastic, plastic_plastic),
+             (ff_size, fp_size, pp_size)) = self._convert_data(
+                fixed_fixed_data_items, fixed_plastic_data_items,
+                plastic_plastic_data_items, pre_vertex_slice.n_atoms)
+            del fixed_fixed_data_items
+            del fixed_plastic_data_items
+            del plastic_plastic_data_items
+
+            # Create the rows with the headers
+            items_to_join = [pp_size, plastic_plastic, ff_size, fp_size,
+                             fixed_fixed, fixed_plastic]
+            rows = [numpy.concatenate(items) for items in zip(*items_to_join)]
+            del fixed_fixed, fixed_plastic, plastic_plastic
+
+            # Pad the rows to make them all the same length as the biggest
+            row_lengths = [row.size for row in rows]
+            max_length = max(row_lengths)
+            max_row_length = max_length
+            if max_length > 0:
+                max_length = population_table.get_allowed_row_length(
+                    max_length)
+                row_data = numpy.concatenate([numpy.pad(
+                    row, (0, max_length - row.size), mode="constant",
+                    constant_values=0x11223344) for row in rows])
 
         # Do the same for delayed rows
-        (delayed_fixed_fixed, delayed_fixed_plastic, delayed_plastic_plastic,
-         delayed_ff_size, delayed_fp_size,
-         delayed_pp_size) = self._convert_data(
-            delayed_fixed_fixed_data_items, delayed_fixed_plastic_data_items,
-            delayed_plastic_plastic_data_items)
-        del delayed_fixed_fixed_data_items, delayed_fixed_plastic_data_items
-        del delayed_plastic_plastic_data_items
-
-        # Create the rows with the headers
-        items_to_join = [delayed_pp_size, delayed_plastic_plastic,
-                         delayed_ff_size, delayed_fp_size,
-                         delayed_fixed_fixed, delayed_fixed_plastic]
-        delayed_rows = [numpy.concatenate(items)
-                        for items in zip(*items_to_join)]
-        del delayed_fixed_fixed, delayed_fixed_plastic, delayed_plastic_plastic
-
-        # Pad the rows to make them all the same length as the biggest
-        row_lengths = [row.size for row in delayed_rows]
-        max_length = max(row_lengths)
         delayed_row_data = []
-        if max_length > 0:
-            max_length = population_table.get_allowed_row_length(max_length)
-            delayed_row_data = numpy.concatenate([numpy.pad(
-                row, (0, max_length - row.size), mode="constant",
-                constant_values=0xBBCCDDEE) for row in delayed_rows])
+        max_delayed_row_length = 0
+        if sum((len(delayed_fixed_fixed_data_items),
+                len(delayed_fixed_plastic_data_items),
+                len(delayed_plastic_plastic_data_items))) > 0:
+            ((delayed_fixed_fixed, delayed_fixed_plastic,
+              delayed_plastic_plastic),
+             (delayed_ff_size, delayed_fp_size,
+              delayed_pp_size)) = self._convert_data(
+                delayed_fixed_fixed_data_items,
+                delayed_fixed_plastic_data_items,
+                delayed_plastic_plastic_data_items, pre_vertex_slice.n_atoms)
+            del delayed_fixed_fixed_data_items
+            del delayed_fixed_plastic_data_items
+            del delayed_plastic_plastic_data_items
 
-        return row_data, delayed_row_data
+            # Create the rows with the headers
+            items_to_join = [delayed_pp_size, delayed_plastic_plastic,
+                             delayed_ff_size, delayed_fp_size,
+                             delayed_fixed_fixed, delayed_fixed_plastic]
+            delayed_rows = [numpy.concatenate(items)
+                            for items in zip(*items_to_join)]
+            del delayed_fixed_fixed, delayed_fixed_plastic
+            del delayed_plastic_plastic
+
+            # Pad the rows to make them all the same length as the biggest
+            row_lengths = [row.size for row in delayed_rows]
+            max_length = max(row_lengths)
+            max_delayed_row_length = max_length
+            if max_length > 0:
+                max_length = population_table.get_allowed_row_length(
+                    max_length)
+                delayed_row_data = numpy.concatenate([numpy.pad(
+                    row, (0, max_length - row.size), mode="constant",
+                    constant_values=0x11223344) for row in delayed_rows])
+
+        return (row_data, max_row_length, delayed_row_data,
+                max_delayed_row_length)

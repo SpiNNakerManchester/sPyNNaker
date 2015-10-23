@@ -1,4 +1,5 @@
 import numpy
+import math
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
     import AbstractSynapseDynamics
@@ -36,15 +37,16 @@ class SynapseDynamicsStatic(AbstractSynapseDynamics):
         """
         synapse_weight_scales = numpy.array(weight_scales, dtype="float")[
             connections["synapse_type"]]
+        n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
 
         fixed_fixed = (((numpy.rint(numpy.abs(connections["weight"]) *
                                     synapse_weight_scales).astype("uint32") &
                         0xFFFF) << 16) |
-                       (numpy.rint(connections["delay"] * (1000.0 /
-                                   machine_time_step)).astype("uint32") &
-                        0xF << (8 + n_synapse_types)) |
+                       ((numpy.rint(connections["delay"] * (1000.0 /
+                                    machine_time_step)).astype("uint32") &
+                         0xF) << (8 + n_synapse_type_bits)) |
                        (connections["synapse_type"] << 8) |
                        (connections["target"] & 0xFF))
 
-        return (fixed_fixed.byteswap().view(dtype="uint8").reshape((-1, 4)),
-                [numpy.zeros(0) for _ in range(connections.size)], numpy.zeros((0, 4)))
+        return (fixed_fixed.view(dtype="uint8").reshape((-1, 4)),
+                None, None)
