@@ -265,7 +265,6 @@ void timer_callback(uint timer_count, uint unused) {
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
-        spin1_exit(0);
         // Wait for the next run of the simulation
         spin1_callback_off(TIMER_TICK);
         event_wait();
@@ -363,15 +362,20 @@ void timer_callback(uint timer_count, uint unused) {
     out_spikes_reset();
 }
 
-void sdp_message_callback(uint msg, uint port) {
+void sdp_message_callback(uint mailbox, uint port) {
     use(port);
 
-    ushort cmd = msg >> 8;
-    if (cmd == CMD_STOP) {
+    sdp_msg_t *msg = (sdp_msg_t *) mailbox;
+    uint16_t length = msg->length;
+    use(length);
+
+    if (msg->cmd_rc == CMD_STOP) {
         spin1_exit(0);
-    } else if (cmd == CMD_RUNTIME) {
-        simulation_ticks = msg & 0xffffff;
+    } else if (msg->cmd_rc == CMD_RUNTIME) {
+        simulation_ticks = msg->arg1;
     }
+
+    spin1_msg_free(msg);
 }
 
 //! \The only entry point for this model. it initialises the model, sets up the
