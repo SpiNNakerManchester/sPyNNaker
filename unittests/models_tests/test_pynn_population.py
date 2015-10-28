@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import unittest
 import spynnaker.pyNN as pyNN
-from spynnaker.pyNN.models.neural_models.izk_curr_exp import \
-    IzhikevichCurrentExponentialPopulation
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from pacman.model.constraints.placer_constraints.\
     placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
@@ -29,7 +27,7 @@ cell_params_izk = {
 pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
 
 
-class TestingPopulation(unittest.TestCase):
+class TestPyNNPopulation(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -44,7 +42,7 @@ class TestingPopulation(unittest.TestCase):
         pyNN.Population(1, pyNN.IF_cond_exp, {}, label="One population")
 
     def test_create_izk_curr_exp_population(self):
-        pyNN.Population(1, IzhikevichCurrentExponentialPopulation,
+        pyNN.Population(1, pyNN.IZK_curr_exp,
                         cell_params_izk, label="One population")
 
     def test_create_if_curr_dual_exp_population(self):
@@ -62,7 +60,7 @@ class TestingPopulation(unittest.TestCase):
 
     def test_create_izk_curr_exp_population_zero(self):
         with self.assertRaises(ConfigurationException):
-            pyNN.Population(0, IzhikevichCurrentExponentialPopulation,
+            pyNN.Population(0, pyNN.IZK_curr_exp,
                             cell_params_izk, label="One population")
 
     def test_create_if_curr_dual_exp_population_zero(self):
@@ -132,28 +130,28 @@ class TestingPopulation(unittest.TestCase):
         pop = pyNN.Population(
             10, pyNN.IF_curr_exp, {'spikes_per_second': 3333},
             label="Constrained population")
-        spikes_per_second = pop._get_vertex._spikes_per_second
+        spikes_per_second = pop._get_vertex.spikes_per_second
         self.assertEqual(spikes_per_second, 3333)
 
     def test_spikes_per_second_not_set_in_a_pop(self):
         pop = pyNN.Population(
             10, pyNN.IF_curr_exp, cell_params_lif,
             label="Constrained population")
-        spikes_per_second = pop._get_vertex._spikes_per_second
+        spikes_per_second = pop._get_vertex.spikes_per_second
         self.assertEqual(spikes_per_second, 30)
 
     def test_ring_buffer_sigma_setting_in_a_pop(self):
         pop = pyNN.Population(
             10, pyNN.IF_curr_exp, {'ring_buffer_sigma': 3333},
             label="Constrained population")
-        ring_buffer_sigma = pop._get_vertex._ring_buffer_sigma
+        ring_buffer_sigma = pop._get_vertex.ring_buffer_sigma
         self.assertEqual(ring_buffer_sigma, 3333)
 
     def test_ring_buffer_sigma_not_set_in_a_pop(self):
         pop = pyNN.Population(
             10, pyNN.IF_curr_exp, cell_params_lif,
             label="Constrained population")
-        ring_buffer_sigma = pop._get_vertex._ring_buffer_sigma
+        ring_buffer_sigma = pop._get_vertex.ring_buffer_sigma
         self.assertEqual(ring_buffer_sigma, 5.0)
 
 

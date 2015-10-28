@@ -58,9 +58,16 @@ from spinn_front_end_common.abstract_models.\
 # local front end imports
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_message import SDPMessage
+from spinnman.messages.sdp.sdp_flag import SDPFlag
 from spynnaker.pyNN.models\
     .abstract_models.abstract_population_recordable_vertex import \
     AbstractPopulationRecordableVertex
+from spynnaker.pyNN.models.common.abstract_gsyn_recordable import \
+    AbstractGSynRecordable
+from spynnaker.pyNN.models.common.abstract_v_recordable import \
+    AbstractVRecordable
+from spynnaker.pyNN.models.common.abstract_spike_recordable \
+    import AbstractSpikeRecordable
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
@@ -84,7 +91,6 @@ from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
 import logging
 import math
 import os
-
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +119,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._populations = list()
         self._projections = list()
         self._no_full_runs = 0
-        self._total_run_time_so_far = 0
+        self._executable_tagets = None
 
         if self._app_id is None:
             self._set_up_main_objects(
@@ -219,7 +225,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         if number_of_boards == "None":
             number_of_boards = None
 
-        if self._no_full_runs == 0:
+        needs_mapping = False
+
+        if not self._has_ran:
             self.setup_interfaces(
                 hostname=self._hostname,
                 bmp_details=config.get("Machine", "bmp_names"),
@@ -233,7 +241,19 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 auto_detect_bmp=config.getboolean("Machine", "auto_detect_bmp"),
                 enable_reinjection=config.getboolean(
                     "Machine", "enable_reinjection"))
-            self._no_full_runs += 1
+
+            # Mapping needs to be done on the first run
+            needs_mapping = True
+        else:
+            # detect if the graph has changed since last run
+            changed = self._detect_if_graph_has_changed()
+            if changed:
+                needs_mapping = True
+                logger.warn("The graph has changed since the original "
+                            "graph was loaded and ran. Therefore "
+                            "decisions made during the mapping process will be"
+                            " incorrect now, and therefore mapping needs to be"
+                            " redone. Sorry. \n\n\n PS. Once issue ")
 
         # adds extra stuff needed by the reload script which cannot be given
         # directly.
@@ -241,38 +261,34 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._reload_script.runtime += run_time
             self._reload_script.time_scale_factor = self._time_scale_factor
 
-        # detect if the graph has changed since last run
-        changed = self._detect_if_graph_has_changed()
-        if changed:
-            logger.warn("The graph has changed since the original "
-                        "graph was loaded and ran. Therefore "
-                        "decisions made during the mapping process will be"
-                        " incorrect now, and therefore mapping needs to be"
-                        " redone. Sorry. \n\n\n PS. Once issue ")
-
         # create network report if needed
-        if changed or self._reports_states is not None:
+        if needs_mapping or self._reports_states is not None:
             reports.network_specification_partitionable_report(
                 self._report_default_directory, self._partitionable_graph,
                 self._hostname)
 
         # check if the runtime has been set before, and if so, validate stuff
-        if self._runtime is not None and self._runtime >= run_time:
-            if not changed:
-                self._deduce_machine_time_step(run_time)
-                for placement in self._placements:
-                    data = bytearray()
-                    data.append(constants.SDP_RUNTIME_ID_CODE)
-                    vertex = self._graph_mapper.get_vertex_from_subvertex(
-                        placement.subvertex)
-                    data.append(vertex.no_machine_time_steps)
-                    self._txrx.send_sdp_message(SDPMessage(SDPHeader(
-                        destination_cpu=placement.p,
-                        destination_chip_x=placement.x,
-                        destination_chip_y=placement.y), data=data))
+        if self._runtime is not None and self._runtime >= run_time \
+        and self._has_ran and not needs_mapping:
+            pass
+            # FIXME: send sdp packet with new runtime
+            #self._deduce_machine_time_step(run_time)
+            #for placement in self._placements:
+                #data = bytearray()
+                #data.append(constants.SDP_RUNTIME_ID_CODE)
+                #vertex = self._graph_mapper.get_vertex_from_subvertex(
+                #    placement.subvertex)
+                #steps = vertex.no_machine_time_steps
+                #data.append((steps >> 16) & 0xff)
+                #data.append((steps >> 8) & 0xff)
+                #data.append(steps & 0xff)
+                #self._txrx.send_sdp_message(SDPMessage(SDPHeader(
+                #    destination_cpu=placement.p,
+                #    destination_chip_x=placement.x,
+                #    destination_chip_y=placement.y), data=data))
         elif self._runtime is not None and self._runtime < run_time:
             # the timer is too large, so mapping has to take place again
-            changed = True
+            needs_mapping = True
             logger.warn("The runtime selected is bigger than the original "
                         "runtime used during this simulation. Therefore "
                         "decisions made during the mapping process will be"
@@ -284,15 +300,19 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             self._deduce_machine_time_step(run_time)
         else:
             self._no_machine_time_steps = None
-            logger.warn("You have set a runtime that will never end, this may"
+            logger.warn("You have set a runtime that will never end, this may "
                         "cause the neural models to fail to partition "
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
-                if (isinstance(vertex, AbstractPopulationRecordableVertex) and
-                        vertex.record):
+                if ((isinstance(vertex, AbstractSpikeRecordable) and
+                        vertex.is_recording_spikes())
+                        or (isinstance(vertex, AbstractVRecordable) and
+                            vertex.is_recording_v())
+                        or (isinstance(vertex, AbstractGSynRecordable) and
+                            vertex.is_recording_gsyn)):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
-                        "is not currently supportable in this tool chain."
+                        "is not currently supportable in this tool chain. "
                         "watch this space")
 
         do_timing = config.getboolean("Reports", "outputTimesForSections")
@@ -303,10 +323,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         self.set_runtime(run_time)
 
-        if changed:
-            # stop the sync0 code so that new mapped stuff can run
-            self.stop(turn_off_machine=False, clear_tags=False,
-                      clear_routing_tables=False)
+        # Partitioning needs to be (re-)done
+        if needs_mapping:
+            if self._has_ran:
+                # stop the sync0 code so that new mapped stuff can run
+                self.stop(turn_off_machine=False, clear_tags=False,
+                          clear_routing_tables=False)
 
             logger.info("*** Running Mapper *** ")
             if do_timing:
@@ -378,7 +400,8 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 timer.start_timing()
             logger.info("*** Generating Output *** ")
             logger.debug("")
-            executable_targets = self.generate_data_specifications()
+            self._executable_targets = self.generate_data_specifications()
+
             if do_timing:
                 logger.info("Time to generate data: {}".format(
                     timer.take_sample()))
@@ -404,7 +427,9 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
             if do_timing:
                 logger.info("Time to execute data specifications: {}".format(
                     timer.take_sample()))
+            # End of mapping
 
+            # Load app
             wait_on_confirmation = False
             send_start_notification = False
             if (not isinstance(self._machine, VirtualMachine) and
@@ -425,7 +450,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                     self.load_routing_tables(self._router_tables, self._app_id)
                     logger.info("*** Loading executables ***")
                     self.load_executable_images(
-                        executable_targets, self._app_id)
+                        self._executable_targets, self._app_id)
                     logger.info("*** Loading buffers ***")
                     self.set_up_send_buffering(self._partitioned_graph,
                                                self._placements, self._tags)
@@ -434,77 +459,83 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if do_timing:
                     logger.debug("Time to load: {}".format(timer.take_sample()))
 
-                if self._do_run is True:
-                    logger.info("*** Running simulation... *** ")
-                    if do_timing:
-                        timer.start_timing()
-                    # every thing is in sync0. load the initial buffers
-                    self._send_buffer_manager.load_initial_buffers()
-                    if do_timing:
-                        logger.debug("Time to load buffers: {}".format(
-                            timer.take_sample()))
+            # set all Populations to unchanged
+            self._detect_if_graph_has_changed()
 
-                    wait_on_confirmation = config.getboolean(
-                        "Database", "wait_on_confirmation")
-                    send_start_notification = config.getboolean(
-                        "Database", "send_start_notification")
+        # Run simulation
+        if (not isinstance(self._machine, VirtualMachine) and
+                config.getboolean("Execute", "run_simulation")):
+            if self._do_run is True:
+                logger.info("*** Running simulation... *** ")
+                if do_timing:
+                    timer.start_timing()
+                # every thing is in sync0. load the initial buffers
+                self._send_buffer_manager.load_initial_buffers()
+                if do_timing:
+                    logger.debug("Time to load buffers: {}".format(
+                        timer.take_sample()))
 
-                self.wait_for_cores_to_be_ready(
-                    executable_targets, self._app_id, self._no_full_runs)
+                wait_on_confirmation = config.getboolean(
+                    "Database", "wait_on_confirmation")
+                send_start_notification = config.getboolean(
+                    "Database", "send_start_notification")
 
-                # wait till external app is ready for us to start if required
-                if (self._database_interface is not None and
-                        wait_on_confirmation):
-                    self._database_interface.wait_for_confirmation()
+            self.wait_for_cores_to_be_ready(
+                self._executable_targets, self._app_id, self._no_full_runs)
 
-            # if not a virtual machine
-            if (not isinstance(self._machine, VirtualMachine) and
-                    config.getboolean("Execute", "run_simulation")):
+            # wait till external app is ready for us to start if required
+            if (self._database_interface is not None and
+                    wait_on_confirmation):
+                self._database_interface.wait_for_confirmation()
 
-                self.start_all_cores(executable_targets, self._app_id,
-                                     self._no_full_runs)
+            self.start_all_cores(self._executable_targets, self._app_id,
+                                 self._no_full_runs)
 
-                if (self._database_interface is not None and
-                        send_start_notification):
-                    self._database_interface.send_start_notification()
+            if (self._database_interface is not None and
+                    send_start_notification):
+                self._database_interface.send_start_notification()
 
-                if self._runtime is None:
-                    logger.info("Application is set to run forever - exiting")
-                else:
-                    self.wait_for_execution_to_complete(
-                        executable_targets, self._app_id, self._runtime,
-                        self._time_scale_factor)
-                self._has_ran = True
-                if self._retrieve_provance_data:
+            if self._runtime is None:
+                logger.info("Application is set to run forever - exiting")
+            else:
+                self.wait_for_execution_to_complete(
+                    self._executable_targets, self._app_id, self._runtime,
+                    self._time_scale_factor, self._no_full_runs)
 
-                    progress = ProgressBar(self._placements.n_placements + 1,
-                                           "Getting provenance data")
+            self._has_ran = True
+            self._no_full_runs += 1
 
-                    # retrieve provence data from central
-                    file_path = os.path.join(self._report_default_directory,
-                                             "provance_data")
+            # FIXME: provance? provenance?
+            if self._retrieve_provance_data:
 
-                    # check the directory doesnt already exist
-                    if not os.path.exists(file_path):
-                        os.mkdir(file_path)
+                progress = ProgressBar(self._placements.n_placements + 1,
+                                       "Getting provenance data")
 
-                    # write provanence data
-                    self.write_provenance_data_in_xml(file_path, self._txrx)
+                # retrieve provence data from central
+                file_path = os.path.join(self._report_default_directory,
+                                         "provance_data")
+
+                # check the directory doesnt already exist
+                if not os.path.exists(file_path):
+                    os.mkdir(file_path)
+
+                # write provanence data
+                self.write_provenance_data_in_xml(file_path, self._txrx)
+                progress.update()
+
+                # retrieve provenance data from any cores that provide data
+                for placement in self._placements.placements:
+                    if isinstance(placement.subvertex,
+                                  AbstractProvidesProvenanceData):
+                        core_file_path = os.path.join(
+                            file_path,
+                            "Provanence_data_for_{}_{}_{}_{}.xml".format(
+                                placement.subvertex.label,
+                                placement.x, placement.y, placement.p))
+                        placement.subvertex.write_provenance_data_in_xml(
+                            core_file_path, self.transceiver, placement)
                     progress.update()
-
-                    # retrieve provenance data from any cores that provide data
-                    for placement in self._placements.placements:
-                        if isinstance(placement.subvertex,
-                                      AbstractProvidesProvenanceData):
-                            core_file_path = os.path.join(
-                                file_path,
-                                "Provanence_data_for_{}_{}_{}_{}.xml".format(
-                                    placement.subvertex.label,
-                                    placement.x, placement.y, placement.p))
-                            placement.subvertex.write_provenance_data_in_xml(
-                                core_file_path, self.transceiver, placement)
-                        progress.update()
-                    progress.end()
+                progress.end()
 
         elif isinstance(self._machine, VirtualMachine):
             logger.info(
@@ -521,12 +552,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         for population in self._populations:
             if population.changed:
                 changed = True
-            population.changed = False
-        if changed:
-            return changed
+                population.changed = False
         for projection in self._projections:
             if projection.changed:
                 changed = True
+                projection.changed = False
         return changed
 
     def _deduce_machine_time_step(self, run_time):
@@ -922,9 +952,11 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         for placement in self._placements:
             self._txrx.send_sdp_message(SDPMessage(
                 sdp_header=SDPHeader(
+                    flags=SDPFlag.REPLY_NOT_EXPECTED,
+                    destination_port=1,
                     destination_cpu=placement.p,
                     destination_chip_x=placement.x,
-                    destination_chip_y=placement.y), data=))
+                    destination_chip_y=placement.y), data=byte_data))
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
@@ -977,7 +1009,6 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
 
         # clear values
         self._no_full_runs = 0
-        self._total_run_time_so_far = 0
 
         # app stop command (currently fucked)
         #self._txrx.stop_application(self._app_id)
@@ -1094,14 +1125,12 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         return self._txrx
 
     @property
-    def _total_run_time_so_far(self):
+    def total_run_time_so_far(self):
         """
 
         :return:
         """
         return self._total_run_time_so_far
-
-    
 
     @property
     def graph_mapper(self):

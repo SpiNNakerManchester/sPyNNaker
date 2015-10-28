@@ -98,7 +98,7 @@ static inline REAL slow_spike_source_get_time_to_spike(
 //! this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
-    if (exp_minus_lambda == 0) {
+    if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }
     else {
@@ -183,6 +183,23 @@ bool read_poisson_parameters(address_t address) {
     return true;
 }
 
+bool initialize_recording(address_t address, address_t system_region) {
+    // Get the recording information
+    uint32_t spike_history_region_size;
+    recording_read_region_sizes(
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
+        &recording_flags, &spike_history_region_size, NULL, NULL);
+    if (recording_is_channel_enabled(
+            recording_flags, e_recording_channel_spike_history)) {
+        if (!recording_initialse_channel(
+                data_specification_get_region(spike_history, address),
+                e_recording_channel_spike_history, spike_history_region_size)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 //! \Initialises the model by reading in the regions and checking recording
 //! data.
 //! \param[in] *timer_period a pointer for the memory address where the timer
@@ -209,18 +226,8 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    // Get the recording information
-    uint32_t spike_history_region_size;
-    recording_read_region_sizes(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
-        &recording_flags, &spike_history_region_size, NULL, NULL);
-    if (recording_is_channel_enabled(
-            recording_flags, e_recording_channel_spike_history)) {
-        if (!recording_initialse_channel(
-                data_specification_get_region(spike_history, address),
-                e_recording_channel_spike_history, spike_history_region_size)) {
-            return false;
-        }
+    if (!initialize_recording(address, system_region)) {
+        return false;
     }
 
     // Setup regions that specify spike source array data
@@ -258,21 +265,35 @@ void timer_callback(uint timer_count, uint unused) {
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
-        spin1_exit(0);
+        // Wait for the next run of the simulation
+        spin1_callback_off(TIMER_TICK);
+        event_wait();
+
+        // Prepare for the next run
+        time = UINT32_MAX;
+        
+        address_t address = data_specification_get_data_address();
+        address_t system_region = data_specification_get_region(
+        system, address);
+        initialize_recording(address, system_region);
+        spin1_callback_on(TIMER_TICK, timer_callback, 2);
         return;
     }
 
     // Loop through slow spike sources
-    for (index_t s = 0; s < num_slow_spike_sources; s++) {
+    slow_spike_source_t *slow_spike_sources = slow_spike_source_array;
+    for (index_t s = num_slow_spike_sources; s > 0; s--) {
 
         // If this spike source is active this tick
-        slow_spike_source_t *slow_spike_source = &slow_spike_source_array[s];
+        slow_spike_source_t *slow_spike_source = slow_spike_sources++;
         if ((time >= slow_spike_source->start_ticks)
                 && (time < slow_spike_source->end_ticks)
-                && (slow_spike_source->mean_isi_ticks != 0)) {
+                && (REAL_COMPARE(slow_spike_source->mean_isi_ticks, !=,
+                    REAL_CONST(0.0)))) {
 
             // If this spike source should spike now
-            if (slow_spike_source->time_to_spike_ticks <= REAL_CONST(0.0)) {
+            if (REAL_COMPARE(slow_spike_source->time_to_spike_ticks, <=,
+                             REAL_CONST(0.0))) {
 
                 // Write spike to out spikes
                 out_spikes_set_spike(slow_spike_source->neuron_id);
@@ -302,10 +323,10 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Loop through fast spike sources
-    for (index_t f = 0; f < num_fast_spike_sources; f++) {
+    fast_spike_source_t *fast_spike_sources = fast_spike_source_array;
+    for (index_t f = num_fast_spike_sources; f > 0; f--) {
+        fast_spike_source_t *fast_spike_source = fast_spike_sources++;
 
-        // If this spike source is active this tick
-        fast_spike_source_t *fast_spike_source = &fast_spike_source_array[f];
         if (time >= fast_spike_source->start_ticks
                 && time < fast_spike_source->end_ticks) {
 
@@ -322,7 +343,7 @@ void timer_callback(uint timer_count, uint unused) {
 
                 // Send spikes
                 const uint32_t spike_key = key | fast_spike_source->neuron_id;
-                for (uint32_t s = 0; s < num_spikes; s++) {
+                for (uint32_t s = num_spikes; s > 0; s--) {
 
                     // if no key has been given, do not send spike to fabric.
                     if (has_been_given_key){
@@ -341,6 +362,22 @@ void timer_callback(uint timer_count, uint unused) {
     // Record output spikes if required
     out_spikes_record(recording_flags);
     out_spikes_reset();
+}
+
+void sdp_message_callback(uint mailbox, uint port) {
+    use(port);
+
+    sdp_msg_t *msg = (sdp_msg_t *) mailbox;
+    uint16_t length = msg->length;
+    use(length);
+
+    if (msg->cmd_rc == CMD_STOP) {
+        spin1_exit(0);
+    } else if (msg->cmd_rc == CMD_RUNTIME) {
+        simulation_ticks = msg->arg1;
+    }
+
+    spin1_msg_free(msg);
 }
 
 //! \The only entry point for this model. it initialises the model, sets up the
@@ -367,6 +404,9 @@ void c_main(void) {
 
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, 2);
+
+    // Set up callback listening to SDP messages
+    spin1_callback_on(SDP_PACKET_RX, sdp_message_callback, 2);
 
     log_info("Starting");
     simulation_run();

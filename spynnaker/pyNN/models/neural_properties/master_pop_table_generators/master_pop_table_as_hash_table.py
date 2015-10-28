@@ -22,16 +22,15 @@ class MasterPopTableAsHashTable(AbstractMasterPopTableFactory):
         """
         raise NotImplementedError
 
-    def update_master_population_table(self, spec, block_start_addr, row_index,
-                                       key, master_pop_table_region, mask):
+    def update_master_population_table(self, spec, block_start_addr, row_length,
+                                       keys_and_masks, master_pop_table_region):
         """
 
         :param spec:
         :param block_start_addr:
-        :param row_index:
-        :param key:
+        :param row_length:
+        :param keys_and_masks:
         :param master_pop_table_region:
-        :param mask:
         :return:
         """
         raise NotImplementedError
@@ -86,4 +85,7 @@ class MasterPopTableAsHashTable(AbstractMasterPopTableFactory):
         :param next_address:
         :return:
         """
+        raise NotImplementedError
+
+    def get_edge_constraints(self):
         raise NotImplementedError
