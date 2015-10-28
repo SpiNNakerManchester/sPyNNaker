@@ -706,15 +706,19 @@ class Spinnaker(object):
                     pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
                 self.add_edge(dependant_edge)
 
-    def add_edge(self, edge_to_add, partition_identifier=None):
+    def add_edge(self, edge_to_add, partition_identifier=None,
+                 partition_constraints=None):
         """
 
         :param edge_to_add:
         :param partition_identifier: the partition identfer for the outgoing
         edge partition
+        :param partition_constraints: the constraints of a partition
+        associated with this edge
         :return:
         """
-        self._partitionable_graph.add_edge(edge_to_add, partition_identifier)
+        self._partitionable_graph.add_edge(edge_to_add, partition_identifier,
+                                           partition_constraints)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         """
@@ -813,7 +817,8 @@ class Spinnaker(object):
                                                           router_table.y)
 
             # execute app stop
-            # self._txrx.stop_application(self._app_id)
+            self._txrx.stop_application(self._app_id)
+
             if self._create_database:
                 self._database_interface.stop()
 

@@ -159,7 +159,8 @@ class Projection(object):
                     synapse_dynamics=synapse_dynamics, label=label)
 
                 # add edge to the graph
-                spinnaker_control.add_edge(self._projection_edge, EDGE_PARTITION_ID)
+                spinnaker_control.add_edge(self._projection_edge,
+                                           EDGE_PARTITION_ID)
                 self._projection_list_ranges = synapse_list.ranges()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):

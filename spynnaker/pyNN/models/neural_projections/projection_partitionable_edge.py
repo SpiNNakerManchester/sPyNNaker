@@ -40,16 +40,11 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         if synapse_dynamics is not None:
             self._synapse_row_io = synapse_dynamics.get_synapse_row_io()
 
-    def create_subedge(self, presubvertex, postsubvertex, constraints=None,
-                       label=None):
+    def create_subedge(self, presubvertex, postsubvertex, label=None):
         """
         Creates a subedge from this edge
         """
-        if constraints is None:
-            constraints = list()
-        constraints.extend(self.constraints)
-        return ProjectionPartitionedEdge(presubvertex, postsubvertex,
-                                         constraints)
+        return ProjectionPartitionedEdge(presubvertex, postsubvertex)
 
     def get_max_n_words(self, vertex_slice=None):
         """

@@ -10,8 +10,7 @@ class DelayAfferentPartitionableEdge(MultiCastPartitionableEdge):
         MultiCastPartitionableEdge.__init__(self, prevertex, delayvertex,
                                             label=label)
 
-    def create_subedge(self, pre_subvertex, post_subvertex, constraints=None,
-                       label=None):
+    def create_subedge(self, pre_subvertex, post_subvertex, label=None):
         """ Create a subedge between the pre_subvertex and the post_subvertex
 
         :param pre_subvertex: The subvertex at the start of the subedge
@@ -29,11 +28,7 @@ class DelayAfferentPartitionableEdge(MultiCastPartitionableEdge):
         :rtype: :py:class:`pacman.model.subgraph.subedge.PartitionedEdge`
         :raise None: does not raise any known exceptions
         """
-        if constraints is None:
-            constraints = list()
-        constraints.extend(self.constraints)
-        return DelayAfferentPartitionedEdge(pre_subvertex, post_subvertex,
-                                            constraints)
+        return DelayAfferentPartitionedEdge(pre_subvertex, post_subvertex)
 
     def is_multi_cast_partitionable_edge(self):
         """helper method for isinstance

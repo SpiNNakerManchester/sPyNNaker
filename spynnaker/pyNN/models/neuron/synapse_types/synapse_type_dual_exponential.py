@@ -52,7 +52,7 @@ class SynapseTypeDualExponential(AbstractSynapseType):
             tau_syn_I, self._n_neurons)
 
     def get_n_synapse_types(self):
-        return 2
+        return 3
 
     def get_synapse_id_by_target(self, target):
         if target == "excitatory":

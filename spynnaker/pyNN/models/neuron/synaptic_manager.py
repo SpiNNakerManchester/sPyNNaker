@@ -809,12 +809,8 @@ class SynapticManager(object):
                     " (aka, something funkky happened)")
         return block, maxed_row_length
 
-    # inhirrted from AbstractProvidesIncomingEdgeConstraints
     def get_incoming_edge_constraints(self):
         """
-
-        :param partitioned_edge:
-        :param graph_mapper:
         :return:
         """
         return self._population_table_type.get_edge_constraints()
