@@ -391,7 +391,7 @@ class Population(object):
                 compatible_output=compatible_output,
                 runtime=self._spinnaker._runtime)
             for vi in v:
-                vi[1] += self._runtime_offset
+                vi[1] += runtime_offset
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to read v: {}".format(timer.take_sample()))
