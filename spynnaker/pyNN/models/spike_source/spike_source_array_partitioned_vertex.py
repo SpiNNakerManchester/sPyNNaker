@@ -12,11 +12,14 @@ from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from spinn_front_end_common.interface.buffer_management.buffer_models.\
     sends_buffers_from_host_partitioned_vertex_pre_buffered_impl \
     import SendsBuffersFromHostPartitionedVertexPreBufferedImpl
+from spynnaker.pyNN.models.common.abstract_eieio_spike_recordable import \
+    AbstractEIEIOSpikeRecordable
 
 
 class SpikeSourceArrayPartitionedVertex(
         PartitionedVertex, RequiresRoutingInfoPartitionedVertex,
-        SendsBuffersFromHostPartitionedVertexPreBufferedImpl):
+        SendsBuffersFromHostPartitionedVertexPreBufferedImpl,
+        AbstractEIEIOSpikeRecordable):
     """
     SpikeSourceArrayPartitionedVertex the partitioned version of the
     spike soruce array supported by PyNN.
@@ -28,7 +31,9 @@ class SpikeSourceArrayPartitionedVertex(
         RequiresRoutingInfoPartitionedVertex.__init__(self)
         SendsBuffersFromHostPartitionedVertexPreBufferedImpl.__init__(
             self, send_buffers)
+        AbstractEIEIOSpikeRecordable.__init__(self)
         self._base_key = None
+        self._region_size = None
 
     def set_routing_infos(self, subedge_routing_infos):
         """
@@ -52,10 +57,13 @@ class SpikeSourceArrayPartitionedVertex(
         return key | self._base_key
 
     @property
+    def region_size(self):
+        return self._region_size
+
+    @property
     def base_key(self):
-        """
-        returns the base key given to the keys in the sned buffer when they
-        were transmitted
-        :return:
-        """
         return self._base_key
+
+    @region_size.setter
+    def region_size(self, new_value):
+        self._region_size = new_value

@@ -5,7 +5,7 @@ from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
+from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
@@ -64,28 +64,27 @@ class Projection(object):
         self._has_retrieved_synaptic_list_from_machine = False
         self._changed = True
 
-        if isinstance(postsynaptic_population._get_vertex,
-                      AbstractPopulationVertex):
-            # Check that the "target" is an acceptable value
-            targets = postsynaptic_population._get_vertex.get_synapse_targets()
-            if target not in targets:
-                raise exceptions.ConfigurationException(
-                    "Target {} is not available in the post-synaptic "
-                    "pynn_population.py (choices are {})"
-                    .format(target, targets))
-            synapse_type = \
-                postsynaptic_population._get_vertex.get_synapse_id(target)
-        else:
+        if not isinstance(postsynaptic_population._get_vertex,
+                          AbstractPopulationVertex):
+
             raise exceptions.ConfigurationException(
                 "postsynaptic_population is not a supposal reciever of"
                 " synaptic projections")
 
+        # Check that the "target" is an acceptable value
+        synapse_type = postsynaptic_population._get_vertex.synapse_type
+        targets = synapse_type.get_synapse_targets()
+        if target not in targets:
+            raise exceptions.ConfigurationException(
+                "Target {} is not available in the post-synaptic population"
+                " (choices are {})".format(target, targets))
+        synapse_id = synapse_type.get_synapse_id_by_target(target)
+
         self._weight_scale = postsynaptic_population._get_vertex.weight_scale
-        synapse_list = \
-            connector.generate_synapse_list(
-                presynaptic_population, postsynaptic_population,
-                1000.0 / machine_time_step,
-                postsynaptic_population._get_vertex.weight_scale, synapse_type)
+        synapse_list = connector.generate_synapse_list(
+            presynaptic_population, postsynaptic_population,
+            1000.0 / machine_time_step,
+            postsynaptic_population._get_vertex.weight_scale, synapse_id)
         self._host_based_synapse_list = copy.deepcopy(synapse_list)
 
         # If there are some negative weights
@@ -361,6 +360,9 @@ class Projection(object):
         """
         Get parameters of the dynamic synapses for all connections in this
         Projection.
+        :param parameter_name: ????????
+        :param list_format: ?????????
+        :param gather: ??????????
         """
         # TODO: Need to work out what is to be returned
         raise NotImplementedError
@@ -377,6 +379,9 @@ class Projection(object):
         non-existent connections). Note that for the array format, if there is
         more than connection between two cells, the summed weight will be
         given.
+        :param format: the type of format to be returned (only support "list")
+        :param gather: gather the weights from stuff. currently has no meaning
+        in spinnaker when set to false. Therefore is always true
         """
         if not gather:
             exceptions.ConfigurationException(

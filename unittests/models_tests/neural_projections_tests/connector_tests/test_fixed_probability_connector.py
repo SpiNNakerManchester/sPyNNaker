@@ -27,7 +27,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedProbabilityConnector(0.5, weight, delay)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
@@ -39,7 +39,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedProbabilityConnector(0, weight, delay)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
@@ -51,7 +51,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedProbabilityConnector(1, weight, delay)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
@@ -94,7 +94,7 @@ class TestingFixedProbabilityConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedProbabilityConnector(
             1, weight, delay, allow_self_connections=False)
         synaptic_list = connection.generate_synapse_list(
