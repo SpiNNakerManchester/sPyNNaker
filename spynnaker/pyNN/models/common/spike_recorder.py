@@ -62,7 +62,8 @@ class SpikeRecorder(object):
             lo_atom = subvertex_slice.lo_atom
 
             # Read the spikes
-#            n_bytes = int(math.ceil(subvertex_slice.n_atoms / 32.0)) * 4
+            n_bytes = int(math.ceil(subvertex_slice.n_atoms / 32.0)) * 4
+
 #            region_size = recording_utils.get_recording_region_size_in_bytes(
 #                n_machine_time_steps, n_bytes)
 #            spike_data = recording_utils.get_data(
@@ -71,7 +72,6 @@ class SpikeRecorder(object):
             # for buffering output info is taken form the buffer manager
             spike_data = buffer_manager.get_data_for_vertex(
                 x, y, p, region, state_region)
-            n_bytes = len(spike_data)
             numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
                 dtype="uint32").byteswap().view("uint8")
             bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
