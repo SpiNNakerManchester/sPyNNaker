@@ -192,7 +192,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         self._edge_count = 0
 
         # Manager of buffered sending
-        self._send_buffer_manager = None
+        self._buffer_manager = None
 
     def run(self, run_time):
         """
@@ -407,7 +407,7 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 if do_timing:
                     timer.start_timing()
                 # every thing is in sync0. load the initial buffers
-                self._send_buffer_manager.load_initial_buffers()
+                self._buffer_manager.load_initial_buffers()
                 if do_timing:
                     logger.debug("Time to load buffers: {}".format(
                         timer.take_sample()))

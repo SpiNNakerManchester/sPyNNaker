@@ -3,12 +3,17 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.partitionable_graph.\
     receive_buffers_to_host_partitionable_vertex import \
     ReceiveBuffersToHostPartitionableVertex
+
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
+    import AbstractDataSpecableVertex
 from spinn_front_end_common.abstract_models.\
     abstract_outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
     AbstractProvidesOutgoingEdgeConstraints
+from spinn_front_end_common.interface.buffer_management.storage_objects.\
+    end_buffering_state import EndBufferingState
 
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions\
@@ -16,10 +21,7 @@ from spynnaker.pyNN.models.neural_properties.randomDistributions\
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
-
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
-    import AbstractDataSpecableVertex
-
+from spynnaker.pyNN.utilities.conf import config
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -55,6 +57,8 @@ class SpikeSourcePoisson(
                ('SPIKE_HISTORY_REGION', 2),
                ('BUFFERING_OUT_STATE', 3)])
 
+    _N_POPULATION_RECORDING_REGIONS = 1
+
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
     # in terms of CPU (2900 at 10 times slowdown is fine, but not at realtime)
     _model_based_max_atoms_per_core = 500
@@ -72,7 +76,10 @@ class SpikeSourcePoisson(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractSpikeRecordable.__init__(self)
-        ReceiveBuffersToHostPartitionableVertex.__init__(self)
+
+        ip_address = config.get("Buffers", "receive_buffer_host")
+        port = config.getint("Buffers", "receive_buffer_port")
+        ReceiveBuffersToHostPartitionableVertex.__init__(self, ip_address, port)
 
         # Store the parameters
         self._rate = rate
@@ -170,6 +177,13 @@ class SpikeSourcePoisson(
                 region=self._POISSON_SPIKE_SOURCE_REGIONS
                            .SPIKE_HISTORY_REGION.value,
                 size=spike_hist_buff_sz, label='spikeHistBuffer',
+                empty=True)
+            spec.reserve_memory_region(
+                region=self._POISSON_SPIKE_SOURCE_REGIONS
+                           .BUFFERING_OUT_STATE.value,
+                size=EndBufferingState.size_of_region(
+                    self._N_POPULATION_RECORDING_REGIONS),
+                label='bufOutState',
                 empty=True)
 
     def write_setup_info(self, spec, spike_history_region_sz, ip_tags):

@@ -204,11 +204,9 @@ class Population(object):
                 timer = Timer()
                 timer.start_timing()
             spikes = self._vertex.get_spikes(
-                self._spinnaker.transceiver,
-                self._spinnaker.buffer_manager,
-                self._spinnaker.no_machine_time_steps,
                 self._spinnaker.placements,
-                self._spinnaker.graph_mapper)
+                self._spinnaker.graph_mapper,
+                self._spinnaker.buffer_manager)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get spikes: {}".format(
                     timer.take_sample()))

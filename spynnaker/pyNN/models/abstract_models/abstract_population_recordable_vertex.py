@@ -27,7 +27,7 @@ class AbstractPopulationRecordableVertex(
     """
 
     def __init__(self, machine_time_step, label):
-        ReceiveBuffersToHostPartitionableVertex.__init__(self)
+        ReceiveBuffersToHostPartitionableVertex.__init__(self, None, None)
         self._record = False
         self._record_v = False
         self._record_gsyn = False

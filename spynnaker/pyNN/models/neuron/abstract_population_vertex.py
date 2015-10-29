@@ -10,10 +10,14 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
     AbstractProvidesOutgoingEdgeConstraints
+from spinn_front_end_common.interface.buffer_management.\
+    storage_objects.end_buffering_state import \
+    EndBufferingState
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
+from spynnaker.pyNN.utilities.conf import config
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
@@ -72,7 +76,10 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
-        ReceiveBuffersToHostPartitionableVertex.__init__(self)
+
+        ip_address = config.get("Buffers", "receive_buffer_host")
+        port = config.getint("Buffers", "receive_buffer_port")
+        ReceiveBuffersToHostPartitionableVertex.__init__(self, ip_address, port)
 
         self._binary = binary
         self._label = label
@@ -194,6 +201,15 @@ class AbstractPopulationVertex(
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
                 size=gsyn_history_region_sz, label='gsynHistBuffer',
+                empty=True)
+
+        if self._spike_recorder.record or self._v_recorder.record_v or self._gsyn_recorder.record_gsyn:
+            spec.reserve_memory_region(
+                region=constants.
+                    POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
+                size=EndBufferingState.size_of_region(
+                    constants.N_POPULATION_RECORDING_REGIONS),
+                label='bufOutState',
                 empty=True)
 
     def _write_setup_info(self, spec, spike_history_region_sz,

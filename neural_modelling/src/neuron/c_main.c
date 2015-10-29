@@ -199,6 +199,10 @@ void timer_callback(uint timer_count, uint unused) {
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time);
+
+    //trigger buffering_out_mechanism - if needed
+    // log_info("Triggering message buffering output for channel %d", channel);
+    recording_send_buffering_out_trigger_message(0);
 }
 
 //! \The only entry point for this model. it initialises the model, sets up the

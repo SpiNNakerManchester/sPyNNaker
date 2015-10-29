@@ -12,10 +12,11 @@ from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
 
+# spinn front end common imports
+from spinn_front_end_common.interface.buffer_management.storage_objects.\
+    end_buffering_state import EndBufferingState
 from spinn_front_end_common.interface.buffer_management.storage_objects\
     .buffered_sending_region import BufferedSendingRegion
-
-# spinn front end common imports
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -75,6 +76,8 @@ class SpikeSourceArray(
                ('SPIKE_DATA_RECORDED_REGION', 3),
                ('BUFFERING_OUT_STATE', 4)])
 
+    _N_POPULATION_RECORDING_REGIONS = 1
+
     def __init__(
             self, n_neurons, spike_times, machine_time_step, timescale_factor,
             port=None, tag=None, ip_address=None, board_address=None,
@@ -94,7 +97,8 @@ class SpikeSourceArray(
             max_atoms_per_core=self._model_based_max_atoms_per_core,
             constraints=constraints)
         AbstractSpikeRecordable.__init__(self)
-        ReceiveBuffersToHostPartitionableVertex.__init__(self)
+
+        ReceiveBuffersToHostPartitionableVertex.__init__(self, ip_address, port)
 
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
@@ -260,6 +264,12 @@ class SpikeSourceArray(
                 region=(self._SPIKE_SOURCE_REGIONS
                         .SPIKE_DATA_RECORDED_REGION.value),
                 size=recorded_region_size + 4, label="RecordedSpikeDataRegion",
+                empty=True)
+            spec.reserve_memory_region(
+                region=self._SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value,
+                size=EndBufferingState.size_of_region(
+                    self._N_POPULATION_RECORDING_REGIONS),
+                label='bufOutState',
                 empty=True)
 
     def _write_setup_info(self, spec, spike_buffer_region_size, ip_tags,
