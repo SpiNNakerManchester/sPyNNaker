@@ -75,6 +75,9 @@ class EIEIOSpikeRecorder(object):
             progress_bar.update()
 
         progress_bar.end()
-        result = numpy.vstack(results)
-        result = result[numpy.lexsort((result[:, 1], result[:, 0]))]
+        if len(results) != 0:
+            result = numpy.vstack(results)
+            result = result[numpy.lexsort((result[:, 1], result[:, 0]))]
+        else:
+            result = []
         return result

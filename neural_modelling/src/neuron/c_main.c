@@ -36,7 +36,7 @@
 //! the number of channels all standard models contain (spikes, voltage, gsyn)
 //! for recording
 #define N_RECORDING_CHANNELS 3
-
+#define MIN_TIME_BETWEEN_TRIGGERS 50
 
 
 // Globals
@@ -44,6 +44,7 @@
 //! the current timer tick value TODO this might be able to be removed with
 //! the timer tick callback returning the same value.
 uint32_t time;
+uint32_t last_time_buffering_trigger;
 
 //! global parameter which contains the number of timer ticks to run for before
 //! being expected to exit
@@ -202,7 +203,11 @@ void timer_callback(uint timer_count, uint unused) {
 
     //trigger buffering_out_mechanism - if needed
     // log_info("Triggering message buffering output for channel %d", channel);
-    recording_send_buffering_out_trigger_message(0);
+    if (time - last_time_buffering_trigger > MIN_TIME_BETWEEN_TRIGGERS)
+    {
+        recording_send_buffering_out_trigger_message(0);
+        last_time_buffering_trigger = time;
+    }
 }
 
 //! \The only entry point for this model. it initialises the model, sets up the
@@ -219,6 +224,7 @@ void c_main(void) {
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;
+    last_time_buffering_trigger = 0;
 
     // Set timer tick (in microseconds)
     log_info("setting timer tic callback for %d microseconds",

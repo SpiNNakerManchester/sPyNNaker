@@ -24,10 +24,14 @@ OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * 4  # The number of bytes for each spike line
 V_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
 GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 8
 
+SPIKE_BUFFER_SIZE_BUFFERING_OUT = 1 * 1024 * 1024  # assigning 1MB for buffering
+V_BUFFER_SIZE_BUFFERING_OUT = 1 * 1024 * 1024      # assigning 1MB for buffering
+GSYN_BUFFER_SIZE_BUFFERING_OUT = 2 * 1024 * 1024   # assigning 1MB for buffering
+
 INFINITE_SIMULATION = 4294967295
 
 # from synaptic manager
-# Words - 2 for row lenth and number of rows and 1 for plastic region size
+# Words - 2 for row length and number of rows and 1 for plastic region size
 # (which might be 0)
 SYNAPTIC_ROW_HEADER_WORDS = 2 + 1
 

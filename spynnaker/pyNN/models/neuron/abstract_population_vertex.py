@@ -236,13 +236,14 @@ class AbstractPopulationVertex(
 
         tag_id = 0
         if recording_info & 0xFFFF != 0:
-            tag_id = iter(tag_ids).next()
+            ip_tag = iter(tag_ids).next()
+            tag_id = ip_tag.tag
 
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
             spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_value(data=recording_info)
-        spec.write_value(data=tag_id.tag)
+        spec.write_value(data=tag_id)
         spec.write_value(data=spike_history_region_sz)
         spec.write_value(data=neuron_potential_region_sz)
         spec.write_value(data=gsyn_region_sz)

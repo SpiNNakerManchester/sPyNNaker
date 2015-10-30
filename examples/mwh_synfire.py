@@ -40,33 +40,40 @@ for i in range(0, nNeurons):
     loopConnections.append(singleConnection)
 
 injectionConnection = [(0, 0, weight_to_spike, 1)]
-# spikeArray = {'spike_times': [[0]]}
-i = [a*100 for a in xrange(30)]
-spikeArray = {'spike_times': [i for _ in xrange(10)],
-              'max_on_chip_memory_usage_for_spikes_in_bytes': 100}
+spikeArray = {'spike_times': [[0]]}
+spikeArrayNull = {'spike_times': [[]]}
+#i = [a*100 for a in xrange(30)]
+#spikeArray = {'spike_times': [i for _ in xrange(10)],
+#              'max_on_chip_memory_usage_for_spikes_in_bytes': 100}
 
 populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
 
-populations.append(p.Population(10, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
+populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
+populations.append(p.Population(1, p.SpikeSourceArray, spikeArrayNull, label='inputSpikes_2'))
+#populations.append(p.Population(10, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
 #populations[0].set_mapping_constraint({"x": 1, "y": 0})
 
 projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
+projections.append(p.Projection(populations[2], populations[0], p.FromListConnector(injectionConnection)))
 
 populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record()
+populations[2].record()
 
-run_time = 100
+run_time = 10000
 print "Running for {} ms".format(run_time)
 p.run(run_time)
+
+null_spikes = populations[2].getSpikes(compatible_output=True)
 
 v = None
 gsyn = None
 spikes = None
-#print(projections[0].getWeights())
-#print(projections[0].getDelays())
-#print delays
+print(projections[0].getWeights())
+print(projections[0].getDelays())
+print delays
 
 v = populations[0].get_v(compatible_output=True)
 gsyn = populations[0].get_gsyn(compatible_output=True)

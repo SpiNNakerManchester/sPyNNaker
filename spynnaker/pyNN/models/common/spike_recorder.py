@@ -1,6 +1,7 @@
 from pacman.utilities.progress_bar import ProgressBar
 
-from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.utilities import constants
+# from spynnaker.pyNN.models.common import recording_utils
 
 import math
 import numpy
@@ -25,9 +26,13 @@ class SpikeRecorder(object):
         if not self._record:
             return 0
 
-        out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * 4
-        return recording_utils.get_recording_region_size_in_bytes(
-            n_machine_time_steps, out_spike_bytes)
+        # size computed without buffering out technique
+        # out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * 4
+        # return recording_utils.get_recording_region_size_in_bytes(
+        #    n_machine_time_steps, out_spike_bytes)
+
+        # size computed for buffering out technique
+        return constants.SPIKE_BUFFER_SIZE_BUFFERING_OUT
 
     def get_dtcm_usage_in_bytes(self):
         if not self._record:

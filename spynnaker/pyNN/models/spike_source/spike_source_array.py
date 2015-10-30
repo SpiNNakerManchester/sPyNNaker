@@ -459,5 +459,5 @@ class SpikeSourceArray(
         list_of_regions_buffering = list()
         if self.is_recording_spikes():
             list_of_regions_buffering.append(
-                self._SPIKE_SOURCE_REGIONS.SPIKE_HISTORY.value)
+                self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value)
         return list_of_regions_buffering

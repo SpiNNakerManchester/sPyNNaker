@@ -1,6 +1,7 @@
 from pacman.utilities.progress_bar import ProgressBar
 
-from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.utilities import constants
+# from spynnaker.pyNN.models.common import recording_utils
 
 import numpy
 import tempfile
@@ -25,8 +26,12 @@ class GsynRecorder(object):
         if not self._record_gsyn:
             return 0
 
-        return recording_utils.get_recording_region_size_in_bytes(
-            n_machine_time_steps, 8 * n_neurons)
+        # size computed without buffering out technique
+        # return recording_utils.get_recording_region_size_in_bytes(
+        #     n_machine_time_steps, 8 * n_neurons)
+
+        # size computed for buffering out technique
+        return constants.GSYN_BUFFER_SIZE_BUFFERING_OUT
 
     def get_dtcm_usage_in_bytes(self):
         if not self._record_gsyn:
