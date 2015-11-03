@@ -72,12 +72,30 @@ static inline payload_t spike_payload(spike_t s) {
 // The type of a synaptic row
 typedef address_t synaptic_row_t;
 
+
+
 // The type of an input
 typedef REAL input_t;
+
+typedef struct input_struct_t{
+    input_t exc;
+    input_t inh;
+} input_struct_t;
+
+typedef struct timed_input_t {
+    uint32_t time;
+    input_struct_t inputs[256];
+} timed_input_t;
 
 
 
 // The type of a state variable
 typedef REAL state_t;
+
+typedef struct timed_state_t {
+    uint32_t time;
+    state_t states[256];
+} timed_state_t;
+
 
 #endif /* __NEURON_TYPEDEFS_H__ */

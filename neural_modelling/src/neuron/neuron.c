@@ -47,6 +47,14 @@ static uint32_t recording_flags;
 //! The input buffers - from synapses.c
 static input_t *input_buffers;
 
+//! storage for neuron state with timestamp
+static timed_state_t voltages;
+uint32_t voltages_size;
+
+//! storage for neuron input with timestamp
+static timed_input_t inputs;
+uint32_t input_size;
+
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parmeters_in_neuron_parameter_data_region {
@@ -196,6 +204,9 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     recording_flags = recording_flags_param;
 
+    voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
+    input_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
+
     _print_neuron_parameters();
 
     return true;
@@ -213,7 +224,6 @@ void neuron_set_input_buffers(input_t *input_buffers_value) {
 //! \param[in] time the timer tic  value currently being executed
 //! \return nothing
 void neuron_do_timestep_update(timer_t time) {
-    use(time);
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -228,11 +238,7 @@ void neuron_do_timestep_update(timer_t time) {
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
         // If we should be recording potential, record this neuron parameter
-        if (recording_is_channel_enabled(recording_flags,
-                e_recording_channel_neuron_potential)) {
-            recording_record(e_recording_channel_neuron_potential, &voltage,
-                             sizeof(state_t));
-        }
+        voltages.states[neuron_index] = voltage;
 
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
@@ -254,13 +260,8 @@ void neuron_do_timestep_update(timer_t time) {
                 additional_input, voltage);
 
         // If we should be recording input, record the values
-        if (recording_is_channel_enabled(recording_flags,
-                e_recording_channel_neuron_gsyn)) {
-            recording_record(e_recording_channel_neuron_gsyn,
-                             &exc_input_value, sizeof(input_t));
-            recording_record(e_recording_channel_neuron_gsyn,
-                             &inh_input_value, sizeof(input_t));
-        }
+        inputs.inputs[neuron_index].exc = exc_input_value;
+        inputs.inputs[neuron_index].inh = inh_input_value;
 
         // update neuron parameters
         state_t result = neuron_model_state_update(
@@ -297,11 +298,26 @@ void neuron_do_timestep_update(timer_t time) {
         }
     }
 
+    // record neuron state (membrane potential) if needed
+    if (recording_is_channel_enabled(recording_flags,
+            e_recording_channel_neuron_potential)) {
+        voltages.time = time;
+        recording_record(e_recording_channel_neuron_potential, &voltages,
+                         voltages_size);
+    }
+
+    // record neuron inputs if needed
+    if (recording_is_channel_enabled(recording_flags,
+            e_recording_channel_neuron_gsyn)) {
+        inputs.time = time;
+        recording_record(e_recording_channel_neuron_gsyn, &inputs, input_size);
+    }
+
     // do logging stuff if required
     out_spikes_print();
     _print_neurons();
 
     // Record any spikes this timestep
-    out_spikes_record(recording_flags);
+    out_spikes_record(recording_flags, time);
     out_spikes_reset();
 }

@@ -9,9 +9,16 @@
 #include <debug.h>
 
 // Globals
+typedef struct timed_out_spikes{
+    uint32_t time;
+    uint32_t out_spikes[16];
+}timed_out_spikes;
+
+timed_out_spikes spikes;
 bit_field_t out_spikes;
 
 static size_t out_spikes_size;
+
 
 //! \brief clears the memory used as a tracker for the next set of spikes
 //! which will be recorded to SDRAM at some point
@@ -30,13 +37,16 @@ bool out_spikes_initialize(size_t max_spike_sources) {
     out_spikes_size = get_bit_field_size(max_spike_sources);
     log_info("Out spike size is %u words, allowing %u spike sources",
              out_spikes_size, max_spike_sources);
-
+    out_spikes = spikes.out_spikes;
+/*
     out_spikes = (bit_field_t) sark_alloc(
         out_spikes_size * sizeof(uint32_t), 1);
     if (out_spikes == NULL) {
         log_error("Could not allocate out spikes array");
         return false;
     }
+*/
+    clear_bit_field(out_spikes, 16);
     out_spikes_reset();
     return true;
 }
@@ -48,15 +58,16 @@ bool out_spikes_initialize(size_t max_spike_sources) {
 //! \param[in] recording_flags the recording flags which state which region
 //! channels are being used.
 //! \return None
-void out_spikes_record(uint32_t recording_flags) {
+void out_spikes_record(uint32_t recording_flags, uint32_t time) {
 
     // If we should record the spike history, copy out-spikes to the
     // appropriate recording channel
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
+        spikes.time = time;
         recording_record(
-            e_recording_channel_spike_history, out_spikes,
-            out_spikes_size * sizeof(uint32_t));
+            e_recording_channel_spike_history, &spikes,
+            (out_spikes_size + 1) * sizeof(uint32_t));
     }
 }
 

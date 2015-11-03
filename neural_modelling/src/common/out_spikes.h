@@ -61,7 +61,7 @@ bool out_spikes_initialize(size_t max_spike_sources);
 //! \param[in] recording_flags the recording flags which state which region
 //! channels are being used.
 //! \return None
-void out_spikes_record(uint32_t recording_flags);
+void out_spikes_record(uint32_t recording_flags, uint32_t time);
 
 //! \brief helper method which checks if the current spikes flags have any
 //! recorded for use.

@@ -361,7 +361,7 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Record output spikes if required
-    out_spikes_record(recording_flags);
+    out_spikes_record(recording_flags, time);
     out_spikes_reset();
 }
 

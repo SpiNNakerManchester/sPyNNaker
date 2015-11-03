@@ -1,10 +1,8 @@
 from pacman.utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.utilities import constants
-# from spynnaker.pyNN.models.common import recording_utils
 
 import numpy
-import tempfile
 
 
 class VRecorder(object):
@@ -21,8 +19,7 @@ class VRecorder(object):
     def record_v(self, record_v):
         self._record_v = record_v
 
-    def get_sdram_usage_in_bytes(
-            self, n_neurons, n_machine_time_steps):
+    def get_sdram_usage_in_bytes(self, n_neurons, n_machine_time_steps):
         if not self._record_v:
             return 0
 
@@ -52,16 +49,7 @@ class VRecorder(object):
 
         ms_per_tick = self._machine_time_step / 1000.0
 
-        tempfilehandle = tempfile.NamedTemporaryFile()
-        data = numpy.memmap(
-            tempfilehandle.file, shape=(n_machine_time_steps, n_atoms),
-            dtype="float64,float64,float64")
-        data["f0"] = (numpy.arange(
-            n_atoms * n_machine_time_steps) % n_atoms).reshape(
-                (n_machine_time_steps, n_atoms))
-        data["f1"] = numpy.repeat(numpy.arange(
-            0, n_machine_time_steps * ms_per_tick, ms_per_tick),
-            n_atoms).reshape((n_machine_time_steps, n_atoms))
+        data = list()
 
         progress_bar = \
             ProgressBar(len(subvertices),
@@ -76,30 +64,33 @@ class VRecorder(object):
             y = placement.y
             p = placement.p
 
-#            region_size = recording_utils.get_recording_region_size_in_bytes(
-#                n_machine_time_steps, 4 * vertex_slice.n_atoms)
-#            neuron_param_region_data = recording_utils.get_data(
-#                transceiver, placement, region, region_size)
-
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data = buffer_manager.get_data_for_vertex(
-                x, y, p, region, state_region)
+            neuron_param_region_data_pointer = buffer_manager.\
+                get_data_for_vertex(x, y, p, region, state_region)
 
-            numpy_data = (numpy.asarray(
-                neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
-                32767.0).reshape((n_machine_time_steps, vertex_slice.n_atoms))
-            data["f2"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
-                numpy_data
+            record_raw = neuron_param_region_data_pointer.read_all()
+            record_length = len(record_raw)
+            n_rows = record_length / ((vertex_slice.n_atoms + 1) * 4)
+            record = (numpy.asarray(record_raw, dtype="uint8").
+                      view(dtype="<i4")).reshape((n_rows,
+                                                  (vertex_slice.n_atoms + 1)))
+            split_record = numpy.array_split(record, [1, 1], 1)
+            record_time = numpy.repeat(
+                split_record[0] * float(ms_per_tick), vertex_slice.n_atoms, 1)
+            record_ids = numpy.tile(
+                numpy.arange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1),
+                len(record_time)).reshape((-1, vertex_slice.n_atoms))
+            record_membrane_potential = split_record[2] / 32767.0
+
+            part_data = numpy.dstack(
+                [record_ids, record_time, record_membrane_potential])
+            part_data = numpy.reshape(part_data, [-1, 3])
+            data.append(part_data)
             progress_bar.update()
 
         progress_bar.end()
-        data.shape = n_atoms * n_machine_time_steps
 
-        # Sort the data - apparently, using lexsort is faster, but it might
-        # consume more memory, so the option is left open for sort-in-place
-        order = numpy.lexsort((data["f1"], data["f0"]))
-        # data.sort(order=['f0', 'f1'], axis=0)
-
-        result = data.view(dtype="float64").reshape(
-            (n_atoms * n_machine_time_steps, 3))[order]
+        data = numpy.vstack(data)
+        order = numpy.lexsort((data[:, 1], data[:, 0]))
+        result = data[order]
         return result

@@ -59,14 +59,14 @@ projections.append(p.Projection(populations[2], populations[0], p.FromListConnec
 
 populations[0].record_v()
 populations[0].record_gsyn()
-populations[0].record()
-populations[2].record()
+#populations[0].record()
+#populations[2].record()
 
 run_time = 10000
 print "Running for {} ms".format(run_time)
 p.run(run_time)
 
-null_spikes = populations[2].getSpikes(compatible_output=True)
+#null_spikes = populations[2].getSpikes(compatible_output=True)
 
 v = None
 gsyn = None
@@ -77,7 +77,7 @@ print delays
 
 v = populations[0].get_v(compatible_output=True)
 gsyn = populations[0].get_gsyn(compatible_output=True)
-spikes = populations[0].getSpikes(compatible_output=True)
+#spikes = populations[0].getSpikes(compatible_output=True)
 
 if spikes is not None:
    print spikes
