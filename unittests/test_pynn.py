@@ -9,7 +9,7 @@ class TestPyNNSetup(unittest.TestCase):
     def test_initial_setup(self):
         import spynnaker.pyNN as pynn
         self.assertEqual(pynn.setup(timestep=1, min_delay=1, max_delay=15.0),
-                         None)
+                         0)
         self.assertEqual(conf.config.getint("Machine", "machineTimeStep"),
                          1 * 1000)
         self.assertEqual(pynn.get_min_delay(), 1)

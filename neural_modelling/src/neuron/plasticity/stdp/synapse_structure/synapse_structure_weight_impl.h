@@ -14,8 +14,6 @@ typedef weight_state_t update_state_t;
 // Both the weight and the synaptic word
 typedef weight_t final_state_t;
 
-#include "synapse_structure.h"
-
 //---------------------------------------
 // Synapse interface functions
 //---------------------------------------

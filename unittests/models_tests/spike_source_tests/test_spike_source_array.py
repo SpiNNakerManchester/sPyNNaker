@@ -34,8 +34,8 @@ class MyTestCase(unittest.TestCase):
         populations.append(p.Population(1, p.SpikeSourceArray, spike_array,
                            label='inputSpikes_1'))
 
-        projections.append(p.Projection(populations[0], populations[0],
-                           p.OneToOneConnector()))
+        projections.append(p.Projection(populations[1], populations[0],
+                           p.AllToAllConnector()))
 
         populations[1].record()
 
