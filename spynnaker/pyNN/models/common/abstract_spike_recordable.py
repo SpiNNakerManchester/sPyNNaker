@@ -22,6 +22,20 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
+    def get_last_extracted_spike_time(self):
+        """ gets the last time point which the vertex thinks its extracted from
+        the machine
+        :return:
+        """
+
+    @abstractmethod
+    def get_cache_file_for_spike_data(self):
+        """
+        gets the cahce file this vertex uses for storing its spike data
+        :return:
+        """
+
+    @abstractmethod
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
                    graph_mapper):
         """ Get the recorded spikes from the object

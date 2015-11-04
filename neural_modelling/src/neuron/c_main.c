@@ -49,6 +49,11 @@ typedef enum regions_e {
     GSYN_RECORDING_REGION
 } regions_e;
 
+//! values for the priority for each callback
+typedef enum callback_priorities{
+    SDP = 1, TIMER = 2
+}callback_priorities;
+
 // Globals
 
 //! the current timer tick value TODO this might be able to be removed with
@@ -169,43 +174,6 @@ static bool initialise(uint32_t *timer_period) {
     return true;
 }
 
-
-//! \After a successful run of the simulation, certain structures need to be
-//! reinitialized before the simulation can be rerun.
-//! Currently, this only restarts recording and resets the time.
-void reinitialise(void) {
-    log_info("Reinitialise: started");
-
-    // Data specification header did not change, so doesn't need to be read
-    // again
-
-    // Timing details mustn't change, so don't need to be read again
-
-    // Recording has a pre-defined memory region, so we need to reset the
-    // pointers
-    initialise_recording();
-
-    // neuron_initialize mustn't be called again, as it calls malloc and we
-    // would leak memory.
-    // TODO: We should however probably reset neuron models. Currently, there is
-    // no interface for this.
-
-    // Synpase initialize also calls malloc, we just hope that this all works
-    // out. Since it uses ring buffers we should be fine.
-
-    // Population table has not changed (and would leak)
-
-    // Synaptic dynamics are currently static, so don't do anything.
-    // TODO: STDP would probably have to be reset here.
-
-    // Spike processing sets up its ring buffer (which shouldn't be done again)
-    // and sets up callbacks which crash the application if recalled.
-
-    // Reset the simulation time to -1, so the first step is 0
-    time = UINT32_MAX;
-    log_info("Reinitialise: finished");
-}
-
 //! \The callback used when a timer tic interrupt is set off. The result of
 //! this is to transmit any spikes that need to be sent at this timer tic,
 //! update any recording, and update the state machine's states.
@@ -239,35 +207,12 @@ void timer_callback(uint timer_count, uint unused) {
         // amounts of samples recorded to SDRAM
         recording_finalise();
 
-        // Wait for the next run of the simulation
-        spin1_callback_off(TIMER_TICK);
-        event_wait();
-        
-        reinitialise();
-
-        spin1_callback_on(TIMER_TICK, timer_callback, 2);
-
-        return;
+        simulation_handle_pause_resume(timer_callback, TIMER);
+        initialise_recording();
     }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time);
-}
-
-void sdp_message_callback(uint mailbox, uint port) {
-    use(port);
-
-    sdp_msg_t *msg = (sdp_msg_t *) mailbox;
-    uint16_t length = msg->length;
-    use(length);
-
-    if (msg->cmd_rc == CMD_STOP) {
-        spin1_exit(0);
-    } else if (msg->cmd_rc == CMD_RUNTIME) {
-        simulation_ticks = msg->arg1;
-    }
-
-    spin1_msg_free(msg);
 }
 
 //! \The only entry point for this model. it initialises the model, sets up the
@@ -291,10 +236,10 @@ void c_main(void) {
     spin1_set_timer_tick(timer_period);
 
     // Set up the timer tick callback (others are handled elsewhere)
-    spin1_callback_on(TIMER_TICK, timer_callback, 2);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     // Set up callback listening to SDP messages
-    spin1_callback_on(SDP_PACKET_RX, sdp_message_callback, 2);
+    simulation_register_simulation_sdp_callback(&simulation_ticks, SDP);
 
     log_info("Starting");
     simulation_run();

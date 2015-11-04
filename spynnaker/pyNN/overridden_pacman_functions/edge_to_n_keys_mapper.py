@@ -5,6 +5,7 @@ EdgeToNKeysMapper
 # pacman imports
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map import \
     DictBasedPartitionedEdgeNKeysMap
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 # front end common imports
 from spinn_front_end_common.abstract_models.\
@@ -30,6 +31,10 @@ class EdgeToNKeysMapper(object):
         :param graph_mapper:
         :return:
         """
+        progress_bar = ProgressBar(
+            len(partitioned_graph.subedges),
+            "Deducing edge to number of keys map")
+
         n_keys_map = DictBasedPartitionedEdgeNKeysMap()
         for edge in partitioned_graph.subedges:
             vertex_slice = graph_mapper.get_subvertex_slice(
@@ -57,4 +62,7 @@ class EdgeToNKeysMapper(object):
                 edge.add_constraints(
                     super_edge.post_vertex.get_incoming_edge_constraints(
                         edge, graph_mapper))
+            progress_bar.update()
+        progress_bar.end()
+
         return {'n_keys_map': n_keys_map}

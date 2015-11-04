@@ -10,6 +10,9 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
 from pacman.operations import algorithm_reports as pacman_algorithm_reports
 
 # common front end imports
+from spinn_front_end_common.interface.interface_functions.\
+    front_end_common_application_exiter import \
+    FrontEndCommonApplicationExiter
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities.report_states import ReportState
 from spinn_front_end_common.utility_models.command_sender import CommandSender
@@ -80,7 +83,8 @@ class Spinnaker(object):
         self._has_ran = False
         self._reports_states = None
         self._app_id = None
-        self._runtime = None
+        self._current_run_ms = None
+        self._buffer_manager = None
         
         # database objects
         self._database_socket_addresses = set()
@@ -100,10 +104,19 @@ class Spinnaker(object):
         self._edge_count = 0
         self._live_spike_recorder = dict()
 
+        # holder for the exeuctable targets (which we will need for reset and
+        # pause and resume functionality
+        self._executable_targets = None
+
+        # holders for data needed for reset when nothing changes in the
+        # application graph
+        self._processor_to_app_data_base_address_mapper = None
+        self._vertex_to_app_data_file_paths = None
+
         # holder for timing related values
         self._no_machine_time_steps = None
         self._machine_time_step = None
-        self._no_full_runs = 0
+        self._no_sync_changes = 0
 
         # state thats needed the first time around
         if self._app_id is None:
@@ -246,14 +259,23 @@ class Spinnaker(object):
         # calculate number of machine time steps
         self._calculate_number_of_machine_time_steps(run_time)
 
-        self._runtime = run_time
+        self._current_run_ms = run_time
 
-        inputs, changed = self._create_pacman_executor_inputs()
-        required_outputs = self._create_pacman_executor_outputs()
+        # get inputs
+        inputs, application_graph_changed = \
+            self._create_pacman_executor_inputs()
+        # get outputs
+        required_outputs = \
+            self._create_pacman_executor_outputs(
+                requires_reset=False,
+                application_graph_changed=application_graph_changed)
+        # algorithms listing
         algorithms = self._create_algorithm_list(
-            config.get("Mode", "mode") == "Debug", changed)
+            config.get("Mode", "mode") == "Debug", application_graph_changed,
+            requires_reset=False)
+        # xml paths to the algorthims metadata
         xml_paths = self._create_xml_paths()
-
+        # run pacman exeuctor
         pacman_exeuctor = helpful_functions.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,
             config.getboolean("Reports", "outputTimesForSections"))
@@ -279,6 +301,61 @@ class Spinnaker(object):
         self._machine = pacman_exeuctor.get_item("MemoryMachine")
         self._database_interface = pacman_exeuctor.get_item("DatabaseInterface")
         self._has_ran = pacman_exeuctor.get_item("RanToken")
+        self._executable_targets = pacman_exeuctor.get_item("ExecutableTargets")
+        self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
+        self._processor_to_app_data_base_address_mapper = \
+            pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
+        self._vertex_to_app_data_file_paths = \
+            pacman_exeuctor.get_item("VertexToAppDataFilePaths")
+
+    def reset(self):
+        """
+        code that puts the simulation back at time zero
+        :return:
+        """
+        inputs, application_graph_changed = \
+            self._create_pacman_executor_inputs(reset=True)
+        algorithms = self._create_algorithm_list(
+            config.get("Mode", "mode") == "Debug", application_graph_changed,
+            requires_reset=True)
+        xml_paths = self._create_xml_paths()
+        required_outputs = self._create_pacman_executor_outputs(
+            requires_reset=True,
+            application_graph_changed=application_graph_changed)
+
+        # rewind the buffers from the buffer manager, to start at the beginning
+        # of the simulation again
+        self._buffer_manager.rewind()
+
+        # TODO there needs to be some decision on reload here.
+
+        pacman_exeuctor = helpful_functions.do_mapping(
+            inputs, algorithms, required_outputs, xml_paths,
+            config.getboolean("Reports", "outputTimesForSections"))
+
+        if application_graph_changed:
+            # sort out outputs datas
+            self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
+            self._placements = pacman_exeuctor.get_item("MemoryPlacements")
+            self._router_tables = \
+                pacman_exeuctor.get_item("MemoryRoutingTables")
+            self._routing_infos = \
+                pacman_exeuctor.get_item("MemoryRoutingInfos")
+            self._tags = pacman_exeuctor.get_item("MemoryTags")
+            self._graph_mapper = pacman_exeuctor.get_item("MemoryGraphMapper")
+            self._partitioned_graph = \
+                pacman_exeuctor.get_item("MemoryPartitionedGraph")
+            self._machine = pacman_exeuctor.get_item("MemoryMachine")
+            self._database_interface = \
+                pacman_exeuctor.get_item("DatabaseInterface")
+            self._has_ran = pacman_exeuctor.get_item("RanToken")
+            self._executable_targets = \
+                pacman_exeuctor.get_item("ExecutableTargets")
+            self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
+            self._processor_to_app_data_base_address_mapper = \
+                pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
+            self._vertex_to_app_data_file_paths = \
+                pacman_exeuctor.get_item("VertexToAppDataFilePaths")
 
     @staticmethod
     def _create_xml_paths():
@@ -297,14 +374,26 @@ class Spinnaker(object):
             pacman_algorithm_reports.__file__), "reports_metadata.xml"))
         return xml_paths
 
-    def _create_algorithm_list(self, in_debug_mode, changed):
+    def _create_algorithm_list(self, in_debug_mode, application_graph_changed,
+                               requires_reset):
         algorithms = ""
-        if changed:
+        if application_graph_changed:
+            if requires_reset:
+                # kill binaries
+                algorithms += "FrontEndCommonApplicationExiter,"
+
             # if the system has ran before, kill the apps and run mapping
+            # add debug algorithms if needed
+            if in_debug_mode:
+                algorithms += "ValidRoutesChecker,"
+
             if self._has_ran:
-                algorithms += ",FrontEndCommonStopApplications"
+                algorithms += "FrontEndCommonApplicationExiter,"
+                # add function for extracting all the recorded data from
+                # recorded populations
+                algorithms += "sPyNNakerRecordingExtracter,"
                 
-            algorithms += config.get("Mapping", "algorithms") + "," 
+            algorithms += config.get("Mapping", "algorithms") + ","
             algorithms += config.get("Mapping", "interface_algorithms")
 
             # if using virutal machine, add to list of algorithms the virtual
@@ -336,203 +425,263 @@ class Spinnaker(object):
                     ",FrontEndCommonNetworkSpecificationPartitionableReport"
     
             # define mapping between output types and reports
-            if changed:
-                if self._reports_states is not None \
-                        and self._reports_states.tag_allocation_report:
-                    algorithms += ",TagReport"
-                if self._reports_states is not None \
-                        and self._reports_states.routing_info_report:
-                    algorithms += ",routingInfoReports"
-                if self._reports_states is not None \
-                        and self._reports_states.router_report:
-                    algorithms += ",RouterReports"
-                if self._reports_states is not None \
-                        and self._reports_states.partitioner_report:
-                    algorithms += ",PartitionerReport"
-                if (self._reports_states is not None and
-                        self._reports_states.
-                        placer_report_with_partitionable_graph):
-                    algorithms += ",PlacerReportWithPartitionableGraph"
-                if (self._reports_states is not None and
-                        self._reports_states.
-                        placer_report_without_partitionable_graph):
-                    algorithms += ",PlacerReportWithoutPartitionableGraph"
-                # add debug algorithms if needed
-                if in_debug_mode:
-                    algorithms += ",ValidRoutesChecker"
+            if self._reports_states is not None \
+                    and self._reports_states.tag_allocation_report:
+                algorithms += ",TagReport"
+            if self._reports_states is not None \
+                    and self._reports_states.routing_info_report:
+                algorithms += ",routingInfoReports"
+            if self._reports_states is not None \
+                    and self._reports_states.router_report:
+                algorithms += ",RouterReports"
+            if self._reports_states is not None \
+                    and self._reports_states.partitioner_report:
+                algorithms += ",PartitionerReport"
+            if (self._reports_states is not None and
+                    self._reports_states.
+                    placer_report_with_partitionable_graph):
+                algorithms += ",PlacerReportWithPartitionableGraph"
+            if (self._reports_states is not None and
+                    self._reports_states.
+                    placer_report_without_partitionable_graph):
+                algorithms += ",PlacerReportWithoutPartitionableGraph"
         else:
-            # add functions for updating the models
-            algorithms += ",FrontEndCommonNewRuntime"
-            # add functions for setting off the models again
-            algorithms += ",FrontEndCommonApplicationRunner"
-
+            if requires_reset:
+                # kill binaries
+                algorithms += "FrontEndCommonApplicationExiter"
+                # load old application data
+                algorithms += \
+                    ",FrontEndCommonPartitionableGraphApplicationDataLoader"
+                # load binairies back on
+                algorithms += ",FrontEndCommomLoadExecutableImages"
+            else:
+                # add function for extracting all the recorded data from
+                # recorded populations
+                algorithms += "sPyNNakerRecordingExtracter"
+                # add functions for updating the models
+                algorithms += ",FrontEndCommonRuntimeUpdater"
+                # add functions for setting off the models again
+                algorithms += ",FrontEndCommonApplicationRunner"
         return algorithms
 
-    @staticmethod
-    def _create_pacman_executor_outputs():
+    def _create_pacman_executor_outputs(
+            self, requires_reset, application_graph_changed):
         # explicitly define what outputs spynnaker expects
         required_outputs = list()
         if config.getboolean("Machine", "virtual_board"):
-            required_outputs.extend([
-                "MemoryPlacements", "MemoryRoutingTables", "MemoryRoutingInfos",
-                "MemoryTags", "MemoryPartitionedGraph", "MemoryGraphMapper"])
+            if application_graph_changed:
+                required_outputs.extend([
+                    "MemoryPlacements", "MemoryRoutingTables",
+                    "MemoryRoutingInfos", "MemoryTags",
+                    "MemoryPartitionedGraph", "MemoryGraphMapper"])
         else:
-            required_outputs.append("RanToken")
+            if not requires_reset:
+                required_outputs.append("RanToken")
         # if front end wants reload script, add requires reload token
-        if config.getboolean("Reports", "writeReloadSteps"):
+        if (config.getboolean("Reports", "writeReloadSteps")
+                and not self._has_ran):
             required_outputs.append("ReloadToken")
         return required_outputs
 
-    def _create_pacman_executor_inputs(self):
-        # make a folder for the json files to be stored in
-        json_folder = os.path.join(self._report_default_directory, "json_files")
-        if not os.path.exists(json_folder):
-            os.mkdir(json_folder)
+    def _create_pacman_executor_inputs(self, reset=False):
 
-        # file path to store any provenance data to
-        provenance_file_path = os.path.join(self._report_default_directory,
-                                            "provance_data")
-        if not os.path.exists(provenance_file_path):
-            os.mkdir(provenance_file_path)
-
-        # translate config "None" to None
-        width = config.get("Machine", "width")
-        height = config.get("Machine", "height")
-        if width == "None":
-            width = None
-        else:
-            width = int(width)
-        if height == "None":
-            height = None
-        else:
-            height = int(height)
-
-        number_of_boards = config.get("Machine", "number_of_boards")
-        if number_of_boards == "None":
-            number_of_boards = None
-
-        scamp_socket_addresses = config.get("Machine", "scamp_connections_data")
-        if scamp_socket_addresses == "None":
-            scamp_socket_addresses = None
-
-        boot_port_num = config.get("Machine", "boot_connection_port_num")
-        if boot_port_num == "None":
-            boot_port_num = None
-        else:
-            boot_port_num = int(boot_port_num)
-
+        application_graph_changed = self._detect_if_graph_has_changed()
         inputs = list()
-        inputs.append({'type': "MemoryPartitionableGraph",
-                       'value': self._partitionable_graph})
-        inputs.append({'type': 'ReportFolder',
-                       'value': self._report_default_directory})
-        inputs.append({'type': "ApplicationDataFolder",
-                       'value': self._app_data_runtime_folder})
-        inputs.append({'type': 'IPAddress', 'value': self._hostname})
 
-        # basic input stuff
-        inputs.append({'type': "BMPDetails",
-                       'value': config.get("Machine", "bmp_names")})
-        inputs.append({'type': "DownedChipsDetails",
-                       'value': config.get("Machine", "down_chips")})
-        inputs.append({'type': "DownedCoresDetails",
-                       'value': config.get("Machine", "down_cores")})
-        inputs.append({'type': "BoardVersion",
-                       'value': config.getint("Machine", "version")})
-        inputs.append({'type': "NumberOfBoards", 'value': number_of_boards})
-        inputs.append({'type': "MachineWidth", 'value': width})
-        inputs.append({'type': "MachineHeight", 'value': height})
-        inputs.append({'type': "AutoDetectBMPFlag",
-                       'value': config.getboolean("Machine",
-                                                  "auto_detect_bmp")})
-        inputs.append({'type': "EnableReinjectionFlag",
-                       'value': config.getboolean("Machine",
-                                                  "enable_reinjection")})
-        inputs.append({'type': "ScampConnectionData",
-                       'value': scamp_socket_addresses})
-        inputs.append({'type': "BootPortNum", 'value': boot_port_num})
-        inputs.append({'type': "APPID", 'value': self._app_id})
-        inputs.append({'type': "RunTime", 'value': self._runtime})
-        inputs.append({'type': "TimeScaleFactor",
-                       'value': self._time_scale_factor})
-        inputs.append({'type': "MachineTimeStep",
-                       'value': self._machine_time_step})
-        inputs.append({'type': "DatabaseSocketAddresses",
-                       'value': self._database_socket_addresses})
-        inputs.append({'type': "DatabaseWaitOnConfirmationFlag",
-                       'value': config.getboolean("Database",
-                                                  "wait_on_confirmation")})
-        inputs.append({'type': "WriteCheckerFlag",
-                       'value': config.getboolean("Mode", "verify_writes")})
-        inputs.append({'type': "WriteTextSpecsFlag",
-                       'value': config.getboolean("Reports",
-                                                  "writeTextSpecs")})
-        inputs.append({'type': "ExecutableFinder", 'value': executable_finder})
-        inputs.append({'type': "MachineHasWrapAroundsFlag",
-                       'value': config.getboolean("Machine",
-                                                  "requires_wrap_arounds")})
-        inputs.append({'type': "ReportStates", 'value': self._reports_states})
-        inputs.append({'type': "UserCreateDatabaseFlag",
-                       'value': config.get("Database", "create_database")})
-        inputs.append({'type': "ExecuteMapping",
-                       'value':  config.getboolean(
-                           "Database",
-                           "create_routing_info_to_neuron_id_mapping")})
-        inputs.append({'type': "DatabaseSocketAddresses",
-                       'value': self._database_socket_addresses})
-        inputs.append({'type': "SendStartNotifications",
-                       'value': config.getboolean("Database",
-                                                  "send_start_notification")})
-        inputs.append({'type': "ProvenanceFilePath",
-                       'value': provenance_file_path})
+        if application_graph_changed:
+            # make a folder for the json files to be stored in
+            json_folder = os.path.join(
+                self._report_default_directory, "json_files")
+            if not os.path.exists(json_folder):
+                os.mkdir(json_folder)
 
-        # add paths for each file based version
-        inputs.append({'type': "FileCoreAllocationsFilePath",
-                       'value': os.path.join(
-                           json_folder, "core_allocations.json")})
-        inputs.append({'type': "FileSDRAMAllocationsFilePath",
-                       'value': os.path.join(
-                           json_folder, "sdram_allocations.json")})
-        inputs.append({'type': "FileMachineFilePath",
-                       'value': os.path.join(
-                           json_folder, "machine.json")})
-        inputs.append({'type': "FilePartitionedGraphFilePath",
-                       'value':os.path.join(
-                           json_folder, "partitioned_graph.json")})
-        inputs.append({'type': "FilePlacementFilePath",
-                       'value': os.path.join(
-                           json_folder, "placements.json")})
-        inputs.append({'type': "FileRouingPathsFilePath",
-                       'value': os.path.join(
-                           json_folder, "routing_paths.json")})
-        inputs.append({'type': "FileConstraintsFilePath",
-                       'value': os.path.join(
-                           json_folder, "constraints.json")})
-        
-        changed = True
-        if self._has_ran:
-            changed = self._detect_if_graph_has_changed()
-            if changed:
+            # file path to store any provenance data to
+            provenance_file_path = os.path.join(self._report_default_directory,
+                                                "provance_data")
+            if not os.path.exists(provenance_file_path):
+                os.mkdir(provenance_file_path)
+
+            # translate config "None" to None
+            width = config.get("Machine", "width")
+            height = config.get("Machine", "height")
+            if width == "None":
+                width = None
+            else:
+                width = int(width)
+            if height == "None":
+                height = None
+            else:
+                height = int(height)
+
+            number_of_boards = config.get("Machine", "number_of_boards")
+            if number_of_boards == "None":
+                number_of_boards = None
+
+            scamp_socket_addresses = config.get("Machine",
+                                                "scamp_connections_data")
+            if scamp_socket_addresses == "None":
+                scamp_socket_addresses = None
+
+            boot_port_num = config.get("Machine", "boot_connection_port_num")
+            if boot_port_num == "None":
+                boot_port_num = None
+            else:
+                boot_port_num = int(boot_port_num)
+
+            inputs.append({'type': "MemoryPartitionableGraph",
+                           'value': self._partitionable_graph})
+            inputs.append({'type': 'ReportFolder',
+                           'value': self._report_default_directory})
+            inputs.append({'type': "ApplicationDataFolder",
+                           'value': self._app_data_runtime_folder})
+            inputs.append({'type': 'IPAddress', 'value': self._hostname})
+
+            # basic input stuff
+            inputs.append({'type': "BMPDetails",
+                           'value': config.get("Machine", "bmp_names")})
+            inputs.append({'type': "DownedChipsDetails",
+                           'value': config.get("Machine", "down_chips")})
+            inputs.append({'type': "DownedCoresDetails",
+                           'value': config.get("Machine", "down_cores")})
+            inputs.append({'type': "BoardVersion",
+                           'value': config.getint("Machine", "version")})
+            inputs.append({'type': "NumberOfBoards",
+                           'value': number_of_boards})
+            inputs.append({'type': "MachineWidth", 'value': width})
+            inputs.append({'type': "MachineHeight", 'value': height})
+            inputs.append({'type': "AutoDetectBMPFlag",
+                           'value': config.getboolean("Machine",
+                                                      "auto_detect_bmp")})
+            inputs.append({'type': "EnableReinjectionFlag",
+                           'value': config.getboolean("Machine",
+                                                      "enable_reinjection")})
+            inputs.append({'type': "ScampConnectionData",
+                           'value': scamp_socket_addresses})
+            inputs.append({'type': "BootPortNum", 'value': boot_port_num})
+            inputs.append({'type': "APPID", 'value': self._app_id})
+            inputs.append({'type': "RunTime", 'value': self._current_run_ms})
+            inputs.append({'type': "TimeScaleFactor",
+                           'value': self._time_scale_factor})
+            inputs.append({'type': "MachineTimeStep",
+                           'value': self._machine_time_step})
+            inputs.append({'type': "DatabaseSocketAddresses",
+                           'value': self._database_socket_addresses})
+            inputs.append({'type': "DatabaseWaitOnConfirmationFlag",
+                           'value': config.getboolean(
+                               "Database", "wait_on_confirmation")})
+            inputs.append({'type': "WriteCheckerFlag",
+                           'value': config.getboolean(
+                               "Mode", "verify_writes")})
+            inputs.append({'type': "WriteTextSpecsFlag",
+                           'value': config.getboolean(
+                               "Reports", "writeTextSpecs")})
+            inputs.append({'type': "ExecutableFinder",
+                           'value': executable_finder})
+            inputs.append({'type': "MachineHasWrapAroundsFlag",
+                           'value': config.getboolean(
+                               "Machine", "requires_wrap_arounds")})
+            inputs.append({'type': "ReportStates",
+                           'value': self._reports_states})
+            inputs.append({'type': "UserCreateDatabaseFlag",
+                           'value': config.get("Database", "create_database")})
+            inputs.append({'type': "ExecuteMapping",
+                           'value':  config.getboolean(
+                               "Database",
+                               "create_routing_info_to_neuron_id_mapping")})
+            inputs.append({'type': "DatabaseSocketAddresses",
+                           'value': self._database_socket_addresses})
+            inputs.append({'type': "SendStartNotifications",
+                           'value': config.getboolean(
+                               "Database", "send_start_notification")})
+            inputs.append({'type': "ProvenanceFilePath",
+                           'value': provenance_file_path})
+
+            # add paths for each file based version
+            inputs.append({'type': "FileCoreAllocationsFilePath",
+                           'value': os.path.join(
+                               json_folder, "core_allocations.json")})
+            inputs.append({'type': "FileSDRAMAllocationsFilePath",
+                           'value': os.path.join(
+                               json_folder, "sdram_allocations.json")})
+            inputs.append({'type': "FileMachineFilePath",
+                           'value': os.path.join(
+                               json_folder, "machine.json")})
+            inputs.append({'type': "FilePartitionedGraphFilePath",
+                           'value':os.path.join(
+                               json_folder, "partitioned_graph.json")})
+            inputs.append({'type': "FilePlacementFilePath",
+                           'value': os.path.join(
+                               json_folder, "placements.json")})
+            inputs.append({'type': "FileRouingPathsFilePath",
+                           'value': os.path.join(
+                               json_folder, "routing_paths.json")})
+            inputs.append({'type': "FileConstraintsFilePath",
+                           'value': os.path.join(
+                               json_folder, "constraints.json")})
+            inputs.append({'type': "NoSyncChanges",
+                           'value': self._no_sync_changes})
+            if self._has_ran:
                 logger.warn("The graph has changed since the original "
                             "graph was loaded and ran. Therefore "
                             "decisions made during the mapping process will be"
                             " incorrect now, and therefore mapping needs to be"
                             " redone. Sorry. \n\n\n PS. Once issue ")
-                # stop the sync0 code so that new mapped stuff can run
-                self.stop(turn_off_machine=False)
-            else:
-                # mapping does not need to be exuected, therefore add
-                # the results from the mapping process into the inputs
-                inputs.append({})
-                
-        return inputs, changed
 
-    def _calculate_number_of_machine_time_steps(self, run_time):
-        if run_time is not None:
+        else:
+            # mapping does not need to be executed, therefore add
+            # the data elements needed for the application runner and
+            # runtime resetter
+            inputs.append({"type": "BufferManager",
+                           "value": self._buffer_manager})
+            inputs.append({'type': "DatabaseWaitOnConfirmationFlag",
+                           'value': config.getboolean(
+                               "Database", "wait_on_confirmation")})
+            inputs.append({'type': "SendStartNotifications",
+                           'value': config.getboolean(
+                               "Database", "send_start_notification")})
+            inputs.append({'type': "DatabaseInterface",
+                           'value': self._database_interface})
+            inputs.append({'type': "ExecutableTargets",
+                           'value': self._executable_targets})
+            inputs.append({'type': "APPID", 'value': self._app_id})
+            inputs.append({"type": "MemoryTransciever",
+                           'value': self._txrx})
+            inputs.append({"type": "RunTime",
+                           'value': self._current_run_ms})
+            inputs.append({'type': "TimeScaleFactor",
+                           'value': self._time_scale_factor})
+            inputs.append({'type': "LoadedReverseIPTagsToken",
+                           'value': True})
+            inputs.append({'type': "LoadedIPTagsToken", 'value': True})
+            inputs.append({'type': "LoadedRoutingTablesToken",
+                           'value': True})
+            inputs.append({'type': "LoadBinariesToken", 'value': True})
+            inputs.append({'type': "LoadedApplicationDataToken",
+                           'value': True})
+            inputs.append({'type': "NoFullRunCount",
+                           'value': self._no_sync_changes})
+            inputs.append({'type': "MemoryPlacements",
+                           'value': self._placements})
+            inputs.append({'type': "MemoryGraphMapper",
+                           'value': self._graph_mapper})
+            inputs.append({'type': "NoSyncChanges",
+                           'value': self._no_sync_changes})
+        if self._has_ran and not reset:
+            no_machine_time_steps =\
+                int((self._current_run_ms * 1000.0) / self._machine_time_step)
+            inputs.append({'type': "RunTimeMachineTimeSteps",
+                           'value': no_machine_time_steps})
+
+        return inputs, application_graph_changed
+
+    def _calculate_number_of_machine_time_steps(self, next_run_time):
+        if next_run_time is not None:
+            if self._current_run_ms is not None:
+                next_run_time += self._current_run_ms
             self._no_machine_time_steps =\
-                int((run_time * 1000.0) / self._machine_time_step)
+                int((next_run_time * 1000.0) / self._machine_time_step)
             ceiled_machine_time_steps = \
-                math.ceil((run_time * 1000.0) / self._machine_time_step)
+                math.ceil((next_run_time * 1000.0) / self._machine_time_step)
             if self._no_machine_time_steps != ceiled_machine_time_steps:
                 raise common_exceptions.ConfigurationException(
                     "The runtime and machine time step combination result in "
@@ -566,13 +715,24 @@ class Spinnaker(object):
         """
         changed = False
         for population in self._populations:
-            if population.changed:
-                changed = True
-                population.changed = False
+            if population.change_requires_mapping:
+                # ask the vertex if this change requires mapping to be redone
+                if population._vertex.change_requires_mapping:
+                    changed = True
+                    population._vertex.change_requires_mapping = False
+                population.change_requires_mapping = False
         for projection in self._projections:
-            if projection.changed:
-                changed = True
-                projection.changed = False
+            if projection.change_requires_mapping:
+                if (projection._delay_edge is not None
+                        and projection._delay_edge.change_requires_mapping):
+                    changed = True
+                    projection._delay_edge.change_requires_mapping = False
+                if (projection._projection_edge is not None
+                        and projection._projection_edge.
+                            change_requires_mapping):
+                    changed = True
+                    projection._projection_edge.change_requires_mapping = False
+                projection.change_requires_mapping = False
         return changed   
 
     @property
@@ -717,7 +877,7 @@ class Spinnaker(object):
         :return:
         """
         if self._has_ran:
-            return float(self._runtime)
+            return float(self._current_run_ms)
         return 0.0
 
     def __repr__(self):
@@ -865,11 +1025,12 @@ class Spinnaker(object):
                                                      router_table.y).virtual:
                         self._txrx.clear_multicast_routes(router_table.x,
                                                           router_table.y)
-            # execute app stop
-            self._tell_cores_to_exit()
+            # stop the binaries that are in some state
+            exiter = FrontEndCommonApplicationExiter()
+            exiter(self._app_id, self._txrx, self._executable_targets)
 
             # clear values
-            self._no_full_runs = 0
+            self._no_sync_changes = 0
 
             # app stop command (currently fucked)
             #self._txrx.stop_application(self._app_id)

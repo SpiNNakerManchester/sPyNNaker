@@ -22,7 +22,6 @@ from pyNN.space import Space
 
 import numpy
 import logging
-import tempfile
 import copy
 
 logger = logging.getLogger(__name__)
@@ -99,33 +98,26 @@ class Population(object):
         self._record_v_file = None
         self._record_gsyn_file = None
 
-        self._spikes_cache_file = None
-        self._v_cache_file = None
-        self._gsyn_cache_file = None
-        self._last_spike_read = None
-        self._last_v_read = None
-        self._last_gsyn_read = None
-
         # parameter
-        self._changed = True
+        self._change_requires_mapping = True
 
     @property
-    def changed(self):
+    def change_requires_mapping(self):
         """
         returns bool which returns if the population spec has changed since
         changed was last changed.
         :return: boolean
         """
-        return self._changed
+        return self._change_requires_mapping
 
-    @changed.setter
-    def changed(self, new_value):
+    @change_requires_mapping.setter
+    def change_requires_mapping(self, new_value):
         """
         setter for the changed
         :param new_value: the new vlaue of the changed
         :return: None
         """
-        self._changed = new_value
+        self._change_requires_mapping = new_value
 
     def __add__(self, other):
         """
@@ -209,8 +201,7 @@ class Population(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getSpikes(self, compatible_output=False, gather=True,
-            only_last_run=False, runtime_offset=0):
+    def getSpikes(self, compatible_output=False, gather=True):
         """
         Return a 2-column numpy array containing cell ids and spike times for
         recorded cells. This is read directly from the memory for the board.
@@ -220,66 +211,50 @@ class Population(object):
         :param compatible_output:
             not used - inserted to match PyNN specs
         :type compatible_output: bool
-        :param only_last_run:
-            only return spikes collected since the most recent start of the 
-            simulation
-        :type only_last_run: bool
-        :param runtime_offset:
-            time offset to be applied to the timestamps, this should be set to
-            the start time of the most recent run of the simulation
         """
-        if self._last_spike_read < self._spinnaker._no_full_runs:
-            if not gather:
-                logger.warn("Spynnaker only supports gather = true, will "
-                            " execute as if gather was true anyhow")
-            timer = None
+        if not gather:
+            logger.warn("Spynnaker only supports gather = true, will "
+                        " execute as if gather was true anyhow")
 
+        if isinstance(self._vertex, AbstractSpikeRecordable):
             if not self._vertex.is_recording_spikes():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record spikes. "
                     "Therefore spikes cannot be retrieved. Please set this "
                     "vertex to record spikes before running this command.")
+        else:
+            raise exceptions.ConfigurationException(
+                "This poplation has not got the capability to record spikes. "
+                "Therefore spikes cannot be retrieved or asked to be recorded. "
+                "Please readjust your PyNN script and try again.")
 
-            if not self._spinnaker.has_ran:
-                raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet run, therefore spikes cannot"
-                    " be retrieved. Please execute the simulation before"
-                    " running this command")
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer = Timer()
-                timer.start_timing()
+        if not self._spinnaker.has_ran:
+            raise local_exceptions.SpynnakerException(
+                "The simulation has not yet run, therefore spikes cannot"
+                " be retrieved. Please execute the simulation before"
+                " running this command")
+
+        # check that the vertex has read up to the position it needs to
+        runtime_time_steps = self._spinnaker.no_machine_time_steps
+        if runtime_time_steps == self._vertex.get_last_extracted_spike_time:
+            return numpy.load(self._vertex.get_cache_file_for_spike_data())
+        else:
             spikes = self._vertex.get_spikes(
                 self._spinnaker.transceiver,
                 self._spinnaker.no_machine_time_steps,
-                self._spinnaker.placements,
-                self._spinnaker.graph_mapper)
+                self._spinnaker.placements, self._spinnaker.graph_mapper)
 
-            for spike in spikes:
-                spike[1] += runtime_offset
-
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                logger.info("Time to get spikes: {}".format(
-                    timer.take_sample()))
-            if self._spikes_cache_file is None:
-                self._spikes_cache_file = \
-                    tempfile.NamedTemporaryFile(mode='a+b')
-            numpy.save(self._spikes_cache_file, spikes)
-            self._last_spike_read = self._spinnaker._no_full_runs
-            if only_last_run:
-                return spikes
+            numpy.save(self._vertex.get_cache_file_for_spike_data(), spikes)
 
         # Load from the file
-        self._spikes_cache_file.seek(0)
-        lists = []
-        for i in range(self._spinnaker._no_full_runs):
-            lists.append(numpy.load(self._spikes_cache_file))
-        return numpy.concatenate(lists)
+        self._vertex.get_cache_file_for_spike_data().seek(0)
+        return numpy.load(self._vertex.get_cache_file_for_spike_data())
 
-    def get_spike_counts(self, gather=True, only_last_run=False):
+    def get_spike_counts(self, gather=True):
         """
         Returns the number of spikes for each neuron.
         """
-        spikes = self.getSpikes(True, gather, only_last_run)
+        spikes = self.getSpikes(True, gather)
         n_spikes = {}
         counts = numpy.bincount(spikes[:, 0].astype(dtype="uint32"),
                                 minlength=self._vertex.n_atoms)
@@ -288,8 +263,7 @@ class Population(object):
         return n_spikes
 
     # noinspection PyUnusedLocal
-    def get_gsyn(self, gather=True, compatible_output=False,
-            only_last_run=False, runtime_offset=0):
+    def get_gsyn(self, gather=True, compatible_output=False):
         """
         Return a 3-column numpy array containing cell ids, time and synaptic
         conductances for recorded cells.
@@ -299,59 +273,44 @@ class Population(object):
         :param compatible_output:
             not used - inserted to match PyNN specs
         :type compatible_output: bool
-        :param only_last_run:
-            only return gsyn collected since the most recent start of the 
-            simulation
-        :type only_last_run: bool
-        :param runtime_offset:
-            time offset to be applied to the timestamps, this should be set to
-            the start time of the most recent run of the simulation
         """
 
-        if self._last_gsyn_read < self._spinnaker._no_full_runs:
+        if isinstance(self._vertex, AbstractGSynRecordable):
             if not self._vertex.is_recording_gsyn():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record gsyn. "
                     "Therefore gsyn cannot be retrieved. Please set this "
                     "vertex to record gsyn before running this command.")
+        else:
+            raise exceptions.ConfigurationException(
+                "This poplation has not got the capability to record gsyn. "
+                "Therefore gsyn cannot be retrieved or asked to be recorded. "
+                "Please readjust your PyNN script and try again.")
 
-            if not self._spinnaker.has_ran:
-                raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet run, therefore gsyn cannot"
-                    " be retrieved. Please execute the simulation before"
-                    " running this command")
-            timer = None
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer = Timer()
-                timer.start_timing()
+        if not self._spinnaker.has_ran:
+            raise local_exceptions.SpynnakerException(
+                "The simulation has not yet run, therefore gsyn cannot"
+                " be retrieved. Please execute the simulation before"
+                " running this command")
+
+        # check that the vertex has read up to the position it needs to
+        runtime_time_steps = self._spinnaker.no_machine_time_steps
+        if runtime_time_steps == self._vertex.get_last_extracted_gsyn_time:
+            return numpy.load(self._vertex.get_cache_file_for_gsyn_data())
+        else:
             gsyn = self._vertex.get_gsyn(
                 self._spinnaker.transceiver,
                 self._spinnaker.no_machine_time_steps,
-                self._spinnaker.placements,
-                self._spinnaker.graph_mapper)
-            for gsy in gsyn:
-                gsy[1] += runtime_offset
-                
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                logger.info("Time to get gsyn: {}".format(timer.take_sample()))
+                self._spinnaker.placements, self._spinnaker.graph_mapper)
 
-            if self._gsyn_cache_file is None:
-                self._gsyn_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
-            numpy.save(self._gsyn_cache_file, gsyn)
-            self._last_gsyn_read = self._spinnaker._no_full_runs
-            if only_last_run:
-                return gsyn
+            numpy.save(self._vertex.get_cache_file_for_gsyn_data(), gsyn)
 
         # Load from the file
-        self._gsyn_cache_file.seek(0)
-        lists = []
-        for i in range(self._spinnaker._no_full_runs):
-            lists.append(numpy.load(self._gsyn_cache_file))
-        return numpy.concatenate(lists)
+        self._vertex.get_cache_file_for_gsyn_data().seek(0)
+        return numpy.load(self._vertex.get_cache_file_for_gsyn_data())
 
     # noinspection PyUnusedLocal
-    def get_v(self, gather=True, compatible_output=False, only_last_run=False,
-        runtime_offset=0):
+    def get_v(self, gather=True, compatible_output=False):
         """
         Return a 3-column numpy array containing cell ids, time, and Vm for
         recorded cells.
@@ -362,55 +321,40 @@ class Population(object):
         :param compatible_output:
             not used - inserted to match PyNN specs
         :type compatible_output: bool
-        :param only_last_run:
-            only return voltages collected since the most recent start of the 
-            simulation
-        :type only_last_run: bool
-        :param runtime_offset:
-            time offset to be applied to the voltages, this should be set to
-            the start time of the most recent run of the simulation
         """
-        if self._last_v_read < self._spinnaker._no_full_runs:
+        if isinstance(self._vertex, AbstractVRecordable):
             if not self._vertex.is_recording_v():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record v. "
                     "Therefore v cannot be retrieved. Please set this "
                     "vertex to record v before running this command.")
+        else:
+            raise exceptions.ConfigurationException(
+                "This poplation has not got the capability to record v. "
+                "Therefore v cannot be retrieved or asked to be recorded. "
+                "Please readjust your PyNN script and try again.")
 
-            if not self._spinnaker.has_ran:
-                raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet run, therefore v cannot"
-                    " be retrieved. Please execute the simulation before"
-                    " running this command")
+        if not self._spinnaker.has_ran:
+            raise local_exceptions.SpynnakerException(
+                "The simulation has not yet run, therefore v cannot"
+                " be retrieved. Please execute the simulation before"
+                " running this command")
 
-            timer = None
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer = Timer()
-                timer.start_timing()
+        # check that the vertex has read up to the position it needs to
+        runtime_time_steps = self._spinnaker.no_machine_time_steps
+        if runtime_time_steps == self._vertex.get_last_extracted_v_time:
+            return numpy.load(self._vertex.get_cache_file_for_v_data())
+        else:
             v = self._vertex.get_v(
                 self._spinnaker.transceiver,
                 self._spinnaker.no_machine_time_steps,
-                self._spinnaker.placements,
-                self._spinnaker.graph_mapper)
-            for vi in v:
-                vi[1] += runtime_offset
+                self._spinnaker.placements, self._spinnaker.graph_mapper)
 
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                logger.info("Time to read v: {}".format(timer.take_sample()))
-
-            if self._v_cache_file is None:
-                self._v_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
-            numpy.save(self._v_cache_file, v)
-            self._last_v_read = self._spinnaker._no_full_runs
-            if only_last_run:
-                return v
+            numpy.save(self._vertex.get_cache_file_for_v_data(), v)
 
         # Load from the file
-        self._v_cache_file.seek(0)
-        lists = []
-        for i in range(self._spinnaker._no_full_runs):
-            lists.append(numpy.load(self._v_cache_file))
-        return numpy.concatenate(lists)
+        self._vertex.get_cache_file_for_v_data().seek(0)
+        return numpy.load(self._vertex.get_cache_file_for_v_data())
 
     def id_to_index(self, cell_id):
         """
@@ -437,12 +381,14 @@ class Population(object):
         """
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
             value, self._vertex.n_atoms))
-        self._changed = True
+        self._change_requires_mapping = True
 
-    def is_local(self, cell_id):
+    @staticmethod
+    def is_local(cell_id):
         """
         Determine whether the cell with the given ID exists on the local
         MPI node.
+        :param cell_id:
         """
 
         # Doesn't really mean anything on SpiNNaker
@@ -479,6 +425,10 @@ class Population(object):
 
     @property
     def label(self):
+        """
+        label of the population
+        :return:
+        """
         return self._vertex.label
 
     @property
@@ -544,7 +494,7 @@ class Population(object):
 
         """
         self.initialize('v', distribution)
-        self._changed = True
+        self._change_requires_mapping = True
 
     def record(self, to_file=None):
         """
@@ -565,7 +515,7 @@ class Population(object):
         self._record_spike_file = to_file
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     def record_gsyn(self, to_file=None):
         """
@@ -586,7 +536,7 @@ class Population(object):
         self._record_gsyn_file = to_file
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     def record_v(self, to_file=None):
         """
@@ -603,7 +553,7 @@ class Population(object):
         self._record_v_file = to_file
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     @property
     def positions(self):
@@ -702,8 +652,7 @@ class Population(object):
         self.set(parametername, rand_distr)
 
         # state that something has changed in the population,
-        self._changed = True
-
+        self._change_requires_mapping = True
 
     def sample(self, n, rng=None):
         """
@@ -750,7 +699,7 @@ class Population(object):
         self._positions[cell_id] = pos
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     def _set_positions(self, positions):
         """
@@ -764,7 +713,7 @@ class Population(object):
             self._positions = positions
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     def set(self, parameter, value=None):
         """
@@ -796,7 +745,7 @@ class Population(object):
             self._vertex.set_value(key, value)
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     @property
     def structure(self):
@@ -819,7 +768,7 @@ class Population(object):
                 "try again")
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     # NONE PYNN API CALL
     def add_placement_constraint(self, x, y, p=None):
@@ -835,7 +784,7 @@ class Population(object):
         self._vertex.add_constraint(PlacerChipAndCoreConstraint(x, y, p))
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     # NONE PYNN API CALL
     def set_mapping_constraint(self, constraint_dict):
@@ -848,7 +797,7 @@ class Population(object):
         self.add_placement_constraint(**constraint_dict)
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     # NONE PYNN API CALL
     def set_model_based_max_atoms_per_core(self, new_value):
@@ -865,7 +814,7 @@ class Population(object):
                 "variable being adjusted by the end user. Sorry")
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     @property
     def size(self):
@@ -891,7 +840,7 @@ class Population(object):
         self.set(parametername, value_array)
 
         # state that something has changed in the population,
-        self._changed = True
+        self._change_requires_mapping = True
 
     def _end(self):
         """ Do final steps at the end of the simulation

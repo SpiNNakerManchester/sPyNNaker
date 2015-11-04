@@ -3,7 +3,8 @@ SpikeSourceArray
 """
 
 # spynnaker imports
-from spinn_front_end_common.utility_models.outgoing_edge_same_contiguous_keys_restrictor import \
+from spinn_front_end_common.utility_models.\
+    outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
@@ -43,6 +44,7 @@ from enum import Enum
 import logging
 import sys
 import math
+import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -122,34 +124,102 @@ class SpikeSourceArray(
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
 
-        #handle outgoing constraints
+        # handle outgoing constraints
         self._outgoing_edge_key_restrictor = \
             OutgoingEdgeSameContiguousKeysRestrictor()
 
+        # bool for if state has changed.
+        self._change_requires_mapping = True
+
+        # counter of how many machien time steps the vertex has extracted
+        self._extracted_machine_time_steps = 0
+        self._spikes_cache_file = None
+
+    @property
+    def change_requires_mapping(self):
+        """
+        property for checking if someting has changed
+        :return:
+        """
+        return self._change_requires_mapping
+
+    @change_requires_mapping.setter
+    def change_requires_mapping(self, new_value):
+        """
+        setter for the changed property
+        :param new_value: the new state to change it to
+        :return:
+        """
+        self._change_requires_mapping = new_value
+
     @property
     def spike_times(self):
+        """
+        property for the spike times of the spike soruce array
+        :return:
+        """
         return self._spike_times
 
     @spike_times.setter
     def spike_times(self, spike_times):
+        """
+        setter for the spike soruce array's spike times. Not a extend, but an
+         actual change
+        :param spike_times:
+        :return:
+        """
         self._spike_times = spike_times
         if len(self._partitioned_vertices) != 0:
             self._send_buffers.clear()
             for (vertex_slice, vertex) in self._partitioned_vertices:
                 send_buffer = dict()
-                send_buffer[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
+                send_buffer[
+                    self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
                     self._get_spike_send_buffer(vertex_slice)
                 vertex.send_buffers = send_buffer
 
-
     def is_recording_spikes(self):
+        """
+        helper method fro chekcing if spikes are being stored
+        :return:
+        """
         return self._spike_recorder.record
 
     def set_recording_spikes(self):
+        """
+        sets the recoridng flags
+        :return:
+        """
         self._spike_recorder.record = True
+
+    def get_last_extracted_spike_time(self):
+        """
+        returns the total number of machine time stepst aht this vertex thinks
+        it has extracted from the
+        :return:
+        """
+        return self._extracted_machine_time_steps
+
+    def get_cache_file_for_spike_data(self):
+        """
+        gets the cahce file this vertex uses for storing its spike data
+        :return: the cache file for spikes
+        """
+        if self._spikes_cache_file is None:
+            self._spikes_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
+        return self._spikes_cache_file
 
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
                    graph_mapper):
+        """
+        gets spikes from the spike source array
+        :param transceiver:
+        :param n_machine_time_steps:
+        :param placements:
+        :param graph_mapper:
+        :return:
+        """
+        self._extracted_machine_time_steps += n_machine_time_steps
         return self._spike_recorder.get_spikes(
             self.label, transceiver,
             self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value,
@@ -188,7 +258,7 @@ class SpikeSourceArray(
         send_buffer[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
             self._get_spike_send_buffer(vertex_slice)
         # create and return the partitioned vertex
-        partitioned_vertex =  SpikeSourceArrayPartitionedVertex(
+        partitioned_vertex = SpikeSourceArrayPartitionedVertex(
             send_buffer, resources_required, label, constraints)
         self._partitioned_vertices.append((vertex_slice, partitioned_vertex))
         return partitioned_vertex
@@ -430,7 +500,6 @@ class SpikeSourceArray(
         return self._outgoing_edge_key_restrictor.\
             get_outgoing_edge_constraints()
 
-
     def is_data_specable(self):
         """
         helper method for isinstance
@@ -453,6 +522,8 @@ class SpikeSourceArray(
         """
         if hasattr(self, key):
             setattr(self, key, value)
+            if key != "spike_times":
+                self._change_requires_mapping = True
             return
         raise Exception("Type {} does not have parameter {}".format(
             self._model_name, key))

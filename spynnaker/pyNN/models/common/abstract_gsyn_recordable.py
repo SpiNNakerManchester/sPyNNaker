@@ -22,6 +22,20 @@ class AbstractGSynRecordable(object):
         """
 
     @abstractmethod
+    def get_last_extracted_gsyn_time(self):
+        """ gets the last time point which the vertex thinks its extracted from
+        the machine
+        :return:
+        """
+
+    @abstractmethod
+    def get_cache_file_for_gsyn_data(self):
+        """
+        gets the cahce file this vertex uses for storing its gsyn data
+        :return:
+        """
+
+    @abstractmethod
     def get_gsyn(self, transceiver, n_machine_time_steps, placements,
                  graph_mapper):
         """ Get the recorded gsyn from the object

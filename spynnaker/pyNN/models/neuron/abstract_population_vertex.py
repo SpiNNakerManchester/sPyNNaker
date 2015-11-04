@@ -3,7 +3,8 @@ from six import add_metaclass
 import logging
 import os
 
-from spinn_front_end_common.utility_models.outgoing_edge_same_contiguous_keys_restrictor import \
+from spinn_front_end_common.utility_models.\
+    outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_edge_constraints import \
@@ -29,6 +30,8 @@ from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
+
+import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +94,35 @@ class AbstractPopulationVertex(
         # set up continious restrictor
         self._outgoing_edge_key_restrictor = \
             OutgoingEdgeSameContiguousKeysRestrictor()
+
+        # set up cache files for recording of parameters
+        self._spikes_cache_file = None
+        self._vs_cache_file = None
+        self._gsyns_cache_file = None
+        # position params for knowing how much data has been extracted
+        self._extracted_spike_machine_time_steps = 0
+        self._extracted_v_machine_time_steps = 0
+        self._extracted_gsyn_machine_time_steps = 0
+
+        # bool for if state has changed.
+        self._change_requires_mapping = True
+
+    @property
+    def change_requires_mapping(self):
+        """
+        property for checking if someting has changed
+        :return:
+        """
+        return self._change_requires_mapping
+
+    @change_requires_mapping.setter
+    def change_requires_mapping(self, new_value):
+        """
+        setter for the changed property
+        :param new_value: the new state to change it to
+        :return:
+        """
+        self._change_requires_mapping = new_value
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -346,10 +378,21 @@ class AbstractPopulationVertex(
     # @implements AbstractSpikeRecordable.get_spikes
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
                    graph_mapper):
+        self._extracted_spike_machine_time_steps += n_machine_time_steps
         return self._spike_recorder.get_spikes(
             self._label, transceiver,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
             n_machine_time_steps, placements, graph_mapper, self)
+
+    # @implements AbstractSpikeRecordable.get_cache_file_for_spike_data
+    def get_cache_file_for_spike_data(self):
+        if self._spikes_cache_file is None:
+            self._spikes_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
+        return self._spikes_cache_file
+
+    # @implements AbstractSpikeRecordable.get_last_extracted_spike_time
+    def get_last_extracted_spike_time(self):
+        return self._extracted_spike_machine_time_steps
 
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
@@ -359,9 +402,20 @@ class AbstractPopulationVertex(
     def set_recording_v(self):
         self._v_recorder.record_v = True
 
+    # @implements AbstractVRecordable.get_cache_file_for_v_data
+    def get_cache_file_for_v_data(self):
+        if self._vs_cache_file is None:
+            self._vs_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
+        return self._vs_cache_file
+
+    # @implements AbstractVRecordable.get_last_extracted_v_time
+    def get_last_extracted_v_time(self):
+        return self._extracted_v_machine_time_steps
+
     # @implements AbstractVRecordable.get_v
     def get_v(self, transceiver, n_machine_time_steps, placements,
               graph_mapper):
+        self._extracted_v_machine_time_steps += n_machine_time_steps
         return self._v_recorder.get_v(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
@@ -375,9 +429,20 @@ class AbstractPopulationVertex(
     def set_recording_gsyn(self):
         self._gsyn_recorder.record_gsyn = True
 
+    # @implements AbstractGSynRecordable.get_cache_file_for_gsyn_data
+    def get_cache_file_for_gsyn_data(self):
+        if self._gsyns_cache_file is None:
+            self._gsyns_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
+        return self._gsyns_cache_file
+
+    # @implements AbstractGSynRecordable.get_last_extracted_gsyn_time
+    def get_last_extracted_gsyn_time(self):
+        return self._extracted_gsyn_machine_time_steps
+
     # @implements AbstractGSynRecordable.get_gsyn
     def get_gsyn(self, transceiver, n_machine_time_steps, placements,
                  graph_mapper):
+        self._extracted_gsyn_machine_time_steps += n_machine_time_steps
         return self._gsyn_recorder.get_gsyn(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,

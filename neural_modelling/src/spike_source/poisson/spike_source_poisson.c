@@ -43,6 +43,11 @@ typedef enum region{
     system, poisson_params, spike_history,
 }region;
 
+//! values for the priority for each callback
+typedef enum callback_priorities{
+    SDP = 1, TIMER = 2
+}callback_priorities;
+
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
 typedef enum poisson_region_parameters{
@@ -183,7 +188,10 @@ bool read_poisson_parameters(address_t address) {
     return true;
 }
 
-bool initialize_recording(address_t address, address_t system_region) {
+bool initialize_recording() {
+
+    address_t address = data_specification_get_data_address();
+    address_t system_region = data_specification_get_region(system, address);
     // Get the recording information
     uint32_t spike_history_region_size;
     recording_read_region_sizes(
@@ -226,7 +234,7 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    if (!initialize_recording(address, system_region)) {
+    if (!initialize_recording()) {
         return false;
     }
 
@@ -265,18 +273,10 @@ void timer_callback(uint timer_count, uint unused) {
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
-        // Wait for the next run of the simulation
-        spin1_callback_off(TIMER_TICK);
-        event_wait();
-
-        // Prepare for the next run
-        time = UINT32_MAX;
-        
-        address_t address = data_specification_get_data_address();
-        address_t system_region = data_specification_get_region(
-        system, address);
-        initialize_recording(address, system_region);
-        spin1_callback_on(TIMER_TICK, timer_callback, 2);
+        // go into pause and resume state
+        simulation_handle_pause_resume(timer_callback, TIMER);
+        // handle resetting the recording state
+        initialize_recording();
         return;
     }
 
@@ -364,22 +364,6 @@ void timer_callback(uint timer_count, uint unused) {
     out_spikes_reset();
 }
 
-void sdp_message_callback(uint mailbox, uint port) {
-    use(port);
-
-    sdp_msg_t *msg = (sdp_msg_t *) mailbox;
-    uint16_t length = msg->length;
-    use(length);
-
-    if (msg->cmd_rc == CMD_STOP) {
-        spin1_exit(0);
-    } else if (msg->cmd_rc == CMD_RUNTIME) {
-        simulation_ticks = msg->arg1;
-    }
-
-    spin1_msg_free(msg);
-}
-
 //! \The only entry point for this model. it initialises the model, sets up the
 //! Interrupts for the Timer tick and calls the spin1api for running.
 void c_main(void) {
@@ -403,10 +387,10 @@ void c_main(void) {
     spin1_set_timer_tick(timer_period);
 
     // Register callback
-    spin1_callback_on(TIMER_TICK, timer_callback, 2);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     // Set up callback listening to SDP messages
-    spin1_callback_on(SDP_PACKET_RX, sdp_message_callback, 2);
+    spin1_callback_on(PAUSE_RESUME, simulation_sdp_packet_callback, SDP);
 
     log_info("Starting");
     simulation_run();

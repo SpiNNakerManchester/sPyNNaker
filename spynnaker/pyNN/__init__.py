@@ -171,9 +171,9 @@ def rank():
 
 def reset():
     """Reset the time to zero, and start the clock.
-    TO BE IMPLEMENTED
     """
-    pass
+    global _spinnaker
+    _spinnaker.reset()
 
 
 def run(run_time=None):

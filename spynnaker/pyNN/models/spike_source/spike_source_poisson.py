@@ -1,11 +1,7 @@
-from enum import Enum
-import math
-import numpy
-import logging
-
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spinn_front_end_common.utility_models.outgoing_edge_same_contiguous_keys_restrictor import \
+from spinn_front_end_common.utility_models.\
+    outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
@@ -21,6 +17,12 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 from data_specification.enums.data_type import DataType
+
+from enum import Enum
+import math
+import numpy
+import logging
+import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +75,13 @@ class SpikeSourcePoisson(
 
         self._outgoing_edge_key_restrictor = \
             OutgoingEdgeSameContiguousKeysRestrictor()
+
+        # counter of how many machien time steps the vertex has extracted
+        self._extracted_machine_time_steps = 0
+        self._spikes_cache_file = None
+
+        # bool for if state has changed.
+        self._change_requires_mapping = True
 
     @property
     def rate(self):
@@ -411,6 +420,7 @@ class SpikeSourcePoisson(
 
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
                    graph_mapper):
+        self._extracted_machine_time_steps += n_machine_time_steps
         return self._spike_recorder.get_spikes(
             self._label, transceiver,
             self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
@@ -432,6 +442,40 @@ class SpikeSourcePoisson(
         :return:
         """
         return True
+
+    @property
+    def change_requires_mapping(self):
+        """
+        property for checking if someting has changed
+        :return:
+        """
+        return self._change_requires_mapping
+
+    @change_requires_mapping.setter
+    def change_requires_mapping(self, new_value):
+        """
+        setter for the changed property
+        :param new_value: the new state to change it to
+        :return:
+        """
+        self._change_requires_mapping = new_value
+
+    def get_last_extracted_spike_time(self):
+        """
+        returns the total number of machine time stepst aht this vertex thinks
+        it has extracted from the
+        :return:
+        """
+        return self._extracted_machine_time_steps
+
+    def get_cache_file_for_spike_data(self):
+        """
+        gets the cahce file this vertex uses for storing its spike data
+        :return: the cache file for spikes
+        """
+        if self._spikes_cache_file is None:
+            self._spikes_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
+        return self._spikes_cache_file
 
     def get_value(self, key):
         """ Get a property of the overall model

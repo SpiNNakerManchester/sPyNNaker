@@ -12,6 +12,11 @@
 // Constants
 #define DELAY_STAGE_LENGTH  16
 
+//! values for the priority for each callback
+typedef enum callback_priorities{
+    MC_PACKET = -1, USER_AND_SDP = 1, TIMER = 2
+}callback_priorities;
+
 // Globals
 static uint32_t key = 0;
 static uint32_t num_neurons = 0;
@@ -205,16 +210,8 @@ void timer_callback(uint unused0, uint unused1) {
     if (infinite_run != TRUE && time >= simulation_ticks) {
         log_info("Simulation complete.\n");
 
-        // Wait for the next run of the simulation
-        spin1_callback_off(TIMER_TICK);
-        event_wait();
-
-        // Prepare for the next run
-        time = UINT32_MAX;
-        
-        spin1_callback_on(TIMER_TICK, timer_callback, 2);
-
-        return;
+        // handle the pause and resume functionality
+        simulation_handle_pause_resume(timer_callback, TIMER);
     }
 
     // Loop through delay stages
@@ -273,17 +270,6 @@ void timer_callback(uint unused0, uint unused1) {
     memset(current_time_slot_spike_counters, 0, sizeof(uint8_t) * num_neurons);
 }
 
-void sdp_message_callback(uint msg, uint port) {
-    use(port);
-
-    ushort cmd = msg >> 8;
-    if (cmd == CMD_STOP) {
-        spin1_exit(0);
-    } else if (cmd == CMD_RUNTIME) {
-        simulation_ticks = msg & 0xffffff;
-    }
-}
-
 // Entry point
 void c_main(void) {
 
@@ -306,12 +292,12 @@ void c_main(void) {
     spin1_set_timer_tick(timer_period);
 
     // Register callbacks
-    spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, -1);
-    spin1_callback_on(USER_EVENT, spike_process, 1);
-    spin1_callback_on(TIMER_TICK, timer_callback, 2);
+    spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);
+    spin1_callback_on(USER_EVENT, spike_process, USER_AND_SDP);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
-    // Set up callback listening to SDP messages
-    spin1_callback_on(SDP_PACKET_RX, sdp_message_callback, 2);
+    simulation_register_simulation_sdp_callback(
+        &simulation_ticks, USER_AND_SDP);
 
     log_info("Starting");
     simulation_run();
