@@ -43,7 +43,6 @@ import logging
 import math
 import os
 
-
 logger = logging.getLogger(__name__)
 
 executable_finder = ExecutableFinder()
@@ -87,7 +86,6 @@ class Spinnaker(object):
         self._database_socket_addresses = set()
         if database_socket_addresses is not None:
             self._database_socket_addresses.union(database_socket_addresses)
-
         self._database_interface = None
         self._create_database = None
 
@@ -97,14 +95,15 @@ class Spinnaker(object):
 
         # population holders
         self._populations = list()
+        self._projections = list()
         self._multi_cast_vertex = None
         self._edge_count = 0
-        # specific utility vertexes
         self._live_spike_recorder = dict()
 
-        # holder for number of times the timer event should exuecte for the sim
+        # holder for timing related values
         self._no_machine_time_steps = None
         self._machine_time_step = None
+        self._no_full_runs = 0
 
         # state thats needed the first time around
         if self._app_id is None:
@@ -249,10 +248,10 @@ class Spinnaker(object):
 
         self._runtime = run_time
 
-        inputs = self._create_pacman_executor_inputs()
+        inputs, changed = self._create_pacman_executor_inputs()
         required_outputs = self._create_pacman_executor_outputs()
         algorithms = self._create_algorithm_list(
-            config.get("Mode", "mode") == "Debug")
+            config.get("Mode", "mode") == "Debug", changed)
         xml_paths = self._create_xml_paths()
 
         pacman_exeuctor = helpful_functions.do_mapping(
@@ -298,59 +297,74 @@ class Spinnaker(object):
             pacman_algorithm_reports.__file__), "reports_metadata.xml"))
         return xml_paths
 
-    def _create_algorithm_list(self, in_debug_mode):
+    def _create_algorithm_list(self, in_debug_mode, changed):
         algorithms = ""
-        algorithms += \
-            config.get("Mapping", "algorithms") + "," + \
-            config.get("Mapping", "interface_algorithms")
+        if changed:
+            # if the system has ran before, kill the apps and run mapping
+            if self._has_ran:
+                algorithms += ",FrontEndCommonStopApplications"
+                
+            algorithms += config.get("Mapping", "algorithms") + "," 
+            algorithms += config.get("Mapping", "interface_algorithms")
 
-        # if using virutal machine, add to list of algorithms the virtual
-        # machine generator, otherwise add the standard machine generator
-        if config.getboolean("Machine", "virtual_board"):
-            algorithms += ",FrontEndCommonVirtualMachineInterfacer"
+            # if using virutal machine, add to list of algorithms the virtual
+            # machine generator, otherwise add the standard machine generator
+            if config.getboolean("Machine", "virtual_board"):
+                algorithms += ",FrontEndCommonVirtualMachineInterfacer"
+            else:
+                algorithms += ",FrontEndCommonMachineInterfacer"
+                algorithms += ",FrontEndCommonApplicationRunner"
+    
+                # if going to write provanence data after the run add the two
+                # provenance gatherers
+                if config.get("Reports", "writeProvanceData"):
+                    algorithms += ",FrontEndCommonProvenanceGatherer"
+    
+                # if the end user wants reload script, add the reload script
+                # creator to the list (reload script currently only supported 
+                # for the original run)
+                # TODO look at this for multiple runs
+                if (not self._has_ran 
+                        and config.getboolean("Reports", "writeReloadSteps")):
+                    algorithms += ",FrontEndCommonReloadScriptCreator"
+    
+            if config.getboolean("Reports", "writeMemoryMapReport"):
+                algorithms += ",FrontEndCommonMemoryMapReport"
+    
+            if config.getboolean("Reports", "writeNetworkSpecificationReport"):
+                algorithms += \
+                    ",FrontEndCommonNetworkSpecificationPartitionableReport"
+    
+            # define mapping between output types and reports
+            if changed:
+                if self._reports_states is not None \
+                        and self._reports_states.tag_allocation_report:
+                    algorithms += ",TagReport"
+                if self._reports_states is not None \
+                        and self._reports_states.routing_info_report:
+                    algorithms += ",routingInfoReports"
+                if self._reports_states is not None \
+                        and self._reports_states.router_report:
+                    algorithms += ",RouterReports"
+                if self._reports_states is not None \
+                        and self._reports_states.partitioner_report:
+                    algorithms += ",PartitionerReport"
+                if (self._reports_states is not None and
+                        self._reports_states.
+                        placer_report_with_partitionable_graph):
+                    algorithms += ",PlacerReportWithPartitionableGraph"
+                if (self._reports_states is not None and
+                        self._reports_states.
+                        placer_report_without_partitionable_graph):
+                    algorithms += ",PlacerReportWithoutPartitionableGraph"
+                # add debug algorithms if needed
+                if in_debug_mode:
+                    algorithms += ",ValidRoutesChecker"
         else:
-            algorithms += ",FrontEndCommonMachineInterfacer"
+            # add functions for updating the models
+            algorithms += ",FrontEndCommonNewRuntime"
+            # add functions for setting off the models again
             algorithms += ",FrontEndCommonApplicationRunner"
-
-            # if going to write provanence data after the run add the two
-            # provenance gatherers
-            if config.get("Reports", "writeProvanceData"):
-                algorithms += ",FrontEndCommonProvenanceGatherer"
-
-            # if the end user wants reload script, add the reload script
-            # creator to the list
-            if config.getboolean("Reports", "writeReloadSteps"):
-                algorithms += ",FrontEndCommonReloadScriptCreator"
-
-        if config.getboolean("Reports", "writeMemoryMapReport"):
-            algorithms += ",FrontEndCommonMemoryMapReport"
-
-        if config.getboolean("Reports", "writeNetworkSpecificationReport"):
-            algorithms += \
-                ",FrontEndCommonNetworkSpecificationPartitionableReport"
-
-        # define mapping between output types and reports
-        if self._reports_states is not None \
-                and self._reports_states.tag_allocation_report:
-            algorithms += ",TagReport"
-        if self._reports_states is not None \
-                and self._reports_states.routing_info_report:
-            algorithms += ",routingInfoReports"
-        if self._reports_states is not None \
-                and self._reports_states.router_report:
-            algorithms += ",RouterReports"
-        if self._reports_states is not None \
-                and self._reports_states.partitioner_report:
-            algorithms += ",PartitionerReport"
-        if (self._reports_states is not None and
-                self._reports_states.placer_report_with_partitionable_graph):
-            algorithms += ",PlacerReportWithPartitionableGraph"
-        if (self._reports_states is not None and
-                self._reports_states.placer_report_without_partitionable_graph):
-            algorithms += ",PlacerReportWithoutPartitionableGraph"
-        # add debug algorithms if needed
-        if in_debug_mode:
-            algorithms += ",ValidRoutesChecker"
 
         return algorithms
 
@@ -494,7 +508,24 @@ class Spinnaker(object):
         inputs.append({'type': "FileConstraintsFilePath",
                        'value': os.path.join(
                            json_folder, "constraints.json")})
-        return inputs
+        
+        changed = True
+        if self._has_ran:
+            changed = self._detect_if_graph_has_changed()
+            if changed:
+                logger.warn("The graph has changed since the original "
+                            "graph was loaded and ran. Therefore "
+                            "decisions made during the mapping process will be"
+                            " incorrect now, and therefore mapping needs to be"
+                            " redone. Sorry. \n\n\n PS. Once issue ")
+                # stop the sync0 code so that new mapped stuff can run
+                self.stop(turn_off_machine=False)
+            else:
+                # mapping does not need to be exuected, therefore add
+                # the results from the mapping process into the inputs
+                inputs.append({})
+                
+        return inputs, changed
 
     def _calculate_number_of_machine_time_steps(self, run_time):
         if run_time is not None:
@@ -513,7 +544,7 @@ class Spinnaker(object):
                         self._no_machine_time_steps)
         else:
             self._no_machine_time_steps = None
-            logger.warn("You have set a runtime that will never end, this may"
+            logger.warn("You have set a runtime that will never end, this may "
                         "cause the neural models to fail to partition "
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
@@ -525,8 +556,24 @@ class Spinnaker(object):
                             vertex.is_recording_gsyn)):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
-                        "is not currently supportable in this tool chain."
+                        "is not currently supportable in this tool chain. "
                         "watch this space")
+                
+    def _detect_if_graph_has_changed(self):
+        """
+        iterates though the graph and looks for asks if they have changed
+        :return:
+        """
+        changed = False
+        for population in self._populations:
+            if population.changed:
+                changed = True
+                population.changed = False
+        for projection in self._projections:
+            if projection.changed:
+                changed = True
+                projection.changed = False
+        return changed   
 
     @property
     def app_id(self):
@@ -735,6 +782,13 @@ class Spinnaker(object):
         """
         self._populations.append(population)
 
+    def _add_projection(self, projection):
+        """ called by each projection to add itself to the list
+        :param projection:
+        :return:
+        """
+        self._projections.append(projection)
+
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,
             source, target, synapse_dynamics, label, rng):
@@ -811,9 +865,14 @@ class Spinnaker(object):
                                                      router_table.y).virtual:
                         self._txrx.clear_multicast_routes(router_table.x,
                                                           router_table.y)
-
             # execute app stop
-            # self._txrx.stop_application(self._app_id)
+            self._tell_cores_to_exit()
+
+            # clear values
+            self._no_full_runs = 0
+
+            # app stop command (currently fucked)
+            #self._txrx.stop_application(self._app_id)
             if self._create_database:
                 self._database_interface.stop()
 

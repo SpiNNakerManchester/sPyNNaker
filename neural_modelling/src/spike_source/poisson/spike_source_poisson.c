@@ -183,6 +183,23 @@ bool read_poisson_parameters(address_t address) {
     return true;
 }
 
+bool initialize_recording(address_t address, address_t system_region) {
+    // Get the recording information
+    uint32_t spike_history_region_size;
+    recording_read_region_sizes(
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
+        &recording_flags, &spike_history_region_size, NULL, NULL);
+    if (recording_is_channel_enabled(
+            recording_flags, e_recording_channel_spike_history)) {
+        if (!recording_initialse_channel(
+                data_specification_get_region(spike_history, address),
+                e_recording_channel_spike_history, spike_history_region_size)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 //! \Initialises the model by reading in the regions and checking recording
 //! data.
 //! \param[in] *timer_period a pointer for the memory address where the timer
@@ -209,18 +226,8 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    // Get the recording information
-    uint32_t spike_history_region_size;
-    recording_read_region_sizes(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
-        &recording_flags, &spike_history_region_size, NULL, NULL);
-    if (recording_is_channel_enabled(
-            recording_flags, e_recording_channel_spike_history)) {
-        if (!recording_initialse_channel(
-                data_specification_get_region(spike_history, address),
-                e_recording_channel_spike_history, spike_history_region_size)) {
-            return false;
-        }
+    if (!initialize_recording(address, system_region)) {
+        return false;
     }
 
     // Setup regions that specify spike source array data
@@ -258,8 +265,18 @@ void timer_callback(uint timer_count, uint unused) {
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
+        // Wait for the next run of the simulation
+        spin1_callback_off(TIMER_TICK);
+        event_wait();
 
-        spin1_exit(0);
+        // Prepare for the next run
+        time = UINT32_MAX;
+        
+        address_t address = data_specification_get_data_address();
+        address_t system_region = data_specification_get_region(
+        system, address);
+        initialize_recording(address, system_region);
+        spin1_callback_on(TIMER_TICK, timer_callback, 2);
         return;
     }
 
@@ -347,6 +364,22 @@ void timer_callback(uint timer_count, uint unused) {
     out_spikes_reset();
 }
 
+void sdp_message_callback(uint mailbox, uint port) {
+    use(port);
+
+    sdp_msg_t *msg = (sdp_msg_t *) mailbox;
+    uint16_t length = msg->length;
+    use(length);
+
+    if (msg->cmd_rc == CMD_STOP) {
+        spin1_exit(0);
+    } else if (msg->cmd_rc == CMD_RUNTIME) {
+        simulation_ticks = msg->arg1;
+    }
+
+    spin1_msg_free(msg);
+}
+
 //! \The only entry point for this model. it initialises the model, sets up the
 //! Interrupts for the Timer tick and calls the spin1api for running.
 void c_main(void) {
@@ -371,6 +404,9 @@ void c_main(void) {
 
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, 2);
+
+    // Set up callback listening to SDP messages
+    spin1_callback_on(SDP_PACKET_RX, sdp_message_callback, 2);
 
     log_info("Starting");
     simulation_run();
