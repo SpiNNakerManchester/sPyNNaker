@@ -1,5 +1,9 @@
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
+
+from pyNN.random import RandomDistribution
+
 import numpy
 
 
@@ -56,6 +60,23 @@ class AllToAllConnector(AbstractConnector):
             connection_slice = self._connection_slice(
                 pre_vertex_slice, post_vertex_slice)
 
+            if isinstance(self._delays, RandomDistribution):
+                return (utility_calls.get_probability_within_range(
+                    self._delays, min_delay, max_delay) *
+                    post_vertex_slice.n_atoms * 1.1)
+            elif not hasattr(self._delays, '__iter__'):
+                if self._delays >= min_delay and self._delays <= max_delay:
+                    return post_vertex_slice.n_atoms
+                return 0
+            else:
+                max_length = max([len([delay for delay in self._delays[
+                    self._connection_slice(slice(atom, atom + 1))]
+                    if min_delay is None or max_delay is None or
+                    (delay >= min_delay and delay <= max_delay)])
+                    for atom in range(pre_vertex_slice.lo_atom,
+                                      pre_vertex_slice.hi_atom + 1)])
+                return max_length
+
             return self._get_n_connections_from_pre_vertex_with_delay_maximum(
                 self._delays, n_connections, connection_slice,
                 min_delay, max_delay)
@@ -102,5 +123,5 @@ class AllToAllConnector(AbstractConnector):
             self._weights, n_connections, connection_slice)
         block["delay"] = self._generate_values(
             self._delays, n_connections, connection_slice)
-        block["synapse_type"] = synapse_type
+        block["synapse_type"] = [synapse_type] * n_connections
         return block

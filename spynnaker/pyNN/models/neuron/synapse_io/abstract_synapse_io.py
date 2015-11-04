@@ -16,7 +16,7 @@ class AbstractSynapseIO(object):
     def get_sdram_usage_in_bytes(
             self, synapse_information, n_pre_slices, pre_slice_index,
             n_post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, n_delay_stages):
+            post_vertex_slice, n_delay_stages, population_table):
         """ Get the SDRAM usage of a list of synapse information objects for\
             the given slices, and given number of delay stages (each stage\
             representing a multiple of the maximum delay supported), returning\

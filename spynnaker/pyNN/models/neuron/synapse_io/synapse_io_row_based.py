@@ -1,4 +1,5 @@
 import numpy
+import math
 
 from spynnaker.pyNN.models.neuron.synapse_io.abstract_synapse_io \
     import AbstractSynapseIO
@@ -26,7 +27,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     def get_sdram_usage_in_bytes(
             self, synapse_information, n_pre_slices, pre_slice_index,
             n_post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, n_delay_stages):
+            post_vertex_slice, n_delay_stages, population_table):
 
         # Find the maximum row length - i.e. the maximum number of bytes
         # that will be needed by any row for both rows with delay extensions
@@ -54,16 +55,24 @@ class SynapseIORowBased(AbstractSynapseIO):
             undelayed_max_bytes += bytes_per_item * max_undelayed_row_length
             delayed_max_bytes += bytes_per_item * max_delayed_row_length
 
+        # Adjust for the allowed row lengths from the population table
+        undelayed_max_bytes = population_table.get_allowed_row_length(
+            int(math.ceil(undelayed_max_bytes / 4.0))) * 4
+        delayed_max_bytes = population_table.get_allowed_row_length(
+            int(math.ceil(delayed_max_bytes / 4.0))) * 4
+
         # Add on the header words and multiply by the number of rows in the
         # block
         n_bytes_undelayed = 0
         if undelayed_max_bytes > 0:
-            n_bytes_undelayed = _N_HEADER_WORDS + (
-                undelayed_max_bytes * pre_vertex_slice.n_atoms)
+            n_bytes_undelayed = ((
+                (_N_HEADER_WORDS * 4) + undelayed_max_bytes) *
+                pre_vertex_slice.n_atoms)
         n_bytes_delayed = 0
         if delayed_max_bytes > 0:
-            n_bytes_delayed = _N_HEADER_WORDS + (
-                delayed_max_bytes * pre_vertex_slice.n_atoms * n_delay_stages)
+            n_bytes_delayed = ((
+                (_N_HEADER_WORDS * 4) + delayed_max_bytes) *
+                pre_vertex_slice.n_atoms * n_delay_stages)
         return (n_bytes_undelayed, n_bytes_delayed)
 
     @staticmethod
@@ -214,14 +223,15 @@ class SynapseIORowBased(AbstractSynapseIO):
 
             # Pad the rows to make them all the same length as the biggest
             row_lengths = [row.size for row in rows]
-            max_length = max(row_lengths)
+            max_length = max(row_lengths) - _N_HEADER_WORDS
             max_row_length = max_length
             if max_length > 0:
                 max_length = population_table.get_allowed_row_length(
                     max_length)
                 row_data = numpy.concatenate([numpy.pad(
-                    row, (0, max_length - row.size), mode="constant",
-                    constant_values=0x11223344) for row in rows])
+                    row, (0, max_length - (row.size - _N_HEADER_WORDS)),
+                    mode="constant", constant_values=0x11223344)
+                    for row in rows])
 
         # Do the same for delayed rows
         delayed_row_data = []
@@ -251,14 +261,15 @@ class SynapseIORowBased(AbstractSynapseIO):
 
             # Pad the rows to make them all the same length as the biggest
             row_lengths = [row.size for row in delayed_rows]
-            max_length = max(row_lengths)
+            max_length = max(row_lengths) - _N_HEADER_WORDS
             max_delayed_row_length = max_length
             if max_length > 0:
                 max_length = population_table.get_allowed_row_length(
                     max_length)
                 delayed_row_data = numpy.concatenate([numpy.pad(
-                    row, (0, max_length - row.size), mode="constant",
-                    constant_values=0x11223344) for row in delayed_rows])
+                    row, (0, max_length - (row.size - _N_HEADER_WORDS)),
+                    mode="constant", constant_values=0x11223344)
+                    for row in delayed_rows])
 
         return (row_data, max_row_length, delayed_row_data,
                 max_delayed_row_length)

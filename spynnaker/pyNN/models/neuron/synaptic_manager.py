@@ -163,7 +163,7 @@ class SynapticManager(object):
                         edge.synapse_information, n_pre_slices,
                         pre_slice_index, n_post_slices, post_slice_index,
                         pre_vertex_slice, post_vertex_slice,
-                        edge.n_delay_stages)
+                        edge.n_delay_stages, self._population_table_type)
 
                 # Add population table required padding between blocks and
                 # add the block sizes
@@ -215,7 +215,8 @@ class SynapticManager(object):
                             in_edge.synapse_information, n_pre_slices,
                             pre_slice_index, n_post_slices, post_slice_index,
                             pre_vertex_slice, post_vertex_slice,
-                            in_edge.n_delay_stages)
+                            in_edge.n_delay_stages,
+                            self._population_table_type)
 
                     memory_size = self._population_table_type\
                         .get_next_allowed_address(memory_size)
