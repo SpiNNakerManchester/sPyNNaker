@@ -420,11 +420,13 @@ class SpikeSourcePoisson(
 
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
                    graph_mapper):
+        to_extract_n_machine_time_steps = \
+            n_machine_time_steps - self._extracted_machine_time_steps
         self._extracted_machine_time_steps += n_machine_time_steps
         return self._spike_recorder.get_spikes(
             self._label, transceiver,
             self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            to_extract_n_machine_time_steps, placements, graph_mapper, self)
 
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
         """

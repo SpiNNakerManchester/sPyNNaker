@@ -81,6 +81,7 @@ class Spinnaker(object):
         self._machine = None
         self._txrx = None
         self._has_ran = False
+        self._has_resetted_last = False
         self._reports_states = None
         self._app_id = None
         self._current_run_ms = None
@@ -267,7 +268,7 @@ class Spinnaker(object):
         # get outputs
         required_outputs = \
             self._create_pacman_executor_outputs(
-                requires_reset=False,
+                requires_reset=self._has_resetted_last,
                 application_graph_changed=application_graph_changed)
         # algorithms listing
         algorithms = self._create_algorithm_list(
@@ -290,18 +291,36 @@ class Spinnaker(object):
                 pacman_exeuctor.get_item("MemoryTransciever"))
 
         # sort out outputs datas
+        if application_graph_changed:
+            self._update_data_structures_from_pacman_exeuctor(pacman_exeuctor)
+
+        # reset the reset flag to say the last thing was not a reset call
+        self._has_resetted_last = False
+
+    def _update_data_structures_from_pacman_exeuctor(self, pacman_exeuctor):
+        """
+        updates all the spinnaker local data structs that it needs from the
+        pacman exeuctor
+        :param pacman_exeuctor: the pacman exectuor required to extract data
+            structs from.
+        :return:
+        """
         self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
         self._placements = pacman_exeuctor.get_item("MemoryPlacements")
-        self._router_tables = pacman_exeuctor.get_item("MemoryRoutingTables")
-        self._routing_infos = pacman_exeuctor.get_item("MemoryRoutingInfos")
+        self._router_tables = \
+            pacman_exeuctor.get_item("MemoryRoutingTables")
+        self._routing_infos = \
+            pacman_exeuctor.get_item("MemoryRoutingInfos")
         self._tags = pacman_exeuctor.get_item("MemoryTags")
         self._graph_mapper = pacman_exeuctor.get_item("MemoryGraphMapper")
         self._partitioned_graph = \
             pacman_exeuctor.get_item("MemoryPartitionedGraph")
         self._machine = pacman_exeuctor.get_item("MemoryMachine")
-        self._database_interface = pacman_exeuctor.get_item("DatabaseInterface")
+        self._database_interface = \
+            pacman_exeuctor.get_item("DatabaseInterface")
         self._has_ran = pacman_exeuctor.get_item("RanToken")
-        self._executable_targets = pacman_exeuctor.get_item("ExecutableTargets")
+        self._executable_targets = \
+            pacman_exeuctor.get_item("ExecutableTargets")
         self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
         self._processor_to_app_data_base_address_mapper = \
             pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
@@ -313,49 +332,39 @@ class Spinnaker(object):
         code that puts the simulation back at time zero
         :return:
         """
+        self._has_resetted_last = True
         inputs, application_graph_changed = \
-            self._create_pacman_executor_inputs(reset=True)
+            self._create_pacman_executor_inputs(reset=self._has_resetted_last)
         algorithms = self._create_algorithm_list(
             config.get("Mode", "mode") == "Debug", application_graph_changed,
-            requires_reset=True)
+            requires_reset=self._has_resetted_last)
         xml_paths = self._create_xml_paths()
         required_outputs = self._create_pacman_executor_outputs(
-            requires_reset=True,
+            requires_reset=self._has_resetted_last,
             application_graph_changed=application_graph_changed)
 
         # rewind the buffers from the buffer manager, to start at the beginning
         # of the simulation again
         self._buffer_manager.rewind()
 
+        # reset the current count of how many milliseconds the application
+        # has ran for over multiple calls to run
+        self._current_run_ms = 0
+
+        # reset the n_machien time steps from each vertex
+        for vertex in self.partitionable_graph.vertices:
+            vertex.set_no_machine_time_steps(0)
+
         # TODO there needs to be some decision on reload here.
 
+        # execute reset functionality
         pacman_exeuctor = helpful_functions.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,
             config.getboolean("Reports", "outputTimesForSections"))
 
+        # if the application graph changed reset the data structures
         if application_graph_changed:
-            # sort out outputs datas
-            self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
-            self._placements = pacman_exeuctor.get_item("MemoryPlacements")
-            self._router_tables = \
-                pacman_exeuctor.get_item("MemoryRoutingTables")
-            self._routing_infos = \
-                pacman_exeuctor.get_item("MemoryRoutingInfos")
-            self._tags = pacman_exeuctor.get_item("MemoryTags")
-            self._graph_mapper = pacman_exeuctor.get_item("MemoryGraphMapper")
-            self._partitioned_graph = \
-                pacman_exeuctor.get_item("MemoryPartitionedGraph")
-            self._machine = pacman_exeuctor.get_item("MemoryMachine")
-            self._database_interface = \
-                pacman_exeuctor.get_item("DatabaseInterface")
-            self._has_ran = pacman_exeuctor.get_item("RanToken")
-            self._executable_targets = \
-                pacman_exeuctor.get_item("ExecutableTargets")
-            self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
-            self._processor_to_app_data_base_address_mapper = \
-                pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
-            self._vertex_to_app_data_file_paths = \
-                pacman_exeuctor.get_item("VertexToAppDataFilePaths")
+            self._update_data_structures_from_pacman_exeuctor(pacman_exeuctor)
 
     @staticmethod
     def _create_xml_paths():
@@ -377,6 +386,7 @@ class Spinnaker(object):
     def _create_algorithm_list(self, in_debug_mode, application_graph_changed,
                                requires_reset):
         algorithms = ""
+
         if application_graph_changed:
             if requires_reset:
                 # kill binaries
@@ -404,11 +414,6 @@ class Spinnaker(object):
                 algorithms += ",FrontEndCommonMachineInterfacer"
                 algorithms += ",FrontEndCommonApplicationRunner"
     
-                # if going to write provanence data after the run add the two
-                # provenance gatherers
-                if config.get("Reports", "writeProvanceData"):
-                    algorithms += ",FrontEndCommonProvenanceGatherer"
-    
                 # if the end user wants reload script, add the reload script
                 # creator to the list (reload script currently only supported 
                 # for the original run)
@@ -423,6 +428,11 @@ class Spinnaker(object):
             if config.getboolean("Reports", "writeNetworkSpecificationReport"):
                 algorithms += \
                     ",FrontEndCommonNetworkSpecificationPartitionableReport"
+
+            # if going to write provanence data after the run add the two
+            # provenance gatherers
+            if config.get("Reports", "writeProvanceData"):
+                algorithms += ",FrontEndCommonProvenanceGatherer"
     
             # define mapping between output types and reports
             if self._reports_states is not None \
@@ -457,11 +467,16 @@ class Spinnaker(object):
             else:
                 # add function for extracting all the recorded data from
                 # recorded populations
-                algorithms += "sPyNNakerRecordingExtracter"
-                # add functions for updating the models
-                algorithms += ",FrontEndCommonRuntimeUpdater"
+                if not self._has_resetted_last:
+                    algorithms += "SpyNNakerRecordingExtracter,"
+                    # add functions for updating the models
+                algorithms += "FrontEndCommonRuntimeUpdater,"
                 # add functions for setting off the models again
-                algorithms += ",FrontEndCommonApplicationRunner"
+                algorithms += "FrontEndCommonApplicationRunner,"
+                # if going to write provanence data after the run add the two
+                # provenance gatherers
+                if config.get("Reports", "writeProvanceData"):
+                    algorithms += "FrontEndCommonProvenanceGatherer"
         return algorithms
 
     def _create_pacman_executor_outputs(
@@ -488,18 +503,18 @@ class Spinnaker(object):
         application_graph_changed = self._detect_if_graph_has_changed()
         inputs = list()
 
+        # file path to store any provenance data to
+        provenance_file_path = os.path.join(self._report_default_directory,
+                                            "provance_data")
+        if not os.path.exists(provenance_file_path):
+                os.mkdir(provenance_file_path)
+
         if application_graph_changed:
             # make a folder for the json files to be stored in
             json_folder = os.path.join(
                 self._report_default_directory, "json_files")
             if not os.path.exists(json_folder):
                 os.mkdir(json_folder)
-
-            # file path to store any provenance data to
-            provenance_file_path = os.path.join(self._report_default_directory,
-                                                "provance_data")
-            if not os.path.exists(provenance_file_path):
-                os.mkdir(provenance_file_path)
 
             # translate config "None" to None
             width = config.get("Machine", "width")
@@ -620,6 +635,8 @@ class Spinnaker(object):
                                json_folder, "constraints.json")})
             inputs.append({'type': "NoSyncChanges",
                            'value': self._no_sync_changes})
+            inputs.append({"type": "LoadInitialBuffersFlag",
+                           "value": True})
             if self._has_ran:
                 logger.warn("The graph has changed since the original "
                             "graph was loaded and ran. Therefore "
@@ -666,11 +683,29 @@ class Spinnaker(object):
                            'value': self._graph_mapper})
             inputs.append({'type': "NoSyncChanges",
                            'value': self._no_sync_changes})
+            inputs.append({'type': "MemoryPartitionableGraph",
+                           'value': self._partitionable_graph})
+            inputs.append({'type': "MemoryExtendedMachine",
+                           'value': self._machine})
+            inputs.append({'type': "MemoryRoutingTables",
+                           'value': self._router_tables})
+            inputs.append({'type': "ProvenanceFilePath",
+                           'value': provenance_file_path})
         if self._has_ran and not reset:
             no_machine_time_steps =\
                 int((self._current_run_ms * 1000.0) / self._machine_time_step)
             inputs.append({'type': "RunTimeMachineTimeSteps",
                            'value': no_machine_time_steps})
+            inputs.append({"type": "LoadInitialBuffersFlag", "value": False})
+        if self._has_ran and reset:
+            inputs.append(({
+                'type': "ProcessorToAppDataBaseAddress",
+                "value": self._processor_to_app_data_base_address_mapper}))
+            inputs.append({"type": "VertexToAppDataFilePaths",
+                           'value': self._vertex_to_app_data_file_paths})
+            inputs.append({'type': "WriteCheckerFlag",
+                           'value': config.getboolean(
+                               "Mode", "verify_writes")})
 
         return inputs, application_graph_changed
 
@@ -1036,6 +1071,8 @@ class Spinnaker(object):
             #self._txrx.stop_application(self._app_id)
             if self._create_database:
                 self._database_interface.stop()
+
+            self._buffer_manager.stop()
 
             # stop the transciever
             if turn_off_machine:

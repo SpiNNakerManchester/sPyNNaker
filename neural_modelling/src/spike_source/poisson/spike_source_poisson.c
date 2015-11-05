@@ -45,7 +45,7 @@ typedef enum region{
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    SDP = 1, TIMER = 2
+    SDP = 0, TIMER = 2
 }callback_priorities;
 
 //! what each position in the poisson parameter region actually represent in

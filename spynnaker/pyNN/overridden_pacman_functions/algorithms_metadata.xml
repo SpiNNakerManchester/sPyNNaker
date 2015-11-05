@@ -119,7 +119,7 @@
             </parameter>
         </produces_outputs>
     </algorithm>
-    <algorithm name="SpyNNakerRecordingExtractor">
+    <algorithm name="SpyNNakerRecordingExtracter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_recording_extractor</python_module>
         <python_class>SpyNNakerRecordingExtractor</python_class>
         <required_inputs>

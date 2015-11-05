@@ -64,17 +64,21 @@ class SpyNNakerRecordingExtractor(object):
         :param graph_mapper:
         :return:
         """
-        if (vertex.is_recording_spikes
-                and vertex.get_last_extracted_spike_time !=
+        recording_spikes = vertex.is_recording_spikes
+        lastast_recorded_time = vertex.get_last_extracted_spike_time
+        equal_to_time = vertex.get_last_extracted_spike_time != runtime_in_machine_time_steps
+        if (vertex.is_recording_spikes()
+                and vertex.get_last_extracted_spike_time() !=
                 runtime_in_machine_time_steps):
             to_extract_machine_time_steps = \
                 runtime_in_machine_time_steps - \
-                vertex.get_last_extracted_spike_time
-            spikes = vertex.get_spikes(
-                transceiver, to_extract_machine_time_steps, placements,
-                graph_mapper)
-            spike_cache_file = vertex.get_cache_file_for_spike_data
-            numpy.save(spike_cache_file, spikes)
+                vertex.get_last_extracted_spike_time()
+            if to_extract_machine_time_steps != 0:
+                spikes = vertex.get_spikes(
+                    transceiver, to_extract_machine_time_steps, placements,
+                    graph_mapper)
+                spike_cache_file = vertex.get_cache_file_for_spike_data()
+                numpy.save(spike_cache_file, spikes)
 
     @staticmethod
     def _handle_v_recordings(
@@ -89,17 +93,18 @@ class SpyNNakerRecordingExtractor(object):
         :param graph_mapper:
         :return:
         """
-        if (vertex.is_recording_v
-                and vertex.get_last_extracted_v_time !=
+        if (vertex.is_recording_v()
+                and vertex.get_last_extracted_v_time() !=
                 runtime_in_machine_time_steps):
             to_extract_machine_time_steps = \
                 runtime_in_machine_time_steps - \
-                vertex.get_last_extracted_v_time
-            vs = vertex.get_v(
-                transceiver, to_extract_machine_time_steps, placements,
-                graph_mapper)
-            v_cache_file = vertex.get_cache_file_for_v_data
-            numpy.save(v_cache_file, vs)
+                vertex.get_last_extracted_v_time()
+            if to_extract_machine_time_steps != 0:
+                vs = vertex.get_v(
+                    transceiver, to_extract_machine_time_steps, placements,
+                    graph_mapper)
+                v_cache_file = vertex.get_cache_file_for_v_data()
+                numpy.save(v_cache_file, vs)
 
     @staticmethod
     def _handle_gsyn_recordings(
@@ -114,14 +119,15 @@ class SpyNNakerRecordingExtractor(object):
         :param graph_mapper:
         :return:
         """
-        if (vertex.is_recording_gsyn
-                and vertex.get_last_extracted_gsyn_time !=
+        if (vertex.is_recording_gsyn()
+                and vertex.get_last_extracted_gsyn_time() !=
                 runtime_in_machine_time_steps):
             to_extract_machine_time_steps = \
                 runtime_in_machine_time_steps - \
-                vertex.get_last_extracted_gsyn_time
-            gsyns = vertex.get_gsyn(
-                transceiver, to_extract_machine_time_steps, placements,
-                graph_mapper)
-            gsyn_cache_file = vertex.get_cache_file_for_gsyn_data
-            numpy.save(gsyn_cache_file, gsyns)
+                vertex.get_last_extracted_gsyn_time()
+            if to_extract_machine_time_steps != 0:
+                gsyns = vertex.get_gsyn(
+                    transceiver, to_extract_machine_time_steps, placements,
+                    graph_mapper)
+                gsyn_cache_file = vertex.get_cache_file_for_gsyn_data()
+                numpy.save(gsyn_cache_file, gsyns)

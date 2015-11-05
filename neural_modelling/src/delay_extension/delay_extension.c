@@ -14,7 +14,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC_PACKET = -1, USER_AND_SDP = 1, TIMER = 2
+    MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 2
 }callback_priorities;
 
 // Globals
@@ -293,11 +293,11 @@ void c_main(void) {
 
     // Register callbacks
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);
-    spin1_callback_on(USER_EVENT, spike_process, USER_AND_SDP);
+    spin1_callback_on(USER_EVENT, spike_process, USER);
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     simulation_register_simulation_sdp_callback(
-        &simulation_ticks, USER_AND_SDP);
+        &simulation_ticks, SDP);
 
     log_info("Starting");
     simulation_run();
