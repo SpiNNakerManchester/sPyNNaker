@@ -178,6 +178,7 @@ class SpikeSourceArray(
                     self._get_spike_send_buffer(vertex_slice)
                 vertex.send_buffers = send_buffer
 
+    # @implements AbstractSpikeRecordable.is_recording_spikes
     def is_recording_spikes(self):
         """
         helper method fro chekcing if spikes are being stored
@@ -185,6 +186,7 @@ class SpikeSourceArray(
         """
         return self._spike_recorder.record
 
+    # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
         """
         sets the recoridng flags
@@ -192,6 +194,7 @@ class SpikeSourceArray(
         """
         self._spike_recorder.record = True
 
+    # @implements AbstractSpikeRecordable.set_last_extracted_spike_time
     def get_last_extracted_spike_time(self):
         """
         returns the total number of machine time stepst aht this vertex thinks
@@ -200,6 +203,7 @@ class SpikeSourceArray(
         """
         return self._extracted_machine_time_steps
 
+    # @implements AbstractSpikeRecordable.get_cache_file_for_spike_data
     def get_cache_file_for_spike_data(self):
         """
         gets the cahce file this vertex uses for storing its spike data
@@ -208,6 +212,14 @@ class SpikeSourceArray(
         if self._spikes_cache_file is None:
             self._spikes_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
         return self._spikes_cache_file
+
+    # @implements AbstractSpikeRecordable.set_last_extracted_spike_time
+    def set_last_extracted_spike_time(self, new_value):
+        self._extracted_machine_time_steps = new_value
+
+    # @implements AbstractSpikeRecordable.close_cache_file_for_spike_data
+    def close_cache_file_for_spike_data(self):
+        self._spikes_cache_file = None
 
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
                    graph_mapper):

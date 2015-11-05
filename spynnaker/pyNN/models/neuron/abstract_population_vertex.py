@@ -396,6 +396,13 @@ class AbstractPopulationVertex(
     def get_last_extracted_spike_time(self):
         return self._extracted_spike_machine_time_steps
 
+    # @implements AbstractSpikeRecordable.set_last_extracted_spike_time
+    def set_last_extracted_spike_time(self, new_value):
+        self._extracted_spike_machine_time_steps = new_value
+
+    def close_cache_file_for_spike_data(self):
+        self._spikes_cache_file = None
+
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
         return self._v_recorder.record_v
@@ -413,6 +420,14 @@ class AbstractPopulationVertex(
     # @implements AbstractVRecordable.get_last_extracted_v_time
     def get_last_extracted_v_time(self):
         return self._extracted_v_machine_time_steps
+
+    # @implements AbstractVRecordable.get_last_extracted_v_time
+    def close_cache_file_for_v_data(self):
+        self._vs_cache_file = None
+
+    # @implements AbstractVRecordable.set_last_extracted_v_time
+    def set_last_extracted_v_time(self, new_value):
+        self._extracted_v_machine_time_steps = new_value
 
     # @implements AbstractVRecordable.get_v
     def get_v(self, transceiver, n_machine_time_steps, placements,
@@ -438,6 +453,14 @@ class AbstractPopulationVertex(
         if self._gsyns_cache_file is None:
             self._gsyns_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
         return self._gsyns_cache_file
+
+    # @implements AbstractGSynRecordable.set_last_extracted_gsyn_time
+    def set_last_extracted_gsyn_time(self, new_value):
+        self._extracted_gsyn_machine_time_steps = new_value
+
+    # @implements AbstractGSynRecordable.close_cache_file_for_gsyn_data
+    def close_cache_file_for_gsyn_data(self):
+        self._gsyns_cache_file = None
 
     # @implements AbstractGSynRecordable.get_last_extracted_gsyn_time
     def get_last_extracted_gsyn_time(self):

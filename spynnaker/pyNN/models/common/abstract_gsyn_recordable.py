@@ -29,9 +29,24 @@ class AbstractGSynRecordable(object):
         """
 
     @abstractmethod
+    def set_last_extracted_gsyn_time(self, new_value):
+        """ sets the last time point which the vertex thinks its extracted from
+        the machine
+        :param new_value: the new value to set the last_extracted_gsyn_time
+        :return:
+        """
+
+    @abstractmethod
     def get_cache_file_for_gsyn_data(self):
         """
         gets the cahce file this vertex uses for storing its gsyn data
+        :return:
+        """
+
+    @abstractmethod
+    def close_cache_file_for_gsyn_data(self):
+        """
+        closes the cahce file this vertex uses for storing its gsyn data
         :return:
         """
 

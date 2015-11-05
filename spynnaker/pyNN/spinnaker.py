@@ -22,6 +22,8 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 
 # local front end imports
+from spynnaker.pyNN.models.common.abstract_eieio_spike_recordable import \
+    AbstractEIEIOSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_gsyn_recordable import \
     AbstractGSynRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable import \
@@ -354,6 +356,17 @@ class Spinnaker(object):
         # reset the n_machien time steps from each vertex
         for vertex in self.partitionable_graph.vertices:
             vertex.set_no_machine_time_steps(0)
+            if isinstance(vertex, AbstractSpikeRecordable):
+                vertex.set_last_extracted_spike_time(0)
+                vertex.close_cache_file_for_spike_data()
+            if isinstance(vertex, AbstractVRecordable):
+                vertex.set_last_extracted_v_time(0)
+                vertex.close_cache_file_for_v_data()
+            if isinstance(vertex, AbstractGSynRecordable):
+                vertex.set_last_extracted_gsyn_time(0)
+                vertex.close_cache_file_for_gsyn_data()
+            if isinstance(vertex, AbstractEIEIOSpikeRecordable):
+                pass
 
         # TODO there needs to be some decision on reload here.
 
