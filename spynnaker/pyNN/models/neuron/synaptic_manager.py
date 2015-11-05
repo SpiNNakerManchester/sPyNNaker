@@ -524,7 +524,7 @@ class SynapticManager(object):
                     self._population_table_type.update_master_population_table(
                         spec, next_block_start_addr, row_length,
                         keys_and_masks, master_pop_table_region)
-                    next_block_start_addr += len(row_data)
+                    next_block_start_addr += len(row_data) * 4
                 del row_data
 
                 if len(delayed_row_data) > 0:
@@ -537,7 +537,7 @@ class SynapticManager(object):
                     self._population_table_type.update_master_population_table(
                         spec, next_block_start_addr, delayed_row_length,
                         keys_and_masks, master_pop_table_region)
-                    next_block_start_addr += len(delayed_row_data)
+                    next_block_start_addr += len(delayed_row_data) * 4
                 del delayed_row_data
 
         self._population_table_type.finish_master_pop_table(

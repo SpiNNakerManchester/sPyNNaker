@@ -163,18 +163,15 @@ class SynapseIORowBased(AbstractSynapseIO):
                 if fixed_fixed_data is not None:
                     fixed_fixed_data_items.append([numpy.ravel(
                         fixed_fixed_data[undelayed_row_indices == i])
-                        for i in range(pre_vertex_slice.lo_atom,
-                                       pre_vertex_slice.hi_atom + 1)])
+                        for i in range(pre_vertex_slice.n_atoms)])
                 if fixed_plastic_data is not None:
                     fixed_plastic_data_items.append(numpy.ravel(
                         [fixed_plastic_data[undelayed_row_indices == i]
-                         for i in range(pre_vertex_slice.lo_atom,
-                                        pre_vertex_slice.hi_atom + 1)]))
+                         for i in range(pre_vertex_slice.n_atoms)]))
                 if plastic_plastic_data is not None:
                     plastic_plastic_data_items.append(numpy.ravel(
                         [plastic_plastic_data[undelayed_row_indices == i]
-                         for i in range(pre_vertex_slice.lo_atom,
-                                        pre_vertex_slice.hi_atom + 1)]))
+                         for i in range(pre_vertex_slice.n_atoms)]))
                 del fixed_fixed_data, fixed_plastic_data, plastic_plastic_data
             del undelayed_connections
 
@@ -187,18 +184,15 @@ class SynapseIORowBased(AbstractSynapseIO):
                 if fixed_fixed_data is not None:
                     delayed_fixed_fixed_data_items.append(numpy.ravel(
                         [fixed_fixed_data[delayed_row_indices == i]
-                         for i in range(pre_vertex_slice.lo_atom,
-                                        pre_vertex_slice.hi_atom + 1)]))
+                         for i in range(pre_vertex_slice.n_atoms)]))
                 if fixed_plastic_data is not None:
                     delayed_fixed_plastic_data_items.append(numpy.ravel(
                         [fixed_plastic_data[delayed_row_indices == i]
-                         for i in range(pre_vertex_slice.lo_atom,
-                                        pre_vertex_slice.hi_atom + 1)]))
+                         for i in range(pre_vertex_slice.n_atoms)]))
                 if plastic_plastic_data is not None:
                     delayed_plastic_plastic_data_items.append(numpy.ravel(
                         [plastic_plastic_data[delayed_row_indices == i]
-                         for i in range(pre_vertex_slice.lo_atom,
-                                        pre_vertex_slice.hi_atom + 1)]))
+                         for i in range(pre_vertex_slice.n_atoms)]))
                 del fixed_fixed_data, fixed_plastic_data, plastic_plastic_data
             del delayed_connections
 
