@@ -410,13 +410,26 @@ class Spinnaker(object):
                                requires_reset):
         algorithms = list()
 
-        if application_graph_changed:
-            if requires_reset:
+        # if youve not ran before, add the buffer manager
+        if not self._has_ran:
+                algorithms.append("FrontEndCommonBufferManagerCreater")
+
+        # if your needing qa reset, you need to clean the binairies
+        # (unless youve not ran yet)
+        if requires_reset and not self._has_ran:
                 # kill binaries
                 algorithms.append("FrontEndCommonApplicationExiter")
 
-            if not self._has_ran:
-                algorithms.append("FrontEndCommonBufferManagerCreater")
+        # if needs a reset but no applciation graph has changed, then you
+        # need to reload the app data and executable images
+        if requires_reset and not application_graph_changed:
+            algorithms.append(
+                "FrontEndCommonPartitionableGraphApplicationDataLoader")
+            # load binairies back on
+            algorithms.append("FrontEndCommomLoadExecutableImages")
+
+        # if the allication graph has changed, need to go through mapping
+        if application_graph_changed:
 
             # if the system has ran before, kill the apps and run mapping
             # add debug algorithms if needed
@@ -490,27 +503,18 @@ class Spinnaker(object):
                     placer_report_without_partitionable_graph):
                 algorithms.append("PlacerReportWithoutPartitionableGraph")
         else:
-            if requires_reset:
-                # kill binaries
-                algorithms.append("FrontEndCommonApplicationExiter")
-                # load old application data
-                algorithms.append(
-                    "FrontEndCommonPartitionableGraphApplicationDataLoader")
-                # load binairies back on
-                algorithms.append("FrontEndCommomLoadExecutableImages")
-            else:
-                # add function for extracting all the recorded data from
-                # recorded populations
-                if not self._has_resetted_last:
-                    algorithms.append("SpyNNakerRecordingExtracter")
-                    # add functions for updating the models
-                algorithms.append("FrontEndCommonRuntimeUpdater")
-                # add functions for setting off the models again
-                algorithms.append("FrontEndCommonApplicationRunner")
-                # if going to write provanence data after the run add the two
-                # provenance gatherers
-                if config.get("Reports", "writeProvanceData"):
-                    algorithms.append("FrontEndCommonProvenanceGatherer")
+            # add function for extracting all the recorded data from
+            # recorded populations
+            if not self._has_resetted_last:
+                algorithms.append("SpyNNakerRecordingExtracter")
+                # add functions for updating the models
+            algorithms.append("FrontEndCommonRuntimeUpdater")
+            # add functions for setting off the models again
+            algorithms.append("FrontEndCommonApplicationRunner")
+            # if going to write provanence data after the run add the two
+            # provenance gatherers
+            if config.get("Reports", "writeProvanceData"):
+                algorithms.append("FrontEndCommonProvenanceGatherer")
         return algorithms
 
     def _create_pacman_executor_outputs(
@@ -544,6 +548,11 @@ class Spinnaker(object):
                 os.mkdir(provenance_file_path)
 
         if application_graph_changed:
+
+            # the application graph has changed, so new binaries are being
+            # loaded and therefore sync mode starts at zero again.
+            self._no_sync_changes = 0
+
             # make a folder for the json files to be stored in
             json_folder = os.path.join(
                 self._report_default_directory, "json_files")
@@ -667,17 +676,19 @@ class Spinnaker(object):
             inputs.append({'type': "FileConstraintsFilePath",
                            'value': os.path.join(
                                json_folder, "constraints.json")})
-            inputs.append({'type': "NoSyncChanges",
-                           'value': self._no_sync_changes})
             inputs.append({"type": "LoadInitialBuffersFlag",
                            "value": True})
+            inputs.append({'type': "NoSyncChanges",
+                           'value': self._no_sync_changes})
             if self._has_ran:
-
-                logger.warn("The graph has changed since the original "
-                            "graph was loaded and ran. Therefore "
-                            "decisions made during the mapping process will be"
-                            " incorrect now, and therefore mapping needs to be"
-                            " redone. Sorry.")
+                logger.warn(
+                    "The graph has changed since the original graph was loaded "
+                    "and ran. Therefore decisions made during the mapping "
+                    "process will be incorrect now, and therefore mapping "
+                    "needs to be redone. Sorry. Please note that any "
+                    "recorded data will also have been lost. If you were "
+                    "wanting this daya, please rerun your script and extract"
+                    "the data before recalling run. Thank you")
                 inputs.append({'type': "BufferManager",
                                'value': self._buffer_manager})
         else:
@@ -727,6 +738,7 @@ class Spinnaker(object):
                            'value': provenance_file_path})
             inputs.append({'type': "BufferManager",
                            'value': self._buffer_manager})
+
         if self._has_ran and not reset:
             no_machine_time_steps =\
                 int(((total_runtime - self._current_run_ms) * 1000.0)
