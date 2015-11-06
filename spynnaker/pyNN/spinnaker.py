@@ -266,6 +266,14 @@ class Spinnaker(object):
         # get inputs
         inputs, application_graph_changed = \
             self._create_pacman_executor_inputs(total_run_time)
+
+        # if the application graph has changed and youve already ran, kill old
+        # stuff running on machine
+        if application_graph_changed and self._has_ran:
+            exiter = FrontEndCommonApplicationExiter()
+            exiter(self._app_id, self._txrx, self._executable_targets,
+                   self._no_sync_changes)
+
         # get outputs
         required_outputs = \
             self._create_pacman_executor_outputs(
@@ -400,34 +408,45 @@ class Spinnaker(object):
 
     def _create_algorithm_list(self, in_debug_mode, application_graph_changed,
                                requires_reset):
-        algorithms = ""
+        algorithms = list()
 
         if application_graph_changed:
             if requires_reset:
                 # kill binaries
-                algorithms += "FrontEndCommonApplicationExiter,"
+                algorithms.append("FrontEndCommonApplicationExiter")
+
+            if not self._has_ran:
+                algorithms.append("FrontEndCommonBufferManagerCreater")
 
             # if the system has ran before, kill the apps and run mapping
             # add debug algorithms if needed
             if in_debug_mode:
-                algorithms += "ValidRoutesChecker,"
-
-            if self._has_ran:
-                algorithms += "FrontEndCommonApplicationExiter,"
-                # add function for extracting all the recorded data from
-                # recorded populations
-                algorithms += "sPyNNakerRecordingExtracter,"
+                algorithms.append("ValidRoutesChecker")
                 
-            algorithms += config.get("Mapping", "algorithms") + ","
-            algorithms += config.get("Mapping", "interface_algorithms")
+            algorithm_names = \
+                config.get("Mapping", "algorithms") + "," + \
+                config.get("Mapping", "interface_algorithms")
+
+            algorithm_strings = algorithm_names.split(",")
+            for algorithm_string in algorithm_strings:
+                split_string = algorithm_string.split(":")
+                if len(split_string) == 1:
+                    algorithms.append(split_string[0])
+                else:
+                    raise common_exceptions.ConfigurationException(
+                        "The tool chain expects config params of list of 1 "
+                        "element with ,. Where the elements are either: the "
+                        "algorithum_name:algorithm_config_file_path, or "
+                        "algorithum_name if its a interal to pacman algorithm."
+                        " Please rectify this and try again")
 
             # if using virutal machine, add to list of algorithms the virtual
             # machine generator, otherwise add the standard machine generator
             if config.getboolean("Machine", "virtual_board"):
-                algorithms += ",FrontEndCommonVirtualMachineInterfacer"
+                algorithms.append("FrontEndCommonVirtualMachineInterfacer")
             else:
-                algorithms += ",FrontEndCommonMachineInterfacer"
-                algorithms += ",FrontEndCommonApplicationRunner"
+                algorithms.append("FrontEndCommonMachineInterfacer")
+                algorithms.append("FrontEndCommonApplicationRunner")
     
                 # if the end user wants reload script, add the reload script
                 # creator to the list (reload script currently only supported 
@@ -435,63 +454,63 @@ class Spinnaker(object):
                 # TODO look at this for multiple runs
                 if (not self._has_ran 
                         and config.getboolean("Reports", "writeReloadSteps")):
-                    algorithms += ",FrontEndCommonReloadScriptCreator"
+                    algorithms.append("FrontEndCommonReloadScriptCreator")
     
             if config.getboolean("Reports", "writeMemoryMapReport"):
-                algorithms += ",FrontEndCommonMemoryMapReport"
+                algorithms.append("FrontEndCommonMemoryMapReport")
     
             if config.getboolean("Reports", "writeNetworkSpecificationReport"):
-                algorithms += \
-                    ",FrontEndCommonNetworkSpecificationPartitionableReport"
+                algorithms.append(
+                    "FrontEndCommonNetworkSpecificationPartitionableReport")
 
             # if going to write provanence data after the run add the two
             # provenance gatherers
             if config.get("Reports", "writeProvanceData"):
-                algorithms += ",FrontEndCommonProvenanceGatherer"
+                algorithms.append("FrontEndCommonProvenanceGatherer")
     
             # define mapping between output types and reports
             if self._reports_states is not None \
                     and self._reports_states.tag_allocation_report:
-                algorithms += ",TagReport"
+                algorithms.append("TagReport")
             if self._reports_states is not None \
                     and self._reports_states.routing_info_report:
-                algorithms += ",routingInfoReports"
+                algorithms.append("routingInfoReports")
             if self._reports_states is not None \
                     and self._reports_states.router_report:
-                algorithms += ",RouterReports"
+                algorithms.append("RouterReports")
             if self._reports_states is not None \
                     and self._reports_states.partitioner_report:
-                algorithms += ",PartitionerReport"
+                algorithms.append("PartitionerReport")
             if (self._reports_states is not None and
                     self._reports_states.
                     placer_report_with_partitionable_graph):
-                algorithms += ",PlacerReportWithPartitionableGraph"
+                algorithms.append("PlacerReportWithPartitionableGraph")
             if (self._reports_states is not None and
                     self._reports_states.
                     placer_report_without_partitionable_graph):
-                algorithms += ",PlacerReportWithoutPartitionableGraph"
+                algorithms.append("PlacerReportWithoutPartitionableGraph")
         else:
             if requires_reset:
                 # kill binaries
-                algorithms += "FrontEndCommonApplicationExiter"
+                algorithms.append("FrontEndCommonApplicationExiter")
                 # load old application data
-                algorithms += \
-                    ",FrontEndCommonPartitionableGraphApplicationDataLoader"
+                algorithms.append(
+                    "FrontEndCommonPartitionableGraphApplicationDataLoader")
                 # load binairies back on
-                algorithms += ",FrontEndCommomLoadExecutableImages"
+                algorithms.append("FrontEndCommomLoadExecutableImages")
             else:
                 # add function for extracting all the recorded data from
                 # recorded populations
                 if not self._has_resetted_last:
-                    algorithms += "SpyNNakerRecordingExtracter,"
+                    algorithms.append("SpyNNakerRecordingExtracter")
                     # add functions for updating the models
-                algorithms += "FrontEndCommonRuntimeUpdater,"
+                algorithms.append("FrontEndCommonRuntimeUpdater")
                 # add functions for setting off the models again
-                algorithms += "FrontEndCommonApplicationRunner,"
+                algorithms.append("FrontEndCommonApplicationRunner")
                 # if going to write provanence data after the run add the two
                 # provenance gatherers
                 if config.get("Reports", "writeProvanceData"):
-                    algorithms += "FrontEndCommonProvenanceGatherer"
+                    algorithms.append("FrontEndCommonProvenanceGatherer")
         return algorithms
 
     def _create_pacman_executor_outputs(
@@ -653,12 +672,14 @@ class Spinnaker(object):
             inputs.append({"type": "LoadInitialBuffersFlag",
                            "value": True})
             if self._has_ran:
+
                 logger.warn("The graph has changed since the original "
                             "graph was loaded and ran. Therefore "
                             "decisions made during the mapping process will be"
                             " incorrect now, and therefore mapping needs to be"
-                            " redone. Sorry. \n\n\n PS. Once issue ")
-
+                            " redone. Sorry.")
+                inputs.append({'type': "BufferManager",
+                               'value': self._buffer_manager})
         else:
             # mapping does not need to be executed, therefore add
             # the data elements needed for the application runner and
@@ -704,6 +725,8 @@ class Spinnaker(object):
                            'value': self._router_tables})
             inputs.append({'type': "ProvenanceFilePath",
                            'value': provenance_file_path})
+            inputs.append({'type': "BufferManager",
+                           'value': self._buffer_manager})
         if self._has_ran and not reset:
             no_machine_time_steps =\
                 int(((total_runtime - self._current_run_ms) * 1000.0)
