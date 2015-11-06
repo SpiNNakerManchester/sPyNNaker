@@ -1,9 +1,12 @@
 from pacman.utilities.progress_bar import ProgressBar
 from spinnman.messages.eieio.data_messages.eieio_data_header \
     import EIEIODataHeader
-from spynnaker.pyNN.models.common import recording_utils
 
 import numpy
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class EIEIOSpikeRecorder(object):
@@ -36,6 +39,7 @@ class EIEIOSpikeRecorder(object):
                    placements, graph_mapper, partitionable_vertex):
 
         results = list()
+        missing = list()
         ms_per_tick = self._machine_time_step / 1000.0
         subvertices = \
             graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
@@ -50,12 +54,14 @@ class EIEIOSpikeRecorder(object):
             x = placement.x
             y = placement.y
             p = placement.p
-            # Read the spikes
-#            spike_data = recording_utils.get_data(
-#                transceiver, placement, region, subvertex.region_size)
-            spike_data = buffer_manager.get_data_for_vertex(
-                x, y, p, region, state_region)
 
+            # Read the spikes
+            raw_spike_data, missing_processor = \
+                buffer_manager.get_data_for_vertex(
+                    x, y, p, region, state_region)
+            if missing_processor is not None:
+                missing.append(missing_processor)
+            spike_data = raw_spike_data.read_all()
             number_of_bytes_written = len(spike_data)
 
             offset = 0
@@ -75,6 +81,10 @@ class EIEIOSpikeRecorder(object):
             progress_bar.update()
 
         progress_bar.end()
+        for i in missing:
+            logger.info("Missing information in chip ({0:d},{1:d}), core {2:d},"
+                        " population {3:s}, for region {4:d}".format(
+                            i[0], i[1], i[2], label, i[3]))
         if len(results) != 0:
             result = numpy.vstack(results)
             result = result[numpy.lexsort((result[:, 1], result[:, 0]))]

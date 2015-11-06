@@ -3,6 +3,9 @@ from pacman.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.utilities import constants
 
 import numpy
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class VRecorder(object):
@@ -50,6 +53,7 @@ class VRecorder(object):
         ms_per_tick = self._machine_time_step / 1000.0
 
         data = list()
+        missing = list()
 
         progress_bar = \
             ProgressBar(len(subvertices),
@@ -65,9 +69,11 @@ class VRecorder(object):
             p = placement.p
 
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer = buffer_manager.\
-                get_data_for_vertex(x, y, p, region, state_region)
-
+            neuron_param_region_data_pointer, missing_processor =\
+                buffer_manager.get_data_for_vertex(
+                    x, y, p, region, state_region)
+            if missing_processor is not None:
+                missing.append(missing_processor)
             record_raw = neuron_param_region_data_pointer.read_all()
             record_length = len(record_raw)
             n_rows = record_length / ((vertex_slice.n_atoms + 1) * 4)
@@ -89,7 +95,10 @@ class VRecorder(object):
             progress_bar.update()
 
         progress_bar.end()
-
+        for i in missing:
+            logger.info("Missing information in chip ({0:d},{1:d}), core {2:d},"
+                        " population {3:s}, for region {4:d}".format(
+                            i[0], i[1], i[2], label, i[3]))
         data = numpy.vstack(data)
         order = numpy.lexsort((data[:, 1], data[:, 0]))
         result = data[order]
