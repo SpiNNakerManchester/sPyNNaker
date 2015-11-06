@@ -194,35 +194,11 @@ class SpikeSourceArray(
         """
         self._spike_recorder.record = True
 
-    # @implements AbstractSpikeRecordable.set_last_extracted_spike_time
-    def get_last_extracted_spike_time(self):
-        """
-        returns the total number of machine time stepst aht this vertex thinks
-        it has extracted from the
-        :return:
-        """
-        return self._extracted_machine_time_steps
-
-    # @implements AbstractSpikeRecordable.get_cache_file_for_spike_data
-    def get_cache_file_for_spike_data(self):
-        """
-        gets the cahce file this vertex uses for storing its spike data
-        :return: the cache file for spikes
-        """
-        if self._spikes_cache_file is None:
-            self._spikes_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
-        return self._spikes_cache_file
-
-    # @implements AbstractSpikeRecordable.set_last_extracted_spike_time
-    def set_last_extracted_spike_time(self, new_value):
-        self._extracted_machine_time_steps = new_value
-
-    # @implements AbstractSpikeRecordable.close_cache_file_for_spike_data
-    def close_cache_file_for_spike_data(self):
-        self._spikes_cache_file = None
+    def reset(self):
+        self._spike_recorder.reset()
 
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
+                   graph_mapper, return_data=True):
         """
         gets spikes from the spike source array
         :param transceiver:
@@ -231,11 +207,10 @@ class SpikeSourceArray(
         :param graph_mapper:
         :return:
         """
-        self._extracted_machine_time_steps += n_machine_time_steps
         return self._spike_recorder.get_spikes(
             self.label, transceiver,
             self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value,
-            placements, graph_mapper, self)
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     @property
     def model_name(self):

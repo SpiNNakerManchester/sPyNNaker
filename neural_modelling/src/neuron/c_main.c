@@ -195,8 +195,6 @@ void timer_callback(uint timer_count, uint unused) {
     /* if a fixed number of simulation ticks that were specified at startup
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
-        log_info("Simulation complete.\n");
-
         // print statistics into logging region
         synapses_print_pre_synaptic_events();
         synapses_print_saturation_count();

@@ -22,8 +22,6 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 
 # local front end imports
-from spynnaker.pyNN.models.common.abstract_eieio_spike_recordable import \
-    AbstractEIEIOSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_gsyn_recordable import \
     AbstractGSynRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable import \
@@ -258,15 +256,16 @@ class Spinnaker(object):
         :param run_time:
         :return:
         """
+        logger.info("Starting exeuction process")
 
         # calculate number of machine time steps
-        self._calculate_number_of_machine_time_steps(run_time)
+        total_run_time = self._calculate_number_of_machine_time_steps(run_time)
 
         self._current_run_ms = run_time
 
         # get inputs
         inputs, application_graph_changed = \
-            self._create_pacman_executor_inputs()
+            self._create_pacman_executor_inputs(total_run_time)
         # get outputs
         required_outputs = \
             self._create_pacman_executor_outputs(
@@ -295,9 +294,12 @@ class Spinnaker(object):
         # sort out outputs datas
         if application_graph_changed:
             self._update_data_structures_from_pacman_exeuctor(pacman_exeuctor)
+        else:
+            self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
 
         # reset the reset flag to say the last thing was not a reset call
         self._has_resetted_last = False
+        self._current_run_ms = total_run_time
 
     def _update_data_structures_from_pacman_exeuctor(self, pacman_exeuctor):
         """
@@ -328,12 +330,16 @@ class Spinnaker(object):
             pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
         self._vertex_to_app_data_file_paths = \
             pacman_exeuctor.get_item("VertexToAppDataFilePaths")
+        self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
 
     def reset(self):
         """
         code that puts the simulation back at time zero
         :return:
         """
+
+        logger.info("Starting reset progress")
+
         self._has_resetted_last = True
         inputs, application_graph_changed = \
             self._create_pacman_executor_inputs(reset=self._has_resetted_last)
@@ -353,20 +359,16 @@ class Spinnaker(object):
         # has ran for over multiple calls to run
         self._current_run_ms = 0
 
+        # change num of resets as loading the binary again resets the sync to 0
+        self._no_sync_changes = 0
+
         # reset the n_machien time steps from each vertex
         for vertex in self.partitionable_graph.vertices:
             vertex.set_no_machine_time_steps(0)
-            if isinstance(vertex, AbstractSpikeRecordable):
-                vertex.set_last_extracted_spike_time(0)
-                vertex.close_cache_file_for_spike_data()
-            if isinstance(vertex, AbstractVRecordable):
-                vertex.set_last_extracted_v_time(0)
-                vertex.close_cache_file_for_v_data()
-            if isinstance(vertex, AbstractGSynRecordable):
-                vertex.set_last_extracted_gsyn_time(0)
-                vertex.close_cache_file_for_gsyn_data()
-            if isinstance(vertex, AbstractEIEIOSpikeRecordable):
-                pass
+            if (isinstance(vertex, AbstractSpikeRecordable)
+                    or isinstance(vertex, AbstractVRecordable)
+                    or isinstance(vertex, AbstractGSynRecordable)):
+                vertex.reset()
 
         # TODO there needs to be some decision on reload here.
 
@@ -511,7 +513,7 @@ class Spinnaker(object):
             required_outputs.append("ReloadToken")
         return required_outputs
 
-    def _create_pacman_executor_inputs(self, reset=False):
+    def _create_pacman_executor_inputs(self, total_runtime, reset=False):
 
         application_graph_changed = self._detect_if_graph_has_changed()
         inputs = list()
@@ -688,8 +690,6 @@ class Spinnaker(object):
             inputs.append({'type': "LoadBinariesToken", 'value': True})
             inputs.append({'type': "LoadedApplicationDataToken",
                            'value': True})
-            inputs.append({'type': "NoFullRunCount",
-                           'value': self._no_sync_changes})
             inputs.append({'type': "MemoryPlacements",
                            'value': self._placements})
             inputs.append({'type': "MemoryGraphMapper",
@@ -706,7 +706,8 @@ class Spinnaker(object):
                            'value': provenance_file_path})
         if self._has_ran and not reset:
             no_machine_time_steps =\
-                int((self._current_run_ms * 1000.0) / self._machine_time_step)
+                int(((total_runtime - self._current_run_ms) * 1000.0)
+                    / self._machine_time_step)
             inputs.append({'type': "RunTimeMachineTimeSteps",
                            'value': no_machine_time_steps})
             inputs.append({"type": "LoadInitialBuffersFlag", "value": False})
@@ -755,6 +756,7 @@ class Spinnaker(object):
                         "recording a population when set to infinite runtime "
                         "is not currently supportable in this tool chain. "
                         "watch this space")
+        return next_run_time
                 
     def _detect_if_graph_has_changed(self):
         """
@@ -1075,7 +1077,8 @@ class Spinnaker(object):
                                                           router_table.y)
             # stop the binaries that are in some state
             exiter = FrontEndCommonApplicationExiter()
-            exiter(self._app_id, self._txrx, self._executable_targets)
+            exiter(self._app_id, self._txrx, self._executable_targets,
+                   self._no_sync_changes)
 
             # clear values
             self._no_sync_changes = 0

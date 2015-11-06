@@ -7,7 +7,7 @@ from abc import abstractproperty
 
 
 @add_metaclass(ABCMeta)
-class AbstractEIEIOSpikeRecordable(object):
+class AbstractUsesEIEIORecordings(object):
     """
     AbstractEIEIOSpikeRecordable: interface which covers the fact that eieio
     recordable vertices need to have a base key for atoms, and needs to store
@@ -27,4 +27,3 @@ class AbstractEIEIOSpikeRecordable(object):
 
         :return:
         """
-

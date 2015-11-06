@@ -12,14 +12,14 @@ from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 from spinn_front_end_common.interface.buffer_management.buffer_models.\
     sends_buffers_from_host_partitioned_vertex_pre_buffered_impl \
     import SendsBuffersFromHostPartitionedVertexPreBufferedImpl
-from spynnaker.pyNN.models.common.abstract_eieio_spike_recordable import \
-    AbstractEIEIOSpikeRecordable
+from spynnaker.pyNN.models.common.abstract_uses_eieio_recordings import \
+    AbstractUsesEIEIORecordings
 
 
 class SpikeSourceArrayPartitionedVertex(
         PartitionedVertex, RequiresRoutingInfoPartitionedVertex,
         SendsBuffersFromHostPartitionedVertexPreBufferedImpl,
-        AbstractEIEIOSpikeRecordable):
+        AbstractUsesEIEIORecordings):
     """
     SpikeSourceArrayPartitionedVertex the partitioned version of the
     spike soruce array supported by PyNN.
@@ -31,7 +31,7 @@ class SpikeSourceArrayPartitionedVertex(
         RequiresRoutingInfoPartitionedVertex.__init__(self)
         SendsBuffersFromHostPartitionedVertexPreBufferedImpl.__init__(
             self, send_buffers)
-        AbstractEIEIOSpikeRecordable.__init__(self)
+        AbstractUsesEIEIORecordings.__init__(self)
         self._base_key = None
         self._region_size = None
 

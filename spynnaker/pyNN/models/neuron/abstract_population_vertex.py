@@ -95,15 +95,6 @@ class AbstractPopulationVertex(
         self._outgoing_edge_key_restrictor = \
             OutgoingEdgeSameContiguousKeysRestrictor()
 
-        # set up cache files for recording of parameters
-        self._spikes_cache_file = None
-        self._vs_cache_file = None
-        self._gsyns_cache_file = None
-        # position params for knowing how much data has been extracted
-        self._extracted_spike_machine_time_steps = 0
-        self._extracted_v_machine_time_steps = 0
-        self._extracted_gsyn_machine_time_steps = 0
-
         # bool for if state has changed.
         self._change_requires_mapping = True
 
@@ -375,33 +366,19 @@ class AbstractPopulationVertex(
     def set_recording_spikes(self):
         self._spike_recorder.record = True
 
+    # @implements AbstractSpikeRecordable.reset
+    def reset(self):
+        self._spike_recorder.reset()
+        self._v_recorder.reset()
+        self._gsyn_recorder.reset()
+
     # @implements AbstractSpikeRecordable.get_spikes
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
-        to_extract_n_machine_time_steps = \
-            n_machine_time_steps - self._extracted_spike_machine_time_steps
-        self._extracted_spike_machine_time_steps += n_machine_time_steps
+                   graph_mapper, return_data=True):
         return self._spike_recorder.get_spikes(
             self._label, transceiver,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-            to_extract_n_machine_time_steps, placements, graph_mapper, self)
-
-    # @implements AbstractSpikeRecordable.get_cache_file_for_spike_data
-    def get_cache_file_for_spike_data(self):
-        if self._spikes_cache_file is None:
-            self._spikes_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
-        return self._spikes_cache_file
-
-    # @implements AbstractSpikeRecordable.get_last_extracted_spike_time
-    def get_last_extracted_spike_time(self):
-        return self._extracted_spike_machine_time_steps
-
-    # @implements AbstractSpikeRecordable.set_last_extracted_spike_time
-    def set_last_extracted_spike_time(self, new_value):
-        self._extracted_spike_machine_time_steps = new_value
-
-    def close_cache_file_for_spike_data(self):
-        self._spikes_cache_file = None
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
@@ -411,34 +388,13 @@ class AbstractPopulationVertex(
     def set_recording_v(self):
         self._v_recorder.record_v = True
 
-    # @implements AbstractVRecordable.get_cache_file_for_v_data
-    def get_cache_file_for_v_data(self):
-        if self._vs_cache_file is None:
-            self._vs_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
-        return self._vs_cache_file
-
-    # @implements AbstractVRecordable.get_last_extracted_v_time
-    def get_last_extracted_v_time(self):
-        return self._extracted_v_machine_time_steps
-
-    # @implements AbstractVRecordable.get_last_extracted_v_time
-    def close_cache_file_for_v_data(self):
-        self._vs_cache_file = None
-
-    # @implements AbstractVRecordable.set_last_extracted_v_time
-    def set_last_extracted_v_time(self, new_value):
-        self._extracted_v_machine_time_steps = new_value
-
     # @implements AbstractVRecordable.get_v
     def get_v(self, transceiver, n_machine_time_steps, placements,
-              graph_mapper):
-        to_extract_n_machine_time_steps = \
-            n_machine_time_steps - self._extracted_v_machine_time_steps
-        self._extracted_v_machine_time_steps += n_machine_time_steps
+              graph_mapper, return_data=True):
         return self._v_recorder.get_v(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
-            to_extract_n_machine_time_steps, placements, graph_mapper, self)
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
     def is_recording_gsyn(self):
@@ -448,34 +404,13 @@ class AbstractPopulationVertex(
     def set_recording_gsyn(self):
         self._gsyn_recorder.record_gsyn = True
 
-    # @implements AbstractGSynRecordable.get_cache_file_for_gsyn_data
-    def get_cache_file_for_gsyn_data(self):
-        if self._gsyns_cache_file is None:
-            self._gsyns_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
-        return self._gsyns_cache_file
-
-    # @implements AbstractGSynRecordable.set_last_extracted_gsyn_time
-    def set_last_extracted_gsyn_time(self, new_value):
-        self._extracted_gsyn_machine_time_steps = new_value
-
-    # @implements AbstractGSynRecordable.close_cache_file_for_gsyn_data
-    def close_cache_file_for_gsyn_data(self):
-        self._gsyns_cache_file = None
-
-    # @implements AbstractGSynRecordable.get_last_extracted_gsyn_time
-    def get_last_extracted_gsyn_time(self):
-        return self._extracted_gsyn_machine_time_steps
-
     # @implements AbstractGSynRecordable.get_gsyn
     def get_gsyn(self, transceiver, n_machine_time_steps, placements,
-                 graph_mapper):
-        to_extract_n_machine_time_steps = \
-            n_machine_time_steps - self._extracted_gsyn_machine_time_steps
-        self._extracted_gsyn_machine_time_steps += n_machine_time_steps
+                 graph_mapper, return_data=True):
         return self._gsyn_recorder.get_gsyn(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
-            to_extract_n_machine_time_steps, placements, graph_mapper, self)
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     def initialize(self, variable, value):
         initialize_attr = getattr(

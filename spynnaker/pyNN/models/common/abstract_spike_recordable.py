@@ -22,29 +22,7 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def get_last_extracted_spike_time(self):
-        """ gets the last time point which the vertex thinks its extracted from
-        the machine
-        :return:
-        """
-
-    @abstractmethod
-    def set_last_extracted_spike_time(self, new_value):
-        """ sets the last time point which the vertex thinks its extracted from
-        the machine
-        :param new_value: the new value for the last_extracted_spike_time
-        :return:
-        """
-
-    @abstractmethod
-    def get_cache_file_for_spike_data(self):
-        """
-        gets the cahce file this vertex uses for storing its spike data
-        :return:
-        """
-
-    @abstractmethod
-    def close_cache_file_for_spike_data(self):
+    def reset(self):
         """
         closes the cahce file this vertex uses for storing its spike data
         :return:
@@ -52,12 +30,14 @@ class AbstractSpikeRecordable(object):
 
     @abstractmethod
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
+                   graph_mapper, return_data):
         """ Get the recorded spikes from the object
         :param transceiver: the python interface to the spinnaker machine
         :param n_machine_time_steps: the number of machine time steps the
         system expects to run
         :param placements: the placements object
+        :param return_data: bool which tells the method to either return
+            retrieved spikes, or just update if needed
         :param graph_mapper: the graph mapper object
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
                 ordered by time

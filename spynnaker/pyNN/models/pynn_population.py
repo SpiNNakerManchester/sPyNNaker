@@ -234,21 +234,12 @@ class Population(object):
                 " be retrieved. Please execute the simulation before"
                 " running this command")
 
-        # check that the vertex has read up to the position it needs to
-        runtime_time_steps = self._spinnaker.no_machine_time_steps
-        if runtime_time_steps == self._vertex.get_last_extracted_spike_time:
-            return numpy.load(self._vertex.get_cache_file_for_spike_data())
-        else:
-            spikes = self._vertex.get_spikes(
-                self._spinnaker.transceiver,
-                self._spinnaker.no_machine_time_steps,
-                self._spinnaker.placements, self._spinnaker.graph_mapper)
+        spikes = self._vertex.get_spikes(
+            self._spinnaker.transceiver,
+            self._spinnaker.no_machine_time_steps,
+            self._spinnaker.placements, self._spinnaker.graph_mapper)
 
-            numpy.save(self._vertex.get_cache_file_for_spike_data(), spikes)
-
-        # Load from the file
-        self._vertex.get_cache_file_for_spike_data().seek(0)
-        return numpy.load(self._vertex.get_cache_file_for_spike_data())
+        return spikes
 
     def get_spike_counts(self, gather=True):
         """
@@ -294,20 +285,10 @@ class Population(object):
                 " running this command")
 
         # check that the vertex has read up to the position it needs to
-        runtime_time_steps = self._spinnaker.no_machine_time_steps
-        if runtime_time_steps == self._vertex.get_last_extracted_gsyn_time:
-            return numpy.load(self._vertex.get_cache_file_for_gsyn_data())
-        else:
-            gsyn = self._vertex.get_gsyn(
+        return self._vertex.get_gsyn(
                 self._spinnaker.transceiver,
                 self._spinnaker.no_machine_time_steps,
                 self._spinnaker.placements, self._spinnaker.graph_mapper)
-
-            numpy.save(self._vertex.get_cache_file_for_gsyn_data(), gsyn)
-
-        # Load from the file
-        self._vertex.get_cache_file_for_gsyn_data().seek(0)
-        return numpy.load(self._vertex.get_cache_file_for_gsyn_data())
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -341,20 +322,10 @@ class Population(object):
                 " running this command")
 
         # check that the vertex has read up to the position it needs to
-        runtime_time_steps = self._spinnaker.no_machine_time_steps
-        if runtime_time_steps == self._vertex.get_last_extracted_v_time:
-            return numpy.load(self._vertex.get_cache_file_for_v_data())
-        else:
-            v = self._vertex.get_v(
-                self._spinnaker.transceiver,
-                self._spinnaker.no_machine_time_steps,
-                self._spinnaker.placements, self._spinnaker.graph_mapper)
-
-            numpy.save(self._vertex.get_cache_file_for_v_data(), v)
-
-        # Load from the file
-        self._vertex.get_cache_file_for_v_data().seek(0)
-        return numpy.load(self._vertex.get_cache_file_for_v_data())
+        return self._vertex.get_v(
+            self._spinnaker.transceiver,
+            self._spinnaker.no_machine_time_steps,
+            self._spinnaker.placements, self._spinnaker.graph_mapper)
 
     def id_to_index(self, cell_id):
         """

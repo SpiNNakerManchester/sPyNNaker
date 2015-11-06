@@ -22,29 +22,7 @@ class AbstractGSynRecordable(object):
         """
 
     @abstractmethod
-    def get_last_extracted_gsyn_time(self):
-        """ gets the last time point which the vertex thinks its extracted from
-        the machine
-        :return:
-        """
-
-    @abstractmethod
-    def set_last_extracted_gsyn_time(self, new_value):
-        """ sets the last time point which the vertex thinks its extracted from
-        the machine
-        :param new_value: the new value to set the last_extracted_gsyn_time
-        :return:
-        """
-
-    @abstractmethod
-    def get_cache_file_for_gsyn_data(self):
-        """
-        gets the cahce file this vertex uses for storing its gsyn data
-        :return:
-        """
-
-    @abstractmethod
-    def close_cache_file_for_gsyn_data(self):
+    def reset(self):
         """
         closes the cahce file this vertex uses for storing its gsyn data
         :return:
@@ -52,7 +30,7 @@ class AbstractGSynRecordable(object):
 
     @abstractmethod
     def get_gsyn(self, transceiver, n_machine_time_steps, placements,
-                 graph_mapper):
+                 graph_mapper, return_data):
         """ Get the recorded gsyn from the object
         :param transceiver: the python interface to the spinnaker machine
         :param n_machine_time_steps: the number of timer tics that will

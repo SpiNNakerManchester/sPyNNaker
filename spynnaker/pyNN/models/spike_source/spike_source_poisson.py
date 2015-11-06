@@ -308,11 +308,26 @@ class SpikeSourcePoisson(
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
             spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
 
+    # @implements AbstractSpikeRecordable.is_recording_spikes
     def is_recording_spikes(self):
         return self._spike_recorder.record
 
+    # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
         self._spike_recorder.record = True
+
+    # @implements AbstractSpikeRecordable.reset
+    def reset(self):
+        self._spike_recorder.reset()
+
+    # @implements AbstractSpikeRecordable.get_spikes
+    def get_spikes(self, transceiver, n_machine_time_steps, placements,
+                   graph_mapper, return_data=True):
+        return self._spike_recorder.get_spikes(
+            self._label, transceiver,
+            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
+
 
     # inherited from partionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
@@ -418,16 +433,6 @@ class SpikeSourcePoisson(
         """
         return "spike_source_poisson.aplx"
 
-    def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
-        to_extract_n_machine_time_steps = \
-            n_machine_time_steps - self._extracted_machine_time_steps
-        self._extracted_machine_time_steps += n_machine_time_steps
-        return self._spike_recorder.get_spikes(
-            self._label, transceiver,
-            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            to_extract_n_machine_time_steps, placements, graph_mapper, self)
-
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
         """
         gets the constraints for edges going out of this vertex
@@ -461,23 +466,6 @@ class SpikeSourcePoisson(
         :return:
         """
         self._change_requires_mapping = new_value
-
-    def get_last_extracted_spike_time(self):
-        """
-        returns the total number of machine time stepst aht this vertex thinks
-        it has extracted from the
-        :return:
-        """
-        return self._extracted_machine_time_steps
-
-    def get_cache_file_for_spike_data(self):
-        """
-        gets the cahce file this vertex uses for storing its spike data
-        :return: the cache file for spikes
-        """
-        if self._spikes_cache_file is None:
-            self._spikes_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
-        return self._spikes_cache_file
 
     def get_value(self, key):
         """ Get a property of the overall model
