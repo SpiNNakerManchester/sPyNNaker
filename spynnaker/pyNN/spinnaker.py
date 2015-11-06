@@ -341,8 +341,8 @@ class Spinnaker(object):
         logger.info("Starting reset progress")
 
         self._has_resetted_last = True
-        inputs, application_graph_changed = \
-            self._create_pacman_executor_inputs(reset=self._has_resetted_last)
+        inputs, application_graph_changed = self._create_pacman_executor_inputs(
+                reset=self._has_resetted_last, total_runtime=0)
         algorithms = self._create_algorithm_list(
             config.get("Mode", "mode") == "Debug", application_graph_changed,
             requires_reset=self._has_resetted_last)

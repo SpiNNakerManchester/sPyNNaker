@@ -62,8 +62,6 @@ class GsynRecorder(object):
         else:
             to_extract_n_machine_time_steps = \
                 n_machine_time_steps - self._extracted_gsyn_machine_time_steps
-            self._extracted_gsyn_machine_time_steps += \
-                to_extract_n_machine_time_steps
 
             ms_per_tick = self._machine_time_step / 1000.0
 
@@ -79,7 +77,9 @@ class GsynRecorder(object):
                 n_atoms * to_extract_n_machine_time_steps) % n_atoms).reshape(
                     (to_extract_n_machine_time_steps, n_atoms))
             data["f1"] = numpy.repeat(numpy.arange(
-                0, to_extract_n_machine_time_steps * ms_per_tick, ms_per_tick),
+                (self._extracted_gsyn_machine_time_steps * ms_per_tick),
+                (self._extracted_gsyn_machine_time_steps +
+                 to_extract_n_machine_time_steps) * ms_per_tick, ms_per_tick),
                 n_atoms).reshape((to_extract_n_machine_time_steps, n_atoms))
 
             progress_bar = ProgressBar(
@@ -110,27 +110,31 @@ class GsynRecorder(object):
             progress_bar.end()
             data.shape = n_atoms * to_extract_n_machine_time_steps
 
-            # Sort the data - apparently, using lexsort is faster, but it might
-            # consume more memory, so the option is left open for sort-in-place
-            order = numpy.lexsort((data["f1"], data["f0"]))
-            # data.sort(order=['f0', 'f1'], axis=0)
-
-            gsyn = data.view(dtype="float64").reshape(
-                (n_atoms * to_extract_n_machine_time_steps, 4))[order]
-
             # extract old data
             cached_gsyn = recording_utils.pull_off_cached_lists(
                 self._no_gsyn_loads, self._gsyns_cache_file)
 
             # cache the data just pulled off
-            numpy.save(self._gsyns_cache_file, gsyn)
+            numpy.save(self._gsyns_cache_file, data)
             self._no_gsyn_loads += 1
 
             # concat extracted with cached
             if len(cached_gsyn) != 0:
-                all_gsyn = numpy.concatenate((cached_gsyn, gsyn))
+                all_gsyn = numpy.concatenate((cached_gsyn, data))
             else:
-                all_gsyn = gsyn
+                all_gsyn = data
 
-            # return all spikes
-            return all_gsyn
+            shaped_gsyn = all_gsyn.view(dtype="float64").reshape(
+                (n_atoms * n_machine_time_steps, 4))
+
+            # Sort the data - apparently, using lexsort is faster, but it might
+            # consume more memory, so the option is left open for sort-in-place
+
+            # data.sort(order=['f0', 'f1'], axis=0)
+            order = numpy.lexsort((all_gsyn["f1"], all_gsyn["f0"]))
+
+            self._extracted_gsyn_machine_time_steps += \
+                to_extract_n_machine_time_steps
+
+            # return all gsyn
+            return shaped_gsyn[order]

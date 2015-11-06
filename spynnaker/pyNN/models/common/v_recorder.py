@@ -77,7 +77,7 @@ class VRecorder(object):
                     (to_extract_n_machine_time_steps, n_atoms))
             # sort out times
             data["f1"] = numpy.repeat(numpy.arange(
-                self._extracted_v_machine_time_steps,
+                (self._extracted_v_machine_time_steps * ms_per_tick),
                 (self._extracted_v_machine_time_steps +
                  to_extract_n_machine_time_steps) * ms_per_tick, ms_per_tick),
                 n_atoms).reshape((to_extract_n_machine_time_steps, n_atoms))
@@ -109,30 +109,30 @@ class VRecorder(object):
             progress_bar.end()
             data.shape = n_atoms * to_extract_n_machine_time_steps
 
-            # Sort the data - apparently, using lexsort is faster, but it might
-            # consume more memory, so the option is left open for sort-in-place
-            order = numpy.lexsort((data["f1"], data["f0"]))
-            # data.sort(order=['f0', 'f1'], axis=0)
-
-            vs = data.view(dtype="float64").reshape(
-                (n_atoms * to_extract_n_machine_time_steps, 3))[order]
-
              # extract old data
             cached_v = recording_utils.pull_off_cached_lists(
                 self._no_v_loads, self._vs_cache_file)
 
             # cache the data just pulled off
-            numpy.save(self._vs_cache_file, vs)
+            numpy.save(self._vs_cache_file, data)
             self._no_v_loads += 1
 
             # concat extracted with cached
             if len(cached_v) != 0:
-                all_vs = numpy.concatenate((cached_v, vs))
+                all_vs = numpy.concatenate((cached_v, data))
+
             else:
-                all_vs = vs
+                all_vs = data
+
+            shaped_vs = all_vs.view(dtype="float64").reshape(
+                (n_atoms * n_machine_time_steps, 3))
+
+            # Sort the data - apparently, using lexsort is faster, but it might
+            # consume more memory, so the option is left open for sort-in-place
+            order = numpy.lexsort((all_vs["f1"], all_vs["f0"]))
 
             self._extracted_v_machine_time_steps += \
                 to_extract_n_machine_time_steps
 
             # return all spikes
-            return all_vs
+            return shaped_vs[order]
