@@ -1,12 +1,7 @@
-from spinn_front_end_common.utilities import exceptions
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.models.neural_properties.synapse_row_info \
-    import SynapseRowInfo
 import logging
 import numpy
-from numpy.lib import recfunctions
 
 logger = logging.getLogger(__name__)
 
