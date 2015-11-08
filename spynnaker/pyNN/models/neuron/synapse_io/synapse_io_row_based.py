@@ -120,8 +120,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             # Get the actual connections
             connections = synapse_info.connector.create_synaptic_block(
                 n_pre_slices, pre_slice_index, n_post_slices,
-                post_slice_index, pre_vertex_slice, post_vertex_slice,
-                synapse_info.synapse_type)
+                post_slice_index, pre_vertex_slice, post_vertex_slice)
 
             # Split the connections up based on the delays
             undelayed_connections = connections
@@ -159,7 +158,8 @@ class SynapseIORowBased(AbstractSynapseIO):
                 fixed_fixed_data, fixed_plastic_data, plastic_plastic_data =\
                     synapse_info.synapse_dynamics.get_synaptic_data(
                         undelayed_connections, self._machine_time_step,
-                        n_synapse_types, weight_scales)
+                        n_synapse_types, weight_scales,
+                        synapse_info.synapse_type)
                 if fixed_fixed_data is not None:
                     fixed_fixed_data_items.append([numpy.ravel(
                         fixed_fixed_data[undelayed_row_indices == i])
@@ -180,7 +180,8 @@ class SynapseIORowBased(AbstractSynapseIO):
                 fixed_fixed_data, fixed_plastic_data, plastic_plastic_data =\
                     synapse_info.synapse_dynamics.get_synaptic_data(
                         delayed_connections, self._machine_time_step,
-                        n_synapse_types, weight_scales)
+                        n_synapse_types, weight_scales,
+                        synapse_info.synapse_type)
                 if fixed_fixed_data is not None:
                     delayed_fixed_fixed_data_items.append(numpy.ravel(
                         [fixed_fixed_data[delayed_row_indices == i]
