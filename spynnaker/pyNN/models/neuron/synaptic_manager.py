@@ -368,29 +368,30 @@ class SynapticManager(object):
                 subedge.pre_subvertex)
             edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
-            for synapse_info in edge.synapse_information:
-                synapse_type = synapse_info.synapse_type
-                synapse_dynamics = synapse_info.synapse_dynamics
-                connector = synapse_info.connector
-                weight_mean = synapse_dynamics.get_weight_mean(
-                    connector, pre_vertex_slice, post_vertex_slice)
-                n_connections = \
-                    connector.get_n_connections_to_post_vertex_maximum(
-                        pre_vertex_slice, post_vertex_slice)
-                weight_variance = synapse_dynamics.get_weight_variance(
-                    connector, pre_vertex_slice, post_vertex_slice)
-                running_totals[synapse_type].add_items(
-                    weight_mean, weight_variance, n_connections)
+            if isinstance(edge, ProjectionPartitionableEdge):
+                for synapse_info in edge.synapse_information:
+                    synapse_type = synapse_info.synapse_type
+                    synapse_dynamics = synapse_info.synapse_dynamics
+                    connector = synapse_info.connector
+                    weight_mean = synapse_dynamics.get_weight_mean(
+                        connector, pre_vertex_slice, post_vertex_slice)
+                    n_connections = \
+                        connector.get_n_connections_to_post_vertex_maximum(
+                            pre_vertex_slice, post_vertex_slice)
+                    weight_variance = synapse_dynamics.get_weight_variance(
+                        connector, pre_vertex_slice, post_vertex_slice)
+                    running_totals[synapse_type].add_items(
+                        weight_mean, weight_variance, n_connections)
 
-                weight_max = synapse_dynamics.get_weight_maximum(
-                    connector, pre_vertex_slice, post_vertex_slice)
-                biggest_weight[synapse_type] = max(
-                    biggest_weight[synapse_type], weight_max)
-                total_weights[synapse_type] += (
-                    weight_max * n_connections)
+                    weight_max = synapse_dynamics.get_weight_maximum(
+                        connector, pre_vertex_slice, post_vertex_slice)
+                    biggest_weight[synapse_type] = max(
+                        biggest_weight[synapse_type], weight_max)
+                    total_weights[synapse_type] += (
+                        weight_max * n_connections)
 
-                if synapse_dynamics.are_weights_signed():
-                    weights_signed = True
+                    if synapse_dynamics.are_weights_signed():
+                        weights_signed = True
 
         max_weights = numpy.zeros(n_synapse_types)
         for synapse_type in range(n_synapse_types):
@@ -506,13 +507,21 @@ class SynapticManager(object):
                 pre_slice_index = pre_vertex_slices.index(
                     subedge.pre_subvertex)
 
-                row_data, row_length, delayed_row_data, delayed_row_length =\
+                (row_data, row_length, delayed_row_data, delayed_row_length,
+                 delayed_source_ids, delay_stages) = \
                     self._synapse_io.get_synapses(
                         edge.synapse_information, n_pre_slices,
                         pre_slice_index, n_post_slices, post_slice_index,
                         pre_vertex_slice, post_vertex_slice,
                         edge.n_delay_stages, self._population_table_type,
                         n_synapse_types, weight_scales)
+
+                if edge.delay_edge is not None:
+                    edge.delay_edge.pre_vertex.add_delays(
+                        pre_vertex_slice, delayed_source_ids, delay_stages)
+                elif delayed_source_ids.size != 0:
+                    raise Exception("Found delayed source ids but no delay"
+                                    " edge for edge {}".format(edge.label))
 
                 if len(row_data) > 0:
                     next_block_start_addr = self._write_padding(
@@ -533,7 +542,8 @@ class SynapticManager(object):
                     spec.switch_write_focus(synaptic_matrix_region)
                     spec.write_array(delayed_row_data)
                     keys_and_masks = delay_key_index[
-                        (subedge.pre_subvertex, pre_vertex_slice)]
+                        (edge.pre_vertex, pre_vertex_slice.lo_atom,
+                         pre_vertex_slice.hi_atom)]
                     self._population_table_type.update_master_population_table(
                         spec, next_block_start_addr, delayed_row_length,
                         keys_and_masks, master_pop_table_region)
@@ -553,9 +563,11 @@ class SynapticManager(object):
             edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
             if isinstance(edge.pre_vertex, DelayExtensionVertex):
-                pre_slice = graph_mapper.get_subvertex_slice(
+                pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
-                delay_key_index[(subedge.pre_subvertex, pre_slice)] =\
+                delay_key_index[(edge.pre_vertex.source_vertex,
+                                 pre_vertex_slice.lo_atom,
+                                 pre_vertex_slice.hi_atom)] =\
                     routing_info.get_keys_and_masks_from_subedge(subedge)
 
         subvertices = list(graph_mapper.get_subvertices_from_vertex(vertex))

@@ -38,15 +38,14 @@ class SynapseDynamicsStatic(AbstractSynapseDynamics):
         synapse_weight_scale = weight_scales[synapse_type]
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
 
-        fixed_fixed = (((numpy.rint(numpy.abs(connections["weight"]) *
-                                    synapse_weight_scale).astype("uint32") &
-                        0xFFFF) << 16) |
-                       ((numpy.rint(connections["delay"] * (1000.0 /
-                                    machine_time_step)).astype("uint32") &
-                         0xF) << (8 + n_synapse_type_bits)) |
-                       (synapse_type << 8) |
-                       ((connections["target"] -
-                         post_vertex_slice.lo_atom) & 0xFF))
+        fixed_fixed = (
+            ((numpy.rint(numpy.abs(connections["weight"]) *
+              synapse_weight_scale).astype("uint32") & 0xFFFF) << 16) |
+            ((numpy.rint(connections["delay"] *
+             (1000.0 / machine_time_step)).astype("uint32") & 0xF) <<
+             (8 + n_synapse_type_bits)) |
+            (synapse_type << 8) |
+            ((connections["target"] - post_vertex_slice.lo_atom) & 0xFF))
 
         return (fixed_fixed.view(dtype="uint8").reshape((-1, 4)),
                 None, None)

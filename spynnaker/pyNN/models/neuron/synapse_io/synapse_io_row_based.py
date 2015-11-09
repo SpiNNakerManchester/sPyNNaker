@@ -132,26 +132,19 @@ class SynapseIORowBased(AbstractSynapseIO):
             del connections
 
             # Get which row each connection will go into
-            undelayed_row_indices = []
-            if len(undelayed_connections) > 0:
-                undelayed_row_indices = numpy.digitize(
-                    undelayed_connections["source"], numpy.arange(
-                        pre_vertex_slice.lo_atom,
-                        pre_vertex_slice.hi_atom + 1),
-                    right=True)
+            undelayed_row_indices = (undelayed_connections["source"] -
+                                     pre_vertex_slice.lo_atom)
 
-            delayed_row_indices = []
-            if len(delayed_connections) > 0:
-
-                # Convert the delayed source indices into source index *
-                # delay stage
-                delayed_row_indices = numpy.digitize(
-                    delayed_connections["source"], numpy.arange(
-                        pre_vertex_slice.lo_atom,
-                        pre_vertex_slice.hi_atom + 1),
-                    right=True) * numpy.floor(
-                        (numpy.round(delayed_connections["delay"] - 1.0)) /
-                        max_delay) - 1
+            # Get the delay stages and which row each delayed connection will
+            # go into
+            stages = numpy.floor(
+                (numpy.round(delayed_connections["delay"] - 1.0)) /
+                max_delay)
+            delayed_row_indices = (delayed_connections["source"] -
+                                   pre_vertex_slice.lo_atom) * stages
+            delayed_connections["delay"] -= max_delay * stages
+            delayed_source_ids = (delayed_connections["source"] -
+                                  pre_vertex_slice.lo_atom)
 
             # Get the data for the connections
             if len(undelayed_connections) > 0:
@@ -165,13 +158,13 @@ class SynapseIORowBased(AbstractSynapseIO):
                         fixed_fixed_data[undelayed_row_indices == i])
                         for i in range(pre_vertex_slice.n_atoms)])
                 if fixed_plastic_data is not None:
-                    fixed_plastic_data_items.append(numpy.ravel(
-                        [fixed_plastic_data[undelayed_row_indices == i]
-                         for i in range(pre_vertex_slice.n_atoms)]))
+                    fixed_plastic_data_items.append([numpy.ravel(
+                        fixed_plastic_data[undelayed_row_indices == i])
+                        for i in range(pre_vertex_slice.n_atoms)])
                 if plastic_plastic_data is not None:
-                    plastic_plastic_data_items.append(numpy.ravel(
-                        [plastic_plastic_data[undelayed_row_indices == i]
-                         for i in range(pre_vertex_slice.n_atoms)]))
+                    plastic_plastic_data_items.append([numpy.ravel(
+                        plastic_plastic_data[undelayed_row_indices == i])
+                        for i in range(pre_vertex_slice.n_atoms)])
                 del fixed_fixed_data, fixed_plastic_data, plastic_plastic_data
             del undelayed_connections
 
@@ -183,17 +176,17 @@ class SynapseIORowBased(AbstractSynapseIO):
                         self._machine_time_step, n_synapse_types,
                         weight_scales, synapse_info.synapse_type)
                 if fixed_fixed_data is not None:
-                    delayed_fixed_fixed_data_items.append(numpy.ravel(
-                        [fixed_fixed_data[delayed_row_indices == i]
-                         for i in range(pre_vertex_slice.n_atoms)]))
+                    delayed_fixed_fixed_data_items.append([numpy.ravel(
+                        fixed_fixed_data[delayed_row_indices == i])
+                        for i in range(pre_vertex_slice.n_atoms)])
                 if fixed_plastic_data is not None:
-                    delayed_fixed_plastic_data_items.append(numpy.ravel(
-                        [fixed_plastic_data[delayed_row_indices == i]
-                         for i in range(pre_vertex_slice.n_atoms)]))
+                    delayed_fixed_plastic_data_items.append([numpy.ravel(
+                        fixed_plastic_data[delayed_row_indices == i])
+                        for i in range(pre_vertex_slice.n_atoms)])
                 if plastic_plastic_data is not None:
-                    delayed_plastic_plastic_data_items.append(numpy.ravel(
-                        [plastic_plastic_data[delayed_row_indices == i]
-                         for i in range(pre_vertex_slice.n_atoms)]))
+                    delayed_plastic_plastic_data_items.append([numpy.ravel(
+                        plastic_plastic_data[delayed_row_indices == i])
+                        for i in range(pre_vertex_slice.n_atoms)])
                 del fixed_fixed_data, fixed_plastic_data, plastic_plastic_data
             del delayed_connections
 
@@ -267,4 +260,4 @@ class SynapseIORowBased(AbstractSynapseIO):
                     for row in delayed_rows])
 
         return (row_data, max_row_length, delayed_row_data,
-                max_delayed_row_length)
+                max_delayed_row_length, delayed_source_ids, stages)

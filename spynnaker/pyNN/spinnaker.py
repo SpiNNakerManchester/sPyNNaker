@@ -79,6 +79,8 @@ from spynnaker.pyNN.models.abstract_models\
     import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
     SpynnakerDataBaseWriter
+from spynnaker.pyNN.models.utility_models.delay_extension_vertex import \
+    DelayExtensionVertex
 
 # general imports
 import logging
@@ -264,10 +266,10 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
                 if ((isinstance(vertex, AbstractSpikeRecordable) and
-                        vertex.is_recording_spikes())
-                        or (isinstance(vertex, AbstractVRecordable) and
-                            vertex.is_recording_v())
-                        or (isinstance(vertex, AbstractGSynRecordable) and
+                        vertex.is_recording_spikes()) or
+                        (isinstance(vertex, AbstractVRecordable) and
+                            vertex.is_recording_v()) or
+                        (isinstance(vertex, AbstractGSynRecordable) and
                             vertex.is_recording_gsyn)):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
@@ -798,6 +800,37 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
                 machine=self._machine, placements=self._placements,
                 report_folder=self._report_default_directory)
 
+    def _generate_data_spec_for_subvertices(
+            self, placement, associated_vertex, executable_targets):
+
+        # if the vertex can generate a DSG, call it
+        if isinstance(associated_vertex, AbstractDataSpecableVertex):
+
+            ip_tags = self._tags.get_ip_tags_for_vertex(
+                placement.subvertex)
+            reverse_ip_tags = self._tags.get_reverse_ip_tags_for_vertex(
+                placement.subvertex)
+            associated_vertex.generate_data_spec(
+                placement.subvertex, placement, self._partitioned_graph,
+                self._partitionable_graph, self._routing_infos,
+                self._hostname, self._graph_mapper,
+                self._report_default_directory, ip_tags, reverse_ip_tags,
+                self._write_text_specs, self._app_data_runtime_folder)
+
+            # Get name of binary from vertex
+            binary_name = associated_vertex.get_binary_file_name()
+
+            # Attempt to find this within search paths
+            binary_path = executable_finder.get_executable_path(
+                binary_name)
+            if binary_path is None:
+                raise exceptions.ExecutableNotFoundException(binary_name)
+
+            if not executable_targets.has_binary(binary_path):
+                executable_targets.add_binary(binary_path)
+            executable_targets.add_processor(
+                binary_path, placement.x, placement.y, placement.p)
+
     def generate_data_specifications(self):
         """ generates the dsg for the graph.
 
@@ -811,39 +844,23 @@ class Spinnaker(FrontEndCommonConfigurationFunctions,
         # create a progress bar for end users
         progress_bar = ProgressBar(len(list(self._placements.placements)),
                                    "Generating data specifications")
+        delay_extension_placements = list()
         for placement in self._placements.placements:
             associated_vertex =\
                 self._graph_mapper.get_vertex_from_subvertex(
                     placement.subvertex)
 
-            # if the vertex can generate a DSG, call it
-            if isinstance(associated_vertex, AbstractDataSpecableVertex):
+            if isinstance(associated_vertex, DelayExtensionVertex):
+                delay_extension_placements.append(
+                    (placement, associated_vertex))
+            else:
+                self._generate_data_spec_for_subvertices(
+                    placement, associated_vertex, executable_targets)
+                progress_bar.update()
 
-                ip_tags = self._tags.get_ip_tags_for_vertex(
-                    placement.subvertex)
-                reverse_ip_tags = self._tags.get_reverse_ip_tags_for_vertex(
-                    placement.subvertex)
-                associated_vertex.generate_data_spec(
-                    placement.subvertex, placement, self._partitioned_graph,
-                    self._partitionable_graph, self._routing_infos,
-                    self._hostname, self._graph_mapper,
-                    self._report_default_directory, ip_tags, reverse_ip_tags,
-                    self._write_text_specs, self._app_data_runtime_folder)
-
-                # Get name of binary from vertex
-                binary_name = associated_vertex.get_binary_file_name()
-
-                # Attempt to find this within search paths
-                binary_path = executable_finder.get_executable_path(
-                    binary_name)
-                if binary_path is None:
-                    raise exceptions.ExecutableNotFoundException(binary_name)
-
-                if not executable_targets.has_binary(binary_path):
-                    executable_targets.add_binary(binary_path)
-                executable_targets.add_processor(
-                    binary_path, placement.x, placement.y, placement.p)
-
+        for placement, associated_vertex in delay_extension_placements:
+            self._generate_data_spec_for_subvertices(
+                placement, associated_vertex, executable_targets)
             progress_bar.update()
 
         # finish the progress bar
