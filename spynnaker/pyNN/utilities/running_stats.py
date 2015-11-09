@@ -23,19 +23,20 @@ class RunningStats(object):
         self._mean_2 += term_1
 
     def add_items(self, mean, variance, n_items):
-        new_n_items = self._n_items + n_items
-        mean_2 = variance * (n_items - 1.0)
+        if n_items > 0:
+            new_n_items = self._n_items + n_items
+            mean_2 = variance * (n_items - 1.0)
 
-        delta = mean - self._mean
-        delta_2 = delta * delta
-        new_mean = (((self._n_items * self._mean) + (n_items * mean)) /
-                    new_n_items)
-        new_mean_2 = (self._mean_2 + mean_2 +
-                      (delta_2 * self._n_items * n_items) / new_n_items)
+            delta = mean - self._mean
+            delta_2 = delta * delta
+            new_mean = (((self._n_items * self._mean) + (n_items * mean)) /
+                        new_n_items)
+            new_mean_2 = (self._mean_2 + mean_2 +
+                          (delta_2 * self._n_items * n_items) / new_n_items)
 
-        self._n_items = new_n_items
-        self._mean = new_mean
-        self._mean_2 = new_mean_2
+            self._n_items = new_n_items
+            self._mean = new_mean
+            self._mean_2 = new_mean_2
 
     @property
     def n_items(self):

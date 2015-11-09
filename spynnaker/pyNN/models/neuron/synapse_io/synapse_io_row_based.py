@@ -157,9 +157,9 @@ class SynapseIORowBased(AbstractSynapseIO):
             if len(undelayed_connections) > 0:
                 fixed_fixed_data, fixed_plastic_data, plastic_plastic_data =\
                     synapse_info.synapse_dynamics.get_synaptic_data(
-                        undelayed_connections, self._machine_time_step,
-                        n_synapse_types, weight_scales,
-                        synapse_info.synapse_type)
+                        undelayed_connections, post_vertex_slice,
+                        self._machine_time_step, n_synapse_types,
+                        weight_scales, synapse_info.synapse_type)
                 if fixed_fixed_data is not None:
                     fixed_fixed_data_items.append([numpy.ravel(
                         fixed_fixed_data[undelayed_row_indices == i])
@@ -179,9 +179,9 @@ class SynapseIORowBased(AbstractSynapseIO):
             if len(delayed_connections) > 0:
                 fixed_fixed_data, fixed_plastic_data, plastic_plastic_data =\
                     synapse_info.synapse_dynamics.get_synaptic_data(
-                        delayed_connections, self._machine_time_step,
-                        n_synapse_types, weight_scales,
-                        synapse_info.synapse_type)
+                        delayed_connections, post_vertex_slice,
+                        self._machine_time_step, n_synapse_types,
+                        weight_scales, synapse_info.synapse_type)
                 if fixed_fixed_data is not None:
                     delayed_fixed_fixed_data_items.append(numpy.ravel(
                         [fixed_fixed_data[delayed_row_indices == i]

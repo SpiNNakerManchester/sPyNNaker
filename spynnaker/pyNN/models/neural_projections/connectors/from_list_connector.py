@@ -34,7 +34,7 @@ class FromListConnector(AbstractConnector):
             self._conn_list = numpy.zeros(0)
         else:
             self._conn_list = numpy.array(
-                conn_list, dtype=[("source", "uint32"), ("target", "uint16"),
+                conn_list, dtype=[("source", "uint32"), ("target", "uint32"),
                                   ("weight", "float64"), ("delay", "float64")])
 
     def get_delay_maximum(self):
@@ -79,21 +79,30 @@ class FromListConnector(AbstractConnector):
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        return numpy.mean(self._conn_list["weight"][mask])
+        weights = self._conn_list["weight"][mask]
+        if weights.size == 0:
+            return 0
+        return numpy.mean(weights)
 
     def get_weight_maximum(self, pre_vertex_slice, post_vertex_slice):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        return numpy.max(self._conn_list["weight"][mask])
+        weights = self._conn_list["weight"][mask]
+        if weights.size == 0:
+            return 0
+        return numpy.max(weights)
 
     def get_weight_variance(self, pre_vertex_slice, post_vertex_slice):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        return numpy.var(self._conn_list["weight"][mask])
+        weights = self._conn_list["weight"][mask]
+        if weights.size == 0:
+            return 0
+        return numpy.var(weights)
 
     def create_synaptic_block(
             self, n_pre_slices, pre_slice_index, n_post_slices,
