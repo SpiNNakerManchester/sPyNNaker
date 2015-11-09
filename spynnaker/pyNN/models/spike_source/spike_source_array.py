@@ -455,7 +455,23 @@ class SpikeSourceArray(
         raise Exception("Population {} does not have parameter {}".format(
             self, key))
 
+    def set_value(self, key, value):
+        """ Set a property of the overall model
+        :param key: the name of the param to change
+        :param value: the value of the parameter to change
+        """
+        if hasattr(self, key):
+            setattr(self, key, value)
+            return
+        raise Exception("Type {} does not have parameter {}".format(
+            self._model_name, key))
+
     def get_buffered_regions_list(self):
+        """
+        Returns the list of regions used for output buffering
+
+        :return: list of Enum from _SPIKE_SOURCE_REGIONS
+        """
         list_of_regions_buffering = list()
         if self.is_recording_spikes():
             list_of_regions_buffering.append(

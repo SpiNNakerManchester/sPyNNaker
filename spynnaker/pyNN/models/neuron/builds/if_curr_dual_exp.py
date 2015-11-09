@@ -47,7 +47,7 @@ class IFCurrDualExp(AbstractPopulationVertex):
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_dual_exp.aplx",
+            self, n_neurons=n_neurons, binary="IF_curr_exp_dual.aplx",
             label=label,
             max_atoms_per_core=IFCurrDualExp._model_based_max_atoms_per_core,
             machine_time_step=machine_time_step,
