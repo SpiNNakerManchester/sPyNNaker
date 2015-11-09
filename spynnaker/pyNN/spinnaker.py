@@ -417,7 +417,7 @@ class Spinnaker(object):
         algorithms = list()
 
         # if youve not ran before, add the buffer manager
-        if not self._has_ran and application_graph_changed:
+        if application_graph_changed:
             algorithms.append("FrontEndCommonBufferManagerCreater")
 
         # if your needing qa reset, you need to clean the binairies
@@ -746,8 +746,6 @@ class Spinnaker(object):
                     "recorded data will also have been lost. If you were "
                     "wanting this daya, please rerun your script and extract"
                     "the data before recalling run. Thank you")
-                inputs.append({'type': "BufferManager",
-                               'value': self._buffer_manager})
         else:
             # mapping does not need to be executed, therefore add
             # the data elements needed for the application runner and
