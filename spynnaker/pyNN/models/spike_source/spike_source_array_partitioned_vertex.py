@@ -66,6 +66,7 @@ class SpikeSourceArrayPartitionedVertex(
     def base_key(self):
         return self._base_key
 
+    # ignore this pycharm error its confused
     @region_size.setter
     def region_size(self, new_value):
         self._region_size = new_value
