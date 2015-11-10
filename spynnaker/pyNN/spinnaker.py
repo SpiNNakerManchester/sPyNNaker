@@ -10,6 +10,9 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
 from pacman.operations import algorithm_reports as pacman_algorithm_reports
 
 # common front end imports
+from spinn_front_end_common.interface.\
+    abstract_resetable_for_run_interface import \
+    AbstractResetableForRunInterface
 from spinn_front_end_common.interface.interface_functions.\
     front_end_common_application_exiter import \
     FrontEndCommonApplicationExiter
@@ -266,12 +269,23 @@ class Spinnaker(object):
         inputs, application_graph_changed = \
             self._create_pacman_executor_inputs(total_run_time)
 
+        if application_graph_changed and self._has_ran:
+            raise common_exceptions.ConfigurationException(
+                "Currently supporting changes to the application graph are not "
+                "working, please call p.reset(), p.end(), add changes and then"
+                "call p.setup(). Thankyou")
+
         # if the application graph has changed and youve already ran, kill old
         # stuff running on machine
         if application_graph_changed and self._has_ran:
             exiter = FrontEndCommonApplicationExiter()
             exiter(self._app_id, self._txrx, self._executable_targets,
                    self._no_sync_changes)
+        if self._has_ran:
+            for vertex in self._partitionable_graph.vertices:
+                if isinstance(vertex, AbstractResetableForRunInterface):
+                    vertex.reset_for_run(self._current_run_ms,
+                                         self._no_machine_time_steps)
 
         # get outputs
         required_outputs = \
@@ -349,6 +363,9 @@ class Spinnaker(object):
                     or isinstance(vertex, AbstractVRecordable)
                     or isinstance(vertex, AbstractGSynRecordable)):
                 vertex.reset()
+            if isinstance(vertex, AbstractResetableForRunInterface):
+                vertex.reset_for_run(self._current_run_ms,
+                                     self._no_machine_time_steps)
 
         # execute reset functionality
         helpful_functions.do_mapping(
@@ -564,6 +581,8 @@ class Spinnaker(object):
                 os.mkdir(provenance_file_path)
 
         # all modes need the NoSyncChanges
+        if application_graph_changed:
+            self._no_sync_changes = 0
         inputs.append({'type': "NoSyncChanges", 'value': self._no_sync_changes})
 
         # support resetting the machine during start up
@@ -734,8 +753,6 @@ class Spinnaker(object):
             inputs.append({'type': "FileConstraintsFilePath",
                            'value': os.path.join(
                                json_folder, "constraints.json")})
-            inputs.append({"type": "LoadInitialBuffersFlag",
-                           "value": True})
 
             if self._has_ran:
                 logger.warn(
@@ -788,7 +805,6 @@ class Spinnaker(object):
                            'value': self._router_tables})
             inputs.append({'type': "ProvenanceFilePath",
                            'value': provenance_file_path})
-            inputs.append({"type": "LoadInitialBuffersFlag", "value": False})
 
         return inputs, application_graph_changed
 

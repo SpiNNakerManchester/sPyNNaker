@@ -3,6 +3,8 @@ SpikeSourceArray
 """
 
 # spynnaker imports
+from spinn_front_end_common.interface.abstract_resetable_for_run_interface import \
+    AbstractResetableForRunInterface
 from spinn_front_end_common.utility_models.\
     outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
@@ -54,7 +56,8 @@ _RECORD_OVERALLOCATION = 2000
 
 class SpikeSourceArray(
         AbstractDataSpecableVertex, AbstractPartitionableVertex,
-        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints):
+        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
+        AbstractResetableForRunInterface):
     """
     model for play back of spikes
     """
@@ -90,6 +93,7 @@ class SpikeSourceArray(
             max_atoms_per_core=self._model_based_max_atoms_per_core,
             constraints=constraints)
         AbstractSpikeRecordable.__init__(self)
+        AbstractResetableForRunInterface.__init__(self)
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
@@ -133,6 +137,7 @@ class SpikeSourceArray(
 
         # counter of how many machien time steps the vertex has extracted
         self._extracted_machine_time_steps = 0
+        self._last_runtime_position = 0
         self._spikes_cache_file = None
 
     @property
@@ -169,14 +174,6 @@ class SpikeSourceArray(
         :return:
         """
         self._spike_times = spike_times
-        if len(self._partitioned_vertices) != 0:
-            self._send_buffers.clear()
-            for (vertex_slice, vertex) in self._partitioned_vertices:
-                send_buffer = dict()
-                send_buffer[
-                    self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
-                    self._get_spike_send_buffer(vertex_slice)
-                vertex.send_buffers = send_buffer
 
     # @implements AbstractSpikeRecordable.is_recording_spikes
     def is_recording_spikes(self):
@@ -260,7 +257,6 @@ class SpikeSourceArray(
         1) Official PyNN format - single list that is used for all neurons
         2) SpiNNaker format - list of lists, one per neuron
         """
-        send_buffer = None
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         if key not in self._send_buffers:
             send_buffer = BufferedSendingRegion(
@@ -271,28 +267,37 @@ class SpikeSourceArray(
                 for neuron in range(vertex_slice.lo_atom,
                                     vertex_slice.hi_atom + 1):
                     for timeStamp in sorted(self._spike_times[neuron]):
-                        time_stamp_in_ticks = int(
-                            math.ceil((timeStamp * 1000.0) /
-                                      self._machine_time_step))
-                        send_buffer.add_key(time_stamp_in_ticks,
-                                            neuron - vertex_slice.lo_atom)
+                        self._check_time_stamp(
+                            send_buffer, timeStamp, self._machine_time_step,
+                            self._no_machine_time_steps,
+                            self._last_runtime_position,
+                            (neuron - vertex_slice.lo_atom))
             else:
 
                 # This is in official PyNN format, all neurons use the
                 # same list:
                 neuron_list = range(vertex_slice.n_atoms)
                 for timeStamp in sorted(self._spike_times):
-                    time_stamp_in_ticks = int(
-                        math.ceil((timeStamp * 1000.0) /
-                                  self._machine_time_step))
-
-                    # add to send_buffer collection
-                    send_buffer.add_keys(time_stamp_in_ticks, neuron_list)
+                    self._check_time_stamp(
+                        send_buffer, timeStamp, self._machine_time_step,
+                        self._no_machine_time_steps,
+                        self._last_runtime_position, neuron_list)
 
             self._send_buffers[key] = send_buffer
         else:
             send_buffer = self._send_buffers[key]
         return send_buffer
+
+    @staticmethod
+    def _check_time_stamp(
+            send_buffer, time_stamp, machine_time_step, no_machine_time_steps,
+            last_runtime_position, neuron_list):
+        time_stamp_in_ticks = int(
+            math.ceil((time_stamp * 1000.0) / machine_time_step))
+        # deduce if the time stamp is within the time window of the simulation
+        if (last_runtime_position <= time_stamp_in_ticks
+                < (last_runtime_position + no_machine_time_steps)):
+            send_buffer.add_key(time_stamp_in_ticks, neuron_list)
 
     def _reserve_memory_regions(
             self, spec, spike_region_size, recorded_region_size):
@@ -514,3 +519,14 @@ class SpikeSourceArray(
             return
         raise Exception("Type {} does not have parameter {}".format(
             self._model_name, key))
+
+    # @impliments AbstractResetableForRunInterface.reset_for_run
+    def reset_for_run(
+            self, last_runtime_in_milliseconds, this_runtime_in_milliseconds):
+        self._send_buffers.clear()
+        self._last_runtime_position = last_runtime_in_milliseconds
+        for (vertex_slice, partitioned_vertex) in self._partitioned_vertices:
+            send_buffers = dict()
+            send_buffers[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] = \
+                self._get_spike_send_buffer(vertex_slice)
+            partitioned_vertex.send_buffers = send_buffers
