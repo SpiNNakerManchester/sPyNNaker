@@ -206,7 +206,9 @@ void _dma_complete_callback(uint unused, uint tag) {
 
 /* INTERFACE FUNCTIONS - cannot be static */
 
-bool spike_processing_initialise(size_t row_max_n_words) {
+bool spike_processing_initialise(
+        size_t row_max_n_words, uint mc_packet_callback_priority,
+        uint dma_trasnfer_callback_priority, uint user_event_priority) {
 
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
@@ -229,9 +231,10 @@ bool spike_processing_initialise(size_t row_max_n_words) {
 
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
-            _multicast_packet_received_callback, -1);
-    spin1_callback_on(DMA_TRANSFER_DONE, _dma_complete_callback, 0);
-    spin1_callback_on(USER_EVENT, _user_event_callback, 0);
+            _multicast_packet_received_callback, mc_packet_callback_priority);
+    spin1_callback_on(DMA_TRANSFER_DONE, _dma_complete_callback,
+                      dma_trasnfer_callback_priority);
+    spin1_callback_on(USER_EVENT, _user_event_callback, user_event_priority);
 
     return true;
 }

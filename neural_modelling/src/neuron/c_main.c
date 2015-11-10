@@ -51,7 +51,7 @@ typedef enum regions_e {
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    SDP = 0, TIMER = 2
+    MC = -1, SDP_AND_DMA_AND_USER = 0, TIMER = 2
 }callback_priorities;
 
 // Globals
@@ -167,7 +167,8 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
-    if (!spike_processing_initialise(row_max_n_words)) {
+    if (!spike_processing_initialise(row_max_n_words, MC, SDP_AND_DMA_AND_USER,
+                                     SDP_AND_DMA_AND_USER)) {
         return false;
     }
     log_info("Initialise: finished");
@@ -205,7 +206,10 @@ void timer_callback(uint timer_count, uint unused) {
         // amounts of samples recorded to SDRAM
         recording_finalise();
 
+        // falls into the apuse resume mode of operating
         simulation_handle_pause_resume(timer_callback, TIMER);
+
+        // restart the recording status
         initialise_recording();
     }
     // otherwise do synapse and neuron time step updates
@@ -237,7 +241,8 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     // Set up callback listening to SDP messages
-    simulation_register_simulation_sdp_callback(&simulation_ticks, SDP);
+    simulation_register_simulation_sdp_callback(&simulation_ticks,
+                                                SDP_AND_DMA_AND_USER);
 
     log_info("Starting");
     simulation_run();
