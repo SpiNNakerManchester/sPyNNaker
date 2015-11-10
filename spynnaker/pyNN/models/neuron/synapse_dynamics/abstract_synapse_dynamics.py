@@ -38,8 +38,7 @@ class AbstractSynapseDynamics(object):
 
     @abstractmethod
     def get_synaptic_data(
-            self, connections, machine_time_step, n_synapse_types,
-            weight_scales, synapse_type):
+            self, connections, n_synapse_types, weight_scales, synapse_type):
         """ Get the fixed-fixed, fixed-plastic and plastic-plastic data for\
             the given connections.  Data is returned as an array of arrays of\
             words for each connection

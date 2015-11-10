@@ -29,8 +29,8 @@ class SynapseDynamicsStatic(AbstractSynapseDynamics):
         return 4
 
     def get_synaptic_data(
-            self, connections, post_vertex_slice, machine_time_step,
-            n_synapse_types, weight_scales, synapse_type):
+            self, connections, post_vertex_slice, n_synapse_types,
+            weight_scales, synapse_type):
         """ Get the fixed-fixed, fixed-plastic and plastic-plastic data for\
             the given connections.  Data is returned as an array of arrays of\
             bytes for each connection
@@ -41,8 +41,7 @@ class SynapseDynamicsStatic(AbstractSynapseDynamics):
         fixed_fixed = (
             ((numpy.rint(numpy.abs(connections["weight"]) *
               synapse_weight_scale).astype("uint32") & 0xFFFF) << 16) |
-            ((numpy.rint(connections["delay"] *
-             (1000.0 / machine_time_step)).astype("uint32") & 0xF) <<
+            ((connections["delay"].astype("uint32") & 0xF) <<
              (8 + n_synapse_type_bits)) |
             (synapse_type << 8) |
             ((connections["target"] - post_vertex_slice.lo_atom) & 0xFF))
