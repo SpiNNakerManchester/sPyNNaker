@@ -22,8 +22,15 @@ class AbstractVRecordable(object):
         """
 
     @abstractmethod
+    def reset(self):
+        """
+        closes the cahce file this vertex uses for storing its v data
+        :return:
+        """
+
+    @abstractmethod
     def get_v(self, transceiver, n_machine_time_steps, placements,
-              graph_mapper):
+              graph_mapper, return_data):
         """ Get the recorded v from the object
 
         :param transceiver: the python interface to the spinnaker machine

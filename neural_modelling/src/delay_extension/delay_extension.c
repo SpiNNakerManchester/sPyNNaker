@@ -12,6 +12,11 @@
 // Constants
 #define DELAY_STAGE_LENGTH  16
 
+//! values for the priority for each callback
+typedef enum callback_priorities{
+    MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 2
+}callback_priorities;
+
 // Globals
 static uint32_t key = 0;
 static uint32_t num_neurons = 0;
@@ -203,8 +208,8 @@ void timer_callback(uint unused0, uint unused1) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
-        log_info("Simulation complete.\n");
-        spin1_exit(0);
+        // handle the pause and resume functionality
+        simulation_handle_pause_resume(timer_callback, TIMER);
     }
 
     // Loop through delay stages
@@ -285,9 +290,12 @@ void c_main(void) {
     spin1_set_timer_tick(timer_period);
 
     // Register callbacks
-    spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, -1);
-    spin1_callback_on(USER_EVENT, spike_process, 1);
-    spin1_callback_on(TIMER_TICK, timer_callback, 2);
+    spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);
+    spin1_callback_on(USER_EVENT, spike_process, USER);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
+
+    simulation_register_simulation_sdp_callback(
+        &simulation_ticks, SDP);
 
     log_info("Starting");
     simulation_run();

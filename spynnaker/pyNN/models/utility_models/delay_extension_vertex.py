@@ -3,7 +3,8 @@ import logging
 from enum import Enum
 import math
 
-from spinn_front_end_common.utility_models.outgoing_edge_same_contiguous_keys_restrictor import \
+from spinn_front_end_common.utility_models.\
+    outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \

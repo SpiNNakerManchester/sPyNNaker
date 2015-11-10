@@ -5,6 +5,7 @@ EdgeToNKeysMapper
 # pacman imports
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map import \
     DictBasedPartitionedEdgeNKeysMap
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 # front end common imports
 from spinn_front_end_common.abstract_models.\
@@ -32,23 +33,29 @@ class EdgeToNKeysMapper(object):
         :param partitionable_graph:
         :return:
         """
+        progress_bar = ProgressBar(
+            len(partitioned_graph.subvertices),
+            "Deducing edge to number of keys map")
+
         n_keys_map = DictBasedPartitionedEdgeNKeysMap()
         for vertex in partitioned_graph.subvertices:
-                partitions = \
-                    partitioned_graph.outgoing_edges_partitions_from_vertex(
-                        vertex)
-                for partition_id in partitions:
-                    partition = partitions[partition_id]
-                    added_constraints = False
-                    for edge in partition.edges:
-                        constraints = self._process_partitionable_edge(
-                            edge, graph_mapper, n_keys_map, partitionable_graph,
-                            partition_id)
-                        if not added_constraints:
-                            partition.add_constraints(constraints)
-                        else:
-                            self._check_constraints_equal(
-                                constraints, partition.constraints)
+            partitions = \
+                partitioned_graph.outgoing_edges_partitions_from_vertex(
+                    vertex)
+            for partition_id in partitions:
+                partition = partitions[partition_id]
+                added_constraints = False
+                for edge in partition.edges:
+                    constraints = self._process_partitionable_edge(
+                        edge, graph_mapper, n_keys_map, partitionable_graph,
+                        partition_id)
+                    if not added_constraints:
+                        partition.add_constraints(constraints)
+                    else:
+                        self._check_constraints_equal(
+                            constraints, partition.constraints)
+            progress_bar.update()
+        progress_bar.end()
         return {'n_keys_map': n_keys_map}
 
     @staticmethod

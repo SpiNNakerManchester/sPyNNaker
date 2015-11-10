@@ -63,6 +63,7 @@ class Projection(object):
         self._delay_list_ranges = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
+        self._change_requires_mapping = True
 
         if not isinstance(postsynaptic_population._get_vertex,
                           AbstractPopulationVertex):
@@ -162,6 +163,25 @@ class Projection(object):
                 spinnaker_control.add_edge(self._projection_edge,
                                            EDGE_PARTITION_ID)
                 self._projection_list_ranges = synapse_list.ranges()
+        spinnaker_control._add_projection(self)
+
+    @property
+    def change_requires_mapping(self):
+        """
+        returns bool which returns if the population spec has changed since
+        changed was last changed.
+        :return: boolean
+        """
+        return self._change_requires_mapping
+
+    @change_requires_mapping.setter
+    def change_requires_mapping(self, new_value):
+        """
+        setter for the changed
+        :param new_value: the new vlaue of the changed
+        :return: None
+        """
+        self._change_requires_mapping = new_value
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
         """ searches though the partitionable graph's edges to locate any
@@ -380,8 +400,13 @@ class Projection(object):
                 weights.extend(row.weights / self._weight_scale)
             return weights
 
-        weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
-                               self._projection_edge.post_vertex.n_atoms))
+        weights = None
+        if self._projection_edge is not None:
+            weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
+                                   self._projection_edge.post_vertex.n_atoms))
+        else:
+            weights = numpy.empty((self._delay_edge.pre_vertex.n_atoms,
+                                   self._delay_edge.post_vertex.n_atoms))
         weights.fill(numpy.nan)
         rows = self._host_based_synapse_list.get_rows()
         for pre_atom in range(len(rows)):
@@ -556,3 +581,4 @@ class Projection(object):
         """
         # TODO
         raise NotImplementedError
+

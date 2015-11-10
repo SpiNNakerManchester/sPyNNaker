@@ -75,7 +75,7 @@ class Population(object):
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
-
+        
         # create population vertex.
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
@@ -99,9 +99,26 @@ class Population(object):
         self._record_v_file = None
         self._record_gsyn_file = None
 
-        self._spikes_cache_file = None
-        self._v_cache_file = None
-        self._gsyn_cache_file = None
+        # parameter
+        self._change_requires_mapping = True
+
+    @property
+    def change_requires_mapping(self):
+        """
+        returns bool which returns if the population spec has changed since
+        changed was last changed.
+        :return: boolean
+        """
+        return self._change_requires_mapping
+
+    @change_requires_mapping.setter
+    def change_requires_mapping(self, new_value):
+        """
+        setter for the changed
+        :param new_value: the new vlaue of the changed
+        :return: None
+        """
+        self._change_requires_mapping = new_value
 
     def __add__(self, other):
         """
@@ -188,44 +205,42 @@ class Population(object):
     def getSpikes(self, compatible_output=False, gather=True):
         """
         Return a 2-column numpy array containing cell ids and spike times for
-        recorded cells.   This is read directly from the memory for the board.
+        recorded cells. This is read directly from the memory for the board.
+        :param gather:
+            not used - inserted to match PyNN specs
+        :type gather: bool
+        :param compatible_output:
+            not used - inserted to match PyNN specs
+        :type compatible_output: bool
         """
-        if self._spikes_cache_file is None:
+        if not gather:
+            logger.warn("Spynnaker only supports gather = true, will "
+                        " execute as if gather was true anyhow")
 
-            if not gather:
-                logger.warn("Spynnaker only supports gather = true, will "
-                            " execute as if gather was true anyhow")
-            timer = None
-
+        if isinstance(self._vertex, AbstractSpikeRecordable):
             if not self._vertex.is_recording_spikes():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record spikes. "
                     "Therefore spikes cannot be retrieved. Please set this "
                     "vertex to record spikes before running this command.")
+        else:
+            raise exceptions.ConfigurationException(
+                "This poplation has not got the capability to record spikes. "
+                "Therefore spikes cannot be retrieved or asked to be recorded. "
+                "Please readjust your PyNN script and try again.")
 
-            if not self._spinnaker.has_ran:
-                raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet run, therefore spikes cannot"
-                    " be retrieved. Please execute the simulation before"
-                    " running this command")
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer = Timer()
-                timer.start_timing()
-            spikes = self._vertex.get_spikes(
-                self._spinnaker.transceiver,
-                self._spinnaker.no_machine_time_steps,
-                self._spinnaker.placements,
-                self._spinnaker.graph_mapper)
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                logger.info("Time to get spikes: {}".format(
-                    timer.take_sample()))
-            self._spikes_cache_file = tempfile.NamedTemporaryFile()
-            numpy.save(self._spikes_cache_file, spikes)
-            return spikes
+        if not self._spinnaker.has_ran:
+            raise local_exceptions.SpynnakerException(
+                "The simulation has not yet run, therefore spikes cannot"
+                " be retrieved. Please execute the simulation before"
+                " running this command")
 
-        # Load from the file
-        self._spikes_cache_file.seek(0)
-        return numpy.load(self._spikes_cache_file)
+        spikes = self._vertex.get_spikes(
+            self._spinnaker.transceiver,
+            self._spinnaker.no_machine_time_steps,
+            self._spinnaker.placements, self._spinnaker.graph_mapper)
+
+        return spikes
 
     def get_spike_counts(self, gather=True):
         """
@@ -242,41 +257,39 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids and synaptic
+        Return a 3-column numpy array containing cell ids, time and synaptic
         conductances for recorded cells.
-
+        :param gather:
+            not used - inserted to match PyNN specs
+        :type gather: bool
+        :param compatible_output:
+            not used - inserted to match PyNN specs
+        :type compatible_output: bool
         """
-        if self._gsyn_cache_file is None:
+
+        if isinstance(self._vertex, AbstractGSynRecordable):
             if not self._vertex.is_recording_gsyn():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record gsyn. "
                     "Therefore gsyn cannot be retrieved. Please set this "
                     "vertex to record gsyn before running this command.")
+        else:
+            raise exceptions.ConfigurationException(
+                "This poplation has not got the capability to record gsyn. "
+                "Therefore gsyn cannot be retrieved or asked to be recorded. "
+                "Please readjust your PyNN script and try again.")
 
-            if not self._spinnaker.has_ran:
-                raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet run, therefore gsyn cannot"
-                    " be retrieved. Please execute the simulation before"
-                    " running this command")
-            timer = None
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer = Timer()
-                timer.start_timing()
-            gsyn = self._vertex.get_gsyn(
+        if not self._spinnaker.has_ran:
+            raise local_exceptions.SpynnakerException(
+                "The simulation has not yet run, therefore gsyn cannot"
+                " be retrieved. Please execute the simulation before"
+                " running this command")
+
+        # check that the vertex has read up to the position it needs to
+        return self._vertex.get_gsyn(
                 self._spinnaker.transceiver,
                 self._spinnaker.no_machine_time_steps,
-                self._spinnaker.placements,
-                self._spinnaker.graph_mapper)
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                logger.info("Time to get gsyn: {}".format(timer.take_sample()))
-
-            self._gsyn_cache_file = tempfile.NamedTemporaryFile()
-            numpy.save(self._gsyn_cache_file, gsyn)
-            return gsyn
-
-        # Reload the data
-        self._gsyn_cache_file.seek(0)
-        numpy.load(self._gsyn_cache_file)
+                self._spinnaker.placements, self._spinnaker.graph_mapper)
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -291,39 +304,29 @@ class Population(object):
             not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
-        if self._v_cache_file is None:
+        if isinstance(self._vertex, AbstractVRecordable):
             if not self._vertex.is_recording_v():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record v. "
                     "Therefore v cannot be retrieved. Please set this "
                     "vertex to record v before running this command.")
+        else:
+            raise exceptions.ConfigurationException(
+                "This poplation has not got the capability to record v. "
+                "Therefore v cannot be retrieved or asked to be recorded. "
+                "Please readjust your PyNN script and try again.")
 
-            if not self._spinnaker.has_ran:
-                raise local_exceptions.SpynnakerException(
-                    "The simulation has not yet run, therefore v cannot"
-                    " be retrieved. Please execute the simulation before"
-                    " running this command")
+        if not self._spinnaker.has_ran:
+            raise local_exceptions.SpynnakerException(
+                "The simulation has not yet run, therefore v cannot"
+                " be retrieved. Please execute the simulation before"
+                " running this command")
 
-            timer = None
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                timer = Timer()
-                timer.start_timing()
-            v = self._vertex.get_v(
-                self._spinnaker.transceiver,
-                self._spinnaker.no_machine_time_steps,
-                self._spinnaker.placements,
-                self._spinnaker.graph_mapper)
-
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
-                logger.info("Time to read v: {}".format(timer.take_sample()))
-
-            self._v_cache_file = tempfile.NamedTemporaryFile()
-            numpy.save(self._v_cache_file, v)
-            return v
-
-        # Reload the data
-        self._v_cache_file.seek(0)
-        return numpy.load(self._v_cache_file)
+        # check that the vertex has read up to the position it needs to
+        return self._vertex.get_v(
+            self._spinnaker.transceiver,
+            self._spinnaker.no_machine_time_steps,
+            self._spinnaker.placements, self._spinnaker.graph_mapper)
 
     def id_to_index(self, cell_id):
         """
@@ -350,11 +353,14 @@ class Population(object):
         """
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
             value, self._vertex.n_atoms))
+        self._change_requires_mapping = True
 
-    def is_local(self, cell_id):
+    @staticmethod
+    def is_local(cell_id):
         """
         Determine whether the cell with the given ID exists on the local
         MPI node.
+        :param cell_id:
         """
 
         # Doesn't really mean anything on SpiNNaker
@@ -391,6 +397,10 @@ class Population(object):
 
     @property
     def label(self):
+        """
+        label of the population
+        :return:
+        """
         return self._vertex.label
 
     @property
@@ -456,6 +466,7 @@ class Population(object):
 
         """
         self.initialize('v', distribution)
+        self._change_requires_mapping = True
 
     def record(self, to_file=None):
         """
@@ -475,6 +486,9 @@ class Population(object):
         # set the file to store the spikes in once retrieved
         self._record_spike_file = to_file
 
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
     def record_gsyn(self, to_file=None):
         """
         Record the synaptic conductance for all cells in the Population.
@@ -493,6 +507,9 @@ class Population(object):
         self._vertex.set_recording_gsyn()
         self._record_gsyn_file = to_file
 
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
     def record_v(self, to_file=None):
         """
         Record the membrane potential for all cells in the Population.
@@ -506,6 +523,9 @@ class Population(object):
 
         self._vertex.set_recording_v()
         self._record_v_file = to_file
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     @property
     def positions(self):
@@ -603,6 +623,9 @@ class Population(object):
         """
         self.set(parametername, rand_distr)
 
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
     def sample(self, n, rng=None):
         """
         returns a random selection fo neurons from a population in the form
@@ -647,6 +670,9 @@ class Population(object):
             self._structure.generate_positions(self._vertex.n_atoms)
         self._positions[cell_id] = pos
 
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
     def _set_positions(self, positions):
         """
         sets all the positions in the population.
@@ -657,6 +683,9 @@ class Population(object):
                              "in an un-structured population")
         else:
             self._positions = positions
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     def set(self, parameter, value=None):
         """
@@ -687,6 +716,9 @@ class Population(object):
         for (key, value) in parameter.iteritems():
             self._vertex.set_value(key, value)
 
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
     @property
     def structure(self):
         """
@@ -707,6 +739,9 @@ class Population(object):
                 "the constraint entered is not a recongised constraint. "
                 "try again")
 
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
     # NONE PYNN API CALL
     def add_placement_constraint(self, x, y, p=None):
         """ Add a placement constraint
@@ -720,6 +755,9 @@ class Population(object):
         """
         self._vertex.add_constraint(PlacerChipAndCoreConstraint(x, y, p))
 
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
     # NONE PYNN API CALL
     def set_mapping_constraint(self, constraint_dict):
         """ Add a placement constraint - for backwards compatibility
@@ -729,6 +767,9 @@ class Population(object):
         :type constraint_dict: dict of str->int
         """
         self.add_placement_constraint(**constraint_dict)
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     # NONE PYNN API CALL
     def set_model_based_max_atoms_per_core(self, new_value):
@@ -743,6 +784,9 @@ class Population(object):
             raise exceptions.ConfigurationException(
                 "This population does not support its max_atoms_per_core "
                 "variable being adjusted by the end user. Sorry")
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     @property
     def size(self):
@@ -766,6 +810,9 @@ class Population(object):
                 "the size of the population. Please change this and try "
                 "again, or alternatively, use set()")
         self.set(parametername, value_array)
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     def _end(self):
         """ Do final steps at the end of the simulation

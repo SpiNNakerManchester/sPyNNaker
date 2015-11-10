@@ -46,6 +46,27 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
         self._pre_vertex = presynaptic_population._internal_delay_vertex
         self._stored_synaptic_data_from_machine = None
 
+        # boolean that checks if this edge has changed since last run
+        self._change_requires_mapping = True
+
+    @property
+    def change_requires_mapping(self):
+        """
+        returns bool which returns if the population spec has changed since
+        changed was last changed.
+        :return: boolean
+        """
+        return self._change_requires_mapping
+
+    @change_requires_mapping.setter
+    def change_requires_mapping(self, new_value):
+        """
+        setter for the changed
+        :param new_value: the new vlaue of the changed
+        :return: None
+        """
+        self._change_requires_mapping = new_value
+
     @property
     def num_delay_stages(self):
         """

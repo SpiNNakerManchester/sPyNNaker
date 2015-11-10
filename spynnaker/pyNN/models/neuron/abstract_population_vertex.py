@@ -3,7 +3,8 @@ from six import add_metaclass
 import logging
 import os
 
-from spinn_front_end_common.utility_models.outgoing_edge_same_contiguous_keys_restrictor import \
+from spinn_front_end_common.utility_models.\
+    outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_edge_constraints import \
@@ -29,6 +30,8 @@ from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
+
+import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +94,26 @@ class AbstractPopulationVertex(
         # set up continious restrictor
         self._outgoing_edge_key_restrictor = \
             OutgoingEdgeSameContiguousKeysRestrictor()
+
+        # bool for if state has changed.
+        self._change_requires_mapping = True
+
+    @property
+    def change_requires_mapping(self):
+        """
+        property for checking if someting has changed
+        :return:
+        """
+        return self._change_requires_mapping
+
+    @change_requires_mapping.setter
+    def change_requires_mapping(self, new_value):
+        """
+        setter for the changed property
+        :param new_value: the new state to change it to
+        :return:
+        """
+        self._change_requires_mapping = new_value
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -343,13 +366,19 @@ class AbstractPopulationVertex(
     def set_recording_spikes(self):
         self._spike_recorder.record = True
 
+    # @implements AbstractSpikeRecordable.reset
+    def reset(self):
+        self._spike_recorder.reset()
+        self._v_recorder.reset()
+        self._gsyn_recorder.reset()
+
     # @implements AbstractSpikeRecordable.get_spikes
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
+                   graph_mapper, return_data=True):
         return self._spike_recorder.get_spikes(
             self._label, transceiver,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
@@ -361,11 +390,11 @@ class AbstractPopulationVertex(
 
     # @implements AbstractVRecordable.get_v
     def get_v(self, transceiver, n_machine_time_steps, placements,
-              graph_mapper):
+              graph_mapper, return_data=True):
         return self._v_recorder.get_v(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
     def is_recording_gsyn(self):
@@ -377,11 +406,11 @@ class AbstractPopulationVertex(
 
     # @implements AbstractGSynRecordable.get_gsyn
     def get_gsyn(self, transceiver, n_machine_time_steps, placements,
-                 graph_mapper):
+                 graph_mapper, return_data=True):
         return self._gsyn_recorder.get_gsyn(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     def initialize(self, variable, value):
         initialize_attr = getattr(
