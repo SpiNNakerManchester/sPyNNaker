@@ -23,6 +23,7 @@ from pyNN.space import Space
 import numpy
 import logging
 import tempfile
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -64,10 +65,18 @@ class Population(object):
             cell_label = "Population {}".format(
                 Population._non_labelled_vertex_count)
             Population._non_labelled_vertex_count += 1
+            
+        # copy the parametersso that the end users are not exposed to the
+        # additions placed by spinnaker.
+        cellparams = copy.deepcopy(cellparams)
+
+        # set spinnaker targetted parameters
         cellparams['label'] = cell_label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
+        
+        # create population vertex.
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
         self._delay_vertex = None
