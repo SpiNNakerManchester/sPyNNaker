@@ -147,9 +147,6 @@ class SynapseIORowBased(AbstractSynapseIO):
             # go into
             stages = numpy.floor(
                 (numpy.round(delayed_connections["delay"] - 1.0)) / max_delay)
-            n_stages = 0
-            if stages.size > 0:
-                n_stages = int(numpy.max(stages))
             delayed_row_indices = (
                 (delayed_connections["source"] - pre_vertex_slice.lo_atom) +
                 ((stages - 1) * pre_vertex_slice.n_atoms))
@@ -189,15 +186,18 @@ class SynapseIORowBased(AbstractSynapseIO):
                 if fixed_fixed_data is not None:
                     delayed_fixed_fixed_data_items.append([numpy.ravel(
                         fixed_fixed_data[delayed_row_indices == i])
-                        for i in range(pre_vertex_slice.n_atoms * n_stages)])
+                        for i in range(pre_vertex_slice.n_atoms *
+                                       n_delay_stages)])
                 if fixed_plastic_data is not None:
                     delayed_fixed_plastic_data_items.append([numpy.ravel(
                         fixed_plastic_data[delayed_row_indices == i])
-                        for i in range(pre_vertex_slice.n_atoms * n_stages)])
+                        for i in range(pre_vertex_slice.n_atoms *
+                                       n_delay_stages)])
                 if plastic_plastic_data is not None:
                     delayed_plastic_plastic_data_items.append([numpy.ravel(
                         plastic_plastic_data[delayed_row_indices == i])
-                        for i in range(pre_vertex_slice.n_atoms * n_stages)])
+                        for i in range(pre_vertex_slice.n_atoms *
+                                       n_delay_stages)])
                 del fixed_fixed_data, fixed_plastic_data, plastic_plastic_data
             del delayed_connections
 
@@ -245,7 +245,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 delayed_fixed_fixed_data_items,
                 delayed_fixed_plastic_data_items,
                 delayed_plastic_plastic_data_items,
-                pre_vertex_slice.n_atoms * n_stages)
+                pre_vertex_slice.n_atoms * n_delay_stages)
             del delayed_fixed_fixed_data_items
             del delayed_fixed_plastic_data_items
             del delayed_plastic_plastic_data_items
