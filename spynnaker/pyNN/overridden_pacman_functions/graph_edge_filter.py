@@ -55,14 +55,14 @@ class GraphEdgeFilter(object):
         for subvert in subgraph.subvertices:
             out_going_partitions = \
                 subgraph.outgoing_edges_partitions_from_vertex(subvert)
-            for partitioner_identifer in out_going_partitions:
+            for partitioner_identifier in out_going_partitions:
                 for subedge in \
-                        out_going_partitions[partitioner_identifer].edges:
+                        out_going_partitions[partitioner_identifier].edges:
                     if not self._is_filterable(subedge, graph_mapper):
                         logger.debug("this subedge was not pruned {}"
                                      .format(subedge))
                         new_sub_graph.add_subedge(subedge,
-                                                  partitioner_identifer)
+                                                  partitioner_identifier)
                         associated_edge = graph_mapper.\
                             get_partitionable_edge_from_partitioned_edge(
                                 subedge)

@@ -41,11 +41,11 @@ class AbstractVertexWithEdgeToDependentVertices(object):
         """
 
     @abstractmethod
-    def partition_identifer_for_dependent_edge(self, dependent_edge):
+    def partition_identifier_for_dependent_edge(self, dependent_edge):
         """ helper emthod for the vertex to give semantic data of the partition
-        uidentifer type for each depdent vertex.
+        uidentifier type for each depdent vertex.
 
         :param dependent_edge: the edge which coems from this to one of its
         dependent vertices.
-        :return: the outgoing spike parittion identifer for this depdentent edge
+        :return: the outgoing spike parittion identifier for this depdentent edge
         """
