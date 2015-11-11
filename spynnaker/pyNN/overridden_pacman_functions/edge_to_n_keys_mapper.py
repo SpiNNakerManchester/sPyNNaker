@@ -1,7 +1,3 @@
-"""
-EdgeToNKeysMapper
-"""
-
 # pacman imports
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map import \
     DictBasedPartitionedEdgeNKeysMap
@@ -19,13 +15,12 @@ from spinn_front_end_common.abstract_models.\
 
 
 class EdgeToNKeysMapper(object):
-    """
-    generates a mapping between each edge and the number of keys it requires.
+    """ Generates a mapping between each edge and the number of keys it\
+        requires.
     """
 
     def __call__(self, partitioned_graph, graph_mapper):
         """
-        Generate an n_keys map for the graph and add constraints
         :param partitioned_graph:
         :param graph_mapper:
         :return:

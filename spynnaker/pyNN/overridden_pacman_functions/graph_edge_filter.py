@@ -1,7 +1,3 @@
-"""
-GraphEdgeFilter
-"""
-
 # pacman imports
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
     import MultiCastPartitionableEdge
@@ -20,16 +16,14 @@ logger = logging.getLogger(__name__)
 
 
 class GraphEdgeFilter(object):
-    """
-    the filterer
+    """ Removes graph edges that aren't required
     """
 
     def __call__(self, subgraph, graph_mapper):
         """
-        runs the graph edge filterer
         :param subgraph: the subgraph whose edges are to be filtered
-        :param graph_mapper:
-        the graph mapper between partitionable and partitioned graphs.
+        :param graph_mapper: the graph mapper between partitionable and \
+                partitioned graphs.
         :return: a new graph mapper and partitioned graph
         """
         new_sub_graph = PartitionedGraph(label=subgraph.label)

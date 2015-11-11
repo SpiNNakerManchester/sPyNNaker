@@ -3,7 +3,8 @@ SpikeSourceArray
 """
 
 # spynnaker imports
-from spinn_front_end_common.utility_models.outgoing_edge_same_contiguous_keys_restrictor import \
+from spinn_front_end_common.utility_models\
+    .outgoing_edge_same_contiguous_keys_restrictor import \
     OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
@@ -121,7 +122,7 @@ class SpikeSourceArray(
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
 
-        #handle outgoing constraints
+        # handle outgoing constraints
         self._outgoing_edge_key_restrictor = \
             OutgoingEdgeSameContiguousKeysRestrictor()
 
@@ -419,7 +420,6 @@ class SpikeSourceArray(
         return self._outgoing_edge_key_restrictor.\
             get_outgoing_edge_constraints()
 
-
     def is_data_specable(self):
         """
         helper method for isinstance
@@ -434,7 +434,7 @@ class SpikeSourceArray(
             return getattr(self, key)
         raise Exception("Population {} does not have parameter {}".format(
             self, key))
-            
+
     def set_value(self, key, value):
         """ Set a property of the overall model
         :param key: the name of the param to change

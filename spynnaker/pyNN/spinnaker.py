@@ -1,6 +1,3 @@
-"""
-Spinnaker
-"""
 
 # pacman imports
 from pacman.model.partitionable_graph.partitionable_graph import \
@@ -82,7 +79,7 @@ class Spinnaker(object):
         self._reports_states = None
         self._app_id = None
         self._runtime = None
-        
+
         # database objects
         self._database_socket_addresses = set()
         if database_socket_addresses is not None:
@@ -275,10 +272,11 @@ class Spinnaker(object):
         self._routing_infos = pacman_exeuctor.get_item("MemoryRoutingInfos")
         self._tags = pacman_exeuctor.get_item("MemoryTags")
         self._graph_mapper = pacman_exeuctor.get_item("MemoryGraphMapper")
-        self._partitioned_graph = \
-            pacman_exeuctor.get_item("MemoryPartitionedGraph")
+        self._partitioned_graph = pacman_exeuctor.get_item(
+            "MemoryPartitionedGraph")
         self._machine = pacman_exeuctor.get_item("MemoryMachine")
-        self._database_interface = pacman_exeuctor.get_item("DatabaseInterface")
+        self._database_interface = pacman_exeuctor.get_item(
+            "DatabaseInterface")
         self._has_ran = pacman_exeuctor.get_item("RanToken")
 
     @staticmethod
@@ -304,7 +302,7 @@ class Spinnaker(object):
             config.get("Mapping", "algorithms") + "," + \
             config.get("Mapping", "interface_algorithms")
 
-        # if using virutal machine, add to list of algorithms the virtual
+        # if using virtual machine, add to list of algorithms the virtual
         # machine generator, otherwise add the standard machine generator
         if config.getboolean("Machine", "virtual_board"):
             algorithms += ",FrontEndCommonVirtualMachineInterfacer"
@@ -346,7 +344,8 @@ class Spinnaker(object):
                 self._reports_states.placer_report_with_partitionable_graph):
             algorithms += ",PlacerReportWithPartitionableGraph"
         if (self._reports_states is not None and
-                self._reports_states.placer_report_without_partitionable_graph):
+                self._reports_states
+                .placer_report_without_partitionable_graph):
             algorithms += ",PlacerReportWithoutPartitionableGraph"
         # add debug algorithms if needed
         if in_debug_mode:
@@ -360,8 +359,9 @@ class Spinnaker(object):
         required_outputs = list()
         if config.getboolean("Machine", "virtual_board"):
             required_outputs.extend([
-                "MemoryPlacements", "MemoryRoutingTables", "MemoryRoutingInfos",
-                "MemoryTags", "MemoryPartitionedGraph", "MemoryGraphMapper"])
+                "MemoryPlacements", "MemoryRoutingTables",
+                "MemoryRoutingInfos", "MemoryTags", "MemoryPartitionedGraph",
+                "MemoryGraphMapper"])
         else:
             required_outputs.append("RanToken")
         # if front end wants reload script, add requires reload token
@@ -371,7 +371,8 @@ class Spinnaker(object):
 
     def _create_pacman_executor_inputs(self):
         # make a folder for the json files to be stored in
-        json_folder = os.path.join(self._report_default_directory, "json_files")
+        json_folder = os.path.join(
+            self._report_default_directory, "json_files")
         if not os.path.exists(json_folder):
             os.mkdir(json_folder)
 
@@ -397,7 +398,8 @@ class Spinnaker(object):
         if number_of_boards == "None":
             number_of_boards = None
 
-        scamp_socket_addresses = config.get("Machine", "scamp_connections_data")
+        scamp_socket_addresses = config.get(
+            "Machine", "scamp_connections_data")
         if scamp_socket_addresses == "None":
             scamp_socket_addresses = None
 
@@ -461,7 +463,7 @@ class Spinnaker(object):
         inputs.append({'type': "UserCreateDatabaseFlag",
                        'value': config.get("Database", "create_database")})
         inputs.append({'type': "ExecuteMapping",
-                       'value':  config.getboolean(
+                       'value': config.getboolean(
                            "Database",
                            "create_routing_info_to_neuron_id_mapping")})
         inputs.append({'type': "DatabaseSocketAddresses",
@@ -483,7 +485,7 @@ class Spinnaker(object):
                        'value': os.path.join(
                            json_folder, "machine.json")})
         inputs.append({'type': "FilePartitionedGraphFilePath",
-                       'value':os.path.join(
+                       'value': os.path.join(
                            json_folder, "partitioned_graph.json")})
         inputs.append({'type': "FilePlacementFilePath",
                        'value': os.path.join(
@@ -518,10 +520,10 @@ class Spinnaker(object):
                         "correctly")
             for vertex in self._partitionable_graph.vertices:
                 if ((isinstance(vertex, AbstractSpikeRecordable) and
-                        vertex.is_recording_spikes())
-                        or (isinstance(vertex, AbstractVRecordable) and
-                            vertex.is_recording_v())
-                        or (isinstance(vertex, AbstractGSynRecordable) and
+                        vertex.is_recording_spikes()) or
+                        (isinstance(vertex, AbstractVRecordable) and
+                            vertex.is_recording_v()) or
+                        (isinstance(vertex, AbstractGSynRecordable) and
                             vertex.is_recording_gsyn)):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
@@ -642,16 +644,14 @@ class Spinnaker(object):
 
     @property
     def min_supported_delay(self):
-        """
-        the min supported delay based in milliseconds
+        """ The minimum supported delay based in milliseconds
         :return:
         """
         return self._min_supported_delay
 
     @property
     def max_supported_delay(self):
-        """
-        the max supported delay based in milliseconds
+        """ The maximum supported delay based in milliseconds
         :return:
         """
         return self._max_supported_delay
@@ -710,8 +710,8 @@ class Spinnaker(object):
         """
 
         :param edge_to_add:
-        :param partition_identifier: the partition identfer for the outgoing
-        edge partition
+        :param partition_identifier: the partition identfier for the outgoing\
+                    edge partition
         :return:
         """
         self._partitionable_graph.add_edge(edge_to_add, partition_identifier)
@@ -817,7 +817,7 @@ class Spinnaker(object):
             if self._create_database:
                 self._database_interface.stop()
 
-            # stop the transciever
+            # stop the transceiver
             if turn_off_machine:
                 logger.info("Turning off machine")
             self._txrx.close(power_off_machine=turn_off_machine)

@@ -1,7 +1,3 @@
-"""
-AbstractVertexWithEdgeToDependentVertices
-"""
-
 # general imports
 from six import add_metaclass
 from abc import ABCMeta
@@ -10,7 +6,7 @@ from abc import abstractmethod
 
 @add_metaclass(ABCMeta)
 class AbstractVertexWithEdgeToDependentVertices(object):
-    """ A vertex with a dependent vertices, which should be connected to this
+    """ A vertex with a dependent vertices, which should be connected to this\
         vertex by an edge directly to each of them
     """
 
@@ -21,31 +17,30 @@ class AbstractVertexWithEdgeToDependentVertices(object):
         :type dependent_vertices: iterable of vertices
         :return: None
         :rtype: None
-        :raise None: this method does not raise any knwon exception
+        :raise None: this method does not raise any known exception
         """
         self._dependent_vertices = dependent_vertices
 
     @property
     def dependent_vertices(self):
-        """
-        returns the dependent vertices which this vertex depends upon
+        """ Return the vertices which this vertex depends upon
         :return:
         """
         return self._dependent_vertices
 
     @abstractmethod
     def has_dependent_vertices(self):
-        """
-        helper method for isinstance
+        """ Helper method for isinstance
         :return:
         """
 
     @abstractmethod
     def partition_identifier_for_dependent_edge(self, dependent_edge):
-        """ helper emthod for the vertex to give semantic data of the partition
-        uidentifier type for each depdent vertex.
+        """ helper method for the vertex to give semantic data of the\
+            partition identifier type for each dependent vertex.
 
-        :param dependent_edge: the edge which coems from this to one of its
-        dependent vertices.
-        :return: the outgoing spike parittion identifier for this depdentent edge
+        :param dependent_edge: the edge which comes from this to one of its\
+                dependent vertices.
+        :return: the outgoing spike partition identifier for this dependent \
+                edge
         """

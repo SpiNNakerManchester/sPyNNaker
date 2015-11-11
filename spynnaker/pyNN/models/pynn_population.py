@@ -29,10 +29,9 @@ logger = logging.getLogger(__name__)
 
 
 class Population(object):
-    """
-    A collection neuron of the same types. It encapsulates a type of
-    vertex used with Spiking Neural Networks, comprising n cells (atoms)
-    of the same model type.
+    """ A collection neuron of the same types. It encapsulates a type of\
+        vertex used with Spiking Neural Networks, comprising n cells (atoms)\
+        of the same model type.
 
     :param int size:
         size (number of cells) of the Population.
@@ -51,9 +50,6 @@ class Population(object):
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
                  structure=None):
-        """
-        Instantiates a :py:object:`Population`.
-        """
         if size is not None and size <= 0:
             raise exceptions.ConfigurationException(
                 "A population cannot have a negative or zero size.")
@@ -65,17 +61,17 @@ class Population(object):
             cell_label = "Population {}".format(
                 Population._non_labelled_vertex_count)
             Population._non_labelled_vertex_count += 1
-            
-        # copy the parametersso that the end users are not exposed to the
+
+        # copy the parameters so that the end users are not exposed to the
         # additions placed by spinnaker.
         cellparams = copy.deepcopy(cellparams)
 
-        # set spinnaker targetted parameters
+        # set spinnaker targeted parameters
         cellparams['label'] = cell_label
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
-        
+
         # create population vertex.
         self._vertex = cellclass(**cellparams)
         self._spinnaker = spinnaker
@@ -93,7 +89,7 @@ class Population(object):
         self._spinnaker._add_population(self)
         self._spinnaker.add_vertex(self._vertex)
 
-        # initialize common stuff
+        # initialise common stuff
         self._size = size
         self._record_spike_file = None
         self._record_v_file = None
@@ -104,35 +100,26 @@ class Population(object):
         self._gsyn_cache_file = None
 
     def __add__(self, other):
+        """ Merges populations
         """
-        merges populations
-        """
-        # TODO: Remove?  Not in API...
-        raise NotImplementedError
-
-    def _add_recorder(self, variable):
-        """ Create a new Recorder for the supplied variable."""
-        # TODO: Remove?  Not in API...
+        # TODO: Make this add the neurons from another population to this one
         raise NotImplementedError
 
     def all(self):
+        """ Iterator over cell ids on all nodes.
         """
-        Iterator over cell ids on all nodes.
-        """
-        # TODO: Need to work out what is to be returned
+        # TODO: Return the cells when we have such a thing
         raise NotImplementedError
 
     @property
     def conductance_based(self):
-        """
-        returns a boolean based on if the population is a conductance based pop
+        """ True if the population uses conductance inputs
         """
         return isinstance(self._vertex.input_type, InputTypeConductance)
 
     @property
     def default_parameters(self):
-        """
-        returns the default paramters of the vertex from this population
+        """ The default parameters of the vertex from this population
         :return:
         """
         return self._vertex.default_parameters
@@ -141,8 +128,8 @@ class Population(object):
         """
         Returns a human-readable description of the population.
 
-        The output may be customized by specifying a different template
-        togther with an associated template engine (see ``pyNN.descriptions``).
+        The output may be customised by specifying a different template
+        together with an associated template engine (see ``pyNN.descriptions``)
 
         If template is None, then a dictionary containing the template context
         will be returned.
@@ -150,24 +137,18 @@ class Population(object):
         # TODO:
         raise NotImplementedError
 
-    @property
-    def grandparent(self):
-        # TODO: Remove? Not in API...
-        raise NotImplementedError
-
     def __getitem__(self, index_or_slice):
         # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 
     def get(self, parameter_name, gather=False):
-        """
-        Get the values of a parameter for every local cell in the population.
+        """ Get the values of a parameter for every local cell in the\
+            population.
         """
         return self._vertex.get_value(parameter_name)
 
     def _get_cell_position(self, cell_id):
-        """
-        returns the position of a cell.
+        """ Get the position of a cell.
         """
         # TODO: This isn't part of the API - is it ever used?
         if self._structure is None:
@@ -178,8 +159,7 @@ class Population(object):
         return self._positions[cell_id]
 
     def _get_cell_initial_value(self, cell_id, variable):
-        """
-        set a given cells intial value
+        """ Get a given cells initial value
         """
         # TODO: Remove?  This isn't in the API...
         raise NotImplementedError
@@ -187,8 +167,8 @@ class Population(object):
     # noinspection PyPep8Naming
     def getSpikes(self, compatible_output=False, gather=True):
         """
-        Return a 2-column numpy array containing cell ids and spike times for
-        recorded cells.   This is read directly from the memory for the board.
+        Return a 2-column numpy array containing cell ids and spike times for\
+        recorded cells.
         """
         if self._spikes_cache_file is None:
 
@@ -228,8 +208,7 @@ class Population(object):
         return numpy.load(self._spikes_cache_file)
 
     def get_spike_counts(self, gather=True):
-        """
-        Returns the number of spikes for each neuron.
+        """ Return the number of spikes for each neuron.
         """
         spikes = self.getSpikes(True, gather)
         n_spikes = {}
@@ -242,7 +221,7 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids and synaptic
+        Return a 4-column numpy array containing cell ids and synaptic\
         conductances for recorded cells.
 
         """
@@ -420,9 +399,7 @@ class Population(object):
         return total_spikes / self._size
 
     def nearest(self, position):
-        """
-        return the neuron closest to the specified position.
-        Added functionality 23 November 2014 ADR
+        """ Return the neuron closest to the specified position.
         """
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
@@ -436,8 +413,7 @@ class Population(object):
 
     @property
     def position_generator(self):
-        """
-        returns a position generator. Added functionality 27 November 2014 ADR
+        """ Returns a position generator.
         """
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
@@ -458,10 +434,8 @@ class Population(object):
         self.initialize('v', distribution)
 
     def record(self, to_file=None):
-        """
-        Record spikes from all cells in the Population.
-        A flag is set for this population that is passed to the simulation,
-        triggering spike time recording.
+        """ Record spikes from all cells in the Population.
+
         :param to_file: file to write the spike data to
         """
 
@@ -476,10 +450,8 @@ class Population(object):
         self._record_spike_file = to_file
 
     def record_gsyn(self, to_file=None):
-        """
-        Record the synaptic conductance for all cells in the Population.
-        A flag is set for this population that is passed to the simulation,
-        triggering gsyn value recording.
+        """ Record the synaptic conductance for all cells in the Population.
+
         :param to_file: the file to write the recorded gsyn to.
         """
         if not isinstance(self._vertex, AbstractGSynRecordable):
@@ -494,10 +466,8 @@ class Population(object):
         self._record_gsyn_file = to_file
 
     def record_v(self, to_file=None):
-        """
-        Record the membrane potential for all cells in the Population.
-        A flag is set for this population that is passed to the simulation,
-        triggering potential recording.
+        """ Record the membrane potential for all cells in the Population.
+
         :param to_file: the file to write the recorded v to.
         """
         if not isinstance(self._vertex, AbstractVRecordable):
@@ -509,13 +479,11 @@ class Population(object):
 
     @property
     def positions(self):
-        """
-        Returns the position array for structured populations.
-        Added functionality 27 November 2014 ADR
+        """ Return the position array for structured populations.
         """
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
-                             "for an un-structured population")
+                             "for an unstructured population")
         elif self._positions is None:
             self._positions = self._structure.generate_positions(
                 self._vertex.n_atoms)
@@ -524,7 +492,7 @@ class Population(object):
     # noinspection PyPep8Naming
     def printSpikes(self, filename, gather=True):
         """ Write spike time information from the population to a given file.
-        :param filename: the absoluete file path for where the spikes are to\
+        :param filename: the absolute file path for where the spikes are to\
                     be printed in
         :param gather: Supported from the PyNN language, but ignored here
         """
@@ -549,7 +517,7 @@ class Population(object):
 
     def print_gsyn(self, filename, gather=True):
         """ Write conductance information from the population to a given file.
-        :param filename: the absoluete file path for where the gsyn are to be\
+        :param filename: the absolute file path for where the gsyn are to be\
                     printed in
         :param gather: Supported from the PyNN language, but ignored here
         """
@@ -598,15 +566,15 @@ class Population(object):
         """
         'Random' set. Set the value of parametername to a value taken from
         rand_distr, which should be a RandomDistribution object.
-        :param parametername: the paramter to set
-        :param rand_distr: the random distrubtion object to set the paramter to
+        :param parametername: the parameter to set
+        :param rand_distr: the random distribution object to set the parameter\
+                     to
         """
         self.set(parametername, rand_distr)
 
     def sample(self, n, rng=None):
-        """
-        returns a random selection fo neurons from a population in the form
-        of a population view
+        """ Return a random selection of neurons from a population in the form\
+            of a population view
         :param n: the number of neurons to sample
         :param rng: the random number generator to use.
         """
@@ -615,8 +583,7 @@ class Population(object):
         raise NotImplementedError
 
     def save_positions(self, file):
-        """
-        save positions to file. Added functionality 23 November 2014 ADR
+        """ Save positions to file.
         :param file: the file to write the positions to.
         """
         if self._structure is None:
@@ -629,15 +596,13 @@ class Population(object):
         file_handle.close()
 
     def _set_cell_initial_value(self, cell_id, variable, value):
-        """
-        set a given cells intial value
+        """ Set a given cells initial value
         """
         # TODO: Remove? Not part of API...
         raise NotImplementedError
 
     def _set_cell_position(self, cell_id, pos):
-        """
-        sets a cell to a given position
+        """ Sets a cell to a given position
         """
         # TODO: Remove?  This is never called
         if self._structure is None:
@@ -648,8 +613,7 @@ class Population(object):
         self._positions[cell_id] = pos
 
     def _set_positions(self, positions):
-        """
-        sets all the positions in the population.
+        """ Sets all the positions in the population.
         """
         # TODO: Remove?  This is never used
         if self._structure is None:
@@ -689,8 +653,7 @@ class Population(object):
 
     @property
     def structure(self):
-        """
-        Returns the structure for the population. Added 23 November 2014 ADR
+        """ Return the structure for the population.
         """
         return self._structure
 
@@ -732,10 +695,9 @@ class Population(object):
 
     # NONE PYNN API CALL
     def set_model_based_max_atoms_per_core(self, new_value):
-        """
-        supports the setting of each models max atoms per core parameter
+        """ Supports the setting of each models max atoms per core parameter
+
         :param new_value: the new value for the max atoms per core.
-        :return:
         """
         if hasattr(self._vertex, "set_model_max_atoms_per_core"):
             self._vertex.set_model_max_atoms_per_core(new_value)
@@ -746,8 +708,7 @@ class Population(object):
 
     @property
     def size(self):
-        """
-        propety method for the n atoms / size of the population
+        """ The number of neurons in the population
         :return:
         """
         return self._vertex.n_atoms
@@ -757,8 +718,8 @@ class Population(object):
         'Topographic' set. Set the value of parametername to the values in
         value_array, which must have the same dimensions as the Population.
         :param parametername: the name of the parameter
-        :param value_array: the array of values which must have the correct
-        number of elements.
+        :param value_array: the array of values which must have the correct\
+                number of elements.
         """
         if len(value_array) != self._vertex.n_atoms:
             raise exceptions.ConfigurationException(

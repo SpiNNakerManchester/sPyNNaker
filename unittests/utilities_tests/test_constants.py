@@ -14,9 +14,12 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(constants.RECORDING_ENTRY_BYTE_SIZE, 4)
 
         self.assertEqual(constants.SYNAPSE_INDEX_BITS, 8)
-        self.assertEqual(constants.MAX_NEURON_SIZE, (1 << constants.SYNAPSE_INDEX_BITS))
-        self.assertEqual(constants.OUT_SPIKE_SIZE, (constants.MAX_NEURON_SIZE >> 5) )
-        self.assertEqual(constants.OUT_SPIKE_BYTES, constants.OUT_SPIKE_SIZE * 4 )
+        self.assertEqual(
+            constants.MAX_NEURON_SIZE, (1 << constants.SYNAPSE_INDEX_BITS))
+        self.assertEqual(
+            constants.OUT_SPIKE_SIZE, (constants.MAX_NEURON_SIZE >> 5))
+        self.assertEqual(
+            constants.OUT_SPIKE_BYTES, constants.OUT_SPIKE_SIZE * 4)
         self.assertEqual(constants.V_BUFFER_SIZE_PER_TICK_PER_NEURON, 4)
         self.assertEqual(constants.GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON, 4)
 
@@ -27,32 +30,35 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(constants.NA_TO_PA_SCALE, 1000.0)
 
         self.assertEqual(constants.WEIGHT_FLOAT_TO_FIXED_SCALE, 16.0)
-        self.assertEqual(constants.SCALE, constants.WEIGHT_FLOAT_TO_FIXED_SCALE *constants. NA_TO_PA_SCALE)
+        self.assertEqual(
+            constants.SCALE, constants.WEIGHT_FLOAT_TO_FIXED_SCALE *
+            constants. NA_TO_PA_SCALE)
 
         self.assertEqual(constants.MAX_SUPPORTED_DELAY_TICS, 16)
         self.assertEqual(constants.MAX_DELAY_BLOCKS, 8)
         self.assertEqual(constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK, 16)
 
-        self.assertEqual(constants.IF_CURRENT_EXP_CORE_APPLICATION_ID, 0xAC1)
-        self.assertEqual(constants.SPIKESOURCEARRAY_CORE_APPLICATION_ID, 0xAC2)
-        self.assertEqual(constants.SPIKESOURCEPOISSON_CORE_APPLICATION_ID, 0xAC3)
-        self.assertEqual(constants.DELAY_EXTENSION_CORE_APPLICATION_ID, 0xAC4)
-        self.assertEqual(constants.MUNICH_MOTOR_CONTROL_CORE_APPLICATION_ID, 0xAC5)
-        self.assertEqual(constants.IF_CONDUCTIVE_EXP_CORE_APPLICATION_ID, 0xAC7)
-        self.assertEqual(constants.IZK_CURRENT_EXP_CORE_APPLICATION_ID, 0xAC8)
-
     def test_population_based_regions_enum(self):
         self.assertEqual(constants.POPULATION_BASED_REGIONS.SYSTEM.value, 0)
-        self.assertEqual(constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value, 1)
-        self.assertEqual(constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value, 2)
-        self.assertEqual(constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value, 3)
-        self.assertEqual(constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value, 4)
-        self.assertEqual(constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value, 5)
+        self.assertEqual(
+            constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value, 1)
+        self.assertEqual(
+            constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value, 2)
+        self.assertEqual(
+            constants.POPULATION_BASED_REGIONS.ROW_LEN_TRANSLATION.value, 3)
+        self.assertEqual(
+            constants.POPULATION_BASED_REGIONS.MASTER_POP_TABLE.value, 4)
+        self.assertEqual(
+            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value, 5)
 
-        self.assertEqual(constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value, 6)
-        self.assertEqual(constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value, 7)
-        self.assertEqual(constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value, 8)
-        self.assertEqual(constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value, 9)
+        self.assertEqual(
+            constants.POPULATION_BASED_REGIONS.STDP_PARAMS.value, 6)
+        self.assertEqual(
+            constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value, 7)
+        self.assertEqual(
+            constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value, 8)
+        self.assertEqual(
+            constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value, 9)
 
 if __name__ == '__main__':
     unittest.main()

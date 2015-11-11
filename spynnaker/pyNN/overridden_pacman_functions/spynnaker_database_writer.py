@@ -1,6 +1,3 @@
-"""
-SpynnakerDatabaseWriter
-"""
 
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from spinn_front_end_common.utilities import helpful_functions
@@ -10,16 +7,15 @@ from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
 
 class SpynnakerDatabaseWriter(object):
     """
-    SpynnakerDatabaseWriter
     """
-    
+
     def __call__(
-            self, partitioned_graph, user_create_database, tags, 
+            self, partitioned_graph, user_create_database, tags,
             wait_on_confirmation, app_data_runtime_folder, runtime, machine,
             database_socket_addresses, time_scale_factor, machine_time_step,
             partitionable_graph, graph_mapper, placements, routing_infos,
             router_tables, execute_mapping):
-        
+
         database_interface = None
         # add database generation if requested
         needs_database = \
@@ -64,4 +60,3 @@ class SpynnakerDatabaseWriter(object):
             database_interface.send_read_notification()
 
         return {"database_interface": database_interface}
-
