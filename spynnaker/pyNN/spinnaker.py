@@ -246,11 +246,12 @@ class Spinnaker(object):
 
         self._runtime = run_time
 
+        xml_paths = self._create_xml_paths()
+
         inputs = self._create_pacman_executor_inputs()
         required_outputs = self._create_pacman_executor_outputs()
         algorithms = self._create_algorithm_list(
             config.get("Mode", "mode") == "Debug")
-        xml_paths = self._create_xml_paths()
 
         pacman_exeuctor = helpful_functions.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,

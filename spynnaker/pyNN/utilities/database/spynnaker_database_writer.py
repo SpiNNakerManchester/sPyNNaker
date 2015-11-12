@@ -21,11 +21,8 @@ class SpynnakerDataBaseWriter(DatabaseWriter):
     spynnaker front end
     """
 
-    def __init__(self, database_directory, wait_for_read_confirmation,
-                 socket_addresses):
-        DatabaseWriter.__init__(
-            self, database_directory, wait_for_read_confirmation,
-            socket_addresses)
+    def __init__(self, database_directory):
+        DatabaseWriter.__init__(self, database_directory)
 
     def add_partitionable_vertices(self, partitionable_graph):
         """
