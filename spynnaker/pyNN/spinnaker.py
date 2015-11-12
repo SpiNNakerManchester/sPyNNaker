@@ -704,7 +704,9 @@ class Spinnaker(object):
                 self.add_vertex(dependant_vertex)
                 dependant_edge = MultiCastPartitionableEdge(
                     pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
-                self.add_edge(dependant_edge)
+                self.add_edge(
+                    dependant_edge,
+                    vertex_to_add.edge_partition_identifier_for_dependent_edge)
 
     def add_edge(self, edge_to_add, partition_identifier=None):
         """
