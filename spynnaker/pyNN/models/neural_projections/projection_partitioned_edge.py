@@ -50,8 +50,8 @@ class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
         self._synapse_sublist = None
 
     def filter_sub_edge(self, graph_mapper):
-        """determines if theres an actual connection in this subedge in temrs of
-        synaptic data
+        """ Determines if there's an actual connection in this subedge using\
+            the synaptic data
 
         """
         pre_vertex_slice = graph_mapper.get_subvertex_slice(

@@ -3,14 +3,6 @@ SpikeSourceArray
 """
 
 # spynnaker imports
-from spinn_front_end_common.interface.abstract_resetable_for_run_interface import \
-    AbstractResetableForRunInterface
-from spinn_front_end_common.utility_models.\
-    outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
     import EIEIOSpikeRecorder
@@ -20,10 +12,12 @@ from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.spike_source.spike_source_array_partitioned_vertex\
     import SpikeSourceArrayPartitionedVertex
 
+# spinn front end common imports
 from spinn_front_end_common.interface.buffer_management.storage_objects\
     .buffered_sending_region import BufferedSendingRegion
-
-# spinn front end common imports
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -36,6 +30,9 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.constraints.tag_allocator_constraints\
     .tag_allocator_require_iptag_constraint\
     import TagAllocatorRequireIptagConstraint
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 # dsg imports
 from data_specification.data_specification_generator\
@@ -127,10 +124,6 @@ class SpikeSourceArray(
 
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
-
-        # handle outgoing constraints
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
 
         # bool for if state has changed.
         self._change_requires_mapping = True
@@ -489,8 +482,7 @@ class SpikeSourceArray(
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.\
-            get_outgoing_edge_constraints()
+        return [KeyAllocatorContiguousRangeContraint()]
 
     def is_data_specable(self):
         """

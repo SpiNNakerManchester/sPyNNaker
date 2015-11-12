@@ -1,7 +1,3 @@
-"""
-GraphEdgeFilter
-"""
-
 # pacman imports
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
     import MultiCastPartitionableEdge
@@ -20,16 +16,14 @@ logger = logging.getLogger(__name__)
 
 
 class GraphEdgeFilter(object):
-    """
-    the filterer
+    """ Removes graph edges that aren't required
     """
 
     def __call__(self, subgraph, graph_mapper):
         """
-        runs the graph edge filterer
         :param subgraph: the subgraph whose edges are to be filtered
-        :param graph_mapper:
-        the graph mapper between partitionable and partitioned graphs.
+        :param graph_mapper: the graph mapper between partitionable and \
+                partitioned graphs.
         :return: a new graph mapper and partitioned graph
         """
         new_sub_graph = PartitionedGraph(label=subgraph.label)
@@ -55,14 +49,14 @@ class GraphEdgeFilter(object):
         for subvert in subgraph.subvertices:
             out_going_partitions = \
                 subgraph.outgoing_edges_partitions_from_vertex(subvert)
-            for partitioner_identifer in out_going_partitions:
+            for partitioner_identifier in out_going_partitions:
                 for subedge in \
-                        out_going_partitions[partitioner_identifer].edges:
+                        out_going_partitions[partitioner_identifier].edges:
                     if not self._is_filterable(subedge, graph_mapper):
                         logger.debug("this subedge was not pruned {}"
                                      .format(subedge))
                         new_sub_graph.add_subedge(subedge,
-                                                  partitioner_identifer)
+                                                  partitioner_identifier)
                         associated_edge = graph_mapper.\
                             get_partitionable_edge_from_partitioned_edge(
                                 subedge)

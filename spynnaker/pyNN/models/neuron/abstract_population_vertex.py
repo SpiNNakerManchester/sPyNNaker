@@ -3,9 +3,6 @@ from six import add_metaclass
 import logging
 import os
 
-from spinn_front_end_common.utility_models.\
-    outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_edge_constraints import \
     AbstractProvidesIncomingEdgeConstraints
@@ -31,7 +28,9 @@ from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
 
-import tempfile
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 logger = logging.getLogger(__name__)
 
@@ -90,10 +89,6 @@ class AbstractPopulationVertex(
         self._synapse_manager = SynapticManager(
             synapse_type, machine_time_step, ring_buffer_sigma,
             spikes_per_second)
-
-        # set up continious restrictor
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
 
         # bool for if state has changed.
         self._change_requires_mapping = True
@@ -498,8 +493,7 @@ class AbstractPopulationVertex(
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.\
-            get_outgoing_edge_constraints()
+        return [KeyAllocatorContiguousRangeContraint()]
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)
