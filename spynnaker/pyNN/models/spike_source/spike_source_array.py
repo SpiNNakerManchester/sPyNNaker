@@ -23,6 +23,9 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
+from spinn_front_end_common.interface.\
+    abstract_resetable_for_run_interface import \
+    AbstractResetableForRunInterface
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \

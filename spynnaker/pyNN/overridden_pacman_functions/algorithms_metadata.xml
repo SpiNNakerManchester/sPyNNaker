@@ -12,6 +12,8 @@
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </required_inputs>
+        <parameters>
+        </parameters>
         <produces_outputs>
             <parameter>
                 <param_name>new_sub_graph</param_name>
@@ -36,6 +38,8 @@
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
         </required_inputs>
+        <parameters>
+        </parameters>
         <produces_outputs>
             <parameter>
                 <param_name>n_keys_map</param_name>
@@ -60,10 +64,6 @@
                 <param_type>MemoryTags</param_type>
             </parameter>
             <parameter>
-                <param_name>wait_on_confirmation</param_name>
-                <param_type>DatabaseWaitOnConfirmationFlag</param_type>
-            </parameter>
-            <parameter>
                 <param_name>app_data_runtime_folder</param_name>
                 <param_type>ApplicationDataFolder</param_type>
             </parameter>
@@ -74,10 +74,6 @@
             <parameter>
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
-            </parameter>
-            <parameter>
-                <param_name>database_socket_addresses</param_name>
-                <param_type>DatabaseSocketAddresses</param_type>
             </parameter>
             <parameter>
                 <param_name>time_scale_factor</param_name>
@@ -112,10 +108,16 @@
                 <param_type>ExecuteMapping</param_type>
             </parameter>
         </required_inputs>
+        <parameters>
+        </parameters>
         <produces_outputs>
             <parameter>
                 <param_name>database_interface</param_name>
                 <param_type>DatabaseInterface</param_type>
+            </parameter>
+            <parameter>
+                <param_name>database_file_path</param_name>
+                <param_type>DatabaseFilePath</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>

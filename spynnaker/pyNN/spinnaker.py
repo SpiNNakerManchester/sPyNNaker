@@ -92,6 +92,7 @@ class Spinnaker(object):
             self._database_socket_addresses.union(database_socket_addresses)
         self._database_interface = None
         self._create_database = None
+        self._database_file_path = None
 
         # Determine default executable folder location
         # and add this default to end of list of search paths
@@ -111,7 +112,7 @@ class Spinnaker(object):
         # holders for data needed for reset when nothing changes in the
         # application graph
         self._processor_to_app_data_base_address_mapper = None
-        self._vertex_to_app_data_file_paths = None
+        self._placement_to_app_data_file_paths = None
 
         # holder for timing related values
         self._no_machine_time_steps = None
@@ -375,7 +376,7 @@ class Spinnaker(object):
             self._placements = self._router_tables = self._routing_infos = \
                 self._tags = self._graph_mapper = self._partitioned_graph = \
                 self._database_interface = self._executable_targets = \
-                self._vertex_to_app_data_file_paths = \
+                self._placement_to_app_data_file_paths = \
                 self._processor_to_app_data_base_address_mapper = None
 
     def _update_data_structures_from_pacman_exeuctor(self, pacman_exeuctor):
@@ -399,14 +400,16 @@ class Spinnaker(object):
         self._machine = pacman_exeuctor.get_item("MemoryMachine")
         self._database_interface = \
             pacman_exeuctor.get_item("DatabaseInterface")
+        self._database_file_path = \
+            pacman_exeuctor.get_item("DatabaseFilePath")
         self._has_ran = pacman_exeuctor.get_item("RanToken")
         self._executable_targets = \
             pacman_exeuctor.get_item("ExecutableTargets")
         self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
         self._processor_to_app_data_base_address_mapper = \
             pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
-        self._vertex_to_app_data_file_paths = \
-            pacman_exeuctor.get_item("VertexToAppDataFilePaths")
+        self._placement_to_app_data_file_paths = \
+            pacman_exeuctor.get_item("PlacementToAppDataFilePaths")
         self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
 
     @staticmethod
@@ -537,6 +540,7 @@ class Spinnaker(object):
                     "FrontEndCommonPartitionableGraphApplicationDataLoader")
                 algorithms.append("FrontEndCommomLoadExecutableImages")
             if not executing_reset:
+                algorithms.append("FrontEndCommonNotificationProtocol")
                 # add functions for setting off the models again
                 algorithms.append("FrontEndCommonApplicationRunner")
                 # if going to write provanence data after the run add the two
@@ -603,8 +607,8 @@ class Spinnaker(object):
             inputs.append(({
                 'type': "ProcessorToAppDataBaseAddress",
                 "value": self._processor_to_app_data_base_address_mapper}))
-            inputs.append({"type": "VertexToAppDataFilePaths",
-                           'value': self._vertex_to_app_data_file_paths})
+            inputs.append({"type": "PlacementToAppDataFilePaths",
+                           'value': self._placement_to_app_data_file_paths})
             inputs.append({'type': "WriteCheckerFlag",
                            'value': config.getboolean(
                                "Mode", "verify_writes")})
@@ -774,6 +778,10 @@ class Spinnaker(object):
                                "Database", "send_start_notification")})
             inputs.append({'type': "DatabaseInterface",
                            'value': self._database_interface})
+            inputs.append({"type": "DatabaseSocketAddresses",
+                           'value': self._database_socket_addresses})
+            inputs.append({'type': "DatabaseFilePath",
+                           'value': self._database_file_path})
             inputs.append({'type': "ExecutableTargets",
                            'value': self._executable_targets})
             inputs.append({'type': "APPID", 'value': self._app_id})
