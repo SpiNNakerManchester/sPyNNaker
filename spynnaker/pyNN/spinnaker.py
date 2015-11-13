@@ -302,7 +302,8 @@ class Spinnaker(object):
             config.getboolean("Reports", "outputTimesForSections"))
 
         # gather provenance data from the executor itself if needed
-        if config.get("Reports", "writeProvanceData"):
+        if (config.get("Reports", "writeProvanceData")
+                and not config.getboolean("Machine", "virtual_board")):
             pacman_executor_file_path = os.path.join(
                 pacman_exeuctor.get_item("ProvenanceFilePath"),
                 "PACMAN_provancence_data.xml")
@@ -387,7 +388,17 @@ class Spinnaker(object):
             structs from.
         :return:
         """
-        self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
+        if not config.getboolean("Machine", "virtual_board"):
+            self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
+            self._has_ran = pacman_exeuctor.get_item("RanToken")
+            self._executable_targets = \
+                pacman_exeuctor.get_item("ExecutableTargets")
+            self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
+            self._processor_to_app_data_base_address_mapper = \
+                pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
+            self._placement_to_app_data_file_paths = \
+                pacman_exeuctor.get_item("PlacementToAppDataFilePaths")
+
         self._placements = pacman_exeuctor.get_item("MemoryPlacements")
         self._router_tables = \
             pacman_exeuctor.get_item("MemoryRoutingTables")
@@ -402,14 +413,6 @@ class Spinnaker(object):
             pacman_exeuctor.get_item("DatabaseInterface")
         self._database_file_path = \
             pacman_exeuctor.get_item("DatabaseFilePath")
-        self._has_ran = pacman_exeuctor.get_item("RanToken")
-        self._executable_targets = \
-            pacman_exeuctor.get_item("ExecutableTargets")
-        self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
-        self._processor_to_app_data_base_address_mapper = \
-            pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
-        self._placement_to_app_data_file_paths = \
-            pacman_exeuctor.get_item("PlacementToAppDataFilePaths")
         self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
 
     @staticmethod
@@ -434,7 +437,8 @@ class Spinnaker(object):
         algorithms = list()
 
         # if youve not ran before, add the buffer manager
-        if application_graph_changed:
+        if (application_graph_changed
+                and not config.getboolean("Machine", "virtual_board")):
             algorithms.append("FrontEndCommonBufferManagerCreater")
 
         # if your needing qa reset, you need to clean the binairies
@@ -450,10 +454,9 @@ class Spinnaker(object):
             # add debug algorithms if needed
             if in_debug_mode:
                 algorithms.append("ValidRoutesChecker")
-                
+
             algorithm_names = \
-                config.get("Mapping", "algorithms") + "," + \
-                config.get("Mapping", "interface_algorithms")
+                config.get("Mapping", "algorithms")
 
             algorithm_strings = algorithm_names.split(",")
             for algorithm_string in algorithm_strings:
@@ -481,6 +484,16 @@ class Spinnaker(object):
 
                 algorithms.append("FrontEndCommonMachineInterfacer")
                 algorithms.append("FrontEndCommonApplicationRunner")
+                algorithms.append("FrontEndCommonNotificationProtocol")
+                algorithms.append(
+                    "FrontEndCommonPartitionableGraphApplicationDataLoader")
+                algorithms.append("FrontEndCommonPartitionableGraphHost"
+                                  "ExecuteDataSpecification")
+                algorithms.append("FrontEndCommomLoadExecutableImages")
+                algorithms.append("FrontEndCommonRoutingTableLoader")
+                algorithms.append("FrontEndCommonTagsLoader")
+                algorithms.append("FrontEndCommomPartitionableGraphData"
+                                  "SpecificationWriter")
     
                 # if the end user wants reload script, add the reload script
                 # creator to the list (reload script currently only supported 
@@ -495,7 +508,8 @@ class Spinnaker(object):
                         "handle resets, therefore it will only contain the "
                         "initial run. Sorry")
 
-            if config.getboolean("Reports", "writeMemoryMapReport"):
+            if (config.getboolean("Reports", "writeMemoryMapReport")
+                    and not config.getboolean("Machine", "virtual_board")):
                 algorithms.append("FrontEndCommonMemoryMapReport")
     
             if config.getboolean("Reports", "writeNetworkSpecificationReport"):
@@ -504,7 +518,8 @@ class Spinnaker(object):
 
             # if going to write provanence data after the run add the two
             # provenance gatherers
-            if config.get("Reports", "writeProvanceData"):
+            if (config.get("Reports", "writeProvanceData")
+                    and not config.getboolean("Machine", "virtual_board")):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
     
             # define mapping between output types and reports
@@ -564,7 +579,8 @@ class Spinnaker(object):
                 required_outputs.append("RanToken")
         # if front end wants reload script, add requires reload token
         if (config.getboolean("Reports", "writeReloadSteps")
-                and not self._has_ran and application_graph_changed):
+                and not self._has_ran and application_graph_changed
+                and not config.getboolean("Machine", "virtual_board")):
             required_outputs.append("ReloadToken")
         return required_outputs
 
