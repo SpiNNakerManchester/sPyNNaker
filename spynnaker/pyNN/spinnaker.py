@@ -355,7 +355,7 @@ class Spinnaker(object):
         # not ran
         self._has_ran = False
 
-        # reset the n_machien time steps from each vertex
+        # reset the n_machine_time_steps from each vertex
         for vertex in self.partitionable_graph.vertices:
             vertex.set_no_machine_time_steps(0)
             if isinstance(vertex, AbstractSpikeRecordable):
@@ -373,7 +373,7 @@ class Spinnaker(object):
             inputs, algorithms, required_outputs, xml_paths,
             config.getboolean("Reports", "outputTimesForSections"))
 
-        # if graph has changed kill all old objectws as they will need to be
+        # if graph has changed kill all old objects as they will need to be
         # rebuilt at next run
         if application_graph_changed:
             self._placements = self._router_tables = self._routing_infos = \

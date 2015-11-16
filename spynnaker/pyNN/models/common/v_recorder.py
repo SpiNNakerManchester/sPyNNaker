@@ -49,7 +49,8 @@ class VRecorder(object):
         self._no_v_loads = 0
 
     def get_v(self, label, n_atoms, transceiver, region, n_machine_time_steps,
-              placements, graph_mapper, partitionable_vertex, return_data=True):
+              placements, graph_mapper, partitionable_vertex,
+              return_data=True):
 
         if self._vs_cache_file is None:
             self._vs_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
@@ -99,7 +100,8 @@ class VRecorder(object):
                     transceiver, placement, region, region_size)
 
                 numpy_data = (numpy.asarray(
-                    neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
+                    neuron_param_region_data, dtype="uint8").view(
+                        dtype="<i4") /
                     32767.0).reshape((to_extract_n_machine_time_steps,
                                       vertex_slice.n_atoms))
                 data["f2"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
@@ -109,7 +111,7 @@ class VRecorder(object):
             progress_bar.end()
             data.shape = n_atoms * to_extract_n_machine_time_steps
 
-             # extract old data
+            # extract old data
             cached_v = recording_utils.pull_off_cached_lists(
                 self._no_v_loads, self._vs_cache_file)
 

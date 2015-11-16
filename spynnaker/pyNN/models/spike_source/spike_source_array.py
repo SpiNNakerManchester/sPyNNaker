@@ -4,6 +4,8 @@ SpikeSourceArray
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models.abstract_mappable \
+    import AbstractMappable
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
@@ -58,7 +60,8 @@ _RECORD_OVERALLOCATION = 2000
 class SpikeSourceArray(
         AbstractDataSpecableVertex, AbstractPartitionableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
-        AbstractResetableForRunInterface, SimplePopulationSettable):
+        AbstractResetableForRunInterface, SimplePopulationSettable,
+        AbstractMappable):
     """
     model for play back of spikes
     """
@@ -94,7 +97,11 @@ class SpikeSourceArray(
             max_atoms_per_core=self._model_based_max_atoms_per_core,
             constraints=constraints)
         AbstractSpikeRecordable.__init__(self)
+        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
         AbstractResetableForRunInterface.__init__(self)
+        SimplePopulationSettable.__init__(self)
+        AbstractMappable.__init__(self)
+
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
             max_on_chip_memory_usage_for_spikes_in_bytes
@@ -133,6 +140,15 @@ class SpikeSourceArray(
         self._extracted_machine_time_steps = 0
         self._last_runtime_position = 0
         self._spikes_cache_file = None
+
+        self._requires_mapping = True
+
+    @property
+    def requires_mapping(self):
+        return self._requires_mapping
+
+    def mark_no_changes(self):
+        self._requires_mapping = False
 
     @property
     def spike_times(self):
@@ -476,7 +492,7 @@ class SpikeSourceArray(
         """
         return True
 
-    # @impliments AbstractResetableForRunInterface.reset_for_run
+    # @implements AbstractResetableForRunInterface.reset_for_run
     def reset_for_run(
             self, last_runtime_in_milliseconds, this_runtime_in_milliseconds):
         self._send_buffers.clear()

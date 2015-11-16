@@ -60,11 +60,18 @@ def pull_off_cached_lists(no_loads, cache_file):
     """
     cache_file.seek(0)
     if no_loads == 1:
-        return numpy.load(cache_file)
+        values = numpy.load(cache_file)
+
+        # Seek to the end of the file (for windows compatibility)
+        cache_file.seek(0, 2)
+        return values
     elif no_loads == 0:
         return []
     else:
         lists = list()
         for _ in range(0, no_loads):
             lists.append(numpy.load(cache_file))
+
+        # Seek to the end of the file (for windows compatibility)
+        cache_file.seek(0, 2)
         return numpy.concatenate(lists)
