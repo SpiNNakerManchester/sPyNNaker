@@ -4,6 +4,8 @@ SpikeSourceArray
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.common.simple_population_settable \
+    import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
     import EIEIOSpikeRecorder
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
@@ -46,7 +48,6 @@ from enum import Enum
 import logging
 import sys
 import math
-import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ _RECORD_OVERALLOCATION = 2000
 class SpikeSourceArray(
         AbstractDataSpecableVertex, AbstractPartitionableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
-        AbstractResetableForRunInterface):
+        AbstractResetableForRunInterface, SimplePopulationSettable):
     """
     model for play back of spikes
     """
@@ -128,30 +129,10 @@ class SpikeSourceArray(
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
 
-        # bool for if state has changed.
-        self._change_requires_mapping = True
-
         # counter of how many machien time steps the vertex has extracted
         self._extracted_machine_time_steps = 0
         self._last_runtime_position = 0
         self._spikes_cache_file = None
-
-    @property
-    def change_requires_mapping(self):
-        """
-        property for checking if someting has changed
-        :return:
-        """
-        return self._change_requires_mapping
-
-    @change_requires_mapping.setter
-    def change_requires_mapping(self, new_value):
-        """
-        setter for the changed property
-        :param new_value: the new state to change it to
-        :return:
-        """
-        self._change_requires_mapping = new_value
 
     @property
     def spike_times(self):
@@ -187,7 +168,8 @@ class SpikeSourceArray(
         """
         self._spike_recorder.record = True
 
-    def reset(self):
+    # @implements AbstractSpikeRecordable.delete_spikes
+    def delete_spikes(self):
         self._spike_recorder.reset()
 
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
@@ -291,8 +273,8 @@ class SpikeSourceArray(
         time_stamp_in_ticks = int(
             math.ceil((time_stamp * 1000.0) / machine_time_step))
         # deduce if the time stamp is within the time window of the simulation
-        if (last_runtime_position <= time_stamp_in_ticks
-                < (last_runtime_position + no_machine_time_steps)):
+        if (last_runtime_position <= time_stamp_in_ticks <
+                (last_runtime_position + no_machine_time_steps)):
             send_buffer.add_key(time_stamp_in_ticks, neuron_list)
 
     def _reserve_memory_regions(
@@ -494,27 +476,6 @@ class SpikeSourceArray(
         """
         return True
 
-    def get_value(self, key):
-        """ Get a property of the overall model
-        """
-        if hasattr(self, key):
-            return getattr(self, key)
-        raise Exception("Population {} does not have parameter {}".format(
-            self, key))
-            
-    def set_value(self, key, value):
-        """ Set a property of the overall model
-        :param key: the name of the param to change
-        :param value: the value of the parameter to change
-        """
-        if hasattr(self, key):
-            setattr(self, key, value)
-            if key != "spike_times":
-                self._change_requires_mapping = True
-            return
-        raise Exception("Type {} does not have parameter {}".format(
-            self._model_name, key))
-
     # @impliments AbstractResetableForRunInterface.reset_for_run
     def reset_for_run(
             self, last_runtime_in_milliseconds, this_runtime_in_milliseconds):
@@ -522,6 +483,7 @@ class SpikeSourceArray(
         self._last_runtime_position = last_runtime_in_milliseconds
         for (vertex_slice, partitioned_vertex) in self._partitioned_vertices:
             send_buffers = dict()
-            send_buffers[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] = \
+            send_buffers[
+                self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] = \
                 self._get_spike_send_buffer(vertex_slice)
             partitioned_vertex.send_buffers = send_buffers

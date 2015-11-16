@@ -3,9 +3,14 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint\
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 
-from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions as local_exceptions
+from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
+    import AbstractPopulationSettable
+from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
+    import AbstractPopulationInitializable
+from spynnaker.pyNN.models.abstract_models.abstract_mappable \
+    import AbstractMappable
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
     import InputTypeConductance
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
@@ -15,7 +20,6 @@ from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
 from spynnaker.pyNN.models.common.abstract_v_recordable \
     import AbstractVRecordable
 
-from pacman.utilities.utility_objs.timer import Timer
 from spinn_front_end_common.utilities import exceptions
 
 from pyNN.space import Space
@@ -98,22 +102,15 @@ class Population(object):
         self._change_requires_mapping = True
 
     @property
-    def change_requires_mapping(self):
-        """
-        returns bool which returns if the population spec has changed since
-        changed was last changed.
-        :return: boolean
-        """
+    def requires_mapping(self):
+        if isinstance(self._vertex, AbstractMappable):
+            return self._vertex.requires_mapping
         return self._change_requires_mapping
 
-    @change_requires_mapping.setter
-    def change_requires_mapping(self, new_value):
-        """
-        setter for the changed
-        :param new_value: the new vlaue of the changed
-        :return: None
-        """
-        self._change_requires_mapping = new_value
+    def mark_no_changes(self):
+        self._change_requires_mapping = False
+        if isinstance(self._vertex, AbstractMappable):
+            self._vertex.mark_no_changes()
 
     def __add__(self, other):
         """ Merges populations
@@ -161,7 +158,10 @@ class Population(object):
         """ Get the values of a parameter for every local cell in the\
             population.
         """
-        return self._vertex.get_value(parameter_name)
+        if isinstance(self._vertex, AbstractPopulationSettable):
+            return self._vertex.get_value(parameter_name)
+        raise KeyError("Population does not have a property {}".format(
+            parameter_name))
 
     def _get_cell_position(self, cell_id):
         """ Get the position of a cell.
@@ -199,8 +199,8 @@ class Population(object):
         else:
             raise exceptions.ConfigurationException(
                 "This poplation has not got the capability to record spikes. "
-                "Therefore spikes cannot be retrieved or asked to be recorded. "
-                "Please readjust your PyNN script and try again.")
+                "Therefore spikes cannot be retrieved or asked to be recorded."
+                " Please readjust your PyNN script and try again.")
 
         if not self._spinnaker.has_ran:
             raise local_exceptions.SpynnakerException(
@@ -259,9 +259,9 @@ class Population(object):
 
         # check that the vertex has read up to the position it needs to
         return self._vertex.get_gsyn(
-                self._spinnaker.transceiver,
-                self._spinnaker.no_machine_time_steps,
-                self._spinnaker.placements, self._spinnaker.graph_mapper)
+            self._spinnaker.transceiver,
+            self._spinnaker.no_machine_time_steps,
+            self._spinnaker.placements, self._spinnaker.graph_mapper)
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -323,6 +323,10 @@ class Population(object):
         this population.
 
         """
+        if not isinstance(self._vertex, AbstractPopulationInitializable):
+            raise KeyError(
+                "Population does not support the initialization of {}".format(
+                    variable))
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
             value, self._vertex.n_atoms))
         self._change_requires_mapping = True
@@ -658,12 +662,17 @@ class Population(object):
         :param parameter: the parameter to set
         :param value: the value of the parameter to set.
         """
+        if not isinstance(self._vertex, AbstractPopulationSettable):
+            raise KeyError("Population does not have property {}".format(
+                parameter))
+
         if type(parameter) is str:
             if value is None:
                 raise Exception("Error: No value given in set() function for "
                                 "population parameter. Exiting.")
             self._vertex.set_value(parameter, value)
             return
+
         if type(parameter) is not dict:
                 raise Exception("Error: invalid parameter type for "
                                 "set() function for population parameter."

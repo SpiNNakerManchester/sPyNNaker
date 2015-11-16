@@ -9,6 +9,8 @@ from spynnaker.pyNN.models.neural_properties.randomDistributions\
     import generate_parameter
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
+    import PopulationSettableChangeRequiresMapping
 
 from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
@@ -25,7 +27,6 @@ from enum import Enum
 import math
 import numpy
 import logging
-import tempfile
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,8 @@ RANDOM_SEED_WORDS = 4
 
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
-        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints):
+        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
+        PopulationSettableChangeRequiresMapping):
     """
     This class represents a Poisson Spike source object, which can represent
     a pynn_population.py of virtual neurons each with its own parameters.
@@ -66,6 +68,8 @@ class SpikeSourcePoisson(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractSpikeRecordable.__init__(self)
+        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        PopulationSettableChangeRequiresMapping.__init__(self)
 
         # Store the parameters
         self._rate = rate
@@ -79,9 +83,6 @@ class SpikeSourcePoisson(
         # counter of how many machien time steps the vertex has extracted
         self._extracted_machine_time_steps = 0
         self._spikes_cache_file = None
-
-        # bool for if state has changed.
-        self._change_requires_mapping = True
 
     @property
     def rate(self):
@@ -316,8 +317,8 @@ class SpikeSourcePoisson(
     def set_recording_spikes(self):
         self._spike_recorder.record = True
 
-    # @implements AbstractSpikeRecordable.reset
-    def reset(self):
+    # @implements AbstractSpikeRecordable.delete_spikes
+    def delete_spikes(self):
         self._spike_recorder.reset()
 
     # @implements AbstractSpikeRecordable.get_spikes
@@ -327,7 +328,6 @@ class SpikeSourcePoisson(
             self._label, transceiver,
             self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             n_machine_time_steps, placements, graph_mapper, self, return_data)
-
 
     # inherited from partionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
@@ -448,28 +448,3 @@ class SpikeSourcePoisson(
         :return:
         """
         return True
-
-    @property
-    def change_requires_mapping(self):
-        """
-        property for checking if someting has changed
-        :return:
-        """
-        return self._change_requires_mapping
-
-    @change_requires_mapping.setter
-    def change_requires_mapping(self, new_value):
-        """
-        setter for the changed property
-        :param new_value: the new state to change it to
-        :return:
-        """
-        self._change_requires_mapping = new_value
-
-    def get_value(self, key):
-        """ Get a property of the overall model
-        """
-        if hasattr(self, key):
-            return getattr(self, key)
-        raise Exception("Population {} does not have parameter {}".format(
-            self, key))

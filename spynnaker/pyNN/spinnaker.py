@@ -85,7 +85,7 @@ class Spinnaker(object):
         self._app_id = None
         self._current_run_ms = None
         self._buffer_manager = None
-        
+
         # database objects
         self._database_socket_addresses = set()
         if database_socket_addresses is not None:
@@ -358,10 +358,12 @@ class Spinnaker(object):
         # reset the n_machien time steps from each vertex
         for vertex in self.partitionable_graph.vertices:
             vertex.set_no_machine_time_steps(0)
-            if (isinstance(vertex, AbstractSpikeRecordable)
-                    or isinstance(vertex, AbstractVRecordable)
-                    or isinstance(vertex, AbstractGSynRecordable)):
-                vertex.reset()
+            if isinstance(vertex, AbstractSpikeRecordable):
+                vertex.delete_spikes()
+            if isinstance(vertex, AbstractVRecordable):
+                vertex.delete_v()
+            if isinstance(vertex, AbstractGSynRecordable):
+                vertex.delete_gsyn()
             if isinstance(vertex, AbstractResetableForRunInterface):
                 vertex.reset_for_run(self._current_run_ms,
                                      self._no_machine_time_steps)
@@ -494,9 +496,9 @@ class Spinnaker(object):
                 algorithms.append("FrontEndCommonTagsLoader")
                 algorithms.append("FrontEndCommomPartitionableGraphData"
                                   "SpecificationWriter")
-    
+
                 # if the end user wants reload script, add the reload script
-                # creator to the list (reload script currently only supported 
+                # creator to the list (reload script currently only supported
                 # for the original run)
                 if (not self._has_ran
                         and config.getboolean("Reports", "writeReloadSteps")):
@@ -511,7 +513,7 @@ class Spinnaker(object):
             if (config.getboolean("Reports", "writeMemoryMapReport")
                     and not config.getboolean("Machine", "virtual_board")):
                 algorithms.append("FrontEndCommonMemoryMapReport")
-    
+
             if config.getboolean("Reports", "writeNetworkSpecificationReport"):
                 algorithms.append(
                     "FrontEndCommonNetworkSpecificationPartitionableReport")
@@ -521,7 +523,7 @@ class Spinnaker(object):
             if (config.get("Reports", "writeProvanceData")
                     and not config.getboolean("Machine", "virtual_board")):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
-    
+
             # define mapping between output types and reports
             if self._reports_states is not None \
                     and self._reports_states.tag_allocation_report:
@@ -863,39 +865,24 @@ class Spinnaker(object):
                         "is not currently supportable in this tool chain. "
                         "watch this space")
         return next_run_time
-                
+
     def _detect_if_graph_has_changed(self, reset_flags=True):
-        """
-        iterates though the graph and looks for asks if they have changed
-        :return:
+        """ Iterates though the graph and looks changes
         """
         changed = False
         for population in self._populations:
-            if population.change_requires_mapping:
-                # ask the vertex if this change requires mapping to be redone
-                if population._vertex.change_requires_mapping:
-                    changed = True
-                    if reset_flags:
-                        population._vertex.change_requires_mapping = False
-                if reset_flags:
-                    population.change_requires_mapping = False
+            if population.requires_mapping:
+                changed = True
+            if reset_flags:
+                population.mark_no_changes()
+
         for projection in self._projections:
-            if projection.change_requires_mapping:
-                if (projection._delay_edge is not None
-                        and projection._delay_edge.change_requires_mapping):
-                    changed = True
-                    if reset_flags:
-                        projection._delay_edge.change_requires_mapping = False
-                if (projection._projection_edge is not None
-                        and projection._projection_edge.
-                            change_requires_mapping):
-                    changed = True
-                    if reset_flags:
-                        projection._projection_edge.change_requires_mapping = \
-                            False
-                if reset_flags:
-                    projection.change_requires_mapping = False
-        return changed   
+            if projection.requires_mapping:
+                changed = True
+            if reset_flags:
+                population.mark_no_changes()
+
+        return changed
 
     @property
     def app_id(self):
@@ -1198,7 +1185,7 @@ class Spinnaker(object):
             self._no_sync_changes = 0
 
             # app stop command (currently fucked)
-            #self._txrx.stop_application(self._app_id)
+            # self._txrx.stop_application(self._app_id)
             if self._create_database:
                 self._database_interface.stop()
 

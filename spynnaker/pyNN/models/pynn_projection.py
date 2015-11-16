@@ -18,6 +18,8 @@ from spynnaker.pyNN.models.neural_projections\
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
+from spynnaker.pyNN.models.abstract_models.abstract_mappable \
+    import AbstractMappable
 
 from spinn_front_end_common.utilities import exceptions
 
@@ -60,7 +62,6 @@ class Projection(object):
         self._delay_list_ranges = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
-        self._change_requires_mapping = True
 
         if not isinstance(postsynaptic_population._get_vertex,
                           AbstractPopulationVertex):
@@ -163,22 +164,22 @@ class Projection(object):
         spinnaker_control._add_projection(self)
 
     @property
-    def change_requires_mapping(self):
-        """
-        returns bool which returns if the population spec has changed since
-        changed was last changed.
-        :return: boolean
-        """
-        return self._change_requires_mapping
+    def requires_mapping(self):
+        projection_edge_mappable = isinstance(
+            self._projection_edge, AbstractMappable)
+        delay_edge_mappable = isinstance(self._delay_edge, AbstractMappable)
+        if (projection_edge_mappable and
+                self._projection_edge.requires_mapping):
+            return True
+        if delay_edge_mappable and self._delay_edge.requires_mapping:
+            return True
+        return False
 
-    @change_requires_mapping.setter
-    def change_requires_mapping(self, new_value):
-        """
-        setter for the changed
-        :param new_value: the new vlaue of the changed
-        :return: None
-        """
-        self._change_requires_mapping = new_value
+    def mark_no_changes(self):
+        if isinstance(self._projection_edge, AbstractMappable):
+            self._projection_edge.mark_no_changes()
+        if isinstance(self._delay_edge, AbstractMappable):
+            self._delay_edge.mark_no_changes()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
         """ searches though the partitionable graph's edges to locate any

@@ -4,12 +4,13 @@ import copy
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.timer import Timer
+
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
-from pacman.utilities.utility_objs.timer import Timer
 
 logger = logging.getLogger(__name__)
 
@@ -35,27 +36,6 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         # synapse list
         if synapse_dynamics is not None:
             self._synapse_row_io = synapse_dynamics.get_synapse_row_io()
-
-        # boolean that checks if this edge has changed since last run
-        self._change_requires_mapping = True
-
-    @property
-    def change_requires_mapping(self):
-        """
-        returns bool which returns if the population spec has changed since
-        changed was last changed.
-        :return: boolean
-        """
-        return self._change_requires_mapping
-
-    @change_requires_mapping.setter
-    def change_requires_mapping(self, new_value):
-        """
-        setter for the changed
-        :param new_value: the new vlaue of the changed
-        :return: None
-        """
-        self._change_requires_mapping = new_value
 
     def create_subedge(self, presubvertex, postsubvertex, constraints=None,
                        label=None):
