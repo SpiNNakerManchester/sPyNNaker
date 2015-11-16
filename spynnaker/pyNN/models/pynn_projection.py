@@ -580,4 +580,3 @@ class Projection(object):
         """
         # TODO
         raise NotImplementedError
-
