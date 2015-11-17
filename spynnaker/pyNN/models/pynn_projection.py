@@ -65,7 +65,7 @@ class Projection(object):
                           AbstractPopulationVertex):
 
             raise exceptions.ConfigurationException(
-                "postsynaptic_population is not a supposal reciever of"
+                "postsynaptic population is not designed to receive"
                 " synaptic projections")
 
         # Check that the "target" is an acceptable value
@@ -279,8 +279,8 @@ class Projection(object):
         """
         Returns a human-readable description of the projection.
 
-        The output may be customized by specifying a different template
-        togther with an associated template engine (see ``pyNN.descriptions``).
+        The output may be customised by specifying a different template
+        together with an associated template engine (see ``pyNN.descriptions``)
 
         If template is None, then a dictionary containing the template context
         will be returned.
@@ -294,7 +294,7 @@ class Projection(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getDelays(self, format='list', gather=True):
+    def getDelays(self, format='list', gather=True):  # @ReservedAssignment
         """
         Get synaptic delays for all connections in this Projection.
 
@@ -347,10 +347,10 @@ class Projection(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getWeights(self, format='list', gather=True):
+    def getWeights(self, format='list', gather=True):  # @ReservedAssignment
         """
         Get synaptic weights for all connections in this Projection.
-        (pyNN gather parameter not supported from the signiture
+        (pyNN gather parameter not supported from the signature
         getWeights(self, format='list', gather=True):)
 
         Possible formats are: a list of length equal to the number of
@@ -440,12 +440,12 @@ class Projection(object):
         """
         Set parameters of the synapse dynamics to values taken from rand_distr
         """
-        # TODO: Look at what this is randomizing
+        # TODO: Look at what this is randomising
         raise NotImplementedError
 
     def __repr__(self):
         """
-        returns a string rep of the projection
+        returns a string representation of the projection
         """
         return "projection {}".format(self._projection_edge.label)
 
@@ -559,4 +559,3 @@ class Projection(object):
         """
         # TODO
         raise NotImplementedError
-

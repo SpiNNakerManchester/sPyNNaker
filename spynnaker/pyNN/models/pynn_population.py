@@ -153,7 +153,7 @@ class Population(object):
         # TODO: This isn't part of the API - is it ever used?
         if self._structure is None:
             raise ValueError("Attempted to get the position of a cell "
-                             "in an un-structured population")
+                             "in an unstructured population")
         elif self._positions is None:
             self._structure.generate_positions(self._vertex.n_atoms)
         return self._positions[cell_id]
@@ -260,7 +260,7 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids, time, and Vm for
+        Return a 3-column numpy array containing cell ids, time, and V_m for
         recorded cells.
 
         :param gather:
@@ -386,7 +386,7 @@ class Population(object):
         """
         Returns the mean number of spikes per neuron.
         :param gather: gather has no meaning in spinnaker, always set to true
-        :return: an array whcih contains the avg spike rate per neuron
+        :return: an array which contains the average spike rate per neuron
         """
         return self.mean_spike_count(gather)
 
@@ -403,7 +403,7 @@ class Population(object):
         """
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
-                             "for an un-structured population")
+                             "for an unstructured population")
         elif self._positions is None:
             self._structure.generate_positions(self._vertex.n_atoms)
         position_diff = numpy.empty(self._positions.shape)
@@ -417,7 +417,7 @@ class Population(object):
         """
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
-                             "for an un-structured population")
+                             "for an unstructured population")
         else:
             return self._structure.generate_positions
 
@@ -582,13 +582,13 @@ class Population(object):
         # TODO: Need PopulationView support
         raise NotImplementedError
 
-    def save_positions(self, file):
+    def save_positions(self, file):  # @ReservedAssignment
         """ Save positions to file.
         :param file: the file to write the positions to.
         """
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
-                             "for an un-structured population")
+                             "for an unstructured population")
         elif self._positions is None:
             self._structure.generate_positions(self._vertex.n_atoms)
         file_handle = open(file, "w")
@@ -607,7 +607,7 @@ class Population(object):
         # TODO: Remove?  This is never called
         if self._structure is None:
             raise ValueError("attempted to set a position for a cell "
-                             "in an un-structured population")
+                             "in an unstructured population")
         elif self._positions is None:
             self._structure.generate_positions(self._vertex.n_atoms)
         self._positions[cell_id] = pos
@@ -618,7 +618,7 @@ class Population(object):
         # TODO: Remove?  This is never used
         if self._structure is None:
             raise ValueError("attempted to set positions "
-                             "in an un-structured population")
+                             "in an unstructured population")
         else:
             self._positions = positions
 
@@ -626,9 +626,9 @@ class Population(object):
         """
         Set one or more parameters for every cell in the population.
 
-        param can be a dict, in which case val should not be supplied, or a
-        string giving the parameter name, in which case val is the parameter
-        value. val can be a numeric value, or list of such
+        param can be a dict, in which case value should not be supplied, or a
+        string giving the parameter name, in which case value is the parameter
+        value. value can be a numeric value, or list of such
         (e.g. for setting spike times)::
 
           p.set("tau_m", 20.0).
@@ -667,8 +667,7 @@ class Population(object):
             self._vertex.add_constraint(constraint)
         else:
             raise exceptions.ConfigurationException(
-                "the constraint entered is not a recongised constraint. "
-                "try again")
+                "the constraint entered is not a recognised constraint")
 
     # NONE PYNN API CALL
     def add_placement_constraint(self, x, y, p=None):
@@ -704,7 +703,7 @@ class Population(object):
         else:
             raise exceptions.ConfigurationException(
                 "This population does not support its max_atoms_per_core "
-                "variable being adjusted by the end user. Sorry")
+                "variable being adjusted by the end user")
 
     @property
     def size(self):
@@ -723,7 +722,7 @@ class Population(object):
         """
         if len(value_array) != self._vertex.n_atoms:
             raise exceptions.ConfigurationException(
-                "To use Tset, you must have a array of values which matches "
+                "To use tset, you must have a array of values which matches "
                 "the size of the population. Please change this and try "
                 "again, or alternatively, use set()")
         self.set(parametername, value_array)

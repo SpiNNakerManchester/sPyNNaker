@@ -13,10 +13,9 @@ class SpynnakerDatabaseWriter(object):
         self._database_interface = None
         self._user_create_database = None
         self._needs_database = None
-    
 
     def __call__(
-            self, partitioned_graph, user_create_database, tags, 
+            self, partitioned_graph, user_create_database, tags,
             app_data_runtime_folder, runtime, machine, time_scale_factor,
             machine_time_step, partitionable_graph, graph_mapper, placements,
             routing_infos, router_tables, execute_mapping):
@@ -76,4 +75,3 @@ class SpynnakerDatabaseWriter(object):
         if ((self._user_create_database == "None" and self._needs_database) or
                 self._user_create_database == "True"):
             return self._database_interface.database_path
-

@@ -47,9 +47,6 @@ executable_finder = ExecutableFinder()
 
 
 class Spinnaker(object):
-    """
-    Spinnaker
-    """
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
                  max_delay=None, graph_label=None,
@@ -99,7 +96,8 @@ class Spinnaker(object):
         # specific utility vertexes
         self._live_spike_recorder = dict()
 
-        # holder for number of times the timer event should exuecte for the sim
+        # holder for number of times the timer event should execute for the
+        # simulation
         self._no_machine_time_steps = None
         self._machine_time_step = None
 
@@ -146,7 +144,7 @@ class Spinnaker(object):
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
 
-        # set up machine targetted data
+        # set up machine targeted data
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
 
@@ -163,9 +161,11 @@ class Spinnaker(object):
                                   hostname):
         self._machine_time_step = config.getint("Machine", "machineTimeStep")
 
-        # deal with params allowed via the setup optimals
+        # deal with params allowed via the setup options
         if timestep is not None:
-            timestep *= 1000  # convert into ms from microseconds
+
+            # convert into milliseconds from microseconds
+            timestep *= 1000
             self._machine_time_step = timestep
 
         if min_delay is not None and float(min_delay * 1000) < 1.0 * timestep:
@@ -266,7 +266,7 @@ class Spinnaker(object):
                 pacman_executor_file_path,
                 pacman_exeuctor.get_item("MemoryTransciever"))
 
-        # sort out outputs datas
+        # sort out outputs data
         self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
         self._placements = pacman_exeuctor.get_item("MemoryPlacements")
         self._router_tables = pacman_exeuctor.get_item("MemoryRoutingTables")
@@ -282,7 +282,7 @@ class Spinnaker(object):
 
     @staticmethod
     def _create_xml_paths():
-        # add the extra xml files from the cfg file
+        # add the extra xml files from the config file
         xml_paths = config.get("Mapping", "extra_xmls_paths")
         if xml_paths == "None":
             xml_paths = list()
@@ -299,9 +299,8 @@ class Spinnaker(object):
 
     def _create_algorithm_list(self, in_debug_mode):
         algorithms = ""
-        algorithms += \
-            config.get("Mapping", "algorithms") + "," + \
-            config.get("Mapping", "interface_algorithms")
+        algorithms += (config.get("Mapping", "algorithms") + "," +
+                       config.get("Mapping", "interface_algorithms"))
 
         # if using virtual machine, add to list of algorithms the virtual
         # machine generator, otherwise add the standard machine generator
@@ -311,7 +310,7 @@ class Spinnaker(object):
             algorithms += ",FrontEndCommonMachineInterfacer"
             algorithms += ",FrontEndCommonApplicationRunner"
 
-            # if going to write provanence data after the run add the two
+            # if going to write provenance data after the run add the two
             # provenance gatherers
             if config.get("Reports", "writeProvanceData"):
                 algorithms += ",FrontEndCommonProvenanceGatherer"
@@ -348,6 +347,7 @@ class Spinnaker(object):
                 self._reports_states
                 .placer_report_without_partitionable_graph):
             algorithms += ",PlacerReportWithoutPartitionableGraph"
+
         # add debug algorithms if needed
         if in_debug_mode:
             algorithms += ",ValidRoutesChecker"
@@ -356,6 +356,7 @@ class Spinnaker(object):
 
     @staticmethod
     def _create_pacman_executor_outputs():
+
         # explicitly define what outputs spynnaker expects
         required_outputs = list()
         if config.getboolean("Machine", "virtual_board"):
@@ -365,12 +366,14 @@ class Spinnaker(object):
                 "MemoryGraphMapper"])
         else:
             required_outputs.append("RanToken")
+
         # if front end wants reload script, add requires reload token
         if config.getboolean("Reports", "writeReloadSteps"):
             required_outputs.append("ReloadToken")
         return required_outputs
 
     def _create_pacman_executor_inputs(self):
+
         # make a folder for the json files to be stored in
         json_folder = os.path.join(
             self._report_default_directory, "json_files")
@@ -506,10 +509,10 @@ class Spinnaker(object):
             ceiled_machine_time_steps = \
                 math.ceil((run_time * 1000.0) / self._machine_time_step)
             if self._no_machine_time_steps != ceiled_machine_time_steps:
-                raise common_exceptions.ConfigurationException(
+                logger.warn(
                     "The runtime and machine time step combination result in "
-                    "a factional number of machine runable time steps and "
-                    "therefore spinnaker cannot determine how many to run for")
+                    "a fractional number of machine time steps")
+                self._no_machine_time_steps = int(ceiled_machine_time_steps)
             for vertex in self._partitionable_graph.vertices:
                 if isinstance(vertex, AbstractDataSpecableVertex):
                     vertex.set_no_machine_time_steps(
@@ -698,7 +701,7 @@ class Spinnaker(object):
             self._multi_cast_vertex.add_commands(vertex_to_add.commands, edge)
             self.add_edge(edge)
 
-        # add any dependent edges and verts if needed
+        # add any dependent edges and vertices if needed
         if isinstance(vertex_to_add,
                       AbstractVertexWithEdgeToDependentVertices):
             for dependant_vertex in vertex_to_add.dependent_vertices:
@@ -713,7 +716,7 @@ class Spinnaker(object):
         """
 
         :param edge_to_add:
-        :param partition_identifier: the partition identfier for the outgoing\
+        :param partition_identifier: the partition identifier for the outgoing\
                     edge partition
         :return:
         """
@@ -769,8 +772,8 @@ class Spinnaker(object):
              clear_tags=None):
         """
         :param turn_off_machine: decides if the machine should be powered down\
-            after running the exeuction. Note that this powers down all boards\
-            connected to the BMP connections given to the transciever
+            after running the execution. Note that this powers down all boards\
+            connected to the BMP connections given to the transceiver
         :type turn_off_machine: bool
         :param clear_routing_tables: informs the tool chain if it\
             should turn off the clearing of the routing tables

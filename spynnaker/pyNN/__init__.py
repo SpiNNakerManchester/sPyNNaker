@@ -1,6 +1,6 @@
 # encoding: utf-8
 """
-The :py:mod:`spynnaker.pynn` package contains the frontend specifications
+The :py:mod:`spynnaker.pynn` package contains the front-end specifications
 and implementation for the PyNN High-level API
 (http://neuralensemble.org/trac/PyNN)
 """
@@ -326,7 +326,7 @@ def Projection(presynaptic_population, postsynaptic_population,
 
 def NativeRNG(seed_value):
     """
-    fixes the rnadom number generators seed
+    fixes the random number generators seed
     :param seed_value:
     :return:
     """
@@ -342,7 +342,7 @@ def get_current_time():
     if _spinnaker is None:
         raise front_end_common_exceptions.ConfigurationException(
             "You currently have not ran setup, please do so before calling "
-            "get_current_time. thankyou")
+            "get_current_time")
     else:
         return _spinnaker.get_current_time()
 
@@ -387,7 +387,7 @@ def get_time_step():
     if _spinnaker is None:
         raise front_end_common_exceptions.ConfigurationException(
             "You currently have not ran setup, please do so before calling "
-            "get_time_step. thankyou")
+            "get_time_step")
     else:
         return _spinnaker.machine_time_step
 
@@ -401,7 +401,7 @@ def get_min_delay():
     if _spinnaker is None:
         raise front_end_common_exceptions.ConfigurationException(
             "You currently have not ran setup, please do so before calling "
-            "get_min_delay. thankyou")
+            "get_min_delay")
     else:
         return _spinnaker.min_supported_delay
 
@@ -415,12 +415,12 @@ def get_max_delay():
     if _spinnaker is None:
         raise front_end_common_exceptions.ConfigurationException(
             "You currently have not ran setup, please do so before calling "
-            "get_max_delay. thankyou")
+            "get_max_delay")
     else:
         return _spinnaker.max_supported_delay
 
 
-def set(cells, param, val=None):
+def set(cells, param, val=None):  # @ReservedAssignment
     """
     Set one or more parameters of an individual cell or list of cells.
 

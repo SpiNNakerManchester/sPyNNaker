@@ -247,7 +247,7 @@ class AbstractPopulationVertex(
             spec.write_value(data=param.get_value(),
                              data_type=param.get_dataspec_datatype())
 
-        # Write the neuron paramters
+        # Write the neuron parameters
         utility_calls.write_parameters_per_neuron(
             spec, vertex_slice, self._neuron_model.get_neural_parameters())
 
@@ -294,7 +294,7 @@ class AbstractPopulationVertex(
             gsyn_history_sz)
 
         # Declare random number generators and distributions:
-        # TODO add random distrubtion stuff
+        # TODO add random distribution stuff
         # self.write_random_distribution_declarations(spec)
 
         # Get the key - use only the first edge
@@ -386,7 +386,7 @@ class AbstractPopulationVertex(
         initialize_attr = getattr(
             self._neuron_model, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialization of"
+            raise Exception("Vertex does not support initialisation of"
                             " parameter {}".format(variable))
         initialize_attr(value)
 
@@ -453,8 +453,8 @@ class AbstractPopulationVertex(
         return True
 
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
-        """
-        gets the constraints for edges going into this vertex
+        """ Gets the constraints for edges going into this vertex
+
         :param partitioned_edge: partitioned edge that goes into this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
@@ -462,9 +462,8 @@ class AbstractPopulationVertex(
         return self._synapse_manager.get_incoming_edge_constraints()
 
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
-        """
-        gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the parittioned edge that leaves this vertex
+        """ Gets the constraints for edges going out of this vertex
+        :param partitioned_edge: the partitioned edge that leaves this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """

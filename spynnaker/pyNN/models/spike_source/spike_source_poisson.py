@@ -37,9 +37,7 @@ RANDOM_SEED_WORDS = 4
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints):
-    """
-    This class represents a Poisson Spike source object, which can represent
-    a pynn_population.py of virtual neurons each with its own parameters.
+    """ A Poisson Spike source object
     """
 
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
@@ -49,7 +47,8 @@ class SpikeSourcePoisson(
                ('SPIKE_HISTORY_REGION', 2)])
 
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
-    # in terms of CPU (2900 at 10 times slowdown is fine, but not at realtime)
+    # in terms of CPU (2900 at 10 times slow down is fine, but not at
+    # real-time)
     _model_based_max_atoms_per_core = 500
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
@@ -126,7 +125,7 @@ class SpikeSourcePoisson(
     @staticmethod
     def get_params_bytes(vertex_slice):
         """
-        Gets the size of the possion parameters in bytes
+        Gets the size of the poisson parameters in bytes
         :param vertex_slice:
         """
         return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS +
@@ -163,7 +162,7 @@ class SpikeSourcePoisson(
 
     def write_setup_info(self, spec, spike_history_region_sz):
         """
-        Write information used to control the simulationand gathering of
+        Write information used to control the simulation and gathering of
         results.
         Currently, this means the flag word used to signal whether information
         on neuron firing and neuron potential is either stored locally in a
@@ -211,7 +210,7 @@ class SpikeSourcePoisson(
 
         # Write Key info for this core:
         if key is None:
-            # if theres no key, then two falses will cover it.
+            # if there's no key, then two false will cover it.
             spec.write_value(data=0)
             spec.write_value(data=0)
         else:
@@ -306,10 +305,10 @@ class SpikeSourcePoisson(
     def set_recording_spikes(self):
         self._spike_recorder.record = True
 
-    # inherited from partionable vertex
+    # inherited from partitionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
-        method for calculating sdram usage
+        method for calculating SDRAM usage
         :param vertex_slice:
         :param graph:
         :return:
@@ -323,7 +322,7 @@ class SpikeSourcePoisson(
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
-        method for calculating dtcm usage for a collection of atoms
+        method for calculating DTCM usage for a collection of atoms
         :param vertex_slice:
         :param graph:
         :return:
