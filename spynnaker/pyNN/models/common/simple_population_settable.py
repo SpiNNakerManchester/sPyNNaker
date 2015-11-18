@@ -26,8 +26,6 @@ class SimplePopulationSettable(AbstractPopulationSettable):
         """
         if hasattr(self, key):
             setattr(self, key, value)
-            if key != "spike_times":
-                self._change_requires_mapping = True
-            return
-        raise Exception("Type {} does not have parameter {}".format(
-            self._model_name, key))
+        else:
+            raise Exception("Type {} does not have parameter {}"
+                            .format(self._model_name, key))

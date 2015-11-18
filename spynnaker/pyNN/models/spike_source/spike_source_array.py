@@ -183,6 +183,7 @@ class SpikeSourceArray(
         :return:
         """
         self._spike_recorder.record = True
+        self._change_requires_mapping = True
 
     # @implements AbstractSpikeRecordable.delete_spikes
     def delete_spikes(self):
