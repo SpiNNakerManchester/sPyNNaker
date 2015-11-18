@@ -1,22 +1,23 @@
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions\
     import generate_parameter
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
+from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
+    import PopulationSettableChangeRequiresMapping
 
+from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
-
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -26,7 +27,6 @@ from enum import Enum
 import math
 import numpy
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,8 @@ RANDOM_SEED_WORDS = 4
 
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
-        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints):
+        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
+        PopulationSettableChangeRequiresMapping):
     """
     This class represents a Poisson Spike source object, which can represent
     a pynn_population.py of virtual neurons each with its own parameters.
@@ -67,6 +68,8 @@ class SpikeSourcePoisson(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractSpikeRecordable.__init__(self)
+        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        PopulationSettableChangeRequiresMapping.__init__(self)
 
         # Store the parameters
         self._rate = rate
@@ -77,8 +80,9 @@ class SpikeSourcePoisson(
         # Prepare for recording, and to get spikes
         self._spike_recorder = SpikeRecorder(machine_time_step)
 
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
+        # counter of how many machien time steps the vertex has extracted
+        self._extracted_machine_time_steps = 0
+        self._spikes_cache_file = None
 
     @property
     def rate(self):
@@ -305,11 +309,25 @@ class SpikeSourcePoisson(
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
             spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
 
+    # @implements AbstractSpikeRecordable.is_recording_spikes
     def is_recording_spikes(self):
         return self._spike_recorder.record
 
+    # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
         self._spike_recorder.record = True
+
+    # @implements AbstractSpikeRecordable.delete_spikes
+    def delete_spikes(self):
+        self._spike_recorder.reset()
+
+    # @implements AbstractSpikeRecordable.get_spikes
+    def get_spikes(self, transceiver, n_machine_time_steps, placements,
+                   graph_mapper, return_data=True):
+        return self._spike_recorder.get_spikes(
+            self._label, transceiver,
+            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     # inherited from partionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
@@ -406,6 +424,8 @@ class SpikeSourcePoisson(
         spec.end_specification()
         data_writer.close()
 
+        return [data_writer.filename]
+
     def get_binary_file_name(self):
         """
 
@@ -413,22 +433,14 @@ class SpikeSourcePoisson(
         """
         return "spike_source_poisson.aplx"
 
-    def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
-        return self._spike_recorder.get_spikes(
-            self._label, transceiver,
-            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            n_machine_time_steps, placements, graph_mapper, self)
-
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
         """
         gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param partitioned_edge: the partitioned edge that leaves this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
-            partitioned_edge, graph_mapper)
+        return [KeyAllocatorContiguousRangeContraint()]
 
     def is_data_specable(self):
         """
@@ -436,11 +448,3 @@ class SpikeSourcePoisson(
         :return:
         """
         return True
-
-    def get_value(self, key):
-        """ Get a property of the overall model
-        """
-        if hasattr(self, key):
-            return getattr(self, key)
-        raise Exception("Population {} does not have parameter {}".format(
-            self, key))

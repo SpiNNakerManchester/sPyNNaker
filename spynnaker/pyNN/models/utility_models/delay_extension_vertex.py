@@ -1,18 +1,16 @@
 import copy
 import logging
 from enum import Enum
-
 import math
-from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
     delay_partitionable_edge import DelayPartitionableEdge
+
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
@@ -21,6 +19,7 @@ from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
     import AbstractProvidesNKeysForEdge
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -29,9 +28,12 @@ from pacman.model.constraints.key_allocator_constraints.\
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
+
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
-
 
 logger = logging.getLogger(__name__)
 
@@ -73,8 +75,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         self._source_vertex = source_vertex
         joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
         self.add_constraint(joint_constrant)
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
 
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
         return list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
@@ -190,6 +190,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
+
+        return [data_writer.filename]
 
     def write_setup_info(self, spec, spike_history_region_sz):
         """
@@ -319,5 +321,4 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
-            partitioned_edge, graph_mapper)
+        return [KeyAllocatorContiguousRangeContraint()]

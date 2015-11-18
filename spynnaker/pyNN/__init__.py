@@ -6,9 +6,10 @@ and implementation for the PyNN High-level API
 """
 
 import inspect
-from collections import defaultdict
+
 from ._version import __version__, __version_name__, __version_month__,\
     __version_year__
+
 
 # utility functions
 from spynnaker.pyNN.utilities import conf
@@ -170,9 +171,9 @@ def rank():
 
 def reset():
     """Reset the time to zero, and start the clock.
-    TO BE IMPLEMENTED
     """
-    pass
+    global _spinnaker
+    _spinnaker.reset()
 
 
 def run(run_time=None):

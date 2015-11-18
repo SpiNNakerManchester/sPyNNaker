@@ -7,11 +7,11 @@ from abc import abstractproperty
 
 
 @add_metaclass(ABCMeta)
-class AbstractEIEIOSpikeRecordable(object):
+class AbstractUsesEIEIORecordings(object):
     """
-    AbstractEIEIOSpikeRecordable: interface which covers the fact that eieio
+    AbstractEIEIOSpikeRecordable: interface which covers the fact that eieio\
     recordable vertices need to have a base key for atoms, and needs to store
-    the max size of the recording region
+    the max size of the recording region\
     """
 
     @abstractproperty
@@ -27,4 +27,3 @@ class AbstractEIEIOSpikeRecordable(object):
 
         :return:
         """
-

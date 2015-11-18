@@ -28,18 +28,18 @@ class _MasterPopEntry(object):
     MASTER_POP_ENTRY_SIZE_BYTES = 12
     MASTER_POP_ENTRY_SIZE_WORDS = 3
 
-    def __init__(self, key_combo, mask, address, row_length):
-        self._key_combo = key_combo
+    def __init__(self, routing_key, mask, address, row_length):
+        self._routing_key = routing_key
         self._mask = mask
         self._address = address
         self._row_length = row_length
 
     @property
-    def key_combo(self):
+    def routing_key(self):
         """
         :return: the key combo of this entry
         """
-        return self._key_combo
+        return self._routing_key
 
     @property
     def mask(self):
@@ -131,9 +131,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         while imin < imax:
             imid = (imax + imin) / 2
             entry = entries[imid]
-            if key & entry.mask == entry.key_combo:
+            if key & entry.mask == entry.routing_key:
                 return entry
-            if key > entry.key_combo:
+            if key > entry.routing_key:
                 imin = imid + 1
             else:
                 imax = imid
@@ -225,11 +225,11 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         # sort out entries based off key_combo
         self._entries = sorted(
             self._entries,
-            key=lambda pop_table_entry: pop_table_entry.key_combo)
+            key=lambda pop_table_entry: pop_table_entry.routing_key)
 
         # add each entry
         for pop_entry in self._entries:
-            spec.write_value(pop_entry.key_combo)
+            spec.write_value(pop_entry.routing_key)
             spec.write_value(pop_entry.mask)
             spec.write_value((pop_entry.address << 8) | pop_entry.row_length)
 

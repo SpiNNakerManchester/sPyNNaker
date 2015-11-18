@@ -43,6 +43,11 @@ typedef enum region{
     system, poisson_params, spike_history,
 }region;
 
+//! values for the priority for each callback
+typedef enum callback_priorities{
+    SDP = 0, TIMER = 2
+}callback_priorities;
+
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
 typedef enum poisson_region_parameters{
@@ -183,6 +188,26 @@ bool read_poisson_parameters(address_t address) {
     return true;
 }
 
+bool initialize_recording() {
+
+    address_t address = data_specification_get_data_address();
+    address_t system_region = data_specification_get_region(system, address);
+    // Get the recording information
+    uint32_t spike_history_region_size;
+    recording_read_region_sizes(
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
+        &recording_flags, &spike_history_region_size, NULL, NULL);
+    if (recording_is_channel_enabled(
+            recording_flags, e_recording_channel_spike_history)) {
+        if (!recording_initialse_channel(
+                data_specification_get_region(spike_history, address),
+                e_recording_channel_spike_history, spike_history_region_size)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 //! \Initialises the model by reading in the regions and checking recording
 //! data.
 //! \param[in] *timer_period a pointer for the memory address where the timer
@@ -209,18 +234,8 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    // Get the recording information
-    uint32_t spike_history_region_size;
-    recording_read_region_sizes(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
-        &recording_flags, &spike_history_region_size, NULL, NULL);
-    if (recording_is_channel_enabled(
-            recording_flags, e_recording_channel_spike_history)) {
-        if (!recording_initialse_channel(
-                data_specification_get_region(spike_history, address),
-                e_recording_channel_spike_history, spike_history_region_size)) {
-            return false;
-        }
+    if (!initialize_recording()) {
+        return false;
     }
 
     // Setup regions that specify spike source array data
@@ -253,13 +268,13 @@ void timer_callback(uint timer_count, uint unused) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
-        log_info("Simulation complete.\n");
-
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
-
-        spin1_exit(0);
+        // go into pause and resume state
+        simulation_handle_pause_resume(timer_callback, TIMER);
+        // handle resetting the recording state
+        initialize_recording();
         return;
     }
 
@@ -370,7 +385,10 @@ void c_main(void) {
     spin1_set_timer_tick(timer_period);
 
     // Register callback
-    spin1_callback_on(TIMER_TICK, timer_callback, 2);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
+
+        // Set up callback listening to SDP messages
+    simulation_register_simulation_sdp_callback(&simulation_ticks, SDP);
 
     log_info("Starting");
     simulation_run();

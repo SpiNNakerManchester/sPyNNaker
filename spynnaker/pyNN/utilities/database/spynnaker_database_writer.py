@@ -21,11 +21,8 @@ class SpynnakerDataBaseWriter(DatabaseWriter):
     spynnaker front end
     """
 
-    def __init__(self, database_directory, wait_for_read_confirmation,
-                 socket_addresses):
-        DatabaseWriter.__init__(
-            self, database_directory, wait_for_read_confirmation,
-            socket_addresses)
+    def __init__(self, database_directory):
+        DatabaseWriter.__init__(self, database_directory)
 
     def add_partitionable_vertices(self, partitionable_graph):
         """
@@ -33,15 +30,9 @@ class SpynnakerDataBaseWriter(DatabaseWriter):
         :param partitionable_graph:
         :return:
         """
-        self._thread_pool.apply_async(self._add_partitionable_vertices,
-                                      args=[partitionable_graph])
 
-    def _add_partitionable_vertices(self, partitionable_graph):
-        # noinspection PyBroadException
         try:
-            self._lock_condition.acquire()
             import sqlite3 as sqlite
-            self._lock_condition.acquire()
             connection = sqlite.connect(self._database_path)
             cur = connection.cursor()
             cur.execute(
@@ -109,6 +100,5 @@ class SpynnakerDataBaseWriter(DatabaseWriter):
                 edge_id_offset += len(edges)
             connection.commit()
             connection.close()
-            self._lock_condition.release()
         except Exception:
             traceback.print_exc()

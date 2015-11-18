@@ -1,6 +1,8 @@
-from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
+from abc import ABCMeta
+from six import add_metaclass
+import logging
+import os
+
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_edge_constraints import \
     AbstractProvidesIncomingEdgeConstraints
@@ -9,9 +11,14 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesOutgoingEdgeConstraints
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
+    import AbstractPopulationInitializable
+from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
+    import AbstractPopulationSettable
+from spynnaker.pyNN.models.abstract_models.abstract_mappable \
+    import AbstractMappable
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
-
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -27,10 +34,9 @@ from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
 
-from abc import ABCMeta
-from six import add_metaclass
-import logging
-import os
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +57,9 @@ class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingEdgeConstraints,
-        AbstractProvidesIncomingEdgeConstraints):
+        AbstractProvidesIncomingEdgeConstraints,
+        AbstractPopulationInitializable, AbstractPopulationSettable,
+        AbstractMappable):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -68,6 +76,11 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
+        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        AbstractProvidesIncomingEdgeConstraints.__init__(self)
+        AbstractPopulationInitializable.__init__(self)
+        AbstractPopulationSettable.__init__(self)
+        AbstractMappable.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -90,9 +103,15 @@ class AbstractPopulationVertex(
             synapse_type, machine_time_step, ring_buffer_sigma,
             spikes_per_second)
 
-        # set up continious restrictor
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
+        # bool for if state has changed.
+        self._change_requires_mapping = True
+
+    @property
+    def requires_mapping(self):
+        return self._change_requires_mapping
+
+    def mark_no_changes(self):
+        self._change_requires_mapping = False
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -325,6 +344,8 @@ class AbstractPopulationVertex(
         spec.end_specification()
         data_writer.close()
 
+        return [data_writer.filename]
+
     # @implements AbstractDataSpecableVertex.get_binary_file_name
     def get_binary_file_name(self):
 
@@ -341,15 +362,20 @@ class AbstractPopulationVertex(
 
     # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
+        self._change_requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
+
+    # @implements AbstractSpikeRecordable.delete_spikes
+    def delete_spikes(self):
+        self._spike_recorder.reset()
 
     # @implements AbstractSpikeRecordable.get_spikes
     def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper):
+                   graph_mapper, return_data=True):
         return self._spike_recorder.get_spikes(
             self._label, transceiver,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
@@ -357,15 +383,20 @@ class AbstractPopulationVertex(
 
     # @implements AbstractVRecordable.set_recording_v
     def set_recording_v(self):
+        self._change_requires_mapping = not self._v_recorder.record_v
         self._v_recorder.record_v = True
+
+    # @implements AbstractVRecordable.delete_v
+    def delete_v(self):
+        self._v_recorder.reset()
 
     # @implements AbstractVRecordable.get_v
     def get_v(self, transceiver, n_machine_time_steps, placements,
-              graph_mapper):
+              graph_mapper, return_data=True):
         return self._v_recorder.get_v(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
     def is_recording_gsyn(self):
@@ -373,23 +404,29 @@ class AbstractPopulationVertex(
 
     # @implements AbstractGSynRecordable.set_recording_gsyn
     def set_recording_gsyn(self):
+        self._change_requires_mapping = not self._gsyn_recorder.record_gsyn
         self._gsyn_recorder.record_gsyn = True
+
+    # @implements AbstractGSynRecordable.delete_gsyn
+    def delete_gsyn(self):
+        self._gsyn_recorder.reset()
 
     # @implements AbstractGSynRecordable.get_gsyn
     def get_gsyn(self, transceiver, n_machine_time_steps, placements,
-                 graph_mapper):
+                 graph_mapper, return_data=True):
         return self._gsyn_recorder.get_gsyn(
             self._label, self.n_atoms, transceiver,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            n_machine_time_steps, placements, graph_mapper, self, return_data)
 
     def initialize(self, variable, value):
         initialize_attr = getattr(
             self._neuron_model, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialization of"
+            raise Exception("Vertex does not support initialisation of"
                             " parameter {}".format(variable))
         initialize_attr(value)
+        self._change_requires_mapping = True
 
     @property
     def synapse_type(self):
@@ -418,6 +455,7 @@ class AbstractPopulationVertex(
                     self._additional_input]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
+                self._change_requires_mapping = True
                 return
         raise Exception("Type {} does not have parameter {}".format(
             self._model_name, key))
@@ -469,8 +507,7 @@ class AbstractPopulationVertex(
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
-            partitioned_edge, graph_mapper)
+        return [KeyAllocatorContiguousRangeContraint()]
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)
