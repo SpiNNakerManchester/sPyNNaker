@@ -1,12 +1,10 @@
-# spinnman imports
-from spinnman import exceptions as spinnman_exceptions
-from spynnaker.pyNN import exceptions
+
+from spinn_front_end_common.utilities import helpful_functions
 
 # dsg imports
 from data_specification import utility_calls as dsg_utility
 
 # general imports
-import struct
 from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
@@ -69,37 +67,6 @@ class AbstractMasterPopTableFactory(object):
         :return:
         """
 
-    @staticmethod
-    def read_and_convert(x, y, address, length, data_format, transceiver):
-        """
-        tries to read and convert a piece of memory. If it fails, it tries
-        again up to for 4 times, and then if still fails, throws an error.
-        """
-        try:
-
-            # turn byte array into str for unpack to work.
-            data = \
-                str(list(transceiver.read_memory(
-                    x, y, address, length))[0])
-            result = struct.unpack(data_format, data)[0]
-            return result
-        except spinnman_exceptions.SpinnmanIOException:
-            raise exceptions.SynapticBlockReadException(
-                "failed to read and translate a piece of memory due to a "
-                "spinnman io exception.")
-        except spinnman_exceptions.SpinnmanInvalidPacketException:
-            raise exceptions.SynapticBlockReadException(
-                "failed to read and translate a piece of memory due to a "
-                "invalid packet exception in spinnman.")
-        except spinnman_exceptions.SpinnmanInvalidParameterException:
-            raise exceptions.SynapticBlockReadException(
-                "failed to read and translate a piece of memory due to a "
-                "invalid parameter exception in spinnman.")
-        except spinnman_exceptions.SpinnmanUnexpectedResponseCodeException:
-            raise exceptions.SynapticBlockReadException(
-                "failed to read and translate a piece of memory due to a "
-                "unexpected response code exception in spinnman.")
-
     def locate_master_pop_table_base_address(self, x, y, p, transceiver,
                                              master_pop_table_region):
         """
@@ -135,9 +102,8 @@ class AbstractMasterPopTableFactory(object):
             dsg_utility.get_region_base_address_offset(
                 app_data_base_address, master_pop_region)
 
-        master_region_base_address_offset = \
-            self.read_and_convert(x, y, master_region_base_address_address,
-                                  4, "<I", transceiver)
+        master_region_base_address_offset = helpful_functions.read_data(
+            x, y, master_region_base_address_address, 4, "<I", transceiver)
 
         master_region_base_address =\
             master_region_base_address_offset + app_data_base_address
@@ -153,4 +119,9 @@ class AbstractMasterPopTableFactory(object):
         :rtype: list of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
         :raise None: this method does not raise any known exceptions
+        """
+
+    @abstractmethod
+    def get_master_population_table_size(self, vertex_slice, in_edges):
+        """ Get the size of the master population table in SDRAM
         """

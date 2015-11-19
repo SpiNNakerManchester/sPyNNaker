@@ -66,7 +66,7 @@ static inline index_t synapse_types_get_input_buffer_index(
 //! to initialise the synapse shaping rules.
 //! \return nothing
 static void synapse_types_shape_input(
-    input_t *input_buffers, index_t neuron_index, synapse_param_t** parameters);
+    input_t *input_buffers, index_t neuron_index, synapse_param_t* parameters);
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
 //! being simulated by this model
@@ -81,7 +81,7 @@ static void synapse_types_shape_input(
 //! \return None
 static void synapse_types_add_neuron_input(
     input_t *input_buffers, index_t synapse_type_index, index_t neuron_index,
-    synapse_param_t** parameters, input_t input);
+    synapse_param_t* parameters, input_t input);
 
 //! \brief extracts the excitatory input buffers from the buffers available
 //! for a given neuron id
@@ -106,6 +106,10 @@ static input_t synapse_types_get_inhibitory_input(
 //! \return a human readable character representing the synapse type.
 static const char *synapse_types_get_type_char(index_t synapse_type_index);
 
+//! \brief prints the parameters of the synapse type
+//! \param[in] the pointer to the parameters to print
+static void synapse_types_print_parameters(synapse_param_t *parameters);
+
 //! \brief prints the input for a neuron id given the available inputs
 //! currently only executed when the models are in debug mode, as the prints are
 //! controlled from the synapses.c _print_inputs method.
@@ -113,6 +117,6 @@ static const char *synapse_types_get_type_char(index_t synapse_type_index);
 //! \param[in] neuron_index  the neuron id currently being considered
 //! \return Nothing
 static void synapse_types_print_input(
-		input_t *input_buffers,  index_t neuron_index);
+        input_t *input_buffers,  index_t neuron_index);
 
 #endif // _SYNAPSE_TYPES_H_

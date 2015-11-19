@@ -19,7 +19,7 @@ def check_directory_exists_and_create_if_not(filename):
     :return:
     """
     directory = os.path.dirname(filename)
-    if not os.path.exists(directory):
+    if directory != "" and not os.path.exists(directory):
         os.makedirs(directory)
 
 
@@ -36,17 +36,31 @@ def convert_param_to_numpy(param, no_atoms):
             "http://neuralensemble.org/PyNN/")
     if isinstance(param, RandomDistribution):
         if no_atoms > 1:
-            return numpy.asarray(param.next(n=no_atoms))
+            return numpy.asarray(param.next(n=no_atoms), dtype="float")
         else:
-            return numpy.array([param.next(n=no_atoms)])
+            return numpy.array([param.next(n=no_atoms)], dtype="float")
     elif not hasattr(param, '__iter__'):
-        return numpy.array([param], dtype=float)
+        return numpy.array([param] * no_atoms, dtype="float")
     elif len(param) != no_atoms:
         raise exceptions.ConfigurationException("The number of params does"
                                                 " not equal with the number"
                                                 " of atoms in the vertex ")
     else:
-        return numpy.array(param, dtype=float)
+        return numpy.array(param, dtype="float")
+
+
+def write_parameters_per_neuron(spec, vertex_slice, parameters):
+    for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+        for param in parameters:
+            value = param.get_value()
+            if hasattr(value, "__len__"):
+                if len(value) > 1:
+                    value = value[atom]
+                else:
+                    value = value[0]
+
+            spec.write_value(data=value,
+                             data_type=param.get_dataspec_datatype())
 
 
 def read_in_data_from_file(
@@ -81,6 +95,7 @@ def read_in_data_from_file(
                 times.append(time)
                 atom_ids.append(neuron_id)
                 data_items.append(data_value)
+
             else:
                 print "failed to enter {}:{}".format(neuron_id, time)
 
@@ -89,38 +104,47 @@ def read_in_data_from_file(
     return result
 
 
-def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time):
+def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time,
+                          split_value="\t"):
     """
     helper method for reading spikes from a file
-    :param file_path: absolute filepath to a file where gsyn values have been
+    :param file_path: absolute filepath to a file where spike values have been
     written
     :param min_atom: min neuron id to which neurons to read in
     :param max_atom: max neuron id to which neurons to read in
     :param min_time: min time slot to read neurons values of.
     :param max_time:max time slot to read neurons values of.
+    :param split_value: the pattern to split by
     :return: a numpi destacked array containing time stamps, neuron id and the
     spike times.
     """
-    spike_times = list()
-    spike_ids = list()
     with open(file_path, 'r') as fsource:
             read_data = fsource.readlines()
 
+    data = dict()
+    max_atom_found = 0
     for line in read_data:
         if not line.startswith('#'):
-            values = line.split("\t")
-            neuron_id = int(eval(values[1]))
+            values = line.split(split_value)
             time = float(eval(values[0]))
-            if (min_atom <= neuron_id < max_atom and
-                    min_time <= time < max_time):
-                spike_times.append(time)
-                spike_ids.append(neuron_id)
+            neuron_id = int(eval(values[1]))
+            if ((min_atom is None or min_atom <= neuron_id)
+                    and (max_atom is None or neuron_id < max_atom)
+                    and (min_time is None or min_time <= time)
+                    and (max_time is None or time < max_time)):
+                if neuron_id not in data:
+                    data[neuron_id] = list()
+                data[neuron_id].append(time)
+                if max_atom is None and neuron_id > max_atom_found:
+                    max_atom_found = neuron_id
 
-    result = numpy.dstack((spike_ids, spike_times))[0]
-    result = result[numpy.lexsort((spike_times, spike_ids))]
+    if max_atom is None:
+        result = numpy.ndarray(shape=max_atom_found, dtype=object)
+    else:
+        result = numpy.ndarray(shape=max_atom, dtype=object)
+    for neuron_id in range(0, max_atom):
+        if neuron_id in data:
+            result[neuron_id] = data[neuron_id]
+        else:
+            result[neuron_id] = list()
     return result
-
-
-
-
-

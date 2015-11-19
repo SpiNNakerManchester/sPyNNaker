@@ -10,6 +10,7 @@ typedef struct post_trace_t {
 typedef struct pre_trace_t {
 } pre_trace_t;
 
+#include "../synapse_structure/synapse_structure_weight_impl.h"
 #include "timing.h"
 #include "../weight_dependence/weight_one_term.h"
 

@@ -2,7 +2,7 @@
 import unittest
 import spynnaker.pyNN as pyNN
 from pprint import pprint as pp
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 if pyNN._spinnaker is None:
     pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
@@ -26,7 +26,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedNumberPreConnector(0, weight, delay)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
@@ -38,7 +38,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedNumberPreConnector(1, weight, delay)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
@@ -50,7 +50,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedNumberPreConnector(5, weight, delay)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
@@ -68,7 +68,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedNumberPreConnector(6, weight, delay)
         with self.assertRaises(ConfigurationException):
             connection.generate_synapse_list(
@@ -81,7 +81,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedNumberPreConnector(-1, weight, delay)
         with self.assertRaises(ConfigurationException):
             connection.generate_synapse_list(
@@ -93,7 +93,7 @@ class TestingFixedNumberPreConnector(unittest.TestCase):
                                            cell_params_lif, label="One pop")
         weight = 2
         delay = 1
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FixedNumberPreConnector(5, weight, delay,
                                                   allow_self_connections=False)
         synaptic_list = connection.generate_synapse_list(

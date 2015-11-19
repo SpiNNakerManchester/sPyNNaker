@@ -17,6 +17,7 @@ static uint32_t key = 0;
 static uint32_t num_neurons = 0;
 static uint32_t time = UINT32_MAX;
 static uint32_t simulation_ticks = 0;
+static uint32_t infinite_run;
 
 static uint8_t **spike_counters = NULL;
 static bit_field_t *neuron_delay_stage_config = NULL;
@@ -116,7 +117,8 @@ static bool initialize(uint32_t *timer_period) {
     // Get the timing details
     if (!simulation_read_timing_details(
             data_specification_get_region(0, address),
-            APPLICATION_NAME_HASH, timer_period, &simulation_ticks)) {
+            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
+            &infinite_run)) {
         return false;
     }
 
@@ -200,7 +202,7 @@ void timer_callback(uint unused0, uint unused1) {
     log_debug("Timer tick %u", time);
 
     // If a fixed number of simulation ticks are specified and these have passed
-    if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {
+    if (infinite_run != TRUE && time >= simulation_ticks) {
         log_info("Simulation complete.\n");
         spin1_exit(0);
     }
@@ -230,7 +232,7 @@ void timer_callback(uint unused0, uint unused1) {
 
                     // Calculate key all spikes coming from this neuron will be
                     // sent with
-                    uint32_t spike_key = ((d * num_neurons) + n) | key;
+                    uint32_t spike_key = ((d * num_neurons) + n) + key;
 
 #if LOG_LEVEL >= LOG_DEBUG
                     if (delay_stage_spike_counters[n] > 0) {

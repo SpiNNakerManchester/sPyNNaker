@@ -9,7 +9,6 @@
 #include "../common/post_events.h"
 
 #include "weight_dependence/weight.h"
-#include "synapse_structure/synapse_structure.h"
 #include "timing_dependence/timing.h"
 #include <string.h>
 #include <debug.h>
@@ -142,7 +141,7 @@ bool synapse_dynamics_initialise(
     return true;
 }
 
-void synapse_dynamics_process_plastic_synapses(
+bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
 
@@ -213,6 +212,8 @@ void synapse_dynamics_process_plastic_synapses(
         event_history->traces[event_history->count_minus_one];
     pre_events_add(time, event_history, timing_add_pre_spike(
         time, last_pre_time, last_pre_trace));
+
+    return true;
 }
 
 void synapse_dynamics_process_post_synaptic_event(
@@ -284,7 +285,7 @@ void synapse_dynamics_print_plastic_synapses(
 //! \return Nothing, this method does not return anything
 void synapse_dynamics_print_plastic_pre_synaptic_events(){
 #ifdef SYNAPSE_BENCHMARK
-	log_info("\t%u plastic pre-synaptic events.\n",
-			 num_plastic_pre_synaptic_events);
+    log_info("\t%u plastic pre-synaptic events.\n",
+            num_plastic_pre_synaptic_events);
 #endif  // SYNAPSE_BENCHMARK
 }

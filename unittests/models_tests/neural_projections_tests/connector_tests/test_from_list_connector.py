@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 import spynnaker.pyNN as pyNN
-from spynnaker.pyNN.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from pprint import pprint as pp
 if pyNN._spinnaker is None:
     pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
@@ -30,7 +30,7 @@ class TestingFromListConnector(unittest.TestCase):
             for j in range(5):
                 connection_list.append((i, j, weight, delay))
 
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FromListConnector(connection_list)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
@@ -94,7 +94,7 @@ class TestingFromListConnector(unittest.TestCase):
             for j in range(5):
                 connection_list.append((i, j, weight, delay))
 
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FromListConnector(connection_list, safe=False)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
@@ -116,7 +116,7 @@ class TestingFromListConnector(unittest.TestCase):
             for j in range(5):
                 connection_list.append((i, j, weight, delay))
 
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FromListConnector(connection_list, verbose=True)
         synaptic_list = connection.generate_synapse_list(
             first_population, first_population, 1, 1.0, synapse_type)
@@ -138,7 +138,7 @@ class TestingFromListConnector(unittest.TestCase):
             for j in range(5):
                 connection_list.append((i, j, weight, delay))
 
-        synapse_type = first_population._vertex.get_synapse_id('excitatory')
+        synapse_type = 0
         connection = pyNN.FromListConnector(connection_list, safe=False,
                                             verbose=True)
         synaptic_list = connection.generate_synapse_list(

@@ -1,12 +1,14 @@
+"""
+Projection
+"""
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
 
-from spynnaker.pyNN.models.abstract_models.abstract_population_vertex \
+from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
@@ -23,6 +25,7 @@ from spinn_front_end_common.utilities import exceptions
 import logging
 import math
 import numpy
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +47,11 @@ class Projection(object):
     _projection_count = 0
 
     # noinspection PyUnusedLocal
-    def __init__(self, presynaptic_population, postsynaptic_population, label,
-                 connector, spinnaker_control, machine_time_step,
-                 timescale_factor, source=None, target='excitatory',
-                 synapse_dynamics=None, rng=None):
+    def __init__(
+            self, presynaptic_population, postsynaptic_population, label,
+            connector, spinnaker_control, machine_time_step, user_max_delay,
+            timescale_factor, source=None, target='excitatory',
+            synapse_dynamics=None, rng=None):
         """
         Instantiates a :py:object:`Projection`.
         """
@@ -59,29 +63,28 @@ class Projection(object):
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
 
-        if isinstance(postsynaptic_population._get_vertex,
-                      AbstractPopulationVertex):
-            # Check that the "target" is an acceptable value
-            targets = postsynaptic_population._get_vertex.get_synapse_targets()
-            if target not in targets:
-                raise exceptions.ConfigurationException(
-                    "Target {} is not available in the post-synaptic "
-                    "pynn_population.py (choices are {})"
-                    .format(target, targets))
-            synapse_type = \
-                postsynaptic_population._get_vertex.get_synapse_id(target)
-        else:
+        if not isinstance(postsynaptic_population._get_vertex,
+                          AbstractPopulationVertex):
+
             raise exceptions.ConfigurationException(
                 "postsynaptic_population is not a supposal reciever of"
                 " synaptic projections")
 
+        # Check that the "target" is an acceptable value
+        synapse_type = postsynaptic_population._get_vertex.synapse_type
+        targets = synapse_type.get_synapse_targets()
+        if target not in targets:
+            raise exceptions.ConfigurationException(
+                "Target {} is not available in the post-synaptic population"
+                " (choices are {})".format(target, targets))
+        synapse_id = synapse_type.get_synapse_id_by_target(target)
+
         self._weight_scale = postsynaptic_population._get_vertex.weight_scale
-        synapse_list = \
-            connector.generate_synapse_list(
-                presynaptic_population, postsynaptic_population,
-                1000.0 / machine_time_step,
-                postsynaptic_population._get_vertex.weight_scale, synapse_type)
-        self._host_based_synapse_list = synapse_list
+        synapse_list = connector.generate_synapse_list(
+            presynaptic_population, postsynaptic_population,
+            1000.0 / machine_time_step,
+            postsynaptic_population._get_vertex.weight_scale, synapse_id)
+        self._host_based_synapse_list = copy.deepcopy(synapse_list)
 
         # If there are some negative weights
         if synapse_list.get_min_weight() < 0:
@@ -117,9 +120,7 @@ class Projection(object):
                 "the max delay for projection {} is not supported by the "
                 "pacman toolchain".format(max_delay))
 
-        if conf.config.has_option("Model", "max_delay"):
-            user_max_delay = conf.config.get("Model", "max_delay")
-            if max_delay > user_max_delay:
+        if max_delay > (user_max_delay / (machine_time_step / 1000.0)):
                 logger.warn("The end user entered a max delay"
                             " for which the projection breaks")
 
@@ -285,14 +286,16 @@ class Projection(object):
         If template is None, then a dictionary containing the template context
         will be returned.
         """
+        # TODO
         raise NotImplementedError
 
     def __getitem__(self, i):
         """Return the `i`th connection within the Projection."""
+        # TODO: Need to work out what is being returned
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getDelays(self, list_format='list', gather=True):
+    def getDelays(self, format='list', gather=True):
         """
         Get synaptic delays for all connections in this Projection.
 
@@ -309,7 +312,7 @@ class Projection(object):
                 self._has_retrieved_synaptic_list_from_machine):
             self._retrieve_synaptic_data_from_machine()
 
-        if list_format == 'list':
+        if format == 'list':
             delays = list()
             for row in self._host_based_synapse_list.get_rows():
                 delays.extend(
@@ -337,7 +340,11 @@ class Projection(object):
         """
         Get parameters of the dynamic synapses for all connections in this
         Projection.
+        :param parameter_name: ????????
+        :param list_format: ?????????
+        :param gather: ??????????
         """
+        # TODO: Need to work out what is to be returned
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -352,6 +359,9 @@ class Projection(object):
         non-existent connections). Note that for the array format, if there is
         more than connection between two cells, the summed weight will be
         given.
+        :param format: the type of format to be returned (only support "list")
+        :param gather: gather the weights from stuff. currently has no meaning
+        in spinnaker when set to false. Therefore is always true
         """
         if not gather:
             exceptions.ConfigurationException(
@@ -368,8 +378,14 @@ class Projection(object):
                 weights.extend(row.weights / self._weight_scale)
             return weights
 
-        weights = numpy.zeros((self._projection_edge.pre_vertex.n_atoms,
-                               self._projection_edge.post_vertex.n_atoms))
+        weights = None
+        if self._projection_edge is not None:
+            weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
+                                   self._projection_edge.post_vertex.n_atoms))
+        else:
+            weights = numpy.empty((self._delay_edge.pre_vertex.n_atoms,
+                                   self._delay_edge.post_vertex.n_atoms))
+        weights.fill(numpy.nan)
         rows = self._host_based_synapse_list.get_rows()
         for pre_atom in range(len(rows)):
             row = rows[pre_atom]
@@ -381,6 +397,8 @@ class Projection(object):
 
     def __len__(self):
         """Return the total number of local connections."""
+
+        # TODO: Need to work out what this means
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -389,6 +407,7 @@ class Projection(object):
         Print synaptic weights to file. In the array format, zeros are printed
         for non-existent connections.
         """
+        # TODO:
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -397,6 +416,7 @@ class Projection(object):
         Print synaptic weights to file. In the array format, zeros are printed
         for non-existent connections.
         """
+        # TODO:
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -404,6 +424,7 @@ class Projection(object):
         """
         Set weights to random values taken from rand_distr.
         """
+        # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -411,6 +432,7 @@ class Projection(object):
         """
         Set delays to random values taken from rand_distr.
         """
+        # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -418,6 +440,7 @@ class Projection(object):
         """
         Set parameters of the synapse dynamics to values taken from rand_distr
         """
+        # TODO: Look at what this is randomizing
         raise NotImplementedError
 
     def __repr__(self):
@@ -452,7 +475,7 @@ class Projection(object):
             delay_rows = delay_synapse_list.get_rows()
             combined_rows = list()
             for i in range(len(rows)):
-                combined_row = rows[i][self._projection_list_ranges]
+                combined_row = rows[i][self._projection_list_ranges[i]]
                 combined_row.append(delay_rows[i][self._delay_list_ranges[i]])
                 combined_rows.append(combined_row)
             self._host_based_synapse_list = SynapticList(combined_rows)
@@ -481,6 +504,7 @@ class Projection(object):
         Save connections to file in a format suitable for reading in with a
         FromFileConnector.
         """
+        # TODO
         raise NotImplementedError
 
     def size(self, gather=True):
@@ -489,6 +513,7 @@ class Projection(object):
          - only local connections, if gather is False,
          - all connections, if gather is True (default)
         """
+        # TODO
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -499,6 +524,7 @@ class Projection(object):
         in the projection, or a 2D array with the same dimensions as the
         connectivity matrix (as returned by `getDelays(format='array')`).
         """
+        # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -507,6 +533,7 @@ class Projection(object):
         Set parameters of the dynamic synapses for all connections in this
         projection.
         """
+        # TODO: Need to set this in the edge
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -519,6 +546,8 @@ class Projection(object):
         Weights should be in nA for current-based and uS for conductance-based
         synapses.
         """
+
+        # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
@@ -528,4 +557,6 @@ class Projection(object):
         If min and max are not given, the minimum and maximum weights are
         calculated automatically.
         """
+        # TODO
         raise NotImplementedError
+

@@ -19,7 +19,7 @@ class STDPMechanism(object):
 
     def __init__(self, timing_dependence=None, weight_dependence=None,
                  voltage_dependence=None, dendritic_delay_fraction=1.0,
-                 mad=False):
+                 mad=True):
         if timing_dependence is not None and \
                 not isinstance(timing_dependence, AbstractTimeDependency):
             raise exceptions.ConfigurationException(
@@ -167,6 +167,6 @@ class STDPMechanism(object):
     # **TODO** make property
     def get_max_weight(self):
         if self.weight_dependence is not None:
-            return self.weight_dependence.w_max
+            return self.weight_dependence.w_max * self._weight_scale
         else:
             return 0.0

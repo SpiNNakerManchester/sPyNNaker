@@ -10,9 +10,6 @@ POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 BLOCK_INDEX_HEADER_WORDS = 3
 BLOCK_INDEX_ROW_WORDS = 2
 
-# database cap file path
-MAX_DATABASE_PATH_LENGTH = 50000
-
 RECORD_SPIKE_BIT = 1 << 0
 RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
@@ -25,7 +22,7 @@ MAX_NEURON_SIZE = (1 << SYNAPSE_INDEX_BITS)
 OUT_SPIKE_SIZE = (MAX_NEURON_SIZE >> 5)  # The size of each output spike line
 OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * 4  # The number of bytes for each spike line
 V_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
-GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
+GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 8
 
 INFINITE_SIMULATION = 4294967295
 
@@ -45,6 +42,9 @@ MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 
+# the miniumum supported delay slot between two neurons
+MIN_SUPPORTED_DELAY = 1
+
 # debug filter positions
 # multicast packets which are sent from a local chip where the local router has
 # router entry for it (this is default routed to the monitor core which
@@ -53,12 +53,11 @@ MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
 
 # please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
 # for other core application ids.
+SPIKE_INJECTOR_CORE_APPLICATION_ID = 0xAC9
 
 # master population table magic
 MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
 MASTER_POP_BINARY_SEARCH = 0xBB2
-
-
 
 EDGES = Enum(
     value="EDGES",

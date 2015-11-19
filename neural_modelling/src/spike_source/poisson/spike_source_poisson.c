@@ -6,10 +6,10 @@
  */
 
 #include "../../common/out_spikes.h"
-#include "../../common/recording.h"
 #include "../../common/maths-util.h"
 
 #include <data_specification.h>
+#include <recording.h>
 #include <debug.h>
 #include <random.h>
 #include <simulation.h>
@@ -76,6 +76,8 @@ static uint32_t recording_flags = 0;
 static uint32_t time;
 //! the number of timer tics that this model should run for before exiting.
 static uint32_t simulation_ticks = 0;
+//! the int that represnets the bool for if the run is infinte or not.
+static uint32_t infinite_run;
 
 //! \deduces the time in timer ticks until the next spike is to occur given a
 //! mean_isi_ticks
@@ -96,8 +98,13 @@ static inline REAL slow_spike_source_get_time_to_spike(
 //! this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
-    return poisson_dist_variate_exp_minus_lambda(
-        mars_kiss64_seed, spike_source_seed, exp_minus_lambda);
+    if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
+        return 0;
+    }
+    else {
+        return poisson_dist_variate_exp_minus_lambda(
+            mars_kiss64_seed, spike_source_seed, exp_minus_lambda);
+    }
 }
 
 //! \entry method for reading the parameters stored in poisson parameter region
@@ -194,19 +201,19 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Get the timing details
+    address_t system_region = data_specification_get_region(
+            system, address);
     if (!simulation_read_timing_details(
-            data_specification_get_region(system, address),
-            APPLICATION_NAME_HASH,
-            timer_period, &simulation_ticks)) {
+            system_region, APPLICATION_NAME_HASH, timer_period,
+            &simulation_ticks, &infinite_run)) {
         return false;
     }
 
     // Get the recording information
     uint32_t spike_history_region_size;
     recording_read_region_sizes(
-        &data_specification_get_region(system, address)
-        [RECORDING_POSITION_IN_REGION], &recording_flags,
-        &spike_history_region_size, NULL, NULL);
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
+        &recording_flags, &spike_history_region_size, NULL, NULL);
     if (recording_is_channel_enabled(
             recording_flags, e_recording_channel_spike_history)) {
         if (!recording_initialse_channel(
@@ -245,25 +252,31 @@ void timer_callback(uint timer_count, uint unused) {
     log_debug("Timer tick %u", time);
 
     // If a fixed number of simulation ticks are specified and these have passed
-    if (simulation_ticks != UINT32_MAX && time >= simulation_ticks) {
+    if (infinite_run != TRUE && time >= simulation_ticks) {
         log_info("Simulation complete.\n");
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         recording_finalise();
+
         spin1_exit(0);
+        return;
     }
 
     // Loop through slow spike sources
-    for (index_t s = 0; s < num_slow_spike_sources; s++) {
+    slow_spike_source_t *slow_spike_sources = slow_spike_source_array;
+    for (index_t s = num_slow_spike_sources; s > 0; s--) {
 
         // If this spike source is active this tick
-        slow_spike_source_t *slow_spike_source = &slow_spike_source_array[s];
+        slow_spike_source_t *slow_spike_source = slow_spike_sources++;
         if ((time >= slow_spike_source->start_ticks)
-                && (time < slow_spike_source->end_ticks)) {
+                && (time < slow_spike_source->end_ticks)
+                && (REAL_COMPARE(slow_spike_source->mean_isi_ticks, !=,
+                    REAL_CONST(0.0)))) {
 
             // If this spike source should spike now
-            if (slow_spike_source->time_to_spike_ticks <= REAL_CONST(0.0)) {
+            if (REAL_COMPARE(slow_spike_source->time_to_spike_ticks, <=,
+                             REAL_CONST(0.0))) {
 
                 // Write spike to out spikes
                 out_spikes_set_spike(slow_spike_source->neuron_id);
@@ -293,10 +306,10 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Loop through fast spike sources
-    for (index_t f = 0; f < num_fast_spike_sources; f++) {
+    fast_spike_source_t *fast_spike_sources = fast_spike_source_array;
+    for (index_t f = num_fast_spike_sources; f > 0; f--) {
+        fast_spike_source_t *fast_spike_source = fast_spike_sources++;
 
-        // If this spike source is active this tick
-        fast_spike_source_t *fast_spike_source = &fast_spike_source_array[f];
         if (time >= fast_spike_source->start_ticks
                 && time < fast_spike_source->end_ticks) {
 
@@ -313,7 +326,7 @@ void timer_callback(uint timer_count, uint unused) {
 
                 // Send spikes
                 const uint32_t spike_key = key | fast_spike_source->neuron_id;
-                for (uint32_t s = 0; s < num_spikes; s++) {
+                for (uint32_t s = num_spikes; s > 0; s--) {
 
                     // if no key has been given, do not send spike to fabric.
                     if (has_been_given_key){

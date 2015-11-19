@@ -8,13 +8,6 @@ class SpynnakerException(Exception):
     pass
 
 
-class ConfigurationException(SpynnakerException):
-    """raised when the pynn front end determines a input param is invalid
-
-    :raise None: does not raise any known exceptions"""
-    pass
-
-
 class MemReadException(SpynnakerException):
     """raised when the pynn front end fails to read a certain memory region
 
@@ -111,19 +104,6 @@ class ExecutableFailedToStopException(SpynnakerException):
 
 
     :raise None: does not raise any known exceptions
-    """
-    pass
-
-
-class BufferableRegionTooSmall(SpynnakerException):
-    """ raised when the SDRAM space of the region for buffered packets is
-    too small to contain any packet at all
-    """
-    pass
-
-
-class BufferedRegionNotPresent(SpynnakerException):
-    """ raised when trying to issue buffered packets for a region not managed
     """
     pass
 
