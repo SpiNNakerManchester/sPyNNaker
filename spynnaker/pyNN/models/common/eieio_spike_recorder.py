@@ -1,4 +1,4 @@
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from spinnman.messages.eieio.data_messages.eieio_data_header \
     import EIEIODataHeader
 

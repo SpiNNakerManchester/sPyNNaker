@@ -2,9 +2,6 @@ from pacman.model.partitionable_graph.\
     receive_buffers_to_host_partitionable_vertex import \
     ReceiveBuffersToHostPartitionableVertex
 from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_edge_constraints import \
     AbstractProvidesIncomingEdgeConstraints
 from spinn_front_end_common.abstract_models.\
@@ -33,6 +30,10 @@ from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
+
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 from abc import ABCMeta
 from six import add_metaclass
@@ -101,10 +102,6 @@ class AbstractPopulationVertex(
         self._synapse_manager = SynapticManager(
             synapse_type, machine_time_step, ring_buffer_sigma,
             spikes_per_second)
-
-        # set up continious restrictor
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -277,7 +274,7 @@ class AbstractPopulationVertex(
             spec.write_value(data=param.get_value(),
                              data_type=param.get_dataspec_datatype())
 
-        # Write the neuron paramters
+        # Write the neuron parameters
         utility_calls.write_parameters_per_neuron(
             spec, vertex_slice, self._neuron_model.get_neural_parameters())
 
@@ -324,7 +321,7 @@ class AbstractPopulationVertex(
             gsyn_history_sz)
 
         # Declare random number generators and distributions:
-        # TODO add random distrubtion stuff
+        # TODO add random distribution stuff
         # self.write_random_distribution_declarations(spec)
 
         # Get the key - use only the first edge
@@ -351,6 +348,8 @@ class AbstractPopulationVertex(
         # End the writing of this specification:
         spec.end_specification()
         data_writer.close()
+
+        return [data_writer.filename]
 
     # @implements AbstractDataSpecableVertex.get_binary_file_name
     def get_binary_file_name(self):
@@ -419,7 +418,7 @@ class AbstractPopulationVertex(
         initialize_attr = getattr(
             self._neuron_model, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialization of"
+            raise Exception("Vertex does not support initialisation of"
                             " parameter {}".format(variable))
         initialize_attr(value)
 
@@ -486,8 +485,8 @@ class AbstractPopulationVertex(
         return True
 
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
-        """
-        gets the constraints for edges going into this vertex
+        """ Gets the constraints for edges going into this vertex
+
         :param partitioned_edge: partitioned edge that goes into this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
@@ -495,14 +494,12 @@ class AbstractPopulationVertex(
         return self._synapse_manager.get_incoming_edge_constraints()
 
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
-        """
-        gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the parittioned edge that leaves this vertex
+        """ Gets the constraints for edges going out of this vertex
+        :param partitioned_edge: the partitioned edge that leaves this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
-            partitioned_edge, graph_mapper)
+        return [KeyAllocatorContiguousRangeContraint()]
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

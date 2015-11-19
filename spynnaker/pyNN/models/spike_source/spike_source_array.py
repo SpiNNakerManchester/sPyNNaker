@@ -1,7 +1,3 @@
-"""
-SpikeSourceArray
-"""
-
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
@@ -17,17 +13,14 @@ from spinn_front_end_common.interface.buffer_management.storage_objects.\
     end_buffering_state import EndBufferingState
 from spinn_front_end_common.interface.buffer_management.storage_objects\
     .buffered_sending_region import BufferedSendingRegion
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
-from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -38,6 +31,9 @@ from pacman.model.constraints.tag_allocator_constraints\
 from pacman.model.partitionable_graph.\
     receive_buffers_to_host_partitionable_vertex import \
     ReceiveBuffersToHostPartitionableVertex
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 # dsg imports
 from data_specification.data_specification_generator\
@@ -59,8 +55,7 @@ class SpikeSourceArray(
         AbstractDataSpecableVertex, AbstractPartitionableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
         ReceiveBuffersToHostPartitionableVertex):
-    """
-    model for play back of spikes
+    """ Model for play back of spikes
     """
 
     _CONFIGURATION_REGION_SIZE = 36
@@ -133,10 +128,6 @@ class SpikeSourceArray(
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
 
-        # handle outgoing constraints
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
-
     @property
     def spike_times(self):
         return self._spike_times
@@ -163,8 +154,7 @@ class SpikeSourceArray(
 
     @property
     def model_name(self):
-        """
-        Return a string representing a label for this class.
+        """ A string representing a label for this class.
         """
         return "SpikeSourceArray"
 
@@ -179,20 +169,20 @@ class SpikeSourceArray(
 
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          constraints=list()):
-        """
-        creates a partitioned vertex from a partitionable vertex
-        :param vertex_slice: the slice of partitionable atoms that the
-        new partitioned vertex will contain
-        :param resources_required: the reosurces used by the partitioned vertex
+        """ Creates a partitioned vertex from a partitionable vertex
+        :param vertex_slice: the slice of partitionable atoms that the new \
+                partitioned vertex will contain
+        :param resources_required: the resources used by the partitioned vertex
         :param label: the label of the partitioned vertex
         :param constraints: extra constraints added to the partitioned vertex
         :return: a partitioned vertex
         :rtype: SpikeSourceArrayPartitionedVertex
         """
-        # map region id to the sned buffer for this partitioned vertex
+        # map region id to the send buffer for this partitioned vertex
         send_buffer = dict()
         send_buffer[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
             self._get_spike_send_buffer(vertex_slice)
+
         # create and return the partitioned vertex
         return SpikeSourceArrayPartitionedVertex(
             send_buffer, resources_required, label, constraints)
@@ -310,7 +300,7 @@ class SpikeSourceArray(
         spec.switch_write_focus(
             region=self._SPIKE_SOURCE_REGIONS.CONFIGURATION_REGION.value)
 
-        # write configs for reverse ip tag
+        # write config for reverse ip tag
         # NOTE
         # as the packets are formed in the buffers, and that its a spike source
         # array, and shouldn't have injected packets, no config should be
@@ -323,7 +313,7 @@ class SpikeSourceArray(
         spec.write_value(data=0)  # key for transmitting
         spec.write_value(data=0)  # mask for transmitting
 
-        # write configs for buffers
+        # write config for buffers
         spec.write_value(data=spike_buffer_region_size)
         spec.write_value(data=self._space_before_notification)
 
@@ -375,12 +365,16 @@ class SpikeSourceArray(
         self._write_setup_info(
             spec, spike_buffer.buffer_size, ip_tags, recording_size)
 
+        subvertex.set_routing_infos(routing_info)
+
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
 
         # tell the subvertex its region size
         subvertex.region_size = recording_size
+
+        return [data_writer.filename]
 
     def get_binary_file_name(self):
         """
@@ -400,12 +394,12 @@ class SpikeSourceArray(
         return 0
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        """ calculates the total sdram usage of the spike source array. If the
-        memory requirement is beyond what is deemed to be the usage of the
-        processor, then it executes a buffered format.
+        """ calculates the total SDRAM usage of the spike source array. If \
+            the memory requirement is beyond what is deemed to be the usage\
+            of the processor, then it executes a buffered format.
 
         :param vertex_slice: the slice of atoms this partitioned vertex will
-        represent from the partiionable vertex
+        represent from the partitionable vertex
         :param graph: the partitionable graph which contains the high level
         objects
         :return:
@@ -433,12 +427,11 @@ class SpikeSourceArray(
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
         """
         gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param partitioned_edge: the partitioned edge that leaves this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
-            partitioned_edge, graph_mapper)
+        return [KeyAllocatorContiguousRangeContraint()]
 
     def is_data_specable(self):
         """

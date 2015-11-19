@@ -1,4 +1,4 @@
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 from spynnaker.pyNN.utilities import constants
 
