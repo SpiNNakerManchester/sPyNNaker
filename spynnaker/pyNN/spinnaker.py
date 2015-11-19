@@ -80,10 +80,8 @@ class Spinnaker(object):
         self._tags = None
         self._machine = None
         self._txrx = None
-        self._has_ran = False
         self._reports_states = None
         self._app_id = None
-        self._current_run_ms = None
         self._buffer_manager = None
 
         # database objects
@@ -115,6 +113,9 @@ class Spinnaker(object):
         self._placement_to_app_data_file_paths = None
 
         # holder for timing related values
+        self._has_ran = False
+        self._has_reset_last = False
+        self._current_run_ms = None
         self._no_machine_time_steps = None
         self._machine_time_step = None
         self._no_sync_changes = 0
@@ -261,6 +262,15 @@ class Spinnaker(object):
         # calculate number of machine time steps
         total_run_time = self._calculate_number_of_machine_time_steps(run_time)
 
+        if self._has_ran:
+            for vertex in self._partitionable_graph.vertices:
+                if isinstance(vertex, AbstractResetableForRunInterface):
+                    vertex.reset_for_run(self._current_run_ms, total_run_time)
+        if self._has_reset_last:
+            for vertex in self._partitionable_graph.vertices:
+                if isinstance(vertex, AbstractResetableForRunInterface):
+                    vertex.reset_for_run(0, run_time)
+
         self._current_run_ms = run_time
 
         # get inputs
@@ -279,11 +289,6 @@ class Spinnaker(object):
             exiter = FrontEndCommonApplicationExiter()
             exiter(self._app_id, self._txrx, self._executable_targets,
                    self._no_sync_changes)
-        if self._has_ran:
-            for vertex in self._partitionable_graph.vertices:
-                if isinstance(vertex, AbstractResetableForRunInterface):
-                    vertex.reset_for_run(self._current_run_ms,
-                                         self._no_machine_time_steps)
 
         # get outputs
         required_outputs = \
@@ -321,6 +326,9 @@ class Spinnaker(object):
         # reset the reset flag to say the last thing was not a reset call
         self._current_run_ms = total_run_time
 
+        # swithc the reset last flag, as now the last thing to run is a run
+        self._has_reset_last = False
+
     def reset(self):
         """
         code that puts the simulation back at time zero
@@ -332,6 +340,12 @@ class Spinnaker(object):
         inputs, application_graph_changed = \
             self._create_pacman_executor_inputs(
                 total_runtime=0, is_resetting=True)
+
+        if self._has_ran and application_graph_changed:
+            raise common_exceptions.ConfigurationException(
+                "Currently resetting the simulation after changing the model"
+                "is not supported. Please rethink your script and try again")
+
         algorithms = self._create_algorithm_list(
             config.get("Mode", "mode") == "Debug", application_graph_changed,
             executing_reset=True)
@@ -355,6 +369,10 @@ class Spinnaker(object):
         # not ran
         self._has_ran = False
 
+        # sets the reset last flag to true, so that when run occurs, the tools
+        # know to update the vertices which need to know a reset has occured
+        self._has_reset_last = True
+
         # reset the n_machine_time_steps from each vertex
         for vertex in self.partitionable_graph.vertices:
             vertex.set_no_machine_time_steps(0)
@@ -364,9 +382,6 @@ class Spinnaker(object):
                 vertex.delete_v()
             if isinstance(vertex, AbstractGSynRecordable):
                 vertex.delete_gsyn()
-            if isinstance(vertex, AbstractResetableForRunInterface):
-                vertex.reset_for_run(self._current_run_ms,
-                                     self._no_machine_time_steps)
 
         # execute reset functionality
         helpful_functions.do_mapping(
@@ -644,10 +659,6 @@ class Spinnaker(object):
             inputs.append({'type': "APPID", 'value': self._app_id})
 
         elif application_graph_changed and not is_resetting:
-
-            # the application graph has changed, so new binaries are being
-            # loaded and therefore sync mode starts at zero again.
-            self._no_sync_changes = 0
 
             # make a folder for the json files to be stored in
             json_folder = os.path.join(

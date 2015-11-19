@@ -103,26 +103,34 @@ class SpikeRecorder(object):
             progress_bar.end()
             spike_ids = numpy.hstack(spike_ids)
             spike_times = numpy.hstack(spike_times)
-            result = numpy.dstack((spike_ids, spike_times))[0]
-            spikes = result[numpy.lexsort((spike_times, spike_ids))]
-
-            # extract old data
-            cached_spikes = recording_utils.pull_off_cached_lists(
-                self._no_spike_loads, self._spikes_cache_file)
-
-            # cache the data just pulled off
-            numpy.save(self._spikes_cache_file, spikes)
-            self._no_spike_loads += 1
-
-            # concat extracted with cached
-            if len(cached_spikes) != 0:
-                all_spikes = numpy.concatenate((cached_spikes, spikes))
+            if len(spike_times) == 0 or len(spike_ids) == 0:
+                # extract old data
+                cached_spikes = recording_utils.pull_off_cached_lists(
+                    self._no_spike_loads, self._spikes_cache_file)
+                self._extracted_spike_machine_time_steps += \
+                    to_extract_n_machine_time_steps
+                return cached_spikes
             else:
-                all_spikes = spikes
+                result = numpy.dstack((spike_ids, spike_times))[0]
+                spikes = result[numpy.lexsort((spike_times, spike_ids))]
 
-            self._extracted_spike_machine_time_steps += \
-                to_extract_n_machine_time_steps
+                # extract old data
+                cached_spikes = recording_utils.pull_off_cached_lists(
+                    self._no_spike_loads, self._spikes_cache_file)
 
-            # return all spikes
-            return all_spikes
+                # cache the data just pulled off
+                numpy.save(self._spikes_cache_file, spikes)
+                self._no_spike_loads += 1
+
+                # concat extracted with cached
+                if len(cached_spikes) != 0:
+                    all_spikes = numpy.concatenate((cached_spikes, spikes))
+                else:
+                    all_spikes = spikes
+
+                self._extracted_spike_machine_time_steps += \
+                    to_extract_n_machine_time_steps
+
+                # return all spikes
+                return all_spikes
 

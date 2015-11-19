@@ -87,12 +87,13 @@ bool initialise_recording() {
     recording_read_region_sizes(
         &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
         &recording_flags, &region_sizes[0], &region_sizes[1], &region_sizes[2]);
+    log_info("recording flags are %d", recording_flags);
     for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
         if (recording_is_channel_enabled(recording_flags,
                                          channels_to_record[i])) {
             if (!recording_initialse_channel(
-                    data_specification_get_region(regions_to_record[i],
-                                                  address),
+                    data_specification_get_region(
+                        regions_to_record[i], address),
                     channels_to_record[i], region_sizes[i])) {
                 return false;
             }
@@ -210,7 +211,10 @@ void timer_callback(uint timer_count, uint unused) {
         simulation_handle_pause_resume(timer_callback, TIMER);
 
         // restart the recording status
-        initialise_recording();
+        if (!initialise_recording()) {
+            log_error("I couldnt resetup recording");
+            spin1_exit(0);
+        }
     }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);

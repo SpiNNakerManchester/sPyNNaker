@@ -89,6 +89,9 @@ class SpikeSourceArray(
         if port is None:
             port = config.getint("Buffers", "receive_buffer_port")
 
+        self._min_buffered_memory_size = \
+            config.getint("Buffers", "min_buffered_memory_size")
+
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
@@ -254,8 +257,17 @@ class SpikeSourceArray(
         """
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         if key not in self._send_buffers:
-            send_buffer = BufferedSendingRegion(
-                self._max_on_chip_memory_usage_for_spikes)
+
+            # build buffer with size based off min and max sizes
+            if (self._max_on_chip_memory_usage_for_spikes <
+                    self._min_buffered_memory_size):
+                send_buffer = \
+                    BufferedSendingRegion(self._min_buffered_memory_size)
+            else:
+                send_buffer = BufferedSendingRegion(
+                    self._max_on_chip_memory_usage_for_spikes)
+
+            # translate spikes into buffer
             if hasattr(self._spike_times[0], "__len__"):
 
                 # This is in SpiNNaker 'list of lists' format:
@@ -290,8 +302,7 @@ class SpikeSourceArray(
         time_stamp_in_ticks = int(
             math.ceil((time_stamp * 1000.0) / machine_time_step))
         # deduce if the time stamp is within the time window of the simulation
-        if (last_runtime_position <= time_stamp_in_ticks <
-                (last_runtime_position + no_machine_time_steps)):
+        if last_runtime_position <= time_stamp_in_ticks < no_machine_time_steps:
             send_buffer.add_key(time_stamp_in_ticks, neuron_list)
 
     def _reserve_memory_regions(
@@ -463,10 +474,15 @@ class SpikeSourceArray(
         if self._spike_recorder.record:
             record_size = (send_buffer.total_region_size + 4 +
                            _RECORD_OVERALLOCATION)
-        return (
+        total_size = (
             (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
             SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size +
             record_size)
+
+        if total_size < self._min_buffered_memory_size:
+            return self._min_buffered_memory_size
+        else:
+            return total_size
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
