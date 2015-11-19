@@ -1,32 +1,30 @@
+from enum import Enum
+import math
+import numpy
+import logging
+
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions\
     import generate_parameter
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 
+from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
-
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 from data_specification.enums.data_type import DataType
-
-from enum import Enum
-import math
-import numpy
-import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +37,7 @@ RANDOM_SEED_WORDS = 4
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints):
-    """
-    This class represents a Poisson Spike source object, which can represent
-    a pynn_population.py of virtual neurons each with its own parameters.
+    """ A Poisson Spike source object
     """
 
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
@@ -51,7 +47,8 @@ class SpikeSourcePoisson(
                ('SPIKE_HISTORY_REGION', 2)])
 
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
-    # in terms of CPU (2900 at 10 times slowdown is fine, but not at realtime)
+    # in terms of CPU (2900 at 10 times slow down is fine, but not at
+    # real-time)
     _model_based_max_atoms_per_core = 500
 
     def __init__(self, n_neurons, machine_time_step, timescale_factor,
@@ -76,9 +73,6 @@ class SpikeSourcePoisson(
 
         # Prepare for recording, and to get spikes
         self._spike_recorder = SpikeRecorder(machine_time_step)
-
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
 
     @property
     def rate(self):
@@ -131,7 +125,7 @@ class SpikeSourcePoisson(
     @staticmethod
     def get_params_bytes(vertex_slice):
         """
-        Gets the size of the possion parameters in bytes
+        Gets the size of the poisson parameters in bytes
         :param vertex_slice:
         """
         return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS +
@@ -168,7 +162,7 @@ class SpikeSourcePoisson(
 
     def write_setup_info(self, spec, spike_history_region_sz):
         """
-        Write information used to control the simulationand gathering of
+        Write information used to control the simulation and gathering of
         results.
         Currently, this means the flag word used to signal whether information
         on neuron firing and neuron potential is either stored locally in a
@@ -216,7 +210,7 @@ class SpikeSourcePoisson(
 
         # Write Key info for this core:
         if key is None:
-            # if theres no key, then two falses will cover it.
+            # if there's no key, then two false will cover it.
             spec.write_value(data=0)
             spec.write_value(data=0)
         else:
@@ -311,10 +305,10 @@ class SpikeSourcePoisson(
     def set_recording_spikes(self):
         self._spike_recorder.record = True
 
-    # inherited from partionable vertex
+    # inherited from partitionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
-        method for calculating sdram usage
+        method for calculating SDRAM usage
         :param vertex_slice:
         :param graph:
         :return:
@@ -328,7 +322,7 @@ class SpikeSourcePoisson(
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
-        method for calculating dtcm usage for a collection of atoms
+        method for calculating DTCM usage for a collection of atoms
         :param vertex_slice:
         :param graph:
         :return:
@@ -406,6 +400,8 @@ class SpikeSourcePoisson(
         spec.end_specification()
         data_writer.close()
 
+        return [data_writer.filename]
+
     def get_binary_file_name(self):
         """
 
@@ -423,12 +419,11 @@ class SpikeSourcePoisson(
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
         """
         gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param partitioned_edge: the partitioned edge that leaves this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.get_outgoing_edge_constraints(
-            partitioned_edge, graph_mapper)
+        return [KeyAllocatorContiguousRangeContraint()]
 
     def is_data_specable(self):
         """

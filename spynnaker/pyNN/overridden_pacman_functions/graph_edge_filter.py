@@ -1,9 +1,12 @@
+# pacman imports
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
     import MultiCastPartitionableEdge
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
+
+# spynnaker imports
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
@@ -13,11 +16,16 @@ logger = logging.getLogger(__name__)
 
 
 class GraphEdgeFilter(object):
+    """ Removes graph edges that aren't required
+    """
 
-    def __init__(self, common_report_folder):
-        self._common_report_folder = common_report_folder
-
-    def run(self, subgraph, graph_mapper):
+    def __call__(self, subgraph, graph_mapper):
+        """
+        :param subgraph: the subgraph whose edges are to be filtered
+        :param graph_mapper: the graph mapper between partitionable and \
+                partitioned graphs.
+        :return: a new graph mapper and partitioned graph
+        """
         new_sub_graph = PartitionedGraph(label=subgraph.label)
         new_graph_mapper = GraphMapper(graph_mapper.first_graph_label,
                                        subgraph.label)
@@ -38,27 +46,38 @@ class GraphEdgeFilter(object):
             progress_bar.update()
 
         # start checking subedges to decide which ones need pruning....
-        for subedge in subgraph.subedges:
-            if not self._is_filterable(subedge, graph_mapper):
-                logger.debug("this subedge was not pruned {}".format(subedge))
-                new_sub_graph.add_subedge(subedge)
-                associated_edge = graph_mapper.\
-                    get_partitionable_edge_from_partitioned_edge(subedge)
-                new_graph_mapper.add_partitioned_edge(subedge, associated_edge)
-            else:
-                logger.debug("this subedge was pruned {}".format(subedge))
-            progress_bar.update()
+        for subvert in subgraph.subvertices:
+            out_going_partitions = \
+                subgraph.outgoing_edges_partitions_from_vertex(subvert)
+            for partitioner_identifier in out_going_partitions:
+                for subedge in \
+                        out_going_partitions[partitioner_identifier].edges:
+                    if not self._is_filterable(subedge, graph_mapper):
+                        logger.debug("this subedge was not pruned {}"
+                                     .format(subedge))
+                        new_sub_graph.add_subedge(subedge,
+                                                  partitioner_identifier)
+                        associated_edge = graph_mapper.\
+                            get_partitionable_edge_from_partitioned_edge(
+                                subedge)
+                        new_graph_mapper.add_partitioned_edge(
+                            subedge, associated_edge)
+                    else:
+                        logger.debug("this subedge was pruned {}"
+                                     .format(subedge))
+                    progress_bar.update()
         progress_bar.end()
 
         # returned the pruned partitioned_graph and graph_mapper
-        return new_sub_graph, new_graph_mapper
+        return {'new_sub_graph': new_sub_graph,
+                'new_graph_mapper': new_graph_mapper}
 
-    def _is_filterable(self, subedge, graph_mapper):
+    @staticmethod
+    def _is_filterable(subedge, graph_mapper):
         associated_edge = \
             graph_mapper.get_partitionable_edge_from_partitioned_edge(subedge)
         if isinstance(subedge, AbstractFilterableEdge):
-            return subedge.filter_sub_edge(graph_mapper,
-                                           self._common_report_folder)
+            return subedge.filter_sub_edge(graph_mapper)
         elif isinstance(associated_edge, MultiCastPartitionableEdge):
             return False
         else:
