@@ -1,26 +1,21 @@
-"""
-ProjectionPartitionableEdge
-"""
+import logging
+import copy
+
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
-from pacman.utilities.progress_bar import ProgressBar
-
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
+from pacman.utilities.utility_objs.timer import Timer
 
-from spinn_front_end_common.utilities.timer import Timer
-
-import logging
-import copy
 logger = logging.getLogger(__name__)
 
 
 class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
-    """
-    the partitionable edge for a projection (high level edge)
+    """ The partitionable edge for a projection (high level edge)
     """
 
     def __init__(self, presynaptic_population, postsynaptic_population,
@@ -43,8 +38,7 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
 
     def create_subedge(self, presubvertex, postsubvertex, constraints=None,
                        label=None):
-        """
-        Creates a subedge from this edge
+        """ Create a subedge from this edge
         """
         if constraints is None:
             constraints = list()
@@ -57,7 +51,7 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         Gets the maximum number of words for a subvertex at the end of the
         connection
         :param vertex_slice: the vertex slice for this vertex which contains \
-        the lo and hi atoms for this slice
+                the lo and hi atoms for this slice
         """
         if vertex_slice is None:
             return max([self._synapse_row_io.get_n_words(
@@ -70,8 +64,8 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
 
     def get_n_rows(self):
         """
-        Gets the number of synaptic rows coming in to a subvertex at the end of
-        the connection
+        Gets the number of synaptic rows coming in to a subvertex at the end \
+        of the connection
         """
         return self._synapse_list.get_n_rows()
 

@@ -1,6 +1,3 @@
-"""
-Utilities for accessing the location of memory regions on the board
-"""
 from enum import Enum
 from spinn_front_end_common.utilities.constants import \
     DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS
@@ -42,7 +39,7 @@ MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 
-# the miniumum supported delay slot between two neurons
+# the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
 
 # debug filter positions
@@ -58,15 +55,6 @@ SPIKE_INJECTOR_CORE_APPLICATION_ID = 0xAC9
 # master population table magic
 MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
 MASTER_POP_BINARY_SEARCH = 0xBB2
-
-EDGES = Enum(
-    value="EDGES",
-    names=[("EAST", 0),
-           ("NORTH_EAST", 1),
-           ("NORTH", 2),
-           ("WEST", 3),
-           ("SOUTH_WEST", 4),
-           ("SOUTH", 5)])
 
 # Regions for populations
 POPULATION_BASED_REGIONS = Enum(
