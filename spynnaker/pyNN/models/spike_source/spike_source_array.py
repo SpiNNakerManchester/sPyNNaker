@@ -423,11 +423,12 @@ class SpikeSourceArray(
         recording_size = (spike_buffer.total_region_size + 4 +
                           _RECORD_OVERALLOCATION)
 
-        self._reserve_memory_regions(spec, spike_buffer.buffer_size,
-                                     recording_size)
+        self._reserve_memory_regions(
+            spec, spike_buffer.max_buffer_size_possible, recording_size)
 
         self._write_setup_info(
-            spec, spike_buffer.buffer_size, ip_tags, recording_size)
+            spec, spike_buffer.max_buffer_size_possible, ip_tags,
+            recording_size)
 
         subvertex.set_routing_infos(routing_info)
 
