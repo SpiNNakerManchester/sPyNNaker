@@ -193,8 +193,7 @@ class Population(object):
                 timer.start_timing()
             spikes = self._vertex.get_spikes(
                 self._spinnaker.placements,
-                self._spinnaker.graph_mapper,
-                self._spinnaker.buffer_manager)
+                self._spinnaker.graph_mapper)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get spikes: {}".format(
                     timer.take_sample()))
@@ -243,8 +242,7 @@ class Population(object):
             gsyn = self._vertex.get_gsyn(
                 self._spinnaker.no_machine_time_steps,
                 self._spinnaker.placements,
-                self._spinnaker.graph_mapper,
-                self._spinnaker.buffer_manager)
+                self._spinnaker.graph_mapper)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to get gsyn: {}".format(timer.take_sample()))
 
@@ -289,8 +287,7 @@ class Population(object):
             v = self._vertex.get_v(
                 self._spinnaker.no_machine_time_steps,
                 self._spinnaker.placements,
-                self._spinnaker.graph_mapper,
-                self._spinnaker.buffer_manager)
+                self._spinnaker.graph_mapper)
 
             if conf.config.getboolean("Reports", "outputTimesForSections"):
                 logger.info("Time to read v: {}".format(timer.take_sample()))

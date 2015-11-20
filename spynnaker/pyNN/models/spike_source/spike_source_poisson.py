@@ -8,9 +8,6 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
-from pacman.model.partitionable_graph.\
-    receive_buffers_to_host_partitionable_vertex import \
-    ReceiveBuffersToHostPartitionableVertex
 
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions\
@@ -27,6 +24,9 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.interface.buffer_management.storage_objects.\
     end_buffering_state import EndBufferingState
+from spinn_front_end_common.interface.buffer_management\
+    .buffer_models.receive_buffers_to_host_partitionable_vertex \
+    import ReceiveBuffersToHostPartitionableVertex
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -435,9 +435,9 @@ class SpikeSourcePoisson(
         """
         return "spike_source_poisson.aplx"
 
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
+    def get_spikes(self, placements, graph_mapper):
         return self._spike_recorder.get_spikes(
-            self._label, buffer_manager,
+            self._label, self.buffer_manager,
             self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             self._POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)

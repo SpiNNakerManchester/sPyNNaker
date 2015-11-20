@@ -1,6 +1,3 @@
-from pacman.model.partitionable_graph.\
-    receive_buffers_to_host_partitionable_vertex import \
-    ReceiveBuffersToHostPartitionableVertex
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_edge_constraints import \
     AbstractProvidesIncomingEdgeConstraints
@@ -10,6 +7,10 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.interface.buffer_management.\
     storage_objects.end_buffering_state import \
     EndBufferingState
+from spinn_front_end_common.interface.buffer_management \
+    .buffer_models.receive_buffers_to_host_partitionable_vertex \
+    import ReceiveBuffersToHostPartitionableVertex
+
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from data_specification.data_specification_generator \
@@ -371,9 +372,9 @@ class AbstractPopulationVertex(
         self._spike_recorder.record = True
 
     # @implements AbstractSpikeRecordable.get_spikes
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
+    def get_spikes(self, placements, graph_mapper):
         return self._spike_recorder.get_spikes(
-            self._label, buffer_manager,
+            self._label, self.buffer_manager,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)
@@ -388,10 +389,9 @@ class AbstractPopulationVertex(
         self._v_recorder.record_v = True
 
     # @implements AbstractVRecordable.get_v
-    def get_v(self, n_machine_time_steps, placements,
-              graph_mapper, buffer_manager):
+    def get_v(self, n_machine_time_steps, placements, graph_mapper):
         return self._v_recorder.get_v(
-            self._label, self.n_atoms, buffer_manager,
+            self._label, self.n_atoms, self.buffer_manager,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             n_machine_time_steps, placements, graph_mapper, self)
@@ -406,10 +406,9 @@ class AbstractPopulationVertex(
         self._gsyn_recorder.record_gsyn = True
 
     # @implements AbstractGSynRecordable.get_gsyn
-    def get_gsyn(self, n_machine_time_steps, placements,
-              graph_mapper, buffer_manager):
+    def get_gsyn(self, n_machine_time_steps, placements, graph_mapper):
         return self._gsyn_recorder.get_gsyn(
-            self._label, self.n_atoms, buffer_manager,
+            self._label, self.n_atoms, self.buffer_manager,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             n_machine_time_steps, placements, graph_mapper, self)

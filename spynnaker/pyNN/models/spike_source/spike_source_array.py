@@ -21,6 +21,9 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
+from spinn_front_end_common.interface.buffer_management\
+    .buffer_models.receive_buffers_to_host_partitionable_vertex \
+    import ReceiveBuffersToHostPartitionableVertex
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -28,9 +31,6 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.constraints.tag_allocator_constraints\
     .tag_allocator_require_iptag_constraint\
     import TagAllocatorRequireIptagConstraint
-from pacman.model.partitionable_graph.\
-    receive_buffers_to_host_partitionable_vertex import \
-    ReceiveBuffersToHostPartitionableVertex
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -93,7 +93,8 @@ class SpikeSourceArray(
             constraints=constraints)
         AbstractSpikeRecordable.__init__(self)
 
-        ReceiveBuffersToHostPartitionableVertex.__init__(self, ip_address, port)
+        ReceiveBuffersToHostPartitionableVertex.__init__(
+            self, ip_address, port)
 
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
@@ -145,9 +146,9 @@ class SpikeSourceArray(
         # self.set_buffering_output()
         self._spike_recorder.record = True
 
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
+    def get_spikes(self, placements, graph_mapper):
         return self._spike_recorder.get_spikes(
-            self.label, buffer_manager,
+            self.label, self.buffer_manager,
             self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_RECORDED_REGION.value,
             self._SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)
