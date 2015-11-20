@@ -89,9 +89,6 @@ class SpikeSourceArray(
         if port is None:
             port = config.getint("Buffers", "receive_buffer_port")
 
-        self._min_buffered_memory_size = \
-            config.getint("Buffers", "min_buffered_memory_size")
-
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
@@ -135,6 +132,7 @@ class SpikeSourceArray(
         self._send_buffers = dict()
         self._spike_recording_region_size = None
         self._partitioned_vertices = list()
+        self._partitioned_vertices_current_max_buffer_size = dict()
 
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
@@ -170,6 +168,7 @@ class SpikeSourceArray(
         :return:
         """
         self._spike_times = spike_times
+        self._check_buffer_sizes()
 
     # @implements AbstractSpikeRecordable.is_recording_spikes
     def is_recording_spikes(self):
@@ -237,12 +236,15 @@ class SpikeSourceArray(
         """
         # map region id to the sned buffer for this partitioned vertex
         send_buffer = dict()
+        send_buffers = self._get_spike_send_buffer(vertex_slice)
         send_buffer[self._SPIKE_SOURCE_REGIONS.SPIKE_DATA_REGION.value] =\
-            self._get_spike_send_buffer(vertex_slice)
+            send_buffers
         # create and return the partitioned vertex
         partitioned_vertex = SpikeSourceArrayPartitionedVertex(
             send_buffer, resources_required, label, constraints)
         self._partitioned_vertices.append((vertex_slice, partitioned_vertex))
+        self._partitioned_vertices_current_max_buffer_size[partitioned_vertex] \
+            = send_buffers.max_buffer_size_possible
         return partitioned_vertex
 
     def _get_spike_send_buffer(self, vertex_slice):
@@ -258,13 +260,7 @@ class SpikeSourceArray(
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         if key not in self._send_buffers:
 
-            # build buffer with size based off min and max sizes
-            if (self._max_on_chip_memory_usage_for_spikes <
-                    self._min_buffered_memory_size):
-                send_buffer = \
-                    BufferedSendingRegion(self._min_buffered_memory_size)
-            else:
-                send_buffer = BufferedSendingRegion(
+            send_buffer = BufferedSendingRegion(
                     self._max_on_chip_memory_usage_for_spikes)
 
             # translate spikes into buffer
@@ -470,7 +466,7 @@ class SpikeSourceArray(
         :return:
         """
         send_buffer = self._get_spike_send_buffer(vertex_slice)
-        send_size = send_buffer.buffer_size
+        send_size = send_buffer.max_buffer_size_possible
         record_size = 0
         if self._spike_recorder.record:
             record_size = (send_buffer.total_region_size + 4 +
@@ -480,10 +476,7 @@ class SpikeSourceArray(
             SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size +
             record_size)
 
-        if total_size < self._min_buffered_memory_size:
-            return self._min_buffered_memory_size
-        else:
-            return total_size
+        return total_size
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
