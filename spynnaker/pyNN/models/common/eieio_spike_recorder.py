@@ -36,7 +36,8 @@ class EIEIOSpikeRecorder(object):
         return n_neurons * 4
 
     def get_spikes(self, label, buffer_manager, region, state_region,
-                   placements, graph_mapper, partitionable_vertex):
+                   placements, graph_mapper, partitionable_vertex,
+                   base_key_function):
 
         results = list()
         missing = list()
@@ -74,17 +75,18 @@ class EIEIOSpikeRecorder(object):
                 keys = numpy.frombuffer(
                     spike_data, dtype="<u4", count=eieio_header.count,
                     offset=offset)
-                neuron_ids = \
-                    (keys - subvertex.base_key) + subvertex_slice.lo_atom
+                neuron_ids = ((keys - base_key_function(subvertex)) +
+                              subvertex_slice.lo_atom)
                 offset += eieio_header.count * 4
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
             progress_bar.update()
 
         progress_bar.end()
         for i in missing:
-            logger.info("Missing information in chip ({0:d},{1:d}), core {2:d},"
-                        " population {3:s}, for region {4:d}".format(
-                            i[0], i[1], i[2], label, i[3]))
+            logger.info(
+                "Missing information in chip ({0:d},{1:d}), core {2:d},"
+                "population {3:s}, for region {4:d}".format(
+                    i[0], i[1], i[2], label, i[3]))
         if len(results) != 0:
             result = numpy.vstack(results)
             result = result[numpy.lexsort((result[:, 1], result[:, 0]))]

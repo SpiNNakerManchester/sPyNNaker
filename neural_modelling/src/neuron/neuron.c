@@ -16,6 +16,10 @@
 #include <debug.h>
 #include <string.h>
 
+#define SPIKE_RECORDING_CHANNEL 0
+#define V_RECORDING_CHANNEL 1
+#define GSYN_RECORDING_CHANNEL 2
+
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
 
@@ -299,18 +303,16 @@ void neuron_do_timestep_update(timer_t time) {
     }
 
     // record neuron state (membrane potential) if needed
-    if (recording_is_channel_enabled(recording_flags,
-            e_recording_channel_neuron_potential)) {
+    if (recording_is_channel_enabled(recording_flags, V_RECORDING_CHANNEL)) {
         voltages.time = time;
-        recording_record(e_recording_channel_neuron_potential, &voltages,
-                         voltages_size);
+        recording_record(V_RECORDING_CHANNEL, &voltages, voltages_size);
     }
 
     // record neuron inputs if needed
-    if (recording_is_channel_enabled(recording_flags,
-            e_recording_channel_neuron_gsyn)) {
+    if (recording_is_channel_enabled(
+            recording_flags, GSYN_RECORDING_CHANNEL)) {
         inputs.time = time;
-        recording_record(e_recording_channel_neuron_gsyn, &inputs, input_size);
+        recording_record(GSYN_RECORDING_CHANNEL, &inputs, input_size);
     }
 
     // do logging stuff if required
@@ -318,6 +320,9 @@ void neuron_do_timestep_update(timer_t time) {
     _print_neurons();
 
     // Record any spikes this timestep
-    out_spikes_record(recording_flags, time);
+    if (recording_is_channel_enabled(
+            recording_flags, SPIKE_RECORDING_CHANNEL)) {
+        out_spikes_record(SPIKE_RECORDING_CHANNEL, time);
+    }
     out_spikes_reset();
 }

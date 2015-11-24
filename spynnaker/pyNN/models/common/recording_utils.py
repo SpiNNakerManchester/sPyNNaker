@@ -16,8 +16,8 @@ def get_recording_region_size_in_bytes(
     if n_machine_time_steps is None:
         raise Exception(
             "Cannot record this parameter without a fixed run time")
-    return (_RECORDING_COUNT_SIZE +
-            (n_machine_time_steps * bytes_per_timestep))
+    return ((n_machine_time_steps * bytes_per_timestep) +
+            (n_machine_time_steps * 4))
 
 
 def get_data(transceiver, placement, region, region_size):

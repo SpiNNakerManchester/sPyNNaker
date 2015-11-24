@@ -22,7 +22,6 @@
 #include "plasticity/synapse_dynamics.h"
 
 #include <data_specification.h>
-#include <region_defs.h>
 #include <simulation.h>
 #include <debug.h>
 
@@ -35,16 +34,27 @@
 
 //! the number of channels all standard models contain (spikes, voltage, gsyn)
 //! for recording
-#define N_RECORDING_CHANNELS 3
-#define MIN_TIME_BETWEEN_TRIGGERS 50
+//! human readable definitions of each region in SDRAM
+typedef enum regions_e {
+    SYSTEM_REGION,
+    NEURON_PARAMS_REGION,
+    SYNAPSE_PARAMS_REGION,
+    POPULATION_TABLE_REGION,
+    SYNAPTIC_MATRIX_REGION,
+    SYNAPSE_DYNAMICS_REGION,
+    BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
+    BUFFERING_OUT_GSYN_RECORDING_REGION,
+    BUFFERING_OUT_CONTROL_REGION
+} regions_e;
 
+#define NUMBER_OF_REGIONS_TO_RECORD 3
 
 // Globals
 
 //! the current timer tick value TODO this might be able to be removed with
 //! the timer tick callback returning the same value.
 uint32_t time;
-uint32_t last_time_buffering_trigger;
 
 //! global parameter which contains the number of timer ticks to run for before
 //! being expected to exit
@@ -79,45 +89,21 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    // Set up recording
-    recording_channel_e channels_to_record[] = {
-        e_recording_channel_spike_history,
-        e_recording_channel_neuron_potential,
-        e_recording_channel_neuron_gsyn
-    };
     regions_e regions_to_record[] = {
         BUFFERING_OUT_SPIKE_RECORDING_REGION,
         BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
         BUFFERING_OUT_GSYN_RECORDING_REGION
     };
     uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-    uint32_t *recording_flags_from_system_conf = &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    uint8_t tag_id = recording_flags_from_system_conf[1];
-    uint32_t *region_sizes = &recording_flags_from_system_conf[2];
+    uint32_t *recording_flags_from_system_conf =
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
     uint32_t recording_flags;
     regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
 
-    recording_initialize(n_regions_to_record, regions_to_record,
-                         region_sizes, state_region, tag_id, &recording_flags);
-
-    /*
-    uint32_t region_sizes[N_RECORDING_CHANNELS];
-    uint32_t recording_flags;
-    recording_read_region_sizes(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
-        &recording_flags, &region_sizes[0], &region_sizes[1], &region_sizes[2]);
-    for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
-        if (recording_is_channel_enabled(recording_flags,
-                                         channels_to_record[i])) {
-            if (!recording_initialise_channel(
-                    data_specification_get_region(regions_to_record[i],
-                                                  address),
-                    channels_to_record[i], region_sizes[i])) {
-                return false;
-            }
-        }
-    }
-    */
+    recording_initialize(
+        n_regions_to_record, regions_to_record,
+        recording_flags_from_system_conf, state_region, &recording_flags);
+    log_info("Recording flags = 0x%08x", recording_flags);
 
     // Set up the neurons
     uint32_t n_neurons;
@@ -201,13 +187,8 @@ void timer_callback(uint timer_count, uint unused) {
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time);
 
-    //trigger buffering_out_mechanism - if needed
-    // log_info("Triggering message buffering output for channel %d", channel);
-    if (time - last_time_buffering_trigger > MIN_TIME_BETWEEN_TRIGGERS)
-    {
-        recording_send_buffering_out_trigger_message(0);
-        last_time_buffering_trigger = time;
-    }
+    // trigger buffering_out_mechanism
+    recording_do_timestep_update(time);
 }
 
 //! \The only entry point for this model. it initialises the model, sets up the
@@ -224,7 +205,6 @@ void c_main(void) {
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;
-    last_time_buffering_trigger = 0;
 
     // Set timer tick (in microseconds)
     log_info("setting timer tic callback for %d microseconds",

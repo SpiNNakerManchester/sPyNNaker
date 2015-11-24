@@ -58,10 +58,10 @@ bool out_spikes_initialize(size_t max_spike_sources);
 //! spike recording region in SDRAM (flags to deduce which regions are active
 //! are handed to this method due to recording not containing them itself).
 //! TODO change the recording.h and recording.c to contain the channels itself.
-//! \param[in] recording_flags the recording flags which state which region
-//! channels are being used.
+//! \param[in] channel the channel to record to
+//! \param[in] time the time of the recording
 //! \return None
-void out_spikes_record(uint32_t recording_flags, uint32_t time);
+void out_spikes_record(uint8_t channel, uint32_t time);
 
 //! \brief helper method which checks if the current spikes flags have any
 //! recorded for use.

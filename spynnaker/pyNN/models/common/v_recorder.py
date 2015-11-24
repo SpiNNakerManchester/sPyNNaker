@@ -1,10 +1,9 @@
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.common import recording_utils
 
 import numpy
 import logging
-
 logger = logging.getLogger(__name__)
 
 
@@ -26,12 +25,8 @@ class VRecorder(object):
         if not self._record_v:
             return 0
 
-        # size computed without buffering out technique
-        # return recording_utils.get_recording_region_size_in_bytes(
-        #     n_machine_time_steps, 4 * n_neurons)
-
-        # size computed for buffering out technique
-        return constants.V_BUFFER_SIZE_BUFFERING_OUT
+        return recording_utils.get_recording_region_size_in_bytes(
+            n_machine_time_steps, 4 * n_neurons)
 
     def get_dtcm_usage_in_bytes(self):
         if not self._record_v:
@@ -53,7 +48,7 @@ class VRecorder(object):
         ms_per_tick = self._machine_time_step / 1000.0
 
         data = list()
-        missing = list()
+        missing_str = ""
 
         progress_bar = \
             ProgressBar(len(subvertices),
@@ -69,11 +64,11 @@ class VRecorder(object):
             p = placement.p
 
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, missing_processor =\
+            neuron_param_region_data_pointer, missing_data =\
                 buffer_manager.get_data_for_vertex(
                     x, y, p, region, state_region)
-            if missing_processor is not None:
-                missing.append(missing_processor)
+            if missing_data:
+                missing_str += "({}, {}, {}); ".format(x, y, p)
             record_raw = neuron_param_region_data_pointer.read_all()
             record_length = len(record_raw)
             n_rows = record_length / ((vertex_slice.n_atoms + 1) * 4)
@@ -95,10 +90,11 @@ class VRecorder(object):
             progress_bar.update()
 
         progress_bar.end()
-        for i in missing:
-            logger.info("Missing information in chip ({0:d},{1:d}), core {2:d},"
-                        " population {3:s}, for region {4:d}".format(
-                            i[0], i[1], i[2], label, i[3]))
+        if len(missing_str) > 0:
+            logger.warn(
+                "Population {} is missing membrane voltage data in region {}"
+                " from the following cores: {}".format(
+                    label, region, missing_str))
         data = numpy.vstack(data)
         order = numpy.lexsort((data[:, 1], data[:, 0]))
         result = data[order]

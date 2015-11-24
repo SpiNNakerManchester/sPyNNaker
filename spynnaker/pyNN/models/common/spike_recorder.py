@@ -1,6 +1,6 @@
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.common import recording_utils
 
 import math
 import numpy
@@ -27,13 +27,9 @@ class SpikeRecorder(object):
         if not self._record:
             return 0
 
-        # size computed without buffering out technique
-        # out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * 4
-        # return recording_utils.get_recording_region_size_in_bytes(
-        #    n_machine_time_steps, out_spike_bytes)
-
-        # size computed for buffering out technique
-        return constants.SPIKE_BUFFER_SIZE_BUFFERING_OUT
+        out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * 4
+        return recording_utils.get_recording_region_size_in_bytes(
+            n_machine_time_steps, out_spike_bytes)
 
     def get_dtcm_usage_in_bytes(self):
         if not self._record:
@@ -55,7 +51,7 @@ class SpikeRecorder(object):
         subvertices = \
             graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
 
-        missing = list()
+        missing_str = ""
 
         progress_bar = ProgressBar(len(subvertices),
                                    "Getting spikes for {}".format(label))
@@ -75,11 +71,11 @@ class SpikeRecorder(object):
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, missing_processor = \
+            neuron_param_region_data_pointer, data_missing = \
                 buffer_manager.get_data_for_vertex(
                     x, y, p, region, state_region)
-            if missing_processor is not None:
-                missing.append(missing_processor)
+            if data_missing:
+                missing_str += "({}, {}, {}); ".format(x, y, p)
             record_raw = neuron_param_region_data_pointer.read_all()
             raw_data = (numpy.asarray(record_raw, dtype="uint8").
                         view(dtype="<i4")).reshape(
@@ -97,10 +93,10 @@ class SpikeRecorder(object):
             progress_bar.update()
 
         progress_bar.end()
-        for i in missing:
-            logger.info("Missing information in chip ({0:d},{1:d}), core {2:d},"
-                        " population {3:s}, for region {4:d}".format(
-                            i[0], i[1], i[2], label, i[3]))
+        if len(missing_str) > 0:
+            logger.warn(
+                "Population {} is missing spike data in region {} from the"
+                " following cores: {}".format(label, region, missing_str))
 
         spike_ids = numpy.hstack(spike_ids)
         spike_times = numpy.hstack(spike_times)

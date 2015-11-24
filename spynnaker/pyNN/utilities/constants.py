@@ -21,9 +21,9 @@ OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * 4  # The number of bytes for each spike line
 V_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
 GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 8
 
-SPIKE_BUFFER_SIZE_BUFFERING_OUT = 1 * 1024 * 1024  # assigning 1MB for buffering
-V_BUFFER_SIZE_BUFFERING_OUT = 1 * 1024 * 1024      # assigning 1MB for buffering
-GSYN_BUFFER_SIZE_BUFFERING_OUT = 2 * 1024 * 1024   # assigning 1MB for buffering
+SPIKE_BUFFER_SIZE_BUFFERING_OUT = 1 * 1024 * 1024
+V_BUFFER_SIZE_BUFFERING_OUT = 1 * 1024 * 1024
+GSYN_BUFFER_SIZE_BUFFERING_OUT = 2 * 1024 * 1024
 
 INFINITE_SIMULATION = 4294967295
 
@@ -46,20 +46,6 @@ MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 # the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
 
-# debug filter positions
-# multicast packets which are sent from a local chip where the local router has
-# router entry for it (this is default routed to the monitor core which
-# currently drops the packet).
-MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
-
-# please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
-# for other core application ids.
-SPIKE_INJECTOR_CORE_APPLICATION_ID = 0xAC9
-
-# master population table magic
-MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
-MASTER_POP_BINARY_SEARCH = 0xBB2
-
 # Regions for populations
 POPULATION_BASED_REGIONS = Enum(
     value="POPULATION_BASED_REGIONS",
@@ -73,18 +59,3 @@ POPULATION_BASED_REGIONS = Enum(
            ('POTENTIAL_HISTORY', 7),
            ('GSYN_HISTORY', 8),
            ('BUFFERING_OUT_STATE', 9)])
-
-# The number of recording regions available for a population
-N_POPULATION_RECORDING_REGIONS = 3
-
-# The size of the system region (+1 for flags, +1 for buffering out iptag)
-# for a population
-POPULATION_SYSTEM_REGION_BYTES = (DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS +
-                                  N_POPULATION_RECORDING_REGIONS + 2) * 4
-
-# The size of the headers of a population neuron region
-# (1 word each for has_key, key, n_neurons, n_params, ODE timestep)
-POPULATION_NEURON_PARAMS_HEADER_BYTES = 20
-
-# The default routing mask to use
-DEFAULT_MASK = 0xfffff800
