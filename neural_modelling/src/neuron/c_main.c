@@ -56,12 +56,14 @@ typedef enum regions_e {
 //! the timer tick callback returning the same value.
 uint32_t time;
 
-//! global parameter which contains the number of timer ticks to run for before
-//! being expected to exit
+//! The number of timer ticks to run for before being expected to exit
 static uint32_t simulation_ticks = 0;
 
-//! global paramter which states if this model should run for infinite time
+//! Determines if this model should run for infinite time
 static uint32_t infinite_run;
+
+//! The recording flags
+static uint32_t recording_flags = 0;
 
 //! \Initialises the model by reading in the regions and checking recording
 //! data.
@@ -97,7 +99,6 @@ static bool initialize(uint32_t *timer_period) {
     uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
     uint32_t *recording_flags_from_system_conf =
         &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    uint32_t recording_flags;
     regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
 
     recording_initialize(
@@ -178,7 +179,9 @@ void timer_callback(uint timer_count, uint unused) {
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
-        recording_finalise();
+        if (recording_flags > 0) {
+            recording_finalise();
+        }
 
         spin1_exit(0);
         return;
