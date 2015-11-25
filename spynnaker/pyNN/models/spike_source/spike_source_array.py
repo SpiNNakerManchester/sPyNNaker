@@ -80,8 +80,10 @@ class SpikeSourceArray(ReverseIpTagMultiCastSource, AbstractSpikeRecordable):
         self._spike_recorder.record = True
 
     def get_spikes(self, placements, graph_mapper):
+        subvertices = graph_mapper.get_subvertices_from_vertex(self)
+        buffer_manager = next(iter(subvertices)).buffer_manager
         return self._spike_recorder.get_spikes(
-            self.label, self.buffer_manager,
+            self.label, buffer_manager,
             (ReverseIPTagMulticastSourcePartitionedVertex.
              _REGIONS.RECORDING_BUFFER.value),
             (ReverseIPTagMulticastSourcePartitionedVertex.

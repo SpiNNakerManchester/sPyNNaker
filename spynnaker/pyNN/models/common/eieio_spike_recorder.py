@@ -40,7 +40,7 @@ class EIEIOSpikeRecorder(object):
                    base_key_function):
 
         results = list()
-        missing = list()
+        missing_str = ""
         ms_per_tick = self._machine_time_step / 1000.0
         subvertices = \
             graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
@@ -57,11 +57,11 @@ class EIEIOSpikeRecorder(object):
             p = placement.p
 
             # Read the spikes
-            raw_spike_data, missing_processor = \
+            raw_spike_data, data_missing = \
                 buffer_manager.get_data_for_vertex(
                     x, y, p, region, state_region)
-            if missing_processor is not None:
-                missing.append(missing_processor)
+            if data_missing:
+                missing_str += "({}, {}, {}); ".format(x, y, p)
             spike_data = raw_spike_data.read_all()
             number_of_bytes_written = len(spike_data)
 
@@ -82,11 +82,10 @@ class EIEIOSpikeRecorder(object):
             progress_bar.update()
 
         progress_bar.end()
-        for i in missing:
-            logger.info(
-                "Missing information in chip ({0:d},{1:d}), core {2:d},"
-                "population {3:s}, for region {4:d}".format(
-                    i[0], i[1], i[2], label, i[3]))
+        if len(missing_str) > 0:
+            logger.warn(
+                "Population {} is missing spike data in region {} from the"
+                " following cores: {}".format(label, region, missing_str))
         if len(results) != 0:
             result = numpy.vstack(results)
             result = result[numpy.lexsort((result[:, 1], result[:, 0]))]
