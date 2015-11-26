@@ -70,7 +70,8 @@ class AbstractPopulationVertex(
             constraints=None,
             spike_buffer_max_size=constants.SPIKE_BUFFER_SIZE_BUFFERING_OUT,
             v_buffer_max_size=constants.V_BUFFER_SIZE_BUFFERING_OUT,
-            gsyn_buffer_max_size=constants.GSYN_BUFFER_SIZE_BUFFERING_OUT):
+            gsyn_buffer_max_size=constants.GSYN_BUFFER_SIZE_BUFFERING_OUT,
+            buffer_size_before_receive=constants.BUFFER_SIZE_BEFORE_RECEIVE):
 
         AbstractPartitionableVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
@@ -99,6 +100,7 @@ class AbstractPopulationVertex(
         self._spike_buffer_max_size = spike_buffer_max_size
         self._v_buffer_max_size = v_buffer_max_size
         self._gsyn_buffer_max_size = gsyn_buffer_max_size
+        self._buffer_size_before_receive = buffer_size_before_receive
 
         # Set up synapse handling
         self._synapse_manager = SynapticManager(
@@ -164,12 +166,15 @@ class AbstractPopulationVertex(
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         return (self._get_sdram_usage_for_neuron_params(vertex_slice) +
                 self.get_buffer_state_region_size(3) +
-                self._spike_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps) +
-                self._v_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps) +
-                self._gsyn_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps) +
+                min((self._spike_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, self._no_machine_time_steps),
+                    self._spike_buffer_max_size)) +
+                min((self._v_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, self._no_machine_time_steps),
+                    self._v_buffer_max_size)) +
+                min((self._gsyn_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, self._no_machine_time_steps),
+                    self._gsyn_buffer_max_size)) +
                 self._synapse_manager.get_sdram_usage_in_bytes(
                     vertex_slice, graph.incoming_edges_to_vertex(self)))
 
@@ -203,8 +208,9 @@ class AbstractPopulationVertex(
             [spike_history_region_sz, v_history_region_sz,
              gsyn_history_region_sz])
 
-    def _write_setup_info(self, spec, spike_history_region_sz,
-                          neuron_potential_region_sz, gsyn_region_sz, ip_tags):
+    def _write_setup_info(
+            self, spec, spike_history_region_sz, neuron_potential_region_sz,
+            gsyn_region_sz, ip_tags, buffer_size_before_receive):
         """ Write information used to control the simulation and gathering of\
             results.
         """
@@ -215,7 +221,7 @@ class AbstractPopulationVertex(
         self.write_recording_data(
             spec, ip_tags,
             [spike_history_region_sz, neuron_potential_region_sz,
-             gsyn_region_sz])
+             gsyn_region_sz], buffer_size_before_receive)
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice):
@@ -289,6 +295,7 @@ class AbstractPopulationVertex(
         gsyn_history_sz = min((self._gsyn_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self._no_machine_time_steps),
             self._gsyn_buffer_max_size))
+        buffer_size_before_receive = self._buffer_size_before_receive
 
         # Reserve memory regions
         self._reserve_memory_regions(
@@ -312,7 +319,8 @@ class AbstractPopulationVertex(
 
         # Write the regions
         self._write_setup_info(
-            spec, spike_history_sz, v_history_sz, gsyn_history_sz, ip_tags)
+            spec, spike_history_sz, v_history_sz, gsyn_history_sz, ip_tags,
+            buffer_size_before_receive)
         self._write_neuron_parameters(spec, key, vertex_slice)
 
         # allow the synaptic matrix to write its data specable data

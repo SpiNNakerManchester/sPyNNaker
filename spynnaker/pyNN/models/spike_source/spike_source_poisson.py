@@ -59,9 +59,12 @@ class SpikeSourcePoisson(
     # real-time)
     _model_based_max_atoms_per_core = 500
 
-    def __init__(self, n_neurons, machine_time_step, timescale_factor,
-                 constraints=None, label="SpikeSourcePoisson",
-                 rate=1.0, start=0.0, duration=None, seed=None):
+    def __init__(
+            self, n_neurons, machine_time_step, timescale_factor,
+            constraints=None, label="SpikeSourcePoisson", rate=1.0, start=0.0,
+            duration=None, seed=None,
+            spike_buffer_max_size=constants.SPIKE_BUFFER_SIZE_BUFFERING_OUT,
+            buffer_size_before_receive=constants.BUFFER_SIZE_BEFORE_RECEIVE):
         """
         Creates a new SpikeSourcePoisson Object.
         """
@@ -82,6 +85,8 @@ class SpikeSourcePoisson(
 
         # Prepare for recording, and to get spikes
         self._spike_recorder = SpikeRecorder(machine_time_step)
+        self._spike_buffer_max_size = spike_buffer_max_size
+        self._buffer_size_before_receive = buffer_size_before_receive
 
     @property
     def rate(self):
@@ -167,7 +172,9 @@ class SpikeSourcePoisson(
             [self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value],
             [spike_hist_buff_sz])
 
-    def _write_setup_info(self, spec, spike_history_region_sz, ip_tags):
+    def _write_setup_info(
+            self, spec, spike_history_region_sz, ip_tags,
+            buffer_size_before_receive):
         """ Write information used to control the simulation and gathering of\
             results.
         :param spec:
@@ -178,7 +185,9 @@ class SpikeSourcePoisson(
 
         self._write_basic_setup_info(
             spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
-        self.write_recording_data(spec, ip_tags, [spike_history_region_sz])
+        self.write_recording_data(
+            spec, ip_tags, [spike_history_region_sz],
+            buffer_size_before_receive)
 
     def _write_poisson_parameters(self, spec, key, num_neurons):
         """
@@ -307,9 +316,10 @@ class SpikeSourcePoisson(
         :return:
         """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
-        spike_hist_buff_sz = \
+        spike_hist_buff_sz = min((
             self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._no_machine_time_steps)
+                vertex_slice.n_atoms, self._no_machine_time_steps),
+            self._spike_buffer_max_size))
         return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
                 self.get_recording_data_size(1) +
                 self.get_buffer_state_region_size(1) +
@@ -365,8 +375,11 @@ class SpikeSourcePoisson(
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
-        spike_hist_buff_sz = self._spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._no_machine_time_steps)
+        spike_hist_buff_sz = min((
+            self._spike_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self._no_machine_time_steps),
+            self._spike_buffer_max_size))
+        buffer_size_before_receive = self._buffer_size_before_receive
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
@@ -380,7 +393,8 @@ class SpikeSourcePoisson(
         self.reserve_memory_regions(
             spec, setup_sz, poisson_params_sz, spike_hist_buff_sz)
 
-        self._write_setup_info(spec, spike_hist_buff_sz, ip_tags)
+        self._write_setup_info(
+            spec, spike_hist_buff_sz, ip_tags, buffer_size_before_receive)
 
         # Every subedge should have the same key
         key = None

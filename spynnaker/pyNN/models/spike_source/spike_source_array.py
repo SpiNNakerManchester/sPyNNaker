@@ -1,4 +1,5 @@
 # spynnaker imports
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
     import EIEIOSpikeRecorder
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
@@ -29,10 +30,14 @@ class SpikeSourceArray(ReverseIpTagMultiCastSource, AbstractSpikeRecordable):
     def __init__(
             self, n_neurons, spike_times, machine_time_step, timescale_factor,
             port=None, tag=None, ip_address=None, board_address=None,
-            max_on_chip_memory_usage_for_spikes_in_bytes=1024 * 1024,
+            max_on_chip_memory_usage_for_spikes_in_bytes=(
+                constants.SPIKE_BUFFER_SIZE_BUFFERING_OUT),
             space_before_notification=640,
             constraints=None, label="SpikeSourceArray",
-            spike_recorder_buffer_size=1024 * 1024):
+            spike_recorder_buffer_size=(
+                constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
+            buffer_size_before_receive=(
+                constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)):
         self._ip_address = ip_address
         if ip_address is None:
             self._ip_address = config.get("Buffers", "receive_buffer_host")
@@ -60,6 +65,7 @@ class SpikeSourceArray(ReverseIpTagMultiCastSource, AbstractSpikeRecordable):
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
         self._spike_recorder_buffer_size = spike_recorder_buffer_size
+        self._buffer_size_before_receive = buffer_size_before_receive
 
     @property
     def spike_times(self):
@@ -76,7 +82,8 @@ class SpikeSourceArray(ReverseIpTagMultiCastSource, AbstractSpikeRecordable):
         self.enable_recording(
             self._ip_address, self._port, self._board_address,
             self._send_buffer_notification_tag,
-            self._spike_recorder_buffer_size)
+            self._spike_recorder_buffer_size,
+            self._buffer_size_before_receive)
         self._spike_recorder.record = True
 
     def get_spikes(self, placements, graph_mapper):
