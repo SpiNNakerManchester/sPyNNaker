@@ -40,7 +40,7 @@ typedef struct fast_spike_source_t {
 
 //! spike source array region ids in human readable form
 typedef enum region{
-    system, poisson_params, spike_history,
+    system, poisson_params,
     BUFFERING_OUT_SPIKE_RECORDING_REGION,
     BUFFERING_OUT_CONTROL_REGION
 }region;
@@ -271,7 +271,9 @@ void timer_callback(uint timer_count, uint unused) {
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
-        recording_finalise();
+        if (recording_flags > 0) {
+            recording_finalise();
+        }
 
         spin1_exit(0);
         return;
@@ -357,7 +359,9 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Record output spikes if required
-    out_spikes_record(recording_flags, time);
+    if (recording_flags > 0) {
+        out_spikes_record(0, time);
+    }
     out_spikes_reset();
 }
 
