@@ -28,9 +28,9 @@ typedef struct slow_spike_source_t {
     REAL time_to_spike_ticks;
 } slow_spike_source_t;
 
-//! data structure for spikes which have at least one spike fired per timer tick
-//! this is separated from spikes which have multiple timer ticks between firings
-//! as there are separate algorithms for each type.
+//! data structure for spikes which have at least one spike fired per timer
+//! tick; this is separated from spikes which have multiple timer ticks\
+//! between firings as there are separate algorithms for each type.
 typedef struct fast_spike_source_t {
     uint32_t neuron_id;
     uint32_t start_ticks;
@@ -40,7 +40,7 @@ typedef struct fast_spike_source_t {
 
 //! spike source array region ids in human readable form
 typedef enum region{
-    system, poisson_params,
+    SYSTEM, POISSON_PARAMS,
     BUFFERING_OUT_SPIKE_RECORDING_REGION,
     BUFFERING_OUT_CONTROL_REGION
 }region;
@@ -50,8 +50,8 @@ typedef enum region{
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
 typedef enum poisson_region_parameters{
-    has_key, transmission_key, parameter_seed_start_position,
-}poisson_region_parameters;
+    HAS_KEY, TRANSMISSION_KEY, PARAMETER_SEED_START_POSITION,
+} poisson_region_parameters;
 
 // Globals
 //! global variable which contains all the data for neurons which are expected
@@ -93,8 +93,8 @@ static uint32_t simulation_ticks = 0;
 //! the int that represents the bool for if the run is infinite or not.
 static uint32_t infinite_run;
 
-//! deduces the time in timer ticks until the next spike is to occur given a
-//! mean_isi_ticks
+//! \brief deduces the time in timer ticks until the next spike is to occur
+//!        given the mean inter spike interval
 //! \param[in] mean_inter_spike_interval_in_ticks The mean number of ticks
 //!            before a spike is expected to occur in a slow process.
 //! \return a real which represents time in timer ticks until the next spike is
@@ -105,7 +105,7 @@ static inline REAL slow_spike_source_get_time_to_spike(
             * mean_inter_spike_interval_in_ticks;
 }
 
-//! \Determines how many spikes to transmit this timer tick.
+//! \brief Determines how many spikes to transmit this timer tick.
 //! \param[in] exp_minus_lambda The amount of spikes expected to be produced
 //!            this timer interval (timer tick in real time)
 //! \return a uint32_t which represents the number of spikes to transmit
@@ -130,20 +130,20 @@ bool read_poisson_parameters(address_t address) {
 
     log_info("read_parameters: starting");
 
-    has_been_given_key = address[has_key];
-    key = address[transmission_key];
+    has_been_given_key = address[HAS_KEY];
+    key = address[TRANSMISSION_KEY];
     log_info("\tkey = %08x", key);
 
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
-    memcpy(spike_source_seed, &address[parameter_seed_start_position],
+    memcpy(spike_source_seed, &address[PARAMETER_SEED_START_POSITION],
         seed_size * sizeof(uint32_t));
     validate_mars_kiss64_seed(spike_source_seed);
 
     log_info("\tSeed (%u) = %u %u %u %u", seed_size, spike_source_seed[0],
              spike_source_seed[1], spike_source_seed[2], spike_source_seed[3]);
 
-    num_slow_spike_sources = address[parameter_seed_start_position + seed_size];
-    num_fast_spike_sources = address[parameter_seed_start_position +
+    num_slow_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
+    num_fast_spike_sources = address[PARAMETER_SEED_START_POSITION +
                                      seed_size + 1];
     log_info("\tslow spike sources = %u, fast spike sources = %u,",
              num_slow_spike_sources, num_fast_spike_sources);
@@ -156,7 +156,7 @@ bool read_poisson_parameters(address_t address) {
             log_error("Failed to allocate slow_spike_source_array");
             return false;
         }
-        uint32_t slow_spikes_offset = parameter_seed_start_position +
+        uint32_t slow_spikes_offset = PARAMETER_SEED_START_POSITION +
                                     seed_size + 2;
         memcpy(slow_spike_source_array,
                 &address[slow_spikes_offset],
@@ -181,7 +181,7 @@ bool read_poisson_parameters(address_t address) {
         // locate offset for the fast spike sources in the SDRAM from where the
         // seed finished.
         uint32_t fast_spike_source_offset =
-              parameter_seed_start_position + seed_size + 2 +
+                PARAMETER_SEED_START_POSITION + seed_size + 2 +
             + (num_slow_spike_sources * (sizeof(slow_spike_source_t)
                 / sizeof(uint32_t)));
         memcpy(fast_spike_source_array, &address[fast_spike_source_offset],
@@ -216,7 +216,7 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details
     address_t system_region = data_specification_get_region(
-            system, address);
+            SYSTEM, address);
     if (!simulation_read_timing_details(
             system_region, APPLICATION_NAME_HASH, timer_period,
             &simulation_ticks, &infinite_run)) {
@@ -238,7 +238,7 @@ static bool initialize(uint32_t *timer_period) {
 
     // Setup regions that specify spike source array data
     if (!read_poisson_parameters(
-            data_specification_get_region(poisson_params, address))) {
+            data_specification_get_region(POISSON_PARAMS, address))) {
         return false;
     }
 
@@ -247,11 +247,7 @@ static bool initialize(uint32_t *timer_period) {
     return true;
 }
 
-//! The callback used when a timer tick interrupt is set off. The result of
-//! this is to transmit any spikes that need to be sent at this timer tick,
-//! update any recording, and update the state machine's states.
-//! If the timer tick is set to the end time, this method will call the
-//! spin1api stop command to allow clean exit of the executable.
+//! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
 //!            executed since start of simulation
 //! \param[in] unused for consistency sake of the API always returning two
@@ -365,8 +361,7 @@ void timer_callback(uint timer_count, uint unused) {
     out_spikes_reset();
 }
 
-//! The only entry point for this model. it initialises the model, sets up the
-//! Interrupts for the Timer tick and calls the spin1api for running.
+//! The entry point for this model
 void c_main(void) {
 
     // Load DTCM data

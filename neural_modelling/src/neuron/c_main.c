@@ -32,8 +32,6 @@
        constant
 #endif
 
-//! the number of channels all standard models contain (spikes, voltage, gsyn)
-//! for recording
 //! human readable definitions of each region in SDRAM
 typedef enum regions_e {
     SYSTEM_REGION,
@@ -48,6 +46,7 @@ typedef enum regions_e {
     BUFFERING_OUT_CONTROL_REGION
 } regions_e;
 
+//! The number of regions that are to be used for recording
 #define NUMBER_OF_REGIONS_TO_RECORD 3
 
 // Globals
@@ -65,12 +64,11 @@ static uint32_t infinite_run;
 //! The recording flags
 static uint32_t recording_flags = 0;
 
-//! \Initialises the model by reading in the regions and checking recording
-//! data.
-//! \param[in] *timer_period a pointer for the memory address where the timer
-//! period should be stored during the function.
-//! \return boolean of True if it successfully read all the regions and set up
-//! all its internal data structures. Otherwise returns False
+//! \brief Initialises the model by reading in the regions and checking
+//!        recording data.
+//! \param[in] timer_period a pointer for the memory address where the timer
+//!            period should be stored during the function.
+//! \return True if it successfully initialised, false otherwise
 static bool initialize(uint32_t *timer_period) {
     log_info("Initialise: started");
 
@@ -148,15 +146,10 @@ static bool initialize(uint32_t *timer_period) {
     return true;
 }
 
-//! \The callback used when a timer tic interrupt is set off. The result of
-//! this is to transmit any spikes that need to be sent at this timer tic,
-//! update any recording, and update the state machine's states.
-//! If the timer tic is set to the end time, this method will call the
-//! spin1api stop command to allow clean exit of the executable.
+//! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
-//! executed since start of simulation
-//! \param[in] unused for consistency sake of the API always returning two
-//! parameters, this parameter has no semantics currently and thus is set to 0
+//!            executed since start of simulation
+//! \param[in] unused unused parameter kept for API consistency
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
@@ -194,8 +187,7 @@ void timer_callback(uint timer_count, uint unused) {
     recording_do_timestep_update(time);
 }
 
-//! \The only entry point for this model. it initialises the model, sets up the
-//! Interrupts for the Timer tic and calls the spin1api for running.
+//! \brief The entry point for this model.
 void c_main(void) {
 
     // Load DTCM data

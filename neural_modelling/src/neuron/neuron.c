@@ -52,11 +52,11 @@ static uint32_t recording_flags;
 static input_t *input_buffers;
 
 //! storage for neuron state with timestamp
-static timed_state_t voltages;
+static timed_state_t *voltages;
 uint32_t voltages_size;
 
 //! storage for neuron input with timestamp
-static timed_input_t inputs;
+static timed_input_t *inputs;
 uint32_t input_size;
 
 //! parameters that reside in the neuron_parameter_data_region in human
@@ -68,8 +68,8 @@ typedef enum parmeters_in_neuron_parameter_data_region {
 
 
 //! private method for doing output debug data on the neurons
-//! \return nothing
 static inline void _print_neurons() {
+
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
 #if LOG_LEVEL >= LOG_DEBUG
@@ -83,8 +83,8 @@ static inline void _print_neurons() {
 }
 
 //! private method for doing output debug data on the neurons
-//! \return nothing
 static inline void _print_neuron_parameters() {
+
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
 #if LOG_LEVEL >= LOG_DEBUG
@@ -97,15 +97,13 @@ static inline void _print_neuron_parameters() {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-//! \translate the data stored in the NEURON_PARAMS data region in SDRAM and
-//! converts it into c based objects for use.
+//! \brief Set up the neuron models
 //! \param[in] address the absolute address in SDRAM for the start of the
 //!            NEURON_PARAMS data region in SDRAM
 //! \param[in] recording_flags_param the recordings parameters
 //!            (contains which regions are active and how big they are)
 //! \param[out] n_neurons_value The number of neurons this model is to emulate
-//! \return boolean which is True is the translation was successful
-//! otherwise False
+//! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         uint32_t *n_neurons_value) {
     log_info("neuron_initialise: starting");
@@ -209,7 +207,9 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     recording_flags = recording_flags_param;
 
     voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
+    voltages = (timed_state_t *) spin1_malloc(voltages_size);
     input_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
+    inputs = (timed_input_t *) spin1_malloc(input_size);
 
     _print_neuron_parameters();
 
@@ -218,15 +218,13 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
 //! \setter for the internal input buffers
 //! \param[in] input_buffers_value the new input buffers
-//! \return None this method does not return anything.
 void neuron_set_input_buffers(input_t *input_buffers_value) {
     input_buffers = input_buffers_value;
 }
 
 //! \executes all the updates to neural parameters when a given timer period
 //! has occurred.
-//! \param[in] time the timer tic  value currently being executed
-//! \return nothing
+//! \param[in] time the timer tick  value currently being executed
 void neuron_do_timestep_update(timer_t time) {
 
     // update each neuron individually
@@ -242,7 +240,7 @@ void neuron_do_timestep_update(timer_t time) {
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
         // If we should be recording potential, record this neuron parameter
-        voltages.states[neuron_index] = voltage;
+        voltages->states[neuron_index] = voltage;
 
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
@@ -264,8 +262,8 @@ void neuron_do_timestep_update(timer_t time) {
                 additional_input, voltage);
 
         // If we should be recording input, record the values
-        inputs.inputs[neuron_index].exc = exc_input_value;
-        inputs.inputs[neuron_index].inh = inh_input_value;
+        inputs->inputs[neuron_index].exc = exc_input_value;
+        inputs->inputs[neuron_index].inh = inh_input_value;
 
         // update neuron parameters
         state_t result = neuron_model_state_update(
@@ -304,15 +302,15 @@ void neuron_do_timestep_update(timer_t time) {
 
     // record neuron state (membrane potential) if needed
     if (recording_is_channel_enabled(recording_flags, V_RECORDING_CHANNEL)) {
-        voltages.time = time;
-        recording_record(V_RECORDING_CHANNEL, &voltages, voltages_size);
+        voltages->time = time;
+        recording_record(V_RECORDING_CHANNEL, voltages, voltages_size);
     }
 
     // record neuron inputs if needed
     if (recording_is_channel_enabled(
             recording_flags, GSYN_RECORDING_CHANNEL)) {
-        inputs.time = time;
-        recording_record(GSYN_RECORDING_CHANNEL, &inputs, input_size);
+        inputs->time = time;
+        recording_record(GSYN_RECORDING_CHANNEL, inputs, input_size);
     }
 
     // do logging stuff if required
