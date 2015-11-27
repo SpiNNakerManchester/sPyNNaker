@@ -101,7 +101,7 @@ static bool initialize(uint32_t *timer_period) {
 
     recording_initialize(
         n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, &recording_flags);
+        recording_flags_from_system_conf, state_region, 2, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
 
     // Set up the neurons
@@ -184,7 +184,9 @@ void timer_callback(uint timer_count, uint unused) {
     neuron_do_timestep_update(time);
 
     // trigger buffering_out_mechanism
-    recording_do_timestep_update(time);
+    if (recording_flags > 0) {
+        recording_do_timestep_update(time);
+    }
 }
 
 //! \brief The entry point for this model.

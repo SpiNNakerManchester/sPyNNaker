@@ -234,7 +234,7 @@ static bool initialize(uint32_t *timer_period) {
 
     recording_initialize(
         n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, &recording_flags);
+        recording_flags_from_system_conf, state_region, 2, &recording_flags);
 
     // Setup regions that specify spike source array data
     if (!read_poisson_parameters(
@@ -359,6 +359,10 @@ void timer_callback(uint timer_count, uint unused) {
         out_spikes_record(0, time);
     }
     out_spikes_reset();
+
+    if (recording_flags > 0) {
+        recording_do_timestep_update(time);
+    }
 }
 
 //! The entry point for this model
