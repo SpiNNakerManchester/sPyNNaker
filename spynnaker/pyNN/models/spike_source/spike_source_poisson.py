@@ -380,6 +380,8 @@ class SpikeSourcePoisson(
                 vertex_slice.n_atoms, self._no_machine_time_steps),
             self._spike_buffer_max_size))
         buffer_size_before_receive = self._buffer_size_before_receive
+        if spike_hist_buff_sz < self._spike_buffer_max_size:
+            buffer_size_before_receive = spike_hist_buff_sz
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 

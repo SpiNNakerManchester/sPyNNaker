@@ -270,6 +270,14 @@ class AbstractPopulationVertex(
             spec, vertex_slice,
             self._threshold_type.get_threshold_parameters())
 
+    def _get_recording_and_buffer_sizes(
+            self, buffer_max, space_needed, buffer_size_before_receive):
+        if space_needed == 0:
+            return 0, buffer_size_before_receive
+        if buffer_max < space_needed:
+            return buffer_max, buffer_size_before_receive
+        return space_needed, space_needed + 256
+
     # @implements AbstractDataSpecableVertex.generate_data_spec
     def generate_data_spec(
             self, subvertex, placement, subgraph, graph, routing_info,
@@ -285,17 +293,29 @@ class AbstractPopulationVertex(
             self.model_name))
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
-        # Get recording sizes
-        spike_history_sz = min((self._spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._no_machine_time_steps),
-            self._spike_buffer_max_size))
-        v_history_sz = min((self._v_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._no_machine_time_steps),
-            self._v_buffer_max_size))
-        gsyn_history_sz = min((self._gsyn_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._no_machine_time_steps),
-            self._gsyn_buffer_max_size))
-        buffer_size_before_receive = self._buffer_size_before_receive
+        # Get recording sizes - the order is important here as spikes will
+        # require less space than voltage and voltage less than gsyn.  This
+        # order ensures that the buffer size before receive is optimum for
+        # all recording channels
+        # TODO: Maybe split the buffer size before receive by channel?
+        spike_history_sz, buffer_size_before_receive = \
+            self._get_recording_and_buffer_sizes(
+                self._spike_buffer_max_size,
+                self._spike_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, self._no_machine_time_steps),
+                self._buffer_size_before_receive)
+        v_history_sz, buffer_size_before_receive = \
+            self._get_recording_and_buffer_sizes(
+                self._v_buffer_max_size,
+                self._v_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, self._no_machine_time_steps),
+                buffer_size_before_receive)
+        gsyn_history_sz, buffer_size_before_receive = \
+            self._get_recording_and_buffer_sizes(
+                self._gsyn_buffer_max_size,
+                self._gsyn_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, self._no_machine_time_steps),
+                buffer_size_before_receive)
 
         # Reserve memory regions
         self._reserve_memory_regions(
