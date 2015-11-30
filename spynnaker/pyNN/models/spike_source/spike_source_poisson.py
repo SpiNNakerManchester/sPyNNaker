@@ -375,13 +375,16 @@ class SpikeSourcePoisson(
 
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
-        spike_hist_buff_sz = min((
-            self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._no_machine_time_steps),
-            self._spike_buffer_max_size))
+        spike_hist_buff_sz = self._spike_recorder.get_sdram_usage_in_bytes(
+            vertex_slice.n_atoms, self._no_machine_time_steps)
         buffer_size_before_receive = self._buffer_size_before_receive
-        if spike_hist_buff_sz < self._spike_buffer_max_size:
-            buffer_size_before_receive = spike_hist_buff_sz
+        if config.getboolean("Buffers", "enable_buffered_recording"):
+            if spike_hist_buff_sz < self._spike_buffer_max_size:
+                buffer_size_before_receive = spike_hist_buff_sz + 256
+            else:
+                spike_hist_buff_sz = self._spike_buffer_max_size
+        else:
+            buffer_size_before_receive = spike_hist_buff_sz + 256
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 

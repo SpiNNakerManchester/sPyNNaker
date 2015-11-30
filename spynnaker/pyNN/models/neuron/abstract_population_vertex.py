@@ -114,6 +114,8 @@ class AbstractPopulationVertex(
             "Buffers", "receive_buffer_host")
         self._receive_buffer_port = config.getint(
             "Buffers", "receive_buffer_port")
+        self._enable_buffered_recording = config.getboolean(
+            "Buffers", "enable_buffered_recording")
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -277,6 +279,8 @@ class AbstractPopulationVertex(
     def _get_recording_and_buffer_sizes(self, buffer_max, space_needed):
         if space_needed == 0:
             return 0, False
+        if not self._enable_buffered_recording:
+            return space_needed, False
         if buffer_max < space_needed:
             return buffer_max, True
         return space_needed, False
