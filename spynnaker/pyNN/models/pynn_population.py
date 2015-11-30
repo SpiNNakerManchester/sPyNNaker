@@ -192,8 +192,6 @@ class Population(object):
                 timer = Timer()
                 timer.start_timing()
             spikes = self._vertex.get_spikes(
-                self._spinnaker.transceiver,
-                self._spinnaker.no_machine_time_steps,
                 self._spinnaker.placements,
                 self._spinnaker.graph_mapper)
             if conf.config.getboolean("Reports", "outputTimesForSections"):
@@ -242,7 +240,6 @@ class Population(object):
                 timer = Timer()
                 timer.start_timing()
             gsyn = self._vertex.get_gsyn(
-                self._spinnaker.transceiver,
                 self._spinnaker.no_machine_time_steps,
                 self._spinnaker.placements,
                 self._spinnaker.graph_mapper)
@@ -288,7 +285,6 @@ class Population(object):
                 timer = Timer()
                 timer.start_timing()
             v = self._vertex.get_v(
-                self._spinnaker.transceiver,
                 self._spinnaker.no_machine_time_steps,
                 self._spinnaker.placements,
                 self._spinnaker.graph_mapper)
@@ -748,3 +744,23 @@ class Population(object):
     @_internal_delay_vertex.setter
     def _internal_delay_vertex(self, delay_vertex):
         self._delay_vertex = delay_vertex
+
+    # NONE PYNN API CALL
+    def is_vertex_recording(self):
+        record_spikes = self._vertex.record
+        record_v = self._vertex.record_v
+        record_gsyn = self._vertex.record_gsyn
+        recording = record_spikes or record_v or record_gsyn
+        return recording
+
+    # NONE PYNN API CALL
+    def is_vertex_recording_spikes(self):
+        return self._vertex.record
+
+    # NONE PYNN API CALL
+    def is_vertex_recording_v(self):
+        return self._vertex.record_v
+
+    # NONE PYNN API CALL
+    def is_vertex_recording_gsyn(self):
+        return self._vertex.record_gsyn
