@@ -71,7 +71,8 @@ class AbstractPopulationVertex(
             spike_buffer_max_size=constants.SPIKE_BUFFER_SIZE_BUFFERING_OUT,
             v_buffer_max_size=constants.V_BUFFER_SIZE_BUFFERING_OUT,
             gsyn_buffer_max_size=constants.GSYN_BUFFER_SIZE_BUFFERING_OUT,
-            buffer_size_before_receive=constants.BUFFER_SIZE_BEFORE_RECEIVE):
+            buffer_size_before_receive=constants.BUFFER_SIZE_BEFORE_RECEIVE,
+            time_between_requests=0):
 
         AbstractPartitionableVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
@@ -101,6 +102,7 @@ class AbstractPopulationVertex(
         self._v_buffer_max_size = v_buffer_max_size
         self._gsyn_buffer_max_size = gsyn_buffer_max_size
         self._buffer_size_before_receive = buffer_size_before_receive
+        self._time_between_requests = time_between_requests
 
         # Set up synapse handling
         self._synapse_manager = SynapticManager(
@@ -210,7 +212,8 @@ class AbstractPopulationVertex(
 
     def _write_setup_info(
             self, spec, spike_history_region_sz, neuron_potential_region_sz,
-            gsyn_region_sz, ip_tags, buffer_size_before_receive):
+            gsyn_region_sz, ip_tags, buffer_size_before_receive,
+            time_between_requests):
         """ Write information used to control the simulation and gathering of\
             results.
         """
@@ -221,7 +224,8 @@ class AbstractPopulationVertex(
         self.write_recording_data(
             spec, ip_tags,
             [spike_history_region_sz, neuron_potential_region_sz,
-             gsyn_region_sz], buffer_size_before_receive)
+             gsyn_region_sz], buffer_size_before_receive,
+            time_between_requests)
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice):
@@ -270,13 +274,12 @@ class AbstractPopulationVertex(
             spec, vertex_slice,
             self._threshold_type.get_threshold_parameters())
 
-    def _get_recording_and_buffer_sizes(
-            self, buffer_max, space_needed, buffer_size_before_receive):
+    def _get_recording_and_buffer_sizes(self, buffer_max, space_needed):
         if space_needed == 0:
-            return 0, buffer_size_before_receive
+            return 0, False
         if buffer_max < space_needed:
-            return buffer_max, buffer_size_before_receive
-        return space_needed, space_needed + 256
+            return buffer_max, True
+        return space_needed, False
 
     # @implements AbstractDataSpecableVertex.generate_data_spec
     def generate_data_spec(
@@ -298,24 +301,26 @@ class AbstractPopulationVertex(
         # order ensures that the buffer size before receive is optimum for
         # all recording channels
         # TODO: Maybe split the buffer size before receive by channel?
-        spike_history_sz, buffer_size_before_receive = \
+        spike_history_sz, spike_buffering_needed = \
             self._get_recording_and_buffer_sizes(
                 self._spike_buffer_max_size,
                 self._spike_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps),
-                self._buffer_size_before_receive)
-        v_history_sz, buffer_size_before_receive = \
+                    vertex_slice.n_atoms, self._no_machine_time_steps))
+        v_history_sz, v_buffering_needed = \
             self._get_recording_and_buffer_sizes(
                 self._v_buffer_max_size,
                 self._v_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps),
-                buffer_size_before_receive)
-        gsyn_history_sz, buffer_size_before_receive = \
+                    vertex_slice.n_atoms, self._no_machine_time_steps))
+        gsyn_history_sz, gsyn_buffering_needed = \
             self._get_recording_and_buffer_sizes(
                 self._gsyn_buffer_max_size,
                 self._gsyn_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps),
-                buffer_size_before_receive)
+                    vertex_slice.n_atoms, self._no_machine_time_steps))
+        buffer_size_before_receive = self._buffer_size_before_receive
+        if (not spike_buffering_needed and not v_buffering_needed and
+                not gsyn_buffering_needed):
+            buffer_size_before_receive = max((
+                spike_history_sz, v_history_sz, gsyn_history_sz)) + 256
 
         # Reserve memory regions
         self._reserve_memory_regions(
@@ -340,7 +345,7 @@ class AbstractPopulationVertex(
         # Write the regions
         self._write_setup_info(
             spec, spike_history_sz, v_history_sz, gsyn_history_sz, ip_tags,
-            buffer_size_before_receive)
+            buffer_size_before_receive, self._time_between_requests)
         self._write_neuron_parameters(spec, key, vertex_slice)
 
         # allow the synaptic matrix to write its data specable data
