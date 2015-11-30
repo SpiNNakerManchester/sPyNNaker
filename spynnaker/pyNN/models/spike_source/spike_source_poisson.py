@@ -62,9 +62,7 @@ class SpikeSourcePoisson(
     def __init__(
             self, n_neurons, machine_time_step, timescale_factor,
             constraints=None, label="SpikeSourcePoisson", rate=1.0, start=0.0,
-            duration=None, seed=None,
-            spike_buffer_max_size=constants.SPIKE_BUFFER_SIZE_BUFFERING_OUT,
-            buffer_size_before_receive=constants.BUFFER_SIZE_BEFORE_RECEIVE):
+            duration=None, seed=None):
         """
         Creates a new SpikeSourcePoisson Object.
         """
@@ -85,8 +83,12 @@ class SpikeSourcePoisson(
 
         # Prepare for recording, and to get spikes
         self._spike_recorder = SpikeRecorder(machine_time_step)
-        self._spike_buffer_max_size = spike_buffer_max_size
-        self._buffer_size_before_receive = buffer_size_before_receive
+        self._spike_buffer_max_size = config.getint(
+            "Buffers", "spike_buffer_size")
+        self._buffer_size_before_receive = config.getint(
+            "Buffers", "buffer_size_before_receive")
+        self._time_between_requests = config.getint(
+            "Buffers", "time_between_requests")
 
     @property
     def rate(self):
@@ -187,7 +189,7 @@ class SpikeSourcePoisson(
             spec, self._POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         self.write_recording_data(
             spec, ip_tags, [spike_history_region_sz],
-            buffer_size_before_receive)
+            buffer_size_before_receive, self._time_between_requests)
 
     def _write_poisson_parameters(self, spec, key, num_neurons):
         """

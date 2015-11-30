@@ -67,12 +67,7 @@ class AbstractPopulationVertex(
             machine_time_step, timescale_factor, spikes_per_second,
             ring_buffer_sigma, model_name, neuron_model, input_type,
             synapse_type, threshold_type, additional_input=None,
-            constraints=None,
-            spike_buffer_max_size=constants.SPIKE_BUFFER_SIZE_BUFFERING_OUT,
-            v_buffer_max_size=constants.V_BUFFER_SIZE_BUFFERING_OUT,
-            gsyn_buffer_max_size=constants.GSYN_BUFFER_SIZE_BUFFERING_OUT,
-            buffer_size_before_receive=constants.BUFFER_SIZE_BEFORE_RECEIVE,
-            time_between_requests=0):
+            constraints=None):
 
         AbstractPartitionableVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
@@ -98,11 +93,16 @@ class AbstractPopulationVertex(
         self._spike_recorder = SpikeRecorder(machine_time_step)
         self._v_recorder = VRecorder(machine_time_step)
         self._gsyn_recorder = GsynRecorder(machine_time_step)
-        self._spike_buffer_max_size = spike_buffer_max_size
-        self._v_buffer_max_size = v_buffer_max_size
-        self._gsyn_buffer_max_size = gsyn_buffer_max_size
-        self._buffer_size_before_receive = buffer_size_before_receive
-        self._time_between_requests = time_between_requests
+        self._spike_buffer_max_size = config.getint(
+            "Buffers", "spike_buffer_size")
+        self._v_buffer_max_size = config.getint(
+            "Buffers", "v_buffer_size")
+        self._gsyn_buffer_max_size = config.getint(
+            "Buffers", "gsyn_buffer_size")
+        self._buffer_size_before_receive = config.getint(
+            "Buffers", "buffer_size_before_receive")
+        self._time_between_requests = config.getint(
+            "Buffers", "time_between_requests")
 
         # Set up synapse handling
         self._synapse_manager = SynapticManager(

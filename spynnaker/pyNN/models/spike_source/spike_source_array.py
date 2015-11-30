@@ -31,7 +31,7 @@ class SpikeSourceArray(ReverseIpTagMultiCastSource, AbstractSpikeRecordable):
             self, n_neurons, spike_times, machine_time_step, timescale_factor,
             port=None, tag=None, ip_address=None, board_address=None,
             max_on_chip_memory_usage_for_spikes_in_bytes=(
-                constants.SPIKE_BUFFER_SIZE_BUFFERING_OUT),
+                constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
             space_before_notification=640,
             constraints=None, label="SpikeSourceArray",
             spike_recorder_buffer_size=(
