@@ -28,7 +28,7 @@ class SpynnakerDataSpecificationWriter(
 
         # create a progress bar for end users
         progress_bar = ProgressBar(len(list(placements.placements)),
-                                   "Generating data specifications")
+                                   "Generating sPyNNaker data specifications")
         for placement in placements.placements:
             associated_vertex = graph_mapper.get_vertex_from_subvertex(
                 placement.subvertex)
