@@ -5,9 +5,6 @@ import math
 from spynnaker.pyNN.utilities import constants
 
 from spinn_front_end_common.abstract_models.\
-    abstract_outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
     AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.abstract_models\
@@ -27,10 +24,12 @@ from pacman.model.constraints.key_allocator_constraints.\
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
-
 
 logger = logging.getLogger(__name__)
 
@@ -72,8 +71,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         self._source_vertex = source_vertex
         self._n_delay_stages = 0
         self._delay_per_stage = delay_per_stage
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
 
         # Dictionary of vertex_slice -> delay block for data specification
         self._delay_blocks = dict()
@@ -169,6 +166,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         spec.end_specification()
         data_writer.close()
 
+        return [data_writer.filename]
+
     def write_setup_info(self, spec, spike_history_region_sz):
         """
         """
@@ -239,9 +238,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
         """
         gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param partitioned_edge: the partitioned edge that leaves this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor\
-            .get_outgoing_edge_constraints(partitioned_edge, graph_mapper)
+        return [KeyAllocatorContiguousRangeContraint()]

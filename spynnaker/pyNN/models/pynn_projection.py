@@ -31,6 +31,7 @@ import math
 import numpy
 
 logger = logging.getLogger(__name__)
+EDGE_PARTITION_ID = "SPIKE"
 
 
 # noinspection PyProtectedMember
@@ -48,9 +49,6 @@ class Projection(object):
             connector, spinnaker_control, machine_time_step, user_max_delay,
             timescale_factor, source=None, target='excitatory',
             synapse_dynamics=None, rng=None):
-        """
-        Instantiates a :py:object:`Projection`.
-        """
         self._spinnaker = spinnaker_control
         self._projection_edge = None
         self._host_based_synapse_list = None
@@ -60,7 +58,7 @@ class Projection(object):
                           AbstractPopulationVertex):
 
             raise exceptions.ConfigurationException(
-                "postsynaptic_population is not a supposed receiver of"
+                "postsynaptic population is not designed to receive"
                 " synaptic projections")
 
         synapse_type = postsynaptic_population._get_vertex\
@@ -104,7 +102,7 @@ class Projection(object):
                         " for which the projection breaks")
 
         # check that the projection edges label is not none, and give an
-        # auto-generated label if set to None
+        # auto generated label if set to None
         if label is None:
             label = "projection edge {}".format(Projection._projection_count)
             Projection._projection_count += 1
@@ -127,7 +125,8 @@ class Projection(object):
                 self._synapse_information, label=label)
 
             # add edge to the graph
-            spinnaker_control.add_edge(self._projection_edge)
+            spinnaker_control.add_edge(
+                self._projection_edge, EDGE_PARTITION_ID)
 
         # If the delay exceeds the post vertex delay, add a delay extension
         if max_delay > post_vertex_max_supported_delay_ms:
@@ -141,14 +140,14 @@ class Projection(object):
         """ searches though the partitionable graph's edges to locate any
         edge which has the same post and pre vertex
 
-        :param presynaptic_vertex: the source partitionable vertex of the
-        multapse
-        :type presynaptic_vertex: instance of
-        pacman.model.partitionable_graph.abstract_partitionable_vertex
-        :param postsynaptic_vertex: The destination partitionable vertex of
-        the multapse
-        :type postsynaptic_vertex: instance of
-        pacman.model.partitionable_graph.abstract_partitionable_vertex
+        :param presynaptic_vertex: the source partitionable vertex of the\
+                multapse
+        :type presynaptic_vertex: instance of\
+                pacman.model.partitionable_graph.abstract_partitionable_vertex
+        :param postsynaptic_vertex: The destination partitionable vertex of\
+                the multapse
+        :type postsynaptic_vertex: instance of\
+                pacman.model.partitionable_graph.abstract_partitionable_vertex
         :return: None or the edge going to these vertices.
         """
         graph_edges = self._spinnaker.partitionable_graph.edges
@@ -187,7 +186,7 @@ class Projection(object):
             delay_afferent_edge = DelayAfferentPartitionableEdge(
                 pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
                     pre_vertex.label))
-            self._spinnaker.add_edge(delay_afferent_edge)
+            self._spinnaker.add_edge(delay_afferent_edge, EDGE_PARTITION_ID)
 
         # Ensure that the delay extension knows how many states it will support
         num_stages = int(math.floor(float(max_delay_for_projection - 1) /
@@ -202,15 +201,15 @@ class Projection(object):
             delay_edge = MultiCastPartitionableEdge(
                 delay_vertex, post_vertex, label="{}_delayed_to_{}".format(
                     pre_vertex.label, post_vertex.label))
-            self._spinnaker.add_edge(delay_edge)
+            self._spinnaker.add_edge(delay_edge, EDGE_PARTITION_ID)
         return delay_edge
 
     def describe(self, template='projection_default.txt', engine='default'):
         """
         Returns a human-readable description of the projection.
 
-        The output may be customized by specifying a different template
-        togther with an associated template engine (see ``pyNN.descriptions``).
+        The output may be customised by specifying a different template
+        together with an associated template engine (see ``pyNN.descriptions``)
 
         If template is None, then a dictionary containing the template context
         will be returned.
@@ -224,7 +223,7 @@ class Projection(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getDelays(self, format='list', gather=True):
+    def getDelays(self, format='list', gather=True):  # @ReservedAssignment
         """
         Get synaptic delays for all connections in this Projection.
 
@@ -269,18 +268,18 @@ class Projection(object):
         """
         Get parameters of the dynamic synapses for all connections in this
         Projection.
-        :param parameter_name: ????????
-        :param list_format: ?????????
-        :param gather: ??????????
+        :param parameter_name:
+        :param list_format:
+        :param gather:
         """
         # TODO: Need to work out what is to be returned
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getWeights(self, format='list', gather=True):
+    def getWeights(self, format='list', gather=True):  # @ReservedAssignment
         """
         Get synaptic weights for all connections in this Projection.
-        (pyNN gather parameter not supported from the signiture
+        (pyNN gather parameter not supported from the signature
         getWeights(self, format='list', gather=True):)
 
         Possible formats are: a list of length equal to the number of
@@ -289,8 +288,8 @@ class Projection(object):
         more than connection between two cells, the summed weight will be
         given.
         :param format: the type of format to be returned (only support "list")
-        :param gather: gather the weights from stuff. currently has no meaning
-        in spinnaker when set to false. Therefore is always true
+        :param gather: gather the weights from stuff. currently has no meaning\
+                in spinnaker when set to false. Therefore is always true
         """
         if not gather:
             exceptions.ConfigurationException(
@@ -307,8 +306,13 @@ class Projection(object):
                 weights.extend(row.weights / self._weight_scale)
             return weights
 
-        weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
-                               self._projection_edge.post_vertex.n_atoms))
+        weights = None
+        if self._projection_edge is not None:
+            weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
+                                   self._projection_edge.post_vertex.n_atoms))
+        else:
+            weights = numpy.empty((self._delay_edge.pre_vertex.n_atoms,
+                                   self._delay_edge.post_vertex.n_atoms))
         weights.fill(numpy.nan)
         rows = self._host_based_synapse_list.get_rows()
         for pre_atom in range(len(rows)):
@@ -320,7 +324,8 @@ class Projection(object):
         return weights
 
     def __len__(self):
-        """Return the total number of local connections."""
+        """ Return the total number of local connections.
+        """
 
         # TODO: Need to work out what this means
         raise NotImplementedError
@@ -364,12 +369,12 @@ class Projection(object):
         """
         Set parameters of the synapse dynamics to values taken from rand_distr
         """
-        # TODO: Look at what this is randomizing
+        # TODO: Look at what this is randomising
         raise NotImplementedError
 
     def __repr__(self):
         """
-        returns a string rep of the projection
+        returns a string representation of the projection
         """
         return "projection {}".format(self._projection_edge.label)
 

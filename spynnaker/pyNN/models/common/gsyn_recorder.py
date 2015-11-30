@@ -1,9 +1,12 @@
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 from spynnaker.pyNN.models.common import recording_utils
 
 import numpy
-import tempfile
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class GsynRecorder(object):
@@ -20,8 +23,7 @@ class GsynRecorder(object):
     def record_gsyn(self, record_gsyn):
         self._record_gsyn = record_gsyn
 
-    def get_sdram_usage_in_bytes(
-            self, n_neurons, n_machine_time_steps):
+    def get_sdram_usage_in_bytes(self, n_neurons, n_machine_time_steps):
         if not self._record_gsyn:
             return 0
 
@@ -38,7 +40,7 @@ class GsynRecorder(object):
             return 0
         return n_neurons * 8
 
-    def get_gsyn(self, label, n_atoms, transceiver, region,
+    def get_gsyn(self, label, n_atoms, buffer_manager, region, state_region,
                  n_machine_time_steps, placements, graph_mapper,
                  partitionable_vertex):
 
@@ -47,16 +49,8 @@ class GsynRecorder(object):
         subvertices = \
             graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
 
-        tempfilehandle = tempfile.NamedTemporaryFile()
-        data = numpy.memmap(
-            tempfilehandle.file, shape=(n_machine_time_steps, n_atoms),
-            dtype="float64,float64,float64,float64")
-        data["f0"] = (numpy.arange(
-            n_atoms * n_machine_time_steps) % n_atoms).reshape(
-                (n_machine_time_steps, n_atoms))
-        data["f1"] = numpy.repeat(numpy.arange(
-            0, n_machine_time_steps * ms_per_tick, ms_per_tick),
-            n_atoms).reshape((n_machine_time_steps, n_atoms))
+        data = list()
+        missing_str = ""
 
         progress_bar = ProgressBar(
             len(subvertices), "Getting conductance for {}".format(label))
@@ -65,29 +59,42 @@ class GsynRecorder(object):
             vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
             placement = placements.get_placement_of_subvertex(subvertex)
 
-            region_size = recording_utils.get_recording_region_size_in_bytes(
-                n_machine_time_steps, 8 * vertex_slice.n_atoms)
-            neuron_param_region_data = recording_utils.get_data(
-                transceiver, placement, region, region_size)
+            x = placement.x
+            y = placement.y
+            p = placement.p
 
-            numpy_data = (numpy.asarray(
-                neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
-                32767.0).reshape(
-                    (n_machine_time_steps, vertex_slice.n_atoms * 2))
-            data["f2"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
-                numpy_data[:, 0::2]
-            data["f3"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
-                numpy_data[:, 1::2]
+            # for buffering output info is taken form the buffer manager
+            neuron_param_region_data_pointer, data_missing =\
+                buffer_manager.get_data_for_vertex(
+                    x, y, p, region, state_region)
+            if data_missing:
+                missing_str += "({}, {}, {}); ".format(x, y, p)
+            record_raw = neuron_param_region_data_pointer.read_all()
+            record = (numpy.asarray(record_raw, dtype="uint8").
+                      view(dtype="<i4")).reshape(
+                (-1, ((vertex_slice.n_atoms * 2) + 1)))
+            split_record = numpy.array_split(record, [1, 1], 1)
+            record_time = numpy.repeat(
+                split_record[0] * float(ms_per_tick),
+                vertex_slice.n_atoms, 1)
+            record_ids = numpy.tile(
+                numpy.arange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1),
+                len(record_time)).reshape((-1, vertex_slice.n_atoms))
+            record_gsyn = (split_record[2] / 32767.0).reshape(
+                [-1, vertex_slice.n_atoms, 2])
+
+            part_data = numpy.dstack([record_ids, record_time, record_gsyn])
+            part_data = numpy.reshape(part_data, [-1, 4])
+            data.append(part_data)
             progress_bar.update()
 
         progress_bar.end()
-        data.shape = n_atoms * n_machine_time_steps
-
-        # Sort the data - apparently, using lexsort is faster, but it might
-        # consume more memory, so the option is left open for sort-in-place
-        order = numpy.lexsort((data["f1"], data["f0"]))
-        # data.sort(order=['f0', 'f1'], axis=0)
-
-        result = data.view(dtype="float64").reshape(
-            (n_atoms * n_machine_time_steps, 4))[order]
+        if len(missing_str) > 0:
+            logger.warn(
+                "Population {} is missing conductance data in region {}"
+                " from the following cores: {}".format(
+                    label, region, missing_str))
+        data = numpy.vstack(data)
+        order = numpy.lexsort((data[:, 1], data[:, 0]))
+        result = data[order]
         return result

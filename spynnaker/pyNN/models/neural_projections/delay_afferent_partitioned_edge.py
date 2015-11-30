@@ -15,7 +15,7 @@ class DelayAfferentPartitionedEdge(MultiCastPartitionedEdge,
             self, presubvertex, postsubvertex, constraints=constraints)
         AbstractFilterableEdge.__init__(self)
 
-    def filter_sub_edge(self, graph_mapper, common_report_folder):
+    def filter_sub_edge(self, graph_mapper):
         """
         Filters a subedge of this edge if the edge is not a one-to-one edge
         """

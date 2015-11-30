@@ -1,6 +1,3 @@
-"""
-Utilities for accessing the location of memory regions on the board
-"""
 from enum import Enum
 from spinn_front_end_common.utilities.constants import \
     DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS
@@ -24,10 +21,14 @@ OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * 4  # The number of bytes for each spike line
 V_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
 GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 8
 
+SPIKE_BUFFER_SIZE_BUFFERING_IN = 1 * 1024 * 1024
+EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT = 1 * 1024 * 1024
+EIEIO_BUFFER_SIZE_BEFORE_RECEIVE = 512 * 1024
+
 INFINITE_SIMULATION = 4294967295
 
 # from synaptic manager
-# Words - 2 for row lenth and number of rows and 1 for plastic region size
+# Words - 2 for row length and number of rows and 1 for plastic region size
 # (which might be 0)
 SYNAPTIC_ROW_HEADER_WORDS = 2 + 1
 
@@ -42,31 +43,8 @@ MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 
-# the miniumum supported delay slot between two neurons
+# the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
-
-# debug filter positions
-# multicast packets which are sent from a local chip where the local router has
-# router entry for it (this is default routed to the monitor core which
-# currently drops the packet).
-MON_CORE_DEFAULT_RTD_PACKETS_FILTER_POSITION = 12
-
-# please see SpiNNFrontEndCommon/spinn_front_end_common/utilities/constants.py
-# for other core application ids.
-SPIKE_INJECTOR_CORE_APPLICATION_ID = 0xAC9
-
-# master population table magic
-MASTER_POP_2DARRAY_MAGIC_NUMBER = 0xBB1
-MASTER_POP_BINARY_SEARCH = 0xBB2
-
-EDGES = Enum(
-    value="EDGES",
-    names=[("EAST", 0),
-           ("NORTH_EAST", 1),
-           ("NORTH", 2),
-           ("WEST", 3),
-           ("SOUTH_WEST", 4),
-           ("SOUTH", 5)])
 
 # Regions for populations
 POPULATION_BASED_REGIONS = Enum(
@@ -79,18 +57,5 @@ POPULATION_BASED_REGIONS = Enum(
            ('SYNAPSE_DYNAMICS', 5),
            ('SPIKE_HISTORY', 6),
            ('POTENTIAL_HISTORY', 7),
-           ('GSYN_HISTORY', 8)])
-
-# The number of recording regions available for a population
-N_POPULATION_RECORDING_REGIONS = 3
-
-# The size of the system region (+1 for flags) for a population
-POPULATION_SYSTEM_REGION_BYTES = (DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS +
-                                  N_POPULATION_RECORDING_REGIONS + 1) * 4
-
-# The size of the headers of a population neuron region
-# (1 word each for has_key, key, n_neurons, n_params, ODE timestep)
-POPULATION_NEURON_PARAMS_HEADER_BYTES = 20
-
-# The default routing mask to use
-DEFAULT_MASK = 0xfffff800
+           ('GSYN_HISTORY', 8),
+           ('BUFFERING_OUT_STATE', 9)])

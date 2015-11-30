@@ -16,15 +16,15 @@ max_delay = 50
 
 
 cell_params_lif = {'cm'        : 0.25, # nF
-                     'i_offset'  : 0.0,
-                     'tau_m'     : 20.0,
-                     'tau_refrac': 2.0,
-                     'tau_syn_E' : 5.0,
-                     'tau_syn_I' : 5.0,
-                     'v_reset'   : -70.0,
-                     'v_rest'    : -65.0,
-                     'v_thresh'  : -50.0
-                     }
+                   'i_offset'  : 0.0,
+                   'tau_m'     : 20.0,
+                   'tau_refrac': 2.0,
+                   'tau_syn_E' : 5.0,
+                   'tau_syn_I' : 5.0,
+                   'v_reset'   : -70.0,
+                   'v_rest'    : -65.0,
+                   'v_thresh'  : -50.0
+                   }
 
 populations = list()
 projections = list()
@@ -40,26 +40,33 @@ for i in range(0, nNeurons):
     loopConnections.append(singleConnection)
 
 injectionConnection = [(0, 0, weight_to_spike, 1)]
-# spikeArray = {'spike_times': [[0]]}
-i = [a*100 for a in xrange(30)]
-spikeArray = {'spike_times': [i for _ in xrange(10)],
-              'max_on_chip_memory_usage_for_spikes_in_bytes': 100}
+spikeArray = {'spike_times': [[0]]}
+spikeArrayNull = {'spike_times': [[]]}
+#i = [a*100 for a in xrange(30)]
+#spikeArray = {'spike_times': [i for _ in xrange(10)],
+#              'max_on_chip_memory_usage_for_spikes_in_bytes': 100}
 
 populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
 
-populations.append(p.Population(10, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
+populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
+populations.append(p.Population(1, p.SpikeSourceArray, spikeArrayNull, label='inputSpikes_2'))
+#populations.append(p.Population(10, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
 #populations[0].set_mapping_constraint({"x": 1, "y": 0})
 
 projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(loopConnections)))
 projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
+projections.append(p.Projection(populations[2], populations[0], p.FromListConnector(injectionConnection)))
 
 populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record()
+populations[2].record()
 
 run_time = 10000
 print "Running for {} ms".format(run_time)
 p.run(run_time)
+
+null_spikes = populations[2].getSpikes(compatible_output=True)
 
 v = None
 gsyn = None
@@ -73,7 +80,7 @@ gsyn = populations[0].get_gsyn(compatible_output=True)
 spikes = populations[0].getSpikes(compatible_output=True)
 
 if spikes is not None:
-   print spikes
+   #print spikes
    pylab.figure()
    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
    pylab.xlabel('neuron id')
@@ -94,7 +101,7 @@ if v != None:
    for pos in range(0, nNeurons, 20):
        v_for_neuron = v[pos * ticks : (pos + 1) * ticks]
        pylab.plot([i[1] for i in v_for_neuron],
-               [i[2] for i in v_for_neuron])
+                  [i[2] for i in v_for_neuron])
    pylab.show()
 
 if gsyn != None:
@@ -105,7 +112,7 @@ if gsyn != None:
    for pos in range(0, nNeurons, 20):
        gsyn_for_neuron = gsyn[pos * ticks : (pos + 1) * ticks]
        pylab.plot([i[1] for i in gsyn_for_neuron],
-               [i[2] for i in gsyn_for_neuron])
+                  [i[2] for i in gsyn_for_neuron])
    pylab.show()
 
 p.end()
