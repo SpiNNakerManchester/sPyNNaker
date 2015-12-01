@@ -353,10 +353,11 @@ class SynapticManager(object):
 
     def _get_ring_buffer_to_input_left_shifts(
             self, subvertex, sub_graph, graph_mapper, post_vertex_slice,
-            machine_timestep):
+            machine_timestep, weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
         """
+        weight_scale_squared = weight_scale * weight_scale
         n_synapse_types = self._synapse_type.get_n_synapse_types()
         running_totals = [RunningStats()] * n_synapse_types
         total_weights = numpy.zeros(n_synapse_types)
@@ -373,18 +374,21 @@ class SynapticManager(object):
                     synapse_type = synapse_info.synapse_type
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
-                    weight_mean = synapse_dynamics.get_weight_mean(
-                        connector, pre_vertex_slice, post_vertex_slice)
+                    weight_mean = (synapse_dynamics.get_weight_mean(
+                        connector, pre_vertex_slice, post_vertex_slice) *
+                        weight_scale)
                     n_connections = \
                         connector.get_n_connections_to_post_vertex_maximum(
                             pre_vertex_slice, post_vertex_slice)
-                    weight_variance = synapse_dynamics.get_weight_variance(
-                        connector, pre_vertex_slice, post_vertex_slice)
+                    weight_variance = (synapse_dynamics.get_weight_variance(
+                        connector, pre_vertex_slice, post_vertex_slice) *
+                        weight_scale_squared)
                     running_totals[synapse_type].add_items(
                         weight_mean, weight_variance, n_connections)
 
-                    weight_max = synapse_dynamics.get_weight_maximum(
-                        connector, pre_vertex_slice, post_vertex_slice)
+                    weight_max = (synapse_dynamics.get_weight_maximum(
+                        connector, pre_vertex_slice, post_vertex_slice) *
+                        weight_scale)
                     biggest_weight[synapse_type] = max(
                         biggest_weight[synapse_type], weight_max)
                     total_weights[synapse_type] += (
@@ -432,12 +436,14 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_synapse_parameters(
-            self, spec, subvertex, subgraph, graph_mapper, vertex_slice):
+            self, spec, subvertex, subgraph, graph_mapper, vertex_slice,
+            input_type):
 
         # Get the ring buffer shifts and scaling factors
+        weight_scale = input_type.get_global_weight_scale()
         ring_buffer_shifts = self._get_ring_buffer_to_input_left_shifts(
             subvertex, subgraph, graph_mapper, vertex_slice,
-            self._machine_time_step)
+            self._machine_time_step, weight_scale)
 
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
@@ -447,7 +453,10 @@ class SynapticManager(object):
 
         spec.write_array(ring_buffer_shifts)
 
-        return ring_buffer_shifts
+        weight_scales = [
+            self._get_weight_scale(r) * weight_scale
+            for r in ring_buffer_shifts]
+        return weight_scales
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_addr):
@@ -555,7 +564,7 @@ class SynapticManager(object):
 
     def write_data_spec(
             self, spec, vertex, vertex_slice, subvertex, placement, subgraph,
-            graph, routing_info, hostname, graph_mapper):
+            graph, routing_info, hostname, graph_mapper, input_type):
 
         # Create an index of delay keys into this subvertex
         delay_key_index = dict()
@@ -582,9 +591,8 @@ class SynapticManager(object):
         self._reserve_memory_regions(
             spec, vertex, vertex_slice, graph, all_syn_block_sz)
 
-        ring_buffer_shifts = self._write_synapse_parameters(
-            spec, subvertex, subgraph, graph_mapper, vertex_slice)
-        weight_scales = [self._get_weight_scale(r) for r in ring_buffer_shifts]
+        weight_scales = self._write_synapse_parameters(
+            spec, subvertex, subgraph, graph_mapper, vertex_slice, input_type)
 
         self._write_synaptic_matrix_and_master_population_table(
             spec, n_slices, slice_index, subvertex, vertex_slice,

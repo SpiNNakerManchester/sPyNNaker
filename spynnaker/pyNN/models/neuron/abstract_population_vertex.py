@@ -370,7 +370,7 @@ class AbstractPopulationVertex(
         # allow the synaptic matrix to write its data specable data
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, subvertex, placement, subgraph, graph,
-            routing_info, hostname, graph_mapper)
+            routing_info, hostname, graph_mapper, self._input_type)
 
         # End the writing of this specification:
         spec.end_specification()
