@@ -1195,7 +1195,7 @@ class Spinnaker(object):
             # clear values
             self._no_sync_changes = 0
 
-            # app stop command (currently fucked)
+            # app stop command
             self._txrx.stop_application(self._app_id)
 
             if self._create_database:
