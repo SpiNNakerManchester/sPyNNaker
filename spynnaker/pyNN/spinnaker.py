@@ -10,9 +10,6 @@ from pacman.operations import algorithm_reports as pacman_algorithm_reports
 from spinn_front_end_common.interface.\
     abstract_resetable_for_run_interface import \
     AbstractResetableForRunInterface
-from spinn_front_end_common.interface.interface_functions.\
-    front_end_common_application_exiter import \
-    FrontEndCommonApplicationExiter
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities.report_states import ReportState
 from spinn_front_end_common.utility_models.command_sender import CommandSender
@@ -286,9 +283,7 @@ class Spinnaker(object):
         # if the application graph has changed and youve already ran, kill old
         # stuff running on machine
         if application_graph_changed and self._has_ran:
-            exiter = FrontEndCommonApplicationExiter()
-            exiter(self._app_id, self._txrx, self._executable_targets,
-                   self._no_sync_changes)
+            self._txrx.stop_application(self._app_id)
 
         # get outputs
         required_outputs = \
@@ -1187,10 +1182,6 @@ class Spinnaker(object):
                                                      router_table.y).virtual:
                         self._txrx.clear_multicast_routes(router_table.x,
                                                           router_table.y)
-            # stop the binaries that are in some state
-            exiter = FrontEndCommonApplicationExiter()
-            exiter(self._app_id, self._txrx, self._executable_targets,
-                   self._no_sync_changes)
 
             # clear values
             self._no_sync_changes = 0
