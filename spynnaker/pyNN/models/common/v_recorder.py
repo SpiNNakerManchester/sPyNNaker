@@ -96,16 +96,21 @@ class VRecorder(object):
                     recording_utils.get_recording_region_size_in_bytes(
                         to_extract_n_machine_time_steps,
                         4 * vertex_slice.n_atoms)
-                neuron_param_region_data = recording_utils.get_data(
-                    transceiver, placement, region, region_size)
-
-                numpy_data = (numpy.asarray(
+                neuron_param_region_data, size_of_data = \
+                    recording_utils.get_data(
+                        transceiver, placement, region, region_size)
+                numpy_data = numpy.asarray(
                     neuron_param_region_data, dtype="uint8").view(
-                        dtype="<i4") /
-                    32767.0).reshape((to_extract_n_machine_time_steps,
-                                      vertex_slice.n_atoms))
-                data["f2"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
-                    numpy_data
+                        dtype="<i4") / 32767.0
+                # if theres data, reshape it, otherwise just leave it empty
+                if size_of_data != 0:
+                    numpy_data =  numpy_data.reshape(
+                         (to_extract_n_machine_time_steps,
+                          vertex_slice.n_atoms))
+
+                    data["f2"][:, vertex_slice.lo_atom:
+                                  vertex_slice.hi_atom + 1] = numpy_data
+
                 progress_bar.update()
 
             progress_bar.end()

@@ -48,7 +48,8 @@ def get_data(transceiver, placement, region, region_size):
                 expected_size, number_of_bytes_written))
 
     return transceiver.read_memory(
-        x, y, region_base_address + 4, number_of_bytes_written)
+        x, y, region_base_address + 4, number_of_bytes_written), \
+           number_of_bytes_written
 
 
 def pull_off_cached_lists(no_loads, cache_file):

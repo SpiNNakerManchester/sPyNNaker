@@ -67,10 +67,8 @@ class EIEIOSpikeRecorder(object):
                 subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
                 # Read the spikes
-                spike_data = recording_utils.get_data(
+                spike_data, number_of_bytes_written = recording_utils.get_data(
                     transceiver, placement, region, subvertex.region_size)
-
-                number_of_bytes_written = len(spike_data)
 
                 offset = 0
                 while offset < number_of_bytes_written:

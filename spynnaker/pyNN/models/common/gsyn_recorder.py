@@ -93,18 +93,25 @@ class GsynRecorder(object):
                     recording_utils.get_recording_region_size_in_bytes(
                         to_extract_n_machine_time_steps,
                         8 * vertex_slice.n_atoms)
-                neuron_param_region_data = recording_utils.get_data(
-                    transceiver, placement, region, region_size)
+                neuron_param_region_data, number_of_bytes_written = \
+                    recording_utils.get_data(
+                        transceiver, placement, region, region_size)
 
                 numpy_data = (numpy.asarray(
-                    neuron_param_region_data, dtype="uint8").view(dtype="<i4") /
-                    32767.0).reshape(
+                    neuron_param_region_data,
+                    dtype="uint8").view(dtype="<i4") / 32767.0)
+
+                if number_of_bytes_written > 0:
+                    numpy_data = numpy_data.reshape(
                         (to_extract_n_machine_time_steps,
                          vertex_slice.n_atoms * 2))
-                data["f2"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
-                    numpy_data[:, 0::2]
-                data["f3"][:, vertex_slice.lo_atom:vertex_slice.hi_atom + 1] =\
-                    numpy_data[:, 1::2]
+
+                    data["f2"][:, vertex_slice.lo_atom:
+                                  vertex_slice.hi_atom + 1] =\
+                        numpy_data[:, 0::2]
+                    data["f3"][:, vertex_slice.lo_atom:
+                                vertex_slice.hi_atom + 1] =\
+                        numpy_data[:, 1::2]
                 progress_bar.update()
 
             progress_bar.end()

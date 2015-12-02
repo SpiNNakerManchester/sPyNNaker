@@ -85,7 +85,7 @@ class SpikeRecorder(object):
                 region_size = \
                     recording_utils.get_recording_region_size_in_bytes(
                         to_extract_n_machine_time_steps, n_bytes)
-                spike_data = recording_utils.get_data(
+                spike_data, number_bytes_written = recording_utils.get_data(
                     transceiver, placement, region, region_size)
                 numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
                     dtype="uint32").byteswap().view("uint8")
