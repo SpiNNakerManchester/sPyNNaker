@@ -49,11 +49,10 @@ class SynapseIORowBased(AbstractSynapseIO):
                     post_slice_index, pre_vertex_slice, post_vertex_slice,
                     max_delay_supported + 1, max_delay)
 
-            bytes_per_item = synapse_info.synapse_dynamics\
-                .get_n_bytes_per_connection()
-
-            undelayed_max_bytes += bytes_per_item * max_undelayed_row_length
-            delayed_max_bytes += bytes_per_item * max_delayed_row_length
+            undelayed_max_bytes += synapse_info.get_n_bytes_for_connections(
+                max_undelayed_row_length)
+            delayed_max_bytes += synapse_info.get_n_bytes_for_connections(
+                max_delayed_row_length)
 
         # Adjust for the allowed row lengths from the population table
         undelayed_max_bytes = population_table.get_allowed_row_length(

@@ -32,8 +32,8 @@ class AbstractSynapseDynamics(object):
         """
 
     @abstractmethod
-    def get_n_bytes_per_connection(self):
-        """ Get the number of bytes per connection
+    def get_n_bytes_for_connections(self, n_connections):
+        """ Get the number of bytes for the given number of connections
         """
 
     @abstractmethod

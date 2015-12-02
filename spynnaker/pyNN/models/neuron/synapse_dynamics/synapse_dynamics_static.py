@@ -25,8 +25,8 @@ class SynapseDynamicsStatic(AbstractSynapseDynamics):
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
         pass
 
-    def get_n_bytes_per_connection(self):
-        return 4
+    def get_n_bytes_for_connections(self, n_connections):
+        return 4 * n_connections
 
     def get_synaptic_data(
             self, connections, post_vertex_slice, n_synapse_types,
