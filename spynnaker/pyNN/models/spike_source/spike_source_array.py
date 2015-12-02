@@ -168,7 +168,6 @@ class SpikeSourceArray(
         :return:
         """
         self._spike_times = spike_times
-        self._check_buffer_sizes()
 
     # @implements AbstractSpikeRecordable.is_recording_spikes
     def is_recording_spikes(self):
@@ -185,7 +184,7 @@ class SpikeSourceArray(
         :return:
         """
         self._spike_recorder.record = True
-        self._change_requires_mapping = True
+        self._requires_mapping = True
 
     # @implements AbstractSpikeRecordable.delete_spikes
     def delete_spikes(self):
