@@ -457,6 +457,7 @@ class Spinnaker(object):
         # (unless youve not ran yet)
         if executing_reset and self._has_ran:
             # kill binaries
+            # TODO when sark 1.34 appears, this only needs to send a signal
             algorithms.append("FrontEndCommonApplicationExiter")
 
         # if the allication graph has changed, need to go through mapping
