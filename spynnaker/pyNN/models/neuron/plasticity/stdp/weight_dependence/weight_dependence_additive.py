@@ -56,7 +56,7 @@ class WeightDependenceAdditive(AbstractWeightDependence):
     def vertex_executable_suffix(self):
         return "additive"
 
-    def get_paramters_sdram_usage_in_bytes(
+    def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         if n_weight_terms == 1:
             return (4 * 4) * n_synapse_types

@@ -80,5 +80,6 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
             spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
             LOOKUP_TAU_MINUS_SHIFT)
 
+    @property
     def synaptic_structure(self):
         return self._synapse_structure

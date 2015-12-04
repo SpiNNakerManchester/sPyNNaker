@@ -41,7 +41,7 @@ class WeightDependenceMultiplicative(AbstractWeightDependence):
     def vertex_executable_suffix(self):
         return "multiplicative"
 
-    def get_paramters_sdram_usage_in_bytes(
+    def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         if n_weight_terms != 1:
             raise NotImplementedError(

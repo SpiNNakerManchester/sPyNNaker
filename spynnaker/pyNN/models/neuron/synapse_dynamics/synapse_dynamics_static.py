@@ -1,14 +1,14 @@
 import numpy
 import math
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
-    import AbstractSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics\
+    .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 
 
-class SynapseDynamicsStatic(AbstractSynapseDynamics):
+class SynapseDynamicsStatic(AbstractStaticSynapseDynamics):
 
     def __init__(self):
-        AbstractSynapseDynamics.__init__(self)
+        AbstractStaticSynapseDynamics.__init__(self)
 
     def is_same_as(self, synapse_dynamics):
         return isinstance(synapse_dynamics, SynapseDynamicsStatic)
@@ -25,16 +25,12 @@ class SynapseDynamicsStatic(AbstractSynapseDynamics):
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
         pass
 
-    def get_n_bytes_for_connections(self, n_connections):
-        return 4 * n_connections
+    def get_n_words_for_static_connections(self, n_connections):
+        return n_connections
 
-    def get_synaptic_data(
-            self, connections, post_vertex_slice, n_synapse_types,
-            weight_scales, synapse_type):
-        """ Get the fixed-fixed, fixed-plastic and plastic-plastic data for\
-            the given connections.  Data is returned as an array of arrays of\
-            bytes for each connection
-        """
+    def get_static_synaptic_data(
+            self, connections, connection_row_indices, n_rows,
+            post_vertex_slice, n_synapse_types, weight_scales, synapse_type):
         synapse_weight_scale = weight_scales[synapse_type]
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
 
@@ -45,6 +41,9 @@ class SynapseDynamicsStatic(AbstractSynapseDynamics):
              (8 + n_synapse_type_bits)) |
             (synapse_type << 8) |
             ((connections["target"] - post_vertex_slice.lo_atom) & 0xFF))
+        fixed_fixed_rows = self.convert_per_connection_data_to_rows(
+            connection_row_indices, n_rows,
+            fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
+        ff_size, ff_data = self.get_n_items_and_words(fixed_fixed_rows, 4)
 
-        return (fixed_fixed.view(dtype="uint8").reshape((-1, 4)),
-                None, None)
+        return (ff_data, ff_size)

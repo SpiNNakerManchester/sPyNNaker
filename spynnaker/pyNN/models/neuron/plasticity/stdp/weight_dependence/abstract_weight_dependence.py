@@ -18,7 +18,7 @@ class AbstractWeightDependence(object):
         """
 
     @abstractmethod
-    def get_paramters_sdram_usage_in_bytes(
+    def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         """ Get the amount of SDRAM used by the parameters of this rule
         """

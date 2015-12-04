@@ -71,7 +71,7 @@ class SynapticManager(object):
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
-        self._synapse_dynamics = None
+        self._synapse_dynamics = SynapseDynamicsStatic()
 
     @property
     def synapse_dynamics(self):
@@ -81,8 +81,7 @@ class SynapticManager(object):
     def synapse_dynamics(self, synapse_dynamics):
 
         # We can always override static dynamics or None
-        if self._synapse_dynamics is None or isinstance(
-                synapse_dynamics, SynapseDynamicsStatic):
+        if isinstance(self._synapse_dynamics, SynapseDynamicsStatic):
             self._synapse_dynamics = synapse_dynamics
 
         # Otherwise, the dynamics must be equal

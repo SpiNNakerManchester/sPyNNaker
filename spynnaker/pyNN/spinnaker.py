@@ -367,9 +367,10 @@ class Spinnaker(object):
         else:
             required_outputs.append("RanToken")
 
-        # if front end wants reload script, add requires reload token
-        if config.getboolean("Reports", "writeReloadSteps"):
-            required_outputs.append("ReloadToken")
+            # if front end wants reload script, add requires reload token
+            if config.getboolean("Reports", "writeReloadSteps"):
+                required_outputs.append("ReloadToken")
+
         return required_outputs
 
     def _create_pacman_executor_inputs(self):

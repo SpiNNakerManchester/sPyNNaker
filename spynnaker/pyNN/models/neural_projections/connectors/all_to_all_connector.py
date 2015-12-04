@@ -11,6 +11,7 @@ class AllToAllConnector(AbstractConnector):
     """ Connects all cells in the presynaptic population to all cells in \
         the postsynaptic population
     """
+
     def __init__(self, weights=0.0, delays=1, allow_self_connections=True):
         """
 

@@ -2,6 +2,9 @@ from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
 
+import numpy
+import math
+
 
 @add_metaclass(ABCMeta)
 class AbstractSynapseDynamics(object):
@@ -31,19 +34,6 @@ class AbstractSynapseDynamics(object):
         """ Write the synapse parameters to the spec
         """
 
-    @abstractmethod
-    def get_n_bytes_for_connections(self, n_connections):
-        """ Get the number of bytes for the given number of connections
-        """
-
-    @abstractmethod
-    def get_synaptic_data(
-            self, connections, n_synapse_types, weight_scales, synapse_type):
-        """ Get the fixed-fixed, fixed-plastic and plastic-plastic data for\
-            the given connections.  Data is returned as an array of arrays of\
-            words for each connection
-        """
-
     def get_delay_maximum(self, connector):
         """ Get the maximum delay for the synapses
         """
@@ -67,3 +57,25 @@ class AbstractSynapseDynamics(object):
         """
         return connector.get_weight_variance(
             pre_vertex_slice, post_vertex_slice)
+
+    def convert_per_connection_data_to_rows(
+            self, connection_row_indices, n_rows, data):
+        """ Converts per-connection data generated from connections into\
+            row-based data to be returned from get_synaptic_data
+        """
+        return [
+            numpy.ravel(data[connection_row_indices == i])
+            for i in range(n_rows)
+        ]
+
+    def get_n_items_and_words(self, rows, item_size):
+        """ Get the number of items in each row, and convert the row data\
+            to words
+        """
+        n_items = numpy.array([
+            int(math.ceil(float(row.size) / float(item_size)))
+            for row in rows], dtype="uint32").reshape((-1, 1))
+        words = [numpy.pad(
+            row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",
+            constant_values=0).view("uint32") for row in rows]
+        return n_items, words

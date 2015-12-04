@@ -7,8 +7,8 @@ from abc import abstractmethod
 class AbstractSynapseStructure(object):
 
     @abstractmethod
-    def get_n_bytes_for_connections(self, n_connections):
-        """ Get the number of bytes for the given number of connections
+    def get_n_bytes_per_connection(self):
+        """ Get the number of bytes for each connection
         """
 
     @abstractmethod

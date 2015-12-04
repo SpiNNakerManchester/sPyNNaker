@@ -53,6 +53,7 @@ class Projection(object):
         self._projection_edge = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
+        self._synapse_dynamics = synapse_dynamics
 
         if not isinstance(postsynaptic_population._get_vertex,
                           AbstractPopulationVertex):
@@ -68,18 +69,22 @@ class Projection(object):
                 "Synapse target {} not found in {}".format(
                     target, postsynaptic_population.label))
 
+        synapse_dynamics_stdp = None
         if synapse_dynamics is None:
-            synapse_dynamics = SynapseDynamicsStatic()
-        postsynaptic_population._get_vertex.synapse_dynamics = synapse_dynamics
+            synapse_dynamics_stdp = SynapseDynamicsStatic()
+        else:
+            synapse_dynamics_stdp = synapse_dynamics.slow
+        postsynaptic_population._get_vertex.synapse_dynamics = \
+            synapse_dynamics_stdp
 
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(
-            connector, synapse_dynamics, synapse_type)
+            connector, synapse_dynamics_stdp, synapse_type)
         connector.set_population_information(
             presynaptic_population._get_vertex.n_atoms,
             postsynaptic_population._get_vertex.n_atoms)
 
-        max_delay = synapse_dynamics.get_delay_maximum(connector)
+        max_delay = synapse_dynamics_stdp.get_delay_maximum(connector)
         if max_delay is None:
             max_delay = user_max_delay
 
