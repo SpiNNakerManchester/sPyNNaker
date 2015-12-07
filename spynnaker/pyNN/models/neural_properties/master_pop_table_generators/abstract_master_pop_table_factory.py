@@ -90,31 +90,9 @@ class AbstractMasterPopTableFactory(object):
 
         :return: the master pop table in some form
         """
-        master_region_base_address = helpful_functions.\
-            locate_memory_region_on_core(
-                x, y, p, master_pop_table_region, transceiver)
+        master_region_base_address = transceiver.\
+            locate_memory_region_on_core(x, y, p, master_pop_table_region)
         return master_region_base_address
-
-#        # Get the App Data base address for the core
-#        # (location where this cores memory starts in
-#        # sdram and region table)
-#        app_data_base_address = \
-#            transceiver.get_cpu_information_from_core(x, y, p).user[0]
-#
-#        # Get the memory address of the master pop table region
-#        master_pop_region = master_pop_table_region
-#
-#        master_region_base_address_address = \
-#            dsg_utility.get_region_base_address_offset(
-#                app_data_base_address, master_pop_region)
-#
-#        master_region_base_address_offset = helpful_functions.read_data(
-#            x, y, master_region_base_address_address, 4, "<I", transceiver)
-#
-#        master_region_base_address =\
-#            master_region_base_address_offset + app_data_base_address
-#
-#        return master_region_base_address, app_data_base_address
 
     @abstractmethod
     def get_edge_constraints(self):
