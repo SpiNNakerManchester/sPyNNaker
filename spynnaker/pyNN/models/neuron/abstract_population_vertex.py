@@ -9,6 +9,11 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
     AbstractProvidesOutgoingEdgeConstraints
+from spinn_front_end_common.abstract_models.abstract_uses_memory_mallocs import \
+    AbstractPartitionableUsesMemoryMallocs
+from spinn_front_end_common.utilities import constants as \
+    front_end_common_constants
+
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
@@ -33,6 +38,7 @@ from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.conf import config
 
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
@@ -59,7 +65,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingEdgeConstraints,
         AbstractProvidesIncomingEdgeConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractMappable):
+        AbstractMappable, AbstractPartitionableUsesMemoryMallocs):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -81,6 +87,7 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractMappable.__init__(self)
+        AbstractPartitionableUsesMemoryMallocs.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -171,11 +178,35 @@ class AbstractPopulationVertex(
                 self._gsyn_recorder.get_sdram_usage_in_bytes(
                     vertex_slice.n_atoms, self._no_machine_time_steps) +
                 self._synapse_manager.get_sdram_usage_in_bytes(
-                    vertex_slice, graph.incoming_edges_to_vertex(self)))
+                    vertex_slice, graph.incoming_edges_to_vertex(self)) +
+                (self.get_number_of_mallocs_used_by_dsg(
+                    vertex_slice, graph.incoming_edges_to_vertex(self)) *
+                 front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
 
     # @implements AbstractPopulationVertex.model_name
     def model_name(self):
         return self._model_name
+
+    # @implements AbstractDataSpecableVertex.get_number_of_mallocs_used_by_dsg
+    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
+        extra_mallocs = 0
+        if self._gsyn_recorder.record_gsyn:
+            extra_mallocs += 1
+        if self._v_recorder.record_v:
+            extra_mallocs += 1
+        if self._spike_recorder.record:
+            extra_mallocs += 1
+        all_mallocs = (self._get_number_of_mallocs_from_basic_model() +
+                self._synapse_manager.get_number_of_mallocs_used_by_dsg(
+                    vertex_slice, in_edges) + extra_mallocs)
+        if config.getboolean("SpecExecution", "specExecOnHost"):
+            return 1
+        else:
+            return all_mallocs
+
+
+    def _get_number_of_mallocs_from_basic_model(self):
+        return 2 # one for system, one for neuron params
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, spike_history_region_sz,
@@ -198,12 +229,14 @@ class AbstractPopulationVertex(
                 region=constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
                 size=spike_history_region_sz, label='spikeHistBuffer',
                 empty=True)
+
         if self._v_recorder.record_v:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY
                                                          .value,
                 size=v_history_region_sz, label='vHistBuffer',
                 empty=True)
+
         if self._gsyn_recorder.record_gsyn:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,

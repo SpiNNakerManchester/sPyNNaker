@@ -30,6 +30,9 @@ from spinn_front_end_common.utilities import constants as \
 from spinn_front_end_common.interface.\
     abstract_resetable_for_run_interface import \
     AbstractResetableForRunInterface
+from spinn_front_end_common.abstract_models.\
+    abstract_uses_memory_mallocs import \
+    AbstractPartitionableUsesMemoryMallocs
 
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
@@ -53,20 +56,19 @@ import math
 
 logger = logging.getLogger(__name__)
 
-# Space in case the buffering ends up pushing more packets than required
-_RECORD_OVERALLOCATION = 2000
-
 
 class SpikeSourceArray(
         AbstractDataSpecableVertex, AbstractPartitionableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
         AbstractResetableForRunInterface, SimplePopulationSettable,
-        AbstractMappable):
+        AbstractMappable, AbstractPartitionableUsesMemoryMallocs):
     """
     model for play back of spikes
     """
-
+    _DEFAULT_MALLOCS_USED = 3
     _CONFIGURATION_REGION_SIZE = 36
+    # Space in case the buffering ends up pushing more packets than required
+    _RECORD_OVERALLOCATION = 2000
 
     # limited to the n of the x,y,p,n key format
     _model_based_max_atoms_per_core = sys.maxint
@@ -101,6 +103,7 @@ class SpikeSourceArray(
         AbstractResetableForRunInterface.__init__(self)
         SimplePopulationSettable.__init__(self)
         AbstractMappable.__init__(self)
+        AbstractPartitionableUsesMemoryMallocs.__init__(self)
 
         self._spike_times = spike_times
         self._max_on_chip_memory_usage_for_spikes = \
@@ -417,7 +420,7 @@ class SpikeSourceArray(
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         spike_buffer = self._get_spike_send_buffer(vertex_slice)
         recording_size = (spike_buffer.total_region_size + 4 +
-                          _RECORD_OVERALLOCATION)
+                          self._RECORD_OVERALLOCATION)
 
         self._reserve_memory_regions(
             spec, spike_buffer.max_buffer_size_possible, recording_size)
@@ -470,13 +473,28 @@ class SpikeSourceArray(
         record_size = 0
         if self._spike_recorder.record:
             record_size = (send_buffer.total_region_size + 4 +
-                           _RECORD_OVERALLOCATION)
+                           self._RECORD_OVERALLOCATION)
         total_size = (
             (constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
             SpikeSourceArray._CONFIGURATION_REGION_SIZE + send_size +
             record_size)
 
+        # add memory count for mallocs
+        no_mallocs = self.get_number_of_mallocs_used_by_dsg(
+            vertex_slice, graph)
+        total_size += \
+            no_mallocs * front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
+
         return total_size
+
+    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
+        standard_mallocs = self._DEFAULT_MALLOCS_USED
+        if self._spike_recorder.record:
+            standard_mallocs += 1
+        if config.getboolean("SpecExecution", "specExecOnHost"):
+            return 1
+        else:
+            return standard_mallocs
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """

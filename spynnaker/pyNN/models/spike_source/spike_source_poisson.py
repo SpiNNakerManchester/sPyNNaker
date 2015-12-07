@@ -11,13 +11,19 @@ from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
     import PopulationSettableChangeRequiresMapping
-
 from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
+from spynnaker.pyNN.utilities.conf import config
+
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
     AbstractProvidesOutgoingEdgeConstraints
+from spinn_front_end_common.\
+    abstract_models.abstract_uses_memory_mallocs import \
+    AbstractPartitionableUsesMemoryMallocs
+from spinn_front_end_common.utilities import constants as\
+    front_end_common_constants
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -39,7 +45,8 @@ RANDOM_SEED_WORDS = 4
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
-        PopulationSettableChangeRequiresMapping):
+        PopulationSettableChangeRequiresMapping,
+        AbstractPartitionableUsesMemoryMallocs):
     """
     This class represents a Poisson Spike source object, which can represent
     a pynn_population.py of virtual neurons each with its own parameters.
@@ -50,6 +57,7 @@ class SpikeSourcePoisson(
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
                ('SPIKE_HISTORY_REGION', 2)])
+    _DEFAULT_MALLOCS_USED = 2
 
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
     # in terms of CPU (2900 at 10 times slowdown is fine, but not at realtime)
@@ -70,6 +78,7 @@ class SpikeSourcePoisson(
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingEdgeConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
+        AbstractPartitionableUsesMemoryMallocs.__init__(self)
 
         # Store the parameters
         self._rate = rate
@@ -163,7 +172,7 @@ class SpikeSourcePoisson(
             region=self._POISSON_SPIKE_SOURCE_REGIONS
                        .POISSON_PARAMS_REGION.value,
             size=poisson_params_sz, label='PoissonParams')
-        if spike_hist_buff_sz > 0:
+        if self._spike_recorder.record:
             spec.reserve_memory_region(
                 region=self._POISSON_SPIKE_SOURCE_REGIONS
                            .SPIKE_HISTORY_REGION.value,
@@ -341,8 +350,23 @@ class SpikeSourcePoisson(
         spike_hist_buff_sz = \
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._no_machine_time_steps)
-        return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) + 8 +
-                poisson_params_sz + spike_hist_buff_sz)
+        total_size = \
+            ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) + 8 +
+             poisson_params_sz + spike_hist_buff_sz)
+        total_size += self.get_number_of_mallocs_used_by_dsg(
+            vertex_slice, graph.incoming_edges_to_vertex(self)) * \
+            front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
+
+        return total_size
+
+    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
+        standard_mallocs = self._DEFAULT_MALLOCS_USED
+        if self._spike_recorder.record:
+            standard_mallocs += 1
+        if config.getboolean("SpecExecution", "specExecOnHost"):
+            return 1
+        else:
+            return standard_mallocs
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
