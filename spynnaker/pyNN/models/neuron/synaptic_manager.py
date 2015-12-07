@@ -756,8 +756,8 @@ class SynapticManager(object):
                 post_x, post_y, post_p, transceiver,
                 constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
 
-        app_data_base_address = helpful_functions.\
-            get_app_data_base_address(post_x, post_y, post_p, transceiver)
+        app_data_base_address = transceiver.get_app_data_base_address(
+            post_x, post_y, post_p)
 
         incoming_edges = subgraph.incoming_subedges_from_subvertex(
             post_subvertex)
