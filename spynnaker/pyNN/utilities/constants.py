@@ -39,7 +39,7 @@ MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 
-# the miniumum supported delay slot between two neurons
+# the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
 
 # debug filter positions

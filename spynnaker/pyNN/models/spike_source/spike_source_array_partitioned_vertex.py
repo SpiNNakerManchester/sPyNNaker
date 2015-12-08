@@ -1,7 +1,3 @@
-"""
-SpikeSourceArrayPartitionedVertex
-"""
-
 # pacman imports
 from pacman.model.data_request_interfaces.\
     abstract_requires_routing_info_partitioned_vertex import \
@@ -36,9 +32,9 @@ class SpikeSourceArrayPartitionedVertex(
         self._region_size = None
 
     def set_routing_infos(self, subedge_routing_infos):
-        """
-        override from RequiresRoutingInfoPartitionedVertex. allows the spike
-        source array to convert its neuron ids into AER id's
+        """ Allows the spike source array to convert its neuron ids into AER\
+            ids
+
         :param subedge_routing_infos:
         :return:
         """
@@ -48,11 +44,9 @@ class SpikeSourceArrayPartitionedVertex(
         self._base_key = key_masks[0].key
 
     def get_next_key(self, region_id):
-        """
-        over ride from SendsBuffersFromHostPartitionedVertexPreBufferedImpl
-        to support the fact that keys were orignally neuron-ids and need
-        adjusting into keys.
-        :param region_id: the regionid that contains sendable keys.
+        """ Support the fact that keys were originally neuron-ids and need
+            adjusting into keys.
+        :param region_id: the region id that contains send-able keys.
         :return:
         """
         key = SendsBuffersFromHostPartitionedVertexPreBufferedImpl\

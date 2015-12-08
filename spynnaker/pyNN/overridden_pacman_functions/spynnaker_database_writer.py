@@ -75,4 +75,3 @@ class SpynnakerDatabaseWriter(object):
         if ((self._user_create_database == "None" and self._needs_database) or
                 self._user_create_database == "True"):
             return self._database_interface.database_path
-
