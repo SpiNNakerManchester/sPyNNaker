@@ -12,7 +12,8 @@ class AbstractConnector(object):
     """
 
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
-                            ("weight", "float64"), ("delay", "float64")]
+                            ("weight", "float64"), ("delay", "float64"),
+                            ("connector_index", "uint16")]
 
     def __init__(self):
         self._n_pre_neurons = None
@@ -147,6 +148,7 @@ class AbstractConnector(object):
     @abstractmethod
     def create_synaptic_block(
             self, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            connector_index):
         """ Create a synaptic block from the data
         """

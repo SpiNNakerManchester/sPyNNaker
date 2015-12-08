@@ -68,12 +68,13 @@ class OneToOneConnector(AbstractConnector):
 
     def create_synaptic_block(
             self, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            connector_index):
         max_lo_atom = max(
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(
             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
-        n_connections = (min_hi_atom - max_lo_atom) + 1
+        n_connections = max((0, (min_hi_atom - max_lo_atom) + 1))
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
@@ -83,4 +84,5 @@ class OneToOneConnector(AbstractConnector):
             self._weights, n_connections, connection_slice)
         block["delay"] = self._generate_values(
             self._delays, n_connections, connection_slice)
+        block["connector_index"] = connector_index
         return block

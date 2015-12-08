@@ -107,7 +107,8 @@ class AllToAllConnector(AbstractConnector):
 
     def create_synaptic_block(
             self, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            connector_index):
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         connection_slice = self._connection_slice(
             pre_vertex_slice, post_vertex_slice)
@@ -123,4 +124,5 @@ class AllToAllConnector(AbstractConnector):
             self._weights, n_connections, connection_slice)
         block["delay"] = self._generate_values(
             self._delays, n_connections, connection_slice)
+        block["connector_index"] = connector_index
         return block

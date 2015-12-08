@@ -11,6 +11,38 @@ from spynnaker.pyNN.models.neuron.synapse_io.abstract_synapse_io \
 _N_HEADER_WORDS = 3
 
 
+class _ConnectorData(object):
+    """ Private data that is stored during synapse generation to make the\
+        retrieval of information possible
+    """
+
+    def __init__(self):
+        self._undelayed_row_slices_by_pre_post_vertex_slices = dict()
+        self._delayed_row_slices_by_pre_post_vertex_slices = dict()
+
+    def set_undelayed_row_slices(
+            self, pre_vertex_slice, post_vertex_slice, slices):
+        self._undelayed_row_slices_by_pre_post_vertex_slices[
+            (pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom,
+             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)] = slices
+
+    def set_delayed_row_slices(
+            self, pre_vertex_slice, post_vertex_slice, slices):
+        self._delayed_row_slices_by_pre_post_vertex_slices[
+            (pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom,
+             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)] = slices
+
+    def get_undelayed_row_slices(self, pre_vertex_slice, post_vertex_slice):
+        return self._undelayed_row_slices_by_pre_post_vertex_slices[
+            (pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom,
+             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)]
+
+    def get_delayed_row_slices(self, pre_vertex_slice, post_vertex_slice):
+        return self._delayed_row_slices_by_pre_post_vertex_slices[
+            (pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom,
+             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)]
+
+
 class SynapseIORowBased(AbstractSynapseIO):
     """ A SynapseRowIO implementation that uses a row for each source neuron,
         where each row consists of a fixed region, a plastic region, and a\
@@ -163,6 +195,42 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Return the data
         return max_row_length, row_data
 
+    def _update_connectors(
+            self, synapse_information, plastic_connections,
+            plastic_row_indices, static_connections, static_row_indices,
+            n_rows, pre_vertex_slice, post_vertex_slice, set_function):
+
+        # Store the connector data for each connector
+        plastic_connector_index_rows = [
+            plastic_connections["connector_index"][plastic_row_indices == i]
+            for i in xrange(n_rows)]
+        static_connector_index_rows = [
+            static_connections["connector_index"][static_row_indices == i]
+            for i in xrange(n_rows)]
+
+        connector_index = 0
+        for synapse_info in synapse_information:
+
+            # Work out if this is a static or plastic connector
+            index_rows = None
+            if isinstance(
+                    synapse_info.synapse_dynamics,
+                    AbstractStaticSynapseDynamics):
+                index_rows = static_connector_index_rows
+            else:
+                index_rows = plastic_connector_index_rows
+
+            # Get the slices for each row of the matrix for this connector
+            slices = [
+                numpy.where(row == connector_index) for row in index_rows]
+
+            # Update the synapse io data in the synapse info
+            if synapse_info.synapse_io_data is None:
+                synapse_info.synapse_io_data = _ConnectorData()
+            setter = getattr(synapse_info.synapse_io_data, set_function)
+            setter(pre_vertex_slice, post_vertex_slice, slices)
+            connector_index += 1
+
     def get_synapses(
             self, synapse_information, n_pre_slices, pre_slice_index,
             n_post_slices, post_slice_index, pre_vertex_slice,
@@ -181,12 +249,14 @@ class SynapseIORowBased(AbstractSynapseIO):
         all_static_connections = list()
         static_synapse_dynamics = None
         plastic_synapse_dynamics = None
+        connector_index = 0
         for synapse_info in synapse_information:
 
             # Get the actual connections
             connections = synapse_info.connector.create_synaptic_block(
                 n_pre_slices, pre_slice_index, n_post_slices,
-                post_slice_index, pre_vertex_slice, post_vertex_slice)
+                post_slice_index, pre_vertex_slice, post_vertex_slice,
+                connector_index)
 
             if isinstance(
                     synapse_info.synapse_dynamics,
@@ -202,6 +272,8 @@ class SynapseIORowBased(AbstractSynapseIO):
                 # as_same_as each other
                 plastic_synapse_dynamics = synapse_info.synapse_dynamics
                 all_plastic_connections.append(connections)
+
+            connector_index += 1
             del connections
 
         # Join the connections up
@@ -267,6 +339,14 @@ class SynapseIORowBased(AbstractSynapseIO):
                 undelayed_static_row_indices, undelayed_plastic_row_indices,
                 pre_vertex_slice.n_atoms, post_vertex_slice, n_synapse_types,
                 weight_scales, synapse_info.synapse_type, population_table)
+
+            self._update_connectors(
+                synapse_information, undelayed_plastic_connections,
+                undelayed_plastic_row_indices, undelayed_static_connections,
+                undelayed_static_row_indices, pre_vertex_slice.n_atoms,
+                pre_vertex_slice, post_vertex_slice,
+                "set_undelayed_row_slices")
+
             del undelayed_plastic_row_indices, undelayed_static_row_indices
         del undelayed_plastic_connections, undelayed_static_connections
 
@@ -307,9 +387,16 @@ class SynapseIORowBased(AbstractSynapseIO):
                     static_synapse_dynamics, plastic_synapse_dynamics,
                     delayed_static_connections, delayed_plastic_connections,
                     delayed_static_row_indices, delayed_plastic_row_indices,
-                    pre_vertex_slice.n_atoms, post_vertex_slice,
-                    n_synapse_types, weight_scales, synapse_info.synapse_type,
-                    population_table)
+                    pre_vertex_slice.n_atoms * n_delay_stages,
+                    post_vertex_slice, n_synapse_types, weight_scales,
+                    synapse_info.synapse_type, population_table)
+
+            self._update_connectors(
+                synapse_information, delayed_plastic_connections,
+                delayed_plastic_row_indices, delayed_static_connections,
+                delayed_static_row_indices,
+                pre_vertex_slice.n_atoms * n_delay_stages, pre_vertex_slice,
+                post_vertex_slice, "set_delayed_row_slices")
 
             # Get the stages and source ids
             stages = numpy.concatenate((plastic_stages, static_stages))

@@ -31,11 +31,15 @@ class FromListConnector(AbstractConnector):
             logger.warn("the modification of the verbose parameter will be "
                         "ignored")
         if conn_list is None:
-            self._conn_list = numpy.zeros(0)
+            self._conn_list = numpy.zeros(
+                0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         else:
+            temp_conn_list = [tuple(items) + (0,) for items in conn_list]
             self._conn_list = numpy.array(
-                conn_list, dtype=[("source", "uint32"), ("target", "uint32"),
-                                  ("weight", "float64"), ("delay", "float64")])
+                temp_conn_list, dtype=[
+                    ("source", "uint32"), ("target", "uint32"),
+                    ("weight", "float64"), ("delay", "float64"),
+                    ("connector_index", "uint16")])
 
     def get_delay_maximum(self):
         return numpy.max(self._conn_list["delay"])
@@ -106,9 +110,11 @@ class FromListConnector(AbstractConnector):
 
     def create_synaptic_block(
             self, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            connector_index):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
+        self._conn_list[mask]["connector_index"] = connector_index
         return self._conn_list[mask]

@@ -8,7 +8,7 @@ class SynapseInformation(object):
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
         self._synapse_type = synapse_type
-        self._row_offsets = None
+        self._synapse_io_data = None
 
     @property
     def connector(self):
@@ -23,9 +23,9 @@ class SynapseInformation(object):
         return self._synapse_type
 
     @property
-    def row_offsets(self):
-        return self._row_offsets
+    def synapse_io_data(self):
+        return self._synapse_io_data
 
-    @row_offsets.getter
-    def row_offsets(self, row_offsets):
-        self._row_offsets = row_offsets
+    @synapse_io_data.setter
+    def synapse_io_data(self, synapse_io_data):
+        self._synapse_io_data = synapse_io_data
