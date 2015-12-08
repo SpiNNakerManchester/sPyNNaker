@@ -576,9 +576,8 @@ class Spinnaker(object):
                     algorithms.append("FrontEndCommonProvenanceGatherer")
         return algorithms
 
-    @staticmethod
     def _create_pacman_executor_outputs(
-            requires_reset, application_graph_changed):
+            self, requires_reset, application_graph_changed):
 
         # explicitly define what outputs spynnaker expects
         required_outputs = list()
@@ -654,6 +653,7 @@ class Spinnaker(object):
             inputs.append({'type': "MemoryGraphMapper",
                            'value': self._graph_mapper})
             inputs.append({'type': "APPID", 'value': self._app_id})
+            inputs.append({'type': "RanToken", 'value': self._has_ran})
 
         elif application_graph_changed and not is_resetting:
 
@@ -836,6 +836,7 @@ class Spinnaker(object):
                            'value': self._router_tables})
             inputs.append({'type': "ProvenanceFilePath",
                            'value': provenance_file_path})
+            inputs.append({'type': "RanToken", 'value': self._has_ran})
 
         return inputs, application_graph_changed
 

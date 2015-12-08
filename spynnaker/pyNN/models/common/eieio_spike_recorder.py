@@ -4,6 +4,7 @@ from spinnman.messages.eieio.data_messages.eieio_data_header \
 from spynnaker.pyNN.models.common import recording_utils
 
 import numpy
+import tempfile
 
 
 class EIEIOSpikeRecorder(object):
@@ -47,6 +48,9 @@ class EIEIOSpikeRecorder(object):
                    placements, graph_mapper, partitionable_vertex,
                    return_data=True):
 
+        if self._spikes_cache_file is None:
+            self._spikes_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
+
         if n_machine_time_steps == self._extracted_spike_machine_time_steps:
             if return_data:
                 return recording_utils.pull_off_cached_lists(
@@ -73,7 +77,7 @@ class EIEIOSpikeRecorder(object):
                 offset = 0
                 while offset < number_of_bytes_written:
                     eieio_header = EIEIODataHeader.from_bytestring(
-                        spike_data, offset)
+                        str(spike_data), offset)
                     offset += eieio_header.size
                     timestamp = eieio_header.payload_base * ms_per_tick
                     timestamps = numpy.repeat([timestamp], eieio_header.count)
