@@ -209,9 +209,8 @@ class Population(object):
                 " running this command")
 
         spikes = self._vertex.get_spikes(
-            self._spinnaker.transceiver,
-            self._spinnaker.no_machine_time_steps,
-            self._spinnaker.placements, self._spinnaker.graph_mapper)
+            self._spinnaker.placements, self._spinnaker.graph_mapper,
+            self._spinnaker.buffer_manager)
 
         return spikes
 
@@ -259,9 +258,8 @@ class Population(object):
 
         # check that the vertex has read up to the position it needs to
         return self._vertex.get_gsyn(
-            self._spinnaker.transceiver,
-            self._spinnaker.no_machine_time_steps,
-            self._spinnaker.placements, self._spinnaker.graph_mapper)
+            self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
+            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -296,9 +294,8 @@ class Population(object):
 
         # check that the vertex has read up to the position it needs to
         return self._vertex.get_v(
-            self._spinnaker.transceiver,
-            self._spinnaker.no_machine_time_steps,
-            self._spinnaker.placements, self._spinnaker.graph_mapper)
+            self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
+            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
 
     def id_to_index(self, cell_id):
         """

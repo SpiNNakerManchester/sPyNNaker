@@ -11,7 +11,8 @@ from spinn_front_end_common.abstract_models.abstract_uses_memory_mallocs import 
     AbstractPartitionableUsesMemoryMallocs
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
-
+from spynnaker.pyNN.models.neuron.population_partitioned_vertex import \
+    PopulationPartitionedVertex
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
@@ -80,6 +81,7 @@ class AbstractPopulationVertex(
             synapse_type, threshold_type, additional_input=None,
             constraints=None):
 
+        AbstractReceiveBuffersToHost.__init__(self)
         AbstractPartitionableVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
         AbstractDataSpecableVertex.__init__(
@@ -93,7 +95,6 @@ class AbstractPopulationVertex(
         AbstractPopulationSettable.__init__(self)
         AbstractMappable.__init__(self)
         AbstractPartitionableUsesMemoryMallocs.__init__(self)
-        AbstractReceiveBuffersToHost.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -143,6 +144,11 @@ class AbstractPopulationVertex(
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
+
+    def create_subvertex(self, vertex_slice, resources_required, label=None,
+                         constraints=None):
+        return PopulationPartitionedVertex(
+            resources_required, label, constraints)
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -435,14 +441,10 @@ class AbstractPopulationVertex(
             self._receive_buffer_host, self._receive_buffer_port)
         self._spike_recorder.record = True
 
-    # @implements AbstractSpikeRecordable.delete_spikes
-    def delete_spikes(self):
-        self._spike_recorder.reset()
-
     # @implements AbstractSpikeRecordable.get_spikes
-    def get_spikes(self, placements, graph_mapper):
+    def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
-            self._label, self.buffer_manager,
+            self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)
@@ -458,17 +460,14 @@ class AbstractPopulationVertex(
         self._change_requires_mapping = not self._v_recorder.record_v
         self._v_recorder.record_v = True
 
-    # @implements AbstractVRecordable.delete_v
-    def delete_v(self):
-        self._v_recorder.reset()
-
     # @implements AbstractVRecordable.get_v
-    def get_v(self, n_machine_time_steps, placements, graph_mapper):
+    def get_v(self, n_machine_time_steps, placements, graph_mapper,
+              buffer_manager):
         return self._v_recorder.get_v(
-            self._label, self.n_atoms, self.buffer_manager,
+            self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            placements, graph_mapper, self)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
     def is_recording_gsyn(self):
@@ -481,17 +480,14 @@ class AbstractPopulationVertex(
         self._change_requires_mapping = not self._gsyn_recorder.record_gsyn
         self._gsyn_recorder.record_gsyn = True
 
-    # @implements AbstractGSynRecordable.delete_gsyn
-    def delete_gsyn(self):
-        self._gsyn_recorder.reset()
-
     # @implements AbstractGSynRecordable.get_gsyn
-    def get_gsyn(self, n_machine_time_steps, placements, graph_mapper):
+    def get_gsyn(self, n_machine_time_steps, placements, graph_mapper,
+                 buffer_manager):
         return self._gsyn_recorder.get_gsyn(
-            self._label, self.n_atoms, self.buffer_manager,
+            self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            n_machine_time_steps, placements, graph_mapper, self)
+            placements, graph_mapper, self)
 
     def initialize(self, variable, value):
         initialize_attr = getattr(

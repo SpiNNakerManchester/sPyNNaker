@@ -349,8 +349,8 @@ class Spinnaker(object):
             application_graph_changed=application_graph_changed)
 
         # rewind the buffers from the buffer manager, to start at the beginning
-        # of the simulation again
-        self._buffer_manager.rewind()
+        # of the simulation again and clear bufferd out
+        self._buffer_manager.reset()
 
         # reset the current count of how many milliseconds the application
         # has ran for over multiple calls to run
@@ -370,12 +370,6 @@ class Spinnaker(object):
         # reset the n_machine_time_steps from each vertex
         for vertex in self.partitionable_graph.vertices:
             vertex.set_no_machine_time_steps(0)
-            if isinstance(vertex, AbstractSpikeRecordable):
-                vertex.delete_spikes()
-            if isinstance(vertex, AbstractVRecordable):
-                vertex.delete_v()
-            if isinstance(vertex, AbstractGSynRecordable):
-                vertex.delete_gsyn()
 
         # execute reset functionality
         helpful_functions.do_mapping(
@@ -889,7 +883,7 @@ class Spinnaker(object):
             if projection.requires_mapping:
                 changed = True
             if reset_flags:
-                population.mark_no_changes()
+                projection.mark_no_changes()
 
         return changed
 
@@ -1020,6 +1014,10 @@ class Spinnaker(object):
         :return:
         """
         return self._max_supported_delay
+
+    @property
+    def buffer_manager(self):
+        return  self._buffer_manager
 
     def set_app_id(self, value):
         """

@@ -1,8 +1,11 @@
-from pacman.model.abstract_classes.abstract_constrained_vertex import \
-    AbstractConstrainedVertex
+from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+from spinn_front_end_common.interface.buffer_management.buffer_models.\
+    abstract_receive_buffers_to_host import \
+    AbstractReceiveBuffersToHost
 
 
-class PartitionedVertex(AbstractConstrainedVertex):
+class PopulationPartitionedVertex(PartitionedVertex,
+                                  AbstractReceiveBuffersToHost):
     """ Represents a sub-set of atoms from a AbstractConstrainedVertex
     """
 
@@ -21,20 +24,10 @@ class PartitionedVertex(AbstractConstrainedVertex):
         :raise pacman.exceptions.PacmanInvalidParameterException:
                     * If one of the constraints is not valid
         """
-        AbstractConstrainedVertex.__init__(self, label=label,
-                                           constraints=constraints)
-        self._resources_required = resources_required
+        AbstractReceiveBuffersToHost.__init__(self)
+        PartitionedVertex.__init__(
+            self, resources_required=resources_required, label=label,
+            constraints=constraints)
 
-    @property
-    def resources_required(self):
-        """The resources that vertex requires
-
-        :return: The resources required by the vertex
-        :rtype:\
-                    :py:class:`pacman.models.resources.resource_container.ResourceContainer`
-        :raise None: Raises no known exceptions
-        """
-        return self._resources_required
-
-    def __str__(self):
-        return self._label
+    def is_receives_buffers_to_host(self):
+        return True

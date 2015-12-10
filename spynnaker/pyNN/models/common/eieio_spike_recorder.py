@@ -62,7 +62,7 @@ class EIEIOSpikeRecorder(object):
                     x, y, p, region, state_region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
-            spike_data = raw_spike_data.read_all()
+            spike_data = str(raw_spike_data.read_all())
             number_of_bytes_written = len(spike_data)
 
             offset = 0

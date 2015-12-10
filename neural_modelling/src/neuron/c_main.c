@@ -69,12 +69,35 @@ static uint32_t infinite_run;
 //! The recording flags
 static uint32_t recording_flags = 0;
 
+//! \brief Initialises the recording parts of the model
+//! \return True if recording initisation is successful, false otherwise
+static bool initialise_recording(){
+    address_t address = data_specification_get_data_address();
+    address_t system_region = data_specification_get_region(
+        SYSTEM_REGION, address);
+    regions_e regions_to_record[] = {
+        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+        BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
+        BUFFERING_OUT_GSYN_RECORDING_REGION
+    };
+    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+    uint32_t *recording_flags_from_system_conf =
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+    regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
+
+    bool success = recording_initialize(
+        n_regions_to_record, regions_to_record,
+        recording_flags_from_system_conf, state_region, 2, &recording_flags);
+    log_info("Recording flags = 0x%08x", recording_flags);
+    return success;
+}
+
 //! \brief Initialises the model by reading in the regions and checking
 //!        recording data.
 //! \param[in] timer_period a pointer for the memory address where the timer
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
-static bool initialize(uint32_t *timer_period) {
+static bool initialise(uint32_t *timer_period) {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -94,20 +117,10 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    regions_e regions_to_record[] = {
-        BUFFERING_OUT_SPIKE_RECORDING_REGION,
-        BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
-        BUFFERING_OUT_GSYN_RECORDING_REGION
-    };
-    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-    uint32_t *recording_flags_from_system_conf =
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
-
-    recording_initialize(
-        n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, 2, &recording_flags);
-    log_info("Recording flags = 0x%08x", recording_flags);
+    // setup recording region
+    if (!initialise_recording()){
+        return false;
+    }
 
     // Set up the neurons
     uint32_t n_neurons;

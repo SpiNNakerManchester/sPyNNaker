@@ -18,8 +18,8 @@ class SpyNNakerRecordingExtractor(object):
     """
 
     def __call__(
-            self, partitionable_graph, transciever, placements,
-            runtime_in_machine_time_steps, graph_mapper):
+            self, partitionable_graph, placements, graph_mapper,
+            buffer_manager, runtime_in_machine_time_steps):
 
         logger.info(
             "Extracting recorded data from the PyNN application space for "
@@ -29,19 +29,17 @@ class SpyNNakerRecordingExtractor(object):
         for vertex in partitionable_graph.vertices:
             if (isinstance(vertex, AbstractSpikeRecordable)
                     and vertex.is_recording_spikes()):
-                vertex.get_spikes(
-                    transciever, runtime_in_machine_time_steps, placements,
-                    graph_mapper, False)
+                vertex.get_spikes(placements, graph_mapper, buffer_manager)
             if (isinstance(vertex, AbstractVRecordable)
                     and vertex.is_recording_v()):
                 vertex.get_v(
-                    transciever, runtime_in_machine_time_steps, placements,
-                    graph_mapper, False)
+                    runtime_in_machine_time_steps, placements, graph_mapper,
+                    buffer_manager)
             if (isinstance(vertex, AbstractGSynRecordable)
                     and vertex.is_recording_gsyn()):
                 vertex.get_gsyn(
-                    transciever, runtime_in_machine_time_steps, placements,
-                    graph_mapper, False)
+                    runtime_in_machine_time_steps, placements, graph_mapper,
+                    buffer_manager)
 
         for edge in partitionable_graph.edges:
             # TODO fix this for recording weights and delay changes

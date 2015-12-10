@@ -333,7 +333,6 @@ class SpikeSourcePoisson(
         :return:
         """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
-                 poisson_params_sz = self.get_params_bytes(vertex_slice)
         spike_hist_buff_sz = min((
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._no_machine_time_steps),
@@ -356,6 +355,7 @@ class SpikeSourcePoisson(
             return 1
         else:
             return standard_mallocs
+
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         """
         method for calculating DTCM usage for a collection of atoms
@@ -455,9 +455,9 @@ class SpikeSourcePoisson(
         """
         return "spike_source_poisson.aplx"
 
-    def get_spikes(self, placements, graph_mapper):
+    def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
-            self._label, self.buffer_manager,
+            self._label, buffer_manager,
             self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             self._POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)
