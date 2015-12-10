@@ -22,18 +22,13 @@ class AbstractGSynRecordable(object):
         """
 
     @abstractmethod
-    def delete_gsyn(self):
-        """ Deletes the gsyn recorded so far
-        """
-
-    @abstractmethod
-    def get_gsyn(self, transceiver, n_machine_time_steps, placements,
-                 graph_mapper, return_data):
+    def get_gsyn(self, n_machine_time_steps, placements, graph_mapper):
         """ Get the recorded gsyn from the object
 
-        :param transceiver: the python interface to the spinnaker machine
-        :param n_machine_time_steps: the number of timer tics that will\
-                be exeucted on the machine.
+        :param n_machine_time_steps: the number of timer ticks that will\
+                be executed on the machine.
+        :param placements: The placements of the graph
+        :param graph_mapper: The mapper between subvertices and vertices
 
         :return: A numpy array of 4-element arrays of \
                 (neuron_id, time, gsyn_E, gsyn_I)\

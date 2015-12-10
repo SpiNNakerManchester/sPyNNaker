@@ -32,10 +32,6 @@
        constant
 #endif
 
-//! the number of channels all standard models contain (spikes, voltage, gsyn)
-//! for recording
-#define N_RECORDING_CHANNELS 3
-
 //! human readable definitions of each region in SDRAM
 typedef enum regions_e {
     SYSTEM_REGION,
@@ -44,9 +40,10 @@ typedef enum regions_e {
     POPULATION_TABLE_REGION,
     SYNAPTIC_MATRIX_REGION,
     SYNAPSE_DYNAMICS_REGION,
-    SPIKE_RECORDING_REGION,
-    POTENTIAL_RECORDING_REGION,
-    GSYN_RECORDING_REGION
+    BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
+    BUFFERING_OUT_GSYN_RECORDING_REGION,
+    BUFFERING_OUT_CONTROL_REGION
 } regions_e;
 
 //! values for the priority for each callback
@@ -54,61 +51,30 @@ typedef enum callback_priorities{
     MC = -1, SDP_AND_DMA_AND_USER = 0, TIMER = 2
 }callback_priorities;
 
+//! The number of regions that are to be used for recording
+#define NUMBER_OF_REGIONS_TO_RECORD 3
+
 // Globals
 
 //! the current timer tick value TODO this might be able to be removed with
 //! the timer tick callback returning the same value.
 uint32_t time;
 
-//! global parameter which contains the number of timer ticks to run for before
-//! being expected to exit
+//! The number of timer ticks to run for before being expected to exit
 static uint32_t simulation_ticks = 0;
 
-//! global paramter which states if this model should run for infinite time
+//! Determines if this model should run for infinite time
 static uint32_t infinite_run;
-//! keeps track of which types of recording should be done to this model.
+
+//! The recording flags
 static uint32_t recording_flags = 0;
 
-bool initialise_recording() {
-    address_t address = data_specification_get_data_address();
-    address_t system_region = data_specification_get_region(
-        SYSTEM_REGION, address);
-    recording_channel_e channels_to_record[] = {
-        e_recording_channel_spike_history,
-        e_recording_channel_neuron_potential,
-        e_recording_channel_neuron_gsyn
-    };
-    regions_e regions_to_record[] = {
-        SPIKE_RECORDING_REGION,
-        POTENTIAL_RECORDING_REGION,
-        GSYN_RECORDING_REGION
-    };
-    uint32_t region_sizes[N_RECORDING_CHANNELS];
-    recording_read_region_sizes(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
-        &recording_flags, &region_sizes[0], &region_sizes[1], &region_sizes[2]);
-    log_info("recording flags are %d", recording_flags);
-    for (uint32_t i = 0; i < N_RECORDING_CHANNELS; i++) {
-        if (recording_is_channel_enabled(recording_flags,
-                                         channels_to_record[i])) {
-            if (!recording_initialse_channel(
-                    data_specification_get_region(
-                        regions_to_record[i], address),
-                    channels_to_record[i], region_sizes[i])) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-//! \Initialises the model by reading in the regions and checking recording
-//! data.
-//! \param[in] *timer_period a pointer for the memory address where the timer
-//! period should be stored during the function.
-//! \return boolean of True if it successfully read all the regions and set up
-//! all its internal data structures. Otherwise returns False
-static bool initialise(uint32_t *timer_period) {
+//! \brief Initialises the model by reading in the regions and checking
+//!        recording data.
+//! \param[in] timer_period a pointer for the memory address where the timer
+//!            period should be stored during the function.
+//! \return True if it successfully initialised, false otherwise
+static bool initialize(uint32_t *timer_period) {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -128,10 +94,20 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
-    // Set up recording
-    if (!initialise_recording()) {
-        return false;
-    }
+    regions_e regions_to_record[] = {
+        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+        BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
+        BUFFERING_OUT_GSYN_RECORDING_REGION
+    };
+    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+    uint32_t *recording_flags_from_system_conf =
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+    regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
+
+    recording_initialize(
+        n_regions_to_record, regions_to_record,
+        recording_flags_from_system_conf, state_region, 2, &recording_flags);
+    log_info("Recording flags = 0x%08x", recording_flags);
 
     // Set up the neurons
     uint32_t n_neurons;
@@ -176,15 +152,10 @@ static bool initialise(uint32_t *timer_period) {
     return true;
 }
 
-//! \The callback used when a timer tic interrupt is set off. The result of
-//! this is to transmit any spikes that need to be sent at this timer tic,
-//! update any recording, and update the state machine's states.
-//! If the timer tic is set to the end time, this method will call the
-//! spin1api stop command to allow clean exit of the executable.
+//! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
-//! executed since start of simulation
-//! \param[in] unused for consistency sake of the API always returning two
-//! parameters, this parameter has no semantics currently and thus is set to 0
+//!            executed since start of simulation
+//! \param[in] unused unused parameter kept for API consistency
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
@@ -205,7 +176,9 @@ void timer_callback(uint timer_count, uint unused) {
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
-        recording_finalise();
+        if (recording_flags > 0) {
+            recording_finalise();
+        }
 
         // falls into the apuse resume mode of operating
         simulation_handle_pause_resume(timer_callback, TIMER);
@@ -219,10 +192,14 @@ void timer_callback(uint timer_count, uint unused) {
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time);
+
+    // trigger buffering_out_mechanism
+    if (recording_flags > 0) {
+        recording_do_timestep_update(time);
+    }
 }
 
-//! \The only entry point for this model. it initialises the model, sets up the
-//! Interrupts for the Timer tic and calls the spin1api for running.
+//! \brief The entry point for this model.
 void c_main(void) {
 
     // Load DTCM data
