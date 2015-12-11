@@ -22,21 +22,15 @@ class AbstractVRecordable(object):
         """
 
     @abstractmethod
-    def reset(self):
-        """
-        closes the cahce file this vertex uses for storing its v data
-        :return:
-        """
-
-    @abstractmethod
-    def get_v(self, transceiver, n_machine_time_steps, placements,
-              graph_mapper, return_data):
+    def get_v(self, n_machine_time_steps, placements, graph_mapper,
+              buffer_manager):
         """ Get the recorded v from the object
 
-        :param transceiver: the python interface to the spinnaker machine
-        :param n_machine_time_steps: the number of timer tic exeuctions
-        when running on the machine
-
+        :param n_machine_time_steps: the number of timer ticks that will\
+                be executed on the machine.
+        :param placements: The placements of the graph
+        :param graph_mapper: The mapper between subvertices and vertices
+        :param buffer_manager: the buffer manager object
         :return: A numpy array of 3-element arrays of (neuron_id, time, v)\
                 ordered by time
         """

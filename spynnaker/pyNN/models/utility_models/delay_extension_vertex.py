@@ -3,16 +3,15 @@ import logging
 from enum import Enum
 import math
 
-from spinn_front_end_common.utility_models.\
-    outgoing_edge_same_contiguous_keys_restrictor import \
-    OutgoingEdgeSameContiguousKeysRestrictor
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
     delay_partitionable_edge import DelayPartitionableEdge
+from spynnaker.pyNN.utilities.conf import config
+
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
@@ -21,6 +20,10 @@ from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
     import AbstractProvidesNKeysForEdge
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+from spinn_front_end_common.abstract_models.\
+    abstract_uses_memory_mallocs import \
+    AbstractPartitionableUsesMemoryMallocs
+
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -29,6 +32,10 @@ from pacman.model.constraints.key_allocator_constraints.\
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
+
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 
@@ -39,7 +46,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractDataSpecableVertex,
                            AbstractProvidesIncomingEdgeConstraints,
                            AbstractProvidesOutgoingEdgeConstraints,
-                           AbstractProvidesNKeysForEdge):
+                           AbstractProvidesNKeysForEdge,
+                           AbstractPartitionableUsesMemoryMallocs):
     """
     Instance of this class provide delays to incoming spikes in multiples
     of the maximum delays of a neuron (typically 16 or 32)
@@ -49,6 +57,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         names=[('SYSTEM', 0),
                ('DELAY_PARAMS', 1),
                ('SPIKE_HISTORY', 2)])
+    _DEFAULT_MALLOCS_USED = 2
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
@@ -66,14 +75,13 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             timescale_factor=timescale_factor)
         AbstractProvidesIncomingEdgeConstraints.__init__(self)
         AbstractProvidesNKeysForEdge.__init__(self)
+        AbstractPartitionableUsesMemoryMallocs.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0
         self._source_vertex = source_vertex
         joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
         self.add_constraint(joint_constrant)
-        self._outgoing_edge_key_restrictor = \
-            OutgoingEdgeSameContiguousKeysRestrictor()
 
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
         return list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
@@ -169,7 +177,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
-        self.write_setup_info(spec, 0)
+        self.write_setup_info(spec)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -192,7 +200,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         return [data_writer.filename]
 
-    def write_setup_info(self, spec, spike_history_region_sz):
+    def write_setup_info(self, spec):
         """
         """
 
@@ -291,8 +299,18 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        # TODO: Fill this in
-        return 0
+        size_of_mallocs = self.get_number_of_mallocs_used_by_dsg(
+            vertex_slice,  graph.incoming_edges_to_vertex(self)) * \
+            common_constants.SARK_PER_MALLOC_SDRAM_USAGE
+        # TODO: Fill this in to deal with delay slots malloc
+        return size_of_mallocs
+
+    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
+        standard_mallocs = self._DEFAULT_MALLOCS_USED
+        if config.getboolean("SpecExecution", "specExecOnHost"):
+            return 1
+        else:
+            return standard_mallocs
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -316,9 +334,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
         """
         gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the parittioned edge that leaves this vertex
+        :param partitioned_edge: the partitioned edge that leaves this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._outgoing_edge_key_restrictor.\
-            get_outgoing_edge_constraints()
+        return [KeyAllocatorContiguousRangeContraint()]

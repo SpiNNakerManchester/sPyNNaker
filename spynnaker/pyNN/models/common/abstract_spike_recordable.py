@@ -22,23 +22,11 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def reset(self):
-        """
-        closes the cahce file this vertex uses for storing its spike data
-        :return:
-        """
-
-    @abstractmethod
-    def get_spikes(self, transceiver, n_machine_time_steps, placements,
-                   graph_mapper, return_data):
+    def get_spikes(self, placements, graph_mapper, buffer_manager):
         """ Get the recorded spikes from the object
-        :param transceiver: the python interface to the spinnaker machine
-        :param n_machine_time_steps: the number of machine time steps the
-        system expects to run
         :param placements: the placements object
-        :param return_data: bool which tells the method to either return
-            retrieved spikes, or just update if needed
         :param graph_mapper: the graph mapper object
+        :param buffer_manager: the buffer manager object
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
                 ordered by time
         """

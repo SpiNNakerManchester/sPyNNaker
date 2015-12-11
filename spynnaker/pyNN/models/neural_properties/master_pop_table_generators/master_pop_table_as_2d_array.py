@@ -14,7 +14,7 @@ from spynnaker.pyNN.models.neural_properties.master_pop_table_generators.\
     abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 from spynnaker.pyNN import exceptions
 
-# spinn front end common inports
+# spinn front end common imports
 from spinn_front_end_common.utilities import helpful_functions
 
 # dsg imports
@@ -99,9 +99,6 @@ def get_mpt_sb_mem_addrs_from_coords(x, y, p):
 
 
 class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
-    """
-    MasterPopTableAs2dArray
-    """
 
     def __init__(self):
         AbstractMasterPopTableFactory.__init__(self)

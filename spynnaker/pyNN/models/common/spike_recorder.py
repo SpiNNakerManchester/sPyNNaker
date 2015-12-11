@@ -1,21 +1,19 @@
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
+
 from spynnaker.pyNN.models.common import recording_utils
 
 import math
 import numpy
-import tempfile
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class SpikeRecorder(object):
 
     def __init__(self, machine_time_step):
         self._machine_time_step = machine_time_step
         self._record = False
-        # set up cache files for recording of parameters
-        self._spikes_cache_file = None
-        # position params for knowing how much data has been extracted
-        self._extracted_spike_machine_time_steps = 0
-        # number of times the spikes have been loaded to the temp file
-        self._no_spike_loads = 0
 
     @property
     def record(self):
@@ -25,8 +23,7 @@ class SpikeRecorder(object):
     def record(self, record):
         self._record = record
 
-    def get_sdram_usage_in_bytes(
-            self, n_neurons, n_machine_time_steps):
+    def get_sdram_usage_in_bytes(self, n_neurons, n_machine_time_steps):
         if not self._record:
             return 0
 
@@ -44,85 +41,64 @@ class SpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def reset(self):
-        self._spikes_cache_file = None
-        self._extracted_spike_machine_time_steps = 0
-        self._no_spike_loads = 0
+    def get_spikes(self, label, buffer_manager, region, state_region,
+                   placements, graph_mapper, partitionable_vertex):
 
-    def get_spikes(self, label, transceiver, region, n_machine_time_steps,
-                   placements, graph_mapper, partitionable_vertex,
-                   return_data=True):
+        spike_times = list()
+        spike_ids = list()
+        ms_per_tick = self._machine_time_step / 1000.0
 
-        if self._spikes_cache_file is None:
-            self._spikes_cache_file = tempfile.NamedTemporaryFile(mode='a+b')
+        subvertices = \
+            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
 
-        if n_machine_time_steps == self._extracted_spike_machine_time_steps:
-            if return_data:
-                return recording_utils.pull_off_cached_lists(
-                    self._no_spike_loads, self._spikes_cache_file)
-        else:
-            to_extract_n_machine_time_steps = \
-                n_machine_time_steps - self._extracted_spike_machine_time_steps
+        missing_str = ""
 
-            spike_times = list()
-            spike_ids = list()
-            ms_per_tick = self._machine_time_step / 1000.0
+        progress_bar = ProgressBar(len(subvertices),
+                                   "Getting spikes for {}".format(label))
+        for subvertex in subvertices:
 
-            subvertices = \
-                graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
+            placement = placements.get_placement_of_subvertex(subvertex)
+            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
-            progress_bar = ProgressBar(len(subvertices),
-                                       "Getting spikes for {}".format(label))
-            for subvertex in subvertices:
+            x = placement.x
+            y = placement.y
+            p = placement.p
+            lo_atom = subvertex_slice.lo_atom
 
-                placement = placements.get_placement_of_subvertex(subvertex)
-                subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            # Read the spikes
+            n_words = int(math.ceil(subvertex_slice.n_atoms / 32.0))
+            n_bytes = n_words * 4
+            n_words_with_timestamp = n_words + 1
 
-                lo_atom = subvertex_slice.lo_atom
+            # for buffering output info is taken form the buffer manager
+            neuron_param_region_data_pointer, data_missing = \
+                buffer_manager.get_data_for_vertex(
+                    x, y, p, region, state_region)
+            if data_missing:
+                missing_str += "({}, {}, {}); ".format(x, y, p)
+            record_raw = neuron_param_region_data_pointer.read_all()
+            raw_data = (numpy.asarray(record_raw, dtype="uint8").
+                        view(dtype="<i4")).reshape(
+                [-1, n_words_with_timestamp])
+            split_record = numpy.array_split(raw_data, [1, 1], 1)
+            record_time = split_record[0] * float(ms_per_tick)
+            spikes = split_record[2].byteswap().view("uint8")
+            bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
+                (-1, 32))).reshape((-1, n_bytes * 8))
+            time_indices, indices = numpy.where(bits == 1)
+            times = record_time[time_indices].reshape((-1))
+            indices = indices + lo_atom
+            spike_ids.append(indices)
+            spike_times.append(times)
+            progress_bar.update()
 
-                # Read the spikes
-                n_bytes = int(math.ceil(subvertex_slice.n_atoms / 32.0)) * 4
-                region_size = \
-                    recording_utils.get_recording_region_size_in_bytes(
-                        to_extract_n_machine_time_steps, n_bytes)
-                spike_data = recording_utils.get_data(
-                    transceiver, placement, region, region_size)
-                numpy_data = numpy.asarray(spike_data, dtype="uint8").view(
-                    dtype="uint32").byteswap().view("uint8")
-                bits = numpy.fliplr(numpy.unpackbits(numpy_data).reshape(
-                    (-1, 32))).reshape((-1, n_bytes * 8))
-                times, indices = numpy.where(bits == 1)
-                times = ((times +
-                         self._extracted_spike_machine_time_steps) *
-                         ms_per_tick)
-                indices = indices + lo_atom
-                spike_ids.append(indices)
-                spike_times.append(times)
-                progress_bar.update()
+        progress_bar.end()
+        if len(missing_str) > 0:
+            logger.warn(
+                "Population {} is missing spike data in region {} from the"
+                " following cores: {}".format(label, region, missing_str))
 
-            progress_bar.end()
-            spike_ids = numpy.hstack(spike_ids)
-            spike_times = numpy.hstack(spike_times)
-            result = numpy.dstack((spike_ids, spike_times))[0]
-            spikes = result[numpy.lexsort((spike_times, spike_ids))]
-
-            # extract old data
-            cached_spikes = recording_utils.pull_off_cached_lists(
-                self._no_spike_loads, self._spikes_cache_file)
-
-            # cache the data just pulled off
-            numpy.save(self._spikes_cache_file, spikes)
-            self._no_spike_loads += 1
-
-            # concat extracted with cached
-            if len(cached_spikes) != 0:
-                all_spikes = numpy.concatenate((cached_spikes, spikes))
-            else:
-                all_spikes = spikes
-
-            self._extracted_spike_machine_time_steps += \
-                to_extract_n_machine_time_steps
-
-            # return all spikes
-            return all_spikes
-
+        spike_ids = numpy.hstack(spike_ids)
+        spike_times = numpy.hstack(spike_times)
+        result = numpy.dstack((spike_ids, spike_times))[0]
+        return result[numpy.lexsort((spike_times, spike_ids))]

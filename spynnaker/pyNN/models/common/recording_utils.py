@@ -17,8 +17,8 @@ def get_recording_region_size_in_bytes(
     if n_machine_time_steps is None:
         raise Exception(
             "Cannot record this parameter without a fixed run time")
-    return (_RECORDING_COUNT_SIZE +
-            (n_machine_time_steps * bytes_per_timestep))
+    return ((n_machine_time_steps * bytes_per_timestep) +
+            (n_machine_time_steps * 4))
 
 
 def get_data(transceiver, placement, region, region_size):
@@ -48,7 +48,8 @@ def get_data(transceiver, placement, region, region_size):
                 expected_size, number_of_bytes_written))
 
     return transceiver.read_memory(
-        x, y, region_base_address + 4, number_of_bytes_written)
+        x, y, region_base_address + 4, number_of_bytes_written), \
+           number_of_bytes_written
 
 
 def pull_off_cached_lists(no_loads, cache_file):
@@ -60,11 +61,18 @@ def pull_off_cached_lists(no_loads, cache_file):
     """
     cache_file.seek(0)
     if no_loads == 1:
-        return numpy.load(cache_file)
+        values = numpy.load(cache_file)
+
+        # Seek to the end of the file (for windows compatibility)
+        cache_file.seek(0, 2)
+        return values
     elif no_loads == 0:
         return []
     else:
         lists = list()
         for _ in range(0, no_loads):
             lists.append(numpy.load(cache_file))
+
+        # Seek to the end of the file (for windows compatibility)
+        cache_file.seek(0, 2)
         return numpy.concatenate(lists)

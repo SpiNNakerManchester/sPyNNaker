@@ -9,80 +9,66 @@
 #include <debug.h>
 
 // Globals
-bit_field_t out_spikes;
+typedef struct timed_out_spikes{
+    uint32_t time;
+    uint32_t out_spikes[];
+} timed_out_spikes;
 
+static timed_out_spikes *spikes;
+bit_field_t out_spikes;
 static size_t out_spikes_size;
 
-//! \brief clears the memory used as a tracker for the next set of spikes
-//! which will be recorded to SDRAM at some point
-//! \return None
+
+//! \brief clears the currently recorded spikes
 void out_spikes_reset() {
     clear_bit_field(out_spikes, out_spikes_size);
 }
 
-//! \brief initialises a piece of memory which can contain a flag to say if
-//! any source has spiked between resets
-//! \param[in] max_spike_sources the max number of sources which can be
-//! expected to spike between resets
-//! \return a boolean which is True if the initialisation was successful,
-//! false otherwise
+//! \brief initialise the recording of spikes
+//! \param[in] max_spike_sources the number of spike sources to be recorded
+//! \return True if the initialisation was successful, false otherwise
 bool out_spikes_initialize(size_t max_spike_sources) {
     out_spikes_size = get_bit_field_size(max_spike_sources);
     log_info("Out spike size is %u words, allowing %u spike sources",
              out_spikes_size, max_spike_sources);
-
-    out_spikes = (bit_field_t) sark_alloc(
-        out_spikes_size * sizeof(uint32_t), 1);
-    if (out_spikes == NULL) {
-        log_error("Could not allocate out spikes array");
+    spikes = (timed_out_spikes *) spin1_malloc(
+        sizeof(timed_out_spikes) + (out_spikes_size * sizeof(uint32_t)));
+    if (spikes == NULL) {
+        log_error("Out of DTCM when allocating out_spikes");
         return false;
     }
+    out_spikes = &(spikes->out_spikes[0]);
     out_spikes_reset();
     return true;
 }
 
-//! \brief records the current set of flags for each spike source into the
-//! spike recording region in SDRAM (flags to deduce which regions are active
-//! are handed to this method due to recording not containing them itself).
-//! TODO change the recording.h and recording.c to contain the channels itself.
-//! \param[in] recording_flags the recording flags which state which region
-//! channels are being used.
-//! \return None
-void out_spikes_record(uint32_t recording_flags) {
+//! \brief flush the recorded spikes - must be called to do the actual
+//!        recording
+//! \param[in] channel The channel to record to
+//! \param[in] time The time at which the recording is being made
+void out_spikes_record(uint8_t channel, uint32_t time) {
 
-    // If we should record the spike history, copy out-spikes to the
-    // appropriate recording channel
-    if (recording_is_channel_enabled(
-            recording_flags, e_recording_channel_spike_history)) {
-        recording_record(
-            e_recording_channel_spike_history, out_spikes,
-            out_spikes_size * sizeof(uint32_t));
-    }
+    // copy out-spikes to the appropriate recording channel
+    spikes->time = time;
+    recording_record(
+        channel, spikes, (out_spikes_size + 1) * sizeof(uint32_t));
 }
 
-//! \brief helper method which checks if the current spikes flags have any
-//! recorded for use.
-//! \return boolean which is true if there are no recorded spikes since the
-//! last reset and false otherwise.
+//! \brief Check if any spikes have been recorded
+//! \return True if no spikes have been recorded, false otherwise
 bool out_spikes_is_empty() {
     return (empty_bit_field(out_spikes, out_spikes_size));
 
 }
 
-//! \brief helper method which checks if a given source has spiked since the
-//! last reset.
-//! \param[in] spike_source_index the index of the spike source to check if it
-//! has spiked since the last reset.
-//! \return boolean which is true if the spike source has spiked since the last
-//! reset command
+//! \brief Check if a given neuron has been recorded to spike
+//! \param[in] spike_source_index The index of the neuron.
+//! \return true if the spike source has been recorded to spike
 bool out_spikes_is_spike(index_t neuron_index) {
     return (bit_field_test(out_spikes, neuron_index));
 }
 
-//! \brief a debug function that when the model is compiled in DEBUG mode will
-//! record into SDRAM the spikes that are currently been recorded as having
-//! spiked since the last reset command
-//! \return nothing
+//! \brief print out the contents of the output spikes (in DEBUG only)
 void out_spikes_print() {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("out_spikes:\n");
