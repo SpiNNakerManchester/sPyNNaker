@@ -14,7 +14,7 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
     @abstractmethod
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, weight_scales, synapse_type):
+            post_vertex_slice, n_synapse_types):
         """ Get the fixed-fixed data for each row, and lengths for the\
             fixed-fixed parts of each row.
             Data is returned as an array made up of an array of 32-bit words\
@@ -23,4 +23,18 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
             total number of rows is given by n_rows.
             Lengths are returned as an array made up of an integer for each\
             row, for the fixed-fixed region.
+        """
+
+    @abstractmethod
+    def get_n_static_words_per_row(self, ff_size):
+        """ Get the number of bytes to be read per row for the static data\
+            given the size that was written to each row
+        """
+
+    @abstractmethod
+    def read_static_synaptic_data(
+            self, connection_indices, post_vertex_slice, n_synapse_types,
+            ff_size, ff_data):
+        """ Read the connections indicated in the connection indices from the\
+            words of data in ff_data
         """

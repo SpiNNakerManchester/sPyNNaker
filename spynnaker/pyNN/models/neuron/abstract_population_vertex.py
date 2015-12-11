@@ -509,13 +509,17 @@ class AbstractPopulationVertex(
     def synapse_dynamics(self, synapse_dynamics):
         self._synapse_manager.synapse_dynamics = synapse_dynamics
 
-    def get_synaptic_list_from_machine(
-            self, placements, transceiver, pre_subvertex, pre_n_atoms,
-            post_subvertex, synapse_io, subgraph, routing_infos,
-            weight_scales):
-        return self._synapse_manager.get_synaptic_list_from_machine(
-            placements, transceiver, pre_subvertex, pre_n_atoms,
-            post_subvertex, synapse_io, subgraph, routing_infos, weight_scales)
+    def add_pre_run_connection_holder(
+            self, connection_holder, edge, synapse_info):
+        self._synapse_manager.add_pre_run_connection_holder(
+            connection_holder, edge, synapse_info)
+
+    def get_connections_from_machine(
+            self, transceiver, placement, subedge, graph_mapper,
+            routing_infos, synapse_info):
+        return self._synapse_manager.get_connections_from_machine(
+            transceiver, placement, subedge, graph_mapper,
+            routing_infos, synapse_info)
 
     def is_data_specable(self):
         return True

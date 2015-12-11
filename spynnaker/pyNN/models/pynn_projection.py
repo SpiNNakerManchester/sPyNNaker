@@ -4,6 +4,7 @@ Projection
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
+from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
     import MultiCastPartitionableEdge
 
@@ -28,7 +29,6 @@ from spinn_front_end_common.utilities import exceptions
 
 import logging
 import math
-import numpy
 
 logger = logging.getLogger(__name__)
 EDGE_PARTITION_ID = "SPIKE"
@@ -53,7 +53,6 @@ class Projection(object):
         self._projection_edge = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
-        self._synapse_dynamics = synapse_dynamics
 
         if not isinstance(postsynaptic_population._get_vertex,
                           AbstractPopulationVertex):
@@ -228,46 +227,6 @@ class Projection(object):
         raise NotImplementedError
 
     # noinspection PyPep8Naming
-    def getDelays(self, format='list', gather=True):  # @ReservedAssignment
-        """
-        Get synaptic delays for all connections in this Projection.
-
-        Possible formats are: a list of length equal to the number of
-        connections in the projection, a 2D delay array (with NaN for
-        non-existent connections).
-        """
-        if not gather:
-            exceptions.ConfigurationException(
-                "the gather param has no meaning for spinnaker when set to "
-                "false")
-
-        if (self._spinnaker.has_ran and not
-                self._has_retrieved_synaptic_list_from_machine):
-            self._retrieve_synaptic_data_from_machine()
-
-        if format == 'list':
-            delays = list()
-            for row in self._host_based_synapse_list.get_rows():
-                delays.extend(
-                    numpy.asarray(
-                        row.delays * (
-                            float(self._spinnaker.machine_time_step) / 1000.0),
-                        dtype=float))
-            return delays
-
-        delays = numpy.zeros((self._projection_edge.pre_vertex.n_atoms,
-                              self._projection_edge.post_vertex.n_atoms))
-        rows = self._host_based_synapse_list.get_rows()
-        for pre_atom in range(len(rows)):
-            row = rows[pre_atom]
-            for i in xrange(len(row.target_indices)):
-                post_atom = row.target_indices[i]
-                delay = (float(row.delays[i]) *
-                         (float(self._spinnaker.machine_time_step) / 1000.0))
-                delays[pre_atom][post_atom] = delay
-        return delays
-
-    # noinspection PyPep8Naming
     def getSynapseDynamics(self, parameter_name, list_format='list',
                            gather=True):
         """
@@ -280,12 +239,42 @@ class Projection(object):
         # TODO: Need to work out what is to be returned
         raise NotImplementedError
 
+    def _get_synaptic_data(self, as_list, data_to_get):
+        post_vertex = self._projection_edge.post_vertex
+        pre_vertex = self._projection_edge.pre_vertex
+        connection_holder = ConnectionHolder(
+            data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms)
+
+        # If we haven't run, add the holder to get connections, and return it
+        if not self._spinnaker.has_ran:
+
+            post_vertex.add_pre_run_connection_holder(
+                connection_holder, self._projection_edge,
+                self._synapse_information)
+            return connection_holder
+
+        # Otherwise, get the connections now
+        graph_mapper = self._spinnaker.graph_mapper
+        placements = self._spinnaker.placements
+        transceiver = self._spinnaker.transceiver
+        routing_infos = self._spinnaker.routing_infos
+        subedges = graph_mapper.get_partitioned_edges_from_partitionable_edge(
+            self._projection_edge)
+        for subedge in subedges:
+            placement = placements.get_placement_of_subvertex(
+                subedge.post_subvertex)
+            connections = post_vertex.get_connections_from_machine(
+                transceiver, placement, subedge, graph_mapper, routing_infos,
+                self._synapse_information)
+            if connections is not None:
+                connection_holder.add_connections(connections)
+
+        return connection_holder
+
     # noinspection PyPep8Naming
     def getWeights(self, format='list', gather=True):  # @ReservedAssignment
         """
         Get synaptic weights for all connections in this Projection.
-        (pyNN gather parameter not supported from the signature
-        getWeights(self, format='list', gather=True):)
 
         Possible formats are: a list of length equal to the number of
         connections in the projection, a 2D weight array (with NaN for
@@ -301,32 +290,23 @@ class Projection(object):
                 "the gather param has no meaning for spinnaker when set to "
                 "false")
 
-        if (self._spinnaker.has_ran and not
-                self._has_retrieved_synaptic_list_from_machine):
-            self._retrieve_synaptic_data_from_machine()
+        return self._get_synaptic_data(format == 'list', "weight")
 
-        if format == 'list':
-            weights = list()
-            for row in self._host_based_synapse_list.get_rows():
-                weights.extend(row.weights / self._weight_scale)
-            return weights
+    # noinspection PyPep8Naming
+    def getDelays(self, format='list', gather=True):  # @ReservedAssignment
+        """
+        Get synaptic delays for all connections in this Projection.
 
-        weights = None
-        if self._projection_edge is not None:
-            weights = numpy.empty((self._projection_edge.pre_vertex.n_atoms,
-                                   self._projection_edge.post_vertex.n_atoms))
-        else:
-            weights = numpy.empty((self._delay_edge.pre_vertex.n_atoms,
-                                   self._delay_edge.post_vertex.n_atoms))
-        weights.fill(numpy.nan)
-        rows = self._host_based_synapse_list.get_rows()
-        for pre_atom in range(len(rows)):
-            row = rows[pre_atom]
-            for i in xrange(len(row.target_indices)):
-                post_atom = row.target_indices[i]
-                weight = row.weights[i]
-                weights[pre_atom][post_atom] = weight / self._weight_scale
-        return weights
+        Possible formats are: a list of length equal to the number of
+        connections in the projection, a 2D delay array (with NaN for
+        non-existent connections).
+        """
+        if not gather:
+            exceptions.ConfigurationException(
+                "the gather param has no meaning for spinnaker when set to "
+                "false")
+
+        return self._get_synaptic_data(format == 'list', "delay")
 
     def __len__(self):
         """ Return the total number of local connections.

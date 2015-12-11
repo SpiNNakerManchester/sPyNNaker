@@ -9,6 +9,9 @@ import math
 @add_metaclass(ABCMeta)
 class AbstractSynapseDynamics(object):
 
+    NUMPY_CONNECTORS_DTYPE = [("source", "uint32"), ("target", "uint32"),
+                              ("weight", "float64"), ("delay", "float64")]
+
     @abstractmethod
     def is_same_as(self, synapse_dynamics):
         """ Determines if this synapse dynamics is the same as another

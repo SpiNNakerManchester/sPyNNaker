@@ -21,11 +21,3 @@ class SynapseInformation(object):
     @property
     def synapse_type(self):
         return self._synapse_type
-
-    @property
-    def synapse_io_data(self):
-        return self._synapse_io_data
-
-    @synapse_io_data.setter
-    def synapse_io_data(self, synapse_io_data):
-        self._synapse_io_data = synapse_io_data

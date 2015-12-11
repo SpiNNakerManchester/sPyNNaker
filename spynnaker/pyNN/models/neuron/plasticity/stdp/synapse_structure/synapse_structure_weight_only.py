@@ -11,8 +11,11 @@ class SynapseStructureWeightOnly(AbstractSynapseStructure):
     def get_n_bytes_per_connection(self):
         return 2
 
-    def get_synaptic_data(self, connections, synapse_weight_scale):
+    def get_synaptic_data(self, connections):
         plastic_plastic = numpy.rint(
-            numpy.abs(connections["weight"]) *
-            synapse_weight_scale).astype("uint16")
+            numpy.abs(connections["weight"])).astype("uint16")
         return plastic_plastic.view(dtype="uint8").reshape((-1, 2))
+
+    def read_synaptic_data(self, connection_indices, pp_data):
+        return numpy.ravel(
+            [row.view(dtype="uint16")[connection_indices] for row in pp_data])

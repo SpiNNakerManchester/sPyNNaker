@@ -14,7 +14,7 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
     @abstractmethod
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, weight_scales, synapse_type):
+            post_vertex_slice, n_synapse_types):
         """ Get the fixed-plastic data, and plastic-plastic data for each row,\
             and lengths for the fixed_plastic and plastic-plastic parts of\
             each row.
@@ -25,4 +25,22 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
             n_rows.
             Lengths are returned as an array made up of an integer for each\
             row, for each of the fixed-plastic and plastic-plastic regions.
+        """
+
+    @abstractmethod
+    def get_n_plastic_plastic_words_per_row(self, pp_size):
+        """ Get the number of plastic plastic words to be read from each row
+        """
+
+    @abstractmethod
+    def get_n_fixed_plastic_words_per_row(self, fp_size):
+        """ Get the number of fixed plastic words to be read from each row
+        """
+
+    @abstractmethod
+    def read_plastic_synaptic_data(
+            self, connection_indices, post_vertex_slice, n_synapse_types,
+            pp_size, pp_data, fp_size, fp_data):
+        """ Read the connections indicated in the connection indices from the\
+            data in pp_data and fp_data
         """

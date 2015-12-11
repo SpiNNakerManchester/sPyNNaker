@@ -124,8 +124,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
 
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, weight_scales, synapse_type):
-        synapse_weight_scale = weight_scales[synapse_type]
+            post_vertex_slice, n_synapse_types):
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
         dendritic_delays = (
             connections["delay"] * self._dendritic_delay_fraction)
@@ -138,7 +137,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
              (8 + n_synapse_type_bits)) |
             ((axonal_delays.astype("uint16") & 0xF) <<
              (12 + n_synapse_type_bits)) |
-            (synapse_type << 8) |
+            (connections["synapse_type"] << 8) |
             ((connections["target"].astype("uint16") -
               post_vertex_slice.lo_atom) & 0xFF))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
@@ -148,8 +147,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
 
         # Get the plastic data
         synapse_structure = self._timing_dependence.synaptic_structure
-        plastic_plastic = synapse_structure.get_synaptic_data(
-            connections, synapse_weight_scale)
+        plastic_plastic = synapse_structure.get_synaptic_data(connections)
         plastic_headers = numpy.zeros(
             (n_rows, self._n_header_bytes), dtype="uint8")
         plastic_plastic_rows = numpy.concatenate((
@@ -158,6 +156,37 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         pp_size, pp_data = self.get_n_items_and_words(plastic_plastic_rows, 4)
 
         return (fp_data, pp_data, fp_size, pp_size)
+
+    def get_n_plastic_plastic_words_per_row(self, pp_size):
+
+        # pp_size is in words, so return
+        return pp_size
+
+    def get_n_fixed_plastic_words_per_row(self, fp_size):
+
+        # fp_size is in half-words
+        return numpy.ceil(fp_size / 2.0).astype(dtype="uint32")
+
+    def read_plastic_synaptic_data(
+            self, connection_indices, post_vertex_slice, n_synapse_types,
+            pp_size, pp_data, fp_size, fp_data):
+        n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+        data_fixed = numpy.ravel(
+            [row.view(dtype="uint16")[connection_indices] for row in fp_data])
+        pp_without_headers = [
+            row.view(dtype="uint8")[self._n_header_bytes:] for row in pp_data]
+        synapse_structure = self._timing_dependence.synaptic_structure
+
+        connections = numpy.zeros(
+            data_fixed.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
+        connections["source"] = numpy.ravel([numpy.repeat(
+            i, connection_indices[i].size)
+            for i in range(len(connection_indices))])
+        connections["target"] = (data_fixed & 0xFF) + post_vertex_slice.lo_atom
+        connections["weight"] = synapse_structure.read_synaptic_data(
+            connection_indices, pp_without_headers)
+        connections["delay"] = (data_fixed >> (8 + n_synapse_type_bits)) & 0xF
+        return connections
 
     def get_weight_mean(self, connector, pre_vertex_slice, post_vertex_slice):
 

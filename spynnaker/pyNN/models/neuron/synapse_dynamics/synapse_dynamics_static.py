@@ -30,16 +30,15 @@ class SynapseDynamicsStatic(AbstractStaticSynapseDynamics):
 
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, weight_scales, synapse_type):
-        synapse_weight_scale = weight_scales[synapse_type]
+            post_vertex_slice, n_synapse_types):
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
 
         fixed_fixed = (
-            ((numpy.rint(numpy.abs(connections["weight"]) *
-              synapse_weight_scale).astype("uint32") & 0xFFFF) << 16) |
+            ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
+              0xFFFF) << 16) |
             ((connections["delay"].astype("uint32") & 0xF) <<
              (8 + n_synapse_type_bits)) |
-            (synapse_type << 8) |
+            (connections["synapse_type"] << 8) |
             ((connections["target"] - post_vertex_slice.lo_atom) & 0xFF))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
@@ -47,3 +46,23 @@ class SynapseDynamicsStatic(AbstractStaticSynapseDynamics):
         ff_size, ff_data = self.get_n_items_and_words(fixed_fixed_rows, 4)
 
         return (ff_data, ff_size)
+
+    def get_n_static_words_per_row(self, ff_size):
+
+        # The sizes are in words, so just return them
+        return ff_size
+
+    def read_static_synaptic_data(
+            self, connection_indices, post_vertex_slice, n_synapse_types,
+            ff_size, ff_data):
+        n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+        data = numpy.ravel([row[connection_indices] for row in ff_data])
+        connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
+        connections["source"] = numpy.ravel([numpy.repeat(
+            i, connection_indices[i].size)
+            for i in range(len(connection_indices))])
+        connections["target"] = (data & 0xFF) + post_vertex_slice.lo_atom
+        connections["weight"] = (data >> 16) & 0xFFFF
+        connections["delay"] = (data >> (8 + n_synapse_type_bits)) & 0xF
+
+        return connections
