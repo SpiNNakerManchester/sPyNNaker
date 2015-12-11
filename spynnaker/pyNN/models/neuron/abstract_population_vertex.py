@@ -81,7 +81,6 @@ class AbstractPopulationVertex(
             synapse_type, threshold_type, additional_input=None,
             constraints=None):
 
-        AbstractReceiveBuffersToHost.__init__(self)
         AbstractPartitionableVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
         AbstractDataSpecableVertex.__init__(
@@ -95,6 +94,7 @@ class AbstractPopulationVertex(
         AbstractPopulationSettable.__init__(self)
         AbstractMappable.__init__(self)
         AbstractPartitionableUsesMemoryMallocs.__init__(self)
+        AbstractReceiveBuffersToHost.__init__(self)
 
         self._binary = binary
         self._label = label
