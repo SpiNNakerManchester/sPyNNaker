@@ -17,5 +17,6 @@ class SynapseStructureWeightOnly(AbstractSynapseStructure):
         return plastic_plastic.view(dtype="uint8").reshape((-1, 2))
 
     def read_synaptic_data(self, connection_indices, pp_data):
-        return numpy.ravel(
-            [row.view(dtype="uint16")[connection_indices] for row in pp_data])
+        return numpy.concatenate(
+            [pp_data[i].view(dtype="uint16")[connection_indices[i]]
+             for i in range(len(pp_data))])

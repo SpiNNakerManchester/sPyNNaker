@@ -95,7 +95,7 @@ class AbstractConnector(object):
         elif not hasattr(weights, '__iter__'):
             return weights
         else:
-            return numpy.mean(weights[connection_slice])[0]
+            return numpy.mean(weights[connection_slice])
 
     @abstractmethod
     def get_weight_mean(self, pre_vertex_slice, post_vertex_slice):
@@ -131,7 +131,7 @@ class AbstractConnector(object):
         elif not hasattr(weights, '__iter__'):
             return 0.0
         else:
-            return numpy.var(weights[connection_slice])[0]
+            return numpy.var(weights[connection_slice])
 
     @abstractmethod
     def get_weight_variance(self, pre_vertex_slice, post_vertex_slice):

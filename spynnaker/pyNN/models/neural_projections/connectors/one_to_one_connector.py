@@ -1,4 +1,5 @@
 import numpy
+from pyNN.random import RandomDistribution
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 
@@ -32,10 +33,36 @@ class OneToOneConnector(AbstractConnector):
             self, n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-        return 1
+        max_lo_atom = max(
+            (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
+        min_hi_atom = min(
+            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
+        if min_hi_atom < max_lo_atom:
+            return 0
+        if min_delay is None or max_delay is None:
+            return 1
+        if isinstance(self._delays, RandomDistribution):
+            return 1
+        elif not hasattr(self._delays, '__iter__'):
+            if self._delays >= min_delay and self._delays <= max_delay:
+                return 1
+            return 0
+        else:
+            connection_slice = slice(max_lo_atom, min_hi_atom + 1)
+            slice_min_delay = min(self._delays[connection_slice])
+            slice_max_delay = max(self._delays[connection_slice])
+            if slice_min_delay >= min_delay and slice_max_delay <= max_delay:
+                return 1
+            return 0
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_vertex_slice, post_vertex_slice):
+        max_lo_atom = max(
+            (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
+        min_hi_atom = min(
+            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
+        if min_hi_atom <= max_lo_atom:
+            return 0
         return 1
 
     def get_weight_mean(self, pre_vertex_slice, post_vertex_slice):
@@ -44,6 +71,8 @@ class OneToOneConnector(AbstractConnector):
         min_hi_atom = min(
             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
         n_connections = (min_hi_atom - max_lo_atom) + 1
+        if n_connections <= 0:
+            return 0
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_mean(
             self._weights, n_connections, connection_slice)
@@ -54,6 +83,8 @@ class OneToOneConnector(AbstractConnector):
         min_hi_atom = min(
             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
         n_connections = (min_hi_atom - max_lo_atom) + 1
+        if n_connections <= 0:
+            return 0
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_maximum(
             self._weights, n_connections, connection_slice)
@@ -63,6 +94,8 @@ class OneToOneConnector(AbstractConnector):
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(
             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
+        if max_lo_atom >= min_hi_atom:
+            return 0
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_variance(self._weights, connection_slice)
 
@@ -75,6 +108,8 @@ class OneToOneConnector(AbstractConnector):
         min_hi_atom = min(
             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
         n_connections = max((0, (min_hi_atom - max_lo_atom) + 1))
+        if n_connections <= 0:
+            return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)

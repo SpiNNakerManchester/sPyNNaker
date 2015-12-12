@@ -56,9 +56,10 @@ class SynapseDynamicsStatic(AbstractStaticSynapseDynamics):
             self, connection_indices, post_vertex_slice, n_synapse_types,
             ff_size, ff_data):
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
-        data = numpy.ravel([row[connection_indices] for row in ff_data])
+        data = numpy.concatenate(
+            [ff_data[i][connection_indices[i]] for i in range(len(ff_data))])
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
-        connections["source"] = numpy.ravel([numpy.repeat(
+        connections["source"] = numpy.concatenate([numpy.repeat(
             i, connection_indices[i].size)
             for i in range(len(connection_indices))])
         connections["target"] = (data & 0xFF) + post_vertex_slice.lo_atom

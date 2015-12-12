@@ -8,9 +8,6 @@ from spynnaker.pyNN.models.neural_projections.connectors.seed_info \
     import SeedInfo
 from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
     import FromListConnector
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.models.neural_properties.synapse_row_info \
-    import SynapseRowInfo
 
 from spinn_front_end_common.utilities import exceptions
 

@@ -73,7 +73,7 @@ class SynapticManager(object):
         self._synapse_dynamics = SynapseDynamicsStatic()
 
         # Keep the details once computed to allow reading back
-        self._weight_scales = None
+        self._weight_scales = dict()
         self._delay_key_index = dict()
         self._retrieved_blocks = dict()
 
@@ -91,6 +91,10 @@ class SynapticManager(object):
         # We can always override static dynamics or None
         if isinstance(self._synapse_dynamics, SynapseDynamicsStatic):
             self._synapse_dynamics = synapse_dynamics
+
+        # We can ignore a static dynamics trying to overwrite a plastic one
+        elif isinstance(synapse_dynamics, SynapseDynamicsStatic):
+            pass
 
         # Otherwise, the dynamics must be equal
         elif not synapse_dynamics.is_same_as(self._synapse_dynamics):
@@ -465,9 +469,10 @@ class SynapticManager(object):
 
         spec.write_array(ring_buffer_shifts)
 
-        self._weight_scales = numpy.array([
+        weight_scales = numpy.array([
             self._get_weight_scale(r) * weight_scale
             for r in ring_buffer_shifts])
+        return weight_scales
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_addr):
@@ -549,7 +554,7 @@ class SynapticManager(object):
                         connections = self._synapse_io.read_synapses(
                             edge, synapse_info, pre_vertex_slice,
                             post_vertex_slice, row_length, delayed_row_length,
-                            n_synapse_types, self._weight_scales, row_data,
+                            n_synapse_types, weight_scales, row_data,
                             delayed_row_data)
                         connection_holder.add_connections(connections)
 
@@ -611,19 +616,21 @@ class SynapticManager(object):
         self._reserve_memory_regions(
             spec, vertex, vertex_slice, graph, all_syn_block_sz)
 
-        self._write_synapse_parameters(
+        weight_scales = self._write_synapse_parameters(
             spec, subvertex, subgraph, graph_mapper, vertex_slice, input_type)
 
         self._write_synaptic_matrix_and_master_population_table(
             spec, n_slices, slice_index, subvertex, vertex_slice,
-            all_syn_block_sz, self._weight_scales,
+            all_syn_block_sz, weight_scales,
             constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             routing_info, graph_mapper, subgraph)
 
         self._synapse_dynamics.write_parameters(
             spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-            self._machine_time_step, self._weight_scales)
+            self._machine_time_step, weight_scales)
+
+        self._weight_scales[placement] = weight_scales
 
     def get_connections_from_machine(
             self, transceiver, placement, subedge, graph_mapper,
@@ -681,7 +688,7 @@ class SynapticManager(object):
         return self._synapse_io.read_synapses(
             edge, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
-            self._weight_scales, data, delayed_data)
+            self._weight_scales[placement], data, delayed_data)
 
     def _retrieve_synaptic_block(
             self, transceiver, placement, master_pop_table_address,
@@ -691,8 +698,8 @@ class SynapticManager(object):
         """
 
         # See if we have already got this block
-        if key in self._retrieved_blocks:
-            return self._retrieved_blocks[key]
+        if (placement, key) in self._retrieved_blocks:
+            return self._retrieved_blocks[(placement, key)]
 
         max_row_length, synaptic_block_offset = \
             self._population_table_type.extract_synaptic_matrix_data_location(
@@ -712,7 +719,7 @@ class SynapticManager(object):
                 synaptic_matrix_address + synaptic_block_offset,
                 synaptic_block_size)
 
-        self._retrieved_blocks[key] = (block, max_row_length)
+        self._retrieved_blocks[(placement, key)] = (block, max_row_length)
         return block, max_row_length
 
     # inherited from AbstractProvidesIncomingEdgeConstraints

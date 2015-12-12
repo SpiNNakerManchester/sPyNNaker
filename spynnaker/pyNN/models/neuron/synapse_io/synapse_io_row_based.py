@@ -432,7 +432,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         else:
             pp_size = numpy.zeros(n_rows, dtype="uint32")
         ff_size = static_synapse_dynamics.get_n_static_words_per_row(
-            row_data[:, pp_size + 1])
+            row_data[numpy.arange(n_rows), pp_size + 1])
         ff_start = pp_size + _N_HEADER_WORDS
         ff_end = ff_start + ff_size
         return (
@@ -443,16 +443,17 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _get_plastic_data(
             self, row_data, static_synapse_dynamics, plastic_synapse_dynamics):
         n_rows = row_data.shape[0]
+        indices = numpy.arange(n_rows)
         pp_size = plastic_synapse_dynamics\
             .get_n_plastic_plastic_words_per_row(row_data[:, 0])
         ff_size = None
         if static_synapse_dynamics is not None:
             ff_size = static_synapse_dynamics.get_n_static_words_per_row(
-                row_data[:, pp_size + 1])
+                row_data[indices, pp_size + 1])
         else:
             ff_size = numpy.zeros(n_rows, dtype="uint32")
         fp_size = plastic_synapse_dynamics\
-            .get_n_fixed_plastic_words_per_row(row_data[:, pp_size + 2])
+            .get_n_fixed_plastic_words_per_row(row_data[indices, pp_size + 2])
         fp_start = pp_size + ff_size + _N_HEADER_WORDS
         fp_end = fp_start + fp_size
         return (

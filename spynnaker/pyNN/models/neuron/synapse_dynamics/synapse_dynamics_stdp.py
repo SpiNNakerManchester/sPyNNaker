@@ -150,9 +150,12 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         plastic_plastic = synapse_structure.get_synaptic_data(connections)
         plastic_headers = numpy.zeros(
             (n_rows, self._n_header_bytes), dtype="uint8")
-        plastic_plastic_rows = numpy.concatenate((
-            plastic_headers, self.convert_per_connection_data_to_rows(
-                connection_row_indices, n_rows, plastic_plastic)), axis=1)
+        plastic_plastic_row_data = self.convert_per_connection_data_to_rows(
+            connection_row_indices, n_rows, plastic_plastic)
+        plastic_plastic_rows = [
+            numpy.concatenate((
+                plastic_headers[i], plastic_plastic_row_data[i]))
+            for i in range(n_rows)]
         pp_size, pp_data = self.get_n_items_and_words(plastic_plastic_rows, 4)
 
         return (fp_data, pp_data, fp_size, pp_size)
@@ -171,15 +174,16 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
             self, connection_indices, post_vertex_slice, n_synapse_types,
             pp_size, pp_data, fp_size, fp_data):
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
-        data_fixed = numpy.ravel(
-            [row.view(dtype="uint16")[connection_indices] for row in fp_data])
+        data_fixed = numpy.concatenate(
+            [fp_data[i].view(dtype="uint16")[connection_indices[i]]
+             for i in range(len(fp_data))])
         pp_without_headers = [
             row.view(dtype="uint8")[self._n_header_bytes:] for row in pp_data]
         synapse_structure = self._timing_dependence.synaptic_structure
 
         connections = numpy.zeros(
             data_fixed.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
-        connections["source"] = numpy.ravel([numpy.repeat(
+        connections["source"] = numpy.concatenate([numpy.repeat(
             i, connection_indices[i].size)
             for i in range(len(connection_indices))])
         connections["target"] = (data_fixed & 0xFF) + post_vertex_slice.lo_atom

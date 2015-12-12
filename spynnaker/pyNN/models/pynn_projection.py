@@ -4,7 +4,7 @@ Projection
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
     import MultiCastPartitionableEdge
 
@@ -22,7 +22,7 @@ from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
 from spynnaker.pyNN.models.neural_projections\
     .delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
+from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 
 from spinn_front_end_common.utilities import exceptions
 
@@ -260,6 +260,10 @@ class Projection(object):
         routing_infos = self._spinnaker.routing_infos
         subedges = graph_mapper.get_partitioned_edges_from_partitionable_edge(
             self._projection_edge)
+        progress = ProgressBar(
+            len(subedges),
+            "Getting {}s for projection between {} and {}".format(
+                data_to_get, pre_vertex.label, post_vertex.label))
         for subedge in subedges:
             placement = placements.get_placement_of_subvertex(
                 subedge.post_subvertex)
@@ -268,7 +272,8 @@ class Projection(object):
                 self._synapse_information)
             if connections is not None:
                 connection_holder.add_connections(connections)
-
+            progress.update()
+        progress.end()
         return connection_holder
 
     # noinspection PyPep8Naming
@@ -362,55 +367,6 @@ class Projection(object):
         returns a string representation of the projection
         """
         return "projection {}".format(self._projection_edge.label)
-
-    def _retrieve_synaptic_data_from_machine(self):
-        synapse_list = None
-        delay_synapse_list = None
-        if self._projection_edge is not None:
-            synapse_list = \
-                self._projection_edge.get_synaptic_list_from_machine(
-                    graph_mapper=self._spinnaker.graph_mapper,
-                    partitioned_graph=self._spinnaker.partitioned_graph,
-                    placements=self._spinnaker.placements,
-                    transceiver=self._spinnaker.transceiver,
-                    routing_infos=self._spinnaker.routing_infos)
-        if self._delay_edge is not None:
-            delay_synapse_list = \
-                self._delay_edge.get_synaptic_list_from_machine(
-                    graph_mapper=self._spinnaker.graph_mapper,
-                    placements=self._spinnaker.placements,
-                    transceiver=self._spinnaker.transceiver,
-                    partitioned_graph=self._spinnaker.partitioned_graph,
-                    routing_infos=self._spinnaker.routing_infos)
-
-        # If there is both a delay and a non-delay list, merge them
-        if synapse_list is not None and delay_synapse_list is not None:
-            rows = synapse_list.get_rows()
-            delay_rows = delay_synapse_list.get_rows()
-            combined_rows = list()
-            for i in range(len(rows)):
-                combined_row = rows[i][self._projection_list_ranges[i]]
-                combined_row.append(delay_rows[i][self._delay_list_ranges[i]])
-                combined_rows.append(combined_row)
-            self._host_based_synapse_list = SynapticList(combined_rows)
-
-        # If there is only a synapse list, return that
-        elif synapse_list is not None:
-            rows = synapse_list.get_rows()
-            new_rows = list()
-            for i in range(len(rows)):
-                new_rows.append(rows[i][self._projection_list_ranges[i]])
-            self._host_based_synapse_list = SynapticList(new_rows)
-
-        # Otherwise return the delay list (there should be at least one!)
-        else:
-            rows = delay_synapse_list.get_rows()
-            new_rows = list()
-            for i in range(len(rows)):
-                new_rows.append(rows[i][self._delay_list_ranges[i]])
-            self._host_based_synapse_list = SynapticList(new_rows)
-
-        self._has_retrieved_synaptic_list_from_machine = True
 
     # noinspection PyPep8Naming
     def saveConnections(self, file_name, gather=True, compatible_output=True):
