@@ -1,9 +1,6 @@
 
 from spinn_front_end_common.utilities import helpful_functions
 
-# dsg imports
-from data_specification import utility_calls as dsg_utility
-
 # general imports
 from abc import ABCMeta
 from six import add_metaclass
