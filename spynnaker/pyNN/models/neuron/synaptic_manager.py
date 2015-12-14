@@ -513,7 +513,7 @@ class SynapticManager(object):
             if (fixed_plastic_region.size % 2) != 0:
                 fixed_plastic_region = numpy.asarray(numpy.append(
                     fixed_plastic_region, 0), dtype='uint16')
-            # does indeed return something (due to c fancy stuff in numpi) ABS
+            # does indeed return something (due to c fancy stuff in numpy) ABS
 
             # noinspection PyNoneFunctionAssignment
             fixed_plastic_region_words = fixed_plastic_region.view(
@@ -682,7 +682,7 @@ class SynapticManager(object):
                 self._extract_row_data_from_memory_block(numpy_block,
                                                          position_in_block)
 
-            # new position in synpaptic block
+            # new position in synaptic block
             position_in_block = ((atom + 1) *
                                  (max_row_length +
                                   constants.SYNAPTIC_ROW_HEADER_WORDS))
@@ -708,7 +708,7 @@ class SynapticManager(object):
         no_plastic_plastic_entries = synaptic_block[position_in_block]
         position_in_block += 1
 
-        # read inall the plastic entries
+        # read in all the plastic entries
         end_point = position_in_block + no_plastic_plastic_entries
         plastic_plastic_entries = synaptic_block[position_in_block:end_point]
 
@@ -811,7 +811,7 @@ class SynapticManager(object):
                     " (aka, something funkky happened)")
         return block, maxed_row_length
 
-    # inhirrted from AbstractProvidesIncomingEdgeConstraints
+    # inherited from AbstractProvidesIncomingEdgeConstraints
     def get_incoming_edge_constraints(self):
         """
 
