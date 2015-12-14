@@ -104,14 +104,22 @@
                 <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
-                <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
-            </parameter>
-            <parameter>
                 <param_name>execute_mapping</param_name>
                 <param_type>ExecuteMapping</param_type>
             </parameter>
         </required_inputs>
+        <required_optional_inputs>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+                <param_rank>2</param_rank>
+            </parameter>
+             <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryCompressedRoutingTables</param_type>
+                <param_rank>1</param_rank>
+            </parameter>
+        </required_optional_inputs>
         <parameters>
         </parameters>
         <produces_outputs>
