@@ -90,8 +90,9 @@ class AbstractMasterPopTableFactory(object):
 
         :return: the master pop table in some form
         """
-        master_region_base_address = transceiver.\
-            locate_memory_region_on_core(x, y, p, master_pop_table_region)
+        master_region_base_address = helpful_functions.\
+            locate_memory_region_on_core(
+                x, y, p, master_pop_table_region, transceiver)
         return master_region_base_address
 
     @abstractmethod
