@@ -171,7 +171,8 @@ def get_probability_within_range(dist, lower, upper):
         a given RandomDistribution dist
     """
     scipy_stats = _distribution_to_scipy_stats[dist.name]
-    return scipy_stats.cdf(lower, *dist.parameters)
+    return (scipy_stats.cdf(upper, *dist.parameters) -
+            scipy_stats.cdf(lower, *dist.parameters))
 
 
 def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):

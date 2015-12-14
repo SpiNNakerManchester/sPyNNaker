@@ -233,6 +233,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     def get_n_keys_for_partitioned_edge(self, partitioned_edge, graph_mapper):
         vertex_slice = graph_mapper.get_subvertex_slice(
             partitioned_edge.pre_subvertex)
+        if self._n_delay_stages == 0:
+            return 1
         return vertex_slice.n_atoms * self._n_delay_stages
 
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):

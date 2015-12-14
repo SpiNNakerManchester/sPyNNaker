@@ -555,7 +555,7 @@ class SynapticManager(object):
                             edge, synapse_info, pre_vertex_slice,
                             post_vertex_slice, row_length, delayed_row_length,
                             n_synapse_types, weight_scales, row_data,
-                            delayed_row_data)
+                            delayed_row_data, edge.n_delay_stages)
                         connection_holder.add_connections(connections)
 
                 if len(row_data) > 0:
@@ -657,7 +657,7 @@ class SynapticManager(object):
         if edge.delay_edge is not None:
             delayed_key = self._delay_key_index[
                 (edge.pre_vertex, pre_vertex_slice.lo_atom,
-                 pre_vertex_slice.hi_atom)]
+                 pre_vertex_slice.hi_atom)][0].key
 
         # Get the block for the connections from the pre_subvertex
         master_pop_table_address = \
@@ -681,14 +681,15 @@ class SynapticManager(object):
             delayed_data, delayed_max_row_length = \
                 self._retrieve_synaptic_block(
                     transceiver, placement, master_pop_table_address,
-                    synaptic_matrix_address, key,
+                    synaptic_matrix_address, delayed_key,
                     pre_vertex_slice.n_atoms * edge.n_delay_stages)
 
         # Convert the blocks into connections
         return self._synapse_io.read_synapses(
             edge, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
-            self._weight_scales[placement], data, delayed_data)
+            self._weight_scales[placement], data, delayed_data,
+            edge.n_delay_stages)
 
     def _retrieve_synaptic_block(
             self, transceiver, placement, master_pop_table_address,

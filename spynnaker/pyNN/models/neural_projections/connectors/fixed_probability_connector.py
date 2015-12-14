@@ -54,7 +54,7 @@ class FixedProbabilityConnector(AbstractConnector):
     def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._delays,
-            self._n_pre_neurons * self._n_post_neurons * self._p_connect * 1.1)
+            self._n_pre_neurons * self._n_post_neurons * self._p_connect * 2.0)
 
     def get_n_connections_from_pre_vertex_maximum(
             self, n_pre_slices, pre_slice_index, n_post_slices,
@@ -62,23 +62,23 @@ class FixedProbabilityConnector(AbstractConnector):
             min_delay=None, max_delay=None):
         if min_delay is None or max_delay is None:
             return int(math.ceil(
-                post_vertex_slice.n_atoms * self._p_connect * 1.1))
+                post_vertex_slice.n_atoms * self._p_connect * 2.0))
 
         if isinstance(self._delays, RandomDistribution):
             return int(math.ceil(utility_calls.get_probability_within_range(
                 self._delays, min_delay, max_delay) *
-                post_vertex_slice.n_atoms * self._p_connect * 1.1))
+                post_vertex_slice.n_atoms * self._p_connect * 2.0))
         elif not hasattr(self._delays, '__iter__'):
             if self._delays >= min_delay and self._delays <= max_delay:
                 return int(math.ceil(
-                    post_vertex_slice.n_atoms * self._p_connect * 1.1))
+                    post_vertex_slice.n_atoms * self._p_connect * 2.0))
             return 0
 
         raise Exception("Unknown input type for delays")
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_vertex_slice, post_vertex_slice):
-        return int(math.ceil(pre_vertex_slice.n_atoms * self._p_connect * 1.1))
+        return int(math.ceil(pre_vertex_slice.n_atoms * self._p_connect * 2.0))
 
     def get_weight_mean(self, pre_vertex_slice, post_vertex_slice):
         n_connections = int(math.ceil(
