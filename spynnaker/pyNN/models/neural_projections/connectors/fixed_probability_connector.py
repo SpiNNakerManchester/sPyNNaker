@@ -1,10 +1,11 @@
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities import utility_calls
-import math
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 from spinn_front_end_common.utilities import exceptions
+import math
 import numpy
+from scipy.stats import binom
 
 
 class FixedProbabilityConnector(AbstractConnector):
@@ -51,27 +52,30 @@ class FixedProbabilityConnector(AbstractConnector):
             raise exceptions.ConfigurationException(
                 "The probability should be between 0 and 1 (inclusive)")
 
+    def _get_n_connections(self, n_possible_connections):
+        prob = 1.0 - (1.0 / float(self._n_pre_neurons * 100.0))
+        return int(math.ceil(binom.ppf(
+            prob, n_possible_connections, self._p_connect)))
+
     def get_delay_maximum(self):
         return self._get_delay_maximum(
-            self._delays,
-            self._n_pre_neurons * self._n_post_neurons * self._p_connect * 2.0)
+            self._delays, self._get_n_connections(
+                self._n_pre_neurons * self._n_post_neurons))
 
     def get_n_connections_from_pre_vertex_maximum(
             self, n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         if min_delay is None or max_delay is None:
-            return int(math.ceil(
-                post_vertex_slice.n_atoms * self._p_connect * 2.0))
+            return self._get_n_connections(post_vertex_slice.n_atoms)
 
         if isinstance(self._delays, RandomDistribution):
             return int(math.ceil(utility_calls.get_probability_within_range(
                 self._delays, min_delay, max_delay) *
-                post_vertex_slice.n_atoms * self._p_connect * 2.0))
+                self._get_n_connections(post_vertex_slice.n_atoms)))
         elif not hasattr(self._delays, '__iter__'):
             if self._delays >= min_delay and self._delays <= max_delay:
-                return int(math.ceil(
-                    post_vertex_slice.n_atoms * self._p_connect * 2.0))
+                return self._get_n_connections(post_vertex_slice.n_atoms)
             return 0
 
         raise Exception("Unknown input type for delays")

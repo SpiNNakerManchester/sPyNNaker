@@ -137,7 +137,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
              (8 + n_synapse_type_bits)) |
             ((axonal_delays.astype("uint16") & 0xF) <<
              (12 + n_synapse_type_bits)) |
-            (connections["synapse_type"] << 8) |
+            (connections["synapse_type"].astype("uint16") << 8) |
             ((connections["target"].astype("uint16") -
               post_vertex_slice.lo_atom) & 0xFF))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
