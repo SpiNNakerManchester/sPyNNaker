@@ -56,7 +56,8 @@ class OneToOneConnector(AbstractConnector):
             return 0
 
     def get_n_connections_to_post_vertex_maximum(
-            self, pre_vertex_slice, post_vertex_slice):
+            self, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         max_lo_atom = max(
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(

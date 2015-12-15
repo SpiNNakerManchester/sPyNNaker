@@ -368,8 +368,9 @@ class SynapticManager(object):
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_to_input_left_shifts(
-            self, subvertex, sub_graph, graph_mapper, post_vertex_slice,
-            machine_timestep, weight_scale):
+            self, subvertex, sub_graph, graph_mapper, n_post_slices,
+            post_slice_index, post_vertex_slice, machine_timestep,
+            weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
         """
@@ -385,6 +386,10 @@ class SynapticManager(object):
                 subedge.pre_subvertex)
             edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
+            subvertices = list(graph_mapper.get_subvertices_from_vertex(
+                edge.pre_vertex))
+            n_pre_slices = len(subvertices)
+            pre_slice_index = subvertices.index(subedge.pre_subvertex)
             if isinstance(edge, ProjectionPartitionableEdge):
                 for synapse_info in edge.synapse_information:
                     synapse_type = synapse_info.synapse_type
@@ -395,7 +400,9 @@ class SynapticManager(object):
                         weight_scale)
                     n_connections = \
                         connector.get_n_connections_to_post_vertex_maximum(
-                            pre_vertex_slice, post_vertex_slice)
+                            n_pre_slices, pre_slice_index, n_post_slices,
+                            post_slice_index, pre_vertex_slice,
+                            post_vertex_slice)
                     weight_variance = (synapse_dynamics.get_weight_variance(
                         connector, pre_vertex_slice, post_vertex_slice) *
                         weight_scale_squared)
@@ -452,19 +459,20 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_synapse_parameters(
-            self, spec, subvertex, subgraph, graph_mapper, vertex_slice,
+            self, spec, subvertex, subgraph, graph_mapper, n_post_slices,
+            post_slice_index, post_vertex_slice,
             input_type):
 
         # Get the ring buffer shifts and scaling factors
         weight_scale = input_type.get_global_weight_scale()
         ring_buffer_shifts = self._get_ring_buffer_to_input_left_shifts(
-            subvertex, subgraph, graph_mapper, vertex_slice,
-            self._machine_time_step, weight_scale)
+            subvertex, subgraph, graph_mapper, n_post_slices, post_slice_index,
+            post_vertex_slice, self._machine_time_step, weight_scale)
 
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
         utility_calls.write_parameters_per_neuron(
-            spec, vertex_slice,
+            spec, post_vertex_slice,
             self._synapse_type.get_synapse_type_parameters())
 
         spec.write_array(ring_buffer_shifts)
@@ -617,7 +625,8 @@ class SynapticManager(object):
             spec, vertex, vertex_slice, graph, all_syn_block_sz)
 
         weight_scales = self._write_synapse_parameters(
-            spec, subvertex, subgraph, graph_mapper, vertex_slice, input_type)
+            spec, subvertex, subgraph, graph_mapper, n_slices, slice_index,
+            vertex_slice, input_type)
 
         self._write_synaptic_matrix_and_master_population_table(
             spec, n_slices, slice_index, subvertex, vertex_slice,

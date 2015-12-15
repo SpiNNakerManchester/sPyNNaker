@@ -68,7 +68,8 @@ class FromListConnector(AbstractConnector):
         return numpy.max(numpy.bincount(sources))
 
     def get_n_connections_to_post_vertex_maximum(
-            self, pre_vertex_slice, post_vertex_slice):
+            self, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &

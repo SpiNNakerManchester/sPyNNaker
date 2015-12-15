@@ -4,6 +4,7 @@ from abc import abstractmethod
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities import utility_calls
 import numpy
+import math
 
 
 @add_metaclass(ABCMeta)
@@ -49,22 +50,32 @@ class AbstractConnector(object):
 
     @staticmethod
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, n_connections, connection_slice, min_delay, max_delay):
+            delays, n_total_connections, n_connections, connection_slices,
+            min_delay, max_delay):
         """ Gets the expected number of delays that will fall within min_delay\
             and max_delay given given a float, RandomDistribution or list of\
             delays
         """
         if isinstance(delays, RandomDistribution):
-            return utility_calls.get_probability_within_range(
-                delays, min_delay, max_delay) * n_connections * 1.1
+            prob_in_range = utility_calls.get_probability_within_range(
+                delays, min_delay, max_delay)
+            return int(math.ceil(utility_calls.get_probable_maximum_selected(
+                n_total_connections, n_connections, prob_in_range)))
         elif not hasattr(delays, '__iter__'):
             if delays >= min_delay and delays <= max_delay:
-                return n_connections
+                return int(math.ceil(n_connections))
             return 0
         else:
-            return len([
+            n_delayed = sum([len([
                 delay for delay in delays[connection_slice]
                 if delay >= min_delay and delay <= max_delay])
+                for connection_slice in connection_slices])
+            n_total = sum([
+                len(delays[connection_slice])
+                for connection_slice in connection_slices])
+            prob_delayed = float(n_delayed) / float(n_total)
+            return int(math.ceil(utility_calls.get_probable_maximum_selected(
+                n_total_connections, n_delayed, prob_delayed)))
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
@@ -80,7 +91,8 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_n_connections_to_post_vertex_maximum(
-            self, pre_vertex_slice, post_vertex_slice):
+            self, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum number of connections between those to each of the\
             neurons in the post_vertex_slice from neurons in the\
             pre_vertex_slice
