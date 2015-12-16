@@ -9,10 +9,11 @@ from spynnaker.pyNN.models.neural_properties.randomDistributions\
     import generate_parameter
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
-    import PopulationSettableChangeRequiresMapping
+from spynnaker.pyNN.models.common.simple_population_settable \
+    import SimplePopulationSettable
 from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.utilities import utility_calls
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
@@ -27,6 +28,7 @@ from spinn_front_end_common.utilities import constants as\
 from spinn_front_end_common.interface.buffer_management\
     .buffer_models.abstract_receive_buffers_to_host \
     import AbstractReceiveBuffersToHost
+from spinn_front_end_common.utilities import helpful_functions
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -41,14 +43,14 @@ logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
 PARAMS_BASE_WORDS = 4
-PARAMS_WORDS_PER_NEURON = 5
+PARAMS_WORDS_PER_NEURON = 6
 RANDOM_SEED_WORDS = 4
 
 
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
-        PopulationSettableChangeRequiresMapping,
+        SimplePopulationSettable,
         AbstractPartitionableUsesMemoryMallocs,
         AbstractReceiveBuffersToHost):
     """A Poisson Spike source object
@@ -85,7 +87,7 @@ class SpikeSourcePoisson(
         AbstractSpikeRecordable.__init__(self)
         AbstractReceiveBuffersToHost.__init__(self)
         AbstractProvidesOutgoingEdgeConstraints.__init__(self)
-        PopulationSettableChangeRequiresMapping.__init__(self)
+        SimplePopulationSettable.__init__(self)
         AbstractPartitionableUsesMemoryMallocs.__init__(self)
 
         # Store the parameters
@@ -238,80 +240,74 @@ class SpikeSourcePoisson(
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
 
+        spec.write_value(data=num_neurons)
+
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
-        slow_sources = list()
-        fast_sources = list()
         for i in range(0, num_neurons):
+            start_scaled, end_scaled, is_fast_source, exp_minus_lamda, isi_val = \
+                self.generate_poisson_parameters(i)
 
-            # Get the parameter values for source i:
-            rate_val = generate_parameter(self._rate, i)
-            start_val = generate_parameter(self._start, i)
-            end_val = None
-            if self._duration is not None:
-                end_val = generate_parameter(self._duration, i) + start_val
-
-            # Decide if it is a fast or slow source and
-            spikes_per_tick = \
-                (float(rate_val) * (self._machine_time_step / 1000000.0))
-            if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
-                slow_sources.append([i, rate_val, start_val, end_val])
-            else:
-                fast_sources.append([i, spikes_per_tick, start_val, end_val])
-
-        # Write the numbers of each type of source
-        spec.write_value(data=len(slow_sources))
-        spec.write_value(data=len(fast_sources))
-
-        # Now write one struct for each slow source as follows
-        #
-        #   typedef struct slow_spike_source_t
-        #   {
-        #     uint32_t neuron_id;
-        #     uint32_t start_ticks;
-        #     uint32_t end_ticks;
-        #
-        #     accum mean_isi_ticks;
-        #     accum time_to_spike_ticks;
-        #   } slow_spike_source_t;
-        for (neuron_id, rate_val, start_val, end_val) in slow_sources:
-            if rate_val == 0:
-                isi_val = 0
-            else:
-                isi_val = float(1000000.0 /
-                                (rate_val * self._machine_time_step))
-            start_scaled = int(start_val * 1000.0 / self._machine_time_step)
-            end_scaled = 0xFFFFFFFF
-            if end_val is not None:
-                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
+            spec.write_value(data=is_fast_source, data_type=DataType.UINT32)
+            spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
             spec.write_value(data=isi_val, data_type=DataType.S1615)
             spec.write_value(data=0x0, data_type=DataType.UINT32)
 
-        # Now write
-        #   typedef struct fast_spike_source_t
-        #   {
-        #     uint32_t neuron_id;
-        #     uint32_t start_ticks;
-        #     uint32_t end_ticks;
-        #
-        #     unsigned long fract exp_minus_lambda;
-        #   } fast_spike_source_t;
-        for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
-            if spikes_per_tick == 0:
-                exp_minus_lamda = 0
-            else:
-                exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
-            start_scaled = int(start_val * 1000.0 / self._machine_time_step)
-            end_scaled = 0xFFFFFFFF
-            if end_val is not None:
-                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
-            spec.write_value(data=start_scaled, data_type=DataType.UINT32)
-            spec.write_value(data=end_scaled, data_type=DataType.UINT32)
-            spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
+    def generate_poisson_parameters(self, neuron_id):
+       # Get the parameter values for source neuron_id:
+        rate_val = generate_parameter(self._rate, neuron_id)
+        start_val = generate_parameter(self._start, neuron_id)
+        start_scaled = int(start_val * 1000.0 / self._machine_time_step)
+        end_val = None
+        end_scaled = 0xFFFFFFF
+        if self._duration is not None:
+            end_val = generate_parameter(self._duration, neuron_id) + start_val
+            end_scaled = int(end_val * 1000.0 / self._machine_time_step)
+
+        # Decide if it is a fast or slow source and
+        spikes_per_tick = \
+            (float(rate_val) * (self._machine_time_step / 1000000.0))
+        if spikes_per_tick == 0:
+            exp_minus_lamda = 0
+        else:
+            exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
+
+        is_fast_source = 1
+        if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
+            is_fast_source = 0
+
+        if rate_val == 0:
+            isi_val = 0
+        else:
+            isi_val = float(1000000.0 /
+                            (rate_val * self._machine_time_step))
+
+        return start_scaled, end_scaled, is_fast_source, exp_minus_lamda, isi_val
+
+    # @implements AbstractPopulationSettable.update_parameters
+    def update_parameters(self, txrx, vertex_slice, placement):
+        region = self._POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value
+        address = helpful_functions.get_region_address(region, placement, txrx)
+
+        # skip key, seed and num_neurons
+        address += 28
+
+        data = bytearray()
+
+        for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+            start_scaled, end_scaled, is_fast_source, exp_minus_lamda, isi_val = \
+                self.generate_poisson_parameters(i)
+
+            data += utility_calls.convert_value(start_scaled, DataType.UINT32)
+            data += utility_calls.convert_value(end_scaled, DataType.UINT32)
+            data += utility_calls.convert_value(is_fast_source, DataType.UINT32)
+            data += utility_calls.convert_value(exp_minus_lamda, DataType.U032)
+            data += utility_calls.convert_value(isi_val, DataType.S1615)
+            data += utility_calls.convert_value(0x0, DataType.UINT32)
+
+        txrx.write_memory(placement.x, placement.y, address, data)
 
     # @implements AbstractSpikeRecordable.is_recording_spikes
     def is_recording_spikes(self):

@@ -212,6 +212,13 @@ void timer_callback(uint timer_count, uint unused) {
     }
 }
 
+void reload_parameters() {
+    // Get the address this core's DTCM data starts at from SRAM
+    address_t address = data_specification_get_data_address();
+
+    neuron_reload(data_specification_get_region(NEURON_PARAMS_REGION, address));
+}
+
 //! \brief The entry point for this model.
 void c_main(void) {
 
@@ -235,7 +242,8 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     // Set up callback listening to SDP messages
-    simulation_register_simulation_sdp_callback(&simulation_ticks,
+    simulation_register_simulation_sdp_callback(&simulation_ticks, 
+                                                reload_parameters,
                                                 SDP_AND_DMA_AND_USER);
 
     log_info("Starting");

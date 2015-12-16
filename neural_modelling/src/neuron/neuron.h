@@ -31,6 +31,13 @@
 bool neuron_initialise(address_t address, uint32_t recording_flags,
                        uint32_t *n_neurons_value);
 
+//! \reread the data stored in the NEURON_PARAMS region and update the
+//! data structures.
+//! \param[in] address the absolute address in SDRAM for the start of the
+//!            NEURON_PARAMS data region in SDRAM
+//! \return nothing
+void neuron_reload(address_t address);
+
 
 //! \setter for the internal input buffers
 //! \param[in] input_buffers_value the new input buffers

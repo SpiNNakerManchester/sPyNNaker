@@ -216,6 +216,38 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     return true;
 }
 
+void neuron_reload(address_t address) {
+
+    uint32_t next = START_OF_GLOBAL_PARAMETERS;
+
+    // Reload global parameters
+    if (sizeof(global_neuron_params_t) > 0) {
+        memcpy(global_parameters, &address[next],
+            sizeof(global_neuron_params_t));
+        next += sizeof(global_neuron_params_t) / 4;
+    }
+
+    // Reload neurons
+    if (sizeof(neuron_t) != 0) {
+        memcpy(neuron_array, &address[next],
+            n_neurons * sizeof(neuron_t));
+        next += (n_neurons * sizeof(neuron_t)) / 4;
+    }
+
+    // Skip input and additional input
+    next += (n_neurons * sizeof(input_type_t)) / 4;
+    next += (n_neurons * sizeof(additional_input_t)) / 4;
+
+    // Load threshold types
+    if (sizeof(threshold_type_t) != 0) {
+        memcpy(threshold_type_array, &address[next],
+            n_neurons * sizeof(threshold_type_t));
+    }
+
+    neuron_model_set_global_neuron_params(global_parameters);
+
+}
+
 //! \setter for the internal input buffers
 //! \param[in] input_buffers_value the new input buffers
 void neuron_set_input_buffers(input_t *input_buffers_value) {

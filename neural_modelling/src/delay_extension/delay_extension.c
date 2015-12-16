@@ -268,6 +268,10 @@ void timer_callback(uint unused0, uint unused1) {
     memset(current_time_slot_spike_counters, 0, sizeof(uint8_t) * num_neurons);
 }
 
+void update_parameters(void) {
+    return;
+}
+
 // Entry point
 void c_main(void) {
 
@@ -295,7 +299,7 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     simulation_register_simulation_sdp_callback(
-        &simulation_ticks, SDP);
+        &simulation_ticks, update_parameters, SDP);
 
     log_info("Starting");
     simulation_run();

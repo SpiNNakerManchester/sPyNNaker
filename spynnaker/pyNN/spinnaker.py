@@ -556,6 +556,7 @@ class Spinnaker(object):
                 algorithms.append("SpyNNakerRecordingExtracter")
                 # add functions for updating the models
                 algorithms.append("FrontEndCommonRuntimeUpdater")
+                algorithms.append("SpyNNakerParameterReloader")
             if not self._has_ran and not executing_reset:
                 algorithms.append(
                     "FrontEndCommonPartitionableGraphApplicationDataLoader")

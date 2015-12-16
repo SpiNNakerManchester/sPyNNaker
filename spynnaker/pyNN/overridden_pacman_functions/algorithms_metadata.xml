@@ -147,4 +147,30 @@
             </parameter>
         </required_inputs>
     </algorithm>
+    <algorithm name="SpyNNakerParameterReloader">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_parameter_reloader</python_module>
+        <python_class>SpyNNakerParameterReloader</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>partitionable_graph</param_name>
+                <param_type>MemoryPartitionableGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>txrx</param_name>
+                <param_type>MemoryTransciever</param_type>
+            </parameter>
+            <parameter>
+                <param_name>no_sync_changes</param_name>
+                <param_type>NoSyncChanges</param_type>
+            </parameter>
+        </required_inputs>
+    </algorithm>
 </algorithms>

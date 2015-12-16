@@ -11,6 +11,7 @@ from spinn_front_end_common.abstract_models.abstract_uses_memory_mallocs import 
     AbstractPartitionableUsesMemoryMallocs
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
+from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN.models.neuron.population_partitioned_vertex import \
     PopulationPartitionedVertex
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -47,6 +48,8 @@ from abc import ABCMeta
 from six import add_metaclass
 import logging
 import os
+import struct
+import decimal
 
 logger = logging.getLogger(__name__)
 
@@ -137,6 +140,17 @@ class AbstractPopulationVertex(
 
         # bool for if state has changed.
         self._change_requires_mapping = True
+
+        # bool for parameter changes that do not require mapping
+        self._parameters_have_changed = False
+
+    # @implements AbstractPopulationSettable.parameters_have_changed
+    def parameters_have_changed(self):
+        return self._parameters_have_changed
+
+    # @implements AbstractPopulationSettable.mark_parameters_unchanged
+    def mark_parameters_unchanged(self):
+        self._parameters_have_changed = False
 
     @property
     def requires_mapping(self):
@@ -333,6 +347,36 @@ class AbstractPopulationVertex(
             spec, vertex_slice,
             self._threshold_type.get_threshold_parameters())
 
+    # @implements AbstractPopulationSettable.update_parameters
+    def update_parameters(self, txrx, vertex_slice, placement):
+        region = constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value
+        global_params = self._neuron_model.get_global_parameters()
+        address = helpful_functions.get_region_address(region, placement, txrx)
+
+        # skip key and n_atoms
+        address += 12
+
+        data = bytearray()
+
+        for param in global_params:
+            data += utility_calls.convert_value(param.get_value(), 
+                param.get_dataspec_datatype())
+
+        parameters = self._neuron_model.get_neural_parameters()
+        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+            for param in parameters:
+                value = param.get_value()
+                if hasattr(value, "__len__"):
+                    if len(value) > 1:
+                        value = value[atom]
+                    else:
+                        value = value[0]
+
+                data += utility_calls.convert_value(value,
+                    param.get_dataspec_datatype())
+        
+        txrx.write_memory(placement.x, placement.y, address, data)
+
     def _get_recording_and_buffer_sizes(self, buffer_max, space_needed):
         if space_needed == 0:
             return 0, False
@@ -467,7 +511,7 @@ class AbstractPopulationVertex(
             self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            placements, graph_mapper, self)
+            placements, n_machine_time_steps, graph_mapper, self)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
     def is_recording_gsyn(self):
@@ -496,7 +540,7 @@ class AbstractPopulationVertex(
             raise Exception("Vertex does not support initialisation of"
                             " parameter {}".format(variable))
         initialize_attr(value)
-        self._change_requires_mapping = True
+        self._parameters_have_changed = True
 
     @property
     def synapse_type(self):
@@ -520,7 +564,14 @@ class AbstractPopulationVertex(
     def set_value(self, key, value):
         """ Set a property of the overall model
         """
-        for obj in [self._neuron_model, self._input_type,
+        # Properties of the neuron model merely require resending.
+        if hasattr(self._neuron_model, key):
+            setattr(self._neuron_model, key, value)
+            self._parameters_have_changed = True
+            return
+
+        # All other properties require remapping
+        for obj in [self._input_type,
                     self._threshold_type, self._synapse_manager.synapse_type,
                     self._additional_input]:
             if hasattr(obj, key):

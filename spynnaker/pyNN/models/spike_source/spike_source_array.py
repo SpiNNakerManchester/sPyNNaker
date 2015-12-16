@@ -178,6 +178,11 @@ class SpikeSourceArray(
         self._spike_recorder.record = True
         self._change_requires_mapping = True
 
+    # @implements AbstractPopulationSettable.update_parameters
+    def update_parameters(self, txrx, vertex_slice):
+        # there is nothing to send this way.
+        pass
+
     def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager,

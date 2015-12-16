@@ -7,6 +7,8 @@ from spinn_front_end_common.utilities import exceptions
 import numpy
 import os
 import logging
+import decimal
+import struct
 
 
 logger = logging.getLogger(__name__)
@@ -61,6 +63,12 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
 
             spec.write_value(data=value,
                              data_type=param.get_dataspec_datatype())
+
+def convert_value(value, data_type):
+    data_format = "<{}".format(data_type.struct_encoding)
+    text_value = "{}".format(value)
+    data_value = decimal.Decimal(text_value) * data_type.scale
+    return bytearray(struct.pack(data_format, data_value))
 
 
 def read_in_data_from_file(

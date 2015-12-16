@@ -21,3 +21,19 @@ class AbstractPopulationSettable(object):
         :param key: the name of the parameter to change
         :param value: the new value of the parameter to assign
         """
+
+    @abstractmethod
+    def parameters_have_changed(self):
+        """ Indicate that one or more parameters have changed.
+        Should initially be false.
+        :returns: bool"""
+
+    @abstractmethod
+    def mark_parameters_unchanged(self):
+        """ Mark all parameters as unchanged.
+        """
+
+    @abstractmethod
+    def update_parameters(self, txrx, vertex_slice, placement):
+        """ Write updated parameters to SpiNNaker.
+        """

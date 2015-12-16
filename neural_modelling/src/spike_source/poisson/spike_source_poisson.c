@@ -16,27 +16,16 @@
 #include <spin1_api.h>
 #include <string.h>
 
-//! data structure for spikes which have multiple timer tick between firings
-//! this is separated from spikes which fire at least once every timer tick as
-//! there are separate algorithms for each type.
-typedef struct slow_spike_source_t {
-    uint32_t neuron_id;
+//! data structure for poisson sources
+typedef struct spike_source_t {
     uint32_t start_ticks;
     uint32_t end_ticks;
+    bool is_fast_source;
 
+    UFRACT exp_minus_lambda;
     REAL mean_isi_ticks;
     REAL time_to_spike_ticks;
-} slow_spike_source_t;
-
-//! data structure for spikes which have at least one spike fired per timer
-//! tick; this is separated from spikes which have multiple timer ticks\
-//! between firings as there are separate algorithms for each type.
-typedef struct fast_spike_source_t {
-    uint32_t neuron_id;
-    uint32_t start_ticks;
-    uint32_t end_ticks;
-    UFRACT exp_minus_lambda;
-} fast_spike_source_t;
+} spike_source_t;
 
 //! spike source array region ids in human readable form
 typedef enum region{
@@ -46,6 +35,7 @@ typedef enum region{
 }region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
+#define SDP_PORT 2
 
 typedef enum callback_priorities{
     SDP = 0, TIMER = 2
@@ -58,21 +48,11 @@ typedef enum poisson_region_parameters{
 } poisson_region_parameters;
 
 // Globals
-//! global variable which contains all the data for neurons which are expected
-//! to exhibit slow spike generation (less than 1 per timer tick)
-//! (separated for efficiently purposes)
-static slow_spike_source_t *slow_spike_source_array = NULL;
-
-//! global variable which contains all the data for neurons which are expected
-//! to exhibit fast spike generation (more than than 1 per timer tick)
-//! (separated for efficiently purposes)
-static fast_spike_source_t *fast_spike_source_array = NULL;
+//! global variable which contains all the data for neurons
+static spike_source_t *spike_source_array = NULL;
 
 //! counter for how many neurons exhibit slow spike generation
-static uint32_t num_slow_spike_sources = 0;
-
-//! counter for how many neurons exhibit fast spike generation
-static uint32_t num_fast_spike_sources = 0;
+static uint32_t num_spike_sources = 0;
 
 //! a variable that will contain the seed to initiate the poisson generator.
 static mars_kiss64_seed_t spike_source_seed;
@@ -146,59 +126,64 @@ bool read_poisson_parameters(address_t address) {
     log_info("\tSeed (%u) = %u %u %u %u", seed_size, spike_source_seed[0],
              spike_source_seed[1], spike_source_seed[2], spike_source_seed[3]);
 
-    num_slow_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
-    num_fast_spike_sources = address[PARAMETER_SEED_START_POSITION +
-                                     seed_size + 1];
-    log_info("\tslow spike sources = %u, fast spike sources = %u,",
-             num_slow_spike_sources, num_fast_spike_sources);
+    num_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
+    log_info("\tspike sources = %u", num_spike_sources);
 
-    // Allocate DTCM for array of slow spike sources and copy block of data
-    if (num_slow_spike_sources > 0) {
-        slow_spike_source_array = (slow_spike_source_t*) spin1_malloc(
-            num_slow_spike_sources * sizeof(slow_spike_source_t));
-        if (slow_spike_source_array == NULL) {
-            log_error("Failed to allocate slow_spike_source_array");
+    // Allocate DTCM for array of spike sources and copy block of data
+    if (num_spike_sources > 0) {
+        spike_source_array = (spike_source_t*) spin1_malloc(
+            num_spike_sources * sizeof(spike_source_t));
+        if (spike_source_array == NULL) {
+            log_error("Failed to allocate spike_source_array");
             return false;
         }
-        uint32_t slow_spikes_offset = PARAMETER_SEED_START_POSITION +
-                                    seed_size + 2;
-        memcpy(slow_spike_source_array,
-                &address[slow_spikes_offset],
-               num_slow_spike_sources * sizeof(slow_spike_source_t));
+        uint32_t spikes_offset = PARAMETER_SEED_START_POSITION +
+                                      seed_size + 1;
+        memcpy(spike_source_array, &address[spikes_offset],
+               num_spike_sources * sizeof(spike_source_t));
 
         // Loop through slow spike sources and initialise 1st time to spike
-        for (index_t s = 0; s < num_slow_spike_sources; s++) {
-            slow_spike_source_array[s].time_to_spike_ticks =
-                slow_spike_source_get_time_to_spike(
-                    slow_spike_source_array[s].mean_isi_ticks);
+        for (index_t s = 0; s < num_spike_sources; s++) {
+            if (!spike_source_array[s].is_fast_source) {
+                spike_source_array[s].time_to_spike_ticks =
+                    slow_spike_source_get_time_to_spike(
+                        spike_source_array[s].mean_isi_ticks);
+            }
         }
     }
 
-    // Allocate DTCM for array of fast spike sources and copy block of data
-    if (num_fast_spike_sources > 0) {
-        fast_spike_source_array = (fast_spike_source_t*) spin1_malloc(
-            num_fast_spike_sources * sizeof(fast_spike_source_t));
-        if (fast_spike_source_array == NULL) {
-            log_error("Failed to allocate fast_spike_source_array");
-            return false;
-        }
-        // locate offset for the fast spike sources in the SDRAM from where the
-        // seed finished.
-        uint32_t fast_spike_source_offset =
-                PARAMETER_SEED_START_POSITION + seed_size + 2 +
-            + (num_slow_spike_sources * (sizeof(slow_spike_source_t)
-                / sizeof(uint32_t)));
-        memcpy(fast_spike_source_array, &address[fast_spike_source_offset],
-               num_fast_spike_sources * sizeof(fast_spike_source_t));
-
-        for (index_t s = 0; s < num_fast_spike_sources; s++) {
-            log_debug("\t\tNeuron id %d, exp(-k) = %0.8x",
-                      fast_spike_source_array[s].neuron_id,
-                      fast_spike_source_array[s].exp_minus_lambda);
-        }
-    }
     log_info("read_parameters: completed successfully");
     return true;
+}
+
+//! \brief reload the parameter values from SDRAM and populate the arrays
+//! with changed values
+//! \return nothing
+void reload_poisson_parameters() {
+    // Get the address this core's DTCM data starts at from SRAM
+    address_t add = data_specification_get_data_address();
+
+    address_t address = data_specification_get_region(POISSON_PARAMS, add);
+
+    uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
+
+    if (num_spike_sources > 0) {
+        uint32_t spikes_offset = PARAMETER_SEED_START_POSITION +
+                                      seed_size + 1;
+        memcpy(spike_source_array, &address[spikes_offset],
+               num_spike_sources * sizeof(spike_source_t));
+
+        // Loop through slow spike sources and initialise 1st time to spike
+        for (index_t s = 0; s < num_spike_sources; s++) {
+            if (!spike_source_array[s].is_fast_source) {
+                spike_source_array[s].time_to_spike_ticks =
+                    slow_spike_source_get_time_to_spike(
+                        spike_source_array[s].mean_isi_ticks);
+            }
+        }
+    }
+
+    log_info("Successfully reloaded parameters.");
 }
 
 //! \brief Initialises the recording parts of the model
@@ -310,82 +295,77 @@ void timer_callback(uint timer_count, uint unused) {
             &recording_flags);
         }
 
-    // Loop through slow spike sources
-    slow_spike_source_t *slow_spike_sources = slow_spike_source_array;
-    for (index_t s = num_slow_spike_sources; s > 0; s--) {
+    // Loop through spike sources
+    for (index_t s = 0; s < num_spike_sources; s++) {
 
         // If this spike source is active this tick
-        slow_spike_source_t *slow_spike_source = slow_spike_sources++;
-        if ((time >= slow_spike_source->start_ticks)
-                && (time < slow_spike_source->end_ticks)
-                && (REAL_COMPARE(slow_spike_source->mean_isi_ticks, !=,
-                    REAL_CONST(0.0)))) {
+        spike_source_t *spike_source = spike_source_array + s;
+        if (spike_source->is_fast_source) {
+            if (time >= spike_source->start_ticks
+                    && time < spike_source->end_ticks) {
 
-            // If this spike source should spike now
-            if (REAL_COMPARE(slow_spike_source->time_to_spike_ticks, <=,
-                             REAL_CONST(0.0))) {
+                // Get number of spikes to send this tick
+                uint32_t num_spikes = fast_spike_source_get_num_spikes(
+                    spike_source->exp_minus_lambda);
+                log_debug("Generating %d spikes", num_spikes);
 
-                // Write spike to out spikes
-                out_spikes_set_spike(slow_spike_source->neuron_id);
+                // If there are any
+                if (num_spikes > 0) {
 
-                // if no key has been given, do not send spike to fabric.
-                if (has_been_given_key) {
+                    // Write spike to out spikes
+                    out_spikes_set_spike(s);
 
-                    // Send package
-                    while (!spin1_send_mc_packet(
-                            key | slow_spike_source->neuron_id, 0,
-                            NO_PAYLOAD)) {
-                        spin1_delay_us(1);
-                    }
-                    log_debug("Sending spike packet %x at %d\n",
-                        key | slow_spike_source->neuron_id, time);
-                }
+                    // Send spikes
+                    const uint32_t spike_key = key | s;
+                    for (uint32_t s = num_spikes; s > 0; s--) {
 
-                // Update time to spike
-                slow_spike_source->time_to_spike_ticks +=
-                    slow_spike_source_get_time_to_spike(
-                        slow_spike_source->mean_isi_ticks);
-            }
-
-            // Subtract tick
-            slow_spike_source->time_to_spike_ticks -= REAL_CONST(1.0);
-        }
-    }
-
-    // Loop through fast spike sources
-    fast_spike_source_t *fast_spike_sources = fast_spike_source_array;
-    for (index_t f = num_fast_spike_sources; f > 0; f--) {
-        fast_spike_source_t *fast_spike_source = fast_spike_sources++;
-
-        if (time >= fast_spike_source->start_ticks
-                && time < fast_spike_source->end_ticks) {
-
-            // Get number of spikes to send this tick
-            uint32_t num_spikes = fast_spike_source_get_num_spikes(
-                fast_spike_source->exp_minus_lambda);
-            log_debug("Generating %d spikes", num_spikes);
-
-            // If there are any
-            if (num_spikes > 0) {
-
-                // Write spike to out spikes
-                out_spikes_set_spike(fast_spike_source->neuron_id);
-
-                // Send spikes
-                const uint32_t spike_key = key | fast_spike_source->neuron_id;
-                for (uint32_t s = num_spikes; s > 0; s--) {
-
-                    // if no key has been given, do not send spike to fabric.
-                    if (has_been_given_key){
-                        log_debug("Sending spike packet %x at %d\n",
-                                  spike_key, time);
-                        while (!spin1_send_mc_packet(spike_key, 0,
-                                                     NO_PAYLOAD)) {
-                            spin1_delay_us(1);
+                        // if no key has been given, do not send spike to fabric.
+                        if (has_been_given_key){
+                            log_debug("Sending spike packet %x at %d\n",
+                                      spike_key, time);
+                            while (!spin1_send_mc_packet(spike_key, 0,
+                                                         NO_PAYLOAD)) {
+                                spin1_delay_us(1);
+                            }
                         }
                     }
                 }
             }
+        } else {
+            if ((time >= spike_source->start_ticks)
+                    && (time < spike_source->end_ticks)
+                    && (REAL_COMPARE(spike_source->mean_isi_ticks, !=,
+                        REAL_CONST(0.0)))) {
+
+                // If this spike source should spike now
+                if (REAL_COMPARE(spike_source->time_to_spike_ticks, <=,
+                                 REAL_CONST(0.0))) {
+
+                    // Write spike to out spikes
+                    out_spikes_set_spike(s);
+
+                    // if no key has been given, do not send spike to fabric.
+                    if (has_been_given_key) {
+
+                        // Send package
+                        while (!spin1_send_mc_packet(
+                                key | s, 0,
+                                NO_PAYLOAD)) {
+                            spin1_delay_us(1);
+                        }
+                        log_debug("Sending spike packet %x at %d\n",
+                            key | s, time);
+                    }
+
+                    // Update time to spike
+                    spike_source->time_to_spike_ticks +=
+                        slow_spike_source_get_time_to_spike(
+                            spike_source->mean_isi_ticks);
+                }
+
+                // Subtract tick
+                spike_source->time_to_spike_ticks -= REAL_CONST(1.0);
+            }    
         }
     }
 
@@ -413,8 +393,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Initialise out spikes buffer to support number of neurons
-    if (!out_spikes_initialize(num_fast_spike_sources
-                               + num_slow_spike_sources)) {
+    if (!out_spikes_initialize(num_spike_sources)) {
          rt_error(RTE_SWERR);
     }
 
@@ -425,7 +404,9 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
         // Set up callback listening to SDP messages
-    simulation_register_simulation_sdp_callback(&simulation_ticks, SDP);
+    simulation_register_simulation_sdp_callback(&simulation_ticks,
+                                                reload_poisson_parameters,
+                                                SDP);
 
     log_info("Starting");
     simulation_run();
