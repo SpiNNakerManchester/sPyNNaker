@@ -82,6 +82,8 @@ class SynapseIORowBased(AbstractSynapseIO):
         total_plastic_delayed_row_length = 0
         total_static_delayed_row_length = 0
         max_delay_supported = self.get_maximum_delay_supported_in_ms()
+        next_max_delay_supported = (
+            max_delay_supported + (self._machine_time_step / 1000.0))
         max_delay = max_delay_supported * (n_delay_stages + 1)
 
         plastic_synapse_dynamics = None
@@ -93,11 +95,13 @@ class SynapseIORowBased(AbstractSynapseIO):
                     n_pre_slices, pre_slice_index, n_post_slices,
                     post_slice_index, pre_vertex_slice, post_vertex_slice,
                     0, max_delay_supported)
-            max_delayed_row_length = synapse_info.connector\
-                .get_n_connections_from_pre_vertex_maximum(
-                    n_pre_slices, pre_slice_index, n_post_slices,
-                    post_slice_index, pre_vertex_slice, post_vertex_slice,
-                    max_delay_supported + 1, max_delay)
+            max_delayed_row_length = 0
+            if n_delay_stages > 0:
+                max_delayed_row_length = synapse_info.connector\
+                    .get_n_connections_from_pre_vertex_maximum(
+                        n_pre_slices, pre_slice_index, n_post_slices,
+                        post_slice_index, pre_vertex_slice, post_vertex_slice,
+                        next_max_delay_supported, max_delay)
 
             dynamics = synapse_info.synapse_dynamics
 
@@ -484,18 +488,24 @@ class SynapseIORowBased(AbstractSynapseIO):
         plastic_synapse_dynamics = self._plastic_synapse_dynamics[edge]
 
         # Use the row index to work out the actual delay and source
-        row_stage = numpy.array([
-            (i / pre_vertex_slice.n_atoms)
-            for i in range(len(delayed_connection_indices))], dtype="uint32")
-        row_min_delay = (row_stage + 1) * 16
-        connection_min_delay = numpy.concatenate([
-            numpy.repeat(row_min_delay[i], len(delayed_connection_indices[i]))
-            for i in range(len(delayed_connection_indices))])
-        connection_source_extra = numpy.concatenate([
-            numpy.repeat(
-                row_stage[i] * pre_vertex_slice.n_atoms,
-                len(delayed_connection_indices[i]))
-            for i in range(len(delayed_connection_indices))])
+        row_stage = None
+        connection_min_delay = None
+        connection_source_extra = None
+        if delayed_connection_indices is None:
+            row_stage = numpy.array([
+                (i / pre_vertex_slice.n_atoms)
+                for i in range(len(delayed_connection_indices))],
+                dtype="uint32")
+            row_min_delay = (row_stage + 1) * 16
+            connection_min_delay = numpy.concatenate([
+                numpy.repeat(
+                    row_min_delay[i], len(delayed_connection_indices[i]))
+                for i in range(len(delayed_connection_indices))])
+            connection_source_extra = numpy.concatenate([
+                numpy.repeat(
+                    row_stage[i] * pre_vertex_slice.n_atoms,
+                    len(delayed_connection_indices[i]))
+                for i in range(len(delayed_connection_indices))])
 
         # Translate the data into rows
         row_data = None

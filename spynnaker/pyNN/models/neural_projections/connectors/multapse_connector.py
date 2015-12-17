@@ -171,6 +171,7 @@ class MultapseConnector(AbstractConnector):
             numpy.arange(
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1),
             size=n_connections, replace=True)
+        block["source"].sort()
         block["target"] = numpy.random.choice(
             numpy.arange(
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),

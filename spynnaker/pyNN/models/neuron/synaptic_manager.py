@@ -285,7 +285,7 @@ class SynapticManager(object):
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX
                                                          .value,
-                size=all_syn_block_sz, label='SynBlocks')
+                size=all_syn_block_sz, label='SynBlocks', shrink_to_fit=True)
 
         synapse_dynamics_sz = self._get_synapse_dynamics_parameter_size(
             vertex_slice, in_edges)

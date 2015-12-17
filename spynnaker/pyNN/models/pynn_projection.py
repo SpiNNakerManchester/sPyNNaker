@@ -193,10 +193,11 @@ class Projection(object):
             self._spinnaker.add_edge(delay_afferent_edge, EDGE_PARTITION_ID)
 
         # Ensure that the delay extension knows how many states it will support
-        num_stages = int(math.floor(float(max_delay_for_projection - 1) /
-                                    float(max_delay_per_neuron)))
-        if num_stages > delay_vertex.n_delay_stages:
-            delay_vertex.n_delay_stages = num_stages
+        n_stages = int(math.ceil(
+            float(max_delay_for_projection - max_delay_per_neuron) /
+            float(max_delay_per_neuron)))
+        if n_stages > delay_vertex.n_delay_stages:
+            delay_vertex.n_delay_stages = n_stages
 
         # Create the delay edge if there isn't one already
         post_vertex = postsynaptic_population._get_vertex

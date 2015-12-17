@@ -32,11 +32,12 @@ class AbstractConnector(object):
             delays
         """
         if isinstance(delays, RandomDistribution):
-            if delays.boundaries is not None:
-                return max(delays.boundaries)
-
-            return utility_calls.get_maximum_probable_value(
+            max_estimated_delay = utility_calls.get_maximum_probable_value(
                 delays, n_connections)
+            if delays.boundaries is not None:
+                return min(max(delays.boundaries), max_estimated_delay)
+            return max_estimated_delay
+
         elif not hasattr(delays, '__iter__'):
             return delays
         else:
