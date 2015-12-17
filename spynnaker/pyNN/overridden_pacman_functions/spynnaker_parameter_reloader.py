@@ -51,6 +51,8 @@ class SpyNNakerParameterReloader(object):
                 vertex.mark_parameters_unchanged()
             progress.update()
 
+        progress.end()
+
         if num_changed_subvertices == 0:
             return
         else:
