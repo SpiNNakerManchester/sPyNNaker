@@ -62,7 +62,7 @@ class FixedProbabilityConnector(AbstractConnector):
             self._p_connect)
 
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         n_connections = self._get_n_connections(post_vertex_slice.n_atoms)
@@ -75,26 +75,32 @@ class FixedProbabilityConnector(AbstractConnector):
             n_connections, None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         return self._get_n_connections(pre_vertex_slice.n_atoms)
 
-    def get_weight_mean(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_mean(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         n_connections = self._get_n_connections(
             pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms)
         return self._get_weight_mean(self._weights, n_connections, None)
 
-    def get_weight_maximum(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         n_connections = self._get_n_connections(
             pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms)
         return self._get_weight_maximum(
             self._weights, n_connections, None)
 
-    def get_weight_variance(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         return self._get_weight_variance(self._weights, None)
 
     def create_synaptic_block(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, connector_index):
 

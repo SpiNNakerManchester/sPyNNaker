@@ -45,7 +45,7 @@ class FromListConnector(AbstractConnector):
         return numpy.max(self._conn_list["delay"])
 
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
 
@@ -68,7 +68,7 @@ class FromListConnector(AbstractConnector):
         return numpy.max(numpy.bincount(sources))
 
     def get_n_connections_to_post_vertex_maximum(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
@@ -79,7 +79,9 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.max(numpy.bincount(targets))
 
-    def get_weight_mean(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_mean(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
@@ -89,7 +91,9 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.mean(weights)
 
-    def get_weight_maximum(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
@@ -99,7 +103,9 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.max(weights)
 
-    def get_weight_variance(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
@@ -110,7 +116,7 @@ class FromListConnector(AbstractConnector):
         return numpy.var(weights)
 
     def create_synaptic_block(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, connector_index):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &

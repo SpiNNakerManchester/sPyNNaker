@@ -202,7 +202,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _update_connectors(
             self, synapse_information, plastic_connections,
             plastic_row_indices, static_connections, static_row_indices,
-            n_rows, pre_vertex_slice, post_vertex_slice, set_function):
+            n_rows, pre_vertex_slice, post_vertex_slice, delayed):
 
         # Store the connector data for each connector
         plastic_connector_index_rows = [
@@ -229,8 +229,12 @@ class SynapseIORowBased(AbstractSynapseIO):
                 numpy.where(row == connector_index)[0] for row in index_rows]
 
             # Update the synapse io data in the synapse info
-            setter = getattr(self._connector_data[synapse_info], set_function)
-            setter(pre_vertex_slice, post_vertex_slice, slices)
+            if not delayed:
+                self._connector_data[synapse_info].set_undelayed_row_slices(
+                    pre_vertex_slice, post_vertex_slice, slices)
+            else:
+                self._connector_data[synapse_info].set_delayed_row_slices(
+                    pre_vertex_slice, post_vertex_slice, slices)
             connector_index += 1
 
     def get_synapses(
@@ -354,8 +358,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 edge.synapse_information, undelayed_plastic_connections,
                 undelayed_plastic_row_indices, undelayed_static_connections,
                 undelayed_static_row_indices, pre_vertex_slice.n_atoms,
-                pre_vertex_slice, post_vertex_slice,
-                "set_undelayed_row_slices")
+                pre_vertex_slice, post_vertex_slice, delayed=False)
 
             del undelayed_plastic_row_indices, undelayed_static_row_indices
         del undelayed_plastic_connections, undelayed_static_connections
@@ -405,7 +408,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 delayed_plastic_row_indices, delayed_static_connections,
                 delayed_static_row_indices,
                 pre_vertex_slice.n_atoms * n_delay_stages, pre_vertex_slice,
-                post_vertex_slice, "set_delayed_row_slices")
+                post_vertex_slice, delayed=True)
 
             # Get the stages and source ids
             stages = numpy.concatenate((plastic_stages, static_stages))

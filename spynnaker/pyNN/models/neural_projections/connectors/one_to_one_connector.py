@@ -30,7 +30,7 @@ class OneToOneConnector(AbstractConnector):
             self._delays, max((self._n_pre_neurons, self._n_post_neurons)))
 
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         max_lo_atom = max(
@@ -56,7 +56,7 @@ class OneToOneConnector(AbstractConnector):
             return 0
 
     def get_n_connections_to_post_vertex_maximum(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         max_lo_atom = max(
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
@@ -66,7 +66,9 @@ class OneToOneConnector(AbstractConnector):
             return 0
         return 1
 
-    def get_weight_mean(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_mean(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         max_lo_atom = max(
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(
@@ -76,9 +78,11 @@ class OneToOneConnector(AbstractConnector):
             return 0
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_mean(
-            self._weights, n_connections, connection_slice)
+            self._weights, n_connections, [connection_slice])
 
-    def get_weight_maximum(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         max_lo_atom = max(
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(
@@ -88,9 +92,11 @@ class OneToOneConnector(AbstractConnector):
             return 0
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_maximum(
-            self._weights, n_connections, connection_slice)
+            self._weights, n_connections, [connection_slice])
 
-    def get_weight_variance(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         max_lo_atom = max(
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(
@@ -98,10 +104,10 @@ class OneToOneConnector(AbstractConnector):
         if max_lo_atom >= min_hi_atom:
             return 0
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
-        return self._get_weight_variance(self._weights, connection_slice)
+        return self._get_weight_variance(self._weights, [connection_slice])
 
     def create_synaptic_block(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, connector_index):
         max_lo_atom = max(
@@ -117,9 +123,9 @@ class OneToOneConnector(AbstractConnector):
         block["source"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["target"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["weight"] = self._generate_values(
-            self._weights, n_connections, connection_slice)
+            self._weights, n_connections, [connection_slice])
         block["delay"] = self._generate_values(
-            self._delays, n_connections, connection_slice)
+            self._delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         block["connector_index"] = connector_index
         return block

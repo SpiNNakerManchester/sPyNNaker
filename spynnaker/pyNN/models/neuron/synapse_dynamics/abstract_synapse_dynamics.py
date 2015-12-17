@@ -42,24 +42,32 @@ class AbstractSynapseDynamics(object):
         """
         return connector.get_delay_maximum()
 
-    def get_weight_mean(self, connector, pre_vertex_slice, post_vertex_slice):
+    def get_weight_mean(
+            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the mean weight for the synapses
         """
-        return connector.get_weight_mean(pre_vertex_slice, post_vertex_slice)
+        return connector.get_weight_mean(
+            n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice)
 
     def get_weight_maximum(
-            self, connector, pre_vertex_slice, post_vertex_slice):
+            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum weight for the synapses
         """
         return connector.get_weight_maximum(
-            pre_vertex_slice, post_vertex_slice)
+            n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice)
 
     def get_weight_variance(
-            self, connector, pre_vertex_slice, post_vertex_slice):
+            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance in weight for the synapses
         """
         return connector.get_weight_variance(
-            pre_vertex_slice, post_vertex_slice)
+            n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice)
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data):

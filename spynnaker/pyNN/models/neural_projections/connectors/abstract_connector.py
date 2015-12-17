@@ -79,7 +79,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         """ Get the maximum number of connections between those from each of\
@@ -91,7 +91,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_n_connections_to_post_vertex_maximum(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum number of connections between those to each of the\
             neurons in the post_vertex_slice from neurons in the\
@@ -99,7 +99,7 @@ class AbstractConnector(object):
         """
 
     @staticmethod
-    def _get_weight_mean(weights, n_connections, connection_slice):
+    def _get_weight_mean(weights, n_connections, connection_slices):
         """ Get the mean of the weights
         """
         if isinstance(weights, RandomDistribution):
@@ -107,35 +107,45 @@ class AbstractConnector(object):
         elif not hasattr(weights, '__iter__'):
             return weights
         else:
-            return numpy.mean(weights[connection_slice])
+            return numpy.mean([
+                weights[connection_slice]
+                for connection_slice in connection_slices])
 
     @abstractmethod
-    def get_weight_mean(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_mean(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the mean of the weights for this connection
         """
 
     @staticmethod
-    def _get_weight_maximum(weights, n_connections, connection_slice):
+    def _get_weight_maximum(weights, n_connections, connection_slices):
         """ Get the maximum of the weights
         """
         if isinstance(weights, RandomDistribution):
             if weights.boundaries is not None:
-                return max(weights.boundaries)
+                max_weight = max(weights.boundaries)
+                if max_weight != numpy.inf and max_weight != float("inf"):
+                    return max_weight
 
             return utility_calls.get_maximum_probable_value(
                 weights, n_connections)
         elif not hasattr(weights, '__iter__'):
             return weights
         else:
-            return max(weights[connection_slice])
+            return max([
+                weights[connection_slice]
+                for connection_slice in connection_slices])
 
     @abstractmethod
-    def get_weight_maximum(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum of the weights for this connection
         """
 
     @staticmethod
-    def _get_weight_variance(weights, connection_slice):
+    def _get_weight_variance(weights, connection_slices):
         """ Get the variance of the weights
         """
         if isinstance(weights, RandomDistribution):
@@ -143,24 +153,30 @@ class AbstractConnector(object):
         elif not hasattr(weights, '__iter__'):
             return 0.0
         else:
-            return numpy.var(weights[connection_slice])
+            return numpy.var([
+                weights[connection_slice]
+                for connection_slice in connection_slices])
 
     @abstractmethod
-    def get_weight_variance(self, pre_vertex_slice, post_vertex_slice):
+    def get_weight_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance of the weights for this connection
         """
 
-    def _generate_values(self, values, n_connections, connection_slice):
+    def _generate_values(self, values, n_connections, connection_slices):
         if isinstance(values, RandomDistribution):
             return values.next(n_connections)
         elif not hasattr(values, '__iter__'):
             return numpy.repeat([values], n_connections)
         else:
-            return values[connection_slice]
+            return numpy.concatenate([
+                values[connection_slice]
+                for connection_slice in connection_slices])
 
     @abstractmethod
     def create_synaptic_block(
-            self, n_pre_slices, pre_slice_index, n_post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, connector_index):
         """ Create a synaptic block from the data

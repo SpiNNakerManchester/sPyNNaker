@@ -153,7 +153,7 @@ class SynapticManager(object):
                 (4 * self._synapse_type.get_n_synapse_types()))
 
     def _get_exact_synaptic_blocks_size(
-            self, n_post_slices, post_slice_index, post_vertex_slice,
+            self, post_slices, post_slice_index, post_vertex_slice,
             graph_mapper, subvertex, subvertex_in_edges):
         """ Get the exact size all of the synaptic blocks
         """
@@ -169,15 +169,16 @@ class SynapticManager(object):
                 # Add on the size of the tables to be generated
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
-                pre_slices = list(graph_mapper.get_subvertices_from_vertex(
-                    edge.pre_vertex))
-                n_pre_slices = len(pre_slices)
-                pre_slice_index = pre_slices.index(subedge.pre_subvertex)
+                pre_slices = [
+                    graph_mapper.get_subvertex_slice(subvertex)
+                    for subvertex in graph_mapper.get_subvertices_from_vertex(
+                        edge.pre_vertex)]
+                pre_slice_index = pre_slices.index(pre_vertex_slice)
 
                 undelayed_size, delayed_size = \
                     self._synapse_io.get_sdram_usage_in_bytes(
-                        edge, n_pre_slices,
-                        pre_slice_index, n_post_slices, post_slice_index,
+                        edge, pre_slices,
+                        pre_slice_index, post_slices, post_slice_index,
                         pre_vertex_slice, post_vertex_slice,
                         edge.n_delay_stages, self._population_table_type)
 
@@ -202,9 +203,13 @@ class SynapticManager(object):
 
                 # Get an estimate of the number of post sub-vertices by
                 # assuming that all of them are the same size as this one
-                n_post_slices = int(math.ceil(
-                    float(in_edge.pre_vertex.n_atoms) /
-                    float(post_vertex_slice.n_atoms)))
+                post_slices = [Slice(
+                    lo_atom, max(
+                        in_edge.post_vertex.n_atoms,
+                        lo_atom + post_vertex_slice.n_atoms - 1))
+                    for lo_atom in range(
+                        0, in_edge.post_vertex.n_atoms,
+                        post_vertex_slice.n_atoms)]
                 post_slice_index = int(math.floor(
                     float(post_vertex_slice.lo_atom) /
                     float(post_vertex_slice.n_atoms)))
@@ -218,18 +223,19 @@ class SynapticManager(object):
                         in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < n_atoms_per_subvertex:
                     n_atoms_per_subvertex = in_edge.pre_vertex.n_atoms
-                n_pre_slices = int(math.ceil(
-                    float(in_edge.pre_vertex.n_atoms) / n_atoms_per_subvertex))
+                pre_slices = [Slice(
+                    lo_atom, max(
+                        in_edge.pre_vertex.n_atoms,
+                        lo_atom + n_atoms_per_subvertex - 1))
+                    for lo_atom in range(
+                        0, in_edge.pre_vertex.n_atoms, n_atoms_per_subvertex)]
 
                 pre_slice_index = 0
-                for lo_atom in range(
-                        0, in_edge.pre_vertex.n_atoms, n_atoms_per_subvertex):
-                    pre_vertex_slice = Slice(
-                        lo_atom, lo_atom + n_atoms_per_subvertex - 1)
+                for pre_vertex_slice in pre_slices:
                     undelayed_size, delayed_size = \
                         self._synapse_io.get_sdram_usage_in_bytes(
-                            in_edge, n_pre_slices,
-                            pre_slice_index, n_post_slices, post_slice_index,
+                            in_edge, pre_slices,
+                            pre_slice_index, post_slices, post_slice_index,
                             pre_vertex_slice, post_vertex_slice,
                             in_edge.n_delay_stages,
                             self._population_table_type)
@@ -368,7 +374,7 @@ class SynapticManager(object):
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_to_input_left_shifts(
-            self, subvertex, sub_graph, graph_mapper, n_post_slices,
+            self, subvertex, sub_graph, graph_mapper, post_slices,
             post_slice_index, post_vertex_slice, machine_timestep,
             weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
@@ -386,32 +392,36 @@ class SynapticManager(object):
                 subedge.pre_subvertex)
             edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
-            subvertices = list(graph_mapper.get_subvertices_from_vertex(
-                edge.pre_vertex))
-            n_pre_slices = len(subvertices)
-            pre_slice_index = subvertices.index(subedge.pre_subvertex)
+            pre_slices = [
+                graph_mapper.get_subvertex_slice(subvertex)
+                for subvertex in graph_mapper.get_subvertices_from_vertex(
+                    edge.pre_vertex)]
+            pre_slice_index = pre_slices.index(pre_vertex_slice)
             if isinstance(edge, ProjectionPartitionableEdge):
                 for synapse_info in edge.synapse_information:
                     synapse_type = synapse_info.synapse_type
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
                     weight_mean = (synapse_dynamics.get_weight_mean(
-                        connector, pre_vertex_slice, post_vertex_slice) *
-                        weight_scale)
+                        connector, pre_slices, pre_slice_index,
+                        post_slices, post_slice_index, pre_vertex_slice,
+                        post_vertex_slice) * weight_scale)
                     n_connections = \
                         connector.get_n_connections_to_post_vertex_maximum(
-                            n_pre_slices, pre_slice_index, n_post_slices,
+                            pre_slices, pre_slice_index, post_slices,
                             post_slice_index, pre_vertex_slice,
                             post_vertex_slice)
                     weight_variance = (synapse_dynamics.get_weight_variance(
-                        connector, pre_vertex_slice, post_vertex_slice) *
-                        weight_scale_squared)
+                        connector, pre_slices, pre_slice_index,
+                        post_slices, post_slice_index, pre_vertex_slice,
+                        post_vertex_slice) * weight_scale_squared)
                     running_totals[synapse_type].add_items(
                         weight_mean, weight_variance, n_connections)
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
-                        connector, pre_vertex_slice, post_vertex_slice) *
-                        weight_scale)
+                        connector, pre_slices, pre_slice_index,
+                        post_slices, post_slice_index, pre_vertex_slice,
+                        post_vertex_slice) * weight_scale)
                     biggest_weight[synapse_type] = max(
                         biggest_weight[synapse_type], weight_max)
                     total_weights[synapse_type] += (
@@ -459,14 +469,14 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_synapse_parameters(
-            self, spec, subvertex, subgraph, graph_mapper, n_post_slices,
+            self, spec, subvertex, subgraph, graph_mapper, post_slices,
             post_slice_index, post_vertex_slice,
             input_type):
 
         # Get the ring buffer shifts and scaling factors
         weight_scale = input_type.get_global_weight_scale()
         ring_buffer_shifts = self._get_ring_buffer_to_input_left_shifts(
-            subvertex, subgraph, graph_mapper, n_post_slices, post_slice_index,
+            subvertex, subgraph, graph_mapper, post_slices, post_slice_index,
             post_vertex_slice, self._machine_time_step, weight_scale)
 
         spec.switch_write_focus(
@@ -501,7 +511,7 @@ class SynapticManager(object):
         return next_block_start_addr
 
     def _write_synaptic_matrix_and_master_population_table(
-            self, spec, n_post_slices, post_slice_index, subvertex,
+            self, spec, post_slices, post_slice_index, subvertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region, routing_info,
             graph_mapper, subgraph):
@@ -534,17 +544,17 @@ class SynapticManager(object):
 
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
-                pre_vertex_slices = list(
-                    graph_mapper.get_subvertices_from_vertex(edge.pre_vertex))
-                n_pre_slices = len(pre_vertex_slices)
-                pre_slice_index = pre_vertex_slices.index(
-                    subedge.pre_subvertex)
+                pre_slices = [
+                    graph_mapper.get_subvertex_slice(subvertex)
+                    for subvertex in graph_mapper.get_subvertices_from_vertex(
+                        edge.pre_vertex)]
+                pre_slice_index = pre_slices.index(pre_vertex_slice)
 
                 (row_data, row_length, delayed_row_data, delayed_row_length,
                  delayed_source_ids, delay_stages) = \
                     self._synapse_io.get_synapses(
-                        edge, n_pre_slices,
-                        pre_slice_index, n_post_slices, post_slice_index,
+                        edge, pre_slices,
+                        pre_slice_index, post_slices, post_slice_index,
                         pre_vertex_slice, post_vertex_slice,
                         edge.n_delay_stages, self._population_table_type,
                         n_synapse_types, weight_scales)
@@ -597,8 +607,8 @@ class SynapticManager(object):
             spec, master_pop_table_region)
 
     def write_data_spec(
-            self, spec, vertex, vertex_slice, subvertex, placement, subgraph,
-            graph, routing_info, hostname, graph_mapper, input_type):
+            self, spec, vertex, post_vertex_slice, subvertex, placement,
+            subgraph, graph, routing_info, hostname, graph_mapper, input_type):
 
         # Create an index of delay keys into this subvertex
         for subedge in subgraph.incoming_subedges_from_subvertex(subvertex):
@@ -612,24 +622,26 @@ class SynapticManager(object):
                      pre_vertex_slice.hi_atom)] = \
                     routing_info.get_keys_and_masks_from_subedge(subedge)
 
-        subvertices = list(graph_mapper.get_subvertices_from_vertex(vertex))
-        n_slices = len(subvertices)
-        slice_index = subvertices.index(subvertex)
+        post_slices = [
+            graph_mapper.get_subvertex_slice(subvertex)
+            for subvertex in graph_mapper.get_subvertices_from_vertex(
+                edge.post_vertex)]
+        post_slice_index = post_slices.index(post_vertex_slice)
 
         # Reserve the memory
         subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)
         all_syn_block_sz = self._get_exact_synaptic_blocks_size(
-            n_slices, slice_index, vertex_slice, graph_mapper, subvertex,
-            subvert_in_edges)
+            post_slices, post_slice_index, post_vertex_slice, graph_mapper,
+            subvertex, subvert_in_edges)
         self._reserve_memory_regions(
-            spec, vertex, vertex_slice, graph, all_syn_block_sz)
+            spec, vertex, post_vertex_slice, graph, all_syn_block_sz)
 
         weight_scales = self._write_synapse_parameters(
-            spec, subvertex, subgraph, graph_mapper, n_slices, slice_index,
-            vertex_slice, input_type)
+            spec, subvertex, subgraph, graph_mapper, post_slices,
+            post_slice_index, post_vertex_slice, input_type)
 
         self._write_synaptic_matrix_and_master_population_table(
-            spec, n_slices, slice_index, subvertex, vertex_slice,
+            spec, post_slices, post_slice_index, subvertex, post_vertex_slice,
             all_syn_block_sz, weight_scales,
             constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,

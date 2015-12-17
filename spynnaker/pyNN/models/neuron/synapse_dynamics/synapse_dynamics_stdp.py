@@ -192,21 +192,25 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         connections["delay"] = (data_fixed >> (8 + n_synapse_type_bits)) & 0xF
         return connections
 
-    def get_weight_mean(self, connector, pre_vertex_slice, post_vertex_slice):
+    def get_weight_mean(
+            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
 
         # Because the weights could all be changed to the maximum, the mean
         # has to be given as the maximum for scaling
         return self._weight_dependence.weight_maximum
 
     def get_weight_variance(
-            self, connector, pre_vertex_slice, post_vertex_slice):
+            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
 
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0
 
     def get_weight_maximum(
-            self, connector, pre_vertex_slice, post_vertex_slice):
+            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
 
         # The maximum weight is the largest that it could be set to from
         # the weight dependence
