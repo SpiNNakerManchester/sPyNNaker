@@ -491,7 +491,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         row_stage = None
         connection_min_delay = None
         connection_source_extra = None
-        if delayed_connection_indices is None:
+        if delayed_connection_indices is not None:
             row_stage = numpy.array([
                 (i / pre_vertex_slice.n_atoms)
                 for i in range(len(delayed_connection_indices))],
