@@ -124,13 +124,20 @@ class AbstractConnector(object):
         """ Get the maximum of the weights
         """
         if isinstance(weights, RandomDistribution):
-            if weights.boundaries is not None:
-                max_weight = max(weights.boundaries)
-                if max_weight != numpy.inf and max_weight != float("inf"):
-                    return max_weight
+            mean_weight = utility_calls.get_mean(weights)
+            if mean_weight < 0:
+                min_weight = utility_calls.get_minimum_probable_value(
+                    weights, n_connections)
+                if weights.boundaries is not None:
+                    return abs(max(min_weight, min(weights.boundaries)))
+                return abs(min_weight)
+            else:
+                max_weight = utility_calls.get_maximum_probable_value(
+                    weights, n_connections)
+                if weights.boundaries is not None:
+                    return abs(min(max_weight, max(weights.boundaries)))
+                return abs(max_weight)
 
-            return utility_calls.get_maximum_probable_value(
-                weights, n_connections)
         elif not hasattr(weights, '__iter__'):
             return weights
         else:
