@@ -298,7 +298,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
 
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
         size_of_mallocs = self.get_number_of_mallocs_used_by_dsg(
             vertex_slice,  graph.incoming_edges_to_vertex(self)) * \
             common_constants.SARK_PER_MALLOC_SDRAM_USAGE

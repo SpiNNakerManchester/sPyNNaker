@@ -325,7 +325,7 @@ class SpikeSourcePoisson(
         self._spike_recorder.record = True
 
     # inherited from partitionable vertex
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
         """
         method for calculating SDRAM usage
         :param vertex_slice:
@@ -333,19 +333,23 @@ class SpikeSourcePoisson(
         :return:
         """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
-        spike_hist_buff_sz = min((
-            self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._no_machine_time_steps),
-            self._spike_buffer_max_size))
         total_size = \
             ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
              self.get_recording_data_size(1) +
-             self.get_buffer_state_region_size(1) +
-             poisson_params_sz + spike_hist_buff_sz)
+             self.get_buffer_state_region_size(1) + poisson_params_sz)
         total_size += self.get_number_of_mallocs_used_by_dsg(
             vertex_slice, graph.incoming_edges_to_vertex(self)) * \
             front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
         return total_size
+
+    # @implements AbstractRecordableVertex.get_runtime_sdram_usage_for_atoms
+    def get_runtime_sdram_usage_for_atoms(self, vertex_slice,
+                                          partitionable_graph,
+                                          no_machine_time_steps):
+        return min((
+            self._spike_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, no_machine_time_steps),
+            self._spike_buffer_max_size))
 
     def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
         standard_mallocs = self._DEFAULT_MALLOCS_USED

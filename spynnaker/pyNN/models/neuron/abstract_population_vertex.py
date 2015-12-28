@@ -199,24 +199,28 @@ class AbstractPopulationVertex(
                 self._neuron_model.get_sdram_usage_in_bytes(
                     vertex_slice.n_atoms))
 
-    # @implements AbstractPopulationVertex.get_sdram_usage_for_atoms
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
+    # @implements AbstractPopulationVertex.get_static_sdram_usage_for_atoms
+    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
         return (self._get_sdram_usage_for_neuron_params(vertex_slice) +
                 self.get_buffer_state_region_size(3) +
-                min((self._spike_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps),
-                    self._spike_buffer_max_size)) +
-                min((self._v_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps),
-                    self._v_buffer_max_size)) +
-                min((self._gsyn_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps),
-                    self._gsyn_buffer_max_size)) +
                 self._synapse_manager.get_sdram_usage_in_bytes(
                     vertex_slice, graph.incoming_edges_to_vertex(self)) +
                 (self.get_number_of_mallocs_used_by_dsg(
                     vertex_slice, graph.incoming_edges_to_vertex(self)) *
                  front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
+
+    # @implements AbstractRecordableVertex.get_runtime_sdram_usage_for_atoms
+    def get_runtime_sdram_usage_for_atoms(
+            self, vertex_slice, partitionable_graph, no_machine_time_steps):
+        return (min((self._spike_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, no_machine_time_steps),
+                    self._spike_buffer_max_size)) +
+                min((self._v_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, no_machine_time_steps),
+                    self._v_buffer_max_size)) +
+                min((self._gsyn_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, no_machine_time_steps),
+                    self._gsyn_buffer_max_size)))
 
     # @implements AbstractPopulationVertex.model_name
     def model_name(self):

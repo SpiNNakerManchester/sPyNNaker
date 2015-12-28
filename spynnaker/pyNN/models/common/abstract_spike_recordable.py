@@ -2,9 +2,12 @@ from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
 
+from spynnaker.pyNN.models.common.abstract_recordable_vertex import \
+    AbstractRecordableVertex
+
 
 @add_metaclass(ABCMeta)
-class AbstractSpikeRecordable(object):
+class AbstractSpikeRecordable(AbstractRecordableVertex):
     """ Indicates that spikes can be recorded from this object
     """
 

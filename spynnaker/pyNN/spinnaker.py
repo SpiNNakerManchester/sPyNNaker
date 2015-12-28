@@ -609,20 +609,20 @@ class Spinnaker(object):
             self._no_sync_changes = 0
         inputs.append({'type': "NoSyncChanges", 'value': self._no_sync_changes})
 
+        # all modes need the runtime in machine time steps
+        # (partitioner and rerun)
+        no_machine_time_steps = \
+            int(((total_runtime - self._current_run_ms) * 1000.0)
+                / self._machine_time_step)
+        inputs.append({'type': "RunTimeMachineTimeSteps",
+                       'value': no_machine_time_steps})
+
         # support resetting the machine during start up
         if (config.getboolean("Machine", "ResetMachineOnStartupFlag") and
                 not self._has_ran and not is_resetting):
             inputs.append({"type": "ResetMachineOnStartupFlag", 'value': True})
         else:
             inputs.append({"type": "ResetMachineOnStartupFlag", 'value': False})
-
-        # support runtime updator
-        if self._has_ran and not is_resetting:
-            no_machine_time_steps =\
-                int(((total_runtime - self._current_run_ms) * 1000.0)
-                    / self._machine_time_step)
-            inputs.append({'type': "RunTimeMachineTimeSteps",
-                           'value': no_machine_time_steps})
 
         # FrontEndCommonPartitionableGraphApplicationDataLoader after a
         # reset and no changes
@@ -751,6 +751,9 @@ class Spinnaker(object):
                                "Database", "send_start_notification")})
             inputs.append({'type': "ProvenanceFilePath",
                            'value': provenance_file_path})
+            inputs.append({'type': "TakeRuntimeSdramUsageIntoAccount",
+                           'value': config.getboolean(
+                               "Mode", "use_auto_pause_and_resume")})
 
             # add paths for each file based version
             inputs.append({'type': "FileCoreAllocationsFilePath",
