@@ -331,7 +331,7 @@ class SpikeSourcePoisson(
     def set_recording_spikes(self):
         ip_address = config.get("Buffers", "receive_buffer_host")
         port = config.getint("Buffers", "receive_buffer_port")
-        self.set_buffering_output(ip_address, port)
+        self.activate_buffering_output(ip_address, port)
         self._spike_recorder.record = True
 
     # inherited from partitionable vertex

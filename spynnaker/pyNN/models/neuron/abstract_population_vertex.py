@@ -449,7 +449,7 @@ class AbstractPopulationVertex(
     # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
         self._change_requires_mapping = not self._spike_recorder.record
-        self.set_buffering_output(
+        self.activate_buffering_output(
             self._receive_buffer_host, self._receive_buffer_port)
         self._spike_recorder.record = True
 
@@ -467,7 +467,7 @@ class AbstractPopulationVertex(
 
     # @implements AbstractVRecordable.set_recording_v
     def set_recording_v(self):
-        self.set_buffering_output(
+        self.activate_buffering_output(
             self._receive_buffer_host, self._receive_buffer_port)
         self._change_requires_mapping = not self._v_recorder.record_v
         self._v_recorder.record_v = True
@@ -487,7 +487,7 @@ class AbstractPopulationVertex(
 
     # @implements AbstractGSynRecordable.set_recording_gsyn
     def set_recording_gsyn(self):
-        self.set_buffering_output(
+        self.activate_buffering_output(
             self._receive_buffer_host, self._receive_buffer_port)
         self._change_requires_mapping = not self._gsyn_recorder.record_gsyn
         self._gsyn_recorder.record_gsyn = True
