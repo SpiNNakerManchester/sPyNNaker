@@ -751,7 +751,7 @@ class Spinnaker(object):
                                "Database", "send_start_notification")})
             inputs.append({'type': "ProvenanceFilePath",
                            'value': provenance_file_path})
-            inputs.append({'type': "TakeRuntimeSdramUsageIntoAccount",
+            inputs.append({'type': "UseAutoPauseAndResume",
                            'value': config.getboolean(
                                "Mode", "use_auto_pause_and_resume")})
 

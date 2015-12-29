@@ -342,7 +342,7 @@ class SpikeSourcePoisson(
             front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
         return total_size
 
-    # @implements AbstractRecordableVertex.get_runtime_sdram_usage_for_atoms
+    # @implements AbstractRecordableInterface.get_runtime_sdram_usage_for_atoms
     def get_runtime_sdram_usage_for_atoms(self, vertex_slice,
                                           partitionable_graph,
                                           no_machine_time_steps):

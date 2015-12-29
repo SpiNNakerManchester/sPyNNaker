@@ -209,7 +209,7 @@ class AbstractPopulationVertex(
                     vertex_slice, graph.incoming_edges_to_vertex(self)) *
                  front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
 
-    # @implements AbstractRecordableVertex.get_runtime_sdram_usage_for_atoms
+    # @implements AbstractRecordableInterface.get_runtime_sdram_usage_for_atoms
     def get_runtime_sdram_usage_for_atoms(
             self, vertex_slice, partitionable_graph, no_machine_time_steps):
         return (min((self._spike_recorder.get_sdram_usage_in_bytes(
