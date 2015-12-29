@@ -142,6 +142,14 @@ class AbstractPopulationVertex(
     def requires_mapping(self):
         return self._change_requires_mapping
 
+    @property
+    def enable_buffered_recording(self):
+        return self._enable_buffered_recording
+
+    @enable_buffered_recording.setter
+    def enable_buffered_recording(self, new_value):
+        self._enable_buffered_recording = new_value
+
     def mark_no_changes(self):
         self._change_requires_mapping = False
 

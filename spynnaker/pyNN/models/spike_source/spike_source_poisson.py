@@ -102,6 +102,8 @@ class SpikeSourcePoisson(
             "Buffers", "buffer_size_before_receive")
         self._time_between_requests = config.getint(
             "Buffers", "time_between_requests")
+        self._enable_buffered_recording = \
+            config.getboolean("Buffers", "enable_buffered_recording")
 
     @property
     def rate(self):
@@ -110,6 +112,14 @@ class SpikeSourcePoisson(
     @rate.setter
     def rate(self, rate):
         self._rate = rate
+
+    @property
+    def enable_buffered_recording(self):
+        return self._enable_buffered_recording
+
+    @enable_buffered_recording.setter
+    def enable_buffered_recording(self, new_value):
+        self.enable_buffered_recording = new_value
 
     @property
     def start(self):
@@ -413,7 +423,7 @@ class SpikeSourcePoisson(
         spike_hist_buff_sz = self._spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self._no_machine_time_steps)
         buffer_size_before_receive = self._buffer_size_before_receive
-        if config.getboolean("Buffers", "enable_buffered_recording"):
+        if self._enable_buffered_recording:
             if spike_hist_buff_sz < self._spike_buffer_max_size:
                 buffer_size_before_receive = spike_hist_buff_sz + 256
             else:
