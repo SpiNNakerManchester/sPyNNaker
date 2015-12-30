@@ -657,15 +657,31 @@ class Spinnaker(object):
         # if your using the auto pause and resume, then add the inputs needed
         # for this functionality.
         if using_auto_pause_and_resume:
+            # due to the mismatch between dsg's and dse's in different front
+            # end, the inputs not given to the multile pause and resume but
+            # which are needed for dsg/dse need to be put in the extra inputs
             extra_inputs = list()
+            extra_inputs.append({'type': 'ExecutableFinder',
+                                 'value': executable_finder})
+            extra_inputs.append({'type': 'IPAddress', 'value': self._hostname})
+            extra_inputs.append({'type': 'ReportFolder',
+                                 'value': self._report_default_directory})
+            extra_inputs.append(
+                {'type': 'WriteTextSpecsFlag',
+                 'value': config.getboolean("Reports", "writeTextSpecs")})
+            extra_inputs.append({'type': 'ApplicationDataFolder',
+                                 'value': self._app_data_runtime_folder})
+
             spynnaker_xml_file = os.path.join(
                 os.path.dirname(overridden_pacman_functions.__file__),
                 "algorithms_metadata.xml")
+            extra_xmls = list()
+            extra_xmls.append(spynnaker_xml_file)
 
             inputs.append({'type': "ExtraAlgorthums",
                            'value': "SpyNNakerRecordingExtracter"})
             inputs.append({'type': "ExtraInputs", 'value': extra_inputs})
-            inputs.append({'type': "ExtraXMLS", 'value': spynnaker_xml_file})
+            inputs.append({'type': "ExtraXMLS", 'value': extra_xmls})
             inputs.append({'type': "DSGeneratorAlgorithm",
                            'value': "FrontEndCommomPartitionableGraphData"
                                     "SpecificationWriter"})
