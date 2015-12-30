@@ -140,18 +140,9 @@ class SpikeSourceArray(
         :param no_machine_time_steps:
         :return:
         """
-        # TODO need to check this out properly. I think this is wrong
-        recording_size = (ReverseIPTagMulticastSourcePartitionedVertex
-                          .get_recording_data_size(1))
-        if self._record_buffer_size > 0:
-            recording_size += self._record_buffer_size
-            recording_size += (ReverseIPTagMulticastSourcePartitionedVertex.
-                               get_buffer_state_region_size(1))
-
-        if self._send_buffer_times is not None:
-            return self._send_buffer_max_space + recording_size
-        else:
-            return recording_size
+        # TODO I know this is wrong, but need some way to deduce size correctly
+        # and annoyingly SSA just doesnt fit currently. buffered out makes pain
+        return 1
 
     @property
     def requires_mapping(self):
