@@ -121,7 +121,6 @@ class SpikeSourceArray(
             self._space_before_notification =\
                 self._max_on_chip_memory_usage_for_spikes
 
-
     def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
         mallocs = \
             ReverseIpTagMultiCastSource.get_number_of_mallocs_used_by_dsg(
@@ -130,6 +129,29 @@ class SpikeSourceArray(
             return 1
         else:
             return mallocs
+
+    def get_runtime_sdram_usage_for_atoms(
+            self, vertex_slice, partitionable_graph, no_machine_time_steps):
+        """
+        this should explore the spike table and give the size in sdram to
+        store these spikes or the
+        :param vertex_slice:
+        :param partitionable_graph:
+        :param no_machine_time_steps:
+        :return:
+        """
+        # TODO need to check this out properly. I think this is wrong
+        recording_size = (ReverseIPTagMulticastSourcePartitionedVertex
+                          .get_recording_data_size(1))
+        if self._record_buffer_size > 0:
+            recording_size += self._record_buffer_size
+            recording_size += (ReverseIPTagMulticastSourcePartitionedVertex.
+                               get_buffer_state_region_size(1))
+
+        if self._send_buffer_times is not None:
+            return self._send_buffer_max_space + recording_size
+        else:
+            return recording_size
 
     @property
     def requires_mapping(self):

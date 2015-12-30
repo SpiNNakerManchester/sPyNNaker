@@ -270,7 +270,7 @@ class Spinnaker(object):
         self._current_run_ms = run_time
 
         # get inputs
-        inputs, application_graph_changed = \
+        inputs, application_graph_changed, uses_auto_pause_and_resume = \
             self._create_pacman_executor_inputs(total_run_time)
 
         if application_graph_changed and self._has_ran:
@@ -289,12 +289,16 @@ class Spinnaker(object):
             self._create_pacman_executor_outputs(
                 requires_reset=False,
                 application_graph_changed=application_graph_changed)
+
         # algorithms listing
         algorithms = self._create_algorithm_list(
             config.get("Mode", "mode") == "Debug", application_graph_changed,
-            executing_reset=False)
+            executing_reset=False,
+            using_auto_pause_and_resume=uses_auto_pause_and_resume)
+
         # xml paths to the algorthims metadata
         xml_paths = self._create_xml_paths()
+
         # run pacman exeuctor
         pacman_exeuctor = helpful_functions.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,
@@ -331,7 +335,7 @@ class Spinnaker(object):
 
         logger.info("Starting reset progress")
 
-        inputs, application_graph_changed = \
+        inputs, application_graph_changed, using_auto_pause_and_resume = \
             self._create_pacman_executor_inputs(
                 total_runtime=0, is_resetting=True)
 
@@ -342,7 +346,9 @@ class Spinnaker(object):
 
         algorithms = self._create_algorithm_list(
             config.get("Mode", "mode") == "Debug", application_graph_changed,
-            executing_reset=True)
+            executing_reset=True,
+            using_auto_pause_and_resume=using_auto_pause_and_resume)
+
         xml_paths = self._create_xml_paths()
         required_outputs = self._create_pacman_executor_outputs(
             requires_reset=True,
@@ -438,13 +444,28 @@ class Spinnaker(object):
         return xml_paths
 
     def _create_algorithm_list(
-            self, in_debug_mode, application_graph_changed, executing_reset):
+            self, in_debug_mode, application_graph_changed, executing_reset,
+            using_auto_pause_and_resume):
+        """
+        creates the list of algorithms to use within the system
+        :param in_debug_mode: if the tools should be operating in debug mode
+        :param application_graph_changed: has the graph changed since last run
+        :param executing_reset: are we executing a reset function
+        :param using_auto_pause_and_resume: check if the system is to use
+        auto pasue and resume functionality
+        :return: list of algorithums to use
+        """
         algorithms = list()
+        
+        if using_auto_pause_and_resume:
+            algorithms.append("FrontEndCommonAutoPauseAndResumer")
 
         # if youve not ran before, add the buffer manager
-        if (application_graph_changed
-                and not config.getboolean("Machine", "virtual_board")):
-            algorithms.append("FrontEndCommonBufferManagerCreater")
+
+        using_virtual_board = config.getboolean("Machine", "virtual_board")
+        if application_graph_changed and not using_virtual_board:
+            if not using_auto_pause_and_resume:
+                algorithms.append("FrontEndCommonBufferManagerCreater")
 
         # if your needing qa reset, you need to clean the binairies
         # (unless youve not ran yet)
@@ -479,7 +500,7 @@ class Spinnaker(object):
 
             # if using virutal machine, add to list of algorithms the virtual
             # machine generator, otherwise add the standard machine generator
-            if config.getboolean("Machine", "virtual_board"):
+            if using_virtual_board:
                 algorithms.append("FrontEndCommonVirtualMachineInterfacer")
             else:
                 # protect agains the situation where the system has already
@@ -489,33 +510,35 @@ class Spinnaker(object):
                     self._txrx = None
 
                 algorithms.append("FrontEndCommonMachineInterfacer")
-                algorithms.append("FrontEndCommonApplicationRunner")
                 algorithms.append("FrontEndCommonNotificationProtocol")
-                algorithms.append(
-                    "FrontEndCommonPartitionableGraphApplicationDataLoader")
-                algorithms.append("FrontEndCommonPartitionableGraphHost"
-                                  "ExecuteDataSpecification")
-                algorithms.append("FrontEndCommomLoadExecutableImages")
                 algorithms.append("FrontEndCommonRoutingTableLoader")
                 algorithms.append("FrontEndCommonTagsLoader")
-                algorithms.append("FrontEndCommomPartitionableGraphData"
-                                  "SpecificationWriter")
+
+                # add algorithms that the auto supples if not using it
+                if not using_auto_pause_and_resume:
+                    algorithms.append("FrontEndCommomLoadExecutableImages")
+                    algorithms.append("FrontEndCommonApplicationRunner")
+                    algorithms.append("FrontEndCommonApplicationDataLoader")
+                    algorithms.append("FrontEndCommonPartitionableGraphHost"
+                                      "ExecuteDataSpecification")
+                    algorithms.append("FrontEndCommomLoadExecutableImages")
+                    algorithms.append("FrontEndCommomPartitionableGraphData"
+                                      "SpecificationWriter")
 
                 # if the end user wants reload script, add the reload script
                 # creator to the list (reload script currently only supported
                 # for the original run)
-                if (not self._has_ran
-                        and config.getboolean("Reports", "writeReloadSteps")):
+                write_reload = config.getboolean("Reports", "writeReloadSteps")
+                if not self._has_ran and write_reload:
                     algorithms.append("FrontEndCommonReloadScriptCreator")
-                elif (self.has_ran and
-                        config.getboolean("Reports", "writeReloadSteps")):
+                elif self.has_ran and write_reload:
                     logger.warn(
                         "The reload script cannot handle multi-runs, nor can it"
                         "handle resets, therefore it will only contain the "
                         "initial run. Sorry")
 
             if (config.getboolean("Reports", "writeMemoryMapReport")
-                    and not config.getboolean("Machine", "virtual_board")):
+                    and not using_virtual_board):
                 algorithms.append("FrontEndCommonMemoryMapReport")
 
             if config.getboolean("Reports", "writeNetworkSpecificationReport"):
@@ -525,7 +548,7 @@ class Spinnaker(object):
             # if going to write provanence data after the run add the two
             # provenance gatherers
             if (config.get("Reports", "writeProvanceData")
-                    and not config.getboolean("Machine", "virtual_board")):
+                    and not using_virtual_board):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
 
             # define mapping between output types and reports
@@ -623,6 +646,32 @@ class Spinnaker(object):
             inputs.append({"type": "ResetMachineOnStartupFlag", 'value': True})
         else:
             inputs.append({"type": "ResetMachineOnStartupFlag", 'value': False})
+
+        # all algorithms need to know if they are used in a auto_pause_and_resume
+        # mode.
+        using_auto_pause_and_resume = \
+            config.getboolean("Mode", "use_auto_pause_and_resume")
+        inputs.append({'type': "UseAutoPauseAndResume",
+                       'value': using_auto_pause_and_resume})
+
+        # if your using the auto pause and resume, then add the inputs needed
+        # for this functionality.
+        if using_auto_pause_and_resume:
+            extra_inputs = list()
+            spynnaker_xml_file = os.path.join(
+                os.path.dirname(overridden_pacman_functions.__file__),
+                "algorithms_metadata.xml")
+
+            inputs.append({'type': "ExtraAlgorthums",
+                           'value': "SpyNNakerRecordingExtracter"})
+            inputs.append({'type': "ExtraInputs", 'value': extra_inputs})
+            inputs.append({'type': "ExtraXMLS", 'value': spynnaker_xml_file})
+            inputs.append({'type': "DSGeneratorAlgorithm",
+                           'value': "FrontEndCommomPartitionableGraphData"
+                                    "SpecificationWriter"})
+            inputs.append({'type': "DSExecutorAlgorithm",
+                           'value': "FrontEndCommonPartitionableGraphHost"
+                                    "ExecuteDataSpecification"})
 
         # FrontEndCommonPartitionableGraphApplicationDataLoader after a
         # reset and no changes
@@ -751,9 +800,6 @@ class Spinnaker(object):
                                "Database", "send_start_notification")})
             inputs.append({'type': "ProvenanceFilePath",
                            'value': provenance_file_path})
-            inputs.append({'type': "UseAutoPauseAndResume",
-                           'value': config.getboolean(
-                               "Mode", "use_auto_pause_and_resume")})
 
             # add paths for each file based version
             inputs.append({'type': "FileCoreAllocationsFilePath",
@@ -835,7 +881,7 @@ class Spinnaker(object):
                            'value': provenance_file_path})
             inputs.append({'type': "RanToken", 'value': self._has_ran})
 
-        return inputs, application_graph_changed
+        return inputs, application_graph_changed, using_auto_pause_and_resume
 
     def _calculate_number_of_machine_time_steps(self, next_run_time):
         if next_run_time is not None:
