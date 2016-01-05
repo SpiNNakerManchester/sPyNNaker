@@ -65,5 +65,6 @@ class SynapseDynamicsStatic(AbstractStaticSynapseDynamics):
         connections["target"] = (data & 0xFF) + post_vertex_slice.lo_atom
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = (data >> (8 + n_synapse_type_bits)) & 0xF
+        connections["delay"][connections["delay"] == 0] = 16
 
         return connections

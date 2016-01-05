@@ -20,6 +20,10 @@ class FromListConnector(AbstractConnector):
         the index of the postsynaptic neuron.
     """
 
+    CONN_LIST_DTYPE = [
+        ("source", "uint32"), ("target", "uint32"),
+        ("weight", "float64"), ("delay", "float64")]
+
     def __init__(self, conn_list=None, safe=True, verbose=False):
         """
         Creates a new FromListConnector.
@@ -30,16 +34,14 @@ class FromListConnector(AbstractConnector):
         if verbose:
             logger.warn("the modification of the verbose parameter will be "
                         "ignored")
-        if conn_list is None:
-            self._conn_list = numpy.zeros(
-                0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        if conn_list is None or len(conn_list) == 0:
+            self._conn_list = numpy.zeros(0, dtype=self.CONN_LIST_DTYPE)
         else:
-            temp_conn_list = [tuple(items) + (0, 0,) for items in conn_list]
+            temp_conn_list = conn_list
+            if not isinstance(conn_list[0], tuple):
+                temp_conn_list = [tuple(items) for items in conn_list]
             self._conn_list = numpy.array(
-                temp_conn_list, dtype=[
-                    ("source", "uint32"), ("target", "uint32"),
-                    ("weight", "float64"), ("delay", "float64"),
-                    ("synapse_type", "uint8"), ("connector_index", "uint16")])
+                temp_conn_list, dtype=self.CONN_LIST_DTYPE)
 
     def get_delay_maximum(self):
         return numpy.max(self._conn_list["delay"])
@@ -123,6 +125,13 @@ class FromListConnector(AbstractConnector):
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        self._conn_list[mask]["synapse_type"] = synapse_type
-        self._conn_list[mask]["connector_index"] = connector_index
-        return self._conn_list[mask]
+        items = self._conn_list[mask]
+        block = numpy.zeros(
+            items.size, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block["source"] = items["source"]
+        block["target"] = items["target"]
+        block["weight"] = items["weight"]
+        block["delay"] = items["delay"]
+        block["synapse_type"] = synapse_type
+        block["connector_index"] = connector_index
+        return block

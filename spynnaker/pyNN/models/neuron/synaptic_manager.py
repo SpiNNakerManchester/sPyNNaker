@@ -204,7 +204,7 @@ class SynapticManager(object):
                 # Get an estimate of the number of post sub-vertices by
                 # assuming that all of them are the same size as this one
                 post_slices = [Slice(
-                    lo_atom, max(
+                    lo_atom, min(
                         in_edge.post_vertex.n_atoms,
                         lo_atom + post_vertex_slice.n_atoms - 1))
                     for lo_atom in range(
@@ -224,7 +224,7 @@ class SynapticManager(object):
                 if in_edge.pre_vertex.n_atoms < n_atoms_per_subvertex:
                     n_atoms_per_subvertex = in_edge.pre_vertex.n_atoms
                 pre_slices = [Slice(
-                    lo_atom, max(
+                    lo_atom, min(
                         in_edge.pre_vertex.n_atoms,
                         lo_atom + n_atoms_per_subvertex - 1))
                     for lo_atom in range(
@@ -382,7 +382,7 @@ class SynapticManager(object):
         """
         weight_scale_squared = weight_scale * weight_scale
         n_synapse_types = self._synapse_type.get_n_synapse_types()
-        running_totals = [RunningStats()] * n_synapse_types
+        running_totals = [RunningStats() for _ in range(n_synapse_types)]
         total_weights = numpy.zeros(n_synapse_types)
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
@@ -402,7 +402,7 @@ class SynapticManager(object):
                     synapse_type = synapse_info.synapse_type
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
-                    weight_mean = (synapse_dynamics.get_weight_mean(
+                    weight_mean = abs(synapse_dynamics.get_weight_mean(
                         connector, pre_slices, pre_slice_index,
                         post_slices, post_slice_index, pre_vertex_slice,
                         post_vertex_slice) * weight_scale)
@@ -411,7 +411,7 @@ class SynapticManager(object):
                             pre_slices, pre_slice_index, post_slices,
                             post_slice_index, pre_vertex_slice,
                             post_vertex_slice)
-                    weight_variance = (synapse_dynamics.get_weight_variance(
+                    weight_variance = abs(synapse_dynamics.get_weight_variance(
                         connector, pre_slices, pre_slice_index,
                         post_slices, post_slice_index, pre_vertex_slice,
                         post_vertex_slice) * weight_scale_squared)
@@ -589,6 +589,11 @@ class SynapticManager(object):
                     next_block_start_addr += len(row_data) * 4
                 del row_data
 
+                if next_block_start_addr > all_syn_block_sz:
+                    raise Exception(
+                        "Too much synaptic memory has been written: {} of {} "
+                        .format(next_block_start_addr, all_syn_block_sz))
+
                 if len(delayed_row_data) > 0:
                     next_block_start_addr = self._write_padding(
                         spec, synaptic_matrix_region, next_block_start_addr)
@@ -602,6 +607,11 @@ class SynapticManager(object):
                         keys_and_masks, master_pop_table_region)
                     next_block_start_addr += len(delayed_row_data) * 4
                 del delayed_row_data
+
+                if next_block_start_addr > all_syn_block_sz:
+                    raise Exception(
+                        "Too much synaptic memory has been written: {} of {} "
+                        .format(next_block_start_addr, all_syn_block_sz))
 
         self._population_table_type.finish_master_pop_table(
             spec, master_pop_table_region)
@@ -624,8 +634,7 @@ class SynapticManager(object):
 
         post_slices = [
             graph_mapper.get_subvertex_slice(subvertex)
-            for subvertex in graph_mapper.get_subvertices_from_vertex(
-                edge.post_vertex)]
+            for subvertex in graph_mapper.get_subvertices_from_vertex(vertex)]
         post_slice_index = post_slices.index(post_vertex_slice)
 
         # Reserve the memory

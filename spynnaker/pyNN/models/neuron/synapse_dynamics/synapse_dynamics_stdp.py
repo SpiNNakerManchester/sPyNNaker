@@ -190,6 +190,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         connections["weight"] = synapse_structure.read_synaptic_data(
             connection_indices, pp_without_headers)
         connections["delay"] = (data_fixed >> (8 + n_synapse_type_bits)) & 0xF
+        connections["delay"][connections["delay"] == 0] = 16
         return connections
 
     def get_weight_mean(

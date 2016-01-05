@@ -41,8 +41,11 @@ class ConnectionHolder(object):
             order = numpy.lexsort((
                 self._merged_connections["target"],
                 self._merged_connections["source"]))
-            self._merged_connections = self._merged_connections[order][
-                self._data_item_to_return]
+            if self._data_item_to_return is not None:
+                self._merged_connections = self._merged_connections[order][
+                    self._data_item_to_return]
+            else:
+                self._merged_connections = self._merged_connections[order]
         else:
             matrix = numpy.zeros((self._n_pre_atoms, self._n_post_atoms))
             matrix.fill(numpy.nan)

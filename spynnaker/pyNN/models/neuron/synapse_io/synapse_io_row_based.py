@@ -1,11 +1,13 @@
 import numpy
 import math
 from collections import defaultdict
+
+from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
+    import AbstractSynapseDynamics
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 from spynnaker.pyNN.models.neuron.synapse_dynamics\
     .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
-
 from spynnaker.pyNN.models.neuron.synapse_io.abstract_synapse_io \
     import AbstractSynapseIO
 
@@ -83,7 +85,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         total_static_delayed_row_length = 0
         max_delay_supported = self.get_maximum_delay_supported_in_ms()
         next_max_delay_supported = (
-            max_delay_supported + (self._machine_time_step / 1000.0))
+            max_delay_supported + numpy.finfo(numpy.double).tiny)
         max_delay = max_delay_supported * (n_delay_stages + 1)
 
         plastic_synapse_dynamics = None
@@ -527,9 +529,11 @@ class SynapseIORowBased(AbstractSynapseIO):
                 ff_size, ff_data = self._get_static_data(
                     row_data, static_synapse_dynamics,
                     plastic_synapse_dynamics)
-                connections.append(dynamics.read_static_synaptic_data(
+                undelayed_connections = dynamics.read_static_synaptic_data(
                     undelayed_connection_indices, post_vertex_slice,
-                    n_synapse_types, ff_size, ff_data))
+                    n_synapse_types, ff_size, ff_data)
+                undelayed_connections["source"] += pre_vertex_slice.lo_atom
+                connections.append(undelayed_connections)
             if delayed_connection_indices is not None:
                 ff_size, ff_data = self._get_static_data(
                     delayed_row_data, static_synapse_dynamics,
@@ -538,6 +542,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                     delayed_connection_indices, post_vertex_slice,
                     n_synapse_types, ff_size, ff_data)
                 delayed_connections["source"] -= connection_source_extra
+                delayed_connections["source"] += pre_vertex_slice.lo_atom
                 delayed_connections["delay"] += connection_min_delay
                 connections.append(delayed_connections)
 
@@ -564,15 +569,20 @@ class SynapseIORowBased(AbstractSynapseIO):
                 connections.append(delayed_connections)
 
         # Join the connections into a single list
-        connections = numpy.concatenate(connections)
+        if len(connections) > 0:
+            connections = numpy.concatenate(connections)
 
-        # Return the delays values to milliseconds
-        connections["delay"] = (
-            connections["delay"] / (1000.0 / self._machine_time_step))
+            # Return the delays values to milliseconds
+            connections["delay"] = (
+                connections["delay"] / (1000.0 / self._machine_time_step))
 
-        # Undo the weight scaling
-        connections["weight"] = (
-            connections["weight"] / weight_scales[synapse_info.synapse_type])
+            # Undo the weight scaling
+            connections["weight"] = (
+                connections["weight"] /
+                weight_scales[synapse_info.synapse_type])
+        else:
+            connections = numpy.zeros(
+                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
         # Return the connections
         return connections
