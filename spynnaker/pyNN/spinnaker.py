@@ -291,7 +291,7 @@ class Spinnaker(object):
                 application_graph_changed=application_graph_changed)
 
         # algorithms listing
-        algorithms = self._create_algorithm_list(
+        algorithms, optional_algorithms = self._create_algorithm_list(
             config.get("Mode", "mode") == "Debug", application_graph_changed,
             executing_reset=False,
             using_auto_pause_and_resume=uses_auto_pause_and_resume)
@@ -301,8 +301,8 @@ class Spinnaker(object):
 
         # run pacman exeuctor
         pacman_exeuctor = helpful_functions.do_mapping(
-            inputs, algorithms, required_outputs, xml_paths,
-            config.getboolean("Reports", "outputTimesForSections"))
+            inputs, algorithms, optional_algorithms, required_outputs,
+            xml_paths, config.getboolean("Reports", "outputTimesForSections"))
 
         # gather provenance data from the executor itself if needed
         if (config.get("Reports", "writeProvanceData")
@@ -344,7 +344,7 @@ class Spinnaker(object):
                 "Currently resetting the simulation after changing the model"
                 "is not supported. Please rethink your script and try again")
 
-        algorithms = self._create_algorithm_list(
+        algorithms, optional_algorithms = self._create_algorithm_list(
             config.get("Mode", "mode") == "Debug", application_graph_changed,
             executing_reset=True,
             using_auto_pause_and_resume=using_auto_pause_and_resume)
@@ -379,8 +379,8 @@ class Spinnaker(object):
 
         # execute reset functionality
         helpful_functions.do_mapping(
-            inputs, algorithms, required_outputs, xml_paths,
-            config.getboolean("Reports", "outputTimesForSections"))
+            inputs, algorithms, optional_algorithms, required_outputs,
+            xml_paths, config.getboolean("Reports", "outputTimesForSections"))
 
         # if graph has changed kill all old objects as they will need to be
         # rebuilt at next run
@@ -453,19 +453,17 @@ class Spinnaker(object):
         :param executing_reset: are we executing a reset function
         :param using_auto_pause_and_resume: check if the system is to use
         auto pasue and resume functionality
-        :return: list of algorithums to use
+        :return: list of algorithums to use and a list of optional
+        algotihms to use
         """
         algorithms = list()
-        
-        if using_auto_pause_and_resume:
-            algorithms.append("FrontEndCommonAutoPauseAndResumer")
+        optional_algorithms = list()
 
         # if youve not ran before, add the buffer manager
-
         using_virtual_board = config.getboolean("Machine", "virtual_board")
         if application_graph_changed and not using_virtual_board:
             if not using_auto_pause_and_resume:
-                algorithms.append("FrontEndCommonBufferManagerCreater")
+                optional_algorithms.append("FrontEndCommonBufferManagerCreater")
 
         # if your needing qa reset, you need to clean the binairies
         # (unless youve not ran yet)
@@ -511,19 +509,23 @@ class Spinnaker(object):
 
                 algorithms.append("FrontEndCommonMachineInterfacer")
                 algorithms.append("FrontEndCommonNotificationProtocol")
-                algorithms.append("FrontEndCommonRoutingTableLoader")
-                algorithms.append("FrontEndCommonTagsLoader")
+                optional_algorithms.append("FrontEndCommonRoutingTableLoader")
+                optional_algorithms.append("FrontEndCommonTagsLoader")
 
                 # add algorithms that the auto supples if not using it
                 if not using_auto_pause_and_resume:
-                    algorithms.append("FrontEndCommomLoadExecutableImages")
+                    optional_algorithms.append(
+                        "FrontEndCommomLoadExecutableImages")
                     algorithms.append("FrontEndCommonApplicationRunner")
-                    algorithms.append("FrontEndCommonApplicationDataLoader")
+                    optional_algorithms.append(
+                        "FrontEndCommonApplicationDataLoader")
                     algorithms.append("FrontEndCommonPartitionableGraphHost"
                                       "ExecuteDataSpecification")
                     algorithms.append("FrontEndCommomLoadExecutableImages")
                     algorithms.append("FrontEndCommomPartitionableGraphData"
                                       "SpecificationWriter")
+                else:
+                    algorithms.append("FrontEndCommonAutoPauseAndResumer")
 
                 # if the end user wants reload script, add the reload script
                 # creator to the list (reload script currently only supported
@@ -572,26 +574,34 @@ class Spinnaker(object):
                     self._reports_states.
                     placer_report_without_partitionable_graph):
                 algorithms.append("PlacerReportWithoutPartitionableGraph")
-        else:
+                
+        elif not executing_reset:
             # add function for extracting all the recorded data from
             # recorded populations
-            if self._has_ran and not executing_reset:
+            if self._has_ran:
                 algorithms.append("SpyNNakerRecordingExtracter")
                 # add functions for updating the models
                 algorithms.append("FrontEndCommonRuntimeUpdater")
-            if not self._has_ran and not executing_reset:
-                algorithms.append(
+            if not self._has_ran:
+                optional_algorithms.append(
                     "FrontEndCommonPartitionableGraphApplicationDataLoader")
                 algorithms.append("FrontEndCommomLoadExecutableImages")
-            if not executing_reset:
-                algorithms.append("FrontEndCommonNotificationProtocol")
-                # add functions for setting off the models again
+
+            # add defualt algortihms
+            algorithms.append("FrontEndCommonNotificationProtocol")
+
+            # add functions for setting off the models again
+            if using_auto_pause_and_resume:
+                algorithms.append("FrontEndCommonAutoPauseAndResumer")
+            else:
                 algorithms.append("FrontEndCommonApplicationRunner")
-                # if going to write provanence data after the run add the two
-                # provenance gatherers
-                if config.get("Reports", "writeProvanceData"):
-                    algorithms.append("FrontEndCommonProvenanceGatherer")
-        return algorithms
+
+            # if going to write provanence data after the run add the two
+            # provenance gatherers
+            if config.get("Reports", "writeProvanceData"):
+                algorithms.append("FrontEndCommonProvenanceGatherer")
+
+        return algorithms, optional_algorithms
 
     def _create_pacman_executor_outputs(
             self, requires_reset, application_graph_changed):
