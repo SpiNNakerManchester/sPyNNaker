@@ -657,8 +657,19 @@ class Spinnaker(object):
         else:
             inputs.append({"type": "ResetMachineOnStartupFlag", 'value': False})
 
-        # all algorithms need to know if they are used in a auto_pause_and_resume
-        # mode.
+        # stuff most versions need
+        inputs.append({'type': "WriteCheckerFlag",
+                       'value': config.getboolean("Mode", "verify_writes")})
+MemoryRoutingInfos
+MemoryPartitionedGraph
+MemoryTags
+ReportStates
+ApplicationDataFolder
+MachineTimeStep
+
+
+        # all algorithms need to know if they are used in an
+        #  auto_pause_and_resume mode.
         using_auto_pause_and_resume = \
             config.getboolean("Mode", "use_auto_pause_and_resume")
         inputs.append({'type': "UseAutoPauseAndResume",
@@ -689,7 +700,7 @@ class Spinnaker(object):
             extra_xmls.append(spynnaker_xml_file)
 
             inputs.append({'type': "ExtraAlgorthums",
-                           'value': "SpyNNakerRecordingExtracter"})
+                           'value': ["SpyNNakerRecordingExtracter"]})
             inputs.append({'type': "ExtraInputs", 'value': extra_inputs})
             inputs.append({'type': "ExtraXMLS", 'value': extra_xmls})
             inputs.append({'type': "DSGeneratorAlgorithm",
@@ -698,6 +709,11 @@ class Spinnaker(object):
             inputs.append({'type': "DSExecutorAlgorithm",
                            'value': "FrontEndCommonPartitionableGraphHost"
                                     "ExecuteDataSpecification"})
+            inputs.append({'type': "HasRanBefore", 'value': self._has_ran})
+            inputs.append({'type': "ApplicationGraphChanged",
+                           'value': application_graph_changed})
+            inputs.append({'type': "HasResetBefore",
+                           'value': self._has_reset_last})
 
         # FrontEndCommonPartitionableGraphApplicationDataLoader after a
         # reset and no changes
@@ -800,9 +816,6 @@ class Spinnaker(object):
             inputs.append({'type': "DatabaseWaitOnConfirmationFlag",
                            'value': config.getboolean(
                                "Database", "wait_on_confirmation")})
-            inputs.append({'type': "WriteCheckerFlag",
-                           'value': config.getboolean(
-                               "Mode", "verify_writes")})
             inputs.append({'type': "WriteTextSpecsFlag",
                            'value': config.getboolean(
                                "Reports", "writeTextSpecs")})

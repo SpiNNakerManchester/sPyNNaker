@@ -244,13 +244,12 @@ class AbstractPopulationVertex(
         if self._spike_recorder.record:
             extra_mallocs += 1
         all_mallocs = (self._get_number_of_mallocs_from_basic_model() +
-                self._synapse_manager.get_number_of_mallocs_used_by_dsg(
-                    vertex_slice, in_edges) + extra_mallocs)
+            self._synapse_manager.get_number_of_mallocs_used_by_dsg(
+                vertex_slice, in_edges) + extra_mallocs)
         if config.getboolean("SpecExecution", "specExecOnHost"):
             return 1
         else:
             return all_mallocs
-
 
     def _get_number_of_mallocs_from_basic_model(self):
         return 2 # one for system, one for neuron params

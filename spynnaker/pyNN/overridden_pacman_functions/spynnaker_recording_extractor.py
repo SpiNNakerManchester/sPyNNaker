@@ -4,6 +4,7 @@ from spynnaker.pyNN.models.common.abstract_spike_recordable import \
     AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable import \
     AbstractVRecordable
+from spynnaker.pyNN import exceptions
 
 import numpy
 import logging
@@ -19,7 +20,12 @@ class SpyNNakerRecordingExtractor(object):
 
     def __call__(
             self, partitionable_graph, placements, graph_mapper,
-            buffer_manager, runtime_in_machine_time_steps):
+            buffer_manager, runtime_in_machine_time_steps, ran_token):
+
+        if not ran_token:
+            raise exceptions.InvalidParameterType(
+                "The ran token is set to false, and therfore recordings cannot"
+                "be executed correctly. Please fix and try again")
 
         logger.info(
             "Extracting recorded data from the PyNN application space for "
