@@ -5,7 +5,7 @@ from abc import abstractmethod
 
 @add_metaclass(ABCMeta)
 class AbstractPopulationInitializable(object):
-    """ Indicates that this object has properties that can be initialized by a\
+    """ Indicates that this object has properties that can be initialised by a\
         PyNN Population
     """
 

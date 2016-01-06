@@ -281,7 +281,7 @@ void c_main(void) {
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;
 
-    // Initialize the incoming spike buffer
+    // Initialise the incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(256)) {
          rt_error(RTE_SWERR);
     }

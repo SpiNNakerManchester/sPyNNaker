@@ -48,9 +48,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractProvidesOutgoingEdgeConstraints,
                            AbstractProvidesNKeysForEdge,
                            AbstractPartitionableUsesMemoryMallocs):
-    """
-    Instance of this class provide delays to incoming spikes in multiples
-    of the maximum delays of a neuron (typically 16 or 32)
+    """ Provide delays to incoming spikes in multiples of the maximum delays\
+        of a neuron (typically 16 or 32)
     """
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
@@ -88,9 +87,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     @property
     def model_name(self):
-        """
-        Return a string representing a label for this class.
-        """
         return "DelayExtension"
 
     @property
@@ -123,8 +119,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return spike_block_row_length * no_active_timesteps * 4
 
     def get_spike_buffer_size(self, lo_atom, hi_atom):
-        """
-        Gets the size of the spike buffer for a range of neurons and time steps
+        """ Get the size of the spike buffer for a range of neurons and time\
+            steps
         """
         if not self._record:
             return 0
@@ -140,10 +136,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, subvertex, placement, sub_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
             write_text_specs, application_run_time_folder):
-        """
-        Model-specific construction of the data blocks necessary to build a
-        single Delay Extension Block on one core.
-        """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
                 placement.x, placement.y, placement.p, hostname, report_folder,
@@ -201,8 +193,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return [data_writer.filename]
 
     def write_setup_info(self, spec):
-        """
-        """
 
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
@@ -263,8 +253,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     def write_delay_parameters(self, spec, processor_chip_x, processor_chip_y,
                                processor_id, subvertex, num_delay_blocks,
                                delay_block, vertex_slice, key):
-        """
-        Generate Delay Parameter data (region 2):
+        """ Generate Delay Parameter data
         """
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -300,9 +289,9 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         size_of_mallocs = self.get_number_of_mallocs_used_by_dsg(
-            vertex_slice,  graph.incoming_edges_to_vertex(self)) * \
+            vertex_slice, graph.incoming_edges_to_vertex(self)) * \
             common_constants.SARK_PER_MALLOC_SDRAM_USAGE
-        # TODO: Fill this in to deal with delay slots malloc
+
         return size_of_mallocs
 
     def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
@@ -320,10 +309,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return "delay_extension.aplx"
 
     def is_data_specable(self):
-        """
-        helper method for isinstance
-        :return:
-        """
         return True
 
     def get_n_keys_for_partitioned_edge(self, partitioned_edge, graph_mapper):
@@ -332,10 +317,4 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return vertex_slice.n_atoms * self._max_stages
 
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
-        """
-        gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the partitioned edge that leaves this vertex
-        :param graph_mapper: the graph mapper object
-        :return: list of constraints
-        """
         return [KeyAllocatorContiguousRangeContraint()]

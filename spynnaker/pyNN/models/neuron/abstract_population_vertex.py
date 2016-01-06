@@ -4,13 +4,13 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
     AbstractProvidesOutgoingEdgeConstraints
-from spinn_front_end_common.interface.buffer_management \
-    .buffer_models.abstract_receive_buffers_to_host \
-    import AbstractReceiveBuffersToHost
-from spinn_front_end_common.abstract_models.abstract_uses_memory_mallocs import \
-    AbstractPartitionableUsesMemoryMallocs
+from spinn_front_end_common.abstract_models.\
+    abstract_uses_memory_mallocs import AbstractPartitionableUsesMemoryMallocs
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
+from spinn_front_end_common.interface.buffer_management.buffer_models\
+    .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
+
 from spynnaker.pyNN.models.neuron.population_partitioned_vertex import \
     PopulationPartitionedVertex
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -70,7 +70,7 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingEdgeConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractMappable, AbstractPartitionableUsesMemoryMallocs,
-        AbstractReceiveBuffersToHost):
+        ReceiveBuffersToHostBasicImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -81,7 +81,7 @@ class AbstractPopulationVertex(
             synapse_type, threshold_type, additional_input=None,
             constraints=None):
 
-        AbstractReceiveBuffersToHost.__init__(self)
+        ReceiveBuffersToHostBasicImpl.__init__(self)
         AbstractPartitionableVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
         AbstractDataSpecableVertex.__init__(
@@ -148,7 +148,7 @@ class AbstractPopulationVertex(
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          constraints=None):
         return PopulationPartitionedVertex(
-            resources_required, label, constraints)
+            self.buffering_output(), resources_required, label, constraints)
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -231,17 +231,19 @@ class AbstractPopulationVertex(
             extra_mallocs += 1
         if self._spike_recorder.record:
             extra_mallocs += 1
-        all_mallocs = (self._get_number_of_mallocs_from_basic_model() +
-                self._synapse_manager.get_number_of_mallocs_used_by_dsg(
-                    vertex_slice, in_edges) + extra_mallocs)
+        all_mallocs = (
+            self._get_number_of_mallocs_from_basic_model() +
+            self._synapse_manager.get_number_of_mallocs_used_by_dsg(
+                vertex_slice, in_edges) + extra_mallocs)
         if config.getboolean("SpecExecution", "specExecOnHost"):
             return 1
         else:
             return all_mallocs
 
-
     def _get_number_of_mallocs_from_basic_model(self):
-        return 2 # one for system, one for neuron params
+
+        # one for system, one for neuron params
+        return 2
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, spike_history_region_sz,
@@ -559,9 +561,6 @@ class AbstractPopulationVertex(
             post_subvertex, synapse_io, subgraph, routing_infos, weight_scales)
 
     def is_data_specable(self):
-        return True
-
-    def is_receives_buffers_to_host(self):
         return True
 
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):

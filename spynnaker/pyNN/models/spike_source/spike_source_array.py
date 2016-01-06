@@ -121,7 +121,6 @@ class SpikeSourceArray(
             self._space_before_notification =\
                 self._max_on_chip_memory_usage_for_spikes
 
-
     def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
         mallocs = \
             ReverseIpTagMultiCastSource.get_number_of_mallocs_used_by_dsg(
@@ -140,17 +139,15 @@ class SpikeSourceArray(
 
     @property
     def spike_times(self):
-        """
-        property for the spike times of the spike soruce array
+        """ The spike times of the spike source array
         :return:
         """
         return self._send_buffer_times
 
     @spike_times.setter
     def spike_times(self, spike_times):
-        """
-        setter for the spike soruce array's spike times. Not a extend, but an
-         actual change
+        """ Set the spike source array's spike times. Not an extend, but an\
+            actual change
         :param spike_times:
         :return:
         """
@@ -158,18 +155,10 @@ class SpikeSourceArray(
 
     # @implements AbstractSpikeRecordable.is_recording_spikes
     def is_recording_spikes(self):
-        """
-        helper method fro chekcing if spikes are being stored
-        :return:
-        """
         return self._spike_recorder.record
 
     # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
-        """
-        sets the recoridng flags
-        :return:
-        """
         self.enable_recording(
             self._ip_address, self._port, self._board_address,
             self._send_buffer_notification_tag,
@@ -196,28 +185,16 @@ class SpikeSourceArray(
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        """
-
-        :param new_value:
-        :return:
-        """
         SpikeSourceArray._model_based_max_atoms_per_core = new_value
 
     def _get_spike_send_buffer(self, vertex_slice):
-        """
-        spikeArray is a list with one entry per 'neuron'. The entry for
-        one neuron is a list of times (in ms) when the neuron fires.
-        We need to transpose this 'matrix' and get a list of firing neuron
-        indices for each time tick:
-        List can come in two formats (both now supported):
-        1) Official PyNN format - single list that is used for all neurons
-        2) SpiNNaker format - list of lists, one per neuron
+        """ Get the send buffer for the spikes
         """
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         if key not in self._send_buffers:
 
             send_buffer = BufferedSendingRegion(
-                    self._max_on_chip_memory_usage_for_spikes)
+                self._max_on_chip_memory_usage_for_spikes)
 
             # translate spikes into buffer
             if hasattr(self._send_buffer_times, "__len__"):
@@ -254,7 +231,8 @@ class SpikeSourceArray(
         time_stamp_in_ticks = int(
             math.ceil((time_stamp * 1000.0) / machine_time_step))
         # deduce if the time stamp is within the time window of the simulation
-        if last_runtime_position <= time_stamp_in_ticks < no_machine_time_steps:
+        if (last_runtime_position <= time_stamp_in_ticks <
+                no_machine_time_steps):
             send_buffer.add_key(time_stamp_in_ticks, neuron_list)
 
     # @implements AbstractResetableForRunInterface.reset_for_run
@@ -273,7 +251,7 @@ class SpikeSourceArray(
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          constraints=None):
 
-        # map region id to the sned buffer for this partitioned vertex
+        # map region id to the send buffer for this partitioned vertex
         send_buffer = dict()
         send_buffers = self._get_spike_send_buffer(vertex_slice)
         send_buffer[

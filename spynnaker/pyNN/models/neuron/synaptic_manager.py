@@ -1,5 +1,5 @@
-from spinn_front_end_common.abstract_models.abstract_uses_memory_mallocs import \
-    AbstractPartitionableUsesMemoryMallocs
+from spinn_front_end_common.abstract_models\
+    .abstract_uses_memory_mallocs import AbstractPartitionableUsesMemoryMallocs
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
@@ -558,7 +558,7 @@ class SynapticManager(AbstractPartitionableUsesMemoryMallocs):
             master_pop_table_region, synaptic_matrix_region, routing_info,
             graph_mapper, subgraph):
         """ Simultaneously generates both the master population table and
-            the synatic matrix.
+            the synaptic matrix.
         """
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
@@ -693,8 +693,7 @@ class SynapticManager(AbstractPartitionableUsesMemoryMallocs):
     def _translate_synaptic_block_from_memory(
             self, synaptic_block, n_atoms, max_row_length, synapse_io,
             weight_scales):
-        """
-        translates a collection of memory into synaptic rows
+        """ Translates a collection of memory into synaptic rows
         """
         synaptic_list = list()
         numpy_block = numpy.frombuffer(dtype='uint8',
@@ -834,7 +833,7 @@ class SynapticManager(AbstractPartitionableUsesMemoryMallocs):
                     " (aka, something funkky happened)")
         return block, maxed_row_length
 
-    # inhirrted from AbstractProvidesIncomingEdgeConstraints
+    # inherited from AbstractProvidesIncomingEdgeConstraints
     def get_incoming_edge_constraints(self):
         """
 
