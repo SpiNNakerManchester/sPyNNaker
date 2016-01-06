@@ -98,7 +98,6 @@ class SpikeSourceArray(
 
         # used for reset and rerun
         self._requires_mapping = True
-        self._change_requires_mapping = True
         self._last_runtime_position = 0
 
         self._max_on_chip_memory_usage_for_spikes = \
@@ -165,7 +164,7 @@ class SpikeSourceArray(
             self._spike_recorder_buffer_size,
             self._buffer_size_before_receive)
         self._spike_recorder.record = True
-        self._change_requires_mapping = True
+        self._requires_mapping = True
 
     def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
