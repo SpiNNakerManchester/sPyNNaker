@@ -7,9 +7,6 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
 from pacman.operations import algorithm_reports as pacman_algorithm_reports
 
 # common front end imports
-from spinn_front_end_common.interface.\
-    abstract_resetable_for_run_interface import \
-    AbstractResetableForRunInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities.report_states import ReportState
 from spinn_front_end_common.utility_models.command_sender import CommandSender
@@ -19,10 +16,10 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 
 # local front end imports
-from spynnaker.pyNN.models.common.abstract_gsyn_recordable import \
-    AbstractGSynRecordable
-from spynnaker.pyNN.models.common.abstract_v_recordable import \
-    AbstractVRecordable
+from spynnaker.pyNN.models.common.abstract_gsyn_recordable\
+    import AbstractGSynRecordable
+from spynnaker.pyNN.models.common.abstract_v_recordable\
+    import AbstractVRecordable
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.pynn_population import Population
@@ -37,6 +34,10 @@ from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_has_first_machine_time_step \
+    import AbstractHasFirstMachineTimeStep
+
 
 # general imports
 import logging
@@ -109,7 +110,7 @@ class Spinnaker(object):
         # holder for timing related values
         self._has_ran = False
         self._has_reset_last = False
-        self._current_run_ms = None
+        self._current_run_ms = 0
         self._no_machine_time_steps = None
         self._machine_time_step = None
         self._no_sync_changes = 0
@@ -258,26 +259,23 @@ class Spinnaker(object):
         # calculate number of machine time steps
         total_run_time = self._calculate_number_of_machine_time_steps(run_time)
 
-        if self._has_ran:
-            for vertex in self._partitionable_graph.vertices:
-                if isinstance(vertex, AbstractResetableForRunInterface):
-                    vertex.reset_for_run(self._current_run_ms, total_run_time)
-        if self._has_reset_last:
-            for vertex in self._partitionable_graph.vertices:
-                if isinstance(vertex, AbstractResetableForRunInterface):
-                    vertex.reset_for_run(0, run_time)
-
-        self._current_run_ms = run_time
+        # Calculate the first machine time step to start from and set this
+        # where necessary
+        first_machine_time_step = int(math.ceil(
+            (self._current_run_ms * 1000.0) / self._machine_time_step))
+        for vertex in self._partitionable_graph.vertices:
+            if isinstance(vertex, AbstractHasFirstMachineTimeStep):
+                vertex.set_first_machine_time_step(first_machine_time_step)
 
         # get inputs
         inputs, application_graph_changed = \
-            self._create_pacman_executor_inputs(total_run_time)
+            self._create_pacman_executor_inputs(run_time)
 
         if application_graph_changed and self._has_ran:
             raise common_exceptions.ConfigurationException(
                 "Changes to the application graph are not currently supported;"
                 " please instead call p.reset(), p.end(), add changes and then"
-                "call p.setup()")
+                " call p.setup()")
 
         # if the application graph has changed and you've already ran, kill old
         # stuff running on machine
@@ -285,10 +283,9 @@ class Spinnaker(object):
             self._txrx.stop_application(self._app_id)
 
         # get outputs
-        required_outputs = \
-            self._create_pacman_executor_outputs(
-                requires_reset=False,
-                application_graph_changed=application_graph_changed)
+        required_outputs = self._create_pacman_executor_outputs(
+            requires_reset=False,
+            application_graph_changed=application_graph_changed)
 
         # algorithms listing
         algorithms = self._create_algorithm_list(
@@ -335,12 +332,12 @@ class Spinnaker(object):
 
         inputs, application_graph_changed = \
             self._create_pacman_executor_inputs(
-                total_runtime=0, is_resetting=True)
+                this_run_time=0, is_resetting=True)
 
         if self._has_ran and application_graph_changed:
             raise common_exceptions.ConfigurationException(
-                "Currently resetting the simulation after changing the model"
-                "is not supported")
+                "Resetting the simulation after changing the model"
+                " is not supported")
 
         algorithms = self._create_algorithm_list(
             config.get("Mode", "mode") == "Debug", application_graph_changed,
@@ -558,7 +555,7 @@ class Spinnaker(object):
             # add function for extracting all the recorded data from
             # recorded populations
             if self._has_ran and not executing_reset:
-                algorithms.append("SpyNNakerRecordingExtracter")
+                algorithms.append("SpyNNakerRecordingExtractor")
 
                 # add functions for updating the models
                 algorithms.append("FrontEndCommonRuntimeUpdater")
@@ -601,7 +598,7 @@ class Spinnaker(object):
         return required_outputs
 
     def _create_pacman_executor_inputs(
-            self, total_runtime, is_resetting=False):
+            self, this_run_time, is_resetting=False):
 
         application_graph_changed = \
             self._detect_if_graph_has_changed(not is_resetting)
@@ -631,7 +628,7 @@ class Spinnaker(object):
         # support runtime updater
         if self._has_ran and not is_resetting:
             no_machine_time_steps =\
-                int(((total_runtime - self._current_run_ms) * 1000.0) /
+                int((this_run_time * 1000.0) /
                     self._machine_time_step)
             inputs.append({'type': "RunTimeMachineTimeSteps",
                            'value': no_machine_time_steps})
@@ -727,7 +724,7 @@ class Spinnaker(object):
                            'value': scamp_socket_addresses})
             inputs.append({'type': "BootPortNum", 'value': boot_port_num})
             inputs.append({'type': "APPID", 'value': self._app_id})
-            inputs.append({'type': "RunTime", 'value': self._current_run_ms})
+            inputs.append({'type': "RunTime", 'value': this_run_time})
             inputs.append({'type': "TimeScaleFactor",
                            'value': self._time_scale_factor})
             inputs.append({'type': "MachineTimeStep",
@@ -814,7 +811,7 @@ class Spinnaker(object):
             inputs.append({'type': "APPID", 'value': self._app_id})
             inputs.append({"type": "MemoryTransciever", 'value': self._txrx})
             inputs.append({"type": "RunTime",
-                           'value': self._current_run_ms})
+                           'value': this_run_time})
             inputs.append({'type': "TimeScaleFactor",
                            'value': self._time_scale_factor})
             inputs.append({'type': "LoadedReverseIPTagsToken",
@@ -842,27 +839,18 @@ class Spinnaker(object):
         return inputs, application_graph_changed
 
     def _calculate_number_of_machine_time_steps(self, next_run_time):
+        total_run_time = next_run_time
         if next_run_time is not None:
-            if self._current_run_ms is not None:
-                next_run_time += self._current_run_ms
-            self._no_machine_time_steps =\
-                int((next_run_time * 1000.0) / self._machine_time_step)
-            ceiled_machine_time_steps = \
-                math.ceil((next_run_time * 1000.0) / self._machine_time_step)
-            if self._no_machine_time_steps != ceiled_machine_time_steps:
+            total_run_time += self._current_run_ms
+            machine_time_steps = (
+                (total_run_time * 1000.0) / self._machine_time_step)
+            if machine_time_steps != int(machine_time_steps):
                 logger.warn(
                     "The runtime and machine time step combination result in "
                     "a fractional number of machine time steps")
-                self._no_machine_time_steps = int(ceiled_machine_time_steps)
-            for vertex in self._partitionable_graph.vertices:
-                if isinstance(vertex, AbstractDataSpecableVertex):
-                    vertex.set_no_machine_time_steps(
-                        self._no_machine_time_steps)
+            self._no_machine_time_steps = int(math.ceil(machine_time_steps))
         else:
             self._no_machine_time_steps = None
-            logger.warn("You have set a runtime that will never end, this may "
-                        "cause the neural models to fail to partition "
-                        "correctly")
             for vertex in self._partitionable_graph.vertices:
                 if ((isinstance(vertex, AbstractSpikeRecordable) and
                         vertex.is_recording_spikes()) or
@@ -872,9 +860,11 @@ class Spinnaker(object):
                             vertex.is_recording_gsyn)):
                     raise common_exceptions.ConfigurationException(
                         "recording a population when set to infinite runtime "
-                        "is not currently supportable in this tool chain. "
-                        "watch this space")
-        return next_run_time
+                        "is not currently supported")
+        for vertex in self._partitionable_graph.vertices:
+            if isinstance(vertex, AbstractDataSpecableVertex):
+                vertex.set_no_machine_time_steps(self._no_machine_time_steps)
+        return total_run_time
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes

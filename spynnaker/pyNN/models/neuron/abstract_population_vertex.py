@@ -4,8 +4,6 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
     AbstractProvidesOutgoingEdgeConstraints
-from spinn_front_end_common.abstract_models.\
-    abstract_uses_memory_mallocs import AbstractPartitionableUsesMemoryMallocs
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
 from spinn_front_end_common.interface.buffer_management.buffer_models\
@@ -69,8 +67,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingEdgeConstraints,
         AbstractProvidesIncomingEdgeConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractMappable, AbstractPartitionableUsesMemoryMallocs,
-        ReceiveBuffersToHostBasicImpl):
+        AbstractMappable, ReceiveBuffersToHostBasicImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -94,7 +91,6 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractMappable.__init__(self)
-        AbstractPartitionableUsesMemoryMallocs.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -214,7 +210,7 @@ class AbstractPopulationVertex(
                     self._gsyn_buffer_max_size)) +
                 self._synapse_manager.get_sdram_usage_in_bytes(
                     vertex_slice, graph.incoming_edges_to_vertex(self)) +
-                (self.get_number_of_mallocs_used_by_dsg(
+                (self._get_number_of_mallocs_used_by_dsg(
                     vertex_slice, graph.incoming_edges_to_vertex(self)) *
                  front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
 
@@ -222,8 +218,7 @@ class AbstractPopulationVertex(
     def model_name(self):
         return self._model_name
 
-    # @implements AbstractDataSpecableVertex.get_number_of_mallocs_used_by_dsg
-    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
+    def _get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
         extra_mallocs = 0
         if self._gsyn_recorder.record_gsyn:
             extra_mallocs += 1
@@ -231,14 +226,9 @@ class AbstractPopulationVertex(
             extra_mallocs += 1
         if self._spike_recorder.record:
             extra_mallocs += 1
-        all_mallocs = (
-            self._get_number_of_mallocs_from_basic_model() +
-            self._synapse_manager.get_number_of_mallocs_used_by_dsg(
-                vertex_slice, in_edges) + extra_mallocs)
-        if config.getboolean("SpecExecution", "specExecOnHost"):
-            return 1
-        else:
-            return all_mallocs
+        return (
+            2 + self._synapse_manager.get_number_of_mallocs_used_by_dsg() +
+            extra_mallocs)
 
     def _get_number_of_mallocs_from_basic_model(self):
 

@@ -295,7 +295,7 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     simulation_register_simulation_sdp_callback(
-        &simulation_ticks, SDP);
+        &simulation_ticks, &infinite_run, SDP);
 
     log_info("Starting");
     simulation_run();

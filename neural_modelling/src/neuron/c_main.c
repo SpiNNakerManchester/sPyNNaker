@@ -235,8 +235,8 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     // Set up callback listening to SDP messages
-    simulation_register_simulation_sdp_callback(&simulation_ticks,
-                                                SDP_AND_DMA_AND_USER);
+    simulation_register_simulation_sdp_callback(
+        &simulation_ticks, &infinite_run, SDP_AND_DMA_AND_USER);
 
     log_info("Starting");
     simulation_run();

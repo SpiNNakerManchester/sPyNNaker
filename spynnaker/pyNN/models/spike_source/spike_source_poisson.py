@@ -19,9 +19,6 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
     AbstractProvidesOutgoingEdgeConstraints
-from spinn_front_end_common.\
-    abstract_models.abstract_uses_memory_mallocs import \
-    AbstractPartitionableUsesMemoryMallocs
 from spinn_front_end_common.utilities import constants as\
     front_end_common_constants
 from spinn_front_end_common.interface.buffer_management.buffer_models\
@@ -48,7 +45,6 @@ class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
         PopulationSettableChangeRequiresMapping,
-        AbstractPartitionableUsesMemoryMallocs,
         ReceiveBuffersToHostBasicImpl):
     """ A Poisson Spike source object
     """
@@ -82,7 +78,6 @@ class SpikeSourcePoisson(
         ReceiveBuffersToHostBasicImpl.__init__(self)
         AbstractProvidesOutgoingEdgeConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
-        AbstractPartitionableUsesMemoryMallocs.__init__(self)
 
         # Store the parameters
         self._rate = rate
@@ -325,19 +320,16 @@ class SpikeSourcePoisson(
              self.get_recording_data_size(1) +
              self.get_buffer_state_region_size(1) +
              poisson_params_sz + spike_hist_buff_sz)
-        total_size += self.get_number_of_mallocs_used_by_dsg(
+        total_size += self._get_number_of_mallocs_used_by_dsg(
             vertex_slice, graph.incoming_edges_to_vertex(self)) * \
             front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
         return total_size
 
-    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
+    def _get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
         standard_mallocs = self._DEFAULT_MALLOCS_USED
         if self._spike_recorder.record:
             standard_mallocs += 1
-        if config.getboolean("SpecExecution", "specExecOnHost"):
-            return 1
-        else:
-            return standard_mallocs
+        return standard_mallocs
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         return 0
