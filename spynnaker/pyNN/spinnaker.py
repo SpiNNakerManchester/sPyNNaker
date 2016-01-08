@@ -119,7 +119,8 @@ class Spinnaker(object):
                     config.getboolean("Reports", "writeReloadSteps"),
                     config.getboolean("Reports", "writeTransceiverReport"),
                     config.getboolean("Reports", "outputTimesForSections"),
-                    config.getboolean("Reports", "writeTagAllocationReports"))
+                    config.getboolean("Reports", "writeTagAllocationReports"),
+                    config.getboolean("Reports", "writeMemoryMapReport"))
 
             # set up reports default folder
             self._report_default_directory, this_run_time_string = \
@@ -144,6 +145,9 @@ class Spinnaker(object):
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
+
+        self._exec_dse_on_host = config.getboolean(
+                "SpecExecution", "specExecOnHost")
 
         # set up machine targeted data
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
@@ -303,6 +307,21 @@ class Spinnaker(object):
         algorithms += (config.get("Mapping", "algorithms") + "," +
                        config.get("Mapping", "interface_algorithms"))
 
+        if self._exec_dse_on_host:
+            algorithms += \
+                ",FrontEndCommonPartitionableGraphApplicationDataLoader" \
+                ",FrontEndCommonPartitionableGraphHostExecuteDataSpecification"
+        else:
+            # The following line is not split to avoid error in future search
+            algorithms += \
+                ",FrontEndCommonPartitionableGraphMachineExecuteDataSpecification"
+
+        if self._reports_states.write_memory_map_report:
+            if self._exec_dse_on_host:
+                algorithms += ",FrontEndCommonMemoryMapOnHostReport"
+            else:
+                algorithms += ",FrontEndCommonMemoryMapOnChipReport"
+
         # if using virtual machine, add to list of algorithms the virtual
         # machine generator, otherwise add the standard machine generator
         if config.getboolean("Machine", "virtual_board"):
@@ -320,9 +339,6 @@ class Spinnaker(object):
             # creator to the list
             if config.getboolean("Reports", "writeReloadSteps"):
                 algorithms += ",FrontEndCommonReloadScriptCreator"
-
-        if config.getboolean("Reports", "writeMemoryMapReport"):
-            algorithms += ",FrontEndCommonMemoryMapReport"
 
         if config.getboolean("Reports", "writeNetworkSpecificationReport"):
             algorithms += \
