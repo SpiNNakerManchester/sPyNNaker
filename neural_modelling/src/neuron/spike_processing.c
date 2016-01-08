@@ -66,7 +66,7 @@ static inline void _setup_synaptic_dma_read() {
                 &n_bytes_to_transfer)) {
 
             // Write the SDRAM address of the plastic region and the
-            // Key of the originating spike to the beginning of dma buffer
+            // Key of the originating spike to the beginning of DMA buffer
             dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
             next_buffer->sdram_writeback_address = row_address;
             next_buffer->originating_spike = spike;
@@ -85,7 +85,7 @@ static inline void _setup_synaptic_dma_read() {
     }
 
     // If the setup was not done, and there are no more spikes,
-    // stop trying to set up synaptic dmas
+    // stop trying to set up synaptic DMAs
     if (!setup_done) {
         log_debug("DMA not busy");
         dma_busy = false;
@@ -97,7 +97,7 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
     // Get pointer to current buffer
     dma_buffer *buffer = &dma_buffers[dma_buffer_index];
 
-    // Get the number of plastic bytes and the writeback address from the
+    // Get the number of plastic bytes and the write back address from the
     // synaptic row
     size_t n_plastic_region_bytes =
         synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
@@ -124,7 +124,7 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
 
-        // If we're not already processing synaptic dmas,
+        // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
         if (!dma_busy) {
 
@@ -155,6 +155,7 @@ void _dma_complete_callback(uint unused, uint tag) {
 
     // If this DMA is the result of a read
     if (tag == DMA_TAG_READ_SYNAPTIC_ROW) {
+
         // Get pointer to current buffer
         uint32_t current_buffer_index = buffer_being_read;
         dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
@@ -165,6 +166,7 @@ void _dma_complete_callback(uint unused, uint tag) {
         // Process synaptic row repeatedly
         bool subsequent_spikes;
         do {
+
             // Are there any more incoming spikes from the same pre-synaptic
             // neuron?
             subsequent_spikes = in_spikes_is_next_spike_equal(
@@ -206,7 +208,9 @@ void _dma_complete_callback(uint unused, uint tag) {
 
 /* INTERFACE FUNCTIONS - cannot be static */
 
-bool spike_processing_initialise(size_t row_max_n_words) {
+bool spike_processing_initialise(
+        size_t row_max_n_words, uint mc_packet_callback_priority,
+        uint dma_trasnfer_callback_priority, uint user_event_priority) {
 
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
@@ -229,9 +233,10 @@ bool spike_processing_initialise(size_t row_max_n_words) {
 
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
-            _multicast_packet_received_callback, -1);
-    spin1_callback_on(DMA_TRANSFER_DONE, _dma_complete_callback, 0);
-    spin1_callback_on(USER_EVENT, _user_event_callback, 0);
+            _multicast_packet_received_callback, mc_packet_callback_priority);
+    spin1_callback_on(DMA_TRANSFER_DONE, _dma_complete_callback,
+                      dma_trasnfer_callback_priority);
+    spin1_callback_on(USER_EVENT, _user_event_callback, user_event_priority);
 
     return true;
 }
@@ -241,6 +246,7 @@ void spike_processing_finish_write(uint32_t process_id) {
 }
 
 void spike_processing_print_buffer_overflows() {
+
     // Check for buffer overflow
     uint32_t spike_buffer_overflows = in_spikes_get_n_buffer_overflows();
     if (spike_buffer_overflows > 0) {

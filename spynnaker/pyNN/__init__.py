@@ -156,39 +156,31 @@ def get_spynnaker():
 
 
 def num_processes():
-    """Return the number of MPI processes
+    """ Return the number of MPI processes
        (not used for SpiNNaker, always returns 1)
     """
     return 1
 
 
 def rank():
-    """Return the MPI rank of the current node. (not used for SpiNNaker,
-    always returns 0 - as this is the minimum rank suggesting the front node)
+    """ Return the MPI rank of the current node. (not used for SpiNNaker,\
+        always returns 0 - as this is the minimum rank suggesting the front\
+        node)
     """
     return 0
 
 
 def reset():
-    """Reset the time to zero, and start the clock.
-    TO BE IMPLEMENTED
+    """ Reset the time to zero, and start the clock.
     """
-    pass
+    global _spinnaker
+    _spinnaker.reset()
 
 
 def run(run_time=None):
-    """Run the simulation for run_time ms.
+    """ Run the simulation for run_time ms.
 
-    :param int run_time:
-        simulation length (in ms)
-
-    On run the following :py:class:`pacman103.core.control.Controller`
-    functions are called:
-     - :py:mod:`pacman103.core.control.Controller.map_model`
-     - :py:mod:`pacman103.core.control.Controller.specify_output`
-     - :py:mod:`pacman103.core.control.Controller.generate_output`
-     - :py:mod:`pacman103.core.control.Controller.load_executables`
-     - :py:mod:`pacman103.core.control.Controller.run`
+    :param run_time: simulation length (in ms)
     """
     global _spinnaker
     _spinnaker.run(run_time)
@@ -197,26 +189,11 @@ def run(run_time=None):
 
 def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
           database_socket_addresses=None, **extra_params):
-    """
-    Should be called at the very beginning of a script.
-    extra_params contains any keyword arguments that are required by a given
-    simulator but not by others.
-    For simulation on SpiNNaker the following parameters are mandatory:
+    """ Should be called at the very beginning of a script.
+        extra_params contains any keyword arguments that are required by a\
+        given simulator but not by others.
 
-    :param `pacman103.lib.lib_machine` machine:
-        A SpiNNaker machine used to run the simulation.
-
-
-    The setup() call instantiates a
-    :py:class:`pacman103.core.control.Controller`
-    object which is used as a global variable throughout the whole process.
-
-    It also creates an AppMonitor Object (a vertex with model-type AppMon),
-    placing a mapping constraint on it so that it is on chip (0,0).
-    This functionality may move elsewhere later.
-
-    NB: timestep, min_delay and max_delay are required by the PyNN API but we
-    ignore them because they have no bearing on the on-chip simulation code.
+    :param machine: A SpiNNaker machine used to run the simulation.
     :param timestep:
     :param min_delay:
     :param max_delay:
@@ -249,13 +226,8 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
 
 
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
-    """
-    Sets a ceiling on the number of neurons of a given type that can be placed
-    on a single core.
-    This information is stored in the model itself  and is referenced
-    during the partition stage of the mapper.
-    Note that each neuron type has a default value for this parameter that will
-    be used if no override is given.
+    """ Sets a ceiling on the number of neurons of a given type that can be\
+        placed on a single core.
     :param neuron_type:
     :param max_permitted:
     """
@@ -274,8 +246,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
 
 
 def register_database_notification_request(hostname, notify_port, ack_port):
-    """
-    Adds a socket system which is registered with the notification protocol
+    """ Adds a socket system which is registered with the notification protocol
 
     :param hostname:
     :param notify_port:
@@ -325,8 +296,7 @@ def Projection(presynaptic_population, postsynaptic_population,
 
 
 def NativeRNG(seed_value):
-    """
-    fixes the random number generators seed
+    """ Fixes the random number generator's seed
     :param seed_value:
     :return:
     """
@@ -352,8 +322,7 @@ def get_current_time():
 # =============================================================================
 
 def create(cellclass, cellparams=None, n=1):
-    """
-    Create n cells all of the same type.
+    """ Create n cells all of the same type.
 
     If n > 1, return a list of cell ids/references.
     If n==1, return just the single id.
@@ -365,8 +334,7 @@ def create(cellclass, cellparams=None, n=1):
 
 def connect(source, target, weight=0.0, delay=None, synapse_type="excitatory",
             p=1, rng=None):
-    """
-    Connect a source of spikes to a synaptic target.
+    """ Connect a source of spikes to a synaptic target.
 
     source and target can both be individual cells or lists of cells, in
     which case all possible connections are made with probability p, using
@@ -379,8 +347,7 @@ def connect(source, target, weight=0.0, delay=None, synapse_type="excitatory",
 
 
 def get_time_step():
-    """
-    returns the timestep assigned to the spinnaker backend
+    """ The timestep requested
     :return:
     """
     global _spinnaker
@@ -393,8 +360,7 @@ def get_time_step():
 
 
 def get_min_delay():
-    """
-    returns the minimum allowed synaptic delay.
+    """ The minimum allowed synaptic delay.
     :return:
     """
     global _spinnaker
@@ -407,8 +373,7 @@ def get_min_delay():
 
 
 def get_max_delay():
-    """
-    return the maximum allowed synaptic delay.
+    """ The maximum allowed synaptic delay.
     :return:
     """
     global _spinnaker
@@ -421,8 +386,7 @@ def get_max_delay():
 
 
 def set(cells, param, val=None):  # @ReservedAssignment
-    """
-    Set one or more parameters of an individual cell or list of cells.
+    """ Set one or more parameters of an individual cell or list of cells.
 
     param can be a dict, in which case val should not be supplied, or a string
     giving the parameter name, in which case val is the parameter value.
@@ -436,21 +400,18 @@ def initialize(cells, variable, value):
 
 
 def record(source, filename):
-    """
-    Record spikes to a file. source should be a Population.
+    """ Record spikes to a file. source should be a Population.
     """
     source.record(to_file=filename)
 
 
 def record_v(source, filename):
-    """
-    Record spikes to a file. source should be a Population.
+    """ Record spikes to a file. source should be a Population.
     """
     source.record_v(to_file=filename)
 
 
 def record_gsyn(source, filename):
-    """
-    Record spikes to a file. source should be a Population.
+    """ Record spikes to a file. source should be a Population.
     """
     source.record_gsyn(to_file=filename)

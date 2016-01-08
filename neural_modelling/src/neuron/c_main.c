@@ -46,6 +46,11 @@ typedef enum regions_e {
     BUFFERING_OUT_CONTROL_REGION
 } regions_e;
 
+//! values for the priority for each callback
+typedef enum callback_priorities{
+    MC = -1, SDP_AND_DMA_AND_USER = 0, TIMER = 2
+} callback_priorities;
+
 //! The number of regions that are to be used for recording
 #define NUMBER_OF_REGIONS_TO_RECORD 3
 
@@ -64,12 +69,35 @@ static uint32_t infinite_run;
 //! The recording flags
 static uint32_t recording_flags = 0;
 
+//! \brief Initialises the recording parts of the model
+//! \return True if recording initialisation is successful, false otherwise
+static bool initialise_recording(){
+    address_t address = data_specification_get_data_address();
+    address_t system_region = data_specification_get_region(
+        SYSTEM_REGION, address);
+    regions_e regions_to_record[] = {
+        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+        BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
+        BUFFERING_OUT_GSYN_RECORDING_REGION
+    };
+    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+    uint32_t *recording_flags_from_system_conf =
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+    regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
+
+    bool success = recording_initialize(
+        n_regions_to_record, regions_to_record,
+        recording_flags_from_system_conf, state_region, 2, &recording_flags);
+    log_info("Recording flags = 0x%08x", recording_flags);
+    return success;
+}
+
 //! \brief Initialises the model by reading in the regions and checking
 //!        recording data.
 //! \param[in] timer_period a pointer for the memory address where the timer
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
-static bool initialize(uint32_t *timer_period) {
+static bool initialise(uint32_t *timer_period) {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -89,20 +117,10 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    regions_e regions_to_record[] = {
-        BUFFERING_OUT_SPIKE_RECORDING_REGION,
-        BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
-        BUFFERING_OUT_GSYN_RECORDING_REGION
-    };
-    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-    uint32_t *recording_flags_from_system_conf =
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
-
-    recording_initialize(
-        n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, 2, &recording_flags);
-    log_info("Recording flags = 0x%08x", recording_flags);
+    // setup recording region
+    if (!initialise_recording()){
+        return false;
+    }
 
     // Set up the neurons
     uint32_t n_neurons;
@@ -139,7 +157,8 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    if (!spike_processing_initialise(row_max_n_words)) {
+    if (!spike_processing_initialise(row_max_n_words, MC, SDP_AND_DMA_AND_USER,
+                                     SDP_AND_DMA_AND_USER)) {
         return false;
     }
     log_info("Initialise: finished");
@@ -162,8 +181,6 @@ void timer_callback(uint timer_count, uint unused) {
     /* if a fixed number of simulation ticks that were specified at startup
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
-        log_info("Simulation complete.\n");
-
         // print statistics into logging region
         synapses_print_pre_synaptic_events();
         synapses_print_saturation_count();
@@ -176,8 +193,14 @@ void timer_callback(uint timer_count, uint unused) {
             recording_finalise();
         }
 
-        spin1_exit(0);
-        return;
+        // falls into the pause resume mode of operating
+        simulation_handle_pause_resume(timer_callback, TIMER);
+
+        // restart the recording status
+        if (!initialise_recording()) {
+            log_error("Error setting up recording");
+            spin1_exit(0);
+        }
     }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
@@ -196,7 +219,7 @@ void c_main(void) {
     uint32_t timer_period;
 
     // initialise the model
-    if (!initialize(&timer_period)){
+    if (!initialise(&timer_period)){
         rt_error(RTE_API);
     }
 
@@ -204,12 +227,16 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    log_info("setting timer tic callback for %d microseconds",
+    log_info("setting timer tick callback for %d microseconds",
               timer_period);
     spin1_set_timer_tick(timer_period);
 
     // Set up the timer tick callback (others are handled elsewhere)
-    spin1_callback_on(TIMER_TICK, timer_callback, 2);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
+
+    // Set up callback listening to SDP messages
+    simulation_register_simulation_sdp_callback(
+        &simulation_ticks, &infinite_run, SDP_AND_DMA_AND_USER);
 
     log_info("Starting");
     simulation_run();

@@ -43,15 +43,15 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractProvidesIncomingEdgeConstraints,
                            AbstractProvidesOutgoingEdgeConstraints,
                            AbstractProvidesNKeysForEdge):
-    """
-    Instance of this class provide delays to incoming spikes in multiples
-    of the maximum delays of a neuron (typically 16 or 32)
+    """ Provide delays to incoming spikes in multiples of the maximum delays\
+        of a neuron (typically 16 or 32)
     """
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
         names=[('SYSTEM', 0),
                ('DELAY_PARAMS', 1),
                ('SPIKE_HISTORY', 2)])
+    _DEFAULT_MALLOCS_USED = 2
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
@@ -81,9 +81,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     @property
     def model_name(self):
-        """
-        Return a string representing a label for this class.
-        """
         return "DelayExtension"
 
     @property
@@ -116,8 +113,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return spike_block_row_length * no_active_timesteps * 4
 
     def get_spike_buffer_size(self, lo_atom, hi_atom):
-        """
-        Gets the size of the spike buffer for a range of neurons and time steps
+        """ Get the size of the spike buffer for a range of neurons and time\
+            steps
         """
         if not self._record:
             return 0
@@ -133,10 +130,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, subvertex, placement, sub_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
             write_text_specs, application_run_time_folder):
-        """
-        Model-specific construction of the data blocks necessary to build a
-        single Delay Extension Block on one core.
-        """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
                 placement.x, placement.y, placement.p, hostname, report_folder,
@@ -170,7 +163,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
-        self.write_setup_info(spec, 0)
+        self.write_setup_info(spec)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -193,9 +186,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         return [data_writer.filename]
 
-    def write_setup_info(self, spec, spike_history_region_sz):
-        """
-        """
+    def write_setup_info(self, spec):
 
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
@@ -256,8 +247,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     def write_delay_parameters(self, spec, processor_chip_x, processor_chip_y,
                                processor_id, subvertex, num_delay_blocks,
                                delay_block, vertex_slice, key):
-        """
-        Generate Delay Parameter data (region 2):
+        """ Generate Delay Parameter data
         """
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -292,8 +282,14 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        # TODO: Fill this in
-        return 0
+        size_of_mallocs = (
+            self._DEFAULT_MALLOCS_USED *
+            common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
+
+        return size_of_mallocs
+
+    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
+        return
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -303,10 +299,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return "delay_extension.aplx"
 
     def is_data_specable(self):
-        """
-        helper method for isinstance
-        :return:
-        """
         return True
 
     def get_n_keys_for_partitioned_edge(self, partitioned_edge, graph_mapper):
@@ -315,10 +307,4 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return vertex_slice.n_atoms * self._max_stages
 
     def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
-        """
-        gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the partitioned edge that leaves this vertex
-        :param graph_mapper: the graph mapper object
-        :return: list of constraints
-        """
         return [KeyAllocatorContiguousRangeContraint()]

@@ -1,10 +1,4 @@
-"""
-DelayPartitionableEdge
-"""
-
 # spynnaker imports
-import copy
-
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
@@ -21,15 +15,13 @@ from pacman.utilities.utility_objs.progress_bar import ProgressBar
 # general imports
 import math
 import logging
+import copy
 
 
 logger = logging.getLogger(__name__)
 
 
 class DelayPartitionableEdge(ProjectionPartitionableEdge):
-    """
-    DelayPartitionableEdge
-    """
 
     def __init__(self, presynaptic_population, postsynaptic_population,
                  machine_time_step, num_delay_stages, max_delay_per_neuron,
@@ -48,18 +40,10 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
 
     @property
     def num_delay_stages(self):
-        """
-
-        :return:
-        """
         return self._pre_vertex.max_stages
 
     @property
     def max_delay_per_neuron(self):
-        """
-
-        :return:
-        """
         return self._pre_vertex.max_delay_per_neuron
 
     def _get_delay_stage_max_n_words(self, vertex_slice, stage):
@@ -70,9 +54,9 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
         return conns
 
     def get_max_n_words(self, vertex_slice=None):
-        """
-        Gets the maximum number of words for a subvertex at the end of the
-        connection
+        """ Get the maximum number of words for a subvertex at the end of the\
+            connection
+
         :param vertex_slice: the vertex slice which represents which part
                              of the partitionable vertex
         :type vertex_slice: pacman.model.graph_mapper.slide
@@ -81,16 +65,14 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
                     for stage in range(self._pre_vertex.max_stages)])
 
     def get_n_rows(self):
-        """
-        Gets the number of synaptic rows coming in to a vertex at the end of
-        the connection
+        """ Get the number of synaptic rows coming in to a vertex at the end\
+            of the connection
         """
         return self._synapse_list.get_n_rows() * self._pre_vertex.max_stages
 
     def create_subedge(self, presubvertex, postsubvertex, constraints=None,
                        label=None):
-        """
-        Creates a subedge from this edge
+        """ Create a subedge from this edge
         :param postsubvertex:
         :param presubvertex:
         :param constraints:
@@ -103,9 +85,8 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):
-        """
-        Get synaptic data for all connections in this Projection from the
-        machine.
+        """ Get synaptic data for all connections in this Projection from the\
+            machine.
         :param graph_mapper:
         :param partitioned_graph:
         :param placements:

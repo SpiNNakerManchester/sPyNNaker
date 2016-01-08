@@ -121,4 +121,30 @@
             </parameter>
         </produces_outputs>
     </algorithm>
+    <algorithm name="SpyNNakerRecordingExtractor">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_recording_extractor</python_module>
+        <python_class>SpyNNakerRecordingExtractor</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>partitionable_graph</param_name>
+                <param_type>MemoryPartitionableGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>runtime_in_machine_time_steps</param_name>
+                <param_type>RunTimeMachineTimeSteps</param_type>
+            </parameter>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>buffer_manager</param_name>
+                <param_type>BufferManager</param_type>
+            </parameter>
+        </required_inputs>
+    </algorithm>
 </algorithms>

@@ -22,10 +22,11 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def get_spikes(self, placements, graph_mapper):
+    def get_spikes(self, placements, graph_mapper, buffer_manager):
         """ Get the recorded spikes from the object
         :param placements: the placements object
         :param graph_mapper: the graph mapper object
+        :param buffer_manager: the buffer manager object
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
                 ordered by time
         """
