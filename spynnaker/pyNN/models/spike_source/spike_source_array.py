@@ -175,15 +175,3 @@ class SpikeSourceArray(
 
     def set_first_machine_time_step(self, first_machine_time_step):
         self.first_machine_time_step = first_machine_time_step
-
-    # @implements AbstractResetableForRunInterface.reset_for_run
-    def reset_for_run(
-            self, last_runtime_in_milliseconds, this_runtime_in_milliseconds):
-        self._send_buffers.clear()
-        self._last_runtime_position = last_runtime_in_milliseconds
-        for (vertex_slice, partitioned_vertex) in self._partitioned_vertices:
-            send_buffers = dict()
-            send_buffers[
-                self._REGIONS.SEND_BUFFER.value] = \
-                self._get_spike_send_buffer(vertex_slice)
-            partitioned_vertex.send_buffers = send_buffers
