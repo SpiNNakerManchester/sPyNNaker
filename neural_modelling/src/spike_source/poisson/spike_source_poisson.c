@@ -372,18 +372,17 @@ void sdp_packet_callback(uint mailbox, uint port) {
 
     uint32_t n_items = data[0];
     data = &(data[1]);
-    uint32_t last = 0;
     for (uint32_t item = 0; item < n_items; item++) {
         uint32_t id = data[(item * 4)];
-        log_info("%u", id);
-        spike_source_array[id].is_fast_source = (bool) data[(item * 4) + 1];
-        spike_source_array[id].exp_minus_lambda =
-            ulrbits(data[(item * 4) + 2]);
-        spike_source_array[id].mean_isi_ticks =
-            kbits((int32_t) data[(item * 4) + 3]);
-        last = id;
+        if (id < num_spike_sources) {
+            log_info("Updating rate of %u", id);
+            spike_source_array[id].is_fast_source = (bool) data[(item * 4) + 1];
+            spike_source_array[id].exp_minus_lambda =
+                ulrbits(data[(item * 4) + 2]);
+            spike_source_array[id].mean_isi_ticks =
+                kbits((int32_t) data[(item * 4) + 3]);
+        }
     }
-    log_info("%u", last);
     spin1_msg_free(msg);
 }
 

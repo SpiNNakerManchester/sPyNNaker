@@ -56,8 +56,10 @@ from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 
 # spike sources
+# Possion is overridden below to add database information when live rate
+# changes are implemented
 from spynnaker.pyNN.models.spike_source.spike_source_poisson\
-    import SpikeSourcePoisson
+    import SpikeSourcePoisson as SpikeSourcePoissonClass
 from spynnaker.pyNN.models.spike_source.spike_source_array \
     import SpikeSourceArray
 from spynnaker.pyNN.models.spike_source.spike_source_from_file \
@@ -415,3 +417,37 @@ def record_gsyn(source, filename):
     """ Record spikes to a file. source should be a Population.
     """
     source.record_gsyn(to_file=filename)
+
+
+def SpikeSourcePoisson(
+        n_neurons, machine_time_step, timescale_factor, constraints=None,
+        label="SpikeSourcePoisson", rate=1.0, start=0.0, duration=None,
+        seed=None, port=None, database_notify_host=None,
+        database_notify_port_num=None, database_ack_port_num=None):
+
+    if port is not None:
+        if database_notify_port_num is None:
+            database_notify_port_num = conf.config.getint(
+                "Database", "notify_port")
+        if database_notify_host is None:
+            database_notify_host = conf.config.get(
+                "Database", "notify_hostname")
+        if database_ack_port_num is None:
+            database_ack_port_num = conf.config.get(
+                "Database", "listen_port")
+            if database_ack_port_num == "None":
+                database_ack_port_num = None
+
+        # build the database socket address used by the notification interface
+        database_socket = SocketAddress(
+            listen_port=database_ack_port_num,
+            notify_host_name=database_notify_host,
+            notify_port_no=database_notify_port_num)
+
+        # update socket interface with new demands.
+        global _spinnaker
+        _spinnaker._add_socket_address(database_socket)
+
+    return SpikeSourcePoissonClass(
+        n_neurons, machine_time_step, timescale_factor, constraints, label,
+        rate, start, duration, seed, port)

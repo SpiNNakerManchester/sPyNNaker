@@ -92,8 +92,9 @@ class SpikeSourcePoisson(
         self._updatable = False
         if port is not None:
             self.add_constraint(TagAllocatorRequireReverseIptagConstraint(
-                port))
-        self._updatable = True
+                port, sdp_port=(front_end_common_constants.SDP_PORTS
+                                .POISSON_UPDATE_RATE_SDP_PORT.value)))
+            self._updatable = True
 
         # Prepare for recording, and to get spikes
         self._spike_recorder = SpikeRecorder(machine_time_step)
