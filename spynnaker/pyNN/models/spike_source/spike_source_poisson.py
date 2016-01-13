@@ -40,7 +40,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
-PARAMS_BASE_WORDS = 4
+PARAMS_BASE_WORDS = 5
 PARAMS_WORDS_PER_NEURON = 6
 RANDOM_SEED_WORDS = 4
 
@@ -88,10 +88,12 @@ class SpikeSourcePoisson(
         self._start = start
         self._duration = duration
         self._rng = numpy.random.RandomState(seed)
-        
+
+        self._updatable = False
         if port is not None:
             self.add_constraint(TagAllocatorRequireReverseIptagConstraint(
                 port))
+        self._updatable = True
 
         # Prepare for recording, and to get spikes
         self._spike_recorder = SpikeRecorder(machine_time_step)
@@ -139,6 +141,19 @@ class SpikeSourcePoisson(
         """ Return a string representing a label for this class.
         """
         return "SpikeSourcePoisson"
+
+    def create_subvertex(
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
+        if self._updatable and vertex_slice.n_atoms != self._n_atoms:
+            raise Exception(
+                "Poisson Sources which allow weight changes (i.e. one where"
+                " the port parameter is set) must have a maximum of {}"
+                " neurons".format(
+                    SpikeSourcePoisson._model_based_max_atoms_per_core))
+        return AbstractPartitionableVertex.create_subvertex(
+            self, vertex_slice, resources_required, label=label,
+            constraints=constraints)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
@@ -229,6 +244,11 @@ class SpikeSourcePoisson(
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+
+        # Write the SDP port to use for updates
+        spec.write_value(
+            data=(front_end_common_constants.SDP_PORTS
+                  .POISSON_UPDATE_RATE_SDP_PORT.value))
 
         # Write the number of sources
         spec.write_value(data=num_neurons)

@@ -43,7 +43,7 @@ typedef enum callback_priorities{
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
 typedef enum poisson_region_parameters{
-    HAS_KEY, TRANSMISSION_KEY, PARAMETER_SEED_START_POSITION,
+    HAS_KEY, TRANSMISSION_KEY, PARAMETER_SEED_START_POSITION
 } poisson_region_parameters;
 
 // Globals
@@ -112,9 +112,11 @@ static inline uint32_t fast_spike_source_get_num_spikes(
 //! \entry method for reading the parameters stored in Poisson parameter region
 //! \param[in] address the absolute SDRAm memory address to which the
 //!            Poisson parameter region starts.
+//! \param[out] update_sdp_port The SDP port on which rate updates will be
+//!             received
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
-bool read_poisson_parameters(address_t address) {
+bool read_poisson_parameters(address_t address, uint *update_sdp_port) {
 
     log_info("read_parameters: starting");
 
@@ -130,7 +132,10 @@ bool read_poisson_parameters(address_t address) {
     log_info("\tSeed (%u) = %u %u %u %u", seed_size, spike_source_seed[0],
              spike_source_seed[1], spike_source_seed[2], spike_source_seed[3]);
 
-    num_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
+    *update_sdp_port = address[PARAMETER_SEED_START_POSITION + seed_size];
+    log_info("\tListening for rate updates on SDP port %u\n", *update_sdp_port);
+
+    num_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size + 1];
     log_info("\tspike sources = %u", num_spike_sources);
 
     // Allocate DTCM for array of spike sources and copy block of data
@@ -141,8 +146,7 @@ bool read_poisson_parameters(address_t address) {
             log_error("Failed to allocate spike_source_array");
             return false;
         }
-        uint32_t spikes_offset = PARAMETER_SEED_START_POSITION +
-                                      seed_size + 1;
+        uint32_t spikes_offset = PARAMETER_SEED_START_POSITION + seed_size + 2;
         memcpy(spike_source_array, &address[spikes_offset],
                num_spike_sources * sizeof(spike_source_t));
 
@@ -189,11 +193,12 @@ static bool initialise_recording(){
 
 //! Initialises the model by reading in the regions and checking recording
 //! data.
-//! \param[in] *timer_period a pointer for the memory address where the timer
+//! \param[out] timer_period a pointer for the memory address where the timer
 //!            period should be stored during the function.
+//! \param[out] update_sdp_port The SDP port on which to listen for rate updates
 //! \return boolean of True if it successfully read all the regions and set up
 //!         all its internal data structures. Otherwise returns False
-static bool initialize(uint32_t *timer_period) {
+static bool initialize(uint32_t *timer_period, uint *update_sdp_port) {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -220,7 +225,8 @@ static bool initialize(uint32_t *timer_period) {
 
     // Setup regions that specify spike source array data
     if (!read_poisson_parameters(
-            data_specification_get_region(POISSON_PARAMS, address))) {
+            data_specification_get_region(POISSON_PARAMS, address),
+            update_sdp_port)) {
         return false;
     }
 
@@ -386,7 +392,8 @@ void c_main(void) {
 
     // Load DTCM data
     uint32_t timer_period;
-    if (!initialize(&timer_period)) {
+    uint update_sdp_port;
+    if (!initialize(&timer_period, &update_sdp_port)) {
         rt_error(RTE_SWERR);
     }
 
@@ -407,7 +414,7 @@ void c_main(void) {
     // Set up callback listening to SDP messages
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
-    spin1_sdp_callback_on(4, sdp_packet_callback, 0);
+    spin1_sdp_callback_on(update_sdp_port, sdp_packet_callback, 0);
 
     log_info("Starting");
     simulation_run();
