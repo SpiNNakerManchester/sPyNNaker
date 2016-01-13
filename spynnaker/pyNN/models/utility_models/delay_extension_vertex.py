@@ -1,22 +1,25 @@
 import copy
 import logging
 from enum import Enum
-
 import math
+
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
     delay_partitionable_edge import DelayPartitionableEdge
+
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_edge_constraints \
     import AbstractProvidesIncomingEdgeConstraints
-from spinn_front_end_common.abstract_models\
-    .abstract_outgoing_edge_same_contiguous_keys_restrictor\
-    import AbstractOutgoingEdgeSameContiguousKeysRestrictor
 from spinn_front_end_common.utilities import constants as common_constants
-from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge import AbstractProvidesNKeysForEdge
+from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
+    import AbstractProvidesNKeysForEdge
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -25,9 +28,12 @@ from pacman.model.constraints.key_allocator_constraints.\
     import KeyAllocatorFixedMaskConstraint
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
+
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
-
 
 logger = logging.getLogger(__name__)
 
@@ -35,17 +41,17 @@ logger = logging.getLogger(__name__)
 class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractDataSpecableVertex,
                            AbstractProvidesIncomingEdgeConstraints,
-                           AbstractOutgoingEdgeSameContiguousKeysRestrictor,
+                           AbstractProvidesOutgoingEdgeConstraints,
                            AbstractProvidesNKeysForEdge):
-    """
-    Instance of this class provide delays to incoming spikes in multiples
-    of the maximum delays of a neuron (typically 16 or 32)
+    """ Provide delays to incoming spikes in multiples of the maximum delays\
+        of a neuron (typically 16 or 32)
     """
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
         names=[('SYSTEM', 0),
                ('DELAY_PARAMS', 1),
                ('SPIKE_HISTORY', 2)])
+    _DEFAULT_MALLOCS_USED = 2
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
@@ -62,7 +68,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractProvidesIncomingEdgeConstraints.__init__(self)
-        AbstractOutgoingEdgeSameContiguousKeysRestrictor.__init__(self)
+        AbstractProvidesNKeysForEdge.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0
@@ -75,9 +81,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     @property
     def model_name(self):
-        """
-        Return a string representing a label for this class.
-        """
         return "DelayExtension"
 
     @property
@@ -110,8 +113,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return spike_block_row_length * no_active_timesteps * 4
 
     def get_spike_buffer_size(self, lo_atom, hi_atom):
-        """
-        Gets the size of the spike buffer for a range of neurons and time steps
+        """ Get the size of the spike buffer for a range of neurons and time\
+            steps
         """
         if not self._record:
             return 0
@@ -127,10 +130,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, subvertex, placement, sub_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
             write_text_specs, application_run_time_folder):
-        """
-        Model-specific construction of the data blocks necessary to build a
-        single Delay Extension Block on one core.
-        """
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
                 placement.x, placement.y, placement.p, hostname, report_folder,
@@ -164,7 +163,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
-        self.write_setup_info(spec, 0)
+        self.write_setup_info(spec)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -185,9 +184,9 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         spec.end_specification()
         data_writer.close()
 
-    def write_setup_info(self, spec, spike_history_region_sz):
-        """
-        """
+        return [data_writer.filename]
+
+    def write_setup_info(self, spec):
 
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
@@ -248,8 +247,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     def write_delay_parameters(self, spec, processor_chip_x, processor_chip_y,
                                processor_id, subvertex, num_delay_blocks,
                                delay_block, vertex_slice, key):
-        """
-        Generate Delay Parameter data (region 2):
+        """ Generate Delay Parameter data
         """
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -284,8 +282,14 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        # TODO: Fill this in
-        return 0
+        size_of_mallocs = (
+            self._DEFAULT_MALLOCS_USED *
+            common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
+
+        return size_of_mallocs
+
+    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
+        return
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -295,13 +299,12 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return "delay_extension.aplx"
 
     def is_data_specable(self):
-        """
-        helper method for isinstance
-        :return:
-        """
         return True
 
     def get_n_keys_for_partitioned_edge(self, partitioned_edge, graph_mapper):
         vertex_slice = graph_mapper.get_subvertex_slice(
             partitioned_edge.pre_subvertex)
         return vertex_slice.n_atoms * self._max_stages
+
+    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
+        return [KeyAllocatorContiguousRangeContraint()]

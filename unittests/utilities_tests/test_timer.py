@@ -1,7 +1,7 @@
 import unittest
-
-from spinn_front_end_common.utilities.timer import Timer
 from time import sleep
+
+from pacman.utilities.utility_objs.timer import Timer
 
 
 class TestTimer(unittest.TestCase):

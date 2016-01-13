@@ -1,9 +1,10 @@
-"""
-ProjectionPartitionableEdge
-"""
+import logging
+import copy
+
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
-from pacman.utilities.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from pacman.utilities.utility_objs.timer import Timer
 
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
@@ -11,16 +12,11 @@ from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
 from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
     fixed_synapse_row_io import FixedSynapseRowIO
 
-from spinn_front_end_common.utilities.timer import Timer
-
-import logging
-import copy
 logger = logging.getLogger(__name__)
 
 
 class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
-    """
-    the partitionable edge for a projection (high level edge)
+    """ The partitionable edge for a projection (high level edge)
     """
 
     def __init__(self, presynaptic_population, postsynaptic_population,
@@ -43,8 +39,7 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
 
     def create_subedge(self, presubvertex, postsubvertex, constraints=None,
                        label=None):
-        """
-        Creates a subedge from this edge
+        """ Create a subedge from this edge
         """
         if constraints is None:
             constraints = list()
@@ -53,11 +48,10 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
                                          constraints)
 
     def get_max_n_words(self, vertex_slice=None):
-        """
-        Gets the maximum number of words for a subvertex at the end of the
-        connection
+        """ Get the maximum number of words for a subvertex at the end of the\
+            connection
         :param vertex_slice: the vertex slice for this vertex which contains \
-        the lo and hi atoms for this slice
+                the low and high atoms for this slice
         """
         if vertex_slice is None:
             return max([self._synapse_row_io.get_n_words(
@@ -69,23 +63,20 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
                 for synapse_row in self._synapse_list.get_rows()])
 
     def get_n_rows(self):
-        """
-        Gets the number of synaptic rows coming in to a subvertex at the end of
-        the connection
+        """ Get the number of synaptic rows coming in to a subvertex at the\
+            end of the connection
         """
         return self._synapse_list.get_n_rows()
 
     def get_synapse_row_io(self):
-        """
-        Gets the row reader and writer
+        """ Gets the row reader and writer
         """
         return self._synapse_row_io
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):
-        """
-        Get synaptic data for all connections in this Projection from the
-        machine.
+        """ Get synaptic data for all connections in this Projection from the\
+            machine.
         """
         if self._stored_synaptic_data_from_machine is None:
             timer = None
@@ -137,18 +128,10 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
 
     @property
     def synapse_dynamics(self):
-        """
-
-        :return: returns the synapse_dynamics for the edge
-        """
         return self._synapse_dynamics
 
     @property
     def synapse_list(self):
-        """
-
-        :return: returns the synaptic list for the edge
-        """
         return self._synapse_list
 
     def is_multi_cast_partitionable_edge(self):

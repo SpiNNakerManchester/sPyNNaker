@@ -17,8 +17,8 @@ class MemReadException(SpynnakerException):
 
 
 class RallocException(SpynnakerException):
-    """rasied when the pynn front end detects that a routing error has occured
-    (during multicast soruce)
+    """raised when the pynn front end detects that a routing error has occurred
+    (during multicast source)
 
     :raise None: does not raise any known exceptions
     """
@@ -26,8 +26,8 @@ class RallocException(SpynnakerException):
 
 
 class FilterableException(SpynnakerException):
-    """rasied during the pynn's front end pruning of uninportant subedges when\
-     a subedge cannot be detemrined if it is prunable or not
+    """raised during the pynn's front end pruning of unimportant subedges when\
+     a subedge cannot be determined if it is prunable or not
 
     :raise None: does not raise any known exceptions
     """
@@ -61,7 +61,7 @@ class SynapticBlockReadException(exceptions.ConfigurationException):
 
 class SynapticMaxIncomingAtomsSupportException(
         exceptions.ConfigurationException):
-    """raised when a synatpic sublist exceeds the max atoms possible to be
+    """raised when a synaptic sublist exceeds the max atoms possible to be
     supported
 
     :raise None: does not raise any known exceptions
@@ -78,19 +78,10 @@ class DelayExtensionException(exceptions.ConfigurationException):
     pass
 
 
-class ExecutableNotFoundException(SpynnakerException):
-    """ raised when a suitable executable cannot be found
-    to load onto SpiNNaker for a particular vertex
-
-
-    :raise None: does not raise any known exceptions
-    """
-    pass
-
-
 class ExecutableFailedToStartException(SpynnakerException):
-    """ raised when the messgaes from the trnasicever state that some or all the
-    application images pushed to the board have failed to start when asked
+    """ raised when the messages from the transceiver state that some or all\
+        the application images pushed to the board have failed to start when\
+        asked
 
 
     :raise None: does not raise any known exceptions
@@ -99,8 +90,9 @@ class ExecutableFailedToStartException(SpynnakerException):
 
 
 class ExecutableFailedToStopException(SpynnakerException):
-    """ raised when the messgaes from the trnasicever state that some or all the
-    application images pushed to the board have failed to stop when expected
+    """ raised when the messages from the transceiver state that some or all\
+        the application images pushed to the board have failed to stop when\
+        expected
 
 
     :raise None: does not raise any known exceptions

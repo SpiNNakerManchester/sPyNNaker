@@ -29,27 +29,38 @@ typedef struct spike_source_t {
 
 //! spike source array region ids in human readable form
 typedef enum region{
-    system, poisson_params, spike_history,
+    SYSTEM, POISSON_PARAMS,
+    BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    BUFFERING_OUT_CONTROL_REGION
 }region;
+
+#define NUMBER_OF_REGIONS_TO_RECORD 1
+
+typedef enum callback_priorities{
+    SDP = 0, TIMER = 2
+} callback_priorities;
 
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
 typedef enum poisson_region_parameters{
-    has_key, transmission_key, parameter_seed_start_position,
-}poisson_region_parameters;
+    HAS_KEY, TRANSMISSION_KEY, PARAMETER_SEED_START_POSITION,
+} poisson_region_parameters;
 
 // Globals
 //! global variable which contains all the data for neurons
 static spike_source_t *spike_source_array = NULL;
 
+
 //! counter for how many neurons exhibit slow spike generation
 static uint32_t num_spike_sources = 0;
+
 
 //! a variable that will contain the seed to initiate the poisson generator.
 static mars_kiss64_seed_t spike_source_seed;
 
-//! a vairable which checks if there has been a key allocated to this spike
-//! source posson
+
+//! a variable which checks if there has been a key allocated to this spike
+//! source Poisson
 static bool has_been_given_key;
 
 //! A variable that contains the key value that this model should transmit with
@@ -62,32 +73,34 @@ static uint32_t recording_flags = 0;
 //! timer tick callback timer value.
 static uint32_t time;
 
-//! the number of timer tics that this model should run for before exiting.
+
+//! the number of timer ticks that this model should run for before exiting.
 static uint32_t simulation_ticks = 0;
 
-//! the int that represnets the bool for if the run is infinte or not.
+
+//! the int that represents the bool for if the run is infinite or not.
 static uint32_t infinite_run;
 
-//! \deduces the time in timer ticks until the next spike is to occur given a
-//! mean_isi_ticks
+//! \brief deduces the time in timer ticks until the next spike is to occur
+//!        given the mean inter-spike interval
 //! \param[in] mean_inter_spike_interval_in_ticks The mean number of ticks
-//! before a spike is expected to occur in a slow process.
+//!            before a spike is expected to occur in a slow process.
 //! \return a real which represents time in timer ticks until the next spike is
-//! to occur
+//!         to occur
 static inline REAL slow_spike_source_get_time_to_spike(
         REAL mean_inter_spike_interval_in_ticks) {
     return exponential_dist_variate(mars_kiss64_seed, spike_source_seed)
             * mean_inter_spike_interval_in_ticks;
 }
 
-//! \Determines how many spikes to transmit this timer tick.
+//! \brief Determines how many spikes to transmit this timer tick.
 //! \param[in] exp_minus_lambda The amount of spikes expected to be produced
-//! this timer interval (timer tick in real time)
+//!            this timer interval (timer tick in real time)
 //! \return a uint32_t which represents the number of spikes to transmit
-//! this timer tick
+//!         this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
-    if (exp_minus_lambda == 0) {
+    if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }
     else {
@@ -96,28 +109,28 @@ static inline uint32_t fast_spike_source_get_num_spikes(
     }
 }
 
-//! \entry method for reading the parameters stored in poisson parameter region
+//! \entry method for reading the parameters stored in Poisson parameter region
 //! \param[in] address the absolute SDRAm memory address to which the
-//! poisson parameter region starts.
+//!            Poisson parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
-//! False otherwise
+//!         False otherwise
 bool read_poisson_parameters(address_t address) {
 
     log_info("read_parameters: starting");
 
-    has_been_given_key = address[has_key];
-    key = address[transmission_key];
+    has_been_given_key = address[HAS_KEY];
+    key = address[TRANSMISSION_KEY];
     log_info("\tkey = %08x", key);
 
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
-    memcpy(spike_source_seed, &address[parameter_seed_start_position],
+    memcpy(spike_source_seed, &address[PARAMETER_SEED_START_POSITION],
         seed_size * sizeof(uint32_t));
     validate_mars_kiss64_seed(spike_source_seed);
 
     log_info("\tSeed (%u) = %u %u %u %u", seed_size, spike_source_seed[0],
              spike_source_seed[1], spike_source_seed[2], spike_source_seed[3]);
 
-    num_spike_sources = address[parameter_seed_start_position + seed_size];
+    num_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
     log_info("\tspike sources = %u", num_spike_sources);
 
     // Allocate DTCM for array of spike sources and copy block of data
@@ -128,7 +141,7 @@ bool read_poisson_parameters(address_t address) {
             log_error("Failed to allocate spike_source_array");
             return false;
         }
-        uint32_t spikes_offset = parameter_seed_start_position +
+        uint32_t spikes_offset = PARAMETER_SEED_START_POSITION +
                                       seed_size + 1;
         memcpy(spike_source_array, &address[spikes_offset],
                num_spike_sources * sizeof(spike_source_t));
@@ -147,12 +160,39 @@ bool read_poisson_parameters(address_t address) {
     return true;
 }
 
-//! \Initialises the model by reading in the regions and checking recording
+//! \brief Initialises the recording parts of the model
+//! \return True if recording initialisation is successful, false otherwise
+static bool initialise_recording(){
+
+    // Get the address this core's DTCM data starts at from SRAM
+    address_t address = data_specification_get_data_address();
+
+    // Get the system region
+    address_t system_region = data_specification_get_region(
+            SYSTEM, address);
+
+    // Get the recording information
+    uint8_t regions_to_record[] = {
+        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    };
+    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+    uint32_t *recording_flags_from_system_conf =
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
+
+    bool success = recording_initialize(
+        n_regions_to_record, regions_to_record,
+        recording_flags_from_system_conf, state_region, 2, &recording_flags);
+    log_info("Recording flags = 0x%08x", recording_flags);
+    return success;
+}
+
+//! Initialises the model by reading in the regions and checking recording
 //! data.
 //! \param[in] *timer_period a pointer for the memory address where the timer
-//! period should be stored during the function.
+//!            period should be stored during the function.
 //! \return boolean of True if it successfully read all the regions and set up
-//! all its internal data structures. Otherwise returns False
+//!         all its internal data structures. Otherwise returns False
 static bool initialize(uint32_t *timer_period) {
     log_info("Initialise: started");
 
@@ -166,30 +206,21 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details
     address_t system_region = data_specification_get_region(
-            system, address);
+            SYSTEM, address);
     if (!simulation_read_timing_details(
             system_region, APPLICATION_NAME_HASH, timer_period,
             &simulation_ticks, &infinite_run)) {
         return false;
     }
 
-    // Get the recording information
-    uint32_t spike_history_region_size;
-    recording_read_region_sizes(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
-        &recording_flags, &spike_history_region_size, NULL, NULL);
-    if (recording_is_channel_enabled(
-            recording_flags, e_recording_channel_spike_history)) {
-        if (!recording_initialse_channel(
-                data_specification_get_region(spike_history, address),
-                e_recording_channel_spike_history, spike_history_region_size)) {
-            return false;
-        }
+    // setup recording region
+    if (!initialise_recording()){
+        return false;
     }
 
     // Setup regions that specify spike source array data
     if (!read_poisson_parameters(
-            data_specification_get_region(poisson_params, address))) {
+            data_specification_get_region(POISSON_PARAMS, address))) {
         return false;
     }
 
@@ -198,15 +229,12 @@ static bool initialize(uint32_t *timer_period) {
     return true;
 }
 
-//! \The callback used when a timer tick interrupt is set off. The result of
-//! this is to transmit any spikes that need to be sent at this timer tick,
-//! update any recording, and update the state machine's states.
-//! If the timer tick is set to the end time, this method will call the
-//! spin1api stop command to allow clean exit of the executable.
+//! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
-//! executed since start of simulation
+//!            executed since start of simulation
 //! \param[in] unused for consistency sake of the API always returning two
-//! parameters, this parameter has no semantics currently and thus is set to 0
+//!            parameters, this parameter has no semantics currently and thus
+//!            is set to 0
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
@@ -217,14 +245,33 @@ void timer_callback(uint timer_count, uint unused) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
-        log_info("Simulation complete.\n");
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
-        recording_finalise();
-        spin1_exit(0);
-        return;
-    }
+        if (recording_flags > 0) {
+            recording_finalise();
+        }
+        // go into pause and resume state
+        simulation_handle_pause_resume(timer_callback, TIMER);
+
+        // handle resetting the recording state
+        // Get the recording information
+        address_t address = data_specification_get_data_address();
+        address_t system_region = data_specification_get_region(
+            SYSTEM, address);
+        uint8_t regions_to_record[] = {
+            BUFFERING_OUT_SPIKE_RECORDING_REGION,
+        };
+        uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+        uint32_t *recording_flags_from_system_conf =
+            &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+        uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
+
+        recording_initialize(
+            n_regions_to_record, regions_to_record,
+            recording_flags_from_system_conf, state_region, 2,
+            &recording_flags);
+        }
 
     // Loop through spike sources
     for (index_t s = 0; s < num_spike_sources; s++) {
@@ -269,7 +316,9 @@ void timer_callback(uint timer_count, uint unused) {
                     && (spike_source->mean_isi_ticks != 0)) {
 
                 // If this spike source should spike now
-                if (spike_source->time_to_spike_ticks <= REAL_CONST(0.0)) {
+                if (REAL_COMPARE(
+                        spike_source->time_to_spike_ticks, <=,
+                        REAL_CONST(0.0))) {
 
                     // Write spike to out spikes
                     out_spikes_set_spike(s);
@@ -300,8 +349,14 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Record output spikes if required
-    out_spikes_record(recording_flags);
+    if (recording_flags > 0) {
+        out_spikes_record(0, time);
+    }
     out_spikes_reset();
+
+    if (recording_flags > 0) {
+        recording_do_timestep_update(time);
+    }
 }
 
 void sdp_packet_callback(uint mailbox, uint port) {
@@ -326,8 +381,7 @@ void sdp_packet_callback(uint mailbox, uint port) {
     spin1_msg_free(msg);
 }
 
-//! \The only entry point for this model. it initialises the model, sets up the
-//! Interrupts for the Timer tick and calls the spin1api for running.
+//! The entry point for this model
 void c_main(void) {
 
     // Load DTCM data
@@ -348,8 +402,12 @@ void c_main(void) {
     spin1_set_timer_tick(timer_period);
 
     // Register callback
-    spin1_callback_on(TIMER_TICK, timer_callback, 2);
-    spin1_callback_on(SDP_PACKET_RX, sdp_packet_callback, 1);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
+
+    // Set up callback listening to SDP messages
+    simulation_register_simulation_sdp_callback(
+        &simulation_ticks, &infinite_run, SDP);
+    spin1_sdp_callback_on(4, sdp_packet_callback, 0);
 
     log_info("Starting");
     simulation_run();
