@@ -138,6 +138,10 @@ class SpikeSourcePoisson(
         self._seed = seed
 
     @property
+    def updatable(self):
+        return self._updatable
+
+    @property
     def model_name(self):
         """ Return a string representing a label for this class.
         """

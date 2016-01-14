@@ -3,6 +3,8 @@ from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
     SpynnakerDataBaseWriter
+from spynnaker.pyNN.models.spike_source.spike_source_poisson \
+    import SpikeSourcePoisson
 
 
 class SpynnakerDatabaseWriter(object):
@@ -23,6 +25,13 @@ class SpynnakerDatabaseWriter(object):
         # add database generation if requested
         self._needs_database = \
             helpful_functions.auto_detect_database(partitioned_graph)
+        if not self._needs_database:
+            for subvertex in partitioned_graph.subvertices:
+                vertex = graph_mapper.get_vertex_from_subvertex(subvertex)
+                if isinstance(vertex, SpikeSourcePoisson) and vertex.updatable:
+                    self._needs_database = True
+                    break
+
         self._user_create_database = user_create_database
         if ((self._user_create_database == "None" and self._needs_database) or
                 self._user_create_database == "True"):
