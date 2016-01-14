@@ -138,8 +138,7 @@ class Population(object):
         return self._vertex.default_parameters
 
     def describe(self, template='population_default.txt', engine='default'):
-        """
-        Returns a human-readable description of the population.
+        """ Returns a human-readable description of the population.
 
         The output may be customised by specifying a different template
         together with an associated template engine (see ``pyNN.descriptions``)
@@ -193,20 +192,15 @@ class Population(object):
         if isinstance(self._vertex, AbstractSpikeRecordable):
             if not self._vertex.is_recording_spikes():
                 raise exceptions.ConfigurationException(
-                    "This population has not been set to record spikes. "
-                    "Therefore spikes cannot be retrieved. Please set this "
-                    "vertex to record spikes before running this command.")
+                    "This population has not been set to record spikes")
         else:
             raise exceptions.ConfigurationException(
-                "This poplation has not got the capability to record spikes. "
-                "Therefore spikes cannot be retrieved or asked to be recorded."
-                " Please readjust your PyNN script and try again.")
+                "This population has not got the capability to record spikes")
 
         if not self._spinnaker.has_ran:
             raise local_exceptions.SpynnakerException(
                 "The simulation has not yet run, therefore spikes cannot"
-                " be retrieved. Please execute the simulation before"
-                " running this command")
+                " be retrieved")
 
         spikes = self._vertex.get_spikes(
             self._spinnaker.placements, self._spinnaker.graph_mapper,
@@ -241,20 +235,15 @@ class Population(object):
         if isinstance(self._vertex, AbstractGSynRecordable):
             if not self._vertex.is_recording_gsyn():
                 raise exceptions.ConfigurationException(
-                    "This population has not been set to record gsyn. "
-                    "Therefore gsyn cannot be retrieved. Please set this "
-                    "vertex to record gsyn before running this command.")
+                    "This population has not been set to record gsyn")
         else:
             raise exceptions.ConfigurationException(
-                "This poplation has not got the capability to record gsyn. "
-                "Therefore gsyn cannot be retrieved or asked to be recorded. "
-                "Please readjust your PyNN script and try again.")
+                "This population has not got the capability to record gsyn")
 
         if not self._spinnaker.has_ran:
             raise local_exceptions.SpynnakerException(
                 "The simulation has not yet run, therefore gsyn cannot"
-                " be retrieved. Please execute the simulation before"
-                " running this command")
+                " be retrieved")
 
         # check that the vertex has read up to the position it needs to
         return self._vertex.get_gsyn(
@@ -277,20 +266,15 @@ class Population(object):
         if isinstance(self._vertex, AbstractVRecordable):
             if not self._vertex.is_recording_v():
                 raise exceptions.ConfigurationException(
-                    "This population has not been set to record v. "
-                    "Therefore v cannot be retrieved. Please set this "
-                    "vertex to record v before running this command.")
+                    "This population has not been set to record v")
         else:
             raise exceptions.ConfigurationException(
-                "This poplation has not got the capability to record v. "
-                "Therefore v cannot be retrieved or asked to be recorded. "
-                "Please readjust your PyNN script and try again.")
+                "This population has not got the capability to record v")
 
         if not self._spinnaker.has_ran:
             raise local_exceptions.SpynnakerException(
                 "The simulation has not yet run, therefore v cannot"
-                " be retrieved. Please execute the simulation before"
-                " running this command")
+                " be retrieved")
 
         # check that the vertex has read up to the position it needs to
         return self._vertex.get_v(
@@ -298,31 +282,29 @@ class Population(object):
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
 
     def id_to_index(self, cell_id):
-        """
-        Given the ID(s) of cell(s) in the Population, return its (their) index
-        (order in the Population).
+        """ Given the ID(s) of cell(s) in the Population, return its (their)\
+            index (order in the Population).
         """
 
         # TODO: Need __getitem__
         raise NotImplementedError
 
     def id_to_local_index(self, cell_id):
-        """
-        Given the ID(s) of cell(s) in the Population, return its (their) index
-        (order in the Population), counting only cells on the local MPI node.
+        """ Given the ID(s) of cell(s) in the Population, return its (their)\
+            index (order in the Population), counting only cells on the local\
+            MPI node.
         """
         # TODO: Need __getitem__
         raise NotImplementedError
 
     def initialize(self, variable, value):
-        """
-        Set the initial value of one of the state variables of the neurons in
-        this population.
+        """ Set the initial value of one of the state variables of the neurons\
+            in this population.
 
         """
         if not isinstance(self._vertex, AbstractPopulationInitializable):
             raise KeyError(
-                "Population does not support the initialization of {}".format(
+                "Population does not support the initialisation of {}".format(
                     variable))
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
             value, self._vertex.n_atoms))
@@ -330,9 +312,8 @@ class Population(object):
 
     @staticmethod
     def is_local(cell_id):
-        """
-        Determine whether the cell with the given ID exists on the local
-        MPI node.
+        """ Determine whether the cell with the given ID exists on the local \
+            MPI node.
         :param cell_id:
         """
 
@@ -347,39 +328,33 @@ class Population(object):
         raise NotImplementedError
 
     def inject(self, current_source):
-        """
-        Connect a current source to all cells in the Population.
+        """ Connect a current source to all cells in the Population.
         """
 
         # TODO:
         raise NotImplementedError
 
     def __iter__(self):
-        """
-        suppose to iterate over local cells
+        """ Iterate over local cells
         """
 
         # TODO:
         raise NotImplementedError
 
     def __len__(self):
-        """
-        Returns the total number of cells in the population.
+        """ Get the total number of cells in the population.
         """
         return self._size
 
     @property
     def label(self):
-        """
-        label of the population
-        :return:
+        """ The label of the population
         """
         return self._vertex.label
 
     @property
     def local_size(self):
-        """
-        returns the number of local cells
+        """ The number of local cells
         """
 
         # Doesn't make much sense on SpiNNaker
@@ -387,16 +362,15 @@ class Population(object):
 
     # noinspection PyPep8Naming
     def meanSpikeCount(self, gather=True):
-        """
-        Returns the mean number of spikes per neuron.
+        """ The mean number of spikes per neuron
+
         :param gather: gather has no meaning in spinnaker, always set to true
         :return: an array which contains the average spike rate per neuron
         """
         return self.mean_spike_count(gather)
 
     def mean_spike_count(self, gather=True):
-        """
-        Returns the mean number of spikes per neuron.
+        """ The mean number of spikes per neuron
         """
         spike_counts = self.get_spike_counts(gather)
         total_spikes = sum(spike_counts.values())
@@ -417,7 +391,7 @@ class Population(object):
 
     @property
     def position_generator(self):
-        """ Returns a position generator.
+        """ Return a position generator
         """
         if self._structure is None:
             raise ValueError("attempted to retrieve positions "
@@ -427,9 +401,8 @@ class Population(object):
 
     # noinspection PyPep8Naming
     def randomInit(self, distribution):
-        """
-        Set initial membrane potentials for all the cells in the population to
-        random values.
+        """ Set initial membrane potentials for all the cells in the\
+            population to random values.
 
         :param `pyNN.random.RandomDistribution` distribution:
             the distribution used to draw random values.
@@ -577,9 +550,9 @@ class Population(object):
         file_handle.close()
 
     def rset(self, parametername, rand_distr):
-        """
-        'Random' set. Set the value of parametername to a value taken from
-        rand_distr, which should be a RandomDistribution object.
+        """ 'Random' set. Set the value of parametername to a value taken\
+             from rand_distr, which should be a RandomDistribution object.
+
         :param parametername: the parameter to set
         :param rand_distr: the random distribution object to set the parameter\
                      to
@@ -646,8 +619,7 @@ class Population(object):
         self._change_requires_mapping = True
 
     def set(self, parameter, value=None):
-        """
-        Set one or more parameters for every cell in the population.
+        """ Set one or more parameters for every cell in the population.
 
         param can be a dict, in which case value should not be supplied, or a
         string giving the parameter name, in which case value is the parameter
@@ -690,9 +662,8 @@ class Population(object):
 
     # NONE PYNN API CALL
     def set_constraint(self, constraint):
-        """
-        Apply a constraint to a population that restricts the processor
-        onto which its sub-populations will be placed.
+        """ Apply a constraint to a population that restricts the processor\
+            onto which its sub-populations will be placed.
         """
         if isinstance(constraint, AbstractConstraint):
             self._vertex.add_constraint(constraint)
@@ -756,9 +727,8 @@ class Population(object):
         return self._vertex.n_atoms
 
     def tset(self, parametername, value_array):
-        """
-        'Topographic' set. Set the value of parametername to the values in
-        value_array, which must have the same dimensions as the Population.
+        """ 'Topographic' set. Set the value of parametername to the values in\
+            value_array, which must have the same dimensions as the Population.
         :param parametername: the name of the parameter
         :param value_array: the array of values which must have the correct\
                 number of elements.

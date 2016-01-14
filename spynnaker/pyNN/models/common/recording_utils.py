@@ -47,17 +47,18 @@ def get_data(transceiver, placement, region, region_size):
             "Expected {} bytes but read {}".format(
                 expected_size, number_of_bytes_written))
 
-    return transceiver.read_memory(
-        x, y, region_base_address + 4, number_of_bytes_written), \
-           number_of_bytes_written
+    return (
+        transceiver.read_memory(
+            x, y, region_base_address + 4, number_of_bytes_written),
+        number_of_bytes_written)
 
 
 def pull_off_cached_lists(no_loads, cache_file):
-    """
-    helper method for extracting numpy based data froma  file
-    :param no_loads: the numebr of numpy elements in the file
+    """ Extracts numpy based data from a  file
+
+    :param no_loads: the number of numpy elements in the file
     :param cache_file: the file to extract from
-    :return:
+    :return: The extracted data
     """
     cache_file.seek(0)
     if no_loads == 1:
