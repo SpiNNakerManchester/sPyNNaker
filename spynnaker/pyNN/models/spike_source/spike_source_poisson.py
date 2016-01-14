@@ -95,6 +95,10 @@ class SpikeSourcePoisson(
             "Buffers", "time_between_requests")
         self._enable_buffered_recording = \
             config.getboolean("Buffers", "enable_buffered_recording")
+        uses_auto_pause_and_resume = config.getboolean(
+            "Mode", "use_auto_pause_and_resume")
+        if uses_auto_pause_and_resume:
+            self._enable_buffered_recording = False
 
     @property
     def rate(self):

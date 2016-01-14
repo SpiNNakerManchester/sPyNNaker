@@ -40,3 +40,4 @@ class PopulationPartitionedVertex(
 
     def is_receives_buffers_to_host(self):
         return True
+

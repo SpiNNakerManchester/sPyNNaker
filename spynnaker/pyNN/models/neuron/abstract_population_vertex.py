@@ -130,6 +130,10 @@ class AbstractPopulationVertex(
             "Buffers", "receive_buffer_port")
         self._enable_buffered_recording = config.getboolean(
             "Buffers", "enable_buffered_recording")
+        uses_auto_pause_and_resume = config.getboolean(
+            "Mode", "use_auto_pause_and_resume")
+        if uses_auto_pause_and_resume:
+            self._enable_buffered_recording = False
 
         # bool for if state has changed.
         self._change_requires_mapping = True

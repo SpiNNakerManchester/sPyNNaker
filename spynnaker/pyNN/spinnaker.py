@@ -577,7 +577,7 @@ class Spinnaker(object):
             # add function for extracting all the recorded data from
             # recorded populations
             if self._has_ran:
-                algorithms.append("SpyNNakerRecordingExtracter")
+                algorithms.append("SpyNNakerRecordingExtractor")
                 # add functions for updating the models
                 algorithms.append("FrontEndCommonRuntimeUpdater")
             if not self._has_ran:
@@ -645,13 +645,13 @@ class Spinnaker(object):
         # all modes need the runtime in machine time steps
         # (partitioner and rerun)
         no_machine_time_steps = \
-            int(((total_runtime - self._current_run_ms) * 1000.0)
+            int(((this_run_time - self._current_run_ms) * 1000.0)
                 / self._machine_time_step)
         inputs.append({'type': "RunTimeMachineTimeSteps",
                        'value': no_machine_time_steps})
 
         # support resetting the machine during start up
-        if (config.getboolean("Machine", "ResetMachineOnStartupFlag") and
+        if (config.getboolean("Machine", "reset_machine_on_startup") and
                 not self._has_ran and not is_resetting):
             inputs.append({"type": "ResetMachineOnStartupFlag", 'value': True})
         else:
@@ -700,7 +700,7 @@ class Spinnaker(object):
             extra_xmls.append(spynnaker_xml_file)
 
             inputs.append({'type': "ExtraAlgorthums",
-                           'value': ["SpyNNakerRecordingExtracter"]})
+                           'value': ["SpyNNakerRecordingExtractor"]})
             inputs.append({'type': "ExtraInputs", 'value': extra_inputs})
             inputs.append({'type': "ExtraXMLS", 'value': extra_xmls})
             inputs.append({'type': "DSGeneratorAlgorithm",

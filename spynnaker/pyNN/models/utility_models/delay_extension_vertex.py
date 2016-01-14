@@ -282,10 +282,9 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         return 128 * n_atoms
 
     def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
-        size_of_mallocs = self.get_number_of_mallocs_used_by_dsg(
-            vertex_slice,  graph.incoming_edges_to_vertex(self)) * \
-            common_constants.SARK_PER_MALLOC_SDRAM_USAGE
-        # TODO: Fill this in to deal with delay slots malloc
+        size_of_mallocs = (
+            self._DEFAULT_MALLOCS_USED *
+            common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
         return size_of_mallocs
 
     def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
