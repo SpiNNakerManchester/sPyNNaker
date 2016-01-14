@@ -582,7 +582,7 @@ class Spinnaker(object):
                 algorithms.append("FrontEndCommonRuntimeUpdater")
             if not self._has_ran:
                 optional_algorithms.append(
-                    "FrontEndCommonPartitionableGraphApplicationDataLoader")
+                    "FrontEndCommonApplicationDataLoader")
                 algorithms.append("FrontEndCommomLoadExecutableImages")
 
             # add defualt algortihms
@@ -715,7 +715,7 @@ class Spinnaker(object):
             inputs.append({'type': "HasResetBefore",
                            'value': self._has_reset_last})
 
-        # FrontEndCommonPartitionableGraphApplicationDataLoader after a
+        # FrontEndCommonApplicationDataLoader after a
         # reset and no changes
         if not self._has_ran and not application_graph_changed:
             inputs.append(({
