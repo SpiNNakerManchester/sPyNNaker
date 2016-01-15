@@ -52,9 +52,8 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):
-        """
-        Get synaptic data for all connections in this Projection from the
-        machine.
+        """ Get synaptic data for all connections in this Projection from the\
+            machine.
         """
         if self._stored_synaptic_data_from_machine is None:
             timer = None

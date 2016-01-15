@@ -3,6 +3,7 @@ from spynnaker.pyNN import exceptions
 
 import struct
 import logging
+import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +25,8 @@ def get_data(transceiver, placement, region, region_size):
     """ Get the recorded data from a region
     """
 
-    region_base_address = helpful_functions.get_region_address(
-        transceiver, placement, region)
+    region_base_address = helpful_functions.locate_memory_region_on_core(
+        placement.x, placement.y, placement.p, region, transceiver)
     number_of_bytes_written_buf = buffer(transceiver.read_memory(
         placement.x, placement.y, region_base_address, 4))
     number_of_bytes_written = struct.unpack_from(
@@ -38,6 +39,34 @@ def get_data(transceiver, placement, region, region_size):
             "Expected {} bytes but read {}".format(
                 expected_size, number_of_bytes_written))
 
-    return transceiver.read_memory(
-        placement.x, placement.y, region_base_address + 4,
+    return (
+        transceiver.read_memory(
+            placement.x, placement.y, region_base_address + 4,
+            number_of_bytes_written),
         number_of_bytes_written)
+
+
+def pull_off_cached_lists(no_loads, cache_file):
+    """ Extracts numpy based data from a  file
+
+    :param no_loads: the number of numpy elements in the file
+    :param cache_file: the file to extract from
+    :return: The extracted data
+    """
+    cache_file.seek(0)
+    if no_loads == 1:
+        values = numpy.load(cache_file)
+
+        # Seek to the end of the file (for windows compatibility)
+        cache_file.seek(0, 2)
+        return values
+    elif no_loads == 0:
+        return []
+    else:
+        lists = list()
+        for _ in range(0, no_loads):
+            lists.append(numpy.load(cache_file))
+
+        # Seek to the end of the file (for windows compatibility)
+        cache_file.seek(0, 2)
+        return numpy.concatenate(lists)

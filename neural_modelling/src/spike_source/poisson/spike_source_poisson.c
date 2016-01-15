@@ -47,6 +47,10 @@ typedef enum region{
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
 
+typedef enum callback_priorities{
+    SDP = 0, TIMER = 2
+} callback_priorities;
+
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
 typedef enum poisson_region_parameters{
@@ -94,7 +98,7 @@ static uint32_t simulation_ticks = 0;
 static uint32_t infinite_run;
 
 //! \brief deduces the time in timer ticks until the next spike is to occur
-//!        given the mean inter spike interval
+//!        given the mean inter-spike interval
 //! \param[in] mean_inter_spike_interval_in_ticks The mean number of ticks
 //!            before a spike is expected to occur in a slow process.
 //! \return a real which represents time in timer ticks until the next spike is
@@ -197,6 +201,33 @@ bool read_poisson_parameters(address_t address) {
     return true;
 }
 
+//! \brief Initialises the recording parts of the model
+//! \return True if recording initialisation is successful, false otherwise
+static bool initialise_recording(){
+
+    // Get the address this core's DTCM data starts at from SRAM
+    address_t address = data_specification_get_data_address();
+
+    // Get the system region
+    address_t system_region = data_specification_get_region(
+            SYSTEM, address);
+
+    // Get the recording information
+    uint8_t regions_to_record[] = {
+        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    };
+    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+    uint32_t *recording_flags_from_system_conf =
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
+
+    bool success = recording_initialize(
+        n_regions_to_record, regions_to_record,
+        recording_flags_from_system_conf, state_region, 2, &recording_flags);
+    log_info("Recording flags = 0x%08x", recording_flags);
+    return success;
+}
+
 //! Initialises the model by reading in the regions and checking recording
 //! data.
 //! \param[in] *timer_period a pointer for the memory address where the timer
@@ -223,18 +254,10 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    // Get the recording information
-    uint8_t regions_to_record[] = {
-        BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    };
-    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-    uint32_t *recording_flags_from_system_conf =
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
-
-    recording_initialize(
-        n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, 2, &recording_flags);
+    // setup recording region
+    if (!initialise_recording()){
+        return false;
+    }
 
     // Setup regions that specify spike source array data
     if (!read_poisson_parameters(
@@ -263,17 +286,33 @@ void timer_callback(uint timer_count, uint unused) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
-        log_info("Simulation complete.\n");
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
             recording_finalise();
         }
+        // go into pause and resume state
+        simulation_handle_pause_resume(timer_callback, TIMER);
 
-        spin1_exit(0);
-        return;
-    }
+        // handle resetting the recording state
+        // Get the recording information
+        address_t address = data_specification_get_data_address();
+        address_t system_region = data_specification_get_region(
+            SYSTEM, address);
+        uint8_t regions_to_record[] = {
+            BUFFERING_OUT_SPIKE_RECORDING_REGION,
+        };
+        uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+        uint32_t *recording_flags_from_system_conf =
+            &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+        uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
+
+        recording_initialize(
+            n_regions_to_record, regions_to_record,
+            recording_flags_from_system_conf, state_region, 2,
+            &recording_flags);
+        }
 
     // Loop through slow spike sources
     slow_spike_source_t *slow_spike_sources = slow_spike_source_array;
@@ -387,7 +426,11 @@ void c_main(void) {
     spin1_set_timer_tick(timer_period);
 
     // Register callback
-    spin1_callback_on(TIMER_TICK, timer_callback, 2);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
+
+    // Set up callback listening to SDP messages
+    simulation_register_simulation_sdp_callback(
+        &simulation_ticks, &infinite_run, SDP);
 
     log_info("Starting");
     simulation_run();

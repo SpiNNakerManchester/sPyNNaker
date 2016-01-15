@@ -1,14 +1,28 @@
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models.abstract_mappable \
+    import AbstractMappable
+from spynnaker.pyNN.models.common.simple_population_settable \
+    import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
     import EIEIOSpikeRecorder
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.models.abstract_models\
+    .abstract_has_first_machine_time_step\
+    import AbstractHasFirstMachineTimeStep
+
 
 # spinn front end common imports
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
     import ReverseIpTagMultiCastSource
+from spinn_front_end_common.utilities import constants as \
+    front_end_common_constants
+from spinn_front_end_common.utilities import exceptions
 from spinn_front_end_common.utility_models\
     .reverse_ip_tag_multicast_source_partitioned_vertex \
     import ReverseIPTagMulticastSourcePartitionedVertex
@@ -21,7 +35,10 @@ import sys
 logger = logging.getLogger(__name__)
 
 
-class SpikeSourceArray(ReverseIpTagMultiCastSource, AbstractSpikeRecordable):
+class SpikeSourceArray(
+        ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
+        SimplePopulationSettable, AbstractMappable,
+        AbstractHasFirstMachineTimeStep):
     """ Model for play back of spikes
     """
 
@@ -61,34 +78,84 @@ class SpikeSourceArray(ReverseIpTagMultiCastSource, AbstractSpikeRecordable):
             send_buffer_notification_port=self._port,
             send_buffer_notification_tag=tag)
         AbstractSpikeRecordable.__init__(self)
+        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        SimplePopulationSettable.__init__(self)
+        AbstractMappable.__init__(self)
+        AbstractHasFirstMachineTimeStep.__init__(self)
 
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
         self._spike_recorder_buffer_size = spike_recorder_buffer_size
         self._buffer_size_before_receive = buffer_size_before_receive
 
+        # Keep track of any previously generated buffers
+        self._send_buffers = dict()
+        self._spike_recording_region_size = None
+        self._partitioned_vertices = list()
+        self._partitioned_vertices_current_max_buffer_size = dict()
+
+        # used for reset and rerun
+        self._requires_mapping = True
+        self._last_runtime_position = 0
+
+        self._max_on_chip_memory_usage_for_spikes = \
+            max_on_chip_memory_usage_for_spikes_in_bytes
+        self._space_before_notification = space_before_notification
+        if self._max_on_chip_memory_usage_for_spikes is None:
+            self._max_on_chip_memory_usage_for_spikes = \
+                front_end_common_constants.MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
+
+        # check the values do not conflict with chip memory limit
+        if self._max_on_chip_memory_usage_for_spikes < 0:
+            raise exceptions.ConfigurationException(
+                "The memory usage on chip is either beyond what is supportable"
+                " on the spinnaker board being supported or you have requested"
+                " a negative value for a memory usage. Please correct and"
+                " try again")
+
+        if (self._max_on_chip_memory_usage_for_spikes <
+                self._space_before_notification):
+            self._space_before_notification =\
+                self._max_on_chip_memory_usage_for_spikes
+
+    @property
+    def requires_mapping(self):
+        return self._requires_mapping
+
+    def mark_no_changes(self):
+        self._requires_mapping = False
+
     @property
     def spike_times(self):
-        return self._send_buffer_times
+        """ The spike times of the spike source array
+        :return:
+        """
+        return self.send_buffer_times
 
     @spike_times.setter
     def spike_times(self, spike_times):
-        self._send_buffer_times = spike_times
+        """ Set the spike source array's spike times. Not an extend, but an\
+            actual change
+        :param spike_times:
+        :return:
+        """
+        self.send_buffer_times = spike_times
 
+    # @implements AbstractSpikeRecordable.is_recording_spikes
     def is_recording_spikes(self):
         return self._spike_recorder.record
 
+    # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
         self.enable_recording(
             self._ip_address, self._port, self._board_address,
             self._send_buffer_notification_tag,
             self._spike_recorder_buffer_size,
             self._buffer_size_before_receive)
+        self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 
-    def get_spikes(self, placements, graph_mapper):
-        subvertices = graph_mapper.get_subvertices_from_vertex(self)
-        buffer_manager = next(iter(subvertices)).buffer_manager
+    def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager,
             (ReverseIPTagMulticastSourcePartitionedVertex.
@@ -100,34 +167,11 @@ class SpikeSourceArray(ReverseIpTagMultiCastSource, AbstractSpikeRecordable):
 
     @property
     def model_name(self):
-        """ A string representing a label for this class.
-        """
         return "SpikeSourceArray"
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        """
-
-        :param new_value:
-        :return:
-        """
         SpikeSourceArray._model_based_max_atoms_per_core = new_value
 
-    def get_value(self, key):
-        """ Get a property of the overall model
-        """
-        if hasattr(self, key):
-            return getattr(self, key)
-        raise Exception("Population {} does not have parameter {}".format(
-            self, key))
-
-    def set_value(self, key, value):
-        """ Set a property of the overall model
-        :param key: the name of the param to change
-        :param value: the value of the parameter to change
-        """
-        if hasattr(self, key):
-            setattr(self, key, value)
-            return
-        raise Exception("Type {} does not have parameter {}".format(
-            self._model_name, key))
+    def set_first_machine_time_step(self, first_machine_time_step):
+        self.first_machine_time_step = first_machine_time_step

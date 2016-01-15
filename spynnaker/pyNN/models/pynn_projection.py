@@ -1,6 +1,3 @@
-"""
-Projection
-"""
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
@@ -23,6 +20,8 @@ from spynnaker.pyNN.models.neural_projections\
     .delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
+from spynnaker.pyNN.models.abstract_models.abstract_mappable \
+    import AbstractMappable
 
 from spinn_front_end_common.utilities import exceptions
 
@@ -36,10 +35,10 @@ EDGE_PARTITION_ID = "SPIKE"
 
 # noinspection PyProtectedMember
 class Projection(object):
-    """
-    A container for all the connections of a given type (same synapse type
-    and plasticity mechanisms) between two populations, together with methods
-    to set parameters of those connections, including of plasticity mechanisms.
+    """ A container for all the connections of a given type (same synapse type\
+        and plasticity mechanisms) between two populations, together with\
+        methods to set parameters of those connections, including of\
+        plasticity mechanisms.
     """
     _projection_count = 0
 
@@ -139,10 +138,29 @@ class Projection(object):
                 max_delay, post_vertex_max_supported_delay_ms,
                 machine_time_step, timescale_factor)
             self._projection_edge.delay_edge = delay_edge
+        spinnaker_control._add_projection(self)
+
+    @property
+    def requires_mapping(self):
+        projection_edge_mappable = isinstance(
+            self._projection_edge, AbstractMappable)
+        delay_edge_mappable = isinstance(self._delay_edge, AbstractMappable)
+        if (projection_edge_mappable and
+                self._projection_edge.requires_mapping):
+            return True
+        if delay_edge_mappable and self._delay_edge.requires_mapping:
+            return True
+        return False
+
+    def mark_no_changes(self):
+        if isinstance(self._projection_edge, AbstractMappable):
+            self._projection_edge.mark_no_changes()
+        if isinstance(self._delay_edge, AbstractMappable):
+            self._delay_edge.mark_no_changes()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
-        """ searches though the partitionable graph's edges to locate any
-        edge which has the same post and pre vertex
+        """ Searches though the partitionable graph's edges to locate any\
+            edge which has the same post and pre vertex
 
         :param presynaptic_vertex: the source partitionable vertex of the\
                 multapse
@@ -165,12 +183,7 @@ class Projection(object):
             self, presynaptic_population, postsynaptic_population, label,
             max_delay_for_projection, max_delay_per_neuron, machine_time_step,
             timescale_factor):
-        """
-        Instantiate new delay extension component, connecting a new edge from
-        the source vertex to it and new edges from it to the target (given
-        by numBlocks).
-        The outgoing edges cover each required block of delays, in groups of
-        MAX_DELAYS_PER_NEURON delay slots (currently 16).
+        """ Instantiate delay extension component
         """
 
         # Create a delay extension vertex to do the extra delays
@@ -210,8 +223,7 @@ class Projection(object):
         return delay_edge
 
     def describe(self, template='projection_default.txt', engine='default'):
-        """
-        Returns a human-readable description of the projection.
+        """ Return a human-readable description of the projection.
 
         The output may be customised by specifying a different template
         together with an associated template engine (see ``pyNN.descriptions``)
@@ -230,9 +242,8 @@ class Projection(object):
     # noinspection PyPep8Naming
     def getSynapseDynamics(self, parameter_name, list_format='list',
                            gather=True):
-        """
-        Get parameters of the dynamic synapses for all connections in this
-        Projection.
+        """ Get parameters of the dynamic synapses for all connections in this\
+            Projection.
         :param parameter_name:
         :param list_format:
         :param gather:
@@ -323,64 +334,55 @@ class Projection(object):
 
     # noinspection PyPep8Naming
     def printDelays(self, file_name, list_format='list', gather=True):
-        """
-        Print synaptic weights to file. In the array format, zeros are printed
-        for non-existent connections.
+        """ Print synaptic weights to file. In the array format, zeros are\
+            printed for non-existent connections.
         """
         # TODO:
         raise NotImplementedError
 
     # noinspection PyPep8Naming
     def printWeights(self, file_name, list_format='list', gather=True):
-        """
-        Print synaptic weights to file. In the array format, zeros are printed
-        for non-existent connections.
+        """ Print synaptic weights to file. In the array format, zeros are\
+            printed for non-existent connections.
         """
         # TODO:
         raise NotImplementedError
 
     # noinspection PyPep8Naming
     def randomizeWeights(self, rand_distr):
-        """
-        Set weights to random values taken from rand_distr.
+        """ Set weights to random values taken from rand_distr.
         """
         # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
     def randomizeDelays(self, rand_distr):
-        """
-        Set delays to random values taken from rand_distr.
+        """ Set delays to random values taken from rand_distr.
         """
         # TODO: Requires that the synapse list is not created proactively
         raise NotImplementedError
 
     # noinspection PyPep8Naming
     def randomizeSynapseDynamics(self, param, rand_distr):
-        """
-        Set parameters of the synapse dynamics to values taken from rand_distr
+        """ Set parameters of the synapse dynamics to values taken from\
+            rand_distr
         """
         # TODO: Look at what this is randomising
         raise NotImplementedError
 
     def __repr__(self):
-        """
-        returns a string representation of the projection
-        """
         return "projection {}".format(self._projection_edge.label)
 
     # noinspection PyPep8Naming
     def saveConnections(self, file_name, gather=True, compatible_output=True):
-        """
-        Save connections to file in a format suitable for reading in with a
-        FromFileConnector.
+        """ Save connections to file in a format suitable for reading in with\
+            a FromFileConnector.
         """
         # TODO
         raise NotImplementedError
 
     def size(self, gather=True):
-        """
-        Return the total number of connections.
+        """ Return the total number of connections.
          - only local connections, if gather is False,
          - all connections, if gather is True (default)
         """
@@ -389,10 +391,11 @@ class Projection(object):
 
     # noinspection PyPep8Naming
     def setDelays(self, d):
-        """
-        d can be a single number, in which case all delays are set to this
-        value, or a list/1D array of length equal to the number of connections
-        in the projection, or a 2D array with the same dimensions as the
+        """ Set the delays
+
+        d can be a single number, in which case all delays are set to this\
+        value, or a list/1D array of length equal to the number of connections\
+        in the projection, or a 2D array with the same dimensions as the\
         connectivity matrix (as returned by `getDelays(format='array')`).
         """
         # TODO: Requires that the synapse list is not created proactively
@@ -400,21 +403,21 @@ class Projection(object):
 
     # noinspection PyPep8Naming
     def setSynapseDynamics(self, param, value):
-        """
-        Set parameters of the dynamic synapses for all connections in this
-        projection.
+        """ Set parameters of the dynamic synapses for all connections in this\
+            projection.
         """
         # TODO: Need to set this in the edge
         raise NotImplementedError
 
     # noinspection PyPep8Naming
     def setWeights(self, w):
-        """
-        w can be a single number, in which case all weights are set to this
-        value, or a list/1D array of length equal to the number of connections
-        in the projection, or a 2D array with the same dimensions as the
-        connectivity matrix (as returned by `getWeights(format='array')`).
-        Weights should be in nA for current-based and uS for conductance-based
+        """ Set the weights
+
+        w can be a single number, in which case all weights are set to this\
+        value, or a list/1D array of length equal to the number of connections\
+        in the projection, or a 2D array with the same dimensions as the\
+        connectivity matrix (as returned by `getWeights(format='array')`).\
+        Weights should be in nA for current-based and uS for conductance-based\
         synapses.
         """
 
@@ -423,9 +426,9 @@ class Projection(object):
 
     # noinspection PyPep8Naming
     def weightHistogram(self, min_weight=None, max_weight=None, nbins=10):
-        """
-        Return a histogram of synaptic weights.
-        If min and max are not given, the minimum and maximum weights are
+        """ Return a histogram of synaptic weights.
+
+        If min and max are not given, the minimum and maximum weights are\
         calculated automatically.
         """
         # TODO

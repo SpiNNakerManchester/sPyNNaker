@@ -38,9 +38,8 @@ class VRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_v(self, label, n_atoms, buffer_manager, region, state_region,
-              n_machine_time_steps, placements, graph_mapper,
-              partitionable_vertex):
+    def get_v(self, label, buffer_manager, region, state_region, placements,
+              graph_mapper, partitionable_vertex):
 
         subvertices = \
             graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
