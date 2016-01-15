@@ -499,8 +499,7 @@ class Spinnaker(object):
                 algorithms.append("FrontEndCommomLoadExecutableImages")
                 algorithms.append("FrontEndCommonRoutingTableLoader")
                 algorithms.append("FrontEndCommonTagsLoader")
-                algorithms.append("FrontEndCommomPartitionableGraphData"
-                                  "SpecificationWriter")
+                algorithms.append("SpynnakerDataSpecificationWriter")
 
                 # if the end user wants reload script, add the reload script
                 # creator to the list (reload script currently only supported

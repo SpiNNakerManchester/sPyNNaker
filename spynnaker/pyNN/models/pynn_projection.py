@@ -142,21 +142,14 @@ class Projection(object):
 
     @property
     def requires_mapping(self):
-        projection_edge_mappable = isinstance(
-            self._projection_edge, AbstractMappable)
-        delay_edge_mappable = isinstance(self._delay_edge, AbstractMappable)
-        if (projection_edge_mappable and
+        if (isinstance(self._projection_edge, AbstractMappable) and
                 self._projection_edge.requires_mapping):
-            return True
-        if delay_edge_mappable and self._delay_edge.requires_mapping:
             return True
         return False
 
     def mark_no_changes(self):
         if isinstance(self._projection_edge, AbstractMappable):
             self._projection_edge.mark_no_changes()
-        if isinstance(self._delay_edge, AbstractMappable):
-            self._delay_edge.mark_no_changes()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
         """ Searches though the partitionable graph's edges to locate any\
