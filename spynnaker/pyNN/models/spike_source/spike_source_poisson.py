@@ -40,7 +40,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
-PARAMS_BASE_WORDS = 5
+PARAMS_BASE_WORDS = 8
 PARAMS_WORDS_PER_NEURON = 6
 RANDOM_SEED_WORDS = 4
 
@@ -257,6 +257,20 @@ class SpikeSourcePoisson(
 
         # Write the number of sources
         spec.write_value(data=num_neurons)
+
+        # Write the number of seconds per timestep (unsigned long fract)
+        spec.write_value(
+            data=(float(self._machine_time_step) / 1000000.0),
+            data_type=DataType.U032)
+
+        # Write the number of timesteps per second (accum)
+        spec.write_value(
+            data=(1000000.0 / float(self._machine_time_step)),
+            data_type=DataType.S1615)
+
+        # Write the slow-rate-per-tick-cutoff (accum)
+        spec.write_value(
+            data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
         # For each neuron, get the rate to work out if it is a slow
         # or fast source

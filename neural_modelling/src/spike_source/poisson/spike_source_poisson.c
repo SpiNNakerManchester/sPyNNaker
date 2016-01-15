@@ -81,6 +81,15 @@ static uint32_t simulation_ticks = 0;
 //! the int that represents the bool for if the run is infinite or not.
 static uint32_t infinite_run;
 
+//! the number of ticks per second
+static REAL ticks_per_second;
+
+//! the number of seconds per tick
+static UFRACT seconds_per_tick;
+
+//! the rate per tick below which a source is considered slow
+static REAL slow_rate_per_tick_cutoff;
+
 //! \brief deduces the time in timer ticks until the next spike is to occur
 //!        given the mean inter-spike interval
 //! \param[in] mean_inter_spike_interval_in_ticks The mean number of ticks
@@ -138,6 +147,21 @@ bool read_poisson_parameters(address_t address, uint *update_sdp_port) {
     num_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size + 1];
     log_info("\tspike sources = %u", num_spike_sources);
 
+    memcpy(
+        &seconds_per_tick,
+        &address[PARAMETER_SEED_START_POSITION + seed_size + 2],
+        sizeof(UFRACT));
+
+    memcpy(
+        &ticks_per_second,
+        &address[PARAMETER_SEED_START_POSITION + seed_size + 3],
+        sizeof(REAL));
+
+    memcpy(
+        &slow_rate_per_tick_cutoff,
+        &address[PARAMETER_SEED_START_POSITION + seed_size + 4],
+        sizeof(REAL));
+
     // Allocate DTCM for array of spike sources and copy block of data
     if (num_spike_sources > 0) {
         spike_source_array = (spike_source_t*) spin1_malloc(
@@ -146,9 +170,10 @@ bool read_poisson_parameters(address_t address, uint *update_sdp_port) {
             log_error("Failed to allocate spike_source_array");
             return false;
         }
-        uint32_t spikes_offset = PARAMETER_SEED_START_POSITION + seed_size + 2;
-        memcpy(spike_source_array, &address[spikes_offset],
-               num_spike_sources * sizeof(spike_source_t));
+        uint32_t spikes_offset = PARAMETER_SEED_START_POSITION + seed_size + 5;
+        memcpy(
+            spike_source_array, &address[spikes_offset],
+            num_spike_sources * sizeof(spike_source_t));
 
         // Loop through slow spike sources and initialise 1st time to spike
         for (index_t s = 0; s < num_spike_sources; s++) {
@@ -368,19 +393,26 @@ void timer_callback(uint timer_count, uint unused) {
 void sdp_packet_callback(uint mailbox, uint port) {
     use(port);
     sdp_msg_t *msg = (sdp_msg_t *) mailbox;
-    uint32_t *data = &(msg->cmd_rc);
+    uint32_t *data = (uint32_t *) &(msg->cmd_rc);
 
     uint32_t n_items = data[0];
     data = &(data[1]);
     for (uint32_t item = 0; item < n_items; item++) {
-        uint32_t id = data[(item * 4)];
+        uint32_t id = data[(item * 2)];
         if (id < num_spike_sources) {
-            log_info("Updating rate of %u", id);
-            spike_source_array[id].is_fast_source = (bool) data[(item * 4) + 1];
-            spike_source_array[id].exp_minus_lambda =
-                ulrbits(data[(item * 4) + 2]);
-            spike_source_array[id].mean_isi_ticks =
-                kbits((int32_t) data[(item * 4) + 3]);
+            REAL rate = 0.0;
+            memcpy(&rate, &data[(item * 2) + 1], sizeof(REAL));
+            log_info("Setting rate of %u to %kHz", id, rate);
+            REAL rate_per_tick = rate * seconds_per_tick;
+            if (rate > slow_rate_per_tick_cutoff) {
+                spike_source_array[id].is_fast_source = true;
+                spike_source_array[id].exp_minus_lambda =
+                    (UFRACT) EXP(-rate_per_tick);
+            } else {
+                spike_source_array[id].is_fast_source = false;
+                spike_source_array[id].mean_isi_ticks =
+                    rate * ticks_per_second;
+            }
         }
     }
     spin1_msg_free(msg);
