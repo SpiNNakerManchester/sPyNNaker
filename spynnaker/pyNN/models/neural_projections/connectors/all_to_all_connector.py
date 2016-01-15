@@ -56,7 +56,7 @@ class AllToAllConnector(AbstractConnector):
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             self._delays, self._n_pre_neurons * self._n_post_neurons,
             post_vertex_slice.n_atoms,
-            self._connection_slices(pre_slice_index, post_vertex_slice),
+            self._connection_slices(pre_vertex_slice, post_vertex_slice),
             min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
