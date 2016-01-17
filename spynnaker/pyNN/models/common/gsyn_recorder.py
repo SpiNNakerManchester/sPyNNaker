@@ -40,9 +40,8 @@ class GsynRecorder(object):
             return 0
         return n_neurons * 8
 
-    def get_gsyn(self, label, n_atoms, buffer_manager, region, state_region,
-                 n_machine_time_steps, placements, graph_mapper,
-                 partitionable_vertex):
+    def get_gsyn(self, label, buffer_manager, region, state_region,
+                 placements, graph_mapper, partitionable_vertex):
 
         ms_per_tick = self._machine_time_step / 1000.0
 
