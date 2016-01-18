@@ -33,42 +33,40 @@ logger = logging.getLogger(__name__)
 
 
 class DistanceDependentProbabilityConnector(FromListConnector):
-    """
-    Make connections using a distribution which varies with distance.
-
-    :param `string` d_expression:
-        the right-hand side of a valid python expression for
-        probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",
-        that can be parsed by eval(), that computes the distance
-        dependent distribution
-    :param `bool` allow_self_connections:
-        if the connector is used to connect a
-        Population to itself, this flag determines whether a neuron is
-        allowed to connect to itself, or only to other neurons in the
-        Population.
-    :param `float` weights:
-        may either be a float, a !RandomDistribution object, a list/
-        1D array with at least as many items as connections to be
-        created, or a distance dependence as per a d_expression. Units nA.
-    :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
-        will be set to the global minimum delay.
-    :param `pyNN.Space` space:
-        a Space object, needed if you wish to specify distance-
-        dependent weights or delays
-    :param `int` n_connections:
-        The number of efferent synaptic connections per neuron.
+    """ Make connections using a distribution which varies with distance.
     """
 
     def __init__(self, d_expression, allow_self_connections=True,
                  weights=0.0, delays=None, space=Space(), safe=True,
                  verbose=False, n_connections=None):
         """
-        Creates a new DistanceDependentConnector. Uses the underlying machinery
-        for FromListConnector.
+
+        :param `string` d_expression:
+            the right-hand side of a valid python expression for
+            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",
+            that can be parsed by eval(), that computes the distance
+            dependent distribution
+        :param `bool` allow_self_connections:
+            if the connector is used to connect a
+            Population to itself, this flag determines whether a neuron is
+            allowed to connect to itself, or only to other neurons in the
+            Population.
+        :param `float` weights:
+            may either be a float, a !RandomDistribution object, a list/
+            1D array with at least as many items as connections to be
+            created, or a distance dependence as per a d_expression. Units nA.
+        :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
+            will be set to the global minimum delay.
+        :param `pyNN.Space` space:
+            a Space object, needed if you wish to specify distance-
+            dependent weights or delays
+        :param `int` n_connections:
+            The number of different synaptic connections per neuron.
         """
         self.d_expression = d_expression
         self.allow_self_connections = allow_self_connections
         self.space = space
+
         # weights may be a fixed value, a list of values,
         # a RandomDistribution object, or a distance_dependence function.
         self.weights = weights

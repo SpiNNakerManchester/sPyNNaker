@@ -9,26 +9,24 @@
 // The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2
 
-// The number of spaces in the incoming spike buffer
-#define N_INCOMING_SPIKES 2048
-
 // DMA tags
 #define DMA_TAG_READ_SYNAPTIC_ROW 0
 #define DMA_TAG_WRITE_PLASTIC_REGION 1
 
 // DMA buffer structure combines the row read from SDRAM with
 typedef struct dma_buffer {
-  // Address in SDRAM to write back plastic region to
-  address_t sdram_writeback_address;
 
-  // Key of originating spike
-  // (used to allow row data to be re-used for multiple spikes)
-  spike_t originating_spike;
+    // Address in SDRAM to write back plastic region to
+    address_t sdram_writeback_address;
 
-  uint32_t n_bytes_transferred;
+    // Key of originating spike
+    // (used to allow row data to be re-used for multiple spikes)
+    spike_t originating_spike;
 
-  // Row data
-  uint32_t *row;
+    uint32_t n_bytes_transferred;
+
+    // Row data
+    uint32_t *row;
 
 } dma_buffer;
 
@@ -210,7 +208,8 @@ void _dma_complete_callback(uint unused, uint tag) {
 
 bool spike_processing_initialise(
         size_t row_max_n_words, uint mc_packet_callback_priority,
-        uint dma_trasnfer_callback_priority, uint user_event_priority) {
+        uint dma_trasnfer_callback_priority, uint user_event_priority,
+        uint incoming_spike_buffer_size) {
 
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
@@ -227,7 +226,7 @@ bool spike_processing_initialise(
     max_n_words = row_max_n_words;
 
     // Allocate incoming spike buffer
-    if (!in_spikes_initialize_spike_buffer(N_INCOMING_SPIKES)) {
+    if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
         return false;
     }
 

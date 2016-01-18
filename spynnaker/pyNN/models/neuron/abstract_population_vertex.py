@@ -74,9 +74,9 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, binary, label, max_atoms_per_core,
             machine_time_step, timescale_factor, spikes_per_second,
-            ring_buffer_sigma, model_name, neuron_model, input_type,
-            synapse_type, threshold_type, additional_input=None,
-            constraints=None):
+            ring_buffer_sigma, incoming_spike_buffer_size, model_name,
+            neuron_model, input_type, synapse_type, threshold_type,
+            additional_input=None, constraints=None):
 
         ReceiveBuffersToHostBasicImpl.__init__(self)
         AbstractPartitionableVertex.__init__(
@@ -96,6 +96,10 @@ class AbstractPopulationVertex(
         self._label = label
         self._machine_time_step = machine_time_step
         self._timescale_factor = timescale_factor
+        self._incoming_spike_buffer_size = incoming_spike_buffer_size
+        if incoming_spike_buffer_size is None:
+            self._incoming_spike_buffer_size = config.getint(
+                "Simulation", "incoming_spike_buffer_size")
 
         self._model_name = model_name
         self._neuron_model = neuron_model
@@ -315,6 +319,9 @@ class AbstractPopulationVertex(
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
+
+        # Write the size of the incoming spike buffer
+        spec.write_value(data=self._incoming_spike_buffer_size)
 
         # Write the global parameters
         global_params = self._neuron_model.get_global_parameters()
