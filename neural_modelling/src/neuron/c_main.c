@@ -199,7 +199,7 @@ void timer_callback(uint timer_count, uint unused) {
         // restart the recording status
         if (!initialise_recording()) {
             log_error("Error setting up recording");
-            spin1_exit(0);
+            rt_error(RTE_SWERR);
         }
     }
     // otherwise do synapse and neuron time step updates
