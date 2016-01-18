@@ -10,7 +10,7 @@
 #define N_DMA_BUFFERS 2
 
 // The number of spaces in the incoming spike buffer
-#define N_INCOMING_SPIKES 256
+#define N_INCOMING_SPIKES 2048
 
 // DMA tags
 #define DMA_TAG_READ_SYNAPTIC_ROW 0

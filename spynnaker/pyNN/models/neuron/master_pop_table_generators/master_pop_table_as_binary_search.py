@@ -107,6 +107,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 address_and_row_length & 0xFF))
 
         entry = self._locate_entry(entries, incoming_key_combo)
+        if entry is None:
+            return 0, None
 
         max_row_size = entry.row_length
         return max_row_size, entry.address * 4
@@ -130,7 +132,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 imin = imid + 1
             else:
                 imax = imid
-        raise Exception("Entry not found for key {}".format(key))
+        return None
 
     def get_master_population_table_size(self, vertex_slice, in_edges):
         """

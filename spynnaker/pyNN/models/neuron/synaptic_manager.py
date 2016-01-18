@@ -171,8 +171,8 @@ class SynapticManager(object):
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
                 pre_slices = [
-                    graph_mapper.get_subvertex_slice(subvertex)
-                    for subvertex in graph_mapper.get_subvertices_from_vertex(
+                    graph_mapper.get_subvertex_slice(subv)
+                    for subv in graph_mapper.get_subvertices_from_vertex(
                         edge.pre_vertex)]
                 pre_slice_index = pre_slices.index(pre_vertex_slice)
 
@@ -397,8 +397,8 @@ class SynapticManager(object):
             edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
             pre_slices = [
-                graph_mapper.get_subvertex_slice(subvertex)
-                for subvertex in graph_mapper.get_subvertices_from_vertex(
+                graph_mapper.get_subvertex_slice(subv)
+                for subv in graph_mapper.get_subvertices_from_vertex(
                     edge.pre_vertex)]
             pre_slice_index = pre_slices.index(pre_vertex_slice)
             if isinstance(edge, ProjectionPartitionableEdge):
@@ -549,8 +549,8 @@ class SynapticManager(object):
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
                 pre_slices = [
-                    graph_mapper.get_subvertex_slice(subvertex)
-                    for subvertex in graph_mapper.get_subvertices_from_vertex(
+                    graph_mapper.get_subvertex_slice(subv)
+                    for subv in graph_mapper.get_subvertices_from_vertex(
                         edge.pre_vertex)]
                 pre_slice_index = pre_slices.index(pre_vertex_slice)
 
@@ -637,8 +637,8 @@ class SynapticManager(object):
                     routing_info.get_keys_and_masks_from_subedge(subedge)
 
         post_slices = [
-            graph_mapper.get_subvertex_slice(subvertex)
-            for subvertex in graph_mapper.get_subvertices_from_vertex(vertex)]
+            graph_mapper.get_subvertex_slice(subv)
+            for subv in graph_mapper.get_subvertices_from_vertex(vertex)]
         post_slice_index = post_slices.index(post_vertex_slice)
 
         # Reserve the memory
@@ -742,7 +742,7 @@ class SynapticManager(object):
                 placement.x, placement.y)
 
         block = None
-        if max_row_length > 0:
+        if max_row_length > 0 and synaptic_block_offset is not None:
 
             # calculate the synaptic block size in bytes
             synaptic_block_size = self._synapse_io.get_block_n_bytes(
