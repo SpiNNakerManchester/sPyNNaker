@@ -32,8 +32,8 @@ class SpikeSourceFromFile(SpikeSourceArray):
             self, n_neurons, spike_times, machine_time_step,
             timescale_factor, port=port,
             tag=tag, ip_address=ip_address, board_address=board_address,
-            max_on_chip_memory_usage_for_spikes_in_bytes=
-            max_on_chip_memory_usage_for_spikes_in_bytes,
+            max_on_chip_memory_usage_for_spikes_in_bytes=(
+                max_on_chip_memory_usage_for_spikes_in_bytes),
             constraints=constraints, label=label)
 
     @staticmethod
@@ -57,7 +57,8 @@ class SpikeSourceFromFile(SpikeSourceArray):
             subsampled_times = []
             while t_index < t_last:
                 spikes_in_interval = 0
-                while t_index < t_last and times[t_index] <= t_start + interval:
+                while (t_index < t_last and
+                        times[t_index] <= t_start + interval):
                     spikes_in_interval += 1
                     if spikes_in_interval >= interval:
                         t_start = times[t_index] + interval

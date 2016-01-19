@@ -145,9 +145,11 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         next += sizeof(global_neuron_params_t) / 4;
     }
 
-    log_info("\tneurons = %u, params size = %u, input type size = %u,"
-             "threshold size = %u", n_neurons, sizeof(neuron_t),
-             sizeof(input_type_t), sizeof(threshold_type_t));
+    log_info(
+        "\tneurons = %u, spike buffer size = %u, params size = %u,"
+        "input type size = %u, threshold size = %u", n_neurons,
+        *incoming_spike_buffer_size, sizeof(neuron_t),
+        sizeof(input_type_t), sizeof(threshold_type_t));
 
     // Allocate DTCM for neuron array and copy block of data
     if (sizeof(neuron_t) != 0) {

@@ -7,6 +7,7 @@ from spynnaker.pyNN.utilities import conf
 
 import logging
 import copy
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import ProjectionPartitionedEdge
 logger = logging.getLogger(__name__)
 
 
@@ -49,6 +50,12 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         if self._delay_edge is None:
             return 0
         return self._delay_edge.pre_vertex.n_delay_stages
+
+    def create_subedge(
+            self, pre_subvertex, post_subvertex, label=None, constraints=None):
+        return ProjectionPartitionedEdge(
+            self._synapse_information, pre_subvertex, post_subvertex, label,
+            constraints)
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):
