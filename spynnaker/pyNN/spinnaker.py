@@ -532,8 +532,20 @@ class Spinnaker(object):
                 # creator to the list (reload script currently only supported
                 # for the original run)
                 write_reload = config.getboolean("Reports", "writeReloadSteps")
+
+                # if reload and auto pause and resume are on, raise exception
+                if write_reload and using_auto_pause_and_resume:
+                    raise common_exceptions.ConfigurationException(
+                        "You cannot use auto pause and resume with a "
+                        "reload script. This is due to reload not being able to"
+                        "extract data from the machine. Please fix"
+                        " and try again")
+
+                # if first run, create reload
                 if not self._has_ran and write_reload:
                     algorithms.append("FrontEndCommonReloadScriptCreator")
+
+                # if ran before, warn that reload is only avilable for first run
                 elif self.has_ran and write_reload:
                     logger.warn(
                         "The reload script cannot handle multi-runs, nor can"
@@ -1169,6 +1181,14 @@ class Spinnaker(object):
         :return:
         """
         return self._no_machine_time_steps
+
+    @property
+    def writing_reload_script(self):
+        """
+        returns if the system is to use auto_pause and resume
+        :return:
+        """
+        return config.getboolean("Reports", "writeReloadSteps")
 
     @property
     def timescale_factor(self):

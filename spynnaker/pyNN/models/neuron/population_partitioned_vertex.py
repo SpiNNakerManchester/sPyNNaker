@@ -11,7 +11,7 @@ class PopulationPartitionedVertex(
 
     def __init__(
             self, buffering_output, resources_required, label,
-            constraints=None):
+            extra_static_sdram_requirement, constraints=None):
         """
         :param buffering_output: True if the vertex is set to buffer output,\
                     False otherwise
@@ -34,6 +34,7 @@ class PopulationPartitionedVertex(
             constraints=constraints)
 
         self._buffering_output = buffering_output
+        self._extra_static_sdram_requirement = extra_static_sdram_requirement
 
     def buffering_output(self):
         return self._buffering_output
@@ -41,3 +42,5 @@ class PopulationPartitionedVertex(
     def is_receives_buffers_to_host(self):
         return True
 
+    def extra_static_sdram_requirement(self):
+        return self._extra_static_sdram_requirement

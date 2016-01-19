@@ -76,7 +76,8 @@ class SpikeSourceArray(
             send_buffer_space_before_notify=space_before_notification,
             send_buffer_notification_ip_address=self._ip_address,
             send_buffer_notification_port=self._port,
-            send_buffer_notification_tag=tag)
+            send_buffer_notification_tag=tag, extra_static_sdram=config.getint(
+                "Recording", "extra_recording_data_for_static_sdram_usage"))
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingEdgeConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)

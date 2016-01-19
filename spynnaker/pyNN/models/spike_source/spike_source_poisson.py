@@ -75,7 +75,9 @@ class SpikeSourcePoisson(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractSpikeRecordable.__init__(self)
-        ReceiveBuffersToHostBasicImpl.__init__(self)
+        ReceiveBuffersToHostBasicImpl.__init__(
+            self, config.getint(
+                "Recording", "extra_recording_data_for_static_sdram_usage"))
         AbstractProvidesOutgoingEdgeConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
 
@@ -340,6 +342,8 @@ class SpikeSourcePoisson(
         total_size += self._get_number_of_mallocs_used_by_dsg(
             vertex_slice, graph.incoming_edges_to_vertex(self)) * \
             front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
+        total_size += config.getint(
+            "Recording", "extra_recording_data_for_static_sdram_usage")
         return total_size
 
     # @implements AbstractRecordableInterface.get_runtime_sdram_usage_for_atoms
