@@ -1077,10 +1077,19 @@ class Spinnaker(object):
             extra_inputs.append({
                 'type': "PlacementToAppDataFilePaths",
                 'value':self._placement_to_app_data_file_paths})
+            extra_inputs.append({
+                'type': "LoadBinariesToken",
+                'value': True})
+
+        # multi run mode
         if not application_graph_changed and self._has_ran:
             extra_inputs.append({
                 'type': "LoadBinariesToken",
                 'value': True})
+            extra_inputs.append({
+                'type': "BufferManager",
+                'value': self._buffer_manager})
+
         return inputs
 
     def _calculate_number_of_machine_time_steps(self, next_run_time):
