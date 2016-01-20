@@ -337,8 +337,6 @@ class SpikeSourcePoisson(
             ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
              self.get_recording_data_size(1) +
              self.get_buffer_state_region_size(1) + poisson_params_sz)
-        total_size += self.get_number_of_mallocs_used_by_dsg(
-             self.get_buffer_state_region_size(1) + poisson_params_sz)
         total_size += self._get_number_of_mallocs_used_by_dsg(
             vertex_slice, graph.incoming_edges_to_vertex(self)) * \
             front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
