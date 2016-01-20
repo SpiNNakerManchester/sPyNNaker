@@ -275,7 +275,8 @@ void c_main(void) {
     uint32_t timer_period = 0;
     if (!initialize(&timer_period)) {
         log_error("Error in initialisation - exiting!");
-         rt_error(RTE_SWERR);
+        rt_error(RTE_SWERR);
+        return;
     }
 
     // Start the time at "-1" so that the first tick will be 0

@@ -106,6 +106,7 @@ class Spinnaker(object):
         # application graph
         self._processor_to_app_data_base_address_mapper = None
         self._placement_to_app_data_file_paths = None
+        self._dsg_targets = None
 
         # holder for timing related values
         self._has_ran = False
@@ -313,7 +314,7 @@ class Spinnaker(object):
                 "PACMAN_provancence_data.xml")
             pacman_exeuctor.write_provenance_data_in_xml(
                 pacman_executor_file_path,
-                pacman_exeuctor.get_item("MemoryTransciever"))
+                pacman_exeuctor.get_item("MemoryTransceiver"))
 
         # sort out outputs data
         if application_graph_changed:
@@ -398,15 +399,13 @@ class Spinnaker(object):
         :return:
         """
         if not config.getboolean("Machine", "virtual_board"):
-            self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
+            self._txrx = pacman_exeuctor.get_item("MemoryTransceiver")
             self._has_ran = pacman_exeuctor.get_item("RanToken")
             self._executable_targets = \
                 pacman_exeuctor.get_item("ExecutableTargets")
             self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
-            self._processor_to_app_data_base_address_mapper = \
-                pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
-            self._placement_to_app_data_file_paths = \
-                pacman_exeuctor.get_item("PlacementToAppDataFilePaths")
+            self._dsg_targets = pacman_exeuctor.get_item(
+                "DataSpecificationTargets")
 
         self._placements = pacman_exeuctor.get_item("MemoryPlacements")
         self._router_tables = \
@@ -498,8 +497,6 @@ class Spinnaker(object):
                     # The following lines are not split to avoid error
                     # in future search
                     algorithms.append(
-                        "FrontEndCommonPartitionableGraphApplicationDataLoader")
-                    algorithms.append(
                         "FrontEndCommonPartitionableGraphHostExecuteDataSpecification")
                 else:
                     algorithms.append(
@@ -575,8 +572,16 @@ class Spinnaker(object):
                 # add functions for updating the models
                 algorithms.append("FrontEndCommonRuntimeUpdater")
             if not self._has_ran and not executing_reset:
-                algorithms.append(
-                    "FrontEndCommonPartitionableGraphApplicationDataLoader")
+
+                if self._exec_dse_on_host:
+                    # The following lines are not split to avoid error
+                    # in future search
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphApplicationDataLoader")
+                else:
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")
+
                 algorithms.append("FrontEndCommomLoadExecutableImages")
             if not executing_reset:
                 algorithms.append("FrontEndCommonNotificationProtocol")
@@ -648,22 +653,16 @@ class Spinnaker(object):
             inputs.append({'type': "RunTimeMachineTimeSteps",
                            'value': no_machine_time_steps})
 
-        # FrontEndCommonPartitionableGraphApplicationDataLoader after a
-        # reset and no changes
+        # After a reset and no changes
         if not self._has_ran and not application_graph_changed:
-            inputs.append(({
-                'type': "ProcessorToAppDataBaseAddress",
-                "value": self._processor_to_app_data_base_address_mapper}))
-            inputs.append({"type": "PlacementToAppDataFilePaths",
-                           'value': self._placement_to_app_data_file_paths})
-            inputs.append({'type': "WriteCheckerFlag",
-                           'value': config.getboolean(
-                               "Mode", "verify_writes")})
+            inputs.append({
+                'type': "DataSpecificationTargets",
+                "value": self._dsg_targets})
 
         # support resetting when there's changes in the application graph
         # (only need to exit)
         if application_graph_changed and is_resetting:
-            inputs.append({"type": "MemoryTransciever", 'value': self._txrx})
+            inputs.append({"type": "MemoryTransceiver", 'value': self._txrx})
             inputs.append({'type': "ExecutableTargets",
                            'value': self._executable_targets})
             inputs.append({'type': "MemoryPlacements",
@@ -716,66 +715,66 @@ class Spinnaker(object):
                            'value': self._app_data_runtime_folder})
             inputs.append({'type': 'IPAddress', 'value': self._hostname})
 
-        # basic input stuff
-        inputs.append({'type': "BMPDetails",
-                       'value': config.get("Machine", "bmp_names")})
-        inputs.append({'type': "DownedChipsDetails",
-                       'value': config.get("Machine", "down_chips")})
-        inputs.append({'type': "DownedCoresDetails",
-                       'value': config.get("Machine", "down_cores")})
-        inputs.append({'type': "BoardVersion",
-                       'value': config.getint("Machine", "version")})
-        inputs.append({'type': "NumberOfBoards",
-                       'value': number_of_boards})
-        inputs.append({'type': "MachineWidth", 'value': width})
-        inputs.append({'type': "MachineHeight", 'value': height})
-        inputs.append({'type': "AutoDetectBMPFlag",
-                       'value': config.getboolean("Machine",
-                                                  "auto_detect_bmp")})
-        inputs.append({'type': "EnableReinjectionFlag",
-                       'value': config.getboolean("Machine",
-                                                  "enable_reinjection")})
-        inputs.append({'type': "ScampConnectionData",
-                       'value': scamp_socket_addresses})
-        inputs.append({'type': "BootPortNum", 'value': boot_port_num})
-        inputs.append({'type': "APPID", 'value': self._app_id})
-        inputs.append({'type': "DSEAPPID", 'value': self._dse_app_id})
-        inputs.append({'type': "RunTime", 'value': self._runtime})
-        inputs.append({'type': "TimeScaleFactor",
-                       'value': self._time_scale_factor})
-        inputs.append({'type': "MachineTimeStep",
-                       'value': self._machine_time_step})
-        inputs.append({'type': "DatabaseSocketAddresses",
-                       'value': self._database_socket_addresses})
-        inputs.append({'type': "DatabaseWaitOnConfirmationFlag",
-                       'value': config.getboolean(
+            # basic input stuff
+            inputs.append({'type': "BMPDetails",
+                           'value': config.get("Machine", "bmp_names")})
+            inputs.append({'type': "DownedChipsDetails",
+                           'value': config.get("Machine", "down_chips")})
+            inputs.append({'type': "DownedCoresDetails",
+                           'value': config.get("Machine", "down_cores")})
+            inputs.append({'type': "BoardVersion",
+                           'value': config.getint("Machine", "version")})
+            inputs.append({'type': "NumberOfBoards",
+                           'value': number_of_boards})
+            inputs.append({'type': "MachineWidth", 'value': width})
+            inputs.append({'type': "MachineHeight", 'value': height})
+            inputs.append({'type': "AutoDetectBMPFlag",
+                           'value': config.getboolean("Machine",
+                                                      "auto_detect_bmp")})
+            inputs.append({'type': "EnableReinjectionFlag",
+                           'value': config.getboolean("Machine",
+                                                      "enable_reinjection")})
+            inputs.append({'type': "ScampConnectionData",
+                           'value': scamp_socket_addresses})
+            inputs.append({'type': "BootPortNum", 'value': boot_port_num})
+            inputs.append({'type': "APPID", 'value': self._app_id})
+            inputs.append({'type': "DSEAPPID", 'value': self._dse_app_id})
+            inputs.append({'type': "RunTime", 'value': this_run_time})
+            inputs.append({'type': "TimeScaleFactor",
+                           'value': self._time_scale_factor})
+            inputs.append({'type': "MachineTimeStep",
+                           'value': self._machine_time_step})
+            inputs.append({'type': "DatabaseSocketAddresses",
+                           'value': self._database_socket_addresses})
+            inputs.append({'type': "DatabaseWaitOnConfirmationFlag",
+                           'value': config.getboolean(
                                "Database", "wait_on_confirmation")})
-        inputs.append({'type': "WriteCheckerFlag",
-                       'value': config.getboolean(
-                           "Mode", "verify_writes")})
-        inputs.append({'type': "WriteTextSpecsFlag",
-                       'value': config.getboolean(
+            inputs.append({'type': "WriteCheckerFlag",
+                           'value': config.getboolean(
+                               "Mode", "verify_writes")})
+            inputs.append({'type': "WriteTextSpecsFlag",
+                           'value': config.getboolean(
                                "Reports", "writeTextSpecs")})
-        inputs.append({'type': "ExecutableFinder",
-                       'value': executable_finder})
-        inputs.append({'type': "MachineHasWrapAroundsFlag",
-                       'value': config.getboolean(
+            inputs.append({'type': "ExecutableFinder",
+                           'value': executable_finder})
+            inputs.append({'type': "MachineHasWrapAroundsFlag",
+                           'value': config.getboolean(
                                "Machine", "requires_wrap_arounds")})
-        inputs.append({'type': "ReportStates",
-                       'value': self._reports_states})
-        inputs.append({'type': "UserCreateDatabaseFlag",
-                       'value': config.get("Database", "create_database")})
-        inputs.append({'type': "ExecuteMapping",
-                       'value': config.getboolean(
-                           "Database",
-                           "create_routing_info_to_neuron_id_mapping")})
-        inputs.append({'type': "DatabaseSocketAddresses",
-                       'value': self._database_socket_addresses})
-        inputs.append({'type': "SendStartNotifications",
-                       'value': config.getboolean("Database",
-                                                  "send_start_notification")})
-        inputs.append({'type': "ProvenanceFilePath",
-                       'value': provenance_file_path})
+            inputs.append({'type': "ReportStates",
+                           'value': self._reports_states})
+            inputs.append({'type': "UserCreateDatabaseFlag",
+                           'value': config.get("Database", "create_database")})
+            inputs.append({'type': "ExecuteMapping",
+                           'value': config.getboolean(
+                               "Database",
+                               "create_routing_info_to_neuron_id_mapping")})
+            inputs.append({'type': "DatabaseSocketAddresses",
+                           'value': self._database_socket_addresses})
+            inputs.append({'type': "SendStartNotifications",
+                           'value': config.getboolean(
+                               "Database", "send_start_notification")})
+            inputs.append({'type': "ProvenanceFilePath",
+                           'value': provenance_file_path})
 
             # add paths for each file based version
             inputs.append({'type': "FileCoreAllocationsFilePath",
@@ -825,7 +824,7 @@ class Spinnaker(object):
             inputs.append({'type': "ExecutableTargets",
                            'value': self._executable_targets})
             inputs.append({'type': "APPID", 'value': self._app_id})
-            inputs.append({"type": "MemoryTransciever", 'value': self._txrx})
+            inputs.append({"type": "MemoryTransceiver", 'value': self._txrx})
             inputs.append({"type": "RunTime",
                            'value': this_run_time})
             inputs.append({'type': "TimeScaleFactor",
