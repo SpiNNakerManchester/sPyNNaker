@@ -11,17 +11,9 @@ from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities.report_states import ReportState
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
 
 # local front end imports
-from spynnaker.pyNN.models.common.abstract_gsyn_recordable\
-    import AbstractGSynRecordable
-from spynnaker.pyNN.models.common.abstract_v_recordable\
-    import AbstractVRecordable
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
@@ -34,10 +26,6 @@ from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_has_first_machine_time_step \
-    import AbstractHasFirstMachineTimeStep
-
 
 # general imports
 import logging
@@ -115,6 +103,8 @@ class Spinnaker(object):
         self._no_machine_time_steps = None
         self._machine_time_step = None
         self._no_sync_changes = 0
+        self._steps = None
+        self._original_first_run = None
 
         # state thats needed the first time around
         if self._app_id is None:
@@ -257,9 +247,27 @@ class Spinnaker(object):
         """
         logger.info("Starting execution process")
 
+        if self._original_first_run is None:
+            self._original_first_run = run_time
+        if self._has_reset_last and self._original_first_run != run_time:
+            raise common_exceptions.ConfigurationException(
+                "Currently spynnaker cannot reset and immediately handle a "
+                "runtime that was not the same as the original run. Please "
+                "run for {} ms and then change the runtime."
+                .format(self._original_first_run))
+
         # get inputs
         inputs, application_graph_changed, uses_auto_pause_and_resume = \
             self._create_pacman_executor_inputs(run_time)
+
+        if (self._original_first_run < run_time and
+                not uses_auto_pause_and_resume):
+            raise common_exceptions.ConfigurationException(
+                "Currently spynnaker cannot handle a runtime greater than what"
+                " was used during the initial run, unless you use the "
+                "\" auto_pause_and_resume\" functionality. To turn this on, "
+                " please go to your .spynnaker.cfg file and add "
+                "[Mode] and use_auto_pause_and_resume = False")
 
         if application_graph_changed and self._has_ran:
             raise common_exceptions.ConfigurationException(
@@ -283,7 +291,7 @@ class Spinnaker(object):
             executing_reset=False,
             using_auto_pause_and_resume=uses_auto_pause_and_resume)
 
-        # xml paths to the algorthims metadata
+        # xml paths to the algorithms metadata
         xml_paths = self._create_xml_paths()
 
         # run pacman executor
@@ -303,7 +311,8 @@ class Spinnaker(object):
 
         # sort out outputs data
         self._update_data_structures_from_pacman_exeuctor(
-            pacman_exeuctor, application_graph_changed)
+            pacman_exeuctor, application_graph_changed,
+            uses_auto_pause_and_resume)
 
         # switch the reset last flag, as now the last thing to run is a run
         self._has_reset_last = False
@@ -373,7 +382,8 @@ class Spinnaker(object):
                 self._processor_to_app_data_base_address_mapper = None
 
     def _update_data_structures_from_pacman_exeuctor(
-            self, pacman_exeuctor, application_graph_changed):
+            self, pacman_exeuctor, application_graph_changed,
+            uses_auto_pause_and_resume):
         """ Updates all the spinnaker local data structures that it needs from\
             the pacman executor
         :param pacman_exeuctor: the pacman executor required to extract data\
@@ -407,6 +417,9 @@ class Spinnaker(object):
                 pacman_exeuctor.get_item("DatabaseFilePath")
             self._dsg_targets = \
                 pacman_exeuctor.get_item("DataSpecificationTargets")
+
+        if uses_auto_pause_and_resume:
+            self._steps = pacman_exeuctor.get_item("Steps")
 
         # update stuff that alkways needed updating
         self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
@@ -1043,6 +1056,9 @@ class Spinnaker(object):
         extra_inputs.append({
             'type': "MachineTimeStep",
             'value': self._machine_time_step})
+        extra_inputs.append({
+            'type': "TotalCommunitiveRunTime",
+            'value': self._current_run_ms})
 
         # standard inputs
         inputs.append({
@@ -1071,8 +1087,11 @@ class Spinnaker(object):
         inputs.append({
             'type': "HasResetBefore",
             'value': self._has_reset_last})
+        inputs.append({
+            'type': "Steps",
+            'value': self._steps})
 
-        # add extra needed by auto_pause and resume if reset has occured
+        # add extra needed by auto_pause and resume if reset has occurred
         if not application_graph_changed and not is_resetting:
             inputs.append({
                 'type': "MemoryRoutingInfos",
