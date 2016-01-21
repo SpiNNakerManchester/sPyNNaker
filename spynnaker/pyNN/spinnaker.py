@@ -485,8 +485,8 @@ class Spinnaker(object):
                     raise common_exceptions.ConfigurationException(
                         "The tool chain expects config params of list of 1 "
                         "element with ,. Where the elements are either: the "
-                        "algorithum_name:algorithm_config_file_path, or "
-                        "algorithum_name if its a interal to pacman algorithm."
+                        "algorithm_name:algorithm_config_file_path, or "
+                        "algorithm_name if its a internal to pacman algorithm."
                         " Please rectify this and try again")
 
             # if using virtual machine, add to list of algorithms the virtual
@@ -505,7 +505,7 @@ class Spinnaker(object):
                 optional_algorithms.append("FrontEndCommonRoutingTableLoader")
                 optional_algorithms.append("FrontEndCommonTagsLoader")
 
-                # add algorithms that the auto supples if not using it
+                # add algorithms that the auto supplies if not using it
                 if not using_auto_pause_and_resume:
                     optional_algorithms.append(
                         "FrontEndCommonLoadExecutableImages")
@@ -537,7 +537,8 @@ class Spinnaker(object):
                 if not self._has_ran and write_reload:
                     algorithms.append("FrontEndCommonReloadScriptCreator")
 
-                # if ran before, warn that reload is only avilable for first run
+                # if ran before, warn that reload is only available for
+                # first run
                 elif self.has_ran and write_reload:
                     logger.warn(
                         "The reload script cannot handle multi-runs, nor can"
@@ -592,7 +593,7 @@ class Spinnaker(object):
                     "FrontEndCommonApplicationDataLoader")
                 algorithms.append("FrontEndCommonLoadExecutableImages")
 
-            # add defualt algortihms
+            # add default algorithms
             algorithms.append("FrontEndCommonNotificationProtocol")
 
             # add functions for setting off the models again
@@ -993,6 +994,7 @@ class Spinnaker(object):
         inputs.append({
             'type': "ApplicationDataFolder",
             'value': self._app_data_runtime_folder})
+
         return inputs
 
     def _add_resetted_last_and_no_change_inputs(self, inputs):
@@ -1105,6 +1107,7 @@ class Spinnaker(object):
             extra_inputs.append({
                 'type': "LoadBinariesToken",
                 'value': True})
+        if self._buffer_manager is not None:
             extra_inputs.append({
                 'type': "BufferManager",
                 'value': self._buffer_manager})
