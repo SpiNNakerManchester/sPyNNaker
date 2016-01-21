@@ -1,4 +1,64 @@
 <algorithms>
+    <algorithm name="SpyNNakerRuntimeUpdator">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_runtime_updator</python_module>
+        <python_class>SpyNNakerRuntimeUpdator</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>run_time</param_name>
+                <param_type>RunTime</param_type>
+            </parameter>
+            <parameter>
+                <param_name>partitionable_graph</param_name>
+                <param_type>MemoryPartitionableGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>current_run_ms</param_name>
+                <param_type>CurrentRunMS</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_time_step</param_name>
+                <param_type>MachineTimeStep</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>total_run_time</param_name>
+                <param_type>TotalCommunitiveRunTime</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
+    <algorithm name="SpyNNakerRuntimeUpdatorAfterRun">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_runtime_updator</python_module>
+        <python_class>SpyNNakerRuntimeUpdator</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>run_time</param_name>
+                <param_type>RunTime</param_type>
+            </parameter>
+            <parameter>
+                <param_name>partitionable_graph</param_name>
+                <param_type>MemoryPartitionableGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>current_run_ms</param_name>
+                <param_type>CurrentRunMS</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_time_step</param_name>
+                <param_type>MachineTimeStep</param_type>
+            </parameter>
+            <parameter>
+                <param_name>ran_token</param_name>
+                <param_type>RanToken</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>total_run_time</param_name>
+                <param_type>TotalCommunitiveRunTime</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="GraphEdgeFilter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter</python_module>
         <python_class>GraphEdgeFilter</python_class>

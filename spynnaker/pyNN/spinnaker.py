@@ -257,17 +257,6 @@ class Spinnaker(object):
         """
         logger.info("Starting execution process")
 
-        # calculate number of machine time steps
-        total_run_time = self._calculate_number_of_machine_time_steps(run_time)
-
-        # Calculate the first machine time step to start from and set this
-        # where necessary
-        first_machine_time_step = int(math.ceil(
-            (self._current_run_ms * 1000.0) / self._machine_time_step))
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractHasFirstMachineTimeStep):
-                vertex.set_first_machine_time_step(first_machine_time_step)
-
         # get inputs
         inputs, application_graph_changed, uses_auto_pause_and_resume = \
             self._create_pacman_executor_inputs(run_time)
@@ -313,14 +302,8 @@ class Spinnaker(object):
                 pacman_exeuctor.get_item("MemoryTransciever"))
 
         # sort out outputs data
-        if application_graph_changed:
-            self._update_data_structures_from_pacman_exeuctor(pacman_exeuctor)
-        else:
-            self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
-            self._has_ran = pacman_exeuctor.get_item("RanToken")
-
-        # reset the reset flag to say the last thing was not a reset call
-        self._current_run_ms = total_run_time
+        self._update_data_structures_from_pacman_exeuctor(
+            pacman_exeuctor, application_graph_changed)
 
         # switch the reset last flag, as now the last thing to run is a run
         self._has_reset_last = False
@@ -389,41 +372,47 @@ class Spinnaker(object):
                 self._placement_to_app_data_file_paths = \
                 self._processor_to_app_data_base_address_mapper = None
 
-    def _update_data_structures_from_pacman_exeuctor(self, pacman_exeuctor):
+    def _update_data_structures_from_pacman_exeuctor(
+            self, pacman_exeuctor, application_graph_changed):
         """ Updates all the spinnaker local data structures that it needs from\
             the pacman executor
         :param pacman_exeuctor: the pacman executor required to extract data\
                 structures from.
         :return:
         """
-        if not config.getboolean("Machine", "virtual_board"):
-            self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
-            self._has_ran = pacman_exeuctor.get_item("RanToken")
-            self._executable_targets = \
-                pacman_exeuctor.get_item("ExecutableTargets")
-            self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
-            self._processor_to_app_data_base_address_mapper = \
-                pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
-            self._placement_to_app_data_file_paths = \
-                pacman_exeuctor.get_item("PlacementToAppDataFilePaths")
+        if application_graph_changed:
+            if not config.getboolean("Machine", "virtual_board"):
+                self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
+                self._executable_targets = \
+                    pacman_exeuctor.get_item("ExecutableTargets")
+                self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
+                self._processor_to_app_data_base_address_mapper = \
+                    pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
+                self._placement_to_app_data_file_paths = \
+                    pacman_exeuctor.get_item("PlacementToAppDataFilePaths")
 
-        self._placements = pacman_exeuctor.get_item("MemoryPlacements")
-        self._router_tables = \
-            pacman_exeuctor.get_item("MemoryRoutingTables")
-        self._routing_infos = \
-            pacman_exeuctor.get_item("MemoryRoutingInfos")
-        self._tags = pacman_exeuctor.get_item("MemoryTags")
-        self._graph_mapper = pacman_exeuctor.get_item("MemoryGraphMapper")
-        self._partitioned_graph = \
-            pacman_exeuctor.get_item("MemoryPartitionedGraph")
-        self._machine = pacman_exeuctor.get_item("MemoryMachine")
-        self._database_interface = \
-            pacman_exeuctor.get_item("DatabaseInterface")
-        self._database_file_path = \
-            pacman_exeuctor.get_item("DatabaseFilePath")
-        self._dsg_targets = \
-            pacman_exeuctor.get_item("DataSpecificationTargets")
+            self._placements = pacman_exeuctor.get_item("MemoryPlacements")
+            self._router_tables = \
+                pacman_exeuctor.get_item("MemoryRoutingTables")
+            self._routing_infos = \
+                pacman_exeuctor.get_item("MemoryRoutingInfos")
+            self._tags = pacman_exeuctor.get_item("MemoryTags")
+            self._graph_mapper = pacman_exeuctor.get_item("MemoryGraphMapper")
+            self._partitioned_graph = \
+                pacman_exeuctor.get_item("MemoryPartitionedGraph")
+            self._machine = pacman_exeuctor.get_item("MemoryMachine")
+            self._database_interface = \
+                pacman_exeuctor.get_item("DatabaseInterface")
+            self._database_file_path = \
+                pacman_exeuctor.get_item("DatabaseFilePath")
+            self._dsg_targets = \
+                pacman_exeuctor.get_item("DataSpecificationTargets")
+
+        # update stuff that alkways needed updating
         self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
+        self._has_ran = pacman_exeuctor.get_item("RanToken")
+        self._current_run_ms = \
+            pacman_exeuctor.get_item("TotalCommunitiveRunTime")
 
     @staticmethod
     def _create_xml_paths():
@@ -458,6 +447,9 @@ class Spinnaker(object):
         """
         algorithms = list()
         optional_algorithms = list()
+
+        # needed for multi-run/SSA's to work correctly.
+        algorithms.append("SpyNNakerRuntimeUpdator")
 
         # if youve not ran before, add the buffer manager
         using_virtual_board = config.getboolean("Machine", "virtual_board")
@@ -516,13 +508,13 @@ class Spinnaker(object):
                 # add algorithms that the auto supples if not using it
                 if not using_auto_pause_and_resume:
                     optional_algorithms.append(
-                        "FrontEndCommomLoadExecutableImages")
+                        "FrontEndCommonLoadExecutableImages")
                     algorithms.append("FrontEndCommonApplicationRunner")
                     optional_algorithms.append(
                         "FrontEndCommonApplicationDataLoader")
                     algorithms.append("FrontEndCommonPartitionableGraphHost"
                                       "ExecuteDataSpecification")
-                    algorithms.append("FrontEndCommomLoadExecutableImages")
+                    algorithms.append("FrontEndCommonLoadExecutableImages")
                     algorithms.append("FrontEndCommomPartitionableGraphData"
                                       "SpecificationWriter")
                 else:
@@ -598,7 +590,7 @@ class Spinnaker(object):
             if not self._has_ran:
                 optional_algorithms.append(
                     "FrontEndCommonApplicationDataLoader")
-                algorithms.append("FrontEndCommomLoadExecutableImages")
+                algorithms.append("FrontEndCommonLoadExecutableImages")
 
             # add defualt algortihms
             algorithms.append("FrontEndCommonNotificationProtocol")
@@ -643,13 +635,15 @@ class Spinnaker(object):
 
         inputs = list()
 
-        application_graph_changed, provenance_file_path, self._no_sync_changes,\
-        no_machine_time_steps, json_folder, width, height, number_of_boards,\
-        scamp_socket_addresses, boot_port_num, using_auto_pause_and_resume = \
-            self._deduce_standard_input_params(is_resetting, this_run_time)
+        application_graph_changed, provenance_file_path, \
+            self._no_sync_changes, no_machine_time_steps, json_folder, width, \
+            height, number_of_boards, scamp_socket_addresses, boot_port_num, \
+            using_auto_pause_and_resume, max_sdram_size = \
+                self._deduce_standard_input_params(is_resetting, this_run_time)
 
         inputs = self._add_standard_basic_inputs(
-            inputs, no_machine_time_steps, is_resetting)
+            inputs, no_machine_time_steps, is_resetting, max_sdram_size,
+            this_run_time)
 
         # if using auto_pause and resume, add basic pause and resume inputs
         if using_auto_pause_and_resume:
@@ -658,8 +652,7 @@ class Spinnaker(object):
 
         # FrontEndCommonApplicationDataLoader after a reset and no changes
         if not self._has_ran and not application_graph_changed:
-            inputs = self._add_resetted_last_and_no_change_inputs(
-                using_auto_pause_and_resume, inputs)
+            inputs = self._add_resetted_last_and_no_change_inputs(inputs)
 
         # support resetting when there's changes in the application graph
         # (only need to exit)
@@ -670,8 +663,7 @@ class Spinnaker(object):
         elif application_graph_changed and not is_resetting:
             inputs = self._add_mapping_inputs(
                 inputs, width, height, scamp_socket_addresses, boot_port_num,
-                this_run_time, provenance_file_path, json_folder,
-                number_of_boards)
+                provenance_file_path, json_folder, number_of_boards)
 
             # if already ran, this is a remapping, thus needs to warn end user
             if self._has_ran:
@@ -680,8 +672,7 @@ class Spinnaker(object):
                     " done again.  Any recorded data will be erased.")
         #
         else:
-            inputs = self._add_extra_run_inputs(
-                inputs, this_run_time, provenance_file_path)
+            inputs = self._add_extra_run_inputs(inputs, provenance_file_path)
 
         return inputs, application_graph_changed, using_auto_pause_and_resume
 
@@ -743,14 +734,20 @@ class Spinnaker(object):
         using_auto_pause_and_resume = \
             config.getboolean("Mode", "use_auto_pause_and_resume")
 
+        # used for debug purposes to fix max size of sdram each chip has
+        max_sdram_size = config.get("Machine", "max_sdram_allowed_per_chip")
+        if max_sdram_size == "None":
+            max_sdram_size = None
+        else:
+            max_sdram_size = int(max_sdram_size)
+
         return \
             application_graph_changed, provenance_file_path, \
             self._no_sync_changes, no_machine_time_steps, json_folder, width,\
             height, number_of_boards, scamp_socket_addresses, boot_port_num, \
-            using_auto_pause_and_resume
+            using_auto_pause_and_resume, max_sdram_size
 
-    def _add_extra_run_inputs(
-            self, inputs, this_run_time, provenance_file_path):
+    def _add_extra_run_inputs(self, inputs, provenance_file_path):
         # mapping does not need to be executed, therefore add
         # the data elements needed for the application runner and
         # runtime re-setter
@@ -781,9 +778,6 @@ class Spinnaker(object):
         inputs.append({
             "type": "MemoryTransciever",
             'value': self._txrx})
-        inputs.append({
-            "type": "RunTime",
-            'value': this_run_time})
         inputs.append({
             'type': "TimeScaleFactor",
             'value': self._time_scale_factor})
@@ -827,7 +821,7 @@ class Spinnaker(object):
 
     def _add_mapping_inputs(
             self, inputs, width, height, scamp_socket_addresses, boot_port_num,
-            this_run_time, provenance_file_path, json_folder, number_of_boards):
+            provenance_file_path, json_folder, number_of_boards):
 
         # basic input stuff
         inputs.append({
@@ -875,9 +869,6 @@ class Spinnaker(object):
         inputs.append({
             'type': "APPID",
             'value': self._app_id})
-        inputs.append({
-            'type': "RunTime",
-            'value': this_run_time})
         inputs.append({
             'type': "TimeScaleFactor",
             'value': self._time_scale_factor})
@@ -958,7 +949,8 @@ class Spinnaker(object):
         return inputs
 
     def _add_standard_basic_inputs(
-            self, inputs, no_machine_time_steps, is_resetting):
+            self, inputs, no_machine_time_steps, is_resetting, max_sdram_size,
+            this_run_time):
 
         # support resetting the machine during start up
         reset_machine_on_startup = \
@@ -967,6 +959,18 @@ class Spinnaker(object):
             (reset_machine_on_startup and not self._has_ran
              and not is_resetting)
 
+        inputs.append({
+            'type': "RunTime",
+            'value': this_run_time})
+        inputs.append({
+            'type': "CurrentRunMS",
+            'value': self._current_run_ms})
+        inputs.append({
+            'type': "UseAutoPauseAndResume",
+            'value': True})
+        inputs.append({
+            'type': "MaxSDRAMSize",
+            'value':max_sdram_size})
         inputs.append({
             'type': "NoSyncChanges",
             'value': self._no_sync_changes})
@@ -991,8 +995,7 @@ class Spinnaker(object):
             'value': self._app_data_runtime_folder})
         return inputs
 
-    def _add_resetted_last_and_no_change_inputs(
-            self, using_auto_pause_and_resume, inputs):
+    def _add_resetted_last_and_no_change_inputs(self, inputs):
         inputs.append(({
             'type': "ProcessorToAppDataBaseAddress",
             "value": self._processor_to_app_data_base_address_mapper}))
@@ -1032,14 +1035,18 @@ class Spinnaker(object):
         extra_inputs.append({
             'type': 'ApplicationDataFolder',
             'value': self._app_data_runtime_folder})
+        extra_inputs.append({
+            'type': "CurrentRunMS",
+            'value': self._current_run_ms})
+        extra_inputs.append({
+            'type': "MachineTimeStep",
+            'value': self._machine_time_step})
 
         # standard inputs
         inputs.append({
-            'type': "UseAutoPauseAndResume",
-            'value': True})
-        inputs.append({
-            'type': "ExtraAlgorthums",
-            'value': ["SpyNNakerRecordingExtractor"]})
+            'type': "ExtraAlgorithms",
+            'value': ["SpyNNakerRecordingExtractor",
+                      "SpyNNakerRuntimeUpdatorAfterRun"]})
         inputs.append({
             'type': "ExtraInputs",
             'value': extra_inputs})
@@ -1103,34 +1110,6 @@ class Spinnaker(object):
                 'value': self._buffer_manager})
 
         return inputs
-
-    def _calculate_number_of_machine_time_steps(self, next_run_time):
-        total_run_time = next_run_time
-        if next_run_time is not None:
-            total_run_time += self._current_run_ms
-            machine_time_steps = (
-                (total_run_time * 1000.0) / self._machine_time_step)
-            if machine_time_steps != int(machine_time_steps):
-                logger.warn(
-                    "The runtime and machine time step combination result in "
-                    "a fractional number of machine time steps")
-            self._no_machine_time_steps = int(math.ceil(machine_time_steps))
-        else:
-            self._no_machine_time_steps = None
-            for vertex in self._partitionable_graph.vertices:
-                if ((isinstance(vertex, AbstractSpikeRecordable) and
-                        vertex.is_recording_spikes()) or
-                        (isinstance(vertex, AbstractVRecordable) and
-                            vertex.is_recording_v()) or
-                        (isinstance(vertex, AbstractGSynRecordable) and
-                            vertex.is_recording_gsyn)):
-                    raise common_exceptions.ConfigurationException(
-                        "recording a population when set to infinite runtime "
-                        "is not currently supported")
-        for vertex in self._partitionable_graph.vertices:
-            if isinstance(vertex, AbstractDataSpecableVertex):
-                vertex.set_no_machine_time_steps(self._no_machine_time_steps)
-        return total_run_time
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
