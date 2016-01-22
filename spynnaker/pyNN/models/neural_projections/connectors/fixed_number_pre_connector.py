@@ -1,91 +1,164 @@
+from pyNN.random import RandomDistribution
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
-from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import generate_parameter_array
 import numpy
-import random
-from spinn_front_end_common.utilities import exceptions
+import logging
+
+logger = logging.getLogger(__file__)
 
 
 class FixedNumberPreConnector(AbstractConnector):
+    """ Connects a fixed number of pre-synaptic neurons selected at random,
+        to all post-synaptic neurons
     """
-    Connects a fixed number of pre-synaptic neurons selected at randoom,
-    to all post-synaptic neurons
+    def __init__(
+            self, n, weights=0.0, delays=1, allow_self_connections=True,
+            space=None, safe=True, verbose=False):
+        """
 
-    :param `int` n:
-        number of random pre-synaptic neurons connected to output
-    :param `bool` allow_self_connections:
-        if the connector is used to connect a
-        Population to itself, this flag determines whether a neuron is
-        allowed to connect to itself, or only to other neurons in the
-        Population.
-    :param weights:
-        may either be a float, a !RandomDistribution object, a list/
-        1D array with at least as many items as connections to be
-        created. Units nA.
-    :param delays:
-        If `None`, all synaptic delays will be set
-        to the global minimum delay.
-    :param `pyNN.Space` space:
-        a Space object, needed if you wish to specify distance-
-        dependent weights or delays - not implemented
-    """
-    def __init__(self, n, weights=0.0, delays=1,
-                 allow_self_connections=True):
+        :param `int` n:
+            number of random pre-synaptic neurons connected to output
+        :param `bool` allow_self_connections:
+            if the connector is used to connect a
+            Population to itself, this flag determines whether a neuron is
+            allowed to connect to itself, or only to other neurons in the
+            Population.
+        :param weights:
+            may either be a float, a !RandomDistribution object, a list/
+            1D array with at least as many items as connections to be
+            created. Units nA.
+        :param delays:
+            If `None`, all synaptic delays will be set
+            to the global minimum delay.
+        :param `pyNN.Space` space:
+            a Space object, needed if you wish to specify distance-
+            dependent weights or delays - not implemented
         """
-        Creates a new FixedNumberPreConnector
-        """
-        self._n_pre = int(n)
-        self._weights = float(weights)
-        self._delays = int(delays)
+        AbstractConnector.__init__(self, safe, space, verbose)
+        self._n_pre = n
+        self._weights = weights
+        self._delays = delays
         self._allow_self_connections = allow_self_connections
+        self._pre_neurons = None
 
-    def generate_synapse_list(
-            self, presynaptic_population, postsynaptic_population, delay_scale,
-            weight_scale, synapse_type):
+        self._check_parameters(weights, delays, allow_lists=False)
+        if isinstance(n, RandomDistribution):
+            raise NotImplementedError(
+                "RandomDistribution is not supported for n in the"
+                " implementation of FixedNumberPreConnector on this platform")
 
-        prevertex = presynaptic_population._get_vertex
-        postvertex = postsynaptic_population._get_vertex
+    def get_delay_maximum(self):
+        return self._get_delay_maximum(
+            self._delays, self._n_pre * self._n_post_neurons)
 
-        id_lists = list()
-        weight_lists = list()
-        delay_lists = list()
-        type_lists = list()
-        for _ in range(0, prevertex.n_atoms):
-            id_lists.append(list())
-            weight_lists.append(list())
-            delay_lists.append(list())
-            type_lists.append(list())
+    def _get_pre_neurons(self):
+        if self._pre_neurons is None:
+            self._pre_neurons = numpy.random.choice(
+                self._n_pre_neurons, self._n_pre, False).sort()
+        return self._pre_neurons
 
-        if not 0 <= self._n_pre <= prevertex.n_atoms:
-            raise exceptions.ConfigurationException(
-                "Sample size has to be a number less than the size of the "
-                "population but greater than zero")
-        pre_synaptic_neurons = random.sample(range(0, prevertex.n_atoms),
-                                             self._n_pre)
+    def _pre_neurons_in_slice(self, pre_vertex_slice):
+        pre_neurons = self._get_pre_neurons()
+        return pre_neurons[
+            pre_neurons >= pre_vertex_slice.lo_atom &
+            pre_neurons <= pre_vertex_slice.hi_atom]
 
-        for pre_atom in pre_synaptic_neurons:
+    def _is_connected(self, pre_vertex_slice):
+        return self._pre_neurons_in_slice(pre_vertex_slice).size > 0
 
-            present = numpy.ones(postvertex.n_atoms, dtype=numpy.uint32)
-            if (not self._allow_self_connections and
-                    presynaptic_population == postsynaptic_population):
-                present[pre_atom] = 0
-                n_present = postvertex.n_atoms - 1
-            else:
-                n_present = postvertex.n_atoms
+    def get_n_connections_from_pre_vertex_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            min_delay=None, max_delay=None):
 
-            id_lists[pre_atom] = numpy.where(present)[0]
-            weight_lists[pre_atom] = (generate_parameter_array(
-                self._weights, n_present, present) * weight_scale)
+        if not self._is_connected(pre_vertex_slice):
+            return 0
 
-            delay_lists[pre_atom] = (generate_parameter_array(
-                self._delays, n_present, present) * delay_scale)
+        if min_delay is None or max_delay is None:
+            return post_vertex_slice.n_atoms
 
-            type_lists[pre_atom] = generate_parameter_array(
-                synapse_type, n_present, present)
+        pre_neurons = self._pre_neurons_in_slice(pre_vertex_slice)
+        return self._get_n_connections_from_pre_vertex_with_delay_maximum(
+            self._delays, self._n_pre * self._n_post_neurons,
+            len(pre_neurons) * post_vertex_slice.n_atoms, None,
+            min_delay, max_delay)
 
-        connection_list = [SynapseRowInfo(id_lists[i], weight_lists[i],
-                                          delay_lists[i], type_lists[i])
-                           for i in range(0, prevertex.n_atoms)]
+    def get_n_connections_to_post_vertex_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        if not self._is_connected(pre_vertex_slice):
+            return 0
+        return self._n_pre
 
-        return SynapticList(connection_list)
+    def get_weight_mean(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        if not self._is_connected(pre_vertex_slice):
+            return 0.0
+        pre_neurons = self._pre_neurons_in_slice(pre_vertex_slice)
+        n_connections = len(pre_neurons) * post_vertex_slice.n_atoms
+        return self._get_weight_mean(
+            self._weights, n_connections, None)
+
+    def get_weight_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        if not self._is_connected(pre_vertex_slice):
+            return 0.0
+        pre_neurons = self._pre_neurons_in_slice(pre_vertex_slice)
+        n_connections = len(pre_neurons) * post_vertex_slice.n_atoms
+        return self._get_weight_maximum(
+            self._weights, n_connections, None)
+
+    def get_weight_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        if not self._is_connected(pre_vertex_slice):
+            return 0.0
+        return self._get_weight_variance(self._weights, None)
+
+    def generate_on_machine(self):
+        return (
+            not self._generate_lists_on_host(self._weights) and
+            not self._generate_lists_on_host(self._delays))
+
+    def create_synaptic_block(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type, connector_index):
+        if not self._is_connected(pre_vertex_slice):
+            return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        pre_neurons_in_slice = self._pre_neurons_in_slice(pre_vertex_slice)
+
+        n_connections = len(pre_neurons_in_slice) * post_vertex_slice.n_atoms
+        if (not self._allow_self_connections and
+                pre_vertex_slice is post_vertex_slice):
+            n_connections -= len(pre_neurons_in_slice)
+        block = numpy.zeros(
+            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+
+        if (not self._allow_self_connections and
+                pre_vertex_slice is post_vertex_slice):
+            block["source"] = [
+                pre_index for pre_index in pre_neurons_in_slice
+                for post_index in range(
+                    post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
+                if pre_index != post_index]
+            block["target"] = [
+                post_index for pre_index in pre_neurons_in_slice
+                for post_index in range(
+                    post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
+                if pre_index != post_index]
+        else:
+            block["source"] = numpy.repeat(
+                pre_neurons_in_slice, post_vertex_slice.n_atoms)
+            block["target"] = numpy.tile(numpy.arange(
+                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
+                len(pre_neurons_in_slice))
+        block["weight"] = self._generate_weights(
+            self._weights, n_connections, None)
+        block["delay"] = self._generate_delays(
+            self._delays, n_connections, None)
+        block["synapse_type"] = synapse_type
+        block["connector_index"] = connector_index
+        return block

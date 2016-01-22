@@ -8,7 +8,6 @@ class SynapseInformation(object):
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
         self._synapse_type = synapse_type
-        self._synapse_io_data = None
 
     @property
     def connector(self):

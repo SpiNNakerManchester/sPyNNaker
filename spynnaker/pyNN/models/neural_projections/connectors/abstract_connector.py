@@ -2,9 +2,11 @@ from abc import ABCMeta
 from six import add_metaclass
 from abc import abstractmethod
 from pyNN.random import RandomDistribution
+from pyNN.random import NumpyRNG
 from spynnaker.pyNN.utilities import utility_calls
 import numpy
 import math
+import re
 
 
 @add_metaclass(ABCMeta)
@@ -17,14 +19,45 @@ class AbstractConnector(object):
                             ("synapse_type", "uint8"),
                             ("connector_index", "uint16")]
 
-    def __init__(self):
+    def __init__(self, safe=True, space=None, verbose=False):
+        self._safe = safe
+        self._space = space
+        self._verbose = verbose
+
+        self._pre_population = None
+        self._post_population = None
         self._n_pre_neurons = None
         self._n_post_neurons = None
+        self._rng = None
 
-    def set_population_information(
-            self, n_pre_neurons, n_post_neurons):
-        self._n_pre_neurons = n_pre_neurons
-        self._n_post_neurons = n_post_neurons
+    def set_projection_information(
+            self, pre_population, post_population, rng):
+        self._pre_population = pre_population
+        self._post_population = post_population
+        self._n_pre_neurons = pre_population.size
+        self._n_post_neurons = post_population.size
+        self._rng = rng
+        if self._rng is None:
+            self._rng = NumpyRNG()
+
+    def _check_parameter(self, values, name, allow_lists=True):
+        """ Check that the types of the values is supported
+        """
+        if (not numpy.isscalar(values) and
+                not isinstance(values, RandomDistribution) and
+                not hasattr(values, "__getitem__")):
+            raise Exception("Parameter {} format unsupported".format(name))
+        if not allow_lists and hasattr(values, "__getitem__"):
+            raise NotImplementedError(
+                "Lists of {} are not supported the implementation of"
+                " {} on this platform".format(self.__class__))
+
+    def _check_parameters(self, weights, delays, allow_lists=True):
+        """ Check the types of the weights and delays are supported; lists can\
+            be disallowed if desired
+        """
+        self._check_parameter(weights, "weights")
+        self._check_parameter(delays, "delays")
 
     @staticmethod
     def _get_delay_maximum(delays, n_connections):
@@ -37,11 +70,11 @@ class AbstractConnector(object):
             if delays.boundaries is not None:
                 return min(max(delays.boundaries), max_estimated_delay)
             return max_estimated_delay
-
-        elif not hasattr(delays, '__iter__'):
+        elif numpy.isscalar(delays):
             return delays
-        else:
+        elif hasattr(delays, "__getitem__"):
             return max(delays)
+        raise Exception("Unrecognised delay format")
 
     @abstractmethod
     def get_delay_maximum(self):
@@ -62,11 +95,11 @@ class AbstractConnector(object):
                 delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_in_range)))
-        elif not hasattr(delays, '__iter__'):
+        elif numpy.isscalar(delays):
             if delays >= min_delay and delays <= max_delay:
                 return int(math.ceil(n_connections))
             return 0
-        else:
+        elif hasattr(delays, "__getitem__"):
             n_delayed = sum([len([
                 delay for delay in delays[connection_slice]
                 if delay >= min_delay and delay <= max_delay])
@@ -77,6 +110,7 @@ class AbstractConnector(object):
             prob_delayed = float(n_delayed) / float(n_total)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_delayed, prob_delayed)))
+        raise Exception("Unrecognised delay format")
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
@@ -105,12 +139,13 @@ class AbstractConnector(object):
         """
         if isinstance(weights, RandomDistribution):
             return utility_calls.get_mean(weights)
-        elif not hasattr(weights, '__iter__'):
+        elif numpy.isscalar(weights):
             return weights
-        else:
+        elif hasattr(weights, "__getitem__"):
             return numpy.mean([
                 weights[connection_slice]
                 for connection_slice in connection_slices])
+        raise Exception("Unrecognised weight format")
 
     @abstractmethod
     def get_weight_mean(
@@ -138,12 +173,13 @@ class AbstractConnector(object):
                     return abs(min(max_weight, max(weights.boundaries)))
                 return abs(max_weight)
 
-        elif not hasattr(weights, '__iter__'):
+        elif numpy.isscalar(weights):
             return weights
-        else:
+        elif hasattr(weights, "__getitem__"):
             return max([
                 weights[connection_slice]
                 for connection_slice in connection_slices])
+        raise Exception("Unrecognised weight format")
 
     @abstractmethod
     def get_weight_maximum(
@@ -158,12 +194,13 @@ class AbstractConnector(object):
         """
         if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)
-        elif not hasattr(weights, '__iter__'):
+        elif numpy.isscalar(weights):
             return 0.0
-        else:
+        elif hasattr(weights, "__getitem__"):
             return numpy.var([
                 weights[connection_slice]
                 for connection_slice in connection_slices])
+        raise Exception("Unrecognised weight format")
 
     @abstractmethod
     def get_weight_variance(
@@ -172,15 +209,89 @@ class AbstractConnector(object):
         """ Get the variance of the weights for this connection
         """
 
+    def _expand_distances(self, d_expression):
+        """ Check if a distance expression contains at least one term d[x]. \
+            If yes, then the distances are expanded to distances in the\
+            separate coordinates rather than the overall distance over all\
+            coordinates, and we assume the user has specified an expression\
+            such as d[0] + d[2].
+        """
+        regexpr = re.compile(r'.*d\[\d*\].*')
+        if regexpr.match(d_expression):
+            return True
+        return False
+
     def _generate_values(self, values, n_connections, connection_slices):
         if isinstance(values, RandomDistribution):
             return values.next(n_connections)
-        elif not hasattr(values, '__iter__'):
+        elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections)
-        else:
+        elif hasattr(values, "__getitem__"):
             return numpy.concatenate([
                 values[connection_slice]
                 for connection_slice in connection_slices])
+        elif isinstance(values, basestring) or callable(values):
+            if self._space is None:
+                raise Exception(
+                    "No space object specified in projection {}-{}".format(
+                        self._pre_population, self._post_population))
+
+            expand_distances = True
+            if isinstance(values, basestring):
+                expand_distances = self._expand_distances(values)
+
+            d = self._space.distances(
+                self._pre_population.positions,
+                self._post_population.positions,
+                expand_distances)
+
+            if isinstance(values, basestring):
+                return eval(values)
+            return values(d)
+
+    def _generate_weights(self, values, n_connections, connection_slices):
+        """ Generate weight values
+        """
+        weights = self._generate_values(
+            values, n_connections, connection_slices)
+        if self._safe:
+            if numpy.amin(weights) < 0 and numpy.amax(weights) > 0:
+                raise Exception(
+                    "Weights must be either all positive or all negative"
+                    " in projection {}->{}".format(
+                        self._pre_population.label,
+                        self._post_population.label))
+        return weights
+
+    def _generate_delays(self, values, n_connections, connection_slices):
+        """ Generate delay values
+        """
+        return self._generate_values(
+            values, n_connections, connection_slices)
+
+    def _generate_lists_on_host(self, values):
+        """ Checks if the connector should generate lists on host rather than\
+            trying to generate the connectivity data on the machine, based on\
+            the types of the weights and/or delays
+        """
+
+        # Scalars are fine on the machine
+        if numpy.isscalar(values):
+            return True
+
+        # Only certain types of random distributions are supported for\
+        # generation on the machine
+        if isinstance(values, RandomDistribution):
+            return values.name in (
+                "uniform", "uniform_int", "poisson", "normal", "exponential")
+
+        return False
+
+    @abstractmethod
+    def generate_on_machine(self):
+        """ Determines if the connector generation is supported on the machine\
+            or if the connector must be generated on the host
+        """
 
     @abstractmethod
     def create_synaptic_block(

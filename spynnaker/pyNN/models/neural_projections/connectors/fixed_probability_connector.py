@@ -27,28 +27,19 @@ class FixedProbabilityConnector(AbstractConnector):
         a Space object, needed if you wish to specify distance-
         dependent weights or delays - not implemented
     """
-    def __init__(self, p_connect, weights=0.0, delays=1,
-                 allow_self_connections=True):
-        """
-        Creates a new FixedProbabilityConnector.
-        """
+    def __init__(
+            self, p_connect, weights=0.0, delays=1,
+            allow_self_connections=True, safe=True, space=None, verbose=False):
+        AbstractConnector.__init__(self, safe, space, verbose)
         self._p_connect = p_connect
         self._weights = weights
         self._delays = delays
         self._allow_self_connections = allow_self_connections
 
-        if hasattr(self._weights, "__iter__"):
-            raise NotImplementedError(
-                "Lists of weights are not supported for the"
-                " FixedProbabilityConnector")
-        if hasattr(self._delays, "__iter__"):
-            raise NotImplementedError(
-                "Lists of delays are not supported for the"
-                " FixedProbabilityConnector")
-
+        self._check_parameters(weights, delays, allow_lists=False)
         if not 0 <= self._p_connect <= 1:
             raise exceptions.ConfigurationException(
-                "The probability should be between 0 and 1 (inclusive)")
+                "The probability must be between 0 and 1 (inclusive)")
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -104,9 +95,15 @@ class FixedProbabilityConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, connector_index):
 
-        present = (numpy.random.rand(
-            post_vertex_slice.n_atoms * pre_vertex_slice.n_atoms) <=
-            self._p_connect)
+        n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
+        items = numpy.random.rand(n_items)
+
+        # If self connections are not allowed, remove possibility the self
+        # connections by setting them to a value of infinity
+        if not self._allow_self_connections:
+            items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
+
+        present = items < self._p_connect
         ids = numpy.where(present)[0]
         n_connections = numpy.sum(present)
 

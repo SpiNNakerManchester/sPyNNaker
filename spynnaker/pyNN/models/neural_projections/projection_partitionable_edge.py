@@ -4,10 +4,11 @@ from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.timer import Timer
 
 from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
+    import ProjectionPartitionedEdge
 
 import logging
 import copy
-from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import ProjectionPartitionedEdge
 logger = logging.getLogger(__name__)
 
 

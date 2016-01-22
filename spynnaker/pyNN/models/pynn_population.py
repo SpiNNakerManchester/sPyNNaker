@@ -22,8 +22,6 @@ from spynnaker.pyNN.models.common.abstract_v_recordable \
 
 from spinn_front_end_common.utilities import exceptions
 
-from pyNN.space import Space
-
 import numpy
 import logging
 import copy
@@ -161,23 +159,6 @@ class Population(object):
             return self._vertex.get_value(parameter_name)
         raise KeyError("Population does not have a property {}".format(
             parameter_name))
-
-    def _get_cell_position(self, cell_id):
-        """ Get the position of a cell.
-        """
-        # TODO: This isn't part of the API - is it ever used?
-        if self._structure is None:
-            raise ValueError("Attempted to get the position of a cell "
-                             "in an unstructured population")
-        elif self._positions is None:
-            self._structure.generate_positions(self._vertex.n_atoms)
-        return self._positions[cell_id]
-
-    def _get_cell_initial_value(self, cell_id, variable):
-        """ Get a given cells initial value
-        """
-        # TODO: Remove?  This isn't in the API...
-        raise NotImplementedError
 
     # noinspection PyPep8Naming
     def getSpikes(self, compatible_output=False, gather=True):
@@ -377,27 +358,20 @@ class Population(object):
         return total_spikes / self._size
 
     def nearest(self, position):
-        """ Return the neuron closest to the specified position.
+        """ Return the neuron closest to the specified position
         """
-        if self._structure is None:
-            raise ValueError("attempted to retrieve positions "
-                             "for an unstructured population")
-        elif self._positions is None:
-            self._structure.generate_positions(self._vertex.n_atoms)
-        position_diff = numpy.empty(self._positions.shape)
-        position_diff.fill(position)
-        distances = Space.distances(self._positions, position_diff)
-        return distances.argmin()
+        # doesn't always work correctly if a position is equidistant between
+        # two neurons, i.e. 0.5 should be rounded up, but it isn't always.
+        # also doesn't take account of periodic boundary conditions
 
-    @property
-    def position_generator(self):
-        """ Return a position generator
-        """
-        if self._structure is None:
-            raise ValueError("attempted to retrieve positions "
-                             "for an unstructured population")
-        else:
-            return self._structure.generate_positions
+        # TODO: Enable when __getitem__ is enabled
+        # pos = numpy.array([position] * self.positions.shape[1]).transpose()
+        # dist_arr = (self.positions - pos) ** 2
+        # distances = dist_arr.sum(axis=0)
+        # nearest = distances.argmin()
+        # return self[nearest]
+
+        raise NotImplementedError
 
     # noinspection PyPep8Naming
     def randomInit(self, distribution):
@@ -468,13 +442,22 @@ class Population(object):
     def positions(self):
         """ Return the position array for structured populations.
         """
-        if self._structure is None:
-            raise ValueError("attempted to retrieve positions "
-                             "for an unstructured population")
-        elif self._positions is None:
+        if self._positions is None:
+            if self._structure is None:
+                raise ValueError("attempted to retrieve positions "
+                                 "for an unstructured population")
             self._positions = self._structure.generate_positions(
                 self._vertex.n_atoms)
         return self._positions
+
+    @positions.setter
+    def positions(self, positions):
+        """ Sets all the positions in the population.
+        """
+        self._positions = positions
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     # noinspection PyPep8Naming
     def printSpikes(self, filename, gather=True):
@@ -574,49 +557,11 @@ class Population(object):
 
     def save_positions(self, file):  # @ReservedAssignment
         """ Save positions to file.
-        :param file: the file to write the positions to.
+            :param file: the file to write the positions to.
         """
-        if self._structure is None:
-            raise ValueError("attempted to retrieve positions "
-                             "for an unstructured population")
-        elif self._positions is None:
-            self._structure.generate_positions(self._vertex.n_atoms)
         file_handle = open(file, "w")
-        file_handle.write(self._positions)
+        file_handle.write(self.positions)
         file_handle.close()
-
-    def _set_cell_initial_value(self, cell_id, variable, value):
-        """ Set a given cells initial value
-        """
-        # TODO: Remove? Not part of API...
-        raise NotImplementedError
-
-    def _set_cell_position(self, cell_id, pos):
-        """ Sets a cell to a given position
-        """
-        # TODO: Remove?  This is never called
-        if self._structure is None:
-            raise ValueError("attempted to set a position for a cell "
-                             "in an unstructured population")
-        elif self._positions is None:
-            self._structure.generate_positions(self._vertex.n_atoms)
-        self._positions[cell_id] = pos
-
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
-
-    def _set_positions(self, positions):
-        """ Sets all the positions in the population.
-        """
-        # TODO: Remove?  This is never used
-        if self._structure is None:
-            raise ValueError("attempted to set positions "
-                             "in an unstructured population")
-        else:
-            self._positions = positions
-
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
 
     def set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.

@@ -77,8 +77,6 @@ from spynnaker.pyNN.models.neural_projections.connectors.\
     DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
-from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector\
-    import SmallWorldConnector
 
 # Mechanisms for synapse dynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.pynn_synapse_dynamics\
