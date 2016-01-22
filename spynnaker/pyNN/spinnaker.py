@@ -300,7 +300,7 @@ class Spinnaker(object):
             xml_paths, config.getboolean("Reports", "outputTimesForSections"))
 
         # gather provenance data from the executor itself if needed
-        if (config.get("Reports", "writeProvanceData") and
+        if (config.getboolean("Reports", "writeProvanceData") and
                 not config.getboolean("Machine", "virtual_board")):
             pacman_executor_file_path = os.path.join(
                 pacman_exeuctor.get_item("ProvenanceFilePath"),
@@ -568,7 +568,7 @@ class Spinnaker(object):
 
             # if going to write provenance data after the run add the two
             # provenance gatherers
-            if (config.get("Reports", "writeProvanceData")
+            if (config.getboolean("Reports", "writeProvanceData")
                     and not using_virtual_board):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
 
@@ -599,8 +599,9 @@ class Spinnaker(object):
             # recorded populations
             if self._has_ran:
                 algorithms.append("SpyNNakerRecordingExtractor")
-                # add functions for updating the models
-                algorithms.append("FrontEndCommonRuntimeUpdater")
+                if not using_auto_pause_and_resume:
+                    # add functions for updating the models
+                    algorithms.append("FrontEndCommonRuntimeUpdater")
             if not self._has_ran:
                 optional_algorithms.append(
                     "FrontEndCommonApplicationDataLoader")
@@ -617,7 +618,7 @@ class Spinnaker(object):
 
             # if going to write provanence data after the run add the two
             # provenance gatherers
-            if config.get("Reports", "writeProvanceData"):
+            if config.getboolean("Reports", "writeProvanceData"):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
 
         return algorithms, optional_algorithms
