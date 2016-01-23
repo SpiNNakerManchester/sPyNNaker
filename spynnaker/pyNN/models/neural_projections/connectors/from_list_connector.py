@@ -24,16 +24,11 @@ class FromListConnector(AbstractConnector):
         ("source", "uint32"), ("target", "uint32"),
         ("weight", "float64"), ("delay", "float64")]
 
-    def __init__(self, conn_list=None, safe=True, verbose=False):
+    def __init__(self, conn_list, safe=True, verbose=False):
         """
         Creates a new FromListConnector.
         """
-        if not safe:
-            logger.warn("the modification of the safe parameter will be "
-                        "ignored")
-        if verbose:
-            logger.warn("the modification of the verbose parameter will be "
-                        "ignored")
+        AbstractConnector.__init__(self, safe, None, verbose)
         if conn_list is None or len(conn_list) == 0:
             self._conn_list = numpy.zeros(0, dtype=self.CONN_LIST_DTYPE)
         else:
@@ -116,6 +111,9 @@ class FromListConnector(AbstractConnector):
         if weights.size == 0:
             return 0
         return numpy.var(weights)
+
+    def generate_on_machine(self):
+        return False
 
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,

@@ -148,7 +148,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         probs = self._probs[
             pre_slice_index.to_slice, post_slice_index.to_slice]
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
-        items = numpy.random.rand(n_items)
+        items = self._rng.next(n_items)
 
         # If self connections are not allowed, remove possibility the self
         # connections by setting them to a value of infinity

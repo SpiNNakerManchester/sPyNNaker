@@ -11,7 +11,8 @@ class OneToOneConnector(AbstractConnector):
     pynn_population.py for all i.
     """
 
-    def __init__(self, weights=0.0, delays=1):
+    def __init__(
+            self, weights=0.0, delays=1, space=None, safe=True, verbose=False):
         """
         :param weights:
             may either be a float, a !RandomDistribution object, a list/
@@ -22,8 +23,11 @@ class OneToOneConnector(AbstractConnector):
             to the global minimum delay.
 
         """
+        AbstractConnector.__init__(self, safe, space, verbose)
         self._weights = weights
         self._delays = delays
+
+        self._check_parameters(weights, delays)
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -105,6 +109,11 @@ class OneToOneConnector(AbstractConnector):
             return 0
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_variance(self._weights, [connection_slice])
+
+    def generate_on_machine(self):
+        return (
+            not self._generate_lists_on_host(self._weights) and
+            not self._generate_lists_on_host(self._delays))
 
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,

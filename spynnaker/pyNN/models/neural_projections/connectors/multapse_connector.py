@@ -24,16 +24,21 @@ class MultapseConnector(AbstractConnector):
         to the global minimum delay.
 
     """
-    def __init__(self, num_synapses=0, weights=0.0, delays=1):
+    def __init__(
+            self, num_synapses, weights=0.0, delays=1,
+            safe=True, verbose=False):
         """
         Creates a new connector.
         """
+        AbstractConnector.__init__(self, safe, None, verbose)
         self._num_synapses = num_synapses
         self._weights = weights
         self._delays = delays
         self._pre_slices = None
         self._post_slices = None
         self._synapses_per_subedge = None
+
+        self._check_parameters(weights, delays)
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(self._delays, self._num_synapses)
@@ -48,8 +53,9 @@ class MultapseConnector(AbstractConnector):
             prob_connect = [
                 float(pre.n_atoms * post.n_atoms) / float(n_connections)
                 for pre in pre_slices for post in post_slices]
-            self._synapses_per_subedge = numpy.random.multinomial(
-                self._num_synapses, prob_connect)
+            self._synapses_per_subedge = self._rng.next(
+                1, distribution="multinomial", parameters=[
+                    self._num_synapses, prob_connect])
             self._pre_slices = pre_slices
             self._post_slices = post_slices
 
@@ -152,6 +158,11 @@ class MultapseConnector(AbstractConnector):
         connection_slice = self._get_connection_slice(
             pre_slice_index, post_slice_index)
         return self._get_weight_variance(self._weights, [connection_slice])
+
+    def generate_on_machine(self):
+        return (
+            not self._generate_lists_on_host(self._weights) and
+            not self._generate_lists_on_host(self._delays))
 
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
