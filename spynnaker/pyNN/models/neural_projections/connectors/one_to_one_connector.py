@@ -131,9 +131,9 @@ class OneToOneConnector(AbstractConnector):
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         block["source"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["target"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
-        block["weight"] = self._generate_values(
+        block["weight"] = self._generate_weights(
             self._weights, n_connections, [connection_slice])
-        block["delay"] = self._generate_values(
+        block["delay"] = self._generate_delays(
             self._delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         block["connector_index"] = connector_index

@@ -187,9 +187,9 @@ class MultapseConnector(AbstractConnector):
             numpy.arange(
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
             size=n_connections, replace=True)
-        block["weight"] = self._generate_values(
+        block["weight"] = self._generate_weights(
             self._weights, n_connections, [connection_slice])
-        block["delay"] = self._generate_values(
+        block["delay"] = self._generate_delays(
             self._delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         block["connector_index"] = connector_index

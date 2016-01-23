@@ -165,9 +165,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
-        block["weight"] = self._generate_values(
+        block["weight"] = self._generate_weights(
             self._weights, n_connections, None)
-        block["delay"] = self._generate_values(
+        block["delay"] = self._generate_delays(
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         block["connector_index"] = connector_index
