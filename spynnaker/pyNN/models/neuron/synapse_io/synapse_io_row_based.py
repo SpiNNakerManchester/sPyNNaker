@@ -158,8 +158,9 @@ class SynapseIORowBased(AbstractSynapseIO):
                 pre_vertex_slice.n_atoms * n_delay_stages)
         return (n_bytes_undelayed, n_bytes_delayed)
 
+    @staticmethod
     def _get_max_row_length_and_row_data(
-            self, static_connections, plastic_connections, static_row_indices,
+            static_connections, plastic_connections, static_row_indices,
             plastic_row_indices, n_rows, post_vertex_slice, n_synapse_types,
             population_table, static_synapse_dynamics,
             plastic_synapse_dynamics):

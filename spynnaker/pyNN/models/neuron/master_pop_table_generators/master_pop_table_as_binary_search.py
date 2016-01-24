@@ -226,6 +226,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             spec.write_value(pop_entry.mask)
             spec.write_value((pop_entry.address << 8) | pop_entry.row_length)
 
+        del self._entries
+        self._entries = None
+
     def get_edge_constraints(self):
         """ Returns any constraints placed on the edges because of having this\
             master pop table implemented in the cores.
