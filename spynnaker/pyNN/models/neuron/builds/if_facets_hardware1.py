@@ -14,7 +14,7 @@ class IFFacetsConductancePopulation(AbstractPopulationVertex):
             spikes_per_second=None, ring_buffer_sigma=None, constraints=None,
             label=None, g_leak=40.0, tau_syn_E=30.0, tau_syn_I=30.0,
             v_thresh=-55.0, v_rest=-65.0, e_rev_I=-80, v_reset=-80.0,
-            v_init=None):
+            v_init=None, using_auto_pause_and_resume=False):
         raise exceptions.SpynnakerException(
             "This neuron model is currently not supported by the tool chain")
 

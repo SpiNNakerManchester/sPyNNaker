@@ -3,6 +3,13 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
+from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.resources.sdram_resource import SDRAMResource
+from spinn_front_end_common.interface.abstract_recordable_interface import \
+    AbstractRecordableInterface
 
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_properties.randomDistributions\
@@ -67,7 +74,8 @@ class SpikeSourcePoisson(
     def __init__(
             self, n_neurons, machine_time_step, timescale_factor,
             constraints=None, label="SpikeSourcePoisson", rate=1.0, start=0.0,
-            duration=None, seed=None):
+            duration=None, seed=None,
+            using_auto_pause_and_resume=False):
         AbstractPartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=self._model_based_max_atoms_per_core)
@@ -97,9 +105,8 @@ class SpikeSourcePoisson(
             "Buffers", "time_between_requests")
         self._enable_buffered_recording = \
             config.getboolean("Buffers", "enable_buffered_recording")
-        uses_auto_pause_and_resume = config.getboolean(
-            "Mode", "use_auto_pause_and_resume")
-        if uses_auto_pause_and_resume:
+        self._uses_auto_pause_and_resume = using_auto_pause_and_resume
+        if self._uses_auto_pause_and_resume:
             self._enable_buffered_recording = False
 
     @property
@@ -352,6 +359,39 @@ class SpikeSourcePoisson(
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, no_machine_time_steps),
             self._spike_buffer_max_size))
+
+    # @implements AbstractPartitionableVertex.get_resources_used_by_atoms
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
+        """ Get the separate resource requirements for a range of atoms
+
+        :param vertex_slice: the low value of atoms to calculate resources from
+        :param graph: A reference to the graph containing this vertex.
+        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
+        :return: a Resource container that contains a \
+                    CPUCyclesPerTickResource, DTCMResource and SDRAMResource
+        :rtype: ResourceContainer
+        :raise None: this method does not raise any known exception
+        """
+        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
+        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
+        static_sdram_requirement = \
+            self.get_static_sdram_usage_for_atoms(vertex_slice, graph)
+
+        # set all to just static sdram for the time being
+        all_sdram_usage = static_sdram_requirement
+
+        # check runtime sdram usage if required
+        if (not self._using_auto_pause_and_resume and
+                isinstance(self, AbstractRecordableInterface)):
+            runtime_sdram_usage = self.get_runtime_sdram_usage_for_atoms(
+                vertex_slice, graph, self._no_machine_time_steps)
+            all_sdram_usage += runtime_sdram_usage
+
+        # noinspection PyTypeChecker
+        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
+                                      dtcm=DTCMResource(dtcm_requirement),
+                                      sdram=SDRAMResource(all_sdram_usage))
+        return resources
 
     def _get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
         standard_mallocs = self._DEFAULT_MALLOCS_USED

@@ -153,6 +153,11 @@ class Spinnaker(object):
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
                                        host_name)
 
+        # if your using the auto pause and resume, then add the inputs needed
+        # for this functionality.
+        self._using_auto_pause_and_resume = \
+            config.getboolean("Mode", "use_auto_pause_and_resume")
+
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
 
@@ -300,7 +305,7 @@ class Spinnaker(object):
             xml_paths, config.getboolean("Reports", "outputTimesForSections"))
 
         # gather provenance data from the executor itself if needed
-        if (config.get("Reports", "writeProvanceData") and
+        if (config.get("Reports", "writeProvenanceData") and
                 not config.getboolean("Machine", "virtual_board")):
             pacman_executor_file_path = os.path.join(
                 pacman_exeuctor.get_item("ProvenanceFilePath"),
@@ -568,7 +573,7 @@ class Spinnaker(object):
 
             # if going to write provenance data after the run add the two
             # provenance gatherers
-            if (config.getboolean("Reports", "writeProvanceData")
+            if (config.getboolean("Reports", "writeProvenanceData")
                     and not using_virtual_board):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
 
@@ -617,7 +622,7 @@ class Spinnaker(object):
 
             # if going to write provanence data after the run add the two
             # provenance gatherers
-            if config.getboolean("Reports", "writeProvanceData"):
+            if config.getboolean("Reports", "writeProvenanceData"):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
 
         return algorithms, optional_algorithms
@@ -1158,6 +1163,14 @@ class Spinnaker(object):
         :return:
         """
         return self._app_id
+
+    @property
+    def using_auto_pause_and_resume(self):
+        """
+
+        :return:
+        """
+        return self._using_auto_pause_and_resume
 
     @property
     def has_ran(self):

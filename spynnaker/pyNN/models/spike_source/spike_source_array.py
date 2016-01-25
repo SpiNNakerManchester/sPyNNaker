@@ -1,4 +1,11 @@
 # spynnaker imports
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
+from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.resources.sdram_resource import SDRAMResource
+from spinn_front_end_common.interface.abstract_recordable_interface import \
+    AbstractRecordableInterface
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_mappable \
     import AbstractMappable
@@ -54,13 +61,16 @@ class SpikeSourceArray(
             spike_recorder_buffer_size=(
                 constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
             buffer_size_before_receive=(
-                constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)):
+                constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE),
+            using_auto_pause_and_resume=False):
         self._ip_address = ip_address
         if ip_address is None:
             self._ip_address = config.get("Buffers", "receive_buffer_host")
         self._port = port
         if port is None:
             self._port = config.getint("Buffers", "receive_buffer_port")
+
+        self._using_auto_pause_and_resume = using_auto_pause_and_resume
 
         ReverseIpTagMultiCastSource.__init__(
             self, n_keys=n_neurons, machine_time_step=machine_time_step,
@@ -188,6 +198,39 @@ class SpikeSourceArray(
              _REGIONS.RECORDING_BUFFER_STATE.value),
             placements, graph_mapper, self,
             lambda subvertex: subvertex.virtual_key)
+
+    # @implements AbstractPartitionableVertex.get_resources_used_by_atoms
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
+        """ Get the separate resource requirements for a range of atoms
+
+        :param vertex_slice: the low value of atoms to calculate resources from
+        :param graph: A reference to the graph containing this vertex.
+        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
+        :return: a Resource container that contains a \
+                    CPUCyclesPerTickResource, DTCMResource and SDRAMResource
+        :rtype: ResourceContainer
+        :raise None: this method does not raise any known exception
+        """
+        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
+        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
+        static_sdram_requirement = \
+            self.get_static_sdram_usage_for_atoms(vertex_slice, graph)
+
+        # set all to just static sdram for the time being
+        all_sdram_usage = static_sdram_requirement
+
+        # check runtime sdram usage if required
+        if (not self._using_auto_pause_and_resume and
+                isinstance(self, AbstractRecordableInterface)):
+            runtime_sdram_usage = self.get_runtime_sdram_usage_for_atoms(
+                vertex_slice, graph, self._no_machine_time_steps)
+            all_sdram_usage += runtime_sdram_usage
+
+        # noinspection PyTypeChecker
+        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
+                                      dtcm=DTCMResource(dtcm_requirement),
+                                      sdram=SDRAMResource(all_sdram_usage))
+        return resources
 
     @property
     def model_name(self):

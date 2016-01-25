@@ -24,7 +24,7 @@ class IzkCurrExp(AbstractPopulationVertex):
     def __init__(
             self, n_neurons, machine_time_step, timescale_factor,
             spikes_per_second=None, ring_buffer_sigma=None, constraints=None,
-            label=None,
+            label=None, using_auto_pause_and_resume=False,
             a=default_parameters['a'], b=default_parameters['b'],
             c=default_parameters['c'], d=default_parameters['d'],
             i_offset=default_parameters['i_offset'],
@@ -49,7 +49,8 @@ class IzkCurrExp(AbstractPopulationVertex):
             ring_buffer_sigma=ring_buffer_sigma,
             model_name="IZK_curr_exp", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
-            threshold_type=threshold_type, constraints=constraints)
+            threshold_type=threshold_type, constraints=constraints,
+            using_auto_pause_and_resume=using_auto_pause_and_resume)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
