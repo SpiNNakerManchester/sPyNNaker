@@ -37,6 +37,7 @@ class SpyNNakerRuntimeUpdator(object):
 
         progress_bar = ProgressBar(len(partitionable_graph.vertices),
                                    "Updating python vertices runtime")
+
         # calculate number of machine time steps
         total_run_time = self._calculate_number_of_machine_time_steps(
             run_time, current_run_ms, machine_time_step, partitionable_graph)
@@ -50,8 +51,6 @@ class SpyNNakerRuntimeUpdator(object):
                 vertex.set_first_machine_time_step(first_machine_time_step)
             progress_bar.update()
         progress_bar.end()
-
-        return {'total_run_time': total_run_time}
 
     @staticmethod
     def _calculate_number_of_machine_time_steps(

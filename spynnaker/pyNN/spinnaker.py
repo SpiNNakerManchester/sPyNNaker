@@ -568,7 +568,7 @@ class Spinnaker(object):
 
             # if going to write provenance data after the run add the two
             # provenance gatherers
-            if (config.get("Reports", "writeProvanceData")
+            if (config.getboolean("Reports", "writeProvanceData")
                     and not using_virtual_board):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
 
@@ -599,8 +599,9 @@ class Spinnaker(object):
             # recorded populations
             if self._has_ran:
                 algorithms.append("SpyNNakerRecordingExtractor")
-                # add functions for updating the models
-                algorithms.append("FrontEndCommonRuntimeUpdater")
+                if not using_auto_pause_and_resume:
+                    # add functions for updating the models
+                    algorithms.append("FrontEndCommonRuntimeUpdater")
             if not self._has_ran:
                 optional_algorithms.append(
                     "FrontEndCommonApplicationDataLoader")
@@ -617,7 +618,7 @@ class Spinnaker(object):
 
             # if going to write provanence data after the run add the two
             # provenance gatherers
-            if config.get("Reports", "writeProvanceData"):
+            if config.getboolean("Reports", "writeProvanceData"):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
 
         return algorithms, optional_algorithms
@@ -977,14 +978,14 @@ class Spinnaker(object):
             'type': "RunTime",
             'value': this_run_time})
         inputs.append({
-            'type': "CurrentRunMS",
+            'type': "TotalCommunitiveRunTime",
             'value': self._current_run_ms})
         inputs.append({
             'type': "UseAutoPauseAndResume",
             'value': True})
         inputs.append({
             'type': "MaxSDRAMSize",
-            'value':max_sdram_size})
+            'value': max_sdram_size})
         inputs.append({
             'type': "NoSyncChanges",
             'value': self._no_sync_changes})
@@ -1051,14 +1052,11 @@ class Spinnaker(object):
             'type': 'ApplicationDataFolder',
             'value': self._app_data_runtime_folder})
         extra_inputs.append({
-            'type': "CurrentRunMS",
+            'type': "TotalCommunitiveRunTime",
             'value': self._current_run_ms})
         extra_inputs.append({
             'type': "MachineTimeStep",
             'value': self._machine_time_step})
-        extra_inputs.append({
-            'type': "TotalCommunitiveRunTime",
-            'value': self._current_run_ms})
 
         # standard inputs
         inputs.append({
@@ -1125,6 +1123,9 @@ class Spinnaker(object):
         if not application_graph_changed and self._has_ran:
             extra_inputs.append({
                 'type': "LoadBinariesToken",
+                'value': True})
+            extra_inputs.append({
+                'type': "RanToken",
                 'value': True})
         if self._buffer_manager is not None:
             extra_inputs.append({
