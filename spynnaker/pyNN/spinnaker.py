@@ -599,9 +599,8 @@ class Spinnaker(object):
             # recorded populations
             if self._has_ran:
                 algorithms.append("SpyNNakerRecordingExtractor")
-                if not using_auto_pause_and_resume:
-                    # add functions for updating the models
-                    algorithms.append("FrontEndCommonRuntimeUpdater")
+                # add functions for updating the models
+                algorithms.append("FrontEndCommonRuntimeUpdater")
             if not self._has_ran:
                 optional_algorithms.append(
                     "FrontEndCommonApplicationDataLoader")
