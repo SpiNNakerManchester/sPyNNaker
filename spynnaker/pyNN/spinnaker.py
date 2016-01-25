@@ -305,7 +305,7 @@ class Spinnaker(object):
             xml_paths, config.getboolean("Reports", "outputTimesForSections"))
 
         # gather provenance data from the executor itself if needed
-        if (config.get("Reports", "writeProvenanceData") and
+        if (config.getboolean("Reports", "writeProvenanceData") and
                 not config.getboolean("Machine", "virtual_board")):
             pacman_executor_file_path = os.path.join(
                 pacman_exeuctor.get_item("ProvenanceFilePath"),
