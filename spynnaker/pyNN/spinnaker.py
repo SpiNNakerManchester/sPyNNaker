@@ -429,8 +429,11 @@ class Spinnaker(object):
         # update stuff that alkways needed updating
         self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
         self._has_ran = pacman_exeuctor.get_item("RanToken")
-        self._current_run_ms = \
-            pacman_exeuctor.get_item("TotalCommunitiveRunTime")
+        if uses_auto_pause_and_resume:
+            self._current_run_ms = \
+                pacman_exeuctor.get_item("TotalCommunitiveRunTime")
+        else:
+            self._current_run_ms += pacman_exeuctor.get_item("RunTime")
 
     @staticmethod
     def _create_xml_paths():
