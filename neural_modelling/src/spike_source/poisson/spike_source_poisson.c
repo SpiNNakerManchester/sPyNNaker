@@ -49,7 +49,7 @@ typedef enum region{
 
 typedef enum callback_priorities{
     SDP = 0, TIMER = 2
-}callback_priorities;
+} callback_priorities;
 
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
@@ -98,7 +98,7 @@ static uint32_t simulation_ticks = 0;
 static uint32_t infinite_run;
 
 //! \brief deduces the time in timer ticks until the next spike is to occur
-//!        given the mean inter spike interval
+//!        given the mean inter-spike interval
 //! \param[in] mean_inter_spike_interval_in_ticks The mean number of ticks
 //!            before a spike is expected to occur in a slow process.
 //! \return a real which represents time in timer ticks until the next spike is
@@ -202,13 +202,16 @@ bool read_poisson_parameters(address_t address) {
 }
 
 //! \brief Initialises the recording parts of the model
-//! \return True if recording initisation is successful, false otherwise
+//! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(){
+
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();
+
     // Get the system region
     address_t system_region = data_specification_get_region(
             SYSTEM, address);
+
     // Get the recording information
     uint8_t regions_to_record[] = {
         BUFFERING_OUT_SPIKE_RECORDING_REGION,
@@ -283,6 +286,7 @@ void timer_callback(uint timer_count, uint unused) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
@@ -424,8 +428,9 @@ void c_main(void) {
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
-        // Set up callback listening to SDP messages
-    simulation_register_simulation_sdp_callback(&simulation_ticks, SDP);
+    // Set up callback listening to SDP messages
+    simulation_register_simulation_sdp_callback(
+        &simulation_ticks, &infinite_run, SDP);
 
     log_info("Starting");
     simulation_run();

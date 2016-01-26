@@ -49,7 +49,7 @@ typedef enum regions_e {
 //! values for the priority for each callback
 typedef enum callback_priorities{
     MC = -1, SDP_AND_DMA_AND_USER = 0, TIMER = 2
-}callback_priorities;
+} callback_priorities;
 
 //! The number of regions that are to be used for recording
 #define NUMBER_OF_REGIONS_TO_RECORD 3
@@ -70,7 +70,7 @@ static uint32_t infinite_run;
 static uint32_t recording_flags = 0;
 
 //! \brief Initialises the recording parts of the model
-//! \return True if recording initisation is successful, false otherwise
+//! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(){
     address_t address = data_specification_get_data_address();
     address_t system_region = data_specification_get_region(
@@ -193,12 +193,12 @@ void timer_callback(uint timer_count, uint unused) {
             recording_finalise();
         }
 
-        // falls into the apuse resume mode of operating
+        // falls into the pause resume mode of operating
         simulation_handle_pause_resume(timer_callback, TIMER);
 
         // restart the recording status
         if (!initialise_recording()) {
-            log_error("I couldnt resetup recording");
+            log_error("Error setting up recording");
             spin1_exit(0);
         }
     }
@@ -227,7 +227,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    log_info("setting timer tic callback for %d microseconds",
+    log_info("setting timer tick callback for %d microseconds",
               timer_period);
     spin1_set_timer_tick(timer_period);
 
@@ -235,8 +235,8 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     // Set up callback listening to SDP messages
-    simulation_register_simulation_sdp_callback(&simulation_ticks,
-                                                SDP_AND_DMA_AND_USER);
+    simulation_register_simulation_sdp_callback(
+        &simulation_ticks, &infinite_run, SDP_AND_DMA_AND_USER);
 
     log_info("Starting");
     simulation_run();

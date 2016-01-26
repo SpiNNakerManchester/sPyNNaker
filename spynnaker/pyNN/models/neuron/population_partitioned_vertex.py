@@ -4,17 +4,21 @@ from spinn_front_end_common.interface.buffer_management.buffer_models.\
     AbstractReceiveBuffersToHost
 
 
-class PopulationPartitionedVertex(PartitionedVertex,
-                                  AbstractReceiveBuffersToHost):
+class PopulationPartitionedVertex(
+        PartitionedVertex, AbstractReceiveBuffersToHost):
     """ Represents a sub-set of atoms from a AbstractConstrainedVertex
     """
 
-    def __init__(self, resources_required, label, constraints=None):
+    def __init__(
+            self, buffering_output, resources_required, label,
+            constraints=None):
         """
+        :param buffering_output: True if the vertex is set to buffer output,\
+                    False otherwise
         :param resources_required: The approximate resources needed for\
-                                   the vertex
-        :type resources_required:
-        :py:class:`pacman.models.resources.resource_container.ResourceContainer`
+                    the vertex
+        :type resources_required:\
+                    :py:class:`pacman.models.resources.resource_container.ResourceContainer`
         :param label: The name of the subvertex
         :type label: str
         :param constraints: The constraints of the subvertex
@@ -28,6 +32,11 @@ class PopulationPartitionedVertex(PartitionedVertex,
         PartitionedVertex.__init__(
             self, resources_required=resources_required, label=label,
             constraints=constraints)
+
+        self._buffering_output = buffering_output
+
+    def buffering_output(self):
+        return self._buffering_output
 
     def is_receives_buffers_to_host(self):
         return True

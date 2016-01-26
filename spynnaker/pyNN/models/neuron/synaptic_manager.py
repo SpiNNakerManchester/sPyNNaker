@@ -1,5 +1,3 @@
-from spinn_front_end_common.abstract_models.abstract_uses_memory_mallocs import \
-    AbstractPartitionableUsesMemoryMallocs
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
@@ -31,14 +29,13 @@ _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
 
-class SynapticManager(AbstractPartitionableUsesMemoryMallocs):
+class SynapticManager(object):
     """ Deals with synapses
     """
 
     def __init__(self, synapse_type, machine_time_step, ring_buffer_sigma,
                  spikes_per_second, population_table_type=None):
 
-        AbstractPartitionableUsesMemoryMallocs.__init__(self)
         self._synapse_type = synapse_type
         self._ring_buffer_sigma = ring_buffer_sigma
         self._spikes_per_second = spikes_per_second
@@ -245,26 +242,8 @@ class SynapticManager(AbstractPartitionableUsesMemoryMallocs):
                                                          .value,
                 size=synapse_dynamics_sz, label='synapseDynamicsParams')
 
-    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
-        standard_mallocs = 1
-
-        # get data needed to check extra memory regions
-        all_syn_block_sz = \
-            self._get_estimate_synaptic_blocks_size(vertex_slice, in_edges)
-        synapse_dynamics_sz = self._get_synapse_dynamics_parameter_size(
-            in_edges)
-        master_pop_table_sz = \
-            self._population_table_type.get_master_population_table_size(
-                vertex_slice, in_edges)
-
-        # check each param for if it needs a memory region
-        if synapse_dynamics_sz != 0:
-            standard_mallocs += 1
-        if all_syn_block_sz > 0:
-            standard_mallocs += 1
-        if master_pop_table_sz > 0:
-            standard_mallocs += 1
-        return standard_mallocs
+    def get_number_of_mallocs_used_by_dsg(self):
+        return 4
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
@@ -558,7 +537,7 @@ class SynapticManager(AbstractPartitionableUsesMemoryMallocs):
             master_pop_table_region, synaptic_matrix_region, routing_info,
             graph_mapper, subgraph):
         """ Simultaneously generates both the master population table and
-            the synatic matrix.
+            the synaptic matrix.
         """
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
@@ -693,8 +672,7 @@ class SynapticManager(AbstractPartitionableUsesMemoryMallocs):
     def _translate_synaptic_block_from_memory(
             self, synaptic_block, n_atoms, max_row_length, synapse_io,
             weight_scales):
-        """
-        translates a collection of memory into synaptic rows
+        """ Translates a collection of memory into synaptic rows
         """
         synaptic_list = list()
         numpy_block = numpy.frombuffer(dtype='uint8',
@@ -834,6 +812,7 @@ class SynapticManager(AbstractPartitionableUsesMemoryMallocs):
                     " (aka, something funkky happened)")
         return block, maxed_row_length
 
+    # inherited from AbstractProvidesIncomingEdgeConstraints
     def get_incoming_edge_constraints(self):
         """
         :return:
