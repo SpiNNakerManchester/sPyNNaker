@@ -60,6 +60,14 @@ class ConnectionHolder(object):
         data = self._merge_connections()
         return data[s]
 
+    def __len__(self):
+        data = self._merge_connections()
+        return len(data)
+
+    def __iter__(self):
+        data = self._merge_connections()
+        return iter(data)
+
     def __str__(self):
         data = self._merge_connections()
         return data.__str__()
