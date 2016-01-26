@@ -41,6 +41,14 @@ class PfisterSpikeTripletTimeDependence(AbstractTimeDependency):
                 (self._tau_x == other.tau_x) and
                 (self._tau_y == other.tau_y))
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing PfisterSpikeTripletTimeDependence
+        :param other: instance of PfisterSpikeTripletTimeDependence
+        :return:
+        """
+        return not self.__eq__(other)
+
     def create_synapse_row_io(
             self, synaptic_row_header_words, dendritic_delay_fraction):
         return PlasticWeightSynapseRowIo(

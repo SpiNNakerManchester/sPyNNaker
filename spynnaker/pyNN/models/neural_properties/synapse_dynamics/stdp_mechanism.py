@@ -86,6 +86,14 @@ class STDPMechanism(object):
                 (self._dendritic_delay_fraction ==
                  other.dendritic_delay_fraction))
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing stdp_mechanisms
+        :param other: instance of STDPMechanism
+        :return:
+        """
+        return not self.__eq__(other)
+
     def get_synapse_row_io(self):
         if self.timing_dependence is not None:
             # If we're using MAD, the header contains a single timestamp and

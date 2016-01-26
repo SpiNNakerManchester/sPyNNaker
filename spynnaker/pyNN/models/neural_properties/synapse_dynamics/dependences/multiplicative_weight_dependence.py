@@ -21,6 +21,14 @@ class MultiplicativeWeightDependence(AbstractWeightDependency):
                 (self.A_plus == other.A_plus) and
                 (self.A_minus == other.A_minus))
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing MultiplicativeWeightDependence
+        :param other: instance of MultiplicativeWeightDependence
+        :return:
+        """
+        return not self.__eq__(other)
+
     def get_params_size_bytes(self, num_synapse_types, num_terms):
         if num_terms != 1:
             raise NotImplementedError(

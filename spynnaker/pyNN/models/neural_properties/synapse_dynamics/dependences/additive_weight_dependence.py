@@ -26,6 +26,14 @@ class AdditiveWeightDependence(AbstractWeightDependency):
                 (self._A3_plus == other.A3_plus) and
                 (self._A3_minus == other.A3_minus))
 
+    def __ne__(self, other):
+        """
+        comparison  method for comparing AbstractWeightDependency
+        :param other: instance of AbstractWeightDependency
+        :return:
+        """
+        return not self.__eq__(other)
+
     def get_params_size_bytes(self, num_synapse_types, num_terms):
         if num_terms == 1:
             return (4 * 4) * num_synapse_types
