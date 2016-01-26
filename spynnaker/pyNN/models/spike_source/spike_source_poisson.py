@@ -381,7 +381,7 @@ class SpikeSourcePoisson(
         all_sdram_usage = static_sdram_requirement
 
         # check runtime sdram usage if required
-        if (not self._using_auto_pause_and_resume and
+        if (not self._uses_auto_pause_and_resume and
                 isinstance(self, AbstractRecordableInterface)):
             runtime_sdram_usage = self.get_runtime_sdram_usage_for_atoms(
                 vertex_slice, graph, self._no_machine_time_steps)
