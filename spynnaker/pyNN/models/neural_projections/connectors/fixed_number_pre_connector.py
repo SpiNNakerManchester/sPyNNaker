@@ -160,5 +160,4 @@ class FixedNumberPreConnector(AbstractConnector):
         block["delay"] = self._generate_delays(
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
-        block["connector_index"] = connector_index
         return block

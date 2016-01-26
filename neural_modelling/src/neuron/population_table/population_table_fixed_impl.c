@@ -1,5 +1,5 @@
 #include "population_table.h"
-#include "synapse_row.h"
+#include "../synapse_row.h"
 #include <debug.h>
 #include <string.h>
 
@@ -119,8 +119,8 @@ static inline key_t _key_n(key_t k) {
     return k & 0x7FF;
 }
 
-bool population_table_get_address(spike_t spike, address_t* row_address,
-                                  size_t* n_bytes_to_transfer) {
+bool population_table_get_first_address(
+        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
 
     uint32_t table_index = _get_table_index(_key_x(spike), _key_y(spike),
                                             _key_p(spike));
@@ -175,3 +175,9 @@ bool population_table_get_address(spike_t spike, address_t* row_address,
     return true;
 }
 
+bool population_table_get_next_address(
+        address_t* row_address, size_t* n_bytes_to_transfer) {
+
+    // We assume there is only one row in this representation
+    return false;
+}

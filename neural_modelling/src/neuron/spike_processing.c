@@ -1,5 +1,5 @@
 #include "spike_processing.h"
-#include "population_table.h"
+#include "population_table/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
 #include "../common/in_spikes.h"
@@ -46,38 +46,49 @@ static uint32_t buffer_being_read;
 
 static uint32_t max_n_words;
 
+static spike_t spike;
+
 /* PRIVATE FUNCTIONS - static for inlining */
+
+static inline void _do_dma_read(
+        address_t row_address, size_t n_bytes_to_transfer) {
+
+    // Write the SDRAM address of the plastic region and the
+    // Key of the originating spike to the beginning of DMA buffer
+    dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
+    next_buffer->sdram_writeback_address = row_address;
+    next_buffer->originating_spike = spike;
+    next_buffer->n_bytes_transferred = n_bytes_to_transfer;
+
+    // Start a DMA transfer to fetch this synaptic row into current
+    // buffer
+    buffer_being_read = next_buffer_to_fill;
+    spin1_dma_transfer(
+        DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row, DMA_READ,
+        n_bytes_to_transfer);
+    next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
+}
 
 static inline void _setup_synaptic_dma_read() {
 
+    // Set up to store the dma location and size to read
+    address_t row_address;
+    size_t n_bytes_to_transfer;
+
+    // If there's more rows to process from the previous spike
+    if (population_table_get_next_address(&row_address, &n_bytes_to_transfer)) {
+        _do_dma_read(row_address, n_bytes_to_transfer);
+    }
+
     // If there's more incoming spikes
-    spike_t spike;
     uint32_t setup_done = false;
     while (!setup_done && in_spikes_get_next_spike(&spike)) {
         log_debug("Checking for row for spike 0x%.8x\n", spike);
 
         // Decode spike to get address of destination synaptic row
-        address_t row_address;
-        size_t n_bytes_to_transfer;
-
-        if (population_table_get_address(spike, &row_address,
-                &n_bytes_to_transfer)) {
-
-            // Write the SDRAM address of the plastic region and the
-            // Key of the originating spike to the beginning of DMA buffer
-            dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
-            next_buffer->sdram_writeback_address = row_address;
-            next_buffer->originating_spike = spike;
-            next_buffer->n_bytes_transferred = n_bytes_to_transfer;
-
-            // Start a DMA transfer to fetch this synaptic row into current
-            // buffer
-            buffer_being_read = next_buffer_to_fill;
-            spin1_dma_transfer(DMA_TAG_READ_SYNAPTIC_ROW, row_address,
-                               next_buffer->row,
-                               DMA_READ, n_bytes_to_transfer);
-            next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
-
+        if (population_table_get_first_address(
+                spike, &row_address, &n_bytes_to_transfer)) {
+            _do_dma_read(row_address, n_bytes_to_transfer);
             setup_done = true;
         }
     }

@@ -17,7 +17,7 @@ class AbstractSynapseStructure(object):
         """
 
     @abstractmethod
-    def read_synaptic_data(self, connection_indices, pp_data):
+    def read_synaptic_data(self, fp_size, pp_data):
         """ Read the plastic synaptic data for this connection from\
             the data
         """

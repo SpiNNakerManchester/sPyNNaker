@@ -118,7 +118,7 @@ class FromListConnector(AbstractConnector):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, connector_index):
+            synapse_type):
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
@@ -131,5 +131,4 @@ class FromListConnector(AbstractConnector):
         block["weight"] = items["weight"]
         block["delay"] = items["delay"]
         block["synapse_type"] = synapse_type
-        block["connector_index"] = connector_index
         return block

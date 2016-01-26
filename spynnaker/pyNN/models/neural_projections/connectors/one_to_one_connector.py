@@ -47,7 +47,7 @@ class OneToOneConnector(AbstractConnector):
             return 1
         if isinstance(self._delays, RandomDistribution):
             return 1
-        elif not hasattr(self._delays, '__iter__'):
+        elif numpy.isscalar(self._delays):
             if self._delays >= min_delay and self._delays <= max_delay:
                 return 1
             return 0
@@ -66,7 +66,7 @@ class OneToOneConnector(AbstractConnector):
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(
             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
-        if min_hi_atom <= max_lo_atom:
+        if min_hi_atom < max_lo_atom:
             return 0
         return 1
 
@@ -118,7 +118,7 @@ class OneToOneConnector(AbstractConnector):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, connector_index):
+            synapse_type):
         max_lo_atom = max(
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(
@@ -136,5 +136,4 @@ class OneToOneConnector(AbstractConnector):
         block["delay"] = self._generate_delays(
             self._delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
-        block["connector_index"] = connector_index
         return block

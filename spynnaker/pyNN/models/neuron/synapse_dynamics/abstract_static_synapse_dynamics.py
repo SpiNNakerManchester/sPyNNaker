@@ -32,9 +32,12 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
         """
 
     @abstractmethod
+    def get_n_synapses_in_rows(self, ff_size):
+        """ Get the number of synapses in the rows with sizes ff_size
+        """
+
+    @abstractmethod
     def read_static_synaptic_data(
-            self, connection_indices, post_vertex_slice, n_synapse_types,
-            ff_size, ff_data):
-        """ Read the connections indicated in the connection indices from the\
-            words of data in ff_data
+            self, post_vertex_slice, n_synapse_types, ff_size, ff_data):
+        """ Read the connections from the words of data in ff_data
         """

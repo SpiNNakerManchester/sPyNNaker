@@ -16,8 +16,7 @@ class AbstractConnector(object):
 
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
                             ("weight", "float64"), ("delay", "float64"),
-                            ("synapse_type", "uint8"),
-                            ("connector_index", "uint16")]
+                            ("synapse_type", "uint8")]
 
     def __init__(self, safe=True, space=None, verbose=False):
         self._safe = safe
@@ -176,7 +175,7 @@ class AbstractConnector(object):
         elif numpy.isscalar(weights):
             return weights
         elif hasattr(weights, "__getitem__"):
-            return max([
+            return numpy.amax([
                 weights[connection_slice]
                 for connection_slice in connection_slices])
         raise Exception("Unrecognised weight format")
@@ -297,6 +296,6 @@ class AbstractConnector(object):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, connector_index):
+            synapse_type):
         """ Create a synaptic block from the data
         """

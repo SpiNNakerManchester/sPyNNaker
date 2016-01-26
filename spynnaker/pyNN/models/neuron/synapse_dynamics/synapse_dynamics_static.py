@@ -52,16 +52,18 @@ class SynapseDynamicsStatic(AbstractStaticSynapseDynamics):
         # The sizes are in words, so just return them
         return ff_size
 
+    def get_n_synapses_in_rows(self, ff_size):
+
+        # Each word is a synapse and sizes are in words, so just return them
+        return ff_size
+
     def read_static_synaptic_data(
-            self, connection_indices, post_vertex_slice, n_synapse_types,
-            ff_size, ff_data):
+            self, post_vertex_slice, n_synapse_types, ff_size, ff_data):
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
-        data = numpy.concatenate(
-            [ff_data[i][connection_indices[i]] for i in range(len(ff_data))])
+        data = numpy.concatenate(ff_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate([numpy.repeat(
-            i, connection_indices[i].size)
-            for i in range(len(connection_indices))])
+            i, ff_size[i]) for i in range(len(ff_size))])
         connections["target"] = (data & 0xFF) + post_vertex_slice.lo_atom
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = (data >> (8 + n_synapse_type_bits)) & 0xF

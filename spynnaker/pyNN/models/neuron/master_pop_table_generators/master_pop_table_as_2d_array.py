@@ -155,7 +155,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
         # retrieve the max row length
         max_row_length = ROW_LEN_TABLE_ENTRIES[max_row_length_index]
-        return max_row_length, synaptic_block_base_address_offset
+        return [(max_row_length, synaptic_block_base_address_offset)]
 
     def get_master_population_table_size(self, vertex_slice, in_edges):
         """

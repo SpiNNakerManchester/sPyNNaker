@@ -38,9 +38,15 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         """
 
     @abstractmethod
+    def get_n_synapses_in_rows(self, pp_size, fp_size):
+        """ Get the number of synapses in each of the rows with plastic sizes
+            pp_size and fp_size
+        """
+
+    @abstractmethod
     def read_plastic_synaptic_data(
-            self, connection_indices, post_vertex_slice, n_synapse_types,
-            pp_size, pp_data, fp_size, fp_data):
+            self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
+            fp_size, fp_data):
         """ Read the connections indicated in the connection indices from the\
             data in pp_data and fp_data
         """

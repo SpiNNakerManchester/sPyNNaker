@@ -8,6 +8,7 @@ class SynapseInformation(object):
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
         self._synapse_type = synapse_type
+        self._index = 0
 
     @property
     def connector(self):
@@ -20,3 +21,11 @@ class SynapseInformation(object):
     @property
     def synapse_type(self):
         return self._synapse_type
+
+    @property
+    def index(self):
+        return self._index
+
+    @index.setter
+    def index(self, index):
+        self._index = index

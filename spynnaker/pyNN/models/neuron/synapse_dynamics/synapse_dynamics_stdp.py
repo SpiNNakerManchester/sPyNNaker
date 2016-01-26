@@ -170,25 +170,31 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         # fp_size is in half-words
         return numpy.ceil(fp_size / 2.0).astype(dtype="uint32")
 
+    def get_n_synapses_in_rows(self, pp_size, fp_size):
+
+        # Each fixed-plastic synapse is a half-word and fp_size is in half
+        # words so just return it
+        return fp_size
+
     def read_plastic_synaptic_data(
-            self, connection_indices, post_vertex_slice, n_synapse_types,
-            pp_size, pp_data, fp_size, fp_data):
+            self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
+            fp_size, fp_data):
+        n_rows = len(fp_size)
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
-        data_fixed = numpy.concatenate(
-            [fp_data[i].view(dtype="uint16")[connection_indices[i]]
-             for i in range(len(fp_data))])
+        data_fixed = numpy.concatenate([
+            fp_data[i].view(dtype="uint16")[0:fp_size[i]]
+            for i in range(n_rows)])
         pp_without_headers = [
             row.view(dtype="uint8")[self._n_header_bytes:] for row in pp_data]
         synapse_structure = self._timing_dependence.synaptic_structure
 
         connections = numpy.zeros(
             data_fixed.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
-        connections["source"] = numpy.concatenate([numpy.repeat(
-            i, connection_indices[i].size)
-            for i in range(len(connection_indices))])
+        connections["source"] = numpy.concatenate(
+            [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
         connections["target"] = (data_fixed & 0xFF) + post_vertex_slice.lo_atom
         connections["weight"] = synapse_structure.read_synaptic_data(
-            connection_indices, pp_without_headers)
+            fp_size, pp_without_headers)
         connections["delay"] = (data_fixed >> (8 + n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
         return connections

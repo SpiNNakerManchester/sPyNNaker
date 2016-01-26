@@ -32,6 +32,7 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         self._stored_synaptic_data_from_machine = None
 
     def add_synapse_information(self, synapse_information):
+        synapse_information.index = len(self._synapse_information)
         self._synapse_information.append(synapse_information)
 
     @property

@@ -18,7 +18,7 @@
 #include "neuron.h"
 #include "synapses.h"
 #include "spike_processing.h"
-#include "population_table.h"
+#include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
 
 #include <data_specification.h>

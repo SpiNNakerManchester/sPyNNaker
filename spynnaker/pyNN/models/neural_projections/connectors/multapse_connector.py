@@ -167,7 +167,7 @@ class MultapseConnector(AbstractConnector):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, connector_index):
+            synapse_type):
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
@@ -192,5 +192,4 @@ class MultapseConnector(AbstractConnector):
         block["delay"] = self._generate_delays(
             self._delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
-        block["connector_index"] = connector_index
         return block

@@ -118,7 +118,7 @@ class FixedNumberPostConnector(AbstractConnector):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, connector_index):
+            synapse_type):
         if not self._is_connected(post_vertex_slice):
             return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         post_neurons_in_slice = self._post_neurons_in_slice(post_vertex_slice)
@@ -153,5 +153,4 @@ class FixedNumberPostConnector(AbstractConnector):
         block["delay"] = self._generate_delays(
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
-        block["connector_index"] = connector_index
         return block

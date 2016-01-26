@@ -143,7 +143,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, connector_index):
+            synapse_type):
 
         probs = self._probs[
             pre_slice_index.to_slice, post_slice_index.to_slice]
@@ -170,5 +170,4 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         block["delay"] = self._generate_delays(
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
-        block["connector_index"] = connector_index
         return block

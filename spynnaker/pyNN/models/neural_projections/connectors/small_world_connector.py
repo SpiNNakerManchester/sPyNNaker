@@ -88,7 +88,7 @@ class SmallWorldConnector(AbstractConnector):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, connector_index):
+            synapse_type):
 
         ids = numpy.where(self._mask[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice])[0]
@@ -105,7 +105,6 @@ class SmallWorldConnector(AbstractConnector):
         block["delay"] = self._generate_delays(
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
-        block["connector_index"] = connector_index
 
         # Re-wire some connections
         rewired = numpy.where(
