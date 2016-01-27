@@ -9,10 +9,9 @@ class ProjectionPartitionedEdge(
 
     def __init__(
             self, synapse_information, pre_subvertex, post_subvertex,
-            label=None, constraints=None):
+            label=None):
         MultiCastPartitionedEdge.__init__(
-            self, pre_subvertex, post_subvertex, label=label,
-            constraints=constraints)
+            self, pre_subvertex, post_subvertex, label=label)
         AbstractFilterableEdge.__init__(self)
 
         self._synapse_information = synapse_information

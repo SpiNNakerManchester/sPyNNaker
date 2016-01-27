@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 class DelayAfferentPartitionedEdge(MultiCastPartitionedEdge,
                                    AbstractFilterableEdge):
 
-    def __init__(self, presubvertex, postsubvertex, constraints):
+    def __init__(self, presubvertex, postsubvertex):
         MultiCastPartitionedEdge.__init__(
-            self, presubvertex, postsubvertex, constraints=constraints)
+            self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
 
     def filter_sub_edge(self, graph_mapper):

@@ -3,6 +3,8 @@ MasterPopTableAs2dArray
 """
 
 # pacman imports
+from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_field_constraint import \
+    KeyAllocatorFixedFieldConstraint
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
 from pacman.utilities.utility_objs.field import Field
@@ -306,5 +308,6 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         fields.append(Field(0, 7, 0xFF000000))
         fields.append(Field(0, 7, 0x00FF0000))
         fields.append(Field(0, 17, 0x0000F800))
-        constraints.append(KeyAllocatorFixedMaskConstraint(0xFFFFF800, fields))
+        constraints.append(KeyAllocatorFixedMaskConstraint(0xFFFFF800))
+        constraints.append(KeyAllocatorFixedFieldConstraint(fields))
         return constraints

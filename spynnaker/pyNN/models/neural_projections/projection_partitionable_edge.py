@@ -54,10 +54,9 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         return self._delay_edge.pre_vertex.n_delay_stages
 
     def create_subedge(
-            self, pre_subvertex, post_subvertex, label=None, constraints=None):
+            self, pre_subvertex, post_subvertex, label=None):
         return ProjectionPartitionedEdge(
-            self._synapse_information, pre_subvertex, post_subvertex, label,
-            constraints)
+            self._synapse_information, pre_subvertex, post_subvertex, label)
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):
