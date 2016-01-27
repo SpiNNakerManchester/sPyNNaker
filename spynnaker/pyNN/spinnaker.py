@@ -536,6 +536,9 @@ class Spinnaker(object):
             if self._reports_states is not None \
                     and self._reports_states.routing_info_report:
                 algorithms.append("routingInfoReports")
+                algorithms.append("unCompressedRoutingTableReports")
+                algorithms.append("compressedRoutingTableReports")
+                algorithms.append("comparisonOfRoutingTablesReport")
             if self._reports_states is not None \
                     and self._reports_states.router_report:
                 algorithms.append("RouterReports")
