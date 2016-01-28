@@ -472,6 +472,9 @@ class Spinnaker(object):
         # needed for multi-run/SSA's to work correctly.
         algorithms.append("SpyNNakerRuntimeUpdator")
 
+        # add functions for updating the models
+        algorithms.append("FrontEndCommonRuntimeUpdater")
+
         # if youve not ran before, add the buffer manager
         using_virtual_board = config.getboolean("Machine", "virtual_board")
         if application_graph_changed and not using_virtual_board:
@@ -607,8 +610,6 @@ class Spinnaker(object):
             # recorded populations
             if self._has_ran:
                 algorithms.append("SpyNNakerRecordingExtractor")
-                # add functions for updating the models
-                algorithms.append("FrontEndCommonRuntimeUpdater")
             if not self._has_ran:
                 optional_algorithms.append(
                     "FrontEndCommonApplicationDataLoader")
