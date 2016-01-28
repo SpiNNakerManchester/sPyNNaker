@@ -170,11 +170,9 @@ class SynapticManager(object):
                 # Add on the size of the tables to be generated
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
-                pre_slices = [
-                    graph_mapper.get_subvertex_slice(subv)
-                    for subv in graph_mapper.get_subvertices_from_vertex(
-                        edge.pre_vertex)]
-                pre_slice_index = pre_slices.index(pre_vertex_slice)
+                pre_slices = graph_mapper.get_subvertex_slices(edge.pre_vertex)
+                pre_slice_index = graph_mapper.get_subvertex_index(
+                    subedge.pre_subvertex)
 
                 for synapse_info in edge.synapse_information:
                     undelayed_size, delayed_size = \
@@ -550,11 +548,9 @@ class SynapticManager(object):
 
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
-                pre_slices = [
-                    graph_mapper.get_subvertex_slice(subv)
-                    for subv in graph_mapper.get_subvertices_from_vertex(
-                        edge.pre_vertex)]
-                pre_slice_index = pre_slices.index(pre_vertex_slice)
+                pre_slices = graph_mapper.get_subvertex_slices(edge.pre_vertex)
+                pre_slice_index = graph_mapper.get_subvertex_index(
+                    subedge.pre_subvertex)
 
                 for synapse_info in edge.synapse_information:
 
@@ -651,10 +647,8 @@ class SynapticManager(object):
                      pre_vertex_slice.hi_atom)] = \
                     routing_info.get_keys_and_masks_from_subedge(subedge)
 
-        post_slices = [
-            graph_mapper.get_subvertex_slice(subv)
-            for subv in graph_mapper.get_subvertices_from_vertex(vertex)]
-        post_slice_index = post_slices.index(post_vertex_slice)
+        post_slices = graph_mapper.get_subvertex_slices(vertex)
+        post_slice_index = graph_mapper.get_subvertex_index(subvertex)
 
         # Reserve the memory
         subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)

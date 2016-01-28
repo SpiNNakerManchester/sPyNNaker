@@ -298,7 +298,8 @@ class Spinnaker(object):
         # run pacman executor
         pacman_exeuctor = helpful_functions.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,
-            config.getboolean("Reports", "outputTimesForSections"))
+            config.getboolean("Reports", "outputTimesForSections"),
+            True)
 
         # gather provenance data from the executor itself if needed
         if (config.get("Reports", "writeProvanceData") and
@@ -478,6 +479,28 @@ class Spinnaker(object):
                         "algorithum_name if its a interal to pacman algorithm."
                         " Please rectify this and try again")
 
+            # Add reports early so they get executed as soon as possible
+            if self._reports_states is not None \
+                    and self._reports_states.tag_allocation_report:
+                algorithms.append("TagReport")
+            if self._reports_states is not None \
+                    and self._reports_states.routing_info_report:
+                algorithms.append("routingInfoReports")
+            if self._reports_states is not None \
+                    and self._reports_states.router_report:
+                algorithms.append("RouterReports")
+            if self._reports_states is not None \
+                    and self._reports_states.partitioner_report:
+                algorithms.append("PartitionerReport")
+            if (self._reports_states is not None and
+                    self._reports_states.
+                    placer_report_with_partitionable_graph):
+                algorithms.append("PlacerReportWithPartitionableGraph")
+            if (self._reports_states is not None and
+                    self._reports_states.
+                    placer_report_without_partitionable_graph):
+                algorithms.append("PlacerReportWithoutPartitionableGraph")
+
             # if using virtual machine, add to list of algorithms the virtual
             # machine generator, otherwise add the standard machine generator
             if config.getboolean("Machine", "virtual_board"):
@@ -528,28 +551,6 @@ class Spinnaker(object):
             if (config.get("Reports", "writeProvanceData") and
                     not config.getboolean("Machine", "virtual_board")):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
-
-            # define mapping between output types and reports
-            if self._reports_states is not None \
-                    and self._reports_states.tag_allocation_report:
-                algorithms.append("TagReport")
-            if self._reports_states is not None \
-                    and self._reports_states.routing_info_report:
-                algorithms.append("routingInfoReports")
-            if self._reports_states is not None \
-                    and self._reports_states.router_report:
-                algorithms.append("RouterReports")
-            if self._reports_states is not None \
-                    and self._reports_states.partitioner_report:
-                algorithms.append("PartitionerReport")
-            if (self._reports_states is not None and
-                    self._reports_states.
-                    placer_report_with_partitionable_graph):
-                algorithms.append("PlacerReportWithPartitionableGraph")
-            if (self._reports_states is not None and
-                    self._reports_states.
-                    placer_report_without_partitionable_graph):
-                algorithms.append("PlacerReportWithoutPartitionableGraph")
         else:
 
             # add function for extracting all the recorded data from

@@ -34,7 +34,7 @@ from data_specification.data_specification_generator\
 
 logger = logging.getLogger(__name__)
 
-_DELAY_PARAM_HEADER_WORDS = 3
+_DELAY_PARAM_HEADER_WORDS = 5
 
 
 class DelayExtensionVertex(AbstractPartitionableVertex,
@@ -80,7 +80,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             PartitionerSameSizeAsVertexConstraint(source_vertex))
 
     def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
-        return list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
+        return list()  # list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
 
     @property
     def model_name(self):
@@ -146,16 +146,31 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
         key = None
-        if len(sub_graph.outgoing_subedges_from_subvertex(subvertex)) > 0:
+        outgoing_edges = sub_graph.outgoing_subedges_from_subvertex(subvertex)
+        if len(outgoing_edges) > 0:
             keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
-                sub_graph.outgoing_subedges_from_subvertex(subvertex)[0])
+                outgoing_edges[0])
 
             # NOTE: using the first key assigned as the key.  Should in future
             # get the list of keys and use one per neuron, to allow arbitrary
             # key and mask assignments
             key = keys_and_masks[0].key
 
-        self.write_delay_parameters(spec, vertex_slice, key)
+        incoming_key = None
+        incoming_mask = None
+        incoming_edges = sub_graph.incoming_subedges_from_subvertex(subvertex)
+        for incoming_edge in incoming_edges:
+            incoming_slice = graph_mapper.get_subvertex_slice(
+                incoming_edge.pre_subvertex)
+            if (incoming_slice.lo_atom == vertex_slice.lo_atom and
+                    incoming_slice.hi_atom == vertex_slice.hi_atom):
+                keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                    incoming_edge)
+                incoming_key = keys_and_masks[0].key
+                incoming_mask = keys_and_masks[0].mask
+
+        self.write_delay_parameters(
+            spec, vertex_slice, key, incoming_key, incoming_mask)
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
@@ -168,7 +183,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         self._write_basic_setup_info(
             spec, self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
 
-    def write_delay_parameters(self, spec, vertex_slice, key):
+    def write_delay_parameters(
+            self, spec, vertex_slice, key, incoming_key, incoming_mask):
         """ Generate Delay Parameter data
         """
 
@@ -181,10 +197,10 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value)
 
         # Write header info to the memory region:
-        # Write Key info for this core:
-        # Every outgoing edge from this vertex should have the same key
-
+        # Write Key info for this core and the incoming key and mask:
         spec.write_value(data=key)
+        spec.write_value(data=incoming_key)
+        spec.write_value(data=incoming_mask)
 
         # Write the number of neurons in the block:
         spec.write_value(data=vertex_slice.n_atoms)
@@ -205,7 +221,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         size_of_mallocs = (
             self._DEFAULT_MALLOCS_USED *
             common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
-        
+
         n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
         return ((constants.BLOCK_INDEX_HEADER_WORDS * 4) +
                 (_DELAY_PARAM_HEADER_WORDS * 4) +

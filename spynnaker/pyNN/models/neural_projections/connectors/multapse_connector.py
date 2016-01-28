@@ -45,8 +45,8 @@ class MultapseConnector(AbstractConnector):
 
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
         if (self._synapses_per_subedge is None or
-                self._pre_slices != pre_slices or
-                self._post_slices != post_slices):
+                len(self._pre_slices) != len(pre_slices) or
+                len(self._post_slices) != len(post_slices)):
             n_pre_atoms = sum([pre.n_atoms for pre in pre_slices])
             n_post_atoms = sum([post.n_atoms for post in post_slices])
             n_connections = n_pre_atoms * n_post_atoms
