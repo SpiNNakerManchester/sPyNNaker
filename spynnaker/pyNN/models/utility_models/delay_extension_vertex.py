@@ -8,9 +8,6 @@ from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_edge_constraints import \
     AbstractProvidesOutgoingEdgeConstraints
-from spinn_front_end_common.abstract_models\
-    .abstract_provides_incoming_edge_constraints \
-    import AbstractProvidesIncomingEdgeConstraints
 from spinn_front_end_common.utilities import constants as common_constants
 from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
     import AbstractProvidesNKeysForEdge
@@ -20,9 +17,6 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_mask_constraint \
-    import KeyAllocatorFixedMaskConstraint
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from pacman.model.constraints.key_allocator_constraints\
@@ -39,7 +33,6 @@ _DELAY_PARAM_HEADER_WORDS = 5
 
 class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractDataSpecableVertex,
-                           AbstractProvidesIncomingEdgeConstraints,
                            AbstractProvidesOutgoingEdgeConstraints,
                            AbstractProvidesNKeysForEdge):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
@@ -66,7 +59,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
-        AbstractProvidesIncomingEdgeConstraints.__init__(self)
+        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
         AbstractProvidesNKeysForEdge.__init__(self)
 
         self._source_vertex = source_vertex
@@ -78,9 +71,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         self.add_constraint(
             PartitionerSameSizeAsVertexConstraint(source_vertex))
-
-    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
-        return list()  # list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
 
     @property
     def model_name(self):
