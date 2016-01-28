@@ -254,12 +254,6 @@ class Spinnaker(object):
 
         if self._original_first_run is None:
             self._original_first_run = run_time
-        if self._has_reset_last and self._original_first_run != run_time:
-            raise common_exceptions.ConfigurationException(
-                "Currently spynnaker cannot reset and immediately handle a "
-                "runtime that was not the same as the original run. Please "
-                "run for {} ms and then change the runtime."
-                .format(self._original_first_run))
 
         # get inputs
         inputs, application_graph_changed, uses_auto_pause_and_resume = \
@@ -469,11 +463,12 @@ class Spinnaker(object):
         algorithms = list()
         optional_algorithms = list()
 
-        # needed for multi-run/SSA's to work correctly.
-        algorithms.append("SpyNNakerRuntimeUpdator")
+        if not executing_reset:
+            # needed for multi-run/SSA's to work correctly.
+            algorithms.append("SpyNNakerRuntimeUpdator")
 
-        # add functions for updating the models
-        algorithms.append("FrontEndCommonRuntimeUpdater")
+            # add functions for updating the models
+            algorithms.append("FrontEndCommonRuntimeUpdater")
 
         # if youve not ran before, add the buffer manager
         using_virtual_board = config.getboolean("Machine", "virtual_board")
@@ -813,9 +808,10 @@ class Spinnaker(object):
         inputs.append({
             'type': "LoadedRoutingTablesToken",
             'value': True})
-        inputs.append({
-            'type': "LoadBinariesToken",
-            'value': True})
+        if not self._has_reset_last:
+            inputs.append({
+                'type': "LoadBinariesToken",
+                'value': True})
         inputs.append({
             'type': "LoadedApplicationDataToken",
             'value': True})
