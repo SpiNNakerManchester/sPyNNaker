@@ -43,6 +43,7 @@ from spynnaker.pyNN.models.abstract_models\
 import logging
 import math
 import os
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -317,6 +318,11 @@ class Spinnaker(object):
         else:
             self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
             self._has_ran = pacman_exeuctor.get_item("RanToken")
+
+        if config.getboolean("Machine", "virtual_board"):
+            print(
+                "Execution on virtual board is complete - application exiting")
+            sys.exit(0)
 
         # reset the reset flag to say the last thing was not a reset call
         self._current_run_ms = total_run_time

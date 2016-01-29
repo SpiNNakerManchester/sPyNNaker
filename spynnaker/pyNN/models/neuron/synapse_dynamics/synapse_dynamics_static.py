@@ -43,7 +43,8 @@ class SynapseDynamicsStatic(AbstractStaticSynapseDynamics):
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
-        ff_size, ff_data = self.get_n_items_and_words(fixed_fixed_rows, 4)
+        ff_size = self.get_n_items(fixed_fixed_rows, 4)
+        ff_data = [fixed_row.view("uint32") for fixed_row in fixed_fixed_rows]
 
         return (ff_data, ff_size)
 

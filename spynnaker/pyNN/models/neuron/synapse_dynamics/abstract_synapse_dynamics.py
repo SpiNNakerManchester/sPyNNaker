@@ -75,18 +75,22 @@ class AbstractSynapseDynamics(object):
             row-based data to be returned from get_synaptic_data
         """
         return [
-            numpy.ravel(data[connection_row_indices == i])
+            data[connection_row_indices == i].reshape(-1)
             for i in range(n_rows)
         ]
 
-    def get_n_items_and_words(self, rows, item_size):
-        """ Get the number of items in each row, and convert the row data\
-            to words
+    def get_n_items(self, rows, item_size):
+        """ Get the number of items in each row as 4-byte values, given the\
+            item size
         """
-        n_items = numpy.array([
+        return numpy.array([
             int(math.ceil(float(row.size) / float(item_size)))
             for row in rows], dtype="uint32").reshape((-1, 1))
+
+    def get_words(self, rows):
+        """ Convert the row data to words
+        """
         words = [numpy.pad(
             row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",
             constant_values=0).view("uint32") for row in rows]
-        return n_items, words
+        return words

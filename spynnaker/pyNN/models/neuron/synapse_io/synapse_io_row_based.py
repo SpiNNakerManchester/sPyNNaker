@@ -125,19 +125,21 @@ class SynapseIORowBased(AbstractSynapseIO):
                     connections, row_indices, n_rows, post_vertex_slice,
                     n_synapse_types)
 
-        # Join the bits into rows
-        items_to_join = [pp_size, pp_data, ff_size, fp_size, ff_data, fp_data]
-        rows = [numpy.concatenate(items) for items in zip(*items_to_join)]
+        # Add some padding
+        row_lengths = [
+            3 + pp_data[i].size + fp_data[i].size + ff_data[i].size
+            for i in range(n_rows)]
+        max_length = max(row_lengths) - _N_HEADER_WORDS
+        max_row_length = population_table.get_allowed_row_length(max_length)
+        padding = [
+            numpy.zeros(max_row_length - (row_length - _N_HEADER_WORDS))
+            for row_length in row_lengths]
 
-        # Make all the rows the same length
-        row_lengths = [row.size for row in rows]
-        max_row_length = max(row_lengths) - _N_HEADER_WORDS
-        max_length = population_table.get_allowed_row_length(max_row_length)
-        row_data = numpy.concatenate([
-            numpy.pad(
-                row, (0, max_length - (row.size - _N_HEADER_WORDS)),
-                mode="constant", constant_values=0x11223344)
-            for row in rows])
+        # Join the bits into rows
+        items_to_join = [
+            pp_size, pp_data, ff_size, fp_size, ff_data, fp_data, padding]
+        rows = [numpy.concatenate(items) for items in zip(*items_to_join)]
+        row_data = numpy.concatenate(rows)
 
         # Return the data
         return max_row_length, row_data

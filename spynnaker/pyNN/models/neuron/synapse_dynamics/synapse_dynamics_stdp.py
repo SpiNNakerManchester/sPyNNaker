@@ -143,7 +143,8 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype="uint8").reshape((-1, 2)))
-        fp_size, fp_data = self.get_n_items_and_words(fixed_plastic_rows, 2)
+        fp_size = self.get_n_items(fixed_plastic_rows, 2)
+        fp_data = self.get_words(fixed_plastic_rows)
 
         # Get the plastic data
         synapse_structure = self._timing_dependence.synaptic_structure
@@ -156,7 +157,8 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
             numpy.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))
             for i in range(n_rows)]
-        pp_size, pp_data = self.get_n_items_and_words(plastic_plastic_rows, 4)
+        pp_size = self.get_n_items(plastic_plastic_rows, 4)
+        pp_data = self.get_words(plastic_plastic_rows, 4)
 
         return (fp_data, pp_data, fp_size, pp_size)
 
