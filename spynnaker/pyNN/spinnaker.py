@@ -440,6 +440,9 @@ class Spinnaker(object):
         xml_paths.append(
             os.path.join(os.path.dirname(overridden_pacman_functions.__file__),
                          "algorithms_metadata.xml"))
+        xml_paths.append(
+            os.path.join(os.path.dirname(overridden_pacman_functions.__file__),
+                         "rigs_algorithm_metadata.xml"))
         xml_paths.append(os.path.join(os.path.dirname(
             pacman_algorithm_reports.__file__), "reports_metadata.xml"))
         return xml_paths

@@ -1,3 +1,5 @@
+from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
+    import AbstractWeightUpdatable
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
     import MultiCastPartitionedEdge
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import\
@@ -7,13 +9,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class DelayAfferentPartitionedEdge(MultiCastPartitionedEdge,
-                                   AbstractFilterableEdge):
+class DelayAfferentPartitionedEdge(
+        MultiCastPartitionedEdge, AbstractFilterableEdge,
+        AbstractWeightUpdatable):
 
     def __init__(self, presubvertex, postsubvertex):
         MultiCastPartitionedEdge.__init__(
             self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
+        AbstractWeightUpdatable.__init__(self)
 
     def filter_sub_edge(self, graph_mapper):
         """
@@ -30,3 +34,8 @@ class DelayAfferentPartitionedEdge(MultiCastPartitionedEdge,
         if (pre_sub_lo != post_sub_lo) or (pre_sub_hi != post_sub_hi):
             return True
         return False
+
+    def update_weight(self, graph_mapper):
+        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._pre_subvertex)
+        return pre_vertex_slice.n_atoms
