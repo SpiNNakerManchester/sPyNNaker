@@ -17,8 +17,8 @@ from spynnaker.pyNN.utilities.conf import config
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utilities import constants as\
     front_end_common_constants
 from spinn_front_end_common.interface.buffer_management.buffer_models\
@@ -43,7 +43,7 @@ RANDOM_SEED_WORDS = 4
 
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
-        AbstractSpikeRecordable, AbstractProvidesOutgoingEdgeConstraints,
+        AbstractSpikeRecordable, AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping,
         ReceiveBuffersToHostBasicImpl):
     """ A Poisson Spike source object
@@ -76,7 +76,7 @@ class SpikeSourcePoisson(
             timescale_factor=timescale_factor)
         AbstractSpikeRecordable.__init__(self)
         ReceiveBuffersToHostBasicImpl.__init__(self)
-        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
 
         # Store the parameters
@@ -337,7 +337,7 @@ class SpikeSourcePoisson(
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
-    def generate_data_spec(self, subvertex, placement, subgraph, graph,
+    def generate_data_spec(self, subvertex, placement, partitioned_graph, graph,
                            routing_info, hostname, graph_mapper, report_folder,
                            ip_tags, reverse_ip_tags, write_text_specs,
                            application_run_time_folder):
@@ -378,10 +378,11 @@ class SpikeSourcePoisson(
 
         # Every subedge should have the same key
         key = None
-        subedges = subgraph.outgoing_subedges_from_subvertex(subvertex)
-        if len(subedges) > 0:
-            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
-                subedges[0])
+        partitions = partitioned_graph.\
+            outgoing_edges_partitions_from_vertex(subvertex)
+        for partition in partitions.values():
+            keys_and_masks = \
+                routing_info.get_keys_and_masks_from_partition(partition)
             key = keys_and_masks[0].key
 
         self._write_poisson_parameters(spec, key, vertex_slice.n_atoms)
@@ -402,7 +403,7 @@ class SpikeSourcePoisson(
             self._POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)
 
-    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
+    def get_outgoing_partition_constraints(self, partition, graph_mapper):
         return [KeyAllocatorContiguousRangeContraint()]
 
     def is_data_specable(self):

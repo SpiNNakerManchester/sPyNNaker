@@ -1,3 +1,4 @@
+
 # pacman imports
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map import \
     DictBasedPartitionedEdgeNKeysMap
@@ -5,14 +6,14 @@ from pacman.utilities.utility_objs.progress_bar import ProgressBar
 
 # front end common imports
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_incoming_edge_constraints import \
-    AbstractProvidesIncomingEdgeConstraints
+    abstract_provides_incoming_partition_constraints import \
+    AbstractProvidesIncomingPartitionConstraints
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_n_keys_for_edge import \
+    abstract_provides_n_keys_for_partition import \
     AbstractProvidesNKeysForEdge
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utilities import exceptions
 
 
@@ -41,15 +42,14 @@ class EdgeToNKeysMapper(object):
             for partition_id in partitions:
                 partition = partitions[partition_id]
                 added_constraints = False
-                for edge in partition.edges:
-                    constraints = self._process_partitionable_edge(
-                        edge, graph_mapper, n_keys_map, partitionable_graph,
-                        partition_id)
-                    if not added_constraints:
-                        partition.add_constraints(constraints)
-                    else:
-                        self._check_constraints_equal(
-                            constraints, partition.constraints)
+                constraints = self._process_partition(
+                    partition, graph_mapper, n_keys_map, partitionable_graph,
+                    partition_id)
+                if not added_constraints:
+                    partition.add_constraints(constraints)
+                else:
+                    self._check_constraints_equal(
+                        constraints, partition.constraints)
             progress_bar.update()
         progress_bar.end()
         return {'n_keys_map': n_keys_map}
@@ -66,46 +66,48 @@ class EdgeToNKeysMapper(object):
             if constraint not in stored_constraints:
                 raise exceptions.ConfigurationException(
                     "Two edges within the same partition have different "
-                    "constraints. This is deemed an error. Plese fix and "
+                    "constraints. This is deemed an error. Please fix and "
                     "try again")
 
     @staticmethod
-    def _process_partitionable_edge(edge, graph_mapper, n_keys_map,
-                                    partitionable_graph, partition_id):
+    def _process_partition(
+            partition, graph_mapper, n_keys_map, partitionable_graph,
+            partition_id):
         """
 
-        :param edge:
+        :param partition:
         :param graph_mapper:
         :param n_keys_map:
         :param partitionable_graph:
         :param partition_id:
         :return:
         """
-        vertex_slice = graph_mapper.get_subvertex_slice(edge.pre_subvertex)
-        super_edge = \
-            graph_mapper.get_partitionable_edge_from_partitioned_edge(edge)
+        partitioned_edge = partition.edges[0]
+        vertex_slice = graph_mapper.get_subvertex_slice(
+            partitioned_edge.pre_subvertex)
+        edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
+            partitioned_edge)
 
-        if not isinstance(super_edge.pre_vertex, AbstractProvidesNKeysForEdge):
-            n_keys_map.set_n_keys_for_patitioned_edge(edge,
-                                                      vertex_slice.n_atoms)
+        if not isinstance(edge.pre_vertex, AbstractProvidesNKeysForEdge):
+            n_keys_map.set_n_keys_for_partition(partition, vertex_slice.n_atoms)
         else:
-            n_keys_map.set_n_keys_for_patitioned_edge(
-                edge,
-                super_edge.pre_vertex.get_n_keys_for_partitioned_edge(
-                    edge, graph_mapper))
+            n_keys_map.set_n_keys_for_partition(
+                partition,
+                edge.pre_vertex.get_n_keys_for_partition(
+                    partition, graph_mapper))
 
         constraints = list()
-        if isinstance(super_edge.pre_vertex,
-                      AbstractProvidesOutgoingEdgeConstraints):
+        if isinstance(edge.pre_vertex,
+                      AbstractProvidesOutgoingPartitionConstraints):
             constraints.extend(
-                super_edge.pre_vertex.get_outgoing_edge_constraints(
-                    edge, graph_mapper))
-        if isinstance(super_edge.post_vertex,
-                      AbstractProvidesIncomingEdgeConstraints):
+                edge.pre_vertex.get_outgoing_partition_constraints(
+                    partition, graph_mapper))
+        if isinstance(edge.post_vertex,
+                      AbstractProvidesIncomingPartitionConstraints):
             constraints.extend(
-                super_edge.post_vertex.get_incoming_edge_constraints(
-                    edge, graph_mapper))
+                edge.post_vertex.get_incoming_partition_constraints(
+                    partition, graph_mapper))
         constraints.extend(
             partitionable_graph.partition_from_vertex(
-                super_edge.pre_vertex, partition_id).constraints)
+                edge.pre_vertex, partition_id).constraints)
         return constraints
