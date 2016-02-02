@@ -262,6 +262,7 @@ class Projection(object):
         placements = self._spinnaker.placements
         transceiver = self._spinnaker.transceiver
         routing_infos = self._spinnaker.routing_infos
+        partitioned_graph = self._spinnaker.partitioned_graph
         subedges = graph_mapper.get_partitioned_edges_from_partitionable_edge(
             self._projection_edge)
         progress = ProgressBar(
@@ -273,7 +274,7 @@ class Projection(object):
                 subedge.post_subvertex)
             connections = post_vertex.get_connections_from_machine(
                 transceiver, placement, subedge, graph_mapper, routing_infos,
-                self._synapse_information)
+                self._synapse_information, partitioned_graph)
             if connections is not None:
                 connection_holder.add_connections(connections)
             progress.update()

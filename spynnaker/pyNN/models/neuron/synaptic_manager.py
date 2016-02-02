@@ -518,7 +518,7 @@ class SynapticManager(object):
             self, spec, post_slices, post_slice_index, subvertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region, routing_info,
-            graph_mapper, subgraph):
+            graph_mapper, partitioned_graph):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
         """
@@ -530,7 +530,8 @@ class SynapticManager(object):
         n_synapse_types = self._synapse_type.get_n_synapse_types()
 
         # Get the edges
-        in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        in_subedges = \
+            partitioned_graph.incoming_subedges_from_subvertex(subvertex)
 
         # Set up the master population table
         self._population_table_type.initialise_table(
@@ -589,9 +590,11 @@ class SynapticManager(object):
                             next_block_start_addr)
                         spec.switch_write_focus(synaptic_matrix_region)
                         spec.write_array(row_data)
+                        partition = partitioned_graph.get_partition_of_subedge(
+                            subedge)
                         keys_and_masks = \
-                            routing_info.get_keys_and_masks_from_subedge(
-                                subedge)
+                            routing_info.get_keys_and_masks_from_partition(
+                                partition)
                         self._population_table_type\
                             .update_master_population_table(
                                 spec, next_block_start_addr, row_length,
@@ -633,25 +636,29 @@ class SynapticManager(object):
 
     def write_data_spec(
             self, spec, vertex, post_vertex_slice, subvertex, placement,
-            subgraph, graph, routing_info, hostname, graph_mapper, input_type):
+            partitioned_graph, graph, routing_info, hostname, graph_mapper,
+            input_type):
 
         # Create an index of delay keys into this subvertex
-        for subedge in subgraph.incoming_subedges_from_subvertex(subvertex):
+        for subedge in partitioned_graph.incoming_subedges_from_subvertex(
+                subvertex):
             edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
             if isinstance(edge.pre_vertex, DelayExtensionVertex):
                 pre_vertex_slice = graph_mapper.get_subvertex_slice(
                     subedge.pre_subvertex)
+                partition = partitioned_graph.get_partition_of_subedge(subedge)
                 self._delay_key_index[
                     (edge.pre_vertex.source_vertex, pre_vertex_slice.lo_atom,
                      pre_vertex_slice.hi_atom)] = \
-                    routing_info.get_keys_and_masks_from_subedge(subedge)
+                    routing_info.get_keys_and_masks_from_partition(partition)
 
         post_slices = graph_mapper.get_subvertex_slices(vertex)
         post_slice_index = graph_mapper.get_subvertex_index(subvertex)
 
         # Reserve the memory
-        subvert_in_edges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        subvert_in_edges = partitioned_graph.incoming_subedges_from_subvertex(
+            subvertex)
         all_syn_block_sz = self._get_exact_synaptic_blocks_size(
             post_slices, post_slice_index, post_vertex_slice, graph_mapper,
             subvertex, subvert_in_edges)
@@ -659,7 +666,7 @@ class SynapticManager(object):
             spec, vertex, post_vertex_slice, graph, all_syn_block_sz)
 
         weight_scales = self._write_synapse_parameters(
-            spec, subvertex, subgraph, graph_mapper, post_slices,
+            spec, subvertex, partitioned_graph, graph_mapper, post_slices,
             post_slice_index, post_vertex_slice, input_type)
 
         self._write_synaptic_matrix_and_master_population_table(
@@ -667,7 +674,7 @@ class SynapticManager(object):
             all_syn_block_sz, weight_scales,
             constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            routing_info, graph_mapper, subgraph)
+            routing_info, graph_mapper, partitioned_graph)
 
         self._synapse_dynamics.write_parameters(
             spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
@@ -677,7 +684,7 @@ class SynapticManager(object):
 
     def get_connections_from_machine(
             self, transceiver, placement, subedge, graph_mapper,
-            routing_infos, synapse_info):
+            routing_infos, synapse_info, partitioned_graph):
 
         edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
             subedge)
@@ -692,8 +699,9 @@ class SynapticManager(object):
         n_synapse_types = self._synapse_type.get_n_synapse_types()
 
         # Get the key for the pre_subvertex
-        key = routing_infos.get_subedge_information_from_subedge(
-            subedge).keys_and_masks[0].key
+        partition = partitioned_graph.get_partition_of_subedge(subedge)
+        key = routing_infos.get_subedge_information_from_partition(
+            partition).keys_and_masks[0].key
 
         # Get the key for the delayed pre_subvertex
         delayed_key = None
@@ -769,6 +777,6 @@ class SynapticManager(object):
             block, max_row_length)
         return block, max_row_length
 
-    # inherited from AbstractProvidesIncomingEdgeConstraints
-    def get_incoming_edge_constraints(self):
+    # inherited from AbstractProvidesIncomingPartitionConstraints
+    def get_incoming_partition_constraints(self):
         return self._population_table_type.get_edge_constraints()
