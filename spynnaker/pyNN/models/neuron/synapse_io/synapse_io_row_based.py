@@ -132,7 +132,9 @@ class SynapseIORowBased(AbstractSynapseIO):
         max_length = max(row_lengths) - _N_HEADER_WORDS
         max_row_length = population_table.get_allowed_row_length(max_length)
         padding = [
-            numpy.zeros(max_row_length - (row_length - _N_HEADER_WORDS))
+            numpy.zeros(
+                max_row_length - (row_length - _N_HEADER_WORDS),
+                dtype="uint32")
             for row_length in row_lengths]
 
         # Join the bits into rows

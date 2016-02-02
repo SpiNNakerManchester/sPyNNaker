@@ -158,7 +158,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
                 plastic_headers[i], plastic_plastic_row_data[i]))
             for i in range(n_rows)]
         pp_size = self.get_n_items(plastic_plastic_rows, 4)
-        pp_data = self.get_words(plastic_plastic_rows, 4)
+        pp_data = self.get_words(plastic_plastic_rows)
 
         return (fp_data, pp_data, fp_size, pp_size)
 

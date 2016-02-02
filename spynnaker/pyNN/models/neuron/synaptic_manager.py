@@ -700,8 +700,8 @@ class SynapticManager(object):
 
         # Get the key for the pre_subvertex
         partition = partitioned_graph.get_partition_of_subedge(subedge)
-        key = routing_infos.get_subedge_information_from_partition(
-            partition).keys_and_masks[0].key
+        key = routing_infos.get_keys_and_masks_from_partition(
+            partition)[0].key
 
         # Get the key for the delayed pre_subvertex
         delayed_key = None

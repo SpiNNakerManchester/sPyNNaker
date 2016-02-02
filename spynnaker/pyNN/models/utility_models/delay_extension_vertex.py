@@ -157,8 +157,10 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
                 incoming_edge.pre_subvertex)
             if (incoming_slice.lo_atom == vertex_slice.lo_atom and
                     incoming_slice.hi_atom == vertex_slice.hi_atom):
-                keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
+                partition = partitioned_graph.get_partition_of_subedge(
                     incoming_edge)
+                keys_and_masks = \
+                    routing_info.get_keys_and_masks_from_partition(partition)
                 incoming_key = keys_and_masks[0].key
                 incoming_mask = keys_and_masks[0].mask
 
