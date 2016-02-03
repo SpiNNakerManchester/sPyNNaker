@@ -15,8 +15,9 @@ from spinn_front_end_common.abstract_models\
     .abstract_provides_incoming_partition_constraints \
     import AbstractProvidesIncomingPartitionConstraints
 from spinn_front_end_common.utilities import constants as common_constants
-from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_partition \
-    import AbstractProvidesNKeysForEdge
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_n_keys_for_partition \
+    import AbstractProvidesNKeysForPartition
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 
@@ -42,7 +43,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractDataSpecableVertex,
                            AbstractProvidesIncomingPartitionConstraints,
                            AbstractProvidesOutgoingPartitionConstraints,
-                           AbstractProvidesNKeysForEdge):
+                           AbstractProvidesNKeysForPartition):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -68,7 +69,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
-        AbstractProvidesNKeysForEdge.__init__(self)
+        AbstractProvidesNKeysForPartition.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0

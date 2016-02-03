@@ -10,7 +10,7 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesIncomingPartitionConstraints
 from spinn_front_end_common.abstract_models.\
     abstract_provides_n_keys_for_partition import \
-    AbstractProvidesNKeysForEdge
+    AbstractProvidesNKeysForPartition
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
@@ -88,7 +88,7 @@ class EdgeToNKeysMapper(object):
         edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
             partitioned_edge)
 
-        if not isinstance(edge.pre_vertex, AbstractProvidesNKeysForEdge):
+        if not isinstance(edge.pre_vertex, AbstractProvidesNKeysForPartition):
             n_keys_map.set_n_keys_for_partition(partition, vertex_slice.n_atoms)
         else:
             n_keys_map.set_n_keys_for_partition(
