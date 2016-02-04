@@ -7,6 +7,8 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
 from pacman.operations import algorithm_reports as pacman_algorithm_reports
 
 # common front end imports
+from spinn_front_end_common.interface.interface_functions.front_end_common_execute_mapper import \
+    FrontEndCommonExecuteMapper
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities.report_states import ReportState
 from spinn_front_end_common.utility_models.command_sender import CommandSender
@@ -115,7 +117,12 @@ class Spinnaker(object):
         self._machine_time_step = None
         self._no_sync_changes = 0
 
-        # state thats needed the first time around
+        # holder for algorithms to check for prov if crashed
+        algorithms_listing = \
+            config.get("Reports", "algorithms_to_get_prov_after_crash")
+        self._algorithms_to_catch_prov_on_crash = algorithms_listing.split(",")
+
+        # state that's needed the first time around
         if self._app_id is None:
             self._app_id = config.getint("Machine", "appID")
 
@@ -190,13 +197,13 @@ class Spinnaker(object):
 
         natively_supported_delay_for_models = \
             constants.MAX_SUPPORTED_DELAY_TICS
-        delay_extention_max_supported_delay = \
+        delay_extension_max_supported_delay = \
             constants.MAX_DELAY_BLOCKS \
             * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
 
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
-            delay_extention_max_supported_delay
+            delay_extension_max_supported_delay
 
         if max_delay is not None\
            and float(max_delay * 1000) > max_delay_tics_supported * timestep:
@@ -236,7 +243,7 @@ class Spinnaker(object):
 
         if hostname is not None:
             self._hostname = hostname
-            logger.warn("The machine name from PYNN setup is overriding the "
+            logger.warn("The machine name from PyNN setup is overriding the "
                         "machine name defined in the spynnaker.cfg file")
         elif config.has_option("Machine", "machineName"):
             self._hostname = config.get("Machine", "machineName")
@@ -296,26 +303,28 @@ class Spinnaker(object):
         xml_paths = self._create_xml_paths()
 
         # run pacman executor
-        pacman_exeuctor = helpful_functions.do_mapping(
+        execute_mapper = FrontEndCommonExecuteMapper()
+        pacman_executor = execute_mapper.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,
-            config.getboolean("Reports", "outputTimesForSections"))
+            config.getboolean("Reports", "outputTimesForSections"),
+            self._algorithms_to_catch_prov_on_crash)
 
         # gather provenance data from the executor itself if needed
-        if (config.get("Reports", "writeProvanceData") and
+        if (config.get("Reports", "writeProvenanceData") and
                 not config.getboolean("Machine", "virtual_board")):
             pacman_executor_file_path = os.path.join(
-                pacman_exeuctor.get_item("ProvenanceFilePath"),
-                "PACMAN_provancence_data.xml")
-            pacman_exeuctor.write_provenance_data_in_xml(
+                pacman_executor.get_item("ProvenanceFilePath"),
+                "PACMAN_provenance_data.xml")
+            pacman_executor.write_provenance_data_in_xml(
                 pacman_executor_file_path,
-                pacman_exeuctor.get_item("MemoryTransciever"))
+                pacman_executor.get_item("MemoryTransciever"))
 
         # sort out outputs data
         if application_graph_changed:
-            self._update_data_structures_from_pacman_exeuctor(pacman_exeuctor)
+            self._update_data_structures_from_pacman_executor(pacman_executor)
         else:
-            self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
-            self._has_ran = pacman_exeuctor.get_item("RanToken")
+            self._no_sync_changes = pacman_executor.get_item("NoSyncChanges")
+            self._has_ran = pacman_executor.get_item("RanToken")
 
         # reset the reset flag to say the last thing was not a reset call
         self._current_run_ms = total_run_time
@@ -372,9 +381,11 @@ class Spinnaker(object):
             vertex.set_no_machine_time_steps(0)
 
         # execute reset functionality
-        helpful_functions.do_mapping(
+        execute_mapper = FrontEndCommonExecuteMapper()
+        execute_mapper.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,
-            config.getboolean("Reports", "outputTimesForSections"))
+            config.getboolean("Reports", "outputTimesForSections"),
+            self._algorithms_to_catch_prov_on_crash)
 
         # if graph has changed kill all old objects as they will need to be
         # rebuilt at next run
@@ -385,39 +396,39 @@ class Spinnaker(object):
                 self._placement_to_app_data_file_paths = \
                 self._processor_to_app_data_base_address_mapper = None
 
-    def _update_data_structures_from_pacman_exeuctor(self, pacman_exeuctor):
+    def _update_data_structures_from_pacman_executor(self, pacman_executor):
         """ Updates all the spinnaker local data structures that it needs from\
             the pacman executor
-        :param pacman_exeuctor: the pacman executor required to extract data\
+        :param pacman_executor: the pacman executor required to extract data\
                 structures from.
         :return:
         """
         if not config.getboolean("Machine", "virtual_board"):
-            self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
-            self._has_ran = pacman_exeuctor.get_item("RanToken")
+            self._txrx = pacman_executor.get_item("MemoryTransciever")
+            self._has_ran = pacman_executor.get_item("RanToken")
             self._executable_targets = \
-                pacman_exeuctor.get_item("ExecutableTargets")
-            self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
+                pacman_executor.get_item("ExecutableTargets")
+            self._buffer_manager = pacman_executor.get_item("BufferManager")
             self._processor_to_app_data_base_address_mapper = \
-                pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
+                pacman_executor.get_item("ProcessorToAppDataBaseAddress")
             self._placement_to_app_data_file_paths = \
-                pacman_exeuctor.get_item("PlacementToAppDataFilePaths")
+                pacman_executor.get_item("PlacementToAppDataFilePaths")
 
-        self._placements = pacman_exeuctor.get_item("MemoryPlacements")
+        self._placements = pacman_executor.get_item("MemoryPlacements")
         self._router_tables = \
-            pacman_exeuctor.get_item("MemoryRoutingTables")
+            pacman_executor.get_item("MemoryRoutingTables")
         self._routing_infos = \
-            pacman_exeuctor.get_item("MemoryRoutingInfos")
-        self._tags = pacman_exeuctor.get_item("MemoryTags")
-        self._graph_mapper = pacman_exeuctor.get_item("MemoryGraphMapper")
+            pacman_executor.get_item("MemoryRoutingInfos")
+        self._tags = pacman_executor.get_item("MemoryTags")
+        self._graph_mapper = pacman_executor.get_item("MemoryGraphMapper")
         self._partitioned_graph = \
-            pacman_exeuctor.get_item("MemoryPartitionedGraph")
-        self._machine = pacman_exeuctor.get_item("MemoryMachine")
+            pacman_executor.get_item("MemoryPartitionedGraph")
+        self._machine = pacman_executor.get_item("MemoryMachine")
         self._database_interface = \
-            pacman_exeuctor.get_item("DatabaseInterface")
+            pacman_executor.get_item("DatabaseInterface")
         self._database_file_path = \
-            pacman_exeuctor.get_item("DatabaseFilePath")
-        self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
+            pacman_executor.get_item("DatabaseFilePath")
+        self._no_sync_changes = pacman_executor.get_item("NoSyncChanges")
 
     @staticmethod
     def _create_xml_paths():
@@ -474,8 +485,8 @@ class Spinnaker(object):
                     raise common_exceptions.ConfigurationException(
                         "The tool chain expects config params of list of 1 "
                         "element with ,. Where the elements are either: the "
-                        "algorithum_name:algorithm_config_file_path, or "
-                        "algorithum_name if its a interal to pacman algorithm."
+                        "algorithm_name:algorithm_config_file_path, or "
+                        "algorithm_name if its a internal to pacman algorithm."
                         " Please rectify this and try again")
 
             # if using virtual machine, add to list of algorithms the virtual
@@ -525,7 +536,7 @@ class Spinnaker(object):
 
             # if going to write provenance data after the run add the two
             # provenance gatherers
-            if (config.get("Reports", "writeProvanceData") and
+            if (config.get("Reports", "writeProvenanceData") and
                     not config.getboolean("Machine", "virtual_board")):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
 
@@ -574,7 +585,7 @@ class Spinnaker(object):
 
                 # if going to write provenance data after the run add the two
                 # provenance gatherers
-                if config.get("Reports", "writeProvanceData"):
+                if config.get("Reports", "writeProvenanceData"):
                     algorithms.append("FrontEndCommonProvenanceGatherer")
         return algorithms
 
@@ -609,7 +620,7 @@ class Spinnaker(object):
 
         # file path to store any provenance data to
         provenance_file_path = \
-            os.path.join(self._report_default_directory, "provance_data")
+            os.path.join(self._report_default_directory, "provenance_data")
         if not os.path.exists(provenance_file_path):
                 os.mkdir(provenance_file_path)
 
@@ -780,7 +791,7 @@ class Spinnaker(object):
             inputs.append({'type': "FilePlacementFilePath",
                            'value': os.path.join(
                                json_folder, "placements.json")})
-            inputs.append({'type': "FileRouingPathsFilePath",
+            inputs.append({'type': "FileRoutingPathsFilePath",
                            'value': os.path.join(
                                json_folder, "routing_paths.json")})
             inputs.append({'type': "FileConstraintsFilePath",
@@ -1076,7 +1087,7 @@ class Spinnaker(object):
         """
 
         :param edge_to_add:
-        :param partition_identifier: the partition identfer for the outgoing
+        :param partition_identifier: the partition identifier for the outgoing
                     edge partition
         :param partition_constraints: the constraints of a partition
         associated with this edge
