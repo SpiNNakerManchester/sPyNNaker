@@ -9,6 +9,8 @@ from pacman.operations import algorithm_reports as pacman_algorithm_reports
 # common front end imports
 from spinn_front_end_common.interface.interface_functions.front_end_common_execute_mapper import \
     FrontEndCommonExecuteMapper
+from spinn_front_end_common.interface.interface_functions.front_end_common_iobuf_extractor import \
+    FrontEndCommonIOBufExtractor
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities.report_states import ReportState
 from spinn_front_end_common.utility_models.command_sender import CommandSender
@@ -1166,6 +1168,20 @@ class Spinnaker(object):
         """
         for population in self._populations:
             population._end()
+
+        # if operating in debug mode, extract io buffers from all machine
+        if config.get("Mode", "mode") == "Debug":
+            iobuf_extractor = FrontEndCommonIOBufExtractor()
+            results = iobuf_extractor(self._txrx, True, self._placements)
+            io_buffers = results['io_buffers']
+            for iobuf in io_buffers:
+                file_path = os.path.join(os.path.join(
+                    self._report_default_directory, "provenance_data"),
+                    "IO_buffer_for[{}:{}:{}]".format(iobuf.x, iobuf.y, iobuf.p))
+                output = open(file_path, mode="w")
+                output.writelines(iobuf.iobuf)
+                output.flush()
+                output.close()
 
         # if not a virtual machine, then shut down stuff on the board
         if not config.getboolean("Machine", "virtual_board"):
