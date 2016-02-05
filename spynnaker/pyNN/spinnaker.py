@@ -7,10 +7,10 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
 from pacman.operations import algorithm_reports as pacman_algorithm_reports
 
 # common front end imports
-from spinn_front_end_common.interface.interface_functions.front_end_common_execute_mapper import \
+from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
+from spinn_front_end_common.interface.interface_functions.\
+    front_end_common_execute_mapper import \
     FrontEndCommonExecuteMapper
-from spinn_front_end_common.interface.interface_functions.front_end_common_iobuf_extractor import \
-    FrontEndCommonIOBufExtractor
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities.report_states import ReportState
 from spinn_front_end_common.utility_models.command_sender import CommandSender
@@ -18,6 +18,7 @@ from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
+from spinn_front_end_common.interface import interface_functions
 
 # local front end imports
 from spynnaker.pyNN.models.common.abstract_gsyn_recordable\
@@ -105,6 +106,7 @@ class Spinnaker(object):
         # holder for the executable targets (which we will need for reset and
         # pause and resume functionality
         self._executable_targets = None
+        self._warn_messages = None
 
         # holders for data needed for reset when nothing changes in the
         # application graph
@@ -319,7 +321,8 @@ class Spinnaker(object):
                 "PACMAN_provenance_data.xml")
             pacman_executor.write_provenance_data_in_xml(
                 pacman_executor_file_path,
-                pacman_executor.get_item("MemoryTransciever"))
+                pacman_executor.get_item("MemoryTransciever"),
+                pacman_executor.get_item("WarnMessages"))
 
         # sort out outputs data
         if application_graph_changed:
@@ -431,6 +434,8 @@ class Spinnaker(object):
         self._database_file_path = \
             pacman_executor.get_item("DatabaseFilePath")
         self._no_sync_changes = pacman_executor.get_item("NoSyncChanges")
+        if config.getboolean("Reports", "writeProvenanceData"):
+            self._warn_messages = pacman_executor.get_item("WarnMessages")
 
     @staticmethod
     def _create_xml_paths():
@@ -1171,17 +1176,7 @@ class Spinnaker(object):
 
         # if operating in debug mode, extract io buffers from all machine
         if config.get("Mode", "mode") == "Debug":
-            iobuf_extractor = FrontEndCommonIOBufExtractor()
-            results = iobuf_extractor(self._txrx, True, self._placements)
-            io_buffers = results['io_buffers']
-            for iobuf in io_buffers:
-                file_path = os.path.join(os.path.join(
-                    self._report_default_directory, "provenance_data"),
-                    "IO_buffer_for[{}:{}:{}]".format(iobuf.x, iobuf.y, iobuf.p))
-                output = open(file_path, mode="w")
-                output.writelines(iobuf.iobuf)
-                output.flush()
-                output.close()
+            self._run_debug_iobuf_extraction_for_exit()
 
         # if not a virtual machine, then shut down stuff on the board
         if not config.getboolean("Machine", "virtual_board"):
@@ -1231,6 +1226,39 @@ class Spinnaker(object):
             if turn_off_machine:
                 logger.info("Turning off machine")
             self._txrx.close(power_off_machine=turn_off_machine)
+
+    def _run_debug_iobuf_extraction_for_exit(self):
+        pacman_inputs = list()
+        pacman_inputs.append({
+            'type': "MemoryTransciever",
+            'value': self._txrx})
+        pacman_inputs.append({
+            'type': "RanToken",
+            'value': True})
+        pacman_inputs.append({
+            'type': "MemoryPlacements",
+            'value': self._placements})
+        pacman_inputs.append({
+            'type': "WarnMessages",
+            'value': self._warn_messages})
+        pacman_inputs.append({
+            'type': "ProvenanceFilePath",
+            'value': os.path.join(self._report_default_directory,
+                                  "provenance_data")})
+        pacman_outputs = list()
+        pacman_outputs.append("IOBuffers")
+        pacman_outputs.append("ErrorMessages")
+        pacman_algorithms = list()
+        pacman_algorithms.append("FrontEndCommonIOBufExtractor")
+        pacman_algorithms.append("FrontEndCommonMessagePrinter")
+        pacman_xmls = list()
+        pacman_xmls.append(
+            os.path.join(os.path.dirname(interface_functions.__file__),
+                         "front_end_common_interface_functions.xml"))
+        pacman_executor = PACMANAlgorithmExecutor(
+            algorithms=pacman_algorithms, inputs=pacman_inputs,
+            xml_paths=pacman_xmls, required_outputs=pacman_outputs)
+        pacman_executor.execute_mapping()
 
     def _add_socket_address(self, socket_address):
         """
