@@ -1219,7 +1219,8 @@ class Spinnaker(object):
             self._no_sync_changes = 0
 
             # app stop command
-            self._txrx.stop_application(self._app_id)
+            if config.getboolean("Machine", "use_app_stop"):
+                self._txrx.stop_application(self._app_id)
 
             if self._create_database:
                 self._database_interface.stop()
