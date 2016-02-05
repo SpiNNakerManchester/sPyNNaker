@@ -42,7 +42,9 @@ static inline post_event_history_t *post_events_init_buffers(
 
     // Check allocations succeeded
     if (post_event_history == NULL) {
-        log_error("Unable to allocate global STDP structures - Out of DTCM");
+        log_error(
+            "Unable to allocate global STDP structures - Out of DTCM: Try "
+            "reducing the number of neurons per core to rectify this problem ");
         return NULL;
     }
 
@@ -75,7 +77,7 @@ static inline post_event_window_t post_events_get_window(
         window.next_time = event_time--;
     }
 
-    // Keep looping while event occured after start
+    // Keep looping while event occurred after start
     // Of window and we haven't hit beginning of array
     while (*event_time > begin_time && event_time != events->times);
 
@@ -116,7 +118,7 @@ static inline post_event_window_t post_events_get_window_delayed(
         }
     }
 
-    // Keep looping while event occured after start
+    // Keep looping while event occurred after start
     // Of window and we haven't hit beginning of array
     while (*event_time > begin_time && event_time != events->times);
 
@@ -142,7 +144,7 @@ static inline post_event_window_t post_events_next(post_event_window_t window) {
     window.prev_time = *window.next_time++;
     window.prev_trace = *window.next_trace++;
 
-    // Decrement remining events
+    // Decrement remaining events
     window.num_events--;
     return window;
 }
@@ -158,7 +160,7 @@ static inline post_event_window_t post_events_next_delayed(
     // Go onto next event
     window.next_time++;
 
-    // Decrement remining events
+    // Decrement remaining events
     window.num_events--;
     return window;
 }
