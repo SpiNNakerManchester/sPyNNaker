@@ -105,7 +105,7 @@ class OneToOneConnector(AbstractConnector):
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(
             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
-        if max_lo_atom >= min_hi_atom:
+        if max_lo_atom > min_hi_atom:
             return 0
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_variance(self._weights, [connection_slice])

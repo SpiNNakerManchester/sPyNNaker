@@ -466,28 +466,7 @@ class Spinnaker(object):
 
         # if the allocation graph has changed, need to go through mapping
         if application_graph_changed and not executing_reset:
-
-            # if the system has ran before, kill the apps and run mapping
-            # add debug algorithms if needed
-            if in_debug_mode:
-                algorithms.append("ValidRoutesChecker")
-
-            algorithm_names = \
-                config.get("Mapping", "algorithms")
-
-            algorithm_strings = algorithm_names.split(",")
-            for algorithm_string in algorithm_strings:
-                split_string = algorithm_string.split(":")
-                if len(split_string) == 1:
-                    algorithms.append(split_string[0])
-                else:
-                    raise common_exceptions.ConfigurationException(
-                        "The tool chain expects config params of list of 1 "
-                        "element with ,. Where the elements are either: the "
-                        "algorithum_name:algorithm_config_file_path, or "
-                        "algorithum_name if its a interal to pacman algorithm."
-                        " Please rectify this and try again")
-
+        
             # Add reports early so they get executed as soon as possible
             if self._reports_states is not None \
                     and self._reports_states.tag_allocation_report:
@@ -512,6 +491,27 @@ class Spinnaker(object):
                     self._reports_states.
                     placer_report_without_partitionable_graph):
                 algorithms.append("PlacerReportWithoutPartitionableGraph")
+
+            # if the system has ran before, kill the apps and run mapping
+            # add debug algorithms if needed
+            if in_debug_mode:
+                algorithms.append("ValidRoutesChecker")
+
+            algorithm_names = \
+                config.get("Mapping", "algorithms")
+
+            algorithm_strings = algorithm_names.split(",")
+            for algorithm_string in algorithm_strings:
+                split_string = algorithm_string.split(":")
+                if len(split_string) == 1:
+                    algorithms.append(split_string[0])
+                else:
+                    raise common_exceptions.ConfigurationException(
+                        "The tool chain expects config params of list of 1 "
+                        "element with ,. Where the elements are either: the "
+                        "algorithum_name:algorithm_config_file_path, or "
+                        "algorithum_name if its a interal to pacman algorithm."
+                        " Please rectify this and try again")
 
             # if using virtual machine, add to list of algorithms the virtual
             # machine generator, otherwise add the standard machine generator
@@ -1180,6 +1180,8 @@ class Spinnaker(object):
             if clear_tags is None:
                 clear_tags = config.getboolean("Machine", "clear_tags")
 
+            self._txrx.enable_reinjection(multicast=False)
+            
             # if stopping on machine, clear iptags and
             if clear_tags:
                 for ip_tag in self._tags.ip_tags:
