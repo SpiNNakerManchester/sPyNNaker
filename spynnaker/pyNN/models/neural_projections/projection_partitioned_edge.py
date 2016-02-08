@@ -61,11 +61,17 @@ class ProjectionPartitionedEdge(
             self._post_subvertex)
         post_slices = graph_mapper.get_subvertex_slices(post_vertex)
 
-        n_connections = 0
+        weight = 0
         for synapse_info in self._synapse_information:
-            n_connections += synapse_info.connector.\
+            new_weight = synapse_info.connector.\
                 get_n_connections_to_post_vertex_maximum(
                     pre_slices, pre_slice_index, post_slices,
                     post_slice_index, pre_vertex_slice, post_vertex_slice)
+            new_weight *= pre_vertex_slice.n_atoms
+            if hasattr(pre_vertex, "rate"):
+                new_weight *= pre_vertex.rate
+            elif hasattr(pre_vertex, "spikes_per_second"):
+                new_weight *= pre_vertex.spikes_per_second
+            weight += new_weight
 
-        self._weight = n_connections
+        self._weight = weight
