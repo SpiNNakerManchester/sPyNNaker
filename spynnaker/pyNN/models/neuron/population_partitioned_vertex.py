@@ -120,8 +120,9 @@ class PopulationPartitionedVertex(
             the_number_of_pre_synaptic_events, transmission_event_overflow,
             timer_tic_queue_overloaded, dma_queue_overloaded, placement)
 
+    @staticmethod
     def _add_core_warnings_if_applicable(
-            self, saturation_count, input_buffer_overflows,
+            saturation_count, input_buffer_overflows,
             transmission_event_overflow, timer_tic_queue_overloaded,
             dma_queue_overloaded, message_store, placement):
 
@@ -167,8 +168,9 @@ class PopulationPartitionedVertex(
                 "or time_scale_factor or decrease the number of neurons "
                 "per core.".format(timer_tic_queue_overloaded), "")
 
+    @staticmethod
     def _generate_xml(
-            self, file_path, saturation_count, input_buffer_overflows,
+            file_path, saturation_count, input_buffer_overflows,
             the_number_of_pre_synaptic_events, transmission_event_overflow,
             timer_tic_queue_overloaded, dma_queue_overloaded, placement):
 
