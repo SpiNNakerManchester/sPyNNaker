@@ -8,6 +8,7 @@ from pacman.operations import algorithm_reports as pacman_algorithm_reports
 
 # common front end imports
 from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
+from pacman.utilities.utility_objs.message_holder import MessageHolder
 from spinn_front_end_common.interface.interface_functions.\
     front_end_common_execute_mapper import \
     FrontEndCommonExecuteMapper
@@ -106,7 +107,7 @@ class Spinnaker(object):
         # holder for the executable targets (which we will need for reset and
         # pause and resume functionality
         self._executable_targets = None
-        self._warn_messages = None
+        self._warn_messages = MessageHolder()
 
         # holders for data needed for reset when nothing changes in the
         # application graph
@@ -541,12 +542,6 @@ class Spinnaker(object):
                 algorithms.append(
                     "FrontEndCommonNetworkSpecificationPartitionableReport")
 
-            # if going to write provenance data after the run add the two
-            # provenance gatherers
-            if (config.get("Reports", "writeProvenanceData") and
-                    not config.getboolean("Machine", "virtual_board")):
-                algorithms.append("FrontEndCommonProvenanceGatherer")
-
             # define mapping between output types and reports
             if self._reports_states is not None \
                     and self._reports_states.tag_allocation_report:
@@ -590,10 +585,6 @@ class Spinnaker(object):
                 # add functions for setting off the models again
                 algorithms.append("FrontEndCommonApplicationRunner")
 
-                # if going to write provenance data after the run add the two
-                # provenance gatherers
-                if config.get("Reports", "writeProvenanceData"):
-                    algorithms.append("FrontEndCommonProvenanceGatherer")
         return algorithms
 
     def _create_pacman_executor_outputs(
@@ -624,6 +615,11 @@ class Spinnaker(object):
         application_graph_changed = \
             self._detect_if_graph_has_changed(not is_resetting)
         inputs = list()
+
+        # add warn messages to all runs (cant harm)
+        inputs.append(
+            {'type': "WarnMessages",
+             'value': self._warn_messages})
 
         # file path to store any provenance data to
         provenance_file_path = \
@@ -1175,8 +1171,8 @@ class Spinnaker(object):
             population._end()
 
         # if operating in debug mode, extract io buffers from all machine
-        if config.get("Mode", "mode") == "Debug":
-            self._run_debug_iobuf_extraction_for_exit()
+        self._run_debug_iobuf_extraction_for_exit(
+            config.get("Mode", "mode") == "Debug")
 
         # if not a virtual machine, then shut down stuff on the board
         if not config.getboolean("Machine", "virtual_board"):
@@ -1227,7 +1223,7 @@ class Spinnaker(object):
                 logger.info("Turning off machine")
             self._txrx.close(power_off_machine=turn_off_machine)
 
-    def _run_debug_iobuf_extraction_for_exit(self):
+    def _run_debug_iobuf_extraction_for_exit(self, in_debug_mode):
         pacman_inputs = list()
         pacman_inputs.append({
             'type': "MemoryTransciever",
@@ -1245,12 +1241,21 @@ class Spinnaker(object):
             'type': "ProvenanceFilePath",
             'value': os.path.join(self._report_default_directory,
                                   "provenance_data")})
+        pacman_inputs.append({
+            'type': "MemoryRoutingTables",
+            'value': self._router_tables})
+        pacman_inputs.append({
+            'type': "MemoryExtendedMachine",
+            'value': self._machine})
+
         pacman_outputs = list()
         pacman_outputs.append("IOBuffers")
         pacman_outputs.append("ErrorMessages")
         pacman_algorithms = list()
-        pacman_algorithms.append("FrontEndCommonIOBufExtractor")
-        pacman_algorithms.append("FrontEndCommonMessagePrinter")
+        pacman_algorithms.append("FrontEndCommonProvenanceGatherer")
+        if in_debug_mode:
+            pacman_algorithms.append("FrontEndCommonIOBufExtractor")
+            pacman_algorithms.append("FrontEndCommonMessagePrinter")
         pacman_xmls = list()
         pacman_xmls.append(
             os.path.join(os.path.dirname(interface_functions.__file__),
