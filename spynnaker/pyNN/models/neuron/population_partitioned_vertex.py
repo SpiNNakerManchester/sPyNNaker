@@ -149,7 +149,7 @@ class PopulationPartitionedVertex(
                 "often a sign that the system is running too quickly for the"
                 " number of neurons per core, please increase the timer_tic "
                 "or time_scale_factor or decrease the number of neurons "
-                "per core.".format(input_buffer_overflows), "")
+                "per core.".format(transmission_event_overflow), "")
         if timer_tic_queue_overloaded != 0:
             message_store.add_core_message(
                 placement.x, placement.y, placement.p,

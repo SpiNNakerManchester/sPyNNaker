@@ -1,13 +1,11 @@
-import copy
-import logging
-from enum import Enum
-import math
-
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
     delay_partitionable_edge import DelayPartitionableEdge
 
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_provenance_partitionable_vertex import \
+    AbstractProvidesProvenancePartitionableVertex
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
@@ -20,6 +18,8 @@ from spinn_front_end_common.abstract_models.\
     import AbstractProvidesNKeysForPartition
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+from spinn_front_end_common.utilities import constants \
+    as front_end_common_constants
 
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
@@ -27,8 +27,6 @@ from pacman.model.constraints.partitioner_constraints.\
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_mask_constraint \
     import KeyAllocatorFixedMaskConstraint
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -36,14 +34,20 @@ from pacman.model.constraints.key_allocator_constraints\
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 
+import copy
+import logging
+from enum import Enum
+import math
+
 logger = logging.getLogger(__name__)
 
 
-class DelayExtensionVertex(AbstractPartitionableVertex,
-                           AbstractDataSpecableVertex,
-                           AbstractProvidesIncomingPartitionConstraints,
-                           AbstractProvidesOutgoingPartitionConstraints,
-                           AbstractProvidesNKeysForPartition):
+class DelayExtensionVertex(
+        AbstractDataSpecableVertex,
+        AbstractProvidesProvenancePartitionableVertex,
+        AbstractProvidesIncomingPartitionConstraints,
+        AbstractProvidesOutgoingPartitionConstraints,
+        AbstractProvidesNKeysForPartition):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -51,7 +55,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         value="DELAY_EXTENSION_REGIONS",
         names=[('SYSTEM', 0),
                ('DELAY_PARAMS', 1),
-               ('SPIKE_HISTORY', 2)])
+               ('PROVENANCE_REGION', 2)])
     _DEFAULT_MALLOCS_USED = 2
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
@@ -61,10 +65,11 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         Creates a new DelayExtension Object.
         """
 
-        AbstractPartitionableVertex.__init__(self, n_atoms=n_neurons,
-                                             constraints=constraints,
-                                             label=label,
-                                             max_atoms_per_core=256)
+        AbstractProvidesProvenancePartitionableVertex.__init__(
+            self, n_atoms=n_neurons, constraints=constraints, label=label,
+            max_atoms_per_core=256,
+            provenance_region_id=
+            self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value)
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
@@ -163,6 +168,12 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
+
+        spec.reserve_memory_region(
+            region=self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value,
+            size=
+            front_end_common_constants.PROVENANCE_DATA_REGION_SIZE_IN_BYTES,
+            label="provenance region")
 
         self.write_setup_info(spec)
 

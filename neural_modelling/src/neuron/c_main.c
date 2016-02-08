@@ -47,14 +47,11 @@ typedef enum regions_e{
     PROVENANCE_DATA_REGION
 } regions_e;
 
-typedef enum provenance_data_region_entries{
-    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT,
-    SYNAPTIC_WEIGHT_SATURATION_COUNT,
-    INPUT_BUFFER_OVERFLOW_COUNT,
-    TRANSMISSION_EVENT_OVERFLOW,
-    TIMER_TIC_QUEUE_OVERLOADED,
-    DMA_QUEUE_OVERLOADED
-} provenance_data_region_entries;
+typedef enum extra_provenance_data_region_entries{
+    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 3,
+    SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
+    INPUT_BUFFER_OVERFLOW_COUNT = 5,
+} extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
 typedef enum callback_priorities{

@@ -42,7 +42,8 @@ typedef struct fast_spike_source_t {
 typedef enum region{
     SYSTEM, POISSON_PARAMS,
     BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    BUFFERING_OUT_CONTROL_REGION
+    BUFFERING_OUT_CONTROL_REGION,
+    PROVENANCE_REGION
 }region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
@@ -292,6 +293,9 @@ void timer_callback(uint timer_count, uint unused) {
         if (recording_flags > 0) {
             recording_finalise();
         }
+
+        // store provenance data
+        simulation_store_provenance_data(PROVENANCE_REGION);
         // go into pause and resume state
         simulation_handle_pause_resume(timer_callback, TIMER);
 

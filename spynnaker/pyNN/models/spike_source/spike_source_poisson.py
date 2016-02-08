@@ -1,5 +1,3 @@
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -16,6 +14,9 @@ from spynnaker.pyNN.utilities.conf import config
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_provenance_partitionable_vertex import \
+    AbstractProvidesProvenancePartitionableVertex
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
@@ -42,8 +43,9 @@ RANDOM_SEED_WORDS = 4
 
 
 class SpikeSourcePoisson(
-        AbstractPartitionableVertex, AbstractDataSpecableVertex,
-        AbstractSpikeRecordable, AbstractProvidesOutgoingPartitionConstraints,
+        AbstractProvidesProvenancePartitionableVertex,
+        AbstractDataSpecableVertex, AbstractSpikeRecordable,
+        AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping,
         ReceiveBuffersToHostBasicImpl):
     """ A Poisson Spike source object
@@ -54,7 +56,8 @@ class SpikeSourcePoisson(
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
                ('SPIKE_HISTORY_REGION', 2),
-               ('BUFFERING_OUT_STATE', 3)])
+               ('BUFFERING_OUT_STATE', 3),
+               ('PROVENANCE_REGION', 4)])
 
     _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
@@ -68,9 +71,11 @@ class SpikeSourcePoisson(
             self, n_neurons, machine_time_step, timescale_factor,
             constraints=None, label="SpikeSourcePoisson", rate=1.0, start=0.0,
             duration=None, seed=None):
-        AbstractPartitionableVertex.__init__(
+        AbstractProvidesProvenancePartitionableVertex.__init__(
             self, n_atoms=n_neurons, label=label, constraints=constraints,
-            max_atoms_per_core=self._model_based_max_atoms_per_core)
+            max_atoms_per_core=self._model_based_max_atoms_per_core,
+            provenance_region_id=
+            self._POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value)
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
@@ -169,6 +174,11 @@ class SpikeSourcePoisson(
             spec, self._POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value,
             [self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value],
             [spike_hist_buff_sz])
+        spec.reserve_memory_region(
+            region=self._POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value,
+            size=
+            front_end_common_constants.PROVENANCE_DATA_REGION_SIZE_IN_BYTES,
+            label="Provenance region")
 
     def _write_setup_info(
             self, spec, spike_history_region_sz, ip_tags,
