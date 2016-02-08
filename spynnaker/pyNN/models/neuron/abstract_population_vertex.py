@@ -1,3 +1,14 @@
+
+# pacman imports
+from pacman.interfaces.abstract_provides_provenance_data import \
+    AbstractProvidesProvenanceData
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
+
+# front end common imports
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_partition_constraints import \
     AbstractProvidesIncomingPartitionConstraints
@@ -8,7 +19,11 @@ from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
 from spinn_front_end_common.interface.buffer_management.buffer_models\
     .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
+from spinn_front_end_common.utilities import constants as common_constants
 
+# spynnaker imports
 from spynnaker.pyNN.models.neuron.population_partitioned_vertex import \
     PopulationPartitionedVertex
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -19,12 +34,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
 from spynnaker.pyNN.models.abstract_models.abstract_mappable \
     import AbstractMappable
-from data_specification.data_specification_generator \
-    import DataSpecificationGenerator
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
@@ -37,9 +46,9 @@ from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
-    import KeyAllocatorContiguousRangeContraint
+# dsg imports
+from data_specification.data_specification_generator \
+    import DataSpecificationGenerator
 
 from abc import ABCMeta
 from six import add_metaclass
@@ -189,7 +198,7 @@ class AbstractPopulationVertex(
         if self._additional_input is not None:
             per_neuron_usage += \
                 self._additional_input.get_sdram_usage_per_neuron_in_bytes()
-        return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+        return ((common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
                 self.get_recording_data_size(3) +
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._neuron_model.get_sdram_usage_in_bytes(
@@ -244,8 +253,9 @@ class AbstractPopulationVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-                  self.get_recording_data_size(3)), label='System')
+            size=((
+                common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+                self.get_recording_data_size(3)), label='System')
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
@@ -260,6 +270,11 @@ class AbstractPopulationVertex(
              constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value],
             [spike_history_region_sz, v_history_region_sz,
              gsyn_history_region_sz])
+
+        spec.reserve_memory_region(
+            region=constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value,
+            size=constants.PROVENANCE_DATA_REGION_SIZE_IN_BYTES,
+            label="Provenance_data")
 
     def _write_setup_info(
             self, spec, spike_history_region_sz, neuron_potential_region_sz,

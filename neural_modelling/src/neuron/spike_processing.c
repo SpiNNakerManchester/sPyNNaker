@@ -245,12 +245,10 @@ void spike_processing_finish_write(uint32_t process_id) {
     _setup_synaptic_dma_write(process_id);
 }
 
-void spike_processing_print_buffer_overflows() {
-
+//! \brief returns the number of times the input buffer has overloaded
+//! \return the number of times the input buffer has overloaded
+//! \rtype uint_32t
+uint32_t spike_processing_get_buffer_overflows() {
     // Check for buffer overflow
-    uint32_t spike_buffer_overflows = in_spikes_get_n_buffer_overflows();
-    if (spike_buffer_overflows > 0) {
-        io_printf(IO_BUF, "\tWarning - %u spike buffers overflowed\n",
-                  spike_buffer_overflows);
-    }
+    return in_spikes_get_n_buffer_overflows();
 }

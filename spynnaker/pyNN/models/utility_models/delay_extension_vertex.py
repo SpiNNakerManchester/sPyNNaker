@@ -157,7 +157,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
-            size=constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
+            size=common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
             label='setup')
 
         spec.reserve_memory_region(

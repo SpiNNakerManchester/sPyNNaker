@@ -49,5 +49,5 @@ void synapse_dynamics_print_plastic_synapses(
 //! (the assumption being that a empty function will be removed by the
 //! compiler and therefore there is no code bloat)
 //! \return Nothing, this method does not return anything
-void synapse_dynamics_print_plastic_pre_synaptic_events(){
+uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
 }

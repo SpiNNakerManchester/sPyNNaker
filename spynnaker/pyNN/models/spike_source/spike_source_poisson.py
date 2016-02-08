@@ -316,7 +316,8 @@ class SpikeSourcePoisson(
                 vertex_slice.n_atoms, self._no_machine_time_steps),
             self._spike_buffer_max_size))
         total_size = \
-            ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+            ((front_end_common_constants.
+              DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
              self.get_recording_data_size(1) +
              self.get_buffer_state_region_size(1) +
              poisson_params_sz + spike_hist_buff_sz)

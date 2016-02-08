@@ -21,11 +21,10 @@ void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
-//! \either prints the counters for plastic pre synaptic events based
-//! on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or does
-//! nothing (the assumption being that a empty function will be removed by the
-//! compiler and therefore there is no code bloat)
-//! \return Nothing, this method does not return anything
-void synapse_dynamics_print_plastic_pre_synaptic_events();
+//! \returns the counters for plastic pre synaptic events based
+//! on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
+//! returns 0
+//! \return counters for plastic pre synaptic events or 0
+uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
 
 #endif // _SYNAPSE_DYNAMICS_H_
