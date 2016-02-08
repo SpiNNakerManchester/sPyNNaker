@@ -4,20 +4,19 @@ from pacman.interfaces.abstract_provides_provenance_data import \
     AbstractProvidesProvenanceData
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
-# spinn frnt end common imports
+# spinn front end common imports
 from spinn_front_end_common.interface.buffer_management.buffer_models.\
     abstract_receive_buffers_to_host import \
     AbstractReceiveBuffersToHost
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utilities import constants as common_constants
 
 # data spec imports
-from data_specification import utility_calls as data_specifation_utilties
+from data_specification import utility_calls as data_specification_utilities
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
 
-# geenral imports
+# general imports
 import struct
 
 
@@ -77,7 +76,7 @@ class PopulationPartitionedVertex(
         app_data_base_address = transceiver.get_cpu_information_from_core(
             placement.x, placement.y, placement.p).user[0]
         provenance_data_region_base_address = \
-            data_specifation_utilties.get_region_base_address_offset(
+            data_specification_utilities.get_region_base_address_offset(
                 app_data_base_address,
                 constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value)
         provenance_data_region_base_address_offset = \
