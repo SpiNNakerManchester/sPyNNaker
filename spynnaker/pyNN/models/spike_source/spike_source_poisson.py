@@ -375,7 +375,8 @@ class SpikeSourcePoisson(
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
         # Basic setup plus 8 bytes for recording flags and recording size
-        setup_sz = ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+        setup_sz = ((front_end_common_constants.
+                     DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
                     self.get_recording_data_size(1))
 
         poisson_params_sz = self.get_params_bytes(vertex_slice)

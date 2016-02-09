@@ -13,7 +13,10 @@ from spinn_front_end_common.interface.interface_functions.\
     front_end_common_execute_mapper import \
     FrontEndCommonExecuteMapper
 from spinn_front_end_common.utilities import exceptions as common_exceptions
-from spinn_front_end_common.utilities.report_states import ReportState
+from spinn_front_end_common.utilities.utility_objs.\
+    provenance_data_items import ProvenanceDataItems
+from spinn_front_end_common.utilities.utility_objs.report_states \
+    import ReportState
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
@@ -107,7 +110,8 @@ class Spinnaker(object):
         # holder for the executable targets (which we will need for reset and
         # pause and resume functionality
         self._executable_targets = None
-        self._warn_messages = MessageHolder()
+        self._provenance_data_items = ProvenanceDataItems()
+        self._provenance_file_path = None
 
         # holders for data needed for reset when nothing changes in the
         # application graph
@@ -164,6 +168,12 @@ class Spinnaker(object):
                         "Reports", "defaultApplicationDataFilePath"),
                     app_id=self._app_id,
                     this_run_time_string=this_run_time_string)
+
+            # set up provenance data folder
+            self._provenance_file_path = \
+                os.path.join(self._report_default_directory, "provenance_data")
+            if not os.path.exists(self._provenance_file_path):
+                    os.mkdir(self._provenance_file_path)
 
         self._spikes_per_second = float(config.getfloat(
             "Simulation", "spikes_per_second"))
@@ -312,15 +322,15 @@ class Spinnaker(object):
         pacman_executor = execute_mapper.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,
             config.getboolean("Reports", "outputTimesForSections"),
-            self._algorithms_to_catch_prov_on_crash)
+            self._algorithms_to_catch_prov_on_crash,
+            prov_path=self._provenance_file_path)
 
         # gather provenance data from the executor itself if needed
         if config.get("Reports", "writeProvenanceData"):
-            pacman_executor_file_path = os.path.join(
-                pacman_executor.get_item("ProvenanceFilePath"),
-                "PACMAN_provenance_data.xml")
-            pacman_executor.get_provenance_data_items(
+            prov_items = pacman_executor.get_provenance_data_items(
                 pacman_executor.get_item("MemoryTransciever"))
+            self._provenance_data_items.add_provenance_item_by_operation(
+                "PACMAN", prov_items)
 
         # sort out outputs data
         if application_graph_changed:
@@ -388,7 +398,8 @@ class Spinnaker(object):
         execute_mapper.do_mapping(
             inputs, algorithms, required_outputs, xml_paths,
             config.getboolean("Reports", "outputTimesForSections"),
-            self._algorithms_to_catch_prov_on_crash)
+            self._algorithms_to_catch_prov_on_crash,
+            prov_path=self._provenance_file_path)
 
         # if graph has changed kill all old objects as they will need to be
         # rebuilt at next run
@@ -432,8 +443,6 @@ class Spinnaker(object):
         self._database_file_path = \
             pacman_executor.get_item("DatabaseFilePath")
         self._no_sync_changes = pacman_executor.get_item("NoSyncChanges")
-        if config.getboolean("Reports", "writeProvenanceData"):
-            self._warn_messages = pacman_executor.get_item("WarnMessages")
 
     @staticmethod
     def _create_xml_paths():
@@ -613,17 +622,6 @@ class Spinnaker(object):
             self._detect_if_graph_has_changed(not is_resetting)
         inputs = list()
 
-        # add warn messages to all runs (cant harm)
-        inputs.append(
-            {'type': "WarnMessages",
-             'value': self._warn_messages})
-
-        # file path to store any provenance data to
-        provenance_file_path = \
-            os.path.join(self._report_default_directory, "provenance_data")
-        if not os.path.exists(provenance_file_path):
-                os.mkdir(provenance_file_path)
-
         # all modes need the NoSyncChanges
         if application_graph_changed:
             self._no_sync_changes = 0
@@ -772,8 +770,6 @@ class Spinnaker(object):
             inputs.append({'type': "SendStartNotifications",
                            'value': config.getboolean(
                                "Database", "send_start_notification")})
-            inputs.append({'type': "ProvenanceFilePath",
-                           'value': provenance_file_path})
 
             # add paths for each file based version
             inputs.append({'type': "FileCoreAllocationsFilePath",
@@ -846,8 +842,6 @@ class Spinnaker(object):
                            'value': self._machine})
             inputs.append({'type': "MemoryRoutingTables",
                            'value': self._router_tables})
-            inputs.append({'type': "ProvenanceFilePath",
-                           'value': provenance_file_path})
             inputs.append({'type': "RanToken", 'value': self._has_ran})
 
         return inputs, application_graph_changed
@@ -1221,6 +1215,7 @@ class Spinnaker(object):
             self._txrx.close(power_off_machine=turn_off_machine)
 
     def _run_debug_iobuf_extraction_for_exit(self, in_debug_mode):
+
         pacman_inputs = list()
         pacman_inputs.append({
             'type': "MemoryTransciever",
@@ -1232,12 +1227,11 @@ class Spinnaker(object):
             'type': "MemoryPlacements",
             'value': self._placements})
         pacman_inputs.append({
-            'type': "WarnMessages",
-            'value': self._warn_messages})
-        pacman_inputs.append({
             'type': "ProvenanceFilePath",
-            'value': os.path.join(self._report_default_directory,
-                                  "provenance_data")})
+            'value': self._provenance_file_path})
+        pacman_inputs.append({
+            'type': "ProvenanceItems",
+            'value': self._provenance_data_items})
         pacman_inputs.append({
             'type': "MemoryRoutingTables",
             'value': self._router_tables})
@@ -1250,8 +1244,10 @@ class Spinnaker(object):
         pacman_outputs.append("ErrorMessages")
         pacman_algorithms = list()
         pacman_algorithms.append("FrontEndCommonProvenanceGatherer")
+        pacman_algorithms.append("FrontEndCommonProvenanceXMLWriter")
         if in_debug_mode:
             pacman_algorithms.append("FrontEndCommonIOBufExtractor")
+            pacman_algorithms.append("FrontEndCommonWarningGenerator")
             pacman_algorithms.append("FrontEndCommonMessagePrinter")
         pacman_xmls = list()
         pacman_xmls.append(
