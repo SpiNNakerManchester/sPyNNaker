@@ -64,10 +64,7 @@ PROVENANCE_DATA_ENTRIES = Enum(
     value="PROVENANCE_DATA_ENTRIES",
     names=[("PRE_SYNAPTIC_EVENT_COUNT", 0),
            ("SATURATION_COUNT", 1),
-           ("BUFFER_OVERFLOW_COUNT", 2),
-           ("TRANSMISSION_EVENT_OVERFLOW", 3),
-           ("TIMER_TIC_QUEUE_OVERLOADED", 4),
-           ("DMA_QUEUE_OVERLOADED", 5)])
+           ("BUFFER_OVERFLOW_COUNT", 2)])
 
 # the size most neural models needs for provenance data
 PROVENANCE_DATA_REGION_SIZE_IN_BYTES = len(PROVENANCE_DATA_ENTRIES) * 4

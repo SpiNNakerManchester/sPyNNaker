@@ -315,15 +315,12 @@ class Spinnaker(object):
             self._algorithms_to_catch_prov_on_crash)
 
         # gather provenance data from the executor itself if needed
-        if (config.get("Reports", "writeProvenanceData") and
-                not config.getboolean("Machine", "virtual_board")):
+        if config.get("Reports", "writeProvenanceData"):
             pacman_executor_file_path = os.path.join(
                 pacman_executor.get_item("ProvenanceFilePath"),
                 "PACMAN_provenance_data.xml")
-            pacman_executor.write_provenance_data_in_xml(
-                pacman_executor_file_path,
-                pacman_executor.get_item("MemoryTransciever"),
-                pacman_executor.get_item("WarnMessages"))
+            pacman_executor.get_provenance_data_items(
+                pacman_executor.get_item("MemoryTransciever"))
 
         # sort out outputs data
         if application_graph_changed:
