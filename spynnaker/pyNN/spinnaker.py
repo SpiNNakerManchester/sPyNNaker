@@ -1,14 +1,17 @@
 
 # pacman imports
+from pacman.interfaces.abstract_provides_provenance_data import \
+    AbstractProvidesProvenanceData
 from pacman.model.partitionable_graph.partitionable_graph import \
     PartitionableGraph
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 from pacman.operations import algorithm_reports as pacman_algorithm_reports
+from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
+from pacman.utilities.utility_objs.provenance_data_item import \
+    ProvenanceDataItem
 
 # common front end imports
-from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
-from pacman.utilities.utility_objs.message_holder import MessageHolder
 from spinn_front_end_common.interface.interface_functions.\
     front_end_common_execute_mapper import \
     FrontEndCommonExecuteMapper
@@ -46,6 +49,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models\
     .abstract_has_first_machine_time_step \
     import AbstractHasFirstMachineTimeStep
+from spynnaker.pyNN import _version
 
 
 # general imports
@@ -58,7 +62,7 @@ logger = logging.getLogger(__name__)
 executable_finder = ExecutableFinder()
 
 
-class Spinnaker(object):
+class Spinnaker(AbstractProvidesProvenanceData):
 
     def __init__(self, host_name=None, timestep=None, min_delay=None,
                  max_delay=None, graph_label=None,
@@ -325,13 +329,6 @@ class Spinnaker(object):
             self._algorithms_to_catch_prov_on_crash,
             prov_path=self._provenance_file_path)
 
-        # gather provenance data from the executor itself if needed
-        if config.get("Reports", "writeProvenanceData"):
-            prov_items = pacman_executor.get_provenance_data_items(
-                pacman_executor.get_item("MemoryTransciever"))
-            self._provenance_data_items.add_provenance_item_by_operation(
-                "PACMAN", prov_items)
-
         # sort out outputs data
         if application_graph_changed:
             self._update_data_structures_from_pacman_executor(pacman_executor)
@@ -344,6 +341,20 @@ class Spinnaker(object):
 
         # switch the reset last flag, as now the last thing to run is a run
         self._has_reset_last = False
+
+        # gather provenance data from the executor itself if needed
+        if config.get("Reports", "writeProvenanceData"):
+
+            # get pacman provenance items
+            prov_items = pacman_executor.get_provenance_data_items(
+                pacman_executor.get_item("MemoryTransciever"))
+            self._provenance_data_items.add_provenance_item_by_operation(
+                "PACMAN", prov_items)
+            # get spynnaker provenance
+            prov_items = self.get_provenance_data_items(
+                pacman_executor.get_item("MemoryTransciever"))
+            self._provenance_data_items.add_provenance_item_by_operation(
+                "sPyNNaker", prov_items)
 
     def reset(self):
         """ Code that puts the simulation back at time zero
@@ -443,6 +454,31 @@ class Spinnaker(object):
         self._database_file_path = \
             pacman_executor.get_item("DatabaseFilePath")
         self._no_sync_changes = pacman_executor.get_item("NoSyncChanges")
+
+    def get_provenance_data_items(self, transceiver, placement=None):
+        """
+        @implements pacman.interface.abstract_provides_provenance_data.AbstractProvidesProvenanceData.get_provenance_data_items
+        :return:
+        """
+        prov_items = list()
+        prov_items.append(ProvenanceDataItem(
+            name="ip_address",
+            item=str(self._hostname)))
+        prov_items.append(ProvenanceDataItem(
+            name="software_version",
+            item="{}:{}:{}:{}".format(
+                _version.__version__,  _version.__version_name__,
+                _version.__version_year__, _version.__version_month__)))
+        prov_items.append(ProvenanceDataItem(
+            name="machine_time_step",
+            item=str(self._machine_time_step)))
+        prov_items.append(ProvenanceDataItem(
+            name="time_scale_factor",
+            item=str(self._time_scale_factor)))
+        prov_items.append(ProvenanceDataItem(
+            name="total_runtime",
+            item=str(self._current_run_ms)))
+        return prov_items
 
     @staticmethod
     def _create_xml_paths():
@@ -1238,10 +1274,22 @@ class Spinnaker(object):
         pacman_inputs.append({
             'type': "MemoryExtendedMachine",
             'value': self._machine})
+        pacman_inputs.append({
+            'type': "MemoryMachine",
+            'value': self._machine})
+        pacman_inputs.append({
+            'type': 'FileMachineFilePath',
+            'value': os.path.join(self._provenance_file_path,
+                                  "Machine.json")})
+
 
         pacman_outputs = list()
-        pacman_outputs.append("IOBuffers")
-        pacman_outputs.append("ErrorMessages")
+        if in_debug_mode:
+            pacman_outputs.append("FileMachine")
+            pacman_outputs.append("ErrorMessages")
+            pacman_outputs.append("IOBuffers")
+        pacman_outputs.append("ProvenanceItems")
+
         pacman_algorithms = list()
         pacman_algorithms.append("FrontEndCommonProvenanceGatherer")
         pacman_algorithms.append("FrontEndCommonProvenanceXMLWriter")
