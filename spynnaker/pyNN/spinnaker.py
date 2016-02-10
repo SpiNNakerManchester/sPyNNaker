@@ -664,6 +664,10 @@ class Spinnaker(AbstractProvidesProvenanceData):
         inputs.append(
             {'type': "NoSyncChanges", 'value': self._no_sync_changes})
 
+        inputs.append(
+            {'type': 'TimeTheshold',
+             'value': config.getint("Machine", "time_to_wait_till_error")})
+
         # support resetting the machine during start up
         if (config.getboolean("Machine", "reset_machine_on_startup") and
                 not self._has_ran and not is_resetting):
