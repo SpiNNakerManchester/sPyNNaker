@@ -54,14 +54,15 @@ class FixedNumberPreConnector(AbstractConnector):
     def _get_pre_neurons(self):
         if self._pre_neurons is None:
             self._pre_neurons = numpy.random.choice(
-                self._n_pre_neurons, self._n_pre, False).sort()
+                self._n_pre_neurons, self._n_pre, False)
+            self._pre_neurons.sort()
         return self._pre_neurons
 
     def _pre_neurons_in_slice(self, pre_vertex_slice):
         pre_neurons = self._get_pre_neurons()
         return pre_neurons[
-            pre_neurons >= pre_vertex_slice.lo_atom &
-            pre_neurons <= pre_vertex_slice.hi_atom]
+            (pre_neurons >= pre_vertex_slice.lo_atom) &
+            (pre_neurons <= pre_vertex_slice.hi_atom)]
 
     def _is_connected(self, pre_vertex_slice):
         return self._pre_neurons_in_slice(pre_vertex_slice).size > 0
@@ -125,7 +126,7 @@ class FixedNumberPreConnector(AbstractConnector):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, connector_index):
+            synapse_type):
         if not self._is_connected(pre_vertex_slice):
             return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         pre_neurons_in_slice = self._pre_neurons_in_slice(pre_vertex_slice)

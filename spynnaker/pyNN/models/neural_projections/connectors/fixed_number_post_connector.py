@@ -47,14 +47,15 @@ class FixedNumberPostConnector(AbstractConnector):
                 else:
                     self._post_neurons = numpy.append(
                         self._post_neurons, permutation)
-            self._post_neurons = self._post_neurons[:self._post_n].sort()
+            self._post_neurons = self._post_neurons[:self._post_n]
+            self._post_neurons.sort()
         return self._post_neurons
 
     def _post_neurons_in_slice(self, post_vertex_slice):
         post_neurons = self._get_post_neurons()
         return post_neurons[
-            post_neurons >= post_vertex_slice.lo_atom &
-            post_neurons <= post_vertex_slice.hi_atom]
+            (post_neurons >= post_vertex_slice.lo_atom) &
+            (post_neurons <= post_vertex_slice.hi_atom)]
 
     def _is_connected(self, post_vertex_slice):
         return self._post_neurons_in_slice(post_vertex_slice).size > 0
