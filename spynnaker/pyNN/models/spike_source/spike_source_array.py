@@ -45,9 +45,9 @@ class SpikeSourceArray(
     _model_based_max_atoms_per_core = sys.maxint
 
     def __init__(
-            self, n_neurons, spike_times, machine_time_step, timescale_factor,
-            port=None, tag=None, ip_address=None, board_address=None,
-            max_on_chip_memory_usage_for_spikes_in_bytes=(
+            self, n_neurons, machine_time_step, timescale_factor,
+            spike_times=[], port=None, tag=None, ip_address=None,
+            board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
                 constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
             space_before_notification=640,
             constraints=None, label="SpikeSourceArray",
