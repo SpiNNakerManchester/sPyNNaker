@@ -155,6 +155,6 @@ class FAKEIFCurrExpPartitioned(
             "The core at {}:{}:{} was at timer tic {} when it should have been"
             " at timer tic {}. It was forcefully closed".format(
                 placement.x, placement.y, placement.p, last_timer_tic,
-                self._no_machine_time_step)))
+                (self._no_machine_time_step / 10))))
         return basic_provenance_entries
 
