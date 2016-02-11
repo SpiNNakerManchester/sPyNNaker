@@ -1,7 +1,5 @@
 
 # pacman imports
-from pacman.interfaces.abstract_provides_provenance_data import \
-    AbstractProvidesProvenanceData
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from pacman.model.constraints.key_allocator_constraints\
@@ -153,7 +151,8 @@ class AbstractPopulationVertex(
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          constraints=None):
         return PopulationPartitionedVertex(
-            self.buffering_output(), resources_required, label, constraints)
+            self.buffering_output(), resources_required, label,
+            self._no_machine_time_steps, constraints)
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -273,7 +272,8 @@ class AbstractPopulationVertex(
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value,
-            size=constants.PROVENANCE_DATA_REGION_SIZE_IN_BYTES,
+            size=(constants.PROVENANCE_DATA_REGION_SIZE_IN_BYTES +
+                  common_constants.PROVENANCE_DATA_REGION_SIZE_IN_BYTES),
             label="Provenance_data")
 
     def _write_setup_info(

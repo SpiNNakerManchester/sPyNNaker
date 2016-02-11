@@ -214,7 +214,6 @@ void timer_callback(uint unused0, uint unused1) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
-        simulation_store_provenance_data(PROVENANCE_REGION);
         // handle the pause and resume functionality
         simulation_handle_pause_resume(timer_callback, TIMER);
     }
@@ -303,6 +302,8 @@ void c_main(void) {
 
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
+    // set up prov registration
+    simulation_register_provenance_function_call(NULL, PROVENANCE_REGION);
 
     log_info("Starting");
     simulation_run();

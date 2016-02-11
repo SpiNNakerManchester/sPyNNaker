@@ -293,9 +293,6 @@ void timer_callback(uint timer_count, uint unused) {
         if (recording_flags > 0) {
             recording_finalise();
         }
-
-        // store provenance data
-        simulation_store_provenance_data(PROVENANCE_REGION);
         // go into pause and resume state
         simulation_handle_pause_resume(timer_callback, TIMER);
 
@@ -435,6 +432,9 @@ void c_main(void) {
     // Set up callback listening to SDP messages
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
+
+    // set up prov registration
+    simulation_register_provenance_function_call(NULL, PROVENANCE_REGION);
 
     log_info("Starting");
     simulation_run();

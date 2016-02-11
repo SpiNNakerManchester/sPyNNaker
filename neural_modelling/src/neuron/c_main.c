@@ -48,9 +48,10 @@ typedef enum regions_e{
 } regions_e;
 
 typedef enum extra_provenance_data_region_entries{
-    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 3,
-    SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
-    INPUT_BUFFER_OVERFLOW_COUNT = 5,
+    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
+    SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
+    INPUT_BUFFER_OVERFLOW_COUNT = 2,
+    CURRENT_TIMER_TICK = 3,
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -172,24 +173,21 @@ static bool initialise(uint32_t *timer_period) {
     return true;
 }
 
-void c_main_store_provenance_data(
-        uint32_t pre_synaptic_event_count, uint32_t saturation_count,
-        uint32_t buffer_overflow_count){
-
-    // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
-    // get the address of the start of the core's provenance data region
-    address_t provenance_region = data_specification_get_region(
-        PROVENANCE_DATA_REGION, address);
-
+void c_main_store_provenance_data(address_t provenance_region){
+    log_info("writing other provenance data");
     // store the data into the provenance data region
     provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
-        pre_synaptic_event_count;
-    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] = saturation_count;
-    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] = buffer_overflow_count;
-    provenance_region[TRANSMISSION_EVENT_OVERFLOW] = 0;
-    provenance_region[TIMER_TIC_QUEUE_OVERLOADED] = 0;
-    provenance_region[DMA_QUEUE_OVERLOADED] = 0;
+        synapses_get_pre_synaptic_events();
+    log_info("a");
+    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
+        synapses_get_saturation_count();
+    log_info("b");
+    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
+        spike_processing_get_buffer_overflows();
+    log_info("c");
+    provenance_region[CURRENT_TIMER_TICK] = time;
+    log_info("d");
+    log_info("finished other provenance data");
 }
 
 //! \brief Timer interrupt callback
@@ -208,11 +206,6 @@ void timer_callback(uint timer_count, uint unused) {
     /* if a fixed number of simulation ticks that were specified at startup
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
-
-        // get statistics into logging region
-        c_main_store_provenance_data(
-            synapses_get_pre_synaptic_events(), synapses_get_saturation_count(),
-            spike_processing_get_buffer_overflows());
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
@@ -264,6 +257,9 @@ void c_main(void) {
     // Set up callback listening to SDP messages
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP_AND_DMA_AND_USER);
+    // set up prov registration
+    simulation_register_provenance_function_call(
+        c_main_store_provenance_data, PROVENANCE_DATA_REGION);
 
     log_info("Starting");
     simulation_run();

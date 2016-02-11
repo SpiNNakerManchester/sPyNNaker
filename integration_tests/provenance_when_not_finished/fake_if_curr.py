@@ -1,4 +1,6 @@
 # spynnaker imports
+from fake_if_curr_partitioned import \
+    FAKEIFCurrExpPartitioned
 from spynnaker.pyNN.models.neuron.neuron_models\
     .neuron_model_leaky_integrate_and_fire \
     import NeuronModelLeakyIntegrateAndFire
@@ -66,6 +68,12 @@ class FAKEIFCurrExp(AbstractPopulationVertex):
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
         FAKEIFCurrExp._model_based_max_atoms_per_core = new_value
+
+    def create_subvertex(self, vertex_slice, resources_required, label=None,
+                         constraints=None):
+        return FAKEIFCurrExpPartitioned(
+            self.buffering_output(), resources_required, label,
+            self._no_machine_time_steps, constraints)
 
     def _write_basic_setup_info(self, spec, region_id):
 
