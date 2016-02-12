@@ -132,7 +132,8 @@ class Spinnaker(object):
                     config.getboolean("Reports", "writeReloadSteps"),
                     config.getboolean("Reports", "writeTransceiverReport"),
                     config.getboolean("Reports", "outputTimesForSections"),
-                    config.getboolean("Reports", "writeTagAllocationReports"))
+                    config.getboolean("Reports", "writeTagAllocationReports"),
+                    config.getboolean("Reports", "writeRouterTableReports"))
 
             # set up reports default folder
             self._report_default_directory, this_run_time_string = \
@@ -537,6 +538,8 @@ class Spinnaker(object):
                     and self._reports_states.routing_info_report:
                 algorithms.append("routingInfoReports")
                 algorithms.append("unCompressedRoutingTableReports")
+            if self._reports_states is not None \
+                    and self._reports_states.generate_routing_table_report:
                 algorithms.append("compressedRoutingTableReports")
                 algorithms.append("comparisonOfRoutingTablesReport")
             if self._reports_states is not None \

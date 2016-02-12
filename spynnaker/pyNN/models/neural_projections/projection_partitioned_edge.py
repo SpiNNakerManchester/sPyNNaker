@@ -69,3 +69,6 @@ class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
 
     def is_multi_cast_partitioned_edge(self):
         return True
+
+    def __repr__(self):
+        return "{}:{}".format(self._pre_subvertex, self._post_subvertex)
