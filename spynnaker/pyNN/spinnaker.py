@@ -458,6 +458,33 @@ class Spinnaker(object):
         # if the allocation graph has changed, need to go through mapping
         if application_graph_changed and not executing_reset:
 
+            # define mapping between output types and reports
+            if self._reports_states is not None \
+                    and self._reports_states.tag_allocation_report:
+                algorithms.append("TagReport")
+            if self._reports_states is not None \
+                    and self._reports_states.routing_info_report:
+                algorithms.append("routingInfoReports")
+                algorithms.append("unCompressedRoutingTableReports")
+            if self._reports_states is not None \
+                    and self._reports_states.generate_routing_table_report:
+                algorithms.append("compressedRoutingTableReports")
+                algorithms.append("comparisonOfRoutingTablesReport")
+            if self._reports_states is not None \
+                    and self._reports_states.router_report:
+                algorithms.append("RouterReports")
+            if self._reports_states is not None \
+                    and self._reports_states.partitioner_report:
+                algorithms.append("PartitionerReport")
+            if (self._reports_states is not None and
+                    self._reports_states.
+                    placer_report_with_partitionable_graph):
+                algorithms.append("PlacerReportWithPartitionableGraph")
+            if (self._reports_states is not None and
+                    self._reports_states.
+                    placer_report_without_partitionable_graph):
+                algorithms.append("PlacerReportWithoutPartitionableGraph")
+
             # if the system has ran before, kill the apps and run mapping
             # add debug algorithms if needed
             if in_debug_mode:
@@ -529,33 +556,6 @@ class Spinnaker(object):
             if (config.get("Reports", "writeProvanceData") and
                     not config.getboolean("Machine", "virtual_board")):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
-
-            # define mapping between output types and reports
-            if self._reports_states is not None \
-                    and self._reports_states.tag_allocation_report:
-                algorithms.append("TagReport")
-            if self._reports_states is not None \
-                    and self._reports_states.routing_info_report:
-                algorithms.append("routingInfoReports")
-                algorithms.append("unCompressedRoutingTableReports")
-            if self._reports_states is not None \
-                    and self._reports_states.generate_routing_table_report:
-                algorithms.append("compressedRoutingTableReports")
-                algorithms.append("comparisonOfRoutingTablesReport")
-            if self._reports_states is not None \
-                    and self._reports_states.router_report:
-                algorithms.append("RouterReports")
-            if self._reports_states is not None \
-                    and self._reports_states.partitioner_report:
-                algorithms.append("PartitionerReport")
-            if (self._reports_states is not None and
-                    self._reports_states.
-                    placer_report_with_partitionable_graph):
-                algorithms.append("PlacerReportWithPartitionableGraph")
-            if (self._reports_states is not None and
-                    self._reports_states.
-                    placer_report_without_partitionable_graph):
-                algorithms.append("PlacerReportWithoutPartitionableGraph")
         else:
 
             # add function for extracting all the recorded data from
