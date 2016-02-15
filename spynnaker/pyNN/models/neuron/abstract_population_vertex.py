@@ -348,6 +348,10 @@ class AbstractPopulationVertex(
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.PROFILING.value,
                 size=(8 + (self.profiler_num_samples * 8)), label="profilerRegion")
+        else:
+            spec.reserve_memory_region(
+                region=constants.POPULATION_BASED_REGIONS.PROFILING.value,
+                size=4, label="profilerRegion")
 
         
     def get_profiling_data(self, txrx, placements, graph_mapper):
@@ -417,10 +421,9 @@ class AbstractPopulationVertex(
              gsyn_region_sz], buffer_size_before_receive,
             time_between_requests)
         
-        if self.profiler_num_samples != 0:
-            # Write profiler info
-            spec.switch_write_focus(region=constants.POPULATION_BASED_REGIONS.PROFILING.value)
-            spec.write_value(data=self.profiler_num_samples)
+        # Write profiler setting.
+        spec.switch_write_focus(region=constants.POPULATION_BASED_REGIONS.PROFILING.value)
+        spec.write_value(data=self.profiler_num_samples)
 
 
     def _write_neuron_parameters(

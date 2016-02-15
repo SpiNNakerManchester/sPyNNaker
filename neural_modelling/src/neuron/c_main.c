@@ -36,6 +36,7 @@
 //! human readable definitions of each region in SDRAM
 typedef enum regions_e{
     SYSTEM_REGION,
+    PROFILER_REGION,
     NEURON_PARAMS_REGION,
     SYNAPSE_PARAMS_REGION,
     POPULATION_TABLE_REGION,
@@ -45,8 +46,7 @@ typedef enum regions_e{
     BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
     BUFFERING_OUT_GSYN_RECORDING_REGION,
     BUFFERING_OUT_CONTROL_REGION,
-    PROVENANCE_DATA_REGION,
-    PROFILER_REGION
+    PROVENANCE_DATA_REGION
 } regions_e;
 
 typedef enum extra_provenance_data_region_entries{
