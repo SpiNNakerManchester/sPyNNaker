@@ -78,28 +78,6 @@ class DelayExtensionException(exceptions.ConfigurationException):
     pass
 
 
-class ExecutableFailedToStartException(SpynnakerException):
-    """ raised when the messages from the transceiver state that some or all\
-        the application images pushed to the board have failed to start when\
-        asked
-
-
-    :raise None: does not raise any known exceptions
-    """
-    pass
-
-
-class ExecutableFailedToStopException(SpynnakerException):
-    """ raised when the messages from the transceiver state that some or all\
-        the application images pushed to the board have failed to stop when\
-        expected
-
-
-    :raise None: does not raise any known exceptions
-    """
-    pass
-
-
 class InvalidParameterType(SpynnakerException):
     """ raised when trying to issue buffered packets for a region not managed
     """

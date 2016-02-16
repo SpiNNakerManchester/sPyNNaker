@@ -42,7 +42,8 @@ typedef struct fast_spike_source_t {
 typedef enum region{
     SYSTEM, POISSON_PARAMS,
     BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    BUFFERING_OUT_CONTROL_REGION
+    BUFFERING_OUT_CONTROL_REGION,
+    PROVENANCE_REGION
 }region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
@@ -431,6 +432,9 @@ void c_main(void) {
     // Set up callback listening to SDP messages
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
+
+    // set up prov registration
+    simulation_register_provenance_function_call(NULL, PROVENANCE_REGION);
 
     log_info("Starting");
     simulation_run();

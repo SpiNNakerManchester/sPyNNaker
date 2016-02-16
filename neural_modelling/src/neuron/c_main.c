@@ -33,7 +33,7 @@
 #endif
 
 //! human readable definitions of each region in SDRAM
-typedef enum regions_e {
+typedef enum regions_e{
     SYSTEM_REGION,
     NEURON_PARAMS_REGION,
     SYNAPSE_PARAMS_REGION,
@@ -43,8 +43,16 @@ typedef enum regions_e {
     BUFFERING_OUT_SPIKE_RECORDING_REGION,
     BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
     BUFFERING_OUT_GSYN_RECORDING_REGION,
-    BUFFERING_OUT_CONTROL_REGION
+    BUFFERING_OUT_CONTROL_REGION,
+    PROVENANCE_DATA_REGION
 } regions_e;
+
+typedef enum extra_provenance_data_region_entries{
+    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
+    SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
+    INPUT_BUFFER_OVERFLOW_COUNT = 2,
+    CURRENT_TIMER_TICK = 3,
+} extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
@@ -165,6 +173,23 @@ static bool initialise(uint32_t *timer_period) {
     return true;
 }
 
+void c_main_store_provenance_data(address_t provenance_region){
+    log_info("writing other provenance data");
+    // store the data into the provenance data region
+    provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
+        synapses_get_pre_synaptic_events();
+    log_info("a");
+    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
+        synapses_get_saturation_count();
+    log_info("b");
+    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
+        spike_processing_get_buffer_overflows();
+    log_info("c");
+    provenance_region[CURRENT_TIMER_TICK] = time;
+    log_info("d");
+    log_info("finished other provenance data");
+}
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
 //!            executed since start of simulation
@@ -181,11 +206,6 @@ void timer_callback(uint timer_count, uint unused) {
     /* if a fixed number of simulation ticks that were specified at startup
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
-        // print statistics into logging region
-        synapses_print_pre_synaptic_events();
-        synapses_print_saturation_count();
-
-        spike_processing_print_buffer_overflows();
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
@@ -237,6 +257,9 @@ void c_main(void) {
     // Set up callback listening to SDP messages
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP_AND_DMA_AND_USER);
+    // set up prov registration
+    simulation_register_provenance_function_call(
+        c_main_store_provenance_data, PROVENANCE_DATA_REGION);
 
     log_info("Starting");
     simulation_run();

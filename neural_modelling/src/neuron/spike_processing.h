@@ -9,6 +9,9 @@ bool spike_processing_initialise(
 
 void spike_processing_finish_write(uint32_t process_id);
 
-void spike_processing_print_buffer_overflows();
+//! \brief returns the number of times the input buffer has overloaded
+//! \return the number of times the input buffer has overloaded
+//! \rtype uint_32t
+uint32_t spike_processing_get_buffer_overflows();
 
 #endif // _SPIKE_PROCESSING_H_

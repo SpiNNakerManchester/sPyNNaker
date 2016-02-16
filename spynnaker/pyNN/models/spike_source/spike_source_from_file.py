@@ -13,8 +13,8 @@ import numpy
 
 class SpikeSourceFromFile(SpikeSourceArray):
     """
-    helper class that allows spikes froma  file to be read in and added to a
-    buffered spike soruce
+    helper class that allows spikes from a  file to be read in and added to a
+    buffered spike source
     """
 
     def __init__(

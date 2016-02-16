@@ -25,7 +25,7 @@ from spynnaker.pyNN.utilities import constants
 import struct
 
 
-class PopulationPartitionedVertex(
+class FAKEIFCurrExpPartitioned(
         AbstractReceiveBuffersToHost, ProvidesProvenancePartitionedVertex):
     """ Represents a sub-set of atoms from a AbstractConstrainedVertex
     """
@@ -150,10 +150,11 @@ class PopulationPartitionedVertex(
             name="Last_timer_tic_the_core_ran_to",
             item=last_timer_tic,
             needs_reporting_to_end_user=
-            last_timer_tic != self._no_machine_time_step,
+            last_timer_tic != (self._no_machine_time_step / 10),
             message_to_end_user=
             "The core at {}:{}:{} was at timer tic {} when it should have been"
             " at timer tic {}. It was forcefully closed".format(
                 placement.x, placement.y, placement.p, last_timer_tic,
-                self._no_machine_time_step)))
+                (self._no_machine_time_step / 10))))
         return basic_provenance_entries
+

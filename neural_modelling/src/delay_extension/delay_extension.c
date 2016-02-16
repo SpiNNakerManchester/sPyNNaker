@@ -17,6 +17,11 @@ typedef enum callback_priorities{
     MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 2
 }callback_priorities;
 
+//! region identifiers
+typedef enum region_identifiers{
+    SYSTEM = 0, DELAY_PARAMS = 1, PROVENANCE_REGION = 2
+}region_identifiers;
+
 // Globals
 static uint32_t key = 0;
 static uint32_t num_neurons = 0;
@@ -121,14 +126,15 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details
     if (!simulation_read_timing_details(
-            data_specification_get_region(0, address),
+            data_specification_get_region(SYSTEM, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
             &infinite_run)) {
         return false;
     }
 
     // Get the parameters
-    if (!read_parameters(data_specification_get_region(1, address))) {
+    if (!read_parameters(data_specification_get_region(DELAY_PARAMS,
+                                                       address))) {
         return false;
     }
 
@@ -296,6 +302,8 @@ void c_main(void) {
 
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
+    // set up prov registration
+    simulation_register_provenance_function_call(NULL, PROVENANCE_REGION);
 
     log_info("Starting");
     simulation_run();
