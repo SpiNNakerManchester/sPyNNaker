@@ -198,9 +198,15 @@ class Population(object):
                 "This population has not got the capability to record spikes")
 
         if not self._spinnaker.has_ran:
-            raise local_exceptions.SpynnakerException(
-                "The simulation has not yet run, therefore spikes cannot"
-                " be retrieved")
+            if self._spinnaker.is_in_virtual_mode:
+                logger.warn(
+                    "The simulation is in virtual machine mode and so has not"
+                    " truly ran. Therefore we will return a empty list.")
+            else:
+                logger.warn(
+                    "The simulation has not yet run, therefore spikes cannot"
+                    " be retrieved. Therefore we will return a empty list.")
+            return numpy.asarray([])
 
         spikes = self._vertex.get_spikes(
             self._spinnaker.placements, self._spinnaker.graph_mapper,
@@ -241,9 +247,15 @@ class Population(object):
                 "This population has not got the capability to record gsyn")
 
         if not self._spinnaker.has_ran:
-            raise local_exceptions.SpynnakerException(
-                "The simulation has not yet run, therefore gsyn cannot"
-                " be retrieved")
+            if self._spinnaker.is_in_virtual_mode:
+                logger.warn(
+                    "The simulation is in virtual machine mode and so has not"
+                    " truly ran. Therefore we will return a empty list.")
+            else:
+                logger.warn(
+                    "The simulation has not yet run, therefore gsyn cannot"
+                    " be retrieved. Therefore we will return a empty list.")
+            return numpy.asarray([])
 
         # check that the vertex has read up to the position it needs to
         return self._vertex.get_gsyn(
@@ -272,9 +284,15 @@ class Population(object):
                 "This population has not got the capability to record v")
 
         if not self._spinnaker.has_ran:
-            raise local_exceptions.SpynnakerException(
-                "The simulation has not yet run, therefore v cannot"
-                " be retrieved")
+            if self._spinnaker.is_in_virtual_mode:
+                logger.warn(
+                    "The simulation is in virtual machine mode and so has not"
+                    " truly ran. Therefore we will return a empty list.")
+            else:
+                logger.warn(
+                    "The simulation has not yet run, therefore v cannot"
+                    " be retrieved. Returning a empty list.")
+            return numpy.asarray([])
 
         # check that the vertex has read up to the position it needs to
         return self._vertex.get_v(

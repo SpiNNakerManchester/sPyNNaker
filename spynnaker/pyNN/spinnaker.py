@@ -13,6 +13,9 @@ from pacman.utilities.utility_objs.provenance_data_item import \
 
 # common front end imports
 from spinn_front_end_common.interface.interface_functions.\
+    front_end_common_HBP_portal_mode import \
+    FrontEndCommonHBPPortalMode
+from spinn_front_end_common.interface.interface_functions.\
     front_end_common_execute_mapper import \
     FrontEndCommonExecuteMapper
 from spinn_front_end_common.utilities import exceptions as common_exceptions
@@ -130,6 +133,9 @@ class Spinnaker(AbstractProvidesProvenanceData):
         self._machine_time_step = None
         self._no_sync_changes = 0
 
+        # HBP portal demon container
+        self._HBP_portal_state = None
+
         # holder for algorithms to check for prov if crashed
         algorithms_listing = \
             config.get("Reports", "algorithms_to_get_prov_after_crash")
@@ -184,6 +190,9 @@ class Spinnaker(AbstractProvidesProvenanceData):
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
+
+        self._in_virtual_machine_mode = \
+            config.getboolean("Machine", "virtual_board")
 
         # set up machine targeted data
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
@@ -270,8 +279,7 @@ class Spinnaker(AbstractProvidesProvenanceData):
         else:
             raise Exception("A SpiNNaker machine must be specified in "
                             "spynnaker.cfg.")
-        use_virtual_board = config.getboolean("Machine", "virtual_board")
-        if self._hostname == 'None' and not use_virtual_board:
+        if self._hostname == 'None' and not self._in_virtual_machine_mode:
             raise Exception("A SpiNNaker machine must be specified in "
                             "spynnaker.cfg.")
 
@@ -316,7 +324,7 @@ class Spinnaker(AbstractProvidesProvenanceData):
 
         # algorithms listing
         algorithms = self._create_algorithm_list(
-            config.get("Mode", "mode") == "Debug", application_graph_changed,
+            config.get("Mode", "mode"), application_graph_changed,
             executing_reset=False)
 
         # xml paths to the algorithms metadata
@@ -344,7 +352,7 @@ class Spinnaker(AbstractProvidesProvenanceData):
         self._has_reset_last = False
 
         # gather provenance data from the executor itself if needed
-        if config.get("Reports", "writeProvenanceData"):
+        if config.get("Reports", "writeProvenanceData") and self._has_ran:
 
             # get pacman provenance items
             prov_items = pacman_executor.get_provenance_data_items(
@@ -429,7 +437,7 @@ class Spinnaker(AbstractProvidesProvenanceData):
                 structures from.
         :return:
         """
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._in_virtual_machine_mode:
             self._txrx = pacman_executor.get_item("MemoryTransciever")
             self._has_ran = pacman_executor.get_item("RanToken")
             self._executable_targets = \
@@ -455,6 +463,9 @@ class Spinnaker(AbstractProvidesProvenanceData):
         self._database_file_path = \
             pacman_executor.get_item("DatabaseFilePath")
         self._no_sync_changes = pacman_executor.get_item("NoSyncChanges")
+
+        if config.get("Mode", "mode") == "HBPPortal":
+            self._HBP_portal_state = pacman_executor.get_item("HBPPortalState")
 
     def get_provenance_data_items(self, transceiver, placement=None):
         """
@@ -500,12 +511,11 @@ class Spinnaker(AbstractProvidesProvenanceData):
         return xml_paths
 
     def _create_algorithm_list(
-            self, in_debug_mode, application_graph_changed, executing_reset):
+            self, mode, application_graph_changed, executing_reset):
         algorithms = list()
 
         # if you've not ran before, add the buffer manager
-        if (application_graph_changed and
-                not config.getboolean("Machine", "virtual_board")):
+        if application_graph_changed and not self._in_virtual_machine_mode:
             algorithms.append("FrontEndCommonBufferManagerCreater")
 
         # if you're needing a reset, you need to clean the binaries
@@ -548,7 +558,8 @@ class Spinnaker(AbstractProvidesProvenanceData):
 
             # if the system has ran before, kill the apps and run mapping
             # add debug algorithms if needed
-            if in_debug_mode:
+
+            if mode == "Debug":
                 algorithms.append("ValidRoutesChecker")
 
             algorithm_names = \
@@ -569,8 +580,11 @@ class Spinnaker(AbstractProvidesProvenanceData):
 
             # if using virtual machine, add to list of algorithms the virtual
             # machine generator, otherwise add the standard machine generator
-            if config.getboolean("Machine", "virtual_board"):
+            if self._in_virtual_machine_mode:
                 algorithms.append("FrontEndCommonVirtualMachineGenerator")
+            elif mode == "HBPPortal":
+                algorithms.append("FrontEndCommonHBPPortalMode")
+                self._add_basic_front_end_common_algorithms(algorithms)
             else:
                 # protect against the situation where the system has already
                 # got a transceiver (overriding does not lose sockets)
@@ -578,34 +592,11 @@ class Spinnaker(AbstractProvidesProvenanceData):
                     self._txrx.close()
                     self._txrx = None
 
-                algorithms.append("FrontEndCommonMachineInterfacer")
-                algorithms.append("FrontEndCommonApplicationRunner")
-                algorithms.append("FrontEndCommonNotificationProtocol")
-                algorithms.append(
-                    "FrontEndCommonPartitionableGraphApplicationDataLoader")
-                algorithms.append("FrontEndCommonPartitionableGraphHost"
-                                  "ExecuteDataSpecification")
-                algorithms.append("FrontEndCommomLoadExecutableImages")
-                algorithms.append("FrontEndCommonRoutingTableLoader")
-                algorithms.append("FrontEndCommonTagsLoader")
-                algorithms.append("FrontEndCommomPartitionableGraphData"
-                                  "SpecificationWriter")
-
-                # if the end user wants reload script, add the reload script
-                # creator to the list (reload script currently only supported
-                # for the original run)
-                if (not self._has_ran and
-                        config.getboolean("Reports", "writeReloadSteps")):
-                    algorithms.append("FrontEndCommonReloadScriptCreator")
-                elif (self.has_ran and
-                        config.getboolean("Reports", "writeReloadSteps")):
-                    logger.warn(
-                        "The reload script cannot handle multi-runs, nor can"
-                        "it handle resets, therefore it will only contain the "
-                        "initial run")
+                algorithms.append("FrontEndCommonMachineGenerator")
+                self._add_basic_front_end_common_algorithms(algorithms)
 
             if (config.getboolean("Reports", "writeMemoryMapReport") and
-                    not config.getboolean("Machine", "virtual_board")):
+                    not self._in_virtual_machine_mode):
                 algorithms.append("FrontEndCommonMemoryMapReport")
 
             if config.getboolean("Reports", "writeNetworkSpecificationReport"):
@@ -657,12 +648,38 @@ class Spinnaker(AbstractProvidesProvenanceData):
 
         return algorithms
 
+    def _add_basic_front_end_common_algorithms(self, algorithms):
+        algorithms.append("FrontEndCommonApplicationRunner")
+        algorithms.append("FrontEndCommonNotificationProtocol")
+        algorithms.append(
+            "FrontEndCommonPartitionableGraphApplicationDataLoader")
+        algorithms.append("FrontEndCommonPartitionableGraphHost"
+                          "ExecuteDataSpecification")
+        algorithms.append("FrontEndCommomLoadExecutableImages")
+        algorithms.append("FrontEndCommonRoutingTableLoader")
+        algorithms.append("FrontEndCommonTagsLoader")
+        algorithms.append("FrontEndCommomPartitionableGraphData"
+                          "SpecificationWriter")
+
+        # if the end user wants reload script, add the reload script
+        # creator to the list (reload script currently only supported
+        # for the original run)
+        if (not self._has_ran and
+                config.getboolean("Reports", "writeReloadSteps")):
+            algorithms.append("FrontEndCommonReloadScriptCreator")
+        elif (self.has_ran and
+                config.getboolean("Reports", "writeReloadSteps")):
+            logger.warn(
+                "The reload script cannot handle multi-runs, nor can"
+                "it handle resets, therefore it will only contain the "
+                "initial run")
+
     def _create_pacman_executor_outputs(
             self, requires_reset, application_graph_changed):
 
         # explicitly define what outputs spynnaker expects
         required_outputs = list()
-        if config.getboolean("Machine", "virtual_board"):
+        if self._in_virtual_machine_mode:
             if application_graph_changed:
                 required_outputs.extend([
                     "MemoryPlacements", "MemoryRoutingTables",
@@ -675,7 +692,7 @@ class Spinnaker(AbstractProvidesProvenanceData):
         # if front end wants reload script, add requires reload token
         if (config.getboolean("Reports", "writeReloadSteps") and
                 not self._has_ran and application_graph_changed and
-                not config.getboolean("Machine", "virtual_board")):
+                not self._in_virtual_machine_mode):
             required_outputs.append("ReloadToken")
         return required_outputs
 
@@ -779,36 +796,61 @@ class Spinnaker(AbstractProvidesProvenanceData):
             else:
                 boot_port_num = int(boot_port_num)
 
+            # basic stuff
             inputs.append({'type': "MemoryPartitionableGraph",
                            'value': self._partitionable_graph})
             inputs.append({'type': 'ReportFolder',
                            'value': self._report_default_directory})
             inputs.append({'type': "ApplicationDataFolder",
                            'value': self._app_data_runtime_folder})
-            inputs.append({'type': 'IPAddress', 'value': self._hostname})
 
-            # basic input stuff
-            inputs.append({'type': "BMPDetails",
-                           'value': config.get("Machine", "bmp_names")})
-            inputs.append({'type': "DownedChipsDetails",
-                           'value': config.get("Machine", "down_chips")})
-            inputs.append({'type': "DownedCoresDetails",
-                           'value': config.get("Machine", "down_cores")})
-            inputs.append({'type': "BoardVersion",
-                           'value': version})
-            inputs.append({'type': "NumberOfBoards",
-                           'value': number_of_boards})
-            inputs.append({'type': "MachineWidth", 'value': width})
-            inputs.append({'type': "MachineHeight", 'value': height})
-            inputs.append({'type': "AutoDetectBMPFlag",
-                           'value': config.getboolean("Machine",
-                                                      "auto_detect_bmp")})
-            inputs.append({'type': "EnableReinjectionFlag",
-                           'value': config.getboolean("Machine",
-                                                      "enable_reinjection")})
-            inputs.append({'type': "ScampConnectionData",
-                           'value': scamp_socket_addresses})
-            inputs.append({'type': "BootPortNum", 'value': boot_port_num})
+            # stuff based off mode
+            if config.get("Mode", "mode") == "HBPPortal":
+                inputs.append({
+                    'type': "PartitioningAlgorithm",
+                    'value': self._detect_partitioning_algorithm()})
+                inputs.append({
+                    'type': "MaxMachineHeight",
+                    'value': config.getint("HBPPortal",
+                                           "HBPPortal_max_machine_height")})
+                inputs.append({
+                    'type': "MaxMachineWidth",
+                    'value': config.getint("HBPPortal",
+                                           "HBPPortal_max_machine_width")})
+
+            elif not self._in_virtual_machine_mode:
+                inputs.append({'type': 'IPAddress', 'value': self._hostname})
+
+                # basic input stuff
+                inputs.append({'type': "BMPDetails",
+                               'value': config.get("Machine", "bmp_names")})
+                inputs.append({'type': "DownedChipsDetails",
+                               'value': config.get("Machine", "down_chips")})
+                inputs.append({'type': "DownedCoresDetails",
+                               'value': config.get("Machine", "down_cores")})
+                inputs.append({'type': "BoardVersion",
+                               'value': version})
+                inputs.append({
+                    'type': "AutoDetectBMPFlag",
+                    'value': config.getboolean("Machine", "auto_detect_bmp")})
+                inputs.append({
+                    'type': "EnableReinjectionFlag",
+                    'value': config.getboolean("Machine",
+                                               "enable_reinjection")})
+                inputs.append({'type': "ScampConnectionData",
+                               'value': scamp_socket_addresses})
+                inputs.append({'type': "BootPortNum", 'value': boot_port_num})
+            else:
+                inputs.append({'type': "NumberOfBoards",
+                               'value': number_of_boards})
+                inputs.append({'type': "MachineWidth", 'value': width})
+                inputs.append({'type': "MachineHeight", 'value': height})
+                inputs.append({'type': "BoardVersion",
+                               'value': version})
+                inputs.append({'type': "MachineHasWrapAroundsFlag",
+                               'value': config.getboolean(
+                                   "Machine", "requires_wrap_arounds")})
+
             inputs.append({'type': "APPID", 'value': self._app_id})
             inputs.append({'type': "RunTime", 'value': this_run_time})
             inputs.append({'type': "TimeScaleFactor",
@@ -828,9 +870,6 @@ class Spinnaker(AbstractProvidesProvenanceData):
                                "Reports", "writeTextSpecs")})
             inputs.append({'type': "ExecutableFinder",
                            'value': executable_finder})
-            inputs.append({'type': "MachineHasWrapAroundsFlag",
-                           'value': config.getboolean(
-                               "Machine", "requires_wrap_arounds")})
             inputs.append({'type': "ReportStates",
                            'value': self._reports_states})
             inputs.append({'type': "UserCreateDatabaseFlag",
@@ -919,6 +958,14 @@ class Spinnaker(AbstractProvidesProvenanceData):
             inputs.append({'type': "RanToken", 'value': self._has_ran})
 
         return inputs, application_graph_changed
+
+
+    def _detect_partitioning_algorithm(self):
+        algorithm_names = config.get("Mapping", "algorithms")
+        algorithms = algorithm_names.split(",")
+        for algorithm_name in algorithms:
+            if len(algorithm_name.split("Partitioner")) != 0:
+                return algorithm_name
 
     def _calculate_number_of_machine_time_steps(self, next_run_time):
         total_run_time = next_run_time
@@ -1095,6 +1142,15 @@ class Spinnaker(AbstractProvidesProvenanceData):
         return self._max_supported_delay
 
     @property
+    def is_in_virtual_mode(self):
+        """
+        helper method which tells top level system if the software is in
+         virutal machine mode
+        :return:
+        """
+        return self._in_virtual_machine_mode
+
+    @property
     def buffer_manager(self):
         return self._buffer_manager
 
@@ -1235,58 +1291,64 @@ class Spinnaker(AbstractProvidesProvenanceData):
         for population in self._populations:
             population._end()
 
-        # if operating in debug mode, extract io buffers from all machine
-        self._run_debug_iobuf_extraction_for_exit(
-            config.get("Mode", "mode") == "Debug")
-
         # if not a virtual machine, then shut down stuff on the board
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._in_virtual_machine_mode:
+            # if operating in debug mode, extract io buffers from all machine
+            self._run_debug_iobuf_extraction_for_exit(
+                config.get("Mode", "mode") == "Debug")
 
-            if turn_off_machine is None:
-                turn_off_machine = \
-                    config.getboolean("Machine", "turn_off_machine")
+            # if in portal mode, tell portal to close, (assumption that portal
+            # code will clean up for us by turning off boards)
+            if config.get("Mode", "mode") == "HBPPortal":
+                hbp_portal_runner = FrontEndCommonHBPPortalMode()
+                hbp_portal_runner(starting=False,
+                                  HBP_portal_state=self._HBP_portal_state)
+            else:
+                if turn_off_machine is None:
+                    turn_off_machine = \
+                        config.getboolean("Machine", "turn_off_machine")
 
-            if clear_routing_tables is None:
-                clear_routing_tables = config.getboolean(
-                    "Machine", "clear_routing_tables")
+                if clear_routing_tables is None:
+                    clear_routing_tables = config.getboolean(
+                        "Machine", "clear_routing_tables")
 
-            if clear_tags is None:
-                clear_tags = config.getboolean("Machine", "clear_tags")
+                if clear_tags is None:
+                    clear_tags = config.getboolean("Machine", "clear_tags")
 
-            # if stopping on machine, clear iptags and
-            if clear_tags:
-                for ip_tag in self._tags.ip_tags:
-                    self._txrx.clear_ip_tag(
-                        ip_tag.tag, board_address=ip_tag.board_address)
-                for reverse_ip_tag in self._tags.reverse_ip_tags:
-                    self._txrx.clear_ip_tag(
-                        reverse_ip_tag.tag,
-                        board_address=reverse_ip_tag.board_address)
+                # if stopping on machine, clear iptags and
+                if clear_tags:
+                    for ip_tag in self._tags.ip_tags:
+                        self._txrx.clear_ip_tag(
+                            ip_tag.tag, board_address=ip_tag.board_address)
+                    for reverse_ip_tag in self._tags.reverse_ip_tags:
+                        self._txrx.clear_ip_tag(
+                            reverse_ip_tag.tag,
+                            board_address=reverse_ip_tag.board_address)
 
-            # if clearing routing table entries, clear
-            if clear_routing_tables:
-                for router_table in self._router_tables.routing_tables:
-                    if not self._machine.get_chip_at(router_table.x,
-                                                     router_table.y).virtual:
-                        self._txrx.clear_multicast_routes(router_table.x,
-                                                          router_table.y)
+                # if clearing routing table entries, clear
+                if clear_routing_tables:
+                    for router_table in self._router_tables.routing_tables:
+                        if not self._machine.get_chip_at(
+                                router_table.x, router_table.y).virtual:
+                            self._txrx.clear_multicast_routes(router_table.x,
+                                                              router_table.y)
 
-            # clear values
-            self._no_sync_changes = 0
+                # clear values
+                self._no_sync_changes = 0
 
-            # app stop command
-            if config.getboolean("Machine", "use_app_stop"):
-                self._txrx.stop_application(self._app_id)
+                # app stop command
+                if config.getboolean("Machine", "use_app_stop"):
+                    self._txrx.stop_application(self._app_id)
 
-            if self._create_database:
-                self._database_interface.stop()
+                if self._create_database:
+                    self._database_interface.stop()
 
-            self._buffer_manager.stop()
+                self._buffer_manager.stop()
 
-            # stop the transceiver
-            if turn_off_machine:
-                logger.info("Turning off machine")
-            self._txrx.close(power_off_machine=turn_off_machine)
+                # stop the transceiver
+                if turn_off_machine:
+                    logger.info("Turning off machine")
+                self._txrx.close(power_off_machine=turn_off_machine)
 
     def _run_debug_iobuf_extraction_for_exit(self, in_debug_mode):
 
