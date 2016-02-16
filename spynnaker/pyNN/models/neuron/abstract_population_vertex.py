@@ -159,7 +159,7 @@ class AbstractPopulationVertex(
         self._change_requires_mapping = True
 
         # By default, profiling is disabled
-        self.profiler_num_samples = 500
+        self.profiler_num_samples = 0
 
     @property
     def requires_mapping(self):
