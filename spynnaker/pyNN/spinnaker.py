@@ -509,7 +509,7 @@ class Spinnaker(object):
             # if using virtual machine, add to list of algorithms the virtual
             # machine generator, otherwise add the standard machine generator
             if config.getboolean("Machine", "virtual_board"):
-                algorithms.append("FrontEndCommonVirtualMachineInterfacer")
+                algorithms.append("FrontEndCommonVirtualMachineGenerator")
             else:
                 # protect against the situation where the system has already
                 # got a transceiver (overriding does not lose sockets)
@@ -684,6 +684,12 @@ class Spinnaker(object):
             else:
                 height = int(height)
 
+            version = config.get("Machine", "version")
+            if version == "None":
+                version = None
+            else:
+                version = int(version)
+
             number_of_boards = config.get("Machine", "number_of_boards")
             if number_of_boards == "None":
                 number_of_boards = None
@@ -715,7 +721,7 @@ class Spinnaker(object):
             inputs.append({'type': "DownedCoresDetails",
                            'value': config.get("Machine", "down_cores")})
             inputs.append({'type': "BoardVersion",
-                           'value': config.getint("Machine", "version")})
+                           'value': version})
             inputs.append({'type': "NumberOfBoards",
                            'value': number_of_boards})
             inputs.append({'type': "MachineWidth", 'value': width})
