@@ -248,11 +248,16 @@ class Spinnaker(AbstractProvidesProvenanceData):
                 if config.getboolean(
                         "Mode", "violate_1ms_wall_clock_restriction"):
                     logger.warn(
-                        "*****************************************************"
-                        "*** The combination of simulation time step and   ***"
-                        "*** the machine time scale factor results in a    ***"
-                        "*** wall clock timer tick that is currently not   ***"
-                        "*** reliably supported by the spinnaker machine.  ***"
+                        "*****************************************************")
+                    logger.warn(
+                        "*** The combination of simulation time step and   ***")
+                    logger.warn(
+                        "*** the machine time scale factor results in a    ***")
+                    logger.warn(
+                        "*** wall clock timer tick that is currently not   ***")
+                    logger.warn(
+                        "*** reliably supported by the spinnaker machine.  ***")
+                    logger.warn(
                         "*****************************************************")
                 else:
                     raise common_exceptions.ConfigurationException(
