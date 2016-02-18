@@ -10,7 +10,7 @@ from spynnaker.pyNN.utilities import conf
 from pacman.utilities.utility_objs.timer import Timer
 
 # pacman imports
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.progress_bar import ProgressBar
 
 # general imports
 import math

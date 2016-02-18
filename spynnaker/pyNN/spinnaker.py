@@ -55,6 +55,10 @@ from spynnaker.pyNN.models.abstract_models\
 from spynnaker.pyNN import _version
 
 
+from spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider import \
+    FakeHBPPortalMachineProvider
+
+
 # general imports
 import logging
 import math
@@ -463,9 +467,7 @@ class Spinnaker(AbstractProvidesProvenanceData):
         self._database_file_path = \
             pacman_executor.get_item("DatabaseFilePath")
         self._no_sync_changes = pacman_executor.get_item("NoSyncChanges")
-
-        if config.get("Mode", "mode") == "HBPPortal":
-            self._HBP_portal_state = pacman_executor.get_item("HBPPortalState")
+        self._HBP_portal_state = pacman_executor.get_item("HBPPortalState")
 
     def get_provenance_data_items(self, transceiver, placement=None):
         """
@@ -582,8 +584,6 @@ class Spinnaker(AbstractProvidesProvenanceData):
             # machine generator, otherwise add the standard machine generator
             if self._in_virtual_machine_mode:
                 algorithms.append("FrontEndCommonVirtualMachineGenerator")
-            elif mode == "HBPPortal":
-                algorithms.append("FrontEndCommonHBPPortalMode")
                 self._add_basic_front_end_common_algorithms(algorithms)
             else:
                 # protect against the situation where the system has already
@@ -591,8 +591,6 @@ class Spinnaker(AbstractProvidesProvenanceData):
                 if self._txrx is not None:
                     self._txrx.close()
                     self._txrx = None
-
-                algorithms.append("FrontEndCommonMachineGenerator")
                 self._add_basic_front_end_common_algorithms(algorithms)
 
             if (config.getboolean("Reports", "writeMemoryMapReport") and
@@ -796,6 +794,10 @@ class Spinnaker(AbstractProvidesProvenanceData):
             else:
                 boot_port_num = int(boot_port_num)
 
+            bmp_names = config.get("Machine", "bmp_names")
+            if bmp_names == "None":
+                bmp_names = None
+
             # basic stuff
             inputs.append({'type': "MemoryPartitionableGraph",
                            'value': self._partitionable_graph})
@@ -803,54 +805,41 @@ class Spinnaker(AbstractProvidesProvenanceData):
                            'value': self._report_default_directory})
             inputs.append({'type': "ApplicationDataFolder",
                            'value': self._app_data_runtime_folder})
+#####################################################################################################
+            inputs.append({
+                'type': "HBPServiceProvider",
+                'value': FakeHBPPortalMachineProvider})
+#####################################################################################################
+            inputs.append({'type': 'IPAddress', 'value': self._hostname})
 
-            # stuff based off mode
-            if config.get("Mode", "mode") == "HBPPortal":
-                inputs.append({
-                    'type': "PartitioningAlgorithm",
-                    'value': self._detect_partitioning_algorithm()})
-                inputs.append({
-                    'type': "MaxMachineHeight",
-                    'value': config.getint("HBPPortal",
-                                           "HBPPortal_max_machine_height")})
-                inputs.append({
-                    'type': "MaxMachineWidth",
-                    'value': config.getint("HBPPortal",
-                                           "HBPPortal_max_machine_width")})
-
-            elif not self._in_virtual_machine_mode:
-                inputs.append({'type': 'IPAddress', 'value': self._hostname})
-
-                # basic input stuff
-                inputs.append({'type': "BMPDetails",
-                               'value': config.get("Machine", "bmp_names")})
-                inputs.append({'type': "DownedChipsDetails",
-                               'value': config.get("Machine", "down_chips")})
-                inputs.append({'type': "DownedCoresDetails",
-                               'value': config.get("Machine", "down_cores")})
-                inputs.append({'type': "BoardVersion",
-                               'value': version})
-                inputs.append({
-                    'type': "AutoDetectBMPFlag",
-                    'value': config.getboolean("Machine", "auto_detect_bmp")})
-                inputs.append({
-                    'type': "EnableReinjectionFlag",
-                    'value': config.getboolean("Machine",
-                                               "enable_reinjection")})
-                inputs.append({'type': "ScampConnectionData",
-                               'value': scamp_socket_addresses})
-                inputs.append({'type': "BootPortNum", 'value': boot_port_num})
-            else:
-                inputs.append({'type': "NumberOfBoards",
-                               'value': number_of_boards})
-                inputs.append({'type': "MachineWidth", 'value': width})
-                inputs.append({'type': "MachineHeight", 'value': height})
-                inputs.append({'type': "BoardVersion",
-                               'value': version})
-                inputs.append({'type': "MachineHasWrapAroundsFlag",
-                               'value': config.getboolean(
-                                   "Machine", "requires_wrap_arounds")})
-
+            # basic input stuff
+            inputs.append({'type': "BMPDetails",
+                           'value': bmp_names})
+            inputs.append({'type': "DownedChipsDetails",
+                           'value': config.get("Machine", "down_chips")})
+            inputs.append({'type': "DownedCoresDetails",
+                           'value': config.get("Machine", "down_cores")})
+            inputs.append({'type': "BoardVersion",
+                           'value': version})
+            inputs.append({
+                'type': "AutoDetectBMPFlag",
+                'value': config.getboolean("Machine", "auto_detect_bmp")})
+            inputs.append({
+                'type': "EnableReinjectionFlag",
+                'value': config.getboolean("Machine",
+                                           "enable_reinjection")})
+            inputs.append({'type': "ScampConnectionData",
+                           'value': scamp_socket_addresses})
+            inputs.append({'type': "BootPortNum", 'value': boot_port_num})
+            inputs.append({'type': "NumberOfBoards",
+                           'value': number_of_boards})
+            inputs.append({'type': "MachineWidth", 'value': width})
+            inputs.append({'type': "MachineHeight", 'value': height})
+            inputs.append({'type': "BoardVersion",
+                           'value': version})
+            inputs.append({'type': "MachineHasWrapAroundsFlag",
+                           'value': config.getboolean(
+                               "Machine", "requires_wrap_arounds")})
             inputs.append({'type': "APPID", 'value': self._app_id})
             inputs.append({'type': "RunTime", 'value': this_run_time})
             inputs.append({'type': "TimeScaleFactor",
@@ -958,14 +947,6 @@ class Spinnaker(AbstractProvidesProvenanceData):
             inputs.append({'type': "RanToken", 'value': self._has_ran})
 
         return inputs, application_graph_changed
-
-
-    def _detect_partitioning_algorithm(self):
-        algorithm_names = config.get("Mapping", "algorithms")
-        algorithms = algorithm_names.split(",")
-        for algorithm_name in algorithms:
-            if len(algorithm_name.split("Partitioner")) != 0:
-                return algorithm_name
 
     def _calculate_number_of_machine_time_steps(self, next_run_time):
         total_run_time = next_run_time
@@ -1299,10 +1280,8 @@ class Spinnaker(AbstractProvidesProvenanceData):
 
             # if in portal mode, tell portal to close, (assumption that portal
             # code will clean up for us by turning off boards)
-            if config.get("Mode", "mode") == "HBPPortal":
-                hbp_portal_runner = FrontEndCommonHBPPortalMode()
-                hbp_portal_runner(starting=False,
-                                  HBP_portal_state=self._HBP_portal_state)
+            if self._HBP_portal_state is not None:
+                self._HBP_portal_state.destroy()
             else:
                 if turn_off_machine is None:
                     turn_off_machine = \

@@ -2,7 +2,7 @@
 # pacman imports
 from pacman.model.routing_info.dict_based_partitioned_edge_n_keys_map import \
     DictBasedPartitionedEdgeNKeysMap
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.progress_bar import ProgressBar
 
 # front end common imports
 from spinn_front_end_common.abstract_models.\
