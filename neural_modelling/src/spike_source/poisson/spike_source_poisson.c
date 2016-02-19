@@ -294,7 +294,7 @@ void timer_callback(uint timer_count, uint unused) {
             recording_finalise();
         }
         // go into pause and resume state
-        simulation_handle_pause_resume(timer_callback, TIMER);
+        simulation_handle_pause_resume();
 
         // handle resetting the recording state
         // Get the recording information
@@ -436,6 +436,5 @@ void c_main(void) {
     // set up prov registration
     simulation_register_provenance_function_call(NULL, PROVENANCE_REGION);
 
-    log_info("Starting");
-    simulation_run();
+    simulation_run(timer_callback, TIMER);
 }

@@ -7,10 +7,19 @@ from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorContiguousRangeContraint
 
 # front end common imports
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
+from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.resources.sdram_resource import SDRAMResource
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_partition_constraints import \
     AbstractProvidesIncomingPartitionConstraints
 from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_edge_constraints import \
+    AbstractProvidesOutgoingEdgeConstraints
+from spinn_front_end_common.interface.abstract_recordable_interface import \
+    AbstractRecordableInterface
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utilities import constants as \
@@ -83,9 +92,11 @@ class AbstractPopulationVertex(
             machine_time_step, timescale_factor, spikes_per_second,
             ring_buffer_sigma, model_name, neuron_model, input_type,
             synapse_type, threshold_type, additional_input=None,
-            constraints=None):
+            constraints=None, using_auto_pause_and_resume=False):
 
-        ReceiveBuffersToHostBasicImpl.__init__(self)
+        ReceiveBuffersToHostBasicImpl.__init__(
+            self, config.getint(
+                "Recording", "extra_recording_data_for_static_sdram_usage"))
         AbstractPartitionableVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
         AbstractDataSpecableVertex.__init__(
@@ -124,6 +135,7 @@ class AbstractPopulationVertex(
             "Buffers", "buffer_size_before_receive")
         self._time_between_requests = config.getint(
             "Buffers", "time_between_requests")
+        self._using_auto_pause_and_resume = using_auto_pause_and_resume
 
         # Set up synapse handling
         self._synapse_manager = SynapticManager(
@@ -137,6 +149,10 @@ class AbstractPopulationVertex(
             "Buffers", "receive_buffer_port")
         self._enable_buffered_recording = config.getboolean(
             "Buffers", "enable_buffered_recording")
+        uses_auto_pause_and_resume = config.getboolean(
+            "Mode", "use_auto_pause_and_resume")
+        if uses_auto_pause_and_resume:
+            self._enable_buffered_recording = False
 
         # bool for if state has changed.
         self._change_requires_mapping = True
@@ -145,14 +161,23 @@ class AbstractPopulationVertex(
     def requires_mapping(self):
         return self._change_requires_mapping
 
+    @property
+    def enable_buffered_recording(self):
+        return self._enable_buffered_recording
+
+    @enable_buffered_recording.setter
+    def enable_buffered_recording(self, new_value):
+        self._enable_buffered_recording = new_value
+
     def mark_no_changes(self):
         self._change_requires_mapping = False
 
     def create_subvertex(self, vertex_slice, resources_required, label=None,
                          constraints=None):
         return PopulationPartitionedVertex(
-            self.buffering_output(), resources_required, label,
-            self._no_machine_time_steps, constraints)
+            self.buffering_output(), resources_required, label, 
+            self._no_machine_time_steps, self.extra_static_sdram_requirement(), 
+            constraints)
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -203,24 +228,63 @@ class AbstractPopulationVertex(
                 self._neuron_model.get_sdram_usage_in_bytes(
                     vertex_slice.n_atoms))
 
-    # @implements AbstractPopulationVertex.get_sdram_usage_for_atoms
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
+    # @implements AbstractPopulationVertex.get_static_sdram_usage_for_atoms
+    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
         return (self._get_sdram_usage_for_neuron_params(vertex_slice) +
                 self.get_buffer_state_region_size(3) +
-                min((self._spike_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps),
-                    self._spike_buffer_max_size)) +
-                min((self._v_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps),
-                    self._v_buffer_max_size)) +
-                min((self._gsyn_recorder.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms, self._no_machine_time_steps),
-                    self._gsyn_buffer_max_size)) +
                 self._synapse_manager.get_sdram_usage_in_bytes(
                     vertex_slice, graph.incoming_edges_to_vertex(self)) +
                 (self._get_number_of_mallocs_used_by_dsg(
                     vertex_slice, graph.incoming_edges_to_vertex(self)) *
-                 front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
+                 front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE) +
+                config.getint("Recording",
+                              "extra_recording_data_for_static_sdram_usage"))
+
+    # @implements AbstractPartitionableVertex.get_resources_used_by_atoms
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
+        """ Get the separate resource requirements for a range of atoms
+
+        :param vertex_slice: the low value of atoms to calculate resources from
+        :param graph: A reference to the graph containing this vertex.
+        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
+        :return: a Resource container that contains a \
+                    CPUCyclesPerTickResource, DTCMResource and SDRAMResource
+        :rtype: ResourceContainer
+        :raise None: this method does not raise any known exception
+        """
+        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
+        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
+        static_sdram_requirement = \
+            self.get_static_sdram_usage_for_atoms(vertex_slice, graph)
+
+        # set all to just static sdram for the time being
+        all_sdram_usage = static_sdram_requirement
+
+        # check runtime sdram usage if required
+        if (not self._using_auto_pause_and_resume and
+                isinstance(self, AbstractRecordableInterface)):
+            runtime_sdram_usage = self.get_runtime_sdram_usage_for_atoms(
+                vertex_slice, graph, self._no_machine_time_steps)
+            all_sdram_usage += runtime_sdram_usage
+
+        # noinspection PyTypeChecker
+        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
+                                      dtcm=DTCMResource(dtcm_requirement),
+                                      sdram=SDRAMResource(all_sdram_usage))
+        return resources
+
+    # @implements AbstractRecordableInterface.get_runtime_sdram_usage_for_atoms
+    def get_runtime_sdram_usage_for_atoms(
+            self, vertex_slice, partitionable_graph, no_machine_time_steps):
+        return (min((self._spike_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, no_machine_time_steps),
+                    self._spike_buffer_max_size)) +
+                min((self._v_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, no_machine_time_steps),
+                    self._v_buffer_max_size)) +
+                min((self._gsyn_recorder.get_sdram_usage_in_bytes(
+                    vertex_slice.n_atoms, no_machine_time_steps),
+                    self._gsyn_buffer_max_size)))
 
     # @implements AbstractPopulationVertex.model_name
     def model_name(self):
@@ -447,7 +511,7 @@ class AbstractPopulationVertex(
     # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
         self._change_requires_mapping = not self._spike_recorder.record
-        self.set_buffering_output(
+        self.activate_buffering_output(
             self._receive_buffer_host, self._receive_buffer_port)
         self._spike_recorder.record = True
 
@@ -465,7 +529,7 @@ class AbstractPopulationVertex(
 
     # @implements AbstractVRecordable.set_recording_v
     def set_recording_v(self):
-        self.set_buffering_output(
+        self.activate_buffering_output(
             self._receive_buffer_host, self._receive_buffer_port)
         self._change_requires_mapping = not self._v_recorder.record_v
         self._v_recorder.record_v = True
@@ -485,7 +549,7 @@ class AbstractPopulationVertex(
 
     # @implements AbstractGSynRecordable.set_recording_gsyn
     def set_recording_gsyn(self):
-        self.set_buffering_output(
+        self.activate_buffering_output(
             self._receive_buffer_host, self._receive_buffer_port)
         self._change_requires_mapping = not self._gsyn_recorder.record_gsyn
         self._gsyn_recorder.record_gsyn = True
