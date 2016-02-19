@@ -32,7 +32,8 @@ class FAKEIFCurrExpPartitioned(
 
     def __init__(
             self, buffering_output, resources_required, label,
-            no_machine_time_steps, constraints=None):
+            no_machine_time_steps, extra_static_sdram_requirement,
+            constraints=None):
         """
         :param buffering_output: True if the vertex is set to buffer output,\
                     False otherwise
@@ -62,9 +63,13 @@ class FAKEIFCurrExpPartitioned(
 
         self._buffering_output = buffering_output
         self._no_machine_time_step = no_machine_time_steps
+        self._extra_static_sdram_requirement = extra_static_sdram_requirement
 
     def buffering_output(self):
         return self._buffering_output
+
+    def extra_static_sdram_requirement(self):
+        return self._extra_static_sdram_requirement
 
     def is_receives_buffers_to_host(self):
         return True

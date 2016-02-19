@@ -15,11 +15,9 @@ from pacman.model.resources.sdram_resource import SDRAMResource
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_partition_constraints import \
     AbstractProvidesIncomingPartitionConstraints
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.interface.abstract_recordable_interface import \
     AbstractRecordableInterface
+from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utilities import constants as \
@@ -228,7 +226,7 @@ class AbstractPopulationVertex(
                 self._neuron_model.get_sdram_usage_in_bytes(
                     vertex_slice.n_atoms))
 
-    # @implements AbstractPopulationVertex.get_static_sdram_usage_for_atoms
+    # @implements AbstractPartitionableVertex.get_static_sdram_usage_for_atoms
     def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
         return (self._get_sdram_usage_for_neuron_params(vertex_slice) +
                 self.get_buffer_state_region_size(3) +

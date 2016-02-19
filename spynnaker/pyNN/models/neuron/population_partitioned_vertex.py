@@ -73,6 +73,7 @@ class PopulationPartitionedVertex(
 
     def extra_static_sdram_requirement(self):
         return self._extra_static_sdram_requirement
+
     def get_provenance_data_items(
             self, transceiver, placement=None):
         """ Write the provenance data using XML

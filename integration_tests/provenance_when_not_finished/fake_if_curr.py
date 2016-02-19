@@ -36,7 +36,7 @@ class FAKEIFCurrExp(AbstractPopulationVertex):
     def __init__(
             self, n_neurons, machine_time_step, timescale_factor,
             spikes_per_second=None, ring_buffer_sigma=None, constraints=None,
-            label=None,
+            label=None, using_auto_pause_and_resume=False,
             tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
             v_reset=default_parameters['v_reset'],
@@ -63,7 +63,8 @@ class FAKEIFCurrExp(AbstractPopulationVertex):
             ring_buffer_sigma=ring_buffer_sigma,
             model_name="IF_curr_exp", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
-            threshold_type=threshold_type, constraints=constraints)
+            threshold_type=threshold_type, constraints=constraints,
+            using_auto_pause_and_resume=using_auto_pause_and_resume)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
@@ -73,7 +74,8 @@ class FAKEIFCurrExp(AbstractPopulationVertex):
                          constraints=None):
         return FAKEIFCurrExpPartitioned(
             self.buffering_output(), resources_required, label,
-            self._no_machine_time_steps, constraints)
+            self._no_machine_time_steps, self.extra_static_sdram_requirement(),
+            constraints)
 
     def _write_basic_setup_info(self, spec, region_id):
 
@@ -91,10 +93,8 @@ class FAKEIFCurrExp(AbstractPopulationVertex):
         # check for infinite runs and add data as required
         if self._no_machine_time_steps is None:
             spec.write_value(data=1)
-            spec.write_value(data=0)
         else:
             spec.write_value(data=0)
-            spec.write_value(data=self._no_machine_time_steps)
 
         # add SDP port number for receiving synchronisations and new run times
         spec.write_value(

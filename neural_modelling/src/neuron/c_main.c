@@ -174,20 +174,16 @@ static bool initialise(uint32_t *timer_period) {
 }
 
 void c_main_store_provenance_data(address_t provenance_region){
-    log_info("writing other provenance data");
+    log_debug("writing other provenance data");
     // store the data into the provenance data region
     provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
         synapses_get_pre_synaptic_events();
-    log_info("a");
     provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
         synapses_get_saturation_count();
-    log_info("b");
     provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
         spike_processing_get_buffer_overflows();
-    log_info("c");
     provenance_region[CURRENT_TIMER_TICK] = time;
-    log_info("d");
-    log_info("finished other provenance data");
+    log_debug("finished other provenance data");
 }
 
 //! \brief Timer interrupt callback
@@ -210,6 +206,7 @@ void timer_callback(uint timer_count, uint unused) {
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
+            log_info("updating recording regions");
             recording_finalise();
         }
 
