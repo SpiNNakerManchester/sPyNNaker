@@ -16,6 +16,8 @@ def print_summary(profiling_data, duration):
 
         print("\tMean time:%fms" % (np.average(times[1])))
 
+        print("\tWith standard deviation %fms" % (np.std(times[1])))
+
         # Digitize the sample entry times into these bins
         sample_timestep_indices = np.digitize(times[0], ms_time_bins)
         assert len(sample_timestep_indices) == len(times[1])
