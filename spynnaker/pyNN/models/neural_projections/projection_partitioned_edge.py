@@ -1,3 +1,5 @@
+from pyNN.random import RandomDistribution
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
     import AbstractWeightUpdatable
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
@@ -69,7 +71,13 @@ class ProjectionPartitionedEdge(
                     post_slice_index, pre_vertex_slice, post_vertex_slice)
             new_weight *= pre_vertex_slice.n_atoms
             if hasattr(pre_vertex, "rate"):
-                new_weight *= pre_vertex.rate
+                rate = pre_vertex.rate
+                if hasattr(rate, "__getitem__"):
+                    rate = max(rate)
+                elif isinstance(rate, RandomDistribution):
+                    rate = utility_calls.get_maximum_probable_value(
+                        rate, pre_vertex_slice.n_atoms)
+                new_weight *= rate
             elif hasattr(pre_vertex, "spikes_per_second"):
                 new_weight *= pre_vertex.spikes_per_second
             weight += new_weight

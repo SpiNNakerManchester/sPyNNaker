@@ -312,9 +312,10 @@ class SpikeSourcePoisson(
 
     # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
-        ip_address = config.get("Buffers", "receive_buffer_host")
-        port = config.getint("Buffers", "receive_buffer_port")
-        self.set_buffering_output(ip_address, port)
+        if config.get("Buffers", "enable_buffered_recording"):
+            ip_address = config.get("Buffers", "receive_buffer_host")
+            port = config.getint("Buffers", "receive_buffer_port")
+            self.set_buffering_output(ip_address, port)
         self._spike_recorder.record = True
 
     # inherited from partitionable vertex
@@ -346,10 +347,10 @@ class SpikeSourcePoisson(
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
-    def generate_data_spec(self, subvertex, placement, partitioned_graph, graph,
-                           routing_info, hostname, graph_mapper, report_folder,
-                           ip_tags, reverse_ip_tags, write_text_specs,
-                           application_run_time_folder):
+    def generate_data_spec(
+            self, subvertex, placement, partitioned_graph, graph, routing_info,
+            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
+            write_text_specs, application_run_time_folder):
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
                 placement.x, placement.y, placement.p, hostname, report_folder,
