@@ -46,7 +46,7 @@ class SpikeSourceArray(
 
     def __init__(
             self, n_neurons, machine_time_step, timescale_factor,
-            spike_times=[], port=None, tag=None, ip_address=None,
+            spike_times=None, port=None, tag=None, ip_address=None,
             board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
                 constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
             space_before_notification=640,
@@ -61,6 +61,8 @@ class SpikeSourceArray(
         self._port = port
         if port is None:
             self._port = config.getint("Buffers", "receive_buffer_port")
+        if spike_times is None:
+            spike_times = []
 
         ReverseIpTagMultiCastSource.__init__(
             self, n_keys=n_neurons, machine_time_step=machine_time_step,
