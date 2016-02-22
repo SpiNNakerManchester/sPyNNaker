@@ -1,7 +1,11 @@
+import logging
+import math
+import numpy
+import copy
+
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
@@ -15,16 +19,9 @@ from spynnaker.pyNN.models.neural_projections\
 from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
     import DelayPartitionableEdge
 from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
-
+from spinn_front_end_common.interface.abstract_mappable_interface \
+    import AbstractMappableInterface
 from spinn_front_end_common.utilities import exceptions
-
-
-import logging
-import math
-import numpy
-import copy
 
 logger = logging.getLogger(__name__)
 EDGE_PARTITION_ID = "SPIKE"
@@ -163,8 +160,9 @@ class Projection(object):
     @property
     def requires_mapping(self):
         projection_edge_mappable = isinstance(
-            self._projection_edge, AbstractMappable)
-        delay_edge_mappable = isinstance(self._delay_edge, AbstractMappable)
+            self._projection_edge, AbstractMappableInterface)
+        delay_edge_mappable = isinstance(
+            self._delay_edge, AbstractMappableInterface)
         if (projection_edge_mappable and
                 self._projection_edge.requires_mapping):
             return True
@@ -173,9 +171,9 @@ class Projection(object):
         return False
 
     def mark_no_changes(self):
-        if isinstance(self._projection_edge, AbstractMappable):
+        if isinstance(self._projection_edge, AbstractMappableInterface):
             self._projection_edge.mark_no_changes()
-        if isinstance(self._delay_edge, AbstractMappable):
+        if isinstance(self._delay_edge, AbstractMappableInterface):
             self._delay_edge.mark_no_changes()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):

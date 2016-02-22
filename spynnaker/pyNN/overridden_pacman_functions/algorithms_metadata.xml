@@ -1,7 +1,7 @@
 <algorithms>
-    <algorithm name="SpyNNakerRuntimeUpdator">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_runtime_updator</python_module>
-        <python_class>SpyNNakerRuntimeUpdator</python_class>
+    <algorithm name="SpyNNakerRuntimeUpdater">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_runtime_updater</python_module>
+        <python_class>SpyNNakerRuntimeUpdater</python_class>
         <required_inputs>
             <parameter>
                 <param_name>run_time</param_name>
@@ -13,7 +13,7 @@
             </parameter>
             <parameter>
                 <param_name>current_run_ms</param_name>
-                <param_type>TotalCommunitiveRunTime</param_type>
+                <param_type>TotalAccumulativeRunTime</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_time_step</param_name>
@@ -21,9 +21,9 @@
             </parameter>
         </required_inputs>
     </algorithm>
-    <algorithm name="SpyNNakerRuntimeUpdatorAfterRun">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_runtime_updator</python_module>
-        <python_class>SpyNNakerRuntimeUpdator</python_class>
+    <algorithm name="SpyNNakerRuntimeUpdaterAfterRun">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_runtime_updater</python_module>
+        <python_class>SpyNNakerRuntimeUpdater</python_class>
         <required_inputs>
             <parameter>
                 <param_name>run_time</param_name>
@@ -35,7 +35,7 @@
             </parameter>
             <parameter>
                 <param_name>current_run_ms</param_name>
-                <param_type>TotalCommunitiveRunTime</param_type>
+                <param_type>TotalAccumulativeRunTime</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_time_step</param_name>
@@ -197,7 +197,7 @@
             </parameter>
             <parameter>
                 <param_name>runtime_in_machine_time_steps</param_name>
-                <param_type>TotalCommunitiveRunTime</param_type>
+                <param_type>TotalAccumulativeRunTime</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>

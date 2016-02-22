@@ -24,7 +24,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class SpyNNakerRuntimeUpdator(object):
+class SpyNNakerRuntimeUpdater(object):
     """ updates the commuilative ran time
     """
 

@@ -1,10 +1,9 @@
 import unittest
-from spynnaker.pyNN.spinnaker import Spinnaker
 import os
-from spynnaker.pyNN.utilities import conf
-import spynnaker.pyNN.exceptions as exceptions
-import time
 import shutil
+
+from spynnaker.pyNN.spinnaker import Spinnaker
+from spynnaker.pyNN.utilities import conf
 
 
 class TestCFGs(unittest.TestCase):

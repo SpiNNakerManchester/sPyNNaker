@@ -7,8 +7,8 @@ from pacman.model.resources.sdram_resource import SDRAMResource
 from spinn_front_end_common.interface.abstract_recordable_interface import \
     AbstractRecordableInterface
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
+from spinn_front_end_common.interface.abstract_mappable_interface \
+    import AbstractMappableInterface
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractMappable,
+        SimplePopulationSettable, AbstractMappableInterface,
         AbstractHasFirstMachineTimeStep):
     """ Model for play back of spikes
     """
@@ -91,7 +91,7 @@ class SpikeSourceArray(
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
-        AbstractMappable.__init__(self)
+        AbstractMappableInterface.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
 
         # handle recording

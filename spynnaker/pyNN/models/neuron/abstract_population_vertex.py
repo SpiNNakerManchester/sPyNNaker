@@ -37,8 +37,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
+from spinn_front_end_common.interface.abstract_mappable_interface \
+    import AbstractMappableInterface
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
@@ -81,7 +81,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractMappable, ReceiveBuffersToHostBasicImpl):
+        AbstractMappableInterface, ReceiveBuffersToHostBasicImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -106,7 +106,7 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
-        AbstractMappable.__init__(self)
+        AbstractMappableInterface.__init__(self)
 
         self._binary = binary
         self._label = label

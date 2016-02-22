@@ -12,14 +12,12 @@ from ._version import __version__, __version_name__, __version_month__,\
 
 
 # utility functions
-from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
 
 # pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN.spinnaker import executable_finder
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities.conf import config
 
 # notification protocol classes (stored in front end common)
 from spinn_front_end_common.utilities.notification_protocol.\
@@ -109,7 +107,6 @@ import spynnaker
 # constraints
 
 # note importing star is a bad thing to do.
-from pyNN.random import *
 from pyNN.space import *
 import os
 

@@ -1,5 +1,9 @@
-from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities import constants
+from scipy import special
+import math
+import sys
+import numpy
+
+from spynnaker.pyNN.utilities import constants, conf
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_properties import master_pop_table_generators
@@ -8,19 +12,12 @@ from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
     import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
-
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
-
 from spinn_front_end_common.utilities import helpful_functions
-
 from data_specification.enums.data_type import DataType
 import data_specification.utility_calls as dsg_utilities
 
-from scipy import special
-import math
-import sys
-import numpy
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28

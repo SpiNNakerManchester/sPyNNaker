@@ -1,16 +1,21 @@
+import numpy
+import logging
+import copy
+
+from pyNN.space import Space
+
 from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions as local_exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
     import AbstractPopulationInitializable
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
+from spinn_front_end_common.interface.abstract_mappable_interface \
+    import AbstractMappableInterface
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
     import InputTypeConductance
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
@@ -19,14 +24,7 @@ from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
     import AbstractGSynRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
     import AbstractVRecordable
-
 from spinn_front_end_common.utilities import exceptions
-
-from pyNN.space import Space
-
-import numpy
-import logging
-import copy
 
 logger = logging.getLogger(__name__)
 
@@ -105,13 +103,13 @@ class Population(object):
 
     @property
     def requires_mapping(self):
-        if isinstance(self._vertex, AbstractMappable):
+        if isinstance(self._vertex, AbstractMappableInterface):
             return self._vertex.requires_mapping
         return self._change_requires_mapping
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
-        if isinstance(self._vertex, AbstractMappable):
+        if isinstance(self._vertex, AbstractMappableInterface):
             self._vertex.mark_no_changes()
 
     def __add__(self, other):
