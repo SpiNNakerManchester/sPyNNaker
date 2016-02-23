@@ -658,6 +658,8 @@ class Spinnaker(object):
             inputs.append({
                 'type': "DataSpecificationTargets",
                 "value": self._dsg_targets})
+        inputs.append({'type': "ReportStates",
+                       'value': self._reports_states})
 
         # support resetting when there's changes in the application graph
         # (only need to exit)
@@ -670,6 +672,7 @@ class Spinnaker(object):
             inputs.append({'type': "MemoryGraphMapper",
                            'value': self._graph_mapper})
             inputs.append({'type': "APPID", 'value': self._app_id})
+            inputs.append({'type': "DSEAPPID", 'value': self._dse_app_id})
             inputs.append({'type': "RanToken", 'value': self._has_ran})
 
         elif application_graph_changed and not is_resetting:
@@ -760,8 +763,6 @@ class Spinnaker(object):
             inputs.append({'type': "MachineHasWrapAroundsFlag",
                            'value': config.getboolean(
                                "Machine", "requires_wrap_arounds")})
-            inputs.append({'type': "ReportStates",
-                           'value': self._reports_states})
             inputs.append({'type': "UserCreateDatabaseFlag",
                            'value': config.get("Database", "create_database")})
             inputs.append({'type': "ExecuteMapping",
@@ -824,6 +825,7 @@ class Spinnaker(object):
             inputs.append({'type': "ExecutableTargets",
                            'value': self._executable_targets})
             inputs.append({'type': "APPID", 'value': self._app_id})
+            inputs.append({'type': "DSEAPPID", 'value': self._dse_app_id})
             inputs.append({"type": "MemoryTransceiver", 'value': self._txrx})
             inputs.append({"type": "RunTime",
                            'value': this_run_time})
