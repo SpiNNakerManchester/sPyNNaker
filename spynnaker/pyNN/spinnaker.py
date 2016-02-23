@@ -106,6 +106,7 @@ class Spinnaker(object):
         # application graph
         self._processor_to_app_data_base_address_mapper = None
         self._placement_to_app_data_file_paths = None
+        self._dsg_targets = None
 
         # holder for timing related values
         self._has_ran = False
@@ -118,6 +119,7 @@ class Spinnaker(object):
         # state thats needed the first time around
         if self._app_id is None:
             self._app_id = config.getint("Machine", "appID")
+            self._dse_app_id = config.getint("Machine", "DSEappID")
 
             if config.getboolean("Reports", "reportsEnabled"):
                 self._reports_states = ReportState(
@@ -132,7 +134,8 @@ class Spinnaker(object):
                     config.getboolean("Reports", "writeReloadSteps"),
                     config.getboolean("Reports", "writeTransceiverReport"),
                     config.getboolean("Reports", "outputTimesForSections"),
-                    config.getboolean("Reports", "writeTagAllocationReports"))
+                    config.getboolean("Reports", "writeTagAllocationReports"),
+                    config.getboolean("Reports", "writeMemoryMapReport"))
 
             # set up reports default folder
             self._report_default_directory, this_run_time_string = \
@@ -157,6 +160,9 @@ class Spinnaker(object):
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
+
+        self._exec_dse_on_host = config.getboolean(
+            "SpecExecution", "specExecOnHost")
 
         # set up machine targeted data
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
@@ -308,7 +314,7 @@ class Spinnaker(object):
                 "PACMAN_provancence_data.xml")
             pacman_exeuctor.write_provenance_data_in_xml(
                 pacman_executor_file_path,
-                pacman_exeuctor.get_item("MemoryTransciever"))
+                pacman_exeuctor.get_item("MemoryTransceiver"))
 
         # sort out outputs data
         if application_graph_changed:
@@ -393,15 +399,13 @@ class Spinnaker(object):
         :return:
         """
         if not config.getboolean("Machine", "virtual_board"):
-            self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
+            self._txrx = pacman_exeuctor.get_item("MemoryTransceiver")
             self._has_ran = pacman_exeuctor.get_item("RanToken")
             self._executable_targets = \
                 pacman_exeuctor.get_item("ExecutableTargets")
             self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
-            self._processor_to_app_data_base_address_mapper = \
-                pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
-            self._placement_to_app_data_file_paths = \
-                pacman_exeuctor.get_item("PlacementToAppDataFilePaths")
+            self._dsg_targets = pacman_exeuctor.get_item(
+                "DataSpecificationTargets")
 
         self._placements = pacman_exeuctor.get_item("MemoryPlacements")
         self._router_tables = \
@@ -474,8 +478,8 @@ class Spinnaker(object):
                     raise common_exceptions.ConfigurationException(
                         "The tool chain expects config params of list of 1 "
                         "element with ,. Where the elements are either: the "
-                        "algorithum_name:algorithm_config_file_path, or "
-                        "algorithum_name if its a interal to pacman algorithm."
+                        "algorithm_name:algorithm_config_file_path, or "
+                        "algorithm_name if its a internal to pacman algorithm."
                         " Please rectify this and try again")
 
             # if using virtual machine, add to list of algorithms the virtual
@@ -489,13 +493,18 @@ class Spinnaker(object):
                     self._txrx.close()
                     self._txrx = None
 
+                if self._exec_dse_on_host:
+                    # The following lines are not split to avoid error
+                    # in future search
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphHostExecuteDataSpecification")  # @IgnorePep8
+                else:
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")  # @IgnorePep8
+
                 algorithms.append("FrontEndCommonMachineInterfacer")
                 algorithms.append("FrontEndCommonApplicationRunner")
                 algorithms.append("FrontEndCommonNotificationProtocol")
-                algorithms.append(
-                    "FrontEndCommonPartitionableGraphApplicationDataLoader")
-                algorithms.append("FrontEndCommonPartitionableGraphHost"
-                                  "ExecuteDataSpecification")
                 algorithms.append("FrontEndCommomLoadExecutableImages")
                 algorithms.append("FrontEndCommonRoutingTableLoader")
                 algorithms.append("FrontEndCommonTagsLoader")
@@ -517,7 +526,10 @@ class Spinnaker(object):
 
             if (config.getboolean("Reports", "writeMemoryMapReport") and
                     not config.getboolean("Machine", "virtual_board")):
-                algorithms.append("FrontEndCommonMemoryMapReport")
+                if self._exec_dse_on_host:
+                    algorithms.append("FrontEndCommonMemoryMapOnHostReport")
+                else:
+                    algorithms.append("FrontEndCommonMemoryMapOnChipReport")
 
             if config.getboolean("Reports", "writeNetworkSpecificationReport"):
                 algorithms.append(
@@ -560,8 +572,16 @@ class Spinnaker(object):
                 # add functions for updating the models
                 algorithms.append("FrontEndCommonRuntimeUpdater")
             if not self._has_ran and not executing_reset:
-                algorithms.append(
-                    "FrontEndCommonPartitionableGraphApplicationDataLoader")
+
+                if self._exec_dse_on_host:
+                    # The following lines are not split to avoid error
+                    # in future search
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphApplicationDataLoader")  # @IgnorePep8
+                else:
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")  # @IgnorePep8
+
                 algorithms.append("FrontEndCommomLoadExecutableImages")
             if not executing_reset:
                 algorithms.append("FrontEndCommonNotificationProtocol")
@@ -633,22 +653,18 @@ class Spinnaker(object):
             inputs.append({'type': "RunTimeMachineTimeSteps",
                            'value': no_machine_time_steps})
 
-        # FrontEndCommonPartitionableGraphApplicationDataLoader after a
-        # reset and no changes
+        # After a reset and no changes
         if not self._has_ran and not application_graph_changed:
-            inputs.append(({
-                'type': "ProcessorToAppDataBaseAddress",
-                "value": self._processor_to_app_data_base_address_mapper}))
-            inputs.append({"type": "PlacementToAppDataFilePaths",
-                           'value': self._placement_to_app_data_file_paths})
-            inputs.append({'type': "WriteCheckerFlag",
-                           'value': config.getboolean(
-                               "Mode", "verify_writes")})
+            inputs.append({
+                'type': "DataSpecificationTargets",
+                "value": self._dsg_targets})
+        inputs.append({'type': "ReportStates",
+                       'value': self._reports_states})
 
         # support resetting when there's changes in the application graph
         # (only need to exit)
         if application_graph_changed and is_resetting:
-            inputs.append({"type": "MemoryTransciever", 'value': self._txrx})
+            inputs.append({"type": "MemoryTransceiver", 'value': self._txrx})
             inputs.append({'type': "ExecutableTargets",
                            'value': self._executable_targets})
             inputs.append({'type': "MemoryPlacements",
@@ -656,6 +672,7 @@ class Spinnaker(object):
             inputs.append({'type': "MemoryGraphMapper",
                            'value': self._graph_mapper})
             inputs.append({'type': "APPID", 'value': self._app_id})
+            inputs.append({'type': "DSEAPPID", 'value': self._dse_app_id})
             inputs.append({'type': "RanToken", 'value': self._has_ran})
 
         elif application_graph_changed and not is_resetting:
@@ -724,6 +741,7 @@ class Spinnaker(object):
                            'value': scamp_socket_addresses})
             inputs.append({'type': "BootPortNum", 'value': boot_port_num})
             inputs.append({'type': "APPID", 'value': self._app_id})
+            inputs.append({'type': "DSEAPPID", 'value': self._dse_app_id})
             inputs.append({'type': "RunTime", 'value': this_run_time})
             inputs.append({'type': "TimeScaleFactor",
                            'value': self._time_scale_factor})
@@ -745,8 +763,6 @@ class Spinnaker(object):
             inputs.append({'type': "MachineHasWrapAroundsFlag",
                            'value': config.getboolean(
                                "Machine", "requires_wrap_arounds")})
-            inputs.append({'type': "ReportStates",
-                           'value': self._reports_states})
             inputs.append({'type': "UserCreateDatabaseFlag",
                            'value': config.get("Database", "create_database")})
             inputs.append({'type': "ExecuteMapping",
@@ -809,7 +825,8 @@ class Spinnaker(object):
             inputs.append({'type': "ExecutableTargets",
                            'value': self._executable_targets})
             inputs.append({'type': "APPID", 'value': self._app_id})
-            inputs.append({"type": "MemoryTransciever", 'value': self._txrx})
+            inputs.append({'type': "DSEAPPID", 'value': self._dse_app_id})
+            inputs.append({"type": "MemoryTransceiver", 'value': self._txrx})
             inputs.append({"type": "RunTime",
                            'value': this_run_time})
             inputs.append({'type': "TimeScaleFactor",
