@@ -24,7 +24,7 @@ class AbstractMasterPopTableFactory(object):
         :param incoming_key: the source key which the synaptic matrix needs to\
                     be mapped to
         :param master_pop_base_mem_address: the base address of the master pop
-        :param txrx: the transciever object from spinnman
+        :param txrx: the transceiver object from spinnman
         :param chip_y: the y coordinate of the chip of this master pop
         :param chip_x: the x coordinate of the chip of this master pop
         :type incoming_key: int
@@ -69,16 +69,16 @@ class AbstractMasterPopTableFactory(object):
                                              master_pop_table_region):
         """
 
-        :param x: x coord for the chip to whcih this master pop table is \
+        :param x: x coord for the chip to which this master pop table is \
         being read
         :type x: int
-        :param y: y coord for the chip to whcih this master pop table is \
+        :param y: y coord for the chip to which this master pop table is \
         being read
         :type y: int
-        :param p: p coord for the processor to whcih this master pop table is \
+        :param p: p coord for the processor to which this master pop table is \
         being read
         :type p: int
-        :param transceiver: the transciever object
+        :param transceiver: the transceiver object
         :type transceiver: spinnman.transciever.Transciever object
         :param master_pop_table_region: the region to which the master pop\
          resides

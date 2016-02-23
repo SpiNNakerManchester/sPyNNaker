@@ -34,7 +34,6 @@ def get_data(transceiver, placement, region, region_size):
     region_base_address_buf = buffer(transceiver.read_memory(
         x, y, region_base_address_offset, 4))
     region_base_address = struct.unpack_from("<I", region_base_address_buf)[0]
-#    region_base_address += app_data_base_address
     number_of_bytes_written_buf = buffer(transceiver.read_memory(
         x, y, region_base_address, 4))
     number_of_bytes_written = struct.unpack_from(

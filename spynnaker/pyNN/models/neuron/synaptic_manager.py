@@ -354,7 +354,7 @@ class SynapticManager(object):
 
             else:
 
-                # Otherwise, sum the pathalogical case of all columns being
+                # Otherwise, sum the pathological case of all columns being
                 # at stdp_max_weight
                 sublist.sum_fixed_weight(total_weights, stdp_max_weight)
                 sublist.sum_fixed_weight(total_square_weights,
@@ -702,9 +702,8 @@ class SynapticManager(object):
     @staticmethod
     def _extract_row_data_from_memory_block(synaptic_block, position_in_block):
 
-        """
-        extracts the 6 elements from a data block which is ordered
-        no PP, pp, No ff, NO fp, FF fp
+        """ extracts the 6 elements from a data block which is ordered\
+            no PP, PP, No FF, NO FP, FF, FP
         """
 
         # read in number of plastic plastic entries
@@ -810,8 +809,7 @@ class SynapticManager(object):
 
             if len(block) != synaptic_block_size:
                 raise exceptions.SynapticBlockReadException(
-                    "Not enough data has been read"
-                    " (aka, something funkky happened)")
+                    "Not enough data has been read")
         return block, maxed_row_length
 
     # inherited from AbstractProvidesIncomingEdgeConstraints

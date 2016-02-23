@@ -162,7 +162,7 @@ class Spinnaker(object):
             "Simulation", "ring_buffer_sigma"))
 
         self._exec_dse_on_host = config.getboolean(
-                "SpecExecution", "specExecOnHost")
+            "SpecExecution", "specExecOnHost")
 
         # set up machine targeted data
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
@@ -478,8 +478,8 @@ class Spinnaker(object):
                     raise common_exceptions.ConfigurationException(
                         "The tool chain expects config params of list of 1 "
                         "element with ,. Where the elements are either: the "
-                        "algorithum_name:algorithm_config_file_path, or "
-                        "algorithum_name if its a interal to pacman algorithm."
+                        "algorithm_name:algorithm_config_file_path, or "
+                        "algorithm_name if its a internal to pacman algorithm."
                         " Please rectify this and try again")
 
             # if using virtual machine, add to list of algorithms the virtual
@@ -497,10 +497,10 @@ class Spinnaker(object):
                     # The following lines are not split to avoid error
                     # in future search
                     algorithms.append(
-                        "FrontEndCommonPartitionableGraphHostExecuteDataSpecification")
+                        "FrontEndCommonPartitionableGraphHostExecuteDataSpecification")  # @IgnorePep8
                 else:
                     algorithms.append(
-                        "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")
+                        "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")  # @IgnorePep8
 
                 algorithms.append("FrontEndCommonMachineInterfacer")
                 algorithms.append("FrontEndCommonApplicationRunner")
@@ -577,10 +577,10 @@ class Spinnaker(object):
                     # The following lines are not split to avoid error
                     # in future search
                     algorithms.append(
-                        "FrontEndCommonPartitionableGraphApplicationDataLoader")
+                        "FrontEndCommonPartitionableGraphApplicationDataLoader")  # @IgnorePep8
                 else:
                     algorithms.append(
-                        "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")
+                        "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")  # @IgnorePep8
 
                 algorithms.append("FrontEndCommomLoadExecutableImages")
             if not executing_reset:

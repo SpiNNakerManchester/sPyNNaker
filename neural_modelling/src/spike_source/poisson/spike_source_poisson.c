@@ -136,7 +136,7 @@ bool read_poisson_parameters(address_t address) {
 
     has_been_given_key = address[HAS_KEY];
     key = address[TRANSMISSION_KEY];
-    log_info("\tkey = %08x", key);
+    log_info("\t key = %08x", key);
 
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
     memcpy(spike_source_seed, &address[PARAMETER_SEED_START_POSITION],
@@ -149,7 +149,7 @@ bool read_poisson_parameters(address_t address) {
     num_slow_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
     num_fast_spike_sources = address[PARAMETER_SEED_START_POSITION +
                                      seed_size + 1];
-    log_info("\tslow spike sources = %u, fast spike sources = %u,",
+    log_info("\t slow spike sources = %u, fast spike sources = %u,",
              num_slow_spike_sources, num_fast_spike_sources);
 
     // Allocate DTCM for array of slow spike sources and copy block of data
@@ -412,7 +412,6 @@ void c_main(void) {
     if (!initialize(&timer_period)) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
-        return;
     }
 
     // Start the time at "-1" so that the first tick will be 0
