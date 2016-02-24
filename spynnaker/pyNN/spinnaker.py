@@ -466,7 +466,7 @@ class Spinnaker(object):
 
         # if the allocation graph has changed, need to go through mapping
         if application_graph_changed and not executing_reset:
-        
+
             # Add reports early so they get executed as soon as possible
             if self._reports_states is not None \
                     and self._reports_states.tag_allocation_report:
@@ -616,6 +616,11 @@ class Spinnaker(object):
         application_graph_changed = \
             self._detect_if_graph_has_changed(not is_resetting)
         inputs = list()
+
+        inputs.append({"type": "DoLoadFlag", "value": config.getboolean(
+            "Mode", "do_load")})
+        inputs.append({"type": "DoWriteFlag", "value": config.getboolean(
+            "Mode", "do_write")})
 
         # file path to store any provenance data to
         provenance_file_path = \
@@ -1166,6 +1171,9 @@ class Spinnaker(object):
         for population in self._populations:
             population._end()
 
+        if not config.getboolean("Mode", "do_stop"):
+            return
+
         # if not a virtual machine, then shut down stuff on the board
         if not config.getboolean("Machine", "virtual_board"):
 
@@ -1181,7 +1189,7 @@ class Spinnaker(object):
                 clear_tags = config.getboolean("Machine", "clear_tags")
 
             self._txrx.enable_reinjection(multicast=False)
-            
+
             # if stopping on machine, clear iptags and
             if clear_tags:
                 for ip_tag in self._tags.ip_tags:
