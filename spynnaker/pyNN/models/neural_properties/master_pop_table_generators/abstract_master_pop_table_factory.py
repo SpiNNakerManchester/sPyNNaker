@@ -65,21 +65,15 @@ class AbstractMasterPopTableFactory(object):
         """
 
     @staticmethod
-    def locate_master_pop_table_base_address(x, y, p, transceiver,
+    def locate_master_pop_table_base_address(placement, transceiver,
                                              master_pop_table_region):
         """
 
-        :param x: x coord for the chip to which this master pop table is \
-        being read
-        :type x: int
-        :param y: y coord for the chip to which this master pop table is \
-        being read
-        :type y: int
-        :param p: p coord for the processor to which this master pop table is \
-        being read
-        :type p: int
+        :param placement: the placement object to get the master pop base
+        address for
+        :type placement: pacman.model.placements.placement.Placement
         :param transceiver: the transceiver object
-        :type transceiver: spinnman.transciever.Transciever object
+        :type transceiver: SpiNNMan.transciever.Transciever object
         :param master_pop_table_region: the region to which the master pop\
          resides
          :type master_pop_table_region: int
@@ -88,8 +82,8 @@ class AbstractMasterPopTableFactory(object):
         :return: the master pop table in some form
         """
         master_region_base_address = helpful_functions.\
-            locate_memory_region_on_core(
-                x, y, p, master_pop_table_region, transceiver)
+            locate_memory_region_for_placement(
+                placement, master_pop_table_region, transceiver)
         return master_region_base_address
 
     @abstractmethod

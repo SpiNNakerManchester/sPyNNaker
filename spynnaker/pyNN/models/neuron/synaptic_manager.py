@@ -754,11 +754,8 @@ class SynapticManager(object):
         # either read in the master pop table or retrieve it from storage
         master_pop_base_mem_address = \
             self._population_table_type.locate_master_pop_table_base_address(
-                post_x, post_y, post_p, transceiver,
+                post_placement, transceiver,
                 constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
-
-        app_data_base_address = helpful_functions.get_app_data_base_address(
-            post_x, post_y, post_p, transceiver)
 
         incoming_edges = subgraph.incoming_subedges_from_subvertex(
             post_subvertex)
@@ -784,17 +781,12 @@ class SynapticManager(object):
                                    (constants.SYNAPTIC_ROW_HEADER_WORDS +
                                     maxed_row_length))
 
-            # read in the base address of the synaptic matrix in the app region
-            # table
-            synapse_region_base_address_location = \
-                dsg_utilities.get_region_base_address_offset(
-                    app_data_base_address,
-                    constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
-
             # read in the memory address of the synaptic_region base address
-            synapse_region_base_address = helpful_functions.read_data(
-                post_x, post_y, synapse_region_base_address_location, 4,
-                "<I", transceiver)
+            synapse_region_base_address = helpful_functions.\
+                locate_memory_region_for_placement(
+                    post_placement,
+                    constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+                    transceiver)
 
             # the base address of the synaptic block in absolute terms is the
             # app base, plus the synaptic matrix base plus the offset

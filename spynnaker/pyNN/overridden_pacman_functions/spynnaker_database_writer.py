@@ -1,6 +1,5 @@
 
 from pacman.utilities.utility_objs.progress_bar import ProgressBar
-from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN.utilities.database.spynnaker_database_writer import \
     SpynnakerDataBaseWriter
 
@@ -21,16 +20,16 @@ class SpynnakerDatabaseWriter(object):
             routing_infos, router_tables, execute_mapping):
 
         # add database generation if requested
+        self._database_interface = SpynnakerDataBaseWriter(
+            app_data_runtime_folder)
+
         self._needs_database = \
-            helpful_functions.auto_detect_database(partitioned_graph)
+            self._database_interface.auto_detect_database(partitioned_graph)
         self._user_create_database = user_create_database
         if ((self._user_create_database == "None" and self._needs_database) or
                 self._user_create_database == "True"):
 
             database_progress = ProgressBar(10, "Creating database")
-
-            self._database_interface = SpynnakerDataBaseWriter(
-                app_data_runtime_folder)
 
             self._database_interface.add_system_params(
                 time_scale_factor, machine_time_step, runtime)

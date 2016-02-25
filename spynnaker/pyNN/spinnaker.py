@@ -96,16 +96,27 @@ class Spinnaker(SpinnakerMainInterface):
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
-    @staticmethod
-    def generate_algoirthm_list(self):
+    def _create_algorithm_list(
+            self, debug, application_graph_changed, executing_reset,
+            using_auto_pause_and_resume):
+        """
+        creates the list of algorithms to use within the system
+        :param debug: if the tools should be operating in debug mode
+        :param application_graph_changed: has the graph changed since last run
+        :param executing_reset: are we executing a reset function
+        :param using_auto_pause_and_resume: check if the system is to use
+        auto pause and resume functionality
+        :return: list of algorithms to use and a list of optional
+        algorithms to use
+        """
         # generate algorithm list from front end config
-        algorithms = list()
+        mapping_algorithms = list()
         algorithm_names = config.get("Mapping", "algorithms")
         algorithm_strings = algorithm_names.split(",")
         for algorithm_string in algorithm_strings:
             split_string = algorithm_string.split(":")
             if len(split_string) == 1:
-                algorithms.append(split_string[0])
+                mapping_algorithms.append(split_string[0])
             else:
                 raise common_exceptions.ConfigurationException(
                     "The tool chain expects config params of list of 1 "
@@ -113,7 +124,12 @@ class Spinnaker(SpinnakerMainInterface):
                     "algorithm_name:algorithm_config_file_path, or "
                     "algorithm_name if its a internal to pacman algorithm."
                     " Please rectify this and try again")
-        return algorithms
+        algorithms, optional_algorithms = \
+            self._create_all_flows_algorithm_common(
+                debug, application_graph_changed, executing_reset,
+                using_auto_pause_and_resume)
+        mapping_algorithms.extend(algorithms)
+        return mapping_algorithms, optional_algorithms
 
     def _set_up_machine_specifics(self, timestep, min_delay, max_delay,
                                   hostname):
@@ -207,33 +223,6 @@ class Spinnaker(SpinnakerMainInterface):
         if self._hostname == 'None' and not use_virtual_board:
             raise Exception("A SpiNNaker machine must be specified in "
                             "spynnaker.cfg.")
-
-    def _create_algorithm_list(
-            self, in_debug_mode, application_graph_changed, executing_reset,
-            using_auto_pause_and_resume):
-        """
-        creates the list of algorithms to use within the system
-        :param in_debug_mode: if the tools should be operating in debug mode
-        :param application_graph_changed: has the graph changed since last run
-        :param executing_reset: are we executing a reset function
-        :param using_auto_pause_and_resume: check if the system is to use
-        auto pause and resume functionality
-        :return: list of algorithms to use and a list of optional
-        algorithms to use
-        """
-        algorithms = list()
-        # needed for multi-run/SSA's to work correctly.
-        algorithms.append("SpyNNakerRuntimeUpdater")
-
-        if self._has_ran and not executing_reset:
-            algorithms.append("SpyNNakerRecordingExtractor")
-
-        algorithms, optional_algorithms = \
-            SpinnakerMainInterface._create_all_flows_algorithm_common(
-                self, in_debug_mode, application_graph_changed, executing_reset,
-                using_auto_pause_and_resume, algorithms)
-
-        return algorithms, optional_algorithms
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes

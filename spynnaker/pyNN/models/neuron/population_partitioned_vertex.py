@@ -86,27 +86,13 @@ class PopulationPartitionedVertex(
         basic_provenance_entries = ProvidesProvenancePartitionedVertex.\
             get_provenance_data_items(self, transceiver, placement)
 
-        # TODO this needs to be moved, once sergio's and rowley's branches are merged.
         # Get the App Data base address for the core
         # (location where this cores memory starts in sdram and region table)
-        app_data_base_address = transceiver.get_cpu_information_from_core(
-            placement.x, placement.y, placement.p).user[0]
-        provenance_data_region_base_address = \
-            data_specification_utilities.get_region_base_address_offset(
-                app_data_base_address,
-                constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value)
-        provenance_data_region_base_address_offset = \
-            helpful_functions.read_data(
-                placement.x, placement.y, provenance_data_region_base_address,
-                4, "<I", transceiver)
-
-        # deduce the base address location for the provenance data region in
-        # sdram
-        provenance_data_base_address =\
-            provenance_data_region_base_address_offset + app_data_base_address
-        # compensate for basic prov reading
-        provenance_data_base_address += \
-            common_constants.PROVENANCE_DATA_REGION_SIZE_IN_BYTES
+        provenance_data_base_address = \
+            helpful_functions.locate_memory_region_for_placement(
+                placement,
+                constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value,
+                transceiver)
 
         # todo this was a function call, but alas the call only returned the first
         # get data from the machine
