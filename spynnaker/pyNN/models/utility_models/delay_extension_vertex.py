@@ -204,7 +204,7 @@ class DelayExtensionVertex(
         spec.end_specification()
         data_writer.close()
 
-        return [data_writer.filename]
+        return data_writer.filename
 
     def write_setup_info(self, spec):
 

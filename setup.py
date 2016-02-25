@@ -37,9 +37,9 @@ setup(
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template'],
                   'spynnaker.pyNN.overridden_pacman_functions': ['*.xml']},
     install_requires=['SpiNNMachine == 2015.004.01',
-                      'SpiNNMan == 2015.004.01',
-                      'SpiNNaker_PACMAN == 2015.004.01',
-                      'SpiNNaker_DataSpecification == 2015.004',
-                      'SpiNNFrontEndCommon == 2015.002.01',
+                      'SpiNNMan == 2016.001',
+                      'SpiNNaker_PACMAN == 2016.001',
+                      'SpiNNaker_DataSpecification == 2016.001',
+                      'SpiNNFrontEndCommon == 2016.001',
                       'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
 )
