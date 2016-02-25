@@ -41,7 +41,6 @@ class Projection(object):
     :param `pacman103.front.pynn.connectors` method:
         an instance of the connection method and parameters for the Projection
     """
-    _projection_count = 0
 
     # noinspection PyUnusedLocal
     def __init__(
@@ -121,8 +120,9 @@ class Projection(object):
         # check that the projection edges label is not none, and give an
         # auto generated label if set to None
         if label is None:
-            label = "projection edge {}".format(Projection._projection_count)
-            Projection._projection_count += 1
+            label = "projection edge {}".format(
+                spinnaker_control.none_labelled_edge_count)
+            spinnaker_control.increment_none_labelled_edge_count()
 
         if max_delay > natively_supported_delay_for_models:
             source_sz = presynaptic_population._get_vertex.n_atoms
@@ -152,7 +152,7 @@ class Projection(object):
                     synapse_dynamics=synapse_dynamics, label=label)
 
                 # add edge to the graph
-                spinnaker_control.add_edge(
+                spinnaker_control.add_partitionable_edge(
                     self._projection_edge, EDGE_PARTITION_ID)
                 self._projection_list_ranges = synapse_list.ranges()
         spinnaker_control._add_projection(self)
@@ -223,7 +223,7 @@ class Projection(object):
                     presynaptic_population, postsynaptic_population,
                     self._spinnaker.machine_time_step,
                     synapse_list=direct_synaptic_sublist, label=label)
-                self._spinnaker.add_edge(direct_edge, EDGE_PARTITION_ID)
+                self._spinnaker.add_partitionable_edge(direct_edge, EDGE_PARTITION_ID)
                 self._projection_edge = direct_edge
                 self._projection_list_ranges = direct_synaptic_sublist.ranges()
 
@@ -241,7 +241,7 @@ class Projection(object):
             presynaptic_population._internal_delay_vertex = delay_vertex
             presynaptic_population._get_vertex.add_constraint(
                 PartitionerSameSizeAsVertexConstraint(delay_vertex))
-            self._spinnaker.add_vertex(delay_vertex)
+            self._spinnaker.add_partitionable_vertex(delay_vertex)
 
         # Create a connection from the source pynn_population.py to the
         # delay vertex
@@ -254,7 +254,7 @@ class Projection(object):
                 label=new_label)
 
             # add to graph
-            self._spinnaker.add_edge(remaining_edge, EDGE_PARTITION_ID)
+            self._spinnaker.add_partitionable_edge(remaining_edge, EDGE_PARTITION_ID)
 
         # Create a list of the connections with delay larger than that which
         # can be handled by the neuron itself
@@ -285,7 +285,7 @@ class Projection(object):
             self._delay_list_ranges = remaining_sublist.ranges()
 
             # add to graph
-            self._spinnaker.add_edge(self._delay_edge, EDGE_PARTITION_ID)
+            self._spinnaker.add_partitionable_edge(self._delay_edge, EDGE_PARTITION_ID)
 
     def describe(self, template='projection_default.txt', engine='default'):
         """ Return a human-readable description of the projection.

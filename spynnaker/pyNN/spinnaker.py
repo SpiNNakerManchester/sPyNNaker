@@ -96,6 +96,25 @@ class Spinnaker(SpinnakerMainInterface):
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
+    @staticmethod
+    def generate_algoirthm_list(self):
+        # generate algorithm list from front end config
+        algorithms = list()
+        algorithm_names = config.get("Mapping", "algorithms")
+        algorithm_strings = algorithm_names.split(",")
+        for algorithm_string in algorithm_strings:
+            split_string = algorithm_string.split(":")
+            if len(split_string) == 1:
+                algorithms.append(split_string[0])
+            else:
+                raise common_exceptions.ConfigurationException(
+                    "The tool chain expects config params of list of 1 "
+                    "element with ,. Where the elements are either: the "
+                    "algorithm_name:algorithm_config_file_path, or "
+                    "algorithm_name if its a internal to pacman algorithm."
+                    " Please rectify this and try again")
+        return algorithms
+
     def _set_up_machine_specifics(self, timestep, min_delay, max_delay,
                                   hostname):
         self._machine_time_step = config.getint("Machine", "machineTimeStep")
@@ -202,16 +221,17 @@ class Spinnaker(SpinnakerMainInterface):
         :return: list of algorithms to use and a list of optional
         algorithms to use
         """
-        algorithms, optional_algorithms = \
-            SpinnakerMainInterface._create_algorithm_list(
-                self, in_debug_mode, application_graph_changed, executing_reset,
-                using_auto_pause_and_resume)
-
+        algorithms = list()
         # needed for multi-run/SSA's to work correctly.
-        algorithms.insert(0, "SpyNNakerRuntimeUpdater")
+        algorithms.append("SpyNNakerRuntimeUpdater")
 
         if self._has_ran and not executing_reset:
-            algorithms.insert(0, "SpyNNakerRecordingExtractor")
+            algorithms.append("SpyNNakerRecordingExtractor")
+
+        algorithms, optional_algorithms = \
+            SpinnakerMainInterface._create_all_flows_algorithm_common(
+                self, in_debug_mode, application_graph_changed, executing_reset,
+                using_auto_pause_and_resume, algorithms)
 
         return algorithms, optional_algorithms
 
@@ -285,7 +305,7 @@ class Spinnaker(SpinnakerMainInterface):
         return "spynnaker front end instance for machine {}"\
             .format(self._hostname)
 
-    def add_vertex(self, vertex_to_add):
+    def add_partitionable_vertex(self, vertex_to_add):
         """
 
         :param vertex_to_add:
@@ -300,20 +320,20 @@ class Spinnaker(SpinnakerMainInterface):
             if self._multi_cast_vertex is None:
                 self._multi_cast_vertex = CommandSender(
                     self._machine_time_step, self._time_scale_factor)
-                self.add_vertex(self._multi_cast_vertex)
+                self.add_partitionable_vertex(self._multi_cast_vertex)
             edge = MultiCastPartitionableEdge(
                 self._multi_cast_vertex, vertex_to_add)
             self._multi_cast_vertex.add_commands(vertex_to_add.commands, edge)
-            self.add_edge(edge)
+            self.add_partitionable_edge(edge)
 
         # add any dependent edges and vertices if needed
         if isinstance(vertex_to_add,
                       AbstractVertexWithEdgeToDependentVertices):
             for dependant_vertex in vertex_to_add.dependent_vertices:
-                self.add_vertex(dependant_vertex)
+                self.add_partitionable_vertex(dependant_vertex)
                 dependant_edge = MultiCastPartitionableEdge(
                     pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
-                self.add_edge(
+                self.add_partitionable_edge(
                     dependant_edge,
                     vertex_to_add.edge_partition_identifier_for_dependent_edge)
 

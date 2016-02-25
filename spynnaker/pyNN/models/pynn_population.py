@@ -47,8 +47,6 @@ class Population(object):
     :returns a list of vertexes and edges
     """
 
-    _non_labelled_vertex_count = 0
-
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
                  structure=None):
         if size is not None and size <= 0:
@@ -60,8 +58,8 @@ class Population(object):
         cell_label = label
         if label is None:
             cell_label = "Population {}".format(
-                Population._non_labelled_vertex_count)
-            Population._non_labelled_vertex_count += 1
+                spinnaker.none_labelled_vertex_count)
+            spinnaker.increment_none_labelled_vertex_count()
 
         # copy the parameters so that the end users are not exposed to the
         # additions placed by spinnaker.
@@ -90,7 +88,7 @@ class Population(object):
             self._structure = None
 
         self._spinnaker._add_population(self)
-        self._spinnaker.add_vertex(self._vertex)
+        self._spinnaker.add_partitionable_vertex(self._vertex)
 
         # initialise common stuff
         self._size = size
