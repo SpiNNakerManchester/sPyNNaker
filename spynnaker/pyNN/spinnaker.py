@@ -111,6 +111,13 @@ class Spinnaker(SpinnakerMainInterface):
         """
         # generate algorithm list from front end config
         mapping_algorithms = list()
+
+        # needed for multi-run/SSA's to work correctly.
+        mapping_algorithms.append("SpyNNakerRuntimeUpdater")
+        if self._has_ran and not executing_reset:
+            mapping_algorithms.append("SpyNNakerRecordingExtractor")
+
+        # get config mapping algorithms and convert as needed
         algorithm_names = config.get("Mapping", "algorithms")
         algorithm_strings = algorithm_names.split(",")
         for algorithm_string in algorithm_strings:
@@ -124,6 +131,8 @@ class Spinnaker(SpinnakerMainInterface):
                     "algorithm_name:algorithm_config_file_path, or "
                     "algorithm_name if its a internal to pacman algorithm."
                     " Please rectify this and try again")
+
+        # get common algorithm flow support
         algorithms, optional_algorithms = \
             self._create_all_flows_algorithm_common(
                 debug, application_graph_changed, executing_reset,
