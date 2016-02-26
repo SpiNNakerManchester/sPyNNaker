@@ -3,6 +3,11 @@ import numpy as np
 
 MS_SCALE = (1.0 / 200032.4)
 
+default_tag_labels = ["Timer",
+                      "Process DMA Read",
+                      "Handle incoming spike",
+                      "Process fixed synapses", "Process plastic synapses"]
+
 def print_summary(profiling_data, duration):
     """
     Print a summary of the profiling data to standard out
@@ -12,7 +17,7 @@ def print_summary(profiling_data, duration):
 
     # Summarise data for all tags
     for tag_name, times in profiling_data.iteritems():
-        print("Tag:%s" % (tag_name))
+        print("Tag:%s" % (default_tag_labels[tag_name]))
 
         print("\tMean time:%fms" % (np.average(times[1])))
 
