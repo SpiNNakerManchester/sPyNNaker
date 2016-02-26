@@ -123,10 +123,20 @@ class Spinnaker(SpinnakerMainInterface):
         # generate algorithm list from front end config
         mapping_algorithms = list()
 
-        # needed for multi-run/SSA's to work correctly.
-        mapping_algorithms.append("SpyNNakerRuntimeUpdater")
-        if self._has_ran and not executing_reset:
-            mapping_algorithms.append("SpyNNakerRecordingExtractor")
+        virtual_board = config.getboolean("Machine", "virtual_board")
+
+        if not virtual_board:
+            # needed for multi-run/SSA's to work correctly.
+            mapping_algorithms.append("SpyNNakerRuntimeUpdater")
+            # if not in auto pause and resume mode, use front end common
+            # chip runtime updater
+            if (application_graph_changed and not executing_reset and
+                    not using_auto_pause_and_resume):
+                mapping_algorithms.append("FrontEndCommonChipRuntimeUpdater")
+            if not application_graph_changed and not executing_reset:
+                mapping_algorithms.append("FrontEndCommonChipRuntimeUpdater")
+            if self._has_ran and not executing_reset:
+                mapping_algorithms.append("SpyNNakerRecordingExtractor")
 
         # get config mapping algorithms and convert as needed
         algorithm_names = config.get("Mapping", "algorithms")
