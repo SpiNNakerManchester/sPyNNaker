@@ -96,6 +96,17 @@ class Spinnaker(SpinnakerMainInterface):
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
+    def _create_pacman_executor_inputs(self, this_run_time, is_resetting=False):
+        inputs, application_graph_changed, using_auto_pause_and_resume = \
+            SpinnakerMainInterface._create_pacman_executor_inputs(
+                self, this_run_time, is_resetting)
+        if application_graph_changed and not is_resetting:
+            inputs.append({
+                'type': "ExecuteMapping",
+                'value': config.getboolean(
+                    "Database", "create_routing_info_to_neuron_id_mapping")})
+        return inputs, application_graph_changed, using_auto_pause_and_resume
+
     def _create_algorithm_list(
             self, debug, application_graph_changed, executing_reset,
             using_auto_pause_and_resume):
