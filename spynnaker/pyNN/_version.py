@@ -1,4 +1,4 @@
-__version__ = "2015.005.01"
-__version_month__ = "September"
-__version_year__ = "2015"
-__version_name__ = "Arbitrary"
+__version__ = "2016.001"
+__version_month__ = "March"
+__version_year__ = "2016"
+__version_name__ = "Another Fine Product from the Nonsense Factory"

@@ -109,6 +109,7 @@ class Spinnaker(object):
         # state thats needed the first time around
         if self._app_id is None:
             self._app_id = config.getint("Machine", "appID")
+            self._dse_app_id = config.getint("Machine", "DSEappID")
 
             if config.getboolean("Reports", "reportsEnabled"):
                 self._reports_states = ReportState(
@@ -123,7 +124,8 @@ class Spinnaker(object):
                     config.getboolean("Reports", "writeReloadSteps"),
                     config.getboolean("Reports", "writeTransceiverReport"),
                     config.getboolean("Reports", "outputTimesForSections"),
-                    config.getboolean("Reports", "writeTagAllocationReports"))
+                    config.getboolean("Reports", "writeTagAllocationReports"),
+                    config.getboolean("Reports", "writeMemoryMapReport"))
 
             # set up reports default folder
             self._report_default_directory, this_run_time_string = \
@@ -148,6 +150,9 @@ class Spinnaker(object):
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
+
+        self._exec_dse_on_host = config.getboolean(
+            "SpecExecution", "specExecOnHost")
 
         # set up machine targeted data
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
@@ -312,7 +317,7 @@ class Spinnaker(object):
                 "PACMAN_provancence_data.xml")
             pacman_exeuctor.write_provenance_data_in_xml(
                 pacman_executor_file_path,
-                pacman_exeuctor.get_item("MemoryTransciever"))
+                pacman_exeuctor.get_item("MemoryTransceiver"))
 
         # sort out outputs data
         self._update_data_structures_from_pacman_exeuctor(
@@ -398,9 +403,12 @@ class Spinnaker(object):
         if application_graph_changed:
             if not config.getboolean("Machine", "virtual_board"):
                 self._txrx = pacman_exeuctor.get_item("MemoryTransciever")
-                self._executable_targets = \
-                    pacman_exeuctor.get_item("ExecutableTargets")
-                self._buffer_manager = pacman_exeuctor.get_item("BufferManager")
+                self._executable_targets = pacman_exeuctor.get_item(
+                    "ExecutableTargets")
+                self._buffer_manager = pacman_exeuctor.get_item(
+                    "BufferManager")
+                self._dsg_targets = pacman_exeuctor.get_item(
+                    "DataSpecificationTargets")
                 self._processor_to_app_data_base_address_mapper = \
                     pacman_exeuctor.get_item("ProcessorToAppDataBaseAddress")
                 self._placement_to_app_data_file_paths = \
@@ -426,7 +434,7 @@ class Spinnaker(object):
         if uses_auto_pause_and_resume:
             self._steps = pacman_exeuctor.get_item("Steps")
 
-        # update stuff that alkways needed updating
+        # update stuff that always needed updating
         self._no_sync_changes = pacman_exeuctor.get_item("NoSyncChanges")
         self._has_ran = pacman_exeuctor.get_item("RanToken")
         if uses_auto_pause_and_resume:
@@ -456,15 +464,15 @@ class Spinnaker(object):
     def _create_algorithm_list(
             self, in_debug_mode, application_graph_changed, executing_reset,
             using_auto_pause_and_resume):
-        """
-        creates the list of algorithms to use within the system
+        """ Creates the list of algorithms to use within the system
+
         :param in_debug_mode: if the tools should be operating in debug mode
         :param application_graph_changed: has the graph changed since last run
         :param executing_reset: are we executing a reset function
-        :param using_auto_pause_and_resume: check if the system is to use
-        auto pasue and resume functionality
-        :return: list of algorithms to use and a list of optional
-        algotihms to use
+        :param using_auto_pause_and_resume: check if the system is to use\
+            auto pause and resume functionality
+        :return: list of algorithms to use and a list of optional\
+            algorithms to use
         """
         algorithms = list()
         optional_algorithms = list()
@@ -472,11 +480,12 @@ class Spinnaker(object):
         # needed for multi-run/SSA's to work correctly.
         algorithms.append("SpyNNakerRuntimeUpdator")
 
-        # if youve not ran before, add the buffer manager
+        # if not ran before, add the buffer manager
         using_virtual_board = config.getboolean("Machine", "virtual_board")
         if application_graph_changed and not using_virtual_board:
             if not using_auto_pause_and_resume:
-                optional_algorithms.append("FrontEndCommonBufferManagerCreater")
+                optional_algorithms.append(
+                    "FrontEndCommonBufferManagerCreater")
 
         # if you're needing a reset, you need to clean the binaries
         # (unless you've not ran yet)
@@ -521,6 +530,15 @@ class Spinnaker(object):
                     self._txrx.close()
                     self._txrx = None
 
+                if self._exec_dse_on_host:
+                    # The following lines are not split to avoid error
+                    # in future search
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphHostExecuteDataSpecification")  # @IgnorePep8
+                else:
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")  # @IgnorePep8
+
                 algorithms.append("FrontEndCommonMachineInterfacer")
                 algorithms.append("FrontEndCommonNotificationProtocol")
                 optional_algorithms.append("FrontEndCommonRoutingTableLoader")
@@ -533,8 +551,6 @@ class Spinnaker(object):
                     algorithms.append("FrontEndCommonApplicationRunner")
                     optional_algorithms.append(
                         "FrontEndCommonApplicationDataLoader")
-                    algorithms.append("FrontEndCommonPartitionableGraphHost"
-                                      "ExecuteDataSpecification")
                     algorithms.append("FrontEndCommonLoadExecutableImages")
                     algorithms.append("FrontEndCommomPartitionableGraphData"
                                       "SpecificationWriter")
@@ -550,8 +566,8 @@ class Spinnaker(object):
                 if write_reload and using_auto_pause_and_resume:
                     raise common_exceptions.ConfigurationException(
                         "You cannot use auto pause and resume with a "
-                        "reload script. This is due to reload not being able to"
-                        "extract data from the machine. Please fix"
+                        "reload script. This is due to reload not being able "
+                        "to extract data from the machine. Please fix"
                         " and try again")
 
                 # if first run, create reload
@@ -566,9 +582,12 @@ class Spinnaker(object):
                         "it handle resets, therefore it will only contain the "
                         "initial run")
 
-            if (config.getboolean("Reports", "writeMemoryMapReport")
-                    and not using_virtual_board):
-                algorithms.append("FrontEndCommonMemoryMapReport")
+            if (config.getboolean("Reports", "writeMemoryMapReport") and
+                    not using_virtual_board):
+                if self._exec_dse_on_host:
+                    algorithms.append("FrontEndCommonMemoryMapOnHostReport")
+                else:
+                    algorithms.append("FrontEndCommonMemoryMapOnChipReport")
 
             if config.getboolean("Reports", "writeNetworkSpecificationReport"):
                 algorithms.append(
@@ -576,8 +595,8 @@ class Spinnaker(object):
 
             # if going to write provenance data after the run add the two
             # provenance gatherers
-            if (config.getboolean("Reports", "writeProvenanceData")
-                    and not using_virtual_board):
+            if (config.getboolean("Reports", "writeProvenanceData") and
+                    not using_virtual_board):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
 
             # define mapping between output types and reports
@@ -610,8 +629,16 @@ class Spinnaker(object):
                 # add functions for updating the models
                 algorithms.append("FrontEndCommonRuntimeUpdater")
             if not self._has_ran:
-                optional_algorithms.append(
-                    "FrontEndCommonApplicationDataLoader")
+                if self._exec_dse_on_host:
+
+                    # The following lines are not split to avoid error
+                    # in future search
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphApplicationDataLoader")  # @IgnorePep8
+                else:
+                    algorithms.append(
+                        "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")  # @IgnorePep8
+
                 algorithms.append("FrontEndCommonLoadExecutableImages")
 
             # add default algorithms
@@ -623,7 +650,7 @@ class Spinnaker(object):
             else:
                 algorithms.append("FrontEndCommonApplicationRunner")
 
-            # if going to write provanence data after the run add the two
+            # if going to write provenance data after the run add the two
             # provenance gatherers
             if config.getboolean("Reports", "writeProvenanceData"):
                 algorithms.append("FrontEndCommonProvenanceGatherer")
@@ -661,7 +688,7 @@ class Spinnaker(object):
             self._no_sync_changes, no_machine_time_steps, json_folder, width, \
             height, number_of_boards, scamp_socket_addresses, boot_port_num, \
             using_auto_pause_and_resume, max_sdram_size = \
-                self._deduce_standard_input_params(is_resetting, this_run_time)
+            self._deduce_standard_input_params(is_resetting, this_run_time)
 
         inputs = self._add_standard_basic_inputs(
             inputs, no_machine_time_steps, is_resetting, max_sdram_size,
@@ -687,7 +714,7 @@ class Spinnaker(object):
                 inputs, width, height, scamp_socket_addresses, boot_port_num,
                 provenance_file_path, json_folder, number_of_boards)
 
-            # if already ran, this is a remapping, thus needs to warn end user
+            # if already ran, this is a re-mapping, thus needs to warn end user
             if self._has_ran:
                 logger.warn(
                     "The network has changed, and therefore mapping will be"
@@ -715,8 +742,8 @@ class Spinnaker(object):
         # all modes need the runtime in machine time steps
         # (partitioner and rerun)
         no_machine_time_steps = \
-            int(((this_run_time - self._current_run_ms) * 1000.0)
-                / self._machine_time_step)
+            int(((this_run_time - self._current_run_ms) * 1000.0) /
+                self._machine_time_step)
 
         # make a folder for the json files to be stored in
         json_folder = os.path.join(
@@ -756,7 +783,7 @@ class Spinnaker(object):
         using_auto_pause_and_resume = \
             config.getboolean("Mode", "use_auto_pause_and_resume")
 
-        # used for debug purposes to fix max size of sdram each chip has
+        # used for debug purposes to fix max size of SDRAM each chip has
         max_sdram_size = config.get("Machine", "max_sdram_allowed_per_chip")
         if max_sdram_size == "None":
             max_sdram_size = None
@@ -978,8 +1005,8 @@ class Spinnaker(object):
         reset_machine_on_startup = \
             config.getboolean("Machine", "reset_machine_on_startup")
         needs_to_reset_machine = \
-            (reset_machine_on_startup and not self._has_ran
-             and not is_resetting)
+            (reset_machine_on_startup and not self._has_ran and
+             not is_resetting)
 
         inputs.append({
             'type': "RunTime",
@@ -1033,8 +1060,8 @@ class Spinnaker(object):
     def _add_auto_pause_and_resume_inputs(
             self, inputs, application_graph_changed, is_resetting):
         # due to the mismatch between dsg's and dse's in different front
-        # end, the inputs not given to the multile pause and resume but
-        # which are needed for dsg/dse need to be put in the extra inputs
+        # end, the inputs not given to the multiple pause and resume but
+        # which are needed for DSG/DSE need to be put in the extra inputs
 
         spynnaker_xml_file = os.path.join(
             os.path.dirname(overridden_pacman_functions.__file__),
@@ -1078,11 +1105,12 @@ class Spinnaker(object):
             'value': extra_xmls})
         inputs.append({
             'type': "DSGeneratorAlgorithm",
-            'value': "FrontEndCommomPartitionableGraphDataSpecificationWriter"})
+            'value':
+            "FrontEndCommomPartitionableGraphDataSpecificationWriter"})
         inputs.append({
             'type': "DSExecutorAlgorithm",
             'value':
-                "FrontEndCommonPartitionableGraphHostExecuteDataSpecification"})
+            "FrontEndCommonPartitionableGraphHostExecuteDataSpecification"})
         inputs.append({
             'type': "HasRanBefore",
             'value': self._has_ran})
@@ -1118,10 +1146,10 @@ class Spinnaker(object):
                 'value': self._dsg_targets})
             extra_inputs.append({
                 'type': "ProcessorToAppDataBaseAddress",
-                'value':self._processor_to_app_data_base_address_mapper})
+                'value': self._processor_to_app_data_base_address_mapper})
             extra_inputs.append({
                 'type': "PlacementToAppDataFilePaths",
-                'value':self._placement_to_app_data_file_paths})
+                'value': self._placement_to_app_data_file_paths})
             extra_inputs.append({
                 'type': "LoadBinariesToken",
                 'value': True})
