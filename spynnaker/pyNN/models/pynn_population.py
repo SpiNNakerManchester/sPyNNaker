@@ -74,8 +74,6 @@ class Population(object):
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
-        cellparams['using_auto_pause_and_resume'] = \
-            spinnaker.using_auto_pause_and_resume
 
         # create population vertex.
         self._vertex = cellclass(**cellparams)

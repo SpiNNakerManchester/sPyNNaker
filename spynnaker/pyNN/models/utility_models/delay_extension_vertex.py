@@ -2,11 +2,6 @@ import copy
 import logging
 from enum import Enum
 import math
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
 
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
@@ -60,7 +55,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
-                 label="DelayExtension", using_auto_pause_and_resume=False):
+                 label="DelayExtension"):
         """
         Creates a new DelayExtension Object.
         """
@@ -78,7 +73,6 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0
         self._source_vertex = source_vertex
-        self._using_auto_pause_and_resume = using_auto_pause_and_resume
         joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
         self.add_constraint(joint_constrant)
 
@@ -287,37 +281,12 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
 
-    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         size_of_mallocs = (
             self._DEFAULT_MALLOCS_USED *
             common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
+
         return size_of_mallocs
-
-    # @implements AbstractPartitionableVertex.get_resources_used_by_atoms
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
-        """ Get the separate resource requirements for a range of atoms
-
-        :param vertex_slice: the low value of atoms to calculate resources from
-        :param graph: A reference to the graph containing this vertex.
-        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return: a Resource container that contains a \
-                    CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: ResourceContainer
-        :raise None: this method does not raise any known exception
-        """
-        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
-        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
-        static_sdram_requirement = \
-            self.get_static_sdram_usage_for_atoms(vertex_slice, graph)
-
-        # set all to just static sdram for the time being
-        all_sdram_usage = static_sdram_requirement
-
-        # noinspection PyTypeChecker
-        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
-                                      dtcm=DTCMResource(dtcm_requirement),
-                                      sdram=SDRAMResource(all_sdram_usage))
-        return resources
 
     def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
         return

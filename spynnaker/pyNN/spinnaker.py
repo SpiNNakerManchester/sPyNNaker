@@ -463,7 +463,7 @@ class Spinnaker(object):
         :param executing_reset: are we executing a reset function
         :param using_auto_pause_and_resume: check if the system is to use
         auto pasue and resume functionality
-        :return: list of algorithums to use and a list of optional
+        :return: list of algorithms to use and a list of optional
         algotihms to use
         """
         algorithms = list()
