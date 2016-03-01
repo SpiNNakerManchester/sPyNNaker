@@ -117,12 +117,14 @@ class SpikeSourcePoisson(
                 self._enable_buffered_recording)
             if spike_buffering_needed:
                 subvertex.activate_buffering_output(
-                    self._receive_buffer_host, self._receive_buffer_port)
+                    buffering_ip_address=self._receive_buffer_host,
+                    buffering_port=self._receive_buffer_port)
         else:
             sdram_per_ts = self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1)
             subvertex.activate_buffering_output(
-                self._minimum_buffer_sdram, sdram_per_ts)
+                minimum_sdram_for_buffering=self._minimum_buffer_sdram,
+                buffered_sdram_per_timestep=sdram_per_ts)
 
         return subvertex
 
@@ -343,9 +345,6 @@ class SpikeSourcePoisson(
 
     # @implements AbstractSpikeRecordable.set_recording_spikes
     def set_recording_spikes(self):
-        ip_address = config.get("Buffers", "receive_buffer_host")
-        port = config.getint("Buffers", "receive_buffer_port")
-        self.activate_buffering_output(ip_address, port)
         self._spike_recorder.record = True
 
     # inherited from partitionable vertex

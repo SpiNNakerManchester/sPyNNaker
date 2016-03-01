@@ -308,8 +308,8 @@ class Spinnaker(object):
 
     @staticmethod
     def _generate_steps(n_machine_time_steps, min_machine_time_steps):
-        number_of_full_iterations = int(
-            n_machine_time_steps / min_machine_time_steps)
+        number_of_full_iterations = max(1, int(
+            n_machine_time_steps / min_machine_time_steps))
         left_over_time_steps = int(
             n_machine_time_steps -
             (number_of_full_iterations * min_machine_time_steps))

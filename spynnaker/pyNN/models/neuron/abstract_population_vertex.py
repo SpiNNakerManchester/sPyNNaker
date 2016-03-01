@@ -169,7 +169,8 @@ class AbstractPopulationVertex(
             if (spike_buffering_needed or v_buffering_needed or
                     gsyn_buffering_needed):
                 subvertex.activate_buffering_output(
-                    self._receive_buffer_host, self._receive_buffer_port)
+                    buffering_ip_address=self._receive_buffer_host,
+                    buffering_port=self._receive_buffer_port)
         else:
             sdram_per_ts = 0
             sdram_per_ts += self._spike_recorder.get_sdram_usage_in_bytes(
@@ -179,7 +180,8 @@ class AbstractPopulationVertex(
             sdram_per_ts += self._gsyn_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1)
             subvertex.activate_buffering_output(
-                self._minimum_sdram_for_buffering, sdram_per_ts)
+                minimum_sdram_for_buffering=self._minimum_buffer_sdram,
+                buffered_sdram_per_timestep=sdram_per_ts)
         return subvertex
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
