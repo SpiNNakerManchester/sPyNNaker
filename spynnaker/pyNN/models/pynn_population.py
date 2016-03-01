@@ -421,20 +421,14 @@ class Population(object):
             raise Exception(
                 "This population does not support the recording of spikes!")
 
-        if self._spinnaker.writing_reload_script:
-            logger.warn(
-                "The system is configured to create a reload script. Therefore"
-                " it is assumed that you will run the reload script and "
-                "therefore we will not record this data")
-        else:
-            # Tell the vertex to record spikes
-            self._vertex.set_recording_spikes()
+        # Tell the vertex to record spikes
+        self._vertex.set_recording_spikes()
 
-            # set the file to store the spikes in once retrieved
-            self._record_spike_file = to_file
+        # set the file to store the spikes in once retrieved
+        self._record_spike_file = to_file
 
-            # state that something has changed in the population,
-            self._change_requires_mapping = True
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     def record_gsyn(self, to_file=None):
         """ Record the synaptic conductance for all cells in the Population.
@@ -449,17 +443,11 @@ class Population(object):
                 "You are trying to record the conductance from a model which "
                 "does not use conductance input.  You will receive "
                 "current measurements instead.")
-        if self._spinnaker.writing_reload_script:
-            logger.warn(
-                "The system is configured to create a reload script. Therefore"
-                " it is assumed that you will run the reload script and "
-                "therefore we will not record this data")
-        else:
-            self._vertex.set_recording_gsyn()
-            self._record_gsyn_file = to_file
+        self._vertex.set_recording_gsyn()
+        self._record_gsyn_file = to_file
 
-            # state that something has changed in the population,
-            self._change_requires_mapping = True
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     def record_v(self, to_file=None):
         """ Record the membrane potential for all cells in the Population.
@@ -469,17 +457,11 @@ class Population(object):
         if not isinstance(self._vertex, AbstractVRecordable):
             raise Exception(
                 "This population does not support the recording of v")
-        if self._spinnaker.writing_reload_script:
-            logger.warn(
-                "The system is configured to create a reload script. Therefore"
-                " it is assumed that you will run the reload script and "
-                "therefore we will not record this data")
-        else:
-            self._vertex.set_recording_v()
-            self._record_v_file = to_file
+        self._vertex.set_recording_v()
+        self._record_v_file = to_file
 
-            # state that something has changed in the population,
-            self._change_requires_mapping = True
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     @property
     def positions(self):

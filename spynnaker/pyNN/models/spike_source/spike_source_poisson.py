@@ -102,7 +102,7 @@ class SpikeSourcePoisson(
         self._minimum_buffer_sdram = config.getint(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
-            "Buffers", "auto_pause_and_resume")
+            "Buffers", "use_auto_pause_and_resume")
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,

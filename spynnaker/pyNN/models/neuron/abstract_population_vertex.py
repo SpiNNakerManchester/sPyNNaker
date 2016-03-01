@@ -6,6 +6,9 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
+from spinn_front_end_common.interface.buffer_management\
+    .buffer_models.receives_buffers_to_host_basic_impl \
+    import ReceiveBuffersToHostBasicImpl
 
 from spynnaker.pyNN.models.common.buffered_partitioned_vertex import \
     BufferedPartitionedVertex
@@ -118,7 +121,7 @@ class AbstractPopulationVertex(
         self._minimum_buffer_sdram = config.getint(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
-            "Buffers", "auto_pause_and_resume")
+            "Buffers", "use_auto_pause_and_resume")
         self._receive_buffer_host = config.get(
             "Buffers", "receive_buffer_host")
         self._receive_buffer_port = config.getint(
@@ -223,7 +226,7 @@ class AbstractPopulationVertex(
             per_neuron_usage += \
                 self._additional_input.get_sdram_usage_per_neuron_in_bytes()
         return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-                self.get_recording_data_size(3) +
+                ReceiveBuffersToHostBasicImpl.get_recording_data_size(3) +
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._neuron_model.get_sdram_usage_in_bytes(
                     vertex_slice.n_atoms))
@@ -232,7 +235,7 @@ class AbstractPopulationVertex(
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         sdram_requirement = (
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
-            self.get_buffer_state_region_size(3) +
+            ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(3) +
             self._synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, graph.incoming_edges_to_vertex(self)) +
             (self._get_number_of_mallocs_used_by_dsg(
@@ -292,7 +295,7 @@ class AbstractPopulationVertex(
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
             size=((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-                  self.get_recording_data_size(3)), label='System')
+                  subvertex.get_recording_data_size(3)), label='System')
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
