@@ -23,6 +23,8 @@ def print_summary(profiling_data, duration):
 
         print("\tWith standard deviation %fms" % (np.std(times[1])))
 
+        print("\tStandard error:%fms" % (np.std(times[1])/np.sqrt(times[1].size)))
+
         # Digitize the sample entry times into these bins
         sample_timestep_indices = np.digitize(times[0], ms_time_bins)
         assert len(sample_timestep_indices) == len(times[1])
