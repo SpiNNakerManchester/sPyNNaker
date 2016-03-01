@@ -377,15 +377,6 @@ class AbstractPopulationVertex(
             spec, vertex_slice,
             self._threshold_type.get_threshold_parameters())
 
-    def _get_recording_and_buffer_sizes(self, buffer_max, space_needed):
-        if space_needed == 0:
-            return 0
-        if not self._enable_buffered_recording:
-            return space_needed
-        if buffer_max < space_needed:
-            return buffer_max
-        return space_needed
-
     # @implements AbstractDataSpecableVertex.generate_data_spec
     def generate_data_spec(
             self, subvertex, placement, subgraph, graph, routing_info,

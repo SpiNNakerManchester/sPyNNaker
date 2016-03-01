@@ -17,7 +17,6 @@ from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.common.buffered_partitioned_vertex \
     import BufferedPartitionedVertex
 
-
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
 from spinn_front_end_common.abstract_models.\
@@ -25,6 +24,8 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesOutgoingEdgeConstraints
 from spinn_front_end_common.utilities import constants as\
     front_end_common_constants
+from spinn_front_end_common.interface.buffer_management.buffer_models\
+    .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -135,14 +136,6 @@ class SpikeSourcePoisson(
     @rate.setter
     def rate(self, rate):
         self._rate = rate
-
-    @property
-    def enable_buffered_recording(self):
-        return self._enable_buffered_recording
-
-    @enable_buffered_recording.setter
-    def enable_buffered_recording(self, new_value):
-        self.enable_buffered_recording = new_value
 
     @property
     def start(self):
@@ -349,17 +342,12 @@ class SpikeSourcePoisson(
 
     # inherited from partitionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        """
-        method for calculating SDRAM usage
-        :param vertex_slice:
-        :param graph:
-        :return:
-        """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         total_size = \
             ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-             self.get_recording_data_size(1) +
-             self.get_buffer_state_region_size(1) + poisson_params_sz)
+             ReceiveBuffersToHostBasicImpl.get_recording_data_size(1) +
+             ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(1) +
+             poisson_params_sz)
         total_size += self._get_number_of_mallocs_used_by_dsg(
             vertex_slice, graph.incoming_edges_to_vertex(self)) * \
             front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
@@ -416,7 +404,7 @@ class SpikeSourcePoisson(
 
         # Basic setup plus 8 bytes for recording flags and recording size
         setup_sz = ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-                    self.get_recording_data_size(1))
+                    subvertex.get_recording_data_size(1))
 
         poisson_params_sz = self.get_params_bytes(vertex_slice)
 
@@ -425,7 +413,8 @@ class SpikeSourcePoisson(
             spec, setup_sz, poisson_params_sz, spike_history_sz, subvertex)
 
         self._write_setup_info(
-            spec, spike_history_sz, ip_tags, buffer_size_before_receive)
+            spec, spike_history_sz, ip_tags, buffer_size_before_receive,
+            subvertex)
 
         # Every subedge should have the same key
         key = None

@@ -457,6 +457,7 @@ class Population(object):
         if not isinstance(self._vertex, AbstractVRecordable):
             raise Exception(
                 "This population does not support the recording of v")
+
         self._vertex.set_recording_v()
         self._record_v_file = to_file
 
