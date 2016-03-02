@@ -251,7 +251,6 @@ class Spinnaker(object):
                     " resetting")
             self._do_mapping(run_time, n_machine_time_steps)
 
-        steps = None
         if not config.getboolean("Buffers", "use_auto_pause_and_resume"):
             steps = [n_machine_time_steps]
         else:
@@ -415,7 +414,6 @@ class Spinnaker(object):
         algorithms = list()
         if config.getboolean("Machine", "virtual_board"):
             algorithms.append("FrontEndCommonVirtualMachineInterfacer")
-            inputs.append({"type": "MachineWidth"})
         else:
             algorithms.append("FrontEndCommonMachineInterfacer")
         algorithms.append("MallocBasedChipIDAllocator")
@@ -498,20 +496,21 @@ class Spinnaker(object):
         )
 
         algorithms = list()
-        algorithms.append("FrontEndCommonRoutingTableLoader")
-        algorithms.append("FrontEndCommonTagsLoader")
+        optional_algorithms = list()
+        optional_algorithms.append("FrontEndCommonRoutingTableLoader")
+        optional_algorithms.append("FrontEndCommonTagsLoader")
         if self._exec_dse_on_host:
-            algorithms.append(
+            optional_algorithms.append(
                 "FrontEndCommonPartitionableGraphHostExecuteDataSpecification")
             if config.getboolean("Reports", "writeMemoryMapReport"):
-                algorithms.append("FrontEndCommonMemoryMapOnHostReport")
+                optional_algorithms.append("FrontEndCommonMemoryMapOnHostReport")  # @IgnorePep8
         else:
-            algorithms.append(
+            optional_algorithms.append(
                 "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")  # @IgnorePep8
             if config.getboolean("Reports", "writeMemoryMapReport"):
-                algorithms.append("FrontEndCommonMemoryMapOnChipReport")
-        algorithms.append("FrontEndCommonLoadExecutableImages")
-        algorithms.append("FrontEndCommonBufferManagerCreater")
+                optional_algorithms.append("FrontEndCommonMemoryMapOnChipReport")
+        optional_algorithms.append("FrontEndCommonLoadExecutableImages")
+        optional_algorithms.append("FrontEndCommonBufferManagerCreater")
 
         if (not self._has_ran and
                 config.getboolean("Reports", "writeReloadSteps")):
@@ -524,7 +523,8 @@ class Spinnaker(object):
                 "initial run")
 
         executor = PACMANAlgorithmExecutor(
-            algorithms, [], inputs, self._xml_paths, [], self._do_timings)
+            algorithms, optional_algorithms, inputs, self._xml_paths, [],
+            self._do_timings)
         executor.execute_mapping()
         self._load_outputs = executor.get_items()
 
