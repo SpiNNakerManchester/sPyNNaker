@@ -105,6 +105,7 @@ class Spinnaker(object):
         self._no_machine_time_steps = None
         self._machine_time_step = None
         self._no_sync_changes = 0
+        self._minimum_step_generated = None
 
         self._app_id = config.getint("Machine", "appID")
 
@@ -252,9 +253,20 @@ class Spinnaker(object):
             self._do_mapping(run_time, n_machine_time_steps)
 
         if not config.getboolean("Buffers", "use_auto_pause_and_resume"):
-            steps = [n_machine_time_steps]
+            if (self._minimum_step_generated is not None and
+                    self._minimum_step_generated != n_machine_time_steps):
+                raise common_exceptions.ConfigurationException(
+                    "The time step here has been set to something not "
+                    "supported")
+            else:
+                steps = [n_machine_time_steps]
         else:
-            steps = self._deduce_number_of_iterations(n_machine_time_steps)
+            if self._minimum_step_generated is not None:
+                steps = self._generate_steps(
+                    n_machine_time_steps, self._minimum_step_generated)
+            else:
+                steps = self._deduce_number_of_iterations(n_machine_time_steps)
+                self._minimum_step_generated = steps[0]
 
         # If we have never run before, or the graph has changed, or a reset
         # has been requested, load the data
@@ -262,7 +274,7 @@ class Spinnaker(object):
                 self._has_reset_last):
 
             # Data generation needs to be done if not already done
-            if not self._has_reset_last:
+            if application_graph_changed:
                 self._do_data_generation(steps[0])
             self._do_load()
 
@@ -297,7 +309,7 @@ class Spinnaker(object):
             vertices_on_chip = vertex_by_chip[x, y]
             sdram = sdram_tracker[x, y]
             sdram_per_vertex = int(sdram / len(vertices_on_chip))
-            for placement in vertices_on_chip:
+            for vertex in vertices_on_chip:
                 n_time_steps = vertex.get_n_timesteps_in_buffer_space(
                     sdram_per_vertex)
                 if min_time_steps is None or n_time_steps < min_time_steps:
@@ -307,13 +319,16 @@ class Spinnaker(object):
 
     @staticmethod
     def _generate_steps(n_machine_time_steps, min_machine_time_steps):
-        number_of_full_iterations = max(1, int(
-            n_machine_time_steps / min_machine_time_steps))
-        left_over_time_steps = int(
-            n_machine_time_steps -
-            (number_of_full_iterations * min_machine_time_steps))
 
-        steps = [int(min_machine_time_steps)] * number_of_full_iterations
+        number_of_full_iterations = \
+            int(math.floor(n_machine_time_steps / min_machine_time_steps))
+        left_over_time_steps = \
+            int(n_machine_time_steps - (number_of_full_iterations *
+                                        min_machine_time_steps))
+
+        steps = list()
+        for _ in range(0, number_of_full_iterations):
+            steps.append(int(min_machine_time_steps))
         if left_over_time_steps != 0:
             steps.append(int(left_over_time_steps))
         return steps
@@ -336,10 +351,6 @@ class Spinnaker(object):
         return int(value)
 
     def _do_mapping(self, run_time, n_machine_time_steps):
-
-        if self._txrx is not None:
-            self._txrx.close()
-            self._txrx = None
 
         # Set the initial n_machine_time_steps to all of them for mapping
         # (note that the underlying vertices will know about
@@ -412,10 +423,18 @@ class Spinnaker(object):
             self._json_folder, "constraints.json")
 
         algorithms = list()
+
+        # handle virtual machine and its linking to multi-run
         if config.getboolean("Machine", "virtual_board"):
             algorithms.append("FrontEndCommonVirtualMachineInterfacer")
         else:
-            algorithms.append("FrontEndCommonMachineInterfacer")
+            if self._machine is None and self._txrx is None:
+                algorithms.append("FrontEndCommonMachineInterfacer")
+            else:
+                inputs["MemoryMachine"] = self._machine
+                inputs["MemoryTransceiver"] = self._txrx
+
+        # always add extended machine builder
         algorithms.append("MallocBasedChipIDAllocator")
 
         # Add reports
