@@ -260,6 +260,7 @@ class Spinnaker(object):
                     "supported")
             else:
                 steps = [n_machine_time_steps]
+                self._minimum_step_generated = steps[0]
         else:
             if self._minimum_step_generated is not None:
                 steps = self._generate_steps(
