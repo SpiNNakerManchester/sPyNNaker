@@ -510,7 +510,9 @@ class Spinnaker(object):
             if config.getboolean("Reports", "writeMemoryMapReport"):
                 optional_algorithms.append("FrontEndCommonMemoryMapOnChipReport")
         optional_algorithms.append("FrontEndCommonLoadExecutableImages")
-        optional_algorithms.append("FrontEndCommonBufferManagerCreater")
+
+        # always make the buffer manager
+        algorithms.append("FrontEndCommonBufferManagerCreater")
 
         if (not self._has_ran and
                 config.getboolean("Reports", "writeReloadSteps")):
@@ -522,9 +524,16 @@ class Spinnaker(object):
                 "it handle resets, therefore it will only contain the "
                 "initial run")
 
+        required_outputs = list()
+        required_outputs.append("LoadedReverseIPTagsToken")
+        required_outputs.append("LoadedIPTagsToken")
+        required_outputs.append("LoadedRoutingTablesToken")
+        required_outputs.append("LoadBinariesToken")
+        required_outputs.append("LoadedApplicationDataToken")
+
         executor = PACMANAlgorithmExecutor(
-            algorithms, optional_algorithms, inputs, self._xml_paths, [],
-            self._do_timings)
+            algorithms, optional_algorithms, inputs, self._xml_paths,
+            required_outputs, self._do_timings)
         executor.execute_mapping()
         self._load_outputs = executor.get_items()
 
