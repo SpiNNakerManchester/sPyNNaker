@@ -252,16 +252,33 @@ class Spinnaker(object):
                     " resetting")
             self._do_mapping(run_time, n_machine_time_steps)
 
+        # Work out an array of timesteps to perform
+        steps = None
         if not config.getboolean("Buffers", "use_auto_pause_and_resume"):
-            if (self._minimum_step_generated is not None and
+
+            # If reset without application graph change, the run time must be
+            # the same as the first run time
+            if (self._has_reset_last and
                     self._minimum_step_generated != n_machine_time_steps):
                 raise common_exceptions.ConfigurationException(
-                    "The time step here has been set to something not "
-                    "supported")
-            else:
-                steps = [n_machine_time_steps]
-                self._minimum_step_generated = steps[0]
+                    "The run time after a reset must be the same as the first"
+                    "run time")
+
+            # Not currently possible to run the second time for more than the
+            # first time without auto pause and resume
+            if (self._minimum_step_generated is not None and
+                    self._minimum_step_generated < n_machine_time_steps):
+                raise common_exceptions.ConfigurationException(
+                    "Second and subsequent run time must be less than or equal"
+                    " to the first run time")
+
+            steps = [n_machine_time_steps]
+            self._minimum_step_generated = steps[0]
         else:
+
+            # With auto pause and resume, any time step is possible but run
+            # time more than the first will guarantee that run will be called
+            # more than once
             if self._minimum_step_generated is not None:
                 steps = self._generate_steps(
                     n_machine_time_steps, self._minimum_step_generated)
@@ -320,16 +337,13 @@ class Spinnaker(object):
 
     @staticmethod
     def _generate_steps(n_machine_time_steps, min_machine_time_steps):
+        number_of_full_iterations = int(math.floor(
+            n_machine_time_steps / min_machine_time_steps))
+        left_over_time_steps = int(
+            n_machine_time_steps -
+            (number_of_full_iterations * min_machine_time_steps))
 
-        number_of_full_iterations = \
-            int(math.floor(n_machine_time_steps / min_machine_time_steps))
-        left_over_time_steps = \
-            int(n_machine_time_steps - (number_of_full_iterations *
-                                        min_machine_time_steps))
-
-        steps = list()
-        for _ in range(0, number_of_full_iterations):
-            steps.append(int(min_machine_time_steps))
+        steps = [int(min_machine_time_steps)] * number_of_full_iterations
         if left_over_time_steps != 0:
             steps.append(int(left_over_time_steps))
         return steps
@@ -519,12 +533,14 @@ class Spinnaker(object):
             optional_algorithms.append(
                 "FrontEndCommonPartitionableGraphHostExecuteDataSpecification")
             if config.getboolean("Reports", "writeMemoryMapReport"):
-                optional_algorithms.append("FrontEndCommonMemoryMapOnHostReport")  # @IgnorePep8
+                optional_algorithms.append(
+                    "FrontEndCommonMemoryMapOnHostReport")
         else:
             optional_algorithms.append(
                 "FrontEndCommonPartitionableGraphMachineExecuteDataSpecification")  # @IgnorePep8
             if config.getboolean("Reports", "writeMemoryMapReport"):
-                optional_algorithms.append("FrontEndCommonMemoryMapOnChipReport")
+                optional_algorithms.append(
+                    "FrontEndCommonMemoryMapOnChipReport")
         optional_algorithms.append("FrontEndCommonLoadExecutableImages")
 
         # always make the buffer manager
@@ -540,16 +556,15 @@ class Spinnaker(object):
                 "it handle resets, therefore it will only contain the "
                 "initial run")
 
-        required_outputs = list()
-        required_outputs.append("LoadedReverseIPTagsToken")
-        required_outputs.append("LoadedIPTagsToken")
-        required_outputs.append("LoadedRoutingTablesToken")
-        required_outputs.append("LoadBinariesToken")
-        required_outputs.append("LoadedApplicationDataToken")
+        outputs = [
+            "LoadedReverseIPTagsToken", "LoadedIPTagsToken",
+            "LoadedRoutingTablesToken", "LoadBinariesToken",
+            "LoadedApplicationDataToken"
+        ]
 
         executor = PACMANAlgorithmExecutor(
             algorithms, optional_algorithms, inputs, self._xml_paths,
-            required_outputs, self._do_timings)
+            outputs, self._do_timings)
         executor.execute_mapping()
         self._load_outputs = executor.get_items()
 
