@@ -399,7 +399,6 @@ class Spinnaker(object):
             "Database", "create_database")
         inputs["ExecuteMapping"] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
-        inputs["DatabaseSocketAddresses"] = self._database_socket_addresses
         inputs["SendStartNotifications"] = config.getboolean(
             "Database", "send_start_notification")
         inputs["ResetMachineOnStartupFlag"] = config.getboolean(
@@ -460,14 +459,10 @@ class Spinnaker(object):
 
         algorithms.extend(config.get("Mapping", "algorithms").split(","))
 
-        # Add the database writer in case it is needed
-        algorithms.append("SpynnakerDatabaseWriter")
-        algorithms.append("FrontEndCommonNotificationProtocol")
-
         outputs = [
             "MemoryTransceiver", "MemoryPlacements", "MemoryRoutingTables",
             "MemoryTags", "MemoryGraphMapper", "MemoryPartitionedGraph",
-            "MemoryMachine", "DatabaseInterface"]
+            "MemoryMachine", "MemoryRoutingInfos"]
 
         # Execute the mapping algorithms
         executor = PACMANAlgorithmExecutor(
@@ -484,6 +479,7 @@ class Spinnaker(object):
         self._graph_mapper = executor.get_item("MemoryGraphMapper")
         self._partitioned_graph = executor.get_item("MemoryPartitionedGraph")
         self._machine = executor.get_item("MemoryMachine")
+        self._routing_infos = executor.get_item("MemoryRoutingInfos")
 
     def _do_data_generation(self, n_machine_time_steps):
 
@@ -589,6 +585,9 @@ class Spinnaker(object):
 
             algorithms.append("FrontEndCommonRuntimeUpdater")
 
+        # Add the database writer in case it is needed
+        algorithms.append("SpynnakerDatabaseWriter")
+        algorithms.append("FrontEndCommonNotificationProtocol")
         algorithms.append("FrontEndCommonApplicationRunner")
 
         if (config.get("Reports", "reportsEnabled") and
@@ -747,6 +746,14 @@ class Spinnaker(object):
         :return:
         """
         return self._partitionable_graph
+
+    @property
+    def routing_infos(self):
+        """
+
+        :return:
+        """
+        return self._routing_infos
 
     @property
     def placements(self):
