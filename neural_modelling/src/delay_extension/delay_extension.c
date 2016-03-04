@@ -15,7 +15,7 @@
 //! values for the priority for each callback
 typedef enum callback_priorities{
     MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 2
-}callback_priorities;
+} callback_priorities;
 
 // Globals
 static uint32_t key = 0;
@@ -49,7 +49,7 @@ static bool read_parameters(address_t address) {
 
     // changed from above for new file format 13-1-2014
     key = address[0];
-    log_info("\tkey = %08x", key);
+    log_info("\t key = %08x", key);
 
     num_neurons = address[1];
     neuron_bit_field_words = get_bit_field_size(num_neurons);
@@ -59,7 +59,7 @@ static bool read_parameters(address_t address) {
     uint32_t num_delay_slots_pot = round_to_next_pot(num_delay_slots);
     num_delay_slots_mask = (num_delay_slots_pot - 1);
 
-    log_info("\tparrot neurons = %u, neuron bit field words = %u,"
+    log_info("\t parrot neurons = %u, neuron bit field words = %u,"
              " num delay stages = %u, num delay slots = %u (pot = %u),"
              " num delay slots mask = %08x",
              num_neurons, neuron_bit_field_words,
@@ -73,7 +73,7 @@ static bool read_parameters(address_t address) {
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
-        log_info("\tdelay stage %u", d);
+        log_info("\t delay stage %u", d);
 
         // Allocate bit-field
         neuron_delay_stage_config[d] = (bit_field_t) spin1_malloc(
@@ -87,7 +87,7 @@ static bool read_parameters(address_t address) {
                neuron_bit_field_words * sizeof(uint32_t));
 
         for (uint32_t w = 0; w < neuron_bit_field_words; w++) {
-            log_debug("\t\tdelay stage config word %u = %08x", w,
+            log_debug("\t\t delay stage config word %u = %08x", w,
                       neuron_delay_stage_config[d][w]);
         }
     }
@@ -109,7 +109,7 @@ static bool read_parameters(address_t address) {
 }
 
 static bool initialize(uint32_t *timer_period) {
-    log_info("initialize: started");
+    log_info("initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();
@@ -132,7 +132,7 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    log_info("initialize: completed successfully");
+    log_info("initialise: completed successfully");
 
     return true;
 }
@@ -275,7 +275,7 @@ void c_main(void) {
     uint32_t timer_period = 0;
     if (!initialize(&timer_period)) {
         log_error("Error in initialisation - exiting!");
-         rt_error(RTE_SWERR);
+        rt_error(RTE_SWERR);
     }
 
     // Start the time at "-1" so that the first tick will be 0
