@@ -33,6 +33,9 @@ class SpikePairTimeDependency(AbstractTimeDependency):
                 (self._tau_minus == other.tau_minus) and
                 (self._nearest == other.nearest))
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def create_synapse_row_io(
             self, synaptic_row_header_words, dendritic_delay_fraction):
         return PlasticWeightSynapseRowIo(

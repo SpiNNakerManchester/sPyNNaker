@@ -459,6 +459,10 @@ class Spinnaker(object):
                 algorithms.append("routingInfoReports")
             if config.getboolean("Reports", "writeRouterReports"):
                 algorithms.append("RouterReports")
+            if config.getboolean("Reports", "writeRoutingTableReports"):
+                algorithms.append("unCompressedRoutingTableReports")
+                algorithms.append("compressedRoutingTableReports")
+                algorithms.append("comparisonOfRoutingTablesReport")
             if config.getboolean("Reports", "writePartitionerReports"):
                 algorithms.append("PartitionerReport")
             if config.getboolean(
@@ -860,15 +864,19 @@ class Spinnaker(object):
                     dependant_edge,
                     vertex_to_add.edge_partition_identifier_for_dependent_edge)
 
-    def add_edge(self, edge_to_add, partition_identifier=None):
+    def add_edge(self, edge_to_add, partition_identifier=None,
+                 partition_constraints=None):
         """
 
         :param edge_to_add:
-        :param partition_identifier: the partition identifier for the outgoing\
+        :param partition_identifier: the partition identifier for the outgoing
                     edge partition
+        :param partition_constraints: the constraints of a partition
+        associated with this edge
         :return:
         """
-        self._partitionable_graph.add_edge(edge_to_add, partition_identifier)
+        self._partitionable_graph.add_edge(edge_to_add, partition_identifier,
+                                           partition_constraints)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         """
