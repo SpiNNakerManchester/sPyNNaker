@@ -396,6 +396,7 @@ class Spinnaker(object):
         inputs["BootPortNum"] = self._read_config_int(
             "Machine", "boot_connection_port_num")
         inputs["APPID"] = self._app_id
+        inputs["ExecDSEOnHostFlag"] = self._exec_dse_on_host
         inputs["DSEAPPID"] = config.getint("Machine", "DSEappID")
         inputs["TimeScaleFactor"] = self._time_scale_factor
         inputs["MachineTimeStep"] = self._machine_time_step
@@ -550,16 +551,6 @@ class Spinnaker(object):
         # always make the buffer manager
         algorithms.append("FrontEndCommonBufferManagerCreater")
 
-        if (not self._has_ran and
-                config.getboolean("Reports", "writeReloadSteps")):
-            algorithms.append("FrontEndCommonReloadScriptCreator")
-        elif (self.has_ran and
-                config.getboolean("Reports", "writeReloadSteps")):
-            logger.warn(
-                "The reload script cannot handle multi-runs, nor can"
-                "it handle resets, therefore it will only contain the "
-                "initial run")
-
         outputs = [
             "LoadedReverseIPTagsToken", "LoadedIPTagsToken",
             "LoadedRoutingTablesToken", "LoadBinariesToken",
@@ -607,8 +598,19 @@ class Spinnaker(object):
         # Add the database writer in case it is needed
         algorithms.append("SpynnakerDatabaseWriter")
         algorithms.append("FrontEndCommonNotificationProtocol")
-        algorithms.append("FrontEndCommonApplicationRunner")
 
+        # Sort out reload if needed
+        if (not self._has_ran and
+                config.getboolean("Reports", "writeReloadSteps")):
+            algorithms.append("FrontEndCommonReloadScriptCreator")
+        elif (self.has_ran and
+                config.getboolean("Reports", "writeReloadSteps")):
+            logger.warn(
+                "The reload script cannot handle multi-runs, nor can"
+                "it handle resets, therefore it will only contain the "
+                "initial run")
+
+        algorithms.append("FrontEndCommonApplicationRunner")
         if (config.get("Reports", "reportsEnabled") and
                 config.get("Reports", "writeProvenanceData") and
                 not config.getboolean("Machine", "virtual_board")):
