@@ -88,7 +88,8 @@ class EdgeToNKeysMapper(object):
             partitioned_edge)
 
         if not isinstance(edge.pre_vertex, AbstractProvidesNKeysForPartition):
-            n_keys_map.set_n_keys_for_partition(partition, vertex_slice.n_atoms)
+            n_keys_map.set_n_keys_for_partition(
+                partition, vertex_slice.n_atoms)
         else:
             n_keys_map.set_n_keys_for_partition(
                 partition,

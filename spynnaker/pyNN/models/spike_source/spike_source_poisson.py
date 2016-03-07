@@ -375,10 +375,10 @@ class SpikeSourcePoisson(
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
-    def generate_data_spec(self, subvertex, placement, partitioned_graph, graph,
-                           routing_info, hostname, graph_mapper, report_folder,
-                           ip_tags, reverse_ip_tags, write_text_specs,
-                           application_run_time_folder):
+    def generate_data_spec(
+            self, subvertex, placement, partitioned_graph, graph, routing_info,
+            hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
+            write_text_specs, application_run_time_folder):
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
                 placement.x, placement.y, placement.p, hostname, report_folder,
