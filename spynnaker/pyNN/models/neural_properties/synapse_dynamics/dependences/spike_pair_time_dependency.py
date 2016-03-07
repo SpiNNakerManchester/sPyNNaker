@@ -34,11 +34,6 @@ class SpikePairTimeDependency(AbstractTimeDependency):
                 (self._nearest == other.nearest))
 
     def __ne__(self, other):
-        """
-        comparison  method for comparing SpikePairTimeDependency
-        :param other: instance of SpikePairTimeDependency
-        :return:
-        """
         return not self.__eq__(other)
 
     def create_synapse_row_io(

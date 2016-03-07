@@ -1,9 +1,7 @@
-"""
-MasterPopTableAs2dArray
-"""
 
 # pacman imports
-from pacman.model.constraints.key_allocator_constraints.key_allocator_fixed_field_constraint import \
+from pacman.model.constraints.key_allocator_constraints.\
+    key_allocator_fixed_field_constraint import \
     KeyAllocatorFixedFieldConstraint
 from pacman.model.constraints.key_allocator_constraints.\
     key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
