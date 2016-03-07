@@ -22,8 +22,7 @@ class EdgeToNKeysMapper(object):
     """
 
     def __call__(self, partitioned_graph, graph_mapper, partitionable_graph):
-        """
-        Generate an n_keys map for the graph and add constraints
+        """ Generate an n_keys map for the graph and add constraints
         :param partitioned_graph:
         :param graph_mapper:
         :param partitionable_graph:
@@ -66,8 +65,7 @@ class EdgeToNKeysMapper(object):
             if constraint not in stored_constraints:
                 raise exceptions.ConfigurationException(
                     "Two edges within the same partition have different "
-                    "constraints. This is deemed an error. Plese fix and "
-                    "try again")
+                    "constraints")
 
     @staticmethod
     def _process_partitionable_edge(edge, graph_mapper, n_keys_map,

@@ -22,11 +22,6 @@ class SynapseDynamics(object):
         return (self.slow == other.slow) and (self.fast == other.fast)
 
     def __ne__(self, other):
-        """
-        comparison  method for comparing synapse dynamics
-        :param other: instance of SynapseDynamics
-        :return:
-        """
         return not self.__eq__(other)
 
     def get_synapse_row_io(self):

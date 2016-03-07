@@ -814,7 +814,4 @@ class SynapticManager(object):
 
     # inherited from AbstractProvidesIncomingEdgeConstraints
     def get_incoming_edge_constraints(self):
-        """
-        :return:
-        """
         return self._population_table_type.get_edge_constraints()

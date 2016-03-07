@@ -71,8 +71,7 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
         return self._synapse_list.get_n_rows() * self._pre_vertex.max_stages
 
     def create_subedge(self, presubvertex, postsubvertex, label=None):
-        """
-        Creates a subedge from this edge
+        """ Create a subedge from this edge
         :param postsubvertex:
         :param presubvertex:
         :param label:
