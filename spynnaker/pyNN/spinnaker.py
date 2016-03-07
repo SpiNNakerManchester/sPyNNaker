@@ -286,19 +286,22 @@ class Spinnaker(object):
                 steps = self._deduce_number_of_iterations(n_machine_time_steps)
                 self._minimum_step_generated = steps[0]
 
-        # If we have never run before, or the graph has changed, or a reset
-        # has been requested, load the data
-        if (not self._has_ran or application_graph_changed or
-                self._has_reset_last):
+        # If we are using a virtual board, stop here
+        if not config.getboolean("Machine", "virtual_board"):
 
-            # Data generation needs to be done if not already done
-            if application_graph_changed:
-                self._do_data_generation(steps[0])
-            self._do_load()
+            # If we have never run before, or the graph has changed, or a reset
+            # has been requested, load the data
+            if (not self._has_ran or application_graph_changed or
+                    self._has_reset_last):
 
-        # Run for each of the given steps
-        for step in steps:
-            self._do_run(step)
+                # Data generation needs to be done if not already done
+                if application_graph_changed:
+                    self._do_data_generation(steps[0])
+                self._do_load()
+
+            # Run for each of the given steps
+            for step in steps:
+                self._do_run(step)
 
     def _deduce_number_of_iterations(self, n_machine_time_steps):
 
@@ -479,9 +482,11 @@ class Spinnaker(object):
         algorithms.extend(config.get("Mapping", "algorithms").split(","))
 
         outputs = [
-            "MemoryTransceiver", "MemoryPlacements", "MemoryRoutingTables",
+            "MemoryPlacements", "MemoryRoutingTables",
             "MemoryTags", "MemoryGraphMapper", "MemoryPartitionedGraph",
             "MemoryMachine", "MemoryRoutingInfos"]
+        if not config.getboolean("Machine", "virtual_board"):
+            outputs.append("MemoryTransceiver")
 
         # Execute the mapping algorithms
         executor = PACMANAlgorithmExecutor(
