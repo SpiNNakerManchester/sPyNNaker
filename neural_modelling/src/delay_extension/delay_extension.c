@@ -122,8 +122,7 @@ static bool initialize(uint32_t *timer_period) {
     // Get the timing details
     if (!simulation_read_timing_details(
             data_specification_get_region(0, address),
-            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run)) {
+            APPLICATION_NAME_HASH, timer_period)) {
         return false;
     }
 
@@ -209,7 +208,7 @@ void timer_callback(uint unused0, uint unused1) {
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
         // handle the pause and resume functionality
-        simulation_handle_pause_resume(timer_callback, TIMER);
+        simulation_handle_pause_resume();
     }
 
     // Loop through delay stages
@@ -297,6 +296,5 @@ void c_main(void) {
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
 
-    log_info("Starting");
-    simulation_run();
+    simulation_run(timer_callback, TIMER);
 }
