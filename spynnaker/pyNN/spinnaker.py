@@ -256,14 +256,6 @@ class Spinnaker(object):
         steps = None
         if not config.getboolean("Buffers", "use_auto_pause_and_resume"):
 
-            # If reset without application graph change, the run time must be
-            # the same as the first run time
-            if (self._has_reset_last and
-                    self._minimum_step_generated != n_machine_time_steps):
-                raise common_exceptions.ConfigurationException(
-                    "The run time after a reset must be the same as the first"
-                    "run time")
-
             # Not currently possible to run the second time for more than the
             # first time without auto pause and resume
             if (self._minimum_step_generated is not None and
