@@ -589,6 +589,7 @@ class Spinnaker(object):
         inputs["NoSyncChanges"] = self._no_sync_changes
         inputs["ProvenanceFilePath"] = self._provenance_file_path
         inputs["RunTimeMachineTimeSteps"] = n_machine_time_steps
+        inputs["TotalMachineTimeSteps"] = total_run_timesteps
         inputs["RunTime"] = run_time
 
         algorithms = list()
