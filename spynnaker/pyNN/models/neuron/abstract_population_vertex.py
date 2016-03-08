@@ -1,9 +1,9 @@
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_incoming_edge_constraints import \
-    AbstractProvidesIncomingEdgeConstraints
+    abstract_provides_incoming_partition_constraints import \
+    AbstractProvidesIncomingPartitionConstraints
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
 from spinn_front_end_common.interface.buffer_management\
@@ -66,8 +66,8 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
-        AbstractProvidesOutgoingEdgeConstraints,
-        AbstractProvidesIncomingEdgeConstraints,
+        AbstractProvidesOutgoingPartitionConstraints,
+        AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractMappable):
     """ Underlying vertex model for Neural Populations.
@@ -87,8 +87,8 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
-        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
-        AbstractProvidesIncomingEdgeConstraints.__init__(self)
+        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
+        AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractMappable.__init__(self)
@@ -379,7 +379,7 @@ class AbstractPopulationVertex(
 
     # @implements AbstractDataSpecableVertex.generate_data_spec
     def generate_data_spec(
-            self, subvertex, placement, subgraph, graph, routing_info,
+            self, subvertex, placement, partitioned_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags,
             reverse_ip_tags, write_text_specs, application_run_time_folder):
 
@@ -438,9 +438,12 @@ class AbstractPopulationVertex(
 
         # Get the key - use only the first edge
         key = None
-        if len(subgraph.outgoing_subedges_from_subvertex(subvertex)) > 0:
-            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
-                subgraph.outgoing_subedges_from_subvertex(subvertex)[0])
+
+        for partition in partitioned_graph.\
+                outgoing_edges_partitions_from_vertex(subvertex).values():
+
+            keys_and_masks = \
+                routing_info.get_keys_and_masks_from_partition(partition)
 
             # NOTE: using the first key assigned as the key.  Should in future
             # get the list of keys and use one per neuron, to allow arbitrary
@@ -453,10 +456,10 @@ class AbstractPopulationVertex(
             buffer_size_before_receive, self._time_between_requests, subvertex)
         self._write_neuron_parameters(spec, key, vertex_slice)
 
-        # allow the synaptic matrix to write its data specable data
+        # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
-            spec, self, vertex_slice, subvertex, placement, subgraph, graph,
-            routing_info, hostname, graph_mapper)
+            spec, self, vertex_slice, subvertex, placement, partitioned_graph,
+            graph, routing_info, hostname, graph_mapper)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -599,18 +602,18 @@ class AbstractPopulationVertex(
     def is_data_specable(self):
         return True
 
-    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
-        """ Gets the constraints for edges going into this vertex
+    def get_incoming_partition_constraints(self, partition, graph_mapper):
+        """ Gets the constraints for partitions going into this vertex
 
-        :param partitioned_edge: partitioned edge that goes into this vertex
+        :param partition: partition that goes into this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
         return self._synapse_manager.get_incoming_edge_constraints()
 
-    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
+    def get_outgoing_partition_constraints(self, partition, graph_mapper):
         """ Gets the constraints for edges going out of this vertex
-        :param partitioned_edge: the partitioned edge that leaves this vertex
+        :param partition: the partition that leaves this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """

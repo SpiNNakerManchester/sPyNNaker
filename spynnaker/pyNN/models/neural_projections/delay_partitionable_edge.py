@@ -70,18 +70,13 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
         """
         return self._synapse_list.get_n_rows() * self._pre_vertex.max_stages
 
-    def create_subedge(self, presubvertex, postsubvertex, constraints=None,
-                       label=None):
+    def create_subedge(self, presubvertex, postsubvertex, label=None):
         """ Create a subedge from this edge
         :param postsubvertex:
         :param presubvertex:
-        :param constraints:
         :param label:
         """
-        if constraints is None:
-            constraints = list()
-        constraints.extend(self._constraints)
-        return DelayPartitionedEdge(presubvertex, postsubvertex, constraints)
+        return DelayPartitionedEdge(presubvertex, postsubvertex)
 
     def get_synaptic_list_from_machine(self, graph_mapper, partitioned_graph,
                                        placements, transceiver, routing_infos):

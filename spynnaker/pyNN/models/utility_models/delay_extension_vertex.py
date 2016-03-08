@@ -9,14 +9,15 @@ from spynnaker.pyNN.models.neural_projections.\
     delay_partitionable_edge import DelayPartitionableEdge
 
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.abstract_models\
-    .abstract_provides_incoming_edge_constraints \
-    import AbstractProvidesIncomingEdgeConstraints
+    .abstract_provides_incoming_partition_constraints \
+    import AbstractProvidesIncomingPartitionConstraints
 from spinn_front_end_common.utilities import constants as common_constants
-from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_edge \
-    import AbstractProvidesNKeysForEdge
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_n_keys_for_partition \
+    import AbstractProvidesNKeysForPartition
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 
@@ -40,9 +41,9 @@ logger = logging.getLogger(__name__)
 
 class DelayExtensionVertex(AbstractPartitionableVertex,
                            AbstractDataSpecableVertex,
-                           AbstractProvidesIncomingEdgeConstraints,
-                           AbstractProvidesOutgoingEdgeConstraints,
-                           AbstractProvidesNKeysForEdge):
+                           AbstractProvidesIncomingPartitionConstraints,
+                           AbstractProvidesOutgoingPartitionConstraints,
+                           AbstractProvidesNKeysForPartition):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -67,8 +68,8 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
-        AbstractProvidesIncomingEdgeConstraints.__init__(self)
-        AbstractProvidesNKeysForEdge.__init__(self)
+        AbstractProvidesIncomingPartitionConstraints.__init__(self)
+        AbstractProvidesNKeysForPartition.__init__(self)
 
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0
@@ -76,7 +77,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
         self.add_constraint(joint_constrant)
 
-    def get_incoming_edge_constraints(self, partitioned_edge, graph_mapper):
+    def get_incoming_partition_constraints(self, partition, graph_mapper):
         return list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
 
     @property
@@ -127,7 +128,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
                 constants.BLOCK_INDEX_ROW_WORDS)) * 4
 
     def generate_data_spec(
-            self, subvertex, placement, sub_graph, graph, routing_info,
+            self, subvertex, placement, partitioned_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
             write_text_specs, application_run_time_folder):
         data_writer, report_writer = \
@@ -150,7 +151,7 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         n_atoms = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         block_len_words = int(math.ceil(n_atoms / 32.0))
         num_delay_blocks, delay_blocks = self.get_delay_blocks(
-            subvertex, sub_graph, graph_mapper)
+            subvertex, partitioned_graph, graph_mapper)
         delay_params_sz = 4 * (delay_params_header_words +
                                (num_delay_blocks * block_len_words))
 
@@ -168,9 +169,11 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
         key = None
-        if len(sub_graph.outgoing_subedges_from_subvertex(subvertex)) > 0:
-            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
-                sub_graph.outgoing_subedges_from_subvertex(subvertex)[0])
+        partitions = partitioned_graph.\
+            outgoing_edges_partitions_from_vertex(subvertex)
+        for partition in partitions.values():
+            keys_and_masks = \
+                routing_info.get_keys_and_masks_from_partition(partition)
 
             # NOTE: using the first key assigned as the key.  Should in future
             # get the list of keys and use one per neuron, to allow arbitrary
@@ -301,10 +304,10 @@ class DelayExtensionVertex(AbstractPartitionableVertex,
     def is_data_specable(self):
         return True
 
-    def get_n_keys_for_partitioned_edge(self, partitioned_edge, graph_mapper):
+    def get_n_keys_for_partition(self, partition, graph_mapper):
         vertex_slice = graph_mapper.get_subvertex_slice(
-            partitioned_edge.pre_subvertex)
+            partition.edges[0].pre_subvertex)
         return vertex_slice.n_atoms * self._max_stages
 
-    def get_outgoing_edge_constraints(self, partitioned_edge, graph_mapper):
+    def get_outgoing_partition_constraints(self, partition, graph_mapper):
         return [KeyAllocatorContiguousRangeContraint()]

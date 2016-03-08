@@ -535,7 +535,7 @@ class SynapticManager(object):
     def _write_synaptic_matrix_and_master_population_table(
             self, spec, subvertex, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region, routing_info,
-            graph_mapper, subgraph):
+            graph_mapper, partitioned_graph):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
         """
@@ -547,7 +547,8 @@ class SynapticManager(object):
         n_synapse_type_bits = self._synapse_type.get_n_synapse_type_bits()
 
         # Filtering incoming subedges
-        in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        in_subedges = \
+            partitioned_graph.incoming_subedges_from_subvertex(subvertex)
         in_proj_subedges = [e for e in in_subedges
                             if isinstance(e, ProjectionPartitionedEdge)]
 
@@ -558,8 +559,9 @@ class SynapticManager(object):
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
         for subedge in in_proj_subedges:
-            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
-                subedge)
+            partition = partitioned_graph.get_partition_of_subedge(subedge)
+            keys_and_masks = routing_info.get_keys_and_masks_from_partition(
+                partition)
             spec.comment(
                 "\nWriting matrix for subedge:{}\n".format(subedge.label))
             sublist = subedge.get_synapse_sublist(graph_mapper)
@@ -766,9 +768,9 @@ class SynapticManager(object):
         incoming_key_combo = None
         for subedge in incoming_edges:
             if subedge.pre_subvertex == pre_subvertex:
-                routing_info = \
-                    routing_infos.get_subedge_information_from_subedge(subedge)
-                keys_and_masks = routing_info.keys_and_masks
+                partition = subgraph.get_partition_of_subedge(subedge)
+                keys_and_masks = \
+                    routing_infos.get_keys_and_masks_from_partition(partition)
                 incoming_key_combo = keys_and_masks[0].key
                 break
 
@@ -812,12 +814,6 @@ class SynapticManager(object):
                     "Not enough data has been read")
         return block, maxed_row_length
 
-    # inherited from AbstractProvidesIncomingEdgeConstraints
+    # inherited from AbstractProvidesIncomingPartitionConstraints
     def get_incoming_edge_constraints(self):
-        """
-
-        :param partitioned_edge:
-        :param graph_mapper:
-        :return:
-        """
         return self._population_table_type.get_edge_constraints()

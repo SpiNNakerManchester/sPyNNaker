@@ -16,8 +16,8 @@ from spynnaker.pyNN.models.abstract_models\
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
     import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utilities import constants as \
@@ -82,7 +82,7 @@ class SpikeSourceArray(
             send_buffer_notification_port=self._port,
             send_buffer_notification_tag=tag)
         AbstractSpikeRecordable.__init__(self)
-        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
         AbstractMappable.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
