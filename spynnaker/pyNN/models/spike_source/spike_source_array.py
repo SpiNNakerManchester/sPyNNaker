@@ -1,11 +1,4 @@
 # spynnaker imports
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
-from spinn_front_end_common.interface.abstract_recordable_interface import \
-    AbstractRecordableInterface
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models.abstract_mappable \
     import AbstractMappable
@@ -23,8 +16,8 @@ from spynnaker.pyNN.models.abstract_models\
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
     import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utilities import constants as \
@@ -61,16 +54,17 @@ class SpikeSourceArray(
             spike_recorder_buffer_size=(
                 constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
             buffer_size_before_receive=(
-                constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE),
-            using_auto_pause_and_resume=False):
+                constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)):
         self._ip_address = ip_address
         if ip_address is None:
             self._ip_address = config.get("Buffers", "receive_buffer_host")
         self._port = port
         if port is None:
             self._port = config.getint("Buffers", "receive_buffer_port")
-
-        self._using_auto_pause_and_resume = using_auto_pause_and_resume
+        self._minimum_sdram_for_buffering = config.getint(
+            "Buffers", "minimum_buffer_sdram")
+        self._using_auto_pause_and_resume = config.getboolean(
+            "Buffers", "use_auto_pause_and_resume")
 
         ReverseIpTagMultiCastSource.__init__(
             self, n_keys=n_neurons, machine_time_step=machine_time_step,
@@ -86,10 +80,9 @@ class SpikeSourceArray(
             send_buffer_space_before_notify=space_before_notification,
             send_buffer_notification_ip_address=self._ip_address,
             send_buffer_notification_port=self._port,
-            send_buffer_notification_tag=tag, extra_static_sdram=config.getint(
-                "Recording", "extra_recording_data_for_static_sdram_usage"))
+            send_buffer_notification_tag=tag)
         AbstractSpikeRecordable.__init__(self)
-        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
         AbstractMappable.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
@@ -129,29 +122,6 @@ class SpikeSourceArray(
             self._space_before_notification =\
                 self._max_on_chip_memory_usage_for_spikes
 
-    def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
-        mallocs = \
-            ReverseIpTagMultiCastSource.get_number_of_mallocs_used_by_dsg(
-                self, vertex_slice, in_edges)
-        if config.getboolean("SpecExecution", "specExecOnHost"):
-            return 1
-        else:
-            return mallocs
-
-    def get_runtime_sdram_usage_for_atoms(
-            self, vertex_slice, partitionable_graph, no_machine_time_steps):
-        """
-        this should explore the spike table and give the size in sdram to
-        store these spikes or the
-        :param vertex_slice:
-        :param partitionable_graph:
-        :param no_machine_time_steps:
-        :return:
-        """
-        # TODO I know this is wrong, but need some way to deduce size correctly
-        # and annoyingly SSA just doesnt fit currently. buffered out makes pain
-        return 1
-
     @property
     def requires_mapping(self):
         return self._requires_mapping
@@ -185,7 +155,9 @@ class SpikeSourceArray(
             self._ip_address, self._port, self._board_address,
             self._send_buffer_notification_tag,
             self._spike_recorder_buffer_size,
-            self._buffer_size_before_receive)
+            self._buffer_size_before_receive,
+            self._minimum_sdram_for_buffering,
+            self._using_auto_pause_and_resume)
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 
@@ -198,39 +170,6 @@ class SpikeSourceArray(
              _REGIONS.RECORDING_BUFFER_STATE.value),
             placements, graph_mapper, self,
             lambda subvertex: subvertex.virtual_key)
-
-    # @implements AbstractPartitionableVertex.get_resources_used_by_atoms
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
-        """ Get the separate resource requirements for a range of atoms
-
-        :param vertex_slice: the low value of atoms to calculate resources from
-        :param graph: A reference to the graph containing this vertex.
-        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return: a Resource container that contains a \
-                    CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: ResourceContainer
-        :raise None: this method does not raise any known exception
-        """
-        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
-        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
-        static_sdram_requirement = \
-            self.get_static_sdram_usage_for_atoms(vertex_slice, graph)
-
-        # set all to just static sdram for the time being
-        all_sdram_usage = static_sdram_requirement
-
-        # check runtime sdram usage if required
-        if (not self._using_auto_pause_and_resume and
-                isinstance(self, AbstractRecordableInterface)):
-            runtime_sdram_usage = self.get_runtime_sdram_usage_for_atoms(
-                vertex_slice, graph, self._no_machine_time_steps)
-            all_sdram_usage += runtime_sdram_usage
-
-        # noinspection PyTypeChecker
-        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
-                                      dtcm=DTCMResource(dtcm_requirement),
-                                      sdram=SDRAMResource(all_sdram_usage))
-        return resources
 
     @property
     def model_name(self):

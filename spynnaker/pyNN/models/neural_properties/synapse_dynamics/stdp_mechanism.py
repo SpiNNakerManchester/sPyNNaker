@@ -86,6 +86,9 @@ class STDPMechanism(object):
                 (self._dendritic_delay_fraction ==
                  other.dendritic_delay_fraction))
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def get_synapse_row_io(self):
         if self.timing_dependence is not None:
             # If we're using MAD, the header contains a single timestamp and
@@ -103,11 +106,11 @@ class STDPMechanism(object):
                           self.timing_dependence.pre_trace_size_bytes)))
 
             # Convert to words, rounding up to take into account word
-            # alignement
+            # alignment
             synaptic_row_header_words = int(
                 math.ceil(float(synaptic_row_header_bytes) / 4.0))
 
-            # Create a suitable synapse row io object
+            # Create a suitable synapse row IO object
             return self._timing_dependence.create_synapse_row_io(
                 synaptic_row_header_words, self._dendritic_delay_fraction)
         else:

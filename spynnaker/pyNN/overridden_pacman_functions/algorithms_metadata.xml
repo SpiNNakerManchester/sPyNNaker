@@ -1,54 +1,4 @@
 <algorithms>
-    <algorithm name="SpyNNakerRuntimeUpdator">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_runtime_updator</python_module>
-        <python_class>SpyNNakerRuntimeUpdator</python_class>
-        <required_inputs>
-            <parameter>
-                <param_name>run_time</param_name>
-                <param_type>RunTime</param_type>
-            </parameter>
-            <parameter>
-                <param_name>partitionable_graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>current_run_ms</param_name>
-                <param_type>TotalCommunitiveRunTime</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine_time_step</param_name>
-                <param_type>MachineTimeStep</param_type>
-            </parameter>
-        </required_inputs>
-    </algorithm>
-    <algorithm name="SpyNNakerRuntimeUpdatorAfterRun">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_runtime_updator</python_module>
-        <python_class>SpyNNakerRuntimeUpdator</python_class>
-        <required_inputs>
-            <parameter>
-                <param_name>run_time</param_name>
-                <param_type>RunTime</param_type>
-            </parameter>
-            <parameter>
-                <param_name>partitionable_graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>current_run_ms</param_name>
-                <param_type>TotalCommunitiveRunTime</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine_time_step</param_name>
-                <param_type>MachineTimeStep</param_type>
-            </parameter>
-            <parameter>
-                <param_name>ran_token</param_name>
-                <param_type>RanToken</param_type>
-            </parameter>
-        </required_inputs>
-        <produces_outputs>
-        </produces_outputs>
-    </algorithm>
     <algorithm name="GraphEdgeFilter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter</python_module>
         <python_class>GraphEdgeFilter</python_class>
@@ -86,6 +36,10 @@
             <parameter>
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>partitionable_graph</param_name>
+                <param_type>MemoryPartitionableGraph</param_type>
             </parameter>
         </required_inputs>
         <parameters>
@@ -150,14 +104,22 @@
                 <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
-                <param_name>router_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
-            </parameter>
-            <parameter>
                 <param_name>execute_mapping</param_name>
                 <param_type>ExecuteMapping</param_type>
             </parameter>
         </required_inputs>
+        <required_optional_inputs>
+            <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+                <param_rank>2</param_rank>
+            </parameter>
+             <parameter>
+                <param_name>router_tables</param_name>
+                <param_type>MemoryCompressedRoutingTables</param_type>
+                <param_rank>1</param_rank>
+            </parameter>
+        </required_optional_inputs>
         <parameters>
         </parameters>
         <produces_outputs>
@@ -185,7 +147,7 @@
             </parameter>
             <parameter>
                 <param_name>runtime_in_machine_time_steps</param_name>
-                <param_type>TotalCommunitiveRunTime</param_type>
+                <param_type>RunTimeMachineTimeSteps</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
