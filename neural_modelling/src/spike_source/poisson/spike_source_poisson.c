@@ -249,8 +249,7 @@ static bool initialize(uint32_t *timer_period) {
     address_t system_region = data_specification_get_region(
             SYSTEM, address);
     if (!simulation_read_timing_details(
-            system_region, APPLICATION_NAME_HASH, timer_period,
-            &simulation_ticks, &infinite_run)) {
+            system_region, APPLICATION_NAME_HASH, timer_period)) {
         return false;
     }
 

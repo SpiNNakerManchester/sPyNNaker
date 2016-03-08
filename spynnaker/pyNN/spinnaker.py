@@ -598,7 +598,7 @@ class Spinnaker(object):
             # recorded populations
             algorithms.append("SpyNNakerRecordingExtractor")
 
-            algorithms.append("FrontEndCommonRuntimeUpdater")
+        algorithms.append("FrontEndCommonRuntimeUpdater")
 
         # Add the database writer in case it is needed
         algorithms.append("SpynnakerDatabaseWriter")
