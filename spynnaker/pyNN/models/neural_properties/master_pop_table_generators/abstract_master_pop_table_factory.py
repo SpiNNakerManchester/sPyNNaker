@@ -1,9 +1,6 @@
 
 from spinn_front_end_common.utilities import helpful_functions
 
-# dsg imports
-from data_specification import utility_calls as dsg_utility
-
 # general imports
 from abc import ABCMeta
 from six import add_metaclass
@@ -27,7 +24,7 @@ class AbstractMasterPopTableFactory(object):
         :param incoming_key: the source key which the synaptic matrix needs to\
                     be mapped to
         :param master_pop_base_mem_address: the base address of the master pop
-        :param txrx: the transciever object from spinnman
+        :param txrx: the transceiver object from spinnman
         :param chip_y: the y coordinate of the chip of this master pop
         :param chip_x: the x coordinate of the chip of this master pop
         :type incoming_key: int
@@ -67,20 +64,21 @@ class AbstractMasterPopTableFactory(object):
         :return:
         """
 
-    def locate_master_pop_table_base_address(self, x, y, p, transceiver,
+    @staticmethod
+    def locate_master_pop_table_base_address(x, y, p, transceiver,
                                              master_pop_table_region):
         """
 
-        :param x: x coord for the chip to whcih this master pop table is \
+        :param x: x coord for the chip to which this master pop table is \
         being read
         :type x: int
-        :param y: y coord for the chip to whcih this master pop table is \
+        :param y: y coord for the chip to which this master pop table is \
         being read
         :type y: int
-        :param p: p coord for the processor to whcih this master pop table is \
+        :param p: p coord for the processor to which this master pop table is \
         being read
         :type p: int
-        :param transceiver: the transciever object
+        :param transceiver: the transceiver object
         :type transceiver: spinnman.transciever.Transciever object
         :param master_pop_table_region: the region to which the master pop\
          resides
@@ -89,26 +87,10 @@ class AbstractMasterPopTableFactory(object):
 
         :return: the master pop table in some form
         """
-        # Get the App Data base address for the core
-        # (location where this cores memory starts in
-        # sdram and region table)
-        app_data_base_address = \
-            transceiver.get_cpu_information_from_core(x, y, p).user[0]
-
-        # Get the memory address of the master pop table region
-        master_pop_region = master_pop_table_region
-
-        master_region_base_address_address = \
-            dsg_utility.get_region_base_address_offset(
-                app_data_base_address, master_pop_region)
-
-        master_region_base_address_offset = helpful_functions.read_data(
-            x, y, master_region_base_address_address, 4, "<I", transceiver)
-
-        master_region_base_address =\
-            master_region_base_address_offset + app_data_base_address
-
-        return master_region_base_address, app_data_base_address
+        master_region_base_address = helpful_functions.\
+            locate_memory_region_on_core(
+                x, y, p, master_pop_table_region, transceiver)
+        return master_region_base_address
 
     @abstractmethod
     def get_edge_constraints(self):

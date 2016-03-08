@@ -136,7 +136,7 @@ bool read_poisson_parameters(address_t address) {
 
     has_been_given_key = address[HAS_KEY];
     key = address[TRANSMISSION_KEY];
-    log_info("\tkey = %08x", key);
+    log_info("\t key = %08x", key);
 
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
     memcpy(spike_source_seed, &address[PARAMETER_SEED_START_POSITION],
@@ -149,7 +149,7 @@ bool read_poisson_parameters(address_t address) {
     num_slow_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
     num_fast_spike_sources = address[PARAMETER_SEED_START_POSITION +
                                      seed_size + 1];
-    log_info("\tslow spike sources = %u, fast spike sources = %u,",
+    log_info("\t slow spike sources = %u, fast spike sources = %u,",
              num_slow_spike_sources, num_fast_spike_sources);
 
     // Allocate DTCM for array of slow spike sources and copy block of data
@@ -249,8 +249,7 @@ static bool initialize(uint32_t *timer_period) {
     address_t system_region = data_specification_get_region(
             SYSTEM, address);
     if (!simulation_read_timing_details(
-            system_region, APPLICATION_NAME_HASH, timer_period,
-            &simulation_ticks, &infinite_run)) {
+            system_region, APPLICATION_NAME_HASH, timer_period)) {
         return false;
     }
 
@@ -293,7 +292,7 @@ void timer_callback(uint timer_count, uint unused) {
             recording_finalise();
         }
         // go into pause and resume state
-        simulation_handle_pause_resume(timer_callback, TIMER);
+        simulation_handle_pause_resume();
 
         // handle resetting the recording state
         // Get the recording information
@@ -410,6 +409,7 @@ void c_main(void) {
     // Load DTCM data
     uint32_t timer_period;
     if (!initialize(&timer_period)) {
+        log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
     }
 
@@ -432,6 +432,5 @@ void c_main(void) {
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
 
-    log_info("Starting");
-    simulation_run();
+    simulation_run(timer_callback, TIMER);
 }

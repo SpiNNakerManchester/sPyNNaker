@@ -16,8 +16,8 @@ from spynnaker.pyNN.models.abstract_models\
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
     import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utilities import constants as \
@@ -63,6 +63,10 @@ class SpikeSourceArray(
             self._port = config.getint("Buffers", "receive_buffer_port")
         if spike_times is None:
             spike_times = []
+        self._minimum_sdram_for_buffering = config.getint(
+            "Buffers", "minimum_buffer_sdram")
+        self._using_auto_pause_and_resume = config.getboolean(
+            "Buffers", "use_auto_pause_and_resume")
 
         ReverseIpTagMultiCastSource.__init__(
             self, n_keys=n_neurons, machine_time_step=machine_time_step,
@@ -80,7 +84,7 @@ class SpikeSourceArray(
             send_buffer_notification_port=self._port,
             send_buffer_notification_tag=tag)
         AbstractSpikeRecordable.__init__(self)
-        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
         AbstractMappable.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
@@ -153,7 +157,9 @@ class SpikeSourceArray(
             self._ip_address, self._port, self._board_address,
             self._send_buffer_notification_tag,
             self._spike_recorder_buffer_size,
-            self._buffer_size_before_receive)
+            self._buffer_size_before_receive,
+            self._minimum_sdram_for_buffering,
+            self._using_auto_pause_and_resume)
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 

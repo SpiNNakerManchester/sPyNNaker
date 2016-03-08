@@ -10,14 +10,12 @@ logger = logging.getLogger(__name__)
 class DelayAfferentPartitionedEdge(ProjectionPartitionedEdge,
                                    AbstractFilterableEdge):
 
-    def __init__(self, presubvertex, postsubvertex, constraints):
-        ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex,
-                                           constraints)
+    def __init__(self, presubvertex, postsubvertex):
+        ProjectionPartitionedEdge.__init__(self, presubvertex, postsubvertex)
         AbstractFilterableEdge.__init__(self)
 
     def filter_sub_edge(self, graph_mapper):
-        """
-        Filters a subedge of this edge if the edge is not a one-to-one edge
+        """ Filter a subedge of this edge if the edge is not a one-to-one edge
         """
         pre_sub_lo = \
             graph_mapper.get_subvertex_slice(self._pre_subvertex).lo_atom

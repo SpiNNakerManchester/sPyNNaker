@@ -354,7 +354,7 @@ class SynapticManager(object):
 
             else:
 
-                # Otherwise, sum the pathalogical case of all columns being
+                # Otherwise, sum the pathological case of all columns being
                 # at stdp_max_weight
                 sublist.sum_fixed_weight(total_weights, stdp_max_weight)
                 sublist.sum_fixed_weight(total_square_weights,
@@ -517,7 +517,7 @@ class SynapticManager(object):
             if (fixed_plastic_region.size % 2) != 0:
                 fixed_plastic_region = numpy.asarray(numpy.append(
                     fixed_plastic_region, 0), dtype='uint16')
-            # does indeed return something (due to c fancy stuff in numpi) ABS
+            # does indeed return something (due to c fancy stuff in numpy) ABS
 
             # noinspection PyNoneFunctionAssignment
             fixed_plastic_region_words = fixed_plastic_region.view(
@@ -535,7 +535,7 @@ class SynapticManager(object):
     def _write_synaptic_matrix_and_master_population_table(
             self, spec, subvertex, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region, routing_info,
-            graph_mapper, subgraph):
+            graph_mapper, partitioned_graph):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
         """
@@ -547,7 +547,8 @@ class SynapticManager(object):
         n_synapse_type_bits = self._synapse_type.get_n_synapse_type_bits()
 
         # Filtering incoming subedges
-        in_subedges = subgraph.incoming_subedges_from_subvertex(subvertex)
+        in_subedges = \
+            partitioned_graph.incoming_subedges_from_subvertex(subvertex)
         in_proj_subedges = [e for e in in_subedges
                             if isinstance(e, ProjectionPartitionedEdge)]
 
@@ -558,8 +559,9 @@ class SynapticManager(object):
         # For each entry in subedge into the subvertex, create a
         # sub-synaptic list
         for subedge in in_proj_subedges:
-            keys_and_masks = routing_info.get_keys_and_masks_from_subedge(
-                subedge)
+            partition = partitioned_graph.get_partition_of_subedge(subedge)
+            keys_and_masks = routing_info.get_keys_and_masks_from_partition(
+                partition)
             spec.comment(
                 "\nWriting matrix for subedge:{}\n".format(subedge.label))
             sublist = subedge.get_synapse_sublist(graph_mapper)
@@ -685,7 +687,7 @@ class SynapticManager(object):
                 self._extract_row_data_from_memory_block(numpy_block,
                                                          position_in_block)
 
-            # new position in synpaptic block
+            # new position in synaptic block
             position_in_block = ((atom + 1) *
                                  (max_row_length +
                                   constants.SYNAPTIC_ROW_HEADER_WORDS))
@@ -702,16 +704,15 @@ class SynapticManager(object):
     @staticmethod
     def _extract_row_data_from_memory_block(synaptic_block, position_in_block):
 
-        """
-        extracts the 6 elements from a data block which is ordered
-        no PP, pp, No ff, NO fp, FF fp
+        """ extracts the 6 elements from a data block which is ordered\
+            no PP, PP, No FF, NO FP, FF, FP
         """
 
         # read in number of plastic plastic entries
         no_plastic_plastic_entries = synaptic_block[position_in_block]
         position_in_block += 1
 
-        # read inall the plastic entries
+        # read in all the plastic entries
         end_point = position_in_block + no_plastic_plastic_entries
         plastic_plastic_entries = synaptic_block[position_in_block:end_point]
 
@@ -754,19 +755,22 @@ class SynapticManager(object):
             post_placement.x, post_placement.y, post_placement.p
 
         # either read in the master pop table or retrieve it from storage
-        master_pop_base_mem_address, app_data_base_address = \
+        master_pop_base_mem_address = \
             self._population_table_type.locate_master_pop_table_base_address(
                 post_x, post_y, post_p, transceiver,
                 constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
+
+        app_data_base_address = helpful_functions.get_app_data_base_address(
+            post_x, post_y, post_p, transceiver)
 
         incoming_edges = subgraph.incoming_subedges_from_subvertex(
             post_subvertex)
         incoming_key_combo = None
         for subedge in incoming_edges:
             if subedge.pre_subvertex == pre_subvertex:
-                routing_info = \
-                    routing_infos.get_subedge_information_from_subedge(subedge)
-                keys_and_masks = routing_info.keys_and_masks
+                partition = subgraph.get_partition_of_subedge(subedge)
+                keys_and_masks = \
+                    routing_infos.get_keys_and_masks_from_partition(partition)
                 incoming_key_combo = keys_and_masks[0].key
                 break
 
@@ -797,8 +801,7 @@ class SynapticManager(object):
 
             # the base address of the synaptic block in absolute terms is the
             # app base, plus the synaptic matrix base plus the offset
-            synaptic_block_base_address = (app_data_base_address +
-                                           synapse_region_base_address +
+            synaptic_block_base_address = (synapse_region_base_address +
                                            synaptic_block_base_address_offset)
 
             # read in and return the synaptic block
@@ -808,16 +811,9 @@ class SynapticManager(object):
 
             if len(block) != synaptic_block_size:
                 raise exceptions.SynapticBlockReadException(
-                    "Not enough data has been read"
-                    " (aka, something funkky happened)")
+                    "Not enough data has been read")
         return block, maxed_row_length
 
-    # inherited from AbstractProvidesIncomingEdgeConstraints
+    # inherited from AbstractProvidesIncomingPartitionConstraints
     def get_incoming_edge_constraints(self):
-        """
-
-        :param partitioned_edge:
-        :param graph_mapper:
-        :return:
-        """
         return self._population_table_type.get_edge_constraints()

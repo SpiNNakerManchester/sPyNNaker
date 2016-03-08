@@ -112,8 +112,7 @@ static bool initialise(uint32_t *timer_period) {
     address_t system_region = data_specification_get_region(
         SYSTEM_REGION, address);
     if (!simulation_read_timing_details(
-            system_region, APPLICATION_NAME_HASH, timer_period,
-            &simulation_ticks, &infinite_run)) {
+            system_region, APPLICATION_NAME_HASH, timer_period)) {
         return false;
     }
 
@@ -194,7 +193,7 @@ void timer_callback(uint timer_count, uint unused) {
         }
 
         // falls into the pause resume mode of operating
-        simulation_handle_pause_resume(timer_callback, TIMER);
+        simulation_handle_pause_resume();
 
         // restart the recording status
         if (!initialise_recording()) {
@@ -238,6 +237,5 @@ void c_main(void) {
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP_AND_DMA_AND_USER);
 
-    log_info("Starting");
-    simulation_run();
+    simulation_run(timer_callback, TIMER);
 }
