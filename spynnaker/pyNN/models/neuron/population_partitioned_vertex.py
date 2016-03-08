@@ -6,9 +6,6 @@ from pacman.interfaces.abstract_provides_provenance_data import \
 # spinn front end common imports
 from pacman.utilities.utility_objs.provenance_data_item import \
     ProvenanceDataItem
-from spinn_front_end_common.interface.buffer_management.buffer_models.\
-    abstract_receive_buffers_to_host import \
-    AbstractReceiveBuffersToHost
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utility_models.\
     provides_provenance_partitioned_vertex import \
@@ -20,40 +17,20 @@ from data_specification import utility_calls as data_specification_utilities
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.common.buffered_partitioned_vertex \
+    import BufferedPartitionedVertex
 
 # general imports
 import struct
 
 
 class PopulationPartitionedVertex(
-        AbstractReceiveBuffersToHost, ProvidesProvenancePartitionedVertex):
-    """ Represents a sub-set of atoms from a AbstractConstrainedVertex
-    """
+        BufferedPartitionedVertex, ProvidesProvenancePartitionedVertex):
 
     def __init__(
-            self, buffering_output, resources_required, label,
-            no_machine_time_steps, extra_static_sdram_requirement, 
-            constraints=None):
-        """
-        :param buffering_output: True if the vertex is set to buffer output,\
-                    False otherwise
-        :param resources_required: The approximate resources needed for\
-                    the vertex
-        :type resources_required:\
-                    :py:class:`pacman.models.resources.resource_container.ResourceContainer`
-        :param label: The name of the subvertex
-        :type label: str
-        :param no_machine_time_steps: the number of machine time steps this
-                model should run for.
-        :type no_machine_time_steps: int
-        :param constraints: The constraints of the subvertex
-        :type constraints: iterable of\
-                    :py:class:`pacman.model.constraints.abstract_constraint\
-                    .AbstractConstraint`
-        :raise pacman.exceptions.PacmanInvalidParameterException:
-                    * If one of the constraints is not valid
-        """
-        AbstractReceiveBuffersToHost.__init__(self)
+            self, resources_required, label, constraints=None):
+        BufferedPartitionedVertex.__init__(
+            self, resources_required, label, constraints)
 
         ProvidesProvenancePartitionedVertex.__init__(
             self, resources_required=resources_required, label=label,
@@ -61,27 +38,7 @@ class PopulationPartitionedVertex(
             constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value)
         AbstractProvidesProvenanceData.__init__(self)
 
-        self._buffering_output = buffering_output
-        self._extra_static_sdram_requirement = extra_static_sdram_requirement
-        self._no_machine_time_step = no_machine_time_steps
-
-    def buffering_output(self):
-        return self._buffering_output
-
-    def is_receives_buffers_to_host(self):
-        return True
-
-    def extra_static_sdram_requirement(self):
-        return self._extra_static_sdram_requirement
-
-    def get_provenance_data_items(
-            self, transceiver, placement=None):
-        """ Write the provenance data using XML
-        :param transceiver: the SpinnMan interface object
-        :param placement: the placement object for this subvertex or None if\
-                    the system does not require a placement object
-        :return: None
-        """
+    def get_provenance_data_items(self, transceiver, placement=None):
 
         basic_provenance_entries = ProvidesProvenancePartitionedVertex.\
             get_provenance_data_items(self, transceiver, placement)
