@@ -301,9 +301,9 @@ void c_main(void) {
 
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
-    
+
     // set up prov registration
-    simulation_register_provenance_function_call(NULL, PROVENANCE_REGION);
+    simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
 
     simulation_run(timer_callback, TIMER);
 }
