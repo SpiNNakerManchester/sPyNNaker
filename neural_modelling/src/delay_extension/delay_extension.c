@@ -20,7 +20,7 @@ typedef enum callback_priorities{
 //! region identifiers
 typedef enum region_identifiers{
     SYSTEM = 0, DELAY_PARAMS = 1, PROVENANCE_REGION = 2
-}region_identifiers;
+} region_identifiers;
 
 // Globals
 static uint32_t key = 0;

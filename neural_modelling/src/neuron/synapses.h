@@ -60,8 +60,8 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
 uint32_t synapses_get_saturation_count();
 
 //! \brief returns the counters for plastic and fixed pre synaptic events based
-//! on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
-//! returns 0
+//!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
+//!        returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events();
 

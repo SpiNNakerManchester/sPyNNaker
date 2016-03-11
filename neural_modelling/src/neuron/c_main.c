@@ -174,6 +174,7 @@ static bool initialise(uint32_t *timer_period) {
 
 void c_main_store_provenance_data(address_t provenance_region){
     log_debug("writing other provenance data");
+    
     // store the data into the provenance data region
     provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
         synapses_get_pre_synaptic_events();
@@ -256,7 +257,8 @@ void c_main(void) {
     // Set up callback listening to SDP messages
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP_AND_DMA_AND_USER);
-    // set up prov registration
+
+    // set up provenance registration
     simulation_register_provenance_callback(
         c_main_store_provenance_data, PROVENANCE_DATA_REGION);
 

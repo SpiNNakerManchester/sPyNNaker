@@ -658,7 +658,7 @@ class Spinnaker(object):
             # out of the simulation before shutting down
             self._recover_from_error(e, executor.get_items())
 
-            self._txrx.stop_application(self._app_id)
+            # self._txrx.stop_application(self._app_id)
 
             exc_info = sys.exc_info()
             raise exc_info[0], exc_info[1], exc_info[2]
