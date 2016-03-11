@@ -185,6 +185,14 @@ void c_main_store_provenance_data(address_t provenance_region){
     log_debug("finished other provenance data");
 }
 
+void resume_callback() {
+    // restart the recording status
+    if (!initialise_recording()) {
+        log_error("Error setting up recording");
+        spin1_rte(RTE_SWERR);
+    }
+}
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
 //!            executed since start of simulation
@@ -210,13 +218,8 @@ void timer_callback(uint timer_count, uint unused) {
         }
 
         // falls into the pause resume mode of operating
-        simulation_handle_pause_resume();
-
-        // restart the recording status
-        if (!initialise_recording()) {
-            log_error("Error setting up recording");
-            spin1_exit(0);
-        }
+        simulation_handle_pause_resume(resume_callback);
+        return;
     }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
@@ -257,5 +260,5 @@ void c_main(void) {
     simulation_register_provenance_callback(
         c_main_store_provenance_data, PROVENANCE_DATA_REGION);
 
-    simulation_run(timer_callback, TIMER);
+    simulation_run();
 }

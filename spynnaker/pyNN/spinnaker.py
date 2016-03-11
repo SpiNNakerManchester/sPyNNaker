@@ -733,7 +733,7 @@ class Spinnaker(object):
 
         # If we have failed to start or end, get some extra data
         if has_failed_to_start or has_failed_to_end:
-            is_rte = False
+            is_rte = True
             if has_failed_to_end:
                 is_rte = error.is_rte
 

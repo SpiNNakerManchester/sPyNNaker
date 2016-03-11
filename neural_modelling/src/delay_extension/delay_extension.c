@@ -213,8 +213,10 @@ void timer_callback(uint unused0, uint unused1) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
+
         // handle the pause and resume functionality
-        simulation_handle_pause_resume();
+        simulation_handle_pause_resume(NULL);
+        return;
     }
 
     // Loop through delay stages
@@ -305,5 +307,5 @@ void c_main(void) {
     // set up prov registration
     simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
 
-    simulation_run(timer_callback, TIMER);
+    simulation_run();
 }

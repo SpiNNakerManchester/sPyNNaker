@@ -270,6 +270,27 @@ static bool initialize(uint32_t *timer_period) {
     return true;
 }
 
+void resume_callback() {
+
+    // handle resetting the recording state
+    // Get the recording information
+    address_t address = data_specification_get_data_address();
+    address_t system_region = data_specification_get_region(
+        SYSTEM, address);
+    uint8_t regions_to_record[] = {
+        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    };
+    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+    uint32_t *recording_flags_from_system_conf =
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
+
+    recording_initialize(
+        n_regions_to_record, regions_to_record,
+        recording_flags_from_system_conf, state_region, 2,
+        &recording_flags);
+}
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
 //!            executed since start of simulation
@@ -293,26 +314,9 @@ void timer_callback(uint timer_count, uint unused) {
             recording_finalise();
         }
         // go into pause and resume state
-        simulation_handle_pause_resume();
-
-        // handle resetting the recording state
-        // Get the recording information
-        address_t address = data_specification_get_data_address();
-        address_t system_region = data_specification_get_region(
-            SYSTEM, address);
-        uint8_t regions_to_record[] = {
-            BUFFERING_OUT_SPIKE_RECORDING_REGION,
-        };
-        uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-        uint32_t *recording_flags_from_system_conf =
-            &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-        uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
-
-        recording_initialize(
-            n_regions_to_record, regions_to_record,
-            recording_flags_from_system_conf, state_region, 2,
-            &recording_flags);
-        }
+        simulation_handle_pause_resume(resume_callback);
+        return;
+    }
 
     // Loop through slow spike sources
     slow_spike_source_t *slow_spike_sources = slow_spike_source_array;
@@ -436,5 +440,5 @@ void c_main(void) {
     // set up prov registration
     simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
 
-    simulation_run(timer_callback, TIMER);
+    simulation_run();
 }
