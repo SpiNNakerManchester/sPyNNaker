@@ -308,13 +308,14 @@ void timer_callback(uint timer_count, uint unused) {
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
+        // go into pause and resume state to avoid another tick
+        simulation_handle_pause_resume(resume_callback);
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
             recording_finalise();
         }
-        // go into pause and resume state
-        simulation_handle_pause_resume(resume_callback);
         return;
     }
 

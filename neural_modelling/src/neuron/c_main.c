@@ -189,7 +189,7 @@ void resume_callback() {
     // restart the recording status
     if (!initialise_recording()) {
         log_error("Error setting up recording");
-        spin1_rte(RTE_SWERR);
+        rt_error(RTE_SWERR);
     }
 }
 
@@ -210,15 +210,15 @@ void timer_callback(uint timer_count, uint unused) {
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
+        // Enter pause and resume state to avoid another tick
+        simulation_handle_pause_resume(resume_callback);
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
             log_info("updating recording regions");
             recording_finalise();
         }
-
-        // falls into the pause resume mode of operating
-        simulation_handle_pause_resume(resume_callback);
         return;
     }
     // otherwise do synapse and neuron time step updates
