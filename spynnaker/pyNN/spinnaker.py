@@ -292,18 +292,21 @@ class Spinnaker(object):
                 steps = self._deduce_number_of_iterations(n_machine_time_steps)
                 self._minimum_step_generated = steps[0]
 
-        # If we are using a virtual board, stop here
-        if not self._use_virtual_board:
+        # If we have never run before, or the graph has changed, or a reset
+        # has been requested, load the data
+        if (not self._has_ran or application_graph_changed or
+                self._has_reset_last):
 
-            # If we have never run before, or the graph has changed, or a reset
-            # has been requested, load the data
-            if (not self._has_ran or application_graph_changed or
-                    self._has_reset_last):
+            # Data generation needs to be done if not already done
+            if application_graph_changed:
+                self._do_data_generation(steps[0])
 
-                # Data generation needs to be done if not already done
-                if application_graph_changed:
-                    self._do_data_generation(steps[0])
+            # If we are using a virtual board, don't load
+            if not self._use_virtual_board:
                 self._do_load()
+
+        # If we are using a virtual board, don't run
+        if not self._use_virtual_board:
 
             # Run for each of the given steps
             for step in steps:
