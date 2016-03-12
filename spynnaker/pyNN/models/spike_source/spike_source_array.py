@@ -45,9 +45,9 @@ class SpikeSourceArray(
     _model_based_max_atoms_per_core = sys.maxint
 
     def __init__(
-            self, n_neurons, spike_times, machine_time_step, timescale_factor,
-            port=None, tag=None, ip_address=None, board_address=None,
-            max_on_chip_memory_usage_for_spikes_in_bytes=(
+            self, n_neurons, machine_time_step, timescale_factor,
+            spike_times=None, port=None, tag=None, ip_address=None,
+            board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
                 constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
             space_before_notification=640,
             constraints=None, label="SpikeSourceArray",
@@ -61,6 +61,12 @@ class SpikeSourceArray(
         self._port = port
         if port is None:
             self._port = config.getint("Buffers", "receive_buffer_port")
+        if spike_times is None:
+            spike_times = []
+        self._minimum_sdram_for_buffering = config.getint(
+            "Buffers", "minimum_buffer_sdram")
+        self._using_auto_pause_and_resume = config.getboolean(
+            "Buffers", "use_auto_pause_and_resume")
 
         ReverseIpTagMultiCastSource.__init__(
             self, n_keys=n_neurons, machine_time_step=machine_time_step,
@@ -151,7 +157,9 @@ class SpikeSourceArray(
             self._ip_address, self._port, self._board_address,
             self._send_buffer_notification_tag,
             self._spike_recorder_buffer_size,
-            self._buffer_size_before_receive)
+            self._buffer_size_before_receive,
+            self._minimum_sdram_for_buffering,
+            self._using_auto_pause_and_resume)
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 

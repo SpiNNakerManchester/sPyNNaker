@@ -23,8 +23,7 @@ class EdgeToNKeysMapper(object):
     """
 
     def __call__(self, partitioned_graph, graph_mapper, partitionable_graph):
-        """
-        Generate an n_keys map for the graph and add constraints
+        """ Generate an n_keys map for the graph and add constraints
         :param partitioned_graph:
         :param graph_mapper:
         :param partitionable_graph:
@@ -89,7 +88,8 @@ class EdgeToNKeysMapper(object):
             partitioned_edge)
 
         if not isinstance(edge.pre_vertex, AbstractProvidesNKeysForPartition):
-            n_keys_map.set_n_keys_for_partition(partition, vertex_slice.n_atoms)
+            n_keys_map.set_n_keys_for_partition(
+                partition, vertex_slice.n_atoms)
         else:
             n_keys_map.set_n_keys_for_partition(
                 partition,

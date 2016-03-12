@@ -1,13 +1,12 @@
 """
 Synfirechain-like example
 """
-import spynnaker.pyNN as p
+import pyNN.spiNNaker as p
 import pylab
-from fake_if_curr import FakeIFCurrExp
 
 p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
 nNeurons = 200  # number of neurons in each population
-p.set_number_of_neurons_per_core(FakeIFCurrExp, nNeurons / 2)
+p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
 
 
 cell_params_lif = {'cm': 0.25,
@@ -34,7 +33,7 @@ for i in range(0, nNeurons):
 
 injectionConnection = [(0, 0, weight_to_spike, 1)]
 spikeArray = {'spike_times': [[0]]}
-populations.append(p.Population(nNeurons, FakeIFCurrExp, cell_params_lif,
+populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
                    label='pop_1'))
 populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
                    label='inputSpikes_1'))
@@ -48,7 +47,7 @@ populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record()
 
-p.run(5000)
+p.run(3000)
 
 v = None
 gsyn = None

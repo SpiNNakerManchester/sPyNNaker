@@ -17,8 +17,7 @@ class DelayPartitionedEdge(ProjectionPartitionedEdge):
         self._synapse_delay_rows = None
 
     def get_synapse_sublist(self, graph_mapper):
-        """
-        Gets the synapse list for this subedge
+        """ Get the synapse list for this subedge
         """
         if self._synapse_sublist is None:
             self._calculate_synapse_sublist(graph_mapper)
@@ -61,7 +60,6 @@ class DelayPartitionedEdge(ProjectionPartitionedEdge):
         self._synapse_delay_rows = len(full_delay_list)
 
     def free_sublist(self):
-        """
-        Indicates that the list will not be needed again
+        """ Indicate that the list will not be needed again
         """
         self._synapse_sublist = None

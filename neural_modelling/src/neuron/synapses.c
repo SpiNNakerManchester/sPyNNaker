@@ -151,10 +151,10 @@ static inline void _print_inputs() {
 
 
 // This is the "inner loop" of the neural simulation.
-// Every spike event could cause upto 256 different weights to
+// Every spike event could cause up to 256 different weights to
 // be put into the ring buffer.
-static inline void _process_fixed_synapses(address_t fixed_region_address,
-                                           uint32_t time) {
+static inline void _process_fixed_synapses(
+        address_t fixed_region_address, uint32_t time) {
     register uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
         fixed_region_address);
     register uint32_t fixed_synapse = synapse_row_num_fixed_synapses(
@@ -167,7 +167,7 @@ static inline void _process_fixed_synapses(address_t fixed_region_address,
     for (; fixed_synapse > 0; fixed_synapse--) {
 
         // Get the next 32 bit word from the synaptic_row
-        // (should autoincrement pointer in single instruction)
+        // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
 
         // Extract components from this word
@@ -292,7 +292,7 @@ void synapses_do_timestep_update(timer_t time) {
         for (uint32_t synapse_type_index = 0;
                 synapse_type_index < SYNAPSE_TYPE_COUNT; synapse_type_index++) {
 
-            // Get index in the ring buffers for the current timeslot for
+            // Get index in the ring buffers for the current time slot for
             // this synapse type and neuron
             uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
                 time, synapse_type_index, neuron_index);
@@ -339,7 +339,7 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
             return false;
         }
 
-        // Perform DMA writeback
+        // Perform DMA write back
         if (write) {
             spike_processing_finish_write(process_id);
         }

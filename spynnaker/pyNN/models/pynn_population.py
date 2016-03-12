@@ -208,6 +208,8 @@ class Population(object):
                     " be retrieved. Therefore we will return a empty list.")
             return numpy.asarray([])
 
+        if self._spinnaker.use_virtual_board:
+            return numpy.zeros((0, 2))
         spikes = self._vertex.get_spikes(
             self._spinnaker.placements, self._spinnaker.graph_mapper,
             self._spinnaker.buffer_manager)
@@ -257,7 +259,8 @@ class Population(object):
                     " be retrieved. Therefore we will return a empty list.")
             return numpy.asarray([])
 
-        # check that the vertex has read up to the position it needs to
+        if self._spinnaker.use_virtual_board:
+            return numpy.zeros((0, 4))
         return self._vertex.get_gsyn(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
@@ -294,7 +297,8 @@ class Population(object):
                     " be retrieved. Returning a empty list.")
             return numpy.asarray([])
 
-        # check that the vertex has read up to the position it needs to
+        if self._spinnaker.use_virtual_board:
+            return numpy.zeros((0, 3))
         return self._vertex.get_v(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)

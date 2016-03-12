@@ -44,7 +44,7 @@ static inline post_event_history_t *post_events_init_buffers(
     if (post_event_history == NULL) {
         log_error(
             "Unable to allocate global STDP structures - Out of DTCM: Try "
-            "reducing the number of neurons per core to rectify this problem ");
+            "reducing the number of neurons per core to fix this problem ");
         return NULL;
     }
 
