@@ -151,10 +151,10 @@ static inline void _print_inputs() {
 
 
 // This is the "inner loop" of the neural simulation.
-// Every spike event could cause upto 256 different weights to
+// Every spike event could cause up to 256 different weights to
 // be put into the ring buffer.
-static inline void _process_fixed_synapses(address_t fixed_region_address,
-                                           uint32_t time) {
+static inline void _process_fixed_synapses(
+        address_t fixed_region_address, uint32_t time) {
     register uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
         fixed_region_address);
     register uint32_t fixed_synapse = synapse_row_num_fixed_synapses(
@@ -167,7 +167,7 @@ static inline void _process_fixed_synapses(address_t fixed_region_address,
     for (; fixed_synapse > 0; fixed_synapse--) {
 
         // Get the next 32 bit word from the synaptic_row
-        // (should autoincrement pointer in single instruction)
+        // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
 
         // Extract components from this word
@@ -292,7 +292,7 @@ void synapses_do_timestep_update(timer_t time) {
         for (uint32_t synapse_type_index = 0;
                 synapse_type_index < SYNAPSE_TYPE_COUNT; synapse_type_index++) {
 
-            // Get index in the ring buffers for the current timeslot for
+            // Get index in the ring buffers for the current time slot for
             // this synapse type and neuron
             uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
                 time, synapse_type_index, neuron_index);
@@ -339,7 +339,7 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
             return false;
         }
 
-        // Perform DMA writeback
+        // Perform DMA write back
         if (write) {
             spike_processing_finish_write(process_id);
         }
@@ -354,21 +354,22 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
     return true;
 }
 
-void synapses_print_saturation_count() {
-    if (saturation_count > 0) {
-        log_warning("Ring buffer saturation events: %d\n", saturation_count);
-    }
+//! \brief returns the number of times the synapses have saturated their
+//!        weights.
+//! \return the number of times the synapses have saturated.
+uint32_t synapses_get_saturation_count() {
+    return saturation_count;
 }
 
-//! \either prints the counters for plastic and fixed pre synaptic events based
-//! on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or does
-//! nothing (the assumption being that a empty function will be removed by the
-//! compiler and therefore there is no code bloat)
-//! \return Nothing, this method does not return anything
-void synapses_print_pre_synaptic_events() {
+//! \brief returns the counters for plastic and fixed pre synaptic events based
+//! on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
+//! returns 0
+//! \return the counter for plastic and fixed pre synaptic events or 0
+uint32_t synapses_get_pre_synaptic_events() {
 #ifdef SYNAPSE_BENCHMARK
-    log_info("\t%u fixed pre-synaptic events.\n",
-            num_fixed_pre_synaptic_events);
-    synapse_dynamics_print_plastic_pre_synaptic_events();
+    return (num_fixed_pre_synaptic_events +
+            synapse_dynamics_get_plastic_pre_synaptic_events());
+#else
+    return 0;
 #endif // SYNAPSE_BENCHMARK
 }

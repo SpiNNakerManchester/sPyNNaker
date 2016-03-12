@@ -42,7 +42,8 @@ typedef struct fast_spike_source_t {
 typedef enum region{
     SYSTEM, POISSON_PARAMS,
     BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    BUFFERING_OUT_CONTROL_REGION
+    BUFFERING_OUT_CONTROL_REGION,
+    PROVENANCE_REGION
 }region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
@@ -269,6 +270,27 @@ static bool initialize(uint32_t *timer_period) {
     return true;
 }
 
+void resume_callback() {
+
+    // handle resetting the recording state
+    // Get the recording information
+    address_t address = data_specification_get_data_address();
+    address_t system_region = data_specification_get_region(
+        SYSTEM, address);
+    uint8_t regions_to_record[] = {
+        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    };
+    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
+    uint32_t *recording_flags_from_system_conf =
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
+
+    recording_initialize(
+        n_regions_to_record, regions_to_record,
+        recording_flags_from_system_conf, state_region, 2,
+        &recording_flags);
+}
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
 //!            executed since start of simulation
@@ -286,32 +308,16 @@ void timer_callback(uint timer_count, uint unused) {
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
+        // go into pause and resume state to avoid another tick
+        simulation_handle_pause_resume(resume_callback);
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
             recording_finalise();
         }
-        // go into pause and resume state
-        simulation_handle_pause_resume();
-
-        // handle resetting the recording state
-        // Get the recording information
-        address_t address = data_specification_get_data_address();
-        address_t system_region = data_specification_get_region(
-            SYSTEM, address);
-        uint8_t regions_to_record[] = {
-            BUFFERING_OUT_SPIKE_RECORDING_REGION,
-        };
-        uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-        uint32_t *recording_flags_from_system_conf =
-            &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-        uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
-
-        recording_initialize(
-            n_regions_to_record, regions_to_record,
-            recording_flags_from_system_conf, state_region, 2,
-            &recording_flags);
-        }
+        return;
+    }
 
     // Loop through slow spike sources
     slow_spike_source_t *slow_spike_sources = slow_spike_source_array;
@@ -432,5 +438,8 @@ void c_main(void) {
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
 
-    simulation_run(timer_callback, TIMER);
+    // set up provenance registration
+    simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
+
+    simulation_run();
 }
