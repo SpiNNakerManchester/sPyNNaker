@@ -4,7 +4,6 @@ from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN import exceptions as local_exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
@@ -198,18 +197,17 @@ class Population(object):
                 "This population has not got the capability to record spikes")
 
         if not self._spinnaker.has_ran:
-            if self._spinnaker.is_in_virtual_mode:
-                logger.warn(
-                    "The simulation is in virtual machine mode and so has not"
-                    " truly ran. Therefore we will return a empty list.")
-            else:
-                logger.warn(
-                    "The simulation has not yet run, therefore spikes cannot"
-                    " be retrieved. Therefore we will return a empty list.")
-            return numpy.asarray([])
+            logger.warn(
+                "The simulation has not yet run, therefore spikes cannot"
+                " be retrieved, hence the list will be empty")
+            return numpy.zeros((0, 2))
 
         if self._spinnaker.use_virtual_board:
+            logger.warn(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
             return numpy.zeros((0, 2))
+
         spikes = self._vertex.get_spikes(
             self._spinnaker.placements, self._spinnaker.graph_mapper,
             self._spinnaker.buffer_manager)
@@ -249,18 +247,17 @@ class Population(object):
                 "This population has not got the capability to record gsyn")
 
         if not self._spinnaker.has_ran:
-            if self._spinnaker.is_in_virtual_mode:
-                logger.warn(
-                    "The simulation is in virtual machine mode and so has not"
-                    " truly ran. Therefore we will return a empty list.")
-            else:
-                logger.warn(
-                    "The simulation has not yet run, therefore gsyn cannot"
-                    " be retrieved. Therefore we will return a empty list.")
-            return numpy.asarray([])
+            logger.warn(
+                "The simulation has not yet run, therefore gsyn cannot"
+                " be retrieved, hence the list will be empty")
+            return numpy.zeros((0, 4))
 
         if self._spinnaker.use_virtual_board:
+            logger.warn(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
             return numpy.zeros((0, 4))
+
         return self._vertex.get_gsyn(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
@@ -287,18 +284,17 @@ class Population(object):
                 "This population has not got the capability to record v")
 
         if not self._spinnaker.has_ran:
-            if self._spinnaker.is_in_virtual_mode:
-                logger.warn(
-                    "The simulation is in virtual machine mode and so has not"
-                    " truly ran. Therefore we will return a empty list.")
-            else:
-                logger.warn(
-                    "The simulation has not yet run, therefore v cannot"
-                    " be retrieved. Returning a empty list.")
-            return numpy.asarray([])
+            logger.warn(
+                "The simulation has not yet run, therefore v cannot"
+                " be retrieved, hence the list will be empty")
+            return numpy.zeros((0, 3))
 
         if self._spinnaker.use_virtual_board:
+            logger.warn(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
             return numpy.zeros((0, 3))
+
         return self._vertex.get_v(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
