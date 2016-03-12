@@ -162,6 +162,7 @@ class Spinnaker(object):
             "SpecExecution", "specExecOnHost")
 
         # set up machine targeted data
+        self._use_virtual_board = config.getboolean("Machine", "virtual_board")
         self._set_up_machine_specifics(
             timestep, min_delay, max_delay, host_name)
 
@@ -239,15 +240,11 @@ class Spinnaker(object):
 
         if hostname is not None:
             self._hostname = hostname
-            logger.warn("The machine name from PYNN setup is overriding the "
+            logger.warn("The machine name from pyNN setup is overriding the "
                         "machine name defined in the spynnaker.cfg file")
-        elif config.has_option("Machine", "machineName"):
-            self._hostname = config.get("Machine", "machineName")
         else:
-            raise Exception("A SpiNNaker machine must be specified in "
-                            "spynnaker.cfg.")
-        use_virtual_board = config.getboolean("Machine", "virtual_board")
-        if self._hostname == 'None' and not use_virtual_board:
+            self._hostname = self._read_config("Machine", "machineName")
+        if self._hostname is None and not self._use_virtual_board:
             raise Exception("A SpiNNaker machine must be specified in "
                             "spynnaker.cfg.")
 
@@ -295,22 +292,22 @@ class Spinnaker(object):
                 steps = self._deduce_number_of_iterations(n_machine_time_steps)
                 self._minimum_step_generated = steps[0]
 
-        # If we are using a virtual board, stop here
-        if not config.getboolean("Machine", "virtual_board"):
+        # If we have never run before, or the graph has changed, or a reset
+        # has been requested, load the data
+        if (not self._has_ran or application_graph_changed or
+                self._has_reset_last):
 
-            # If we have never run before, or the graph has changed, or a reset
-            # has been requested, load the data
-            if (not self._has_ran or application_graph_changed or
-                    self._has_reset_last):
+            # Data generation needs to be done if not already done
+            if application_graph_changed:
+                self._do_data_generation(steps[0])
 
-                # Data generation needs to be done if not already done
-                if application_graph_changed:
-                    self._do_data_generation(steps[0])
+            # If we are using a virtual board, don't load
+            if not self._use_virtual_board:
                 self._do_load()
 
-            # Run for each of the given steps
-            for step in steps:
-                self._do_run(step)
+        # Run for each of the given steps
+        for step in steps:
+            self._do_run(step)
 
     def _deduce_number_of_iterations(self, n_machine_time_steps):
 
@@ -377,6 +374,12 @@ class Spinnaker(object):
             return value
         return int(value)
 
+    def _read_config_boolean(self, section, item):
+        value = self._read_config(section, item)
+        if value is None:
+            return value
+        return bool(value)
+
     def _do_mapping(self, run_time, n_machine_time_steps):
 
         # Set the initial n_machine_time_steps to all of them for mapping
@@ -396,7 +399,7 @@ class Spinnaker(object):
         inputs["BMPDetails"] = config.get("Machine", "bmp_names")
         inputs["DownedChipsDetails"] = config.get("Machine", "down_chips")
         inputs["DownedCoresDetails"] = config.get("Machine", "down_cores")
-        inputs["BoardVersion"] = config.getint("Machine", "version")
+        inputs["BoardVersion"] = self._read_config_int("Machine", "version")
         inputs["NumberOfBoards"] = self._read_config_int(
             "Machine", "number_of_boards")
         inputs["MachineWidth"] = self._read_config_int("Machine", "width")
@@ -422,7 +425,7 @@ class Spinnaker(object):
         inputs["WriteTextSpecsFlag"] = config.getboolean(
             "Reports", "writeTextSpecs")
         inputs["ExecutableFinder"] = executable_finder
-        inputs["MachineHasWrapAroundsFlag"] = config.getboolean(
+        inputs["MachineHasWrapAroundsFlag"] = self._read_config_boolean(
             "Machine", "requires_wrap_arounds")
         inputs["UserCreateDatabaseFlag"] = config.get(
             "Database", "create_database")
@@ -454,8 +457,13 @@ class Spinnaker(object):
         algorithms = list()
 
         # handle virtual machine and its linking to multi-run
-        if config.getboolean("Machine", "virtual_board"):
-            algorithms.append("FrontEndCommonVirtualMachineInterfacer")
+        if self._use_virtual_board:
+            algorithms.append("FrontEndCommonVirtualMachineGenerator")
+            inputs["MemoryTransceiver"] = None
+            if config.getboolean("Machine", "enable_reinjection"):
+                inputs["CPUsPerVirtualChip"] = 15
+            else:
+                inputs["CPUsPerVirtualChip"] = 16
         else:
             if self._machine is None and self._txrx is None:
                 algorithms.append("FrontEndCommonMachineInterfacer")
@@ -496,7 +504,7 @@ class Spinnaker(object):
             "MemoryPlacements", "MemoryRoutingTables",
             "MemoryTags", "MemoryGraphMapper", "MemoryPartitionedGraph",
             "MemoryMachine", "MemoryRoutingInfos"]
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
             outputs.append("MemoryTransceiver")
 
         # Execute the mapping algorithms
@@ -508,7 +516,7 @@ class Spinnaker(object):
         self._pacman_provenance.extract_provenance(executor)
 
         # Get the outputs needed
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
             self._txrx = executor.get_item("MemoryTransceiver")
         self._placements = executor.get_item("MemoryPlacements")
         self._router_tables = executor.get_item("MemoryRoutingTables")
@@ -541,10 +549,6 @@ class Spinnaker(object):
 
         # The initial inputs are the mapping outputs
         inputs = dict(self._mapping_outputs)
-        inputs["WriteReloadFilesFlag"] = (
-            config.getboolean("Reports", "reportsEnabled") and
-            config.getboolean("Reports", "writeReloadSteps")
-        )
         inputs["WriteMemoryMapReportFlag"] = (
             config.getboolean("Reports", "reportsEnabled") and
             config.getboolean("Reports", "writeMemoryMapReport")
@@ -567,9 +571,6 @@ class Spinnaker(object):
                 optional_algorithms.append(
                     "FrontEndCommonMemoryMapOnChipReport")
         optional_algorithms.append("FrontEndCommonLoadExecutableImages")
-
-        # always make the buffer manager
-        algorithms.append("FrontEndCommonBufferManagerCreater")
 
         outputs = [
             "LoadedReverseIPTagsToken", "LoadedIPTagsToken",
@@ -600,7 +601,11 @@ class Spinnaker(object):
             if isinstance(vertex, AbstractHasFirstMachineTimeStep):
                 vertex.set_first_machine_time_step(first_machine_time_step)
 
-        inputs = dict(self._load_outputs)
+        inputs = None
+        if self._load_outputs is not None:
+            inputs = dict(self._load_outputs)
+        else:
+            inputs = dict(self._mapping_outputs)
         inputs["RanToken"] = self._has_ran
         inputs["NoSyncChanges"] = self._no_sync_changes
         inputs["ProvenanceFilePath"] = self._provenance_file_path
@@ -609,13 +614,25 @@ class Spinnaker(object):
         inputs["RunTime"] = run_time
 
         algorithms = list()
-        if self._has_ran and not self._has_reset_last:
 
-            # add function for extracting all the recorded data from
-            # recorded populations
-            algorithms.append("SpyNNakerRecordingExtractor")
+        # Create a buffer manager if there isn't one already
+        if self._buffer_manager is None:
+            inputs["WriteReloadFilesFlag"] = (
+                config.getboolean("Reports", "reportsEnabled") and
+                config.getboolean("Reports", "writeReloadSteps")
+            )
+            algorithms.append("FrontEndCommonBufferManagerCreater")
+        else:
+            inputs["BufferManager"] = self._buffer_manager
 
-        algorithms.append("FrontEndCommonRuntimeUpdater")
+        if not self._use_virtual_board:
+            if self._has_ran and not self._has_reset_last:
+
+                # add function for extracting all the recorded data from
+                # recorded populations
+                algorithms.append("SpyNNakerRecordingExtractor")
+
+            algorithms.append("FrontEndCommonRuntimeUpdater")
 
         # Add the database writer in case it is needed
         algorithms.append("SpynnakerDatabaseWriter")
@@ -625,6 +642,11 @@ class Spinnaker(object):
         if config.getboolean("Reports", "writeReloadSteps"):
             if not self._has_ran:
                 algorithms.append("FrontEndCommonReloadScriptCreator")
+                if self._use_virtual_board:
+                    logger.warn(
+                        "A reload script will be created, but as you are using"
+                        " a virtual board, you will need to edit the "
+                        " machine_name before you use it")
             else:
                 logger.warn(
                     "The reload script cannot handle multi-runs, nor can"
@@ -636,7 +658,8 @@ class Spinnaker(object):
             "BufferManager"
         ]
 
-        algorithms.append("FrontEndCommonApplicationRunner")
+        if not self._use_virtual_board:
+            algorithms.append("FrontEndCommonApplicationRunner")
 
         executor = None
         try:
@@ -654,8 +677,8 @@ class Spinnaker(object):
                 logger.error(line.strip())
             logger.error(e.exception)
 
-            # If an exception occurs during a run, attempt to get information
-            # out of the simulation before shutting down
+            # If an exception occurs during a run, attempt to get
+            # information out of the simulation before shutting down
             self._recover_from_error(e, executor.get_items())
 
             # self._txrx.stop_application(self._app_id)
@@ -672,12 +695,13 @@ class Spinnaker(object):
 
     def _extract_provenance(self):
         if (config.get("Reports", "reportsEnabled") and
-                config.get("Reports", "writeProvenanceData")):
+                config.get("Reports", "writeProvenanceData") and
+                not self._use_virtual_board):
 
             prov_items = None
             provenance_outputs = None
             if (self._last_run_outputs is not None and
-                    not config.getboolean("Machine", "virtual_board")):
+                    not self._use_virtual_board):
                 inputs = dict(self._last_run_outputs)
                 algorithms = list()
                 outputs = list()
@@ -773,7 +797,7 @@ class Spinnaker(object):
     def _extract_iobuf(self):
         if (config.getboolean("Reports", "extract_iobuf") and
                 self._last_run_outputs is not None and
-                not config.getboolean("Machine", "virtual_board")):
+                not self._use_virtual_board):
             inputs = self._last_run_outputs
             algorithms = ["FrontEndCommonIOBufExtractor"]
             outputs = ["IOBuffers"]
@@ -994,6 +1018,10 @@ class Spinnaker(object):
     def buffer_manager(self):
         return self._buffer_manager
 
+    @property
+    def use_virtual_board(self):
+        return self._use_virtual_board
+
     def get_current_time(self):
         """
 
@@ -1129,7 +1157,7 @@ class Spinnaker(object):
         self._extract_iobuf()
 
         # if not a virtual machine, then shut down stuff on the board
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
 
             if turn_off_machine is None:
                 turn_off_machine = \
