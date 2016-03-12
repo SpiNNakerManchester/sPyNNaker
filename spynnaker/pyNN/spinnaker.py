@@ -305,14 +305,9 @@ class Spinnaker(object):
             if not self._use_virtual_board:
                 self._do_load()
 
-        # If we are using a virtual board, don't run
-        if not self._use_virtual_board:
-
-            # Run for each of the given steps
-            for step in steps:
-                self._do_run(step)
-        else:
-            self._has_ran = True
+        # Run for each of the given steps
+        for step in steps:
+            self._do_run(step)
 
     def _deduce_number_of_iterations(self, n_machine_time_steps):
 
@@ -608,73 +603,73 @@ class Spinnaker(object):
             if isinstance(vertex, AbstractHasFirstMachineTimeStep):
                 vertex.set_first_machine_time_step(first_machine_time_step)
 
-        inputs = dict(self._load_outputs)
-        inputs["RanToken"] = self._has_ran
-        inputs["NoSyncChanges"] = self._no_sync_changes
-        inputs["ProvenanceFilePath"] = self._provenance_file_path
-        inputs["RunTimeMachineTimeSteps"] = n_machine_time_steps
-        inputs["TotalMachineTimeSteps"] = total_run_timesteps
-        inputs["RunTime"] = run_time
+        if not self._use_virtual_board:
+            inputs = inputs = dict(self._load_outputs)
+            inputs["RanToken"] = self._has_ran
+            inputs["NoSyncChanges"] = self._no_sync_changes
+            inputs["ProvenanceFilePath"] = self._provenance_file_path
+            inputs["RunTimeMachineTimeSteps"] = n_machine_time_steps
+            inputs["TotalMachineTimeSteps"] = total_run_timesteps
+            inputs["RunTime"] = run_time
 
-        algorithms = list()
-        if self._has_ran and not self._has_reset_last:
+            algorithms = list()
+            if self._has_ran and not self._has_reset_last:
 
-            # add function for extracting all the recorded data from
-            # recorded populations
-            algorithms.append("SpyNNakerRecordingExtractor")
+                # add function for extracting all the recorded data from
+                # recorded populations
+                algorithms.append("SpyNNakerRecordingExtractor")
 
-        algorithms.append("FrontEndCommonRuntimeUpdater")
+            algorithms.append("FrontEndCommonRuntimeUpdater")
 
-        # Add the database writer in case it is needed
-        algorithms.append("SpynnakerDatabaseWriter")
-        algorithms.append("FrontEndCommonNotificationProtocol")
+            # Add the database writer in case it is needed
+            algorithms.append("SpynnakerDatabaseWriter")
+            algorithms.append("FrontEndCommonNotificationProtocol")
 
-        # Sort out reload if needed
-        if config.getboolean("Reports", "writeReloadSteps"):
-            if not self._has_ran:
-                algorithms.append("FrontEndCommonReloadScriptCreator")
-            else:
-                logger.warn(
-                    "The reload script cannot handle multi-runs, nor can"
-                    "it handle resets, therefore it will only contain the "
-                    "initial run")
+            # Sort out reload if needed
+            if config.getboolean("Reports", "writeReloadSteps"):
+                if not self._has_ran:
+                    algorithms.append("FrontEndCommonReloadScriptCreator")
+                else:
+                    logger.warn(
+                        "The reload script cannot handle multi-runs, nor can"
+                        "it handle resets, therefore it will only contain the "
+                        "initial run")
 
-        outputs = [
-            "NoSyncChanges",
-            "BufferManager"
-        ]
+            outputs = [
+                "NoSyncChanges",
+                "BufferManager"
+            ]
+            algorithms.append("FrontEndCommonApplicationRunner")
 
-        algorithms.append("FrontEndCommonApplicationRunner")
+            executor = None
+            try:
+                executor = PACMANAlgorithmExecutor(
+                    algorithms, [], inputs, self._xml_paths, outputs,
+                    self._do_timings, self._print_timings)
+                executor.execute_mapping()
+                self._pacman_provenance.extract_provenance(executor)
+            except PacmanAlgorithmFailedToCompleteException as e:
 
-        executor = None
-        try:
-            executor = PACMANAlgorithmExecutor(
-                algorithms, [], inputs, self._xml_paths, outputs,
-                self._do_timings, self._print_timings)
-            executor.execute_mapping()
-            self._pacman_provenance.extract_provenance(executor)
-        except PacmanAlgorithmFailedToCompleteException as e:
+                logger.error(
+                    "An error has occurred during simulation - "
+                    "attempting to extract data")
+                for line in traceback.format_tb(e.traceback):
+                    logger.error(line.strip())
+                logger.error(e.exception)
 
-            logger.error(
-                "An error has occurred during simulation - "
-                "attempting to extract data")
-            for line in traceback.format_tb(e.traceback):
-                logger.error(line.strip())
-            logger.error(e.exception)
+                # If an exception occurs during a run, attempt to get
+                # information out of the simulation before shutting down
+                self._recover_from_error(e, executor.get_items())
 
-            # If an exception occurs during a run, attempt to get information
-            # out of the simulation before shutting down
-            self._recover_from_error(e, executor.get_items())
+                # self._txrx.stop_application(self._app_id)
 
-            # self._txrx.stop_application(self._app_id)
+                exc_info = sys.exc_info()
+                raise exc_info[0], exc_info[1], exc_info[2]
 
-            exc_info = sys.exc_info()
-            raise exc_info[0], exc_info[1], exc_info[2]
-
-        self._current_run_timesteps = total_run_timesteps
-        self._last_run_outputs = executor.get_items()
-        self._no_sync_changes = executor.get_item("NoSyncChanges")
-        self._buffer_manager = executor.get_item("BufferManager")
+            self._current_run_timesteps = total_run_timesteps
+            self._last_run_outputs = executor.get_items()
+            self._no_sync_changes = executor.get_item("NoSyncChanges")
+            self._buffer_manager = executor.get_item("BufferManager")
         self._has_reset_last = False
         self._has_ran = True
 
