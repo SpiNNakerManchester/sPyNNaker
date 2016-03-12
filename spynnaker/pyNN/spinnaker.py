@@ -615,6 +615,16 @@ class Spinnaker(object):
 
         algorithms = list()
 
+        # Create a buffer manager if there isn't one already
+        if self._buffer_manager is None:
+            inputs["WriteReloadFilesFlag"] = (
+                config.getboolean("Reports", "reportsEnabled") and
+                config.getboolean("Reports", "writeReloadSteps")
+            )
+            algorithms.append("FrontEndCommonBufferManagerCreater")
+        else:
+            inputs["BufferManager"] = self._buffer_manager
+
         if not self._use_virtual_board:
             if self._has_ran and not self._has_reset_last:
 
@@ -627,16 +637,6 @@ class Spinnaker(object):
         # Add the database writer in case it is needed
         algorithms.append("SpynnakerDatabaseWriter")
         algorithms.append("FrontEndCommonNotificationProtocol")
-
-        # Create a buffer manager if there isn't one already
-        if self._buffer_manager is None:
-            inputs["WriteReloadFilesFlag"] = (
-                config.getboolean("Reports", "reportsEnabled") and
-                config.getboolean("Reports", "writeReloadSteps")
-            )
-            algorithms.append("FrontEndCommonBufferManagerCreater")
-        else:
-            inputs["BufferManager"] = self._buffer_manager
 
         # Sort out reload if needed
         if config.getboolean("Reports", "writeReloadSteps"):
