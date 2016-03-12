@@ -459,6 +459,11 @@ class Spinnaker(object):
         # handle virtual machine and its linking to multi-run
         if self._use_virtual_board:
             algorithms.append("FrontEndCommonVirtualMachineGenerator")
+            inputs["MemoryTransceiver"] = None
+            if config.getboolean("Machine", "enable_reinjection"):
+                inputs["CPUsPerVirtualChip"] = 15
+            else:
+                inputs["CPUsPerVirtualChip"] = 16
         else:
             if self._machine is None and self._txrx is None:
                 algorithms.append("FrontEndCommonMachineInterfacer")
@@ -544,10 +549,6 @@ class Spinnaker(object):
 
         # The initial inputs are the mapping outputs
         inputs = dict(self._mapping_outputs)
-        inputs["WriteReloadFilesFlag"] = (
-            config.getboolean("Reports", "reportsEnabled") and
-            config.getboolean("Reports", "writeReloadSteps")
-        )
         inputs["WriteMemoryMapReportFlag"] = (
             config.getboolean("Reports", "reportsEnabled") and
             config.getboolean("Reports", "writeMemoryMapReport")
@@ -570,9 +571,6 @@ class Spinnaker(object):
                 optional_algorithms.append(
                     "FrontEndCommonMemoryMapOnChipReport")
         optional_algorithms.append("FrontEndCommonLoadExecutableImages")
-
-        # always make the buffer manager
-        algorithms.append("FrontEndCommonBufferManagerCreater")
 
         outputs = [
             "LoadedReverseIPTagsToken", "LoadedIPTagsToken",
@@ -603,16 +601,21 @@ class Spinnaker(object):
             if isinstance(vertex, AbstractHasFirstMachineTimeStep):
                 vertex.set_first_machine_time_step(first_machine_time_step)
 
-        if not self._use_virtual_board:
-            inputs = inputs = dict(self._load_outputs)
-            inputs["RanToken"] = self._has_ran
-            inputs["NoSyncChanges"] = self._no_sync_changes
-            inputs["ProvenanceFilePath"] = self._provenance_file_path
-            inputs["RunTimeMachineTimeSteps"] = n_machine_time_steps
-            inputs["TotalMachineTimeSteps"] = total_run_timesteps
-            inputs["RunTime"] = run_time
+        inputs = None
+        if self._load_outputs is not None:
+            inputs = dict(self._load_outputs)
+        else:
+            inputs = dict(self._mapping_outputs)
+        inputs["RanToken"] = self._has_ran
+        inputs["NoSyncChanges"] = self._no_sync_changes
+        inputs["ProvenanceFilePath"] = self._provenance_file_path
+        inputs["RunTimeMachineTimeSteps"] = n_machine_time_steps
+        inputs["TotalMachineTimeSteps"] = total_run_timesteps
+        inputs["RunTime"] = run_time
 
-            algorithms = list()
+        algorithms = list()
+
+        if not self._use_virtual_board:
             if self._has_ran and not self._has_reset_last:
 
                 # add function for extracting all the recorded data from
@@ -621,55 +624,72 @@ class Spinnaker(object):
 
             algorithms.append("FrontEndCommonRuntimeUpdater")
 
-            # Add the database writer in case it is needed
-            algorithms.append("SpynnakerDatabaseWriter")
-            algorithms.append("FrontEndCommonNotificationProtocol")
+        # Add the database writer in case it is needed
+        algorithms.append("SpynnakerDatabaseWriter")
+        algorithms.append("FrontEndCommonNotificationProtocol")
 
-            # Sort out reload if needed
-            if config.getboolean("Reports", "writeReloadSteps"):
-                if not self._has_ran:
-                    algorithms.append("FrontEndCommonReloadScriptCreator")
-                else:
+        # Create a buffer manager if there isn't one already
+        if self._buffer_manager is None:
+            inputs["WriteReloadFilesFlag"] = (
+                config.getboolean("Reports", "reportsEnabled") and
+                config.getboolean("Reports", "writeReloadSteps")
+            )
+            algorithms.append("FrontEndCommonBufferManagerCreater")
+        else:
+            inputs["BufferManager"] = self._buffer_manager
+
+        # Sort out reload if needed
+        if config.getboolean("Reports", "writeReloadSteps"):
+            if not self._has_ran:
+                algorithms.append("FrontEndCommonReloadScriptCreator")
+                if self._use_virtual_board:
                     logger.warn(
-                        "The reload script cannot handle multi-runs, nor can"
-                        "it handle resets, therefore it will only contain the "
-                        "initial run")
+                        "A reload script will be created, but as you are using"
+                        " a virtual board, you will need to edit the "
+                        " machine_name before you use it")
+            else:
+                logger.warn(
+                    "The reload script cannot handle multi-runs, nor can"
+                    "it handle resets, therefore it will only contain the "
+                    "initial run")
 
-            outputs = [
-                "NoSyncChanges",
-                "BufferManager"
-            ]
+        outputs = [
+            "NoSyncChanges",
+            "BufferManager"
+        ]
+
+        if not self._use_virtual_board:
             algorithms.append("FrontEndCommonApplicationRunner")
 
-            executor = None
-            try:
-                executor = PACMANAlgorithmExecutor(
-                    algorithms, [], inputs, self._xml_paths, outputs,
-                    self._do_timings, self._print_timings)
-                executor.execute_mapping()
-                self._pacman_provenance.extract_provenance(executor)
-            except PacmanAlgorithmFailedToCompleteException as e:
+        executor = None
+        try:
+            executor = PACMANAlgorithmExecutor(
+                algorithms, [], inputs, self._xml_paths, outputs,
+                self._do_timings, self._print_timings)
+            executor.execute_mapping()
+            self._pacman_provenance.extract_provenance(executor)
+        except PacmanAlgorithmFailedToCompleteException as e:
 
-                logger.error(
-                    "An error has occurred during simulation - "
-                    "attempting to extract data")
-                for line in traceback.format_tb(e.traceback):
-                    logger.error(line.strip())
-                logger.error(e.exception)
+            logger.error(
+                "An error has occurred during simulation - "
+                "attempting to extract data")
+            for line in traceback.format_tb(e.traceback):
+                logger.error(line.strip())
+            logger.error(e.exception)
 
-                # If an exception occurs during a run, attempt to get
-                # information out of the simulation before shutting down
-                self._recover_from_error(e, executor.get_items())
+            # If an exception occurs during a run, attempt to get
+            # information out of the simulation before shutting down
+            self._recover_from_error(e, executor.get_items())
 
-                # self._txrx.stop_application(self._app_id)
+            # self._txrx.stop_application(self._app_id)
 
-                exc_info = sys.exc_info()
-                raise exc_info[0], exc_info[1], exc_info[2]
+            exc_info = sys.exc_info()
+            raise exc_info[0], exc_info[1], exc_info[2]
 
-            self._current_run_timesteps = total_run_timesteps
-            self._last_run_outputs = executor.get_items()
-            self._no_sync_changes = executor.get_item("NoSyncChanges")
-            self._buffer_manager = executor.get_item("BufferManager")
+        self._current_run_timesteps = total_run_timesteps
+        self._last_run_outputs = executor.get_items()
+        self._no_sync_changes = executor.get_item("NoSyncChanges")
+        self._buffer_manager = executor.get_item("BufferManager")
         self._has_reset_last = False
         self._has_ran = True
 
