@@ -162,6 +162,7 @@ class Spinnaker(object):
             "SpecExecution", "specExecOnHost")
 
         # set up machine targeted data
+        self._use_virtual_board = config.getboolean("Machine", "virtual_board")
         self._set_up_machine_specifics(
             timestep, min_delay, max_delay, host_name)
 
@@ -239,15 +240,11 @@ class Spinnaker(object):
 
         if hostname is not None:
             self._hostname = hostname
-            logger.warn("The machine name from PYNN setup is overriding the "
+            logger.warn("The machine name from pyNN setup is overriding the "
                         "machine name defined in the spynnaker.cfg file")
-        elif config.has_option("Machine", "machineName"):
-            self._hostname = config.get("Machine", "machineName")
         else:
-            raise Exception("A SpiNNaker machine must be specified in "
-                            "spynnaker.cfg.")
-        use_virtual_board = config.getboolean("Machine", "virtual_board")
-        if self._hostname == 'None' and not use_virtual_board:
+            self._hostname = self._read_config("Machine", "machineName")
+        if self._hostname is None and not self._use_virtual_board:
             raise Exception("A SpiNNaker machine must be specified in "
                             "spynnaker.cfg.")
 
@@ -296,7 +293,7 @@ class Spinnaker(object):
                 self._minimum_step_generated = steps[0]
 
         # If we are using a virtual board, stop here
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
 
             # If we have never run before, or the graph has changed, or a reset
             # has been requested, load the data
@@ -311,6 +308,8 @@ class Spinnaker(object):
             # Run for each of the given steps
             for step in steps:
                 self._do_run(step)
+        else:
+            self._has_ran = True
 
     def _deduce_number_of_iterations(self, n_machine_time_steps):
 
@@ -377,6 +376,12 @@ class Spinnaker(object):
             return value
         return int(value)
 
+    def _read_config_boolean(self, section, item):
+        value = self._read_config(section, item)
+        if value is None:
+            return value
+        return bool(value)
+
     def _do_mapping(self, run_time, n_machine_time_steps):
 
         # Set the initial n_machine_time_steps to all of them for mapping
@@ -422,7 +427,7 @@ class Spinnaker(object):
         inputs["WriteTextSpecsFlag"] = config.getboolean(
             "Reports", "writeTextSpecs")
         inputs["ExecutableFinder"] = executable_finder
-        inputs["MachineHasWrapAroundsFlag"] = config.getboolean(
+        inputs["MachineHasWrapAroundsFlag"] = self._read_config_boolean(
             "Machine", "requires_wrap_arounds")
         inputs["UserCreateDatabaseFlag"] = config.get(
             "Database", "create_database")
@@ -454,7 +459,7 @@ class Spinnaker(object):
         algorithms = list()
 
         # handle virtual machine and its linking to multi-run
-        if config.getboolean("Machine", "virtual_board"):
+        if self._use_virtual_board:
             algorithms.append("FrontEndCommonVirtualMachineGenerator")
         else:
             if self._machine is None and self._txrx is None:
@@ -496,7 +501,7 @@ class Spinnaker(object):
             "MemoryPlacements", "MemoryRoutingTables",
             "MemoryTags", "MemoryGraphMapper", "MemoryPartitionedGraph",
             "MemoryMachine", "MemoryRoutingInfos"]
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
             outputs.append("MemoryTransceiver")
 
         # Execute the mapping algorithms
@@ -508,7 +513,7 @@ class Spinnaker(object):
         self._pacman_provenance.extract_provenance(executor)
 
         # Get the outputs needed
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
             self._txrx = executor.get_item("MemoryTransceiver")
         self._placements = executor.get_item("MemoryPlacements")
         self._router_tables = executor.get_item("MemoryRoutingTables")
@@ -672,12 +677,13 @@ class Spinnaker(object):
 
     def _extract_provenance(self):
         if (config.get("Reports", "reportsEnabled") and
-                config.get("Reports", "writeProvenanceData")):
+                config.get("Reports", "writeProvenanceData") and
+                not self._use_virtual_board):
 
             prov_items = None
             provenance_outputs = None
             if (self._last_run_outputs is not None and
-                    not config.getboolean("Machine", "virtual_board")):
+                    not self._use_virtual_board):
                 inputs = dict(self._last_run_outputs)
                 algorithms = list()
                 outputs = list()
@@ -773,7 +779,7 @@ class Spinnaker(object):
     def _extract_iobuf(self):
         if (config.getboolean("Reports", "extract_iobuf") and
                 self._last_run_outputs is not None and
-                not config.getboolean("Machine", "virtual_board")):
+                not self._use_virtual_board):
             inputs = self._last_run_outputs
             algorithms = ["FrontEndCommonIOBufExtractor"]
             outputs = ["IOBuffers"]
@@ -994,6 +1000,10 @@ class Spinnaker(object):
     def buffer_manager(self):
         return self._buffer_manager
 
+    @property
+    def use_virtual_board(self):
+        return self._use_virtual_board
+
     def get_current_time(self):
         """
 
@@ -1129,7 +1139,7 @@ class Spinnaker(object):
         self._extract_iobuf()
 
         # if not a virtual machine, then shut down stuff on the board
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
 
             if turn_off_machine is None:
                 turn_off_machine = \
