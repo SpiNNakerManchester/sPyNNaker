@@ -71,6 +71,7 @@ null_spikes = populations[2].getSpikes(compatible_output=True)
 v = None
 gsyn = None
 spikes = None
+
 print(projections[0].getWeights())
 print(projections[0].getDelays())
 print delays
@@ -93,7 +94,7 @@ else:
 # Make some graphs
 ticks = len(v) / nNeurons
 
-if v != None:
+if v is not None:
    pylab.figure()
    pylab.xlabel('Time/ms')
    pylab.ylabel('v')
@@ -104,7 +105,7 @@ if v != None:
                   [i[2] for i in v_for_neuron])
    pylab.show()
 
-if gsyn != None:
+if gsyn is not None:
    pylab.figure()
    pylab.xlabel('Time/ms')
    pylab.ylabel('gsyn')

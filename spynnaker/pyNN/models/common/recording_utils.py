@@ -34,7 +34,6 @@ def get_data(transceiver, placement, region, region_size):
     region_base_address_buf = buffer(transceiver.read_memory(
         x, y, region_base_address_offset, 4))
     region_base_address = struct.unpack_from("<I", region_base_address_buf)[0]
-    region_base_address += app_data_base_address
     number_of_bytes_written_buf = buffer(transceiver.read_memory(
         x, y, region_base_address, 4))
     number_of_bytes_written = struct.unpack_from(
@@ -77,3 +76,23 @@ def pull_off_cached_lists(no_loads, cache_file):
         # Seek to the end of the file (for windows compatibility)
         cache_file.seek(0, 2)
         return numpy.concatenate(lists)
+
+
+def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
+    if space_needed == 0:
+        return False
+    if not enable_buffered_recording:
+        return False
+    if buffer_max < space_needed:
+        return True
+    return False
+
+
+def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
+    if space_needed == 0:
+        return 0
+    if not enable_buffered_recording:
+        return space_needed
+    if buffer_max < space_needed:
+        return buffer_max
+    return space_needed

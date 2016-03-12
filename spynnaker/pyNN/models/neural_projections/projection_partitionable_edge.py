@@ -37,30 +37,8 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         if synapse_dynamics is not None:
             self._synapse_row_io = synapse_dynamics.get_synapse_row_io()
 
-        # boolean that checks if this edge has changed since last run
-        self._change_requires_mapping = True
-
-    @property
-    def change_requires_mapping(self):
-        """
-        returns bool which returns if the population spec has changed since
-        changed was last changed.
-        :return: boolean
-        """
-        return self._change_requires_mapping
-
-    @change_requires_mapping.setter
-    def change_requires_mapping(self, new_value):
-        """
-        setter for the changed
-        :param new_value: the new vlaue of the changed
-        :return: None
-        """
-        self._change_requires_mapping = new_value
-
     def create_subedge(self, presubvertex, postsubvertex, label=None):
-        """
-        Creates a subedge from this edge
+        """ Create a subedge from this edge
         """
         return ProjectionPartitionedEdge(presubvertex, postsubvertex)
 
@@ -97,7 +75,7 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         """
         if self._stored_synaptic_data_from_machine is None:
             timer = None
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
+            if conf.config.getboolean("Reports", "display_algorithm_timings"):
                 timer = Timer()
                 timer.start_timing()
 
@@ -137,7 +115,7 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
                 progress_bar.update()
             progress_bar.end()
             self._stored_synaptic_data_from_machine = synaptic_list
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
+            if conf.config.getboolean("Reports", "display_algorithm_timings"):
                 logger.info("Time to read matrix: {}".format(
                     timer.take_sample()))
 

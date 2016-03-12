@@ -145,7 +145,7 @@ bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
 
-    // Extract seperate arrays of plastic synapses (from plastic region),
+    // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words = _plastic_synapses(
         plastic_region_address);
@@ -170,7 +170,7 @@ bool synapse_dynamics_process_plastic_synapses(
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
 
-        // Get next control word (autoincrementing)
+        // Get next control word (auto incrementing)
         uint32_t control_word = *control_words++;
 
         // Extract control-word components
@@ -243,7 +243,7 @@ void synapse_dynamics_print_plastic_synapses(
     use(ring_buffer_to_input_buffer_left_shifts);
 #if LOG_LEVEL >= LOG_DEBUG
 
-    // Extract seperate arrays of weights (from plastic region),
+    // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     weight_t *plastic_words = _plastic_synapses(plastic_region_address);
     const control_t *control_words = synapse_row_plastic_controls(
@@ -260,7 +260,7 @@ void synapse_dynamics_print_plastic_synapses(
     // Loop through plastic synapses
     for (uint32_t i = 0; i < plastic_synapse; i++) {
 
-        // Get next weight and control word (autoincrementing control word)
+        // Get next weight and control word (auto incrementing control word)
         uint32_t weight = *plastic_words++;
         uint32_t control_word = *control_words++;
         uint32_t synapse_type = synapse_row_sparse_type(control_word);
@@ -278,14 +278,14 @@ void synapse_dynamics_print_plastic_synapses(
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-//! \either prints the counters for plastic pre synaptic events based
-//! on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or does
-//! nothing (the assumption being that a empty function will be removed by the
-//! compiler and therefore there is no code bloat)
-//! \return Nothing, this method does not return anything
-void synapse_dynamics_print_plastic_pre_synaptic_events(){
+//! \brief returns the counters for plastic pre synaptic events based
+//!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
+//!        returns 0
+//! \return counters for plastic pre synaptic events or 0
+uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
 #ifdef SYNAPSE_BENCHMARK
-    log_info("\t%u plastic pre-synaptic events.\n",
-            num_plastic_pre_synaptic_events);
+    return num_plastic_pre_synaptic_events;
+#else
+    return 0;
 #endif  // SYNAPSE_BENCHMARK
 }
