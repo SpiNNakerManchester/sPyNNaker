@@ -15,8 +15,7 @@ class DelayAfferentPartitionedEdge(ProjectionPartitionedEdge,
         AbstractFilterableEdge.__init__(self)
 
     def filter_sub_edge(self, graph_mapper):
-        """
-        Filters a subedge of this edge if the edge is not a one-to-one edge
+        """ Filter a subedge of this edge if the edge is not a one-to-one edge
         """
         pre_sub_lo = \
             graph_mapper.get_subvertex_slice(self._pre_subvertex).lo_atom

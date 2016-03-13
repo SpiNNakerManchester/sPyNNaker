@@ -20,7 +20,7 @@ typedef enum callback_priorities{
 //! region identifiers
 typedef enum region_identifiers{
     SYSTEM = 0, DELAY_PARAMS = 1, PROVENANCE_REGION = 2
-}region_identifiers;
+} region_identifiers;
 
 // Globals
 static uint32_t key = 0;
@@ -127,14 +127,13 @@ static bool initialize(uint32_t *timer_period) {
     // Get the timing details
     if (!simulation_read_timing_details(
             data_specification_get_region(SYSTEM, address),
-            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run)) {
+            APPLICATION_NAME_HASH, timer_period)) {
         return false;
     }
 
     // Get the parameters
-    if (!read_parameters(data_specification_get_region(DELAY_PARAMS,
-                                                       address))) {
+    if (!read_parameters(data_specification_get_region(
+            DELAY_PARAMS, address))) {
         return false;
     }
 
@@ -214,8 +213,10 @@ void timer_callback(uint unused0, uint unused1) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
+
         // handle the pause and resume functionality
-        simulation_handle_pause_resume();
+        simulation_handle_pause_resume(NULL);
+        return;
     }
 
     // Loop through delay stages
@@ -302,8 +303,9 @@ void c_main(void) {
 
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
-    // set up prov registration
-    simulation_register_provenance_function_call(NULL, PROVENANCE_REGION);
 
-    simulation_run(timer_callback, TIMER);
+    // set up prov registration
+    simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
+
+    simulation_run();
 }

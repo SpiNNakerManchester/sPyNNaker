@@ -121,8 +121,7 @@ static bool initialise(uint32_t *timer_period) {
     address_t system_region = data_specification_get_region(
         SYSTEM_REGION, address);
     if (!simulation_read_timing_details(
-            system_region, APPLICATION_NAME_HASH, timer_period,
-            &simulation_ticks, &infinite_run)) {
+            system_region, APPLICATION_NAME_HASH, timer_period)) {
         return false;
     }
 
@@ -176,6 +175,7 @@ static bool initialise(uint32_t *timer_period) {
 
 void c_main_store_provenance_data(address_t provenance_region){
     log_debug("writing other provenance data");
+
     // store the data into the provenance data region
     provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
         synapses_get_pre_synaptic_events();
@@ -185,6 +185,14 @@ void c_main_store_provenance_data(address_t provenance_region){
         spike_processing_get_buffer_overflows();
     provenance_region[CURRENT_TIMER_TICK] = time;
     log_debug("finished other provenance data");
+}
+
+void resume_callback() {
+    // restart the recording status
+    if (!initialise_recording()) {
+        log_error("Error setting up recording");
+        rt_error(RTE_SWERR);
+    }
 }
 
 //! \brief Timer interrupt callback
@@ -204,21 +212,16 @@ void timer_callback(uint timer_count, uint unused) {
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
+        // Enter pause and resume state to avoid another tick
+        simulation_handle_pause_resume(resume_callback);
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
             log_info("updating recording regions");
             recording_finalise();
         }
-
-        // falls into the pause resume mode of operating
-        simulation_handle_pause_resume();
-
-        // restart the recording status
-        if (!initialise_recording()) {
-            log_error("Error setting up recording");
-            spin1_exit(0);
-        }
+        return;
     }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
@@ -255,9 +258,10 @@ void c_main(void) {
     // Set up callback listening to SDP messages
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP_AND_DMA_AND_USER);
-    // set up prov registration
-    simulation_register_provenance_function_call(
+
+    // set up provenance registration
+    simulation_register_provenance_callback(
         c_main_store_provenance_data, PROVENANCE_DATA_REGION);
 
-    simulation_run(timer_callback, TIMER_AND_BUFFERING);
+    simulation_run();
 }

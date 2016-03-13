@@ -2,10 +2,9 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.\
     delay_partitionable_edge import DelayPartitionableEdge
+from spynnaker.pyNN.models.utility_models.delay_extension_partitioned_vertex \
+    import DelayExtensionPartitionedVertex
 
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_provenance_partitionable_vertex import \
-    AbstractProvidesProvenancePartitionableVertex
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
@@ -18,8 +17,6 @@ from spinn_front_end_common.abstract_models.\
     import AbstractProvidesNKeysForPartition
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
-from spinn_front_end_common.utilities import constants \
-    as front_end_common_constants
 
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
@@ -30,51 +27,39 @@ from pacman.model.constraints.key_allocator_constraints.\
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
 
 import copy
 import logging
-from enum import Enum
 import math
 
 logger = logging.getLogger(__name__)
 
 
 class DelayExtensionVertex(
+        AbstractPartitionableVertex,
         AbstractDataSpecableVertex,
-        AbstractProvidesProvenancePartitionableVertex,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesNKeysForPartition):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
-    _DELAY_EXTENSION_REGIONS = Enum(
-        value="DELAY_EXTENSION_REGIONS",
-        names=[('SYSTEM', 0),
-               ('DELAY_PARAMS', 1),
-               ('PROVENANCE_REGION', 2)])
+
     _DEFAULT_MALLOCS_USED = 2
 
     def __init__(self, n_neurons, max_delay_per_neuron, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
-                 label="DelayExtension", using_auto_pause_and_resume=False):
+                 label="DelayExtension"):
         """
         Creates a new DelayExtension Object.
         """
-
-        AbstractProvidesProvenancePartitionableVertex.__init__(
-            self, n_atoms=n_neurons, constraints=constraints, label=label,
-            max_atoms_per_core=256,
-            provenance_region_id=
-            self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value)
+        AbstractPartitionableVertex.__init__(
+            self, n_neurons, label, 256, constraints)
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
             timescale_factor=timescale_factor)
@@ -84,9 +69,14 @@ class DelayExtensionVertex(
         self._max_delay_per_neuron = max_delay_per_neuron
         self._max_stages = 0
         self._source_vertex = source_vertex
-        self._using_auto_pause_and_resume = using_auto_pause_and_resume
         joint_constrant = PartitionerSameSizeAsVertexConstraint(source_vertex)
         self.add_constraint(joint_constrant)
+
+    def create_subvertex(
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
+        return DelayExtensionPartitionedVertex(
+            resources_required, label, constraints)
 
     def get_incoming_partition_constraints(self, partition, graph_mapper):
         return list([KeyAllocatorFixedMaskConstraint(0xFFFFF800)])
@@ -167,19 +157,19 @@ class DelayExtensionVertex(
                                (num_delay_blocks * block_len_words))
 
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
+            region=(
+                DelayExtensionPartitionedVertex.
+                _DELAY_EXTENSION_REGIONS.SYSTEM.value),
             size=common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
             label='setup')
 
         spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
+            region=(
+                DelayExtensionPartitionedVertex.
+                _DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value),
             size=delay_params_sz, label='delay_params')
 
-        spec.reserve_memory_region(
-            region=self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value,
-            size=
-            front_end_common_constants.PROVENANCE_DATA_REGION_SIZE_IN_BYTES,
-            label="provenance region")
+        subvertex.reserve_provenance_data_region(spec)
 
         self.write_setup_info(spec)
 
@@ -210,7 +200,9 @@ class DelayExtensionVertex(
 
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
-            spec, self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
+            spec,
+            (DelayExtensionPartitionedVertex.
+                _DELAY_EXTENSION_REGIONS.SYSTEM.value))
 
     def get_delay_blocks(self, subvertex, sub_graph, graph_mapper):
 
@@ -278,7 +270,9 @@ class DelayExtensionVertex(
 
         # Set the focus to the memory region 2 (delay parameters):
         spec.switch_write_focus(
-            region=self._DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value)
+            region=(
+                DelayExtensionPartitionedVertex.
+                _DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value))
 
         # Write header info to the memory region:
         # Write Key info for this core:
@@ -301,37 +295,13 @@ class DelayExtensionVertex(
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
 
-    def get_static_sdram_usage_for_atoms(self, vertex_slice, graph):
+    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         size_of_mallocs = (
             self._DEFAULT_MALLOCS_USED *
             common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
-        return size_of_mallocs
-
-    # @implements AbstractPartitionableVertex.get_resources_used_by_atoms
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
-        """ Get the separate resource requirements for a range of atoms
-
-        :param vertex_slice: the low value of atoms to calculate resources from
-        :param graph: A reference to the graph containing this vertex.
-        :type vertex_slice: pacman.model.graph_mapper.slice.Slice
-        :return: a Resource container that contains a \
-                    CPUCyclesPerTickResource, DTCMResource and SDRAMResource
-        :rtype: ResourceContainer
-        :raise None: this method does not raise any known exception
-        """
-        cpu_cycles = self.get_cpu_usage_for_atoms(vertex_slice, graph)
-        dtcm_requirement = self.get_dtcm_usage_for_atoms(vertex_slice, graph)
-        static_sdram_requirement = \
-            self.get_static_sdram_usage_for_atoms(vertex_slice, graph)
-
-        # set all to just static sdram for the time being
-        all_sdram_usage = static_sdram_requirement
-
-        # noinspection PyTypeChecker
-        resources = ResourceContainer(cpu=CPUCyclesPerTickResource(cpu_cycles),
-                                      dtcm=DTCMResource(dtcm_requirement),
-                                      sdram=SDRAMResource(all_sdram_usage))
-        return resources
+        return (
+            size_of_mallocs +
+            DelayExtensionPartitionedVertex.get_provenance_data_size(0))
 
     def get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
         return

@@ -21,8 +21,7 @@ class SpyNNakerRecordingExtractor(object):
 
         if not ran_token:
             raise exceptions.InvalidParameterType(
-                "The ran token is set to false, and therefore recordings cannot"
-                "be executed correctly. Please fix and try again")
+                "The ran token has not been set")
 
         logger.info(
             "Extracting recorded data from the PyNN application space for "

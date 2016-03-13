@@ -70,8 +70,6 @@ class Population(object):
         cellparams['n_neurons'] = size
         cellparams['machine_time_step'] = spinnaker.machine_time_step
         cellparams['timescale_factor'] = spinnaker.timescale_factor
-        cellparams['using_auto_pause_and_resume'] = \
-            spinnaker.using_auto_pause_and_resume
 
         # create population vertex.
         self._vertex = cellclass(**cellparams)
@@ -200,6 +198,8 @@ class Population(object):
                 "The simulation has not yet run, therefore spikes cannot"
                 " be retrieved")
 
+        if self._spinnaker.use_virtual_board:
+            return numpy.zeros((0, 2))
         spikes = self._vertex.get_spikes(
             self._spinnaker.placements, self._spinnaker.graph_mapper,
             self._spinnaker.buffer_manager)
@@ -243,7 +243,8 @@ class Population(object):
                 "The simulation has not yet run, therefore gsyn cannot"
                 " be retrieved")
 
-        # check that the vertex has read up to the position it needs to
+        if self._spinnaker.use_virtual_board:
+            return numpy.zeros((0, 4))
         return self._vertex.get_gsyn(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
@@ -274,7 +275,8 @@ class Population(object):
                 "The simulation has not yet run, therefore v cannot"
                 " be retrieved")
 
-        # check that the vertex has read up to the position it needs to
+        if self._spinnaker.use_virtual_board:
+            return numpy.zeros((0, 3))
         return self._vertex.get_v(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
@@ -419,20 +421,14 @@ class Population(object):
             raise Exception(
                 "This population does not support the recording of spikes!")
 
-        if self._spinnaker.writing_reload_script:
-            logger.warn(
-                "The system is configured to create a reload script. Therefore"
-                " it is assumed that you will run the reload script and "
-                "therefore we will not record this data")
-        else:
-            # Tell the vertex to record spikes
-            self._vertex.set_recording_spikes()
+        # Tell the vertex to record spikes
+        self._vertex.set_recording_spikes()
 
-            # set the file to store the spikes in once retrieved
-            self._record_spike_file = to_file
+        # set the file to store the spikes in once retrieved
+        self._record_spike_file = to_file
 
-            # state that something has changed in the population,
-            self._change_requires_mapping = True
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     def record_gsyn(self, to_file=None):
         """ Record the synaptic conductance for all cells in the Population.
@@ -447,17 +443,11 @@ class Population(object):
                 "You are trying to record the conductance from a model which "
                 "does not use conductance input.  You will receive "
                 "current measurements instead.")
-        if self._spinnaker.writing_reload_script:
-            logger.warn(
-                "The system is configured to create a reload script. Therefore"
-                " it is assumed that you will run the reload script and "
-                "therefore we will not record this data")
-        else:
-            self._vertex.set_recording_gsyn()
-            self._record_gsyn_file = to_file
+        self._vertex.set_recording_gsyn()
+        self._record_gsyn_file = to_file
 
-            # state that something has changed in the population,
-            self._change_requires_mapping = True
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     def record_v(self, to_file=None):
         """ Record the membrane potential for all cells in the Population.
@@ -467,17 +457,12 @@ class Population(object):
         if not isinstance(self._vertex, AbstractVRecordable):
             raise Exception(
                 "This population does not support the recording of v")
-        if self._spinnaker.writing_reload_script:
-            logger.warn(
-                "The system is configured to create a reload script. Therefore"
-                " it is assumed that you will run the reload script and "
-                "therefore we will not record this data")
-        else:
-            self._vertex.set_recording_v()
-            self._record_v_file = to_file
 
-            # state that something has changed in the population,
-            self._change_requires_mapping = True
+        self._vertex.set_recording_v()
+        self._record_v_file = to_file
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
 
     @property
     def positions(self):

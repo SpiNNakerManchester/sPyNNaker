@@ -1,14 +1,10 @@
+from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
 
-from six import add_metaclass
-
-from spinn_front_end_common.interface.abstract_recordable_interface import \
-    AbstractRecordableInterface
-
 
 @add_metaclass(ABCMeta)
-class AbstractVRecordable(AbstractRecordableInterface):
+class AbstractVRecordable(object):
     """ Indicates that membrane voltage can be recorded from this object
     """
 
