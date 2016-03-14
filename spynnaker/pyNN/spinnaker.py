@@ -396,7 +396,7 @@ class Spinnaker(object):
         inputs['ReportFolder'] = self._report_default_directory
         inputs["ApplicationDataFolder"] = self._app_data_runtime_folder
         inputs['IPAddress'] = self._hostname
-        inputs["BMPDetails"] = config.get("Machine", "bmp_names")
+        inputs["BMPDetails"] = self._read_config("Machine", "bmp_names")
         inputs["DownedChipsDetails"] = config.get("Machine", "down_chips")
         inputs["DownedCoresDetails"] = config.get("Machine", "down_cores")
         inputs["BoardVersion"] = self._read_config_int("Machine", "version")
@@ -466,7 +466,7 @@ class Spinnaker(object):
                 inputs["CPUsPerVirtualChip"] = 16
         else:
             if self._machine is None and self._txrx is None:
-                algorithms.append("FrontEndCommonMachineInterfacer")
+                algorithms.append("FrontEndCommonMachineGenerator")
             else:
                 inputs["MemoryMachine"] = self._machine
                 inputs["MemoryTransceiver"] = self._txrx
