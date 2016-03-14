@@ -21,6 +21,10 @@ class ConnectionHolder(object):
             self._connections = list()
         self._connections.append(connections)
 
+    @property
+    def connections(self):
+        return self._connections
+
     def finish(self):
         if self._filename is not None:
 
@@ -75,3 +79,7 @@ class ConnectionHolder(object):
     def __repr__(self):
         data = self._merge_connections()
         return data.__repr__()
+
+    def __getattr__(self, name):
+        data = self._merge_connections()
+        return getattr(data, name)

@@ -139,6 +139,21 @@ class Projection(object):
             self._projection_edge.delay_edge = delay_edge
         spinnaker_control._add_projection(self)
 
+        # If there is a virtual board, we need to hold the data in case the
+        # user asks for it
+        self._virtual_connection_list = None
+        if spinnaker_control.use_virtual_board:
+            self._virtual_connection_list = list()
+            pre_vertex = presynaptic_population._get_vertex
+            post_vertex = postsynaptic_population._get_vertex
+            connection_holder = ConnectionHolder(
+                None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
+                self._virtual_connection_list)
+
+            post_vertex.add_pre_run_connection_holder(
+                connection_holder, self._projection_edge,
+                self._synapse_information)
+
     @property
     def requires_mapping(self):
         if (isinstance(self._projection_edge, AbstractMappable) and
@@ -244,10 +259,18 @@ class Projection(object):
         raise NotImplementedError
 
     def _get_synaptic_data(self, as_list, data_to_get):
-        # TODO: Work out how to do this when there isn't a transceiver
 
         post_vertex = self._projection_edge.post_vertex
         pre_vertex = self._projection_edge.pre_vertex
+
+        # If in virtual board mode, the connection data should be set
+        if self._virtual_connection_list is not None:
+            post_vertex = self._projection_edge.post_vertex
+            pre_vertex = self._projection_edge.pre_vertex
+            return ConnectionHolder(
+                data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
+                self._virtual_connection_list)
+
         connection_holder = ConnectionHolder(
             data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms)
 
