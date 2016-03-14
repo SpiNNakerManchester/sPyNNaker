@@ -183,6 +183,8 @@ class Population(object):
                 "The simulation has not yet run, therefore spikes cannot"
                 " be retrieved")
 
+        if self._spinnaker.use_virtual_board:
+            return numpy.zeros((0, 2))
         spikes = self._vertex.get_spikes(
             self._spinnaker.placements, self._spinnaker.graph_mapper,
             self._spinnaker.buffer_manager)
@@ -226,7 +228,8 @@ class Population(object):
                 "The simulation has not yet run, therefore gsyn cannot"
                 " be retrieved")
 
-        # check that the vertex has read up to the position it needs to
+        if self._spinnaker.use_virtual_board:
+            return numpy.zeros((0, 4))
         return self._vertex.get_gsyn(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
@@ -257,7 +260,8 @@ class Population(object):
                 "The simulation has not yet run, therefore v cannot"
                 " be retrieved")
 
-        # check that the vertex has read up to the position it needs to
+        if self._spinnaker.use_virtual_board:
+            return numpy.zeros((0, 3))
         return self._vertex.get_v(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)

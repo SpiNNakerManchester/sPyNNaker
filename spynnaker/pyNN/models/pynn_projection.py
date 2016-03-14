@@ -244,6 +244,8 @@ class Projection(object):
         raise NotImplementedError
 
     def _get_synaptic_data(self, as_list, data_to_get):
+        # TODO: Work out how to do this when there isn't a transceiver
+
         post_vertex = self._projection_edge.post_vertex
         pre_vertex = self._projection_edge.pre_vertex
         connection_holder = ConnectionHolder(
@@ -279,6 +281,7 @@ class Projection(object):
                 connection_holder.add_connections(connections)
             progress.update()
         progress.end()
+        connection_holder.finish()
         return connection_holder
 
     # noinspection PyPep8Naming

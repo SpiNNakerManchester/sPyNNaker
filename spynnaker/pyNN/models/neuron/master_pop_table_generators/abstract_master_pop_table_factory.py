@@ -22,7 +22,7 @@ class AbstractMasterPopTableFactory(object):
         :param incoming_key: the source key which the synaptic matrix needs to\
                     be mapped to
         :param master_pop_base_mem_address: the base address of the master pop
-        :param txrx: the transciever object from spinnman
+        :param txrx: the transceiver object from spinnman
         :param chip_y: the y coordinate of the chip of this master pop
         :param chip_x: the x coordinate of the chip of this master pop
         :type incoming_key: int

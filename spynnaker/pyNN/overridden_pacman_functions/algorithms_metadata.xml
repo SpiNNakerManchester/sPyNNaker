@@ -175,6 +175,10 @@
                 <param_name>buffer_manager</param_name>
                 <param_type>BufferManager</param_type>
             </parameter>
+            <parameter>
+                <param_name>ran_token</param_name>
+                <param_type>RanToken</param_type>
+            </parameter>
         </required_inputs>
     </algorithm>
     <algorithm name="SpynnakerDataSpecificationWriter">

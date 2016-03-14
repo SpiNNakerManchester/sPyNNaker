@@ -83,3 +83,6 @@ class ProjectionPartitionedEdge(
             weight += new_weight
 
         self._weight = weight
+
+    def __repr__(self):
+        return "{}:{}".format(self._pre_subvertex, self._post_subvertex)

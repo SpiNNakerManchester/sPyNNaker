@@ -583,6 +583,7 @@ class SynapticManager(object):
                                 weight_scales, row_data, delayed_row_data,
                                 edge.n_delay_stages)
                             connection_holder.add_connections(connections)
+                            connection_holder.finish()
 
                     if len(row_data) > 0:
                         next_block_start_addr = self._write_padding(

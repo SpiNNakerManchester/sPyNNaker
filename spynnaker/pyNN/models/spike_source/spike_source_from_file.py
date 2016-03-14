@@ -1,6 +1,3 @@
-"""
-SpikeSourceFromFile
-"""
 
 # spynnaker imports
 from spynnaker.pyNN.models.spike_source.spike_source_array import \
@@ -12,9 +9,7 @@ import numpy
 
 
 class SpikeSourceFromFile(SpikeSourceArray):
-    """
-    helper class that allows spikes froma  file to be read in and added to a
-    buffered spike soruce
+    """ SpikeSourceArray that works from a file
     """
 
     def __init__(
@@ -76,18 +71,8 @@ class SpikeSourceFromFile(SpikeSourceArray):
         return sub_sampled_array
 
     @staticmethod
-    def _convert_spike_list_to_timed_spikes(spike_list, min_idx, max_idx,
-                                            tmin, tmax, tstep):
-        """
-
-        :param spike_list:
-        :param min_idx:
-        :param max_idx:
-        :param tmin:
-        :param tmax:
-        :param tstep:
-        :return:
-        """
+    def _convert_spike_list_to_timed_spikes(
+            spike_list, min_idx, max_idx, tmin, tmax, tstep):
         times = numpy.array(range(tmin, tmax, tstep))
         spike_ids = sorted(spike_list)
         possible_neurons = range(min_idx, max_idx)
@@ -97,8 +82,4 @@ class SpikeSourceFromFile(SpikeSourceArray):
 
     @property
     def spike_times(self):
-        """
-        helper method for acquiring the spike times
-        :return:
-        """
         return self._spike_times

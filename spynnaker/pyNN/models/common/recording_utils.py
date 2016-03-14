@@ -70,3 +70,23 @@ def pull_off_cached_lists(no_loads, cache_file):
         # Seek to the end of the file (for windows compatibility)
         cache_file.seek(0, 2)
         return numpy.concatenate(lists)
+
+
+def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
+    if space_needed == 0:
+        return False
+    if not enable_buffered_recording:
+        return False
+    if buffer_max < space_needed:
+        return True
+    return False
+
+
+def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
+    if space_needed == 0:
+        return 0
+    if not enable_buffered_recording:
+        return space_needed
+    if buffer_max < space_needed:
+        return buffer_max
+    return space_needed

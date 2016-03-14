@@ -44,10 +44,6 @@ void synapse_dynamics_print_plastic_synapses(
     use(ring_buffer_to_input_left_shifts);
 }
 
-//! \As a fixed synapse dynamics has no plastic pre synaptic events, this
-//! method does nothing, but is needed by the synapse dynamics.h file
-//! (the assumption being that a empty function will be removed by the
-//! compiler and therefore there is no code bloat)
-//! \return Nothing, this method does not return anything
-void synapse_dynamics_print_plastic_pre_synaptic_events(){
+uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
+    return 0;
 }
