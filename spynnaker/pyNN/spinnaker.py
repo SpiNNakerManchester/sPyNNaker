@@ -439,7 +439,6 @@ class Spinnaker(object):
             "Machine", "max_sdram_allowed_per_chip")
         inputs["DoWriteFlag"] = config.getboolean("Mode", "do_write")
         inputs["DoLoadFlag"] = config.getboolean("Mode", "do_load")
-        inputs["DoRunFlag"] = config.getboolean("Mode", "do_run")
 
         # add paths for each file based version
         inputs["FileCoreAllocationsFilePath"] = os.path.join(
