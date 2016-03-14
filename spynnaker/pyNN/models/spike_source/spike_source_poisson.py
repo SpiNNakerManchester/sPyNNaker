@@ -116,6 +116,7 @@ class SpikeSourcePoisson(
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
+        SpikeSourcePoisson._n_poisson_subvertices += 1
         subvertex = SpikeSourcePoissonPartitionedVertex(
             resources_required, label, constraints)
         if not self._using_auto_pause_and_resume:
@@ -475,11 +476,3 @@ class SpikeSourcePoisson(
 
     def is_data_specable(self):
         return True
-
-    def create_subvertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-        SpikeSourcePoisson._n_poisson_subvertices += 1
-        return AbstractPartitionableVertex.create_subvertex(
-            self, vertex_slice, resources_required, label=label,
-            constraints=constraints)

@@ -537,8 +537,7 @@ class Spinnaker(object):
         inputs = dict(self._mapping_outputs)
 
         # Run the data generation algorithms
-        algorithms = [
-            "FrontEndCommomPartitionableGraphDataSpecificationWriter"]
+        algorithms = ["SpynnakerDataSpecificationWriter"]
 
         executor = PACMANAlgorithmExecutor(
             algorithms, [], inputs, self._xml_paths, [], self._do_timings,
