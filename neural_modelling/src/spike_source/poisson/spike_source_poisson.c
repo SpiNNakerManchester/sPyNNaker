@@ -142,7 +142,7 @@ bool read_poisson_parameters(address_t address) {
     has_been_given_key = address[HAS_KEY];
     key = address[TRANSMISSION_KEY];
     random_backoff_us = address[RANDOM_BACKOFF];
-    log_info("\t key = %08x, backoff = %u", key, random_backoff_us);
+    log_info("\t key = %08x, back off = %u", key, random_backoff_us);
 
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
     memcpy(spike_source_seed, &address[PARAMETER_SEED_START_POSITION],

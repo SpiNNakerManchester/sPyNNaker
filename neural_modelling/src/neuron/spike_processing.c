@@ -71,7 +71,7 @@ static inline void _do_dma_read(
 
 static inline void _setup_synaptic_dma_read() {
 
-    // Set up to store the dma location and size to read
+    // Set up to store the DMA location and size to read
     address_t row_address;
     size_t n_bytes_to_transfer;
 
@@ -260,7 +260,7 @@ void spike_processing_finish_write(uint32_t process_id) {
 //! \brief returns the number of times the input buffer has overflowed
 //! \return the number of times the input buffer has overloaded
 uint32_t spike_processing_get_buffer_overflows() {
-    
+
     // Check for buffer overflow
     return in_spikes_get_n_buffer_overflows();
 }

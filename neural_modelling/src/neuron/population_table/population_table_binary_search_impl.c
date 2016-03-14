@@ -23,8 +23,8 @@ static uint16_t items_to_go = 0;
 
 static inline uint32_t _get_address(address_and_row_length entry) {
 
-    // The address is in words and is the top 24-bits, so this downshifts by
-    // 8 and then multiplies by 4 (= upshifts by 2) = downshift by 6
+    // The address is in words and is the top 24-bits, so this down shifts by
+    // 8 and then multiplies by 4 (= up shifts by 2) = down shift by 6
     return entry >> 6;
 }
 
