@@ -319,8 +319,9 @@ class Projection(object):
                 "the gather param has no meaning for spinnaker when set to "
                 "false")
 
-        if (self._spinnaker.has_ran and not
-                self._has_retrieved_synaptic_list_from_machine):
+        if (self._spinnaker.has_ran and
+                not self._has_retrieved_synaptic_list_from_machine and
+                not self._spinnaker.use_virtual_board):
             self._retrieve_synaptic_data_from_machine()
 
         if format == 'list':
@@ -375,8 +376,9 @@ class Projection(object):
                 "the gather param has no meaning for spinnaker when set to "
                 "false")
 
-        if (self._spinnaker.has_ran and not
-                self._has_retrieved_synaptic_list_from_machine):
+        if (self._spinnaker.has_ran and
+                not self._has_retrieved_synaptic_list_from_machine and
+                not self._spinnaker.use_virtual_board):
             self._retrieve_synaptic_data_from_machine()
 
         if format == 'list':

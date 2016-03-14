@@ -1,10 +1,13 @@
 
 # pacman imports
-from pacman.model.partitionable_graph.partitionable_graph import \
-    PartitionableGraph
+from pacman.model.partitionable_graph.partitionable_graph \
+    import PartitionableGraph
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
+from spinn_front_end_common.interface.provenance.pacman_provenance_extractor \
+    import PacmanProvenanceExtractor
+from pacman.exceptions import PacmanAlgorithmFailedToCompleteException
 
 
 # common front end imports
@@ -17,6 +20,10 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 from spinn_front_end_common.interface.executable_finder import ExecutableFinder
+from spinn_front_end_common.utilities.exceptions \
+    import ExecutableFailedToStartException
+from spinn_front_end_common.utilities.exceptions \
+    import ExecutableFailedToStopException
 
 # local front end imports
 from spynnaker.pyNN.models.common.abstract_gsyn_recordable\
@@ -47,6 +54,8 @@ from collections import defaultdict
 import logging
 import math
 import os
+import sys
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +82,7 @@ class Spinnaker(object):
         self._partitionable_graph = PartitionableGraph(label=graph_label)
         self._mapping_outputs = None
         self._load_outputs = None
+        self._last_run_outputs = None
         self._partitioned_graph = None
         self._graph_mapper = None
         self._placements = None
@@ -82,6 +92,7 @@ class Spinnaker(object):
         self._machine = None
         self._txrx = None
         self._buffer_manager = None
+        self._pacman_provenance = PacmanProvenanceExtractor()
 
         # database objects
         self._database_socket_addresses = set()
@@ -140,11 +151,18 @@ class Spinnaker(object):
 
         self._xml_paths = self._create_xml_paths()
         self._do_timings = config.getboolean(
-            "Reports", "outputTimesForSections")
+            "Reports", "writeAlgorithmTimings")
+        self._print_timings = config.getboolean(
+            "Reports", "display_algorithm_timings")
+        self._provenance_format = config.get("Reports", "provenance_format")
+        if self._provenance_format not in ["xml", "json"]:
+            raise Exception("Unknown provenance format: {}".format(
+                self._provenance_format))
         self._exec_dse_on_host = config.getboolean(
             "SpecExecution", "specExecOnHost")
 
         # set up machine targeted data
+        self._use_virtual_board = config.getboolean("Machine", "virtual_board")
         self._set_up_machine_specifics(
             timestep, min_delay, max_delay, host_name)
 
@@ -222,15 +240,11 @@ class Spinnaker(object):
 
         if hostname is not None:
             self._hostname = hostname
-            logger.warn("The machine name from PYNN setup is overriding the "
+            logger.warn("The machine name from pyNN setup is overriding the "
                         "machine name defined in the spynnaker.cfg file")
-        elif config.has_option("Machine", "machineName"):
-            self._hostname = config.get("Machine", "machineName")
         else:
-            raise Exception("A SpiNNaker machine must be specified in "
-                            "spynnaker.cfg.")
-        use_virtual_board = config.getboolean("Machine", "virtual_board")
-        if self._hostname == 'None' and not use_virtual_board:
+            self._hostname = self._read_config("Machine", "machineName")
+        if self._hostname is None and not self._use_virtual_board:
             raise Exception("A SpiNNaker machine must be specified in "
                             "spynnaker.cfg.")
 
@@ -278,22 +292,22 @@ class Spinnaker(object):
                 steps = self._deduce_number_of_iterations(n_machine_time_steps)
                 self._minimum_step_generated = steps[0]
 
-        # If we are using a virtual board, stop here
-        if not config.getboolean("Machine", "virtual_board"):
+        # If we have never run before, or the graph has changed, or a reset
+        # has been requested, load the data
+        if (not self._has_ran or application_graph_changed or
+                self._has_reset_last):
 
-            # If we have never run before, or the graph has changed, or a reset
-            # has been requested, load the data
-            if (not self._has_ran or application_graph_changed or
-                    self._has_reset_last):
+            # Data generation needs to be done if not already done
+            if application_graph_changed:
+                self._do_data_generation(steps[0])
 
-                # Data generation needs to be done if not already done
-                if application_graph_changed:
-                    self._do_data_generation(steps[0])
+            # If we are using a virtual board, don't load
+            if not self._use_virtual_board:
                 self._do_load()
 
-            # Run for each of the given steps
-            for step in steps:
-                self._do_run(step)
+        # Run for each of the given steps
+        for step in steps:
+            self._do_run(step)
 
     def _deduce_number_of_iterations(self, n_machine_time_steps):
 
@@ -360,6 +374,12 @@ class Spinnaker(object):
             return value
         return int(value)
 
+    def _read_config_boolean(self, section, item):
+        value = self._read_config(section, item)
+        if value is None:
+            return value
+        return bool(value)
+
     def _do_mapping(self, run_time, n_machine_time_steps):
 
         # Set the initial n_machine_time_steps to all of them for mapping
@@ -370,6 +390,8 @@ class Spinnaker(object):
 
         inputs = dict()
         inputs["RunTime"] = run_time
+        inputs["PostSimulationOverrunBeforeError"] = config.getint(
+            "Machine", "post_simulation_overrun_before_error")
         inputs["MemoryPartitionableGraph"] = self._partitionable_graph
         inputs['ReportFolder'] = self._report_default_directory
         inputs["ApplicationDataFolder"] = self._app_data_runtime_folder
@@ -377,7 +399,7 @@ class Spinnaker(object):
         inputs["BMPDetails"] = config.get("Machine", "bmp_names")
         inputs["DownedChipsDetails"] = config.get("Machine", "down_chips")
         inputs["DownedCoresDetails"] = config.get("Machine", "down_cores")
-        inputs["BoardVersion"] = config.getint("Machine", "version")
+        inputs["BoardVersion"] = self._read_config_int("Machine", "version")
         inputs["NumberOfBoards"] = self._read_config_int(
             "Machine", "number_of_boards")
         inputs["MachineWidth"] = self._read_config_int("Machine", "width")
@@ -403,7 +425,7 @@ class Spinnaker(object):
         inputs["WriteTextSpecsFlag"] = config.getboolean(
             "Reports", "writeTextSpecs")
         inputs["ExecutableFinder"] = executable_finder
-        inputs["MachineHasWrapAroundsFlag"] = config.getboolean(
+        inputs["MachineHasWrapAroundsFlag"] = self._read_config_boolean(
             "Machine", "requires_wrap_arounds")
         inputs["UserCreateDatabaseFlag"] = config.get(
             "Database", "create_database")
@@ -435,8 +457,13 @@ class Spinnaker(object):
         algorithms = list()
 
         # handle virtual machine and its linking to multi-run
-        if config.getboolean("Machine", "virtual_board"):
-            algorithms.append("FrontEndCommonVirtualMachineInterfacer")
+        if self._use_virtual_board:
+            algorithms.append("FrontEndCommonVirtualMachineGenerator")
+            inputs["MemoryTransceiver"] = None
+            if config.getboolean("Machine", "enable_reinjection"):
+                inputs["CPUsPerVirtualChip"] = 15
+            else:
+                inputs["CPUsPerVirtualChip"] = 16
         else:
             if self._machine is None and self._txrx is None:
                 algorithms.append("FrontEndCommonMachineInterfacer")
@@ -477,17 +504,19 @@ class Spinnaker(object):
             "MemoryPlacements", "MemoryRoutingTables",
             "MemoryTags", "MemoryGraphMapper", "MemoryPartitionedGraph",
             "MemoryMachine", "MemoryRoutingInfos"]
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
             outputs.append("MemoryTransceiver")
 
         # Execute the mapping algorithms
         executor = PACMANAlgorithmExecutor(
-            algorithms, [], inputs, self._xml_paths, outputs, self._do_timings)
+            algorithms, [], inputs, self._xml_paths, outputs, self._do_timings,
+            self._print_timings)
         executor.execute_mapping()
         self._mapping_outputs = executor.get_items()
+        self._pacman_provenance.extract_provenance(executor)
 
         # Get the outputs needed
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
             self._txrx = executor.get_item("MemoryTransceiver")
         self._placements = executor.get_item("MemoryPlacements")
         self._router_tables = executor.get_item("MemoryRoutingTables")
@@ -510,18 +539,16 @@ class Spinnaker(object):
             "FrontEndCommomPartitionableGraphDataSpecificationWriter"]
 
         executor = PACMANAlgorithmExecutor(
-            algorithms, [], inputs, self._xml_paths, [], self._do_timings)
+            algorithms, [], inputs, self._xml_paths, [], self._do_timings,
+            self._print_timings)
         executor.execute_mapping()
         self._mapping_outputs = executor.get_items()
+        self._pacman_provenance.extract_provenance(executor)
 
     def _do_load(self):
 
         # The initial inputs are the mapping outputs
         inputs = dict(self._mapping_outputs)
-        inputs["WriteReloadFilesFlag"] = (
-            config.getboolean("Reports", "reportsEnabled") and
-            config.getboolean("Reports", "writeReloadSteps")
-        )
         inputs["WriteMemoryMapReportFlag"] = (
             config.getboolean("Reports", "reportsEnabled") and
             config.getboolean("Reports", "writeMemoryMapReport")
@@ -545,9 +572,6 @@ class Spinnaker(object):
                     "FrontEndCommonMemoryMapOnChipReport")
         optional_algorithms.append("FrontEndCommonLoadExecutableImages")
 
-        # always make the buffer manager
-        algorithms.append("FrontEndCommonBufferManagerCreater")
-
         outputs = [
             "LoadedReverseIPTagsToken", "LoadedIPTagsToken",
             "LoadedRoutingTablesToken", "LoadBinariesToken",
@@ -556,9 +580,10 @@ class Spinnaker(object):
 
         executor = PACMANAlgorithmExecutor(
             algorithms, optional_algorithms, inputs, self._xml_paths,
-            outputs, self._do_timings)
+            outputs, self._do_timings, self._print_timings)
         executor.execute_mapping()
         self._load_outputs = executor.get_items()
+        self._pacman_provenance.extract_provenance(executor)
 
     def _do_run(self, n_machine_time_steps):
 
@@ -576,7 +601,11 @@ class Spinnaker(object):
             if isinstance(vertex, AbstractHasFirstMachineTimeStep):
                 vertex.set_first_machine_time_step(first_machine_time_step)
 
-        inputs = dict(self._load_outputs)
+        inputs = None
+        if self._load_outputs is not None:
+            inputs = dict(self._load_outputs)
+        else:
+            inputs = dict(self._mapping_outputs)
         inputs["RanToken"] = self._has_ran
         inputs["NoSyncChanges"] = self._no_sync_changes
         inputs["ProvenanceFilePath"] = self._provenance_file_path
@@ -585,52 +614,219 @@ class Spinnaker(object):
         inputs["RunTime"] = run_time
 
         algorithms = list()
-        if self._has_ran and not self._has_reset_last:
 
-            # add function for extracting all the recorded data from
-            # recorded populations
-            algorithms.append("SpyNNakerRecordingExtractor")
+        # Create a buffer manager if there isn't one already
+        if self._buffer_manager is None:
+            inputs["WriteReloadFilesFlag"] = (
+                config.getboolean("Reports", "reportsEnabled") and
+                config.getboolean("Reports", "writeReloadSteps")
+            )
+            algorithms.append("FrontEndCommonBufferManagerCreater")
+        else:
+            inputs["BufferManager"] = self._buffer_manager
 
-        algorithms.append("FrontEndCommonRuntimeUpdater")
+        if not self._use_virtual_board:
+            if self._has_ran and not self._has_reset_last:
+
+                # add function for extracting all the recorded data from
+                # recorded populations
+                algorithms.append("SpyNNakerRecordingExtractor")
+
+            algorithms.append("FrontEndCommonRuntimeUpdater")
 
         # Add the database writer in case it is needed
         algorithms.append("SpynnakerDatabaseWriter")
         algorithms.append("FrontEndCommonNotificationProtocol")
 
         # Sort out reload if needed
-        if (not self._has_ran and
-                config.getboolean("Reports", "writeReloadSteps")):
-            algorithms.append("FrontEndCommonReloadScriptCreator")
-        elif (self.has_ran and
-                config.getboolean("Reports", "writeReloadSteps")):
-            logger.warn(
-                "The reload script cannot handle multi-runs, nor can"
-                "it handle resets, therefore it will only contain the "
-                "initial run")
+        if config.getboolean("Reports", "writeReloadSteps"):
+            if not self._has_ran:
+                algorithms.append("FrontEndCommonReloadScriptCreator")
+                if self._use_virtual_board:
+                    logger.warn(
+                        "A reload script will be created, but as you are using"
+                        " a virtual board, you will need to edit the "
+                        " machine_name before you use it")
+            else:
+                logger.warn(
+                    "The reload script cannot handle multi-runs, nor can"
+                    "it handle resets, therefore it will only contain the "
+                    "initial run")
 
-        algorithms.append("FrontEndCommonApplicationRunner")
-        if (config.get("Reports", "reportsEnabled") and
-                config.get("Reports", "writeProvenanceData") and
-                not config.getboolean("Machine", "virtual_board")):
-            algorithms.append("FrontEndCommonProvenanceGatherer")
+        outputs = [
+            "NoSyncChanges",
+            "BufferManager"
+        ]
 
-        executor = PACMANAlgorithmExecutor(
-            algorithms, [], inputs, self._xml_paths, [], self._do_timings)
-        executor.execute_mapping()
+        if not self._use_virtual_board:
+            algorithms.append("FrontEndCommonApplicationRunner")
 
-        # gather provenance data from the executor itself if needed
-        if (config.get("Reports", "writeProvenanceData") and
-                not config.getboolean("Machine", "virtual_board")):
-            pacman_executor_file_path = os.path.join(
-                self._provenance_file_path, "PACMAN_provancence_data.xml")
-            executor.write_provenance_data_in_xml(
-                pacman_executor_file_path, self._txrx)
+        executor = None
+        try:
+            executor = PACMANAlgorithmExecutor(
+                algorithms, [], inputs, self._xml_paths, outputs,
+                self._do_timings, self._print_timings)
+            executor.execute_mapping()
+            self._pacman_provenance.extract_provenance(executor)
+        except PacmanAlgorithmFailedToCompleteException as e:
+
+            logger.error(
+                "An error has occurred during simulation - "
+                "attempting to extract data")
+            for line in traceback.format_tb(e.traceback):
+                logger.error(line.strip())
+            logger.error(e.exception)
+
+            # If an exception occurs during a run, attempt to get
+            # information out of the simulation before shutting down
+            self._recover_from_error(e, executor.get_items())
+
+            # self._txrx.stop_application(self._app_id)
+
+            exc_info = sys.exc_info()
+            raise exc_info[0], exc_info[1], exc_info[2]
 
         self._current_run_timesteps = total_run_timesteps
+        self._last_run_outputs = executor.get_items()
         self._no_sync_changes = executor.get_item("NoSyncChanges")
         self._buffer_manager = executor.get_item("BufferManager")
         self._has_reset_last = False
         self._has_ran = True
+
+    def _extract_provenance(self):
+        if (config.get("Reports", "reportsEnabled") and
+                config.get("Reports", "writeProvenanceData") and
+                not self._use_virtual_board):
+
+            prov_items = None
+            provenance_outputs = None
+            if (self._last_run_outputs is not None and
+                    not self._use_virtual_board):
+                inputs = dict(self._last_run_outputs)
+                algorithms = list()
+                outputs = list()
+
+                algorithms.append("FrontEndCommonPlacementsProvenanceGatherer")
+                algorithms.append("FrontEndCommonRouterProvenanceGatherer")
+                outputs.append("ProvenanceItems")
+
+                executor = PACMANAlgorithmExecutor(
+                    algorithms, [], inputs, self._xml_paths, outputs,
+                    self._do_timings, self._print_timings)
+                executor.execute_mapping()
+                self._pacman_provenance.extract_provenance(executor)
+                provenance_outputs = executor.get_items()
+                prov_items = executor.get_item("ProvenanceItems")
+                prov_items.extend(self._pacman_provenance.data_items)
+            else:
+                prov_items = self._pacman_provenance.data_items
+                if self._load_outputs is not None:
+                    provenance_outputs = self._load_outputs
+                else:
+                    provenance_outputs = self._mapping_outputs
+
+            self._write_provenance(provenance_outputs)
+            self._check_provenance(prov_items)
+
+    def _write_provenance(self, provenance_outputs):
+        """ Write provenance to disk
+        """
+        writer_algorithms = list()
+        if self._provenance_format == "xml":
+            writer_algorithms.append("FrontEndCommonProvenanceXMLWriter")
+        elif self._provenance_format == "json":
+            writer_algorithms.append("FrontEndCommonProvenanceJSONWriter")
+        executor = PACMANAlgorithmExecutor(
+            writer_algorithms, [], provenance_outputs, self._xml_paths,
+            [], self._do_timings, self._print_timings)
+        executor.execute_mapping()
+
+    def _check_provenance(self, items):
+        """ Display any errors from provenance data
+        """
+        for item in items:
+            if item.report:
+                logger.warn(item.message)
+
+    def _recover_from_error(self, e, error_outputs):
+        error = e.exception
+        has_failed_to_start = isinstance(
+            error, ExecutableFailedToStartException)
+        has_failed_to_end = isinstance(
+            error, ExecutableFailedToStopException)
+
+        # If we have failed to start or end, get some extra data
+        if has_failed_to_start or has_failed_to_end:
+            is_rte = True
+            if has_failed_to_end:
+                is_rte = error.is_rte
+
+            inputs = dict(error_outputs)
+            inputs["FailedCoresSubsets"] = error.failed_core_subsets
+            inputs["RanToken"] = True
+            algorithms = list()
+            outputs = list()
+
+            # If there is not an RTE, ask the chips with an error to update
+            # and get the provenance data
+            if not is_rte:
+                algorithms.append("FrontEndCommonChipProvenanceUpdater")
+                algorithms.append("FrontEndCommonPlacementsProvenanceGatherer")
+
+            # Get the other data
+            algorithms.append("FrontEndCommonIOBufExtractor")
+            algorithms.append("FrontEndCommonRouterProvenanceGatherer")
+
+            outputs.append("ProvenanceItems")
+            outputs.append("IOBuffers")
+            outputs.append("ErrorMessages")
+            outputs.append("WarnMessages")
+
+            executor = PACMANAlgorithmExecutor(
+                algorithms, [], inputs, self._xml_paths, outputs,
+                self._do_timings, self._print_timings)
+            executor.execute_mapping()
+
+            self._write_provenance(executor.get_items())
+            self._check_provenance(executor.get_item("ProvenanceItems"))
+            self._write_iobuf(executor.get_item("IOBuffers"))
+            self._print_iobuf(
+                executor.get_item("ErrorMessages"),
+                executor.get_item("WarnMessages"))
+
+    def _extract_iobuf(self):
+        if (config.getboolean("Reports", "extract_iobuf") and
+                self._last_run_outputs is not None and
+                not self._use_virtual_board):
+            inputs = self._last_run_outputs
+            algorithms = ["FrontEndCommonIOBufExtractor"]
+            outputs = ["IOBuffers"]
+            executor = PACMANAlgorithmExecutor(
+                algorithms, [], inputs, self._xml_paths, outputs,
+                self._do_timings, self._print_timings)
+            executor.execute_mapping()
+            self._write_iobuf(executor.get_item("IOBuffers"))
+
+    def _write_iobuf(self, iobufs):
+        for iobuf in iobufs:
+            file_name = os.path.join(
+                self._provenance_file_path,
+                "{}_{}_{}.txt".format(iobuf.x, iobuf.y, iobuf.p))
+            count = 2
+            while os.path.exists(file_name):
+                file_name = os.path.join(
+                    self._provenance_file_path,
+                    "{}_{}_{}-{}.txt".format(iobuf.x, iobuf.y, iobuf.p, count))
+                count += 1
+            writer = open(file_name, "w")
+            writer.write(iobuf.iobuf)
+            writer.close()
+
+    def _print_iobuf(self, errors, warnings):
+        for warning in warnings:
+            logger.warn(warning)
+        for error in errors:
+            logger.error(error)
 
     def reset(self):
         """ Code that puts the simulation back at time zero
@@ -638,6 +834,10 @@ class Spinnaker(object):
 
         logger.info("Starting reset progress")
         if self._txrx is not None:
+
+            # Get provenance up to this point
+            self._extract_provenance()
+            self._extract_iobuf()
             self._txrx.stop_application(self._app_id)
 
         # rewind the buffers from the buffer manager, to start at the beginning
@@ -818,6 +1018,10 @@ class Spinnaker(object):
     def buffer_manager(self):
         return self._buffer_manager
 
+    @property
+    def use_virtual_board(self):
+        return self._use_virtual_board
+
     def get_current_time(self):
         """
 
@@ -949,8 +1153,11 @@ class Spinnaker(object):
         for population in self._populations:
             population._end()
 
+        self._extract_provenance()
+        self._extract_iobuf()
+
         # if not a virtual machine, then shut down stuff on the board
-        if not config.getboolean("Machine", "virtual_board"):
+        if not self._use_virtual_board:
 
             if turn_off_machine is None:
                 turn_off_machine = \

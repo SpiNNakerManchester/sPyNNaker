@@ -91,7 +91,7 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
         """
         if self._stored_synaptic_data_from_machine is None:
             timer = None
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
+            if conf.config.getboolean("Reports", "display_algorithm_timings"):
                 timer = Timer()
                 timer.start_timing()
 
@@ -139,7 +139,7 @@ class DelayPartitionableEdge(ProjectionPartitionableEdge):
             progress_bar.end()
             self._stored_synaptic_data_from_machine = synaptic_list
 
-            if conf.config.getboolean("Reports", "outputTimesForSections"):
+            if conf.config.getboolean("Reports", "display_algorithm_timings"):
                 logger.info("Time to read matrix: {}".format(
                     timer.take_sample()))
 

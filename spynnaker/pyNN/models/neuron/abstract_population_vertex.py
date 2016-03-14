@@ -1,3 +1,12 @@
+
+# pacman imports
+from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+    import AbstractPartitionableVertex
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
+
+# front end common imports
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_partition_constraints import \
     AbstractProvidesIncomingPartitionConstraints
@@ -5,13 +14,14 @@ from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utilities import constants as \
-    front_end_common_constants
+    common_constants
 from spinn_front_end_common.interface.buffer_management\
     .buffer_models.receives_buffers_to_host_basic_impl \
     import ReceiveBuffersToHostBasicImpl
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
 
-from spynnaker.pyNN.models.common.buffered_partitioned_vertex import \
-    BufferedPartitionedVertex
+# spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.common import recording_utils
@@ -21,12 +31,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
 from spynnaker.pyNN.models.abstract_models.abstract_mappable \
     import AbstractMappable
-from data_specification.data_specification_generator \
-    import DataSpecificationGenerator
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
@@ -38,10 +42,12 @@ from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN.models.neuron.population_partitioned_vertex \
+    import PopulationPartitionedVertex
 
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
-    import KeyAllocatorContiguousRangeContraint
+# dsg imports
+from data_specification.data_specification_generator \
+    import DataSpecificationGenerator
 
 from abc import ABCMeta
 from six import add_metaclass
@@ -148,7 +154,7 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
 
-        subvertex = BufferedPartitionedVertex(
+        subvertex = PopulationPartitionedVertex(
             resources_required, label, constraints)
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
@@ -227,22 +233,25 @@ class AbstractPopulationVertex(
         if self._additional_input is not None:
             per_neuron_usage += \
                 self._additional_input.get_sdram_usage_per_neuron_in_bytes()
-        return ((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+        return ((common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
                 ReceiveBuffersToHostBasicImpl.get_recording_data_size(3) +
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._neuron_model.get_sdram_usage_in_bytes(
                     vertex_slice.n_atoms))
 
-    # @implements AbstractPopulationVertex.get_sdram_usage_for_atoms
+    # @implements AbstractPartitionableVertex.get_sdram_usage_for_atoms
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         sdram_requirement = (
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(3) +
+            PopulationPartitionedVertex.get_provenance_data_size(
+                PopulationPartitionedVertex
+                .N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, graph.incoming_edges_to_vertex(self)) +
             (self._get_number_of_mallocs_used_by_dsg(
                 vertex_slice, graph.incoming_edges_to_vertex(self)) *
-             front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
+             common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
 
         # add recording SDRAM if not automatically calculated
         if not self._using_auto_pause_and_resume:
@@ -296,8 +305,9 @@ class AbstractPopulationVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=((constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-                  subvertex.get_recording_data_size(3)), label='System')
+            size=((
+                common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+                subvertex.get_recording_data_size(3)), label='System')
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
@@ -312,6 +322,8 @@ class AbstractPopulationVertex(
              constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value],
             [spike_history_region_sz, v_history_region_sz,
              gsyn_history_region_sz])
+
+        subvertex.reserve_provenance_data_region(spec)
 
     def _write_setup_info(
             self, spec, spike_history_region_sz, neuron_potential_region_sz,
