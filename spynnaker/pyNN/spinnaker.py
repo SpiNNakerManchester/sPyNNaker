@@ -498,7 +498,10 @@ class Spinnaker(object):
                 algorithms.append(
                     "FrontEndCommonNetworkSpecificationPartitionableReport")
 
-        algorithms.extend(config.get("Mapping", "algorithms").split(","))
+        algorithms.extend(config.get(
+            "Mapping", "partitionable_to_partitioned_algorithms").split(","))
+        algorithms.extend(config.get(
+            "Mapping", "partitioned_to_machine_algorithms").split(","))
 
         outputs = [
             "MemoryPlacements", "MemoryRoutingTables",
