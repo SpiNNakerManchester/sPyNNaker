@@ -3,7 +3,7 @@ MODELS = IF_curr_exp \
          IZK_curr_exp \
          IZK_cond_exp \
          IF_curr_exp_dual \
-         IF_curr_exp_stdp_pair_additive \
+#         IF_curr_exp_stdp_pair_additive \
          IF_curr_exp_stdp_pair_multiplicative \
          IF_curr_exp_stdp_nearest_pair_additive \
          IF_curr_exp_stdp_nearest_pair_multiplicative \
