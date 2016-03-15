@@ -7,7 +7,7 @@
 * because both excitatory and inhibitory synaptic time-constants
 * (and thus propogators) are identical.
 *
-* This also includes a 'supervisor' synapse that provides a target spike time 
+* This also has a 'supervisor' synapse that provides a target spike time
 * and does NOT provide any postsynaptic neuron input
 */
 
@@ -22,20 +22,19 @@
 #define SYNAPSE_TYPE_COUNT 3
 
 #include "../decay.h"
-#include "../../common/out_spikes.h"
 #include <debug.h>
-#include <string.h>
 
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
 typedef struct synapse_param_t {
-    decay_t neuron_synapse_decay;
-    decay_t neuron_synapse_init;
+    decay_t exc_decay;
+    decay_t exc_init;
+    decay_t inh_decay;
+    decay_t inh_init;
 } synapse_param_t;
 
 #include "synapse_types.h"
-#include "../plasticity/synapse_dynamics.h"
 
 typedef enum input_buffer_regions {
     EXCITATORY, INHIBITORY, TARGET,
@@ -72,8 +71,8 @@ static inline index_t _in_offset(index_t neuron_index) {
 //! Corresponds to the parameters of the neuron currently being considered.
 //! \return the decay amount for the excitatory input
 static inline decay_t _ex_decay(
-        synapse_param_t **parameters, index_t neuron_index) {
-    return (parameters[0][neuron_index].neuron_synapse_decay);
+        synapse_param_t *parameters, index_t neuron_index) {
+    return (parameters[neuron_index].exc_decay);
 }
 
 //! \brief method which deduces how much decay to put on a inhibitory input
@@ -85,8 +84,8 @@ static inline decay_t _ex_decay(
 //! Corresponds to the parameters of the neuron currently being considered.
 //! \return the decay amount for the inhibitory input
 static inline decay_t _in_decay(
-        synapse_param_t **parameters, index_t neuron_index) {
-    return (parameters[1][neuron_index].neuron_synapse_decay);
+        synapse_param_t *parameters, index_t neuron_index) {
+    return (parameters[neuron_index].inh_decay);
 }
 
 //! \brief decays the stuff thats sitting in the input buffers
@@ -100,9 +99,9 @@ static inline decay_t _in_decay(
 //! \param[in] parameters the parameters retrieved from SDRAM which cover how
 //! to initialise the synapse shaping rules.
 //! \return nothing
-static inline void synapse_types_shape_input( input_t *input_buffers, 
-    index_t neuron_index, synapse_param_t** parameters) {
-    
+static inline void synapse_types_shape_input(
+        input_t *input_buffers, index_t neuron_index,
+        synapse_param_t* parameters) {
     // decay the excitatory inputs
     input_buffers[_ex_offset(neuron_index)] = decay_s1615(
             input_buffers[_ex_offset(neuron_index)],
@@ -126,10 +125,16 @@ static inline void synapse_types_shape_input( input_t *input_buffers,
 //! \return None
 static inline void synapse_types_add_neuron_input(
         input_t *input_buffers, index_t synapse_type_index,
-        index_t neuron_index, synapse_param_t** parameters, input_t input) {
-    input_buffers[synapse_types_get_input_buffer_index(synapse_type_index,
-        neuron_index)] += decay_s1615(input,
-            parameters[synapse_type_index][neuron_index].neuron_synapse_init);
+        index_t neuron_index, synapse_param_t* parameters, input_t input) {
+    if (synapse_type_index == EXCITATORY) {
+        uint32_t index = _ex_offset(neuron_index);
+        input_buffers[index] = input_buffers[index] + decay_s1615(
+            input, parameters[neuron_index].exc_init);
+    } else if (synapse_type_index == INHIBITORY) {
+        uint32_t index = _in_offset(neuron_index);
+        input_buffers[index] = input_buffers[index] + decay_s1615(
+            input, parameters[neuron_index].inh_init);
+    }
 }
 
 //! \brief extracts the excitatory input buffers from the buffers available
@@ -182,6 +187,13 @@ static inline void synapse_types_print_input(
     io_printf(IO_BUF, "%12.6k - %12.6k",
               input_buffers[_ex_offset(neuron_index)],
               input_buffers[_in_offset(neuron_index)]);
+}
+
+static inline void synapse_types_print_parameters(synapse_param_t *parameters) {
+    log_debug("exc_decay = %R\n", (unsigned fract) parameters->exc_decay);
+    log_debug("exc_init  = %R\n", (unsigned fract) parameters->exc_init);
+    log_debug("inh_decay = %R\n", (unsigned fract) parameters->inh_decay);
+    log_debug("inh_init  = %R\n", (unsigned fract) parameters->inh_init);
 }
 
 #endif  // _SYNAPSE_TYPES_EXPONENTIAL_IMPL_H_

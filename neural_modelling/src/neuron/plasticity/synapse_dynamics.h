@@ -21,6 +21,10 @@ void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
+// function for supervised learning ----------------------------
+void synapse_dynamics_process_target_synaptic_event(
+         uint32_t time, index_t neuron_index);
+
 //! \brief returns the counters for plastic pre synaptic events based
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
 //!        returns 0

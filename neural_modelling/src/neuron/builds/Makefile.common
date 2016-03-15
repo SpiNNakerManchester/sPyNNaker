@@ -40,7 +40,8 @@ SYNAPSE_TYPE_OBJECTS += $(BUILD_DIR)neuron/c_main.o \
                         $(BUILD_DIR)neuron/population_table_binary_search_impl.o \
                         $(BUILD_DIR)neuron/plasticity/synapse_dynamics_static_impl.o
                        
-STDP += $(BUILD_DIR)neuron/plasticity/stdp/synapse_dynamics_stdp_mad_impl.o \
+STDP += $(BUILD_DIR)neuron/plasticity/stdp/synapse_dynamics_stdp_target_impl.o \
+        $(BUILD_DIR)neuron/plasticity/stdp/synapse_dynamics_stdp_mad_impl.o \
         $(BUILD_DIR)neuron/plasticity/stdp/synapse_dynamics_stdp_impl.o \
         $(BUILD_DIR)neuron/plasticity/common/post_events.o
 
@@ -48,7 +49,8 @@ STDP_WEIGHT_DEPENDENCE += $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/w
                           $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_additive_two_term_impl.o \
                           $(BUILD_DIR)neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.o
 
-STDP_TIMING_DEPENDENCE += $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_nearest_pair_impl.o \
+STDP_TIMING_DEPENDENCE += $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_target_pair_impl.o \
+                          $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_nearest_pair_impl.o \
                           $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pair_impl.o \
                           $(BUILD_DIR)neuron/plasticity/stdp/timing_dependence/timing_pfister_triplet_impl.o
 

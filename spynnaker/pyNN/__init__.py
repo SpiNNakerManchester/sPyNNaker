@@ -40,6 +40,8 @@ from spynnaker.pyNN.models.neuron.builds.izk_curr_exp \
     import IzkCurrExp as IZK_curr_exp
 from spynnaker.pyNN.models.neuron.builds.izk_cond_exp \
     import IzkCondExp as IZK_cond_exp
+from spynnaker.pyNN.models.neural_models.if_curr_target_exp \
+    import IFCurrentTargetExponentialPopulation as IF_curr_target_exp
 
 # neural projections
 from spynnaker.pyNN.models.neural_projections\
