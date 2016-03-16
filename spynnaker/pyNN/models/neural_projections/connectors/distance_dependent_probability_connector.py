@@ -121,7 +121,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         n_connections = self._get_n_connections(
             pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms,
             pre_vertex_slice, post_vertex_slice)
-        return self._get_weight_mean(self._weights, n_connections, None)
+        return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,

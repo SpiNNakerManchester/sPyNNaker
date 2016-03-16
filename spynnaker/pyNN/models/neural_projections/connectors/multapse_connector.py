@@ -135,8 +135,7 @@ class MultapseConnector(AbstractConnector):
             return 0
         connection_slice = self._get_connection_slice(
             pre_slice_index, post_slice_index)
-        return self._get_weight_mean(
-            self._weights, n_connections, [connection_slice])
+        return self._get_weight_mean(self._weights, [connection_slice])
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,

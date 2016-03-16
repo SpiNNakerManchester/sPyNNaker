@@ -194,17 +194,6 @@ class AbstractPopulationVertex(
                 buffered_sdram_per_timestep=sdram_per_ts)
         return subvertex
 
-        # Set up for delay management
-        self._delay_vertex = None
-
-    @property
-    def delay_vertex(self):
-        return self._delay_vertex
-
-    @delay_vertex.setter
-    def delay_vertex(self, delay_vertex):
-        self._delay_vertex = delay_vertex
-
     @property
     def maximum_delay_supported_in_ms(self):
         return self._synapse_manager.maximum_delay_supported_in_ms
@@ -493,7 +482,7 @@ class AbstractPopulationVertex(
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, subvertex, placement, partitioned_graph,
-            graph, routing_info, hostname, graph_mapper, self._input_type)
+            graph, routing_info, graph_mapper, self._input_type)
 
         # End the writing of this specification:
         spec.end_specification()

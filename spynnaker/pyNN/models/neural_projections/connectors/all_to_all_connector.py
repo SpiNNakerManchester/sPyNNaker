@@ -95,8 +95,7 @@ class AllToAllConnector(AbstractConnector):
             n_connections -= post_vertex_slice.n_atoms
         connection_slices = self._connection_slices(
             pre_vertex_slice, post_vertex_slice)
-        return self._get_weight_mean(
-            self._weights, n_connections, connection_slices)
+        return self._get_weight_mean(self._weights, connection_slices)
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,

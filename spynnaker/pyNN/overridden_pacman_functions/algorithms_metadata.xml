@@ -41,6 +41,10 @@
         <parameters>
         </parameters>
         <produces_outputs>
+            <parameter>
+                <param_name>subgraph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
         </produces_outputs>
     </algorithm>
     <algorithm name="EdgeToNKeysMapper">
@@ -230,12 +234,6 @@
                 <param_type>ApplicationDataFolder</param_type>
             </parameter>
         </required_inputs>
-        <optional_inputs>
-            <parameter>
-                <param_name>do_write</param_name>
-                <param_type>DoWriteFlag</param_type>
-            </parameter>
-        </optional_inputs>
         <produces_outputs>
             <parameter>
                 <param_name>executable_targets</param_name>

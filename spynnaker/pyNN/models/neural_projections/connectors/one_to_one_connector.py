@@ -81,8 +81,7 @@ class OneToOneConnector(AbstractConnector):
         if n_connections <= 0:
             return 0
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
-        return self._get_weight_mean(
-            self._weights, n_connections, [connection_slice])
+        return self._get_weight_mean(self._weights, [connection_slice])
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,

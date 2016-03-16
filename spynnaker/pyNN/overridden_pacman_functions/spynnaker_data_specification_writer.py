@@ -17,7 +17,7 @@ class SpynnakerDataSpecificationWriter(
             self, placements, graph_mapper, tags, executable_finder,
             partitioned_graph, partitionable_graph, routing_infos, hostname,
             report_default_directory, write_text_specs,
-            app_data_runtime_folder, do_write=True):
+            app_data_runtime_folder):
 
         # Keep the results
         executable_targets = ExecutableTargets()
@@ -42,7 +42,7 @@ class SpynnakerDataSpecificationWriter(
                     dsg_targets, graph_mapper, tags, executable_finder,
                     partitioned_graph, partitionable_graph, routing_infos,
                     hostname, report_default_directory, write_text_specs,
-                    app_data_runtime_folder, do_write)
+                    app_data_runtime_folder)
                 progress_bar.update()
 
         for placement, associated_vertex in delay_extension_placements:
@@ -51,7 +51,7 @@ class SpynnakerDataSpecificationWriter(
                 dsg_targets, graph_mapper, tags, executable_finder,
                 partitioned_graph, partitionable_graph, routing_infos,
                 hostname, report_default_directory, write_text_specs,
-                app_data_runtime_folder, do_write)
+                app_data_runtime_folder)
             progress_bar.update()
 
         # finish the progress bar

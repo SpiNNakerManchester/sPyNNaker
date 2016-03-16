@@ -42,22 +42,27 @@ class SynapseIORowBased(AbstractSynapseIO):
         # that will be needed by any row for both rows with delay extensions
         # and rows without
         max_delay_supported = self.get_maximum_delay_supported_in_ms()
-        next_max_delay_supported = (
-            max_delay_supported + numpy.finfo(numpy.double).tiny)
         max_delay = max_delay_supported * (n_delay_stages + 1)
 
+        # delay point where delay extensions start
+        min_delay_for_delay_extension = (
+            max_delay_supported + numpy.finfo(numpy.double).tiny)
+
+        # row length for the undelayed synaptic matrix
         max_undelayed_row_length = synapse_info.connector\
             .get_n_connections_from_pre_vertex_maximum(
                 n_pre_slices, pre_slice_index, n_post_slices,
                 post_slice_index, pre_vertex_slice, post_vertex_slice,
                 0, max_delay_supported)
+
+        # determine the max row length in the delay extension
         max_delayed_row_length = 0
         if n_delay_stages > 0:
             max_delayed_row_length = synapse_info.connector\
                 .get_n_connections_from_pre_vertex_maximum(
                     n_pre_slices, pre_slice_index, n_post_slices,
                     post_slice_index, pre_vertex_slice, post_vertex_slice,
-                    next_max_delay_supported, max_delay)
+                    min_delay_for_delay_extension, max_delay)
 
         # Get the row sizes
         dynamics = synapse_info.synapse_dynamics
@@ -92,7 +97,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_bytes_delayed = (
                 ((_N_HEADER_WORDS * 4) + delayed_max_bytes) *
                 pre_vertex_slice.n_atoms * n_delay_stages)
-        return (n_bytes_undelayed, n_bytes_delayed)
+        return n_bytes_undelayed, n_bytes_delayed
 
     @staticmethod
     def _get_max_row_length_and_row_data(
@@ -155,7 +160,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms()
         if max_delay is not None:
-            max_delay = max_delay * (1000.0 / self._machine_time_step)
+            max_delay *= (1000.0 / self._machine_time_step)
 
         # Get the actual connections
         connections = synapse_info.connector.create_synaptic_block(
@@ -233,7 +238,8 @@ class SynapseIORowBased(AbstractSynapseIO):
         return (row_data, max_row_length, delayed_row_data,
                 max_delayed_row_length, delayed_source_ids, stages)
 
-    def _get_static_data(self, row_data, dynamics):
+    @staticmethod
+    def _get_static_data(row_data, dynamics):
         n_rows = row_data.shape[0]
         ff_size = row_data[:, 1]
         ff_words = dynamics.get_n_static_words_per_row(ff_size)
@@ -243,7 +249,8 @@ class SynapseIORowBased(AbstractSynapseIO):
             ff_size,
             [row_data[row, ff_start:ff_end[row]] for row in range(n_rows)])
 
-    def _get_plastic_data(self, row_data, dynamics):
+    @staticmethod
+    def _get_plastic_data(row_data, dynamics):
         n_rows = row_data.shape[0]
         pp_size = row_data[:, 0]
         pp_words = dynamics.get_n_plastic_plastic_words_per_row(pp_size)

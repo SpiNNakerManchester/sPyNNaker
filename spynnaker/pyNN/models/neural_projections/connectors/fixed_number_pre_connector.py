@@ -98,8 +98,7 @@ class FixedNumberPreConnector(AbstractConnector):
             return 0.0
         pre_neurons = self._pre_neurons_in_slice(pre_vertex_slice)
         n_connections = len(pre_neurons) * post_vertex_slice.n_atoms
-        return self._get_weight_mean(
-            self._weights, n_connections, None)
+        return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,

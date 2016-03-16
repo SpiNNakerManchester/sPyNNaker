@@ -91,8 +91,7 @@ class FixedNumberPostConnector(AbstractConnector):
             return 0.0
         post_neurons = self._post_neurons_in_slice(post_vertex_slice)
         n_connections = pre_vertex_slice.n_atoms * len(post_neurons)
-        return self._get_weight_mean(
-            self._weights, n_connections, None)
+        return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,

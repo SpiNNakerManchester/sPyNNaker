@@ -95,13 +95,13 @@ class AbstractConnector(object):
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_in_range)))
         elif numpy.isscalar(delays):
-            if delays >= min_delay and delays <= max_delay:
+            if min_delay <= delays <= max_delay:
                 return int(math.ceil(n_connections))
             return 0
         elif hasattr(delays, "__getitem__"):
             n_delayed = sum([len([
                 delay for delay in delays[connection_slice]
-                if delay >= min_delay and delay <= max_delay])
+                if min_delay <= delay <= max_delay])
                 for connection_slice in connection_slices])
             n_total = sum([
                 len(delays[connection_slice])
@@ -133,7 +133,7 @@ class AbstractConnector(object):
         """
 
     @staticmethod
-    def _get_weight_mean(weights, n_connections, connection_slices):
+    def _get_weight_mean(weights, connection_slices):
         """ Get the mean of the weights
         """
         if isinstance(weights, RandomDistribution):

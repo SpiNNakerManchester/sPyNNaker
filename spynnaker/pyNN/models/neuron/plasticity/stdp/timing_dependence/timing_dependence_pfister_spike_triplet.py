@@ -8,9 +8,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
 import logging
 logger = logging.getLogger(__name__)
 
-# Constants
-# **NOTE** these should be passed through magical per-vertex build setting
-# thing
+# TODO. When moving to the c make file adding magic numbers, these should be pushed in there.
 LOOKUP_TAU_PLUS_SIZE = 256
 LOOKUP_TAU_PLUS_SHIFT = 0
 LOOKUP_TAU_MINUS_SIZE = 256

@@ -30,7 +30,7 @@ enum parameter_positions {
 static uint32_t key = 0;
 static uint32_t incoming_key = 0;
 static uint32_t incoming_mask = 0;
-static uint32_t incoming_key_mask = 0;
+static uint32_t incoming_neuron_mask = 0;
 static uint32_t num_neurons = 0;
 static uint32_t time = UINT32_MAX;
 static uint32_t simulation_ticks = 0;
@@ -59,15 +59,14 @@ static bool read_parameters(address_t address) {
 
     log_info("read_parameters: starting");
 
-    // changed from above for new file format 13-1-2014
     key = address[KEY];
     incoming_key = address[INCOMING_KEY];
     incoming_mask = address[INCOMING_MASK];
-    incoming_key_mask = ~incoming_mask;
+    incoming_neuron_mask = ~incoming_mask;
     log_info(
         "\t key = 0x%08x, incoming key = 0x%08x, incoming mask = 0x%08x,"
         "incoming key mask = 0x%08x",
-        key, incoming_key, incoming_mask, incoming_key_mask);
+        key, incoming_key, incoming_mask, incoming_neuron_mask);
 
     num_neurons = address[N_ATOMS];
     neuron_bit_field_words = get_bit_field_size(num_neurons);
@@ -172,7 +171,7 @@ void incoming_spike_callback(uint key, uint payload) {
 
 // Gets the neuron id of the incoming spike
 static inline key_t _key_n(key_t k) {
-    return k & incoming_key_mask;
+    return k & incoming_neuron_mask;
 }
 
 void spike_process(uint unused0, uint unused1) {

@@ -87,14 +87,14 @@ class Projection(object):
 
         # check if all delays requested can fit into the natively supported
         # delays in the models
-        delay_extention_max_supported_delay = (
+        delay_extension_max_supported_delay = (
             constants.MAX_DELAY_BLOCKS *
             constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
         post_vertex_max_supported_delay_ms = \
             postsynaptic_population._get_vertex.maximum_delay_supported_in_ms
 
         if max_delay > (post_vertex_max_supported_delay_ms +
-                        delay_extention_max_supported_delay):
+                        delay_extension_max_supported_delay):
             raise exceptions.ConfigurationException(
                 "The maximum delay {} for projection is not supported".format(
                     max_delay))
@@ -133,9 +133,9 @@ class Projection(object):
         # If the delay exceeds the post vertex delay, add a delay extension
         if max_delay > post_vertex_max_supported_delay_ms:
             delay_edge = self._add_delay_extension(
-                presynaptic_population, postsynaptic_population, label,
-                max_delay, post_vertex_max_supported_delay_ms,
-                machine_time_step, timescale_factor)
+                presynaptic_population, postsynaptic_population, max_delay,
+                post_vertex_max_supported_delay_ms, machine_time_step,
+                timescale_factor)
             self._projection_edge.delay_edge = delay_edge
         spinnaker_control._add_projection(self)
 
@@ -187,7 +187,7 @@ class Projection(object):
         return None
 
     def _add_delay_extension(
-            self, presynaptic_population, postsynaptic_population, label,
+            self, presynaptic_population, postsynaptic_population,
             max_delay_for_projection, max_delay_per_neuron, machine_time_step,
             timescale_factor):
         """ Instantiate delay extension component

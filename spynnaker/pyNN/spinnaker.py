@@ -437,8 +437,6 @@ class Spinnaker(object):
             "Machine", "reset_machine_on_startup")
         inputs["MaxSDRAMSize"] = self._read_config_int(
             "Machine", "max_sdram_allowed_per_chip")
-        inputs["DoWriteFlag"] = config.getboolean("Mode", "do_write")
-        inputs["DoLoadFlag"] = config.getboolean("Mode", "do_load")
 
         # add paths for each file based version
         inputs["FileCoreAllocationsFilePath"] = os.path.join(
@@ -1156,9 +1154,6 @@ class Spinnaker(object):
 
         self._extract_provenance()
         self._extract_iobuf()
-
-        if not config.getboolean("Mode", "do_stop"):
-            return
 
         # if not a virtual machine, then shut down stuff on the board
         if not self._use_virtual_board:

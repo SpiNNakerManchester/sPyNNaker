@@ -30,4 +30,4 @@ class GraphEdgeWeightUpdater(object):
         progress_bar.end()
 
         # return nothing
-        return {}
+        return {'subgraph': subgraph}

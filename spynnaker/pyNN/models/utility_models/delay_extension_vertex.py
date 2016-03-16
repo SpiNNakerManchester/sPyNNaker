@@ -160,6 +160,8 @@ class DelayExtensionVertex(
         incoming_mask = None
         incoming_edges = partitioned_graph.incoming_subedges_from_subvertex(
             subvertex)
+
+
         for incoming_edge in incoming_edges:
             incoming_slice = graph_mapper.get_subvertex_slice(
                 incoming_edge.pre_subvertex)
