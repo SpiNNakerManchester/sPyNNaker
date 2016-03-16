@@ -1,16 +1,5 @@
-/*
- * Below is the program trace to show how 3 variables evolve given 
- * targets at 10ms,20ms and a doublet at 30ms,31ms:
- *
- * 10 ms target              |  20 ms target              |  30 ms doublet             |  31 ms doublet
- * --------------------------|----------------------------|----------------------------|----------------------------
- *                           |                            |                            |  updateWeight=accumulator20
- * accumulator+=accumLast0   |  accumulator+=accumLast10  |  accumulator+=accumLast20  |  accumulator=0
- * accumLast=PSP10           |  accumLast=PSP20           |  accumLast=PSP30           |  accumLast=0
- *
- */
-
-
+#ifndef _TIMING_TARGET_PAIR_IMPL_H_
+#define _TIMING_TARGET_PAIR_IMPL_H_
 
 //---------------------------------------
 // Typedefines
@@ -20,24 +9,10 @@ typedef struct post_trace_t {
   uint8_t trace;
   uint8_t ap; // this is an actual neuron action potential, not a target time
 } post_trace_t;
-
 typedef int16_t pre_trace_t;
 
-static uint32_t last_target_time = 0; // the last time a target passed through here
-
 #include "../synapse_structure/synapse_structure_weight_target.h"
-
-//#include "timing.h"
-
-//#include "../synapse_structure/synapse_structure.h"
-
-address_t timing_initialise(address_t address);
-static post_trace_t timing_get_initial_post_trace();
-static update_state_t timing_apply_post_spike(
-    uint32_t time, post_trace_t trace, uint32_t last_pre_time,
-    pre_trace_t last_pre_trace, uint32_t last_post_time,
-    post_trace_t last_post_trace, update_state_t previous_state);
-
+#include "timing.h"
 #include "../weight_dependence/weight_one_term.h"
 
 // Include debug header for log_info etc
@@ -46,6 +21,19 @@ static update_state_t timing_apply_post_spike(
 // Include generic plasticity maths functions
 #include "../../common/maths.h"
 #include "../../common/stdp_typedefs.h"
+
+// the last time a target passed through here
+static uint32_t last_target_time = 0;
+
+// initialize variables
+address_t timing_initialise(address_t address);
+static post_trace_t timing_get_initial_post_trace();
+
+// apply postsynaptic spike occuring after presynaptic input
+static update_state_t timing_apply_post_spike(
+    uint32_t time, post_trace_t trace, uint32_t last_pre_time,
+    pre_trace_t last_pre_trace, uint32_t last_post_time,
+    post_trace_t last_post_trace, update_state_t previous_state);
 
 //---------------------------------------
 // Macros
@@ -153,3 +141,4 @@ static inline update_state_t timing_apply_post_spike(
     return previous_state;
 }
 
+#endif // _TIMING_TARGET_PAIR_IMPL_H_

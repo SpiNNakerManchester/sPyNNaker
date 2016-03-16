@@ -14,7 +14,7 @@
 #include <debug.h>
 
 #ifdef SYNAPSE_BENCHMARK
- uint32_t num_plastic_pre_synaptic_events;
+uint32_t num_plastic_pre_synaptic_events;
 #endif  // SYNAPSE_BENCHMARK
 
 //---------------------------------------
@@ -40,7 +40,7 @@
 // |                           |                    |        SYNAPSE_TYPE_INDEX_BITS         |
 // |---------------------------|--------------------|----------------------------------------|
 #ifndef SYNAPSE_AXONAL_DELAY_BITS
-#define SYNAPSE_AXONAL_DELAY_BITS 3
+#define SYNAPSE_AXONAL_DELAY_BITS 0 // Changed this from 3 to 0, because there's no Target delay
 #endif
 
 #define SYNAPSE_AXONAL_DELAY_MASK ((1 << SYNAPSE_AXONAL_DELAY_BITS) - 1)
@@ -71,7 +71,7 @@ static inline final_state_t _plasticity_update_synapse(
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
         const post_event_history_t *post_event_history) {
-
+	use(new_pre_trace);
     use(delay_dendritic);
 
     // Apply axonal delay to time of last presynaptic spike
@@ -291,7 +291,6 @@ void synapse_dynamics_process_post_synaptic_event(
 
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
-    const uint32_t last_post_time = history->times[history->count_minus_one];
     post_trace_t last_post_trace  = history->traces[history->count_minus_one];
     
     // action potential (ap) is 1 if event comes from neuron, which it does in this function 
@@ -306,7 +305,6 @@ void synapse_dynamics_process_target_synaptic_event(
 
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
-    const uint32_t last_post_time = history->times[history->count_minus_one];
     post_trace_t last_post_trace  = history->traces[history->count_minus_one];
     
     // action potential (ap) is 0, denoting that event comes from target ring buffer

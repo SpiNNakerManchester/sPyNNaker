@@ -11,6 +11,5 @@ TIMING_DEPENDENCE = $(SOURCE_DIRS)/neuron/plasticity/stdp/timing_dependence/timi
 TIMING_DEPENDENCE_H = $(SOURCE_DIRS)/neuron/plasticity/stdp/timing_dependence/timing_target_pair_impl.h
 WEIGHT_DEPENDENCE = $(SOURCE_DIRS)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.o
 WEIGHT_DEPENDENCE_H = $(SOURCE_DIRS)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.h
-PLASTIC_SYNAPSE_STRUCTURE_H = $(SOURCE_DIRS)/neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_target.h
 
 include ../Makefile.common

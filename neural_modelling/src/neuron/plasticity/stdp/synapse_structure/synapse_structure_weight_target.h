@@ -27,8 +27,6 @@ typedef struct update_state_t {
 
 typedef plastic_synapse_t final_state_t;
 
-#include "synapse_structure.h"
-
 static inline update_state_t synapse_structure_get_update_state(
         plastic_synapse_t synaptic_word, index_t synapse_type) {
 
