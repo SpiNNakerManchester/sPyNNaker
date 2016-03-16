@@ -96,6 +96,7 @@ class Spinnaker(object):
         self._machine = None
         self._txrx = None
         self._buffer_manager = None
+        self._ip_address = None
         self._pacman_provenance = PacmanProvenanceExtractor()
 
         # database objects
@@ -537,6 +538,7 @@ class Spinnaker(object):
             else:
                 inputs["MemoryMachine"] = self._machine
                 inputs["MemoryTransceiver"] = self._txrx
+                inputs["IPAddress"] = self._ip_address
 
         # Add reports
         if config.getboolean("Reports", "reportsEnabled"):
@@ -580,8 +582,10 @@ class Spinnaker(object):
             "MemoryMachine", "MemoryRoutingInfos"]
         if not self._use_virtual_board:
             outputs.append("MemoryTransceiver")
-        if (self._spalloc_server is not None or
-                self._remote_spinnaker_url is not None):
+            outputs.append("IPAddress")
+        if (self._machine_allocation_controller is None and (
+                self._spalloc_server is not None or
+                self._remote_spinnaker_url is not None)):
             outputs.append("MachineAllocationContoller")
 
         # Execute the mapping algorithms
@@ -595,6 +599,7 @@ class Spinnaker(object):
         # Get the outputs needed
         if not self._use_virtual_board:
             self._txrx = executor.get_item("MemoryTransceiver")
+            self._ip_address = executor.get_item("IPAddress")
         self._placements = executor.get_item("MemoryPlacements")
         self._router_tables = executor.get_item("MemoryRoutingTables")
         self._tags = executor.get_item("MemoryTags")
