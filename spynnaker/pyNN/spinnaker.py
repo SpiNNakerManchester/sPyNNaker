@@ -519,6 +519,7 @@ class Spinnaker(object):
             elif self._remote_spinnaker_url is not None:
                 algorithms.append("FrontEndCommonHBPMaxMachineGenerator")
             algorithms.append("FrontEndCommonVirtualMachineGenerator")
+            algorithms.append("MallocBasedChipIDAllocator")
             if config.getboolean("Machine", "enable_reinjection"):
                 inputs["CPUsPerVirtualChip"] = 15
             else:
@@ -536,9 +537,6 @@ class Spinnaker(object):
             else:
                 inputs["MemoryMachine"] = self._machine
                 inputs["MemoryTransceiver"] = self._txrx
-
-        # always add extended machine builder
-        algorithms.append("MallocBasedChipIDAllocator")
 
         # Add reports
         if config.getboolean("Reports", "reportsEnabled"):
@@ -566,6 +564,13 @@ class Spinnaker(object):
 
         algorithms.extend(config.get(
             "Mapping", "partitionable_to_partitioned_algorithms").split(","))
+
+        # If using an allocator, we will need to do chip allocation again
+        # after partitioning
+        if (self._remote_spinnaker_url is not None or
+                self._spalloc_server is not None):
+            algorithms.append("MallocBasedChipIDAllocator")
+
         algorithms.extend(config.get(
             "Mapping", "partitioned_to_machine_algorithms").split(","))
 
