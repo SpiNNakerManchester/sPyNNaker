@@ -36,11 +36,12 @@ from enum import Enum
 import math
 import numpy
 import logging
+import random
 
 logger = logging.getLogger(__name__)
 
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
-PARAMS_BASE_WORDS = 4
+PARAMS_BASE_WORDS = 6
 PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
@@ -68,6 +69,10 @@ class SpikeSourcePoisson(
     # in terms of CPU (2900 at 10 times slow down is fine, but not at
     # real-time)
     _model_based_max_atoms_per_core = 500
+
+    # A count of the number of poisson subvertices, to work out the random
+    # back off range
+    _n_poisson_subvertices = 0
 
     def __init__(
             self, n_neurons, machine_time_step, timescale_factor,
@@ -111,6 +116,7 @@ class SpikeSourcePoisson(
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
+        SpikeSourcePoisson._n_poisson_subvertices += 1
         subvertex = SpikeSourcePoissonPartitionedVertex(
             resources_required, label, constraints)
         if not self._using_auto_pause_and_resume:
@@ -263,6 +269,10 @@ class SpikeSourcePoisson(
             # has a key, thus set has key to 1 and then add key
             spec.write_value(data=1)
             spec.write_value(data=key)
+
+        # Write the random back off value
+        spec.write_value(random.randint(
+            0, SpikeSourcePoisson._n_poisson_subvertices))
 
         # Write the random seed (4 words), generated randomly!
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
