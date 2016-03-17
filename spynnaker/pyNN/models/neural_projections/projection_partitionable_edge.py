@@ -1,6 +1,10 @@
+import logging
+import copy
+
+from spinn_machine.utilities.progress_bar import ProgressBar
+
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.timer import Timer
 
 from spynnaker.pyNN.utilities import conf
