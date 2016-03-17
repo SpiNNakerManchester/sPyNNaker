@@ -830,8 +830,10 @@ class Spinnaker(object):
                 else:
                     provenance_outputs = self._mapping_outputs
 
-            self._write_provenance(provenance_outputs)
-            self._check_provenance(prov_items)
+            if provenance_outputs is not None:
+                self._write_provenance(provenance_outputs)
+            if prov_items is not None:
+                self._check_provenance(prov_items)
 
     def _write_provenance(self, provenance_outputs):
         """ Write provenance to disk
