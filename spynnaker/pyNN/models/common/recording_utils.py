@@ -1,4 +1,4 @@
-from data_specification import utility_calls
+from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN import exceptions
 
 import struct
@@ -25,17 +25,10 @@ def get_data(transceiver, placement, region, region_size):
     """ Get the recorded data from a region
     """
 
-    (x, y, p) = placement.x, placement.y, placement.p
-
-    app_data_base_address = transceiver.get_cpu_information_from_core(
-        x, y, p).user[0]
-    region_base_address_offset = utility_calls.get_region_base_address_offset(
-        app_data_base_address, region)
-    region_base_address_buf = buffer(transceiver.read_memory(
-        x, y, region_base_address_offset, 4))
-    region_base_address = struct.unpack_from("<I", region_base_address_buf)[0]
+    region_base_address = helpful_functions.locate_memory_region_on_core(
+        placement.x, placement.y, placement.p, region, transceiver)
     number_of_bytes_written_buf = buffer(transceiver.read_memory(
-        x, y, region_base_address, 4))
+        placement.x, placement.y, region_base_address, 4))
     number_of_bytes_written = struct.unpack_from(
         "<I", number_of_bytes_written_buf)[0]
 
@@ -48,7 +41,8 @@ def get_data(transceiver, placement, region, region_size):
 
     return (
         transceiver.read_memory(
-            x, y, region_base_address + 4, number_of_bytes_written),
+            placement.x, placement.y, region_base_address + 4,
+            number_of_bytes_written),
         number_of_bytes_written)
 
 

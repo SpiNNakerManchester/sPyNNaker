@@ -622,8 +622,7 @@ class Spinnaker(object):
         inputs = dict(self._mapping_outputs)
 
         # Run the data generation algorithms
-        algorithms = [
-            "FrontEndCommomPartitionableGraphDataSpecificationWriter"]
+        algorithms = ["SpynnakerDataSpecificationWriter"]
 
         executor = PACMANAlgorithmExecutor(
             algorithms, [], inputs, self._xml_paths, [], self._do_timings,
@@ -1238,6 +1237,8 @@ class Spinnaker(object):
 
             if clear_tags is None:
                 clear_tags = config.getboolean("Machine", "clear_tags")
+
+            self._txrx.enable_reinjection(multicast=False)
 
             # if stopping on machine, clear iptags and
             if clear_tags:
