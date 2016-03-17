@@ -236,11 +236,11 @@ class Spinnaker(object):
             self._time_scale_factor = max(1,
                                           math.ceil(1000.0 / float(timestep)))
             if self._time_scale_factor > 1:
-                logger.warn("A timestep was entered that has forced pacman103 "
+                logger.warn("A timestep was entered that has forced sPyNNaker "
                             "to automatically slow the simulation down from "
                             "real time by a factor of {}. To remove this "
                             "automatic behaviour, please enter a "
-                            "timescaleFactor value in your .pacman.cfg"
+                            "timescaleFactor value in your .spynnaker.cfg"
                             .format(self._time_scale_factor))
 
         if hostname is not None:
