@@ -64,16 +64,16 @@ class Population(object):
 
         # copy the parameters so that the end users are not exposed to the
         # additions placed by spinnaker.
-        cellparams = copy.deepcopy(cellparams)
+        internal_cellparams = dict(cellparams)
 
         # set spinnaker targeted parameters
-        cellparams['label'] = cell_label
-        cellparams['n_neurons'] = size
-        cellparams['machine_time_step'] = spinnaker.machine_time_step
-        cellparams['timescale_factor'] = spinnaker.timescale_factor
+        internal_cellparams['label'] = cell_label
+        internal_cellparams['n_neurons'] = size
+        internal_cellparams['machine_time_step'] = spinnaker.machine_time_step
+        internal_cellparams['timescale_factor'] = spinnaker.timescale_factor
 
         # create population vertex.
-        self._vertex = cellclass(**cellparams)
+        self._vertex = cellclass(**internal_cellparams)
         self._spinnaker = spinnaker
         self._delay_vertex = None
 
