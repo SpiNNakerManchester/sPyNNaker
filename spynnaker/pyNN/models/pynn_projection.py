@@ -1,7 +1,6 @@
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
     import MultiCastPartitionableEdge
 
@@ -24,6 +23,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_mappable \
     import AbstractMappable
 
 from spinn_front_end_common.utilities import exceptions
+
+from spinn_machine.progress_bar import ProgressBar
 
 
 import logging

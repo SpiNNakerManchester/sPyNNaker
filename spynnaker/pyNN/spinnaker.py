@@ -505,6 +505,26 @@ class Spinnaker(object):
                 "Machine", "spalloc_user")
         if self._remote_spinnaker_url is not None:
             inputs["RemoteSpinnakerUrl"] = self._remote_spinnaker_url
+        if self._use_virtual_board:
+            inputs["IPAddress"] = "virtual"
+            inputs["BMPDetails"] = self._read_config("Machine", "bmp_names")
+            inputs["DownedChipsDetails"] = config.get("Machine", "down_chips")
+            inputs["DownedCoresDetails"] = config.get("Machine", "down_cores")
+            inputs["BoardVersion"] = self._read_config_int(
+                "Machine", "version")
+            inputs["NumberOfBoards"] = self._read_config_int(
+                "Machine", "number_of_boards")
+            inputs["MachineWidth"] = self._read_config_int(
+                "Machine", "width")
+            inputs["MachineHeight"] = self._read_config_int(
+                "Machine", "height")
+            inputs["AutoDetectBMPFlag"] = config.getboolean(
+                "Machine", "auto_detect_bmp")
+            inputs["ScampConnectionData"] = self._read_config(
+                "Machine", "scamp_connections_data")
+            inputs["BootPortNum"] = self._read_config_int(
+                "Machine", "boot_connection_port_num")
+            inputs["MemoryTransceiver"] = None
         inputs["EnableReinjectionFlag"] = config.getboolean(
             "Machine", "enable_reinjection")
 
