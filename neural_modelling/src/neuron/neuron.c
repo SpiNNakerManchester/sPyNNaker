@@ -63,7 +63,7 @@ uint32_t input_size;
 //! readable form
 typedef enum parmeters_in_neuron_parameter_data_region {
     HAS_KEY, TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE,
-    START_OF_GLOBAL_PARAMETERS,
+    INCOMING_SPIKE_BUFFER_SIZE, START_OF_GLOBAL_PARAMETERS,
 } parmeters_in_neuron_parameter_data_region;
 
 
@@ -105,7 +105,7 @@ static inline void _print_neuron_parameters() {
 //! \param[out] n_neurons_value The number of neurons this model is to emulate
 //! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t recording_flags_param,
-        uint32_t *n_neurons_value) {
+        uint32_t *n_neurons_value, uint32_t *incoming_spike_buffer_size) {
     log_info("neuron_initialise: starting");
 
     // Check if there is a key to use
@@ -126,6 +126,9 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     n_neurons = address[N_NEURONS_TO_SIMULATE];
     *n_neurons_value = n_neurons;
 
+    // Read the size of the incoming spike buffer to use
+    *incoming_spike_buffer_size = address[INCOMING_SPIKE_BUFFER_SIZE];
+
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     // Read the global parameter details
@@ -142,9 +145,11 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         next += sizeof(global_neuron_params_t) / 4;
     }
 
-    log_info("\tneurons = %u, params size = %u, input type size = %u,"
-             "threshold size = %u", n_neurons, sizeof(neuron_t),
-             sizeof(input_type_t), sizeof(threshold_type_t));
+    log_info(
+        "\t neurons = %u, spike buffer size = %u, params size = %u,"
+        "input type size = %u, threshold size = %u", n_neurons,
+        *incoming_spike_buffer_size, sizeof(neuron_t),
+        sizeof(input_type_t), sizeof(threshold_type_t));
 
     // Allocate DTCM for neuron array and copy block of data
     if (sizeof(neuron_t) != 0) {

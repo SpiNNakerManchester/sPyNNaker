@@ -92,8 +92,7 @@ class EdgeToNKeysMapper(object):
                 partition, vertex_slice.n_atoms)
         else:
             n_keys_map.set_n_keys_for_partition(
-                partition,
-                edge.pre_vertex.get_n_keys_for_partition(
+                partition, edge.pre_vertex.get_n_keys_for_partition(
                     partition, graph_mapper))
 
         constraints = list()

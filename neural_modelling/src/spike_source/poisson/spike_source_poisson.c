@@ -29,7 +29,7 @@ typedef struct slow_spike_source_t {
 } slow_spike_source_t;
 
 //! data structure for spikes which have at least one spike fired per timer
-//! tick; this is separated from spikes which have multiple timer ticks\
+//! tick; this is separated from spikes which have multiple timer ticks
 //! between firings as there are separate algorithms for each type.
 typedef struct fast_spike_source_t {
     uint32_t neuron_id;
@@ -39,12 +39,12 @@ typedef struct fast_spike_source_t {
 } fast_spike_source_t;
 
 //! spike source array region ids in human readable form
-typedef enum region{
+typedef enum region {
     SYSTEM, POISSON_PARAMS,
     BUFFERING_OUT_SPIKE_RECORDING_REGION,
     BUFFERING_OUT_CONTROL_REGION,
     PROVENANCE_REGION
-}region;
+} region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
 
@@ -55,7 +55,7 @@ typedef enum callback_priorities{
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
 typedef enum poisson_region_parameters{
-    HAS_KEY, TRANSMISSION_KEY, PARAMETER_SEED_START_POSITION,
+    HAS_KEY, TRANSMISSION_KEY, RANDOM_BACKOFF, PARAMETER_SEED_START_POSITION,
 } poisson_region_parameters;
 
 // Globals
@@ -84,6 +84,10 @@ static bool has_been_given_key;
 
 //! A variable that contains the key value that this model should transmit with
 static uint32_t key;
+
+//! An amount of microseconds to back off before starting the timer, in an
+//! attempt to avoid overloading the network
+static uint32_t random_backoff_us;
 
 //! keeps track of which types of recording should be done to this model.
 static uint32_t recording_flags = 0;
@@ -137,7 +141,8 @@ bool read_poisson_parameters(address_t address) {
 
     has_been_given_key = address[HAS_KEY];
     key = address[TRANSMISSION_KEY];
-    log_info("\t key = %08x", key);
+    random_backoff_us = address[RANDOM_BACKOFF];
+    log_info("\t key = %08x, back off = %u", key, random_backoff_us);
 
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
     memcpy(spike_source_seed, &address[PARAMETER_SEED_START_POSITION],
@@ -318,6 +323,9 @@ void timer_callback(uint timer_count, uint unused) {
         }
         return;
     }
+
+    // Sleep for a random time
+    spin1_delay_us(random_backoff_us);
 
     // Loop through slow spike sources
     slow_spike_source_t *slow_spike_sources = slow_spike_source_array;
