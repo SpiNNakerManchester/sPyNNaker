@@ -589,8 +589,7 @@ class Spinnaker(object):
 
         # If using an allocator, we will need to do chip allocation again
         # after partitioning
-        if (self._remote_spinnaker_url is not None or
-                self._spalloc_server is not None):
+        if not self._use_virtual_board:
             algorithms.append("MallocBasedChipIDAllocator")
 
         algorithms.extend(config.get(
@@ -628,8 +627,9 @@ class Spinnaker(object):
         self._machine = executor.get_item("MemoryMachine")
         self._routing_infos = executor.get_item("MemoryRoutingInfos")
 
-        if (self._spalloc_server is not None or
-                self._remote_spinnaker_url is not None):
+        if (self._machine_allocation_controller is None and (
+                self._spalloc_server is not None or
+                self._remote_spinnaker_url is not None)):
             self._machine_allocation_controller = executor.get_item(
                 "MachineAllocationContoller")
 
