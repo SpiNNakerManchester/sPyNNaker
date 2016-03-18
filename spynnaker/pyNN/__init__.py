@@ -40,6 +40,8 @@ from spynnaker.pyNN.models.neuron.builds.izk_curr_exp \
     import IzkCurrExp as IZK_curr_exp
 from spynnaker.pyNN.models.neuron.builds.izk_cond_exp \
     import IzkCondExp as IZK_cond_exp
+from spynnaker.pyNN.models.neuron.builds.if_curr_target_exp \
+    import IFCurrentTargetExponentialPopulation as IF_curr_target_exp
 
 # neural projections
 from spynnaker.pyNN.models.neural_projections\
@@ -123,7 +125,6 @@ def register_binary_search_path(search_path):
     :param search_path:
     Registers an additional binary search path for
         for executables
-
     absolute search path for binaries
     """
     executable_finder.add_path(search_path)
@@ -132,7 +133,6 @@ def register_binary_search_path(search_path):
 def end():
     """
     Do any necessary cleaning up before exiting.
-
     Unregisters the controller,
     prints any data recorded using the low-level API
     """
@@ -143,7 +143,6 @@ def end():
 
 def get_spynnaker():
     """helper method for other plugins to add stuff to the graph
-
     :return:
     """
     global _spinnaker
@@ -174,7 +173,6 @@ def reset():
 
 def run(run_time=None):
     """ Run the simulation for run_time ms.
-
     :param run_time: simulation length (in ms)
     """
     global _spinnaker
@@ -187,7 +185,6 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     """ Should be called at the very beginning of a script.
         extra_params contains any keyword arguments that are required by a\
         given simulator but not by others.
-
     :param machine: A SpiNNaker machine used to run the simulation.
     :param timestep:
     :param min_delay:
@@ -242,7 +239,6 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
 
 def register_database_notification_request(hostname, notify_port, ack_port):
     """ Adds a socket system which is registered with the notification protocol
-
     :param hostname:
     :param notify_port:
     :param ack_report:
@@ -255,7 +251,6 @@ def register_database_notification_request(hostname, notify_port, ack_port):
 # noinspection PyPep8Naming
 def Population(size, cellclass, cellparams, structure=None, label=None):
     """
-
     :param size:
     :param cellclass:
     :param cellparams:
@@ -273,7 +268,6 @@ def Projection(presynaptic_population, postsynaptic_population,
                connector, source=None, target='excitatory',
                synapse_dynamics=None, label=None, rng=None):
     """
-
     :param presynaptic_population:
     :param postsynaptic_population:
     :param connector:
@@ -318,7 +312,6 @@ def get_current_time():
 
 def create(cellclass, cellparams=None, n=1):
     """ Create n cells all of the same type.
-
     If n > 1, return a list of cell ids/references.
     If n==1, return just the single id.
     """
@@ -330,7 +323,6 @@ def create(cellclass, cellparams=None, n=1):
 def connect(source, target, weight=0.0, delay=None, synapse_type="excitatory",
             p=1, rng=None):
     """ Connect a source of spikes to a synaptic target.
-
     source and target can both be individual cells or lists of cells, in
     which case all possible connections are made with probability p, using
     either the random number generator supplied, or the default rng
@@ -382,7 +374,6 @@ def get_max_delay():
 
 def set(cells, param, val=None):  # @ReservedAssignment
     """ Set one or more parameters of an individual cell or list of cells.
-
     param can be a dict, in which case val should not be supplied, or a string
     giving the parameter name, in which case val is the parameter value.
     """
