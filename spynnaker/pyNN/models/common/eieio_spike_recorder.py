@@ -1,4 +1,4 @@
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 from spinnman.messages.eieio.data_messages.eieio_data_header \
     import EIEIODataHeader
 

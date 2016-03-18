@@ -1,7 +1,8 @@
 from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
-from spinn_machine.progress_bar import ProgressBar
 from pacman.utilities.utility_objs.timer import Timer
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \

@@ -1,4 +1,4 @@
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.models.common import recording_utils
 

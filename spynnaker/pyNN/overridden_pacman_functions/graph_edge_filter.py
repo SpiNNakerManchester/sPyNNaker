@@ -4,7 +4,7 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
 from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.model.graph_mapper.graph_mapper \
     import GraphMapper
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 # spynnaker imports
 from spynnaker.pyNN import exceptions
