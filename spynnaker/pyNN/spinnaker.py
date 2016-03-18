@@ -419,6 +419,26 @@ class Spinnaker(object):
             return value
         return bool(value)
 
+    def _add_machine_mapping_inputs(self, inputs):
+        inputs['IPAddress'] = self._hostname
+        inputs["BMPDetails"] = self._read_config("Machine", "bmp_names")
+        inputs["DownedChipsDetails"] = config.get("Machine", "down_chips")
+        inputs["DownedCoresDetails"] = config.get("Machine", "down_cores")
+        inputs["BoardVersion"] = self._read_config_int(
+            "Machine", "version")
+        inputs["NumberOfBoards"] = self._read_config_int(
+            "Machine", "number_of_boards")
+        inputs["MachineWidth"] = self._read_config_int(
+            "Machine", "width")
+        inputs["MachineHeight"] = self._read_config_int(
+            "Machine", "height")
+        inputs["AutoDetectBMPFlag"] = config.getboolean(
+            "Machine", "auto_detect_bmp")
+        inputs["ScampConnectionData"] = self._read_config(
+            "Machine", "scamp_connections_data")
+        inputs["BootPortNum"] = self._read_config_int(
+            "Machine", "boot_connection_port_num")
+
     def _do_mapping(self, run_time, n_machine_time_steps, total_run_time):
 
         # Set the initial n_machine_time_steps to all of them for mapping
@@ -461,6 +481,10 @@ class Spinnaker(object):
         inputs["MaxSDRAMSize"] = self._read_config_int(
             "Machine", "max_sdram_allowed_per_chip")
 
+        # add reinjection flag
+        inputs["EnableReinjectionFlag"] = config.getboolean(
+            "Machine", "enable_reinjection")
+
         # add paths for each file based version
         inputs["FileCoreAllocationsFilePath"] = os.path.join(
             self._json_folder, "core_allocations.json")
@@ -479,55 +503,26 @@ class Spinnaker(object):
 
         # Add inputs based on how the machine is obtained
         if self._hostname is not None:
-            inputs['IPAddress'] = self._hostname
-            inputs["BMPDetails"] = self._read_config("Machine", "bmp_names")
-            inputs["DownedChipsDetails"] = config.get("Machine", "down_chips")
-            inputs["DownedCoresDetails"] = config.get("Machine", "down_cores")
-            inputs["BoardVersion"] = self._read_config_int(
-                "Machine", "version")
-            inputs["NumberOfBoards"] = self._read_config_int(
-                "Machine", "number_of_boards")
-            inputs["MachineWidth"] = self._read_config_int(
-                "Machine", "width")
-            inputs["MachineHeight"] = self._read_config_int(
-                "Machine", "height")
-            inputs["AutoDetectBMPFlag"] = config.getboolean(
-                "Machine", "auto_detect_bmp")
-            inputs["ScampConnectionData"] = self._read_config(
-                "Machine", "scamp_connections_data")
-            inputs["BootPortNum"] = self._read_config_int(
-                "Machine", "boot_connection_port_num")
+            self._add_machine_mapping_inputs(inputs)
+
+        # if using spalloc system
         if self._spalloc_server is not None:
             inputs["SpallocServer"] = self._spalloc_server
             inputs["SpallocPort"] = self._read_config_int(
                 "Machine", "spalloc_port")
             inputs["SpallocUser"] = self._read_config(
                 "Machine", "spalloc_user")
+
+        # if using HBP server system
         if self._remote_spinnaker_url is not None:
             inputs["RemoteSpinnakerUrl"] = self._remote_spinnaker_url
-        if self._use_virtual_board:
-            inputs["IPAddress"] = "virtual"
-            inputs["BMPDetails"] = self._read_config("Machine", "bmp_names")
-            inputs["DownedChipsDetails"] = config.get("Machine", "down_chips")
-            inputs["DownedCoresDetails"] = config.get("Machine", "down_cores")
-            inputs["BoardVersion"] = self._read_config_int(
-                "Machine", "version")
-            inputs["NumberOfBoards"] = self._read_config_int(
-                "Machine", "number_of_boards")
-            inputs["MachineWidth"] = self._read_config_int(
-                "Machine", "width")
-            inputs["MachineHeight"] = self._read_config_int(
-                "Machine", "height")
-            inputs["AutoDetectBMPFlag"] = config.getboolean(
-                "Machine", "auto_detect_bmp")
-            inputs["ScampConnectionData"] = self._read_config(
-                "Machine", "scamp_connections_data")
-            inputs["BootPortNum"] = self._read_config_int(
-                "Machine", "boot_connection_port_num")
-            inputs["MemoryTransceiver"] = None
-        inputs["EnableReinjectionFlag"] = config.getboolean(
-            "Machine", "enable_reinjection")
 
+        # if using virutal board
+        if self._use_virtual_board:
+            self._add_machine_mapping_inputs(inputs)
+            inputs["MemoryTransceiver"] = None
+
+        # handle algorithms
         algorithms = list()
 
         # Handle virtual machine, which will also be needed if an allocation
@@ -786,6 +781,8 @@ class Spinnaker(object):
             # If an exception occurs during a run, attempt to get
             # information out of the simulation before shutting down
             self._recover_from_error(e, executor.get_items())
+
+            # clean the system
             self._shutdown()
 
             exc_info = sys.exc_info()

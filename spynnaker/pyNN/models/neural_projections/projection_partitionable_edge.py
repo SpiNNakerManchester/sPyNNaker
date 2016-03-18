@@ -10,6 +10,7 @@ from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
 
 import logging
 import copy
+
 logger = logging.getLogger(__name__)
 
 
