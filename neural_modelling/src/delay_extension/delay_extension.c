@@ -13,7 +13,7 @@
 #define DELAY_STAGE_LENGTH  16
 
 //! values for the priority for each callback
-typedef enum callback_priorities{
+typedef enum callback_priorities {
     MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 2
 } callback_priorities;
 
@@ -22,8 +22,15 @@ typedef enum region_identifiers{
     SYSTEM = 0, DELAY_PARAMS = 1, PROVENANCE_REGION = 2
 } region_identifiers;
 
+enum parameter_positions {
+    KEY, INCOMING_KEY, INCOMING_MASK, N_ATOMS, N_DELAY_STAGES, DELAY_BLOCKS
+};
+
 // Globals
 static uint32_t key = 0;
+static uint32_t incoming_key = 0;
+static uint32_t incoming_mask = 0;
+static uint32_t incoming_neuron_mask = 0;
 static uint32_t num_neurons = 0;
 static uint32_t time = UINT32_MAX;
 static uint32_t simulation_ticks = 0;
@@ -52,14 +59,19 @@ static bool read_parameters(address_t address) {
 
     log_info("read_parameters: starting");
 
-    // changed from above for new file format 13-1-2014
-    key = address[0];
-    log_info("\t key = %08x", key);
+    key = address[KEY];
+    incoming_key = address[INCOMING_KEY];
+    incoming_mask = address[INCOMING_MASK];
+    incoming_neuron_mask = ~incoming_mask;
+    log_info(
+        "\t key = 0x%08x, incoming key = 0x%08x, incoming mask = 0x%08x,"
+        "incoming key mask = 0x%08x",
+        key, incoming_key, incoming_mask, incoming_neuron_mask);
 
-    num_neurons = address[1];
+    num_neurons = address[N_ATOMS];
     neuron_bit_field_words = get_bit_field_size(num_neurons);
 
-    num_delay_stages = address[2];
+    num_delay_stages = address[N_DELAY_STAGES];
     uint32_t num_delay_slots = num_delay_stages * DELAY_STAGE_LENGTH;
     uint32_t num_delay_slots_pot = round_to_next_pot(num_delay_slots);
     num_delay_slots_mask = (num_delay_slots_pot - 1);
@@ -86,7 +98,7 @@ static bool read_parameters(address_t address) {
 
         // Copy delay stage configuration bits into delay stage configuration bit-field
         address_t neuron_delay_stage_config_data_address =
-            &address[3] + (d * neuron_bit_field_words);
+            &address[DELAY_BLOCKS] + (d * neuron_bit_field_words);
         memcpy(neuron_delay_stage_config[d],
                neuron_delay_stage_config_data_address,
                neuron_bit_field_words * sizeof(uint32_t));
@@ -157,16 +169,9 @@ void incoming_spike_callback(uint key, uint payload) {
     }
 }
 
-//! \helpful method for converting a key with the field ranges of:
-//! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
-//! core that transmitted the spike and n represents the atom id which that
-//! core has spiked with.
-//! \param[in] k The key that needs translating
-//! \return the n field of the key (assuming the key is in the format
-//! described above)
-// TODO: this needs to be removed to allow a true virtual key space
+// Gets the neuron id of the incoming spike
 static inline key_t _key_n(key_t k) {
-    return k & 0x7FF;
+    return k & incoming_neuron_mask;
 }
 
 void spike_process(uint unused0, uint unused1) {
@@ -187,16 +192,21 @@ void spike_process(uint unused0, uint unused1) {
     spike_t s;
     while (in_spikes_get_next_spike(&s)) {
 
-        // Mask out neuron id
-        uint32_t neuron_id = _key_n(s);
-        if (neuron_id < num_neurons) {
+        if ((s & incoming_mask) == incoming_key) {
 
-            // Increment counter
-            current_time_slot_spike_counters[neuron_id]++;
-            log_debug("Incrementing counter %u = %u\n", neuron_id,
-                      current_time_slot_spike_counters[neuron_id]);
+            // Mask out neuron id
+            uint32_t neuron_id = _key_n(s);
+            if (neuron_id < num_neurons) {
+
+                // Increment counter
+                current_time_slot_spike_counters[neuron_id]++;
+                log_debug("Incrementing counter %u = %u\n", neuron_id,
+                          current_time_slot_spike_counters[neuron_id]);
+            } else {
+                log_debug("Invalid neuron ID %u", neuron_id);
+            }
         } else {
-            log_debug("Invalid neuron ID %u", neuron_id);
+            log_debug("Invalid spike key 0x%08x", s);
         }
     }
 
@@ -304,7 +314,7 @@ void c_main(void) {
     simulation_register_simulation_sdp_callback(
         &simulation_ticks, &infinite_run, SDP);
 
-    // set up prov registration
+    // set up provenance registration
     simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
 
     simulation_run();

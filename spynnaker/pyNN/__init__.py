@@ -44,14 +44,8 @@ from spynnaker.pyNN.models.neural_projections\
     .delay_afferent_partitionable_edge import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-from spynnaker.pyNN.models.neural_projections.delay_partitionable_edge \
-    import DelayPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
-    import DelayPartitionedEdge
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
-    import ProjectionPartitionedEdge
 
 # spike sources
 from spynnaker.pyNN.models.spike_source.spike_source_poisson\
@@ -81,27 +75,28 @@ from spynnaker.pyNN.models.neural_projections.connectors.\
     DistanceDependentProbabilityConnector
 from spynnaker.pyNN.models.neural_projections.connectors.\
     fixed_number_post_connector import FixedNumberPostConnector
-from spynnaker.pyNN.models.neural_projections.connectors.small_world_connector\
-    import SmallWorldConnector
 
 # Mechanisms for synapse dynamics
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.\
-    synapse_dynamics import SynapseDynamics
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.stdp_mechanism \
-    import STDPMechanism
+from spynnaker.pyNN.models.neuron.synapse_dynamics.pynn_synapse_dynamics\
+    import PyNNSynapseDynamics as SynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp\
+    import SynapseDynamicsSTDP as STDPMechanism
 
 # STDP weight dependences
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
-    additive_weight_dependence import AdditiveWeightDependence
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
-    multiplicative_weight_dependence import MultiplicativeWeightDependence
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
+    .weight_dependence_additive\
+    import WeightDependenceAdditive as AdditiveWeightDependence
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
+    .weight_dependence_multiplicative\
+    import WeightDependenceMultiplicative as MultiplicativeWeightDependence
 
 # STDP timing dependences
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
-    pfister_spike_triplet_time_dependence import \
-    PfisterSpikeTripletTimeDependence as PfisterSpikeTripletRule
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics.dependences.\
-    spike_pair_time_dependency import SpikePairTimeDependency as SpikePairRule
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
+    .timing_dependence_spike_pair \
+    import TimingDependenceSpikePair as SpikePairRule
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
+    .timing_dependence_pfister_spike_triplet\
+    import TimingDependencePfisterSpikeTriplet as PfisterSpikeTripletRule
 
 import spynnaker
 # constraints

@@ -82,9 +82,9 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, binary, label, max_atoms_per_core,
             machine_time_step, timescale_factor, spikes_per_second,
-            ring_buffer_sigma, model_name, neuron_model, input_type,
-            synapse_type, threshold_type, additional_input=None,
-            constraints=None):
+            ring_buffer_sigma, incoming_spike_buffer_size, model_name,
+            neuron_model, input_type, synapse_type, threshold_type,
+            additional_input=None, constraints=None):
 
         AbstractPartitionableVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
@@ -103,6 +103,10 @@ class AbstractPopulationVertex(
         self._label = label
         self._machine_time_step = machine_time_step
         self._timescale_factor = timescale_factor
+        self._incoming_spike_buffer_size = incoming_spike_buffer_size
+        if incoming_spike_buffer_size is None:
+            self._incoming_spike_buffer_size = config.getint(
+                "Simulation", "incoming_spike_buffer_size")
 
         self._model_name = model_name
         self._neuron_model = neuron_model
@@ -189,6 +193,10 @@ class AbstractPopulationVertex(
                 minimum_sdram_for_buffering=self._minimum_buffer_sdram,
                 buffered_sdram_per_timestep=sdram_per_ts)
         return subvertex
+
+    @property
+    def maximum_delay_supported_in_ms(self):
+        return self._synapse_manager.maximum_delay_supported_in_ms
 
     # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
@@ -365,6 +373,9 @@ class AbstractPopulationVertex(
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
 
+        # Write the size of the incoming spike buffer
+        spec.write_value(data=self._incoming_spike_buffer_size)
+
         # Write the global parameters
         global_params = self._neuron_model.get_global_parameters()
         for param in global_params:
@@ -471,7 +482,7 @@ class AbstractPopulationVertex(
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, subvertex, placement, partitioned_graph,
-            graph, routing_info, hostname, graph_mapper)
+            graph, routing_info, graph_mapper, self._input_type)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -603,13 +614,25 @@ class AbstractPopulationVertex(
     def spikes_per_second(self, spikes_per_second):
         self._synapse_manager.spikes_per_second = spikes_per_second
 
-    def get_synaptic_list_from_machine(
-            self, placements, transceiver, pre_subvertex, pre_n_atoms,
-            post_subvertex, synapse_io, subgraph, routing_infos,
-            weight_scales):
-        return self._synapse_manager.get_synaptic_list_from_machine(
-            placements, transceiver, pre_subvertex, pre_n_atoms,
-            post_subvertex, synapse_io, subgraph, routing_infos, weight_scales)
+    @property
+    def synapse_dynamics(self):
+        return self._synapse_manager.synapse_dynamics
+
+    @synapse_dynamics.setter
+    def synapse_dynamics(self, synapse_dynamics):
+        self._synapse_manager.synapse_dynamics = synapse_dynamics
+
+    def add_pre_run_connection_holder(
+            self, connection_holder, edge, synapse_info):
+        self._synapse_manager.add_pre_run_connection_holder(
+            connection_holder, edge, synapse_info)
+
+    def get_connections_from_machine(
+            self, transceiver, placement, subedge, graph_mapper,
+            routing_infos, synapse_info, partitioned_graph):
+        return self._synapse_manager.get_connections_from_machine(
+            transceiver, placement, subedge, graph_mapper,
+            routing_infos, synapse_info, partitioned_graph)
 
     def is_data_specable(self):
         return True
@@ -621,10 +644,10 @@ class AbstractPopulationVertex(
         :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
-        return self._synapse_manager.get_incoming_edge_constraints()
+        return self._synapse_manager.get_incoming_partition_constraints()
 
     def get_outgoing_partition_constraints(self, partition, graph_mapper):
-        """ Gets the constraints for edges going out of this vertex
+        """ Gets the constraints for partitions going out of this vertex
         :param partition: the partition that leaves this vertex
         :param graph_mapper: the graph mapper object
         :return: list of constraints
