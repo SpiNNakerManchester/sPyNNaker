@@ -4,7 +4,6 @@ from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN import exceptions as local_exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
@@ -65,16 +64,16 @@ class Population(object):
 
         # copy the parameters so that the end users are not exposed to the
         # additions placed by spinnaker.
-        cellparams = copy.deepcopy(cellparams)
+        internal_cellparams = dict(cellparams)
 
         # set spinnaker targeted parameters
-        cellparams['label'] = cell_label
-        cellparams['n_neurons'] = size
-        cellparams['machine_time_step'] = spinnaker.machine_time_step
-        cellparams['timescale_factor'] = spinnaker.timescale_factor
+        internal_cellparams['label'] = cell_label
+        internal_cellparams['n_neurons'] = size
+        internal_cellparams['machine_time_step'] = spinnaker.machine_time_step
+        internal_cellparams['timescale_factor'] = spinnaker.timescale_factor
 
         # create population vertex.
-        self._vertex = cellclass(**cellparams)
+        self._vertex = cellclass(**internal_cellparams)
         self._spinnaker = spinnaker
         self._delay_vertex = None
 
@@ -179,12 +178,17 @@ class Population(object):
                 "This population has not got the capability to record spikes")
 
         if not self._spinnaker.has_ran:
-            raise local_exceptions.SpynnakerException(
+            logger.warn(
                 "The simulation has not yet run, therefore spikes cannot"
-                " be retrieved")
+                " be retrieved, hence the list will be empty")
+            return numpy.zeros((0, 2))
 
         if self._spinnaker.use_virtual_board:
+            logger.warn(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
             return numpy.zeros((0, 2))
+
         spikes = self._vertex.get_spikes(
             self._spinnaker.placements, self._spinnaker.graph_mapper,
             self._spinnaker.buffer_manager)
@@ -224,12 +228,17 @@ class Population(object):
                 "This population has not got the capability to record gsyn")
 
         if not self._spinnaker.has_ran:
-            raise local_exceptions.SpynnakerException(
+            logger.warn(
                 "The simulation has not yet run, therefore gsyn cannot"
-                " be retrieved")
+                " be retrieved, hence the list will be empty")
+            return numpy.zeros((0, 4))
 
         if self._spinnaker.use_virtual_board:
+            logger.warn(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
             return numpy.zeros((0, 4))
+
         return self._vertex.get_gsyn(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
@@ -256,12 +265,17 @@ class Population(object):
                 "This population has not got the capability to record v")
 
         if not self._spinnaker.has_ran:
-            raise local_exceptions.SpynnakerException(
+            logger.warn(
                 "The simulation has not yet run, therefore v cannot"
-                " be retrieved")
+                " be retrieved, hence the list will be empty")
+            return numpy.zeros((0, 3))
 
         if self._spinnaker.use_virtual_board:
+            logger.warn(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
             return numpy.zeros((0, 3))
+
         return self._vertex.get_v(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)

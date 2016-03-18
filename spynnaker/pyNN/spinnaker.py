@@ -68,7 +68,11 @@ class Spinnaker(object):
                  max_delay=None, graph_label=None,
                  database_socket_addresses=None):
 
-        self._hostname = host_name
+        # Machine objects
+        self._hostname = None
+        self._spalloc_server = None
+        self._remote_spinnaker_url = None
+        self._machine_allocation_controller = None
 
         # update graph label if needed
         if graph_label is None:
@@ -92,6 +96,7 @@ class Spinnaker(object):
         self._machine = None
         self._txrx = None
         self._buffer_manager = None
+        self._ip_address = None
         self._pacman_provenance = PacmanProvenanceExtractor()
 
         # database objects
@@ -231,11 +236,11 @@ class Spinnaker(object):
             self._time_scale_factor = max(1,
                                           math.ceil(1000.0 / float(timestep)))
             if self._time_scale_factor > 1:
-                logger.warn("A timestep was entered that has forced pacman103 "
+                logger.warn("A timestep was entered that has forced sPyNNaker "
                             "to automatically slow the simulation down from "
                             "real time by a factor of {}. To remove this "
                             "automatic behaviour, please enter a "
-                            "timescaleFactor value in your .pacman.cfg"
+                            "timescaleFactor value in your .spynnaker.cfg"
                             .format(self._time_scale_factor))
 
         if hostname is not None:
@@ -244,16 +249,50 @@ class Spinnaker(object):
                         "machine name defined in the spynnaker.cfg file")
         else:
             self._hostname = self._read_config("Machine", "machineName")
-        if self._hostname is None and not self._use_virtual_board:
-            raise Exception("A SpiNNaker machine must be specified in "
-                            "spynnaker.cfg.")
+            self._spalloc_server = self._read_config(
+                "Machine", "spalloc_server")
+            self._remote_spinnaker_url = self._read_config(
+                "Machine", "remote_spinnaker_url")
+        if (self._hostname is None and self._spalloc_server is None and
+                self._remote_spinnaker_url is None and
+                not self._use_virtual_board):
+            raise Exception(
+                "A SpiNNaker machine must be specified in spynnaker.cfg.")
+
+        n_items_specified = sum([
+            1 if item is not None else 0
+            for item in [
+                self._hostname, self._spalloc_server,
+                self._remote_spinnaker_url]])
+
+        if (n_items_specified > 1 or
+                (n_items_specified == 1 and self._use_virtual_board)):
+            raise Exception(
+                "Only one of machineName, spalloc_server, "
+                "remote_spinnaker_url and virtual_board should be specified "
+                "in spynnaker.cfg")
+
+        if self._spalloc_server is not None:
+            if self._read_config("Machine", "spalloc_user") is None:
+                raise Exception(
+                    "A spalloc_user must be specified with a spalloc_server")
 
     def run(self, run_time):
 
         n_machine_time_steps = None
+        total_run_time = None
         if run_time is not None:
             n_machine_time_steps = int(
                 (run_time * 1000.0) / self._machine_time_step)
+            total_run_timesteps = (
+                self._current_run_timesteps + n_machine_time_steps)
+            total_run_time = (
+                total_run_timesteps *
+                (float(self._machine_time_step) / 1000.0) *
+                self._time_scale_factor)
+        if self._has_ran and self._machine_allocation_controller is not None:
+            self._machine_allocation_controller.extend_allocation(
+                total_run_time)
 
         # If we have never run before, or the graph has changed,
         # start by performing mapping
@@ -264,7 +303,7 @@ class Spinnaker(object):
                 raise NotImplementedError(
                     "The network cannot be changed between runs without"
                     " resetting")
-            self._do_mapping(run_time, n_machine_time_steps)
+            self._do_mapping(run_time, n_machine_time_steps, total_run_time)
 
         # Work out an array of timesteps to perform
         steps = None
@@ -380,7 +419,27 @@ class Spinnaker(object):
             return value
         return bool(value)
 
-    def _do_mapping(self, run_time, n_machine_time_steps):
+    def _add_machine_mapping_inputs(self, inputs):
+        inputs['IPAddress'] = self._hostname
+        inputs["BMPDetails"] = self._read_config("Machine", "bmp_names")
+        inputs["DownedChipsDetails"] = config.get("Machine", "down_chips")
+        inputs["DownedCoresDetails"] = config.get("Machine", "down_cores")
+        inputs["BoardVersion"] = self._read_config_int(
+            "Machine", "version")
+        inputs["NumberOfBoards"] = self._read_config_int(
+            "Machine", "number_of_boards")
+        inputs["MachineWidth"] = self._read_config_int(
+            "Machine", "width")
+        inputs["MachineHeight"] = self._read_config_int(
+            "Machine", "height")
+        inputs["AutoDetectBMPFlag"] = config.getboolean(
+            "Machine", "auto_detect_bmp")
+        inputs["ScampConnectionData"] = self._read_config(
+            "Machine", "scamp_connections_data")
+        inputs["BootPortNum"] = self._read_config_int(
+            "Machine", "boot_connection_port_num")
+
+    def _do_mapping(self, run_time, n_machine_time_steps, total_run_time):
 
         # Set the initial n_machine_time_steps to all of them for mapping
         # (note that the underlying vertices will know about
@@ -390,28 +449,12 @@ class Spinnaker(object):
 
         inputs = dict()
         inputs["RunTime"] = run_time
+        inputs["TotalRunTime"] = total_run_time
         inputs["PostSimulationOverrunBeforeError"] = config.getint(
             "Machine", "post_simulation_overrun_before_error")
         inputs["MemoryPartitionableGraph"] = self._partitionable_graph
         inputs['ReportFolder'] = self._report_default_directory
         inputs["ApplicationDataFolder"] = self._app_data_runtime_folder
-        inputs['IPAddress'] = self._hostname
-        inputs["BMPDetails"] = config.get("Machine", "bmp_names")
-        inputs["DownedChipsDetails"] = config.get("Machine", "down_chips")
-        inputs["DownedCoresDetails"] = config.get("Machine", "down_cores")
-        inputs["BoardVersion"] = self._read_config_int("Machine", "version")
-        inputs["NumberOfBoards"] = self._read_config_int(
-            "Machine", "number_of_boards")
-        inputs["MachineWidth"] = self._read_config_int("Machine", "width")
-        inputs["MachineHeight"] = self._read_config_int("Machine", "height")
-        inputs["AutoDetectBMPFlag"] = config.getboolean(
-            "Machine", "auto_detect_bmp")
-        inputs["EnableReinjectionFlag"] = config.getboolean(
-            "Machine", "enable_reinjection")
-        inputs["ScampConnectionData"] = self._read_config(
-            "Machine", "scamp_connections_data")
-        inputs["BootPortNum"] = self._read_config_int(
-            "Machine", "boot_connection_port_num")
         inputs["APPID"] = self._app_id
         inputs["ExecDSEOnHostFlag"] = self._exec_dse_on_host
         inputs["DSEAPPID"] = config.getint("Machine", "DSEappID")
@@ -438,6 +481,10 @@ class Spinnaker(object):
         inputs["MaxSDRAMSize"] = self._read_config_int(
             "Machine", "max_sdram_allowed_per_chip")
 
+        # add reinjection flag
+        inputs["EnableReinjectionFlag"] = config.getboolean(
+            "Machine", "enable_reinjection")
+
         # add paths for each file based version
         inputs["FileCoreAllocationsFilePath"] = os.path.join(
             self._json_folder, "core_allocations.json")
@@ -454,25 +501,59 @@ class Spinnaker(object):
         inputs["FileConstraintsFilePath"] = os.path.join(
             self._json_folder, "constraints.json")
 
+        # Add inputs based on how the machine is obtained
+        if self._hostname is not None:
+            self._add_machine_mapping_inputs(inputs)
+
+        # if using spalloc system
+        if self._spalloc_server is not None:
+            inputs["SpallocServer"] = self._spalloc_server
+            inputs["SpallocPort"] = self._read_config_int(
+                "Machine", "spalloc_port")
+            inputs["SpallocUser"] = self._read_config(
+                "Machine", "spalloc_user")
+
+        # if using HBP server system
+        if self._remote_spinnaker_url is not None:
+            inputs["RemoteSpinnakerUrl"] = self._remote_spinnaker_url
+
+        # if using virutal board
+        if self._use_virtual_board:
+            self._add_machine_mapping_inputs(inputs)
+            inputs["MemoryTransceiver"] = None
+
+        # handle algorithms
         algorithms = list()
 
-        # handle virtual machine and its linking to multi-run
-        if self._use_virtual_board:
+        # Handle virtual machine, which will also be needed if an allocation
+        # server is to be used
+        if (self._machine is None and self._txrx is None and (
+                self._use_virtual_board or self._spalloc_server is not None or
+                self._remote_spinnaker_url is not None)):
+            if self._spalloc_server is not None:
+                algorithms.append("FrontEndCommonSpallocMaxMachineGenerator")
+            elif self._remote_spinnaker_url is not None:
+                algorithms.append("FrontEndCommonHBPMaxMachineGenerator")
             algorithms.append("FrontEndCommonVirtualMachineGenerator")
-            inputs["MemoryTransceiver"] = None
+            algorithms.append("MallocBasedChipIDAllocator")
             if config.getboolean("Machine", "enable_reinjection"):
                 inputs["CPUsPerVirtualChip"] = 15
             else:
                 inputs["CPUsPerVirtualChip"] = 16
-        else:
+
+        # Only do allocation or generate a machine if not virtual
+        if not self._use_virtual_board:
             if self._machine is None and self._txrx is None:
-                algorithms.append("FrontEndCommonMachineInterfacer")
+                if self._spalloc_server is not None:
+                    algorithms.append("FrontEndCommonSpallocAllocator")
+                elif self._remote_spinnaker_url is not None:
+                    algorithms.append("FrontEndCommonHBPAllocator")
+
+                algorithms.append("FrontEndCommonMachineGenerator")
             else:
                 inputs["MemoryMachine"] = self._machine
                 inputs["MemoryTransceiver"] = self._txrx
-
-        # always add extended machine builder
-        algorithms.append("MallocBasedChipIDAllocator")
+                inputs["IPAddress"] = self._ip_address
 
         # Add reports
         if config.getboolean("Reports", "reportsEnabled"):
@@ -498,7 +579,16 @@ class Spinnaker(object):
                 algorithms.append(
                     "FrontEndCommonNetworkSpecificationPartitionableReport")
 
-        algorithms.extend(config.get("Mapping", "algorithms").split(","))
+        algorithms.extend(config.get(
+            "Mapping", "partitionable_to_partitioned_algorithms").split(","))
+
+        # If using an allocator, we will need to do chip allocation again
+        # after partitioning
+        if not self._use_virtual_board:
+            algorithms.append("MallocBasedChipIDAllocator")
+
+        algorithms.extend(config.get(
+            "Mapping", "partitioned_to_machine_algorithms").split(","))
 
         outputs = [
             "MemoryPlacements", "MemoryRoutingTables",
@@ -506,6 +596,11 @@ class Spinnaker(object):
             "MemoryMachine", "MemoryRoutingInfos"]
         if not self._use_virtual_board:
             outputs.append("MemoryTransceiver")
+            outputs.append("IPAddress")
+        if (self._machine_allocation_controller is None and (
+                self._spalloc_server is not None or
+                self._remote_spinnaker_url is not None)):
+            outputs.append("MachineAllocationContoller")
 
         # Execute the mapping algorithms
         executor = PACMANAlgorithmExecutor(
@@ -518,6 +613,7 @@ class Spinnaker(object):
         # Get the outputs needed
         if not self._use_virtual_board:
             self._txrx = executor.get_item("MemoryTransceiver")
+            self._ip_address = executor.get_item("IPAddress")
         self._placements = executor.get_item("MemoryPlacements")
         self._router_tables = executor.get_item("MemoryRoutingTables")
         self._tags = executor.get_item("MemoryTags")
@@ -525,6 +621,12 @@ class Spinnaker(object):
         self._partitioned_graph = executor.get_item("MemoryPartitionedGraph")
         self._machine = executor.get_item("MemoryMachine")
         self._routing_infos = executor.get_item("MemoryRoutingInfos")
+
+        if (self._machine_allocation_controller is None and (
+                self._spalloc_server is not None or
+                self._remote_spinnaker_url is not None)):
+            self._machine_allocation_controller = executor.get_item(
+                "MachineAllocationContoller")
 
     def _do_data_generation(self, n_machine_time_steps):
 
@@ -680,7 +782,8 @@ class Spinnaker(object):
             # information out of the simulation before shutting down
             self._recover_from_error(e, executor.get_items())
 
-            # self._txrx.stop_application(self._app_id)
+            # clean the system
+            self._shutdown()
 
             exc_info = sys.exc_info()
             raise exc_info[0], exc_info[1], exc_info[2]
@@ -724,8 +827,10 @@ class Spinnaker(object):
                 else:
                     provenance_outputs = self._mapping_outputs
 
-            self._write_provenance(provenance_outputs)
-            self._check_provenance(prov_items)
+            if provenance_outputs is not None:
+                self._write_provenance(provenance_outputs)
+            if prov_items is not None:
+                self._check_provenance(prov_items)
 
     def _write_provenance(self, provenance_outputs):
         """ Write provenance to disk
@@ -1134,6 +1239,65 @@ class Spinnaker(object):
             timescale_factor=self._time_scale_factor,
             user_max_delay=self.max_supported_delay)
 
+    def _shutdown(
+            self, turn_off_machine=None, clear_routing_tables=None,
+            clear_tags=None):
+
+        # if not a virtual machine, then shut down stuff on the board
+        if not self._use_virtual_board:
+
+            if turn_off_machine is None:
+                turn_off_machine = config.getboolean(
+                    "Machine", "turn_off_machine")
+
+            if clear_routing_tables is None:
+                clear_routing_tables = config.getboolean(
+                    "Machine", "clear_routing_tables")
+
+            if clear_tags is None:
+                clear_tags = config.getboolean("Machine", "clear_tags")
+
+            if self._txrx is not None:
+
+                self._txrx.enable_reinjection(multicast=False)
+
+                # if stopping on machine, clear iptags and
+                if clear_tags:
+                    for ip_tag in self._tags.ip_tags:
+                        self._txrx.clear_ip_tag(
+                            ip_tag.tag, board_address=ip_tag.board_address)
+                    for reverse_ip_tag in self._tags.reverse_ip_tags:
+                        self._txrx.clear_ip_tag(
+                            reverse_ip_tag.tag,
+                            board_address=reverse_ip_tag.board_address)
+
+                # if clearing routing table entries, clear
+                if clear_routing_tables:
+                    for router_table in self._router_tables.routing_tables:
+                        if not self._machine.get_chip_at(
+                                router_table.x, router_table.y).virtual:
+                            self._txrx.clear_multicast_routes(
+                                router_table.x, router_table.y)
+
+                # clear values
+                self._no_sync_changes = 0
+
+                # app stop command
+                self._txrx.stop_application(self._app_id)
+
+            if self._buffer_manager is not None:
+                self._buffer_manager.stop()
+
+            # stop the transceiver
+            if self._txrx is not None:
+                if turn_off_machine:
+                    logger.info("Turning off machine")
+
+                self._txrx.close(power_off_machine=turn_off_machine)
+
+            if self._machine_allocation_controller is not None:
+                self._machine_allocation_controller.close()
+
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
         """
@@ -1155,53 +1319,7 @@ class Spinnaker(object):
         self._extract_provenance()
         self._extract_iobuf()
 
-        # if not a virtual machine, then shut down stuff on the board
-        if not self._use_virtual_board:
-
-            if turn_off_machine is None:
-                turn_off_machine = \
-                    config.getboolean("Machine", "turn_off_machine")
-
-            if clear_routing_tables is None:
-                clear_routing_tables = config.getboolean(
-                    "Machine", "clear_routing_tables")
-
-            if clear_tags is None:
-                clear_tags = config.getboolean("Machine", "clear_tags")
-
-            self._txrx.enable_reinjection(multicast=False)
-
-            # if stopping on machine, clear iptags and
-            if clear_tags:
-                for ip_tag in self._tags.ip_tags:
-                    self._txrx.clear_ip_tag(
-                        ip_tag.tag, board_address=ip_tag.board_address)
-                for reverse_ip_tag in self._tags.reverse_ip_tags:
-                    self._txrx.clear_ip_tag(
-                        reverse_ip_tag.tag,
-                        board_address=reverse_ip_tag.board_address)
-
-            # if clearing routing table entries, clear
-            if clear_routing_tables:
-                for router_table in self._router_tables.routing_tables:
-                    if not self._machine.get_chip_at(router_table.x,
-                                                     router_table.y).virtual:
-                        self._txrx.clear_multicast_routes(router_table.x,
-                                                          router_table.y)
-
-            # clear values
-            self._no_sync_changes = 0
-
-            # app stop command
-            self._txrx.stop_application(self._app_id)
-
-            if self._buffer_manager is not None:
-                self._buffer_manager.stop()
-
-            # stop the transceiver
-            if turn_off_machine:
-                logger.info("Turning off machine")
-            self._txrx.close(power_off_machine=turn_off_machine)
+        self._shutdown(turn_off_machine, clear_routing_tables, clear_tags)
 
     def _add_socket_address(self, socket_address):
         """
