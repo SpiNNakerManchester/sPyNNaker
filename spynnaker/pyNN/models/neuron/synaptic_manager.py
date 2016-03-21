@@ -759,6 +759,9 @@ class SynapticManager(object):
             self._population_table_type.extract_synaptic_matrix_data_location(
                 key, master_pop_table_address, transceiver,
                 placement.x, placement.y)
+        if index >= len(items):
+            return None, None
+
         max_row_length, synaptic_block_offset = items[index]
 
         block = None
