@@ -128,7 +128,7 @@ class Projection(object):
                 self._synapse_information, label=label)
 
             # add edge to the graph
-            spinnaker_control.add_edge(
+            spinnaker_control.add_partitionable_edge(
                 self._projection_edge, EDGE_PARTITION_ID)
 
         # If the delay exceeds the post vertex delay, add a delay extension
@@ -211,7 +211,8 @@ class Projection(object):
             delay_afferent_edge = DelayAfferentPartitionableEdge(
                 pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
                     pre_vertex.label))
-            self._spinnaker.add_edge(delay_afferent_edge, EDGE_PARTITION_ID)
+            self._spinnaker.add_partitionable_edge(
+                delay_afferent_edge, EDGE_PARTITION_ID)
 
         # Ensure that the delay extension knows how many states it will support
         n_stages = int(math.ceil(

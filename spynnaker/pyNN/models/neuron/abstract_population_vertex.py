@@ -13,6 +13,9 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
+from spinn_front_end_common.abstract_models.\
+    abstract_recordable_interface import \
+    AbstractRecordableInterface
 from spinn_front_end_common.utilities import constants as \
     common_constants
 from spinn_front_end_common.interface.buffer_management\
@@ -72,6 +75,7 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
+        AbstractRecordableInterface,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
@@ -154,9 +158,25 @@ class AbstractPopulationVertex(
     def mark_no_changes(self):
         self._change_requires_mapping = False
 
+    def is_recording(self):
+        """
+        helper method for FEC to figure out if this is recording.
+        (used in check for infinite runs)
+        :return:
+        """
+        if (self._gsyn_recorder.record_gsyn or self._v_recorder.record_v
+                or self._spike_recorder.record):
+            return True
+        else:
+            return False
+
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
+        """
+        overloads
+        pacman.model.partitionable_vertex.PartitionableVertex.create_subvertex
+        """
 
         subvertex = PopulationPartitionedVertex(
             resources_required, label, constraints)

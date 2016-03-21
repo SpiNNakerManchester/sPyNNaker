@@ -1,4 +1,6 @@
 # spynnaker imports
+from spinn_front_end_common.abstract_models.abstract_recordable_interface import \
+    AbstractRecordableInterface
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.interface.abstract_mappable_interface \
     import AbstractMappableInterface
@@ -9,8 +11,7 @@ from spynnaker.pyNN.models.common.eieio_spike_recorder \
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_has_first_machine_time_step\
+from spinn_front_end_common.abstract_models.abstract_has_first_machine_time_step \
     import AbstractHasFirstMachineTimeStep
 
 
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
         SimplePopulationSettable, AbstractMappableInterface,
-        AbstractHasFirstMachineTimeStep):
+        AbstractHasFirstMachineTimeStep, AbstractRecordableInterface):
     """ Model for play back of spikes
     """
 
@@ -83,6 +84,8 @@ class SpikeSourceArray(
             send_buffer_notification_ip_address=self._ip_address,
             send_buffer_notification_port=self._port,
             send_buffer_notification_tag=tag)
+
+        AbstractRecordableInterface.__init__(self)
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
@@ -130,6 +133,17 @@ class SpikeSourceArray(
 
     def mark_no_changes(self):
         self._requires_mapping = False
+
+    def is_recording(self):
+        """
+        helper method for FEC to figure out if this is recording.
+        (used in check for infinite runs)
+        :return:
+        """
+        if self._spike_recorder.record:
+            return True
+        else:
+            return False
 
     @property
     def spike_times(self):

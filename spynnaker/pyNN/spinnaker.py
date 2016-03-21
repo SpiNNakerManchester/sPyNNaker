@@ -57,17 +57,27 @@ class Spinnaker(SpinnakerMainInterface):
             "algorithms_metadata.xml"))
 
         # create list of extra algorithms for auto pause and resume
-        extra_algorithms_for_auto_pause_and_resume =\
-            ["SpyNNakerRecordingExtractor",
-             "SpyNNakerRuntimeUpdaterAfterRun"]
+        extra_mapping_inputs = dict()
+        extra_mapping_algorithms = list()
+        extra_pre_run_algorithms = list()
+        extra_post_run_algorithms = list()
+
+        # extra post run algorithms
+        extra_post_run_algorithms.append("SpyNNakerRecordingExtractor")
+
+        # extra mapping inputs
+        extra_mapping_inputs['ExecuteMapping'] = config.getboolean(
+            "Database", "create_routing_info_to_neuron_id_mapping")
 
         SpinnakerMainInterface.__init__(
             self, config, _version, host_name=host_name,
             graph_label=graph_label, this_executable_finder=executable_finder,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
-            extra_algorithms_for_auto_pause_and_resume=
-            extra_algorithms_for_auto_pause_and_resume)
+            extra_mapping_inputs=extra_mapping_inputs,
+            extra_mapping_algorithms=extra_mapping_algorithms,
+            extra_pre_run_algorithms=extra_pre_run_algorithms,
+            extra_post_run_algorithms=extra_post_run_algorithms)
 
         # timing parameters
         self._min_supported_delay = None
@@ -95,71 +105,6 @@ class Spinnaker(SpinnakerMainInterface):
         # get the machine time step
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
-
-    def _create_pacman_executor_inputs(self, this_run_time, is_resetting=False):
-        inputs, application_graph_changed, using_auto_pause_and_resume = \
-            SpinnakerMainInterface._create_pacman_executor_inputs(
-                self, this_run_time, is_resetting)
-        if application_graph_changed and not is_resetting:
-            inputs.append({
-                'type': "ExecuteMapping",
-                'value': config.getboolean(
-                    "Database", "create_routing_info_to_neuron_id_mapping")})
-        return inputs, application_graph_changed, using_auto_pause_and_resume
-
-    def _create_algorithm_list(
-            self, debug, application_graph_changed, executing_reset,
-            using_auto_pause_and_resume):
-        """
-        creates the list of algorithms to use within the system
-        :param debug: if the tools should be operating in debug mode
-        :param application_graph_changed: has the graph changed since last run
-        :param executing_reset: are we executing a reset function
-        :param using_auto_pause_and_resume: check if the system is to use
-        auto pause and resume functionality
-        :return: list of algorithms to use and a list of optional
-        algorithms to use
-        """
-        # generate algorithm list from front end config
-        mapping_algorithms = list()
-
-        virtual_board = config.getboolean("Machine", "virtual_board")
-
-        if not virtual_board:
-            # needed for multi-run/SSA's to work correctly.
-            mapping_algorithms.append("SpyNNakerRuntimeUpdater")
-            # if not in auto pause and resume mode, use front end common
-            # chip runtime updater
-            if (application_graph_changed and not executing_reset and
-                    not using_auto_pause_and_resume):
-                mapping_algorithms.append("FrontEndCommonChipRuntimeUpdater")
-            if not application_graph_changed and not executing_reset:
-                mapping_algorithms.append("FrontEndCommonChipRuntimeUpdater")
-            if self._has_ran and not executing_reset:
-                mapping_algorithms.append("SpyNNakerRecordingExtractor")
-
-        # get config mapping algorithms and convert as needed
-        algorithm_names = config.get("Mapping", "algorithms")
-        algorithm_strings = algorithm_names.split(",")
-        for algorithm_string in algorithm_strings:
-            split_string = algorithm_string.split(":")
-            if len(split_string) == 1:
-                mapping_algorithms.append(split_string[0])
-            else:
-                raise common_exceptions.ConfigurationException(
-                    "The tool chain expects config params of list of 1 "
-                    "element with ,. Where the elements are either: the "
-                    "algorithm_name:algorithm_config_file_path, or "
-                    "algorithm_name if its a internal to pacman algorithm."
-                    " Please rectify this and try again")
-
-        # get common algorithm flow support
-        algorithms, optional_algorithms = \
-            self._create_all_flows_algorithm_common(
-                debug, application_graph_changed, executing_reset,
-                using_auto_pause_and_resume)
-        mapping_algorithms.extend(algorithms)
-        return mapping_algorithms, optional_algorithms
 
     def _set_up_machine_specifics(self, timestep, min_delay, max_delay,
                                   hostname):
@@ -209,50 +154,22 @@ class Spinnaker(SpinnakerMainInterface):
             self._time_scale_factor = \
                 config.getint("Machine", "timeScaleFactor")
             if timestep * self._time_scale_factor < 1000:
-                if config.getboolean(
-                        "Mode", "violate_1ms_wall_clock_restriction"):
-                    logger.warn(
-                        "*****************************************************")
-                    logger.warn(
-                        "*** The combination of simulation time step and   ***")
-                    logger.warn(
-                        "*** the machine time scale factor results in a    ***")
-                    logger.warn(
-                        "*** wall clock timer tick that is currently not   ***")
-                    logger.warn(
-                        "*** reliably supported by the spinnaker machine.  ***")
-                    logger.warn(
-                        "*****************************************************")
-                else:
-                    raise common_exceptions.ConfigurationException(
-                        "The combination of simulation time step and the"
-                        " machine time scale factor results in a wall clock "
-                        "timer tick that is currently not reliably supported "
-                        "by the spinnaker machine.")
+                logger.warn("the combination of machine time step and the "
+                            "machine time scale factor results in a real "
+                            "timer tick that is currently not reliably "
+                            "supported by the spinnaker machine.")
         else:
             self._time_scale_factor = max(1,
                                           math.ceil(1000.0 / float(timestep)))
             if self._time_scale_factor > 1:
-                logger.warn("A timestep was entered that has forced pacman103 "
+                logger.warn("A timestep was entered that has forced sPyNNaker "
                             "to automatically slow the simulation down from "
                             "real time by a factor of {}. To remove this "
                             "automatic behaviour, please enter a "
-                            "timescaleFactor value in your .pacman.cfg"
+                            "timescaleFactor value in your .spynnaker.cfg"
                             .format(self._time_scale_factor))
 
-        if hostname is not None:
-            self._hostname = hostname
-            logger.warn("The machine name from PyNN setup is overriding the "
-                        "machine name defined in the spynnaker.cfg file")
-        elif config.has_option("Machine", "machineName"):
-            self._hostname = config.get("Machine", "machineName")
-        else:
-            raise Exception("A SpiNNaker machine must be specified in "
-                            "spynnaker.cfg.")
-        use_virtual_board = config.getboolean("Machine", "virtual_board")
-        if self._hostname == 'None' and not use_virtual_board:
-            raise Exception("A SpiNNaker machine must be specified in "
-                            "spynnaker.cfg.")
+        SpinnakerMainInterface.set_up_machine_specifics(self, hostname)
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes

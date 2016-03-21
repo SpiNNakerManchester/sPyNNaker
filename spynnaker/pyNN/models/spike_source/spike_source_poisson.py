@@ -27,6 +27,9 @@ from spinn_front_end_common.utilities import constants as\
     front_end_common_constants
 from spinn_front_end_common.interface.buffer_management.buffer_models\
     .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
+from spinn_front_end_common.abstract_models.\
+    abstract_recordable_interface import \
+    AbstractRecordableInterface
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -47,7 +50,7 @@ RANDOM_SEED_WORDS = 4
 
 
 class SpikeSourcePoisson(
-        AbstractPartitionableVertex,
+        AbstractPartitionableVertex, AbstractRecordableInterface,
         AbstractDataSpecableVertex, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping):
@@ -87,6 +90,7 @@ class SpikeSourcePoisson(
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
+        AbstractRecordableInterface.__init__(self)
 
         # Store the parameters
         self._rate = rate
@@ -112,6 +116,17 @@ class SpikeSourcePoisson(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
             "Buffers", "use_auto_pause_and_resume")
+
+    def is_recording(self):
+        """
+        helper method for FEC to figure out if this is recording.
+        (used in check for infinite runs)
+        :return:
+        """
+        if self._spike_recorder.record:
+            return True
+        else:
+            return False
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
