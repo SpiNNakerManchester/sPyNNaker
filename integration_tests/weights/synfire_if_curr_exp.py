@@ -49,6 +49,8 @@ populations[0].record()
 
 p.run(5000)
 
+projections[0].getWeights()
+
 v = None
 gsyn = None
 spikes = None
