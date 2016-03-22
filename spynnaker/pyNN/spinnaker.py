@@ -190,14 +190,6 @@ class Spinnaker(SpinnakerMainInterface):
         return changed
 
     @property
-    def timescale_factor(self):
-        """
-
-        :return:
-        """
-        return self._time_scale_factor
-
-    @property
     def spikes_per_second(self):
         """
 
@@ -236,10 +228,6 @@ class Spinnaker(SpinnakerMainInterface):
         :return:
         """
         return self._max_supported_delay
-
-    def __repr__(self):
-        return "spynnaker front end instance for machine {}"\
-            .format(self._hostname)
 
     def add_partitionable_vertex(self, vertex_to_add):
         """
@@ -346,3 +334,11 @@ class Spinnaker(SpinnakerMainInterface):
 
         SpinnakerMainInterface.stop(
             self, turn_off_machine, clear_routing_tables, clear_tags)
+
+    def run(self, run_time):
+        self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
+        SpinnakerMainInterface.run(self, run_time)
+
+    def __repr__(self):
+        return "spynnaker front end instance for machine {}"\
+            .format(self._hostname)
