@@ -24,7 +24,7 @@ from spinn_front_end_common.interface.abstract_mappable_interface \
 
 from spinn_front_end_common.utilities import exceptions
 
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 import logging
