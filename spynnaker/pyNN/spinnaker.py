@@ -292,14 +292,14 @@ class Spinnaker(SpinnakerMainInterface):
             source, target, synapse_dynamics, label, rng):
         """
 
-        :param presynaptic_population:
-        :param postsynaptic_population:
-        :param connector:
+        :param presynaptic_population: source pop this projection goes from
+        :param postsynaptic_population: dest pop this projection goes to
+        :param connector: the definition of which neurons connect to each other
         :param source:
-        :param target:
-        :param synapse_dynamics:
-        :param label:
-        :param rng:
+        :param target: type of projection
+        :param synapse_dynamics: plasticity object
+        :param label: human readable version of the projection
+        :param rng: the random number generator to use on this projection
         :return:
         """
         if label is None:
@@ -336,6 +336,11 @@ class Spinnaker(SpinnakerMainInterface):
             self, turn_off_machine, clear_routing_tables, clear_tags)
 
     def run(self, run_time):
+        """
+        main entrance for running the graph
+        :param run_time: the time in ms to run the sim for.
+        :return: None
+        """
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         SpinnakerMainInterface.run(self, run_time)
 
