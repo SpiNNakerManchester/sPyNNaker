@@ -2,6 +2,11 @@
 # front end common imports
 from spinn_front_end_common.utilities.database.\
     database_writer import DatabaseWriter
+from spinn_front_end_common.utility_models.live_packet_gather_partitioned_vertex import \
+    LivePacketGatherPartitionedVertex
+from spinn_front_end_common.utility_models.reverse_ip_tag_multicast_source_partitioned_vertex import \
+    ReverseIPTagMulticastSourcePartitionedVertex
+from spynnaker.pyNN import SpikeSourceArray
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 
