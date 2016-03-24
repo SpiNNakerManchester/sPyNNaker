@@ -348,7 +348,7 @@ def get_time_step():
             "You currently have not ran setup, please do so before calling "
             "get_time_step")
     else:
-        return _spinnaker.machine_time_step
+        return _spinnaker.machine_time_step / _spinnaker.machine_time_step
 
 
 def get_min_delay():
