@@ -49,6 +49,13 @@ class Spinnaker(SpinnakerMainInterface):
         # and add this default to end of list of search paths
         executable_finder.add_path(os.path.dirname(model_binaries.__file__))
 
+        # population holders
+        self._populations = list()
+        self._projections = list()
+        self._multi_cast_vertex = None
+        self._edge_count = 0
+        self._live_spike_recorder = dict()
+
         # create xml path for where to locate spynnaker related functions when
         # using auto pause and resume
         extra_algorithm_xml_path = list()
@@ -61,6 +68,9 @@ class Spinnaker(SpinnakerMainInterface):
         extra_mapping_algorithms = list()
         extra_pre_run_algorithms = list()
         extra_post_run_algorithms = list()
+        extra_provenance_algorithms = list()
+
+        extra_provenance_algorithms.append("SPyNNakerProvenanceWriter")
 
         # extra post run algorithms
         extra_post_run_algorithms.append("SpyNNakerRecordingExtractor")
@@ -68,6 +78,7 @@ class Spinnaker(SpinnakerMainInterface):
         # extra mapping inputs
         extra_mapping_inputs['ExecuteMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
+        extra_mapping_inputs["Projections"] = self._projections
 
         SpinnakerMainInterface.__init__(
             self, config, _version, host_name=host_name,
@@ -77,7 +88,8 @@ class Spinnaker(SpinnakerMainInterface):
             extra_mapping_inputs=extra_mapping_inputs,
             extra_mapping_algorithms=extra_mapping_algorithms,
             extra_pre_run_algorithms=extra_pre_run_algorithms,
-            extra_post_run_algorithms=extra_post_run_algorithms)
+            extra_post_run_algorithms=extra_post_run_algorithms,
+            extra_provenance_algorithms=extra_provenance_algorithms)
 
         # timing parameters
         self._min_supported_delay = None
@@ -87,13 +99,6 @@ class Spinnaker(SpinnakerMainInterface):
             "Simulation", "spikes_per_second"))
         self._ring_buffer_sigma = float(config.getfloat(
             "Simulation", "ring_buffer_sigma"))
-
-        # population holders
-        self._populations = list()
-        self._projections = list()
-        self._multi_cast_vertex = None
-        self._edge_count = 0
-        self._live_spike_recorder = dict()
 
         # set up machine targeted data
         self._set_up_machine_specifics(timestep, min_delay, max_delay,

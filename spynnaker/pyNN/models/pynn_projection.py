@@ -455,3 +455,6 @@ class Projection(object):
         """
         # TODO
         raise NotImplementedError
+
+    def get_provenance_data(self):
+        return self._synapse_information.connector.get_provenance_data()

@@ -14,8 +14,7 @@ from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.abstract_models.\
-    abstract_recordable_interface import \
-    AbstractRecordableInterface
+    abstract_recordable import AbstractRecordable
 from spinn_front_end_common.utilities import constants as \
     common_constants
 from spinn_front_end_common.interface.buffer_management\
@@ -75,7 +74,7 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
-        AbstractRecordableInterface,
+        AbstractRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,

@@ -28,8 +28,7 @@ from spinn_front_end_common.utilities import constants as\
 from spinn_front_end_common.interface.buffer_management.buffer_models\
     .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
 from spinn_front_end_common.abstract_models.\
-    abstract_recordable_interface import \
-    AbstractRecordableInterface
+    abstract_recordable import AbstractRecordable
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -50,7 +49,7 @@ RANDOM_SEED_WORDS = 4
 
 
 class SpikeSourcePoisson(
-        AbstractPartitionableVertex, AbstractRecordableInterface,
+        AbstractPartitionableVertex, AbstractRecordable,
         AbstractDataSpecableVertex, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping):
@@ -90,7 +89,7 @@ class SpikeSourcePoisson(
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
-        AbstractRecordableInterface.__init__(self)
+        AbstractRecordable.__init__(self)
 
         # Store the parameters
         self._rate = rate
