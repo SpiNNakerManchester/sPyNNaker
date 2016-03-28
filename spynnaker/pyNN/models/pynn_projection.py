@@ -457,4 +457,18 @@ class Projection(object):
         raise NotImplementedError
 
     def get_provenance_data(self):
-        return self._synapse_information.connector.get_provenance_data()
+        # get connector provenance
+        prov_items = self._synapse_information.connector.get_provenance_data()
+
+        # if plastic synapse dynamics, look for provenance data on clippage
+        if not isinstance(
+                self._synapse_information.synapse_dynamics,
+                SynapseDynamicsStatic):
+            prov_items.extend(
+                self._synapse_information.synapse_dynamics.timing_dependence.
+                get_provenance_data(
+                    self._synapse_information.connector.pre_population,
+                    self._synapse_information.connector.post_population))
+
+        # return prov items
+        return prov_items

@@ -1,3 +1,6 @@
+from spinn_front_end_common.utilities.utility_objs.provenance_data_item import \
+    ProvenanceDataItem
+
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
@@ -25,6 +28,12 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self._nearest = nearest
 
         self._synapse_structure = SynapseStructureWeightOnly()
+
+        # provenance data
+        self._clipped_tau_plus = None
+        self._tau_plus_last_entry = None
+        self._clipped_tau_minus = None
+        self._tau_minus_last_entry = None
 
     @property
     def tau_plus(self):
@@ -72,12 +81,53 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
                 "STDP LUT generation currently only supports 1ms timesteps")
 
         # Write lookup tables
-        plasticity_helpers.write_exp_lut(
-            spec, self._tau_plus, LOOKUP_TAU_PLUS_SIZE, LOOKUP_TAU_PLUS_SHIFT)
-        plasticity_helpers.write_exp_lut(
-            spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
-            LOOKUP_TAU_MINUS_SHIFT)
+        self._clipped_tau_plus, self._tau_plus_last_entry = \
+            plasticity_helpers.write_exp_lut(
+                spec, self._tau_plus, LOOKUP_TAU_PLUS_SIZE,
+                LOOKUP_TAU_PLUS_SHIFT)
+        self._clipped_tau_minus, self._tau_minus_last_entry = \
+            plasticity_helpers.write_exp_lut(
+                spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
+                LOOKUP_TAU_MINUS_SHIFT)
 
     @property
     def synaptic_structure(self):
         return self._synapse_structure
+
+    def get_provenance_data(self, pre_population, post_population):
+        prov_data = list()
+        names = ["Timing_dependence_pfister_spike_triplet between {} and {}"
+                 .format(pre_population.label, post_population.label)]
+        prov_data.append(ProvenanceDataItem(
+            self._add_name(names, "times_tau_plus_clipped"),
+            self._clipped_tau_plus,
+            report=self._clipped_tau_plus > 0,
+            message=(
+                "The timing dependence pfister spike triplet between {} and {}"
+                " has had its tau_plus parameter below {} clipped to {} a "
+                "total of {} times. If this is a issue, try reducing the range"
+                " of the tau plus parameters or decreasing the time constant."
+                .format(
+                    pre_population.label, post_population.label,
+                    self._tau_plus_last_entry, self._tau_plus_last_entry,
+                    self._clipped_tau_plus))))
+        prov_data.append(ProvenanceDataItem(
+            self._add_name(names, "times_tau_minus_clipped"),
+            self._clipped_tau_minus,
+            report=self._clipped_tau_minus > 0,
+            message=(
+                "The timing dependence pfister spike triplet between {} and {}"
+                " has had its tau_minus parameter below {} clipped to {} a "
+                "total of {} times. If this is a issue, try reducing the range"
+                " of the tau minus parameters or decreasing the time constant."
+                .format(
+                    pre_population.label, post_population.label,
+                    self._tau_minus_last_entry, self._tau_minus_last_entry,
+                    self._clipped_tau_minus))))
+        return prov_data
+
+    @staticmethod
+    def _add_name(names, name):
+        new_names = list(names)
+        new_names.append(name)
+        return new_names

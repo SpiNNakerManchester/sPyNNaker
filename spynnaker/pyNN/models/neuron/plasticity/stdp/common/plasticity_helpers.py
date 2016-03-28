@@ -18,14 +18,13 @@ def write_exp_lut(spec, time_constant, size, shift,
     # Calculate time constant reciprocal
     time_constant_reciprocal = 1.0 / float(time_constant)
 
+    # accumulator for clipped values
+    accum = 0
+
     # Check that the last
     last_time = (size - 1) << shift
     last_value = float(last_time) * time_constant_reciprocal
     last_exp_float = math.exp(-last_value)
-    if float_to_fixed(last_exp_float, fixed_point_one) != 0:
-        logger.warning("STDP lookup table with size %u is too short to contain"
-                       " decay with time constant %u - last entry is %f"
-                       % (size, time_constant, last_exp_float))
 
     # Generate LUT
     for i in range(size):
@@ -37,5 +36,11 @@ def write_exp_lut(spec, time_constant, size, shift,
         exp_float = math.exp(-value)
 
         # Convert to fixed-point and write to spec
-        spec.write_value(data=float_to_fixed(exp_float, fixed_point_one),
+        value = float_to_fixed(exp_float, fixed_point_one)
+        if float_to_fixed(last_exp_float, fixed_point_one) != 0:
+            accum += 1
+        spec.write_value(data=value,
                          data_type=DataType.INT16)
+
+    # return clipped and last value.
+    return accum, last_exp_float

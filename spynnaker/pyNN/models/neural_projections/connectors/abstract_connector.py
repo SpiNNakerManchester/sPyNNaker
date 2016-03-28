@@ -35,6 +35,14 @@ class AbstractConnector(object):
         self._clipped_delays = 0
         self._min_time_step = 0
 
+    @property
+    def pre_population(self):
+        return self._pre_population
+
+    @property
+    def post_population(self):
+        return self._post_population
+
     def set_min_time_step(self, min_time_step):
         self._min_time_step = min_time_step
 
