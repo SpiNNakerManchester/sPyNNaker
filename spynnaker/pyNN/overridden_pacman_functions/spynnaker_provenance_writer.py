@@ -1,8 +1,7 @@
 
 
 class SPyNNakerProvenanceWriter(object):
-    """
-    SPyNNakerProvenanceWriter: acquires provenance from spynnaker related objects
+    """ Gets provenance data from sPyNNaker objects
     """
 
     def __call__(self, projections, provenance_data_objects=None):

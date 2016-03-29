@@ -136,15 +136,7 @@ class SpikeSourceArray(
         self._requires_mapping = False
 
     def is_recording(self):
-        """
-        helper method for FEC to figure out if this is recording.
-        (used in check for infinite runs)
-        :return:
-        """
-        if self._spike_recorder.record:
-            return True
-        else:
-            return False
+        return self._spike_recorder.record
 
     @property
     def spike_times(self):

@@ -42,8 +42,8 @@ class Spinnaker(SpinnakerMainInterface):
     """
 
     def __init__(
-            self, host_name=None, timestep=None, min_delay=None, max_delay=None,
-            graph_label=None, database_socket_addresses=None):
+            self, host_name=None, timestep=None, min_delay=None,
+            max_delay=None, graph_label=None, database_socket_addresses=None):
 
         # Determine default executable folder location
         # and add this default to end of list of search paths
@@ -95,10 +95,6 @@ class Spinnaker(SpinnakerMainInterface):
         self._min_supported_delay = None
         self._max_supported_delay = None
         self._time_scale_factor = None
-        self._spikes_per_second = float(config.getfloat(
-            "Simulation", "spikes_per_second"))
-        self._ring_buffer_sigma = float(config.getfloat(
-            "Simulation", "ring_buffer_sigma"))
 
         # set up machine targeted data
         self._set_up_machine_specifics(timestep, min_delay, max_delay,
@@ -195,42 +191,14 @@ class Spinnaker(SpinnakerMainInterface):
         return changed
 
     @property
-    def spikes_per_second(self):
-        """
-
-        :return:
-        """
-        return self._spikes_per_second
-
-    @property
-    def ring_buffer_sigma(self):
-        """
-
-        :return:
-        """
-        return self._ring_buffer_sigma
-
-    @property
-    def get_multi_cast_source(self):
-        """
-
-        :return:
-        """
-        return self._multi_cast_vertex
-
-    @property
     def min_supported_delay(self):
-        """
-        the min supported delay based in milliseconds
-        :return:
+        """ The minimum supported delay based in milliseconds
         """
         return self._min_supported_delay
 
     @property
     def max_supported_delay(self):
-        """
-        the max supported delay based in milliseconds
-        :return:
+        """ The maximum supported delay based in milliseconds
         """
         return self._max_supported_delay
 
@@ -286,9 +254,7 @@ class Spinnaker(SpinnakerMainInterface):
         self._populations.append(population)
 
     def _add_projection(self, projection):
-        """ called by each projection to add itself to the list
-        :param projection:
-        :return:
+        """ Called by each projection to add itself to the list
         """
         self._projections.append(projection)
 
@@ -341,14 +307,9 @@ class Spinnaker(SpinnakerMainInterface):
             self, turn_off_machine, clear_routing_tables, clear_tags)
 
     def run(self, run_time):
-        """
-        main entrance for running the graph
-        :param run_time: the time in ms to run the sim for.
-        :return: None
+        """ Run the model created
+
+        :param run_time: the time in ms to run the simulation for
         """
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         SpinnakerMainInterface.run(self, run_time)
-
-    def __repr__(self):
-        return "spynnaker front end instance for machine {}"\
-            .format(self._hostname)

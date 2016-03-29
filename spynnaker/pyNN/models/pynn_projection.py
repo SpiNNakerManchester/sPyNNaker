@@ -79,7 +79,8 @@ class Projection(object):
         self._synapse_information = SynapseInformation(
             connector, synapse_dynamics_stdp, synapse_type)
         connector.set_projection_information(
-            presynaptic_population, postsynaptic_population, rng)
+            presynaptic_population, postsynaptic_population, rng,
+            machine_time_step)
 
         max_delay = synapse_dynamics_stdp.get_delay_maximum(connector)
         if max_delay is None:

@@ -158,24 +158,13 @@ class AbstractPopulationVertex(
         self._change_requires_mapping = False
 
     def is_recording(self):
-        """
-        helper method for FEC to figure out if this is recording.
-        (used in check for infinite runs)
-        :return:
-        """
-        if (self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
-                self._spike_recorder.record):
-            return True
-        else:
-            return False
+        return (
+            self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
+            self._spike_recorder.record)
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        """
-        overloads
-        pacman.model.partitionable_vertex.PartitionableVertex.create_subvertex
-        """
 
         subvertex = PopulationPartitionedVertex(
             resources_required, label, constraints)

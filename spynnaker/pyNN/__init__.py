@@ -283,9 +283,6 @@ def Projection(presynaptic_population, postsynaptic_population,
     """
     global _spinnaker
 
-    # set the min supported delay for the connector
-    connector.set_min_time_step(_spinnaker.machine_time_step)
-
     return _spinnaker.create_projection(
         presynaptic_population, postsynaptic_population, connector, source,
         target, synapse_dynamics, label, rng)
