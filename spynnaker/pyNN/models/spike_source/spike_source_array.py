@@ -2,8 +2,8 @@
 from spinn_front_end_common.abstract_models.abstract_recordable import \
     AbstractRecordable
 from spynnaker.pyNN.utilities import constants
-from spinn_front_end_common.interface.abstract_mappable_interface \
-    import AbstractMappableInterface
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
@@ -11,7 +11,8 @@ from spynnaker.pyNN.models.common.eieio_spike_recorder \
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.utilities.conf import config
-from spinn_front_end_common.abstract_models.abstract_has_first_machine_time_step \
+from spinn_front_end_common.abstract_models\
+    .abstract_has_first_machine_time_step \
     import AbstractHasFirstMachineTimeStep
 
 
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractMappableInterface,
+        SimplePopulationSettable, AbstractChangableAfterRun,
         AbstractHasFirstMachineTimeStep, AbstractRecordable):
     """ Model for play back of spikes
     """
@@ -89,7 +90,7 @@ class SpikeSourceArray(
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
-        AbstractMappableInterface.__init__(self)
+        AbstractChangableAfterRun.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
 
         # handle recording
@@ -135,15 +136,7 @@ class SpikeSourceArray(
         self._requires_mapping = False
 
     def is_recording(self):
-        """
-        helper method for FEC to figure out if this is recording.
-        (used in check for infinite runs)
-        :return:
-        """
-        if self._spike_recorder.record:
-            return True
-        else:
-            return False
+        return self._spike_recorder.record
 
     @property
     def spike_times(self):

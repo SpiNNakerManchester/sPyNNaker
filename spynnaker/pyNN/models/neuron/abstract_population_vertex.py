@@ -13,8 +13,8 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models.\
-    abstract_recordable import AbstractRecordable
+from spinn_front_end_common.abstract_models.abstract_recordable \
+    import AbstractRecordable
 from spinn_front_end_common.utilities import constants as \
     common_constants
 from spinn_front_end_common.interface.buffer_management\
@@ -31,8 +31,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
-from spinn_front_end_common.interface.abstract_mappable_interface \
-    import AbstractMappableInterface
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
@@ -78,7 +78,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractMappableInterface):
+        AbstractChangableAfterRun):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -100,7 +100,7 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
-        AbstractMappableInterface.__init__(self)
+        AbstractChangableAfterRun.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -158,24 +158,13 @@ class AbstractPopulationVertex(
         self._change_requires_mapping = False
 
     def is_recording(self):
-        """
-        helper method for FEC to figure out if this is recording.
-        (used in check for infinite runs)
-        :return:
-        """
-        if (self._gsyn_recorder.record_gsyn or self._v_recorder.record_v
-                or self._spike_recorder.record):
-            return True
-        else:
-            return False
+        return (
+            self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
+            self._spike_recorder.record)
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        """
-        overloads
-        pacman.model.partitionable_vertex.PartitionableVertex.create_subvertex
-        """
 
         subvertex = PopulationPartitionedVertex(
             resources_required, label, constraints)

@@ -114,6 +114,3 @@ class SmallWorldConnector(AbstractConnector):
             post_vertex_slice.lo_atom)
 
         return block
-
-    def label(self):
-        return "small_world_connector"

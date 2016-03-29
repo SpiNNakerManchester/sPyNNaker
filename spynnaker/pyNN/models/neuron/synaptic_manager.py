@@ -175,7 +175,7 @@ class SynapticManager(object):
                     subedge.pre_subvertex)
 
                 memory_size += self._get_size_of_synapse_information(
-                    edge.synapse_information, pre_slices,pre_slice_index,
+                    edge.synapse_information, pre_slices, pre_slice_index,
                     post_slices, post_slice_index, pre_vertex_slice,
                     post_vertex_slice, edge.n_delay_stages)
 
@@ -230,8 +230,8 @@ class SynapticManager(object):
         return memory_size
 
     def _get_size_of_synapse_information(
-            self, synapse_information, pre_slices,pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            self, synapse_information, pre_slices, pre_slice_index,
+            post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
             n_delay_stages):
 
         memory_size = 0
@@ -397,8 +397,8 @@ class SynapticManager(object):
             edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(
                 subedge)
             pre_slices = [
-                graph_mapper.get_subvertex_slice(subvertex)
-                for subvertex in graph_mapper.get_subvertices_from_vertex(
+                graph_mapper.get_subvertex_slice(subv)
+                for subv in graph_mapper.get_subvertices_from_vertex(
                     edge.pre_vertex)]
             pre_slice_index = pre_slices.index(pre_vertex_slice)
             if isinstance(edge, ProjectionPartitionableEdge):
