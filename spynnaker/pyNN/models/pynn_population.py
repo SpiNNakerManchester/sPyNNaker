@@ -18,8 +18,8 @@ from spynnaker.pyNN.models.common.abstract_v_recordable \
     import AbstractVRecordable
 
 from spinn_front_end_common.utilities import exceptions
-from spinn_front_end_common.interface.abstract_mappable_interface \
-    import AbstractMappableInterface
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 
 import numpy
 import logging
@@ -98,13 +98,13 @@ class Population(object):
 
     @property
     def requires_mapping(self):
-        if isinstance(self._vertex, AbstractMappableInterface):
+        if isinstance(self._vertex, AbstractChangableAfterRun):
             return self._vertex.requires_mapping
         return self._change_requires_mapping
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
-        if isinstance(self._vertex, AbstractMappableInterface):
+        if isinstance(self._vertex, AbstractChangableAfterRun):
             self._vertex.mark_no_changes()
 
     def __add__(self, other):

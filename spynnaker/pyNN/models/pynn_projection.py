@@ -19,8 +19,8 @@ from spynnaker.pyNN.models.neural_projections\
     .delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
-from spinn_front_end_common.interface.abstract_mappable_interface \
-    import AbstractMappableInterface
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 
 from spinn_front_end_common.utilities import exceptions
 
@@ -157,13 +157,13 @@ class Projection(object):
 
     @property
     def requires_mapping(self):
-        if (isinstance(self._projection_edge, AbstractMappableInterface) and
+        if (isinstance(self._projection_edge, AbstractChangableAfterRun) and
                 self._projection_edge.requires_mapping):
             return True
         return False
 
     def mark_no_changes(self):
-        if isinstance(self._projection_edge, AbstractMappableInterface):
+        if isinstance(self._projection_edge, AbstractChangableAfterRun):
             self._projection_edge.mark_no_changes()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
