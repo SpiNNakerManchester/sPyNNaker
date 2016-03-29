@@ -1,4 +1,27 @@
 <algorithms>
+    <algorithm name = "SPyNNakerProvenanceWriter">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_provenance_writer</python_module>
+        <python_class>SPyNNakerProvenanceWriter</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>projections</param_name>
+                <param_type>Projections</param_type>
+            </parameter>
+        </required_inputs>
+        <optional_inputs>
+            <parameter>
+                <param_name>provenance_data_objects</param_name>
+                <param_type>ProvenanceItems</param_type>
+                <param_rank>1</param_rank>
+            </parameter>
+        </optional_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>prov_items</param_name>
+                <param_type>ProvenanceItems</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="GraphEdgeFilter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter</python_module>
         <python_class>GraphEdgeFilter</python_class>

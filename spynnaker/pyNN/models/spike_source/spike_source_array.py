@@ -11,7 +11,8 @@ from spynnaker.pyNN.models.common.eieio_spike_recorder \
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.utilities.conf import config
-from spinn_front_end_common.abstract_models.abstract_has_first_machine_time_step \
+from spinn_front_end_common.abstract_models\
+    .abstract_has_first_machine_time_step \
     import AbstractHasFirstMachineTimeStep
 
 

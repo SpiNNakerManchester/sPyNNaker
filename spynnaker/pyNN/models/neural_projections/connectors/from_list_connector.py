@@ -129,6 +129,18 @@ class FromListConnector(AbstractConnector):
         block["source"] = items["source"]
         block["target"] = items["target"]
         block["weight"] = items["weight"]
-        block["delay"] = items["delay"]
+        block["delay"] = self._clip_delays(items["delay"])
         block["synapse_type"] = synapse_type
         return block
+
+    def _clip_delays(self, delays):
+        # count clippable values
+        self._clipped_delays = (delays < (self._min_time_step / 1000)).sum()
+
+        # clip clippable values
+        delays[delays < (self._min_time_step / 1000)] = \
+            self._min_time_step / 1000
+        return delays
+
+    def label(self):
+        return "from_list_connector"

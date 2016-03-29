@@ -36,3 +36,6 @@ class FromFileConnector(FromListConnector):
             real_file.close()
 
         FromListConnector.__init__(self, conn_list, safe, verbose)
+
+    def label(self):
+        return "from_file_connector"

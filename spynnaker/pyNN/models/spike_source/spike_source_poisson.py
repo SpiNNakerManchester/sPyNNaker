@@ -27,8 +27,8 @@ from spinn_front_end_common.utilities import constants as\
     front_end_common_constants
 from spinn_front_end_common.interface.buffer_management.buffer_models\
     .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
-from spinn_front_end_common.abstract_models.abstract_recordable import \
-    AbstractRecordable
+from spinn_front_end_common.abstract_models.abstract_recordable \
+    import AbstractRecordable
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator

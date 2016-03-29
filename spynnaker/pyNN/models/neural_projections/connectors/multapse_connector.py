@@ -192,3 +192,6 @@ class MultapseConnector(AbstractConnector):
             self._delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         return block
+
+    def label(self):
+        return "multapse_connector"

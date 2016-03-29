@@ -3,6 +3,9 @@ from six import add_metaclass
 from abc import abstractmethod
 from pyNN.random import RandomDistribution
 from pyNN.random import NumpyRNG
+
+from spinn_front_end_common.utilities.utility_objs.provenance_data_item import \
+    ProvenanceDataItem
 from spynnaker.pyNN.utilities import utility_calls
 import numpy
 import math
@@ -28,6 +31,12 @@ class AbstractConnector(object):
         self._n_pre_neurons = None
         self._n_post_neurons = None
         self._rng = None
+
+        self._clipped_delays = 0
+        self._min_time_step = 0
+
+    def set_min_time_step(self, min_time_step):
+        self._min_time_step = min_time_step
 
     def set_projection_information(
             self, pre_population, post_population, rng):
@@ -254,7 +263,7 @@ class AbstractConnector(object):
         weights = self._generate_values(
             values, n_connections, connection_slices)
         if self._safe:
-            if numpy.amin(weights) < 0 and numpy.amax(weights) > 0:
+            if numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"
                     " in projection {}->{}".format(
@@ -265,8 +274,15 @@ class AbstractConnector(object):
     def _generate_delays(self, values, n_connections, connection_slices):
         """ Generate delay values
         """
-        return self._generate_values(
+        delays = self._generate_values(
             values, n_connections, connection_slices)
+        # count clippable values
+        self._clipped_delays = (delays < (self._min_time_step / 1000)).sum()
+
+        # clip clippable values
+        delays[delays < (self._min_time_step / 1000)] = \
+            self._min_time_step / 1000
+        return delays
 
     def _generate_lists_on_host(self, values):
         """ Checks if the connector should generate lists on host rather than\
@@ -299,3 +315,36 @@ class AbstractConnector(object):
             synapse_type):
         """ Create a synaptic block from the data
         """
+
+    @abstractmethod
+    def label(self):
+        """
+        helper method for human readable form of the connector
+        :return:
+        """
+
+    def get_provenance_data(self):
+        data_items = list()
+        names = ["connector_{}_{}_{}".format(
+            self.label(), self._pre_population.label,
+            self._post_population.label)]
+        data_items.append(ProvenanceDataItem(
+            self._add_name(names, "Times_synaptic_delays_got_clipped"),
+            self._clipped_delays,
+            report=self._clipped_delays > 0,
+            message=(
+                "The delays from the {} from {} to {} was clipped "
+                "from below {} to {} a total of {} times. If this causes "
+                "issues you can decrease the time step located within the "
+                ".spynnaker.cfg file or increase your delay above the "
+                "timestep threshold.".format(
+                    self.label(), self._pre_population.label,
+                    self._post_population.label, (self._min_time_step / 1000),
+                    (self._min_time_step / 1000), self._clipped_delays))))
+        return data_items
+
+    @staticmethod
+    def _add_name(names, name):
+        new_names = list(names)
+        new_names.append(name)
+        return new_names

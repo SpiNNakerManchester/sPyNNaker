@@ -13,8 +13,8 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models.abstract_recordable import \
-    AbstractRecordable
+from spinn_front_end_common.abstract_models.abstract_recordable \
+    import AbstractRecordable
 from spinn_front_end_common.utilities import constants as \
     common_constants
 from spinn_front_end_common.interface.buffer_management\
@@ -163,8 +163,8 @@ class AbstractPopulationVertex(
         (used in check for infinite runs)
         :return:
         """
-        if (self._gsyn_recorder.record_gsyn or self._v_recorder.record_v
-                or self._spike_recorder.record):
+        if (self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
+                self._spike_recorder.record):
             return True
         else:
             return False
