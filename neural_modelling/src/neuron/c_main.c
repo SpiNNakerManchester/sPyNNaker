@@ -56,7 +56,7 @@ typedef enum extra_provenance_data_region_entries{
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC = -1, SDP_AND_DMA_AND_USER = 0, TIMER = 2
+    MC = -1, SDP_AND_DMA_AND_USER = 0, TIMER_AND_BUFFERING = 2
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
@@ -95,7 +95,8 @@ static bool initialise_recording(){
 
     bool success = recording_initialize(
         n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, 2, &recording_flags);
+        recording_flags_from_system_conf, state_region,
+        TIMER_AND_BUFFERING, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
     return success;
 }
@@ -176,7 +177,7 @@ static bool initialise(uint32_t *timer_period) {
 
 void c_main_store_provenance_data(address_t provenance_region){
     log_debug("writing other provenance data");
-    
+
     // store the data into the provenance data region
     provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
         synapses_get_pre_synaptic_events();
@@ -254,7 +255,7 @@ void c_main(void) {
     spin1_set_timer_tick(timer_period);
 
     // Set up the timer tick callback (others are handled elsewhere)
-    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER_AND_BUFFERING);
 
     // Set up callback listening to SDP messages
     simulation_register_simulation_sdp_callback(

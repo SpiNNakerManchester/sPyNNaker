@@ -12,14 +12,12 @@ from ._version import __version__, __version_name__, __version_month__,\
 
 
 # utility functions
-from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import utility_calls
 
 # pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN.spinnaker import executable_finder
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities.conf import config
 
 # notification protocol classes (stored in front end common)
 from spinn_front_end_common.utilities.notification_protocol.\
@@ -104,7 +102,6 @@ import spynnaker
 # constraints
 
 # note importing star is a bad thing to do.
-from pyNN.random import *
 from pyNN.space import *
 import os
 
@@ -285,6 +282,7 @@ def Projection(presynaptic_population, postsynaptic_population,
     :return:
     """
     global _spinnaker
+
     return _spinnaker.create_projection(
         presynaptic_population, postsynaptic_population, connector, source,
         target, synapse_dynamics, label, rng)
@@ -351,7 +349,7 @@ def get_time_step():
             "You currently have not ran setup, please do so before calling "
             "get_time_step")
     else:
-        return _spinnaker.machine_time_step
+        return _spinnaker.machine_time_step / _spinnaker.machine_time_step
 
 
 def get_min_delay():
