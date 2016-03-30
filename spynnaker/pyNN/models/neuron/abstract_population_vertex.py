@@ -381,8 +381,7 @@ class AbstractPopulationVertex(
                 x, y, profiling_region_base_address_offset, 4))
             profiling_region_base_address = \
                 struct.unpack_from("<I", profiling_region_base_address_buf)[0]
-            profiling_region_base_address += app_data_base_address
-            
+
             # Read the profiling data size
             words_written_data =\
                 buffer(txrx.read_memory(
