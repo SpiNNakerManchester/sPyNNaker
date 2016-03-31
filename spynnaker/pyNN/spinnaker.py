@@ -24,7 +24,6 @@ from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN import _version
 
 # general imports
 import logging
@@ -63,33 +62,16 @@ class Spinnaker(SpinnakerMainInterface):
             os.path.dirname(overridden_pacman_functions.__file__),
             "algorithms_metadata.xml"))
 
-        # create list of extra algorithms for auto pause and resume
         extra_mapping_inputs = dict()
-        extra_mapping_algorithms = list()
-        extra_pre_run_algorithms = list()
-        extra_post_run_algorithms = list()
-        extra_provenance_algorithms = list()
-
-        extra_provenance_algorithms.append("SPyNNakerProvenanceWriter")
-
-        # extra post run algorithms
-        extra_post_run_algorithms.append("SpyNNakerRecordingExtractor")
-
-        # extra mapping inputs
-        extra_mapping_inputs['ExecuteMapping'] = config.getboolean(
+        extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
-        extra_mapping_inputs["Projections"] = self._projections
 
         SpinnakerMainInterface.__init__(
-            self, config, _version, host_name=host_name,
-            graph_label=graph_label, this_executable_finder=executable_finder,
+            self, config, graph_label=graph_label,
+            executable_finder=executable_finder,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
-            extra_mapping_inputs=extra_mapping_inputs,
-            extra_mapping_algorithms=extra_mapping_algorithms,
-            extra_pre_run_algorithms=extra_pre_run_algorithms,
-            extra_post_run_algorithms=extra_post_run_algorithms,
-            extra_provenance_algorithms=extra_provenance_algorithms)
+            extra_mapping_inputs=extra_mapping_inputs)
 
         # timing parameters
         self._min_supported_delay = None
@@ -97,8 +79,8 @@ class Spinnaker(SpinnakerMainInterface):
         self._time_scale_factor = None
 
         # set up machine targeted data
-        self._set_up_machine_specifics(timestep, min_delay, max_delay,
-                                       host_name)
+        self._set_up_timings(timestep, min_delay, max_delay)
+        self.set_up_machine_specifics(host_name)
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -107,8 +89,7 @@ class Spinnaker(SpinnakerMainInterface):
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
-    def _set_up_machine_specifics(self, timestep, min_delay, max_delay,
-                                  hostname):
+    def _set_up_timings(self, timestep, min_delay, max_delay):
         self._machine_time_step = config.getint("Machine", "machineTimeStep")
 
         # deal with params allowed via the setup options
@@ -169,8 +150,6 @@ class Spinnaker(SpinnakerMainInterface):
                             "automatic behaviour, please enter a "
                             "timescaleFactor value in your .spynnaker.cfg"
                             .format(self._time_scale_factor))
-
-        SpinnakerMainInterface.set_up_machine_specifics(self, hostname)
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
@@ -311,5 +290,9 @@ class Spinnaker(SpinnakerMainInterface):
 
         :param run_time: the time in ms to run the simulation for
         """
+
+        # extra post run algorithms
+        if self._has_ran:
+            self._extra_pre_run_algorithms = ["SpyNNakerRecordingExtractor"]
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         SpinnakerMainInterface.run(self, run_time)

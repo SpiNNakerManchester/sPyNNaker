@@ -224,3 +224,13 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         # The maximum weight is the largest that it could be set to from
         # the weight dependence
         return self._weight_dependence.weight_maximum
+
+    def get_provenance_data(self, pre_population_label, post_population_label):
+        prov_data = list()
+        if self._timing_dependence is not None:
+            prov_data.extend(self._timing_dependence.get_provenance_data(
+                pre_population_label, post_population_label))
+        if self._weight_dependence is not None:
+            prov_data.extend(self._weight_dependence.get_provenance_data(
+                pre_population_label, post_population_label))
+        return prov_data

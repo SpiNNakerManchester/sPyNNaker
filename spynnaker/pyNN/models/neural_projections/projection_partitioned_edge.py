@@ -1,5 +1,8 @@
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities import utility_calls
+from spinn_front_end_common.interface.provenance\
+    .abstract_provides_local_provenance_data \
+    import AbstractProvidesLocalProvenanceData
 from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
     import AbstractWeightUpdatable
 from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
@@ -10,7 +13,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
 
 class ProjectionPartitionedEdge(
         MultiCastPartitionedEdge, AbstractFilterableEdge,
-        AbstractWeightUpdatable):
+        AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
 
     def __init__(
             self, synapse_information, pre_subvertex, post_subvertex,
@@ -83,6 +86,16 @@ class ProjectionPartitionedEdge(
             weight += new_weight
 
         self._weight = weight
+
+    def get_local_provenance_data(self):
+        prov_items = list()
+        for synapse_info in self._synapse_information:
+            prov_items.extend(
+                synapse_info.connector.get_provenance_data())
+            prov_items.extend(
+                synapse_info.synapse_dynamics.get_provenance_data(
+                    self._pre_subvertex.label, self._post_subvertex.label))
+        return prov_items
 
     def __repr__(self):
         return "{}:{}".format(self._pre_subvertex, self._post_subvertex)

@@ -41,3 +41,8 @@ class AbstractTimingDependence(object):
     def synaptic_structure(self):
         """ Get the synaptic structure of the plastic part of the rows
         """
+
+    def get_provenance_data(self, pre_population_label, post_population_label):
+        """ Get any provenance data
+        """
+        return list()

@@ -35,14 +35,6 @@ class AbstractConnector(object):
         self._n_clipped_delays = 0
         self._min_delay = 0
 
-    @property
-    def pre_population(self):
-        return self._pre_population
-
-    @property
-    def post_population(self):
-        return self._post_population
-
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
         self._pre_population = pre_population
@@ -338,12 +330,11 @@ class AbstractConnector(object):
             self._n_clipped_delays,
             report=self._n_clipped_delays > 0,
             message=(
-                "The delays from {} from {} to {} was clipped "
-                "from below {} to {} a total of {} times. If this causes "
-                "issues you can decrease the time step located within the "
-                ".spynnaker.cfg file or increase your delay above the "
-                "timestep threshold.".format(
+                "The delays in the connector {} from {} to {} was clipped "
+                "to {} a total of {} times.  This can be avoided by reducing "
+                "the timestep or increasing the minimum delay to one "
+                "timestep".format(
                     self.__class__.__name__, self._pre_population.label,
                     self._post_population.label, self._min_delay,
-                    self._min_delay, self._n_clipped_delays))))
+                    self._n_clipped_delays))))
         return data_items
