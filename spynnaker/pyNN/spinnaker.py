@@ -42,7 +42,8 @@ class Spinnaker(SpinnakerMainInterface):
 
     def __init__(
             self, host_name=None, timestep=None, min_delay=None,
-            max_delay=None, graph_label=None, database_socket_addresses=None):
+            max_delay=None, graph_label=None, database_socket_addresses=None,
+            n_chips_required=None):
 
         # Determine default executable folder location
         # and add this default to end of list of search paths
@@ -71,7 +72,8 @@ class Spinnaker(SpinnakerMainInterface):
             executable_finder=executable_finder,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
-            extra_mapping_inputs=extra_mapping_inputs)
+            extra_mapping_inputs=extra_mapping_inputs,
+            n_chips_required=n_chips_required)
 
         # timing parameters
         self._min_supported_delay = None

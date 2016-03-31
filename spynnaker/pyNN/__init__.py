@@ -181,7 +181,8 @@ def run(run_time=None):
 
 
 def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
-          database_socket_addresses=None, **extra_params):
+          database_socket_addresses=None, n_chips_required=None,
+          **extra_params):
     """ Should be called at the very beginning of a script.
         extra_params contains any keyword arguments that are required by a\
         given simulator but not by others.
@@ -192,6 +193,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     :param max_delay:
     :param machine:
     :param database_socket_addresses:
+    :param n_chips_required: The number of chips required for the simulation
     :param extra_params:
     :return:
     """
@@ -213,7 +215,8 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     _spinnaker = Spinnaker(
         host_name=machine, timestep=timestep, min_delay=min_delay,
         max_delay=max_delay,
-        database_socket_addresses=database_socket_addresses)
+        database_socket_addresses=database_socket_addresses,
+        n_chips_required=n_chips_required)
     # the PyNN API expects the MPI rank to be returned
     return rank()
 
@@ -409,3 +412,9 @@ def record_gsyn(source, filename):
     """ Record spikes to a file. source should be a Population.
     """
     source.record_gsyn(to_file=filename)
+
+
+def get_machine():
+    """ Get the spinnaker machine in use
+    """
+    return _spinnaker.machine
