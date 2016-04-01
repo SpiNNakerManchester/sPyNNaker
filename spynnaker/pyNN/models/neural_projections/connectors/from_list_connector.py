@@ -129,6 +129,6 @@ class FromListConnector(AbstractConnector):
         block["source"] = items["source"]
         block["target"] = items["target"]
         block["weight"] = items["weight"]
-        block["delay"] = items["delay"]
+        block["delay"] = self._clip_delays(items["delay"])
         block["synapse_type"] = synapse_type
         return block

@@ -19,12 +19,12 @@ from spynnaker.pyNN.models.neural_projections\
     .delay_afferent_partitionable_edge \
     import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 
 from spinn_front_end_common.utilities import exceptions
 
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 
 import logging
@@ -41,7 +41,6 @@ class Projection(object):
         methods to set parameters of those connections, including of\
         plasticity mechanisms.
     """
-    _projection_count = 0
 
     # noinspection PyUnusedLocal
     def __init__(
@@ -80,7 +79,8 @@ class Projection(object):
         self._synapse_information = SynapseInformation(
             connector, synapse_dynamics_stdp, synapse_type)
         connector.set_projection_information(
-            presynaptic_population, postsynaptic_population, rng)
+            presynaptic_population, postsynaptic_population, rng,
+            machine_time_step)
 
         max_delay = synapse_dynamics_stdp.get_delay_maximum(connector)
         if max_delay is None:
@@ -107,8 +107,9 @@ class Projection(object):
         # check that the projection edges label is not none, and give an
         # auto generated label if set to None
         if label is None:
-            label = "projection edge {}".format(Projection._projection_count)
-            Projection._projection_count += 1
+            label = "projection edge {}".format(
+                spinnaker_control.none_labelled_edge_count)
+            spinnaker_control.increment_none_labelled_edge_count()
 
         # Find out if there is an existing edge between the populations
         edge_to_merge = self._find_existing_edge(
@@ -128,7 +129,7 @@ class Projection(object):
                 self._synapse_information, label=label)
 
             # add edge to the graph
-            spinnaker_control.add_edge(
+            spinnaker_control.add_partitionable_edge(
                 self._projection_edge, EDGE_PARTITION_ID)
 
         # If the delay exceeds the post vertex delay, add a delay extension
@@ -157,13 +158,13 @@ class Projection(object):
 
     @property
     def requires_mapping(self):
-        if (isinstance(self._projection_edge, AbstractMappable) and
+        if (isinstance(self._projection_edge, AbstractChangableAfterRun) and
                 self._projection_edge.requires_mapping):
             return True
         return False
 
     def mark_no_changes(self):
-        if isinstance(self._projection_edge, AbstractMappable):
+        if isinstance(self._projection_edge, AbstractChangableAfterRun):
             self._projection_edge.mark_no_changes()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
@@ -205,13 +206,14 @@ class Projection(object):
             presynaptic_population._internal_delay_vertex = delay_vertex
             pre_vertex.add_constraint(
                 PartitionerSameSizeAsVertexConstraint(delay_vertex))
-            self._spinnaker.add_vertex(delay_vertex)
+            self._spinnaker.add_partitionable_vertex(delay_vertex)
 
             # Add the edge
             delay_afferent_edge = DelayAfferentPartitionableEdge(
                 pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
                     pre_vertex.label))
-            self._spinnaker.add_edge(delay_afferent_edge, EDGE_PARTITION_ID)
+            self._spinnaker.add_partitionable_edge(
+                delay_afferent_edge, EDGE_PARTITION_ID)
 
         # Ensure that the delay extension knows how many states it will support
         n_stages = int(math.ceil(
@@ -227,7 +229,8 @@ class Projection(object):
             delay_edge = MultiCastPartitionableEdge(
                 delay_vertex, post_vertex, label="{}_delayed_to_{}".format(
                     pre_vertex.label, post_vertex.label))
-            self._spinnaker.add_edge(delay_edge, EDGE_PARTITION_ID)
+            self._spinnaker.add_partitionable_edge(
+                delay_edge, EDGE_PARTITION_ID)
         return delay_edge
 
     def describe(self, template='projection_default.txt', engine='default'):

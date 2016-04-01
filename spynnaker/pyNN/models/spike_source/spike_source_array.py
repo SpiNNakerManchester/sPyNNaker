@@ -1,7 +1,9 @@
 # spynnaker imports
+from spinn_front_end_common.abstract_models.abstract_recordable import \
+    AbstractRecordable
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
@@ -9,8 +11,8 @@ from spynnaker.pyNN.models.common.eieio_spike_recorder \
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_has_first_machine_time_step\
+from spinn_front_end_common.abstract_models\
+    .abstract_has_first_machine_time_step \
     import AbstractHasFirstMachineTimeStep
 
 
@@ -37,8 +39,8 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractMappable,
-        AbstractHasFirstMachineTimeStep):
+        SimplePopulationSettable, AbstractChangableAfterRun,
+        AbstractHasFirstMachineTimeStep, AbstractRecordable):
     """ Model for play back of spikes
     """
 
@@ -83,10 +85,12 @@ class SpikeSourceArray(
             send_buffer_notification_ip_address=self._ip_address,
             send_buffer_notification_port=self._port,
             send_buffer_notification_tag=tag)
+
+        AbstractRecordable.__init__(self)
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
-        AbstractMappable.__init__(self)
+        AbstractChangableAfterRun.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
 
         # handle recording
@@ -130,6 +134,9 @@ class SpikeSourceArray(
 
     def mark_no_changes(self):
         self._requires_mapping = False
+
+    def is_recording(self):
+        return self._spike_recorder.record
 
     @property
     def spike_times(self):

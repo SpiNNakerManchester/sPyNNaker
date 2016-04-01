@@ -27,6 +27,8 @@ from spinn_front_end_common.utilities import constants as\
     front_end_common_constants
 from spinn_front_end_common.interface.buffer_management.buffer_models\
     .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
+from spinn_front_end_common.abstract_models.abstract_recordable \
+    import AbstractRecordable
 
 from data_specification.data_specification_generator\
     import DataSpecificationGenerator
@@ -47,7 +49,7 @@ RANDOM_SEED_WORDS = 4
 
 
 class SpikeSourcePoisson(
-        AbstractPartitionableVertex,
+        AbstractPartitionableVertex, AbstractRecordable,
         AbstractDataSpecableVertex, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping):
@@ -87,6 +89,7 @@ class SpikeSourcePoisson(
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
+        AbstractRecordable.__init__(self)
 
         # Store the parameters
         self._rate = rate
@@ -112,6 +115,9 @@ class SpikeSourcePoisson(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
             "Buffers", "use_auto_pause_and_resume")
+
+    def is_recording(self):
+        return self._spike_recorder.record
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
@@ -241,7 +247,7 @@ class SpikeSourcePoisson(
             spec, ip_tags, [spike_history_region_sz],
             buffer_size_before_receive, self._time_between_requests)
 
-    def _write_poisson_parameters(self, spec, key, num_neurons):
+    def _write_poisson_parameters(self, spec, key, vertex_slice):
         """ Generate Neuron Parameter data for Poisson spike sources
 
         :param spec:
@@ -250,7 +256,7 @@ class SpikeSourcePoisson(
         :return:
         """
         spec.comment("\nWriting Neuron Parameters for {} poisson sources:\n"
-                     .format(num_neurons))
+                     .format(vertex_slice.n_atoms))
 
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
@@ -284,14 +290,17 @@ class SpikeSourcePoisson(
         # or fast source
         slow_sources = list()
         fast_sources = list()
-        for i in range(0, num_neurons):
+        for i in range(vertex_slice.n_atoms):
+
+            atom_id = vertex_slice.lo_atom + i
 
             # Get the parameter values for source i:
-            rate_val = generate_parameter(self._rate, i)
-            start_val = generate_parameter(self._start, i)
+            rate_val = generate_parameter(self._rate, atom_id)
+            start_val = generate_parameter(self._start, atom_id)
             end_val = None
             if self._duration is not None:
-                end_val = generate_parameter(self._duration, i) + start_val
+                end_val = generate_parameter(
+                    self._duration, atom_id) + start_val
 
             # Decide if it is a fast or slow source and
             spikes_per_tick = \
@@ -451,7 +460,7 @@ class SpikeSourcePoisson(
                 routing_info.get_keys_and_masks_from_partition(partition)
             key = keys_and_masks[0].key
 
-        self._write_poisson_parameters(spec, key, vertex_slice.n_atoms)
+        self._write_poisson_parameters(spec, key, vertex_slice)
 
         # End-of-Spec:
         spec.end_specification()

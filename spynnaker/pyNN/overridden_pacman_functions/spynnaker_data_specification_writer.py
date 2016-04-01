@@ -1,8 +1,8 @@
-from spinn_machine.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 from spinn_front_end_common.interface.interface_functions.\
     front_end_common_partitionable_graph_data_specification_writer \
-    import FrontEndCommomPartitionableGraphDataSpecificationWriter
+    import FrontEndCommonPartitionableGraphDataSpecificationWriter
 from spinn_front_end_common.utilities.utility_objs.executable_targets \
     import ExecutableTargets
 
@@ -11,7 +11,7 @@ from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
 
 
 class SpynnakerDataSpecificationWriter(
-        FrontEndCommomPartitionableGraphDataSpecificationWriter):
+        FrontEndCommonPartitionableGraphDataSpecificationWriter):
     """ Executes data specification generation for sPyNNaker
     """
 

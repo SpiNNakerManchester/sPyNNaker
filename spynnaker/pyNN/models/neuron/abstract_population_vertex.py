@@ -13,6 +13,8 @@ from spinn_front_end_common.abstract_models.\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
+from spinn_front_end_common.abstract_models.abstract_recordable \
+    import AbstractRecordable
 from spinn_front_end_common.utilities import constants as \
     common_constants
 from spinn_front_end_common.interface.buffer_management\
@@ -29,8 +31,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
@@ -72,10 +74,11 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 class AbstractPopulationVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
+        AbstractRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractMappable):
+        AbstractChangableAfterRun):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -97,7 +100,7 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
-        AbstractMappable.__init__(self)
+        AbstractChangableAfterRun.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -153,6 +156,11 @@ class AbstractPopulationVertex(
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
+
+    def is_recording(self):
+        return (
+            self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
+            self._spike_recorder.record)
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
