@@ -10,7 +10,6 @@ import inspect
 from ._version import __version__, __version_name__, __version_month__,\
     __version_year__
 
-
 # utility functions
 from spynnaker.pyNN.utilities import utility_calls
 
@@ -26,6 +25,8 @@ from spinn_front_end_common.utilities.notification_protocol.\
 # front end common exceptions
 from spinn_front_end_common.utilities import exceptions as \
     front_end_common_exceptions
+
+from spynnaker.pyNN.utilities.conf import config
 
 # neural models
 from spynnaker.pyNN.models.neuron.builds.if_cond_exp \
@@ -430,13 +431,13 @@ def SpikeSourcePoisson(
 
     if port is not None:
         if database_notify_port_num is None:
-            database_notify_port_num = conf.config.getint(
+            database_notify_port_num = config.getint(
                 "Database", "notify_port")
         if database_notify_host is None:
-            database_notify_host = conf.config.get(
+            database_notify_host = config.get(
                 "Database", "notify_hostname")
         if database_ack_port_num is None:
-            database_ack_port_num = conf.config.get(
+            database_ack_port_num = config.get(
                 "Database", "listen_port")
             if database_ack_port_num == "None":
                 database_ack_port_num = None

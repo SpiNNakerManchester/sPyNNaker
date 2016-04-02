@@ -142,7 +142,7 @@ class SpikeSourcePoisson(
 
         SpikeSourcePoisson._n_poisson_subvertices += 1
         subvertex = SpikeSourcePoissonPartitionedVertex(
-            resources_required, label, self._is_updatable, constraints)
+            resources_required, label, self._updatable, constraints)
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._no_machine_time_steps)
@@ -193,10 +193,6 @@ class SpikeSourcePoisson(
     @seed.setter
     def seed(self, seed):
         self._seed = seed
-
-    @property
-    def updatable(self):
-        return self._updatable
 
     @property
     def model_name(self):
