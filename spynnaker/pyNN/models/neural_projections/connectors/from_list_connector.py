@@ -1,9 +1,5 @@
-from spinn_front_end_common.utilities import exceptions
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
-from spynnaker.pyNN.models.neural_properties.synapse_row_info \
-    import SynapseRowInfo
 import logging
 import numpy
 
@@ -11,10 +7,9 @@ logger = logging.getLogger(__name__)
 
 
 class FromListConnector(AbstractConnector):
-    """
-    Make connections according to a list.
+    """ Make connections according to a list.
 
-    :param `list` conn_list:
+    :param: conn_list:
         a list of tuples, one tuple for each connection. Each
         tuple should contain::
 
@@ -25,68 +20,115 @@ class FromListConnector(AbstractConnector):
         the index of the postsynaptic neuron.
     """
 
-    def __init__(self, conn_list=None, safe=True, verbose=False):
+    CONN_LIST_DTYPE = [
+        ("source", "uint32"), ("target", "uint32"),
+        ("weight", "float64"), ("delay", "float64")]
+
+    def __init__(self, conn_list, safe=True, verbose=False):
         """
         Creates a new FromListConnector.
         """
-        if not safe:
-            logger.warn("the modification of the safe parameter will be "
-                        "ignored")
-        if verbose:
-            logger.warn("the modification of the verbose parameter will be "
-                        "ignored")
-        if conn_list is None:
-            conn_list = []
-        self._conn_list = conn_list
+        AbstractConnector.__init__(self, safe, None, verbose)
+        if conn_list is None or len(conn_list) == 0:
+            self._conn_list = numpy.zeros(0, dtype=self.CONN_LIST_DTYPE)
+        else:
+            temp_conn_list = conn_list
+            if not isinstance(conn_list[0], tuple):
+                temp_conn_list = [tuple(items) for items in conn_list]
+            self._conn_list = numpy.array(
+                temp_conn_list, dtype=self.CONN_LIST_DTYPE)
 
-    def generate_synapse_list(
-            self, presynaptic_population, postsynaptic_population, delay_scale,
-            weight_scale, synapse_type):
+    def get_delay_maximum(self):
+        return numpy.max(self._conn_list["delay"])
 
-        prevertex = presynaptic_population._get_vertex
-        postvertex = postsynaptic_population._get_vertex
+    def get_n_connections_from_pre_vertex_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            min_delay=None, max_delay=None):
 
-        # Convert connection list into numpy record array
-        conn_list_numpy = numpy.array(
-            self._conn_list, dtype=[("source", "uint32"), ("target", "uint32"),
-                                    ("weight", "float"), ("delay", "float")])
-        if (conn_list_numpy["target"] >= postvertex.n_atoms).any():
-            raise exceptions.ConfigurationException("Target atom out of range")
+        mask = None
+        if min_delay is None or max_delay is None:
+            mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
+                    (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
+                    (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
+                    (self._conn_list["target"] <= post_vertex_slice.hi_atom))
+        else:
+            mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
+                    (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
+                    (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
+                    (self._conn_list["target"] <= post_vertex_slice.hi_atom) &
+                    (self._conn_list["delay"] >= min_delay) &
+                    (self._conn_list["delay"] <= max_delay))
+        sources = self._conn_list["source"][mask]
+        if sources.size == 0:
+            return 0
+        return numpy.max(numpy.bincount(sources))
 
-        # Sort by pre-synaptic neuron
-        conn_list_numpy = numpy.sort(conn_list_numpy, order="source")
+    def get_n_connections_to_post_vertex_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
+                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
+                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
+                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
+        targets = self._conn_list["target"][mask]
+        if targets.size == 0:
+            return 0
+        return numpy.max(numpy.bincount(targets))
 
-        # Apply weight and delay scaling
-        conn_list_numpy["weight"] *= weight_scale
-        conn_list_numpy["delay"] *= delay_scale
+    def get_weight_mean(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
+                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
+                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
+                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
+        weights = self._conn_list["weight"][mask]
+        if weights.size == 0:
+            return 0
+        return numpy.mean(weights)
 
-        # Count number of connections per pre-synaptic neuron
-        pre_counts = numpy.histogram(
-            conn_list_numpy["source"], numpy.arange(prevertex.n_atoms + 1))[0]
+    def get_weight_maximum(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
+                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
+                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
+                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
+        weights = self._conn_list["weight"][mask]
+        if weights.size == 0:
+            return 0
+        return numpy.max(weights)
 
-        # Take cumulative sum of these counts to get start and end indices of
-        # the blocks of connections coming from each pre-synaptic neuron
-        pre_end_idxs = numpy.cumsum(pre_counts)
-        pre_start_idxs = numpy.append(0, pre_end_idxs[:-1])
+    def get_weight_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
+                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
+                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
+                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
+        weights = self._conn_list["weight"][mask]
+        if weights.size == 0:
+            return 0
+        return numpy.var(weights)
 
-        # Loop through slices of connections
-        synaptic_rows = []
-        for _, (start, end) in enumerate(zip(pre_start_idxs, pre_end_idxs)):
+    def generate_on_machine(self):
+        return False
 
-            # Get slice
-            pre_conns = conn_list_numpy[start:end]
-
-            # Repeat synapse type correct number of times
-            synapse_type_row = numpy.empty(len(pre_conns), dtype="uint32")
-            synapse_type_row.fill(synapse_type)
-
-            # Combine post-synaptic neuron ids, weights, delays
-            # and synapse types together into synaptic row
-            synaptic_rows.append(
-                SynapseRowInfo(pre_conns["target"],
-                               pre_conns["weight"],
-                               pre_conns["delay"],
-                               synapse_type_row))
-
-        # Return full synaptic list
-        return SynapticList(synaptic_rows)
+    def create_synaptic_block(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type):
+        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
+                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
+                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
+                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
+        items = self._conn_list[mask]
+        block = numpy.zeros(
+            items.size, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block["source"] = items["source"]
+        block["target"] = items["target"]
+        block["weight"] = items["weight"]
+        block["delay"] = self._clip_delays(items["delay"])
+        block["synapse_type"] = synapse_type
+        return block

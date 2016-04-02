@@ -23,8 +23,8 @@ class IzkCurrExp(AbstractPopulationVertex):
     # noinspection PyPep8Naming
     def __init__(
             self, n_neurons, machine_time_step, timescale_factor,
-            spikes_per_second=None, ring_buffer_sigma=None, constraints=None,
-            label=None,
+            spikes_per_second=None, ring_buffer_sigma=None,
+            incoming_spike_buffer_size=None, constraints=None, label=None,
             a=default_parameters['a'], b=default_parameters['b'],
             c=default_parameters['c'], d=default_parameters['d'],
             i_offset=default_parameters['i_offset'],
@@ -47,6 +47,7 @@ class IzkCurrExp(AbstractPopulationVertex):
             timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
+            incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="IZK_curr_exp", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
             threshold_type=threshold_type, constraints=constraints)

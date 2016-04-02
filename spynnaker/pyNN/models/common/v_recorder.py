@@ -1,4 +1,4 @@
-from pacman.utilities.utility_objs.progress_bar import ProgressBar
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.models.common import recording_utils
 
@@ -65,7 +65,7 @@ class VRecorder(object):
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, missing_data =\
                 buffer_manager.get_data_for_vertex(
-                    x, y, p, region, state_region)
+                    placement, region, state_region)
             if missing_data:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             record_raw = neuron_param_region_data_pointer.read_all()

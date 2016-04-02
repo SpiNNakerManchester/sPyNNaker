@@ -1,71 +1,101 @@
-from pacman.model.partitioned_graph.multi_cast_partitioned_edge import \
-    MultiCastPartitionedEdge
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge import \
-    AbstractFilterableEdge
+from pyNN.random import RandomDistribution
+from spynnaker.pyNN.utilities import utility_calls
+from spinn_front_end_common.interface.provenance\
+    .abstract_provides_local_provenance_data \
+    import AbstractProvidesLocalProvenanceData
+from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
+    import AbstractWeightUpdatable
+from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
+    import MultiCastPartitionedEdge
+from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
+    import AbstractFilterableEdge
 
 
-class ProjectionPartitionedEdge(MultiCastPartitionedEdge,
-                                AbstractFilterableEdge):
+class ProjectionPartitionedEdge(
+        MultiCastPartitionedEdge, AbstractFilterableEdge,
+        AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
 
-    def __init__(self, presubvertex, postsubvertex, constraints):
+    def __init__(
+            self, synapse_information, pre_subvertex, post_subvertex,
+            label=None):
         MultiCastPartitionedEdge.__init__(
-            self, presubvertex, postsubvertex, constraints)
+            self, pre_subvertex, post_subvertex, label=label)
         AbstractFilterableEdge.__init__(self)
-        self._synapse_sublist = None
-        self._weight_scales = None
+        AbstractWeightUpdatable.__init__(self)
 
-    @property
-    def weight_scales(self):
-        return self._weight_scales
-
-    # **YUCK** setters don't work properly with inheritance
-    def weight_scales_setter(self, value):
-        self._weight_scales = value
-
-    def get_synapse_sublist(self, graph_mapper):
-        """
-        Gets the synapse list for this subedge
-        """
-        pre_vertex_slice = \
-            graph_mapper.get_subvertex_slice(self._pre_subvertex)
-        post_vertex_slice = \
-            graph_mapper.get_subvertex_slice(self._post_subvertex)
-        if self._synapse_sublist is None:
-            associated_edge = \
-                graph_mapper.get_partitionable_edge_from_partitioned_edge(self)
-            self._synapse_sublist = \
-                associated_edge.synapse_list.create_atom_sublist(
-                    pre_vertex_slice, post_vertex_slice)
-        return self._synapse_sublist
-
-    def get_n_rows(self, graph_mapper):
-        pre_vertex_slice = graph_mapper.get_subvertex_slice(
-            self._pre_subvertex)
-        return pre_vertex_slice.n_atoms
-
-    def free_sublist(self):
-        """
-        Indicates that the list will not be needed again
-        """
-        self._synapse_sublist = None
+        self._synapse_information = synapse_information
 
     def filter_sub_edge(self, graph_mapper):
-        """ Determines if there's an actual connection in this subedge using\
-            the synaptic data
-
-        """
+        pre_vertex = graph_mapper.get_vertex_from_subvertex(
+            self._pre_subvertex)
+        pre_slice_index = graph_mapper.get_subvertex_index(self._pre_subvertex)
         pre_vertex_slice = graph_mapper.get_subvertex_slice(
             self._pre_subvertex)
+        pre_slices = graph_mapper.get_subvertex_slices(pre_vertex)
+        post_vertex = graph_mapper.get_vertex_from_subvertex(
+            self._post_subvertex)
+        post_slice_index = graph_mapper.get_subvertex_index(
+            self._post_subvertex)
         post_vertex_slice = graph_mapper.get_subvertex_slice(
             self._post_subvertex)
-        edge = graph_mapper.get_partitionable_edge_from_partitioned_edge(self)
+        post_slices = graph_mapper.get_subvertex_slices(post_vertex)
 
-        return not edge.synapse_list.is_connected(pre_vertex_slice,
-                                                  post_vertex_slice)
+        n_connections = 0
+        for synapse_info in self._synapse_information:
+            n_connections += synapse_info.connector.\
+                get_n_connections_to_post_vertex_maximum(
+                    pre_slices, pre_slice_index, post_slices,
+                    post_slice_index, pre_vertex_slice, post_vertex_slice)
+            if n_connections > 0:
+                return False
 
-    @property
-    def synapse_sublist(self):
-        return self._synapse_sublist
+        return n_connections == 0
 
-    def is_multi_cast_partitioned_edge(self):
-        return True
+    def update_weight(self, graph_mapper):
+        pre_vertex = graph_mapper.get_vertex_from_subvertex(
+            self._pre_subvertex)
+        pre_slice_index = graph_mapper.get_subvertex_index(self._pre_subvertex)
+        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._pre_subvertex)
+        pre_slices = graph_mapper.get_subvertex_slices(pre_vertex)
+        post_vertex = graph_mapper.get_vertex_from_subvertex(
+            self._post_subvertex)
+        post_slice_index = graph_mapper.get_subvertex_index(
+            self._post_subvertex)
+        post_vertex_slice = graph_mapper.get_subvertex_slice(
+            self._post_subvertex)
+        post_slices = graph_mapper.get_subvertex_slices(post_vertex)
+
+        weight = 0
+        for synapse_info in self._synapse_information:
+            new_weight = synapse_info.connector.\
+                get_n_connections_to_post_vertex_maximum(
+                    pre_slices, pre_slice_index, post_slices,
+                    post_slice_index, pre_vertex_slice, post_vertex_slice)
+            new_weight *= pre_vertex_slice.n_atoms
+            if hasattr(pre_vertex, "rate"):
+                rate = pre_vertex.rate
+                if hasattr(rate, "__getitem__"):
+                    rate = max(rate)
+                elif isinstance(rate, RandomDistribution):
+                    rate = utility_calls.get_maximum_probable_value(
+                        rate, pre_vertex_slice.n_atoms)
+                new_weight *= rate
+            elif hasattr(pre_vertex, "spikes_per_second"):
+                new_weight *= pre_vertex.spikes_per_second
+            weight += new_weight
+
+        self._weight = weight
+
+    def get_local_provenance_data(self):
+        prov_items = list()
+        for synapse_info in self._synapse_information:
+            prov_items.extend(
+                synapse_info.connector.get_provenance_data())
+            prov_items.extend(
+                synapse_info.synapse_dynamics.get_provenance_data(
+                    self._pre_subvertex.label, self._post_subvertex.label))
+        return prov_items
+
+    def __repr__(self):
+        return "{}:{}".format(self._pre_subvertex, self._post_subvertex)

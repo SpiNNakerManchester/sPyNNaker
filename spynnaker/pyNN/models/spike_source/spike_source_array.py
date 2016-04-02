@@ -1,7 +1,9 @@
 # spynnaker imports
+from spinn_front_end_common.abstract_models.abstract_recordable import \
+    AbstractRecordable
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
@@ -9,15 +11,15 @@ from spynnaker.pyNN.models.common.eieio_spike_recorder \
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_has_first_machine_time_step\
+from spinn_front_end_common.abstract_models\
+    .abstract_has_first_machine_time_step \
     import AbstractHasFirstMachineTimeStep
 
 
 # spinn front end common imports
 from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_edge_constraints import \
-    AbstractProvidesOutgoingEdgeConstraints
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
     import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utilities import constants as \
@@ -37,17 +39,17 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractMappable,
-        AbstractHasFirstMachineTimeStep):
+        SimplePopulationSettable, AbstractChangableAfterRun,
+        AbstractHasFirstMachineTimeStep, AbstractRecordable):
     """ Model for play back of spikes
     """
 
     _model_based_max_atoms_per_core = sys.maxint
 
     def __init__(
-            self, n_neurons, spike_times, machine_time_step, timescale_factor,
-            port=None, tag=None, ip_address=None, board_address=None,
-            max_on_chip_memory_usage_for_spikes_in_bytes=(
+            self, n_neurons, machine_time_step, timescale_factor,
+            spike_times=None, port=None, tag=None, ip_address=None,
+            board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
                 constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
             space_before_notification=640,
             constraints=None, label="SpikeSourceArray",
@@ -61,6 +63,12 @@ class SpikeSourceArray(
         self._port = port
         if port is None:
             self._port = config.getint("Buffers", "receive_buffer_port")
+        if spike_times is None:
+            spike_times = []
+        self._minimum_sdram_for_buffering = config.getint(
+            "Buffers", "minimum_buffer_sdram")
+        self._using_auto_pause_and_resume = config.getboolean(
+            "Buffers", "use_auto_pause_and_resume")
 
         ReverseIpTagMultiCastSource.__init__(
             self, n_keys=n_neurons, machine_time_step=machine_time_step,
@@ -77,10 +85,12 @@ class SpikeSourceArray(
             send_buffer_notification_ip_address=self._ip_address,
             send_buffer_notification_port=self._port,
             send_buffer_notification_tag=tag)
+
+        AbstractRecordable.__init__(self)
         AbstractSpikeRecordable.__init__(self)
-        AbstractProvidesOutgoingEdgeConstraints.__init__(self)
+        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
-        AbstractMappable.__init__(self)
+        AbstractChangableAfterRun.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
 
         # handle recording
@@ -125,6 +135,9 @@ class SpikeSourceArray(
     def mark_no_changes(self):
         self._requires_mapping = False
 
+    def is_recording(self):
+        return self._spike_recorder.record
+
     @property
     def spike_times(self):
         """ The spike times of the spike source array
@@ -151,7 +164,9 @@ class SpikeSourceArray(
             self._ip_address, self._port, self._board_address,
             self._send_buffer_notification_tag,
             self._spike_recorder_buffer_size,
-            self._buffer_size_before_receive)
+            self._buffer_size_before_receive,
+            self._minimum_sdram_for_buffering,
+            self._using_auto_pause_and_resume)
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 
