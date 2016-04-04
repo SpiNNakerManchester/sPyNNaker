@@ -22,7 +22,7 @@ setup(
               'spynnaker.pyNN.models.spike_source',
               'spynnaker.pyNN.models.utility_models',
               'spynnaker.pyNN.models.neural_projections.connectors',
-              'spynnaker.pyNN.models.neuron.additional_input',
+              'spynnaker.pyNN.models.neuron.additional_inputs',
               'spynnaker.pyNN.models.neuron.builds',
               'spynnaker.pyNN.models.neuron.input_types',
               'spynnaker.pyNN.models.neuron.master_pop_table_generators',
