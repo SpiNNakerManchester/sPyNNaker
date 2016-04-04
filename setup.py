@@ -12,7 +12,7 @@ setup(
               'spynnaker.pyNN.overridden_pacman_functions',
               'spynnaker.pyNN.utilities',
               'spynnaker.pyNN.utilities.conf',
-              'spynnaker.pyNN.utilities.random_stats'
+              'spynnaker.pyNN.utilities.random_stats',
               'spynnaker.pyNN.models',
               'spynnaker.pyNN.models.abstract_models',
               'spynnaker.pyNN.models.common',
