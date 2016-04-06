@@ -138,10 +138,26 @@ class Spinnaker(SpinnakerMainInterface):
             self._time_scale_factor = \
                 config.getint("Machine", "timeScaleFactor")
             if timestep * self._time_scale_factor < 1000:
-                logger.warn("the combination of machine time step and the "
-                            "machine time scale factor results in a real "
-                            "timer tick that is currently not reliably "
-                            "supported by the spinnaker machine.")
+                if config.getboolean(
+                        "Mode", "violate_1ms_wall_clock_restriction"):
+                    logger.warn(
+                        "*****************************************************")
+                    logger.warn(
+                        "*** The combination of simulation time step and   ***")
+                    logger.warn(
+                        "*** the machine time scale factor results in a    ***")
+                    logger.warn(
+                        "*** wall clock timer tick that is currently not   ***")
+                    logger.warn(
+                        "*** reliably supported by the spinnaker machine.  ***")
+                    logger.warn(
+                        "*****************************************************")
+                else:
+                    raise common_exceptions.ConfigurationException(
+                        "The combination of simulation time step and the"
+                        " machine time scale factor results in a wall clock "
+                        "timer tick that is currently not reliably supported "
+                        "by the spinnaker machine.")
         else:
             self._time_scale_factor = max(1,
                                           math.ceil(1000.0 / float(timestep)))
