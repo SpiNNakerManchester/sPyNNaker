@@ -291,6 +291,24 @@ class AbstractPopulationVertex(
 
         return sdram_requirement
 
+    # @implements AbstractPartitionableVertex.get_multi_cast_payload_packets_per_tick_requirement
+    def get_multi_cast_payload_packets_per_tick_requirement(
+            self, vertex_slice, graph):
+        # standard neuron models don't use payload based multicast packets.
+        return 0
+
+    # @implements AbstractPartitionableVertex.get_multi_cast_no_payload_packets_per_tick_requirement
+    def get_multi_cast_no_payload_packets_per_tick_requirement(
+            self, vertex_slice, graph):
+        # standard neuron models can only fire 1 spike per timer tick per neuron
+        return vertex_slice.n_atoms
+
+    # @implements AbstractPartitionableVertex.get_fixed_route_packets_per_tick_requirement
+    def get_fixed_route_packets_per_tick_requirement(
+            self, vertex_slice, graph):
+        # standard neuron models don't use fixed route packets at all.
+        return 0
+
     # @implements AbstractPopulationVertex.model_name
     def model_name(self):
         return self._model_name

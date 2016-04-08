@@ -244,6 +244,24 @@ class DelayExtensionVertex(
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms
 
+    # @implements AbstractPartitionableVertex.get_multi_cast_payload_packets_per_tick_requirement
+    def get_multi_cast_payload_packets_per_tick_requirement(
+            self, vertex_slice, graph):
+        # standard neuron models don't use payload based multicast packets.
+        return 0
+
+    # @implements AbstractPartitionableVertex.get_multi_cast_no_payload_packets_per_tick_requirement
+    def get_multi_cast_no_payload_packets_per_tick_requirement(
+            self, vertex_slice, graph):
+        # delays could have all their packets into one delay slot over all atoms.
+        return vertex_slice.n_atoms * self._n_delay_stages
+
+    # @implements AbstractPartitionableVertex.get_fixed_route_packets_per_tick_requirement
+    def get_fixed_route_packets_per_tick_requirement(
+            self, vertex_slice, graph):
+        # standard neuron models don't use fixed route packets at all.
+        return 0
+
     def get_binary_file_name(self):
         return "delay_extension.aplx"
 

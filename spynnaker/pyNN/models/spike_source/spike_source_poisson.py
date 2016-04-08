@@ -409,6 +409,24 @@ class SpikeSourcePoisson(
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         return 0
 
+    # @implements AbstractPartitionableVertex.get_multi_cast_payload_packets_per_tick_requirement
+    def get_multi_cast_payload_packets_per_tick_requirement(
+            self, vertex_slice, graph):
+        # standard neuron models don't use payload based multicast packets.
+        return 0
+
+    # @implements AbstractPartitionableVertex.get_multi_cast_no_payload_packets_per_tick_requirement
+    def get_multi_cast_no_payload_packets_per_tick_requirement(
+            self, vertex_slice, graph):
+        # standard neuron models can only fire 1 spike per timer tick per neuron
+        raise Exception
+
+    # @implements AbstractPartitionableVertex.get_fixed_route_packets_per_tick_requirement
+    def get_fixed_route_packets_per_tick_requirement(
+            self, vertex_slice, graph):
+        # standard neuron models don't use fixed route packets at all.
+        return 0
+
     def generate_data_spec(
             self, subvertex, placement, partitioned_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
