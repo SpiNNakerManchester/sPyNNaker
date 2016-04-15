@@ -19,4 +19,4 @@ class SynapseStructureWeightOnly(AbstractSynapseStructure):
     def read_synaptic_data(self, fp_size, pp_data):
         return numpy.concatenate([
             pp_data[i].view(dtype="uint16")[0:fp_size[i]]
-            for i in range(len(pp_data))], axis=0)
+            for i in range(len(pp_data))])

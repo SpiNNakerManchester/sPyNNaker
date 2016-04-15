@@ -16,6 +16,7 @@ from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.spike_source\
     .spike_source_poisson_partitioned_vertex \
     import SpikeSourcePoissonPartitionedVertex
+from spynnaker.pyNN import exceptions
 
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
@@ -47,6 +48,11 @@ PARAMS_BASE_WORDS = 6
 PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
+# cpu calcs avilable NEEDS TO BE VALID
+CYCLES_PER_FAST_SOURCE = 250
+CYCLES_PER_SLOW_SOURCE = 200
+CYCLES_PER_SPIKE  = 20
+
 
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractRecordable,
@@ -63,6 +69,11 @@ class SpikeSourcePoisson(
                ('SPIKE_HISTORY_REGION', 2),
                ('BUFFERING_OUT_STATE', 3),
                ('PROVENANCE_REGION', 4)])
+
+    _POISSON_SPIKE_SOURCE_TYPES = Enum(
+        value="_POISSON_SPIKE_SOURCE_TYPES",
+        names=[('FAST', 0),
+               ('SLOW', 1)])
 
     _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
@@ -97,6 +108,10 @@ class SpikeSourcePoisson(
         self._duration = duration
         self._rng = numpy.random.RandomState(seed)
 
+        # generate rates data (used in dsg and partitioning for cpu)
+        self.sources = None
+        self._generate_rate_data()
+
         # Prepare for recording, and to get spikes
         self._spike_recorder = SpikeRecorder(machine_time_step)
         self._spike_buffer_max_size = config.getint(
@@ -118,6 +133,32 @@ class SpikeSourcePoisson(
 
     def is_recording(self):
         return self._spike_recorder.record
+
+    def _generate_rate_data(self):
+        # For each neuron, get the rate to work out if it is a slow
+        # or fast source
+        self._sources = list()
+        for atom_id in range(self.n_atoms):
+
+            # Get the parameter values for source i:
+            rate_val = generate_parameter(self._rate, atom_id)
+            start_val = generate_parameter(self._start, atom_id)
+            end_val = None
+            if self._duration is not None:
+                end_val = generate_parameter(
+                    self._duration, atom_id) + start_val
+
+            # Decide if it is a fast or slow source and
+            spikes_per_tick = \
+                (float(rate_val) * (self._machine_time_step / 1000000.0))
+            if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
+                self._sources.append(
+                    [self._POISSON_SPIKE_SOURCE_TYPES.SLOW, rate_val,
+                     start_val, end_val])
+            else:
+                self._sources.append(
+                    [self._POISSON_SPIKE_SOURCE_TYPES.FAST, spikes_per_tick,
+                     start_val, end_val])
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
@@ -288,29 +329,26 @@ class SpikeSourcePoisson(
 
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
-        slow_sources = list()
-        fast_sources = list()
-        for i in range(vertex_slice.n_atoms):
-
-            atom_id = vertex_slice.lo_atom + i
-
-            # Get the parameter values for source i:
-            rate_val = generate_parameter(self._rate, atom_id)
-            start_val = generate_parameter(self._start, atom_id)
-            end_val = None
-            if self._duration is not None:
-                end_val = generate_parameter(
-                    self._duration, atom_id) + start_val
-
-            # Decide if it is a fast or slow source and
-            spikes_per_tick = \
-                (float(rate_val) * (self._machine_time_step / 1000000.0))
-            if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
-                slow_sources.append([i, rate_val, start_val, end_val])
-            else:
-                fast_sources.append([i, spikes_per_tick, start_val, end_val])
+        if self._fast_sources is None or self._slow_sources is None:
+            self._generate_rate_data()
 
         # Write the numbers of each type of source
+        slow_sources = list()
+        fast_sources = list()
+
+        #seperate atoms for slow and fast
+        for atom in range(vertex_slice.lo_atom,
+                          vertex_slice.lo_atom + vertex_slice.n_atoms):
+            (type, _, _, _) = self._sources[atom]
+            if type == self._POISSON_SPIKE_SOURCE_TYPES.FAST:
+                fast_sources.append(self._sources[atom])
+            elif type == self._POISSON_SPIKE_SOURCE_TYPES.SLOW:
+                slow_sources.append((self._sources[atom]))
+            else:
+                raise exceptions.InvalidParameterType(
+                    "The type is not recongonised")
+
+        # write length of each
         spec.write_value(data=len(slow_sources))
         spec.write_value(data=len(fast_sources))
 
@@ -335,7 +373,8 @@ class SpikeSourcePoisson(
             end_scaled = 0xFFFFFFFF
             if end_val is not None:
                 end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
+            spec.write_value(data=neuron_id - vertex_slice.lo_atom,
+                             data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
             spec.write_value(data=isi_val, data_type=DataType.S1615)
@@ -359,7 +398,8 @@ class SpikeSourcePoisson(
             end_scaled = 0xFFFFFFFF
             if end_val is not None:
                 end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
+            spec.write_value(data=neuron_id - vertex_slice.lo_atom,
+                             data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
             spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
@@ -407,25 +447,20 @@ class SpikeSourcePoisson(
         return 0
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        return 0
-
-    # @implements AbstractPartitionableVertex.get_multi_cast_payload_packets_per_tick_requirement
-    def get_multi_cast_payload_packets_per_tick_requirement(
-            self, vertex_slice, graph):
-        # standard neuron models don't use payload based multicast packets.
-        return 0
-
-    # @implements AbstractPartitionableVertex.get_multi_cast_no_payload_packets_per_tick_requirement
-    def get_multi_cast_no_payload_packets_per_tick_requirement(
-            self, vertex_slice, graph):
-        # standard neuron models can only fire 1 spike per timer tick per neuron
-        raise Exception
-
-    # @implements AbstractPartitionableVertex.get_fixed_route_packets_per_tick_requirement
-    def get_fixed_route_packets_per_tick_requirement(
-            self, vertex_slice, graph):
-        # standard neuron models don't use fixed route packets at all.
-        return 0
+        cost = 0
+        for atom in range(vertex_slice.lo_atom,
+                          vertex_slice.lo_atom + vertex_slice.n_atoms):
+            (type, rate, start_val, end_val) = self._sources[atom]
+            if type == self._POISSON_SPIKE_SOURCE_TYPES.FAST:
+                cost += CYCLES_PER_FAST_SOURCE
+                cost += rate * CYCLES_PER_SPIKE
+            elif type == self._POISSON_SPIKE_SOURCE_TYPES.SLOW:
+                cost += CYCLES_PER_SLOW_SOURCE
+                cost += CYCLES_PER_SPIKE / rate
+            else:
+                raise exceptions.InvalidParameterType(
+                    "The rate is not recongised")
+        return cost
 
     def generate_data_spec(
             self, subvertex, placement, partitioned_graph, graph, routing_info,
