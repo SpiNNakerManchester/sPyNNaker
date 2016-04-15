@@ -121,6 +121,7 @@ static inline REAL slow_spike_source_get_time_to_spike(
 //!         this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
+    // Will exp_minus_lambda ever be 0?
     if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }

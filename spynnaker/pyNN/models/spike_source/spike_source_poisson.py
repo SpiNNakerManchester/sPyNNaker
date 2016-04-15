@@ -49,7 +49,7 @@ PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
 # cpu calcs avilable NEEDS TO BE VALID
-CYCLES_PER_FAST_SOURCE = 250
+CYCLES_PER_FAST_RNG_SOURCE = 60
 CYCLES_PER_SLOW_SOURCE = 200
 CYCLES_PER_SPIKE  = 20
 
@@ -149,6 +149,7 @@ class SpikeSourcePoisson(
                     self._duration, atom_id) + start_val
 
             # Decide if it is a fast or slow source and
+            # Michael would like to know why divide by a 1 million?
             spikes_per_tick = \
                 (float(rate_val) * (self._machine_time_step / 1000000.0))
             if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
@@ -389,6 +390,8 @@ class SpikeSourcePoisson(
         #
         #     unsigned long fract exp_minus_lambda;
         #   } fast_spike_source_t;
+
+        # check for underflows / over flows.
         for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
             if spikes_per_tick == 0:
                 exp_minus_lamda = 0
