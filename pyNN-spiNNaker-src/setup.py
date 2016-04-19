@@ -7,7 +7,7 @@ except ImportError:
 
 import os
 
-__version__ = "2015.005.01"
+__version__ = "2016.001"
 
 class CustomInstall(install):
 
@@ -45,6 +45,6 @@ setup(
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=[],
     install_requires=['pyNN >= 0.7, < 0.8',
-                      'sPyNNaker == 2015.005.01'],
+                      'sPyNNaker == 2016.001'],
     cmdclass={'install': CustomInstall}
 )
