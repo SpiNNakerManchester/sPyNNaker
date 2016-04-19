@@ -48,10 +48,11 @@ PARAMS_BASE_WORDS = 6
 PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
-# cpu calcs avilable NEEDS TO BE VALID
-CYCLES_PER_FAST_RNG_SOURCE = 60
-CYCLES_PER_SLOW_SOURCE = 200
-CYCLES_PER_SPIKE  = 20
+# cpu calc available NEEDS TO BE VALID
+CYCLES_PER_FAST_RNG_SOURCE = 50
+CYCLES_PER_SLOW_RNG_SOURCE = 5.2 * CYCLES_PER_FAST_RNG_SOURCE
+CYCLES_PER_SPIKE = 20
+OTHER_PROCESSING_COSTS = 321
 
 
 class SpikeSourcePoisson(
@@ -330,24 +331,24 @@ class SpikeSourcePoisson(
 
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
-        if self._fast_sources is None or self._slow_sources is None:
+        if self._sources is None:
             self._generate_rate_data()
 
         # Write the numbers of each type of source
         slow_sources = list()
         fast_sources = list()
 
-        #seperate atoms for slow and fast
+        # separate atoms for slow and fast
         for atom in range(vertex_slice.lo_atom,
                           vertex_slice.lo_atom + vertex_slice.n_atoms):
-            (type, _, _, _) = self._sources[atom]
-            if type == self._POISSON_SPIKE_SOURCE_TYPES.FAST:
-                fast_sources.append(self._sources[atom])
-            elif type == self._POISSON_SPIKE_SOURCE_TYPES.SLOW:
-                slow_sources.append((self._sources[atom]))
+            (rate_type, _, _, _) = self._sources[atom]
+            if rate_type == self._POISSON_SPIKE_SOURCE_TYPES.FAST:
+                fast_sources.append((atom, self._sources[atom]))
+            elif rate_type == self._POISSON_SPIKE_SOURCE_TYPES.SLOW:
+                slow_sources.append((atom, self._sources[atom]))
             else:
                 raise exceptions.InvalidParameterType(
-                    "The type is not recongonised")
+                    "The type is not recognised")
 
         # write length of each
         spec.write_value(data=len(slow_sources))
@@ -364,7 +365,7 @@ class SpikeSourcePoisson(
         #     accum mean_isi_ticks;
         #     accum time_to_spike_ticks;
         #   } slow_spike_source_t;
-        for (neuron_id, rate_val, start_val, end_val) in slow_sources:
+        for (neuron_id, (_, rate_val, start_val, end_val)) in slow_sources:
             if rate_val == 0:
                 isi_val = 0
             else:
@@ -392,7 +393,8 @@ class SpikeSourcePoisson(
         #   } fast_spike_source_t;
 
         # check for underflows / over flows.
-        for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
+        for (neuron_id,
+             (_, spikes_per_tick, start_val, end_val)) in fast_sources:
             if spikes_per_tick == 0:
                 exp_minus_lamda = 0
             else:
@@ -453,16 +455,19 @@ class SpikeSourcePoisson(
         cost = 0
         for atom in range(vertex_slice.lo_atom,
                           vertex_slice.lo_atom + vertex_slice.n_atoms):
-            (type, rate, start_val, end_val) = self._sources[atom]
-            if type == self._POISSON_SPIKE_SOURCE_TYPES.FAST:
-                cost += CYCLES_PER_FAST_SOURCE
+            # TODO: start and end val may be useful in more accurate estimates
+            (rate_type, rate, _, _) = self._sources[atom]
+            if rate_type == self._POISSON_SPIKE_SOURCE_TYPES.FAST:
+                sigma_rate = (3.0 * math.sqrt(rate)) + rate
+                cost += CYCLES_PER_FAST_RNG_SOURCE * sigma_rate
                 cost += rate * CYCLES_PER_SPIKE
-            elif type == self._POISSON_SPIKE_SOURCE_TYPES.SLOW:
-                cost += CYCLES_PER_SLOW_SOURCE
+            elif rate_type == self._POISSON_SPIKE_SOURCE_TYPES.SLOW:
+                cost += CYCLES_PER_SLOW_RNG_SOURCE
                 cost += CYCLES_PER_SPIKE / rate
             else:
                 raise exceptions.InvalidParameterType(
-                    "The rate is not recongised")
+                    "The rate is not recognised")
+            cost += OTHER_PROCESSING_COSTS
         return cost
 
     def generate_data_spec(
