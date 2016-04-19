@@ -1,6 +1,4 @@
 # spynnaker imports
-from spinn_front_end_common.abstract_models.abstract_recordable import \
-    AbstractRecordable
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
@@ -40,7 +38,7 @@ logger = logging.getLogger(__name__)
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
         SimplePopulationSettable, AbstractChangableAfterRun,
-        AbstractHasFirstMachineTimeStep, AbstractRecordable):
+        AbstractHasFirstMachineTimeStep):
     """ Model for play back of spikes
     """
 
@@ -86,7 +84,6 @@ class SpikeSourceArray(
             send_buffer_notification_port=self._port,
             send_buffer_notification_tag=tag)
 
-        AbstractRecordable.__init__(self)
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
@@ -134,9 +131,6 @@ class SpikeSourceArray(
 
     def mark_no_changes(self):
         self._requires_mapping = False
-
-    def is_recording(self):
-        return self._spike_recorder.record
 
     @property
     def spike_times(self):

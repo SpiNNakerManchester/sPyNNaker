@@ -141,17 +141,17 @@ class Spinnaker(SpinnakerMainInterface):
                 if config.getboolean(
                         "Mode", "violate_1ms_wall_clock_restriction"):
                     logger.warn(
-                        "*****************************************************")
+                        "****************************************************")
                     logger.warn(
-                        "*** The combination of simulation time step and   ***")
+                        "*** The combination of simulation time step and  ***")
                     logger.warn(
-                        "*** the machine time scale factor results in a    ***")
+                        "*** the machine time scale factor results in a   ***")
                     logger.warn(
-                        "*** wall clock timer tick that is currently not   ***")
+                        "*** wall clock timer tick that is currently not  ***")
                     logger.warn(
-                        "*** reliably supported by the spinnaker machine.  ***")
+                        "*** reliably supported by the spinnaker machine. ***")
                     logger.warn(
-                        "*****************************************************")
+                        "****************************************************")
                 else:
                     raise common_exceptions.ConfigurationException(
                         "The combination of simulation time step and the"
@@ -283,7 +283,8 @@ class Spinnaker(SpinnakerMainInterface):
             user_max_delay=self.max_supported_delay)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
-             clear_tags=None, extract_provenance_data=True, extract_iobuf=True):
+             clear_tags=None, extract_provenance_data=True,
+             extract_iobuf=True):
         """
         :param turn_off_machine: decides if the machine should be powered down\
             after running the execution. Note that this powers down all boards\
