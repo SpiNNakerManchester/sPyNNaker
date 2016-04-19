@@ -266,7 +266,8 @@ class SynapticManager(object):
                 vertex_slice, in_edges))
 
     def _reserve_memory_regions(
-            self, spec, vertex, vertex_slice, graph, all_syn_block_sz):
+            self, spec, vertex, subvertex, vertex_slice, graph, sub_graph,
+            all_syn_block_sz, graph_mapper):
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
@@ -275,8 +276,8 @@ class SynapticManager(object):
 
         in_edges = graph.incoming_edges_to_vertex(vertex)
         master_pop_table_sz = \
-            self._population_table_type.get_master_population_table_size(
-                vertex_slice, in_edges)
+            self._population_table_type.get_exact_master_population_table_size(
+                 subvertex, sub_graph, graph_mapper)
         if master_pop_table_sz > 0:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.POPULATION_TABLE
@@ -663,7 +664,8 @@ class SynapticManager(object):
             post_slices, post_slice_index, post_vertex_slice, graph_mapper,
             subvertex, subvert_in_edges)
         self._reserve_memory_regions(
-            spec, vertex, post_vertex_slice, graph, all_syn_block_sz)
+            spec, vertex, subvertex, post_vertex_slice, graph,
+            partitioned_graph, all_syn_block_sz, graph_mapper)
 
         weight_scales = self._write_synapse_parameters(
             spec, subvertex, partitioned_graph, graph_mapper, post_slices,
