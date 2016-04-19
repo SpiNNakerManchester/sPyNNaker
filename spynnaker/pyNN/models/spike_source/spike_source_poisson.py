@@ -16,6 +16,7 @@ from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.spike_source\
     .spike_source_poisson_partitioned_vertex \
     import SpikeSourcePoissonPartitionedVertex
+from spynnaker.pyNN import exceptions
 
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
@@ -47,6 +48,12 @@ PARAMS_BASE_WORDS = 6
 PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
+# cpu calc available NEEDS TO BE VALID
+CYCLES_PER_FAST_RNG_SOURCE = 50
+CYCLES_PER_SLOW_RNG_SOURCE = 5.2 * CYCLES_PER_FAST_RNG_SOURCE
+CYCLES_PER_SPIKE = 20
+OTHER_PROCESSING_COSTS = 321
+
 
 class SpikeSourcePoisson(
         AbstractPartitionableVertex, AbstractRecordable,
@@ -63,6 +70,11 @@ class SpikeSourcePoisson(
                ('SPIKE_HISTORY_REGION', 2),
                ('BUFFERING_OUT_STATE', 3),
                ('PROVENANCE_REGION', 4)])
+
+    _POISSON_SPIKE_SOURCE_TYPES = Enum(
+        value="_POISSON_SPIKE_SOURCE_TYPES",
+        names=[('FAST', 0),
+               ('SLOW', 1)])
 
     _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
@@ -97,6 +109,10 @@ class SpikeSourcePoisson(
         self._duration = duration
         self._rng = numpy.random.RandomState(seed)
 
+        # generate rates data (used in dsg and partitioning for cpu)
+        self.sources = None
+        self._generate_rate_data()
+
         # Prepare for recording, and to get spikes
         self._spike_recorder = SpikeRecorder(machine_time_step)
         self._spike_buffer_max_size = config.getint(
@@ -118,6 +134,33 @@ class SpikeSourcePoisson(
 
     def is_recording(self):
         return self._spike_recorder.record
+
+    def _generate_rate_data(self):
+        # For each neuron, get the rate to work out if it is a slow
+        # or fast source
+        self._sources = list()
+        for atom_id in range(self.n_atoms):
+
+            # Get the parameter values for source i:
+            rate_val = generate_parameter(self._rate, atom_id)
+            start_val = generate_parameter(self._start, atom_id)
+            end_val = None
+            if self._duration is not None:
+                end_val = generate_parameter(
+                    self._duration, atom_id) + start_val
+
+            # Decide if it is a fast or slow source and
+            # Michael would like to know why divide by a 1 million?
+            spikes_per_tick = \
+                (float(rate_val) * (self._machine_time_step / 1000000.0))
+            if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
+                self._sources.append(
+                    [self._POISSON_SPIKE_SOURCE_TYPES.SLOW, rate_val,
+                     start_val, end_val])
+            else:
+                self._sources.append(
+                    [self._POISSON_SPIKE_SOURCE_TYPES.FAST, spikes_per_tick,
+                     start_val, end_val])
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
@@ -288,29 +331,26 @@ class SpikeSourcePoisson(
 
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
-        slow_sources = list()
-        fast_sources = list()
-        for i in range(vertex_slice.n_atoms):
-
-            atom_id = vertex_slice.lo_atom + i
-
-            # Get the parameter values for source i:
-            rate_val = generate_parameter(self._rate, atom_id)
-            start_val = generate_parameter(self._start, atom_id)
-            end_val = None
-            if self._duration is not None:
-                end_val = generate_parameter(
-                    self._duration, atom_id) + start_val
-
-            # Decide if it is a fast or slow source and
-            spikes_per_tick = \
-                (float(rate_val) * (self._machine_time_step / 1000000.0))
-            if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
-                slow_sources.append([i, rate_val, start_val, end_val])
-            else:
-                fast_sources.append([i, spikes_per_tick, start_val, end_val])
+        if self._sources is None:
+            self._generate_rate_data()
 
         # Write the numbers of each type of source
+        slow_sources = list()
+        fast_sources = list()
+
+        # separate atoms for slow and fast
+        for atom in range(vertex_slice.lo_atom,
+                          vertex_slice.lo_atom + vertex_slice.n_atoms):
+            (rate_type, _, _, _) = self._sources[atom]
+            if rate_type == self._POISSON_SPIKE_SOURCE_TYPES.FAST:
+                fast_sources.append((atom, self._sources[atom]))
+            elif rate_type == self._POISSON_SPIKE_SOURCE_TYPES.SLOW:
+                slow_sources.append((atom, self._sources[atom]))
+            else:
+                raise exceptions.InvalidParameterType(
+                    "The type is not recognised")
+
+        # write length of each
         spec.write_value(data=len(slow_sources))
         spec.write_value(data=len(fast_sources))
 
@@ -325,7 +365,7 @@ class SpikeSourcePoisson(
         #     accum mean_isi_ticks;
         #     accum time_to_spike_ticks;
         #   } slow_spike_source_t;
-        for (neuron_id, rate_val, start_val, end_val) in slow_sources:
+        for (neuron_id, (_, rate_val, start_val, end_val)) in slow_sources:
             if rate_val == 0:
                 isi_val = 0
             else:
@@ -335,7 +375,8 @@ class SpikeSourcePoisson(
             end_scaled = 0xFFFFFFFF
             if end_val is not None:
                 end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
+            spec.write_value(data=neuron_id - vertex_slice.lo_atom,
+                             data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
             spec.write_value(data=isi_val, data_type=DataType.S1615)
@@ -350,7 +391,10 @@ class SpikeSourcePoisson(
         #
         #     unsigned long fract exp_minus_lambda;
         #   } fast_spike_source_t;
-        for (neuron_id, spikes_per_tick, start_val, end_val) in fast_sources:
+
+        # check for underflows / over flows.
+        for (neuron_id,
+             (_, spikes_per_tick, start_val, end_val)) in fast_sources:
             if spikes_per_tick == 0:
                 exp_minus_lamda = 0
             else:
@@ -359,7 +403,8 @@ class SpikeSourcePoisson(
             end_scaled = 0xFFFFFFFF
             if end_val is not None:
                 end_scaled = int(end_val * 1000.0 / self._machine_time_step)
-            spec.write_value(data=neuron_id, data_type=DataType.UINT32)
+            spec.write_value(data=neuron_id - vertex_slice.lo_atom,
+                             data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
             spec.write_value(data=exp_minus_lamda, data_type=DataType.U032)
@@ -407,7 +452,23 @@ class SpikeSourcePoisson(
         return 0
 
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
-        return 0
+        cost = 0
+        for atom in range(vertex_slice.lo_atom,
+                          vertex_slice.lo_atom + vertex_slice.n_atoms):
+            # TODO: start and end val may be useful in more accurate estimates
+            (rate_type, rate, _, _) = self._sources[atom]
+            if rate_type == self._POISSON_SPIKE_SOURCE_TYPES.FAST:
+                sigma_rate = (3.0 * math.sqrt(rate)) + rate
+                cost += CYCLES_PER_FAST_RNG_SOURCE * sigma_rate
+                cost += rate * CYCLES_PER_SPIKE
+            elif rate_type == self._POISSON_SPIKE_SOURCE_TYPES.SLOW:
+                cost += CYCLES_PER_SLOW_RNG_SOURCE
+                cost += CYCLES_PER_SPIKE / rate
+            else:
+                raise exceptions.InvalidParameterType(
+                    "The rate is not recognised")
+            cost += OTHER_PROCESSING_COSTS
+        return cost
 
     def generate_data_spec(
             self, subvertex, placement, partitioned_graph, graph, routing_info,
