@@ -277,7 +277,11 @@ class AbstractConnector(object):
         self._n_clipped_delays = numpy.sum(delays < self._min_delay)
 
         # clip values
-        delays[delays < self._min_delay] = self._min_delay
+        if numpy.isscalar(delays):
+            if delays < self._min_delay:
+                delays = self._min_delay
+        else:
+            delays[delays < self._min_delay] = self._min_delay
         return delays
 
     def _generate_delays(self, values, n_connections, connection_slices):
