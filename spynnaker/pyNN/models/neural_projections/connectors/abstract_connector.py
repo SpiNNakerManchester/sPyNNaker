@@ -281,7 +281,8 @@ class AbstractConnector(object):
             if delays < self._min_delay:
                 delays = self._min_delay
         else:
-            delays[delays < self._min_delay] = self._min_delay
+            if len(delays) > 0:
+                delays[delays < self._min_delay] = self._min_delay
         return delays
 
     def _generate_delays(self, values, n_connections, connection_slices):
