@@ -4,6 +4,8 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
 from spynnaker.pyNN.utilities.running_stats import RunningStats
+from spynnaker.pyNN.models.spike_source.spike_source_poisson \
+    import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synapse_io.synapse_io_row_based \
@@ -23,6 +25,7 @@ from spinn_front_end_common.utilities import helpful_functions
 
 from scipy import special
 from collections import defaultdict
+from pyNN.random import RandomDistribution
 import math
 import sys
 import numpy
@@ -68,6 +71,10 @@ class SynapticManager(object):
         if self._spikes_per_second is None:
             self._spikes_per_second = conf.config.getfloat(
                 "Simulation", "spikes_per_second")
+        self._spikes_per_tick = max(
+            1.0,
+            self._spikes_per_second /
+            (1000000.0 / float(self._machine_time_step)))
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
@@ -277,7 +284,7 @@ class SynapticManager(object):
         in_edges = graph.incoming_edges_to_vertex(vertex)
         master_pop_table_sz = \
             self._population_table_type.get_exact_master_population_table_size(
-                 subvertex, sub_graph, graph_mapper)
+                subvertex, sub_graph, graph_mapper)
         if master_pop_table_sz > 0:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.POPULATION_TABLE
@@ -391,6 +398,7 @@ class SynapticManager(object):
         total_weights = numpy.zeros(n_synapse_types)
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
+        max_rate = self._spikes_per_second
 
         for subedge in sub_graph.incoming_subedges_from_subvertex(subvertex):
             pre_vertex_slice = graph_mapper.get_subvertex_slice(
@@ -429,7 +437,22 @@ class SynapticManager(object):
                         post_vertex_slice) * weight_scale)
                     biggest_weight[synapse_type] = max(
                         biggest_weight[synapse_type], weight_max)
-                    total_weights[synapse_type] += (
+
+                    spikes_per_tick = self._spikes_per_tick
+                    if isinstance(edge.pre_vertex, SpikeSourcePoisson):
+                        rate = edge.pre_vertex.rate
+                        if hasattr(rate, "__getitem__"):
+                            rate = max(rate)
+                        elif isinstance(rate, RandomDistribution):
+                            rate = utility_calls.get_maximum_probable_value(
+                                rate, pre_vertex_slice.n_atoms)
+                        if rate > max_rate:
+                            max_rate = rate
+                        spikes_per_tick = max(
+                            1.0,
+                            rate /
+                            (1000000.0 / float(self._machine_time_step)))
+                    total_weights[synapse_type] += spikes_per_tick * (
                         weight_max * n_connections)
 
                     if synapse_dynamics.are_weights_signed():
@@ -441,7 +464,7 @@ class SynapticManager(object):
             max_weights[synapse_type] = min(
                 self._ring_buffer_expected_upper_bound(
                     stats.mean, stats.standard_deviation,
-                    self._spikes_per_second, machine_timestep, stats.n_items,
+                    max_rate, machine_timestep, stats.n_items,
                     self._ring_buffer_sigma),
                 total_weights[synapse_type])
             max_weights[synapse_type] = max(
