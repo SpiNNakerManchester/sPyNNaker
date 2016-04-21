@@ -229,7 +229,7 @@ class AbstractConnector(object):
 
     def _generate_values(self, values, n_connections, connection_slices):
         if isinstance(values, RandomDistribution):
-            return values.next(n_connections)
+            return numpy.asarray(values.next(n_connections))
         elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections)
         elif hasattr(values, "__getitem__"):
