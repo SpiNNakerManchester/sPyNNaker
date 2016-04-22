@@ -229,6 +229,8 @@ class AbstractConnector(object):
 
     def _generate_values(self, values, n_connections, connection_slices):
         if isinstance(values, RandomDistribution):
+            if n_connections == 1:
+                return numpy.array([values.next(n_connections)])
             return values.next(n_connections)
         elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections)
@@ -281,7 +283,8 @@ class AbstractConnector(object):
             if delays < self._min_delay:
                 delays = self._min_delay
         else:
-            delays[delays < self._min_delay] = self._min_delay
+            if delays.size > 0:
+                delays[delays < self._min_delay] = self._min_delay
         return delays
 
     def _generate_delays(self, values, n_connections, connection_slices):
