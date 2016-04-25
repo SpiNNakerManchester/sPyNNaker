@@ -1,5 +1,5 @@
 APP = delay_extension
 BUILD_DIR = build/
-OBJECTS = delay_extension.o
+SOURCES = delay_extension.c
 
 include ../Makefile.common
