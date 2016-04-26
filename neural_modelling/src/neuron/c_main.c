@@ -223,6 +223,10 @@ void timer_callback(uint timer_count, uint unused) {
             log_info("updating recording regions");
             recording_finalise();
         }
+
+        // Subtract 1 from the time so this tick gets done again on the next
+        // run
+        time -= 1;
         return;
     }
     // otherwise do synapse and neuron time step updates
