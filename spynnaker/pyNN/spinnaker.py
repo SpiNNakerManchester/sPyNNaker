@@ -157,7 +157,10 @@ class Spinnaker(SpinnakerMainInterface):
                         "The combination of simulation time step and the"
                         " machine time scale factor results in a wall clock "
                         "timer tick that is currently not reliably supported "
-                        "by the spinnaker machine.")
+                        "by the spinnaker machine.  If you would like to "
+                        "override this behaviour (at your own risk), please "
+                        "add violate_1ms_wall_clock_restriction = True to the "
+                        "[Mode] section of your .spynnaker.cfg file")
         else:
             self._time_scale_factor = max(1,
                                           math.ceil(1000.0 / float(timestep)))
