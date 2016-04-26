@@ -38,7 +38,7 @@ class AbstractAdditionalInput(object):
         :return: The SDRAM usage
         :rtype: int
         """
-        return self.get_n_input_type_parameters() * 4
+        return self.get_n_parameters() * 4
 
     def get_dtcm_usage_per_neuron_in_bytes(self):
         """ Get the DTCM usage of this additional input in bytes
@@ -46,4 +46,4 @@ class AbstractAdditionalInput(object):
         :return: The DTCM usage
         :rtype: int
         """
-        return self.get_n_input_type_parameters() * 4
+        return self.get_n_parameters() * 4
