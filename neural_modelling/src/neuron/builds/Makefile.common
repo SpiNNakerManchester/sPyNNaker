@@ -101,19 +101,19 @@ $(foreach dir, $(SOURCE_DIRS), $(eval $(call stdp-build-rules,$(dir))))
 
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"$$*.c\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	$(CC) -D__FILE__=\"$*.c\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
                         $(WEIGHT_DEPENDENCE_H)
 	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"$$*.c\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	$(CC) -D__FILE__=\"$*.c\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H)\
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
 $(NEURON_MODEL_O): $(NEURON_MODEL)
 	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"$$*.c\" -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) -o $@ $<
+	$(CC) -D__FILE__=\"$*.c\" -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)neuron/neuron.o: $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)
