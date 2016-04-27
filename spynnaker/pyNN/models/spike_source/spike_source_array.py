@@ -165,6 +165,7 @@ class SpikeSourceArray(
         self._spike_recorder.record = True
 
     def get_spikes(self, placements, graph_mapper, buffer_manager):
+
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager,
             (ReverseIPTagMulticastSourcePartitionedVertex.
@@ -172,7 +173,9 @@ class SpikeSourceArray(
             (ReverseIPTagMulticastSourcePartitionedVertex.
              _REGIONS.RECORDING_BUFFER_STATE.value),
             placements, graph_mapper, self,
-            lambda subvertex: subvertex.virtual_key)
+            lambda subvertex:
+                subvertex.virtual_key if subvertex.virtual_key is not None
+                else 0)
 
     @property
     def model_name(self):
