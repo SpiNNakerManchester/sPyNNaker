@@ -321,6 +321,5 @@ class Spinnaker(SpinnakerMainInterface):
         """
 
         # extra post run algorithms
-        self._extra_post_run_algorithms = ["SpyNNakerRecordingExtractor"]
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         SpinnakerMainInterface.run(self, run_time)
