@@ -47,6 +47,15 @@ class AbstractSynapseDynamics(object):
         """
         return connector.get_delay_maximum()
 
+    def get_delay_variance(
+            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        """ Get the variance in delay for the synapses
+        """
+        return connector.get_delay_variance(
+            n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice)
+
     def get_weight_mean(
             self, connector, n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):

@@ -88,6 +88,11 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
                 self._n_pre_neurons * self._n_post_neurons,
                 numpy.amax(self._probs)))
 
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        return self._get_delay_variance(self._delays, None)
+
     def _get_n_connections(self, out_of, pre_vertex_slice, post_vertex_slice):
         max_prob = numpy.amax(
             self._probs[pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
@@ -118,9 +123,6 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms,
-            pre_vertex_slice, post_vertex_slice)
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
