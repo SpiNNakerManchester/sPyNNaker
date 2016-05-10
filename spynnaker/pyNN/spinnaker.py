@@ -12,7 +12,11 @@ from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
 # local front end imports
+from spynnaker.pyNN.models.neuron_parameters_container import \
+    NeuronParametersContainer
+from spynnaker.pyNN.models.pynn_assemblier import Assemblier
 from spynnaker.pyNN.models.pynn_population import Population
+from spynnaker.pyNN.models.pynn_population_view import PopulationView
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
@@ -52,8 +56,14 @@ class Spinnaker(SpinnakerMainInterface):
         # population holders
         self._populations = list()
         self._projections = list()
+
+        # atom holders for pop views and assembliers
+        self._atom_mappings = dict()
+
+        # command sender vertex
         self._multi_cast_vertex = None
-        self._edge_count = 0
+
+        # set of LPG's used by the external device plugin module
         self._live_spike_recorder = dict()
 
         # create xml path for where to locate spynnaker related functions when
@@ -234,6 +244,9 @@ class Spinnaker(SpinnakerMainInterface):
                     dependant_edge,
                     vertex_to_add.edge_partition_identifier_for_dependent_edge)
 
+    def get_atom_mapping(self):
+        return self._atom_mappings
+
     def create_population(self, size, cellclass, cellparams, structure, label):
         """
 
@@ -244,9 +257,43 @@ class Spinnaker(SpinnakerMainInterface):
         :param label:
         :return:
         """
-        return Population(
+        # build a population object
+        population = Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
+        self._add_population(population)
+        return population
+
+    def create_population_vew(
+            self, population_to_view, neuron_selector, label):
+        """
+
+        :param population_to_view:
+        :param neuron_selector:
+        :param label:
+        :return:
+        """
+
+        # build pop view
+        population_view = PopulationView(
+            population_to_view, neuron_selector, label, self)
+
+        return population_view
+
+
+    def create_assembly(self, populations, label):
+        """
+
+        :param populations:
+        :param label:
+        :return:
+        """
+        # create assemblier
+        assembler = Assemblier(populations, label, self)
+
+
+
+
 
     def _add_population(self, population):
         """ Called by each population to add itself to the list
@@ -273,9 +320,6 @@ class Spinnaker(SpinnakerMainInterface):
         :param rng: the random number generator to use on this projection
         :return:
         """
-        if label is None:
-            label = "Projection {}".format(self._edge_count)
-            self._edge_count += 1
         return Projection(
             presynaptic_population=presynaptic_population, label=label,
             postsynaptic_population=postsynaptic_population, rng=rng,

@@ -2,7 +2,8 @@ from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-
+from spynnaker.pyNN.models.neuron_parameters_container import \
+    NeuronParametersContainer
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
@@ -73,6 +74,7 @@ class Population(object):
         self._vertex = cellclass(**internal_cellparams)
         self._spinnaker = spinnaker
         self._delay_vertex = None
+        self._update_spinnaker_atom_mapping(cellparams)
 
         # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
@@ -83,9 +85,6 @@ class Population(object):
         else:
             self._structure = None
 
-        self._spinnaker._add_population(self)
-        self._spinnaker.add_partitionable_vertex(self._vertex)
-
         # initialise common stuff
         self._size = size
         self._record_spike_file = None
@@ -94,6 +93,24 @@ class Population(object):
 
         # parameter
         self._change_requires_mapping = True
+
+    def _update_spinnaker_atom_mapping(self, cellparams):
+        model_name = self._vertex.model_name
+        atom_mappings = self._spinnaker.get_atom_mapping()
+        if model_name not in atom_mappings:
+            atom_mappings[model_name] = dict()
+        atom_mappings[model_name][self] = list()
+        params = dict()
+        neuron_param_object = NeuronParametersContainer()
+        for cell_param in cellparams:
+                params[cell_param] = self.get(cell_param)
+        self._vertex = None
+        for atom in range(0, self._size):
+            for cell_param in cellparams:
+                neuron_param_object.add_param(
+                    cell_param, params[cell_param][atom])
+            atom_mappings[model_name][self].\
+                append(neuron_param_object)
 
     @property
     def requires_mapping(self):

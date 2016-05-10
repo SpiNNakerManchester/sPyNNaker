@@ -292,6 +292,31 @@ def Projection(presynaptic_population, postsynaptic_population,
         target, synapse_dynamics, label, rng)
 
 
+# noinspection PyPep8Naming
+def PopulationView(parent, selector, label=None):
+    """
+    builds a pop view object
+    :param parent: the parent population to link to
+    :param selector: the selector of which neurons to contain
+    :param label: label of this pop view
+    :return: a populationView object
+    """
+    global _spinnaker
+    return _spinnaker.create_population_vew(parent, selector, label)
+
+
+# noinspection PyPep8Naming
+def Assembly(populations, label):
+    """
+    builds a assembly object
+    :param populations: a iterable of populations or population views
+    :param label: label for this assembly
+    :return:
+    """
+    global _spinnaker
+    return _spinnaker.create_assembly(populations, label)
+
+
 def NativeRNG(seed_value):
     """ Fixes the random number generator's seed
     :param seed_value:
