@@ -395,6 +395,7 @@ class SynapticManager(object):
         weight_scale_squared = weight_scale * weight_scale
         n_synapse_types = self._synapse_type.get_n_synapse_types()
         running_totals = [RunningStats() for _ in range(n_synapse_types)]
+        delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
         total_weights = numpy.zeros(n_synapse_types)
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
@@ -431,6 +432,13 @@ class SynapticManager(object):
                     running_totals[synapse_type].add_items(
                         weight_mean, weight_variance, n_connections)
 
+                    delay_variance = synapse_dynamics.get_delay_variance(
+                        connector, pre_slices, pre_slice_index,
+                        post_slices, post_slice_index, pre_vertex_slice,
+                        post_vertex_slice)
+                    delay_running_totals[synapse_type].add_items(
+                        0.0, delay_variance, n_connections)
+
                     weight_max = (synapse_dynamics.get_weight_maximum(
                         connector, pre_slices, pre_slice_index,
                         post_slices, post_slice_index, pre_vertex_slice,
@@ -461,14 +469,17 @@ class SynapticManager(object):
         max_weights = numpy.zeros(n_synapse_types)
         for synapse_type in range(n_synapse_types):
             stats = running_totals[synapse_type]
-            max_weights[synapse_type] = min(
-                self._ring_buffer_expected_upper_bound(
-                    stats.mean, stats.standard_deviation,
-                    max_rate, machine_timestep, stats.n_items,
-                    self._ring_buffer_sigma),
-                total_weights[synapse_type])
-            max_weights[synapse_type] = max(
-                max_weights[synapse_type], biggest_weight[synapse_type])
+            if delay_running_totals[synapse_type].variance == 0.0:
+                max_weights[synapse_type] = total_weights[synapse_type]
+            else:
+                max_weights[synapse_type] = min(
+                    self._ring_buffer_expected_upper_bound(
+                        stats.mean, stats.standard_deviation,
+                        max_rate, machine_timestep, stats.n_items,
+                        self._ring_buffer_sigma),
+                    total_weights[synapse_type])
+                max_weights[synapse_type] = max(
+                    max_weights[synapse_type], biggest_weight[synapse_type])
 
         # Convert these to powers
         max_weight_powers = [0 if w <= 0
