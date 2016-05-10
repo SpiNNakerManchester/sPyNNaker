@@ -1,8 +1,8 @@
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
-    import MultiCastPartitionableEdge
+from spynnaker.pyNN.models.neural_projections.delayed_partitionable_edge \
+    import DelayedPartitionableEdge
 
 from spynnaker.pyNN.models.neural_projections.synapse_information \
     import SynapseInformation
@@ -226,11 +226,14 @@ class Projection(object):
         post_vertex = postsynaptic_population._get_vertex
         delay_edge = self._find_existing_edge(delay_vertex, post_vertex)
         if delay_edge is None:
-            delay_edge = MultiCastPartitionableEdge(
-                delay_vertex, post_vertex, label="{}_delayed_to_{}".format(
+            delay_edge = DelayedPartitionableEdge(
+                delay_vertex, post_vertex, self._synapse_information,
+                label="{}_delayed_to_{}".format(
                     pre_vertex.label, post_vertex.label))
             self._spinnaker.add_partitionable_edge(
                 delay_edge, EDGE_PARTITION_ID)
+        else:
+            delay_edge.add_synapse_information(self._synapse_information)
         return delay_edge
 
     def describe(self, template='projection_default.txt', engine='default'):
