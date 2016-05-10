@@ -39,10 +39,10 @@ static inline input_t synapses_convert_weight_to_input(weight_t weight,
 
 static inline void synapses_print_weight(weight_t weight, uint32_t left_shift) {
     if (weight != 0)
-        log_debug("%12.6k", synapses_convert_weight_to_input(
+        io_printf(IO_BUF, "%12.6k", synapses_convert_weight_to_input(
             weight, left_shift));
     else
-        log_debug("      ");
+        io_printf(IO_BUF, "      ");
 }
 
 bool synapses_initialise(address_t address, uint32_t n_neurons,

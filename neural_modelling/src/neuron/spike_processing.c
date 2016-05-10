@@ -2,7 +2,7 @@
 #include "population_table/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
-#include "../common/in_spikes.h"
+#include <circular_buffer.h>
 #include <spin1_api.h>
 #include <debug.h>
 
@@ -48,6 +48,12 @@ static uint32_t max_n_words;
 
 static spike_t spike;
 
+static circular_buffer in_spike_buffers[2];
+
+static uint32_t in_spike_buffer_write = 0;
+
+static uint32_t in_spike_buffer_read = 0;
+
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void _do_dma_read(
@@ -69,7 +75,7 @@ static inline void _do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
-static inline void _setup_synaptic_dma_read() {
+static inline void _setup_synaptic_dma_read(circular_buffer in_spikes) {
 
     // Set up to store the DMA location and size to read
     address_t row_address;
@@ -81,8 +87,8 @@ static inline void _setup_synaptic_dma_read() {
     }
 
     // If there's more incoming spikes
-    uint32_t setup_done = false;
-    while (!setup_done && in_spikes_get_next_spike(&spike)) {
+    bool setup_done = false;
+    while (!setup_done && circular_buffer_get_next(in_spikes, &spike)) {
         log_debug("Checking for row for spike 0x%.8x\n", spike);
 
         // Decode spike to get address of destination synaptic row
@@ -130,30 +136,17 @@ void _multicast_packet_received_callback(uint key, uint payload) {
 
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
-    // If there was space to add spike to incoming spike queue
-    if (in_spikes_add_spike(key)) {
-
-        // If we're not already processing synaptic DMAs,
-        // flag pipeline as busy and trigger a feed event
-        if (!dma_busy) {
-
-            log_debug("Sending user event for new spike");
-            if (spin1_trigger_user_event(0, 0)) {
-                dma_busy = true;
-            } else {
-                log_debug("Could not trigger user event\n");
-            }
-        }
-    } else {
-        log_debug("Could not add spike");
-    }
+    circular_buffer_add(in_spike_buffers[in_spike_buffer_write], key);
 }
 
-// Called when a user event is received
-void _user_event_callback(uint unused0, uint unused1) {
-    use(unused0);
-    use(unused1);
-    _setup_synaptic_dma_read();
+void spike_processing_do_timestep_update(uint32_t time) {
+    uint state = spin1_int_disable();
+
+    in_spike_buffer_read = in_spike_buffer_write;
+    in_spike_buffer_write = in_spike_buffer_write ^ 1;
+    _setup_synaptic_dma_read(in_spike_buffers[in_spike_buffer_read]);
+
+    spin1_mode_restore(state);
 }
 
 // Called when a DMA completes
@@ -168,9 +161,10 @@ void _dma_complete_callback(uint unused, uint tag) {
         // Get pointer to current buffer
         uint32_t current_buffer_index = buffer_being_read;
         dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
+        circular_buffer in_spikes = in_spike_buffers[in_spike_buffer_read];
 
         // Start the next DMA transfer, so it is complete when we are finished
-        _setup_synaptic_dma_read();
+        _setup_synaptic_dma_read(in_spikes);
 
         // Process synaptic row repeatedly
         bool subsequent_spikes;
@@ -178,8 +172,8 @@ void _dma_complete_callback(uint unused, uint tag) {
 
             // Are there any more incoming spikes from the same pre-synaptic
             // neuron?
-            subsequent_spikes = in_spikes_is_next_spike_equal(
-                current_buffer->originating_spike);
+            subsequent_spikes = circular_buffer_advance_if_next_equals(
+                in_spikes, current_buffer->originating_spike);
 
             // Process synaptic row, writing it back if it's the last time
             // it's going to be processed
@@ -238,9 +232,14 @@ bool spike_processing_initialise(
     buffer_being_read = N_DMA_BUFFERS;
     max_n_words = row_max_n_words;
 
-    // Allocate incoming spike buffer
-    if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
-        return false;
+    // Allocate incoming spike buffers
+    for (int i = 0; i < 2; i++) {
+        in_spike_buffers[i] = circular_buffer_initialize(
+            incoming_spike_buffer_size);
+        if (in_spike_buffers[i] == NULL) {
+            log_error("Out of memory when creating in spike buffers");
+            return false;
+        }
     }
 
     // Set up the callbacks
@@ -248,7 +247,6 @@ bool spike_processing_initialise(
             _multicast_packet_received_callback, mc_packet_callback_priority);
     spin1_callback_on(DMA_TRANSFER_DONE, _dma_complete_callback,
                       dma_trasnfer_callback_priority);
-    spin1_callback_on(USER_EVENT, _user_event_callback, user_event_priority);
 
     return true;
 }
@@ -261,6 +259,12 @@ void spike_processing_finish_write(uint32_t process_id) {
 //! \return the number of times the input buffer has overloaded
 uint32_t spike_processing_get_buffer_overflows() {
 
+    uint32_t overflows = 0;
+    for (uint32_t i = 0; i < 2; i++) {
+        overflows += circular_buffer_get_n_buffer_overflows(
+            in_spike_buffers[i]);
+    }
+
     // Check for buffer overflow
-    return in_spikes_get_n_buffer_overflows();
+    return overflows;
 }

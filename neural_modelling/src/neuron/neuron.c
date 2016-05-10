@@ -279,8 +279,7 @@ void neuron_do_timestep_update(timer_t time) {
 
         // If the neuron has spiked
         if (spike) {
-            log_debug("the neuron %d has been determined to spike",
-                      neuron_index);
+            log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Tell the neuron model
             neuron_model_has_spiked(neuron);
