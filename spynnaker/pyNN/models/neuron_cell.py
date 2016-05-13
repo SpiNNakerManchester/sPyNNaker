@@ -1,5 +1,5 @@
 from spinn_front_end_common.utilities import exceptions
-import copy
+
 
 class NeuronCell(object):
     """
@@ -9,7 +9,7 @@ class NeuronCell(object):
     def __init__(self, default_parameters):
 
         # standard parameters
-        self._params = copy.deepcopy(default_parameters)
+        self._params = dict(default_parameters)
 
         # recording data items
         self._record_spikes = False
