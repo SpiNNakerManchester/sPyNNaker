@@ -1,15 +1,15 @@
 from spinn_front_end_common.utilities import exceptions
-
+import copy
 
 class NeuronCell(object):
     """
     NeuronCell: the object that stores all data about a cell.
     """
 
-    def __init__(self):
+    def __init__(self, default_parameters):
 
         # standard parameters
-        self._params = dict()
+        self._params = copy.deepcopy(default_parameters)
 
         # recording data items
         self._record_spikes = False

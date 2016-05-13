@@ -110,7 +110,7 @@ class Population(object):
             atom_mappings[model_name] = dict()
         atom_mappings[model_name][self] = list()
         params = dict()
-        neuron_param_object = NeuronCell()
+        neuron_param_object = NeuronCell(self._vertex.default_parameters)
         for cell_param in cellparams:
                 params[cell_param] = self.get(cell_param)
         for atom in range(0, self._size):
@@ -209,7 +209,11 @@ class Population(object):
             population.
         """
         if isinstance(self._vertex, AbstractPopulationSettable):
-            return self._vertex.get_value(parameter_name)
+            values = numpy.empty(shape=1)
+            atoms = self._get_atoms_for_pop()
+            for atom in atoms:
+                values.append(atom.get_param(parameter_name))
+            return values
         raise KeyError("Population does not have a property {}".format(
             parameter_name))
 
