@@ -120,7 +120,7 @@ def register_binary_search_path(search_path):
     """
     :param search_path:
     Registers an additional binary search path for
-        for executables
+        for executable's
 
     absolute search path for binaries
     """
@@ -131,7 +131,7 @@ def end():
     """
     Do any necessary cleaning up before exiting.
 
-    Unregisters the controller,
+    Unregistered the controller,
     prints any data recorded using the low-level API
     """
     global _spinnaker

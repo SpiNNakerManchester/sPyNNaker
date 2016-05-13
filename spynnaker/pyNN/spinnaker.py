@@ -12,9 +12,8 @@ from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
 # local front end imports
-from spynnaker.pyNN.models.neuron_parameters_container import \
-    NeuronParametersContainer
-from spynnaker.pyNN.models.pynn_assemblier import Assemblier
+from spynnaker.pyNN.models.neuron_cell import NeuronCell
+from spynnaker.pyNN.models.pynn_assembly import Assemblier
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_population_view import PopulationView
 from spynnaker.pyNN.models.pynn_projection import Projection
@@ -57,7 +56,11 @@ class Spinnaker(SpinnakerMainInterface):
         self._populations = list()
         self._projections = list()
 
-        # atom holders for pop views and assembliers
+        # none labelled objects special to spynnaker
+        self._none_labelled_pop_view_count = 0
+        self._none_labelled_assembly_count = 0
+
+        # atom holders for pop views and assemblers
         self._atom_mappings = dict()
 
         # command sender vertex
@@ -245,6 +248,10 @@ class Spinnaker(SpinnakerMainInterface):
                     vertex_to_add.edge_partition_identifier_for_dependent_edge)
 
     def get_atom_mapping(self):
+        """
+        supports getting the atom mappings needed for pop views and assemblers
+        :return:
+        """
         return self._atom_mappings
 
     def create_population(self, size, cellclass, cellparams, structure, label):
@@ -280,20 +287,16 @@ class Spinnaker(SpinnakerMainInterface):
 
         return population_view
 
-
     def create_assembly(self, populations, label):
         """
 
-        :param populations:
-        :param label:
-        :return:
+        :param populations: populations or pop views to be added to a assembly
+        :param label: the label for this assembly
+        :return: a assembly
         """
-        # create assemblier
+        # create assembler
         assembler = Assemblier(populations, label, self)
-
-
-
-
+        return assembler
 
     def _add_population(self, population):
         """ Called by each population to add itself to the list
@@ -304,6 +307,28 @@ class Spinnaker(SpinnakerMainInterface):
         """ Called by each projection to add itself to the list
         """
         self._projections.append(projection)
+
+    @property
+    def none_labelled_pop_view_count(self):
+        """ The number of times pop views have not been labelled.
+        """
+        return self._none_labelled_pop_view_count
+
+    def increment_none_labelled_pop_view_count(self):
+        """ Increment the number of new pop views which have not been labelled.
+        """
+        self._none_labelled_pop_view_count += 1
+
+    @property
+    def none_labelled_assembly_count(self):
+        """ The number of times assembly have not been labelled.
+        """
+        return self._none_labelled_assembly_count
+
+    def increment_none_labelled_assembly_count(self):
+        """ Increment the number of new assemblies which have not been labelled.
+        """
+        self._none_labelled_assembly_count += 1
 
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,

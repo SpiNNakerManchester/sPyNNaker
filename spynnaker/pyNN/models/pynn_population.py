@@ -1,9 +1,12 @@
+from pyNN import descriptions, random
 from pacman.model.constraints.abstract_constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from spynnaker.pyNN.models.neuron_parameters_container import \
-    NeuronParametersContainer
+from spynnaker.pyNN.models.neuron_cell import \
+    NeuronCell
+from spynnaker.pyNN.models.pynn_assembly import Assembly
+from spynnaker.pyNN.models.pynn_population_view import PopulationView
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
@@ -48,9 +51,9 @@ class Population(object):
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
                  structure=None):
-        if size is not None and size <= 0:
+        if (size is not None and size <= 0) or size is None:
             raise exceptions.ConfigurationException(
-                "A population cannot have a negative or zero size.")
+                "A population cannot have a negative, None or zero size.")
 
         # Create a partitionable_graph vertex for the population and add it
         # to PACMAN
@@ -74,6 +77,7 @@ class Population(object):
         self._vertex = cellclass(**internal_cellparams)
         self._spinnaker = spinnaker
         self._delay_vertex = None
+        self._model_name = self._vertex.model_name
         self._update_spinnaker_atom_mapping(cellparams)
 
         # Internal structure now supported 23 November 2014 ADR
@@ -95,22 +99,36 @@ class Population(object):
         self._change_requires_mapping = True
 
     def _update_spinnaker_atom_mapping(self, cellparams):
+        """
+        update the neuron cell mapping object of spinnaker
+        :param cellparams:
+        :return:
+        """
         model_name = self._vertex.model_name
         atom_mappings = self._spinnaker.get_atom_mapping()
         if model_name not in atom_mappings:
             atom_mappings[model_name] = dict()
         atom_mappings[model_name][self] = list()
         params = dict()
-        neuron_param_object = NeuronParametersContainer()
+        neuron_param_object = NeuronCell()
         for cell_param in cellparams:
                 params[cell_param] = self.get(cell_param)
-        self._vertex = None
         for atom in range(0, self._size):
             for cell_param in cellparams:
                 neuron_param_object.add_param(
                     cell_param, params[cell_param][atom])
             atom_mappings[model_name][self].\
                 append(neuron_param_object)
+
+    def _get_atoms_for_pop(self):
+        """
+        helper method for getting atoms from pop
+        :return:
+        """
+        atom_mapping = self._spinnaker.get_atom_mapping()
+        model_name_atoms = atom_mapping[self._model_name]
+        pop_atoms = model_name_atoms[self]
+        return pop_atoms
 
     @property
     def requires_mapping(self):
@@ -126,14 +144,23 @@ class Population(object):
     def __add__(self, other):
         """ Merges populations
         """
-        # TODO: Make this add the neurons from another population to this one
-        raise NotImplementedError
+        if isinstance(other, Population) or isinstance(other, PopulationView):
+            # if valid, make an assembly
+            return Assembly(
+                [self, other],
+                label="Assembly for {} and {}".format(
+                    self._vertex._label, other.label),
+                spinnaker=self._spinnaker)
+        else:
+            # not valid, blow up
+            raise exceptions.ConfigurationException(
+                "Can only add a population or a population view to "
+                "a population.")
 
     def all(self):
         """ Iterator over cell ids on all nodes.
         """
-        # TODO: Return the cells when we have such a thing
-        raise NotImplementedError
+        return self.__iter__()
 
     @property
     def conductance_based(self):
@@ -157,12 +184,25 @@ class Population(object):
         If template is None, then a dictionary containing the template context
         will be returned.
         """
-        # TODO:
-        raise NotImplementedError
+        context = {
+            "label": self._vertex.label,
+            "celltype": self._vertex.model_name,
+            "structure": None,
+            "size": self._size,
+            "first_id": 0,
+            "last_id": self._size - 1,
+        }
 
-    def __getitem__(self, index_or_slice):
-        # TODO: Used to get a single cell - not yet supported
-        raise NotImplementedError
+        if self.structure:
+            context["structure"] = self.structure.describe(template=None)
+        return descriptions.render(engine, template, context)
+
+    def __getitem__(self, index):
+        if isinstance(index, int):
+            pop_view_atoms = self._get_atoms_for_pop()
+            return pop_view_atoms[index]
+        elif isinstance(index, slice):
+            return PopulationView(self, index, None, self._spinnaker)
 
     def get(self, parameter_name, gather=False):
         """ Get the values of a parameter for every local cell in the\
@@ -174,7 +214,7 @@ class Population(object):
             parameter_name))
 
     # noinspection PyPep8Naming
-    def getSpikes(self, compatible_output=False, gather=True):
+    def getSpikes(self, compatible_output=True, gather=True):
         """
         Return a 2-column numpy array containing cell ids and spike times for\
         recorded cells.
@@ -224,7 +264,7 @@ class Population(object):
     def get_gsyn(self, gather=True, compatible_output=False):
         """
         Return a 3-column numpy array containing cell ids, time and synaptic
-        conductances for recorded cells.
+        conductance's for recorded cells.
         :param gather:
             not used - inserted to match PyNN specs
         :type gather: bool
@@ -294,21 +334,19 @@ class Population(object):
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
 
-    def id_to_index(self, cell_id):
+    def id_to_index(self, id):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population).
         """
+        atoms = self._get_atoms_for_pop()
+        return atoms.index(id)
 
-        # TODO: Need __getitem__
-        raise NotImplementedError
-
-    def id_to_local_index(self, cell_id):
+    def id_to_local_index(self, id):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population), counting only cells on the local\
             MPI node.
         """
-        # TODO: Need __getitem__
-        raise NotImplementedError
+        return self.id_to_index(id)
 
     def initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\
@@ -336,7 +374,15 @@ class Population(object):
     def can_record(self, variable):
         """ Determine whether `variable` can be recorded from this population.
         """
-
+        if variable == "spikes":
+            if isinstance(self._vertex, AbstractSpikeRecordable):
+                return True
+        if variable == "v":
+            if isinstance(self._vertex, AbstractVRecordable):
+                return True
+        if variable == "gsyn":
+            if isinstance(self._vertex, AbstractGSynRecordable):
+                return True
         # TODO: Needs a more precise recording mechanism (coming soon)
         raise NotImplementedError
 
@@ -350,9 +396,8 @@ class Population(object):
     def __iter__(self):
         """ Iterate over local cells
         """
-
-        # TODO:
-        raise NotImplementedError
+        atoms = self._get_atoms_for_pop()
+        return iter(atoms)
 
     def __len__(self):
         """ Get the total number of cells in the population.
@@ -391,19 +436,22 @@ class Population(object):
 
     def nearest(self, position):
         """ Return the neuron closest to the specified position
+        :param position: space position
+        """
+        return self._nearest(position, self.positions)
+
+    def _nearest(self, position, positions):
+        """ Return the neuron closest to the specified position
+        :param position: space position
         """
         # doesn't always work correctly if a position is equidistant between
         # two neurons, i.e. 0.5 should be rounded up, but it isn't always.
         # also doesn't take account of periodic boundary conditions
-
-        # TODO: Enable when __getitem__ is enabled
-        # pos = numpy.array([position] * self.positions.shape[1]).transpose()
-        # dist_arr = (self.positions - pos) ** 2
-        # distances = dist_arr.sum(axis=0)
-        # nearest = distances.argmin()
-        # return self[nearest]
-
-        raise NotImplementedError
+        pos = numpy.array([position] * positions.shape[1]).transpose()
+        dist_arr = (positions - pos) ** 2
+        distances = dist_arr.sum(axis=0)
+        nearest = distances.argmin()
+        return self[nearest]
 
     # noinspection PyPep8Naming
     def randomInit(self, distribution):
@@ -478,9 +526,12 @@ class Population(object):
             if self._structure is None:
                 raise ValueError("attempted to retrieve positions "
                                  "for an unstructured population")
-            self._positions = self._structure.generate_positions(
+            self._positions = self._generate_positions_for_atoms(
                 self._vertex.n_atoms)
         return self._positions
+
+    def _generate_positions_for_atoms(self, n_atoms):
+        return self._structure.generate_positions(n_atoms)
 
     @positions.setter
     def positions(self, positions):
@@ -492,16 +543,34 @@ class Population(object):
         self._change_requires_mapping = True
 
     # noinspection PyPep8Naming
-    def printSpikes(self, filename, gather=True):
+    def printSpikes(self, file, gather=True, compatible_output=True):
         """ Write spike time information from the population to a given file.
         :param filename: the absolute file path for where the spikes are to\
                     be printed in
         :param gather: Supported from the PyNN language, but ignored here
+        :param compatible_output: Supported from the PyNN language,
+         but ignored here
+        """
+        self._print_spikes(file, gather, compatible_output)
+
+    def _print_spikes(self, filename, gather, compatible_output,
+                      neuron_filter=None):
+        """ Write spike time information from the population to a given file.
+        :param filename: the absolute file path for where the spikes are to\
+                    be printed in
+        :param gather: Supported from the PyNN language, but ignored here
+        :param neuron_filter: neuron filter or none if all of pop is to
+        be returned
         """
         if not gather:
             logger.warn("Spynnaker only supports gather = true, will execute"
                         " as if gather was true anyhow")
-        spikes = self.getSpikes(compatible_output=True)
+        if not compatible_output:
+            logger.warn("Spynnaker only supports compatible_output = True, "
+                        "will execute as if gather was true anyhow")
+            compatible_output = True
+
+        spikes = self.getSpikes(compatible_output)
         if spikes is not None:
             first_id = 0
             num_neurons = self._vertex.n_atoms
@@ -517,14 +586,38 @@ class Population(object):
                 spike_file.write("{}\t{}\n".format(time, neuronId))
             spike_file.close()
 
-    def print_gsyn(self, filename, gather=True):
+    def print_gsyn(self, file, gather=True, compatible_output=True):
         """ Write conductance information from the population to a given file.
         :param filename: the absolute file path for where the gsyn are to be\
                     printed in
         :param gather: Supported from the PyNN language, but ignored here
+        :param compatible_output: Supported from the PyNN language,
+         but ignored here
         """
+        return self._print_gsyn(file, gather, compatible_output)
+
+    def _print_gsyn(self, filename, gather, compatible_output,
+                    neuron_filter=None):
+        """ Write conductance information from the population to a given file.
+        :param filename: the absolute file path for where the gsyn are to be\
+                    printed in
+        :param gather: Supported from the PyNN language, but ignored here
+        :param compatible_output: Supported from the PyNN language,
+         but ignored here
+        :param neuron_filter: neuron filter or none if all of pop is to
+        be returned
+        """
+
+        if not gather:
+            logger.warn("Spynnaker only supports gather = true, will execute"
+                        " as if gather was true anyhow")
+        if not compatible_output:
+            logger.warn("Spynnaker only supports compatible_output = True, "
+                        "will execute as if gather was true anyhow")
+            compatible_output = True
+
         time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
-        gsyn = self.get_gsyn(gather, compatible_output=True)
+        gsyn = self.get_gsyn(gather, compatible_output)
         first_id = 0
         num_neurons = self._vertex.n_atoms
         dimensions = self._vertex.n_atoms
@@ -541,20 +634,44 @@ class Population(object):
                 time, neuronId, value_e, value_i))
         file_handle.close()
 
-    def print_v(self, filename, gather=True):
+    def print_v(self, file, gather=True, compatible_output=True):
         """ Write membrane potential information from the population to a\
             given file.
         :param filename: the absolute file path for where the voltage are to\
                      be printed in
+        :param compatible_output: Supported from the PyNN language,
+         but ignored here
         :param gather: Supported from the PyNN language, but ignored here
         """
+        return self._print_v(file, gather, compatible_output)
+
+    def _print_v(self, filename, gather, compatible_output,
+                 neuron_filter=None):
+        """ Write conductance information from the population to a given file.
+        :param filename: the absolute file path for where the gsyn are to be\
+                    printed in
+        :param gather: Supported from the PyNN language, but ignored here
+        :param compatible_output: Supported from the PyNN language,
+         but ignored here
+        :param neuron_filter: neuron filter or none if all of pop is to
+        be returned
+        """
+
+        if not gather:
+            logger.warn("Spynnaker only supports gather = true, will execute"
+                        " as if gather was true anyhow")
+        if not compatible_output:
+            logger.warn("Spynnaker only supports compatible_output = True, "
+                        "will execute as if gather was true anyhow")
+            compatible_output = True
+
         time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
-        v = self.get_v(gather, compatible_output=True)
+        v = self.get_v(gather, compatible_output)
         utility_calls.check_directory_exists_and_create_if_not(filename)
         file_handle = open(filename, "w")
         first_id = 0
-        num_neurons = self._vertex.n_atoms
-        dimensions = self._vertex.n_atoms
+        num_neurons = len(self._get_atoms_for_pop())
+        dimensions = len(self._get_atoms_for_pop())
         file_handle.write("# first_id = {}\n".format(first_id))
         file_handle.write("# n = {}\n".format(num_neurons))
         file_handle.write("# dt = {}\n".format(time_step))
@@ -583,19 +700,37 @@ class Population(object):
         :param n: the number of neurons to sample
         :param rng: the random number generator to use.
         """
-
-        # TODO: Need PopulationView support
-        raise NotImplementedError
+        if self._size < n:
+            raise exceptions.ConfigurationException(
+                "Cant sample for more atoms than what reside in the "
+                "population view.")
+        if rng is None:
+            rng = random.NumpyRNG()
+        indices = rng.permutation(numpy.arange(len(self)))[0:n]
+        return PopulationView(
+            self, indices,
+            "sampled_version of {} from {}"
+                .format(indices, self._vertex._label),
+            self._spinnaker)
 
     def save_positions(self, file):  # @ReservedAssignment
         """ Save positions to file.
             :param file: the file to write the positions to.
         """
-        file_handle = open(file, "w")
-        file_handle.write(self.positions)
+        self._save_positions(file, self.positions)
+
+    def _save_positions(self, file_name, positions):
+        """
+        Save positions to file.
+        :param file_name: the file to write the positions to.
+        :param positions: the positions to write to a file.
+        :return: None
+        """
+        file_handle = open(file_name, "w")
+        file_handle.write(positions)
         file_handle.close()
 
-    def set(self, parameter, value=None):
+    def set(self, param, val=None):
         """ Set one or more parameters for every cell in the population.
 
         param can be a dict, in which case value should not be supplied, or a
@@ -605,27 +740,27 @@ class Population(object):
 
           p.set("tau_m", 20.0).
           p.set({'tau_m':20, 'v_rest':-65})
-        :param parameter: the parameter to set
-        :param value: the value of the parameter to set.
+        :param param: the parameter to set
+        :param val: the value of the parameter to set.
         """
         if not isinstance(self._vertex, AbstractPopulationSettable):
             raise KeyError("Population does not have property {}".format(
-                parameter))
+                param))
 
-        if type(parameter) is str:
-            if value is None:
+        if type(param) is str:
+            if val is None:
                 raise Exception("Error: No value given in set() function for "
                                 "population parameter. Exiting.")
-            self._vertex.set_value(parameter, value)
+            self._vertex.set_value(param, val)
             return
 
-        if type(parameter) is not dict:
+        if type(param) is not dict:
                 raise Exception("Error: invalid parameter type for "
                                 "set() function for population parameter."
                                 " Exiting.")
 
         # Add a dictionary-structured set of new parameters to the current set:
-        for (key, value) in parameter.iteritems():
+        for (key, value) in param.iteritems():
             self._vertex.set_value(key, value)
 
         # state that something has changed in the population,
@@ -732,7 +867,7 @@ class Population(object):
 
     @property
     def _get_vertex(self):
-        return self._vertex
+        raise NotImplementedError
 
     @property
     def _internal_delay_vertex(self):

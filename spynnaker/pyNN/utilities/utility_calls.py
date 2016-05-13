@@ -33,7 +33,7 @@ def convert_param_to_numpy(param, no_atoms):
     """
     converts parameters into numpy arrays as needed
     :param param: the param to convert
-    :param no_atoms: the number of atoms avilable for conversion of param
+    :param no_atoms: the number of atoms available for conversion of param
     :return the converted param in whatever format it was given
     """
     if RandomDistribution is None:
