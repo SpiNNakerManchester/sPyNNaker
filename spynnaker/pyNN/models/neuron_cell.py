@@ -29,6 +29,13 @@ class NeuronCell(object):
         self._params[key] = value
         self._has_change_that_requires_mapping = True
 
+    @property
+    def has_change_that_requires_mapping(self):
+        return self._has_change_that_requires_mapping
+
+    def mark_no_changes(self):
+        self._has_change_that_requires_mapping = False
+
     def get_param(self, key):
         return self._params[key]
 
@@ -45,6 +52,10 @@ class NeuronCell(object):
             raise exceptions.ConfigurationException(
                 "Currently only one type of SDTP can be supported per cell.")
         self._has_change_that_requires_mapping = True
+
+    @property
+    def record_spikes(self):
+        return self._record_spikes
 
     def set_record_spikes(self, new_value, file_path):
         self._record_spikes = new_value

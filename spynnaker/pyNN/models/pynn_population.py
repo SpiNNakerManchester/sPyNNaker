@@ -133,13 +133,19 @@ class Population(object):
     @property
     def requires_mapping(self):
         if isinstance(self._vertex, AbstractChangableAfterRun):
-            return self._vertex.requires_mapping
-        return self._change_requires_mapping
+            atoms = self._get_atoms_for_pop()
+            requires_change = False
+            for atom in atoms:
+                if atom.has_change_that_requires_mapping:
+                    requires_change = True
+            return requires_change
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
         if isinstance(self._vertex, AbstractChangableAfterRun):
-            self._vertex.mark_no_changes()
+            atoms = self._get_atoms_for_pop()
+            for atom in atoms:
+                atom.mark_no_changes()
 
     def __add__(self, other):
         """ Merges populations
@@ -228,7 +234,15 @@ class Population(object):
                         " execute as if gather was true anyhow")
 
         if isinstance(self._vertex, AbstractSpikeRecordable):
-            if not self._vertex.is_recording_spikes():
+
+            # check atoms to see if its recording
+            atoms = self._get_atoms_for_pop()
+            recording_spikes = False
+            for atom in atoms:
+                if atom.record_spikes:
+                    recording_spikes = True
+
+            if not recording_spikes:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record spikes")
         else:
@@ -278,6 +292,7 @@ class Population(object):
         """
 
         if isinstance(self._vertex, AbstractGSynRecordable):
+
             if not self._vertex.is_recording_gsyn():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record gsyn")
