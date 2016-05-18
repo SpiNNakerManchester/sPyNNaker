@@ -1,4 +1,20 @@
 <algorithms>
+    <algorithm name="Grouper">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.grouper</python_module>
+        <python_class>Grouper</python_class>
+        <required_inputs>
+            <parameter>
+                <param_name>atom_mapping</param_name>
+                <param_type>AtomMapping</param_type>
+            </parameter>
+        </required_inputs>
+        <produces_outputs>
+            <parameter>
+                <param_name>partitionable_graph</param_name>
+                <param_type>MemoryPartitionableGraph</param_type>
+            </parameter>
+        </produces_outputs>
+    </algorithm>
     <algorithm name="GraphEdgeFilter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter</python_module>
         <python_class>GraphEdgeFilter</python_class>

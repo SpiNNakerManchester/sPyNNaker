@@ -1,3 +1,5 @@
+from spinn_front_end_common.abstract_models.abstract_changable_after_run import \
+    AbstractChangableAfterRun
 from spinn_front_end_common.utilities import exceptions
 
 
@@ -6,7 +8,9 @@ class NeuronCell(object):
     NeuronCell: the object that stores all data about a cell.
     """
 
-    def __init__(self, default_parameters):
+    def __init__(self, default_parameters, original_vertex):
+
+        self._original_vertex = original_vertex
 
         # standard parameters
         self._params = dict(default_parameters)
@@ -22,21 +26,34 @@ class NeuronCell(object):
         # synaptic link
         self._synapse_dynamics = None
 
-        # change marker
-        self._has_change_that_requires_mapping = True
+        # change marker (only set to a value if the vertex supports it)
+        if isinstance(self._original_vertex, AbstractChangableAfterRun):
+            self._has_change_that_requires_mapping = True
+        else:
+            self._has_change_that_requires_mapping = None
 
     def add_param(self, key, value):
         self._params[key] = value
         self._has_change_that_requires_mapping = True
+
+    def get_has_changed_flag(self):
+        return self._has_change_that_requires_mapping
+
+    def reset_has_changed_flag(self):
+        self._has_change_that_requires_mapping = False
 
     def get_param(self, key):
         return self._params[key]
 
     def set_param(self, key, new_value):
         if key in self._params:
+            needs_resetting = self._original_vertex.requires_remapping(
+                key, self._params[key], new_value)
             self._params[key] = new_value
-        self.add_param(key, new_value)
-        self._has_change_that_requires_mapping = True
+
+        else:
+            self.add_param(key, new_value)
+            self._has_change_that_requires_mapping = True
 
     def set_synapse_dynamics(self, new_value):
         if self._synapse_dynamics is None:
@@ -53,6 +70,9 @@ class NeuronCell(object):
         else:
             self._record_spike_file_path = file_path
         self._has_change_that_requires_mapping = True
+
+    def get_record_spikes(self):
+        return self._record_spikes
 
     def set_record_v(self, new_value, file_path):
         self._record_v = new_value

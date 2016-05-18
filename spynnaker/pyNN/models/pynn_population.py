@@ -74,10 +74,10 @@ class Population(object):
         internal_cellparams['timescale_factor'] = spinnaker.timescale_factor
 
         # create population vertex.
-        self._vertex = cellclass(**internal_cellparams)
+        self._original_vertex = cellclass(**internal_cellparams)
+        self._mapped_vertices = dict()
         self._spinnaker = spinnaker
         self._delay_vertex = None
-        self._model_name = self._vertex.model_name
         self._update_spinnaker_atom_mapping(cellparams)
 
         # Internal structure now supported 23 November 2014 ADR
@@ -104,13 +104,15 @@ class Population(object):
         :param cellparams:
         :return:
         """
-        model_name = self._vertex.model_name
+        model_name = self._original_vertex.model_name
         atom_mappings = self._spinnaker.get_atom_mapping()
         if model_name not in atom_mappings:
             atom_mappings[model_name] = dict()
         atom_mappings[model_name][self] = list()
         params = dict()
-        neuron_param_object = NeuronCell(self._vertex.default_parameters)
+        neuron_param_object = \
+            NeuronCell(self._original_vertex.default_parameters,
+                       self._original_vertex)
         for cell_param in cellparams:
                 params[cell_param] = self.get(cell_param)
         for atom in range(0, self._size):
@@ -132,14 +134,20 @@ class Population(object):
 
     @property
     def requires_mapping(self):
-        if isinstance(self._vertex, AbstractChangableAfterRun):
-            return self._vertex.requires_mapping
-        return self._change_requires_mapping
+        if isinstance(self._original_vertex, AbstractChangableAfterRun):
+            atoms = self._get_atoms_for_pop()
+            for atom in atoms:
+                if atom.get_has_changed_flag():
+                    return True
+            return False
+        return True
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
-        if isinstance(self._vertex, AbstractChangableAfterRun):
-            self._vertex.mark_no_changes()
+        if isinstance(self._original_vertex, AbstractChangableAfterRun):
+            atoms = self._get_atoms_for_pop()
+            for atom in atoms:
+                atom.reset_has_changed_flag()
 
     def __add__(self, other):
         """ Merges populations
@@ -149,7 +157,7 @@ class Population(object):
             return Assembly(
                 [self, other],
                 label="Assembly for {} and {}".format(
-                    self._vertex._label, other.label),
+                    self._original_vertex.label, other.label),
                 spinnaker=self._spinnaker)
         else:
             # not valid, blow up
@@ -166,14 +174,15 @@ class Population(object):
     def conductance_based(self):
         """ True if the population uses conductance inputs
         """
-        return isinstance(self._vertex.input_type, InputTypeConductance)
+        return isinstance(self._original_vertex.input_type,
+                          InputTypeConductance)
 
     @property
     def default_parameters(self):
         """ The default parameters of the vertex from this population
         :return:
         """
-        return self._vertex.default_parameters
+        return self._original_vertex.default_parameters
 
     def describe(self, template='population_default.txt', engine='default'):
         """ Returns a human-readable description of the population.
@@ -185,8 +194,8 @@ class Population(object):
         will be returned.
         """
         context = {
-            "label": self._vertex.label,
-            "celltype": self._vertex.model_name,
+            "label": self._original_vertex.label,
+            "celltype": self._original_vertex.model_name,
             "structure": None,
             "size": self._size,
             "first_id": 0,
@@ -208,7 +217,7 @@ class Population(object):
         """ Get the values of a parameter for every local cell in the\
             population.
         """
-        if isinstance(self._vertex, AbstractPopulationSettable):
+        if isinstance(self._original_vertex, AbstractPopulationSettable):
             values = numpy.empty(shape=1)
             atoms = self._get_atoms_for_pop()
             for atom in atoms:
@@ -227,8 +236,13 @@ class Population(object):
             logger.warn("Spynnaker only supports gather = true, will "
                         " execute as if gather was true anyhow")
 
-        if isinstance(self._vertex, AbstractSpikeRecordable):
-            if not self._vertex.is_recording_spikes():
+        if isinstance(self._original_vertex, AbstractSpikeRecordable):
+            atoms = self._get_atoms_for_pop()
+            recording = False
+            for atom in atoms:
+                if atom.get_record_spikes:
+                    recording = True
+            if not recording:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record spikes")
         else:
@@ -247,11 +261,15 @@ class Population(object):
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 2))
 
-        spikes = self._vertex.get_spikes(
-            self._spinnaker.placements, self._spinnaker.graph_mapper,
-            self._spinnaker.buffer_manager)
+        total_spikes = numpy.empty(shape=2)
+        for vertex in self._mapped_vertices:
+            spikes = vertex.get_spikes(
+                self._spinnaker.placements, self._spinnaker.graph_mapper,
+                self._spinnaker.buffer_manager)
+            filtered_spikes = ?????????????????????????????????????????
+            total_spikes.append(spikes)
 
-        return spikes
+        return total_spikes
 
     def get_spike_counts(self, gather=True):
         """ Return the number of spikes for each neuron.
@@ -259,8 +277,8 @@ class Population(object):
         spikes = self.getSpikes(True, gather)
         n_spikes = {}
         counts = numpy.bincount(spikes[:, 0].astype(dtype="uint32"),
-                                minlength=self._vertex.n_atoms)
-        for i in range(self._vertex.n_atoms):
+                                minlength=self._original_vertex.n_atoms)
+        for i in range(self._original_vertex.n_atoms):
             n_spikes[i] = counts[i]
         return n_spikes
 
@@ -277,8 +295,8 @@ class Population(object):
         :type compatible_output: bool
         """
 
-        if isinstance(self._vertex, AbstractGSynRecordable):
-            if not self._vertex.is_recording_gsyn():
+        if isinstance(self._original_vertex, AbstractGSynRecordable):
+            if not self._original_vertex.is_recording_gsyn():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record gsyn")
         else:
@@ -297,7 +315,7 @@ class Population(object):
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 4))
 
-        return self._vertex.get_gsyn(
+        return self._original_vertex.get_gsyn(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
 
@@ -314,8 +332,8 @@ class Population(object):
             not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
-        if isinstance(self._vertex, AbstractVRecordable):
-            if not self._vertex.is_recording_v():
+        if isinstance(self._original_vertex, AbstractVRecordable):
+            if not self._original_vertex.is_recording_v():
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record v")
         else:
@@ -334,7 +352,7 @@ class Population(object):
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 3))
 
-        return self._vertex.get_v(
+        return self._original_vertex.get_v(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
             self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
 
@@ -357,12 +375,12 @@ class Population(object):
             in this population.
 
         """
-        if not isinstance(self._vertex, AbstractPopulationInitializable):
+        if not isinstance(self._original_vertex, AbstractPopulationInitializable):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
-        self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
-            value, self._vertex.n_atoms))
+        self._original_vertex.initialize(variable, utility_calls.convert_param_to_numpy(
+            value, self._original_vertex.n_atoms))
         self._change_requires_mapping = True
 
     @staticmethod
@@ -379,13 +397,13 @@ class Population(object):
         """ Determine whether `variable` can be recorded from this population.
         """
         if variable == "spikes":
-            if isinstance(self._vertex, AbstractSpikeRecordable):
+            if isinstance(self._original_vertex, AbstractSpikeRecordable):
                 return True
         if variable == "v":
-            if isinstance(self._vertex, AbstractVRecordable):
+            if isinstance(self._original_vertex, AbstractVRecordable):
                 return True
         if variable == "gsyn":
-            if isinstance(self._vertex, AbstractGSynRecordable):
+            if isinstance(self._original_vertex, AbstractGSynRecordable):
                 return True
         # TODO: Needs a more precise recording mechanism (coming soon)
         raise NotImplementedError
@@ -412,7 +430,7 @@ class Population(object):
     def label(self):
         """ The label of the population
         """
-        return self._vertex.label
+        return self._original_vertex.label
 
     @property
     def local_size(self):
@@ -475,12 +493,12 @@ class Population(object):
         :param to_file: file to write the spike data to
         """
 
-        if not isinstance(self._vertex, AbstractSpikeRecordable):
+        if not isinstance(self._original_vertex, AbstractSpikeRecordable):
             raise Exception(
                 "This population does not support the recording of spikes!")
 
         # Tell the vertex to record spikes
-        self._vertex.set_recording_spikes()
+        self._original_vertex.set_recording_spikes()
 
         # set the file to store the spikes in once retrieved
         self._record_spike_file = to_file
@@ -493,15 +511,15 @@ class Population(object):
 
         :param to_file: the file to write the recorded gsyn to.
         """
-        if not isinstance(self._vertex, AbstractGSynRecordable):
+        if not isinstance(self._original_vertex, AbstractGSynRecordable):
             raise Exception(
                 "This population does not support the recording of gsyn")
-        if not isinstance(self._vertex.input_type, InputTypeConductance):
+        if not isinstance(self._original_vertex.input_type, InputTypeConductance):
             logger.warn(
                 "You are trying to record the conductance from a model which "
                 "does not use conductance input.  You will receive "
                 "current measurements instead.")
-        self._vertex.set_recording_gsyn()
+        self._original_vertex.set_recording_gsyn()
         self._record_gsyn_file = to_file
 
         # state that something has changed in the population,
@@ -512,11 +530,11 @@ class Population(object):
 
         :param to_file: the file to write the recorded v to.
         """
-        if not isinstance(self._vertex, AbstractVRecordable):
+        if not isinstance(self._original_vertex, AbstractVRecordable):
             raise Exception(
                 "This population does not support the recording of v")
 
-        self._vertex.set_recording_v()
+        self._original_vertex.set_recording_v()
         self._record_v_file = to_file
 
         # state that something has changed in the population,
@@ -531,7 +549,7 @@ class Population(object):
                 raise ValueError("attempted to retrieve positions "
                                  "for an unstructured population")
             self._positions = self._generate_positions_for_atoms(
-                self._vertex.n_atoms)
+                self._original_vertex.n_atoms)
         return self._positions
 
     def _generate_positions_for_atoms(self, n_atoms):
@@ -577,9 +595,9 @@ class Population(object):
         spikes = self.getSpikes(compatible_output)
         if spikes is not None:
             first_id = 0
-            num_neurons = self._vertex.n_atoms
-            dimensions = self._vertex.n_atoms
-            last_id = self._vertex.n_atoms - 1
+            num_neurons = self._original_vertex.n_atoms
+            dimensions = self._original_vertex.n_atoms
+            last_id = self._original_vertex.n_atoms - 1
             utility_calls.check_directory_exists_and_create_if_not(filename)
             spike_file = open(filename, "w")
             spike_file.write("# first_id = {}\n".format(first_id))
@@ -623,8 +641,8 @@ class Population(object):
         time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
         gsyn = self.get_gsyn(gather, compatible_output)
         first_id = 0
-        num_neurons = self._vertex.n_atoms
-        dimensions = self._vertex.n_atoms
+        num_neurons = self._original_vertex.n_atoms
+        dimensions = self._original_vertex.n_atoms
         utility_calls.check_directory_exists_and_create_if_not(filename)
         file_handle = open(filename, "w")
         file_handle.write("# first_id = {}\n".format(first_id))
@@ -714,7 +732,7 @@ class Population(object):
         return PopulationView(
             self, indices,
             "sampled_version of {} from {}"
-                .format(indices, self._vertex._label),
+                .format(indices, self._original_vertex._label),
             self._spinnaker)
 
     def save_positions(self, file):  # @ReservedAssignment
@@ -747,7 +765,7 @@ class Population(object):
         :param param: the parameter to set
         :param val: the value of the parameter to set.
         """
-        if not isinstance(self._vertex, AbstractPopulationSettable):
+        if not isinstance(self._original_vertex, AbstractPopulationSettable):
             raise KeyError("Population does not have property {}".format(
                 param))
 
@@ -755,7 +773,7 @@ class Population(object):
             if val is None:
                 raise Exception("Error: No value given in set() function for "
                                 "population parameter. Exiting.")
-            self._vertex.set_value(param, val)
+            self._original_vertex.set_value(param, val)
             return
 
         if type(param) is not dict:
@@ -765,7 +783,7 @@ class Population(object):
 
         # Add a dictionary-structured set of new parameters to the current set:
         for (key, value) in param.iteritems():
-            self._vertex.set_value(key, value)
+            self._original_vertex.set_value(key, value)
 
         # state that something has changed in the population,
         self._change_requires_mapping = True
@@ -782,7 +800,7 @@ class Population(object):
             onto which its sub-populations will be placed.
         """
         if isinstance(constraint, AbstractConstraint):
-            self._vertex.add_constraint(constraint)
+            self._original_vertex.add_constraint(constraint)
         else:
             raise exceptions.ConfigurationException(
                 "the constraint entered is not a recognised constraint")
@@ -801,7 +819,7 @@ class Population(object):
         :param p: The processor id of the placement constraint (optional)
         :type p: int
         """
-        self._vertex.add_constraint(PlacerChipAndCoreConstraint(x, y, p))
+        self._original_vertex.add_constraint(PlacerChipAndCoreConstraint(x, y, p))
 
         # state that something has changed in the population,
         self._change_requires_mapping = True
@@ -825,8 +843,8 @@ class Population(object):
 
         :param new_value: the new value for the max atoms per core.
         """
-        if hasattr(self._vertex, "set_model_max_atoms_per_core"):
-            self._vertex.set_model_max_atoms_per_core(new_value)
+        if hasattr(self._original_vertex, "set_model_max_atoms_per_core"):
+            self._original_vertex.set_model_max_atoms_per_core(new_value)
         else:
             raise exceptions.ConfigurationException(
                 "This population does not support its max_atoms_per_core "
@@ -840,7 +858,7 @@ class Population(object):
         """ The number of neurons in the population
         :return:
         """
-        return self._vertex.n_atoms
+        return self._original_vertex.n_atoms
 
     def tset(self, parametername, value_array):
         """ 'Topographic' set. Set the value of parametername to the values in\
@@ -849,7 +867,7 @@ class Population(object):
         :param value_array: the array of values which must have the correct\
                 number of elements.
         """
-        if len(value_array) != self._vertex.n_atoms:
+        if len(value_array) != self._original_vertex.n_atoms:
             raise exceptions.ConfigurationException(
                 "To use tset, you must have a array of values which matches "
                 "the size of the population. Please change this and try "
