@@ -144,10 +144,10 @@ class Population(object):
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
-        if isinstance(self._original_vertex, AbstractChangableAfterRun):
+        if isinstance(self._vertex, AbstractChangableAfterRun):
             atoms = self._get_atoms_for_pop()
             for atom in atoms:
-                atom.reset_has_changed_flag()
+                atom.mark_no_changes()
 
     def __add__(self, other):
         """ Merges populations
@@ -236,13 +236,16 @@ class Population(object):
             logger.warn("Spynnaker only supports gather = true, will "
                         " execute as if gather was true anyhow")
 
-        if isinstance(self._original_vertex, AbstractSpikeRecordable):
+        if isinstance(self._vertex, AbstractSpikeRecordable):
+
+            # check atoms to see if its recording
             atoms = self._get_atoms_for_pop()
-            recording = False
+            recording_spikes = False
             for atom in atoms:
-                if atom.get_record_spikes:
-                    recording = True
-            if not recording:
+                if atom.record_spikes:
+                    recording_spikes = True
+
+            if not recording_spikes:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record spikes")
         else:

@@ -36,11 +36,15 @@ class NeuronCell(object):
         self._params[key] = value
         self._has_change_that_requires_mapping = True
 
-    def get_has_changed_flag(self):
+    @property
+    def has_change_that_requires_mapping(self):
         return self._has_change_that_requires_mapping
 
-    def reset_has_changed_flag(self):
+    def mark_no_changes(self):
         self._has_change_that_requires_mapping = False
+
+    def get_has_changed_flag(self):
+        return self._has_change_that_requires_mapping
 
     def get_param(self, key):
         return self._params[key]
@@ -50,7 +54,6 @@ class NeuronCell(object):
             needs_resetting = self._original_vertex.requires_remapping(
                 key, self._params[key], new_value)
             self._params[key] = new_value
-
         else:
             self.add_param(key, new_value)
             self._has_change_that_requires_mapping = True
@@ -63,6 +66,10 @@ class NeuronCell(object):
                 "Currently only one type of SDTP can be supported per cell.")
         self._has_change_that_requires_mapping = True
 
+    @property
+    def record_spikes(self):
+        return self._record_spikes
+
     def set_record_spikes(self, new_value, file_path):
         self._record_spikes = new_value
         if isinstance(file_path, bool):
@@ -70,9 +77,6 @@ class NeuronCell(object):
         else:
             self._record_spike_file_path = file_path
         self._has_change_that_requires_mapping = True
-
-    def get_record_spikes(self):
-        return self._record_spikes
 
     def set_record_v(self, new_value, file_path):
         self._record_v = new_value
