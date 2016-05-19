@@ -12,10 +12,12 @@ from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
 # local front end imports
-from spynnaker.pyNN.models.neuron_cell import NeuronCell
-from spynnaker.pyNN.models.pynn_assembly import Assemblier
-from spynnaker.pyNN.models.pynn_population import Population
-from spynnaker.pyNN.models.pynn_population_view import PopulationView
+#from spynnaker.pyNN.models.pynn_assembly import Assembly
+#from spynnaker.pyNN.models.pynn_population import Population
+#from spynnaker.pyNN.models.pynn_population_view import PopulationView
+
+from spynnaker.pyNN.models.population_based_objects import \
+    Assembly, PopulationView, Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
@@ -295,7 +297,7 @@ class Spinnaker(SpinnakerMainInterface):
         :return: a assembly
         """
         # create assembler
-        assembler = Assemblier(populations, label, self)
+        assembler = Assembly(populations, label, self)
         return assembler
 
     def _add_population(self, population):
