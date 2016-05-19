@@ -320,7 +320,8 @@ class PopulationView(object):
         # get pop view positions
         if self._positions is None:
             self._positions = \
-                self._population._generate_positions_for_atoms(self._size)
+                self._population._generate_positions_for_atoms(
+                    self._get_atoms_for_pop_view())
         # return closest position
         return self._population._nearest(position, self._positions)
 
@@ -376,7 +377,8 @@ class PopulationView(object):
         """
         pop_view_atoms = self._get_atoms_for_pop_view()
         for atom in pop_view_atoms:
-            atom.set_record_spikes(True, to_file)
+            atom.record_spikes(True)
+            atom.record_spikes_to_file_flag(to_file)
 
     def record_gsyn(self, to_file=True):
         """
@@ -386,7 +388,8 @@ class PopulationView(object):
         """
         pop_view_atoms = self._get_atoms_for_pop_view()
         for atom in pop_view_atoms:
-            atom.set_record_gsyn(True, to_file)
+            atom.set_record_gsyn(True)
+            atom.record_gsyn_to_file_flag(to_file)
 
     def record_v(self, to_file=True):
         """
@@ -396,7 +399,8 @@ class PopulationView(object):
         """
         pop_view_atoms = self._get_atoms_for_pop_view()
         for atom in pop_view_atoms:
-            atom.set_record_v(True, to_file)
+            atom.record_v(True)
+            atom.record_v_to_file_flag(to_file)
 
     def rset(self, parametername, rand_distr):
         """
@@ -435,8 +439,9 @@ class PopulationView(object):
         """
         if self._positions is None:
             self._positions = \
-                self._population._generate_positions_for_atoms(self._size)
-        self._population.__save_positions(self._positions)
+                self._population._generate_positions_for_atoms(
+                    self._get_atoms_for_pop_view())
+        self._population._save_positions(file, self._positions)
 
     def set(self, param, val=None):
         """ Set one or more parameters for every cell in the population view.

@@ -1,4 +1,5 @@
-from spinn_front_end_common.abstract_models.abstract_changable_after_run import \
+from spinn_front_end_common.abstract_models.\
+    abstract_changable_after_run import \
     AbstractChangableAfterRun
 from spinn_front_end_common.utilities import exceptions
 
@@ -8,7 +9,7 @@ class NeuronCell(object):
     NeuronCell: the object that stores all data about a cell.
     """
 
-    def __init__(self, default_parameters, original_vertex):
+    def __init__(self, default_parameters, original_vertex, structure):
 
         self._original_vertex = original_vertex
 
@@ -16,12 +17,21 @@ class NeuronCell(object):
         self._params = dict(default_parameters)
 
         # recording data items
+        # spikes
         self._record_spikes = False
-        self._record_spike_file_path = None
+        self._record_spike_to_file_flag = None
+
+        # gsyn
         self._record_gsyn = False
-        self._record_gsyn_file_path = None
+        self._record_gsyn_to_file_flag = None
+
+        # v
         self._record_v = False
-        self._record_v_file_path = None
+        self._record_v_to_file_flag = None
+
+        # space related structures
+        self._structure = structure
+        self._positions = None
 
         # synaptic link
         self._synapse_dynamics = None
@@ -32,66 +42,226 @@ class NeuronCell(object):
         else:
             self._has_change_that_requires_mapping = None
 
-    def add_param(self, key, value):
-        self._params[key] = value
-        self._has_change_that_requires_mapping = True
+    @property
+    def structure(self):
+        """
+        returns the structure object used by pynn pops
+        :return: structure object
+        """
+        return self._structure
+
+    @structure.setter
+    def structure(self, new_structure):
+        """
+        setter for the structure object
+        :param new_structure: the new structure object
+        :return: None
+        """
+        self._structure = new_structure
+
+    @property
+    def position(self):
+        """
+        returns the positions object
+        :return: the positions object
+        """
+        return self._positions
+
+    @position.setter
+    def position(self, new_value):
+        """
+        setter for the position object
+        :param new_value: the new position object
+        :return: None
+        """
+        self._positions = new_value
 
     @property
     def has_change_that_requires_mapping(self):
+        """
+        get changed require mapping flag
+        :return:
+        """
         return self._has_change_that_requires_mapping
 
     def mark_no_changes(self):
+        """
+        reset change flag
+        :return:
+        """
         self._has_change_that_requires_mapping = False
 
-    def get_has_changed_flag(self):
-        return self._has_change_that_requires_mapping
+    @property
+    def record_spikes(self):
+        """
+        bool flag for record spikes
+        :return:
+        """
+        return self._record_spikes
+
+    @record_spikes.setter
+    def record_spikes(self, new_value):
+        """
+        setter for record flag
+        :param new_value: new value for record flag
+        :return:
+        """
+        if new_value != self._record_spikes:
+            self._record_spikes = new_value
+            self._has_change_that_requires_mapping = True
+
+    @property
+    def record_spikes_to_file_flag(self):
+        """
+        getter for record spikes to file flag
+        :return: bool flag
+        """
+        return self._record_spike_to_file_flag
+
+    @record_spikes_to_file_flag.setter
+    def record_spikes_to_file_flag(self, to_file_flag):
+        """
+        record spikes to file flag setter.
+        :param to_file_flag: bool flag
+        :return: None
+        """
+        if isinstance(to_file_flag, bool):
+            self._record_spike_to_file_flag = to_file_flag
+        else:
+            raise exceptions.ConfigurationException(
+                "Only booleans are allowed to the to_file_flag. "
+                "If you want to use a file_path, we recommend you use pop"
+                " views and assemblies to filter between file paths.")
+
+    @property
+    def record_v(self):
+        """
+        getter for the record v flag
+        :return: boolean flag
+        """
+        return self._record_v
+
+    @record_v.setter
+    def record_v(self, new_value):
+        """
+        setter for the record v bool flag
+        :param new_value: new value for the flag
+        :return: None
+        """
+        if new_value != self._record_v:
+            self._record_v = new_value
+            self._has_change_that_requires_mapping = True
+
+    @property
+    def record_v_to_file_flag(self):
+        """
+        getter for record v to_file_flag
+        :return: file path
+        """
+        return self._record_v_to_file_flag
+
+    @record_v_to_file_flag.setter
+    def record_v_to_file_flag(self, to_file_flag):
+        """
+        record v file path setter.
+        :param to_file_flag: the new file path for the record v
+        :return: None
+        """
+        if isinstance(to_file_flag, bool):
+            self._record_v_to_file_flag = to_file_flag
+        else:
+            raise exceptions.ConfigurationException(
+                "Only booleans are allowed to the to_file_flag. "
+                "If you want to use a file_path, we recommend you use pop"
+                " views and assemblies to filter between file paths.")
+
+    @property
+    def record_gsyn(self):
+        """
+        property for record gsyn bool flag
+        :return: the boolean flag for recording gsyn
+        """
+        return self._record_gsyn
+
+    @record_gsyn.setter
+    def record_gsyn(self, new_value):
+        """
+        setter for record gsyn bool flag
+        :param new_value: the new value for recording gsyn boolean flag
+        :return: None
+        """
+        if new_value != self._record_gsyn:
+            self._record_gsyn = new_value
+            self._has_change_that_requires_mapping = True
+
+    @property
+    def record_gsyn_to_file_flag(self):
+        """
+        getter for record gsyn to file flag
+        :return: file path
+        """
+        return self._record_gsyn_to_file_flag
+
+    @record_gsyn_to_file_flag.setter
+    def record_gsyn_to_file_flag(self, to_file_flag):
+        """
+        record gsyn  to file flag setter.
+        :param to_file_flag: the new flag for the record gsyn to file
+        :return: None
+        """
+        if isinstance(to_file_flag, bool):
+            self._record_gsyn_to_file_flag = "gsyn"
+        else:
+            raise exceptions.ConfigurationException(
+                "Only booleans are allowed to the to_file_flag. "
+                "If you want to use a file_path, we recommend you use pop"
+                " views and assemblies to filter between file paths.")
 
     def get_param(self, key):
+        """
+        getter for any neuron parameter
+        :param key: the name of the param to get
+        :return: the parameter value for this neuron cell
+        """
         return self._params[key]
 
     def set_param(self, key, new_value):
+        """
+        setter for neuron cell params.
+        :param key: the name of the param
+        :param new_value: the new value of the param
+        :return: None
+        """
         if key in self._params:
-            needs_resetting = self._original_vertex.requires_remapping(
-                key, self._params[key], new_value)
+            self._has_change_that_requires_mapping = \
+                self._original_vertex.requires_remapping(
+                    key, self._params[key], new_value)
             self._params[key] = new_value
         else:
-            self.add_param(key, new_value)
-            self._has_change_that_requires_mapping = True
+            raise exceptions.ConfigurationException(
+                "Trying to set a parameter which does not exist")
 
-    def set_synapse_dynamics(self, new_value):
+    @property
+    def synapse_dynamics(self):
+        """
+        synapse dynamics getter
+        :return:the synapse dynamics for this cell
+        """
+        return self._synapse_dynamics
+
+    @synapse_dynamics.setter
+    def synapse_dynamics(self, new_value):
+        """
+        setter for the synapse dynamics, checks that the new dynamics
+        matches currently added ones if one such exists.
+        :param new_value: new synapse_dynamics
+        :return: None
+        """
         if self._synapse_dynamics is None:
             self._synapse_dynamics = new_value
         elif self._synapse_dynamics != new_value:
             raise exceptions.ConfigurationException(
-                "Currently only one type of SDTP can be supported per cell.")
-        self._has_change_that_requires_mapping = True
-
-    @property
-    def record_spikes(self):
-        return self._record_spikes
-
-    def set_record_spikes(self, new_value, file_path):
-        self._record_spikes = new_value
-        if isinstance(file_path, bool):
-            self._record_spike_file_path = "spikes"
-        else:
-            self._record_spike_file_path = file_path
-        self._has_change_that_requires_mapping = True
-
-    def set_record_v(self, new_value, file_path):
-        self._record_v = new_value
-        if isinstance(file_path, bool):
-            self._record_v_file_path = "v"
-        else:
-            self._record_v_file_path = file_path
-        self._has_change_that_requires_mapping = True
-
-    def set_record_gsyn(self, new_value, file_path):
-        self._record_gsyn = new_value
-        if isinstance(file_path, bool):
-            self._record_gsyn_file_path = "gsyn"
-        else:
-            self._record_gsyn_file_path = file_path
+                "Currently only one type of STDP can be supported per cell.")
         self._has_change_that_requires_mapping = True
 
     def __repr__(self):
@@ -104,4 +274,7 @@ class NeuronCell(object):
         output += "synapse_dynamics:{}".format(self._synapse_dynamics)
         output += "requires_remapping:{}".format(
             self._has_change_that_requires_mapping)
+        output += "structure:{}".format(self._structure)
+        output += "positions:{}".format(self._positions)
+
         return output

@@ -21,7 +21,7 @@ class Assembly(object):
     Assembly: a view on a collection of populations/population views / assembles
     """
 
-    def  __init__(self, populations, label, spinnaker):
+    def __init__(self, populations, label, spinnaker):
 
         self._spinnaker = spinnaker
 
@@ -509,7 +509,8 @@ class Assembly(object):
         """
         assembly_atoms = self._get_atoms_for_assembly()
         for atom in assembly_atoms:
-            atom.set_record_spikes(True, to_file)
+            atom.record_spikes(True)
+            atom.record_spikes_to_file_flag(to_file)
 
     def record_gsyn(self, to_file=True):
         """
@@ -519,7 +520,8 @@ class Assembly(object):
         """
         assembly_atoms = self._get_atoms_for_assembly()
         for atom in assembly_atoms:
-            atom.set_record_gsyn(True, to_file)
+            atom.set_record_gsyn(True)
+            atom.record_gsyn_to_file_flag(to_file)
 
     def record_v(self, to_file=True):
         """
@@ -529,7 +531,8 @@ class Assembly(object):
         """
         assembly_atoms = self._get_atoms_for_assembly()
         for atom in assembly_atoms:
-            atom.set_record_v(True, to_file)
+            atom.record_v(True)
+            atom.record_v_to_file_flag(to_file)
 
     def save_positions(self, file):
         """
