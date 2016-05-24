@@ -42,8 +42,4 @@ static inline counter_t in_spikes_get_n_buffer_underflows() {
     return 0;
 }
 
-static inline void in_spikes_print_buffer() {
-    circular_buffer_print_buffer(buffer);
-}
-
 #endif // _IN_SPIKES_H_
