@@ -60,14 +60,14 @@ class Assembly(object):
         # update atom mapping
         self._update_atom_mapping(populations)
 
-        self._size = len(self._spinnaker.get_atom_mapping()[self])
+        self._size = len(self._spinnaker.get_assembly_atom_mapping()[self])
 
     def _get_atoms_for_assembly(self):
         """
         helper method for getting atoms from pop view
         :return:
         """
-        atom_mapping = self._spinnaker.get_atom_mapping()
+        atom_mapping = self._spinnaker.get_assembly_atom_mapping()
         assembly_atoms = atom_mapping[self]
         return assembly_atoms
 
@@ -80,15 +80,18 @@ class Assembly(object):
         """
 
         # get atom mapping
-        atom_mappings = self._spinnaker.get_atom_mapping()
+        assembly_atom_mapping = self._spinnaker.get_assembly_atom_mapping()
+
+        pop_atom_mappings = self._spinnaker.get_pop_atom_mapping()
+        pop_view_atom_mapping = self._spinnaker.get_pop_view_atom_mapping()
 
         # separate the 3 types into the 2 important types
         populations, population_views = self._separate_input(
             populations, set(), set())
 
         # create holder for the assembly itself
-        if self not in atom_mappings:
-            atom_mappings[self] = list()
+        if self not in assembly_atom_mapping:
+            assembly_atom_mapping[self] = list()
 
         # update assembly size
         size = 0
@@ -98,18 +101,14 @@ class Assembly(object):
 
         # update pop atoms
         for population in populations:
-            # make new store
-            model_name = population._vertex.model_name()
-            if self not in atom_mappings[model_name]:
-                atom_mappings[model_name][self] = list()
 
             # get pop based atoms
-            atom_models_for_pop = atom_mappings[model_name][population]
+            atom_models_for_pop = \
+                pop_atom_mappings[population._class][population]
 
             # update the two places for the assembly
             for atom in atom_models_for_pop:
-                atom_mappings[model_name][self].append(atom)
-                atom_mappings[self].append(atom)
+                assembly_atom_mapping[self].append(atom)
                 size += 1
 
             # update boundary tracker
@@ -123,16 +122,13 @@ class Assembly(object):
             if related_population not in populations:
 
                 # acquire pop view atoms
-                model_name = related_population._vertex.model_name()
-                pop_view_atoms = atom_mappings[model_name][population_view]
+                model_class = related_population._class
+                pop_view_atoms = pop_view_atom_mapping[population_view]
 
                 # add mappings for both assembly and for the model level.
                 for atom in pop_view_atoms:
-                    if atom not in atom_mappings[self]:
-                        atom_mappings[self].append(atom)
-                        if self not in atom_mappings[model_name]:
-                            atom_mappings[model_name][self] = list()
-                        atom_mappings[model_name][self].appedn(atom)
+                    if atom not in assembly_atom_mapping[self]:
+                        assembly_atom_mapping[self].append(atom)
                         size += 1
                 self._population_index_boundaries[size] = population_view
             else:
@@ -152,9 +148,9 @@ class Assembly(object):
         :return: the population and population view objects.
         """
         for input_pop in inputs:
-            if input_pop.__class__ == "Population":
+            if isinstance(input_pop, Population):
                 pops.add(input_pop)
-            if input_pop.__class__ == "PopulationView":
+            if isinstance(input_pop, PopulationView):
                 pop_views.add(input_pop)
             if isinstance(input_pop, Assembly):
                 return self._separate_input(
@@ -238,14 +234,14 @@ class Assembly(object):
         self._update_atom_mapping(other)
 
         # update size
-        self._size = len(self._spinnaker.get_atom_mapping[self])
+        self._size = len(self._spinnaker.get_assembly_atom_mapping[self])
 
     def __iter__(self):
         """
         returns a iterator of the assembly atoms
         :return: iterator
         """
-        return iter(self._spinnaker.get_atom_mapping()[self])
+        return iter(self._spinnaker.get_assembly_atom_mapping()[self])
 
     def __len__(self):
         """
@@ -609,7 +605,7 @@ class PopulationView(object):
 
         # filter down to the population, over the pop view
         self._population = self.locate_parent_population()
-        self._model_name = self._population._vertex.model_name()
+        self._model_class = self._population._vertex._class
 
         # update atom mapping for spinnaker understanding
         self._update_atom_mapping()
@@ -636,8 +632,7 @@ class PopulationView(object):
         if isinstance(self._parent_population_or_population_view,
                       PopulationView):
             self._parent_is_pop_view = True
-            return self._parent_population_or_population_view.\
-                locate_parent_population()
+            return self._parent_population_or_population_view._population
         else:
             return self._parent_population_or_population_view
 
@@ -647,22 +642,24 @@ class PopulationView(object):
         :return:
         """
         # check model exists correctly
-        atom_mappings = self._spinnaker.get_atom_mapping()
-        if self._model_name not in atom_mappings:
-            raise exceptions.ConfigurationException(
-                "The population to view in this population view does not"
-                " exist in our standard populations. Please fix and try again")
+        pop_view_atom_mappings = self._spinnaker.get_pop_view_atom_mapping()
 
         # if valid, add neuron param objects to this list as well
         # (assumes a ref copy)
-        atom_mappings[self._model_name][self] = list()
-        atom_models_for_pop = atom_mappings[self._model_name][
-            self._parent_population_or_population_view]
+        pop_view_atom_mappings[self] = list()
+
+        pop_atoms = self._spinnaker.get_pop_atom_mapping()
+        if self._parent_is_pop_view:
+            atom_models_for_pop = pop_view_atom_mappings[
+                self._parent_population_or_population_view]
+        else:
+            atom_models_for_pop = pop_atoms[self._model_class][
+                self._parent_population_or_population_view]
 
         # filter atoms from the parent
         for atom_index in range(0, len(atom_models_for_pop)):
             if atom_index in self._neuron_filter:
-                atom_mappings[self._model_name][self].append(
+                pop_view_atom_mappings[self].append(
                     atom_models_for_pop[atom_index])
 
     def _get_atoms_for_pop_view(self):
@@ -670,10 +667,9 @@ class PopulationView(object):
         helper method for getting atoms from pop view
         :return:
         """
-        atom_mapping = self._spinnaker.get_atom_mapping()
-        model_name_atoms = atom_mapping[self._model_name]
+        atom_mapping = self._spinnaker.get_pop_view_atom_mapping()
         pop_view_atoms = \
-            model_name_atoms[self._parent_population_or_population_view]
+            atom_mapping[self._parent_population_or_population_view]
         return pop_view_atoms
 
     def __add__(self, other):
@@ -772,7 +768,7 @@ class PopulationView(object):
         pop_view_atoms = self._get_atoms_for_pop_view()
         elements = list()
         for atom in pop_view_atoms:
-            elements.append(atom.get_param(parameter_name))
+            elements.append(atom.get(parameter_name))
         return elements
 
     def getSpikes(self, gather=True, compatible_output=True):
@@ -1069,9 +1065,9 @@ class Population(object):
 
         # Create a partitionable_graph vertex for the population and add it
         # to PACMAN
-        cell_label = label
+        self._pop_label = label
         if label is None:
-            cell_label = "Population {}".format(
+            self._pop_label = "Population {}".format(
                 spinnaker.none_labelled_vertex_count)
             spinnaker.increment_none_labelled_vertex_count()
 
@@ -1079,23 +1075,51 @@ class Population(object):
         # additions placed by spinnaker.
         internal_cellparams = dict(cellparams)
 
-        # set spinnaker targeted parameters
-        internal_cellparams['label'] = cell_label
-        internal_cellparams['n_neurons'] = size
-        internal_cellparams['machine_time_step'] = spinnaker.machine_time_step
-        internal_cellparams['timescale_factor'] = spinnaker.timescale_factor
-
         # create population vertex.
-        self._original_vertex = cellclass(**internal_cellparams)
+        self._class = cellclass
         self._mapped_vertices = dict()
         self._spinnaker = spinnaker
         self._delay_vertex = None
 
-        self._update_spinnaker_atom_mapping(cellparams, structure)
-
         # initialise common stuff
         self._size = size
         self._requires_remapping = True
+
+        # core scoped data items
+        self._population_level_parameters = dict()
+        self._constraints = list()
+
+        # add standard ones available
+        self._population_level_parameters['machine_time_step'] = \
+            spinnaker.machine_time_step
+        self._population_level_parameters['time_scale_factor'] = \
+            spinnaker.timescale_factor
+
+        # add params needed by default which are used by population
+        for param in self._class.default_parameters:
+            if param in self._population_level_parameters:
+                internal_cellparams[param] = \
+                    self._population_level_parameters[param]
+
+        # update and remove as required
+        for param in cellclass.model_variables:
+            if param in internal_cellparams:
+                self._population_level_parameters[param] = \
+                    internal_cellparams[param]
+                if param not in self._class.default_parameters:
+                    del internal_cellparams[param]
+            elif param not in self._population_level_parameters:
+                self._population_level_parameters[param] = None
+
+        # update atom mapping
+        self._update_spinnaker_atom_mapping(internal_cellparams, structure)
+
+    def population_parameters(self):
+        return self._population_level_parameters
+
+    @property
+    def constraints(self):
+        return self._constraints
 
     def _update_spinnaker_atom_mapping(self, cellparams, structure):
         """
@@ -1103,31 +1127,51 @@ class Population(object):
         :param cellparams:
         :return:
         """
-        model_name = self._original_vertex.model_name
-        atom_mappings = self._spinnaker.get_atom_mapping()
-        if model_name not in atom_mappings:
-            atom_mappings[model_name] = dict()
-        atom_mappings[model_name][self] = list()
-        params = dict()
-        neuron_param_object = \
-            NeuronCell(self._original_vertex.default_parameters,
-                       self._original_vertex, structure)
-        for cell_param in cellparams:
-                params[cell_param] = self.get(cell_param)
+        atom_mappings = self._spinnaker.get_pop_atom_mapping()
+        if self._class not in atom_mappings:
+            atom_mappings[self._class] = dict()
+        atom_mappings[self._class][self] = list()
+
+        # convert default into atom scope
+        default_params = self._convert_parameters_to_atom_scope(
+            self._class.default_parameters, self._size)
+
+        state_variables = self._class.state_variables
+
+        # convert end user params into atom scope
+        cellparams = self._convert_parameters_to_atom_scope(
+            cellparams, self._size)
+
+        # build cell objects
+        neuron_param_objects = list()
+        for _ in range(0, self._size):
+            neuron_param_objects.append(
+                NeuronCell(default_params, state_variables,
+                           self._class, structure))
+
+        # update atoms with end user parameters
         for atom in range(0, self._size):
             for cell_param in cellparams:
-                neuron_param_object.set_param(
-                    cell_param, params[cell_param][atom])
-            atom_mappings[model_name][self].\
-                append(neuron_param_object)
+                neuron_param_objects[atom].set_param(
+                    cell_param, cellparams[cell_param][atom])
+            atom_mappings[self._class][self].\
+                append(neuron_param_objects[atom])
+
+    @staticmethod
+    def _convert_parameters_to_atom_scope(converted_parameters, n_atoms):
+        default_params = dict()
+        for param_name in converted_parameters:
+            default_params[param_name] = utility_calls.convert_param_to_numpy(
+                converted_parameters[param_name], n_atoms)
+        return default_params
 
     def _get_atoms_for_pop(self):
         """
         helper method for getting atoms from pop
         :return: list of atoms for this pop
         """
-        atom_mapping = self._spinnaker.get_atom_mapping()
-        model_name_atoms = atom_mapping[self._original_vertex.model_name]
+        atom_mapping = self._spinnaker.get_pop_atom_mapping()
+        model_name_atoms = atom_mapping[self._class]
         pop_atoms = model_name_atoms[self]
         return pop_atoms
 
@@ -1141,7 +1185,7 @@ class Population(object):
         if self._requires_remapping:
             return True
 
-        if isinstance(self._original_vertex, AbstractChangableAfterRun):
+        if issubclass(self._class, AbstractChangableAfterRun):
             atoms = self._get_atoms_for_pop()
             for atom in atoms:
                 if atom.has_change_that_requires_mapping():
@@ -1154,7 +1198,7 @@ class Population(object):
         inform all cells to start re tracking changes from now on.
         :return:
         """
-        if isinstance(self._original_vertex, AbstractChangableAfterRun):
+        if issubclass(self._class, AbstractChangableAfterRun):
             atoms = self._get_atoms_for_pop()
             for atom in atoms:
                 atom.mark_no_changes()
@@ -1164,11 +1208,12 @@ class Population(object):
         """ Merges populations
         """
         if isinstance(other, Population) or isinstance(other, PopulationView):
+
             # if valid, make an assembly
             return Assembly(
                 [self, other],
                 label="Assembly for {} and {}".format(
-                    self._original_vertex.label, other.label),
+                    self._pop_label, other.label),
                 spinnaker=self._spinnaker)
         else:
             # not valid, blow up
@@ -1185,15 +1230,14 @@ class Population(object):
     def conductance_based(self):
         """ True if the population uses conductance inputs
         """
-        return isinstance(self._original_vertex.input_type,
-                          InputTypeConductance)
+        return issubclass(self._class.input_type, InputTypeConductance)
 
     @property
     def default_parameters(self):
         """ The default parameters of the vertex from this population
         :return:
         """
-        return self._original_vertex.default_parameters
+        return self._class.default_parameters
 
     def describe(self, template='population_default.txt', engine='default'):
         """ Returns a human-readable description of the population.
@@ -1204,9 +1248,10 @@ class Population(object):
         If template is None, then a dictionary containing the template context
         will be returned.
         """
+
         context = {
-            "label": self._original_vertex.label,
-            "celltype": self._original_vertex.model_name,
+            "label": self._pop_label,
+            "celltype": self._class.model_name(),
             "structure": None,
             "size": self._size,
             "first_id": 0,
@@ -1233,7 +1278,7 @@ class Population(object):
         """ Get the values of a parameter for every local cell in the\
             population.
         """
-        if isinstance(self._original_vertex, AbstractPopulationSettable):
+        if issubclass(self._class, AbstractPopulationSettable):
             # build a empty numpy array.
             values = numpy.empty(shape=1)
 
@@ -1242,7 +1287,7 @@ class Population(object):
 
             # for each atom, add the parameter to the array
             for atom in atoms:
-                values.append(atom.get_param(parameter_name))
+                values.append(atom.get(parameter_name))
             return values
         raise KeyError("Population does not have a property {}".format(
             parameter_name))
@@ -1262,7 +1307,7 @@ class Population(object):
                 "Spynnaker only supports compatible_output = true, will "
                 " execute as if compatible_output was true anyhow")
 
-        if isinstance(self._original_vertex, AbstractSpikeRecordable):
+        if issubclass(self._class, AbstractSpikeRecordable):
 
             # check atoms to see if its recording
             atoms = self._get_atoms_for_pop()
@@ -1309,8 +1354,8 @@ class Population(object):
         spikes = self.getSpikes(True, gather)
         n_spikes = {}
         counts = numpy.bincount(spikes[:, 0].astype(dtype="uint32"),
-                                minlength=self._original_vertex.n_atoms)
-        for i in range(self._original_vertex.n_atoms):
+                                minlength=self._size)
+        for i in range(self._size):
             n_spikes[i] = counts[i]
         return n_spikes
 
@@ -1327,7 +1372,7 @@ class Population(object):
         :type compatible_output: bool
         """
 
-        if isinstance(self._original_vertex, AbstractGSynRecordable):
+        if issubclass(self._class, AbstractGSynRecordable):
 
             # check atoms to see if its recording
             atoms = self._get_atoms_for_pop()
@@ -1381,8 +1426,12 @@ class Population(object):
             not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
-        if isinstance(self._original_vertex, AbstractVRecordable):
-            if not self._original_vertex.is_recording_v():
+        if issubclass(self._class, AbstractVRecordable):
+            recording = False
+            for atom in self._get_atoms_for_pop():
+                if atom.record_v:
+                    recording = True
+            if not recording:
                 raise exceptions.ConfigurationException(
                     "This population has not been set to record v")
         else:
@@ -1433,7 +1482,7 @@ class Population(object):
             in this population.
 
         """
-        if not isinstance(self._original_vertex,
+        if not issubclass(self._class,
                           AbstractPopulationInitializable):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
@@ -1457,13 +1506,13 @@ class Population(object):
         :param variable: the parameter name to check recording for
         """
         if variable == "spikes":
-            if isinstance(self._original_vertex, AbstractSpikeRecordable):
+            if issubclass(self._class, AbstractSpikeRecordable):
                 return True
         elif variable == "v":
-            if isinstance(self._original_vertex, AbstractVRecordable):
+            if issubclass(self._class, AbstractVRecordable):
                 return True
         elif variable == "gsyn":
-            if isinstance(self._original_vertex, AbstractGSynRecordable):
+            if issubclass(self._class, AbstractGSynRecordable):
                 return True
         else:
             raise exceptions.ConfigurationException(
@@ -1491,7 +1540,7 @@ class Population(object):
     def label(self):
         """ The label of the population
         """
-        return self._original_vertex.label
+        return self._pop_label
 
     @property
     def local_size(self):
@@ -1546,31 +1595,31 @@ class Population(object):
         """
         self.initialize('v', distribution)
 
-    def record(self, to_file=None):
+    def record(self, to_file=False):
         """ Record spikes from all cells in the Population.
 
         :param to_file: file to write the spike data to
         """
 
-        if not isinstance(self._original_vertex, AbstractSpikeRecordable):
+        if not issubclass(self._class, AbstractSpikeRecordable):
             raise Exception(
                 "This population does not support the recording of spikes!")
 
         # set the atoms to record spikes to the given file path
         atoms = self._get_atoms_for_pop()
         for atom in atoms:
-            atom.record_spikes(True)
-            atom.record_spikes_to_file_flag(to_file)
+            atom.record_spikes = True
+            atom.record_spikes_to_file_flag = to_file
 
-    def record_gsyn(self, to_file=None):
+    def record_gsyn(self, to_file=False):
         """ Record the synaptic conductance for all cells in the Population.
 
         :param to_file: the file to write the recorded gsyn to.
         """
-        if not isinstance(self._original_vertex, AbstractGSynRecordable):
+        if not issubclass(self._class, AbstractGSynRecordable):
             raise Exception(
                 "This population does not support the recording of gsyn")
-        if not isinstance(self._original_vertex.input_type, InputTypeConductance):
+        if not issubclass(self._class.input_type, InputTypeConductance):
             logger.warn(
                 "You are trying to record the conductance from a model which "
                 "does not use conductance input.  You will receive "
@@ -1579,23 +1628,23 @@ class Population(object):
         # set the atoms to record gsyn to the given file path
         atoms = self._get_atoms_for_pop()
         for atom in atoms:
-            atom.record_gsyn(True)
-            atom.record_gsyn_to_file_flag(to_file)
+            atom.record_gsyn = True
+            atom.record_gsyn_to_file_flag = to_file
 
-    def record_v(self, to_file=None):
+    def record_v(self, to_file=False):
         """ Record the membrane potential for all cells in the Population.
 
         :param to_file: the file to write the recorded v to.
         """
-        if not isinstance(self._original_vertex, AbstractVRecordable):
+        if not issubclass(self._class, AbstractVRecordable):
             raise Exception(
                 "This population does not support the recording of v")
 
         # set the atoms to record v to the given file path
         atoms = self._get_atoms_for_pop()
         for atom in atoms:
-            atom.record_v(True)
-            atom.record_v_to_file_flag(to_file)
+            atom.record_v = True
+            atom.record_v_to_file_flag = to_file
 
     @property
     def positions(self):
@@ -1850,10 +1899,11 @@ class Population(object):
         if rng is None:
             rng = random.NumpyRNG()
         indices = rng.permutation(numpy.arange(len(self)))[0:n]
+        label = self._get_atoms_for_pop()[0]
         return PopulationView(
             self, indices,
             "sampled_version of {} from {}"
-            .format(indices, self._original_vertex.label),
+            .format(indices, label),
             self._spinnaker)
 
     def save_positions(self, file):  # @ReservedAssignment
@@ -1887,7 +1937,7 @@ class Population(object):
         :param param: the parameter to set
         :param val: the value of the parameter to set.
         """
-        if not isinstance(self._original_vertex, AbstractPopulationSettable):
+        if not issubclass(self._class, AbstractPopulationSettable):
             raise KeyError("Population does not have property {}".format(
                 param))
 
@@ -1895,7 +1945,8 @@ class Population(object):
             if val is None:
                 raise Exception("Error: No value given in set() function for "
                                 "population parameter. Exiting.")
-            self._original_vertex.set_value(param, val)
+            for atom in self._get_atoms_for_pop():
+                atom.set_param(param, val)
             return
 
         if type(param) is not dict:
@@ -1930,7 +1981,7 @@ class Population(object):
             onto which its sub-populations will be placed.
         """
         if isinstance(constraint, AbstractConstraint):
-            self._original_vertex.add_constraint(constraint)
+            self._constraints.append(constraint)
         else:
             raise exceptions.ConfigurationException(
                 "the constraint entered is not a recognised constraint")
@@ -1947,8 +1998,7 @@ class Population(object):
         :param p: The processor id of the placement constraint (optional)
         :type p: int
         """
-        self._original_vertex.add_constraint(
-            PlacerChipAndCoreConstraint(x, y, p))
+        self._constraints.append(PlacerChipAndCoreConstraint(x, y, p))
         self._requires_remapping = True
 
     # NONE PYNN API CALL
@@ -1968,8 +2018,8 @@ class Population(object):
 
         :param new_value: the new value for the max atoms per core.
         """
-        if hasattr(self._original_vertex, "set_model_max_atoms_per_core"):
-            self._original_vertex.set_model_max_atoms_per_core(new_value)
+        if hasattr(self._class, "set_model_max_atoms_per_core"):
+            self._class.set_model_max_atoms_per_core(new_value)
             self._requires_remapping = True
         else:
             raise exceptions.ConfigurationException(
@@ -1981,7 +2031,7 @@ class Population(object):
         """ The number of neurons in the population
         :return:
         """
-        return self._original_vertex.n_atoms
+        return self._size
 
     def tset(self, parametername, value_array):
         """ 'Topographic' set. Set the value of parametername to the values in\
@@ -1990,7 +2040,7 @@ class Population(object):
         :param value_array: the array of values which must have the correct\
                 number of elements.
         """
-        if len(value_array) != self._original_vertex.n_atoms:
+        if len(value_array) != self._size:
             raise exceptions.ConfigurationException(
                 "To use tset, you must have a array of values which matches "
                 "the size of the population. Please change this and try "

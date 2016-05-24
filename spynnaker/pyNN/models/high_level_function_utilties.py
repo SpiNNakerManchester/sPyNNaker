@@ -139,4 +139,4 @@ def initialize_parameters(variable, value, atoms, size):
 
     # set params
     for atom_variable, pop_view_atom in zip(variables_for_atoms, atoms):
-        pop_view_atom.set_param(variable, atom_variable)
+        pop_view_atom.initialize(variable, atom_variable)

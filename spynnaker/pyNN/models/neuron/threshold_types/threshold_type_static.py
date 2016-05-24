@@ -10,27 +10,25 @@ class ThresholdTypeStatic(AbstractThresholdType):
     """ A threshold that is a static value
     """
 
-    def __init__(self, n_neurons, v_thresh):
+    def __init__(self, bag_of_atoms):
         AbstractThresholdType.__init__(self)
-        self._n_neurons = n_neurons
-        self._v_thresh = utility_calls.convert_param_to_numpy(
-            v_thresh, n_neurons)
+        self._n_neurons = len(bag_of_atoms)
+        self._atoms = bag_of_atoms
 
     @property
     def v_thresh(self):
-        return self._v_thresh
-
-    @v_thresh.setter
-    def v_thresh(self, v_thresh):
-        self._v_thresh = utility_calls.convert_param_to_numpy(
-            v_thresh, self._n_neurons)
+        data = list()
+        for atom in self._atoms:
+            data.append(atom.get("v_thresh"))
+        return data
 
     def get_n_threshold_parameters(self):
         return 1
 
-    def get_threshold_parameters(self):
+    def get_threshold_parameters(self, atom_id):
         return [
-            NeuronParameter(self._v_thresh, DataType.S1615)
+            NeuronParameter(self._atoms[atom_id].get("v_thresh"),
+                            DataType.S1615)
         ]
 
     def get_n_cpu_cycles_per_neuron(self):

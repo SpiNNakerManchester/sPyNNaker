@@ -1,9 +1,9 @@
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.neuron.abstract_population_vertex \
-    import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex \
+    import BagOfNeuronsVertex
 
 
-class EIFConductanceAlphaPopulation(AbstractPopulationVertex):
+class EIFConductanceAlphaPopulation(BagOfNeuronsVertex):
 
     """ Exponential integrate and fire neuron with spike triggered and \
         sub-threshold adaptation currents (isfa, ista reps.)

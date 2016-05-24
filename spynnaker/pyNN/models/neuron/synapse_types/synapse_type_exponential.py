@@ -22,32 +22,24 @@ def get_exponential_decay_and_init(tau, machine_time_step):
 
 class SynapseTypeExponential(AbstractSynapseType):
 
-    def __init__(self, n_neurons, machine_time_step, tau_syn_E, tau_syn_I):
+    def __init__(self, bag_of_neurons):
         AbstractSynapseType.__init__(self)
-        self._n_neurons = n_neurons
-        self._machine_time_step = machine_time_step
-        self._tau_syn_E = utility_calls.convert_param_to_numpy(
-            tau_syn_E, n_neurons)
-        self._tau_syn_I = utility_calls.convert_param_to_numpy(
-            tau_syn_I, n_neurons)
+        self._n_neurons = len(bag_of_neurons)
+        self._atoms = bag_of_neurons
 
     @property
     def tau_syn_E(self):
-        return self._tau_syn_E
-
-    @tau_syn_E.setter
-    def tau_syn_E(self, tau_syn_E):
-        self._tau_syn_E = utility_calls.convert_param_to_numpy(
-            tau_syn_E, self._n_neurons)
+        data = list()
+        for atom in self._atoms:
+            data.append(atom.get("tau_syn_E"))
+        return data
 
     @property
     def tau_syn_I(self):
-        return self._tau_syn_I
-
-    @tau_syn_I.setter
-    def tau_syn_I(self, tau_syn_I):
-        self._tau_syn_I = utility_calls.convert_param_to_numpy(
-            tau_syn_I, self._n_neurons)
+        data = list()
+        for atom in self._atoms:
+            data.append(atom.get("tau_syn_I"))
+        return data
 
     def get_n_synapse_types(self):
         return 2
@@ -65,11 +57,11 @@ class SynapseTypeExponential(AbstractSynapseType):
     def get_n_synapse_type_parameters(self):
         return 4
 
-    def get_synapse_type_parameters(self):
+    def get_synapse_type_parameters(self, atom_id):
         e_decay, e_init = get_exponential_decay_and_init(
-            self._tau_syn_E, self._machine_time_step)
+            self._atoms[atom_id].get("tau_syn_E"), self._machine_time_step)
         i_decay, i_init = get_exponential_decay_and_init(
-            self._tau_syn_I, self._machine_time_step)
+            self._atoms[atom_id].get("tau_syn_I"), self._machine_time_step)
 
         return [
             NeuronParameter(e_decay, DataType.UINT32),

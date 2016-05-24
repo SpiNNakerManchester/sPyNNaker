@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
-    """ An edge which terminates on an AbstractPopulationVertex
+    """ An edge which terminates on an BagOfNeuronsVertex
     """
 
     def __init__(

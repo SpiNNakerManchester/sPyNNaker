@@ -44,7 +44,7 @@ class AbstractSynapseType(object):
         """
 
     @abstractmethod
-    def get_synapse_type_parameters(self):
+    def get_synapse_type_parameters(self, atom_id):
         """ Get the synapse type parameters
 
         :return: The parameters

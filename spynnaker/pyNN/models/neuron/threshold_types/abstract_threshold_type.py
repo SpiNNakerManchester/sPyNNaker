@@ -17,7 +17,7 @@ class AbstractThresholdType(object):
         """
 
     @abstractmethod
-    def get_threshold_parameters(self):
+    def get_threshold_parameters(self, atom_id):
         """ Get the threshold parameters
 
         :return: An array of parameters

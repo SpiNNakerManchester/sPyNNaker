@@ -44,17 +44,37 @@ class SpikeSourceArray(
 
     _model_based_max_atoms_per_core = sys.maxint
 
+    default_parameters = {
+        'spike_times': None, 'space_before_notification': 640,
+        'spike_recorder_buffer_size':(
+            constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
+        'max_on_chip_memory_usage_for_spikes_in_bytes': (
+            constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
+        'buffer_size_before_receive': (
+            constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE),
+        'label': "SpikeSourceArray"}
+
+    model_variables = {
+        'machine_time_step', 'timescale_factor', 'port', 'tag', 'ip_address',
+        'board_address'}
+
+    model_name = "SpikeSourceArray"
+
     def __init__(
             self, n_neurons, machine_time_step, timescale_factor,
-            spike_times=None, port=None, tag=None, ip_address=None,
-            board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
-                constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
-            space_before_notification=640,
-            constraints=None, label="SpikeSourceArray",
-            spike_recorder_buffer_size=(
-                constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
-            buffer_size_before_receive=(
-                constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)):
+            spike_times=default_parameters['spike_times'],
+            max_on_chip_memory_usage_for_spikes_in_bytes=
+            default_parameters['max_on_chip_memory_usage_for_spikes_in_bytes'],
+            space_before_notification=
+            default_parameters['space_before_notification'],
+            spike_recorder_buffer_size=
+            default_parameters['spike_recorder_buffer_size'],
+            buffer_size_before_receive=
+            default_parameters['buffer_size_before_receive'],
+            port=None, tag=None, ip_address=None,
+            board_address=None,
+            constraints=None, label=default_parameters['label']):
+
         self._ip_address = ip_address
         if ip_address is None:
             self._ip_address = config.get("Buffers", "receive_buffer_host")
@@ -132,6 +152,12 @@ class SpikeSourceArray(
     def mark_no_changes(self):
         self._requires_mapping = False
 
+    def requires_remapping_for_change(self, parameter, old_value, new_value):
+        if parameter == "spike_times":
+            return False
+        else:
+            return True
+
     @property
     def spike_times(self):
         """ The spike times of the spike source array
@@ -173,10 +199,6 @@ class SpikeSourceArray(
              _REGIONS.RECORDING_BUFFER_STATE.value),
             placements, graph_mapper, self,
             lambda subvertex: subvertex.virtual_key)
-
-    @property
-    def model_name(self):
-        return "SpikeSourceArray"
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):

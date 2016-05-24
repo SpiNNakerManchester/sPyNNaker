@@ -510,7 +510,7 @@ class SynapticManager(object):
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
         utility_calls.write_parameters_per_neuron(
             spec, post_vertex_slice,
-            self._synapse_type.get_synapse_type_parameters())
+            self._synapse_type.get_synapse_type_parameters)
 
         spec.write_array(ring_buffer_shifts)
 

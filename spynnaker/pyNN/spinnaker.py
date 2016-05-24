@@ -4,6 +4,7 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 
 # common front end imports
+from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
@@ -11,13 +12,10 @@ from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
-# local front end imports
-#from spynnaker.pyNN.models.pynn_assembly import Assembly
-#from spynnaker.pyNN.models.pynn_population import Population
-#from spynnaker.pyNN.models.pynn_population_view import PopulationView
-
+# add pops pop view and assembly from the bloody same class.
 from spynnaker.pyNN.models.population_based_objects import \
     Assembly, PopulationView, Population
+
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
@@ -63,7 +61,9 @@ class Spinnaker(SpinnakerMainInterface):
         self._none_labelled_assembly_count = 0
 
         # atom holders for pop views and assemblers
-        self._atom_mappings = dict()
+        self._pop_atom_mappings = dict()
+        self._pop_view_atom_mapping = dict()
+        self._assemble_atom_mapping = dict()
 
         # command sender vertex
         self._multi_cast_vertex = None
@@ -249,12 +249,18 @@ class Spinnaker(SpinnakerMainInterface):
                     dependant_edge,
                     vertex_to_add.edge_partition_identifier_for_dependent_edge)
 
-    def get_atom_mapping(self):
+    def get_pop_atom_mapping(self):
         """
         supports getting the atom mappings needed for pop views and assemblers
         :return:
         """
-        return self._atom_mappings
+        return self._pop_atom_mappings
+
+    def get_pop_view_atom_mapping(self):
+        return self._pop_view_atom_mapping
+
+    def get_assembly_atom_mapping(self):
+        return self._assemble_atom_mapping
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         """
@@ -393,4 +399,38 @@ class Spinnaker(SpinnakerMainInterface):
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
+
+        self._execute_grouper_algorithm()
         SpinnakerMainInterface.run(self, run_time)
+
+    def _execute_grouper_algorithm(self):
+        """
+        execute the grouper algorithm.
+        :return: None
+        """
+
+        # build executor
+        inputs = dict()
+        inputs['AtomMapping'] = self._pop_atom_mappings
+        inputs['MachineTimeStep'] = self._machine_time_step
+        inputs['TimeScaleFactor'] = self._time_scale_factor
+
+        outputs = ["MemoryPartitionableGraph", "MemoryAtomToVertexMap"]
+        algorithms = list()
+        algorithms.append("Grouper")
+        xml_paths = list()
+        xml_paths.append(os.path.join(
+            os.path.dirname(overridden_pacman_functions.__file__),
+            "algorithms_metadata.xml"))
+        pacman_executor = PACMANAlgorithmExecutor(
+            algorithms=algorithms, inputs=inputs, required_outputs=outputs,
+            optional_algorithms=[], xml_paths=xml_paths)
+        pacman_executor.execute_mapping()
+
+        # get partitionable graph
+        self._partitionable_graph = \
+            pacman_executor.get_item("MemoryPartitionableGraph")
+        atom_to_vertex_map = pacman_executor.get_item("MemoryAtomToVertexMap")
+
+        # update objects with mapping
+        raise NotImplementedError

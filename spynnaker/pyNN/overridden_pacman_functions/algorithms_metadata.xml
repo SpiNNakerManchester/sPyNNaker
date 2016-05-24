@@ -13,6 +13,10 @@
                 <param_name>partitionable_graph</param_name>
                 <param_type>MemoryPartitionableGraph</param_type>
             </parameter>
+            <parameter>
+                <param_name>atom_to_vertex_map</param_name>
+                <param_type>MemoryAtomToVertexMap</param_type>
+            </parameter>
         </produces_outputs>
     </algorithm>
     <algorithm name="GraphEdgeFilter">

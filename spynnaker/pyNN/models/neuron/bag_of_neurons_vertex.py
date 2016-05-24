@@ -49,8 +49,6 @@ from spynnaker.pyNN.models.neuron.population_partitioned_vertex \
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
 
-from abc import ABCMeta
-from six import add_metaclass
 import logging
 import os
 
@@ -68,8 +66,7 @@ _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 
-@add_metaclass(ABCMeta)
-class AbstractPopulationVertex(
+class BagOfNeuronsVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
@@ -80,16 +77,16 @@ class AbstractPopulationVertex(
     """
 
     def __init__(
-            self, n_neurons, binary, label, max_atoms_per_core,
-            machine_time_step, timescale_factor, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size, model_name,
-            neuron_model, input_type, synapse_type, threshold_type,
-            additional_input=None, constraints=None):
+            self, bag_of_neurons, label,
+            machine_time_step, time_scale_factor, spikes_per_second,
+            ring_buffer_sigma, incoming_spike_buffer_size,
+            model_class, constraints=None):
 
         AbstractPartitionableVertex.__init__(
-            self, n_neurons, label, max_atoms_per_core, constraints)
+            self, len(bag_of_neurons), label,
+            model_class.model_based_max_atoms_per_core, constraints)
         AbstractDataSpecableVertex.__init__(
-            self, machine_time_step, timescale_factor)
+            self, machine_time_step, time_scale_factor)
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
@@ -99,20 +96,25 @@ class AbstractPopulationVertex(
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
 
-        self._binary = binary
+        self._binary = model_class.binary_name
         self._label = label
         self._machine_time_step = machine_time_step
-        self._timescale_factor = timescale_factor
+        self._timescale_factor = time_scale_factor
         self._incoming_spike_buffer_size = incoming_spike_buffer_size
         if incoming_spike_buffer_size is None:
             self._incoming_spike_buffer_size = config.getint(
                 "Simulation", "incoming_spike_buffer_size")
 
-        self._model_name = model_name
-        self._neuron_model = neuron_model
-        self._input_type = input_type
-        self._threshold_type = threshold_type
-        self._additional_input = additional_input
+        self._model_name = model_class.model_name
+        self._neuron_model = model_class.neuron_model(bag_of_neurons)
+        self._input_type = model_class.input_type(bag_of_neurons)
+        self._threshold_type = model_class.threshold_type(bag_of_neurons)
+        synapse_type = model_class.synapse_type(bag_of_neurons)
+
+        self._additional_input = None
+        if hasattr(model_class, 'additional_input'):
+            self._additional_input = \
+                model_class.additional_input(bag_of_neurons)
 
         # Set up for recording
         self._spike_recorder = SpikeRecorder(machine_time_step)
@@ -153,6 +155,9 @@ class AbstractPopulationVertex(
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
+
+    def requires_remapping_for_change(self, parameter, old_value, new_value):
+        return True
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
@@ -202,7 +207,7 @@ class AbstractPopulationVertex(
     def maximum_delay_supported_in_ms(self):
         return self._synapse_manager.maximum_delay_supported_in_ms
 
-    # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
+    # @implements BagOfNeuronsVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         per_neuron_cycles = (
             _NEURON_BASE_N_CPU_CYCLES_PER_NEURON +
@@ -221,7 +226,7 @@ class AbstractPopulationVertex(
                 self._gsyn_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
                 self._synapse_manager.get_n_cpu_cycles(vertex_slice, graph))
 
-    # @implements AbstractPopulationVertex.get_dtcm_usage_for_atoms
+    # @implements BagOfNeuronsVertex.get_dtcm_usage_for_atoms
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         per_neuron_usage = (
             self._neuron_model.get_dtcm_usage_per_neuron_in_bytes() +
@@ -287,7 +292,7 @@ class AbstractPopulationVertex(
 
         return sdram_requirement
 
-    # @implements AbstractPopulationVertex.model_name
+    # @implements BagOfNeuronsVertex.model_name
     def model_name(self):
         return self._model_name
 
@@ -388,21 +393,21 @@ class AbstractPopulationVertex(
 
         # Write the neuron parameters
         utility_calls.write_parameters_per_neuron(
-            spec, vertex_slice, self._neuron_model.get_neural_parameters())
+            spec, vertex_slice, self._neuron_model.get_neural_parameters)
 
         # Write the input type parameters
         utility_calls.write_parameters_per_neuron(
-            spec, vertex_slice, self._input_type.get_input_type_parameters())
+            spec, vertex_slice, self._input_type.get_input_type_parameters)
 
         # Write the additional input parameters
         if self._additional_input is not None:
             utility_calls.write_parameters_per_neuron(
-                spec, vertex_slice, self._additional_input.get_parameters())
+                spec, vertex_slice, self._additional_input.get_parameters)
 
         # Write the threshold type parameters
         utility_calls.write_parameters_per_neuron(
             spec, vertex_slice,
-            self._threshold_type.get_threshold_parameters())
+            self._threshold_type.get_threshold_parameters)
 
     # @implements AbstractDataSpecableVertex.generate_data_spec
     def generate_data_spec(

@@ -8,6 +8,9 @@ class AbstractInputType(object):
     """ Represents a possible input type for a neuron model (e.g. current)
     """
 
+    def __init__(self, bag_of_neurons):
+        self._atoms = bag_of_neurons
+
     @abstractmethod
     def get_global_weight_scale(self):
         """ Get the global weight scaling value
@@ -25,7 +28,7 @@ class AbstractInputType(object):
         """
 
     @abstractmethod
-    def get_input_type_parameters(self):
+    def get_input_type_parameters(self, atom_id):
         """ Get the parameters for the input type
 
         :return: An array of parameters

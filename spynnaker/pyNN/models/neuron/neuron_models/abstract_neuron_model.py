@@ -17,7 +17,7 @@ class AbstractNeuronModel(object):
         """
 
     @abstractmethod
-    def get_neural_parameters(self):
+    def get_neural_parameters(self, atom_id):
         """ Get the neural parameters
 
         :return: an array of parameters

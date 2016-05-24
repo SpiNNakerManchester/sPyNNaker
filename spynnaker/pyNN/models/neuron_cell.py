@@ -9,12 +9,18 @@ class NeuronCell(object):
     NeuronCell: the object that stores all data about a cell.
     """
 
-    def __init__(self, default_parameters, original_vertex, structure):
+    def __init__(self, default_parameters, state_variables,
+                 original_class, structure):
 
-        self._original_vertex = original_vertex
+        self._original_class = original_class
 
         # standard parameters
         self._params = dict(default_parameters)
+
+        # state variables
+        self._state_variables = dict()
+        for state_variable in state_variables:
+            self._state_variables[state_variable] = None
 
         # recording data items
         # spikes
@@ -37,10 +43,32 @@ class NeuronCell(object):
         self._synapse_dynamics = None
 
         # change marker (only set to a value if the vertex supports it)
-        if isinstance(self._original_vertex, AbstractChangableAfterRun):
+        if issubclass(self._original_class, AbstractChangableAfterRun):
             self._has_change_that_requires_mapping = True
         else:
             self._has_change_that_requires_mapping = None
+
+    @property
+    def state_variables(self):
+        """
+        returns the state variables of the cell.
+        :return: the state variable dictionary
+        """
+        return self._state_variables
+
+    def initialize(self, key, new_value):
+        """
+        sets state variables as needed
+        :param key: the state variable name needed to be set
+        :param new_value: the value to set the state value to
+        :return:None
+        """
+        if key in self._state_variables:
+            self._has_change_that_requires_mapping = True
+            self._state_variables[key] = new_value
+        else:
+            raise exceptions.ConfigurationException(
+                "Trying to set a parameter which does not exist")
 
     @property
     def structure(self):
@@ -217,7 +245,7 @@ class NeuronCell(object):
                 "If you want to use a file_path, we recommend you use pop"
                 " views and assemblies to filter between file paths.")
 
-    def get_param(self, key):
+    def get(self, key):
         """
         getter for any neuron parameter
         :param key: the name of the param to get
@@ -233,9 +261,7 @@ class NeuronCell(object):
         :return: None
         """
         if key in self._params:
-            self._has_change_that_requires_mapping = \
-                self._original_vertex.requires_remapping(
-                    key, self._params[key], new_value)
+            self._has_change_that_requires_mapping = True
             self._params[key] = new_value
         else:
             raise exceptions.ConfigurationException(
@@ -259,7 +285,7 @@ class NeuronCell(object):
         """
         if self._synapse_dynamics is None:
             self._synapse_dynamics = new_value
-        elif self._synapse_dynamics != new_value:
+        elif not self._synapse_dynamics.is_same_as(new_value):
             raise exceptions.ConfigurationException(
                 "Currently only one type of STDP can be supported per cell.")
         self._has_change_that_requires_mapping = True
