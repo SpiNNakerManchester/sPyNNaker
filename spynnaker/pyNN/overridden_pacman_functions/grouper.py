@@ -25,7 +25,8 @@ class Grouper(object):
         # handle projections
         self.handle_projections()
 
-        return {'partitionable_graph': partitionable_graph}
+        return {'partitionable_graph': partitionable_graph,
+                'pop_to_vertex_mapping': pop_to_vertex_mapping}
 
     def handle_projections(self):
         """
@@ -61,11 +62,11 @@ class Grouper(object):
 
             # test if the population can be added to the current group.
             population_level_parameters, located, has_constraints, \
-            constraints, added = self._check_population_for_addition(
-                pop_pop_view_assembly, atoms, label, located,
-                population_level_parameters,
-                things_containing_model_type, has_constraints,
-                constraints)
+                constraints, added = self._check_population_for_addition(
+                    pop_pop_view_assembly, atoms, label, located,
+                    population_level_parameters,
+                    things_containing_model_type, has_constraints,
+                    constraints)
 
             # if added, add to pops to remove from this list.
             if added:
@@ -85,8 +86,9 @@ class Grouper(object):
         vertex = model_type.create_vertex(atoms, inputs)
         partitionable_graph.add_vertex(vertex)
 
+    @staticmethod
     def _check_population_for_addition(
-            self, pop_pop_view_assembly, atoms, label, located,
+            pop_pop_view_assembly, atoms, label, located,
             population_level_parameters, things_containing_model_type,
             has_constraints, constraints):
         """
@@ -103,6 +105,7 @@ class Grouper(object):
         """
 
         added = False
+        # if first population, record data needed for comparison
         if not located:
             population_level_parameters = \
                 pop_pop_view_assembly.population_parameters()
@@ -114,7 +117,7 @@ class Grouper(object):
             label += pop_pop_view_assembly.label
             added = True
 
-        else:
+        else: # not first population, therefore compare.
             correct_pop_level_parameters = True
             for param in population_level_parameters:
                 first_param = population_level_parameters[param]
@@ -122,11 +125,14 @@ class Grouper(object):
                     pop_pop_view_assembly.population_parameters()[param]
                 if first_param != second_param:
                     correct_pop_level_parameters = False
+
+            # verify the pop is merge able
             if (correct_pop_level_parameters and not has_constraints and
                     len(pop_pop_view_assembly.constraints) == 0):
                 atoms += things_containing_model_type[pop_pop_view_assembly]
                 label += pop_pop_view_assembly.label
                 added = True
 
+        # return data items
         return population_level_parameters, located, has_constraints, \
             constraints, added
