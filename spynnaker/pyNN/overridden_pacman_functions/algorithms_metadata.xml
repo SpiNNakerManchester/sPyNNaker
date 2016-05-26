@@ -4,8 +4,20 @@
         <python_class>Grouper</python_class>
         <required_inputs>
             <parameter>
-                <param_name>atom_mapping</param_name>
-                <param_type>AtomMapping</param_type>
+                <param_name>population_atom_mapping</param_name>
+                <param_type>PopulationAtomMapping</param_type>
+            </parameter>
+            <parameter>
+                <param_name>pop_view_atom_mapping</param_name>
+                <param_type>PopulationViewAtomMapping</param_type>
+            </parameter>
+            <parameter>
+                <param_name>assembly_atom_mapping</param_name>
+                <param_type>AssemblyAtomMapping</param_type>
+            </parameter>
+            <parameter>
+                <param_name>projections</param_name>
+                <param_type>Projections</param_type>
             </parameter>
         </required_inputs>
         <produces_outputs>
@@ -14,8 +26,8 @@
                 <param_type>MemoryPartitionableGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>atom_to_vertex_map</param_name>
-                <param_type>MemoryAtomToVertexMap</param_type>
+                <param_name>pop_to_vertex_mapping</param_name>
+                <param_type>PopToVertexMapping</param_type>
             </parameter>
         </produces_outputs>
     </algorithm>

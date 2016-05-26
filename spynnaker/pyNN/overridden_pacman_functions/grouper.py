@@ -1,6 +1,5 @@
 from pacman.model.partitionable_graph.partitionable_graph import \
     PartitionableGraph
-from spynnaker.pyNN.models.population_based_objects import Assembly
 
 
 class Grouper(object):
@@ -8,32 +7,36 @@ class Grouper(object):
     grouper: a function which takes a bag of neurons and maps them into vertices
     """
 
-    def __call__(self, atom_mapping):
+    def __call__(
+            self, population_atom_mapping, pop_view_atom_mapping,
+            assembly_atom_mapping, projections):
 
         # build a partitionable graph
         partitionable_graph = PartitionableGraph("grouped_application_graph")
         pop_to_vertex_mapping = dict()
 
         # for each model type build a monolithic vertex for them all
-        for model_type in atom_mapping.keys():
-            local_atom_mapping = dict(atom_mapping[model_type])
+        for model_type in population_atom_mapping.keys():
+            local_atom_mapping = dict(population_atom_mapping[model_type])
             while len(local_atom_mapping.keys()) != 0:
                 self._handle_model_type(
                     local_atom_mapping, model_type, partitionable_graph,
                     pop_to_vertex_mapping)
 
         # handle projections
-        self.handle_projections()
+        self.handle_projections(
+            projections, population_atom_mapping, pop_to_vertex_mapping)
 
         return {'partitionable_graph': partitionable_graph,
                 'pop_to_vertex_mapping': pop_to_vertex_mapping}
 
-    def handle_projections(self):
+    def handle_projections(
+            self, projections, population_atom_mapping, pop_to_vertex_mapping):
         """
 
         :return:
         """
-        pass
+
 
     def _handle_model_type(
             self, things_containing_model_type, model_type,
@@ -54,6 +57,7 @@ class Grouper(object):
         has_constraints = False
         constraints = list()
         population_level_parameters = None
+        internal_pop_to_atom_mapping = dict()
 
         # accumulate all atoms from those populations of this model type
         label = ""
@@ -63,13 +67,23 @@ class Grouper(object):
             # test if the population can be added to the current group.
             population_level_parameters, located, has_constraints, \
                 constraints, added = self._check_population_for_addition(
-                    pop_pop_view_assembly, atoms, label, located,
-                    population_level_parameters,
-                    things_containing_model_type, has_constraints,
+                    pop_pop_view_assembly, located,
+                    population_level_parameters, has_constraints,
                     constraints)
 
             # if added, add to pops to remove from this list.
             if added:
+                # update mapping object
+                internal_pop_to_atom_mapping[pop_pop_view_assembly] = \
+                    (len(atoms),
+                     len(atoms) + len(
+                         things_containing_model_type[pop_pop_view_assembly]))
+
+                # add to atoms and label objects for the vertex
+                atoms += things_containing_model_type[pop_pop_view_assembly]
+                label += pop_pop_view_assembly.label
+
+                # holder for array iteration modifications
                 added_pops.append(pop_pop_view_assembly)
 
         # remove added pops
@@ -86,19 +100,22 @@ class Grouper(object):
         vertex = model_type.create_vertex(atoms, inputs)
         partitionable_graph.add_vertex(vertex)
 
+        # update pop to vertex mapping
+        for pop in added_pops:
+            pop_to_vertex_mapping[pop] = dict()
+            pop_to_vertex_mapping[pop][vertex] = (
+                internal_pop_to_atom_mapping[pop_pop_view_assembly][0],
+                internal_pop_to_atom_mapping[pop_pop_view_assembly][1])
+
     @staticmethod
     def _check_population_for_addition(
-            pop_pop_view_assembly, atoms, label, located,
-            population_level_parameters, things_containing_model_type,
+            pop_pop_view_assembly, located, population_level_parameters,
             has_constraints, constraints):
         """
 
         :param pop_pop_view_assembly:
-        :param atoms:
-        :param label:
         :param located:
         :param population_level_parameters:
-        :param things_containing_model_type:
         :param has_constraints:
         :param constraints:
         :return:
@@ -113,8 +130,6 @@ class Grouper(object):
                 has_constraints = True
                 constraints = pop_pop_view_assembly.constraints
             located = True
-            atoms += things_containing_model_type[pop_pop_view_assembly]
-            label += pop_pop_view_assembly.label
             added = True
 
         else: # not first population, therefore compare.
@@ -129,8 +144,6 @@ class Grouper(object):
             # verify the pop is merge able
             if (correct_pop_level_parameters and not has_constraints and
                     len(pop_pop_view_assembly.constraints) == 0):
-                atoms += things_containing_model_type[pop_pop_view_assembly]
-                label += pop_pop_view_assembly.label
                 added = True
 
         # return data items

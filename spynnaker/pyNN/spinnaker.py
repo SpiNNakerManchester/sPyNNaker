@@ -411,11 +411,14 @@ class Spinnaker(SpinnakerMainInterface):
 
         # build executor
         inputs = dict()
-        inputs['AtomMapping'] = self._pop_atom_mappings
+        inputs['PopulationAtomMapping'] = self._pop_atom_mappings
+        inputs['PopulationViewAtomMapping'] = self._pop_view_atom_mapping
+        inputs['AssemblyAtomMapping'] = self._assemble_atom_mapping
+        inputs['Projections'] = self._projections
         inputs['MachineTimeStep'] = self._machine_time_step
         inputs['TimeScaleFactor'] = self._time_scale_factor
 
-        outputs = ["MemoryPartitionableGraph", "MemoryAtomToVertexMap"]
+        outputs = ["MemoryPartitionableGraph", "PopToVertexMapping"]
         algorithms = list()
         algorithms.append("Grouper")
         xml_paths = list()
@@ -430,7 +433,10 @@ class Spinnaker(SpinnakerMainInterface):
         # get partitionable graph
         self._partitionable_graph = \
             pacman_executor.get_item("MemoryPartitionableGraph")
-        atom_to_vertex_map = pacman_executor.get_item("MemoryAtomToVertexMap")
+        pop_to_vertex_mapping = pacman_executor.get_item("PopToVertexMapping")
 
+        # update each population with their own maping
+        for pop in self._populations:
+            pop.set_mapping(pop_to_vertex_mapping[pop])
         # update objects with mapping
         raise NotImplementedError
