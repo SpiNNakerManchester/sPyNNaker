@@ -359,8 +359,7 @@ class Spinnaker(SpinnakerMainInterface):
             connector=connector, source=source, target=target,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step,
-            timescale_factor=self._time_scale_factor,
-            user_max_delay=self.max_supported_delay)
+            timescale_factor=self._time_scale_factor)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None, extract_provenance_data=True,
@@ -417,6 +416,8 @@ class Spinnaker(SpinnakerMainInterface):
         inputs['Projections'] = self._projections
         inputs['MachineTimeStep'] = self._machine_time_step
         inputs['TimeScaleFactor'] = self._time_scale_factor
+        inputs['UserMaxDelay'] = self.max_supported_delay
+        inputs['VirtualBoardFlag'] = self._use_virtual_board
 
         outputs = ["MemoryPartitionableGraph", "PopToVertexMapping"]
         algorithms = list()

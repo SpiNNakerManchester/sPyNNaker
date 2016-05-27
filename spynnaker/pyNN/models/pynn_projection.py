@@ -1,25 +1,7 @@
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
-    import PartitionerSameSizeAsVertexConstraint
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge \
-    import MultiCastPartitionableEdge
-
-from spynnaker.pyNN.models.neural_projections.synapse_information \
-    import SynapseInformation
 from spynnaker.pyNN.models.neuron.abstract_population_model import \
     AbstractPopulationModel
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
     import SynapseDynamicsStatic
-from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex \
-    import BagOfNeuronsVertex
-from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
-    import DelayExtensionVertex
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
-    import ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections\
-    .delay_afferent_partitionable_edge \
-    import DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
@@ -28,9 +10,7 @@ from spinn_front_end_common.utilities import exceptions
 
 from spinn_machine.utilities.progress_bar import ProgressBar
 
-
 import logging
-import math
 
 logger = logging.getLogger(__name__)
 EDGE_PARTITION_ID = "SPIKE"
@@ -47,28 +27,39 @@ class Projection(object):
     # noinspection PyUnusedLocal
     def __init__(
             self, presynaptic_population, postsynaptic_population, label,
-            connector, spinnaker_control, machine_time_step, user_max_delay,
-            timescale_factor, source=None, target='excitatory',
-            synapse_dynamics=None, rng=None):
+            connector, spinnaker_control, machine_time_step, timescale_factor,
+            source=None, target='excitatory', synapse_dynamics=None, rng=None):
         self._spinnaker = spinnaker_control
+        self._presynaptic_population = presynaptic_population
+        self._postsynaptic_population = postsynaptic_population
+        self._connector = connector
+        self._target = target
+        self._rng = rng
+        self._virtual_connection_list = None
+        self._synapse_information = None
+
+        if source is not None:
+            logger.warn(
+                "source currently means nothing to the SpiNNaker implementation"
+                " of the PyNN projection, therefore it will be ignored")
+
         self._projection_edge = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
-        self._target = target
 
+        # check projection is to a vertex which can handle spikes reception
         if not issubclass(postsynaptic_population._class,
                           AbstractPopulationModel):
-
             raise exceptions.ConfigurationException(
                 "postsynaptic population is not designed to receive"
                 " synaptic projections")
 
+        # update atom's synapse dynamics.
         synapse_dynamics_stdp = None
         if synapse_dynamics is None:
             synapse_dynamics_stdp = SynapseDynamicsStatic()
         else:
             synapse_dynamics_stdp = synapse_dynamics.slow
-
         atoms_for_population = postsynaptic_population._get_atoms_for_pop()
         for atom in atoms_for_population:
             atom.synapse_dynamics = synapse_dynamics_stdp
@@ -76,11 +67,21 @@ class Projection(object):
         # check that the projection edges label is not none, and give an
         # auto generated label if set to None
         if label is None:
-            label = "projection edge {}".format(
+            self._label = "projection edge {}".format(
                 spinnaker_control.none_labelled_edge_count)
             spinnaker_control.increment_none_labelled_edge_count()
+        else:
+            self._label = label
 
         spinnaker_control._add_projection(self)
+
+    @property
+    def label(self):
+        return self._label
+
+    @property
+    def target(self):
+        return self._target
 
     @property
     def requires_mapping(self):
@@ -92,27 +93,6 @@ class Projection(object):
     def mark_no_changes(self):
         if isinstance(self._projection_edge, AbstractChangableAfterRun):
             self._projection_edge.mark_no_changes()
-
-    def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
-        """ Searches though the partitionable graph's edges to locate any\
-            edge which has the same post and pre vertex
-
-        :param presynaptic_vertex: the source partitionable vertex of the\
-                multapse
-        :type presynaptic_vertex: instance of\
-                pacman.model.partitionable_graph.abstract_partitionable_vertex
-        :param postsynaptic_vertex: The destination partitionable vertex of\
-                the multapse
-        :type postsynaptic_vertex: instance of\
-                pacman.model.partitionable_graph.abstract_partitionable_vertex
-        :return: None or the edge going to these vertices.
-        """
-        graph_edges = self._spinnaker.partitionable_graph.edges
-        for edge in graph_edges:
-            if ((edge.pre_vertex == presynaptic_vertex) and
-                    (edge.post_vertex == postsynaptic_vertex)):
-                return edge
-        return None
 
     def describe(self, template='projection_default.txt', engine='default'):
         """ Return a human-readable description of the projection.

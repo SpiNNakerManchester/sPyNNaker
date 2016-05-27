@@ -1077,7 +1077,7 @@ class Population(object):
 
         # create population vertex.
         self._class = cellclass
-        self._mapped_vertices = dict()
+        self._mapped_vertices = None
         self._spinnaker = spinnaker
         self._delay_vertex = None
 
