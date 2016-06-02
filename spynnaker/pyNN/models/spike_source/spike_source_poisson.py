@@ -1,11 +1,10 @@
+from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
 
-from spynnaker.pyNN.models.neural_properties.randomDistributions\
-    import generate_parameter
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
@@ -89,9 +88,10 @@ class SpikeSourcePoisson(
         PopulationSettableChangeRequiresMapping.__init__(self)
 
         # Store the parameters
-        self._rate = rate
-        self._start = start
-        self._duration = duration
+        self._rate = utility_calls.convert_param_to_numpy(rate, n_neurons)
+        self._start = utility_calls.convert_param_to_numpy(start, n_neurons)
+        self._duration = utility_calls.convert_param_to_numpy(
+            duration, n_neurons)
         self._rng = numpy.random.RandomState(seed)
 
         # Prepare for recording, and to get spikes
@@ -275,6 +275,9 @@ class SpikeSourcePoisson(
         spec.write_value(random.randint(
             0, SpikeSourcePoisson._n_poisson_subvertices))
 
+        # Write the number of us to wait between sending spikes
+        # total_mean_rate = numpy
+
         # Write the random seed (4 words), generated randomly!
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
@@ -290,12 +293,11 @@ class SpikeSourcePoisson(
             atom_id = vertex_slice.lo_atom + i
 
             # Get the parameter values for source i:
-            rate_val = generate_parameter(self._rate, atom_id)
-            start_val = generate_parameter(self._start, atom_id)
+            rate_val = self._rate[atom_id]
+            start_val = self._start[atom_id]
             end_val = None
             if self._duration is not None:
-                end_val = generate_parameter(
-                    self._duration, atom_id) + start_val
+                end_val = self._duration[atom_id] + start_val
 
             # Decide if it is a fast or slow source and
             spikes_per_tick = \
