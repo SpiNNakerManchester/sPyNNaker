@@ -283,10 +283,19 @@ class Spinnaker(SpinnakerMainInterface):
             self, population_to_view, neuron_selector, label):
         """
 
-        :param population_to_view:
+        :param population_to_view: population to filter over
         :param neuron_selector:
-        :param label:
-        :return:
+
+        neuron_selector -
+        a slice or numpy mask array. The mask array should either be
+           a boolean array of the same size as the parent, or an
+           integer array containing cell indices, i.e. if p.size == 5,
+             !PopulationView(p, array([False, False, True, False, True]))
+             !PopulationView(p, array([2,4]))
+             !PopulationView(p, slice(2,5,2))
+           will all create the same view.
+        :param label: the label of this pop view
+        :return: a population view object
         """
 
         # build pop view
@@ -399,7 +408,11 @@ class Spinnaker(SpinnakerMainInterface):
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
 
-        self._execute_grouper_algorithm()
+        # run grouper again if changes requires mapping
+        if self._detect_if_graph_has_changed():
+            self._execute_grouper_algorithm()
+
+        # run basic spinnaker
         SpinnakerMainInterface.run(self, run_time)
 
     def _execute_grouper_algorithm(self):
@@ -435,9 +448,11 @@ class Spinnaker(SpinnakerMainInterface):
         self._partitionable_graph = \
             pacman_executor.get_item("MemoryPartitionableGraph")
         pop_to_vertex_mapping = pacman_executor.get_item("PopToVertexMapping")
+        vertex_to_pop_mapping = pacman_executor.get_item("VertexToPopMapping")
 
-        # update each population with their own maping
+        # update each population with their own mapping
         for pop in self._populations:
             pop.set_mapping(pop_to_vertex_mapping[pop])
-        # update objects with mapping
-        raise NotImplementedError
+
+        for vertex in vertex_to_pop_mapping:
+            vertex.set_mapping(vertex_to_pop_mapping[vertex])

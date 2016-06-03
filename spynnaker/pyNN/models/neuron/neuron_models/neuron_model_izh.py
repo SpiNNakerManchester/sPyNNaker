@@ -4,6 +4,7 @@ from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
     import AbstractNeuronModel
 
 from data_specification.enums.data_type import DataType
+from spynnaker.pyNN.utilities import utility_calls
 
 
 class NeuronModelIzh(AbstractNeuronModel):
@@ -56,6 +57,18 @@ class NeuronModelIzh(AbstractNeuronModel):
             data.append(atom.get("u_init"))
         return data
 
+    def initialize_v(self, v_init):
+        v_init = utility_calls.convert_param_to_numpy(
+            v_init, self._n_neurons)
+        for atom, value in zip(self._atoms, v_init):
+            atom.set_param('v_init', value)
+
+    def initialize_u(self, u_init):
+        u_init = utility_calls.convert_param_to_numpy(
+            u_init, self._n_neurons)
+        for atom, value in zip(self._atoms, u_init):
+            atom.set_param('u_init', value)
+
     def get_n_neural_parameters(self):
         return 8
 
@@ -88,7 +101,8 @@ class NeuronModelIzh(AbstractNeuronModel):
             # current timestep - simple correction for threshold
             # REAL this_h;
             NeuronParameter(
-                self._atoms[atom_id].get('machine_time_step') / 1000.0,
+                self._atoms[atom_id].population_parameters[
+                    'machine_time_step'] / 1000.0,
                 DataType.S1615)
         ]
 
@@ -98,7 +112,8 @@ class NeuronModelIzh(AbstractNeuronModel):
     def get_global_parameters(self):
         return [
             NeuronParameter(
-                self._atoms[0].get('machine_time_step') / 1000.0,
+                self._atoms[0].population_parameters[
+                    'machine_time_step'] / 1000.0,
                 DataType.S1615)
         ]
 

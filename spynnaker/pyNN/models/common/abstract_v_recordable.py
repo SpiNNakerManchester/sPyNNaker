@@ -17,13 +17,13 @@ class AbstractVRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_v(self):
+    def set_recording_v(self, to_file_flag, filter=None):
         """ Sets v to being recorded
         """
 
     @abstractmethod
     def get_v(self, n_machine_time_steps, placements, graph_mapper,
-              buffer_manager):
+              buffer_manager, start_atoms, end_atoms):
         """ Get the recorded v from the object
 
         :param n_machine_time_steps: the number of timer ticks that will\

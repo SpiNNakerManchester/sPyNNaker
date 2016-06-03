@@ -13,7 +13,6 @@ from spinn_machine.utilities.progress_bar import ProgressBar
 import logging
 
 logger = logging.getLogger(__name__)
-EDGE_PARTITION_ID = "SPIKE"
 
 
 # noinspection PyProtectedMember
@@ -23,6 +22,9 @@ class Projection(object):
         methods to set parameters of those connections, including of\
         plasticity mechanisms.
     """
+
+    # partition id used by all edges of projections
+    EDGE_PARTITION_ID = "SPIKE"
 
     # noinspection PyUnusedLocal
     def __init__(

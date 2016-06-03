@@ -9,18 +9,29 @@ class NeuronCell(object):
     NeuronCell: the object that stores all data about a cell.
     """
 
-    def __init__(self, default_parameters, state_variables,
-                 original_class, structure):
+    def __init__(self, default_parameters, state_variables, fixed_params,
+                 population_parameters, original_class, structure):
 
         self._original_class = original_class
 
         # standard parameters
-        self._params = dict(default_parameters)
+        self._params = dict()
+        for key in default_parameters:
+            self._params[key] = None
+
+        self._fixed_params = dict()
+        for key in fixed_params:
+            self._fixed_params[key] = fixed_params[key]
 
         # state variables
         self._state_variables = dict()
         for state_variable in state_variables:
             self._state_variables[state_variable] = None
+
+        self._population_parameters = dict()
+        for population_parameter_name in population_parameters:
+            self._population_parameters[population_parameter_name] =\
+                population_parameters[population_parameter_name]
 
         # recording data items
         # spikes
@@ -48,6 +59,8 @@ class NeuronCell(object):
         else:
             self._has_change_that_requires_mapping = None
 
+
+
     @property
     def state_variables(self):
         """
@@ -55,6 +68,18 @@ class NeuronCell(object):
         :return: the state variable dictionary
         """
         return self._state_variables
+
+    def get_state_variable(self, param):
+        """
+        helper method for getting one parameter from the state variables
+        :param param:
+        :return:
+        """
+        if param not in self._state_variables:
+            raise exceptions.ConfigurationException(
+                "Parameter {} does not exist.".format(param))
+        else:
+            return self._state_variables[param]
 
     def initialize(self, key, new_value):
         """
@@ -69,6 +94,26 @@ class NeuronCell(object):
         else:
             raise exceptions.ConfigurationException(
                 "Trying to set a parameter which does not exist")
+
+    @property
+    def population_parameters(self):
+        return self._population_parameters
+
+    def get_population_parameter(self, name):
+        if name in self._population_parameters:
+            return self._population_parameters[name]
+        return None
+
+    def set_population_parameter(self, name, new_value):
+        if name not in self._population_parameters:
+            raise exceptions.ConfigurationException(
+                "Trying to set a population scoped parameter not "
+                "originally given to this atom.")
+        else:
+            self._population_parameters[name] = new_value
+
+    def get_population_parameter_names(self):
+        return self._population_parameters.keys()
 
     @property
     def structure(self):
@@ -105,7 +150,7 @@ class NeuronCell(object):
         self._positions = new_value
 
     @property
-    def has_change_that_requires_mapping(self):
+    def requires_mapping(self):
         """
         get changed require mapping flag
         :return:
@@ -153,13 +198,13 @@ class NeuronCell(object):
         :param to_file_flag: bool flag
         :return: None
         """
-        if isinstance(to_file_flag, bool):
+        if to_file_flag is None or isinstance(to_file_flag, bool):
             self._record_spike_to_file_flag = to_file_flag
         else:
             raise exceptions.ConfigurationException(
-                "Only booleans are allowed to the to_file_flag. "
-                "If you want to use a file_path, we recommend you use pop"
-                " views and assemblies to filter between file paths.")
+                "Only booleans are allowed to the spikes to_file flag. "
+                "If you want to use a file_path, we recommend you use "
+                "print spikes from a population object")
 
     @property
     def record_v(self):
@@ -195,13 +240,13 @@ class NeuronCell(object):
         :param to_file_flag: the new file path for the record v
         :return: None
         """
-        if isinstance(to_file_flag, bool):
+        if to_file_flag is None or isinstance(to_file_flag, bool):
             self._record_v_to_file_flag = to_file_flag
         else:
             raise exceptions.ConfigurationException(
-                "Only booleans are allowed to the to_file_flag. "
-                "If you want to use a file_path, we recommend you use pop"
-                " views and assemblies to filter between file paths.")
+                "Only booleans are allowed to the to_file flag. "
+                "If you want to use a file_path, we recommend you use the "
+                "Population print v function")
 
     @property
     def record_gsyn(self):
@@ -237,13 +282,13 @@ class NeuronCell(object):
         :param to_file_flag: the new flag for the record gsyn to file
         :return: None
         """
-        if isinstance(to_file_flag, bool):
-            self._record_gsyn_to_file_flag = "gsyn"
+        if to_file_flag is None or isinstance(to_file_flag, bool):
+            self._record_gsyn_to_file_flag = to_file_flag
         else:
             raise exceptions.ConfigurationException(
-                "Only booleans are allowed to the to_file_flag. "
-                "If you want to use a file_path, we recommend you use pop"
-                " views and assemblies to filter between file paths.")
+                "Only booleans are allowed to the to_file flag. "
+                "If you want to use a file_path, we recommend you use the "
+                "population print gsyn function")
 
     def get(self, key):
         """
@@ -251,7 +296,14 @@ class NeuronCell(object):
         :param key: the name of the param to get
         :return: the parameter value for this neuron cell
         """
-        return self._params[key]
+        if key in self._params:
+            return self._params[key]
+        elif key in self._fixed_params:
+            return self._fixed_params[key]
+        else:
+            raise exceptions.ConfigurationException(
+                "Trying to get a parameter that does not exist."
+                " Please fix and try again")
 
     def set_param(self, key, new_value):
         """
@@ -292,8 +344,21 @@ class NeuronCell(object):
 
     def __repr__(self):
         output = ""
+        output += "parameters:["
         for key in self._params:
             output += "{}:{},".format(key, self._params[key])
+        output += "]"
+        output += "fixed parameters:["
+        for key in self._fixed_params:
+            output += "{}:{},".format(key, self._fixed_params[key])
+        output += "]"
+        output += "state variables:["
+        for key in self._state_variables:
+            output += "{}:{},".format(key, self._state_variables[key])
+        output += "]"
+        output += "population variables:["
+        for key in self._population_parameters:
+            output += "{}:{},".format(key, self._population_parameters[key])
         output += "record_spikes:{}".format(self._record_spikes)
         output += "record_v:{}".format(self._record_v)
         output += "record_gsyn:{}".format(self._record_gsyn)

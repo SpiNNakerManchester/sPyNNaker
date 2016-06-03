@@ -77,14 +77,23 @@ class BagOfNeuronsVertex(
     """
 
     def __init__(
-            self, bag_of_neurons, label,
-            machine_time_step, time_scale_factor, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size,
-            model_class, constraints=None):
+            self, bag_of_neurons, label, model_class, constraints=None):
 
         AbstractPartitionableVertex.__init__(
             self, len(bag_of_neurons), label,
             model_class.model_based_max_atoms_per_core, constraints)
+
+        machine_time_step = bag_of_neurons[0].population_parameters[
+            'machine_time_step']
+        time_scale_factor = bag_of_neurons[0].population_parameters[
+            'time_scale_factor']
+        spikes_per_second = bag_of_neurons[0].population_parameters[
+            'spikes_per_second']
+        ring_buffer_sigma = bag_of_neurons[0].population_parameters[
+            'ring_buffer_sigma']
+        incoming_spike_buffer_size = bag_of_neurons[0].population_parameters[
+            'incoming_spike_buffer_size']
+
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step, time_scale_factor)
         AbstractSpikeRecordable.__init__(self)
@@ -116,10 +125,27 @@ class BagOfNeuronsVertex(
             self._additional_input = \
                 model_class.additional_input(bag_of_neurons)
 
+        # storage of atoms for usage during sets and records
+        self._atoms = bag_of_neurons
+
         # Set up for recording
         self._spike_recorder = SpikeRecorder(machine_time_step)
         self._v_recorder = VRecorder(machine_time_step)
         self._gsyn_recorder = GsynRecorder(machine_time_step)
+
+        # check the bag of neurons for recording states
+        for atom in bag_of_neurons:
+            if atom.record_spikes:
+                self._change_requires_mapping = not self._spike_recorder.record
+                self._spike_recorder.record = True
+            if atom.record_v:
+                self._change_requires_mapping = not self._v_recorder.record_v
+                self._v_recorder.record_v = True
+            if atom.record_gsyn:
+                self._change_requires_mapping = \
+                    not self._gsyn_recorder.record_gsyn
+                self._gsyn_recorder.record_gsyn = True
+
         self._spike_buffer_max_size = config.getint(
             "Buffers", "spike_buffer_size")
         self._v_buffer_max_size = config.getint(
@@ -148,6 +174,9 @@ class BagOfNeuronsVertex(
 
         # bool for if state has changed.
         self._change_requires_mapping = True
+
+    def set_mapping(self, vertex_mapping):
+        pass
 
     @property
     def requires_mapping(self):
@@ -514,53 +543,75 @@ class BagOfNeuronsVertex(
         return self._spike_recorder.record
 
     # @implements AbstractSpikeRecordable.set_recording_spikes
-    def set_recording_spikes(self):
+    def set_recording_spikes(self, to_file_flag, neuron_filter=None):
         self._change_requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 
+        # update bag of atoms accordingly
+        if neuron_filter is not None:
+            for (atom, filtered) in zip(self._atoms, neuron_filter):
+                if filtered:
+                    atom.record_spikes = True
+                    atom.record_spikes_to_file_flag = to_file_flag
+
     # @implements AbstractSpikeRecordable.get_spikes
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
+    def get_spikes(self, placements, graph_mapper, buffer_manager,
+                   start_atoms, end_atoms):
         return self._spike_recorder.get_spikes(
             self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            placements, graph_mapper, self)
+            placements, graph_mapper, self, start_atoms, end_atoms)
 
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
         return self._v_recorder.record_v
 
     # @implements AbstractVRecordable.set_recording_v
-    def set_recording_v(self):
+    def set_recording_v(self, to_file_flag, neuron_filter=None):
         self._change_requires_mapping = not self._v_recorder.record_v
         self._v_recorder.record_v = True
 
+        # update bag of atoms accordingly
+        if neuron_filter is not None:
+            for (atom, filtered) in zip(self._atoms, neuron_filter):
+                if filtered:
+                    atom.record_v = True
+                    atom.record_v_to_file_flag = to_file_flag
+
     # @implements AbstractVRecordable.get_v
     def get_v(self, n_machine_time_steps, placements, graph_mapper,
-              buffer_manager):
+              buffer_manager, start_atoms, end_atoms):
         return self._v_recorder.get_v(
             self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            placements, graph_mapper, self)
+            placements, graph_mapper, self, start_atoms, end_atoms)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
     def is_recording_gsyn(self):
         return self._gsyn_recorder.record_gsyn
 
     # @implements AbstractGSynRecordable.set_recording_gsyn
-    def set_recording_gsyn(self):
+    def set_recording_gsyn(self, to_file_flag, neuron_filter=None):
         self._change_requires_mapping = not self._gsyn_recorder.record_gsyn
         self._gsyn_recorder.record_gsyn = True
 
+        # update bag of atoms accordingly
+        if neuron_filter is not None:
+            for (atom, filtered) in zip(self._atoms, neuron_filter):
+                if filtered:
+                    atom.record_gsyn = True
+                    atom.record_gsyn_to_file_flag = to_file_flag
+
     # @implements AbstractGSynRecordable.get_gsyn
     def get_gsyn(self, n_machine_time_steps, placements, graph_mapper,
-                 buffer_manager):
+                 buffer_manager, start_atoms, end_atoms):
         return self._gsyn_recorder.get_gsyn(
             self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            placements, graph_mapper, self)
+            placements, graph_mapper, self, start_atoms, end_atoms)
 
     def initialize(self, variable, value):
         initialize_attr = getattr(

@@ -6,6 +6,7 @@ from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
 from data_specification.enums.data_type import DataType
 
 import numpy
+from spynnaker.pyNN.utilities import utility_calls
 
 
 class NeuronModelLeakyIntegrate(AbstractNeuronModel):
@@ -17,12 +18,17 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
 
         for atom in self._atoms:
             if atom.get('v_init') is None:
-                atom.set('v_init', atom.get('v_rest'))
+                atom.set_param('v_init', atom.get('v_rest'))
 
     @property
     def v_init(self):
-
         return self._v_init
+
+    def initialize_v(self, v_init):
+        v_init = utility_calls.convert_param_to_numpy(
+            v_init, self._n_neurons)
+        for atom, value in zip(self._atoms, v_init):
+            atom.set_param('v_init', value)
 
     @property
     def v_rest(self):
@@ -58,7 +64,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
 
     def _exp_tc(self, atom_id):
         return numpy.exp(float(
-            -self._atoms[atom_id].get("machine_time_step")) /
+            -self._atoms[atom_id].population_parameters["machine_time_step"]) /
             (1000.0 * self._atoms[atom_id].get("tau_m")))
 
     def get_n_neural_parameters(self):

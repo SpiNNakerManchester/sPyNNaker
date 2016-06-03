@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint import \
     PartitionerSameSizeAsVertexConstraint
@@ -13,6 +14,8 @@ from spynnaker.pyNN import ProjectionPartitionableEdge, DelayExtensionVertex, \
     DelayAfferentPartitionableEdge
 from spynnaker.pyNN.models.neural_projections.synapse_information import \
     SynapseInformation
+from spynnaker.pyNN.models.neuron.abstract_population_model import \
+    AbstractPopulationModel
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 from spynnaker.pyNN.utilities import constants
 
@@ -34,6 +37,7 @@ class Grouper(object):
         # build a partitionable graph
         partitionable_graph = PartitionableGraph("grouped_application_graph")
         pop_to_vertex_mapping = dict()
+        vertex_to_pop_mapping = OrderedDict()
 
         # for each model type build a monolithic vertex for them all
         for model_type in population_atom_mapping.keys():
@@ -41,7 +45,7 @@ class Grouper(object):
             while len(local_atom_mapping.keys()) != 0:
                 self._handle_model_type(
                     local_atom_mapping, model_type, partitionable_graph,
-                    pop_to_vertex_mapping)
+                    pop_to_vertex_mapping, vertex_to_pop_mapping)
 
         # handle projections
         self.handle_projections(
@@ -49,11 +53,22 @@ class Grouper(object):
             user_max_delay, partitionable_graph, using_virtual_board)
 
         return {'partitionable_graph': partitionable_graph,
-                'pop_to_vertex_mapping': pop_to_vertex_mapping}
+                'pop_to_vertex_mapping': pop_to_vertex_mapping,
+                'vertex_to_pop_mapping': vertex_to_pop_mapping}
 
     def handle_projections(
             self, projections, population_atom_mapping, pop_to_vertex_mapping,
             user_max_delay, partitionable_graph, using_virtual_board):
+        """
+
+        :param projections:
+        :param population_atom_mapping:
+        :param pop_to_vertex_mapping:
+        :param user_max_delay:
+        :param partitionable_graph:
+        :param using_virtual_board:
+        :return:
+        """
         for projection in projections:
             # get populations from the projection
             presynaptic_population = projection._presynaptic_population
@@ -89,6 +104,20 @@ class Grouper(object):
             presynaptic_population, population_atom_mapping,
             synapse_information, projection, user_max_delay,
             partitionable_graph, using_virtual_board):
+        """
+
+        :param post_pop_vertex:
+        :param pre_pop_vertex:
+        :param postsynaptic_population:
+        :param presynaptic_population:
+        :param population_atom_mapping:
+        :param synapse_information:
+        :param projection:
+        :param user_max_delay:
+        :param partitionable_graph:
+        :param using_virtual_board:
+        :return:
+        """
 
         # check if all delays requested can fit into the natively supported
         # delays in the models
@@ -114,11 +143,13 @@ class Grouper(object):
                     max_delay))
 
         # all atoms from a given pop have the same synapse dynamics,
-        #  machine_time_step, and time_scale_factor so get first atom's
+        #  machine_time_step, and time_scale_factor so get from population
         pop_atoms = population_atom_mapping[
             postsynaptic_population._class][postsynaptic_population]
-        machine_time_step = pop_atoms[0].get("machine_time_step")
-        time_scale_factor = pop_atoms[0].get("time_scale_factor")
+        machine_time_step = \
+            pop_atoms[0].population_parameters["machine_time_step"]
+        time_scale_factor = \
+            pop_atoms[0].population_parameters["time_scale_factor"]
 
         # verify max delay is less than the max delay entered by the user
         # during setup.
@@ -139,6 +170,22 @@ class Grouper(object):
             post_vertex_max_supported_delay_ms, presynaptic_population,
             postsynaptic_population, using_virtual_board, machine_time_step,
             time_scale_factor):
+        """
+
+        :param post_pop_vertex:
+        :param pre_pop_vertex:
+        :param projection:
+        :param synapse_information:
+        :param partitionable_graph:
+        :param max_delay:
+        :param post_vertex_max_supported_delay_ms:
+        :param presynaptic_population:
+        :param postsynaptic_population:
+        :param using_virtual_board:
+        :param machine_time_step:
+        :param time_scale_factor:
+        :return:
+        """
 
         # Find out if there is an existing edge between the populations
         edge_to_merge = self._find_existing_edge(
@@ -250,11 +297,15 @@ class Grouper(object):
         """
 
         # all atoms from a given pop have the same synapse dynamics
-        #  and machine_time_step, so get first atom's
+        #  so get first atom's
         pop_atoms = population_atom_mapping[
             postsynaptic_population._class][postsynaptic_population]
         synapse_dynamics_stdp = pop_atoms[0].synapse_dynamics
-        machine_time_step = pop_atoms[0].get("machine_time_step")
+
+        # all atoms from a given pop have the same machine time step so
+        # get from the population.
+        machine_time_step = \
+            pop_atoms[0].population_parameters["machine_time_step"]
 
         # Set and store information for future processing
         synapse_information = SynapseInformation(
@@ -310,7 +361,7 @@ class Grouper(object):
 
     def _handle_model_type(
             self, things_containing_model_type, model_type,
-            partitionable_graph, pop_to_vertex_mapping):
+            partitionable_graph, pop_to_vertex_mapping, vertex_to_pop_mapping):
         """
 
         :param things_containing_model_type:
@@ -326,7 +377,7 @@ class Grouper(object):
         located = False
         has_constraints = False
         constraints = list()
-        population_level_parameters = None
+        fixed_parameters = None
         internal_pop_to_atom_mapping = dict()
 
         # accumulate all atoms from those populations of this model type
@@ -335,11 +386,11 @@ class Grouper(object):
         for pop_pop_view_assembly in things_containing_model_type:
 
             # test if the population can be added to the current group.
-            population_level_parameters, located, has_constraints, \
-                constraints, added = self._check_population_for_addition(
+            located, has_constraints, constraints, added, fixed_parameters = \
+                self._check_population_for_addition(
                     pop_pop_view_assembly, located,
-                    population_level_parameters, has_constraints,
-                    constraints)
+                    things_containing_model_type,
+                    has_constraints, constraints, fixed_parameters)
 
             # if added, add to pops to remove from this list.
             if added:
@@ -361,10 +412,12 @@ class Grouper(object):
             del things_containing_model_type[pop]
 
         # build inputs for the vertex
-        inputs = dict(population_level_parameters)
+        inputs = dict()
         inputs['label'] = label
         inputs['constraints'] = constraints
-        inputs['model_class'] = model_type
+
+        if issubclass(model_type, AbstractPopulationModel):
+            inputs['model_class'] = model_type
 
         # create vertex and add to partitionable graph
         vertex = model_type.create_vertex(atoms, inputs)
@@ -372,53 +425,64 @@ class Grouper(object):
 
         # update pop to vertex mapping
         for pop in added_pops:
-            pop_to_vertex_mapping[pop] = dict()
             pop_to_vertex_mapping[pop] = (
                 vertex,
-                internal_pop_to_atom_mapping[pop_pop_view_assembly][0],
-                internal_pop_to_atom_mapping[pop_pop_view_assembly][1])
+                internal_pop_to_atom_mapping[pop][0],
+                internal_pop_to_atom_mapping[pop][1])
 
             pop._mapped_vertices = pop_to_vertex_mapping[pop]
 
+        # update vertex to pop mapping
+        vertex_to_pop_mapping[vertex] = list()
+        for pop in added_pops:
+            vertex_to_pop_mapping[vertex].append(
+                (pop, internal_pop_to_atom_mapping[pop][0],
+                 internal_pop_to_atom_mapping[pop][1]))
+
     @staticmethod
     def _check_population_for_addition(
-            pop_pop_view_assembly, located, population_level_parameters,
-            has_constraints, constraints):
+            pop_pop_view_assembly, located, things_containing_model_type,
+            has_constraints, constraints, fixed_parameters):
         """
 
         :param pop_pop_view_assembly:
         :param located:
-        :param population_level_parameters:
         :param has_constraints:
         :param constraints:
+        :param fixed_parameters:
         :return:
         """
 
         added = False
         # if first population, record data needed for comparison
         if not located:
-            population_level_parameters = \
-                pop_pop_view_assembly.population_parameters()
             if len(pop_pop_view_assembly.constraints) != 0:
                 has_constraints = True
                 constraints = pop_pop_view_assembly.constraints
+
+            fixed_parameters = \
+                things_containing_model_type[pop_pop_view_assembly][0].\
+                population_parameters
+
             located = True
             added = True
 
-        else: # not first population, therefore compare.
-            correct_pop_level_parameters = True
-            for param in population_level_parameters:
-                first_param = population_level_parameters[param]
-                second_param = \
-                    pop_pop_view_assembly.population_parameters()[param]
-                if first_param != second_param:
-                    correct_pop_level_parameters = False
-
+        else:  # not first population, therefore compare
             # verify the pop is merge able
-            if (correct_pop_level_parameters and not has_constraints and
+            if (not has_constraints and
                     len(pop_pop_view_assembly.constraints) == 0):
+
+                # other fixed parameter extraction
+                other_fixed_parameters = \
+                    things_containing_model_type[pop_pop_view_assembly][0].\
+                    population_parameters
+
                 added = True
+                for parameter_name in fixed_parameters:
+                    if (other_fixed_parameters[parameter_name] !=
+                            fixed_parameters[parameter_name]):
+                        added = False
 
         # return data items
-        return population_level_parameters, located, has_constraints, \
-            constraints, added
+        return located, has_constraints, \
+            constraints, added, fixed_parameters

@@ -16,7 +16,7 @@ class IFCondExp(AbstractPopulationModel):
         conductance input
     """
 
-    _model_based_max_atoms_per_core = 255
+    model_based_max_atoms_per_core = 255
 
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'e_rev_E': 0.0, 'e_rev_I': -70.0,
@@ -36,4 +36,4 @@ class IFCondExp(AbstractPopulationModel):
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        IFCondExp._model_based_max_atoms_per_core = new_value
+        IFCondExp.model_based_max_atoms_per_core = new_value

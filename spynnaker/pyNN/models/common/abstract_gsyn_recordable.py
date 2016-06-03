@@ -17,13 +17,13 @@ class AbstractGSynRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_gsyn(self):
+    def set_recording_gsyn(self, to_file_flag, filter=None):
         """ Sets gsyn to being recorded
         """
 
     @abstractmethod
     def get_gsyn(self, n_machine_time_steps, placements, graph_mapper,
-                 buffer_manager):
+                 buffer_manager, start_atoms, end_atoms):
         """ Get the recorded gsyn from the object
 
         :param n_machine_time_steps: the number of timer ticks that will\

@@ -41,7 +41,8 @@ class GsynRecorder(object):
         return n_neurons * 8
 
     def get_gsyn(self, label, buffer_manager, region, state_region,
-                 placements, graph_mapper, partitionable_vertex):
+                 placements, graph_mapper, partitionable_vertex,
+                 start_atoms, end_atoms):
 
         ms_per_tick = self._machine_time_step / 1000.0
 
@@ -81,6 +82,23 @@ class GsynRecorder(object):
                 len(record_time)).reshape((-1, vertex_slice.n_atoms))
             record_gsyn = (split_record[2] / 32767.0).reshape(
                 [-1, vertex_slice.n_atoms, 2])
+
+            # generate mask for neurons needed for the get level
+            # NOTE: seriously needs these brackets due to stupid numpy not
+            #  handling the & properly. All masks should have this bracketing
+            # stuff.
+            mask = ((record_ids >= start_atoms) & (record_ids <= end_atoms))
+
+            # filter and reshape off neurons not needed for the get level
+            # and allow dstack to work correctly with gsyn which has 2 element
+            # array
+            record_ids = record_ids[mask].reshape((-1, vertex_slice.n_atoms))
+            record_gsyn = record_gsyn[mask].reshape(
+                [-1, vertex_slice.n_atoms, 2])
+            record_time = record_time[mask].reshape((-1, vertex_slice.n_atoms))
+
+            # shift ids to align them with the population requested
+            record_ids = record_ids - start_atoms
 
             part_data = numpy.dstack([record_ids, record_time, record_gsyn])
             part_data = numpy.reshape(part_data, [-1, 4])

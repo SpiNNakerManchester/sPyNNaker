@@ -297,6 +297,15 @@ def PopulationView(parent, selector, label=None):
     builds a pop view object
     :param parent: the parent population to link to
     :param selector: the selector of which neurons to contain
+
+    selector - a slice or numpy mask array. The mask array should either be
+           a boolean array of the same size as the parent, or an
+           integer array containing cell indices, i.e. if p.size == 5,
+             !PopulationView(p, array([False, False, True, False, True]))
+             !PopulationView(p, array([2,4]))
+             !PopulationView(p, slice(2,5,2))
+           will all create the same view.
+
     :param label: label of this pop view
     :return: a populationView object
     """

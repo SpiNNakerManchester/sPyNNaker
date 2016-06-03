@@ -5,8 +5,6 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
 from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type \
     import AbstractSynapseType
 
-from spynnaker.pyNN.utilities import utility_calls
-
 from data_specification.enums.data_type import DataType
 
 
@@ -58,11 +56,14 @@ class SynapseTypeDualExponential(AbstractSynapseType):
 
     def get_synapse_type_parameters(self, atom_id):
         e_decay, e_init = get_exponential_decay_and_init(
-            self._atoms[atom_id].get("tau_syn_E"), self._machine_time_step)
+            self._atoms[atom_id].get("tau_syn_E"),
+            self._atoms[atom_id].population_parameters["machine_time_step"])
         e_decay2, e_init2 = get_exponential_decay_and_init(
-            self._atoms[atom_id].get("tau_syn_E2"), self._machine_time_step)
+            self._atoms[atom_id].get("tau_syn_E2"),
+            self._atoms[atom_id].population_parameters["machine_time_step"])
         i_decay, i_init = get_exponential_decay_and_init(
-            self._atoms[atom_id].get("tau_syn_I"), self._machine_time_step)
+            self._atoms[atom_id].get("tau_syn_I"),
+            self._atoms[atom_id].population_parameters["machine_time_step"])
 
         return [
             NeuronParameter(e_decay, DataType.UINT32),

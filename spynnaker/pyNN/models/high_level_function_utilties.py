@@ -10,7 +10,7 @@ def translate_filter_to_ints(neuron_filter, size):
         :param size:
         :return: None
         """
-        translate_filter(neuron_filter, size, False)
+        return translate_filter(neuron_filter, size, False)
 
 
 def translate_filter_to_boolean_format(neuron_filter, size):
@@ -20,7 +20,7 @@ def translate_filter_to_boolean_format(neuron_filter, size):
     :param size:
     :return:
     """
-    translate_filter(neuron_filter, size, True)
+    return translate_filter(neuron_filter, size, True)
 
 
 def translate_filter(neuron_filter, size, boolean_format):
@@ -40,6 +40,15 @@ def translate_filter(neuron_filter, size, boolean_format):
         else:
             new_filter = _convert_slice_into_index_boolean_list(
                 neuron_filter, size)
+
+    elif isinstance(neuron_filter, int):
+        if boolean_format:
+            new_filter = list()
+            for _ in range(0, size):
+                    new_filter.append(False)
+            new_filter[neuron_filter] = True
+        else:
+            new_filter = [neuron_filter]
 
     # check for bool based filter
     elif len(neuron_filter) != 0:
@@ -140,3 +149,58 @@ def initialize_parameters(variable, value, atoms, size):
     # set params
     for atom_variable, pop_view_atom in zip(variables_for_atoms, atoms):
         pop_view_atom.initialize(variable, atom_variable)
+
+
+def _set_parameters(variable, value, atoms):
+    """
+
+    :param variable: the variable to set
+    :param value: the value to set the parameter to
+    :param atoms:  the atoms to set
+    :param size: the number of neurons that need to be set.
+    :return: None
+    """
+    # expand variables
+    variables_for_atoms = \
+        utility_calls.convert_param_to_numpy(value, len(atoms))
+
+    # set params
+    for atom_variable, pop_view_atom in zip(variables_for_atoms, atoms):
+        pop_view_atom.set_param(variable, atom_variable)
+
+
+def set_parameters(param, val, atoms, mapped_vertices):
+    """
+    private method for :
+    Set one or more parameters for every cell in the population.
+
+    param can be a dict, in which case value should not be supplied, or a
+    string giving the parameter name, in which case value is the parameter
+    value. value can be a numeric value, or list of such
+    (e.g. for setting spike times)::
+
+      p.set("tau_m", 20.0).
+      p.set({'tau_m':20, 'v_rest':-65})
+    :param param: the parameter to set
+    :param val: the value of the parameter to set.
+    """
+    if type(param) is str:
+        if val is None:
+            raise Exception("Error: No value given in set() function for "
+                            "population parameter. Exiting.")
+        _set_parameters(param, val, atoms)
+
+    elif type(param) is not dict:
+            raise Exception("Error: invalid parameter type for "
+                            "set() function for population parameter."
+                            " Exiting.")
+
+    elif mapped_vertices is not None:
+        (vertex, _, _) = mapped_vertices
+        for (key, value) in param.iteritems():
+            vertex.set_value(key, value)
+    else:
+        # Add a dictionary-structured set of new parameters to the
+        # current set: get atoms in pop view
+        for (key, value) in param.iteritems():
+            _set_parameters(key, value, atoms)

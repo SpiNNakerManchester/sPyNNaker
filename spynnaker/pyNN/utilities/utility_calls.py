@@ -29,7 +29,7 @@ def check_directory_exists_and_create_if_not(filename):
         os.makedirs(directory)
 
 
-def convert_param_to_numpy(param, no_atoms):
+def convert_param_to_numpy(param, no_atoms, is_array=False):
     """
     converts parameters into numpy arrays as needed
     :param param: the param to convert
@@ -46,12 +46,30 @@ def convert_param_to_numpy(param, no_atoms):
         else:
             return numpy.array([param.next(n=no_atoms)], dtype="float")
     elif not hasattr(param, '__iter__'):
-        return numpy.array([param] * no_atoms, dtype="float")
-    elif len(param) != no_atoms:
-        raise exceptions.ConfigurationException("The number of params does"
-                                                " not equal with the number"
-                                                " of atoms in the vertex ")
+        if param is None:
+            return [None] * no_atoms
+        else:
+            return numpy.array([param] * no_atoms, dtype="float")
+    elif is_array:
+        if hasattr(param[0], '__len__'):
+            if len(param) != no_atoms:
+                raise exceptions.ConfigurationException(
+                    "The number of params does not equal with the number of"
+                    " atoms in the vertex ")
+            # converts the parameter into a numpy array of floats.
+            return [numpy.array(arr, dtype="float") for arr in param]
+        else:
+            # need to go from [1,2,3] to [[1,2,3],[1,2,3],[1,2,3]] for n atoms
+            # worth. This is done through the use of numpy.tile which takes
+            # the array converted to float and duplicated n_atoms time in the
+            # virtual dimension.
+            return numpy.tile(numpy.array(param, dtype="float"), (no_atoms, 1))
+
     else:
+        if len(param) != no_atoms:
+            raise exceptions.ConfigurationException(
+                "The number of params does not equal with the number "
+                "of atoms in the vertex ")
         return numpy.array(param, dtype="float")
 
 
@@ -60,7 +78,6 @@ def write_parameters_per_neuron(spec, vertex_slice, parameter_call):
         params = parameter_call(atom)
         for param in params:
             value = param.get_value()
-
             spec.write_value(data=value,
                              data_type=param.get_dataspec_datatype())
 

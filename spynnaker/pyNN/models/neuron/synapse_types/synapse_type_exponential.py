@@ -59,9 +59,11 @@ class SynapseTypeExponential(AbstractSynapseType):
 
     def get_synapse_type_parameters(self, atom_id):
         e_decay, e_init = get_exponential_decay_and_init(
-            self._atoms[atom_id].get("tau_syn_E"), self._machine_time_step)
+            self._atoms[atom_id].get("tau_syn_E"),
+            self._atoms[atom_id].population_parameters["machine_time_step"])
         i_decay, i_init = get_exponential_decay_and_init(
-            self._atoms[atom_id].get("tau_syn_I"), self._machine_time_step)
+            self._atoms[atom_id].get("tau_syn_I"),
+            self._atoms[atom_id].population_parameters["machine_time_step"])
 
         return [
             NeuronParameter(e_decay, DataType.UINT32),

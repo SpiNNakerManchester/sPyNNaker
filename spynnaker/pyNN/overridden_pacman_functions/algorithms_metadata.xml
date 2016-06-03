@@ -29,6 +29,10 @@
                 <param_name>pop_to_vertex_mapping</param_name>
                 <param_type>PopToVertexMapping</param_type>
             </parameter>
+            <parameter>
+                <param_name>vertex_to_pop_mapping</param_name>
+                <param_type>VertexToPopMapping</param_type>
+            </parameter>
         </produces_outputs>
     </algorithm>
     <algorithm name="GraphEdgeFilter">

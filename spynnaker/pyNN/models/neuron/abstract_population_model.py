@@ -28,9 +28,17 @@ class AbstractPopulationModel(
     model_variables = {'spikes_per_second', 'ring_buffer_sigma',
                        'incoming_spike_buffer_size', 'machine_time_step',
                        'time_scale_factor'}
+    is_array_parameters = {}
+    fixed_parameters = {}
 
     @staticmethod
     def create_vertex(bag_of_neurons, population_parameters):
+        """
+
+        :param bag_of_neurons:
+        :param population_parameters:
+        :return:
+        """
         params = dict(population_parameters)
         params['bag_of_neurons'] = bag_of_neurons
         vertex = BagOfNeuronsVertex(**params)

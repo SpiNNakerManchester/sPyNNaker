@@ -30,7 +30,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
     def _tau_refrac_timesteps(self, atom_id):
         return numpy.ceil(
             self._atoms[atom_id].get("tau_refrac") /
-            (self._atoms[atom_id].get("machine_time_step") / 1000.0))
+            (self._atoms[atom_id].population_parameters["machine_time_step"]
+             / 1000.0))
 
     def get_neural_parameters(self, atom_id):
         params = NeuronModelLeakyIntegrate.get_neural_parameters(self, atom_id)
