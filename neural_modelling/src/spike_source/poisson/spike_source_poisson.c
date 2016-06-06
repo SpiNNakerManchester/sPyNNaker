@@ -229,7 +229,7 @@ static bool initialise_recording(){
 
     bool success = recording_initialize(
         n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, 2, &recording_flags);
+        recording_flags_from_system_conf, state_region, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
     return success;
 }
@@ -240,7 +240,7 @@ static bool initialise_recording(){
 //!            period should be stored during the function.
 //! \return boolean of True if it successfully read all the regions and set up
 //!         all its internal data structures. Otherwise returns False
-static bool initialize(uint32_t *timer_period) {
+static bool initialize(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -255,7 +255,8 @@ static bool initialize(uint32_t *timer_period) {
     address_t system_region = data_specification_get_region(
             SYSTEM, address);
     if (!simulation_read_timing_details(
-            system_region, APPLICATION_NAME_HASH, timer_period)) {
+            system_region, APPLICATION_NAME_HASH, timer_period,
+            simulation_sdp_port)) {
         return false;
     }
 
@@ -292,7 +293,7 @@ void resume_callback() {
 
     recording_initialize(
         n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, 2,
+        recording_flags_from_system_conf, state_region,
         &recording_flags);
 }
 
@@ -426,7 +427,8 @@ void c_main(void) {
 
     // Load DTCM data
     uint32_t timer_period;
-    if (!initialize(&timer_period)) {
+    uint32_t simulation_sdp_port;
+    if (!initialize(&timer_period, &simulation_sdp_port)) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
     }
@@ -448,7 +450,7 @@ void c_main(void) {
 
     // Set up callback listening to SDP messages
     simulation_register_simulation_sdp_callback(
-        &simulation_ticks, &infinite_run, SDP);
+        &simulation_ticks, &infinite_run, SDP, simulation_sdp_port);
 
     // set up provenance registration
     simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
