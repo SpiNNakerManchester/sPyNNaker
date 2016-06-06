@@ -8,7 +8,7 @@ from pacman.model.partitionable_graph.partitionable_graph import \
     PartitionableGraph
 
 from spinn_front_end_common.utilities import exceptions
-
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN import ProjectionPartitionableEdge, DelayExtensionVertex, \
     DelayAfferentPartitionableEdge
@@ -39,6 +39,10 @@ class Grouper(object):
         pop_to_vertex_mapping = dict()
         vertex_to_pop_mapping = OrderedDict()
 
+        progress_bar = ProgressBar(
+            len(population_atom_mapping.keys()),
+            "grouping atoms together to create vertices")
+
         # for each model type build a monolithic vertex for them all
         for model_type in population_atom_mapping.keys():
             local_atom_mapping = dict(population_atom_mapping[model_type])
@@ -46,6 +50,8 @@ class Grouper(object):
                 self._handle_model_type(
                     local_atom_mapping, model_type, partitionable_graph,
                     pop_to_vertex_mapping, vertex_to_pop_mapping)
+            progress_bar.update()
+        progress_bar.end()
 
         # handle projections
         self.handle_projections(
@@ -69,6 +75,11 @@ class Grouper(object):
         :param using_virtual_board:
         :return:
         """
+        delay_to_vertex_mapping = dict()
+
+        progress_bar = ProgressBar(
+            len(projections), "Updating graph with projection edges")
+
         for projection in projections:
             # get populations from the projection
             presynaptic_population = projection._presynaptic_population
@@ -97,13 +108,16 @@ class Grouper(object):
                 post_pop_vertex, pre_pop_vertex, postsynaptic_population,
                 presynaptic_population, population_atom_mapping,
                 synapse_information, projection, user_max_delay,
-                partitionable_graph, using_virtual_board)
+                partitionable_graph, using_virtual_board,
+                delay_to_vertex_mapping)
+            progress_bar.update()
+        progress_bar.end()
 
     def _sort_out_delays(
             self, post_pop_vertex, pre_pop_vertex, postsynaptic_population,
             presynaptic_population, population_atom_mapping,
             synapse_information, projection, user_max_delay,
-            partitionable_graph, using_virtual_board):
+            partitionable_graph, using_virtual_board, delay_to_vertex_mapping):
         """
 
         :param post_pop_vertex:
@@ -116,6 +130,7 @@ class Grouper(object):
         :param user_max_delay:
         :param partitionable_graph:
         :param using_virtual_board:
+        :param delay_to_vertex_mapping:
         :return:
         """
 
@@ -162,14 +177,15 @@ class Grouper(object):
             post_pop_vertex, pre_pop_vertex, projection, synapse_information,
             partitionable_graph, max_delay, post_vertex_max_supported_delay_ms,
             presynaptic_population, postsynaptic_population,
-            using_virtual_board, machine_time_step, time_scale_factor)
+            using_virtual_board, machine_time_step, time_scale_factor,
+            delay_to_vertex_mapping)
 
     def _handle_edges(
             self, post_pop_vertex, pre_pop_vertex, projection,
             synapse_information, partitionable_graph, max_delay,
             post_vertex_max_supported_delay_ms, presynaptic_population,
             postsynaptic_population, using_virtual_board, machine_time_step,
-            time_scale_factor):
+            time_scale_factor, delay_to_vertex_mapping):
         """
 
         :param post_pop_vertex:
@@ -216,7 +232,7 @@ class Grouper(object):
                 presynaptic_population, pre_pop_vertex, post_pop_vertex,
                 max_delay, post_vertex_max_supported_delay_ms,
                 machine_time_step, time_scale_factor, partitionable_graph,
-                projection)
+                projection, delay_to_vertex_mapping)
             projection_edge.delay_edge = delay_edge
 
         # If there is a virtual board, we need to hold the data in case the
@@ -238,12 +254,15 @@ class Grouper(object):
             self, presynaptic_population,
             pre_pop_vertex, post_pop_vertex, max_delay_for_projection,
             max_delay_per_neuron, machine_time_step, timescale_factor,
-            partitionable_graph, projection):
+            partitionable_graph, projection, delay_to_vertex_mapping):
         """ Instantiate delay extension component
         """
 
         # Create a delay extension vertex to do the extra delays
-        delay_vertex = presynaptic_population._internal_delay_vertex
+        delay_vertex = None
+        if pre_pop_vertex in delay_to_vertex_mapping:
+            delay_vertex = delay_to_vertex_mapping[pre_pop_vertex]
+
         if delay_vertex is None:
 
             # build a delay vertex
@@ -251,7 +270,11 @@ class Grouper(object):
             delay_vertex = DelayExtensionVertex(
                 pre_pop_vertex.n_atoms, max_delay_per_neuron, pre_pop_vertex,
                 machine_time_step, timescale_factor, label=delay_name)
-            presynaptic_population._internal_delay_vertex = delay_vertex
+
+            # store in map for other projections
+            delay_to_vertex_mapping[pre_pop_vertex] = delay_vertex
+
+            # add partitioner constraint to the pre pop vertex
             pre_pop_vertex.add_constraint(
                 PartitionerSameSizeAsVertexConstraint(delay_vertex))
             partitionable_graph.add_vertex(delay_vertex)

@@ -1345,7 +1345,6 @@ class Population(object):
         self._class = cellclass
         self._mapped_vertices = None
         self._spinnaker = spinnaker
-        self._delay_vertex = None
 
         # initialise common stuff
         self._size = size
@@ -2416,15 +2415,3 @@ class Population(object):
             self.print_gsyn("gsyn")
         if record_v:
             self.print_v("v")
-
-    @property
-    def _get_vertex(self):
-        raise NotImplementedError
-
-    @property
-    def _internal_delay_vertex(self):
-        return self._delay_vertex
-
-    @_internal_delay_vertex.setter
-    def _internal_delay_vertex(self, delay_vertex):
-        self._delay_vertex = delay_vertex

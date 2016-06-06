@@ -4,6 +4,7 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 
 # common front end imports
+from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
 from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
@@ -409,8 +410,11 @@ class Spinnaker(SpinnakerMainInterface):
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
 
         # run grouper again if changes requires mapping
-        if self._detect_if_graph_has_changed():
+        if self._detect_if_graph_has_changed(reset_flags=False):
             self._execute_grouper_algorithm()
+            self._partitioned_graph = PartitionedGraph(
+                label=self._partitioned_graph.label)
+            self._graph_mapper = None
 
         # run basic spinnaker
         SpinnakerMainInterface.run(self, run_time)
