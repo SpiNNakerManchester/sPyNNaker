@@ -308,7 +308,7 @@ void resume_callback() {
 void _send_spike(uint spike_key) {
 
     // Wait until the expected time to send
-    while (tc[T1_COUNT] < expected_time) {
+    while (tc[T1_COUNT] > expected_time) {
 
         // Do Nothing
     }
