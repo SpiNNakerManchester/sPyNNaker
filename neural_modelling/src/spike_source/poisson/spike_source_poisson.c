@@ -331,7 +331,7 @@ void _send_spike(uint spike_key) {
 void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
     use(unused);
-    expected_time = tc[T1_COUNT];
+    expected_time = tc[T1_COUNT] - time_between_spikes;
     time++;
 
     log_debug("Timer tick %u", time);
