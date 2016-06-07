@@ -1,4 +1,3 @@
-from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 from pacman.model.constraints.key_allocator_constraints\
@@ -15,7 +14,7 @@ from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.spike_source\
     .spike_source_poisson_partitioned_vertex \
     import SpikeSourcePoissonPartitionedVertex
-
+from spynnaker.pyNN.utilities import utility_calls
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
@@ -36,6 +35,7 @@ import math
 import numpy
 import logging
 import random
+import scipy.stats
 
 logger = logging.getLogger(__name__)
 
@@ -275,8 +275,16 @@ class SpikeSourcePoisson(
         spec.write_value(random.randint(
             0, SpikeSourcePoisson._n_poisson_subvertices))
 
-        # Write the number of us to wait between sending spikes
-        # total_mean_rate = numpy
+        # Write the number of microseconds between sending spikes
+        total_mean_rate = numpy.sum(self._rate)
+        max_spikes = scipy.stats.poisson.ppf(
+            1.0 - (1.0 / total_mean_rate), total_mean_rate)
+        spikes_per_timestep = (
+            max_spikes / (1000000.0 / self._machine_time_step))
+        time_between_spikes = (
+            (self._machine_time_step * self._timescale_factor) /
+            (spikes_per_timestep * 2.0))
+        spec.write_value(data=int(time_between_spikes))
 
         # Write the random seed (4 words), generated randomly!
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
@@ -296,7 +304,7 @@ class SpikeSourcePoisson(
             rate_val = self._rate[atom_id]
             start_val = self._start[atom_id]
             end_val = None
-            if self._duration is not None:
+            if self._duration[atom_id] is not None:
                 end_val = self._duration[atom_id] + start_val
 
             # Decide if it is a fast or slow source and
@@ -330,7 +338,7 @@ class SpikeSourcePoisson(
                                 (rate_val * self._machine_time_step))
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = 0xFFFFFFFF
-            if end_val is not None:
+            if end_val is not None and not math.isnan(end_val):
                 end_scaled = int(end_val * 1000.0 / self._machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
@@ -354,7 +362,7 @@ class SpikeSourcePoisson(
                 exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
             start_scaled = int(start_val * 1000.0 / self._machine_time_step)
             end_scaled = 0xFFFFFFFF
-            if end_val is not None:
+            if end_val is not None and not math.isnan(end_val):
                 end_scaled = int(end_val * 1000.0 / self._machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)

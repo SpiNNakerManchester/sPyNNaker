@@ -55,7 +55,8 @@ typedef enum callback_priorities{
 //! what each position in the poisson parameter region actually represent in
 //! terms of data (each is a word)
 typedef enum poisson_region_parameters{
-    HAS_KEY, TRANSMISSION_KEY, RANDOM_BACKOFF, PARAMETER_SEED_START_POSITION,
+    HAS_KEY, TRANSMISSION_KEY, RANDOM_BACKOFF, TIME_BETWEEN_SPIKES,
+    PARAMETER_SEED_START_POSITION,
 } poisson_region_parameters;
 
 // Globals
@@ -88,6 +89,12 @@ static uint32_t key;
 //! An amount of microseconds to back off before starting the timer, in an
 //! attempt to avoid overloading the network
 static uint32_t random_backoff_us;
+
+//! The number of clock ticks between sending each spike
+static uint32_t time_between_spikes;
+
+//! The expected current clock tick of timer_1
+static uint32_t expected_time;
 
 //! keeps track of which types of recording should be done to this model.
 static uint32_t recording_flags = 0;
@@ -142,6 +149,7 @@ bool read_poisson_parameters(address_t address) {
     has_been_given_key = address[HAS_KEY];
     key = address[TRANSMISSION_KEY];
     random_backoff_us = address[RANDOM_BACKOFF];
+    time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
     log_info("\t key = %08x, back off = %u", key, random_backoff_us);
 
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
@@ -297,6 +305,22 @@ void resume_callback() {
         &recording_flags);
 }
 
+void _send_spike(uint spike_key) {
+
+    // Wait until the expected time to send
+    while (tc[T1_COUNT] < expected_time) {
+
+        // Do Nothing
+    }
+    expected_time -= time_between_spikes;
+
+    // Send the spike
+    log_debug("Sending spike packet %x at %d\n", spike_key, time);
+    while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
+        spin1_delay_us(1);
+    }
+}
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
 //!            executed since start of simulation
@@ -307,6 +331,7 @@ void resume_callback() {
 void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
     use(unused);
+    expected_time = tc[T1_COUNT];
     time++;
 
     log_debug("Timer tick %u", time);
@@ -354,13 +379,7 @@ void timer_callback(uint timer_count, uint unused) {
                 if (has_been_given_key) {
 
                     // Send package
-                    while (!spin1_send_mc_packet(
-                            key | slow_spike_source->neuron_id, 0,
-                            NO_PAYLOAD)) {
-                        spin1_delay_us(1);
-                    }
-                    log_debug("Sending spike packet %x at %d\n",
-                        key | slow_spike_source->neuron_id, time);
+                    _send_spike(key | slow_spike_source->neuron_id);
                 }
 
                 // Update time to spike
@@ -394,17 +413,14 @@ void timer_callback(uint timer_count, uint unused) {
                 out_spikes_set_spike(fast_spike_source->neuron_id);
 
                 // Send spikes
-                const uint32_t spike_key = key | fast_spike_source->neuron_id;
-                for (uint32_t s = num_spikes; s > 0; s--) {
 
-                    // if no key has been given, do not send spike to fabric.
-                    if (has_been_given_key){
-                        log_debug("Sending spike packet %x at %d\n",
-                                  spike_key, time);
-                        while (!spin1_send_mc_packet(spike_key, 0,
-                                                     NO_PAYLOAD)) {
-                            spin1_delay_us(1);
-                        }
+                if (has_been_given_key) {
+                    const uint32_t spike_key =
+                        key | fast_spike_source->neuron_id;
+                    for (uint32_t s = num_spikes; s > 0; s--) {
+
+                        // if no key has been given, do not send spike to fabric.
+                        _send_spike(spike_key);
                     }
                 }
             }
