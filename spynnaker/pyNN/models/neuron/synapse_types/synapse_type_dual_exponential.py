@@ -17,24 +17,15 @@ class SynapseTypeDualExponential(AbstractSynapseType):
 
     @property
     def tau_syn_E(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("tau_syn_E"))
-        return data
+        return self._get_param("tau_syn_E", self._atoms)
 
     @property
     def tau_syn_E2(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("tau_syn_E2"))
-        return data
+        return self._get_param("tau_syn_E2", self._atoms)
 
     @property
     def tau_syn_I(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("tau_syn_I"))
-        return data
+        return self._get_param("tau_syn_I", self._atoms)
 
     def get_n_synapse_types(self):
         return 3

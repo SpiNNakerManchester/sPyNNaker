@@ -1,12 +1,17 @@
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
+from spynnaker.pyNN.models.common.bag_of_neuron_settable import \
+    BagOfNeuronSettable
 
 
 @add_metaclass(ABCMeta)
-class AbstractThresholdType(object):
+class AbstractThresholdType(BagOfNeuronSettable):
     """ Represents types of threshold for a neuron (e.g. stochastic)
     """
+
+    def __init__(self):
+        BagOfNeuronSettable.__init__(self)
 
     @abstractmethod
     def get_n_threshold_parameters(self):

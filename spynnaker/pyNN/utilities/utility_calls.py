@@ -1,20 +1,21 @@
 """
 utility class containing simple helper methods
 """
-from data_specification.exceptions import \
-    DataSpecificationParameterOutOfBoundsException
 from spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl \
     import RandomStatsScipyImpl
 from spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl \
     import RandomStatsUniformImpl
-from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import RandomDistribution
 from spinn_front_end_common.utilities import exceptions
 import numpy
 import os
 import logging
 
 from scipy.stats import binom
+
+try:
+    from pyNN.random import RandomDistribution
+except ImportError:
+    RandomDistribution = None
 
 
 logger = logging.getLogger(__name__)

@@ -2,11 +2,17 @@ from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
 
+from spynnaker.pyNN.models.common.bag_of_neuron_settable import \
+    BagOfNeuronSettable
+
 
 @add_metaclass(ABCMeta)
-class AbstractNeuronModel(object):
+class AbstractNeuronModel(BagOfNeuronSettable):
     """ Represents a neuron model
     """
+
+    def __init__(self):
+        BagOfNeuronSettable.__init__(self)
 
     @abstractmethod
     def get_n_neural_parameters(self):

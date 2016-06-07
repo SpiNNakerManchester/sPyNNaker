@@ -712,20 +712,22 @@ class Assembly(object):
         :param val: the value of the parameter to set.
         """
         for pop_pop_view in self._population_index_boundaries.values():
-            if issubclass(pop_pop_view, AbstractPopulationSettable):
-                raise KeyError(
-                    "Population does not have property {}".format(param))
-            self._check_for_vertex_mapping()
-        if self._check_for_vertex_mapping():
-            for pop_pop_view in self._population_index_boundaries.values():
-                mapped_verts, _ = self._get_mapped_vertex(pop_pop_view)
+            if self._check_for_vertex_mapping():
+                for pop_pop_view in self._population_index_boundaries.values():
+                    mapped_verts, _ = self._get_mapped_vertex(pop_pop_view)
 
-                # get the vertex and init attributes
-                (vertex, _, _) = mapped_verts
-                vertex.set_value(param, val)
-        else:
-            high_level_function_utilties.set_parameters(
-                param, val, self._get_atoms_for_assembly(), None)
+                    # get the vertex and init attributes
+                    (vertex, _, _) = mapped_verts
+                    vertex.set_value(param, val)
+            else:
+                if isinstance(pop_pop_view, Population):
+                    high_level_function_utilties.set_parameters(
+                        param, val, self._get_atoms_for_assembly(), None,
+                        pop_pop_view._class)
+                if isinstance(pop_pop_view, PopulationView):
+                    high_level_function_utilties.set_parameters(
+                        param, val, self._get_atoms_for_assembly(), None,
+                        pop_pop_view._population._class)
 
     @staticmethod
     def _get_mapped_vertex(pop_pop_view):
@@ -1274,13 +1276,9 @@ class PopulationView(object):
         :param param: the parameter to set
         :param val: the value of the parameter to set.
         """
-        if not issubclass(self._population._class, AbstractPopulationSettable):
-            raise KeyError("Population does not have property {}".format(
-                param))
-
         high_level_function_utilties.set_parameters(
             param, val, self._get_atoms_for_pop_view(),
-            self._population._mapped_vertices)
+            self._population._mapped_vertices, self._population._class)
 
     def tset(self, parametername, value_array):
         """ 'Topographic' set. Set the value of parametername to the values in\
@@ -1381,18 +1379,15 @@ class Population(object):
 
         # filter pop level parameters from the model_variables and the
         # default handed down from a population
-        population_level_parameters_fresh = dict()
-        for population_level_parameter in self._class.model_variables:
-            if population_level_parameter in population_level_parameters:
-                population_level_parameters_fresh[population_level_parameter]\
-                    = population_level_parameters[population_level_parameter]
+        new_population_level_params = dict()
+        for cell_param_level_parameter in self._class.population_parameters:
+            if cell_param_level_parameter in population_level_parameters:
+                new_population_level_params[cell_param_level_parameter]\
+                    = population_level_parameters[cell_param_level_parameter]
             else:
-                population_level_parameters_fresh[population_level_parameter]\
-                    = None
-            if population_level_parameter in cellparams:
-                population_level_parameters_fresh[population_level_parameter]\
-                    = cellparams[population_level_parameter]
-        population_level_parameters = population_level_parameters_fresh
+                new_population_level_params[cell_param_level_parameter] = None
+
+        population_level_parameters = new_population_level_params
 
         # filter cell params for any population level parameters given by
         # the end user, If any exist, add them and then remove from cell params
@@ -1843,11 +1838,12 @@ class Population(object):
             in this population.
 
         """
-        if not issubclass(self._class,
-                          AbstractPopulationInitializable):
-            raise KeyError(
-                "Population does not support the initialisation of {}".format(
-                    variable))
+        initialize_attr = getattr(self._class.neuron_model,
+                                  "initialize_%s" % variable, None)
+        if initialize_attr is None or not callable(initialize_attr):
+            raise exceptions.ConfigurationException(
+                "Vertex does not support initialisation of parameter {}"
+                .format(variable))
 
         if self._mapped_vertices is not None:
             (vertex, _, _) = self._mapped_vertices
@@ -2291,15 +2287,9 @@ class Population(object):
         :param param: the parameter to set
         :param val: the value of the parameter to set.
         """
-        if not issubclass(self._class, AbstractPopulationSettable):
-            raise KeyError("Population does not have property {}".format(
-                param))
-
         high_level_function_utilties.set_parameters(
-            param, val, self._get_atoms_for_pop(), self._mapped_vertices)
-
-
-
+            param, val, self._get_atoms_for_pop(), self._mapped_vertices,
+            self._class)
     @property
     def structure(self):
         """ Return the structure for the population.

@@ -15,59 +15,51 @@ class NeuronModelIzh(AbstractNeuronModel):
         self._n_neurons = len(bag_of_neurons)
         self._atoms = bag_of_neurons
 
+        # check for state variables in the basic config params
+        for atom in self._atoms:
+            if atom.get_state_variable('v') is None:
+                if atom.get('v_init') is not None:
+                    atom.initialize('v', atom.get('v_init'))
+                atom.remove_param('v_init')
+        for atom in self._atoms:
+            if atom.get_state_variable('u') is None:
+                if atom.get('u_init') is not None:
+                    atom.initialize('u', atom.get('u_init'))
+                atom.remove_param('u_init')
+
     @property
     def a(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("a"))
-        return data
+        return self._get_param('a', self._atoms)
 
     @property
     def b(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("b"))
-        return data
+        return self._get_param('b', self._atoms)
 
     @property
     def c(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("c"))
-        return data
+        return self._get_param('c', self._atoms)
 
     @property
     def d(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("d"))
-        return data
+        return self._get_param('d', self._atoms)
 
     @property
     def v_init(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("v_init"))
-        return data
+        return self._get_state_variable('v', self._atoms)
 
     @property
     def u_init(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("u_init"))
-        return data
+        return self._get_state_variable('u', self._atoms)
 
     def initialize_v(self, v_init):
         v_init = utility_calls.convert_param_to_numpy(
             v_init, self._n_neurons)
-        for atom, value in zip(self._atoms, v_init):
-            atom.set_param('v_init', value)
+        self._set_state_variable('v', v_init, self._atoms)
 
     def initialize_u(self, u_init):
         u_init = utility_calls.convert_param_to_numpy(
             u_init, self._n_neurons)
-        for atom, value in zip(self._atoms, u_init):
-            atom.set_param('u_init', value)
+        self._set_state_variable('u', u_init, self._atoms)
 
     def get_n_neural_parameters(self):
         return 8
@@ -88,10 +80,12 @@ class NeuronModelIzh(AbstractNeuronModel):
             NeuronParameter(self._atoms[atom_id].get('d'), DataType.S1615),
 
             # REAL V
-            NeuronParameter(self._atoms[atom_id].get('v_init'), DataType.S1615),
+            NeuronParameter(self._atoms[atom_id].get_state_variable('v'),
+                            DataType.S1615),
 
             # REAL U
-            NeuronParameter(self._atoms[atom_id].get('u_init'), DataType.S1615),
+            NeuronParameter(self._atoms[atom_id].get_state_variable('u'),
+                            DataType.S1615),
 
             # offset current [nA]
             # REAL I_offset;

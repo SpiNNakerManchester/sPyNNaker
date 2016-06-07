@@ -3,8 +3,8 @@ from pacman.model.partitionable_graph.partitionable_graph import \
     PartitionableGraph
 
 from spinn_machine.utilities.progress_bar import ProgressBar
-from spynnaker.pyNN.models.neuron.abstract_population_model import \
-    AbstractPopulationModel
+from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex import \
+    BagOfNeuronsVertex
 from spynnaker.pyNN.overridden_pacman_functions.groupers.\
     abstract_grouper import AbstractGrouper
 
@@ -110,7 +110,7 @@ class Grouper(AbstractGrouper):
         inputs['label'] = label
         inputs['constraints'] = constraints
 
-        if issubclass(model_type, AbstractPopulationModel):
+        if issubclass(model_type, BagOfNeuronsVertex):
             inputs['model_class'] = model_type
 
         # create vertex and add to partitionable graph

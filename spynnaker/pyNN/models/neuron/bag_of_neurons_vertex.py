@@ -44,8 +44,8 @@ from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.neuron.population_partitioned_vertex \
-    import PopulationPartitionedVertex
+from spynnaker.pyNN.models.neuron.bag_of_neurons_partitioned_vertex \
+    import BagOfNeuronsPartitionedVertex
 
 # dsg imports
 from data_specification.data_specification_generator \
@@ -73,10 +73,16 @@ class BagOfNeuronsVertex(
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
-        AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractGroupable):
     """ Underlying vertex model for Neural Populations.
     """
+
+    is_array_parameters = {}
+    fixed_parameters = {}
+    population_parameters = {
+        'spikes_per_second', 'ring_buffer_sigma',
+        'incoming_spike_buffer_size', 'machine_time_step',
+        'time_scale_factor'}
 
     def __init__(
             self, bag_of_neurons, label, model_class, constraints=None):
@@ -196,6 +202,19 @@ class BagOfNeuronsVertex(
     def requires_remapping_for_change(self, parameter, old_value, new_value):
         return True
 
+    @staticmethod
+    def create_vertex(bag_of_neurons, population_parameters):
+        """
+
+        :param bag_of_neurons:
+        :param population_parameters:
+        :return:
+        """
+        params = dict(population_parameters)
+        params['bag_of_neurons'] = bag_of_neurons
+        vertex = BagOfNeuronsVertex(**params)
+        return vertex
+
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -204,7 +223,7 @@ class BagOfNeuronsVertex(
             self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
             self._spike_recorder.record
         )
-        subvertex = PopulationPartitionedVertex(
+        subvertex = BagOfNeuronsPartitionedVertex(
             resources_required, label, is_recording, constraints)
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
@@ -298,8 +317,8 @@ class BagOfNeuronsVertex(
         sdram_requirement = (
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(3) +
-            PopulationPartitionedVertex.get_provenance_data_size(
-                PopulationPartitionedVertex
+            BagOfNeuronsPartitionedVertex.get_provenance_data_size(
+                BagOfNeuronsPartitionedVertex
                 .N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, graph.incoming_edges_to_vertex(self)) +
@@ -621,15 +640,6 @@ class BagOfNeuronsVertex(
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self, start_atoms, end_atoms)
 
-    def initialize(self, variable, value):
-        initialize_attr = getattr(
-            self._neuron_model, "initialize_%s" % variable, None)
-        if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialisation of"
-                            " parameter {}".format(variable))
-        initialize_attr(value)
-        self._change_requires_mapping = True
-
     @property
     def synapse_type(self):
         return self._synapse_manager.synapse_type
@@ -637,30 +647,6 @@ class BagOfNeuronsVertex(
     @property
     def input_type(self):
         return self._input_type
-
-    def get_value(self, key):
-        """ Get a property of the overall model
-        """
-        for obj in [self._neuron_model, self._input_type,
-                    self._threshold_type, self._synapse_manager.synapse_type,
-                    self._additional_input]:
-            if hasattr(obj, key):
-                return getattr(obj, key)
-        raise Exception("Population {} does not have parameter {}".format(
-            self.vertex, key))
-
-    def set_value(self, key, value):
-        """ Set a property of the overall model
-        """
-        for obj in [self._neuron_model, self._input_type,
-                    self._threshold_type, self._synapse_manager.synapse_type,
-                    self._additional_input]:
-            if hasattr(obj, key):
-                setattr(obj, key, value)
-                self._change_requires_mapping = True
-                return
-        raise Exception("Type {} does not have parameter {}".format(
-            self._model_name, key))
 
     @property
     def weight_scale(self):

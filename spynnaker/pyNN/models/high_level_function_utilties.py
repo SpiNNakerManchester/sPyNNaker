@@ -169,7 +169,7 @@ def _set_parameters(variable, value, atoms):
         pop_view_atom.set_param(variable, atom_variable)
 
 
-def set_parameters(param, val, atoms, mapped_vertices):
+def set_parameters(param, val, atoms, mapped_vertices, class_object):
     """
     private method for :
     Set one or more parameters for every cell in the population.
@@ -184,6 +184,35 @@ def set_parameters(param, val, atoms, mapped_vertices):
     :param param: the parameter to set
     :param val: the value of the parameter to set.
     """
+    found = False
+
+    bits_to_check = [
+        class_object.neuron_model, class_object.input_type,
+        class_object.threshold_type, class_object.synapse_type]
+
+    if hasattr(class_object, "additional_input"):
+        bits_to_check.append(class_object.additional_input)
+
+    for obj in bits_to_check:
+        if type(param) is str:
+            if hasattr(obj, param):
+                found = True
+        elif type(param) is not dict:
+            raise Exception(
+                "Error: invalid parameter type for set() function for "
+                "population parameter. Exiting.")
+        else:
+            # Add a dictionary-structured set of new parameters to the
+            # current set: get atoms in pop view
+            for (key, value) in param.iteritems():
+                if hasattr(obj, key):
+                    found = True
+    if not found:
+
+        raise exceptions.ConfigurationException(
+            "Type {} does not have parameter {}".format(
+                class_object.model_name, param))
+
     if type(param) is str:
         if val is None:
             raise Exception("Error: No value given in set() function for "

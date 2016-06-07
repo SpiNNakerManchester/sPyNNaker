@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.neuron.abstract_population_model import \
-    AbstractPopulationModel
+from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex import \
+    BagOfNeuronsVertex
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
     import InputTypeConductance
 from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh \
@@ -12,7 +12,7 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
 _IZK_THRESHOLD = 30.0
 
 
-class IzkCondExp(AbstractPopulationModel):
+class IzkCondExp(BagOfNeuronsVertex):
 
     model_based_max_atoms_per_core = 255
 

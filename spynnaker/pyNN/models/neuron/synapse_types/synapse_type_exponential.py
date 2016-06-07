@@ -1,4 +1,3 @@
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type \
@@ -29,17 +28,11 @@ class SynapseTypeExponential(AbstractSynapseType):
 
     @property
     def tau_syn_E(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("tau_syn_E"))
-        return data
+        return self._get_param("tau_syn_E", self._atoms)
 
     @property
     def tau_syn_I(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("tau_syn_I"))
-        return data
+        return self._get_param("tau_syn_I", self._atoms)
 
     def get_n_synapse_types(self):
         return 2

@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.neuron.abstract_population_model import \
-    AbstractPopulationModel
+from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex import \
+    BagOfNeuronsVertex
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
     import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
@@ -51,7 +51,7 @@ class Projection(object):
 
         # check projection is to a vertex which can handle spikes reception
         if not issubclass(postsynaptic_population._class,
-                          AbstractPopulationModel):
+                          BagOfNeuronsVertex):
             raise exceptions.ConfigurationException(
                 "postsynaptic population is not designed to receive"
                 " synaptic projections")

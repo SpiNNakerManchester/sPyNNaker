@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.neuron.abstract_population_model import \
-    AbstractPopulationModel
+from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex import \
+    BagOfNeuronsVertex
 from spynnaker.pyNN.models.neuron.neuron_models\
     .neuron_model_leaky_integrate_and_fire \
     import NeuronModelLeakyIntegrateAndFire
@@ -11,7 +11,7 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 
 
-class IFCurrDualExp(AbstractPopulationModel):
+class IFCurrDualExp(BagOfNeuronsVertex):
     """ Leaky integrate and fire neuron with two exponentially decaying \
         excitatory current inputs, and one exponentially decaying inhibitory \
         current input

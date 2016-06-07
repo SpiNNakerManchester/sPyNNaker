@@ -463,6 +463,3 @@ class Spinnaker(SpinnakerMainInterface):
         for vertex in vertex_to_pop_mapping:
             if isinstance(vertex, AbstractGroupable):
                 vertex.set_mapping(vertex_to_pop_mapping)
-            else:
-                raise common_exceptions.ConfigurationException(
-                    "Found a vertex i dont know how to deal with. AH!")

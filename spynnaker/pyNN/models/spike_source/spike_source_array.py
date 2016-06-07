@@ -4,8 +4,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_groupable import \
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
-from spynnaker.pyNN.models.common.simple_population_settable \
-    import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
     import EIEIOSpikeRecorder
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
@@ -40,8 +38,7 @@ logger = logging.getLogger(__name__)
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource,
         AbstractSpikeRecordable, AbstractGroupable,
-        SimplePopulationSettable, AbstractChangableAfterRun,
-        AbstractHasFirstMachineTimeStep):
+        AbstractChangableAfterRun, AbstractHasFirstMachineTimeStep):
     """ Model for play back of spikes
     """
 
@@ -50,12 +47,12 @@ class SpikeSourceArray(
 
     default_parameters = {'spike_times': None}
 
-    model_variables = {
+    population_parameters = {
         'machine_time_step', 'time_scale_factor', 'ip_address', 'port',
-        'board_address', 'tag', 'space_before_notification',
-        'spike_recorder_buffer_size',
+        'space_before_notification','spike_recorder_buffer_size',
         'max_on_chip_memory_usage_for_spikes_in_bytes',
-        'buffer_size_before_receive'}
+        'buffer_size_before_receive', 'board_address', 'tag'
+    }
 
     is_array_parameters = {'spike_times'}
 
@@ -65,7 +62,8 @@ class SpikeSourceArray(
 
     model_name = "SpikeSourceArray"
 
-    def __init__(self, bag_of_neurons, label, constraints=None):
+    def __init__(self, bag_of_neurons, label="SpikeSourceArray",
+                 constraints=None):
 
         AbstractGroupable.__init__(self)
 
@@ -173,7 +171,6 @@ class SpikeSourceArray(
 
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        SimplePopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
 

@@ -15,14 +15,11 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
     @property
     def v_reset(self):
-        return self._v_reset
+        return self._get_param('v_reset', self._atoms)
 
     @property
     def tau_refrac(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("tau_refrac"))
-        return data
+        return self._get_param('tau_refrac', self._atoms)
 
     def get_n_neural_parameters(self):
         return NeuronModelLeakyIntegrate.get_n_neural_parameters(self) + 3

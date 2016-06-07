@@ -16,10 +16,7 @@ class ThresholdTypeStatic(AbstractThresholdType):
 
     @property
     def v_thresh(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("v_thresh"))
-        return data
+        self._get_param('v_thresh', self._atoms)
 
     def get_n_threshold_parameters(self):
         return 1

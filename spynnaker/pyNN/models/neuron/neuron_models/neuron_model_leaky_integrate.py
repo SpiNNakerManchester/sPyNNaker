@@ -26,44 +26,28 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
 
     @property
     def v_init(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get_state_variable("v"))
-        return data
+        return self._get_state_variable('v', self._atoms)
 
     def initialize_v(self, v_init):
         v_init = utility_calls.convert_param_to_numpy(
             v_init, self._n_neurons)
-        for atom, value in zip(self._atoms, v_init):
-            atom.initialize('v', value)
+        self._set_state_variable('v', v_init, self._atoms)
 
     @property
     def v_rest(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("v_rest"))
-        return data
+        return self._get_param('v_rest', self._atoms)
 
     @property
     def tau_m(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("tau_m"))
-        return data
+        return self._get_param('tau_m', self._atoms)
 
     @property
     def cm(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("cm"))
-        return data
+        return self._get_param('cm', self._atoms)
 
     @property
     def i_offset(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("i_offset"))
-        return data
+        return self._get_param('i_offset', self._atoms)
 
     def _r_membrane(self, atom_id):
         return self._atoms[atom_id].get("tau_m") / \

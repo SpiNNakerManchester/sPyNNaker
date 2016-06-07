@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.neuron.abstract_population_model import \
-    AbstractPopulationModel
+from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex import \
+    BagOfNeuronsVertex
 from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh \
     import NeuronModelIzh
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
@@ -10,7 +10,7 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 
 
-class IzkCurrExp(AbstractPopulationModel):
+class IzkCurrExp(BagOfNeuronsVertex):
 
     model_based_max_atoms_per_core = 255
     _IZK_THRESHOLD = 30.0

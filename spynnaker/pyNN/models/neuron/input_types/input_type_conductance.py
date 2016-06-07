@@ -15,14 +15,11 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_E(self):
-        data = list()
-        for atom in self._atoms:
-            data.append(atom.get("e_rev_E"))
-        return data
+        return self._get_param("e_rev_E", self._atoms)
 
     @property
     def e_rev_I(self):
-        return self._e_rev_I
+        return self._get_param("e_rev_I", self._atoms)
 
     def get_global_weight_scale(self):
         return 1024.0

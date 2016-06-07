@@ -108,7 +108,9 @@ class NeuronCell(object):
         if name not in self._population_parameters:
             raise exceptions.ConfigurationException(
                 "Trying to set a population scoped parameter not "
-                "originally given to this atom.")
+                "originally given to this atom. This param was {}"
+                " and its value was {} for class {}"
+                    .format(name, new_value, self._original_class.model_name))
         else:
             self._population_parameters[name] = new_value
 
