@@ -144,12 +144,12 @@ class AbstractConnector(object):
         """ Get the mean of the weights
         """
         if isinstance(weights, RandomDistribution):
-            return utility_calls.get_mean(weights)
+            return abs(utility_calls.get_mean(weights))
         elif numpy.isscalar(weights):
-            return weights
+            return abs(weights)
         elif hasattr(weights, "__getitem__"):
             return numpy.mean([
-                weights[connection_slice]
+                numpy.abs(weights[connection_slice])
                 for connection_slice in connection_slices])
         raise Exception("Unrecognised weight format")
 
@@ -180,10 +180,10 @@ class AbstractConnector(object):
                 return abs(max_weight)
 
         elif numpy.isscalar(weights):
-            return weights
+            return abs(weights)
         elif hasattr(weights, "__getitem__"):
             return numpy.amax([
-                weights[connection_slice]
+                numpy.abs(weights[connection_slice])
                 for connection_slice in connection_slices])
         raise Exception("Unrecognised weight format")
 
@@ -204,7 +204,7 @@ class AbstractConnector(object):
             return 0.0
         elif hasattr(weights, "__getitem__"):
             return numpy.var([
-                weights[connection_slice]
+                numpy.abs(weights[connection_slice])
                 for connection_slice in connection_slices])
         raise Exception("Unrecognised weight format")
 
@@ -269,7 +269,7 @@ class AbstractConnector(object):
                     " in projection {}->{}".format(
                         self._pre_population.label,
                         self._post_population.label))
-        return weights
+        return numpy.abs(weights)
 
     def _clip_delays(self, delays):
         """ Clip delay values, keeping track of how many have been clipped

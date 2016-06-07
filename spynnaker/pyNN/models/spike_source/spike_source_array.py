@@ -304,7 +304,10 @@ class SpikeSourceArray(
             (ReverseIPTagMulticastSourcePartitionedVertex.
              _REGIONS.RECORDING_BUFFER_STATE.value),
             placements, graph_mapper, self,
-            lambda subvertex: subvertex.virtual_key, start_neuron, end_neuron)
+            lambda subvertex:
+                subvertex.virtual_key if subvertex.virtual_key is not None
+                else 0, 
+            start_neuron, end_neuron)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
