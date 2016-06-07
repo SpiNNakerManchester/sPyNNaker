@@ -2,9 +2,9 @@
 """
 Synfirechain-like example
 """
-from pyNN.random import RandomDistribution
 import spynnaker.pyNN as p
 from spinn_front_end_common.utilities import exceptions
+from pyNN.random import NumpyRNG, RandomDistribution
 
 
 def run():
@@ -117,12 +117,44 @@ def param_sweep(pop, nNeurons, atoms):
     for atom in atoms:
         if atom.get('v_rest') == -65.0:
             raise AssertionError("Pop view didnt set the atom correctly.")
-    
+
+    # test init with static value
     pop.initialize("v", 12345)
     for atom in atoms:
         if atom.get_state_variable('v') != 12345:
             raise AssertionError("Pop view didnt set the atom correctly.")
-    
+
+    # test init with a list
+    pop.initialize("v", elements)
+    for atom in atoms:
+        if atom.get_state_variable('v') != 14:
+            raise AssertionError("Pop view didnt set the atom correctly.")
+
+    # test init with random distribution
+    rngseed = 12345
+    rng = NumpyRNG(seed=rngseed)
+    distrubtion = RandomDistribution('uniform', [0, 10], rng=rng)
+    pop.initialize("v", distrubtion)
+    for atom in atoms:
+        if atom.get_state_variable('v') == 14:
+            raise AssertionError("Pop view didnt set the atom correctly.")
+
+    rngseed = 12345
+    rng = NumpyRNG(seed=rngseed)
+    distrubtion = RandomDistribution('uniform', [0, 100], rng=rng)
+    data = list()
+    for _ in range(0, nNeurons):
+        data.append(distrubtion.next())
+    rngseed = 12345
+    rng = NumpyRNG(seed=rngseed)
+    distrubtion = RandomDistribution('uniform', [0, 100], rng=rng)
+    pop.initialize("v", distrubtion)
+    index = 0
+    for atom in atoms:
+        if atom.get_state_variable('v') != data[index]:
+            raise AssertionError("Pop view didnt set the atom correctly.")
+        index += 1
+
     # test incorrect param setting
     try:
         pop.initialize("v_rest", 12345)

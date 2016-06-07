@@ -22,6 +22,8 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 
 # spynnaker imports
+from spynnaker.pyNN.models.abstract_models.abstract_groupable import \
+    AbstractGroupable
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.common import recording_utils
@@ -72,7 +74,7 @@ class BagOfNeuronsVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
+        AbstractChangableAfterRun, AbstractGroupable):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -104,6 +106,7 @@ class BagOfNeuronsVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
+        AbstractGroupable.__init__(self)
 
         self._binary = model_class.binary_name
         self._label = label
@@ -127,6 +130,7 @@ class BagOfNeuronsVertex(
 
         # storage of atoms for usage during sets and records
         self._atoms = bag_of_neurons
+        self._vertex_to_pop_mapping = None
 
         # Set up for recording
         self._spike_recorder = SpikeRecorder(machine_time_step)
@@ -176,7 +180,11 @@ class BagOfNeuronsVertex(
         self._change_requires_mapping = True
 
     def set_mapping(self, vertex_mapping):
-        pass
+        self._synapse_manager.set_mapping(vertex_mapping)
+
+    @property
+    def vertex_to_pop_mapping(self):
+        return self._synapse_manager.vertex_to_pop_mapping
 
     @property
     def requires_mapping(self):

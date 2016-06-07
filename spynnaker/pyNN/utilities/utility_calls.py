@@ -1,6 +1,8 @@
 """
 utility class containing simple helper methods
 """
+from data_specification.exceptions import \
+    DataSpecificationParameterOutOfBoundsException
 from spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl \
     import RandomStatsScipyImpl
 from spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl \

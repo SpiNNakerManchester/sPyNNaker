@@ -2023,6 +2023,9 @@ class Population(object):
                 atom.record_v = True
                 atom.record_v_to_file_flag = to_file
 
+    def __repr__(self):
+        return "Population {}".format(self._pop_label)
+
     @property
     def positions(self):
         """ Return the position array for structured populations.

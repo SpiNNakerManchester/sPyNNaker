@@ -17,18 +17,25 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
         self._atoms = bag_of_neurons
 
         for atom in self._atoms:
-            if atom.get('v_init') is None:
-                atom.set_param('v_init', atom.get('v_rest'))
+            if atom.get_state_variable('v') is None:
+                if atom.get('v_init') is None:
+                    atom.initialize('v', atom.get('v_rest'))
+                else:
+                    atom.initialize('v', atom.get('v_init'))
+                atom.remove_param('v_init')
 
     @property
     def v_init(self):
-        return self._v_init
+        data = list()
+        for atom in self._atoms:
+            data.append(atom.get_state_variable("v"))
+        return data
 
     def initialize_v(self, v_init):
         v_init = utility_calls.convert_param_to_numpy(
             v_init, self._n_neurons)
         for atom, value in zip(self._atoms, v_init):
-            atom.set_param('v_init', value)
+            atom.initialize('v', value)
 
     @property
     def v_rest(self):
@@ -75,7 +82,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
 
             # membrane voltage [mV]
             # REAL     V_membrane;
-            NeuronParameter(self._atoms[atom_id].get("v_init"),
+            NeuronParameter(self._atoms[atom_id].get_state_variable("v"),
                             DataType.S1615),
 
             # membrane resting voltage [mV]

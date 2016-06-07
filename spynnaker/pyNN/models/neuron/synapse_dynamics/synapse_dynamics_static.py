@@ -19,7 +19,7 @@ class SynapseDynamicsStatic(AbstractStaticSynapseDynamics):
     def get_vertex_executable_suffix(self):
         return ""
 
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
+    def get_parameters_sdram_usage_in_bytes(self, n_synapse_types):
         return 0
 
     def write_parameters(self, spec, region, machine_time_step, weight_scales):

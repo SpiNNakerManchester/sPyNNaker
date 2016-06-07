@@ -19,7 +19,8 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
     """
 
     def __init__(
-            self, pre_vertex, post_vertex, synapse_information, label=None):
+            self, pre_vertex, post_vertex, synapse_information,
+            projection, label=None):
         MultiCastPartitionableEdge.__init__(
             self, pre_vertex, post_vertex, label=label)
 
@@ -31,6 +32,9 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
         # post_vertex - this might be None if no long delays are present
         self._delay_edge = None
 
+        # the projection that this edge is associated with
+        self._associated_projection = projection
+
         self._stored_synaptic_data_from_machine = None
 
     def add_synapse_information(self, synapse_information):
@@ -40,6 +44,10 @@ class ProjectionPartitionableEdge(MultiCastPartitionableEdge):
     @property
     def synapse_information(self):
         return self._synapse_information
+
+    @property
+    def associated_projection(self):
+        return self._associated_projection
 
     @property
     def delay_edge(self):

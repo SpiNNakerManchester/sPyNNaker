@@ -319,6 +319,16 @@ class NeuronCell(object):
             raise exceptions.ConfigurationException(
                 "Trying to set a parameter which does not exist")
 
+    def remove_param(self, key):
+        """
+        removes a parameter (mainly done to convert from model to state
+        for v_init to v for past support
+        :param key: the key to delete.
+        :return: None
+        """
+        if key in self._params:
+            del self._params[key]
+
     @property
     def synapse_dynamics(self):
         """

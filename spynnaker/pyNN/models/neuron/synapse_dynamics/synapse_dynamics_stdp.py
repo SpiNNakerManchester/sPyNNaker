@@ -70,7 +70,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         name += "_" + self._weight_dependence.vertex_executable_suffix
         return name
 
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
+    def get_parameters_sdram_usage_in_bytes(self, n_synapse_types):
         size = 0
 
         size += self._timing_dependence.get_parameters_sdram_usage_in_bytes()

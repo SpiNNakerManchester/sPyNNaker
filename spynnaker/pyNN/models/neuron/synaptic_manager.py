@@ -1,3 +1,5 @@
+from spynnaker.pyNN.models.abstract_models.abstract_groupable import \
+    AbstractGroupable
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
@@ -37,13 +39,16 @@ _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
 
-class SynapticManager(object):
+class SynapticManager(AbstractGroupable):
     """ Deals with synapses
     """
 
     def __init__(self, synapse_type, machine_time_step, ring_buffer_sigma,
                  spikes_per_second, population_table_type=None,
                  synapse_io=None):
+
+        AbstractGroupable.__init__(self)
+        self._vertex_to_pop_mapping = None
 
         self._synapse_type = synapse_type
         self._ring_buffer_sigma = ring_buffer_sigma
@@ -92,6 +97,13 @@ class SynapticManager(object):
     @property
     def synapse_dynamics(self):
         return self._synapse_dynamics
+
+    def set_mapping(self, vertex_mapping):
+        self._vertex_to_pop_mapping = vertex_mapping
+
+    @property
+    def vertex_to_pop_mapping(self):
+        return self._vertex_to_pop_mapping
 
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
@@ -198,12 +210,19 @@ class SynapticManager(object):
 
                 # Get an estimate of the number of post sub-vertices by
                 # assuming that all of them are the same size as this one
+                destination_vertex_lo_atom_slice, \
+                    destination_vertex_hi_atom_slice = \
+                    self._get_post_vertex_atom_slice(in_edge)
+
+                post_vertex_atoms = (destination_vertex_hi_atom_slice -
+                                     destination_vertex_lo_atom_slice)
+
                 post_slices = [Slice(
                     lo_atom, min(
-                        in_edge.post_vertex.n_atoms,
+                        post_vertex_atoms,
                         lo_atom + post_vertex_slice.n_atoms - 1))
                     for lo_atom in range(
-                        0, in_edge.post_vertex.n_atoms,
+                        0, post_vertex_atoms,
                         post_vertex_slice.n_atoms)]
                 post_slice_index = int(math.floor(
                     float(post_vertex_slice.lo_atom) /
@@ -218,12 +237,18 @@ class SynapticManager(object):
                         in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < n_atoms_per_subvertex:
                     n_atoms_per_subvertex = in_edge.pre_vertex.n_atoms
+
+                source_vertex_lo_atom_slice, source_vertex_hi_atom_slice = \
+                    self._get_pre_vertex_atom_slice(in_edge)
+
+                source_vertex_atoms = (source_vertex_hi_atom_slice -
+                                       source_vertex_lo_atom_slice)
                 pre_slices = [Slice(
                     lo_atom, min(
-                        in_edge.pre_vertex.n_atoms,
+                        source_vertex_atoms,
                         lo_atom + n_atoms_per_subvertex - 1))
                     for lo_atom in range(
-                        0, in_edge.pre_vertex.n_atoms, n_atoms_per_subvertex)]
+                        0, source_vertex_atoms, n_atoms_per_subvertex)]
 
                 pre_slice_index = 0
                 for pre_vertex_slice in pre_slices:
@@ -235,6 +260,22 @@ class SynapticManager(object):
                     pre_slice_index += 1
 
         return memory_size
+
+    def _get_post_vertex_atom_slice(self, in_edge):
+        destination_population = \
+            in_edge.associated_projection._postsynaptic_population
+        vertex = destination_population._mapped_vertices[0]
+        (_, vertex_lo_atom_slice, vertex_hi_atom_slice) = \
+            self._vertex_to_pop_mapping[vertex][0]
+        return vertex_lo_atom_slice, vertex_hi_atom_slice
+
+    def _get_pre_vertex_atom_slice(self, in_edge):
+        source_population = \
+            in_edge.associated_projection._presynaptic_population
+        vertex = source_population._mapped_vertices[0]
+        (_, vertex_lo_atom_slice, vertex_hi_atom_slice) = \
+            self._vertex_to_pop_mapping[vertex][0]
+        return vertex_lo_atom_slice, vertex_hi_atom_slice
 
     def _get_size_of_synapse_information(
             self, synapse_information, pre_slices, pre_slice_index,
@@ -262,7 +303,7 @@ class SynapticManager(object):
         """ Get the size of the synapse dynamics region
         """
         return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._synapse_type.get_n_synapse_types())
+            self._synapse_type.get_n_synapse_types())
 
     def get_sdram_usage_in_bytes(self, vertex_slice, in_edges):
         return (

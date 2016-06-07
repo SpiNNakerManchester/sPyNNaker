@@ -218,8 +218,9 @@ class DelayExtensionVertex(
         spec.write_value(data=self._n_delay_stages)
 
         # Write the actual delay blocks
-        spec.write_array(array_values=self._delay_blocks[(
-            vertex_slice.lo_atom, vertex_slice.hi_atom)].delay_block)
+        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
+        if key in self._delay_blocks:
+            spec.write_array(array_values=self._delay_blocks[key].delay_block)
 
     # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):

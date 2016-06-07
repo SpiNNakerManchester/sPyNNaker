@@ -14,6 +14,8 @@ from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
 # add pops pop view and assembly from the bloody same class.
+from spynnaker.pyNN.models.abstract_models.abstract_groupable import \
+    AbstractGroupable
 from spynnaker.pyNN.models.population_based_objects import \
     Assembly, PopulationView, Population
 
@@ -438,7 +440,7 @@ class Spinnaker(SpinnakerMainInterface):
 
         outputs = ["MemoryPartitionableGraph", "PopToVertexMapping"]
         algorithms = list()
-        algorithms.append("Grouper")
+        algorithms.append(config.get("Mapping", "grouper"))
         xml_paths = list()
         xml_paths.append(os.path.join(
             os.path.dirname(overridden_pacman_functions.__file__),
@@ -459,4 +461,8 @@ class Spinnaker(SpinnakerMainInterface):
             pop.set_mapping(pop_to_vertex_mapping[pop])
 
         for vertex in vertex_to_pop_mapping:
-            vertex.set_mapping(vertex_to_pop_mapping[vertex])
+            if isinstance(vertex, AbstractGroupable):
+                vertex.set_mapping(vertex_to_pop_mapping)
+            else:
+                raise common_exceptions.ConfigurationException(
+                    "Found a vertex i dont know how to deal with. AH!")

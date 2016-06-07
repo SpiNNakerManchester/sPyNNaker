@@ -1,4 +1,6 @@
 # spynnaker imports
+from spynnaker.pyNN.models.abstract_models.abstract_groupable import \
+    AbstractGroupable
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
@@ -37,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource,
-        AbstractSpikeRecordable,
+        AbstractSpikeRecordable, AbstractGroupable,
         SimplePopulationSettable, AbstractChangableAfterRun,
         AbstractHasFirstMachineTimeStep):
     """ Model for play back of spikes
@@ -64,6 +66,8 @@ class SpikeSourceArray(
     model_name = "SpikeSourceArray"
 
     def __init__(self, bag_of_neurons, label, constraints=None):
+
+        AbstractGroupable.__init__(self)
 
         # assume all atoms have the same parameters, so can look at first
         # determine ip address
@@ -142,6 +146,7 @@ class SpikeSourceArray(
 
         # store the atoms for future processing
         self._atoms = bag_of_neurons
+        self._mapping = None
 
         # get hard coded values
         self._minimum_sdram_for_buffering = config.getint(
@@ -228,11 +233,17 @@ class SpikeSourceArray(
 
     def set_mapping(self, mapping):
         total_spikes_times = list()
+        mapping = mapping[self]
         for (pop, start, end) in mapping:
             for atom_id in range(start, end):
                 total_spikes_times.append(
                     self._atoms[atom_id].get("spike_times"))
         self.spike_times = total_spikes_times
+        self._mapping = mapping
+
+    @property
+    def vertex_to_pop_mapping(self):
+        return self._mapping
 
     @property
     def requires_mapping(self):
