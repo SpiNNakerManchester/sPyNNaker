@@ -1403,18 +1403,19 @@ class Population(object):
 
         # convert default into atom scope
         default_params = self._convert_parameters_to_atom_scope(
-            self._class.default_parameters, self._size,
-            self._class.is_array_parameters)
+            self._class.default_parameters(self._class), self._size,
+            self._class.is_array_parameters(self._class))
 
         # collect state variables from class
-        state_variables = self._class.state_variables
+        state_variables = self._class.state_variables(self._class)
 
         # collect fixed cell parameters
-        fixed_cell_params = self._class.fixed_parameters
+        fixed_cell_params = self._class.fixed_parameters(self._class)
 
         # convert end user params into atom scope
         cellparams = self._convert_parameters_to_atom_scope(
-            cellparams, self._size, self._class.is_array_parameters)
+            cellparams, self._size,
+            self._class.is_array_parameters(self._class))
 
         # build cell objects
         neuron_param_objects = list()

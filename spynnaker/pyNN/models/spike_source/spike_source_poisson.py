@@ -71,17 +71,25 @@ class SpikeSourcePoisson(
     # back off range
     _n_poisson_subvertices = 0
 
-    default_parameters = {'rate': 1.0, 'start': 0.0, 'duration': None}
-
-    is_array_parameters = {}
-
     population_parameters = {'machine_time_step', 'time_scale_factor'}
 
-    state_variables = {'seed': None}
-
-    fixed_parameters = {}
-
     model_name = "SpikeSourcePoisson"
+
+    @staticmethod
+    def default_parameters(_):
+        return {'rate': 1.0, 'start': 0.0, 'duration': None}
+
+    @staticmethod
+    def fixed_parameters(_):
+        return {}
+
+    @staticmethod
+    def state_variables(_):
+        return list(['seed'])
+
+    @staticmethod
+    def is_array_parameters(_):
+        return {}
 
     def __init__(
             self, bag_of_neurons,

@@ -6,6 +6,22 @@ class InputTypeCurrent(AbstractInputType):
     """ The current input type
     """
 
+    @staticmethod
+    def default_parameters():
+        return {}
+
+    @staticmethod
+    def fixed_parameters():
+        return {}
+
+    @staticmethod
+    def state_variables():
+        return list()
+
+    @staticmethod
+    def is_array_parameters():
+        return {}
+
     def __init__(self, bag_of_neurons):
         AbstractInputType.__init__(self, bag_of_neurons)
 

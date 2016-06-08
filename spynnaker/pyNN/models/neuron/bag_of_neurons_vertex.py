@@ -84,6 +84,55 @@ class BagOfNeuronsVertex(
         'incoming_spike_buffer_size', 'machine_time_step',
         'time_scale_factor'}
 
+    @staticmethod
+    def default_parameters(class_object):
+        parameters = dict()
+        parameters.update(class_object.neuron_model.default_parameters())
+        parameters.update(class_object.synapse_type.default_parameters())
+        parameters.update(class_object.input_type.default_parameters())
+        parameters.update(class_object.threshold_type.default_parameters())
+        if hasattr(class_object, "additional_input"):
+            parameters.update(
+                class_object.additional_input.default_parameters())
+        return parameters
+
+    @staticmethod
+    def fixed_parameters(class_object):
+        parameters = dict()
+        parameters.update(class_object.neuron_model.fixed_parameters())
+        parameters.update(class_object.synapse_type.fixed_parameters())
+        parameters.update(class_object.input_type.fixed_parameters())
+        parameters.update(class_object.threshold_type.fixed_parameters())
+        if hasattr(class_object, "additional_input"):
+            parameters.update(
+                class_object.additional_input.fixed_parameters())
+        return parameters
+
+    @staticmethod
+    def state_variables(class_object):
+        parameters = list()
+        parameters.extend(class_object.neuron_model.state_variables())
+        parameters.extend(class_object.synapse_type.state_variables())
+        parameters.extend(class_object.input_type.state_variables())
+        parameters.extend(class_object.threshold_type.state_variables())
+        if hasattr(class_object, "additional_input"):
+            parameters.extend(
+                class_object.additional_input.state_variables())
+        return parameters
+
+    @staticmethod
+    def is_array_parameters(class_object):
+        parameters = dict()
+        parameters.update(class_object.neuron_model.is_array_parameters())
+        parameters.update(class_object.synapse_type.is_array_parameters())
+        parameters.update(class_object.input_type.is_array_parameters())
+        parameters.update(class_object.threshold_type.is_array_parameters())
+        if hasattr(class_object, "additional_input"):
+            parameters.update(
+                class_object.additional_input.is_array_parameters())
+        return parameters
+
+
     def __init__(
             self, bag_of_neurons, label, model_class, constraints=None):
 
@@ -130,7 +179,7 @@ class BagOfNeuronsVertex(
         synapse_type = model_class.synapse_type(bag_of_neurons)
 
         self._additional_input = None
-        if hasattr(model_class, 'additional_input'):
+        if hasattr(model_class, "additional_input"):
             self._additional_input = \
                 model_class.additional_input(bag_of_neurons)
 

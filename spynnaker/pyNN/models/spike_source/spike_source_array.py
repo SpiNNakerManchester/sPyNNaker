@@ -45,8 +45,6 @@ class SpikeSourceArray(
     _model_based_max_atoms_per_core = sys.maxint
     SPACE_BEFORE_NOTIFICATION = 640
 
-    default_parameters = {'spike_times': None}
-
     population_parameters = {
         'machine_time_step', 'time_scale_factor', 'ip_address', 'port',
         'space_before_notification','spike_recorder_buffer_size',
@@ -54,13 +52,23 @@ class SpikeSourceArray(
         'buffer_size_before_receive', 'board_address', 'tag'
     }
 
-    is_array_parameters = {'spike_times'}
-
-    state_variables = {}
-
-    fixed_parameters = {}
-
     model_name = "SpikeSourceArray"
+
+    @staticmethod
+    def default_parameters(_):
+        return {'spike_times': None}
+
+    @staticmethod
+    def fixed_parameters(_):
+        return {}
+
+    @staticmethod
+    def state_variables(_):
+        return list()
+
+    @staticmethod
+    def is_array_parameters(_):
+        return {'spike_times'}
 
     def __init__(self, bag_of_neurons, label="SpikeSourceArray",
                  constraints=None):

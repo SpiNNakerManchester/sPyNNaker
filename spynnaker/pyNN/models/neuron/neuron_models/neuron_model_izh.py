@@ -9,6 +9,26 @@ from spynnaker.pyNN.utilities import utility_calls
 
 class NeuronModelIzh(AbstractNeuronModel):
 
+    _IZK_THRESHOLD = 30.0
+
+    @staticmethod
+    def default_parameters():
+        return {'a': 0.02, 'b': 0.2, 'c': -65.0, 'd': 2.0, 'v_init': -70.0,
+                'u_init': -14.0, 'i_offset': 0}
+
+    @staticmethod
+    def fixed_parameters():
+        return {'v_thresh': NeuronModelIzh._IZK_THRESHOLD}
+
+    @staticmethod
+    def state_variables():
+        params = list(['v', 'u'])
+        return params
+
+    @staticmethod
+    def is_array_parameters():
+        return {}
+
     def __init__(self, bag_of_neurons):
 
         AbstractNeuronModel.__init__(self)

@@ -10,6 +10,22 @@ from data_specification.enums.data_type import DataType
 
 class SynapseTypeDualExponential(AbstractSynapseType):
 
+    @staticmethod
+    def default_parameters():
+        return {'tau_syn_E': 5.0, 'tau_syn_E2': 5.0, 'tau_syn_I': 5.0}
+
+    @staticmethod
+    def fixed_parameters():
+        return {}
+
+    @staticmethod
+    def state_variables():
+        return list()
+
+    @staticmethod
+    def is_array_parameters():
+        return {}
+
     def __init__(self, bag_of_neurons):
         AbstractSynapseType.__init__(self)
         self._n_neurons = len(bag_of_neurons)

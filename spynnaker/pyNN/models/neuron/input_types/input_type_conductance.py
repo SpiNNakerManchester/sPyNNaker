@@ -9,6 +9,22 @@ class InputTypeConductance(AbstractInputType):
     """ The conductance input type
     """
 
+    @staticmethod
+    def default_parameters():
+        return {'e_rev_E': 0.0, 'e_rev_I': -70.0}
+
+    @staticmethod
+    def fixed_parameters():
+        return {}
+
+    @staticmethod
+    def state_variables():
+        return list()
+
+    @staticmethod
+    def is_array_parameters():
+        return {}
+
     def __init__(self, bag_of_neurons):
         AbstractInputType.__init__(self, bag_of_neurons)
         self._n_neurons = len(bag_of_neurons)

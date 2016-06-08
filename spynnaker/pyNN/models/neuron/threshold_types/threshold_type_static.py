@@ -9,6 +9,22 @@ class ThresholdTypeStatic(AbstractThresholdType):
     """ A threshold that is a static value
     """
 
+    @staticmethod
+    def default_parameters():
+        return {'v_thresh': -50.0}
+
+    @staticmethod
+    def fixed_parameters():
+        return {}
+
+    @staticmethod
+    def state_variables():
+        return []
+
+    @staticmethod
+    def is_array_parameters():
+        return {}
+
     def __init__(self, bag_of_atoms):
         AbstractThresholdType.__init__(self)
         self._n_neurons = len(bag_of_atoms)

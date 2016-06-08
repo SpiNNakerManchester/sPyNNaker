@@ -11,6 +11,24 @@ from spynnaker.pyNN.utilities import utility_calls
 
 class NeuronModelLeakyIntegrate(AbstractNeuronModel):
 
+    @staticmethod
+    def default_parameters():
+        return {'v_init': None, 'v_rest': -65.0, 'tau_m': 20.0,
+                'cm': 1.0, 'i_offset': 0}
+
+    @staticmethod
+    def fixed_parameters():
+        return {}
+
+    @staticmethod
+    def state_variables():
+        params = list(['v'])
+        return params
+
+    @staticmethod
+    def is_array_parameters():
+        return {}
+
     def __init__(self, bag_of_neurons):
         AbstractNeuronModel.__init__(self)
         self._n_neurons = len(bag_of_neurons)

@@ -22,7 +22,7 @@ class AbstractAdditionalInput(BagOfNeuronSettable):
         """
 
     @abstractmethod
-    def get_parameters(self):
+    def get_parameters(self, atom_id):
         """ Get the parameters for the additional input
 
         :return: An array of parameters

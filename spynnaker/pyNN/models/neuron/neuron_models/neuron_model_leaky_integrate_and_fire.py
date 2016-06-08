@@ -10,6 +10,30 @@ import numpy
 
 class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
+    @staticmethod
+    def default_parameters():
+        parameters = {'v_reset': -65.0, 'tau_refrac': 0.1}
+        parameters.update(NeuronModelLeakyIntegrate.default_parameters())
+        return parameters
+
+    @staticmethod
+    def fixed_parameters():
+        parameters = dict()
+        parameters.update(NeuronModelLeakyIntegrate.fixed_parameters())
+        return parameters
+
+    @staticmethod
+    def state_variables():
+        parameters = list()
+        parameters.extend(NeuronModelLeakyIntegrate.state_variables())
+        return parameters
+
+    @staticmethod
+    def is_array_parameters():
+        parameters = dict()
+        parameters.update(NeuronModelLeakyIntegrate.is_array_parameters())
+        return parameters
+
     def __init__(self, bag_of_neurons):
         NeuronModelLeakyIntegrate.__init__(self, bag_of_neurons)
 

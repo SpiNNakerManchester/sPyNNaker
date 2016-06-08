@@ -18,13 +18,6 @@ class IFCurrExp(BagOfNeuronsVertex):
 
     model_based_max_atoms_per_core = 255
 
-    default_parameters = {
-        'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
-        'v_thresh': -50.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
-        'tau_refrac': 0.1, 'i_offset': 0, 'v_init': None}
-
-    state_variables = {'v'}
-
     neuron_model = NeuronModelLeakyIntegrateAndFire
     synapse_type = SynapseTypeExponential
     input_type = InputTypeCurrent
