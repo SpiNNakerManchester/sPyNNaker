@@ -8,7 +8,8 @@ from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
     import PopulationSettableChangeRequiresMapping
-from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
+from spynnaker.pyNN.models.common.multi_spike_recorder \
+    import MultiSpikeRecorder
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.spike_source\
@@ -95,7 +96,7 @@ class SpikeSourcePoisson(
         self._rng = numpy.random.RandomState(seed)
 
         # Prepare for recording, and to get spikes
-        self._spike_recorder = SpikeRecorder(machine_time_step)
+        self._spike_recorder = MultiSpikeRecorder(machine_time_step)
         self._spike_buffer_max_size = config.getint(
             "Buffers", "spike_buffer_size")
         self._buffer_size_before_receive = config.getint(
@@ -113,6 +114,15 @@ class SpikeSourcePoisson(
         self._using_auto_pause_and_resume = config.getboolean(
             "Buffers", "use_auto_pause_and_resume")
 
+    def _max_spikes_per_ts(self, vertex_slice):
+        max_rate = numpy.amax(
+            self._rate[vertex_slice.lo_atom:vertex_slice.hi_atom + 1])
+        ts_per_second = 1000000.0 / self._machine_time_step
+        max_spikes_per_ts = scipy.stats.poisson.ppf(
+            1.0 - (1.0 / self._no_machine_time_steps),
+            max_rate / ts_per_second)
+        return int(math.ceil(max_spikes_per_ts))
+
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -122,7 +132,8 @@ class SpikeSourcePoisson(
             constraints)
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._no_machine_time_steps)
+                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
+                self._no_machine_time_steps)
             spike_buffering_needed = recording_utils.needs_buffering(
                 self._spike_buffer_max_size, spike_buffer_size,
                 self._enable_buffered_recording)
@@ -132,7 +143,7 @@ class SpikeSourcePoisson(
                     buffering_port=self._receive_buffer_port)
         else:
             sdram_per_ts = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, 1)
+                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice), 1)
             subvertex.activate_buffering_output(
                 minimum_sdram_for_buffering=self._minimum_buffer_sdram,
                 buffered_sdram_per_timestep=sdram_per_ts)
@@ -395,7 +406,8 @@ class SpikeSourcePoisson(
             total_size += self._minimum_buffer_sdram
         else:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._no_machine_time_steps)
+                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
+                self._no_machine_time_steps)
             total_size += recording_utils.get_buffer_sizes(
                 self._spike_buffer_max_size, spike_buffer_size,
                 self._enable_buffered_recording)
@@ -428,7 +440,8 @@ class SpikeSourcePoisson(
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
 
         spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._no_machine_time_steps)
+            vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
+            self._no_machine_time_steps)
         spike_history_sz = recording_utils.get_buffer_sizes(
             self._spike_buffer_max_size, spike_buffer_size,
             self._enable_buffered_recording)

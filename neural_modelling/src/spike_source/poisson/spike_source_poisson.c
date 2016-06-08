@@ -5,9 +5,9 @@
  *
  */
 
-#include "../../common/out_spikes.h"
 #include "../../common/maths-util.h"
 
+#include <bit_field.h>
 #include <data_specification.h>
 #include <recording.h>
 #include <debug.h>
@@ -59,6 +59,12 @@ typedef enum poisson_region_parameters{
     PARAMETER_SEED_START_POSITION,
 } poisson_region_parameters;
 
+typedef struct timed_out_spikes{
+    uint32_t time;
+    uint32_t n_buffers;
+    uint32_t out_spikes[];
+} timed_out_spikes;
+
 // Globals
 //! global variable which contains all the data for neurons which are expected
 //! to exhibit slow spike generation (less than 1 per timer tick)
@@ -108,6 +114,79 @@ static uint32_t simulation_ticks = 0;
 
 //! the int that represents the bool for if the run is infinite or not.
 static uint32_t infinite_run;
+
+//! The recorded spikes
+static timed_out_spikes *spikes = NULL;
+
+//! The number of recording spike buffers that have been allocated
+static uint32_t n_spike_buffers_allocated;
+
+//! The size of each spike buffer in bytes
+static uint32_t spike_buffer_size;
+
+static uint32_t n_spike_buffer_words;
+
+static inline bit_field_t _out_spikes(uint32_t n) {
+    return &(spikes->out_spikes[n * n_spike_buffer_words]);
+}
+
+static inline void _reset_spikes() {
+    spikes->n_buffers = 0;
+    for (uint32_t n = n_spike_buffers_allocated; n > 0; n--) {
+        log_info("Clearing bit field %u of %u words", n - 1, n_spike_buffer_words);
+        clear_bit_field(_out_spikes(n - 1), n_spike_buffer_words);
+    }
+}
+
+static inline void _mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
+    if (n_spike_buffers_allocated < n_spikes) {
+        uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
+        log_info("Allocating %u bytes for spike buffering of %u spikes", new_size, n_spikes);
+        timed_out_spikes *new_spikes = (timed_out_spikes *) spin1_malloc(
+            new_size);
+        if (new_spikes == NULL) {
+            log_error("Cannot reallocate spike buffer");
+            rt_error(RTE_SWERR);
+        }
+        log_info("Clearing spikes");
+        uint32_t *data = (uint32_t *) new_spikes;
+        for (uint32_t n = new_size >> 2; n > 0; n--) {
+            data[n] = 0;
+        }
+        if (spikes != NULL) {
+            log_info("Copying old buffer");
+            uint32_t old_size =
+                8 + (n_spike_buffers_allocated * spike_buffer_size);
+            spin1_memcpy(new_spikes, spikes, old_size);
+            sark_free(spikes);
+        }
+        spikes = new_spikes;
+        n_spike_buffers_allocated = n_spikes;
+    }
+    log_info("Setting %u buffers", n_spikes);
+    if (spikes->n_buffers < n_spikes) {
+        spikes->n_buffers = n_spikes;
+    }
+    log_info("Recording %u spikes", n_spikes);
+    for (uint32_t n = n_spikes; n > 0; n--) {
+        bit_field_set(_out_spikes(n - 1), neuron_id);
+    }
+}
+
+static inline void _record_spikes(uint32_t time) {
+    if ((spikes != NULL) && (spikes->n_buffers > 0)) {
+        log_info("Recording spikes at time %u", time);
+        spikes->time = time;
+        recording_record(
+            0, spikes, 8 + (spikes->n_buffers * spike_buffer_size));
+        uint8_t *data = (uint8_t *) spikes;
+        for (uint32_t i = 0; i < 8 + (spikes->n_buffers * n_spike_buffer_words); i++) {
+            log_info("%08x ", data[i]);
+        }
+        log_info("Resetting spikes");
+        _reset_spikes();
+    }
+}
 
 //! \brief deduces the time in timer ticks until the next spike is to occur
 //!        given the mean inter-spike interval
@@ -239,6 +318,7 @@ static bool initialise_recording(){
         n_regions_to_record, regions_to_record,
         recording_flags_from_system_conf, state_region, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
+
     return success;
 }
 
@@ -278,6 +358,12 @@ static bool initialize(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
             data_specification_get_region(POISSON_PARAMS, address))) {
         return false;
     }
+
+    // Set up recording buffer
+    n_spike_buffers_allocated = 0;
+    n_spike_buffer_words = get_bit_field_size(
+        num_fast_spike_sources + num_slow_spike_sources);
+    spike_buffer_size = n_spike_buffer_words * sizeof(uint32_t);
 
     log_info("Initialise: completed successfully");
 
@@ -372,13 +458,11 @@ void timer_callback(uint timer_count, uint unused) {
             if (REAL_COMPARE(slow_spike_source->time_to_spike_ticks, <=,
                              REAL_CONST(0.0))) {
 
-                // Write spike to out spikes
-                out_spikes_set_spike(slow_spike_source->neuron_id);
-
                 // if no key has been given, do not send spike to fabric.
                 if (has_been_given_key) {
 
                     // Send package
+                    _mark_spike(slow_spike_source->neuron_id, 1);
                     _send_spike(key | slow_spike_source->neuron_id);
                 }
 
@@ -409,11 +493,9 @@ void timer_callback(uint timer_count, uint unused) {
             // If there are any
             if (num_spikes > 0) {
 
-                // Write spike to out spikes
-                out_spikes_set_spike(fast_spike_source->neuron_id);
+                _mark_spike(fast_spike_source->neuron_id, num_spikes);
 
                 // Send spikes
-
                 if (has_been_given_key) {
                     const uint32_t spike_key =
                         key | fast_spike_source->neuron_id;
@@ -429,9 +511,8 @@ void timer_callback(uint timer_count, uint unused) {
 
     // Record output spikes if required
     if (recording_flags > 0) {
-        out_spikes_record(0, time);
+        _record_spikes(time);
     }
-    out_spikes_reset();
 
     if (recording_flags > 0) {
         recording_do_timestep_update(time);
@@ -451,12 +532,6 @@ void c_main(void) {
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;
-
-    // Initialise out spikes buffer to support number of neurons
-    if (!out_spikes_initialize(num_fast_spike_sources
-                               + num_slow_spike_sources)) {
-         rt_error(RTE_SWERR);
-    }
 
     // Set timer tick (in microseconds)
     spin1_set_timer_tick(timer_period);
