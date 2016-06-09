@@ -30,6 +30,13 @@ class FixedNumberPostConnector(AbstractConnector):
         return self._get_delay_maximum(
             self._delays, self._n_pre_neurons * self._post_n)
 
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        if not self._is_connected(post_vertex_slice):
+            return 0.0
+        return self._get_delay_variance(self._delays, None)
+
     def _get_post_neurons(self):
         if self._post_neurons is None:
             n = 0
@@ -89,8 +96,6 @@ class FixedNumberPostConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         if not self._is_connected(post_vertex_slice):
             return 0.0
-        post_neurons = self._post_neurons_in_slice(post_vertex_slice)
-        n_connections = pre_vertex_slice.n_atoms * len(post_neurons)
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(

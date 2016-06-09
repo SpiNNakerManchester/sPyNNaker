@@ -31,6 +31,11 @@ class SmallWorldConnector(AbstractConnector):
     def get_delay_maximum(self):
         return self._get_delay_maximum(self._delays, self._n_connections)
 
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        return self._get_delay_variance(self._delays, None)
+
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
         return numpy.sum(
             self._mask[pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
@@ -65,8 +70,6 @@ class SmallWorldConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice)
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(

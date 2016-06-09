@@ -42,7 +42,10 @@ static uint32_t num_delay_stages = 0;
 static uint32_t num_delay_slots_mask = 0;
 static uint32_t neuron_bit_field_words = 0;
 
-static bool processing_spikes = false;
+static uint32_t n_in_spikes = 0;
+static uint32_t n_processed_spikes = 0;
+static uint32_t n_spikes_sent = 0;
+static uint32_t n_spikes_added = 0;
 
 static inline uint32_t round_to_next_pot(uint32_t v) {
     v--;
@@ -159,14 +162,10 @@ void incoming_spike_callback(uint key, uint payload) {
     use(payload);
 
     log_debug("Received spike %x", key);
+    n_in_spikes += 1;
 
     // If there was space to add spike to incoming spike queue
-    if (in_spikes_add_spike(key)) {
-        if (!processing_spikes) {
-            processing_spikes = true;
-            spin1_trigger_user_event(0, 0);
-        }
-    }
+    in_spikes_add_spike(key);
 }
 
 // Gets the neuron id of the incoming spike
@@ -174,9 +173,7 @@ static inline key_t _key_n(key_t k) {
     return k & incoming_neuron_mask;
 }
 
-void spike_process(uint unused0, uint unused1) {
-    use(unused0);
-    use(unused1);
+void spike_process() {
 
     // Get current time slot of incoming spike counters
     uint32_t current_time_slot = time & num_delay_slots_mask;
@@ -185,12 +182,10 @@ void spike_process(uint unused0, uint unused1) {
 
     log_debug("Current time slot %u", current_time_slot);
 
-    // Zero all counters in current time slot
-    memset(current_time_slot_spike_counters, 0, sizeof(uint8_t) * num_neurons);
-
     // While there are any incoming spikes
     spike_t s;
     while (in_spikes_get_next_spike(&s)) {
+        n_processed_spikes += 1;
 
         if ((s & incoming_mask) == incoming_key) {
 
@@ -202,6 +197,7 @@ void spike_process(uint unused0, uint unused1) {
                 current_time_slot_spike_counters[neuron_id]++;
                 log_debug("Incrementing counter %u = %u\n", neuron_id,
                           current_time_slot_spike_counters[neuron_id]);
+                n_spikes_added += 1;
             } else {
                 log_debug("Invalid neuron ID %u", neuron_id);
             }
@@ -209,13 +205,16 @@ void spike_process(uint unused0, uint unused1) {
             log_debug("Invalid spike key 0x%08x", s);
         }
     }
-
-    processing_spikes = false;
 }
 
 void timer_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
+
+    // Process all the spikes from the last timestep
+    uint state = spin1_int_disable();
+    spike_process();
+    spin1_mode_restore(state);
 
     time++;
 
@@ -226,6 +225,12 @@ void timer_callback(uint unused0, uint unused1) {
 
         // handle the pause and resume functionality
         simulation_handle_pause_resume(NULL);
+
+        log_info(
+            "Delay extension finished at time %u, %u received spikes, "
+            "%u processed spikes, %u sent spikes, %u added spikes",
+            time, n_in_spikes, n_processed_spikes, n_spikes_sent,
+            n_spikes_added);
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
@@ -247,8 +252,8 @@ void timer_callback(uint unused0, uint unused1) {
             uint8_t *delay_stage_spike_counters =
                 spike_counters[delay_stage_time_slot];
 
-            log_debug("Checking time slot %u for delay stage %u",
-                      delay_stage_time_slot, d);
+            log_debug("%u: Checking time slot %u for delay stage %u",
+                      time, delay_stage_time_slot, d);
 
             // Loop through neurons
             for (uint32_t n = 0; n < num_neurons; n++) {
@@ -260,14 +265,12 @@ void timer_callback(uint unused0, uint unused1) {
                     // sent with
                     uint32_t spike_key = ((d * num_neurons) + n) + key;
 
-#if LOG_LEVEL >= LOG_DEBUG
                     if (delay_stage_spike_counters[n] > 0) {
                         log_debug("Neuron %u sending %u spikes after delay"
                                   "stage %u with key %x",
                                   n, delay_stage_spike_counters[n], d,
                                   spike_key);
                     }
-#endif  // DEBUG
 
                     // Loop through counted spikes and send
                     for (uint32_t s = 0; s < delay_stage_spike_counters[n];
@@ -276,6 +279,8 @@ void timer_callback(uint unused0, uint unused1) {
                                                      NO_PAYLOAD)) {
                             spin1_delay_us(1);
                         }
+                        n_spikes_sent += 1;
+
                     }
                 }
             }
@@ -309,11 +314,11 @@ void c_main(void) {
     }
 
     // Set timer tick (in microseconds)
+    log_info("Timer period %u", timer_period);
     spin1_set_timer_tick(timer_period);
 
     // Register callbacks
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);
-    spin1_callback_on(USER_EVENT, spike_process, USER);
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     simulation_register_simulation_sdp_callback(

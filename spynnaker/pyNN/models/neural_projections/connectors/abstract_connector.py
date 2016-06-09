@@ -89,6 +89,27 @@ class AbstractConnector(object):
         """
 
     @staticmethod
+    def _get_delay_variance(delays, connection_slices):
+        """ Get the variance of the delays
+        """
+        if isinstance(delays, RandomDistribution):
+            return utility_calls.get_variance(delays)
+        elif numpy.isscalar(delays):
+            return 0.0
+        elif hasattr(delays, "__getitem__"):
+            return numpy.var([
+                delays[connection_slice]
+                for connection_slice in connection_slices])
+        raise Exception("Unrecognised delay format")
+
+    @abstractmethod
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        """ Get the variance of the delays for this connection
+        """
+
+    @staticmethod
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
             delays, n_total_connections, n_connections, connection_slices,
             min_delay, max_delay):
