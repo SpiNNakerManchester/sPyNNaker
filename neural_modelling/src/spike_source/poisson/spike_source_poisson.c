@@ -133,57 +133,47 @@ static inline bit_field_t _out_spikes(uint32_t n) {
 static inline void _reset_spikes() {
     spikes->n_buffers = 0;
     for (uint32_t n = n_spike_buffers_allocated; n > 0; n--) {
-        log_info("Clearing bit field %u of %u words", n - 1, n_spike_buffer_words);
         clear_bit_field(_out_spikes(n - 1), n_spike_buffer_words);
     }
 }
 
 static inline void _mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
-    if (n_spike_buffers_allocated < n_spikes) {
-        uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
-        log_info("Allocating %u bytes for spike buffering of %u spikes", new_size, n_spikes);
-        timed_out_spikes *new_spikes = (timed_out_spikes *) spin1_malloc(
-            new_size);
-        if (new_spikes == NULL) {
-            log_error("Cannot reallocate spike buffer");
-            rt_error(RTE_SWERR);
+    if (recording_flags > 0) {
+        if (n_spike_buffers_allocated < n_spikes) {
+            uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
+            timed_out_spikes *new_spikes = (timed_out_spikes *) spin1_malloc(
+                new_size);
+            if (new_spikes == NULL) {
+                log_error("Cannot reallocate spike buffer");
+                rt_error(RTE_SWERR);
+            }
+            uint32_t *data = (uint32_t *) new_spikes;
+            for (uint32_t n = new_size >> 2; n > 0; n--) {
+                data[n - 1] = 0;
+            }
+            if (spikes != NULL) {
+                uint32_t old_size =
+                    8 + (n_spike_buffers_allocated * spike_buffer_size);
+                spin1_memcpy(new_spikes, spikes, old_size);
+                sark_free(spikes);
+            }
+            spikes = new_spikes;
+            n_spike_buffers_allocated = n_spikes;
         }
-        log_info("Clearing spikes");
-        uint32_t *data = (uint32_t *) new_spikes;
-        for (uint32_t n = new_size >> 2; n > 0; n--) {
-            data[n] = 0;
+        if (spikes->n_buffers < n_spikes) {
+            spikes->n_buffers = n_spikes;
         }
-        if (spikes != NULL) {
-            log_info("Copying old buffer");
-            uint32_t old_size =
-                8 + (n_spike_buffers_allocated * spike_buffer_size);
-            spin1_memcpy(new_spikes, spikes, old_size);
-            sark_free(spikes);
+        for (uint32_t n = n_spikes; n > 0; n--) {
+            bit_field_set(_out_spikes(n - 1), neuron_id);
         }
-        spikes = new_spikes;
-        n_spike_buffers_allocated = n_spikes;
-    }
-    log_info("Setting %u buffers", n_spikes);
-    if (spikes->n_buffers < n_spikes) {
-        spikes->n_buffers = n_spikes;
-    }
-    log_info("Recording %u spikes", n_spikes);
-    for (uint32_t n = n_spikes; n > 0; n--) {
-        bit_field_set(_out_spikes(n - 1), neuron_id);
     }
 }
 
 static inline void _record_spikes(uint32_t time) {
     if ((spikes != NULL) && (spikes->n_buffers > 0)) {
-        log_info("Recording spikes at time %u", time);
         spikes->time = time;
         recording_record(
             0, spikes, 8 + (spikes->n_buffers * spike_buffer_size));
-        uint8_t *data = (uint8_t *) spikes;
-        for (uint32_t i = 0; i < 8 + (spikes->n_buffers * n_spike_buffer_words); i++) {
-            log_info("%08x ", data[i]);
-        }
-        log_info("Resetting spikes");
         _reset_spikes();
     }
 }

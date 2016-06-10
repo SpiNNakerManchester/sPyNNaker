@@ -89,9 +89,8 @@ class MultiSpikeRecorder(object):
                 spikes = spike_data.view("<i4").byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes_per_block * 8))
-                time_indices, indices = numpy.where(bits == 1)
-                times = numpy.asarray(
-                    [time * ms_per_tick])[time_indices].reshape((-1))
+                indices = numpy.nonzero(bits)[1]
+                times = numpy.repeat([time * ms_per_tick], len(indices))
                 indices = indices + lo_atom
                 spike_ids.append(indices)
                 spike_times.append(times)
