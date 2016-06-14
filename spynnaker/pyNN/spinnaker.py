@@ -67,6 +67,7 @@ class Spinnaker(SpinnakerMainInterface):
         self._pop_atom_mappings = dict()
         self._pop_view_atom_mapping = dict()
         self._assemble_atom_mapping = dict()
+        self._extra_edges = list()
 
         # command sender vertex
         self._multi_cast_vertex = None
@@ -463,3 +464,24 @@ class Spinnaker(SpinnakerMainInterface):
         for vertex in vertex_to_pop_mapping:
             if isinstance(vertex, AbstractGroupable):
                 vertex.set_mapping(vertex_to_pop_mapping)
+
+        # add extra edges needed from external device plugin to allow none
+        # synaptic edges to utility models or external devices.
+        for edge_data in self._extra_edges:
+            self._partitionable_graph.add_edge(
+                MultiCastPartitionableEdge(
+                    pre_vertex=pop_to_vertex_mapping[edge_data[0]][0],
+                    post_vertex=pop_to_vertex_mapping[edge_data[1]][0],
+                    label="recorder_edge"),
+                partition_id=edge_data[2])
+
+    def add_extra_edge(self, pre_population, post_population, partition_id):
+        """
+        supports adding extra edges into the graph after grouping has occured
+        :param pre_population:
+        :param post_population:
+        :param partition_id:
+        :return:
+        """
+        self._extra_edges.append(
+            [pre_population, post_population, partition_id])
