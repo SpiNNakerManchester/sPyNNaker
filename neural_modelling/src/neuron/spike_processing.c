@@ -75,6 +75,10 @@ static inline void _do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
+static inline void _do_direct_row(address_t row_address) {
+
+}
+
 static inline void _setup_synaptic_dma_read(circular_buffer in_spikes) {
 
     // Set up to store the DMA location and size to read

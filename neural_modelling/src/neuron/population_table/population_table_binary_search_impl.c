@@ -3,11 +3,17 @@
 #include <debug.h>
 #include <string.h>
 
+#define COUNT_MASK 0x0FFF
+#define TYPE_MASK  0xF000
+
+#define TYPE_ADDRESS 0x0000
+#define TYPE_DIRECT  0x1000
+
 typedef struct master_population_table_entry {
     uint32_t key;
     uint32_t mask;
     uint16_t start;
-    uint16_t count;
+    uint16_t count_and_type;
 } master_population_table_entry;
 
 typedef uint32_t address_and_row_length;
@@ -20,6 +26,7 @@ static address_t synaptic_rows_base_address;
 static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
+static uint8_t item_type;
 
 static inline uint32_t _get_address(address_and_row_length entry) {
 
@@ -42,7 +49,8 @@ static inline void _print_master_population_table() {
     log_info("------------------------------------------\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
-        for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
+        uint16_t count = entry.count_and_type & COUNT_MASK;
+        for (uint16_t j = entry.start; j < (entry.start + count); j++) {
             log_info(
                 "index (%d, %d), key: 0x%.8x, mask: 0x%.8x, address: 0x%.8x,"
                 " row_length: %u\n", i, j, entry.key, entry.mask,
@@ -125,7 +133,7 @@ bool population_table_get_first_address(
         int imid = (imax + imin) >> 1;
         master_population_table_entry entry = master_population_table[imid];
         if ((spike & entry.mask) == entry.key) {
-            if (entry.count == 0) {
+            if (entry.count_and_type == 0) {
                 log_debug(
                     "spike %u (= %x): population found in master population"
                     "table but count is 0");
@@ -133,11 +141,12 @@ bool population_table_get_first_address(
 
             last_neuron_id = _get_neuron_id(entry, spike);
             next_item = entry.start;
-            items_to_go = entry.count;
+            items_to_go = entry.count_and_type & COUNT_MASK;
+            item_type = entry.count_and_type & TYPE_MASK;
 
             log_debug(
                 "spike = %08x, entry_index = %u, start = %u, count = %u",
-                spike, imid, entry.start, entry.count);
+                spike, imid, next_item, items_to_go);
 
             return population_table_get_next_address(
                 row_address, n_bytes_to_transfer);
@@ -166,6 +175,14 @@ bool population_table_get_next_address(
     }
 
     address_and_row_length item = address_list[next_item];
+
+    // If the row is a direct row, indicate this by specifying the
+    // n_bytes_to_transfer is 0
+    if (item_type == TYPE_DIRECT) {
+        *row_address = (address_t) item;
+        *n_bytes_to_transfer = 0;
+        return true;
+    }
 
     uint32_t block_address =
         _get_address(item) + (uint32_t) synaptic_rows_base_address;
