@@ -1,15 +1,20 @@
-from collections import OrderedDict
+# pacman imports
 from pacman.model.partitionable_graph.partitionable_graph import \
     PartitionableGraph
 
+# spinnMachine imports
 from spinn_machine.utilities.progress_bar import ProgressBar
+
+# spynnaker imports
 from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex import \
     BagOfNeuronsVertex
 from spynnaker.pyNN.overridden_pacman_functions.groupers.\
     abstract_grouper import AbstractGrouper
 
-
+# general imports
 import logging
+from collections import OrderedDict
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,6 +35,7 @@ class Grouper(AbstractGrouper):
         pop_to_vertex_mapping = dict()
         vertex_to_pop_mapping = OrderedDict()
 
+        # add progress bar
         progress_bar = ProgressBar(
             len(population_atom_mapping.keys()),
             "grouping atoms together to create vertices")
@@ -57,12 +63,13 @@ class Grouper(AbstractGrouper):
             self, things_containing_model_type, model_type,
             partitionable_graph, pop_to_vertex_mapping, vertex_to_pop_mapping):
         """
-
-        :param things_containing_model_type:
-        :param model_type:
-        :param partitionable_graph:
-        :param pop_to_vertex_mapping:
-        :return:
+        takes the model type and tries to build as little vertices to cover
+        the different parameters available.
+        :param things_containing_model_type: local atom mapping for a model type
+        :param model_type: the model type in question
+        :param partitionable_graph: the partitionable graph to add vertices into
+        :param pop_to_vertex_mapping: the overall vertex to population map
+        :return: None
         """
 
         atoms = list()
