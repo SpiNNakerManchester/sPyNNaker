@@ -598,6 +598,8 @@ class SynapticManager(object):
                             post_vertex_slice, edge.n_delay_stages,
                             self._population_table_type, n_synapse_types,
                             weight_scales)
+                    if row_length == 1 and edge.synapse_information == 0:
+
 
                     if edge.delay_edge is not None:
                         edge.delay_edge.pre_vertex.add_delays(

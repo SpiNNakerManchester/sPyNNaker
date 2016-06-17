@@ -1,7 +1,7 @@
 
 # spynnaker imports
-from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import \
-    ProjectionPartitionedEdge
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
+    import ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neuron.master_pop_table_generators\
     .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 import struct
@@ -29,10 +29,11 @@ class _MasterPopEntry(object):
     ADDRESS_LIST_ENTRY_SIZE_BYTES = 4
     ADDRESS_LIST_ENTRY_SIZE_WORDS = 1
 
-    def __init__(self, routing_key, mask):
+    def __init__(self, routing_key, mask, is_single=False):
         self._routing_key = routing_key
         self._mask = mask
         self._addresses_and_row_lengths = list()
+        self._is_single = is_single
 
     def append(self, address, row_length):
         self._addresses_and_row_lengths.append((address, row_length))
@@ -58,6 +59,10 @@ class _MasterPopEntry(object):
         (synaptic matrix)
         """
         return self._addresses_and_row_lengths
+
+    @property
+    def is_single(self):
+        return self._is_single
 
 
 class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
@@ -123,7 +128,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         """
         :return: the size the master pop table will take in SDRAM (in bytes)
         """
-        in_edges = partitioned_graph.incoming_subedges_from_subvertex(subvertex)
+        in_edges = partitioned_graph.incoming_subedges_from_subvertex(
+            subvertex)
 
         n_subvertices = len(in_edges)
         n_entries = 0
@@ -166,7 +172,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :return:
         """
         self._entries = dict()
-        self._n_entries = 0
+        self._n_addresses = 0
+        self._n_single_entries = 0
 
     def update_master_population_table(
             self, spec, block_start_addr, row_length, keys_and_masks,
@@ -183,10 +190,22 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         key_and_mask = keys_and_masks[0]
         if key_and_mask.key not in self._entries:
             self._entries[key_and_mask.key] = _MasterPopEntry(
-                key_and_mask.key, key_and_mask.mask)
+                key_and_mask.key, key_and_mask.mask, is_single=False)
         self._entries[key_and_mask.key].append(
             block_start_addr / 4, row_length)
         self._n_addresses += 1
+
+    def update_master_population_table_one_to_one(
+            self, spec, keys_and_masks, row_data):
+        key_and_mask = keys_and_masks[0]
+        self._entries[key_and_mask.key] = _MasterPopEntry(
+            key_and_mask.key, key_and_mask.mask, is_single=True)
+
+        # The rows must be 4-elements big to be single entry
+        rows = row_data.reshape((-1, 4))
+        for row in rows:
+            self._entries[key_and_mask.key].append(row[3], 0)
+            self._n_addresses += 1
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Completes any operations required after all entries have been added

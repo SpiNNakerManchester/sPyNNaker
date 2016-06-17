@@ -7,12 +7,14 @@
 //! \param[in] table_address The address of the start of the table data
 //! \param[in] synapse_rows_address The address of the start of the synapse
 //!                                 data
+//! \param[in] direct_rows_address The address of the start of the direct
+//!                                synapse data
 //! \param[out] row_max_n_words Updated with the maximum length of any row in
 //!                             the table in words
 //! \return True if the table was initialised successfully, False otherwise
 bool population_table_initialise(
     address_t table_address, address_t synapse_rows_address,
-    uint32_t *row_max_n_words);
+    address_t direct_rows_address, uint32_t *row_max_n_words);
 
 //! \brief Get the first row data for the given input spike
 //! \param[in] spike The spike received

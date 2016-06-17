@@ -3,11 +3,11 @@
 #include <debug.h>
 #include <string.h>
 
-#define COUNT_MASK 0x0FFF
-#define TYPE_MASK  0xF000
+#define COUNT_MASK ((uint16_t) 0x0FFF)
+#define TYPE_MASK  ((uint16_t) 0xF000)
 
-#define TYPE_ADDRESS 0x0000
-#define TYPE_DIRECT  0x1000
+#define TYPE_ADDRESS ((uint16_t) 0x0000)
+#define TYPE_DIRECT  ((uint16_t) 0x1000)
 
 typedef struct master_population_table_entry {
     uint32_t key;
@@ -20,13 +20,14 @@ typedef uint32_t address_and_row_length;
 
 static master_population_table_entry *master_population_table;
 static uint32_t master_population_table_length;
-static address_and_row_length *address_list;
+static address_and_row_length *address_list;s
 static address_t synaptic_rows_base_address;
+static address_t direct_rows_base_address;
 
 static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
-static uint8_t item_type;
+static uint16_t item_type;
 
 static inline uint32_t _get_address(address_and_row_length entry) {
 
@@ -63,6 +64,7 @@ static inline void _print_master_population_table() {
 
 bool population_table_initialise(address_t table_address,
                                  address_t synapse_rows_address,
+                                 address_t direct_rows_address,
                                  uint32_t *row_max_n_words) {
     log_info("population_table_initialise: starting");
 
@@ -116,6 +118,7 @@ bool population_table_initialise(address_t table_address,
         "the stored synaptic matrix base address is located at: 0x%.8x",
         synapse_rows_address);
     synaptic_rows_base_address = synapse_rows_address;
+    direct_rows_base_address = direct_rows_address;
 
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
 
@@ -179,8 +182,11 @@ bool population_table_get_next_address(
     // If the row is a direct row, indicate this by specifying the
     // n_bytes_to_transfer is 0
     if (item_type == TYPE_DIRECT) {
-        *row_address = (address_t) item;
+        *row_address = (address_t) (
+            _get_address(item) + (uint32_t) direct_rows_base_address +
+            (last_neuron_id * sizeof(uint32_t)));
         *n_bytes_to_transfer = 0;
+        items_to_go = 0;
         return true;
     }
 

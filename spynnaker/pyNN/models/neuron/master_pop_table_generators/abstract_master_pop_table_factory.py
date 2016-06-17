@@ -53,6 +53,12 @@ class AbstractMasterPopTableFactory(object):
         """
 
     @abstractmethod
+    def update_master_population_table_one_to_one(
+            self, spec, keys_and_masks, synaptic_data):
+        """ Updates the master population table with one-to-one entries
+        """
+
+    @abstractmethod
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ completes the master pop table in the spec
 
