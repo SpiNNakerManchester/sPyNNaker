@@ -47,9 +47,14 @@ static spike_t spike;
 
 static circular_buffer in_spike_buffers[2];
 
-static uint32_t in_spike_buffer_write = 0;
+static uint32_t in_spike_buffer_write = 1;
 
 static uint32_t in_spike_buffer_read = 0;
+
+// The spikes lost through not processing fast enough
+static uint32_t timestep_lost_spikes = 0;
+
+static uint32_t n_spikes_received = 0;
 
 static uint32_t *single_fixed_synapses;
 
@@ -158,6 +163,7 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     log_debug("Received spike %x at %d", key, time);
 
     circular_buffer_add(in_spike_buffers[in_spike_buffer_write], key);
+    n_spikes_received += 1;
 }
 
 void spike_processing_do_timestep_update(uint32_t time) {
@@ -166,9 +172,13 @@ void spike_processing_do_timestep_update(uint32_t time) {
 
     in_spike_buffer_read = in_spike_buffer_write;
     in_spike_buffer_write = in_spike_buffer_write ^ 1;
-    _setup_synaptic_dma_read(in_spike_buffers[in_spike_buffer_read]);
+    timestep_lost_spikes += circular_buffer_size(
+        in_spike_buffers[in_spike_buffer_write]);
+    circular_buffer_clear(in_spike_buffers[in_spike_buffer_write]);
 
     spin1_mode_restore(state);
+
+    _setup_synaptic_dma_read(in_spike_buffers[in_spike_buffer_read]);
 }
 
 // Called when a DMA completes
@@ -303,7 +313,10 @@ uint32_t spike_processing_get_buffer_overflows() {
         overflows += circular_buffer_get_n_buffer_overflows(
             in_spike_buffers[i]);
     }
-
-    // Check for buffer overflow
     return overflows;
+}
+
+uint32_t spike_processing_get_thrown_away_packets() {
+    log_info("Received %u spikes\n", n_spikes_received);
+    return timestep_lost_spikes;
 }
