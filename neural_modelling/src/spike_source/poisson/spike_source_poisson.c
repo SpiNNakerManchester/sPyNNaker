@@ -407,7 +407,6 @@ void _send_spike(uint spike_key) {
 void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
     use(unused);
-    expected_time = tc[T1_COUNT] - time_between_spikes;
     time++;
 
     log_debug("Timer tick %u", time);
@@ -433,6 +432,9 @@ void timer_callback(uint timer_count, uint unused) {
     // Sleep for a random time
     spin1_delay_us(random_backoff_us);
 
+    // Set the next expected time to wait for between spike sending
+    expected_time = tc[T1_COUNT] - time_between_spikes;
+
     // Loop through slow spike sources
     slow_spike_source_t *slow_spike_sources = slow_spike_source_array;
     for (index_t s = num_slow_spike_sources; s > 0; s--) {
@@ -448,11 +450,12 @@ void timer_callback(uint timer_count, uint unused) {
             if (REAL_COMPARE(slow_spike_source->time_to_spike_ticks, <=,
                              REAL_CONST(0.0))) {
 
+                _mark_spike(slow_spike_source->neuron_id, 1);
+
                 // if no key has been given, do not send spike to fabric.
                 if (has_been_given_key) {
 
                     // Send package
-                    _mark_spike(slow_spike_source->neuron_id, 1);
                     _send_spike(key | slow_spike_source->neuron_id);
                 }
 

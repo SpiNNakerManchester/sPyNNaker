@@ -28,10 +28,11 @@ from data_specification.data_specification_generator\
 
 import logging
 import math
+import random
 
 logger = logging.getLogger(__name__)
 
-_DELAY_PARAM_HEADER_WORDS = 5
+_DELAY_PARAM_HEADER_WORDS = 7
 
 
 class DelayExtensionVertex(
@@ -44,6 +45,7 @@ class DelayExtensionVertex(
     """
 
     _DEFAULT_MALLOCS_USED = 2
+    _n_subvertices = 0
 
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
@@ -72,6 +74,7 @@ class DelayExtensionVertex(
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
+        DelayExtensionVertex._n_subvertices += 1
         return DelayExtensionPartitionedVertex(
             resources_required, label, constraints)
 
@@ -161,7 +164,6 @@ class DelayExtensionVertex(
         incoming_edges = partitioned_graph.incoming_subedges_from_subvertex(
             subvertex)
 
-
         for incoming_edge in incoming_edges:
             incoming_slice = graph_mapper.get_subvertex_slice(
                 incoming_edge.pre_subvertex)
@@ -216,6 +218,17 @@ class DelayExtensionVertex(
 
         # Write the number of blocks of delays:
         spec.write_value(data=self._n_delay_stages)
+
+        # Write the random back off value
+        spec.write_value(random.randint(
+            0, DelayExtensionVertex._n_subvertices))
+
+        # Write the time between spikes
+        spikes_per_timestep = self._n_delay_stages * vertex_slice.n_atoms
+        time_between_spikes = (
+            (self._machine_time_step * self._timescale_factor) /
+            (spikes_per_timestep * 2.0))
+        spec.write_value(data=int(time_between_spikes))
 
         # Write the actual delay blocks
         spec.write_array(array_values=self._delay_blocks[(

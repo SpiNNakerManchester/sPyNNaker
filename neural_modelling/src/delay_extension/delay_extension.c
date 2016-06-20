@@ -23,7 +23,8 @@ typedef enum region_identifiers{
 } region_identifiers;
 
 enum parameter_positions {
-    KEY, INCOMING_KEY, INCOMING_MASK, N_ATOMS, N_DELAY_STAGES, DELAY_BLOCKS
+    KEY, INCOMING_KEY, INCOMING_MASK, N_ATOMS, N_DELAY_STAGES,
+    RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, DELAY_BLOCKS
 };
 
 // Globals
@@ -46,6 +47,20 @@ static uint32_t n_in_spikes = 0;
 static uint32_t n_processed_spikes = 0;
 static uint32_t n_spikes_sent = 0;
 static uint32_t n_spikes_added = 0;
+
+//! An amount of microseconds to back off before starting the timer, in an
+//! attempt to avoid overloading the network
+static uint32_t random_backoff_us;
+
+//! The number of clock ticks between processing each neuron at each delay
+//! stage
+static uint32_t time_between_spikes;
+
+//! The expected current clock tick of timer_1 to wait for
+static uint32_t expected_time;
+
+static uint32_t n_delays = 0;
+
 
 static inline uint32_t round_to_next_pot(uint32_t v) {
     v--;
@@ -75,6 +90,9 @@ static bool read_parameters(address_t address) {
     neuron_bit_field_words = get_bit_field_size(num_neurons);
 
     num_delay_stages = address[N_DELAY_STAGES];
+    random_backoff_us = address[RANDOM_BACKOFF];
+    time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
+
     uint32_t num_delay_slots = num_delay_stages * DELAY_STAGE_LENGTH;
     uint32_t num_delay_slots_pot = round_to_next_pot(num_delay_slots);
     num_delay_slots_mask = (num_delay_slots_pot - 1);
@@ -85,6 +103,10 @@ static bool read_parameters(address_t address) {
              num_neurons, neuron_bit_field_words,
              num_delay_stages, num_delay_slots, num_delay_slots_pot,
              num_delay_slots_mask);
+
+    log_info(
+        "\t random back off = %u, time_between_spikes = %u",
+        random_backoff_us, time_between_spikes);
 
     // Create array containing a bitfield specifying whether each neuron should
     // emit spikes after each delay stage
@@ -232,11 +254,19 @@ void timer_callback(uint unused0, uint unused1) {
             time, n_in_spikes, n_processed_spikes, n_spikes_sent,
             n_spikes_added);
 
+        log_info("Delayed %u times", n_delays);
+
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time -= 1;
         return;
     }
+
+    // Sleep for a random time
+    spin1_delay_us(random_backoff_us);
+
+    // Set the next expected time to wait for between spike sending
+    expected_time = tc[T1_COUNT] - time_between_spikes;
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
@@ -283,6 +313,14 @@ void timer_callback(uint unused0, uint unused1) {
 
                     }
                 }
+
+                // Wait until the expected time to send
+                while (tc[T1_COUNT] > expected_time) {
+
+                    // Do Nothing
+                    n_delays += 1;
+                }
+                expected_time -= time_between_spikes;
             }
         }
     }
