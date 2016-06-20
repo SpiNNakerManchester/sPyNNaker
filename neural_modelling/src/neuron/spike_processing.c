@@ -237,7 +237,8 @@ bool spike_processing_initialise(
         size_t row_max_n_words, uint mc_packet_callback_priority,
         uint dma_transfer_callback_priority, uint user_event_priority,
         uint incoming_spike_buffer_size,
-        address_t single_fixed_synapses_base_address) {
+        address_t single_fixed_synapses_base_address,
+        address_t *single_fixed_synapses_local_address) {
     use(user_event_priority);
 
     // Allocate the DMA buffers
@@ -272,8 +273,9 @@ bool spike_processing_initialise(
     if (single_fixed_synapses == NULL) {
         log_error("Out of memory when creating single fixed synapses");
     }
+    *single_fixed_synapses_local_address = single_fixed_synapses;
     spin1_memcpy(
-        single_fixed_synapses, single_fixed_synapses_base_address,
+        single_fixed_synapses, &single_fixed_synapses_base_address[1],
         n_single_fixed_synapses * sizeof(uint32_t));
     single_fixed_synapse[0] = 0;
     single_fixed_synapse[1] = 1;

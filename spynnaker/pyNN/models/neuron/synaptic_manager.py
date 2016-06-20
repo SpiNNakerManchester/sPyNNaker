@@ -572,6 +572,13 @@ class SynapticManager(object):
         self._population_table_type.initialise_table(
             spec, master_pop_table_region)
 
+        # Set up for single synapses - write the offset of the single synapses
+        # initially 0
+        single_synapses = list()
+        spec.switch_write_focus(synaptic_matrix_region)
+        spec.write_value(0)
+        n_bytes_written = 0
+
         # For each subedge into the subvertex, create a synaptic list
         for subedge in in_subedges:
 
@@ -598,8 +605,6 @@ class SynapticManager(object):
                             post_vertex_slice, edge.n_delay_stages,
                             self._population_table_type, n_synapse_types,
                             weight_scales)
-                    if row_length == 1 and edge.synapse_information == 0:
-
 
                     if edge.delay_edge is not None:
                         edge.delay_edge.pre_vertex.add_delays(
@@ -623,21 +628,29 @@ class SynapticManager(object):
                             connection_holder.finish()
 
                     if len(row_data) > 0:
-                        next_block_start_address = self._write_padding(
-                            spec, synaptic_matrix_region,
-                            next_block_start_address)
-                        spec.switch_write_focus(synaptic_matrix_region)
-                        spec.write_array(row_data)
-                        partition = partitioned_graph.get_partition_of_subedge(
-                            subedge)
-                        keys_and_masks = \
-                            routing_info.get_keys_and_masks_from_partition(
-                                partition)
-                        self._population_table_type\
-                            .update_master_population_table(
-                                spec, next_block_start_address, row_length,
-                                keys_and_masks, master_pop_table_region)
-                        next_block_start_address += len(row_data) * 4
+
+                        if (row_length == 1 and
+                                len(edge.synapse_information) == 1):
+                            start_position = len(single_synapses)
+                            single_synapses.append(
+                                row_data.reshape(-1, 4)[:, 3])
+
+                        else:
+                            next_block_start_address = self._write_padding(
+                                spec, synaptic_matrix_region,
+                                next_block_start_address)
+                            spec.switch_write_focus(synaptic_matrix_region)
+                            spec.write_array(row_data)
+                            partition = partitioned_graph\
+                                .get_partition_of_subedge(subedge)
+                            keys_and_masks = \
+                                routing_info.get_keys_and_masks_from_partition(
+                                    partition)
+                            self._population_table_type\
+                                .update_master_population_table(
+                                    spec, next_block_start_address, row_length,
+                                    keys_and_masks, master_pop_table_region)
+                            next_block_start_address += len(row_data) * 4
                     del row_data
 
                     if next_block_start_address > all_syn_block_sz:

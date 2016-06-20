@@ -20,7 +20,7 @@ typedef uint32_t address_and_row_length;
 
 static master_population_table_entry *master_population_table;
 static uint32_t master_population_table_length;
-static address_and_row_length *address_list;s
+static address_and_row_length *address_list;
 static address_t synaptic_rows_base_address;
 static address_t direct_rows_base_address;
 
@@ -62,15 +62,16 @@ static inline void _print_master_population_table() {
     log_info("------------------------------------------\n");
 }
 
-bool population_table_initialise(address_t table_address,
-                                 address_t synapse_rows_address,
-                                 address_t direct_rows_address,
-                                 uint32_t *row_max_n_words) {
+bool population_table_initialise(
+        address_t table_address, address_t synapse_rows_address,
+        address_t direct_rows_address, uint32_t *row_max_n_words) {
     log_info("population_table_initialise: starting");
 
     master_population_table_length = table_address[0];
     log_info("master pop table length is %d\n", master_population_table_length);
-    log_info("master pop table entry size is %d\n", sizeof(master_population_table_entry));
+    log_info(
+        "master pop table entry size is %d\n",
+        sizeof(master_population_table_entry));
     uint32_t n_master_pop_bytes =
         master_population_table_length * sizeof(master_population_table_entry);
     uint32_t n_master_pop_words = n_master_pop_bytes >> 2;

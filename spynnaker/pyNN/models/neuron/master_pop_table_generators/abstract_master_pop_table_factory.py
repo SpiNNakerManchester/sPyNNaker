@@ -54,7 +54,7 @@ class AbstractMasterPopTableFactory(object):
 
     @abstractmethod
     def update_master_population_table_one_to_one(
-            self, spec, keys_and_masks, synaptic_data):
+            self, spec, keys_and_masks, start_position):
         """ Updates the master population table with one-to-one entries
         """
 

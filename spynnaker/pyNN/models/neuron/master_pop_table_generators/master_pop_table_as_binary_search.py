@@ -196,16 +196,11 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._n_addresses += 1
 
     def update_master_population_table_one_to_one(
-            self, spec, keys_and_masks, row_data):
+            self, spec, keys_and_masks, start_position):
         key_and_mask = keys_and_masks[0]
         self._entries[key_and_mask.key] = _MasterPopEntry(
             key_and_mask.key, key_and_mask.mask, is_single=True)
-
-        # The rows must be 4-elements big to be single entry
-        rows = row_data.reshape((-1, 4))
-        for row in rows:
-            self._entries[key_and_mask.key].append(row[3], 0)
-            self._n_addresses += 1
+        self._entries[key_and_mask.key].append(start_position, 1)
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Completes any operations required after all entries have been added
@@ -237,12 +232,16 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             pop_table[i]["key"] = entry.routing_key
             pop_table[i]["mask"] = entry.mask
             pop_table[i]["start"] = start
-            count = len(entry.addresses_and_row_lengths)
-            pop_table[i]["count"] = count
-            for j, (address, row_length) in enumerate(
-                    entry.addresses_and_row_lengths):
-                address_list[start + j] = (address << 8) | row_length
-            start += count
+            if entry.is_single:
+                pop_table[i]["count"] = 0x1001
+                address_list[start] = entry.addresses_and_row_lengths[0][0]
+            else:
+                count = len(entry.addresses_and_row_lengths)
+                pop_table[i]["count"] = count
+                for j, (address, row_length) in enumerate(
+                        entry.addresses_and_row_lengths):
+                    address_list[start + j] = (address << 8) | row_length
+                start += count
 
         # Write the arrays
         spec.write_array(pop_table.view("<u4"))
