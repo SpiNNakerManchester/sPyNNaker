@@ -31,6 +31,7 @@ from pyNN.random import RandomDistribution
 import math
 import sys
 import numpy
+import struct
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
@@ -804,10 +805,15 @@ class SynapticManager(object):
                 placement,
                 constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 transceiver)
+        direct_synapses_address = (
+            8 + synaptic_matrix_address + struct.unpack_from(
+                "<I", transceiver.read_memory(
+                    placement.x, placement.y, synaptic_matrix_address, 4))[0])
+        indirect_synapses_address = synaptic_matrix_address + 4
         data, max_row_length = self._retrieve_synaptic_block(
             transceiver, placement, master_pop_table_address,
-            synaptic_matrix_address, key, pre_vertex_slice.n_atoms,
-            synapse_info.index)
+            indirect_synapses_address, direct_synapses_address,
+            key, pre_vertex_slice.n_atoms, synapse_info.index)
 
         # Get the block for the connections from the delayed pre_subvertex
         delayed_data = None
@@ -816,7 +822,8 @@ class SynapticManager(object):
             delayed_data, delayed_max_row_length = \
                 self._retrieve_synaptic_block(
                     transceiver, placement, master_pop_table_address,
-                    synaptic_matrix_address, delayed_key,
+                    indirect_synapses_address, direct_synapses_address,
+                    delayed_key,
                     pre_vertex_slice.n_atoms * edge.n_delay_stages,
                     synapse_info.index)
 
@@ -829,7 +836,8 @@ class SynapticManager(object):
 
     def _retrieve_synaptic_block(
             self, transceiver, placement, master_pop_table_address,
-            synaptic_matrix_address, key, n_rows, index):
+            indirect_synapses_address, direct_synapses_address,
+            key, n_rows, index):
         """ Read in a synaptic block from a given processor and subvertex on\
             the machine
         """
@@ -845,20 +853,39 @@ class SynapticManager(object):
         if index >= len(items):
             return None, None
 
-        max_row_length, synaptic_block_offset = items[index]
+        max_row_length, synaptic_block_offset, is_single = items[index]
 
         block = None
         if max_row_length > 0 and synaptic_block_offset is not None:
 
-            # calculate the synaptic block size in bytes
-            synaptic_block_size = self._synapse_io.get_block_n_bytes(
-                max_row_length, n_rows)
+            if not is_single:
 
-            # read in and return the synaptic block
-            block = transceiver.read_memory(
-                placement.x, placement.y,
-                synaptic_matrix_address + synaptic_block_offset,
-                synaptic_block_size)
+                # calculate the synaptic block size in bytes
+                synaptic_block_size = self._synapse_io.get_block_n_bytes(
+                    max_row_length, n_rows)
+
+                # read in the synaptic block
+                block = transceiver.read_memory(
+                    placement.x, placement.y,
+                    indirect_synapses_address + synaptic_block_offset,
+                    synaptic_block_size)
+
+            else:
+                # The data is one per row
+                synaptic_block_size = n_rows * 4
+
+                # read in the synaptic row data
+                single_block = numpy.asarray(transceiver.read_memory(
+                    placement.x, placement.y,
+                    direct_synapses_address + (synaptic_block_offset * 4),
+                    synaptic_block_size), dtype="uint8").view("uint32")
+
+                # Convert the block into a set of rows
+                numpy_block = numpy.zeros((n_rows, 4), dtype="uint32")
+                numpy_block[:, 3] = single_block
+                numpy_block[:, 1] = 1
+                block = bytearray(numpy_block.tobytes())
+                max_row_length = 1
 
         self._retrieved_blocks[(placement, key, index)] = (
             block, max_row_length)

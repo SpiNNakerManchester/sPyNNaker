@@ -22,6 +22,12 @@ static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
 
+static inline uint32_t _get_direct_address(address_and_row_length entry) {
+
+    // Direct row address is just the direct address bit
+    return (entry & 0x7FFFFF00) >> 8;
+}
+
 static inline uint32_t _get_address(address_and_row_length entry) {
 
     // The address is in words and is the top 24-bits so this down shifts by
@@ -183,7 +189,7 @@ bool population_table_get_next_address(
     // n_bytes_to_transfer is 0
     if (_is_single(item)) {
         *row_address = (address_t) (
-            _get_address(item) + (uint32_t) direct_rows_base_address +
+            _get_direct_address(item) + (uint32_t) direct_rows_base_address +
             (last_neuron_id * sizeof(uint32_t)));
         *n_bytes_to_transfer = 0;
     } else {

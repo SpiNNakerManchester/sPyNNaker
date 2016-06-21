@@ -276,9 +276,16 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         addresses = list()
         for i in range(entry["start"], entry["start"] + entry["count"]):
             address_and_row_length = address_list[i]
-            addresses.append((
-                (address_and_row_length & 0xFF),
-                (address_and_row_length >> 8) * 4))
+            is_single = (address_and_row_length & 0x80000000) > 0
+            address = (address_and_row_length & 0x7FFFFF00)
+            row_length = address_and_row_length & 0xFF
+            if is_single:
+                address = address >> 8
+            else:
+                address = address >> 6
+
+            if is_single:
+                addresses.append((row_length, address, is_single))
         return addresses
 
     def _locate_entry(self, entries, key):
