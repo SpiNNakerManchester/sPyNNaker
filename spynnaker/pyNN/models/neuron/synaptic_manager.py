@@ -4,6 +4,8 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
 from spynnaker.pyNN.utilities.running_stats import RunningStats
+from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
+    import OneToOneConnector
 from spynnaker.pyNN.models.spike_source.spike_source_poisson \
     import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
@@ -634,7 +636,8 @@ class SynapticManager(object):
                             routing_info.get_keys_and_masks_from_partition(
                                 partition)
 
-                        if (row_length == 1):
+                        if (row_length == 1 and isinstance(
+                                synapse_info.connector, OneToOneConnector)):
                             single_rows = row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
                             self._population_table_type\
@@ -667,7 +670,8 @@ class SynapticManager(object):
                             (edge.pre_vertex, pre_vertex_slice.lo_atom,
                              pre_vertex_slice.hi_atom)]
 
-                        if delayed_row_length == 1:
+                        if (delayed_row_length == 1 and isinstance(
+                                synapse_info.connector, OneToOneConnector)):
                             single_rows = delayed_row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
                             self._population_table_type\
@@ -702,9 +706,12 @@ class SynapticManager(object):
 
         # Write the size and data of single synapses to the end of the region
         spec.switch_write_focus(synaptic_matrix_region)
-        single_data = numpy.concatenate(single_synapses)
-        spec.write_value(len(single_data) * 4)
-        spec.write_array(single_data)
+        if len(single_synapses) > 0:
+            single_data = numpy.concatenate(single_synapses)
+            spec.write_value(len(single_data) * 4)
+            spec.write_array(single_data)
+        else:
+            spec.write_value(0)
 
         # Write the position of the single synapses
         spec.set_write_pointer(0)
