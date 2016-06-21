@@ -29,14 +29,14 @@ class _MasterPopEntry(object):
     ADDRESS_LIST_ENTRY_SIZE_BYTES = 4
     ADDRESS_LIST_ENTRY_SIZE_WORDS = 1
 
-    def __init__(self, routing_key, mask, is_single=False):
+    def __init__(self, routing_key, mask):
         self._routing_key = routing_key
         self._mask = mask
         self._addresses_and_row_lengths = list()
-        self._is_single = is_single
 
-    def append(self, address, row_length):
-        self._addresses_and_row_lengths.append((address, row_length))
+    def append(self, address, row_length, is_single):
+        self._addresses_and_row_lengths.append(
+            (address, row_length, is_single))
 
     @property
     def routing_key(self):
@@ -59,10 +59,6 @@ class _MasterPopEntry(object):
         (synaptic matrix)
         """
         return self._addresses_and_row_lengths
-
-    @property
-    def is_single(self):
-        return self._is_single
 
 
 class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
@@ -177,7 +173,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     def update_master_population_table(
             self, spec, block_start_addr, row_length, keys_and_masks,
-            master_pop_table_region):
+            master_pop_table_region, is_single=False):
         """ Adds a entry in the binary search to deal with the synaptic matrix
 
         :param spec: the writer for dsg
@@ -190,17 +186,13 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         key_and_mask = keys_and_masks[0]
         if key_and_mask.key not in self._entries:
             self._entries[key_and_mask.key] = _MasterPopEntry(
-                key_and_mask.key, key_and_mask.mask, is_single=False)
+                key_and_mask.key, key_and_mask.mask)
+        start_addr = block_start_addr
+        if not is_single:
+            start_addr = block_start_addr / 4
         self._entries[key_and_mask.key].append(
-            block_start_addr / 4, row_length)
+            start_addr, row_length, is_single)
         self._n_addresses += 1
-
-    def update_master_population_table_one_to_one(
-            self, spec, keys_and_masks, start_position):
-        key_and_mask = keys_and_masks[0]
-        self._entries[key_and_mask.key] = _MasterPopEntry(
-            key_and_mask.key, key_and_mask.mask, is_single=True)
-        self._entries[key_and_mask.key].append(start_position, 1)
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Completes any operations required after all entries have been added
@@ -232,16 +224,17 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             pop_table[i]["key"] = entry.routing_key
             pop_table[i]["mask"] = entry.mask
             pop_table[i]["start"] = start
-            if entry.is_single:
-                pop_table[i]["count"] = 0x1001
-                address_list[start] = entry.addresses_and_row_lengths[0][0]
-            else:
-                count = len(entry.addresses_and_row_lengths)
-                pop_table[i]["count"] = count
-                for j, (address, row_length) in enumerate(
-                        entry.addresses_and_row_lengths):
-                    address_list[start + j] = (address << 8) | row_length
-                start += count
+            count = len(entry.addresses_and_row_lengths)
+            pop_table[i]["count"] = count
+            for j, (address, row_length, is_single) in enumerate(
+                    entry.addresses_and_row_lengths):
+                single_bit = 0
+                if is_single:
+                    single_bit = 0x80000000
+                address_list[start + j] = (
+                    (single_bit | (address & 0x7FFFFF) << 8) |
+                    (row_length & 0xFF))
+            start += count
 
         # Write the arrays
         spec.write_array(pop_table.view("<u4"))

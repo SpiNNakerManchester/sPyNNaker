@@ -3,17 +3,11 @@
 #include <debug.h>
 #include <string.h>
 
-#define COUNT_MASK ((uint16_t) 0x0FFF)
-#define TYPE_MASK  ((uint16_t) 0xF000)
-
-#define TYPE_ADDRESS ((uint16_t) 0x0000)
-#define TYPE_DIRECT  ((uint16_t) 0x1000)
-
 typedef struct master_population_table_entry {
     uint32_t key;
     uint32_t mask;
     uint16_t start;
-    uint16_t count_and_type;
+    uint16_t count;
 } master_population_table_entry;
 
 typedef uint32_t address_and_row_length;
@@ -27,17 +21,20 @@ static address_t direct_rows_base_address;
 static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
-static uint16_t item_type;
 
 static inline uint32_t _get_address(address_and_row_length entry) {
 
-    // The address is in words and is the top 24-bits, so this down shifts by
+    // The address is in words and is the top 24-bits so this down shifts by
     // 8 and then multiplies by 4 (= up shifts by 2) = down shift by 6
-    return entry >> 6;
+    return (entry & 0x7FFFFF00) >> 6;
 }
 
 static inline uint32_t _get_row_length(address_and_row_length entry) {
     return entry & 0xFF;
+}
+
+static inline uint32_t _is_single(address_and_row_length entry) {
+    return entry & 0x80000000;
 }
 
 static inline uint32_t _get_neuron_id(
@@ -50,7 +47,7 @@ static inline void _print_master_population_table() {
     log_info("------------------------------------------\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
-        uint16_t count = entry.count_and_type & COUNT_MASK;
+        uint16_t count = entry.count;
         for (uint16_t j = entry.start; j < (entry.start + count); j++) {
             log_info(
                 "index (%d, %d), key: 0x%.8x, mask: 0x%.8x, address: 0x%.8x,"
@@ -115,9 +112,12 @@ bool population_table_initialise(
         n_address_list_bytes);
 
     // Store the base address
-    log_debug(
-        "the stored synaptic matrix base address is located at: 0x%.8x",
+    log_info(
+        "the stored synaptic matrix base address is located at: 0x%08x",
         synapse_rows_address);
+    log_info(
+        "the direct synaptic matrix base address is located at: 0x%08x",
+        direct_rows_address);
     synaptic_rows_base_address = synapse_rows_address;
     direct_rows_base_address = direct_rows_address;
 
@@ -137,7 +137,7 @@ bool population_table_get_first_address(
         int imid = (imax + imin) >> 1;
         master_population_table_entry entry = master_population_table[imid];
         if ((spike & entry.mask) == entry.key) {
-            if (entry.count_and_type == 0) {
+            if (entry.count == 0) {
                 log_debug(
                     "spike %u (= %x): population found in master population"
                     "table but count is 0");
@@ -145,8 +145,7 @@ bool population_table_get_first_address(
 
             last_neuron_id = _get_neuron_id(entry, spike);
             next_item = entry.start;
-            items_to_go = entry.count_and_type & COUNT_MASK;
-            item_type = entry.count_and_type & TYPE_MASK;
+            items_to_go = entry.count;
 
             log_debug(
                 "spike = %08x, entry_index = %u, start = %u, count = %u",
@@ -182,27 +181,26 @@ bool population_table_get_next_address(
 
     // If the row is a direct row, indicate this by specifying the
     // n_bytes_to_transfer is 0
-    if (item_type == TYPE_DIRECT) {
+    if (_is_single(item)) {
         *row_address = (address_t) (
             _get_address(item) + (uint32_t) direct_rows_base_address +
             (last_neuron_id * sizeof(uint32_t)));
         *n_bytes_to_transfer = 0;
-        items_to_go = 0;
-        return true;
+    } else {
+
+        uint32_t block_address =
+            _get_address(item) + (uint32_t) synaptic_rows_base_address;
+        uint32_t row_length = _get_row_length(item);
+        uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+        uint32_t neuron_offset = last_neuron_id * stride * sizeof(uint32_t);
+
+        *row_address = (address_t) (block_address + neuron_offset);
+        *n_bytes_to_transfer = stride * sizeof(uint32_t);
+        log_debug("neuron_id = %u, block_address = 0x%.8x,"
+                  "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+                  last_neuron_id, block_address, row_length, *row_address,
+                  *n_bytes_to_transfer);
     }
-
-    uint32_t block_address =
-        _get_address(item) + (uint32_t) synaptic_rows_base_address;
-    uint32_t row_length = _get_row_length(item);
-    uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
-    uint32_t neuron_offset = last_neuron_id * stride * sizeof(uint32_t);
-
-    *row_address = (address_t) (block_address + neuron_offset);
-    *n_bytes_to_transfer = stride * sizeof(uint32_t);
-    log_debug("neuron_id = %u, block_address = 0x%.8x,"
-              "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-              last_neuron_id, block_address, row_length, *row_address,
-              *n_bytes_to_transfer);
 
     next_item += 1;
     items_to_go -= 1;

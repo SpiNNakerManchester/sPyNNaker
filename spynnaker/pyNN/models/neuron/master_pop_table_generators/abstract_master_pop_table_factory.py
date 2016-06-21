@@ -36,11 +36,11 @@ class AbstractMasterPopTableFactory(object):
     @abstractmethod
     def update_master_population_table(
             self, spec, block_start_addr, row_length, keys_and_masks,
-            master_pop_table_region):
+            master_pop_table_region, is_single=False):
         """ updates a spec with a master pop entry in some form
 
         :param spec: the spec to write the master pop entry to
-        :param block_start_addr: the start address of the master pop table
+        :param block_start_addr: the start address of the row in the region
         :param row_length: the row length of this entry
         :param keys_and_masks: list of key_and_mask objects containing the\
                     keys and masks for a given edge that will require being\
@@ -49,13 +49,8 @@ class AbstractMasterPopTableFactory(object):
                     :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
         :param master_pop_table_region: the region to which the master pop\
                     table is being stored
+        :param is_single True if this is a single synapse, False otherwise
         :return:
-        """
-
-    @abstractmethod
-    def update_master_population_table_one_to_one(
-            self, spec, keys_and_masks, start_position):
-        """ Updates the master population table with one-to-one entries
         """
 
     @abstractmethod

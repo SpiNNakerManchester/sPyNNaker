@@ -103,5 +103,6 @@ class PopulationPartitionedVertex(
             report=input_buffer_cleared_count > 0,
             message=(
                 "The input buffer for {} on {}, {}, {} lost {} packets"
-                " through clearing at each timestep.")))
+                " through clearing at each timestep.".format(
+                    label, x, y, p, input_buffer_cleared_count))))
         return provenance_items

@@ -143,10 +143,14 @@ static bool initialise(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
     // Set up the synapses
     input_t *input_buffers;
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
+    address_t indirect_synapses_address;
+    address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
+            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
             n_neurons, &input_buffers,
-            &ring_buffer_to_input_buffer_left_shifts)) {
+            &ring_buffer_to_input_buffer_left_shifts,
+            &indirect_synapses_address, &direct_synapses_address)) {
         return false;
     }
     neuron_set_input_buffers(input_buffers);
@@ -155,7 +159,7 @@ static bool initialise(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
     uint32_t row_max_n_words;
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, address),
-            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
+            indirect_synapses_address, direct_synapses_address,
             &row_max_n_words)) {
         return false;
     }
