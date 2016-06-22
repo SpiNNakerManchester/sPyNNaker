@@ -284,8 +284,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             else:
                 address = address >> 6
 
-            if is_single:
-                addresses.append((row_length, address, is_single))
+            addresses.append((row_length, address, is_single))
         return addresses
 
     def _locate_entry(self, entries, key):
