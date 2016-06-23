@@ -90,8 +90,8 @@ static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
 
 static inline void _print_ring_buffers(uint32_t time) {
 #if LOG_LEVEL >= LOG_DEBUG
-    log_debug("Ring Buffer\n");
-    log_debug("----------------------------------------\n");
+    io_printf(IO_BUF, "Ring Buffer at %u\n", time);
+    io_printf(IO_BUF, "----------------------------------------\n");
     for (uint32_t n = 0; n < n_neurons; n++) {
         for (uint32_t t = 0; t < SYNAPSE_TYPE_COUNT; t++) {
             const char *type_string = synapse_types_get_type_char(t);
@@ -101,7 +101,7 @@ static inline void _print_ring_buffers(uint32_t time) {
                     synapses_get_ring_buffer_index(d + time, t, n)] == 0);
             }
             if (!empty) {
-                log_debug("%3d(%s):", n, type_string);
+                io_printf(IO_BUF, "%3d(%s):", n, type_string);
                 for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
                     log_debug(" ");
                     uint32_t ring_buffer_index =
@@ -109,11 +109,11 @@ static inline void _print_ring_buffers(uint32_t time) {
                     synapses_print_weight(ring_buffers[ring_buffer_index],
                                           ring_buffer_to_input_left_shifts[t]);
                 }
-                log_debug("\n");
+                io_printf(IO_BUF, "\n");
             }
         }
     }
-    log_debug("----------------------------------------\n");
+    io_printf(IO_BUF, "----------------------------------------\n");
 #else
     use(time);
 #endif // LOG_LEVEL >= LOG_DEBUG

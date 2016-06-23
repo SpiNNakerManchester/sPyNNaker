@@ -78,11 +78,14 @@ static inline void _do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
+<<<<<<< HEAD
 static inline void _do_direct_row(address_t row_address) {
     single_fixed_synapse[3] = (uint32_t) row_address[0];
     synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
 }
 
+=======
+>>>>>>> refs/heads/spread_poisson
 static inline void _setup_synaptic_dma_read() {
 
     // Set up to store the DMA location and size to read
@@ -90,9 +93,16 @@ static inline void _setup_synaptic_dma_read() {
     size_t n_bytes_to_transfer;
 
     bool setup_done = false;
+<<<<<<< HEAD
     bool finished = false;
     uint state = 0;
     while (!setup_done && !finished) {
+=======
+    uint state = spin1_int_disable();
+    while (!setup_done && circular_buffer_get_next(in_spike_buffer, &spike)) {
+        spin1_mode_restore(state);
+        log_debug("Checking for row for spike 0x%.8x\n", spike);
+>>>>>>> refs/heads/spread_poisson
 
         // If there's more rows to process from the previous spike
         while (!setup_done && population_table_get_next_address(
@@ -132,6 +142,7 @@ static inline void _setup_synaptic_dma_read() {
         if (!setup_done) {
             finished = true;
         }
+        state = spin1_int_disable();
     }
 
     // If the setup was not done, and there are no more spikes,
@@ -153,7 +164,7 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
     size_t n_plastic_region_bytes =
         synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
 
-    log_debug("Writing back %u bytes of plastic region to %08x",
+    log_info("Writing back %u bytes of plastic region to %08x",
               n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
 
     // Start transfer
