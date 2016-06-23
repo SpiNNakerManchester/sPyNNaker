@@ -477,7 +477,7 @@ class SynapticManager(object):
 
         # If 2^max_weight_power equals the max weight, we have to add another
         # power, as range is 0 - (just under 2^max_weight_power)!
-        max_weight_powers = [w + 1 if (2 ** w) >= a else w
+        max_weight_powers = [w + 1 if (2 ** w) <= a else w
                              for w, a in zip(max_weight_powers, max_weights)]
 
         # If we have synapse dynamics that uses signed weights,
