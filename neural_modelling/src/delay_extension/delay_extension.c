@@ -125,7 +125,7 @@ static bool read_parameters(address_t address) {
     return true;
 }
 
-static bool initialize(uint32_t *timer_period) {
+static bool initialize(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
     log_info("initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -139,7 +139,7 @@ static bool initialize(uint32_t *timer_period) {
     // Get the timing details
     if (!simulation_read_timing_details(
             data_specification_get_region(SYSTEM, address),
-            APPLICATION_NAME_HASH, timer_period)) {
+            APPLICATION_NAME_HASH, timer_period, simulation_sdp_port)) {
         return false;
     }
 
@@ -294,7 +294,8 @@ void c_main(void) {
 
     // Initialise
     uint32_t timer_period = 0;
-    if (!initialize(&timer_period)) {
+    uint32_t simulation_sdp_port = 0;
+    if (!initialize(&timer_period, &simulation_sdp_port)) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
     }
@@ -316,7 +317,7 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     simulation_register_simulation_sdp_callback(
-        &simulation_ticks, &infinite_run, SDP);
+        &simulation_ticks, &infinite_run, SDP, simulation_sdp_port);
 
     // set up provenance registration
     simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
