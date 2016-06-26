@@ -25,7 +25,7 @@ static inline uint32_t _get_address(address_and_row_length entry) {
 
     // The address is in words and is the top 24-bits, so this down shifts by
     // 8 and then multiplies by 4 (= up shifts by 2) = down shift by 6
-    return entry >> 6;
+    return (entry & 0xFFFFFF00) >> 6;
 }
 
 static inline uint32_t _get_row_length(address_and_row_length entry) {
