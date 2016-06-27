@@ -385,7 +385,8 @@ void c_main(void) {
         &simulation_ticks, &infinite_run, SDP, simulation_sdp_port);
 
     // set up provenance registration
-    simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
+    simulation_register_provenance_callback(
+        _store_provenance_data, PROVENANCE_REGION);
 
     simulation_run();
 }
