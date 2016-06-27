@@ -53,8 +53,7 @@ static inline void _print_master_population_table() {
     log_info("------------------------------------------\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
-        uint16_t count = entry.count;
-        for (uint16_t j = entry.start; j < (entry.start + count); j++) {
+        for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
             log_info(
                 "index (%d, %d), key: 0x%.8x, mask: 0x%.8x, address: 0x%.8x,"
                 " row_length: %u\n", i, j, entry.key, entry.mask,
