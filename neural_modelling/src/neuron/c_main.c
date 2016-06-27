@@ -234,7 +234,6 @@ void timer_callback(uint timer_count, uint unused) {
     }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
-    spike_processing_do_timestep_update(time);
     neuron_do_timestep_update(time);
 
     // trigger buffering_out_mechanism

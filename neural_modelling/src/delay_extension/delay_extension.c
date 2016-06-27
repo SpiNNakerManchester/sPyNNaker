@@ -27,6 +27,15 @@ enum parameter_positions {
     RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, DELAY_BLOCKS
 };
 
+typedef enum extra_provenance_data_region_entries{
+    N_PACKETS_RECEIVED = 0,
+    N_PACKETS_PROCESSED = 1,
+    N_PACKETS_ADDED = 2,
+    N_PACKETS_SENT = 3,
+    N_BUFFER_OVERFLOWS = 4,
+    N_DELAYS = 5
+} extra_provenance_data_region_entries;
+
 // Globals
 static uint32_t key = 0;
 static uint32_t incoming_key = 0;
@@ -330,6 +339,19 @@ void timer_callback(uint unused0, uint unused1) {
     uint8_t *current_time_slot_spike_counters =
         spike_counters[current_time_slot];
     memset(current_time_slot_spike_counters, 0, sizeof(uint8_t) * num_neurons);
+}
+
+void _store_provenance_data(address_t provenance_region){
+    log_debug("writing other provenance data");
+
+    // store the data into the provenance data region
+    provenance_region[N_PACKETS_RECEIVED] = n_in_spikes;
+    provenance_region[N_PACKETS_PROCESSED] = n_processed_spikes;
+    provenance_region[N_PACKETS_ADDED] = n_spikes_added;
+    provenance_region[N_PACKETS_SENT] = n_spikes_sent;
+    provenance_region[N_BUFFER_OVERFLOWS] = in_spikes_get_n_buffer_overflows();
+    provenance_region[N_DELAYS] = n_delays;
+    log_debug("finished other provenance data");
 }
 
 // Entry point
