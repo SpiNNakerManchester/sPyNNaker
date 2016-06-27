@@ -23,13 +23,14 @@ class DelayExtensionPartitionedVertex(
                ("N_PACKETS_PROCESSED", 1),
                ("N_PACKETS_ADDED", 2),
                ("N_PACKETS_SENT", 3),
-               ("N_BUFFER_OVERFLOWS", 4)])
+               ("N_BUFFER_OVERFLOWS", 4),
+               ("N_DELAYS", 5)])
 
     def __init__(self, resources_required, label, constraints=None):
         PartitionedVertex.__init__(
             self, resources_required, label, constraints=constraints)
         ProvidesProvenanceDataFromMachineImpl.__init__(
-            self, self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value, 5)
+            self, self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value, 6)
 
     def get_provenance_data_from_machine(self, transceiver, placement):
         provenance_data = self._read_provenance_data(transceiver, placement)
@@ -48,6 +49,8 @@ class DelayExtensionPartitionedVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_SENT.value]
         n_buffer_overflows = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_BUFFER_OVERFLOWS.value]
+        n_delays = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_DELAYS.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -86,3 +89,7 @@ class DelayExtensionPartitionedVertex(
                 "increase the timer_tic or time_scale_factor or decrease the "
                 "number of neurons per core.".format(
                     label, x, y, p, n_buffer_overflows))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
+            n_delays))
+        return provenance_items
