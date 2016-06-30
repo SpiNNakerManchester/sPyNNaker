@@ -20,7 +20,7 @@ from pacman.model.constraints.partitioner_constraints.\
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
-from pacman.model.partitionable_graph.abstract_partitionable_vertex \
+from pacman.model.graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
 from data_specification.data_specification_generator\

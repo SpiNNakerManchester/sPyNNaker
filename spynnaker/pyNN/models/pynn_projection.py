@@ -174,11 +174,11 @@ class Projection(object):
         :param presynaptic_vertex: the source partitionable vertex of the\
                 multapse
         :type presynaptic_vertex: instance of\
-                pacman.model.partitionable_graph.abstract_partitionable_vertex
+                pacman.model.graph.abstract_partitionable_vertex
         :param postsynaptic_vertex: The destination partitionable vertex of\
                 the multapse
         :type postsynaptic_vertex: instance of\
-                pacman.model.partitionable_graph.abstract_partitionable_vertex
+                pacman.model.graph.abstract_partitionable_vertex
         :return: None or the edge going to these vertices.
         """
         graph_edges = self._spinnaker.partitionable_graph.edges

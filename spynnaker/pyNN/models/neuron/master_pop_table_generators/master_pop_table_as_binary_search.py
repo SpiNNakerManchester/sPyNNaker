@@ -8,7 +8,7 @@ import struct
 from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
     import ProjectionPartitionableEdge
 
-from pacman.model.partitionable_graph.abstract_partitionable_vertex\
+from pacman.model.graph.abstract_partitionable_vertex\
     import AbstractPartitionableVertex
 
 # general imports
