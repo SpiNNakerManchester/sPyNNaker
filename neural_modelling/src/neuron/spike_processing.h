@@ -14,8 +14,4 @@ void spike_processing_finish_write(uint32_t process_id);
 //! \return the number of times the input buffer has overflowed
 uint32_t spike_processing_get_buffer_overflows();
 
-//! \brief returns the number of packets that were thrown away at the end
-//!        of the timestep having not been processed
-uint32_t spike_processing_get_thrown_away_packets();
-
 #endif // _SPIKE_PROCESSING_H_

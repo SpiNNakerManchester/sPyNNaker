@@ -48,8 +48,6 @@ static uint32_t max_n_words;
 
 static spike_t spike;
 
-static uint32_t n_spikes_received = 0;
-
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void _do_dma_read(
@@ -153,7 +151,6 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     } else {
         log_debug("Could not add spike");
     }
-    n_spikes_received += 1;
 }
 
 // Called when a user event is received
