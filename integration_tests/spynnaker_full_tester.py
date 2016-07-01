@@ -11,10 +11,8 @@ import copy
 import argparse  # thanks to Jamie Knight for this thing.
 
 
-
 class _Variable(object):
-    """
-    simple data holder.
+    """ Simple data holder.
     """
 
     def __init__(self, basic, variables):
@@ -23,22 +21,19 @@ class _Variable(object):
 
     @property
     def variables(self):
-        """
-        values which are the variable points
+        """ Values which are the variable points
         """
         return self._variables
 
     @property
     def basic(self):
-        """
-        the basic place
+        """ The basic place
         """
         return self._basic
 
 
-class SpYNNakerCFGParameterSwitcher(object):
-    """
-    explorer
+class sPyNNakerCFGParameterSwitcher(object):
+    """ Explorer of configuration switches
     """
 
     def __init__(self, machine_name, bmp_names, version, spalloc_server,
@@ -59,8 +54,8 @@ class SpYNNakerCFGParameterSwitcher(object):
         self._execute_tests(cfg_combinations)
 
     def _execute_tests(self, cfg_combinations):
-        """
-        execute all tests with all combinations
+        """ Execute all tests with all combinations
+
         :param cfg_combinations: the combination of cfg parameters
         :return:
         """
@@ -82,8 +77,8 @@ class SpYNNakerCFGParameterSwitcher(object):
 
     def _execute_test(self, test_script_file_path, test_location, combinations,
                       failed_test_cfg_folder):
-        """
-        goes through all the cfg combinations and tests a script with them
+        """ Goes through all the cfg combinations and tests a script with them
+
         :param test_script_file_path: the file_path to the test
         :param test_location: the location to test stuff
         :param combinations: the combinations of cfg parameters
@@ -138,8 +133,8 @@ class SpYNNakerCFGParameterSwitcher(object):
     @staticmethod
     def _move_test_script_to_test_folder(
             test_location, original_test_script_file_path):
-        """
-        move the script to be tested into the test folder.
+        """ Move the script to be tested into the test folder.
+
         :param test_location: the location where the script goes to
         :param original_test_script_file_path: the test script
         :return: the new test script file path
@@ -151,7 +146,9 @@ class SpYNNakerCFGParameterSwitcher(object):
         in_file = open(original_test_script_file_path, "r")
 
         out.write(
-            "# coding: utf-8\nimport matplotlib \nmatplotlib.use('Agg')\n")
+            "# coding: utf-8\n"
+            "import matplotlib\n"
+            "matplotlib.use('Agg')\n")
         temp = in_file.read()
         in_file.close()
 
@@ -161,8 +158,8 @@ class SpYNNakerCFGParameterSwitcher(object):
         return test_script_file_path
 
     def _generate_test_script_file_paths(self, user_test_script):
-        """
-        locates all scripts for the testing purposes.
+        """ Locates all scripts for the testing purposes.
+
         :param user_test_script: the list of user test scripts.
         :return: list of all test scripts.
         """
@@ -171,7 +168,7 @@ class SpYNNakerCFGParameterSwitcher(object):
         else:
             # locate where i am. as the integration tests are next to me
             location = os.path.dirname(os.path.realpath(__file__))
-            for dir_path, dir_names, file_names in os.walk(location):
+            for dir_path, _, file_names in os.walk(location):
                 for name in file_names:
                     if (name.endswith('.py') and
                             name != "spynnaker_full_tester.py" and
@@ -184,15 +181,15 @@ class SpYNNakerCFGParameterSwitcher(object):
     def _create_parameters(
             self, machine_name, bmp_names, version, spalloc_server,
             spalloc_user):
-        """
-        creates the parameters and identities which ones are variable,
-        machine based, and static.
+        """ Creates the parameters and identities which ones are variable,\
+            machine based, and static.
+
         :param machine_name:
             The ip address or domain name for the SpiNNaker machine to
             use for basic runs.
         :param bmp_names:
             The ip address or domain name for the SpiNNaker machines
-            bmp connection.
+            BMP connection.
         :param version: The version of the SpiNNaker Machine.
         :param spalloc_server:
             The spalloc server address to be used for finding a SpiNNaker
@@ -215,7 +212,7 @@ class SpYNNakerCFGParameterSwitcher(object):
         self._static_cfg_params["Machine"][
             "post_simulation_overrun_before_error"] = \
             config.get("Machine", "post_simulation_overrun_before_error")
-        
+
         # static logging
         self._static_cfg_params["Logging"] = dict()
         self._static_cfg_params["Logging"]["instantiate"] = \
@@ -232,14 +229,14 @@ class SpYNNakerCFGParameterSwitcher(object):
             config.get("Logging", "error")
         self._static_cfg_params["Logging"]["critical"] = \
             config.get("Logging", "critical")
-        
+
         # static recording
         self._static_cfg_params["Recording"] = dict()
         self._static_cfg_params["Recording"]["live_spike_port"] = \
             config.get("Recording", "live_spike_port")
         self._static_cfg_params["Recording"]["live_spike_host"] = \
             config.get("Recording", "live_spike_host")
-        
+
         # static buffers
         self._static_cfg_params["Buffers"] = dict()
         self._static_cfg_params["Buffers"]["receive_buffer_port"] = \
@@ -258,14 +255,14 @@ class SpYNNakerCFGParameterSwitcher(object):
             config.get("Buffers", "gsyn_buffer_size")
         self._static_cfg_params["Buffers"]["minimum_buffer_sdram"] = \
             config.get("Buffers", "minimum_buffer_sdram")
-        
+
         # static mode
         self._static_cfg_params["Mode"] = dict()
         self._static_cfg_params["Mode"]["mode"] = \
             config.get("Mode", "mode")
         self._static_cfg_params["Mode"]["verify_writes"] = \
             config.get("Mode", "verify_writes")
-        
+
         # static database
         self._static_cfg_params["Database"] = dict()
         self._static_cfg_params["Database"]["create_database"] = \
@@ -327,7 +324,7 @@ class SpYNNakerCFGParameterSwitcher(object):
         self._static_cfg_params["Machine"]["machineTimeStep"] = None
         self._static_cfg_params["Machine"]["timeScaleFactor"] = None
 
-        # static auto detect bmp
+        # static auto detect BMP
         self._static_cfg_params["Machine"]["auto_detect_bmp"] = False
 
         # dynamic machine
@@ -387,8 +384,8 @@ class SpYNNakerCFGParameterSwitcher(object):
         self._variable_cfg_params.append(data)
 
     def _generate_cfg_combinations(self):
-        """
-        generate the cfg combinations
+        """ Generate the cfg combinations
+
         :return: return the set of cfg parameter combinations
         """
         combination_base = dict()
@@ -414,8 +411,8 @@ class SpYNNakerCFGParameterSwitcher(object):
         return combinations
 
     def _add_basic_machine(self, combination_base):
-        """
-        add the machine's basic parameter set
+        """ Add the machine's basic parameter set
+
         :param combination_base: the combination to add these parameters to
         :return: None
         """
@@ -426,9 +423,9 @@ class SpYNNakerCFGParameterSwitcher(object):
                     self._machine_cfg_params[variable][field].basic
 
     def _sort_out_machine_combinations(self, combination_base, combinations):
-        """
-        sort out the machine exploration so that it doesnt overload the
-        test suite
+        """ Sort out the machine exploration so that it doesn't overload the\
+            test suite
+
         :param combination_base: the combination base to start with
         :param combinations: the set of complete combinations
         :return:
@@ -450,8 +447,9 @@ class SpYNNakerCFGParameterSwitcher(object):
 
     def _iterate_variable_params(
             self, combination_base, position, combinations, variables):
-        """
-        recursive method to iterate though the parameters for some variables
+        """ Recursive method to iterate though the parameters for some\
+            variables
+
         :param combination_base: the current combination to start adding to
         :param position: the position in the variables to iterate through
         :param combinations: the cfg combinations
@@ -492,14 +490,13 @@ class SpYNNakerCFGParameterSwitcher(object):
 
 
 def main():
+    """ Entrance when running directly.
     """
-    entrance when running directly.
-    :return: None
-    """
+
     # build parser
     parser = argparse.ArgumentParser(
-        description=
-        'Executes either a fixed set of tests or all integration tests.')
+        description=(
+            'Executes either a fixed set of tests or all integration tests.'))
     parser.add_argument(
         'machine_name', type=str,
         help="The ip address or domain name for the SpiNNaker machine to "
@@ -507,7 +504,7 @@ def main():
     parser.add_argument(
         'bmp_names', type=str,
         help="The ip address or domain name for the SpiNNaker machines "
-             "bmp connection.")
+             "BMP connection.")
     parser.add_argument(
         'version', type=int, choices=[2, 3, 4, 5],
         help="The version of the SpiNNaker Machine.")
@@ -547,7 +544,7 @@ def main():
         print "         {}".format(test)
 
     # run tester
-    SpYNNakerCFGParameterSwitcher(
+    sPyNNakerCFGParameterSwitcher(
         machine_name, bmp_names, version, spalloc_server, spalloc_user, tests)
 
 if __name__ == "__main__":
