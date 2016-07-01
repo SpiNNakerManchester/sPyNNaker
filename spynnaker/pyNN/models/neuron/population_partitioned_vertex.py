@@ -29,10 +29,9 @@ class PopulationPartitionedVertex(
         names=[("PRE_SYNAPTIC_EVENT_COUNT", 0),
                ("SATURATION_COUNT", 1),
                ("BUFFER_OVERFLOW_COUNT", 2),
-               ("CURRENT_TIMER_TIC", 3),
-               ("INPUT_BUFFER_CLEARED", 4)])
+               ("CURRENT_TIMER_TIC", 3)])
 
-    N_ADDITIONAL_PROVENANCE_DATA_ITEMS = 5
+    N_ADDITIONAL_PROVENANCE_DATA_ITEMS = 4
 
     def __init__(
             self, resources_required, label, is_recording, constraints=None):
@@ -63,8 +62,6 @@ class PopulationPartitionedVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.PRE_SYNAPTIC_EVENT_COUNT.value]
         last_timer_tick = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.CURRENT_TIMER_TIC.value]
-        input_buffer_cleared_count = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.INPUT_BUFFER_CLEARED.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -96,13 +93,4 @@ class PopulationPartitionedVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Last_timer_tic_the_core_ran_to"),
             last_timer_tick))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(
-                names, "Number_of_packets_cleared_from_the_input_buffers"),
-            input_buffer_cleared_count,
-            report=input_buffer_cleared_count > 0,
-            message=(
-                "The input buffer for {} on {}, {}, {} lost {} packets"
-                " through clearing at each timestep.".format(
-                    label, x, y, p, input_buffer_cleared_count))))
         return provenance_items

@@ -48,8 +48,6 @@ static uint32_t max_n_words;
 
 static spike_t spike;
 
-static uint32_t n_spikes_received = 0;
-
 static uint32_t single_fixed_synapse[4];
 
 /* PRIVATE FUNCTIONS - static for inlining */
@@ -186,7 +184,6 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     } else {
         log_debug("Could not add spike");
     }
-    n_spikes_received += 1;
 }
 
 // Called when a user event is received

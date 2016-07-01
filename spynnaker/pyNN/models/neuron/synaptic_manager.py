@@ -26,6 +26,7 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities import helpful_functions
 
 from scipy import special
+import scipy.stats
 from collections import defaultdict
 from pyNN.random import RandomDistribution
 import math
@@ -402,7 +403,7 @@ class SynapticManager(object):
         total_weights = numpy.zeros(n_synapse_types)
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
-        max_rate = self._spikes_per_second
+        rate_stats = [RunningStats() for _ in range(n_synapse_types)]
 
         for subedge in sub_graph.incoming_subedges_from_subvertex(subvertex):
             pre_vertex_slice = graph_mapper.get_subvertex_slice(
@@ -450,19 +451,24 @@ class SynapticManager(object):
                         biggest_weight[synapse_type], weight_max)
 
                     spikes_per_tick = self._spikes_per_tick
+                    spikes_per_second = self._spikes_per_second
                     if isinstance(edge.pre_vertex, SpikeSourcePoisson):
-                        rate = edge.pre_vertex.rate
-                        if hasattr(rate, "__getitem__"):
-                            rate = max(rate)
-                        elif isinstance(rate, RandomDistribution):
-                            rate = utility_calls.get_maximum_probable_value(
-                                rate, pre_vertex_slice.n_atoms)
-                        if rate > max_rate:
-                            max_rate = rate
-                        spikes_per_tick = max(
-                            1.0,
-                            rate /
+                        spikes_per_second = edge.pre_vertex.rate
+                        if hasattr(spikes_per_second, "__getitem__"):
+                            spikes_per_second = max(spikes_per_second)
+                        elif isinstance(spikes_per_second, RandomDistribution):
+                            spikes_per_second = \
+                                utility_calls.get_maximum_probable_value(
+                                    spikes_per_second,
+                                    pre_vertex_slice.n_atoms)
+                        prob = 1.0 - ((1.0 / 100.0) / pre_vertex_slice.n_atoms)
+                        spikes_per_tick = (
+                            spikes_per_second /
                             (1000000.0 / float(self._machine_time_step)))
+                        spikes_per_tick = scipy.stats.poisson.ppf(
+                            prob, spikes_per_tick)
+                    rate_stats[synapse_type].add_items(
+                        spikes_per_second, 0, n_connections)
                     total_weights[synapse_type] += spikes_per_tick * (
                         weight_max * n_connections)
 
@@ -472,13 +478,14 @@ class SynapticManager(object):
         max_weights = numpy.zeros(n_synapse_types)
         for synapse_type in range(n_synapse_types):
             stats = running_totals[synapse_type]
+            rates = rate_stats[synapse_type]
             if delay_running_totals[synapse_type].variance == 0.0:
                 max_weights[synapse_type] = total_weights[synapse_type]
             else:
                 max_weights[synapse_type] = min(
                     self._ring_buffer_expected_upper_bound(
                         stats.mean, stats.standard_deviation,
-                        max_rate, machine_timestep, stats.n_items,
+                        rates.mean, machine_timestep, stats.n_items,
                         self._ring_buffer_sigma),
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
@@ -491,7 +498,7 @@ class SynapticManager(object):
 
         # If 2^max_weight_power equals the max weight, we have to add another
         # power, as range is 0 - (just under 2^max_weight_power)!
-        max_weight_powers = [w + 1 if (2 ** w) >= a else w
+        max_weight_powers = [w + 1 if (2 ** w) <= a else w
                              for w, a in zip(max_weight_powers, max_weights)]
 
         # If we have synapse dynamics that uses signed weights,
