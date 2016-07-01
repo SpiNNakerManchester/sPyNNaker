@@ -16,7 +16,6 @@
 #define PROFILER_TIMER                    0
 #define PROFILER_DMA_READ                 1
 #define PROFILER_INCOMING_SPIKE           2
-
 #define PROFILER_PROCESS_FIXED_SYNAPSES   3
 #define PROFILER_PROCESS_PLASTIC_SYNAPSES 4
 
@@ -44,29 +43,25 @@ void profiler_init();
 //---------------------------------------
 // Inline functions
 //---------------------------------------
-static inline void profiler_write_entry(uint32_t tag)
-{
-  if(profiler_samples_remaining > 0)
-  {
-    *profiler_output++ = tc[T2_COUNT];
-    *profiler_output++ = tag;
-    profiler_samples_remaining--;
-  }
+static inline void profiler_write_entry(uint32_t tag) {
+    if (profiler_samples_remaining > 0) {
+        *profiler_output++ = tc[T2_COUNT];
+        *profiler_output++ = tag;
+        profiler_samples_remaining--;
+    }
 }
 
-static inline void profiler_write_entry_disable_irq_fiq(uint32_t tag)
-{
-  uint sr = spin1_irq_disable();
-  spin1_fiq_disable();
-  profiler_write_entry(tag);
-  spin1_mode_restore(sr);
+static inline void profiler_write_entry_disable_irq_fiq(uint32_t tag) {
+    uint sr = spin1_irq_disable();
+    spin1_fiq_disable();
+    profiler_write_entry(tag);
+    spin1_mode_restore(sr);
 }
 
-static inline void profiler_write_entry_disable_fiq(uint32_t tag)
-{
-  uint sr = spin1_fiq_disable();
-  profiler_write_entry(tag);
-  spin1_mode_restore(sr);
+static inline void profiler_write_entry_disable_fiq(uint32_t tag) {
+    uint sr = spin1_fiq_disable();
+    profiler_write_entry(tag);
+    spin1_mode_restore(sr);
 }
 #else // PROFILER_ENABLED
 

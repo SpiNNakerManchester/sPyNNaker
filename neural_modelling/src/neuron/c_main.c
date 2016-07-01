@@ -79,7 +79,7 @@ static uint32_t infinite_run;
 //! The recording flags
 static uint32_t recording_flags = 0;
 
-//! Profiler number of smaples
+//! Profiler number of samples
 uint32_t num_profiling_samples;
 
 //! \brief Initialises the recording parts of the model
@@ -252,7 +252,7 @@ void timer_callback(uint timer_count, uint unused) {
     if (recording_flags > 0) {
         recording_do_timestep_update(time);
     }
- 
+
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 
