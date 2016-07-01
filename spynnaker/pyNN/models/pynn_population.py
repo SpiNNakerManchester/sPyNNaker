@@ -10,8 +10,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
     import AbstractPopulationInitializable
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
     import InputTypeConductance
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
@@ -22,10 +20,11 @@ from spynnaker.pyNN.models.common.abstract_v_recordable \
     import AbstractVRecordable
 
 from spinn_front_end_common.utilities import exceptions
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 
 import numpy
 import logging
-import copy
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +47,6 @@ class Population(object):
     :returns a list of vertexes and edges
     """
 
-    _non_labelled_vertex_count = 0
-
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
                  structure=None):
         if size is not None and size <= 0:
@@ -61,8 +58,8 @@ class Population(object):
         cell_label = label
         if label is None:
             cell_label = "Population {}".format(
-                Population._non_labelled_vertex_count)
-            Population._non_labelled_vertex_count += 1
+                spinnaker.none_labelled_vertex_count)
+            spinnaker.increment_none_labelled_vertex_count()
 
         # copy the parameters so that the end users are not exposed to the
         # additions placed by spinnaker.
@@ -89,7 +86,7 @@ class Population(object):
             self._structure = None
 
         self._spinnaker._add_population(self)
-        self._spinnaker.add_vertex(self._vertex)
+        self._spinnaker.add_partitionable_vertex(self._vertex)
 
         # initialise common stuff
         self._size = size
@@ -102,13 +99,13 @@ class Population(object):
 
     @property
     def requires_mapping(self):
-        if isinstance(self._vertex, AbstractMappable):
+        if isinstance(self._vertex, AbstractChangableAfterRun):
             return self._vertex.requires_mapping
         return self._change_requires_mapping
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
-        if isinstance(self._vertex, AbstractMappable):
+        if isinstance(self._vertex, AbstractChangableAfterRun):
             self._vertex.mark_no_changes()
 
     def __add__(self, other):

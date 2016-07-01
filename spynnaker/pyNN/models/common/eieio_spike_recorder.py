@@ -59,7 +59,7 @@ class EIEIOSpikeRecorder(object):
             # Read the spikes
             raw_spike_data, data_missing = \
                 buffer_manager.get_data_for_vertex(
-                    x, y, p, region, state_region)
+                    placement, region, state_region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             spike_data = str(raw_spike_data.read_all())

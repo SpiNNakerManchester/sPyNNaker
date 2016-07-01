@@ -1,7 +1,7 @@
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
@@ -9,8 +9,8 @@ from spynnaker.pyNN.models.common.eieio_spike_recorder \
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_has_first_machine_time_step\
+from spinn_front_end_common.abstract_models\
+    .abstract_has_first_machine_time_step \
     import AbstractHasFirstMachineTimeStep
 
 
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractMappable,
+        SimplePopulationSettable, AbstractChangableAfterRun,
         AbstractHasFirstMachineTimeStep):
     """ Model for play back of spikes
     """
@@ -83,10 +83,11 @@ class SpikeSourceArray(
             send_buffer_notification_ip_address=self._ip_address,
             send_buffer_notification_port=self._port,
             send_buffer_notification_tag=tag)
+
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
-        AbstractMappable.__init__(self)
+        AbstractChangableAfterRun.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
 
         # handle recording
@@ -164,6 +165,7 @@ class SpikeSourceArray(
         self._spike_recorder.record = True
 
     def get_spikes(self, placements, graph_mapper, buffer_manager):
+
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager,
             (ReverseIPTagMulticastSourcePartitionedVertex.
@@ -171,7 +173,9 @@ class SpikeSourceArray(
             (ReverseIPTagMulticastSourcePartitionedVertex.
              _REGIONS.RECORDING_BUFFER_STATE.value),
             placements, graph_mapper, self,
-            lambda subvertex: subvertex.virtual_key)
+            lambda subvertex:
+                subvertex.virtual_key if subvertex.virtual_key is not None
+                else 0)
 
     @property
     def model_name(self):

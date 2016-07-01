@@ -321,6 +321,10 @@ void timer_callback(uint timer_count, uint unused) {
         if (recording_flags > 0) {
             recording_finalise();
         }
+
+        // Subtract 1 from the time so this tick gets done again on the next
+        // run
+        time -= 1;
         return;
     }
 

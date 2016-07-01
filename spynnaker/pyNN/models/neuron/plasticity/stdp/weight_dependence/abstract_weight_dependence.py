@@ -34,3 +34,8 @@ class AbstractWeightDependence(object):
         """ The maximum weight that will ever be set in a synapse as a result\
             of this rule
         """
+
+    def get_provenance_data(self, pre_population_label, post_population_label):
+        """ Get any provenance data
+        """
+        return list()

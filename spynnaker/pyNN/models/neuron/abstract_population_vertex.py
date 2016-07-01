@@ -29,8 +29,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
-from spynnaker.pyNN.models.abstract_models.abstract_mappable \
-    import AbstractMappable
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
@@ -86,7 +86,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractMappable):
+        AbstractChangableAfterRun):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -108,7 +108,7 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
-        AbstractMappable.__init__(self)
+        AbstractChangableAfterRun.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -172,8 +172,12 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
 
+        is_recording = (
+            self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
+            self._spike_recorder.record
+        )
         subvertex = PopulationPartitionedVertex(
-            resources_required, label, constraints)
+            resources_required, label, is_recording, constraints)
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._no_machine_time_steps)
