@@ -103,8 +103,7 @@ static inline void _setup_synaptic_dma_read() {
 
         // If there's more incoming spikes
         cpsr = spin1_int_disable();
-        while (!setup_done && circular_buffer_get_next(
-                in_spike_buffer, &spike)) {
+        while (!setup_done && in_spikes_get_next_spike(&spike)) {
             spin1_mode_restore(cpsr);
             log_debug("Checking for row for spike 0x%.8x\n", spike);
 
