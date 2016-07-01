@@ -3,6 +3,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
+from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.spike_source.spike_source_poisson \
     import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
@@ -23,6 +24,7 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities import helpful_functions
 
 from scipy import special
+import scipy.stats
 from collections import defaultdict
 from pyNN.random import RandomDistribution
 import math
@@ -393,10 +395,12 @@ class SynapticManager(object):
         """
         weight_scale_squared = weight_scale * weight_scale
         n_synapse_types = self._synapse_type.get_n_synapse_types()
+        running_totals = [RunningStats() for _ in range(n_synapse_types)]
+        delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
         total_weights = numpy.zeros(n_synapse_types)
         biggest_weight = numpy.zeros(n_synapse_types)
-        upper_bounds = numpy.zeros(n_synapse_types)
         weights_signed = False
+        rate_stats = [RunningStats() for _ in range(n_synapse_types)]
 
         for subedge in sub_graph.incoming_subedges_from_subvertex(subvertex):
             pre_vertex_slice = graph_mapper.get_subvertex_slice(
@@ -426,11 +430,15 @@ class SynapticManager(object):
                         connector, pre_slices, pre_slice_index,
                         post_slices, post_slice_index, pre_vertex_slice,
                         post_vertex_slice) * weight_scale_squared)
+                    running_totals[synapse_type].add_items(
+                        weight_mean, weight_variance, n_connections)
 
                     delay_variance = synapse_dynamics.get_delay_variance(
                         connector, pre_slices, pre_slice_index,
                         post_slices, post_slice_index, pre_vertex_slice,
                         post_vertex_slice)
+                    delay_running_totals[synapse_type].add_items(
+                        0.0, delay_variance, n_connections)
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
                         connector, pre_slices, pre_slice_index,
@@ -440,39 +448,43 @@ class SynapticManager(object):
                         biggest_weight[synapse_type], weight_max)
 
                     spikes_per_tick = self._spikes_per_tick
-                    rate = self._spikes_per_second
+                    spikes_per_second = self._spikes_per_second
                     if isinstance(edge.pre_vertex, SpikeSourcePoisson):
-                        rate = edge.pre_vertex.rate
-                        if hasattr(rate, "__getitem__"):
-                            rate = max(rate)
-                        elif isinstance(rate, RandomDistribution):
-                            rate = utility_calls.get_maximum_probable_value(
-                                rate, pre_vertex_slice.n_atoms)
-                        spikes_per_tick = max(
-                            1.0,
-                            rate /
+                        spikes_per_second = edge.pre_vertex.rate
+                        if hasattr(spikes_per_second, "__getitem__"):
+                            spikes_per_second = max(spikes_per_second)
+                        elif isinstance(spikes_per_second, RandomDistribution):
+                            spikes_per_second = \
+                                utility_calls.get_maximum_probable_value(
+                                    spikes_per_second,
+                                    pre_vertex_slice.n_atoms)
+                        prob = 1.0 - ((1.0 / 100.0) / pre_vertex_slice.n_atoms)
+                        spikes_per_tick = (
+                            spikes_per_second /
                             (1000000.0 / float(self._machine_time_step)))
+                        spikes_per_tick = scipy.stats.poisson.ppf(
+                            prob, spikes_per_tick)
+                    rate_stats[synapse_type].add_items(
+                        spikes_per_second, 0, n_connections)
                     total_weights[synapse_type] += spikes_per_tick * (
                         weight_max * n_connections)
-                    upper_bound = 0.0
-                    if delay_variance == 0.0:
-                        upper_bound = spikes_per_tick * (
-                            weight_max * n_connections)
-                    if n_connections > 0:
-                        upper_bound = \
-                            SynapticManager._ring_buffer_expected_upper_bound(
-                                weight_mean, weight_variance ** 2,
-                                rate, machine_timestep, n_connections,
-                                self._ring_buffer_sigma)
-                    upper_bounds[synapse_type] += upper_bound
 
                     if synapse_dynamics.are_weights_signed():
                         weights_signed = True
 
         max_weights = numpy.zeros(n_synapse_types)
         for synapse_type in range(n_synapse_types):
+            stats = running_totals[synapse_type]
+            rates = rate_stats[synapse_type]
+            if delay_running_totals[synapse_type].variance == 0.0:
+                max_weights[synapse_type] = total_weights[synapse_type]
+            else:
                 max_weights[synapse_type] = min(
-                    upper_bounds[synapse_type], total_weights[synapse_type])
+                    self._ring_buffer_expected_upper_bound(
+                        stats.mean, stats.standard_deviation,
+                        rates.mean, machine_timestep, stats.n_items,
+                        self._ring_buffer_sigma),
+                    total_weights[synapse_type])
                 max_weights[synapse_type] = max(
                     max_weights[synapse_type], biggest_weight[synapse_type])
 
