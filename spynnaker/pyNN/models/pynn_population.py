@@ -23,7 +23,6 @@ from spinn_front_end_common.abstract_models.abstract_changable_after_run \
 
 import numpy
 import logging
-import copy
 
 logger = logging.getLogger(__name__)
 

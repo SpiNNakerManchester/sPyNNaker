@@ -1,3 +1,4 @@
+
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
@@ -9,7 +10,6 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
 import logging
 logger = logging.getLogger(__name__)
 
-# TODO. When moving to the c make file adding magic numbers, these should be pushed in there.
 LOOKUP_TAU_PLUS_SIZE = 256
 LOOKUP_TAU_PLUS_SHIFT = 0
 LOOKUP_TAU_MINUS_SIZE = 256
@@ -25,6 +25,10 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self._nearest = nearest
 
         self._synapse_structure = SynapseStructureWeightOnly()
+
+        # provenance data
+        self._tau_plus_last_entry = None
+        self._tau_minus_last_entry = None
 
     @property
     def tau_plus(self):
@@ -72,12 +76,23 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
                 "STDP LUT generation currently only supports 1ms timesteps")
 
         # Write lookup tables
-        plasticity_helpers.write_exp_lut(
-            spec, self._tau_plus, LOOKUP_TAU_PLUS_SIZE, LOOKUP_TAU_PLUS_SHIFT)
-        plasticity_helpers.write_exp_lut(
+        self._tau_plus_last_entry = plasticity_helpers.write_exp_lut(
+            spec, self._tau_plus, LOOKUP_TAU_PLUS_SIZE,
+            LOOKUP_TAU_PLUS_SHIFT)
+        self._tau_minus_last_entry = plasticity_helpers.write_exp_lut(
             spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
             LOOKUP_TAU_MINUS_SHIFT)
 
     @property
     def synaptic_structure(self):
         return self._synapse_structure
+
+    def get_provenance_data(self, pre_population_label, post_population_label):
+        prov_data = list()
+        prov_data.append(plasticity_helpers.get_lut_provenance(
+            pre_population_label, post_population_label, "SpikePairRule",
+            "tau_plus_last_entry", "tau_plus", self._tau_plus_last_entry))
+        prov_data.append(plasticity_helpers.get_lut_provenance(
+            pre_population_label, post_population_label, "SpikePairRule",
+            "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
+        return prov_data

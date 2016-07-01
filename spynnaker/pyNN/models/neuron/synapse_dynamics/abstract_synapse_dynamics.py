@@ -37,6 +37,11 @@ class AbstractSynapseDynamics(object):
         """ Write the synapse parameters to the spec
         """
 
+    def get_provenance_data(self, pre_population_label, post_population_label):
+        """ Get the provenance data from this synapse dynamics object
+        """
+        return list()
+
     def get_delay_maximum(self, connector):
         """ Get the maximum delay for the synapses
         """

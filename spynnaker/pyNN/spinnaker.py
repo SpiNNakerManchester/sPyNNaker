@@ -24,7 +24,6 @@ from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN import _version
 
 # general imports
 import logging
@@ -42,8 +41,9 @@ class Spinnaker(SpinnakerMainInterface):
     """
 
     def __init__(
-            self, host_name=None, timestep=None, min_delay=None, max_delay=None,
-            graph_label=None, database_socket_addresses=None):
+            self, host_name=None, timestep=None, min_delay=None,
+            max_delay=None, graph_label=None, database_socket_addresses=None,
+            n_chips_required=None):
 
         # Determine default executable folder location
         # and add this default to end of list of search paths
@@ -63,46 +63,26 @@ class Spinnaker(SpinnakerMainInterface):
             os.path.dirname(overridden_pacman_functions.__file__),
             "algorithms_metadata.xml"))
 
-        # create list of extra algorithms for auto pause and resume
         extra_mapping_inputs = dict()
-        extra_mapping_algorithms = list()
-        extra_pre_run_algorithms = list()
-        extra_post_run_algorithms = list()
-        extra_provenance_algorithms = list()
-
-        extra_provenance_algorithms.append("SPyNNakerProvenanceWriter")
-
-        # extra post run algorithms
-        extra_post_run_algorithms.append("SpyNNakerRecordingExtractor")
-
-        # extra mapping inputs
-        extra_mapping_inputs['ExecuteMapping'] = config.getboolean(
+        extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
-        extra_mapping_inputs["Projections"] = self._projections
 
         SpinnakerMainInterface.__init__(
-            self, config, _version, host_name=host_name,
-            graph_label=graph_label, this_executable_finder=executable_finder,
+            self, config, graph_label=graph_label,
+            executable_finder=executable_finder,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             extra_mapping_inputs=extra_mapping_inputs,
-            extra_mapping_algorithms=extra_mapping_algorithms,
-            extra_pre_run_algorithms=extra_pre_run_algorithms,
-            extra_post_run_algorithms=extra_post_run_algorithms,
-            extra_provenance_algorithms=extra_provenance_algorithms)
+            n_chips_required=n_chips_required)
 
         # timing parameters
         self._min_supported_delay = None
         self._max_supported_delay = None
         self._time_scale_factor = None
-        self._spikes_per_second = float(config.getfloat(
-            "Simulation", "spikes_per_second"))
-        self._ring_buffer_sigma = float(config.getfloat(
-            "Simulation", "ring_buffer_sigma"))
 
         # set up machine targeted data
-        self._set_up_machine_specifics(timestep, min_delay, max_delay,
-                                       host_name)
+        self._set_up_timings(timestep, min_delay, max_delay)
+        self.set_up_machine_specifics(host_name)
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -111,8 +91,7 @@ class Spinnaker(SpinnakerMainInterface):
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
-    def _set_up_machine_specifics(self, timestep, min_delay, max_delay,
-                                  hostname):
+    def _set_up_timings(self, timestep, min_delay, max_delay):
         self._machine_time_step = config.getint("Machine", "machineTimeStep")
 
         # deal with params allowed via the setup options
@@ -159,10 +138,29 @@ class Spinnaker(SpinnakerMainInterface):
             self._time_scale_factor = \
                 config.getint("Machine", "timeScaleFactor")
             if timestep * self._time_scale_factor < 1000:
-                logger.warn("the combination of machine time step and the "
-                            "machine time scale factor results in a real "
-                            "timer tick that is currently not reliably "
-                            "supported by the spinnaker machine.")
+                if config.getboolean(
+                        "Mode", "violate_1ms_wall_clock_restriction"):
+                    logger.warn(
+                        "****************************************************")
+                    logger.warn(
+                        "*** The combination of simulation time step and  ***")
+                    logger.warn(
+                        "*** the machine time scale factor results in a   ***")
+                    logger.warn(
+                        "*** wall clock timer tick that is currently not  ***")
+                    logger.warn(
+                        "*** reliably supported by the spinnaker machine. ***")
+                    logger.warn(
+                        "****************************************************")
+                else:
+                    raise common_exceptions.ConfigurationException(
+                        "The combination of simulation time step and the"
+                        " machine time scale factor results in a wall clock "
+                        "timer tick that is currently not reliably supported "
+                        "by the spinnaker machine.  If you would like to "
+                        "override this behaviour (at your own risk), please "
+                        "add violate_1ms_wall_clock_restriction = True to the "
+                        "[Mode] section of your .spynnaker.cfg file")
         else:
             self._time_scale_factor = max(1,
                                           math.ceil(1000.0 / float(timestep)))
@@ -173,8 +171,6 @@ class Spinnaker(SpinnakerMainInterface):
                             "automatic behaviour, please enter a "
                             "timescaleFactor value in your .spynnaker.cfg"
                             .format(self._time_scale_factor))
-
-        SpinnakerMainInterface.set_up_machine_specifics(self, hostname)
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
@@ -195,42 +191,14 @@ class Spinnaker(SpinnakerMainInterface):
         return changed
 
     @property
-    def spikes_per_second(self):
-        """
-
-        :return:
-        """
-        return self._spikes_per_second
-
-    @property
-    def ring_buffer_sigma(self):
-        """
-
-        :return:
-        """
-        return self._ring_buffer_sigma
-
-    @property
-    def get_multi_cast_source(self):
-        """
-
-        :return:
-        """
-        return self._multi_cast_vertex
-
-    @property
     def min_supported_delay(self):
-        """
-        the min supported delay based in milliseconds
-        :return:
+        """ The minimum supported delay based in milliseconds
         """
         return self._min_supported_delay
 
     @property
     def max_supported_delay(self):
-        """
-        the max supported delay based in milliseconds
-        :return:
+        """ The maximum supported delay based in milliseconds
         """
         return self._max_supported_delay
 
@@ -286,9 +254,7 @@ class Spinnaker(SpinnakerMainInterface):
         self._populations.append(population)
 
     def _add_projection(self, projection):
-        """ called by each projection to add itself to the list
-        :param projection:
-        :return:
+        """ Called by each projection to add itself to the list
         """
         self._projections.append(projection)
 
@@ -320,7 +286,8 @@ class Spinnaker(SpinnakerMainInterface):
             user_max_delay=self.max_supported_delay)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
-             clear_tags=None):
+             clear_tags=None, extract_provenance_data=True,
+             extract_iobuf=True):
         """
         :param turn_off_machine: decides if the machine should be powered down\
             after running the execution. Note that this powers down all boards\
@@ -332,23 +299,27 @@ class Spinnaker(SpinnakerMainInterface):
         :param clear_tags: informs the tool chain if it should clear the tags\
             off the machine at stop
         :type clear_tags: boolean
+        :param extract_provenance_data: informs the tools if it should \
+            try to extract provenance data.
+        :type extract_provenance_data: bool
+        :param extract_iobuf: tells the tools if it should try to \
+            extract iobuf
+        :type extract_iobuf: bool
         :return: None
         """
         for population in self._populations:
             population._end()
 
         SpinnakerMainInterface.stop(
-            self, turn_off_machine, clear_routing_tables, clear_tags)
+            self, turn_off_machine, clear_routing_tables, clear_tags,
+            extract_provenance_data, extract_iobuf)
 
     def run(self, run_time):
+        """ Run the model created
+
+        :param run_time: the time in ms to run the simulation for
         """
-        main entrance for running the graph
-        :param run_time: the time in ms to run the sim for.
-        :return: None
-        """
+
+        # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         SpinnakerMainInterface.run(self, run_time)
-
-    def __repr__(self):
-        return "spynnaker front end instance for machine {}"\
-            .format(self._hostname)

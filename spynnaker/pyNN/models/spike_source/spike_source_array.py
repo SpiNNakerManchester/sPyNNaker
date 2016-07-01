@@ -1,6 +1,4 @@
 # spynnaker imports
-from spinn_front_end_common.abstract_models.abstract_recordable import \
-    AbstractRecordable
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
@@ -40,7 +38,7 @@ logger = logging.getLogger(__name__)
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
         SimplePopulationSettable, AbstractChangableAfterRun,
-        AbstractHasFirstMachineTimeStep, AbstractRecordable):
+        AbstractHasFirstMachineTimeStep):
     """ Model for play back of spikes
     """
 
@@ -86,7 +84,6 @@ class SpikeSourceArray(
             send_buffer_notification_port=self._port,
             send_buffer_notification_tag=tag)
 
-        AbstractRecordable.__init__(self)
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
@@ -135,17 +132,6 @@ class SpikeSourceArray(
     def mark_no_changes(self):
         self._requires_mapping = False
 
-    def is_recording(self):
-        """
-        helper method for FEC to figure out if this is recording.
-        (used in check for infinite runs)
-        :return:
-        """
-        if self._spike_recorder.record:
-            return True
-        else:
-            return False
-
     @property
     def spike_times(self):
         """ The spike times of the spike source array
@@ -179,6 +165,7 @@ class SpikeSourceArray(
         self._spike_recorder.record = True
 
     def get_spikes(self, placements, graph_mapper, buffer_manager):
+
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager,
             (ReverseIPTagMulticastSourcePartitionedVertex.
@@ -186,7 +173,9 @@ class SpikeSourceArray(
             (ReverseIPTagMulticastSourcePartitionedVertex.
              _REGIONS.RECORDING_BUFFER_STATE.value),
             placements, graph_mapper, self,
-            lambda subvertex: subvertex.virtual_key)
+            lambda subvertex:
+                subvertex.virtual_key if subvertex.virtual_key is not None
+                else 0)
 
     @property
     def model_name(self):

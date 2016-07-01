@@ -4,8 +4,8 @@ from abc import abstractmethod
 from pyNN.random import RandomDistribution
 from pyNN.random import NumpyRNG
 
-from spinn_front_end_common.utilities.utility_objs.provenance_data_item import \
-    ProvenanceDataItem
+from spinn_front_end_common.utilities.utility_objs\
+    .provenance_data_item import ProvenanceDataItem
 from spynnaker.pyNN.utilities import utility_calls
 import numpy
 import math
@@ -32,14 +32,11 @@ class AbstractConnector(object):
         self._n_post_neurons = None
         self._rng = None
 
-        self._clipped_delays = 0
-        self._min_time_step = 0
-
-    def set_min_time_step(self, min_time_step):
-        self._min_time_step = min_time_step
+        self._n_clipped_delays = 0
+        self._min_delay = 0
 
     def set_projection_information(
-            self, pre_population, post_population, rng):
+            self, pre_population, post_population, rng, machine_time_step):
         self._pre_population = pre_population
         self._post_population = post_population
         self._n_pre_neurons = pre_population.size
@@ -47,6 +44,7 @@ class AbstractConnector(object):
         self._rng = rng
         if self._rng is None:
             self._rng = NumpyRNG()
+        self._min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists=True):
         """ Check that the types of the values is supported
@@ -146,12 +144,12 @@ class AbstractConnector(object):
         """ Get the mean of the weights
         """
         if isinstance(weights, RandomDistribution):
-            return utility_calls.get_mean(weights)
+            return abs(utility_calls.get_mean(weights))
         elif numpy.isscalar(weights):
-            return weights
+            return abs(weights)
         elif hasattr(weights, "__getitem__"):
             return numpy.mean([
-                weights[connection_slice]
+                numpy.abs(weights[connection_slice])
                 for connection_slice in connection_slices])
         raise Exception("Unrecognised weight format")
 
@@ -182,10 +180,10 @@ class AbstractConnector(object):
                 return abs(max_weight)
 
         elif numpy.isscalar(weights):
-            return weights
+            return abs(weights)
         elif hasattr(weights, "__getitem__"):
             return numpy.amax([
-                weights[connection_slice]
+                numpy.abs(weights[connection_slice])
                 for connection_slice in connection_slices])
         raise Exception("Unrecognised weight format")
 
@@ -206,7 +204,7 @@ class AbstractConnector(object):
             return 0.0
         elif hasattr(weights, "__getitem__"):
             return numpy.var([
-                weights[connection_slice]
+                numpy.abs(weights[connection_slice])
                 for connection_slice in connection_slices])
         raise Exception("Unrecognised weight format")
 
@@ -231,6 +229,8 @@ class AbstractConnector(object):
 
     def _generate_values(self, values, n_connections, connection_slices):
         if isinstance(values, RandomDistribution):
+            if n_connections == 1:
+                return numpy.array([values.next(n_connections)])
             return values.next(n_connections)
         elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections)
@@ -269,20 +269,31 @@ class AbstractConnector(object):
                     " in projection {}->{}".format(
                         self._pre_population.label,
                         self._post_population.label))
-        return weights
+        return numpy.abs(weights)
+
+    def _clip_delays(self, delays):
+        """ Clip delay values, keeping track of how many have been clipped
+        """
+
+        # count values that could be clipped
+        self._n_clipped_delays = numpy.sum(delays < self._min_delay)
+
+        # clip values
+        if numpy.isscalar(delays):
+            if delays < self._min_delay:
+                delays = self._min_delay
+        else:
+            if delays.size > 0:
+                delays[delays < self._min_delay] = self._min_delay
+        return delays
 
     def _generate_delays(self, values, n_connections, connection_slices):
-        """ Generate delay values
+        """ Generate valid delay values
         """
         delays = self._generate_values(
             values, n_connections, connection_slices)
-        # count clippable values
-        self._clipped_delays = (delays < (self._min_time_step / 1000)).sum()
 
-        # clip clippable values
-        delays[delays < (self._min_time_step / 1000)] = \
-            self._min_time_step / 1000
-        return delays
+        return self._clip_delays(delays)
 
     def _generate_lists_on_host(self, values):
         """ Checks if the connector should generate lists on host rather than\
@@ -316,35 +327,21 @@ class AbstractConnector(object):
         """ Create a synaptic block from the data
         """
 
-    @abstractmethod
-    def label(self):
-        """
-        helper method for human readable form of the connector
-        :return:
-        """
-
     def get_provenance_data(self):
         data_items = list()
-        names = ["connector_{}_{}_{}".format(
-            self.label(), self._pre_population.label,
-            self._post_population.label)]
+        name = "{}_{}_{}".format(
+            self._pre_population.label, self._post_population.label,
+            self.__class__.__name__)
         data_items.append(ProvenanceDataItem(
-            self._add_name(names, "Times_synaptic_delays_got_clipped"),
-            self._clipped_delays,
-            report=self._clipped_delays > 0,
+            [name, "Times_synaptic_delays_got_clipped"],
+            self._n_clipped_delays,
+            report=self._n_clipped_delays > 0,
             message=(
-                "The delays from the {} from {} to {} was clipped "
-                "from below {} to {} a total of {} times. If this causes "
-                "issues you can decrease the time step located within the "
-                ".spynnaker.cfg file or increase your delay above the "
-                "timestep threshold.".format(
-                    self.label(), self._pre_population.label,
-                    self._post_population.label, (self._min_time_step / 1000),
-                    (self._min_time_step / 1000), self._clipped_delays))))
+                "The delays in the connector {} from {} to {} was clipped "
+                "to {} a total of {} times.  This can be avoided by reducing "
+                "the timestep or increasing the minimum delay to one "
+                "timestep".format(
+                    self.__class__.__name__, self._pre_population.label,
+                    self._post_population.label, self._min_delay,
+                    self._n_clipped_delays))))
         return data_items
-
-    @staticmethod
-    def _add_name(names, name):
-        new_names = list(names)
-        new_names.append(name)
-        return new_names

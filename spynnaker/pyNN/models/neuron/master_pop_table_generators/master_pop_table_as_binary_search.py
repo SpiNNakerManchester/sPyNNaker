@@ -1,5 +1,7 @@
 
 # spynnaker imports
+from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge import \
+    ProjectionPartitionedEdge
 from spynnaker.pyNN.models.neuron.master_pop_table_generators\
     .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 import struct
@@ -109,6 +111,27 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 n_subvertices += n_edge_subvertices
                 n_entries += (
                     n_edge_subvertices * len(in_edge.synapse_information))
+
+        # Multiply by 2 to get an upper bound
+        return (
+            (n_subvertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +
+            8)
+
+    def get_exact_master_population_table_size(
+            self, subvertex, partitioned_graph, graph_mapper):
+        """
+        :return: the size the master pop table will take in SDRAM (in bytes)
+        """
+        in_edges = partitioned_graph.incoming_subedges_from_subvertex(subvertex)
+
+        n_subvertices = len(in_edges)
+        n_entries = 0
+        for in_edge in in_edges:
+            if isinstance(in_edge, ProjectionPartitionedEdge):
+                edge = graph_mapper.\
+                    get_partitionable_edge_from_partitioned_edge(in_edge)
+                n_entries += len(edge.synapse_information)
 
         # Multiply by 2 to get an upper bound
         return (

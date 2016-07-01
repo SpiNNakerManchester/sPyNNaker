@@ -226,6 +226,10 @@ void timer_callback(uint unused0, uint unused1) {
 
         // handle the pause and resume functionality
         simulation_handle_pause_resume(NULL);
+
+        // Subtract 1 from the time so this tick gets done again on the next
+        // run
+        time -= 1;
         return;
     }
 
