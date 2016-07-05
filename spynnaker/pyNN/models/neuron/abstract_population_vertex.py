@@ -2,6 +2,9 @@
 # pacman imports
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
 
 # front end common imports
 from spinn_front_end_common.abstract_models.\
@@ -17,6 +20,9 @@ from spinn_front_end_common.interface.buffer_management\
     import ReceiveBuffersToHostBasicImpl
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
+from spinn_front_end_common.interface.profiling import profile_utils
+from spinn_front_end_common.interface.profiling.abstract_has_profile_data \
+    import AbstractHasProfileData
 
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -45,19 +51,11 @@ from spynnaker.pyNN.models.neuron.population_partitioned_vertex \
 # dsg imports
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
-from data_specification.utility_calls \
-    import get_region_base_address_offset
-
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
-    import KeyAllocatorContiguousRangeContraint
 
 from abc import ABCMeta
 from six import add_metaclass
 import logging
 import os
-import numpy
-import struct
 
 logger = logging.getLogger(__name__)
 
@@ -72,9 +70,6 @@ _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 12
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
-# Define profiler time scale
-MS_SCALE = (1.0 / 200032.4)
-
 
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
@@ -83,7 +78,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
+        AbstractChangableAfterRun, AbstractHasProfileData):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -106,6 +101,7 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
+        AbstractHasProfileData.__init__(self)
 
         self._binary = binary
         self._label = label
@@ -147,6 +143,12 @@ class AbstractPopulationVertex(
         self._enable_buffered_recording = config.getboolean(
             "Buffers", "enable_buffered_recording")
 
+        # Set up for profiling
+        self._profile_enabled = config.getboolean(
+            "Mode", "enable_profiling")
+        self._n_profile_samples = config.getint(
+            "Mode", "n_profile_samples")
+
         # Set up synapse handling
         self._synapse_manager = SynapticManager(
             synapse_type, machine_time_step, ring_buffer_sigma,
@@ -154,9 +156,6 @@ class AbstractPopulationVertex(
 
         # bool for if state has changed.
         self._change_requires_mapping = True
-
-        # By default, profiling is disabled
-        self.profiler_num_samples = 0
 
     @property
     def requires_mapping(self):
@@ -258,6 +257,9 @@ class AbstractPopulationVertex(
                 self._additional_input.get_sdram_usage_per_neuron_in_bytes()
         return ((common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
                 ReceiveBuffersToHostBasicImpl.get_recording_data_size(3) +
+                profile_utils.get_profile_header_size() +
+                profile_utils.get_profile_region_size(
+                    self._n_profile_samples) +
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._neuron_model.get_sdram_usage_in_bytes(
                     vertex_slice.n_atoms))
@@ -330,7 +332,8 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
             size=((
                 common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-                subvertex.get_recording_data_size(3)), label='System')
+                subvertex.get_recording_data_size(3) +
+                profile_utils.get_profile_header_size()), label='System')
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
@@ -347,119 +350,17 @@ class AbstractPopulationVertex(
              gsyn_history_region_sz])
 
         subvertex.reserve_provenance_data_region(spec)
-
-        if self.profiler_num_samples != 0:
-            spec.reserve_memory_region(
-                region=constants.POPULATION_BASED_REGIONS.PROFILING.value,
-                size=(8 + (self.profiler_num_samples * 8)),
-                label="profilerRegion")
-        else:
-            spec.reserve_memory_region(
-                region=constants.POPULATION_BASED_REGIONS.PROFILING.value,
-                size=4, label="profilerRegion")
+        profile_utils.reserve_profile_region(
+            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            self._n_profile_samples)
 
     def get_profiling_data(self, txrx, placements, graph_mapper):
-
-        subvertices = graph_mapper.get_subvertices_from_vertex(self)
-        for subvertex in subvertices:
-            placement = placements.get_placement_of_subvertex(subvertex)
-            (x, y, p) = placement.x, placement.y, placement.p
-            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-            lo_atom = subvertex_slice.lo_atom
-            logger.debug(
-                "Reading profile from chip {}, {}, core {}, "
-                "lo_atom {}".format(x, y, p, lo_atom))
-
-            # Get the App Data for the core
-            app_data_base_address = \
-                txrx.get_cpu_information_from_core(x, y, p).user[0]
-
-            # Get the position of the value buffer
-            profiling_region_base_address_offset = \
-                get_region_base_address_offset(
-                    app_data_base_address,
-                    constants.POPULATION_BASED_REGIONS.PROFILING.value)
-            profiling_region_base_address_buf = buffer(txrx.read_memory(
-                x, y, profiling_region_base_address_offset, 4))
-            profiling_region_base_address = \
-                struct.unpack_from("<I", profiling_region_base_address_buf)[0]
-
-            # Read the profiling data size
-            words_written_data =\
-                buffer(txrx.read_memory(
-                    x, y, profiling_region_base_address + 4, 4))
-            words_written = \
-                struct.unpack_from("<I", words_written_data)[0]
-
-            # Read the profiling data
-            profiling_data = txrx.read_memory(
-                x, y, profiling_region_base_address + 8, words_written * 4)
-
-            # Finally read into numpy
-            profiling_samples = numpy.asarray(
-                profiling_data, dtype="uint8").view(dtype="<u4")
-
-        # If there's no data, return an empty dictionary
-        if len(profiling_samples) == 0:
-            print("No samples recorded")
-        return {}
-
-        # Slice data to separate times, tags and flags
-        sample_times = profiling_samples[::2]
-        sample_tags_and_flags = profiling_samples[1::2]
-
-        # Further split the tags and flags word into separate arrays of tags
-        # and flags
-        sample_tags = numpy.bitwise_and(sample_tags_and_flags, 0x7FFFFFFF)
-        sample_flags = numpy.right_shift(sample_tags_and_flags, 31)
-
-        # Find indices of samples relating to entries and exits
-        sample_entry_indices = numpy.where(sample_flags == 1)
-        sample_exit_indices = numpy.where(sample_flags == 0)
-
-        # Convert count-down times to count up times from 1st sample
-        sample_times = numpy.subtract(sample_times[0], sample_times)
-        sample_times_ms = numpy.multiply(
-            sample_times, MS_SCALE, dtype=numpy.float)
-
-        # Slice tags and times into entry and exits
-        entry_tags = sample_tags[sample_entry_indices]
-        entry_times_ms = sample_times_ms[sample_entry_indices]
-        exit_tags = sample_tags[sample_exit_indices]
-        exit_times_ms = sample_times_ms[sample_exit_indices]
-
-        # Loop through unique tags
-        tag_dictionary = {}
-        unique_tags = numpy.unique(sample_tags)
-        for tag in unique_tags:
-
-            # Get indices where these tags occur
-            tag_entry_indices = numpy.where(entry_tags == tag)
-            tag_exit_indices = numpy.where(exit_tags == tag)
-
-            # Use these to get subset for this tag
-            tag_entry_times_ms = entry_times_ms[tag_entry_indices]
-            tag_exit_times_ms = exit_times_ms[tag_exit_indices]
-
-        # If the first exit is before the first
-        # Entry, add a dummy entry at beginning
-        if tag_exit_times_ms[0] < tag_entry_times_ms[0]:
-            print "WARNING: profile starts mid-tag"
-        tag_entry_times_ms = numpy.append(0.0, tag_entry_times_ms)
-
-        if len(tag_entry_times_ms) > len(tag_exit_times_ms):
-            print "WARNING: profile finishes mid-tag"
-        tag_entry_times_ms = tag_entry_times_ms[
-            :len(tag_exit_times_ms) - len(tag_entry_times_ms)]
-
-        # Subtract entry times from exit times to get durations of each call
-        tag_durations_ms = numpy.subtract(
-            tag_exit_times_ms, tag_entry_times_ms)
-
-        # Add entry times and durations to dictionary
-        tag_dictionary[tag] = (tag_entry_times_ms, tag_durations_ms)
-
-        return tag_dictionary
+        return profile_utils.get_profiling_data(
+            constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            self._PROFILE_TAG_LABELS,
+            self._machine_time_step,
+            (self._machine_time_step * self._no_machine_time_steps) / 1000.0,
+            txrx, placements, graph_mapper)
 
     def _write_setup_info(
             self, spec, spike_history_region_sz, neuron_potential_region_sz,
@@ -472,16 +373,14 @@ class AbstractPopulationVertex(
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
             spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value)
+        profile_utils.write_profile_region_data(
+            spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value,
+            self._n_profile_samples)
         subvertex.write_recording_data(
             spec, ip_tags,
             [spike_history_region_sz, neuron_potential_region_sz,
              gsyn_region_sz], buffer_size_before_receive,
             time_between_requests)
-
-        # Write profiler setting.
-        spec.switch_write_focus(
-            region=constants.POPULATION_BASED_REGIONS.PROFILING.value)
-        spec.write_value(data=self.profiler_num_samples)
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice):

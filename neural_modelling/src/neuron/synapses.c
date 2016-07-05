@@ -2,7 +2,7 @@
 #include "spike_processing.h"
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
-#include "profiler.h"
+#include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
 #include <string.h>

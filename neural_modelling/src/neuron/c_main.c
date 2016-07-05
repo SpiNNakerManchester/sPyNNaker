@@ -16,7 +16,6 @@
 
 #include "../common/in_spikes.h"
 #include "neuron.h"
-#include "profiler.h"
 #include "synapses.h"
 #include "spike_processing.h"
 #include "population_table/population_table.h"
@@ -24,6 +23,7 @@
 
 #include <data_specification.h>
 #include <simulation.h>
+#include <profiler.h>
 #include <debug.h>
 
 /* validates that the model being compiled does indeed contain a application
@@ -36,7 +36,6 @@
 //! human readable definitions of each region in SDRAM
 typedef enum regions_e{
     SYSTEM_REGION,
-    PROFILER_REGION,
     NEURON_PARAMS_REGION,
     SYNAPSE_PARAMS_REGION,
     POPULATION_TABLE_REGION,
@@ -46,7 +45,8 @@ typedef enum regions_e{
     BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
     BUFFERING_OUT_GSYN_RECORDING_REGION,
     BUFFERING_OUT_CONTROL_REGION,
-    PROVENANCE_DATA_REGION
+    PROVENANCE_DATA_REGION,
+    PROFILER_REGION
 } regions_e;
 
 typedef enum extra_provenance_data_region_entries{
@@ -79,9 +79,6 @@ static uint32_t infinite_run;
 //! The recording flags
 static uint32_t recording_flags = 0;
 
-//! Profiler number of samples
-uint32_t num_profiling_samples;
-
 //! \brief Initialises the recording parts of the model
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(){
@@ -95,7 +92,8 @@ static bool initialise_recording(){
     };
     uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
     uint32_t *recording_flags_from_system_conf =
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
+        &system_region[
+            SIMULATION_N_TIMING_DETAIL_WORDS + PROFILER_N_HEADER_WORDS];
     regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
 
     bool success = recording_initialize(
@@ -178,8 +176,9 @@ static bool initialise(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
     }
 
     // Setup profiler
-    profiler_read_region(data_specification_get_region(PROFILER_REGION, address));
-    profiler_init();
+    profiler_init(
+        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
+        data_specification_get_region(PROFILER_REGION, address));
 
     log_info("Initialise: finished");
     return true;
