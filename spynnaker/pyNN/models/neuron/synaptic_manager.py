@@ -169,7 +169,7 @@ class SynapticManager(object):
             graph_mapper, subvertex, subvertex_in_edges):
         """ Get the exact size all of the synaptic blocks
         """
-        memory_size = 0
+        memory_size = 8
 
         # Go through the subedges and add up the memory
         for subedge in subvertex_in_edges:
@@ -195,7 +195,7 @@ class SynapticManager(object):
     def _get_estimate_synaptic_blocks_size(self, post_vertex_slice, in_edges):
         """ Get an estimate of the synaptic blocks memory size
         """
-        memory_size = 0
+        memory_size = 8
 
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionPartitionableEdge):
