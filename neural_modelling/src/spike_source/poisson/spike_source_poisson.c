@@ -240,7 +240,7 @@ static bool initialise_recording(){
 //!            period should be stored during the function.
 //! \return boolean of True if it successfully read all the regions and set up
 //!         all its internal data structures. Otherwise returns False
-static bool initialize(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
+static bool initialize(uint32_t *timer_period) {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -251,12 +251,11 @@ static bool initialize(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
         return false;
     }
 
-    // Get the timing details
-    address_t system_region = data_specification_get_region(
-            SYSTEM, address);
-    if (!simulation_read_timing_details(
-            system_region, APPLICATION_NAME_HASH, timer_period,
-            simulation_sdp_port)) {
+    // Get the timing details and set up the simulation interface
+    if (!simulation_initialise(
+            data_specification_get_region(SYSTEM, address),
+            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
+            &infinite_run, SDP, NULL, PROVENANCE_REGION)) {
         return false;
     }
 
@@ -427,8 +426,7 @@ void c_main(void) {
 
     // Load DTCM data
     uint32_t timer_period;
-    uint32_t simulation_sdp_port;
-    if (!initialize(&timer_period, &simulation_sdp_port)) {
+    if (!initialize(&timer_period)) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
     }
@@ -447,13 +445,6 @@ void c_main(void) {
 
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
-
-    // Set up callback listening to SDP messages
-    simulation_register_simulation_sdp_callback(
-        &simulation_ticks, &infinite_run, SDP, simulation_sdp_port);
-
-    // set up provenance registration
-    simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
 
     simulation_run();
 }
