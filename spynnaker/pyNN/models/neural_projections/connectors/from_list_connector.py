@@ -41,6 +41,18 @@ class FromListConnector(AbstractConnector):
     def get_delay_maximum(self):
         return numpy.max(self._conn_list["delay"])
 
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
+                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
+                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
+                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
+        delays = self._conn_list["delay"][mask]
+        if delays.size == 0:
+            return 0
+        return numpy.var(delays)
+
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,

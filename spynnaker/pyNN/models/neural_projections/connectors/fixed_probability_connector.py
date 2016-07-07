@@ -47,6 +47,11 @@ class FixedProbabilityConnector(AbstractConnector):
                 self._n_pre_neurons * self._n_post_neurons,
                 self._n_pre_neurons * self._n_post_neurons, self._p_connect))
 
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        return self._get_delay_variance(self._delays, None)
+
     def _get_n_connections(self, out_of):
         return utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons, out_of,
@@ -73,8 +78,6 @@ class FixedProbabilityConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms)
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
