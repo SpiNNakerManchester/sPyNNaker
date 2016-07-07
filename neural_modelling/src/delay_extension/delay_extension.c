@@ -136,10 +136,11 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
-    // Get the timing details
-    if (!simulation_read_timing_details(
+    // Get the timing details and set up the simulation interface
+    if (!simulation_initialise(
             data_specification_get_region(SYSTEM, address),
-            APPLICATION_NAME_HASH, timer_period)) {
+            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
+            &infinite_run, SDP, NULL, PROVENANCE_REGION)) {
         return false;
     }
 
@@ -314,12 +315,6 @@ void c_main(void) {
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);
     spin1_callback_on(USER_EVENT, spike_process, USER);
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
-
-    simulation_register_simulation_sdp_callback(
-        &simulation_ticks, &infinite_run, SDP);
-
-    // set up provenance registration
-    simulation_register_provenance_callback(NULL, PROVENANCE_REGION);
 
     simulation_run();
 }
