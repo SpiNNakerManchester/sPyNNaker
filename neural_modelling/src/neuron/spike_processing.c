@@ -81,9 +81,11 @@ static inline void _setup_synaptic_dma_read() {
     }
 
     // If there's more incoming spikes
+    uint cpsr = spin1_int_disable();
     uint32_t setup_done = false;
     while (!setup_done && in_spikes_get_next_spike(&spike)) {
         log_debug("Checking for row for spike 0x%.8x\n", spike);
+        spin1_mode_restore(cpsr);
 
         // Decode spike to get address of destination synaptic row
         if (population_table_get_first_address(
@@ -91,6 +93,7 @@ static inline void _setup_synaptic_dma_read() {
             _do_dma_read(row_address, n_bytes_to_transfer);
             setup_done = true;
         }
+        cpsr = spin1_int_disable();
     }
 
     // If the setup was not done, and there are no more spikes,
@@ -99,6 +102,7 @@ static inline void _setup_synaptic_dma_read() {
         log_debug("DMA not busy");
         dma_busy = false;
     }
+    spin1_mode_restore(cpsr);
 }
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
