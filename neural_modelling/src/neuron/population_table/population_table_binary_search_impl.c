@@ -35,7 +35,7 @@ static inline uint32_t _get_address(address_and_row_length entry) {
     // with the given mask 0xFFFFFF00 to fully remove the row length
     // NOTE: The mask can be removed given the machien spec says it
     // hardcodes the bottom 2 bits to zero anyhows. BUT BAD CODE PRACTICE
-    return (entry & 0x7FFFFF00) >> 6;
+    return (entry & 0xFFFFFF00) >> 6;
 }
 
 static inline uint32_t _get_row_length(address_and_row_length entry) {

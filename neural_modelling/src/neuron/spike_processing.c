@@ -279,7 +279,7 @@ bool spike_processing_initialise(
         return false;
     }
 
-    // Set up for single fixed synapses
+    // Set up for single fixed synapses (data that is consistent per direct row)
     single_fixed_synapse[0] = 0;
     single_fixed_synapse[1] = 1;
     single_fixed_synapse[2] = 0;

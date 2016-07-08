@@ -164,12 +164,17 @@ class SynapticManager(object):
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 (4 * self._synapse_type.get_n_synapse_types()))
 
+    def _get_static_synaptic_matrix_sdram_requirements(self):
+        return 8 # 4 for address of direct addresses, and
+        # 4 for the size of the direct addresses matrix in bytes
+
     def _get_exact_synaptic_blocks_size(
             self, post_slices, post_slice_index, post_vertex_slice,
-            graph_mapper, subvertex, subvertex_in_edges):
+            graph_mapper, subvertex_in_edges):
         """ Get the exact size all of the synaptic blocks
         """
-        memory_size = 8
+
+        memory_size = self._get_static_synaptic_matrix_sdram_requirements()
 
         # Go through the subedges and add up the memory
         for subedge in subvertex_in_edges:
@@ -195,7 +200,8 @@ class SynapticManager(object):
     def _get_estimate_synaptic_blocks_size(self, post_vertex_slice, in_edges):
         """ Get an estimate of the synaptic blocks memory size
         """
-        memory_size = 8
+
+        memory_size = self._get_static_synaptic_matrix_sdram_requirements()
 
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionPartitionableEdge):
@@ -725,6 +731,7 @@ class SynapticManager(object):
         spec.set_write_pointer(0)
         spec.write_value(next_block_start_address)
 
+
     def write_data_spec(
             self, spec, vertex, post_vertex_slice, subvertex, placement,
             partitioned_graph, graph, routing_info, graph_mapper, input_type):
@@ -751,7 +758,7 @@ class SynapticManager(object):
             subvertex)
         all_syn_block_sz = self._get_exact_synaptic_blocks_size(
             post_slices, post_slice_index, post_vertex_slice, graph_mapper,
-            subvertex, subvert_in_edges)
+            subvert_in_edges)
         self._reserve_memory_regions(
             spec, vertex, subvertex, post_vertex_slice, graph,
             partitioned_graph, all_syn_block_sz, graph_mapper)
@@ -813,7 +820,8 @@ class SynapticManager(object):
                 constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 transceiver)
         direct_synapses_address = (
-            8 + synaptic_matrix_address + struct.unpack_from(
+            self._get_static_synaptic_matrix_sdram_requirements() +
+            synaptic_matrix_address + struct.unpack_from(
                 "<I", transceiver.read_memory(
                     placement.x, placement.y, synaptic_matrix_address, 4))[0])
         indirect_synapses_address = synaptic_matrix_address + 4

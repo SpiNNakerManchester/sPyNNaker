@@ -73,6 +73,10 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     ADDRESS_LIST_DTYPE = "<u4"
 
+    SINGLE_BIT_FLAG_BIT = 0x80000000 # top bit of the 32 bit number
+    ROW_LENGTH_MASK = 0xFF
+    ADDRESS_MASK = 0x7FFFFF00
+
     def __init__(self):
         AbstractMasterPopTableFactory.__init__(self)
         self._entries = None
@@ -181,6 +185,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param row_length: how long in bytes each synaptic entry is
         :param keys_and_masks: the keys and masks for this master pop entry
         :param master_pop_table_region: the region id for the master pop
+        :param is_single: flag that states if the entry is a direct entry for
+        a single row.
         :return: None
         """
         key_and_mask = keys_and_masks[0]
@@ -188,6 +194,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             self._entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask)
         start_addr = block_start_addr
+        # if single, dont add to start address as its going in its own block
         if not is_single:
             start_addr = block_start_addr / 4
         self._entries[key_and_mask.key].append(
@@ -230,10 +237,13 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                     entry.addresses_and_row_lengths):
                 single_bit = 0
                 if is_single:
-                    single_bit = 0x80000000
+                    single_bit = \
+                        MasterPopTableAsBinarySearch.SINGLE_BIT_FLAG_BIT
                 address_list[start + j] = (
-                    (single_bit | (address & 0x7FFFFF) << 8) |
-                    (row_length & 0xFF))
+                    (single_bit |
+                     (address & 0x7FFFFF) << 8) |
+                    (row_length &
+                     MasterPopTableAsBinarySearch.ROW_LENGTH_MASK))
             start += count
 
         # Write the arrays
@@ -276,9 +286,15 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         addresses = list()
         for i in range(entry["start"], entry["start"] + entry["count"]):
             address_and_row_length = address_list[i]
-            is_single = (address_and_row_length & 0x80000000) > 0
-            address = (address_and_row_length & 0x7FFFFF00)
-            row_length = address_and_row_length & 0xFF
+            is_single = (
+                address_and_row_length &
+                MasterPopTableAsBinarySearch.SINGLE_BIT_FLAG_BIT) > 0
+            address = (
+                address_and_row_length &
+                MasterPopTableAsBinarySearch.ADDRESS_MASK)
+            row_length = (
+                address_and_row_length &
+                MasterPopTableAsBinarySearch.ROW_LENGTH_MASK)
             if is_single:
                 address = address >> 8
             else:
