@@ -226,7 +226,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     def update_master_population_table(
             self, spec, block_start_addr, row_length, keys_and_masks,
-            master_pop_table_region):
+            master_pop_table_region, is_single=False):
         """
         Writes an entry in the Master Population Table for the newly
         created synaptic block.
@@ -246,6 +246,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         :param keys_and_masks:
         :param mask:
         :param master_pop_table_region:
+        :param is_single True if this is a single synapse, False otherwise
         :return:
         """
         # Which core has this projection arrived from?
