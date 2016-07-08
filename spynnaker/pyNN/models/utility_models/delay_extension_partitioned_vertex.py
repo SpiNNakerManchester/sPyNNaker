@@ -1,10 +1,14 @@
+# pacman imports
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
+
+# front end common imports
 from spinn_front_end_common.interface.provenance\
     .provides_provenance_data_from_machine_impl \
     import ProvidesProvenanceDataFromMachineImpl
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 
+# general imports
 from enum import Enum
 
 

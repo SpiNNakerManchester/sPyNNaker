@@ -1,5 +1,5 @@
-
-from spynnaker.pyNN.utilities import constants
+from data_specification.data_specification_generator import \
+    DataSpecificationGenerator
 from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
 from spynnaker.pyNN.models.utility_models.delay_extension_partitioned_vertex \
     import DelayExtensionPartitionedVertex
@@ -23,9 +23,6 @@ from pacman.model.constraints.key_allocator_constraints\
 from pacman.model.partitionable_graph.abstract_partitionable_vertex \
     import AbstractPartitionableVertex
 
-from data_specification.data_specification_generator\
-    import DataSpecificationGenerator
-
 import logging
 import math
 import random
@@ -33,6 +30,7 @@ import random
 logger = logging.getLogger(__name__)
 
 _DELAY_PARAM_HEADER_WORDS = 7
+_DEFAULT_MALLOCS_USED = 2
 
 
 class DelayExtensionVertex(
@@ -44,7 +42,6 @@ class DelayExtensionVertex(
         of a neuron (typically 16 or 32)
     """
 
-    _DEFAULT_MALLOCS_USED = 2
     _n_subvertices = 0
 
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
@@ -111,6 +108,7 @@ class DelayExtensionVertex(
             self, subvertex, placement, partitioned_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
             write_text_specs, application_run_time_folder):
+
         data_writer, report_writer = \
             self.get_data_spec_file_writers(
                 placement.x, placement.y, placement.p, hostname, report_folder,
@@ -125,8 +123,9 @@ class DelayExtensionVertex(
         # Reserve SDRAM space for memory areas:
         vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
         n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
-        delay_params_sz = 4 * (_DELAY_PARAM_HEADER_WORDS +
-                               (self._n_delay_stages * n_words_per_stage))
+        delay_params_sz = \
+            4 * (_DELAY_PARAM_HEADER_WORDS +
+                 (self._n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
             region=(
@@ -177,7 +176,9 @@ class DelayExtensionVertex(
                 incoming_mask = keys_and_masks[0].mask
 
         self.write_delay_parameters(
-            spec, vertex_slice, key, incoming_key, incoming_mask)
+            spec, vertex_slice, key, incoming_key, incoming_mask,
+            self._n_subvertices)
+
         # End-of-Spec:
         spec.end_specification()
         data_writer.close()
@@ -193,7 +194,8 @@ class DelayExtensionVertex(
                 _DELAY_EXTENSION_REGIONS.SYSTEM.value))
 
     def write_delay_parameters(
-            self, spec, vertex_slice, key, incoming_key, incoming_mask):
+            self, spec, vertex_slice, key, incoming_key, incoming_mask,
+            n_subvertices):
         """ Generate Delay Parameter data
         """
 
@@ -220,8 +222,7 @@ class DelayExtensionVertex(
         spec.write_value(data=self._n_delay_stages)
 
         # Write the random back off value
-        spec.write_value(random.randint(
-            0, DelayExtensionVertex._n_subvertices))
+        spec.write_value(random.randint(0, n_subvertices))
 
         # Write the time between spikes
         spikes_per_timestep = self._n_delay_stages * vertex_slice.n_atoms
@@ -241,17 +242,11 @@ class DelayExtensionVertex(
 
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         size_of_mallocs = (
-            self._DEFAULT_MALLOCS_USED *
+            _DEFAULT_MALLOCS_USED *
             common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
         return (
             size_of_mallocs +
             DelayExtensionPartitionedVertex.get_provenance_data_size(0))
-
-        n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
-        return ((constants.BLOCK_INDEX_HEADER_WORDS * 4) +
-                (_DELAY_PARAM_HEADER_WORDS * 4) +
-                (n_words_per_stage * self._n_delay_stages * 4) +
-                size_of_mallocs)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
