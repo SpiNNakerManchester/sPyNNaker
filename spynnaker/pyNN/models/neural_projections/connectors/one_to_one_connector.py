@@ -33,6 +33,18 @@ class OneToOneConnector(AbstractConnector):
         return self._get_delay_maximum(
             self._delays, max((self._n_pre_neurons, self._n_post_neurons)))
 
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        max_lo_atom = max(
+            (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
+        min_hi_atom = min(
+            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
+        if max_lo_atom > min_hi_atom:
+            return 0
+        connection_slice = slice(max_lo_atom, min_hi_atom + 1)
+        return self._get_delay_variance(self._delays, [connection_slice])
+
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
