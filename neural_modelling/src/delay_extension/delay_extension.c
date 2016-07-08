@@ -159,7 +159,7 @@ static bool read_parameters(address_t address) {
     return true;
 }
 
-static bool initialize(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
+static bool initialize(uint32_t *timer_period) {
     log_info("initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -170,10 +170,11 @@ static bool initialize(uint32_t *timer_period, uint32_t *simulation_sdp_port) {
         return false;
     }
 
-    // Get the timing details
-    if (!simulation_read_timing_details(
+    // Get the timing details and set up the simulation interface
+    if (!simulation_initialise(
             data_specification_get_region(SYSTEM, address),
-            APPLICATION_NAME_HASH, timer_period, simulation_sdp_port)) {
+            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
+            &infinite_run, SDP, NULL, PROVENANCE_REGION)) {
         return false;
     }
 
@@ -359,8 +360,7 @@ void c_main(void) {
 
     // Initialise
     uint32_t timer_period = 0;
-    uint32_t simulation_sdp_port = 0;
-    if (!initialize(&timer_period, &simulation_sdp_port)) {
+    if (!initialize(&timer_period)) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
     }
