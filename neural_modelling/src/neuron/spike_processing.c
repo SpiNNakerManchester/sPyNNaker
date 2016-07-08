@@ -223,7 +223,7 @@ void _dma_complete_callback(uint unused, uint tag) {
 
 bool spike_processing_initialise(
         size_t row_max_n_words, uint mc_packet_callback_priority,
-        uint dma_trasnfer_callback_priority, uint user_event_priority,
+        uint dma_transfer_callback_priority, uint user_event_priority,
         uint incoming_spike_buffer_size) {
 
     // Allocate the DMA buffers
@@ -235,7 +235,7 @@ bool spike_processing_initialise(
             return false;
         }
         log_info(
-            "DMA buffer %u allocated at 0x%08x", (uint32_t) dma_buffers[i].row);
+            "DMA buffer %u allocated at 0x%08x", i, dma_buffers[i].row);
     }
     dma_busy = false;
     next_buffer_to_fill = 0;
@@ -251,7 +251,7 @@ bool spike_processing_initialise(
     spin1_callback_on(MC_PACKET_RECEIVED,
             _multicast_packet_received_callback, mc_packet_callback_priority);
     spin1_callback_on(DMA_TRANSFER_DONE, _dma_complete_callback,
-                      dma_trasnfer_callback_priority);
+                      dma_transfer_callback_priority);
     spin1_callback_on(USER_EVENT, _user_event_callback, user_event_priority);
 
     return true;

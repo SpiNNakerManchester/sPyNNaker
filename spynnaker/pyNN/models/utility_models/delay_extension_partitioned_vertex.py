@@ -1,7 +1,3 @@
-# data spec imports
-from data_specification.data_specification_generator import \
-    DataSpecificationGenerator
-
 # pacman imports
 from pacman.model.partitioned_graph.partitioned_vertex import PartitionedVertex
 
@@ -11,15 +7,10 @@ from spinn_front_end_common.interface.provenance\
     import ProvidesProvenanceDataFromMachineImpl
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
-from spinn_front_end_common.utilities import constants as common_constants
 
 # general imports
 from enum import Enum
-import math
-import random
 
-_DELAY_PARAM_HEADER_WORDS = 7
-DEFAULT_MALLOCS_USED = 2
 
 class DelayExtensionPartitionedVertex(
         PartitionedVertex, ProvidesProvenanceDataFromMachineImpl):
@@ -106,134 +97,3 @@ class DelayExtensionPartitionedVertex(
             self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
             n_delays))
         return provenance_items
-
-    def generate_data_spec(
-            self, subvertex, placement, partitioned_graph, routing_info,
-            hostname, graph_mapper, report_folder, write_text_specs,
-            application_run_time_folder, n_subvertices):
-
-        data_writer, report_writer = \
-            self.get_data_spec_file_writers(
-                placement.x, placement.y, placement.p, hostname, report_folder,
-                write_text_specs, application_run_time_folder)
-
-        spec = DataSpecificationGenerator(data_writer, report_writer)
-
-        # Reserve memory:
-        spec.comment("\nReserving memory space for data regions:\n\n")
-
-        # ###################################################################
-        # Reserve SDRAM space for memory areas:
-        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-        n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
-        delay_params_sz = 4 * (_DELAY_PARAM_HEADER_WORDS +
-                               (self._n_delay_stages * n_words_per_stage))
-
-        spec.reserve_memory_region(
-            region=(
-                DelayExtensionPartitionedVertex.
-                _DELAY_EXTENSION_REGIONS.SYSTEM.value),
-            size=common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
-            label='setup')
-
-        spec.reserve_memory_region(
-            region=(
-                DelayExtensionPartitionedVertex.
-                _DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value),
-            size=delay_params_sz, label='delay_params')
-
-        subvertex.reserve_provenance_data_region(spec)
-
-        self.write_setup_info(spec)
-
-        spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
-
-        key = None
-        partitions = partitioned_graph.\
-            outgoing_edges_partitions_from_vertex(subvertex)
-        for partition in partitions.values():
-            keys_and_masks = \
-                routing_info.get_keys_and_masks_from_partition(partition)
-
-            # NOTE: using the first key assigned as the key.  Should in future
-            # get the list of keys and use one per neuron, to allow arbitrary
-            # key and mask assignments
-            key = keys_and_masks[0].key
-
-        incoming_key = None
-        incoming_mask = None
-        incoming_edges = partitioned_graph.incoming_subedges_from_subvertex(
-            subvertex)
-
-        for incoming_edge in incoming_edges:
-            incoming_slice = graph_mapper.get_subvertex_slice(
-                incoming_edge.pre_subvertex)
-            if (incoming_slice.lo_atom == vertex_slice.lo_atom and
-                    incoming_slice.hi_atom == vertex_slice.hi_atom):
-                partition = partitioned_graph.get_partition_of_subedge(
-                    incoming_edge)
-                keys_and_masks = \
-                    routing_info.get_keys_and_masks_from_partition(partition)
-                incoming_key = keys_and_masks[0].key
-                incoming_mask = keys_and_masks[0].mask
-
-        self.write_delay_parameters(
-            spec, vertex_slice, key, incoming_key, incoming_mask,
-            n_subvertices)
-
-        # End-of-Spec:
-        spec.end_specification()
-        data_writer.close()
-
-        return data_writer.filename
-
-    def write_setup_info(self, spec):
-
-        # Write this to the system region (to be picked up by the simulation):
-        self._write_basic_setup_info(
-            spec,
-            (DelayExtensionPartitionedVertex.
-                _DELAY_EXTENSION_REGIONS.SYSTEM.value))
-
-    def write_delay_parameters(
-            self, spec, vertex_slice, key, incoming_key, incoming_mask,
-            n_subvertices):
-        """ Generate Delay Parameter data
-        """
-
-        # Write spec with commands to construct required delay region:
-        spec.comment("\nWriting Delay Parameters for {} Neurons:\n"
-                     .format(vertex_slice.n_atoms))
-
-        # Set the focus to the memory region 2 (delay parameters):
-        spec.switch_write_focus(
-            region=(
-                DelayExtensionPartitionedVertex.
-                _DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value))
-
-        # Write header info to the memory region:
-        # Write Key info for this core and the incoming key and mask:
-        spec.write_value(data=key)
-        spec.write_value(data=incoming_key)
-        spec.write_value(data=incoming_mask)
-
-        # Write the number of neurons in the block:
-        spec.write_value(data=vertex_slice.n_atoms)
-
-        # Write the number of blocks of delays:
-        spec.write_value(data=self._n_delay_stages)
-
-        # Write the random back off value
-        spec.write_value(random.randint(0, n_subvertices))
-
-        # Write the time between spikes
-        spikes_per_timestep = self._n_delay_stages * vertex_slice.n_atoms
-        time_between_spikes = (
-            (self._machine_time_step * self._timescale_factor) /
-            (spikes_per_timestep * 2.0))
-        spec.write_value(data=int(time_between_spikes))
-
-        # Write the actual delay blocks
-        spec.write_array(array_values=self._delay_blocks[(
-            vertex_slice.lo_atom, vertex_slice.hi_atom)].delay_block)
-
