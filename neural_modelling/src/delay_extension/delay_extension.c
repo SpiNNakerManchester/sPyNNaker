@@ -159,6 +159,19 @@ static bool read_parameters(address_t address) {
     return true;
 }
 
+void _store_provenance_data(address_t provenance_region){
+    log_debug("writing other provenance data");
+
+    // store the data into the provenance data region
+    provenance_region[N_PACKETS_RECEIVED] = n_in_spikes;
+    provenance_region[N_PACKETS_PROCESSED] = n_processed_spikes;
+    provenance_region[N_PACKETS_ADDED] = n_spikes_added;
+    provenance_region[N_PACKETS_SENT] = n_spikes_sent;
+    provenance_region[N_BUFFER_OVERFLOWS] = in_spikes_get_n_buffer_overflows();
+    provenance_region[N_DELAYS] = n_delays;
+    log_debug("finished other provenance data");
+}
+
 static bool initialize(uint32_t *timer_period) {
     log_info("initialise: started");
 
@@ -174,7 +187,7 @@ static bool initialize(uint32_t *timer_period) {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP, NULL, PROVENANCE_REGION)) {
+            &infinite_run, SDP, _store_provenance_data, PROVENANCE_REGION)) {
         return false;
     }
 
@@ -205,7 +218,11 @@ static inline key_t _key_n(key_t k) {
     return k & incoming_neuron_mask;
 }
 
-void spike_process() {
+static void spike_process() {
+
+    // turn off inturppts as this function is criticle for
+    // keeping time in sync.
+    uint state = spin1_int_disable();
 
     // Get current time slot of incoming spike counters
     uint32_t current_time_slot = time & num_delay_slots_mask;
@@ -237,6 +254,9 @@ void spike_process() {
             log_debug("Invalid spike key 0x%08x", s);
         }
     }
+
+    // reactivate interupts as criticle section complete
+    spin1_mode_restore(state);
 }
 
 void timer_callback(uint unused0, uint unused1) {
@@ -244,9 +264,7 @@ void timer_callback(uint unused0, uint unused1) {
     use(unused1);
 
     // Process all the spikes from the last timestep
-    uint state = spin1_int_disable();
     spike_process();
-    spin1_mode_restore(state);
 
     time++;
 
@@ -342,19 +360,6 @@ void timer_callback(uint unused0, uint unused1) {
     memset(current_time_slot_spike_counters, 0, sizeof(uint8_t) * num_neurons);
 }
 
-void _store_provenance_data(address_t provenance_region){
-    log_debug("writing other provenance data");
-
-    // store the data into the provenance data region
-    provenance_region[N_PACKETS_RECEIVED] = n_in_spikes;
-    provenance_region[N_PACKETS_PROCESSED] = n_processed_spikes;
-    provenance_region[N_PACKETS_ADDED] = n_spikes_added;
-    provenance_region[N_PACKETS_SENT] = n_spikes_sent;
-    provenance_region[N_BUFFER_OVERFLOWS] = in_spikes_get_n_buffer_overflows();
-    provenance_region[N_DELAYS] = n_delays;
-    log_debug("finished other provenance data");
-}
-
 // Entry point
 void c_main(void) {
 
@@ -380,13 +385,6 @@ void c_main(void) {
     // Register callbacks
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
-
-    simulation_register_simulation_sdp_callback(
-        &simulation_ticks, &infinite_run, SDP, simulation_sdp_port);
-
-    // set up provenance registration
-    simulation_register_provenance_callback(
-        _store_provenance_data, PROVENANCE_REGION);
 
     simulation_run();
 }
