@@ -30,12 +30,12 @@ static inline uint32_t _get_direct_address(address_and_row_length entry) {
 
 static inline uint32_t _get_address(address_and_row_length entry) {
 
-    // The address is in words and is the top 24-bits, so this down shifts by
-    // 8 and then multiplies by 4 (= up shifts by 2) = down shift by 6
-    // with the given mask 0xFFFFFF00 to fully remove the row length
-    // NOTE: The mask can be removed given the machien spec says it
-    // hardcodes the bottom 2 bits to zero anyhows. BUT BAD CODE PRACTICE
-    return (entry & 0xFFFFFF00) >> 6;
+    // The address is in words and is the top 23-bits but 1, so this down
+    // shifts by 8 and then multiplies by 4 (= up shifts by 2) = down shift by 6
+    // with the given mask 0x7FFFFF00 to fully remove the row length
+    // NOTE: The mask can be removed given the machine spec says it
+    // hard-codes the bottom 2 bits to zero anyhow. BUT BAD CODE PRACTICE
+    return (entry & 0x7FFFFF00) >> 6;
 }
 
 static inline uint32_t _get_row_length(address_and_row_length entry) {
