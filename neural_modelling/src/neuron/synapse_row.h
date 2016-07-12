@@ -45,6 +45,11 @@
        shaping include
 #endif
 
+// If the number of input type bits isn't explicity defined, use all synapse type bits
+#ifndef SYNAPSE_INPUT_TYPE_BITS
+#define SYNAPSE_INPUT_TYPE_BITS SYNAPSE_TYPE_BITS
+#endif
+
 #ifndef SYNAPSE_TYPE_COUNT
 //! how many types of synapses will be supported
 //! (is expected to be done by implementations of synapse shapers)
@@ -52,6 +57,12 @@
 #error SYNAPSE_TYPE_COUNT was undefined.  It should be defined by a synapse\
        shaping include
 #endif
+
+// If the number of input types isn't explicity defined, use all synapse types
+#ifndef SYNAPSE_INPUT_TYPE_COUNT
+#define SYNAPSE_INPUT_TYPE_COUNT SYNAPSE_TYPE_COUNT
+#endif
+
 
 //! how many bits the synapse can support to represent the neuron id.
 #ifndef SYNAPSE_INDEX_BITS
