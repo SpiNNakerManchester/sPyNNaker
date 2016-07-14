@@ -9,32 +9,33 @@
             <arg>--placements={placements_path}</arg>
 
         </command_line_args>
-         <required_inputs>
-            <parameter>
+        <input_definitions>
+            <parameter is_file="True">
                 <param_name>graph</param_name>
                 <param_type>FilePartitionedGraph</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>machine</param_name>
                 <param_type>FileMachine</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>constraints</param_name>
                 <param_type>FileConstraints</param_type>
             </parameter>
-             <parameter>
+            <parameter is_file="True">
                 <param_name>placements_path</param_name>
-                <param_type>FilePlacementFilePath</param_type>
-            </parameter>
-        </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>FilePlacementFilePath</param_name>
                 <param_type>FilePlacements</param_type>
             </parameter>
-        </produces_outputs>
+        </input_definitions>
+        <required_inputs>
+            <param_name>graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>constraints</param_name>
+            <param_name>placements_path</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>FilePlacements</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="RigCommandLineHilbertPlacer">
         <command_line_args>
@@ -46,32 +47,33 @@
             <arg>--placements={placements_path}</arg>
 
         </command_line_args>
-         <required_inputs>
-            <parameter>
+        <input_definitions>
+            <parameter is_file="True">
                 <param_name>graph</param_name>
                 <param_type>FilePartitionedGraph</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>machine</param_name>
                 <param_type>FileMachine</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>constraints</param_name>
                 <param_type>FileConstraints</param_type>
             </parameter>
-             <parameter>
+            <parameter is_file="True">
                 <param_name>placements_path</param_name>
-                <param_type>FilePlacementFilePath</param_type>
-            </parameter>
-        </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>FilePlacementFilePath</param_name>
                 <param_type>FilePlacements</param_type>
             </parameter>
-        </produces_outputs>
+        </input_definitions>
+        <required_inputs>
+            <param_name>graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>constraints</param_name>
+            <param_name>placements_path</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>FilePlacements</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="RigCommandLineRandomPlacer">
         <command_line_args>
@@ -83,32 +85,33 @@
             <arg>--placements={placements_path}</arg>
 
         </command_line_args>
-         <required_inputs>
-            <parameter>
+        <input_definitions>
+            <parameter is_file="True">
                 <param_name>graph</param_name>
                 <param_type>FilePartitionedGraph</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>machine</param_name>
                 <param_type>FileMachine</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>constraints</param_name>
                 <param_type>FileConstraints</param_type>
             </parameter>
-             <parameter>
+            <parameter is_file="True">
                 <param_name>placements_path</param_name>
-                <param_type>FilePlacementFilePath</param_type>
-            </parameter>
-        </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>FilePlacementFilePath</param_name>
                 <param_type>FilePlacements</param_type>
             </parameter>
-        </produces_outputs>
+        </input_definitions>
+        <required_inputs>
+            <param_name>graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>constraints</param_name>
+            <param_name>placements_path</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>FilePlacements</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="RigAllocator">
         <command_line_args>
@@ -121,40 +124,44 @@
             <arg>--allocations=cores:{core_allocation_path}</arg>
             <arg>--allocations=sdram:{sdram_allocation_path}</arg>
         </command_line_args>
-         <required_inputs>
-            <parameter>
+        <input_definitions>
+            <parameter is_file="True">
                 <param_name>graph</param_name>
                 <param_type>FilePartitionedGraph</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>machine</param_name>
                 <param_type>FileMachine</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>constraints</param_name>
                 <param_type>FileConstraints</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>placements</param_name>
                 <param_type>FilePlacements</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>core_allocation_path</param_name>
-                <param_type>FileCoreAllocationsFilePath</param_type>
-            </parameter>
-             <parameter>
-                <param_name>sdram_allocation_path</param_name>
-                <param_type>FileSDRAMAllocationsFilePath</param_type>
-            </parameter>
-        </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>FileCoreAllocationsFilePath</param_name>
                 <param_type>FileCoreAllocations</param_type>
             </parameter>
-        </produces_outputs>
+            <parameter is_file="True">
+                <param_name>sdram_allocation_path</param_name>
+                <param_type>FileSDRAMAllocations</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>constraints</param_name>
+            <param_name>placements</param_name>
+            <param_name>core_allocation_path</param_name>
+            <param_name>sdram_allocation_path</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>FileCoreAllocations</param_type>
+            <param_type>FileSDRAMAllocations</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="RigRouter">
         <command_line_args>
@@ -168,40 +175,42 @@
             <arg>--core-resource=cores</arg>
             <arg>--routes={routing_paths_file_path}</arg>
         </command_line_args>
-         <required_inputs>
-            <parameter>
+        <input_definitions>
+            <parameter is_file="True">
                 <param_name>graph</param_name>
                 <param_type>FilePartitionedGraph</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>machine</param_name>
                 <param_type>FileMachine</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>constraints</param_name>
                 <param_type>FileConstraints</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>placements</param_name>
                 <param_type>FilePlacements</param_type>
             </parameter>
-            <parameter>
+            <parameter is_file="True">
                 <param_name>allocations</param_name>
                 <param_type>FileCoreAllocations</param_type>
             </parameter>
-             <parameter>
+            <parameter is_file="True">
                 <param_name>routing_paths_file_path</param_name>
-                <param_type>FileRouingPathsFilePath</param_type>
+                <param_type>FileRouingPaths</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>graph</param_name>
+            <param_name>machine</param_name>
+            <param_name>constraints</param_name>
+            <param_name>placements</param_name>
+            <param_name>allocations</param_name>
+            <param_name>routing_paths_file_path</param_name>
         </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>FileRouingPathsFilePath</param_name>
-                <param_type>FileRoutingPaths</param_type>
-            </parameter>
-        </produces_outputs>
+        <outputs>
+            <param_type>FileRouingPaths</param_type>
+        </outputs>
     </algorithm>
-
 </algorithms>
