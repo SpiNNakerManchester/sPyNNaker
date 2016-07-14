@@ -96,20 +96,26 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
 
     @property
     def _n_header_bytes(self):
+
+        n_bytes = 0
         if self._mad:
 
             # If we're using MAD, the header contains a single timestamp and
             # pre-trace
-            return (
+            n_bytes = (
                 TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
         else:
 
             # Otherwise, headers consist of a counter followed by
             # NUM_PRE_SYNAPTIC_EVENTS timestamps and pre-traces
-            return (
+            n_bytes = (
                 4 + (NUM_PRE_SYNAPTIC_EVENTS *
                      (TIME_STAMP_BYTES +
                       self.timing_dependence.pre_trace_n_bytes)))
+
+        # The actual number of bytes is in a word-aligned struct, so work out
+        # the number of words
+        return int(math.ceil(float(n_bytes) / 4.0)) * 4
 
     def get_n_words_for_plastic_connections(self, n_connections):
         synapse_structure = self._timing_dependence.synaptic_structure

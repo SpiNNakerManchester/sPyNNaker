@@ -25,8 +25,8 @@ static inline index_t synapses_get_ring_buffer_index_combined(
 }
 
 // Converts a weight stored in a synapse row to an input
-static inline input_t synapses_convert_weight_to_input(weight_t weight,
-                                                       uint32_t left_shift) {
+static inline input_t synapses_convert_weight_to_input(
+        weight_t weight, uint32_t left_shift) {
     union {
         int_k_t input_type;
         s1615 output_type;
@@ -45,14 +45,16 @@ static inline void synapses_print_weight(weight_t weight, uint32_t left_shift) {
         io_printf(IO_BUF, "      ");
 }
 
-bool synapses_initialise(address_t address, uint32_t n_neurons,
-                         input_t **input_buffers_value,
-                         uint32_t **ring_buffer_to_input_buffer_left_shifts);
+bool synapses_initialise(
+    address_t synapse_params_address, address_t synaptic_matrix_address,
+    uint32_t n_neurons, input_t **input_buffers_value,
+    uint32_t **ring_buffer_to_input_buffer_left_shifts,
+    address_t *indirect_synapses_address, address_t *direct_synapses_address);
 
 void synapses_do_timestep_update(timer_t time);
 
-bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
-                                   bool write, uint32_t process_id);
+bool synapses_process_synaptic_row(
+    uint32_t time, synaptic_row_t row, bool write, uint32_t process_id);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.
