@@ -112,9 +112,9 @@ static inline post_event_window_t post_events_get_window_delayed(
         // **NOTE** next_time can be invalid
         window.next_time = event_time--;
 
-        // If this event is still in the future, move the end time back
+        // If this event is still in the future, set it as the end
         if (*event_time > end_time) {
-            end_event_time = window.next_time;
+            end_event_time = event_time;
         }
     }
 
