@@ -3,7 +3,7 @@ import numpy
 
 
 class DelayBlock(object):
-    """ A block of delays for a subvertex
+    """ A block of delays for a vertex
     """
 
     def __init__(

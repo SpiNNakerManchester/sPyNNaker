@@ -13,28 +13,21 @@ class DelayAfferentMachineEdge(
         SimpleMachineEdge, AbstractFilterableEdge,
         AbstractWeightUpdatable):
 
-    def __init__(self, presubvertex, postsubvertex):
+    def __init__(self, pre_vertex, post_vertex):
         SimpleMachineEdge.__init__(
-            self, presubvertex, postsubvertex)
+            self, pre_vertex, post_vertex)
         AbstractFilterableEdge.__init__(self)
         AbstractWeightUpdatable.__init__(self)
 
-    def filter_sub_edge(self, graph_mapper):
-        """ Filter a subedge of this edge if the edge is not a one-to-one edge
-        """
-        pre_sub_lo = \
-            graph_mapper.get_slice(self._pre_subvertex).lo_atom
-        pre_sub_hi = \
-            graph_mapper.get_slice(self._pre_subvertex).hi_atom
-        post_sub_lo = \
-            graph_mapper.get_slice(self._post_subvertex).lo_atom
-        post_sub_hi = \
-            graph_mapper.get_slice(self._post_subvertex).hi_atom
-        if (pre_sub_lo != post_sub_lo) or (pre_sub_hi != post_sub_hi):
+    def filter_edge(self, graph_mapper):
+        pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
+        pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+        post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
+        post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+        if (pre_lo != post_lo) or (pre_hi != post_hi):
             return True
         return False
 
     def update_weight(self, graph_mapper):
-        pre_vertex_slice = graph_mapper.get_slice(
-            self._pre_subvertex)
-        return pre_vertex_slice.n_atoms
+        pre_vertex_slice = graph_mapper.get_slice(self.pre_vertex)
+        self._weight = pre_vertex_slice.n_atoms

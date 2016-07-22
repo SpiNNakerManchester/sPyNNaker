@@ -50,7 +50,7 @@ class EIEIOSpikeRecorder(object):
         for vertex in vertices:
 
             placement = placements.get_placement_of_vertex(vertex)
-            subvertex_slice = graph_mapper.get_slice(vertex)
+            vertex_slice = graph_mapper.get_slice(vertex)
 
             x = placement.x
             y = placement.y
@@ -76,7 +76,7 @@ class EIEIOSpikeRecorder(object):
                     spike_data, dtype="<u4", count=eieio_header.count,
                     offset=offset)
                 neuron_ids = ((keys - base_key_function(vertex)) +
-                              subvertex_slice.lo_atom)
+                              vertex_slice.lo_atom)
                 offset += eieio_header.count * 4
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
             progress_bar.update()

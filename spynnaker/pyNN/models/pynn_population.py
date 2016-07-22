@@ -623,7 +623,7 @@ class Population(object):
     # NONE PYNN API CALL
     def set_constraint(self, constraint):
         """ Apply a constraint to a population that restricts the processor\
-            onto which its sub-populations will be placed.
+            onto which its atoms will be placed.
         """
         if isinstance(constraint, AbstractConstraint):
             self._vertex.add_constraint(constraint)

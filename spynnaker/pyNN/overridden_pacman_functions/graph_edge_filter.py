@@ -25,7 +25,7 @@ class GraphEdgeFilter(object):
         :param graph_mapper: the graph mapper between graphs
         :return: a new graph mapper and machine graph
         """
-        new_sub_graph = MachineGraph(label=machine_graph.label)
+        new_machine_graph = MachineGraph(label=machine_graph.label)
         new_graph_mapper = GraphMapper(graph_mapper.first_graph_label,
                                        machine_graph.label)
 
@@ -34,51 +34,46 @@ class GraphEdgeFilter(object):
             len(machine_graph.vertices) + len(machine_graph.edges),
             "Filtering edges")
 
-        # add the subverts directly, as they wont be pruned.
-        for subvert in machine_graph.vertices:
-            new_sub_graph.add_vertex(subvert)
-            associated_vertex = graph_mapper.get_application_vertex(subvert)
-            vertex_slice = graph_mapper.get_slice(subvert)
+        # add the vertices directly, as they wont be pruned.
+        for vertex in machine_graph.vertices:
+            new_machine_graph.add_vertex(vertex)
+            associated_vertex = graph_mapper.get_application_vertex(vertex)
+            vertex_slice = graph_mapper.get_slice(vertex)
             new_graph_mapper.add_vertex_mapping(
-                vertex=subvert, vertex_slice=vertex_slice,
+                vertex=vertex, vertex_slice=vertex_slice,
                 vertex=associated_vertex)
             progress_bar.update()
 
         # start checking edges to decide which ones need pruning....
-        for subvert in machine_graph.vertices:
+        for vertex in machine_graph.vertices:
             out_going_partitions = \
                 machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
-                    subvert)
+                    vertex)
             for partition in out_going_partitions:
-                for subedge in partition.edges:
-                    if not self._is_filterable(subedge, graph_mapper):
-                        logger.debug("this subedge was not pruned {}"
-                                     .format(subedge))
-                        new_sub_graph.add_edge(subedge, partition.identifier)
-                        associated_edge = graph_mapper.\
-                            get_application_edge(
-                                subedge)
-                        new_graph_mapper.add_edge_mapping(
-                            subedge, associated_edge)
+                for edge in partition.edges:
+                    if not self._is_filterable(edge, graph_mapper):
+                        logger.debug(
+                            "this edge was not pruned {}".format(edge))
+                        new_machine_graph.add_edge(edge, partition.identifier)
+                        app_edge = graph_mapper.get_application_edge(edge)
+                        new_graph_mapper.add_edge_mapping(edge, app_edge)
                     else:
-                        logger.debug("this subedge was pruned {}"
-                                     .format(subedge))
+                        logger.debug(
+                            "this edge was pruned {}".format(edge))
                     progress_bar.update()
         progress_bar.end()
 
         # returned the pruned graph and graph_mapper
-        return {'new_sub_graph': new_sub_graph,
+        return {'new_machine_graph': new_machine_graph,
                 'new_graph_mapper': new_graph_mapper}
 
     @staticmethod
-    def _is_filterable(subedge, graph_mapper):
-        associated_edge = \
-            graph_mapper.get_application_edge(subedge)
-        if isinstance(subedge, AbstractFilterableEdge):
-            return subedge.filter_sub_edge(graph_mapper)
-        elif isinstance(associated_edge, SimpleApplicationEdge):
+    def _is_filterable(edge, graph_mapper):
+        app_edge = graph_mapper.get_application_edge(edge)
+        if isinstance(edge, AbstractFilterableEdge):
+            return edge.filter_edge(graph_mapper)
+        elif isinstance(app_edge, SimpleApplicationEdge):
             return False
         else:
             raise exceptions.FilterableException(
-                "cannot figure out if subedge {} is prunable or not"
-                .format(subedge))
+                "cannot figure out if edge {} is prunable or not".format(edge))

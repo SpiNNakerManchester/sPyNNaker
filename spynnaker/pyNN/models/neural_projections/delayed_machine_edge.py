@@ -14,20 +14,20 @@ class DelayedMachineEdge(SimpleMachineEdge, AbstractFilterableEdge):
         AbstractFilterableEdge.__init__(self)
         self._synapse_information = synapse_information
 
-    def filter_sub_edge(self, graph_mapper):
+    def filter_edge(self, graph_mapper):
         pre_vertex = graph_mapper.get_application_vertex(
-            self._pre_subvertex)
+            self.pre_vertex)
         pre_slice_index = graph_mapper.get_machine_vertex_index(
-            self._pre_subvertex)
+            self.pre_vertex)
         pre_vertex_slice = graph_mapper.get_slice(
-            self._pre_subvertex)
+            self.pre_vertex)
         pre_slices = graph_mapper.get_slices(pre_vertex)
         post_vertex = graph_mapper.get_application_vertex(
-            self._post_subvertex)
+            self.post_vertex)
         post_slice_index = graph_mapper.get_machine_vertex_index(
-            self._post_subvertex)
+            self.post_vertex)
         post_vertex_slice = graph_mapper.get_slice(
-            self._post_subvertex)
+            self.post_vertex)
         post_slices = graph_mapper.get_slices(post_vertex)
 
         n_connections = 0

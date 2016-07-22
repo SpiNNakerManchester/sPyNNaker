@@ -58,15 +58,15 @@ class SpikeRecorder(object):
         for vertex in vertices:
 
             placement = placements.get_placement_of_vertex(vertex)
-            subvertex_slice = graph_mapper.get_slice(vertex)
+            vertex_slice = graph_mapper.get_slice(vertex)
 
             x = placement.x
             y = placement.y
             p = placement.p
-            lo_atom = subvertex_slice.lo_atom
+            lo_atom = vertex_slice.lo_atom
 
             # Read the spikes
-            n_words = int(math.ceil(subvertex_slice.n_atoms / 32.0))
+            n_words = int(math.ceil(vertex_slice.n_atoms / 32.0))
             n_bytes = n_words * 4
             n_words_with_timestamp = n_words + 1
 

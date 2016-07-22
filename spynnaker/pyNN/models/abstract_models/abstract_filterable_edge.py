@@ -5,15 +5,14 @@ from abc import abstractmethod
 
 @add_metaclass(ABCMeta)
 class AbstractFilterableEdge(object):
-    """
-    supports edges that can be filtered
+    """ An edge that can be filtered
     """
 
     def __init__(self):
         pass
 
     @abstractmethod
-    def filter_sub_edge(self, graph_mapper):
+    def filter_edge(self, graph_mapper):
         """ method to allow edges to determine if a edge is filter-able
 
         :param graph_mapper: the mapper between graphs

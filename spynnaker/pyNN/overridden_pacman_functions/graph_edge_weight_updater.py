@@ -23,9 +23,9 @@ class GraphEdgeWeightUpdater(object):
             len(machine_graph.edges), "Updating edge weights")
 
         # start checking edges to decide which ones need pruning....
-        for subedge in machine_graph.edges:
-            if isinstance(subedge, AbstractWeightUpdatable):
-                subedge.update_weight(graph_mapper)
+        for edge in machine_graph.edges:
+            if isinstance(edge, AbstractWeightUpdatable):
+                edge.update_weight(graph_mapper)
             progress_bar.update()
         progress_bar.end()
 

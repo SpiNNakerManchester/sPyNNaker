@@ -622,10 +622,10 @@ class AbstractPopulationVertex(
             connection_holder, edge, synapse_info)
 
     def get_connections_from_machine(
-            self, transceiver, placement, subedge, graph_mapper,
+            self, transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info, machine_graph):
         return self._synapse_manager.get_connections_from_machine(
-            transceiver, placement, subedge, graph_mapper,
+            transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info, machine_graph)
 
     def is_data_specable(self):

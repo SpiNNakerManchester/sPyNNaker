@@ -172,25 +172,25 @@ class SynapticManager(object):
 
     def _get_exact_synaptic_blocks_size(
             self, post_slices, post_slice_index, post_vertex_slice,
-            graph_mapper, subvertex_in_edges):
+            graph_mapper, in_edges):
         """ Get the exact size all of the synaptic blocks
         """
 
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
 
         # Go through the edges and add up the memory
-        for subedge in subvertex_in_edges:
+        for edge in in_edges:
 
             edge = graph_mapper.get_application_edge(
-                subedge)
+                edge)
             if isinstance(edge, ProjectionApplicationEdge):
 
                 # Add on the size of the tables to be generated
                 pre_vertex_slice = graph_mapper.get_slice(
-                    subedge.pre_vertex)
+                    edge.pre_vertex)
                 pre_slices = graph_mapper.get_slices(edge.pre_vertex)
                 pre_slice_index = graph_mapper.get_machine_vertex_index(
-                    subedge.pre_vertex)
+                    edge.pre_vertex)
 
                 memory_size += self._get_size_of_synapse_information(
                     edge.synapse_information, pre_slices, pre_slice_index,
@@ -208,7 +208,7 @@ class SynapticManager(object):
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
 
-                # Get an estimate of the number of post sub-vertices by
+                # Get an estimate of the number of post vertices by
                 # assuming that all of them are the same size as this one
                 post_slices = [Slice(
                     lo_atom, min(
@@ -221,21 +221,21 @@ class SynapticManager(object):
                     float(post_vertex_slice.lo_atom) /
                     float(post_vertex_slice.n_atoms)))
 
-                # Get an estimate of the number of pre-sub-vertices - clearly
+                # Get an estimate of the number of pre-vertices - clearly
                 # this will not be correct if the SDRAM usage is high!
                 # TODO: Can be removed once we move to population-based keys
-                n_atoms_per_subvertex = sys.maxint
+                n_atoms_per_vertex = sys.maxint
                 if isinstance(in_edge.pre_vertex, AbstractApplicationVertex):
-                    n_atoms_per_subvertex = \
+                    n_atoms_per_vertex = \
                         in_edge.pre_vertex.get_max_atoms_per_core()
-                if in_edge.pre_vertex.n_atoms < n_atoms_per_subvertex:
-                    n_atoms_per_subvertex = in_edge.pre_vertex.n_atoms
+                if in_edge.pre_vertex.n_atoms < n_atoms_per_vertex:
+                    n_atoms_per_vertex = in_edge.pre_vertex.n_atoms
                 pre_slices = [Slice(
                     lo_atom, min(
                         in_edge.pre_vertex.n_atoms,
-                        lo_atom + n_atoms_per_subvertex - 1))
+                        lo_atom + n_atoms_per_vertex - 1))
                     for lo_atom in range(
-                        0, in_edge.pre_vertex.n_atoms, n_atoms_per_subvertex)]
+                        0, in_edge.pre_vertex.n_atoms, n_atoms_per_vertex)]
 
                 pre_slice_index = 0
                 for pre_vertex_slice in pre_slices:
@@ -285,7 +285,7 @@ class SynapticManager(object):
                 vertex_slice, in_edges))
 
     def _reserve_memory_regions(
-            self, spec, vertex, vertex, vertex_slice, graph, sub_graph,
+            self, spec, vertex, vertex, vertex_slice, graph, machine_graph,
             all_syn_block_sz, graph_mapper):
 
         spec.reserve_memory_region(
@@ -296,7 +296,7 @@ class SynapticManager(object):
         in_edges = graph.get_edges_ending_at_vertex(vertex)
         master_pop_table_sz = \
             self._population_table_type.get_exact_master_population_table_size(
-                vertex, sub_graph, graph_mapper)
+                vertex, machine_graph, graph_mapper)
         if master_pop_table_sz > 0:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.POPULATION_TABLE
@@ -398,7 +398,7 @@ class SynapticManager(object):
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_to_input_left_shifts(
-            self, vertex, sub_graph, graph_mapper, post_slices,
+            self, vertex, machine_graph, graph_mapper, post_slices,
             post_slice_index, post_vertex_slice, machine_timestep,
             weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
@@ -413,18 +413,16 @@ class SynapticManager(object):
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
 
-        for subedge in sub_graph.get_edges_ending_at_vertex(vertex):
-            pre_vertex_slice = graph_mapper.get_slice(
-                subedge.pre_vertex)
-            edge = graph_mapper.get_application_edge(
-                subedge)
+        for edge in machine_graph.get_edges_ending_at_vertex(vertex):
+            pre_vertex_slice = graph_mapper.get_slice(edge.pre_vertex)
+            app_edge = graph_mapper.get_application_edge(edge)
             pre_slices = [
-                graph_mapper.get_slice(subv)
-                for subv in graph_mapper.get_machine_vertices(
-                    edge.pre_vertex)]
+                graph_mapper.get_slice(vertex)
+                for vertex in graph_mapper.get_machine_vertices(
+                    app_edge.pre_vertex)]
             pre_slice_index = pre_slices.index(pre_vertex_slice)
-            if isinstance(edge, ProjectionApplicationEdge):
-                for synapse_info in edge.synapse_information:
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
                     synapse_type = synapse_info.synapse_type
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
@@ -460,8 +458,8 @@ class SynapticManager(object):
 
                     spikes_per_tick = self._spikes_per_tick
                     spikes_per_second = self._spikes_per_second
-                    if isinstance(edge.pre_vertex, SpikeSourcePoisson):
-                        spikes_per_second = edge.pre_vertex.rate
+                    if isinstance(app_edge.pre_vertex, SpikeSourcePoisson):
+                        spikes_per_second = app_edge.pre_vertex.rate
                         if hasattr(spikes_per_second, "__getitem__"):
                             spikes_per_second = max(spikes_per_second)
                         elif isinstance(spikes_per_second, RandomDistribution):
@@ -526,13 +524,13 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_synapse_parameters(
-            self, spec, vertex, subgraph, graph_mapper, post_slices,
+            self, spec, vertex, graph, graph_mapper, post_slices,
             post_slice_index, post_vertex_slice, input_type):
 
         # Get the ring buffer shifts and scaling factors
         weight_scale = input_type.get_global_weight_scale()
         ring_buffer_shifts = self._get_ring_buffer_to_input_left_shifts(
-            vertex, subgraph, graph_mapper, post_slices, post_slice_index,
+            vertex, graph, graph_mapper, post_slices, post_slice_index,
             post_vertex_slice, self._machine_time_step, weight_scale)
 
         spec.switch_write_focus(
@@ -597,56 +595,55 @@ class SynapticManager(object):
         spec.write_value(0)
         next_single_start_position = 0
 
-        # For each subedge into the vertex, create a synaptic list
-        for subedge in in_edges:
+        # For each edge into the vertex, create a synaptic list
+        for edge in in_edges:
 
-            edge = graph_mapper.get_application_edge(
-                subedge)
-            if isinstance(edge, ProjectionApplicationEdge):
+            app_edge = graph_mapper.get_application_edge(edge)
+            if isinstance(app_edge, ProjectionApplicationEdge):
 
-                spec.comment("\nWriting matrix for subedge:{}\n".format(
-                    subedge.label))
+                spec.comment("\nWriting matrix for edge:{}\n".format(
+                    edge.label))
 
-                pre_vertex_slice = graph_mapper.get_slice(
-                    subedge.pre_vertex)
-                pre_slices = graph_mapper.get_slices(edge.pre_vertex)
+                pre_vertex_slice = graph_mapper.get_slice(edge.pre_vertex)
+                pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
                 pre_slice_index = graph_mapper.get_machine_vertex_index(
-                    subedge.pre_vertex)
+                    edge.pre_vertex)
 
-                for synapse_info in edge.synapse_information:
+                for synapse_info in app_edge.synapse_information:
 
                     (row_data, row_length, delayed_row_data,
                      delayed_row_length, delayed_source_ids, delay_stages) = \
                         self._synapse_io.get_synapses(
                             synapse_info, pre_slices, pre_slice_index,
                             post_slices, post_slice_index, pre_vertex_slice,
-                            post_vertex_slice, edge.n_delay_stages,
+                            post_vertex_slice, app_edge.n_delay_stages,
                             self._population_table_type, n_synapse_types,
                             weight_scales)
 
-                    if edge.delay_edge is not None:
-                        edge.delay_edge.pre_vertex.add_delays(
+                    if app_edge.delay_edge is not None:
+                        app_edge.delay_edge.pre_vertex.add_delays(
                             pre_vertex_slice, delayed_source_ids, delay_stages)
                     elif delayed_source_ids.size != 0:
-                        raise Exception("Found delayed source ids but no delay"
-                                        " edge for edge {}".format(edge.label))
+                        raise Exception(
+                            "Found delayed source ids but no delay edge for {}"
+                            .format(app_edge.label))
 
-                    if ((edge, synapse_info) in
+                    if ((app_edge, synapse_info) in
                             self._pre_run_connection_holders):
                         holders = self._pre_run_connection_holders[
-                            edge, synapse_info]
+                            app_edge, synapse_info]
                         for connection_holder in holders:
                             connections = self._synapse_io.read_synapses(
                                 synapse_info, pre_vertex_slice,
                                 post_vertex_slice, row_length,
                                 delayed_row_length, n_synapse_types,
                                 weight_scales, row_data, delayed_row_data,
-                                edge.n_delay_stages)
+                                app_edge.n_delay_stages)
                             connection_holder.add_connections(connections)
                             connection_holder.finish()
 
                     if len(row_data) > 0:
-                        rinfo = routing_info.get_routing_info_for_edge(subedge)
+                        rinfo = routing_info.get_routing_info_for_edge(edge)
 
                         if (row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector)):
@@ -680,7 +677,7 @@ class SynapticManager(object):
 
                     if len(delayed_row_data) > 0:
                         rinfo = self._delay_key_index[
-                            (edge.pre_vertex, pre_vertex_slice.lo_atom,
+                            (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
                              pre_vertex_slice.hi_atom)]
 
                         if (delayed_row_length == 1 and isinstance(
@@ -736,27 +733,25 @@ class SynapticManager(object):
             machine_graph, graph, routing_info, graph_mapper, input_type):
 
         # Create an index of delay keys into this vertex
-        for subedge in machine_graph.get_edges_ending_at_vertex(
+        for edge in machine_graph.get_edges_ending_at_vertex(
                 vertex):
-            edge = graph_mapper.get_application_edge(
-                subedge)
-            if isinstance(edge.pre_vertex, DelayExtensionVertex):
-                pre_vertex_slice = graph_mapper.get_slice(
-                    subedge.pre_vertex)
+            app_edge = graph_mapper.get_application_edge(edge)
+            if isinstance(app_edge.pre_vertex, DelayExtensionVertex):
+                pre_vertex_slice = graph_mapper.get_slice(edge.pre_vertex)
                 self._delay_key_index[
-                    (edge.pre_vertex.source_vertex, pre_vertex_slice.lo_atom,
+                    (app_edge.pre_vertex.source_vertex,
+                     pre_vertex_slice.lo_atom,
                      pre_vertex_slice.hi_atom)] = \
-                    routing_info.get_routing_info_for_edge(subedge)
+                    routing_info.get_routing_info_for_edge(edge)
 
         post_slices = graph_mapper.get_slices(vertex)
         post_slice_index = graph_mapper.get_machine_vertex_index(vertex)
 
         # Reserve the memory
-        subvert_in_edges = machine_graph.get_edges_ending_at_vertex(
-            vertex)
+        in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
         all_syn_block_sz = self._get_exact_synaptic_blocks_size(
             post_slices, post_slice_index, post_vertex_slice, graph_mapper,
-            subvert_in_edges)
+            in_edges)
         self._reserve_memory_regions(
             spec, vertex, vertex, post_vertex_slice, graph,
             machine_graph, all_syn_block_sz, graph_mapper)
@@ -779,23 +774,23 @@ class SynapticManager(object):
         self._weight_scales[placement] = weight_scales
 
     def get_connections_from_machine(
-            self, transceiver, placement, subedge, graph_mapper,
+            self, transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info, machine_graph):
 
         edge = graph_mapper.get_application_edge(
-            subedge)
+            edge)
         if not isinstance(edge, ProjectionApplicationEdge):
             return None
 
         # Get details for extraction
         pre_vertex_slice = graph_mapper.get_slice(
-            subedge.pre_vertex)
+            edge.pre_vertex)
         post_vertex_slice = graph_mapper.get_slice(
-            subedge.post_vertex)
+            edge.post_vertex)
         n_synapse_types = self._synapse_type.get_n_synapse_types()
 
         # Get the key for the pre_vertex
-        key = routing_infos.get_first_key_for_edge(subedge)
+        key = routing_infos.get_first_key_for_edge(edge)
 
         # Get the key for the delayed pre_vertex
         delayed_key = None

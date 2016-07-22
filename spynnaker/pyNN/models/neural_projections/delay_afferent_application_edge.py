@@ -11,14 +11,4 @@ class DelayAfferentApplicationEdge(SimpleApplicationEdge):
             self, prevertex, delayvertex, label=label)
 
     def create_machine_edge(self, pre_vertex, post_vertex):
-        """ Create a subedge between the pre_vertex and the post_vertex
-
-        :param pre_vertex: The subvertex at the start of the subedge
-        :type pre_vertex:\
-            :py:class:`pacman.model.graph.application.abstract_application_vertex.AbstractApplicationVertex`
-        :param post_vertex: The subvertex at the end of the subedge
-        :type post_vertex:\
-            :py:class:`pacman.model.graph.application.abstract_application_vertex.AbstractApplicationVertex`
-        :return: The created subedge
-        """
         return DelayAfferentMachineEdge(pre_vertex, post_vertex)

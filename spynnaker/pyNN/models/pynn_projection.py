@@ -297,11 +297,11 @@ class Projection(object):
             len(edges),
             "Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))
-        for subedge in edges:
+        for edge in edges:
             placement = placements.get_placement_of_vertex(
-                subedge.post_vertex)
+                edge.post_vertex)
             connections = post_vertex.get_connections_from_machine(
-                transceiver, placement, subedge, graph_mapper, routing_infos,
+                transceiver, placement, edge, graph_mapper, routing_infos,
                 self._synapse_information, machine_graph)
             if connections is not None:
                 connection_holder.add_connections(connections)

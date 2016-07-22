@@ -468,7 +468,6 @@ class SpikeSourcePoisson(
             spec, spike_history_sz, ip_tags, buffer_size_before_receive,
             vertex)
 
-        # Every subedge should have the same key
         key = routing_info.get_first_key_from_pre_vertex(
             vertex, constants.SPIKE_PARTITION_ID)
 

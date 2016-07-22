@@ -91,7 +91,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :return: the size the master pop table will take in SDRAM (in bytes)
         """
 
-        # Entry for each sub-edge - but don't know the edges yet, so
+        # Entry for each edge - but don't know the edges yet, so
         # assume multiple entries for each edge
         n_vertices = 0
         n_entries = 0

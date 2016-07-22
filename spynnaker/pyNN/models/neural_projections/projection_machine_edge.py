@@ -25,20 +25,20 @@ class ProjectionMachineEdge(
 
         self._synapse_information = synapse_information
 
-    def filter_sub_edge(self, graph_mapper):
+    def filter_edge(self, graph_mapper):
         pre_vertex = graph_mapper.get_application_vertex(
-            self._pre_subvertex)
+            self.pre_vertex)
         pre_slice_index = graph_mapper.get_machine_vertex_index(
-            self._pre_subvertex)
+            self.pre_vertex)
         pre_vertex_slice = graph_mapper.get_slice(
-            self._pre_subvertex)
+            self.pre_vertex)
         pre_slices = graph_mapper.get_slices(pre_vertex)
         post_vertex = graph_mapper.get_application_vertex(
-            self._post_subvertex)
+            self.post_vertex)
         post_slice_index = graph_mapper.get_machine_vertex_index(
-            self._post_subvertex)
+            self.post_vertex)
         post_vertex_slice = graph_mapper.get_slice(
-            self._post_subvertex)
+            self.post_vertex)
         post_slices = graph_mapper.get_slices(post_vertex)
 
         n_connections = 0
@@ -54,18 +54,18 @@ class ProjectionMachineEdge(
 
     def update_weight(self, graph_mapper):
         pre_vertex = graph_mapper.get_application_vertex(
-            self._pre_subvertex)
+            self.pre_vertex)
         pre_slice_index = graph_mapper.get_machine_vertex_index(
-            self._pre_subvertex)
+            self.pre_vertex)
         pre_vertex_slice = graph_mapper.get_slice(
-            self._pre_subvertex)
+            self.pre_vertex)
         pre_slices = graph_mapper.get_slices(pre_vertex)
         post_vertex = graph_mapper.get_application_vertex(
-            self._post_subvertex)
+            self.post_vertex)
         post_slice_index = graph_mapper.get_machine_vertex_index(
-            self._post_subvertex)
+            self.post_vertex)
         post_vertex_slice = graph_mapper.get_slice(
-            self._post_subvertex)
+            self.post_vertex)
         post_slices = graph_mapper.get_slices(post_vertex)
 
         weight = 0
@@ -96,8 +96,8 @@ class ProjectionMachineEdge(
                 synapse_info.connector.get_provenance_data())
             prov_items.extend(
                 synapse_info.synapse_dynamics.get_provenance_data(
-                    self._pre_subvertex.label, self._post_subvertex.label))
+                    self.pre_vertex.label, self.post_vertex.label))
         return prov_items
 
     def __repr__(self):
-        return "{}:{}".format(self._pre_subvertex, self._post_subvertex)
+        return "{}:{}".format(self.pre_vertex, self.post_vertex)
