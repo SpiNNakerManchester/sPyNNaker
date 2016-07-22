@@ -36,21 +36,21 @@ class EIEIOSpikeRecorder(object):
         return n_neurons * 4
 
     def get_spikes(self, label, buffer_manager, region, state_region,
-                   placements, graph_mapper, partitionable_vertex,
+                   placements, graph_mapper, application_vertex,
                    base_key_function):
 
         results = list()
         missing_str = ""
         ms_per_tick = self._machine_time_step / 1000.0
-        subvertices = \
-            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
-        progress_bar = ProgressBar(len(subvertices),
+        vertices = \
+            graph_mapper.get_machine_vertices(application_vertex)
+        progress_bar = ProgressBar(len(vertices),
                                    "Getting spikes for {}".format(label))
 
-        for subvertex in subvertices:
+        for vertex in vertices:
 
-            placement = placements.get_placement_of_subvertex(subvertex)
-            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            placement = placements.get_placement_of_vertex(vertex)
+            subvertex_slice = graph_mapper.get_slice(vertex)
 
             x = placement.x
             y = placement.y
@@ -75,7 +75,7 @@ class EIEIOSpikeRecorder(object):
                 keys = numpy.frombuffer(
                     spike_data, dtype="<u4", count=eieio_header.count,
                     offset=offset)
-                neuron_ids = ((keys - base_key_function(subvertex)) +
+                neuron_ids = ((keys - base_key_function(vertex)) +
                               subvertex_slice.lo_atom)
                 offset += eieio_header.count * 4
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])

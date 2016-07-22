@@ -42,23 +42,23 @@ class SpikeRecorder(object):
         return n_neurons * 4
 
     def get_spikes(self, label, buffer_manager, region, state_region,
-                   placements, graph_mapper, partitionable_vertex):
+                   placements, graph_mapper, application_vertex):
 
         spike_times = list()
         spike_ids = list()
         ms_per_tick = self._machine_time_step / 1000.0
 
-        subvertices = \
-            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
+        vertices = \
+            graph_mapper.get_machine_vertices(application_vertex)
 
         missing_str = ""
 
-        progress_bar = ProgressBar(len(subvertices),
+        progress_bar = ProgressBar(len(vertices),
                                    "Getting spikes for {}".format(label))
-        for subvertex in subvertices:
+        for vertex in vertices:
 
-            placement = placements.get_placement_of_subvertex(subvertex)
-            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            placement = placements.get_placement_of_vertex(vertex)
+            subvertex_slice = graph_mapper.get_slice(vertex)
 
             x = placement.x
             y = placement.y

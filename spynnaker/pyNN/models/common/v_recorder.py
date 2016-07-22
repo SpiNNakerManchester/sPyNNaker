@@ -39,10 +39,10 @@ class VRecorder(object):
         return n_neurons * 4
 
     def get_v(self, label, buffer_manager, region, state_region, placements,
-              graph_mapper, partitionable_vertex):
+              graph_mapper, application_vertex):
 
-        subvertices = \
-            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
+        vertices = \
+            graph_mapper.get_machine_vertices(application_vertex)
 
         ms_per_tick = self._machine_time_step / 1000.0
 
@@ -50,13 +50,13 @@ class VRecorder(object):
         missing_str = ""
 
         progress_bar = \
-            ProgressBar(len(subvertices),
+            ProgressBar(len(vertices),
                         "Getting membrane voltage for {}".format(label))
 
-        for subvertex in subvertices:
+        for vertex in vertices:
 
-            vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-            placement = placements.get_placement_of_subvertex(subvertex)
+            vertex_slice = graph_mapper.get_slice(vertex)
+            placement = placements.get_placement_of_vertex(vertex)
 
             x = placement.x
             y = placement.y

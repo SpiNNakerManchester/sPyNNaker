@@ -10,7 +10,7 @@ class MultiCastCommand(object):
         """
 
         :param time: The time within the simulation at which to send the\
-                    commmand.  0 or a positive value indicates the number of\
+                    command.  0 or a positive value indicates the number of\
                     timesteps after the start of the simulation at which\
                     the command is to be sent.  A negative value indicates the\
                     (number of timesteps - 1) before the end of simulation at\
@@ -21,7 +21,7 @@ class MultiCastCommand(object):
         :type key: int
         :param mask: A mask to indicate the important bits of the command key.\
                     By default, all bits are assumed to be important, but this\
-                    can be used to optimize the sending of a group of commands
+                    can be used to optimise the sending of a group of commands
         :type mask: int
         :param payload: The payload of the command
         :type payload: int
@@ -73,7 +73,7 @@ class MultiCastCommand(object):
     def delay_between_repeats(self):
         return self._delay_between_repeats
 
-    def get_payload(self, routing_info, partitioned_graph, graph_mapper):
+    def get_payload(self, routing_info, graph, graph_mapper):
         """ Get the payload of the command.  By default, this just returns the\
             payload in the packet, but this can be overridden to compute the\
             payload from the routing information if so required.  This will be\
@@ -83,14 +83,13 @@ class MultiCastCommand(object):
                     from which edge keys can be obtained
         :type routing_info: \
                     :py:class:`pacman.model.routing_info.routing_info.RoutingInfo`
-        :param partitioned_graph: The partitioned graph for which the routing\
+        :param graph: The graph for which the routing\
                     information was obtained
-        :type partitioned_graph: \
-                    :py:class:`pacman.model.partitioned_graph.partitioned_graph.PartitionedGraph`
-        :param graph_mapper: The mapper between the partitioned and\
-                    partitionable graphs
+        :type graph: \
+                    :py:class:`pacman.model.graph.machine.machine_graph.MachineGraph`
+        :param graph_mapper: The mapper between the graphs
         :type graph_mapper: \
-                    :py:class:`pacman.model.graph_mapper.graph_mapper.GraphMapper`
+                    :py:class:`pacman.model.graph.graph_mapper.GraphMapper`
         :return: The payload of the command, or None if there is no payload
         :rtype: int
         """

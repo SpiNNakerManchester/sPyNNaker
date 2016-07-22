@@ -5,40 +5,41 @@ from spinn_front_end_common.interface.provenance\
     import AbstractProvidesLocalProvenanceData
 from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
     import AbstractWeightUpdatable
-from pacman.model.partitioned_graph.multi_cast_partitioned_edge \
-    import MultiCastPartitionedEdge
+from pacman.model.graph.machine.simple_machine_edge \
+    import SimpleMachineEdge
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
 
 
-class ProjectionPartitionedEdge(
-        MultiCastPartitionedEdge, AbstractFilterableEdge,
+class ProjectionMachineEdge(
+        SimpleMachineEdge, AbstractFilterableEdge,
         AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
 
     def __init__(
-            self, synapse_information, pre_subvertex, post_subvertex,
+            self, synapse_information, pre_vertex, post_vertex,
             label=None):
-        MultiCastPartitionedEdge.__init__(
-            self, pre_subvertex, post_subvertex, label=label)
+        SimpleMachineEdge.__init__(
+            self, pre_vertex, post_vertex, label=label)
         AbstractFilterableEdge.__init__(self)
         AbstractWeightUpdatable.__init__(self)
 
         self._synapse_information = synapse_information
 
     def filter_sub_edge(self, graph_mapper):
-        pre_vertex = graph_mapper.get_vertex_from_subvertex(
+        pre_vertex = graph_mapper.get_application_vertex(
             self._pre_subvertex)
-        pre_slice_index = graph_mapper.get_subvertex_index(self._pre_subvertex)
-        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+        pre_slice_index = graph_mapper.get_machine_vertex_index(
             self._pre_subvertex)
-        pre_slices = graph_mapper.get_subvertex_slices(pre_vertex)
-        post_vertex = graph_mapper.get_vertex_from_subvertex(
+        pre_vertex_slice = graph_mapper.get_slice(
+            self._pre_subvertex)
+        pre_slices = graph_mapper.get_slices(pre_vertex)
+        post_vertex = graph_mapper.get_application_vertex(
             self._post_subvertex)
-        post_slice_index = graph_mapper.get_subvertex_index(
+        post_slice_index = graph_mapper.get_machine_vertex_index(
             self._post_subvertex)
-        post_vertex_slice = graph_mapper.get_subvertex_slice(
+        post_vertex_slice = graph_mapper.get_slice(
             self._post_subvertex)
-        post_slices = graph_mapper.get_subvertex_slices(post_vertex)
+        post_slices = graph_mapper.get_slices(post_vertex)
 
         n_connections = 0
         for synapse_info in self._synapse_information:
@@ -52,19 +53,20 @@ class ProjectionPartitionedEdge(
         return n_connections == 0
 
     def update_weight(self, graph_mapper):
-        pre_vertex = graph_mapper.get_vertex_from_subvertex(
+        pre_vertex = graph_mapper.get_application_vertex(
             self._pre_subvertex)
-        pre_slice_index = graph_mapper.get_subvertex_index(self._pre_subvertex)
-        pre_vertex_slice = graph_mapper.get_subvertex_slice(
+        pre_slice_index = graph_mapper.get_machine_vertex_index(
             self._pre_subvertex)
-        pre_slices = graph_mapper.get_subvertex_slices(pre_vertex)
-        post_vertex = graph_mapper.get_vertex_from_subvertex(
+        pre_vertex_slice = graph_mapper.get_slice(
+            self._pre_subvertex)
+        pre_slices = graph_mapper.get_slices(pre_vertex)
+        post_vertex = graph_mapper.get_application_vertex(
             self._post_subvertex)
-        post_slice_index = graph_mapper.get_subvertex_index(
+        post_slice_index = graph_mapper.get_machine_vertex_index(
             self._post_subvertex)
-        post_vertex_slice = graph_mapper.get_subvertex_slice(
+        post_vertex_slice = graph_mapper.get_slice(
             self._post_subvertex)
-        post_slices = graph_mapper.get_subvertex_slices(post_vertex)
+        post_slices = graph_mapper.get_slices(post_vertex)
 
         weight = 0
         for synapse_info in self._synapse_information:

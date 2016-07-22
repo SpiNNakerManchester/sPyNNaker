@@ -1,4 +1,4 @@
-from pacman.model.constraints.abstract_constraints.abstract_constraint\
+from pacman.model.constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
@@ -51,7 +51,7 @@ class Population(object):
             raise exceptions.ConfigurationException(
                 "A population cannot have a negative or zero size.")
 
-        # Create a partitionable_graph vertex for the population and add it
+        # Create a graph vertex for the population and add it
         # to PACMAN
         cell_label = label
         if label is None:
@@ -84,7 +84,7 @@ class Population(object):
             self._structure = None
 
         self._spinnaker._add_population(self)
-        self._spinnaker.add_partitionable_vertex(self._vertex)
+        self._spinnaker.add_application_vertex(self._vertex)
 
         # initialise common stuff
         self._size = size

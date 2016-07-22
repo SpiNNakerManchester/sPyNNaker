@@ -29,7 +29,7 @@ class AbstractGSynRecordable(object):
         :param n_machine_time_steps: the number of timer ticks that will\
                 be executed on the machine.
         :param placements: The placements of the graph
-        :param graph_mapper: The mapper between subvertices and vertices
+        :param graph_mapper: The mapper between vertices and vertices
         :param buffer_manager: the buffer manager object
         :return: A numpy array of 4-element arrays of \
                 (neuron_id, time, gsyn_E, gsyn_I)\

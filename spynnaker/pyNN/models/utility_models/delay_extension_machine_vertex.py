@@ -1,5 +1,6 @@
 # pacman imports
-from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
+from pacman.model.graph.machine.simple_machine_vertex \
+    import SimpleMachineVertex
 
 # front end common imports
 from spinn_front_end_common.interface.provenance\
@@ -12,8 +13,8 @@ from spinn_front_end_common.utilities.utility_objs\
 from enum import Enum
 
 
-class DelayExtensionPartitionedVertex(
-        SimplePartitionedVertex, ProvidesProvenanceDataFromMachineImpl):
+class DelayExtensionMachineVertex(
+        SimpleMachineVertex, ProvidesProvenanceDataFromMachineImpl):
 
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
@@ -31,7 +32,7 @@ class DelayExtensionPartitionedVertex(
                ("N_DELAYS", 5)])
 
     def __init__(self, resources_required, label, constraints=None):
-        SimplePartitionedVertex.__init__(
+        SimpleMachineVertex.__init__(
             self, resources_required, label, constraints=constraints)
         ProvidesProvenanceDataFromMachineImpl.__init__(
             self, self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value, 6)

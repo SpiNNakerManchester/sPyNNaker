@@ -57,7 +57,7 @@ from vector_topographic_activity_plot import * #mapped_boxplot
 #from pyNN.brian import *               # use if running brian
 from pyNN.random import *               # add support for RNG from native PyNN
 from spynnaker.pyNN import *      # Imports the pyNN.spiNNaker module
-#from pyNN.random import NumpyRNG, RandomDistribution  
+#from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.utility import Timer
 
 from operator import itemgetter
@@ -65,7 +65,7 @@ from operator import itemgetter
 time_step = 1.0
 
 # Simulation Setup
-setup(timestep=time_step, min_delay = 1.0, max_delay = 11.0, db_name='vis_attn_iCub.sqlite')            
+setup(timestep=time_step, min_delay = 1.0, max_delay = 11.0, db_name='vis_attn_iCub.sqlite')
 
 layer_to_observe = 'lip'
 lip_map_on = True
@@ -78,7 +78,7 @@ vector_plot = True
 active_pfc = True
 output_to_file = False
 
-preferred_orientation = 0   # ADR added preferred and aversive orientations. These 
+preferred_orientation = 0   # ADR added preferred and aversive orientations. These
 aversive_orientation = 2   # will be used to set biassing in LIP
 base_num_neurons = 48 #128
 weight_prescale_factor = 1  # prescales weights and capacitances to account for system limits
@@ -98,7 +98,7 @@ else:
    MetricFile = 'object_annots_%dx%d' % (tuple([base_num_neurons]*2))
 #neuronSim = True
 # loopT = True
-	
+
 scale = visual_network_scaling.scale_factor(dimensions=2, dim_sizes=None, base_dim_size=base_num_neurons, subsample_factor_i_1=1.6, subsample_factor_1_2=1.0, subsample_factor_2_4=2.0, subsample_factor_4_L=1.0, subsample_factor_4_P=1.0, base_filter_size=5.0, sweep_filter=False, filter_scale=(1,1,1), xy_kernel_quant_cutoff=(0,0), base_v2_subfield_size=2, sweep_subfield=False, subfield_scale=(1,1,1), active_P=active_pfc)
 scale.setindex(f_idx=0, s_idx=0) # base_filter_size=5.0
 
@@ -121,7 +121,7 @@ for nrn in xrange(scale.input_size[0]*scale.input_size[1]):
        starty = starty + 1
    else:
        startx = startx + 1
-      
+
 lip_x_array = numpy.zeros((int(scale.lip_pop_size[0]*scale.lip_pop_size[1])),int)
 lip_y_array = numpy.zeros((int(scale.lip_pop_size[0]*scale.lip_pop_size[1])),int)
 
@@ -140,25 +140,25 @@ for nrn in xrange(scale.lip_pop_size[0]*scale.lip_pop_size[1]):
 
 #PARAMETERS gaussian
 scales=2                # scales
-orientations=4          # orientations 
+orientations=4          # orientations
 #sizeg1=5.0             # size of the gaussian filter
 
 #size_k1 = 5            # x-Size kernel (connections)
 #size_k2 = 5            # y-Size kernel (connections)
-#jump = 1               # overlapping 
+#jump = 1               # overlapping
 delays = 1.0            # connection delays
 v2_v4_delays = 2*delays if active_pfc else delays
 
 # PARAMETERS NETWORK
 
 feedback_weight_scaling = 0.81 #1.25 #0.9
-input_gain = 1.0 #0.8 #0.5 #1.0 #0.4                     # steepness of the Gaussian input filter. This varies parametrically with scales. Generally the more scales, the shallower, 
+input_gain = 1.0 #0.8 #0.5 #1.0 #0.4                     # steepness of the Gaussian input filter. This varies parametrically with scales. Generally the more scales, the shallower,
 gaussian_eccentricity = 5.5 #4.6 #4.0 #8.0 # 2.25        # ratio of major/minor axis for the input filter. This varies parametrically with orientations. Generally the more orientations, the more eccentric
 input_strength = 2.25*weight_prescale_factor #2.25 #1.86 #4 #7 #4.1 #2.25 #24 #15 #9 #24 #20         # spinn is 20   # drive strength of the input->gaussian filters
 v1_v2_weights = 8*weight_prescale_factor #8 #15 #10.75 #15 #12 #15         # spinn is 15   # weights between v1 and v2 orientation maps (one2one connectors)
 wta_v2 = True      	                   # do the gaussian filter maps in v2 inhibit each other?
-wta_between_v2_weight = -1.85*weight_prescale_factor #-1 # spinn is -1   # inhibition weight between several orientations in v2 
-wta_within_v2_weight = -0.6*weight_prescale_factor #0.2 #-0.155 #-1  # spinn is -1   # inhibition weight within a single orientation in v2 
+wta_between_v2_weight = -1.85*weight_prescale_factor #-1 # spinn is -1   # inhibition weight between several orientations in v2
+wta_within_v2_weight = -0.6*weight_prescale_factor #0.2 #-0.155 #-1  # spinn is -1   # inhibition weight within a single orientation in v2
 weights_v4_lip = 22*weight_prescale_factor #22 #35 #25 #5         # spinn is 3
 wta_lip_weight = -7*weight_prescale_factor #-20 #-10       # spinn is -7   # competition in LIP
 pfc_v1_weights = 0.0725*weight_prescale_factor # pfc->v1 competition biasing weights. Used if top-down priming is on.
@@ -168,7 +168,7 @@ wta_bias = 1.3 #1.3 #1.5             # spinn is 1.3  # sets the relative strengt
 wta_IOR_delay = 1           # scales the delay for IOR (self-inhibition)
 
 # set weight values for the critical V2->V4 connection. History of parameters:
-#3 AP 2.25 #4.5 FB #5.5 !FB #3 #6.79 #2.5 #2.9 #2.3 #7 # spinn is 3 
+#3 AP 2.25 #4.5 FB #5.5 !FB #3 #6.79 #2.5 #2.9 #2.3 #7 # spinn is 3
 if plasticity_on:
    weights_v2_v4 = 5*weight_prescale_factor
 elif active_pfc:
@@ -180,7 +180,7 @@ else:
    if feedback_on:
       weights_v2_v4 = 4.5*weight_prescale_factor
    else:
-      weights_v2_v4 = 5.5*weight_prescale_factor 
+      weights_v2_v4 = 5.5*weight_prescale_factor
 
 # random objects and initialisations
 rng = NumpyRNG(seed=28374)
@@ -199,9 +199,9 @@ tau_syn_inh = tau_syn_exc*3
 i_offset = 0
 
 i_bias_pref = 0.825 if active_pfc else 1.0  #3.0 #4.0          # spinn is 4.0  # strong stimulation; should cause persistent spiking ADR
-i_bias_avert = 0.7 if active_pfc else 0.6 # 0.8 #0.0         # spinn is 0.0  # mild stimulation to non-aversive orientations; 
+i_bias_avert = 0.7 if active_pfc else 0.6 # 0.8 #0.0         # spinn is 0.0  # mild stimulation to non-aversive orientations;
                                                                              # biasses away from the  aversive group. ADR
-i_bias_neut = 0.5 if active_pfc else 0.5 #0.0               # spinn is 0.0  # very mild stimulation; 
+i_bias_neut = 0.5 if active_pfc else 0.5 #0.0               # spinn is 0.0  # very mild stimulation;
                                                                              # should just keep a population in random spiking ADR
 
 if plasticity_on: # set plasticity between v2 and v4, if desired
@@ -229,7 +229,7 @@ timer.start()
 # cell_params will be passed to the constructor of the Population Object
 
 cell_params = {
-    'tau_m'      : tau_m,    'cm'         : cm,    
+    'tau_m'      : tau_m,    'cm'         : cm,
     'v_rest'     : v_rest,   'v_reset'    : v_reset,  'v_thresh'   : v_thresh,
     'tau_syn_E'       : tau_syn_exc,        'tau_syn_I'       : tau_syn_inh, 'tau_refrac'       : t_refrac, 'i_offset' : i_offset
     }
@@ -247,14 +247,14 @@ else:
 data_input_1 = subsample_spikes_by_time(data_input_1, 0, 100, 6)
 data_input_1 = random_skew_times(data_input_1, 3)
 data_input_1 = [data_input_1[neuron] if neuron in data_input_1 else [] for neuron in range(scale.input_size[0]*scale.input_size[1])]
-input_pol_1 = Population(scale.input_size[0]*scale.input_size[1],         # size 
+input_pol_1 = Population(scale.input_size[0]*scale.input_size[1],         # size
               SpikeSourceArray,   # Neuron Type
               {'spike_times': data_input_1},   # Neuron Parameters
               label="input_pol_1") # Label
 if layer_to_observe == 'input_pol_1' or layer_to_observe == 'all':
-   print "%g - observing input (positive polarity)" % timer.elapsedTime()    
+   print "%g - observing input (positive polarity)" % timer.elapsedTime()
    #input_pol_1.set_mapping_constraint({'x':0, 'y':0})
-   input_pol_1.record() # ('spikes', to_file=False) 
+   input_pol_1.record() # ('spikes', to_file=False)
 
 if input_file_type:
    data_input_2 = convert_spike_list_to_timed_spikes(spike_list=input_spike_list, min_idx=0, max_idx=scale.input_size[0]*scale.input_size[1], tmin=int(time_step), tmax=runtime, tstep=int(time_step))
@@ -263,14 +263,14 @@ else:
 data_input_2 = subsample_spikes_by_time(data_input_2, 0, 100, 6)
 data_input_2 = random_skew_times(data_input_2, 3)
 data_input_2 = [data_input_2[neuron] if neuron in data_input_2 else [] for neuron in range(scale.input_size[0]*scale.input_size[1])]
-input_pol_2 = Population(scale.input_size[0]*scale.input_size[1],         # size 
+input_pol_2 = Population(scale.input_size[0]*scale.input_size[1],         # size
               SpikeSourceArray,   # Neuron Type
               {'spike_times': data_input_2},   # Neuron Parameters
               label="input_pol_2") # Label
 if layer_to_observe == 'input_pol_2' or layer_to_observe == 'all':
-   print "%g - observing input (negative polarity)" % timer.elapsedTime()    
+   print "%g - observing input (negative polarity)" % timer.elapsedTime()
    #input_pol_2.set_mapping_constraint({'x':0, 'y':0})
-   input_pol_2.record() # ('spikes', to_file=False) 
+   input_pol_2.record() # ('spikes', to_file=False)
 
 # population and projection containers
 v1_pop = []
@@ -283,48 +283,48 @@ print "%g - Creating v1 populations" % timer.elapsedTime()
 
 for i in range(orientations):           # Cycles orientations
     # creates a population for each connection
-    v1_pop.append(Population(scale.v1_pop_size[0]*scale.v1_pop_size[1],         # size 
+    v1_pop.append(Population(scale.v1_pop_size[0]*scale.v1_pop_size[1],         # size
                   IF_curr_exp,   # Neuron Type
                   cell_params,   # Neuron Parameters
-                  label="v1_%d" % i)) # Label)    
+                  label="v1_%d" % i)) # Label)
     if layer_to_observe == 'v1' or layer_to_observe == 'all':
         print "%g - observing v1" % timer.elapsedTime()
         #if layer_to_observe == 'v1':    v1_pop[i].set_mapping_constraint({'x':0, 'y':0})
-        v1_pop[i].record() # ('spikes', to_file=False)       
+        v1_pop[i].record() # ('spikes', to_file=False)
 
 print "%g - Creating v2 populations" % timer.elapsedTime()
 
 for i in range(orientations):           # Cycles orientations
     # creates a population for each connection
-    v2_pop.append(Population(scale.v2_pop_size[0]*scale.v2_pop_size[1],         # size 
+    v2_pop.append(Population(scale.v2_pop_size[0]*scale.v2_pop_size[1],         # size
                   IF_curr_exp,   # Neuron Type
                   cell_params,   # Neuron Parameters
-                  label="v2_%d" % i)) # Label)      
+                  label="v2_%d" % i)) # Label)
     if layer_to_observe == 'v2' or layer_to_observe == 'all':
-        print "%g - observing v2" % timer.elapsedTime()    
+        print "%g - observing v2" % timer.elapsedTime()
         #if layer_to_observe == 'v2':    v2_pop[i].set_mapping_constraint({'x':0, 'y':0})
-        v2_pop[i].record() # ('spikes', to_file=False)   
+        v2_pop[i].record() # ('spikes', to_file=False)
 
 print "%g - Creating v4 populations" % timer.elapsedTime()
 
 for i in range(orientations):           # Cycles orientations
     # creates a population for each connection
-    v4_pop.append(Population(scale.v4_pop_size[0]*scale.v4_pop_size[1],         # size 
-	          IF_curr_exp,   # Neuron Type
-		  cell_params,   # Neuron Parameters
-		  label="v4_%d" % i)) # Label)      
-    if layer_to_observe == 'v4' or layer_to_observe == 'all':                     
-        print "%g - observing v4" % timer.elapsedTime()    
+    v4_pop.append(Population(scale.v4_pop_size[0]*scale.v4_pop_size[1],         # size
+            IF_curr_exp,   # Neuron Type
+        cell_params,   # Neuron Parameters
+        label="v4_%d" % i)) # Label)
+    if layer_to_observe == 'v4' or layer_to_observe == 'all':
+        print "%g - observing v4" % timer.elapsedTime()
         #if layer_to_observe == 'v4':    v4_pop[i].set_mapping_constraint({'x':0, 'y':1})
-        v4_pop[i].record() # ('spikes', to_file=False)     
+        v4_pop[i].record() # ('spikes', to_file=False)
 
 print "%g - Creating PFC population" % timer.elapsedTime()
 
 for i in range(orientations):           # Cycles orientations
-    pfc.append(Population(scale.pfc_pop_size[0]*scale.pfc_pop_size[1],         # size 
-	       IF_curr_exp,   # Neuron Type
-	       cell_params,   # Neuron Parameters
-	       label="pfc_%d" % i))
+    pfc.append(Population(scale.pfc_pop_size[0]*scale.pfc_pop_size[1],         # size
+        IF_curr_exp,   # Neuron Type
+        cell_params,   # Neuron Parameters
+        label="pfc_%d" % i))
     #pfc[i].initialize('v',v_init_distr)
     pfc[i].randomInit(v_init_distr) # this was commented in SA's version
     # set biasses to hardwire preference ADR
@@ -337,27 +337,27 @@ for i in range(orientations):           # Cycles orientations
     if active_pfc == False:
        v_rest_or = []
        for j in range(pfc[i].size):
-	   v_rest_or.append(v_rest_distr.next())
+    v_rest_or.append(v_rest_distr.next())
        pfc[i].set('v_rest', v_rest_or)
        #pfc[i].tset('v_rest', numpy.array(v_rest_or))
-	    
-    if layer_to_observe == 'pfc' or layer_to_observe == 'all':                     
-        print "%g - observing pfc" % timer.elapsedTime()    
+
+    if layer_to_observe == 'pfc' or layer_to_observe == 'all':
+        print "%g - observing pfc" % timer.elapsedTime()
         #pfc[i].set_mapping_constraint({'x':0, 'y':1})
-        pfc[i].record() # ('spikes', to_file=False)  
+        pfc[i].record() # ('spikes', to_file=False)
 
 
 print "%g - Creating LIP population" % timer.elapsedTime()
-lip = Population(scale.lip_pop_size[0]*scale.lip_pop_size[1],         # size 
-  	         IF_curr_exp,   # Neuron Type
-	         cell_params,   # Neuron Parameters
-	         label="lip")
-if layer_to_observe == 'lip' or layer_to_observe == 'all':                     
+lip = Population(scale.lip_pop_size[0]*scale.lip_pop_size[1],         # size
+            IF_curr_exp,   # Neuron Type
+            cell_params,   # Neuron Parameters
+            label="lip")
+if layer_to_observe == 'lip' or layer_to_observe == 'all':
     print "%g - observing lip" % timer.elapsedTime()
     lip_placement = PlacerChipAndCoreConstraint(x=0, y=0)
-    lip.set_constraint(lip_placement)    
+    lip.set_constraint(lip_placement)
     #lip.set_mapping_constraint({'x':0, 'y':0}) # , 'p':15}
-    lip.record() # ('spikes', to_file=False) 
+    lip.record() # ('spikes', to_file=False)
 
 
 print "%g - Creating gaussian Filters connections: scale=%d orientation=%d size=%f" % (timer.elapsedTime(), scales, orientations, scale.filter_scale)
@@ -366,23 +366,23 @@ projections = []     # Connection Handler
 gaussian_filters = TunedGaussianConnectorList(scales, orientations, scale.filter_scale, input_gain, gaussian_eccentricity)
 
 for i in range(orientations):
-    # creates connections lists for different orientations, implementing a 
+    # creates connections lists for different orientations, implementing a
     # convolutional network with different gaussian orientation filters (single scale)
-    conn_list = Filter2DConnector_jose(scale.input_size[0], scale.input_size[1], 
-		                       scale.v1_pop_size[0], scale.v1_pop_size[1], 
-		                       gaussian_filters[i], 
-		                       scale.x_kernel, scale.y_kernel, 
-		                       scale.jump[0], delays, 
-		                       gain=input_strength)
+    conn_list = Filter2DConnector_jose(scale.input_size[0], scale.input_size[1],
+                            scale.v1_pop_size[0], scale.v1_pop_size[1],
+                            gaussian_filters[i],
+                            scale.x_kernel, scale.y_kernel,
+                            scale.jump[0], delays,
+                            gain=input_strength)
     #conn_list_pairs = [(conn[0], conn[1]) for conn in conn_list]
     #conn_list_pairs.sort()
     #conn_list_file=open('input_v1_connections.txt', 'w')
     #conn_list_file.write('input->v1 connections: %s\n' % conn_list_pairs)
     #conn_list_file.close
-    projections.append(Projection(input_pol_1, v1_pop[i], 
-	FromListConnector(conn_list), label='input[p0]->v1_pop_%d' % (i)))
-    projections.append(Projection(input_pol_2, v1_pop[i], 
-	FromListConnector(conn_list), label='input[p1]->v1_pop_%d' % (i)))
+    projections.append(Projection(input_pol_1, v1_pop[i],
+    FromListConnector(conn_list), label='input[p0]->v1_pop_%d' % (i)))
+    projections.append(Projection(input_pol_2, v1_pop[i],
+    FromListConnector(conn_list), label='input[p1]->v1_pop_%d' % (i)))
     """
     SortedConnections = sorted(conn_list, key=lambda x: x[1])
     ConnectionsByDestination = itertools.groupby(SortedConnections, key=lambda x: x[1])
@@ -401,14 +401,14 @@ for i in range(orientations):
 if active_pfc == True:
    print "%g - Creating v2->pfc connections" % timer.elapsedTime()
    pfc_filters = TunedGaussianConnectorList(1, 1, scale.pfc_filter_scale[0], scale.pfc_filter_gain, scale.pfc_eccentricities[0])
-   pfc_filter_conn_list = Filter2DConnector_jose(scale.v2_pop_size[0], scale.v2_pop_size[1], 
-		                       scale.pfc_pop_size[0], scale.pfc_pop_size[1], 
-		                       pfc_filters[0], 
-		                       int(math.floor(scale.pfc_filter_scale[0])), int(math.floor(scale.pfc_filter_scale[1])), 
-		                       scale.pfc_jumps[0], delays, 
-		                       gain=v2_pfc_weights)
+   pfc_filter_conn_list = Filter2DConnector_jose(scale.v2_pop_size[0], scale.v2_pop_size[1],
+                            scale.pfc_pop_size[0], scale.pfc_pop_size[1],
+                            pfc_filters[0],
+                            int(math.floor(scale.pfc_filter_scale[0])), int(math.floor(scale.pfc_filter_scale[1])),
+                            scale.pfc_jumps[0], delays,
+                            gain=v2_pfc_weights)
    for i in range(orientations):
-       projections.append(Projection(v2_pop[i], pfc[i], FromListConnector(pfc_filter_conn_list), label='v2_pop%d->pfc_%d' % (i,i)))   
+       projections.append(Projection(v2_pop[i], pfc[i], FromListConnector(pfc_filter_conn_list), label='v2_pop%d->pfc_%d' % (i,i)))
 
 print "%g - Creating v1->v2 connections" % timer.elapsedTime()
 
@@ -420,36 +420,36 @@ for i in range(orientations):
 if(wta_v2 == True):
     print "%g - Creating Lateral inhibition for the v2 populations" % timer.elapsedTime()
     for i in range(orientations):           # Cycles orientations
-	for j in range(orientations):           # Cycles orientations
-	    if (i!=j):                      # Avoid self connections
-		# Creates lateral inhibition between the v2 populations
-		print "%g - v2[%d]->v2[%d] lateral inhibition" % (timer.elapsedTime(), i, j)
-          	wta_between_list =  ProximityConnector(scale.v2_pop_size[0], scale.v2_pop_size[1], scale.v2_subfield, 
+    for j in range(orientations):           # Cycles orientations
+        if (i!=j):                      # Avoid self connections
+        # Creates lateral inhibition between the v2 populations
+        print "%g - v2[%d]->v2[%d] lateral inhibition" % (timer.elapsedTime(), i, j)
+            wta_between_list =  ProximityConnector(scale.v2_pop_size[0], scale.v2_pop_size[1], scale.v2_subfield,
                                                         wta_between_v2_weight, 1, allow_self_connections=True)
-		projections.append(Projection(  v2_pop[i], 
-		                                v2_pop[j], 
-		                                FromListConnector(wta_between_list), 
-		                                target='inhibitory'))                    
+        projections.append(Projection(  v2_pop[i],
+                                        v2_pop[j],
+                                        FromListConnector(wta_between_list),
+                                        target='inhibitory'))
 
 print "%g - Creating within inhibition pools" % timer.elapsedTime()
 for i in range(orientations):           # Cycles orientations
-    wta_within_list =  ProximityConnector(scale.v2_pop_size[0], scale.v2_pop_size[1], scale.v2_subfield, 
+    wta_within_list =  ProximityConnector(scale.v2_pop_size[0], scale.v2_pop_size[1], scale.v2_subfield,
                                             wta_within_v2_weight, 1, allow_self_connections=False)
     print "%g - v2[%d] within inhibition" % (timer.elapsedTime(), i)
-    projections.append(Projection(  v2_pop[i], 
-		                    v2_pop[i], 
-		                    FromListConnector(wta_within_list), 
-		                    target='inhibitory'))                    
-				
+    projections.append(Projection(  v2_pop[i],
+                            v2_pop[i],
+                            FromListConnector(wta_within_list),
+                            target='inhibitory'))
+
 print "%g - Creating v2->v4 projections" % timer.elapsedTime()
 
 for i in range(orientations):           # Cycles orientations
     v2_v4_conn_list =  subSamplerConnector2D(scale.v2_pop_size[0], scale.v4_pop_size[0], weights_v2_v4, v2_v4_delays)
     print "%g - v2-v4[%d] subsampling projection" % (timer.elapsedTime(), i)
-    projections.append(Projection(  v2_pop[i], 
-		                    v4_pop[i], 
-		                    FromListConnector(v2_v4_conn_list),
-		                    target='excitatory'))
+    projections.append(Projection(  v2_pop[i],
+                            v4_pop[i],
+                            FromListConnector(v2_v4_conn_list),
+                            target='excitatory'))
     if plasticity_on: # added ability to set plasticity ADR
        # this turns on plasticity in the last projection to be appended
        # to the list (which was just done above)
@@ -459,34 +459,34 @@ for i in range(orientations):           # Cycles orientations
        #projections[-1].plasticity_id = Proj_Plasticity.id
     if feedback_on: # feedback adds top-down biassing of preferred/active stimuli
        v4_v2_conn_list =  overSamplerConnector2D(scale.v4_pop_size[0], scale.v2_pop_size[0], weights_v2_v4*feedback_weight_scaling, v2_v4_delays) # overSamplerConnector remaps the downscaled connections to their original sources
-       projections.append(Projection(  v4_pop[i], 
-                                       v2_pop[i], 
+       projections.append(Projection(  v4_pop[i],
+                                       v2_pop[i],
                                        FromListConnector(v4_v2_conn_list),
                                        target='excitatory'))
        #v4_v1_conn_list =  overSamplerConnector2D(scale.v4_pop_size[0], scale.v1_pop_size[0], feedback_weight_scaling, 1) # overSamplerConnector remaps the downscaled connections to their original sources
-       #projections.append(Projection(  v4_pop[i], 
-       #                                v1_pop[i], 
-        #                               FromListConnector(v4_v2_conn_list), 
-         #                              target='excitatory'))                       
+       #projections.append(Projection(  v4_pop[i],
+       #                                v1_pop[i],
+        #                               FromListConnector(v4_v2_conn_list),
+         #                              target='excitatory'))
 
 print "%g - Creating v4->lip projections" % timer.elapsedTime()
 for i in range(orientations):           # Cycles orientations
-    projections.append(Projection(  v4_pop[i], 
-		                    lip, 
-		                    OneToOneConnector(weights=weights_v4_lip, delays=delays), 
-		                    target='excitatory'))        
+    projections.append(Projection(  v4_pop[i],
+                            lip,
+                            OneToOneConnector(weights=weights_v4_lip, delays=delays),
+                            target='excitatory'))
 
 print "%g - Creating LIP WTA" % timer.elapsedTime()
-#projections.append(Projection(  lip, 
-#		                lip, 
-#		                OneToOneConnector(weights=wta_lip_weight, delays=delays), 
+#projections.append(Projection(  lip,
+#		                lip,
+#		                OneToOneConnector(weights=wta_lip_weight, delays=delays),
 #		                target='inhibitory'))
 
 # ADR added WTA connections to neighbouring neurons. Original version had only the
 # self connection, which looks wrong (would be an "inverse WTA")
-#projections.append(Projection(  lip, 
-#		                lip, 
-#		                AllToAllConnector(weights=wta_lip_weight*wta_bias, delays=delays, allow_self_connections=False),  
+#projections.append(Projection(  lip,
+#		                lip,
+#		                AllToAllConnector(weights=wta_lip_weight*wta_bias, delays=delays, allow_self_connections=False),
 #		                target='inhibitory'))
 
 # Temporary workaround for PACMAN103 builds a FromListConnector until such time as allow_self_connections
@@ -497,10 +497,10 @@ lip_WTA_conn_list = [(i, j, wta_lip_weight if i == j else wta_lip_weight*wta_bia
 #conn_list_file=open('lip_lip_connections.txt', 'w')
 #conn_list_file.write('lip->lip connections: %s\n' % conn_list_pairs)
 #conn_list_file.close
-projections.append(Projection(  lip, 
-		                lip, 
-		                FromListConnector(lip_WTA_conn_list),  
-		                target='inhibitory'))                       
+projections.append(Projection(  lip,
+                        lip,
+                        FromListConnector(lip_WTA_conn_list),
+                        target='inhibitory'))
 
 
 print "%g - Creating pfc->v4 projections" % timer.elapsedTime()
@@ -508,31 +508,31 @@ for i in range(orientations):           # Cycles orientations
     if i == aversive_orientation:       # aversive orientation connectivity projects to other orientations ADR
        if aversive_inhibitory:
           if active_pfc:
-             projections.append(Projection(  pfc[i], 
-                                             v4_pop[i], 
-                                             OneToOneConnector(weights=-pfc_v4_weights, delays=delays), 
+             projections.append(Projection(  pfc[i],
+                                             v4_pop[i],
+                                             OneToOneConnector(weights=-pfc_v4_weights, delays=delays),
                                              target='inhibitory'))
           else:
-             projections.append(Projection(  pfc[i], 
-                                             v4_pop[i], 
-                                             AllToAllConnector(weights=-pfc_v4_weights, delays=delays), 
+             projections.append(Projection(  pfc[i],
+                                             v4_pop[i],
+                                             AllToAllConnector(weights=-pfc_v4_weights, delays=delays),
                                              target='inhibitory'))
           if top_down_priming:
              projections.append(Projection(  pfc[i],
                                              v1_pop[i],
                                              AllToAllConnector(weights=-pfc_v1_weights, delays=delays),
                                              target='inhibitory'))
-       else: 
+       else:
           for j in [orientation for orientation in range(orientations) if orientation != i]:
               if active_pfc:
-                 projections.append(Projection(  pfc[i], 
-                                                 v4_pop[j], 
-                                                 OneToOneConnector(weights=pfc_v4_weights, delays=delays), 
+                 projections.append(Projection(  pfc[i],
+                                                 v4_pop[j],
+                                                 OneToOneConnector(weights=pfc_v4_weights, delays=delays),
                                                  target='excitatory'))
               else:
-                 projections.append(Projection(  pfc[i], 
-                                                 v4_pop[j], 
-                                                 AllToAllConnector(weights=pfc_v4_weights, delays=delays), 
+                 projections.append(Projection(  pfc[i],
+                                                 v4_pop[j],
+                                                 AllToAllConnector(weights=pfc_v4_weights, delays=delays),
                                                  target='excitatory'))
               if top_down_priming:
                  projections.append(Projection(  pfc[i],
@@ -541,21 +541,21 @@ for i in range(orientations):           # Cycles orientations
                                                  target='excitatory'))
     else:
        if active_pfc:
-          projections.append(Projection(  pfc[i], 
-                                          v4_pop[i], 
-                                          OneToOneConnector(weights=pfc_v4_weights, delays=delays), 
+          projections.append(Projection(  pfc[i],
+                                          v4_pop[i],
+                                          OneToOneConnector(weights=pfc_v4_weights, delays=delays),
                                           target='excitatory'))
-       else:       
-          projections.append(Projection(  pfc[i], 
-                                          v4_pop[i], 
-                                          AllToAllConnector(weights=pfc_v4_weights, delays=delays), 
+       else:
+          projections.append(Projection(  pfc[i],
+                                          v4_pop[i],
+                                          AllToAllConnector(weights=pfc_v4_weights, delays=delays),
                                           target='excitatory'))
        if top_down_priming:
           projections.append(Projection(  pfc[i],
                                           v1_pop[i],
                                           AllToAllConnector(weights=pfc_v1_weights, delays=delays),
-                                          target='excitatory'))                    
-                
+                                          target='excitatory'))
+
 
 lip.set('tau_syn_E', 20)
 #pfc[3].set('i_offset', 1)
@@ -602,12 +602,12 @@ if output_to_file:
    print type(setup_time)
    print type(runtime)
    output_file.write("Load time: %f s \n" % (run_time-setup_time-(runtime/1000.0)))
-   output_file.write("Run time: %f s \n" % (runtime/1000.0))   
-else: 
+   output_file.write("Run time: %f s \n" % (runtime/1000.0))
+else:
    print "Setup time", setup_time
    print "Load time", (run_time - setup_time - runtime/1000.0)
    print "Run time", (runtime/1000.0)
- 
+
 # get spikes and plot
 
 # For layers with sub-populations (V1, V2, PFC, V4)
@@ -731,7 +731,7 @@ if layer_to_observe == 'lip' or layer_to_observe == 'all':
     # Get the coordinates of the most active area
     # and do a coarse mapping up to input resolution
     activeLip = numpy.argmax(lip_counts)
-    lip_mag = round(float(scale.input_size[0])/float(scale.lip_pop_size[0])) 
+    lip_mag = round(float(scale.input_size[0])/float(scale.lip_pop_size[0]))
     print activeLip, lip_counts[activeLip], lip_x_array[activeLip],lip_y_array[activeLip],lip_x_array[activeLip]*lip_mag, lip_y_array[activeLip]*lip_mag
 
     x_attend = double(lip_x_array[activeLip]*lip_mag)
@@ -762,17 +762,17 @@ if layer_to_observe == 'lip' or layer_to_observe == 'all':
        # make a custom colormap for plotting
 
        colormap = numpy.array([(0.0,0.0,0.0),
-         		       (0.1,0.1,0.1),
-			       (0.2,0.2,0.2),
-			       (0.3,0.3,0.3), 
-			       (0.4,0.4,0.4),        
-			       (0.5,0.5,0.5),
-			       (0.6,0.6,0.6),
-			       (0.7,0.7,0.7),
-			       (0.8,0.8,0.8),
-			       (0.9,0.9,0.9),
-			       (1.0,1.0,1.0)])
-								     
+                        (0.1,0.1,0.1),
+                (0.2,0.2,0.2),
+                (0.3,0.3,0.3),
+                (0.4,0.4,0.4),
+                (0.5,0.5,0.5),
+                (0.6,0.6,0.6),
+                (0.7,0.7,0.7),
+                (0.8,0.8,0.8),
+                (0.9,0.9,0.9),
+                (1.0,1.0,1.0)])
+
        ColMap = ListedColormap(colormap, name='attncolmap')
 
        register_cmap(cmap=ColMap)
@@ -799,7 +799,7 @@ if layer_to_observe == 'lip' or layer_to_observe == 'all':
        biassed_objs = visual_metrics.bias_annotations(annotations=rescaled_objs, preferred=preferred_orientation, aversive=aversive_orientation)
        performance = visual_metrics.attn_performance_monitor(data=met_data, objects=biassed_objs, y_dim=scale.pfc_pop_size[1], t_window=metric_window, t_w_offset=metric_start_offset, t_start=metric_t_start, t_stop=metric_t_stop)
        if output_to_file:
-          output_file.write("Metric time window: %d ms\n" % metric_window) 
+          output_file.write("Metric time window: %d ms\n" % metric_window)
           output_file.write("Metric window offset %d ms\n" % metric_start_offset)
           output_file.write("Start recording metrics at: %d ms\n" % metric_t_start)
           output_file.write("Stop recording metrics at: %d ms\n" % metric_t_stop)
@@ -812,12 +812,12 @@ if layer_to_observe == 'lip' or layer_to_observe == 'all':
               output_file.write("%d ms             %f\n" % (t_ref, t_m))
               t_ref += metric_window
           output_file.write("--------------------------------------------------------------------------------\n\n")
-          output_file.close() 
+          output_file.close()
        else:
           print "Computed network performance(s) for this trial: %s\n" % performance
-    else: 
+    else:
        output_file.write("--------------------------------------------------------------------------------\n\n")
-       output_file.close() 
+       output_file.close()
 if layer_to_observe == 'input_pol_1' or layer_to_observe == 'all':
    # make a 2D array for plotting (input)
 

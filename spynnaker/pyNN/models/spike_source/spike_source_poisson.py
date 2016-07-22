@@ -1,5 +1,6 @@
-from pacman.model.graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
+from spynnaker.pyNN.utilities import constants
+from pacman.model.graph.application.abstract_application_vertex \
+    import AbstractApplicationVertex
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -12,9 +13,8 @@ from spynnaker.pyNN.models.common.multi_spike_recorder \
     import MultiSpikeRecorder
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.common import recording_utils
-from spynnaker.pyNN.models.spike_source\
-    .spike_source_poisson_partitioned_vertex \
-    import SpikeSourcePoissonPartitionedVertex
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
+    import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import utility_calls
 
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
@@ -47,7 +47,7 @@ RANDOM_SEED_WORDS = 4
 
 
 class SpikeSourcePoisson(
-        AbstractPartitionableVertex,
+        AbstractApplicationVertex,
         AbstractDataSpecableVertex, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping):
@@ -70,15 +70,15 @@ class SpikeSourcePoisson(
     # real-time)
     _model_based_max_atoms_per_core = 500
 
-    # A count of the number of poisson subvertices, to work out the random
+    # A count of the number of poisson vertices, to work out the random
     # back off range
-    _n_poisson_subvertices = 0
+    _n_poisson_vertices = 0
 
     def __init__(
             self, n_neurons, machine_time_step, timescale_factor,
             constraints=None, label="SpikeSourcePoisson", rate=1.0, start=0.0,
             duration=None, seed=None):
-        AbstractPartitionableVertex.__init__(
+        AbstractApplicationVertex.__init__(
             self, n_neurons, label, self._model_based_max_atoms_per_core,
             constraints)
         AbstractDataSpecableVertex.__init__(
@@ -123,11 +123,11 @@ class SpikeSourcePoisson(
             max_rate / ts_per_second)
         return int(math.ceil(max_spikes_per_ts))
 
-    def create_subvertex(
+    def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        SpikeSourcePoisson._n_poisson_subvertices += 1
-        subvertex = SpikeSourcePoissonPartitionedVertex(
+        SpikeSourcePoisson._n_poisson_vertices += 1
+        vertex = SpikeSourcePoissonMachineVertex(
             resources_required, label, self._spike_recorder.record,
             constraints)
         if not self._using_auto_pause_and_resume:
@@ -138,17 +138,17 @@ class SpikeSourcePoisson(
                 self._spike_buffer_max_size, spike_buffer_size,
                 self._enable_buffered_recording)
             if spike_buffering_needed:
-                subvertex.activate_buffering_output(
+                vertex.activate_buffering_output(
                     buffering_ip_address=self._receive_buffer_host,
                     buffering_port=self._receive_buffer_port)
         else:
             sdram_per_ts = self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice), 1)
-            subvertex.activate_buffering_output(
+            vertex.activate_buffering_output(
                 minimum_sdram_for_buffering=self._minimum_buffer_sdram,
                 buffered_sdram_per_timestep=sdram_per_ts)
 
-        return subvertex
+        return vertex
 
     @property
     def rate(self):
@@ -202,7 +202,7 @@ class SpikeSourcePoisson(
                  PARAMS_WORDS_PER_NEURON)) * 4
 
     def reserve_memory_regions(self, spec, setup_sz, poisson_params_sz,
-                               spike_hist_buff_sz, subvertex):
+                               spike_hist_buff_sz, vertex):
         """ Reserve memory regions for poisson source parameters and output\
             buffer.
         :param spec:
@@ -216,26 +216,26 @@ class SpikeSourcePoisson(
         # Reserve memory:
         spec.reserve_memory_region(
             region=(
-                SpikeSourcePoissonPartitionedVertex.
+                SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value),
             size=setup_sz, label='setup')
         spec.reserve_memory_region(
             region=(
-                SpikeSourcePoissonPartitionedVertex.
+                SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value),
             size=poisson_params_sz, label='PoissonParams')
-        subvertex.reserve_buffer_regions(
+        vertex.reserve_buffer_regions(
             spec,
-            (SpikeSourcePoissonPartitionedVertex.
+            (SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value),
-            [SpikeSourcePoissonPartitionedVertex.
+            [SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value],
             [spike_hist_buff_sz])
-        subvertex.reserve_provenance_data_region(spec)
+        vertex.reserve_provenance_data_region(spec)
 
     def _write_setup_info(
             self, spec, spike_history_region_sz, ip_tags,
-            buffer_size_before_receive, subvertex):
+            buffer_size_before_receive, vertex):
         """ Write information used to control the simulation and gathering of\
             results.
 
@@ -247,9 +247,9 @@ class SpikeSourcePoisson(
 
         self._write_basic_setup_info(
             spec,
-            (SpikeSourcePoissonPartitionedVertex.
+            (SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value))
-        subvertex.write_recording_data(
+        vertex.write_recording_data(
             spec, ip_tags, [spike_history_region_sz],
             buffer_size_before_receive, self._time_between_requests)
 
@@ -267,7 +267,7 @@ class SpikeSourcePoisson(
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
             region=(
-                SpikeSourcePoissonPartitionedVertex.
+                SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value))
 
         # Write header info to the memory region:
@@ -284,7 +284,7 @@ class SpikeSourcePoisson(
 
         # Write the random back off value
         spec.write_value(random.randint(
-            0, SpikeSourcePoisson._n_poisson_subvertices))
+            0, SpikeSourcePoisson._n_poisson_vertices))
 
         # Write the number of microseconds between sending spikes
         total_mean_rate = numpy.sum(self._rate)
@@ -388,7 +388,6 @@ class SpikeSourcePoisson(
     def set_recording_spikes(self):
         self._spike_recorder.record = True
 
-    # inherited from partitionable vertex
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         total_size = \
@@ -396,10 +395,10 @@ class SpikeSourcePoisson(
               DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
              ReceiveBuffersToHostBasicImpl.get_recording_data_size(1) +
              ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(1) +
-             SpikeSourcePoissonPartitionedVertex.get_provenance_data_size(0) +
+             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
              poisson_params_sz)
         total_size += self._get_number_of_mallocs_used_by_dsg(
-            vertex_slice, graph.incoming_edges_to_vertex(self)) * \
+            vertex_slice, graph.get_edges_ending_at_vertex(self)) * \
             front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
 
         if self._using_auto_pause_and_resume:
@@ -427,7 +426,7 @@ class SpikeSourcePoisson(
         return 0
 
     def generate_data_spec(
-            self, subvertex, placement, partitioned_graph, graph, routing_info,
+            self, vertex, placement, machine_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
             write_text_specs, application_run_time_folder):
         data_writer, report_writer = \
@@ -437,7 +436,7 @@ class SpikeSourcePoisson(
 
         spec = DataSpecificationGenerator(data_writer, report_writer)
 
-        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+        vertex_slice = graph_mapper.get_slice(vertex)
 
         spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
@@ -457,26 +456,21 @@ class SpikeSourcePoisson(
         # Basic setup plus 8 bytes for recording flags and recording size
         setup_sz = ((front_end_common_constants.
                      DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-                    subvertex.get_recording_data_size(1))
+                    vertex.get_recording_data_size(1))
 
         poisson_params_sz = self.get_params_bytes(vertex_slice)
 
         # Reserve SDRAM space for memory areas:
         self.reserve_memory_regions(
-            spec, setup_sz, poisson_params_sz, spike_history_sz, subvertex)
+            spec, setup_sz, poisson_params_sz, spike_history_sz, vertex)
 
         self._write_setup_info(
             spec, spike_history_sz, ip_tags, buffer_size_before_receive,
-            subvertex)
+            vertex)
 
         # Every subedge should have the same key
-        key = None
-        partitions = partitioned_graph.\
-            outgoing_edges_partitions_from_vertex(subvertex)
-        for partition in partitions.values():
-            keys_and_masks = \
-                routing_info.get_keys_and_masks_from_partition(partition)
-            key = keys_and_masks[0].key
+        key = routing_info.get_first_key_from_pre_vertex(
+            vertex, constants.SPIKE_PARTITION_ID)
 
         self._write_poisson_parameters(spec, key, vertex_slice)
 
@@ -492,9 +486,9 @@ class SpikeSourcePoisson(
     def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
             self._label, buffer_manager,
-            (SpikeSourcePoissonPartitionedVertex.
+            (SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value),
-            (SpikeSourcePoissonPartitionedVertex.
+            (SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value),
             placements, graph_mapper, self)
 

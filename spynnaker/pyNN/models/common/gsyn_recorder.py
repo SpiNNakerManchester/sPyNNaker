@@ -41,22 +41,22 @@ class GsynRecorder(object):
         return n_neurons * 8
 
     def get_gsyn(self, label, buffer_manager, region, state_region,
-                 placements, graph_mapper, partitionable_vertex):
+                 placements, graph_mapper, application_vertex):
 
         ms_per_tick = self._machine_time_step / 1000.0
 
-        subvertices = \
-            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
+        vertices = \
+            graph_mapper.get_machine_vertices(application_vertex)
 
         data = list()
         missing_str = ""
 
         progress_bar = ProgressBar(
-            len(subvertices), "Getting conductance for {}".format(label))
-        for subvertex in subvertices:
+            len(vertices), "Getting conductance for {}".format(label))
+        for vertex in vertices:
 
-            vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-            placement = placements.get_placement_of_subvertex(subvertex)
+            vertex_slice = graph_mapper.get_slice(vertex)
+            placement = placements.get_placement_of_vertex(vertex)
 
             x = placement.x
             y = placement.y

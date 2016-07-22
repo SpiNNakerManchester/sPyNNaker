@@ -5,11 +5,11 @@ logger = logging.getLogger(__name__)
 
 
 def generate_synaptic_matrix_reports(common_report_directory,
-                                     partitioned_graph, graph_mapper):
+                                     graph, graph_mapper):
     """
 
     :param common_report_directory:
-    :param partitioned_graph:
+    :param graph:
     :param graph_mapper:
     :return:
     """
@@ -17,10 +17,10 @@ def generate_synaptic_matrix_reports(common_report_directory,
                                     "synaptic_matrix_reports")
     if not os.path.exists(top_level_folder):
         os.mkdir(top_level_folder)
-    for partitioned_edge in partitioned_graph.subedges():
+    for edge in graph.edges:
         file_name = os.path.join(top_level_folder,
                                  "synaptic_matrix_for_patitioned_edge_{}"
-                                 .format(partitioned_edge))
+                                 .format(edge))
         output = None
         try:
             output = open(file_name, "w")
@@ -29,7 +29,7 @@ def generate_synaptic_matrix_reports(common_report_directory,
                          " {} for writing.".format(file_name))
 
         # extract matrix
-        synaptic_matrix = partitioned_edge.get_synapse_sublist(graph_mapper)
+        synaptic_matrix = edge.get_synapse_sublist(graph_mapper)
         counter = 0
         for synaptic_row in synaptic_matrix.get_rows():
             output_string = "entry {} [ \n target_index[".format(counter)
@@ -54,11 +54,11 @@ def generate_synaptic_matrix_reports(common_report_directory,
         output.close()
 
 
-def generate_synaptic_matrix_report(common_report_directory, partitioned_edge):
+def generate_synaptic_matrix_report(common_report_directory, edge):
     """
 
     :param common_report_directory:
-    :param partitioned_edge:
+    :param edge:
     :return:
     """
     top_level_folder = os.path.join(common_report_directory,
@@ -67,7 +67,7 @@ def generate_synaptic_matrix_report(common_report_directory, partitioned_edge):
         os.mkdir(top_level_folder)
     file_name = os.path.join(top_level_folder,
                              "synaptic_matrix_for_patitioned_edge_{}"
-                             .format(partitioned_edge))
+                             .format(edge))
     output = None
     try:
         output = open(file_name, "w")
@@ -76,7 +76,7 @@ def generate_synaptic_matrix_report(common_report_directory, partitioned_edge):
                      " {} for writing.".format(file_name))
 
     # extract matrix
-    synaptic_matrix = partitioned_edge.synapse_sublist
+    synaptic_matrix = edge.synapse_sublist
     counter = 0
     for synaptic_row in synaptic_matrix.get_rows():
         output_string = "entry {} [ \n target_index[".format(counter)

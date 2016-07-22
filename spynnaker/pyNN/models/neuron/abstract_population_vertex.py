@@ -1,7 +1,7 @@
 
 # pacman imports
-from pacman.model.graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
+from pacman.model.graph.application.abstract_application_vertex \
+    import AbstractApplicationVertex
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -42,8 +42,8 @@ from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.neuron.population_partitioned_vertex \
-    import PopulationPartitionedVertex
+from spynnaker.pyNN.models.neuron.population_machine_vertex \
+    import PopulationMachineVertex
 
 # dsg imports
 from data_specification.data_specification_generator \
@@ -70,7 +70,7 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
-        AbstractPartitionableVertex, AbstractDataSpecableVertex,
+        AbstractApplicationVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
@@ -86,7 +86,7 @@ class AbstractPopulationVertex(
             neuron_model, input_type, synapse_type, threshold_type,
             additional_input=None, constraints=None):
 
-        AbstractPartitionableVertex.__init__(
+        AbstractApplicationVertex.__init__(
             self, n_neurons, label, max_atoms_per_core, constraints)
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step, timescale_factor)
@@ -154,7 +154,7 @@ class AbstractPopulationVertex(
     def mark_no_changes(self):
         self._change_requires_mapping = False
 
-    def create_subvertex(
+    def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
 
@@ -162,7 +162,7 @@ class AbstractPopulationVertex(
             self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
             self._spike_recorder.record
         )
-        subvertex = PopulationPartitionedVertex(
+        vertex = PopulationMachineVertex(
             resources_required, label, is_recording, constraints)
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
@@ -182,7 +182,7 @@ class AbstractPopulationVertex(
                 self._enable_buffered_recording)
             if (spike_buffering_needed or v_buffering_needed or
                     gsyn_buffering_needed):
-                subvertex.activate_buffering_output(
+                vertex.activate_buffering_output(
                     buffering_ip_address=self._receive_buffer_host,
                     buffering_port=self._receive_buffer_port)
         else:
@@ -193,10 +193,10 @@ class AbstractPopulationVertex(
                 vertex_slice.n_atoms, 1)
             sdram_per_ts += self._gsyn_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1)
-            subvertex.activate_buffering_output(
+            vertex.activate_buffering_output(
                 minimum_sdram_for_buffering=self._minimum_buffer_sdram,
                 buffered_sdram_per_timestep=sdram_per_ts)
-        return subvertex
+        return vertex
 
     @property
     def maximum_delay_supported_in_ms(self):
@@ -251,18 +251,18 @@ class AbstractPopulationVertex(
                 self._neuron_model.get_sdram_usage_in_bytes(
                     vertex_slice.n_atoms))
 
-    # @implements AbstractPartitionableVertex.get_sdram_usage_for_atoms
+    # @implements AbstractApplicationVertex.get_sdram_usage_for_atoms
     def get_sdram_usage_for_atoms(self, vertex_slice, graph):
         sdram_requirement = (
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(3) +
-            PopulationPartitionedVertex.get_provenance_data_size(
-                PopulationPartitionedVertex
+            PopulationMachineVertex.get_provenance_data_size(
+                PopulationMachineVertex
                 .N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph.incoming_edges_to_vertex(self)) +
+                vertex_slice, graph.get_edges_ending_at_vertex(self)) +
             (self._get_number_of_mallocs_used_by_dsg(
-                vertex_slice, graph.incoming_edges_to_vertex(self)) *
+                vertex_slice, graph.get_edges_ending_at_vertex(self)) *
              common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
 
         # add recording SDRAM if not automatically calculated
@@ -310,7 +310,7 @@ class AbstractPopulationVertex(
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, spike_history_region_sz,
-            v_history_region_sz, gsyn_history_region_sz, subvertex):
+            v_history_region_sz, gsyn_history_region_sz, vertex):
 
         spec.comment("\nReserving memory space for data regions:\n\n")
 
@@ -319,14 +319,14 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
             size=((
                 common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
-                subvertex.get_recording_data_size(3)), label='System')
+                vertex.get_recording_data_size(3)), label='System')
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
             size=self._get_sdram_usage_for_neuron_params(vertex_slice),
             label='NeuronParams')
 
-        subvertex.reserve_buffer_regions(
+        vertex.reserve_buffer_regions(
             spec,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             [constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
@@ -335,12 +335,12 @@ class AbstractPopulationVertex(
             [spike_history_region_sz, v_history_region_sz,
              gsyn_history_region_sz])
 
-        subvertex.reserve_provenance_data_region(spec)
+        vertex.reserve_provenance_data_region(spec)
 
     def _write_setup_info(
             self, spec, spike_history_region_sz, neuron_potential_region_sz,
             gsyn_region_sz, ip_tags, buffer_size_before_receive,
-            time_between_requests, subvertex):
+            time_between_requests, vertex):
         """ Write information used to control the simulation and gathering of\
             results.
         """
@@ -348,7 +348,7 @@ class AbstractPopulationVertex(
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
             spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value)
-        subvertex.write_recording_data(
+        vertex.write_recording_data(
             spec, ip_tags,
             [spike_history_region_sz, neuron_potential_region_sz,
              gsyn_region_sz], buffer_size_before_receive,
@@ -406,7 +406,7 @@ class AbstractPopulationVertex(
 
     # @implements AbstractDataSpecableVertex.generate_data_spec
     def generate_data_spec(
-            self, subvertex, placement, partitioned_graph, graph, routing_info,
+            self, vertex, placement, machine_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags,
             reverse_ip_tags, write_text_specs, application_run_time_folder):
 
@@ -417,7 +417,7 @@ class AbstractPopulationVertex(
         spec = DataSpecificationGenerator(data_writer, report_writer)
         spec.comment("\n*** Spec for block of {} neurons ***\n".format(
             self.model_name))
-        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+        vertex_slice = graph_mapper.get_slice(vertex)
 
         # Get recording sizes - the order is important here as spikes will
         # require less space than voltage and voltage less than gsyn.  This
@@ -457,35 +457,25 @@ class AbstractPopulationVertex(
         # Reserve memory regions
         self._reserve_memory_regions(
             spec, vertex_slice, spike_history_sz, v_history_sz,
-            gsyn_history_sz, subvertex)
+            gsyn_history_sz, vertex)
 
         # Declare random number generators and distributions:
         # TODO add random distribution stuff
         # self.write_random_distribution_declarations(spec)
 
-        # Get the key - use only the first edge
-        key = None
-
-        for partition in partitioned_graph.\
-                outgoing_edges_partitions_from_vertex(subvertex).values():
-
-            keys_and_masks = \
-                routing_info.get_keys_and_masks_from_partition(partition)
-
-            # NOTE: using the first key assigned as the key.  Should in future
-            # get the list of keys and use one per neuron, to allow arbitrary
-            # key and mask assignments
-            key = keys_and_masks[0].key
+        # Get the key
+        key = routing_info.get_first_key_from_pre_vertex(
+            vertex, constants.SPIKE_PARTITION_ID)
 
         # Write the regions
         self._write_setup_info(
             spec, spike_history_sz, v_history_sz, gsyn_history_sz, ip_tags,
-            buffer_size_before_receive, self._time_between_requests, subvertex)
+            buffer_size_before_receive, self._time_between_requests, vertex)
         self._write_neuron_parameters(spec, key, vertex_slice)
 
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
-            spec, self, vertex_slice, subvertex, placement, partitioned_graph,
+            spec, self, vertex_slice, vertex, placement, machine_graph,
             graph, routing_info, graph_mapper, self._input_type)
 
         # End the writing of this specification:
@@ -633,10 +623,10 @@ class AbstractPopulationVertex(
 
     def get_connections_from_machine(
             self, transceiver, placement, subedge, graph_mapper,
-            routing_infos, synapse_info, partitioned_graph):
+            routing_infos, synapse_info, machine_graph):
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, subedge, graph_mapper,
-            routing_infos, synapse_info, partitioned_graph)
+            routing_infos, synapse_info, machine_graph)
 
     def is_data_specable(self):
         return True

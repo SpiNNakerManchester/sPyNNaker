@@ -16,8 +16,7 @@ class AbstractFilterableEdge(object):
     def filter_sub_edge(self, graph_mapper):
         """ method to allow edges to determine if a edge is filter-able
 
-        :param graph_mapper: the mapper that informs partitioned vertexes of\
-                their slice of atoms
+        :param graph_mapper: the mapper between graphs
         :return: true or false
         :rtype: boolean
         :raise none: this method does not raise any known exceptions

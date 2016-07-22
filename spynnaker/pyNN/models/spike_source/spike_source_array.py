@@ -24,8 +24,8 @@ from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
 from spinn_front_end_common.utilities import exceptions
 from spinn_front_end_common.utility_models\
-    .reverse_ip_tag_multicast_source_partitioned_vertex \
-    import ReverseIPTagMulticastSourcePartitionedVertex
+    .reverse_ip_tag_multicast_source_machine_vertex \
+    import ReverseIPTagMulticastSourceMachineVertex
 
 
 # general imports
@@ -78,6 +78,7 @@ class SpikeSourceArray(
             receive_port=None, receive_sdp_port=None, receive_tag=None,
             virtual_key=None, prefix=None, prefix_type=None, check_keys=False,
             send_buffer_times=spike_times,
+            send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
             send_buffer_max_space=max_on_chip_memory_usage_for_spikes_in_bytes,
             send_buffer_space_before_notify=space_before_notification,
             send_buffer_notification_ip_address=self._ip_address,
@@ -98,8 +99,7 @@ class SpikeSourceArray(
         # Keep track of any previously generated buffers
         self._send_buffers = dict()
         self._spike_recording_region_size = None
-        self._partitioned_vertices = list()
-        self._partitioned_vertices_current_max_buffer_size = dict()
+        self._machine_vertices = list()
 
         # used for reset and rerun
         self._requires_mapping = True
@@ -168,13 +168,13 @@ class SpikeSourceArray(
 
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager,
-            (ReverseIPTagMulticastSourcePartitionedVertex.
+            (ReverseIPTagMulticastSourceMachineVertex.
              _REGIONS.RECORDING_BUFFER.value),
-            (ReverseIPTagMulticastSourcePartitionedVertex.
+            (ReverseIPTagMulticastSourceMachineVertex.
              _REGIONS.RECORDING_BUFFER_STATE.value),
             placements, graph_mapper, self,
-            lambda subvertex:
-                subvertex.virtual_key if subvertex.virtual_key is not None
+            lambda vertex:
+                vertex.virtual_key if vertex.virtual_key is not None
                 else 0)
 
     @property

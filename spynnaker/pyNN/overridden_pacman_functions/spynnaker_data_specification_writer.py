@@ -1,8 +1,8 @@
 from spinn_machine.utilities.progress_bar import ProgressBar
 
 from spinn_front_end_common.interface.interface_functions.\
-    front_end_common_partitionable_graph_data_specification_writer \
-    import FrontEndCommonPartitionableGraphDataSpecificationWriter
+    front_end_common_application_graph_data_specification_writer \
+    import FrontEndCommonApplicationGraphDataSpecificationWriter
 from spinn_front_end_common.utilities.utility_objs.executable_targets \
     import ExecutableTargets
 
@@ -11,13 +11,13 @@ from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
 
 
 class SpynnakerDataSpecificationWriter(
-        FrontEndCommonPartitionableGraphDataSpecificationWriter):
+        FrontEndCommonApplicationGraphDataSpecificationWriter):
     """ Executes data specification generation for sPyNNaker
     """
 
     def __call__(
             self, placements, graph_mapper, tags, executable_finder,
-            partitioned_graph, partitionable_graph, routing_infos, hostname,
+            machine_graph, application_graph, routing_infos, hostname,
             report_default_directory, write_text_specs,
             app_data_runtime_folder):
 
@@ -32,26 +32,26 @@ class SpynnakerDataSpecificationWriter(
         progress_bar = ProgressBar(len(list(placements.placements)),
                                    "Generating sPyNNaker data specifications")
         for placement in placements.placements:
-            associated_vertex = graph_mapper.get_vertex_from_subvertex(
-                placement.subvertex)
+            associated_vertex = graph_mapper.get_application_vertex(
+                placement.vertex)
 
             if isinstance(associated_vertex, DelayExtensionVertex):
                 delay_extension_placements.append(
                     (placement, associated_vertex))
             else:
-                self._generate_data_spec_for_subvertices(
+                self._generate_data_spec_for_vertices(
                     placement, associated_vertex, executable_targets,
                     dsg_targets, graph_mapper, tags, executable_finder,
-                    partitioned_graph, partitionable_graph, routing_infos,
+                    machine_graph, application_graph, routing_infos,
                     hostname, report_default_directory, write_text_specs,
                     app_data_runtime_folder)
                 progress_bar.update()
 
         for placement, associated_vertex in delay_extension_placements:
-            self._generate_data_spec_for_subvertices(
+            self._generate_data_spec_for_vertices(
                 placement, associated_vertex, executable_targets,
                 dsg_targets, graph_mapper, tags, executable_finder,
-                partitioned_graph, partitionable_graph, routing_infos,
+                machine_graph, application_graph, routing_infos,
                 hostname, report_default_directory, write_text_specs,
                 app_data_runtime_folder)
             progress_bar.update()

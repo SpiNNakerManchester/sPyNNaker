@@ -1,8 +1,9 @@
 from data_specification.data_specification_generator import \
     DataSpecificationGenerator
 from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
-from spynnaker.pyNN.models.utility_models.delay_extension_partitioned_vertex \
-    import DelayExtensionPartitionedVertex
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
+    import DelayExtensionMachineVertex
 
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
@@ -20,8 +21,8 @@ from pacman.model.constraints.partitioner_constraints.\
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
-from pacman.model.graph.abstract_partitionable_vertex \
-    import AbstractPartitionableVertex
+from pacman.model.graph.application.abstract_application_vertex \
+    import AbstractApplicationVertex
 
 import logging
 import math
@@ -34,7 +35,7 @@ _DEFAULT_MALLOCS_USED = 2
 
 
 class DelayExtensionVertex(
-        AbstractPartitionableVertex,
+        AbstractApplicationVertex,
         AbstractDataSpecableVertex,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesNKeysForPartition):
@@ -42,7 +43,7 @@ class DelayExtensionVertex(
         of a neuron (typically 16 or 32)
     """
 
-    _n_subvertices = 0
+    _n_vertices = 0
 
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
@@ -50,7 +51,7 @@ class DelayExtensionVertex(
         """
         Creates a new DelayExtension Object.
         """
-        AbstractPartitionableVertex.__init__(
+        AbstractApplicationVertex.__init__(
             self, n_neurons, label, 256, constraints)
         AbstractDataSpecableVertex.__init__(
             self, machine_time_step=machine_time_step,
@@ -68,11 +69,11 @@ class DelayExtensionVertex(
         self.add_constraint(
             PartitionerSameSizeAsVertexConstraint(source_vertex))
 
-    def create_subvertex(
+    def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        DelayExtensionVertex._n_subvertices += 1
-        return DelayExtensionPartitionedVertex(
+        DelayExtensionVertex._n_vertices += 1
+        return DelayExtensionMachineVertex(
             resources_required, label, constraints)
 
     @property
@@ -105,7 +106,7 @@ class DelayExtensionVertex(
             for (source_id, stage) in zip(source_ids, stages)]
 
     def generate_data_spec(
-            self, subvertex, placement, partitioned_graph, graph, routing_info,
+            self, vertex, placement, machine_graph, graph, routing_info,
             hostname, graph_mapper, report_folder, ip_tags, reverse_ip_tags,
             write_text_specs, application_run_time_folder):
 
@@ -121,7 +122,7 @@ class DelayExtensionVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+        vertex_slice = graph_mapper.get_slice(vertex)
         n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
         delay_params_sz = \
             4 * (_DELAY_PARAM_HEADER_WORDS +
@@ -129,55 +130,43 @@ class DelayExtensionVertex(
 
         spec.reserve_memory_region(
             region=(
-                DelayExtensionPartitionedVertex.
+                DelayExtensionMachineVertex.
                 _DELAY_EXTENSION_REGIONS.SYSTEM.value),
             size=common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
             label='setup')
 
         spec.reserve_memory_region(
             region=(
-                DelayExtensionPartitionedVertex.
+                DelayExtensionMachineVertex.
                 _DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value),
             size=delay_params_sz, label='delay_params')
 
-        subvertex.reserve_provenance_data_region(spec)
+        vertex.reserve_provenance_data_region(spec)
 
         self.write_setup_info(spec)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
-        key = None
-        partitions = partitioned_graph.\
-            outgoing_edges_partitions_from_vertex(subvertex)
-        for partition in partitions.values():
-            keys_and_masks = \
-                routing_info.get_keys_and_masks_from_partition(partition)
-
-            # NOTE: using the first key assigned as the key.  Should in future
-            # get the list of keys and use one per neuron, to allow arbitrary
-            # key and mask assignments
-            key = keys_and_masks[0].key
+        key = routing_info.get_first_key_from_pre_vertex(
+            vertex, constants.SPIKE_PARTITION_ID)
 
         incoming_key = None
         incoming_mask = None
-        incoming_edges = partitioned_graph.incoming_subedges_from_subvertex(
-            subvertex)
+        incoming_edges = machine_graph.get_edges_ending_at_vertex(
+            vertex)
 
         for incoming_edge in incoming_edges:
-            incoming_slice = graph_mapper.get_subvertex_slice(
-                incoming_edge.pre_subvertex)
+            incoming_slice = graph_mapper.get_slice(
+                incoming_edge.pre_vertex)
             if (incoming_slice.lo_atom == vertex_slice.lo_atom and
                     incoming_slice.hi_atom == vertex_slice.hi_atom):
-                partition = partitioned_graph.get_partition_of_subedge(
-                    incoming_edge)
-                keys_and_masks = \
-                    routing_info.get_keys_and_masks_from_partition(partition)
-                incoming_key = keys_and_masks[0].key
-                incoming_mask = keys_and_masks[0].mask
+                rinfo = routing_info.get_routing_info_for_edge(incoming_edge)
+                incoming_key = rinfo.first_key
+                incoming_mask = rinfo.first_mask
 
         self.write_delay_parameters(
             spec, vertex_slice, key, incoming_key, incoming_mask,
-            self._n_subvertices)
+            self._n_vertices)
 
         # End-of-Spec:
         spec.end_specification()
@@ -190,12 +179,12 @@ class DelayExtensionVertex(
         # Write this to the system region (to be picked up by the simulation):
         self._write_basic_setup_info(
             spec,
-            (DelayExtensionPartitionedVertex.
+            (DelayExtensionMachineVertex.
                 _DELAY_EXTENSION_REGIONS.SYSTEM.value))
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask,
-            n_subvertices):
+            n_vertices):
         """ Generate Delay Parameter data
         """
 
@@ -206,7 +195,7 @@ class DelayExtensionVertex(
         # Set the focus to the memory region 2 (delay parameters):
         spec.switch_write_focus(
             region=(
-                DelayExtensionPartitionedVertex.
+                DelayExtensionMachineVertex.
                 _DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value))
 
         # Write header info to the memory region:
@@ -222,7 +211,7 @@ class DelayExtensionVertex(
         spec.write_value(data=self._n_delay_stages)
 
         # Write the random back off value
-        spec.write_value(random.randint(0, n_subvertices))
+        spec.write_value(random.randint(0, n_vertices))
 
         # Write the time between spikes
         spikes_per_timestep = self._n_delay_stages * vertex_slice.n_atoms
@@ -235,7 +224,6 @@ class DelayExtensionVertex(
         spec.write_array(array_values=self._delay_blocks[(
             vertex_slice.lo_atom, vertex_slice.hi_atom)].delay_block)
 
-    # inherited from partitionable vertex
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return 128 * n_atoms
@@ -246,7 +234,7 @@ class DelayExtensionVertex(
             common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
         return (
             size_of_mallocs +
-            DelayExtensionPartitionedVertex.get_provenance_data_size(0))
+            DelayExtensionMachineVertex.get_provenance_data_size(0))
 
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
@@ -259,8 +247,8 @@ class DelayExtensionVertex(
         return True
 
     def get_n_keys_for_partition(self, partition, graph_mapper):
-        vertex_slice = graph_mapper.get_subvertex_slice(
-            partition.edges[0].pre_subvertex)
+        vertex_slice = graph_mapper.get_slice(
+            partition.edges[0].pre_vertex)
         if self._n_delay_stages == 0:
             return 1
         return vertex_slice.n_atoms * self._n_delay_stages

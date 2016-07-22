@@ -1,4 +1,5 @@
-from pacman.model.graph.simple_partitioned_vertex import SimplePartitionedVertex
+from pacman.model.graph.machine.simple_machine_vertex \
+    import SimpleMachineVertex
 from spinn_front_end_common.interface.buffer_management\
     .buffer_models.receives_buffers_to_host_basic_impl \
     import ReceiveBuffersToHostBasicImpl
@@ -11,8 +12,8 @@ from spinn_front_end_common.interface.provenance\
 from enum import Enum
 
 
-class SpikeSourcePoissonPartitionedVertex(
-        SimplePartitionedVertex, ReceiveBuffersToHostBasicImpl,
+class SpikeSourcePoissonMachineVertex(
+        SimpleMachineVertex, ReceiveBuffersToHostBasicImpl,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable):
 
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
@@ -25,7 +26,7 @@ class SpikeSourcePoissonPartitionedVertex(
 
     def __init__(
             self, resources_required, label, is_recording, constraints=None):
-        SimplePartitionedVertex.__init__(
+        SimpleMachineVertex.__init__(
             self, resources_required, label, constraints=constraints)
         ReceiveBuffersToHostBasicImpl.__init__(self)
         ProvidesProvenanceDataFromMachineImpl.__init__(
