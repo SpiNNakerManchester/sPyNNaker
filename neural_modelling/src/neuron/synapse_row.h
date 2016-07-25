@@ -91,9 +91,9 @@ typedef uint16_t control_t;
 //
 // We are expecting the original source address in SDRAM to be
 // in location 0. The number of array elements in the plastic
-// region is held in the upper part of row[1]. A tag to indicate
+// region is held in the upper part of row[0]. A tag to indicate
 // the nature of the synaptic row structure is held in the lower
-// part of row[1].
+// part of row[0].
 //
 //   0:  [ N = <plastic elements>         | <tag> ]
 //   1:  [ First word of plastic region           ]
