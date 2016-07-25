@@ -119,7 +119,7 @@ static inline address_t synapse_row_fixed_region(address_t row) {
 
 // Within the fixed-region extracted using the above API, fixed[0]
 // Contains the number of 32-bit fixed synaptic words, fixed[1]
-// Contains the number of 16-buit plastic synapse control words
+// Contains the number of 16-bit plastic synapse control words
 // (The weights for the plastic synapses are assumed to be stored
 // In some learning-rule-specific format in the plastic region)
 //   0:            [ F = Num fixed synapses                                   ]
@@ -129,7 +129,7 @@ static inline address_t synapse_row_fixed_region(address_t row) {
 // F+1:           [ Last fixed synaptic word                                  ]
 // F+2:           [ 1st plastic synapse control word|2nd plastic control word ]
 //   ...
-// F+1+ceil(P/2): [ Last word of fixed region              ]
+// F+1+ceil(P/2): [ Last word of plastic region              ]
 static inline size_t synapse_row_num_fixed_synapses(address_t fixed) {
     return ((size_t) (fixed[0]));
 }
