@@ -2,114 +2,110 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
     import AbstractNeuronModel
-from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums.data_type import DataType
 
 import numpy
+from spynnaker.pyNN.utilities import utility_calls
 
 
 class NeuronModelLeakyIntegrate(AbstractNeuronModel):
 
-    def __init__(self, n_neurons, machine_time_step, v_init, v_rest, tau_m, cm,
-                 i_offset):
+    @staticmethod
+    def default_parameters():
+        return {'v_init': None, 'v_rest': -65.0, 'tau_m': 20.0,
+                'cm': 1.0, 'i_offset': 0}
+
+    @staticmethod
+    def fixed_parameters():
+        return {}
+
+    @staticmethod
+    def state_variables():
+        params = list(['v'])
+        return params
+
+    @staticmethod
+    def is_array_parameters():
+        return {}
+
+    def __init__(self, bag_of_neurons):
         AbstractNeuronModel.__init__(self)
-        self._n_neurons = n_neurons
-        self._machine_time_step = machine_time_step
-        self._v_init = utility_calls.convert_param_to_numpy(v_init, n_neurons)
-        self._v_rest = utility_calls.convert_param_to_numpy(v_rest, n_neurons)
-        self._tau_m = utility_calls.convert_param_to_numpy(tau_m, n_neurons)
-        self._cm = utility_calls.convert_param_to_numpy(cm, n_neurons)
-        self._i_offset = utility_calls.convert_param_to_numpy(
-            i_offset, n_neurons)
+        self._n_neurons = len(bag_of_neurons)
+        self._atoms = bag_of_neurons
 
-        if v_init is None:
-            self._v_init = v_rest
-
-    def initialize_v(self, v_init):
-        self._v_init = utility_calls.convert_param_to_numpy(
-            v_init, self._n_neurons)
+        for atom in self._atoms:
+            if atom.get_state_variable('v') is None:
+                if atom.get('v_init') is None:
+                    atom.initialize('v', atom.get('v_rest'))
+                else:
+                    atom.initialize('v', atom.get('v_init'))
+                atom.remove_param('v_init')
 
     @property
     def v_init(self):
-        return self._v_init
+        return self._get_state_variable('v', self._atoms)
 
-    @v_init.setter
-    def v_init(self, v_init):
-        self._v_init = utility_calls.convert_param_to_numpy(
+    def initialize_v(self, v_init):
+        v_init = utility_calls.convert_param_to_numpy(
             v_init, self._n_neurons)
+        self._set_state_variable('v', v_init, self._atoms)
 
     @property
     def v_rest(self):
-        return self._v_rest
-
-    @v_rest.setter
-    def v_rest(self, v_rest):
-        self._v_rest = utility_calls.convert_param_to_numpy(
-            v_rest, self._n_neurons)
+        return self._get_param('v_rest', self._atoms)
 
     @property
     def tau_m(self):
-        return self._tau_m
-
-    @tau_m.setter
-    def tau_m(self, tau_m):
-        self._tau_m = utility_calls.convert_param_to_numpy(
-            tau_m, self._n_neurons)
+        return self._get_param('tau_m', self._atoms)
 
     @property
     def cm(self):
-        return self._cm
-
-    @cm.setter
-    def cm(self, cm):
-        self._cm = utility_calls.convert_param_to_numpy(cm, self._n_neurons)
+        return self._get_param('cm', self._atoms)
 
     @property
     def i_offset(self):
-        return self._i_offset
+        return self._get_param('i_offset', self._atoms)
 
-    @i_offset.setter
-    def i_offset(self, i_offset):
-        self._i_offset = utility_calls.convert_param_to_numpy(
-            i_offset, self._n_neurons)
+    def _r_membrane(self, atom_id):
+        return self._atoms[atom_id].get("tau_m") / \
+            self._atoms[atom_id].get('cm')
 
-    @property
-    def _r_membrane(self):
-        return self._tau_m / self._cm
-
-    @property
-    def _exp_tc(self):
-        return numpy.exp(float(-self._machine_time_step) /
-                         (1000.0 * self._tau_m))
+    def _exp_tc(self, atom_id):
+        return numpy.exp(float(
+            -self._atoms[atom_id].population_parameters["machine_time_step"]) /
+            (1000.0 * self._atoms[atom_id].get("tau_m")))
 
     def get_n_neural_parameters(self):
         return 5
 
-    def get_neural_parameters(self):
+    def get_neural_parameters(self, atom_id):
         return [
 
             # membrane voltage [mV]
             # REAL     V_membrane;
-            NeuronParameter(self._v_init, DataType.S1615),
+            NeuronParameter(self._atoms[atom_id].get_state_variable("v"),
+                            DataType.S1615),
 
             # membrane resting voltage [mV]
             # REAL     V_rest;
-            NeuronParameter(self._v_rest, DataType.S1615),
+            NeuronParameter(self._atoms[atom_id].get("v_rest"),
+                            DataType.S1615),
 
             # membrane resistance [MOhm]
             # REAL     R_membrane;
-            NeuronParameter(self._r_membrane, DataType.S1615),
+            NeuronParameter(self._r_membrane(atom_id), DataType.S1615),
 
             # 'fixed' computation parameter - time constant multiplier for
             # closed-form solution
             # exp( -(machine time step in ms)/(R * C) ) [.]
             # REAL     exp_TC;
-            NeuronParameter(self._exp_tc, DataType.S1615),
+            NeuronParameter(self._exp_tc(atom_id), DataType.S1615),
 
             # offset current [nA]
             # REAL     I_offset;
-            NeuronParameter(self._i_offset, DataType.S1615)
+            NeuronParameter(self._atoms[atom_id].get("i_offset"),
+                            DataType.S1615)
         ]
 
     def get_n_global_parameters(self):

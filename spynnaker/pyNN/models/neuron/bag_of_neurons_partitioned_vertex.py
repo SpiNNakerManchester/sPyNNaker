@@ -19,7 +19,7 @@ from spynnaker.pyNN.utilities import constants
 from enum import Enum
 
 
-class PopulationPartitionedVertex(
+class BagOfNeuronsPartitionedVertex(
         PartitionedVertex, ReceiveBuffersToHostBasicImpl,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable):
 

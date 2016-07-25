@@ -1,12 +1,17 @@
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
+from spynnaker.pyNN.models.common.bag_of_neuron_settable import \
+    BagOfNeuronSettable
 
 
 @add_metaclass(ABCMeta)
-class AbstractAdditionalInput(object):
+class AbstractAdditionalInput(BagOfNeuronSettable):
     """ Represents a possible additional independent input for a model
     """
+
+    def __init__(self):
+        BagOfNeuronSettable.__init__(self)
 
     @abstractmethod
     def get_n_parameters(self):
@@ -17,7 +22,7 @@ class AbstractAdditionalInput(object):
         """
 
     @abstractmethod
-    def get_parameters(self):
+    def get_parameters(self, atom_id):
         """ Get the parameters for the additional input
 
         :return: An array of parameters

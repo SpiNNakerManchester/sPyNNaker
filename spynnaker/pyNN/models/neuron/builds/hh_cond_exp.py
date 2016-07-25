@@ -1,9 +1,9 @@
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.neuron.abstract_population_vertex \
-    import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex \
+    import BagOfNeuronsVertex
 
 
-class HHCondExp(AbstractPopulationVertex):
+class HHCondExp(BagOfNeuronsVertex):
     """ Single-compartment Hodgkin-Huxley model with exponentially decaying \
         current input
     """

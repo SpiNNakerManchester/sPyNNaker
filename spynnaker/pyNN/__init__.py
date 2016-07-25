@@ -120,7 +120,7 @@ def register_binary_search_path(search_path):
     """
     :param search_path:
     Registers an additional binary search path for
-        for executables
+        for executable's
 
     absolute search path for binaries
     """
@@ -131,7 +131,7 @@ def end():
     """
     Do any necessary cleaning up before exiting.
 
-    Unregisters the controller,
+    Unregistered the controller,
     prints any data recorded using the low-level API
     """
     global _spinnaker
@@ -237,8 +237,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     if hasattr(neuron_type, "set_model_max_atoms_per_core"):
         neuron_type.set_model_max_atoms_per_core(max_permitted)
     else:
-        raise Exception("{} is not a Vertex type"
-                        .format(neuron_type))
+        raise Exception("{} is not a Vertex type".format(neuron_type))
 
 
 def register_database_notification_request(hostname, notify_port, ack_port):
@@ -290,6 +289,40 @@ def Projection(presynaptic_population, postsynaptic_population,
     return _spinnaker.create_projection(
         presynaptic_population, postsynaptic_population, connector, source,
         target, synapse_dynamics, label, rng)
+
+
+# noinspection PyPep8Naming
+def PopulationView(parent, selector, label=None):
+    """
+    builds a pop view object
+    :param parent: the parent population to link to
+    :param selector: the selector of which neurons to contain
+
+    selector - a slice or numpy mask array. The mask array should either be
+           a boolean array of the same size as the parent, or an
+           integer array containing cell indices, i.e. if p.size == 5,
+             !PopulationView(p, array([False, False, True, False, True]))
+             !PopulationView(p, array([2,4]))
+             !PopulationView(p, slice(2,5,2))
+           will all create the same view.
+
+    :param label: label of this pop view
+    :return: a populationView object
+    """
+    global _spinnaker
+    return _spinnaker.create_population_vew(parent, selector, label)
+
+
+# noinspection PyPep8Naming
+def Assembly(populations, label):
+    """
+    builds a assembly object
+    :param populations: a iterable of populations or population views
+    :param label: label for this assembly
+    :return:
+    """
+    global _spinnaker
+    return _spinnaker.create_assembly(populations, label)
 
 
 def NativeRNG(seed_value):

@@ -6,8 +6,24 @@ class InputTypeCurrent(AbstractInputType):
     """ The current input type
     """
 
-    def __init__(self):
-        AbstractInputType.__init__(self)
+    @staticmethod
+    def default_parameters():
+        return {}
+
+    @staticmethod
+    def fixed_parameters():
+        return {}
+
+    @staticmethod
+    def state_variables():
+        return list()
+
+    @staticmethod
+    def is_array_parameters():
+        return {}
+
+    def __init__(self, bag_of_neurons):
+        AbstractInputType.__init__(self, bag_of_neurons)
 
     def get_global_weight_scale(self):
         return 1.0
@@ -15,7 +31,7 @@ class InputTypeCurrent(AbstractInputType):
     def get_n_input_type_parameters(self):
         return 0
 
-    def get_input_type_parameters(self):
+    def get_input_type_parameters(self, atom_id):
         return []
 
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):

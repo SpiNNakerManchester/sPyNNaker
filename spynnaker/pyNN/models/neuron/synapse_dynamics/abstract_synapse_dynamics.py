@@ -28,7 +28,7 @@ class AbstractSynapseDynamics(object):
         """
 
     @abstractmethod
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
+    def get_parameters_sdram_usage_in_bytes(self, n_synapse_types):
         """ Get the SDRAM usage of the synapse dynamics parameters in bytes
         """
 

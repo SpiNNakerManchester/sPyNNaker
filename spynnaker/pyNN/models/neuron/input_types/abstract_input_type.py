@@ -1,12 +1,18 @@
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
+from spynnaker.pyNN.models.common.bag_of_neuron_settable import \
+    BagOfNeuronSettable
 
 
 @add_metaclass(ABCMeta)
-class AbstractInputType(object):
+class AbstractInputType(BagOfNeuronSettable):
     """ Represents a possible input type for a neuron model (e.g. current)
     """
+
+    def __init__(self, bag_of_neurons):
+        BagOfNeuronSettable.__init__(self)
+        self._atoms = bag_of_neurons
 
     @abstractmethod
     def get_global_weight_scale(self):
@@ -25,7 +31,7 @@ class AbstractInputType(object):
         """
 
     @abstractmethod
-    def get_input_type_parameters(self):
+    def get_input_type_parameters(self, atom_id):
         """ Get the parameters for the input type
 
         :return: An array of parameters

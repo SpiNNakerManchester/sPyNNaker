@@ -1,9 +1,9 @@
 # spynnaker imports
+from spynnaker.pyNN.models.abstract_models.abstract_groupable import \
+    AbstractGroupable
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
-from spynnaker.pyNN.models.common.simple_population_settable \
-    import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
     import EIEIOSpikeRecorder
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
@@ -36,41 +36,134 @@ logger = logging.getLogger(__name__)
 
 
 class SpikeSourceArray(
-        ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractChangableAfterRun,
-        AbstractHasFirstMachineTimeStep):
+        ReverseIpTagMultiCastSource,
+        AbstractSpikeRecordable, AbstractGroupable,
+        AbstractChangableAfterRun, AbstractHasFirstMachineTimeStep):
     """ Model for play back of spikes
     """
 
     _model_based_max_atoms_per_core = sys.maxint
+    SPACE_BEFORE_NOTIFICATION = 640
 
-    def __init__(
-            self, n_neurons, machine_time_step, timescale_factor,
-            spike_times=None, port=None, tag=None, ip_address=None,
-            board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
-                constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
-            space_before_notification=640,
-            constraints=None, label="SpikeSourceArray",
-            spike_recorder_buffer_size=(
-                constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
-            buffer_size_before_receive=(
-                constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)):
+    population_parameters = {
+        'machine_time_step', 'time_scale_factor', 'ip_address', 'port',
+        'space_before_notification','spike_recorder_buffer_size',
+        'max_on_chip_memory_usage_for_spikes_in_bytes',
+        'buffer_size_before_receive', 'board_address', 'tag'
+    }
+
+    model_name = "SpikeSourceArray"
+
+    @staticmethod
+    def default_parameters(_):
+        return {'spike_times': None}
+
+    @staticmethod
+    def fixed_parameters(_):
+        return {}
+
+    @staticmethod
+    def state_variables(_):
+        return list()
+
+    @staticmethod
+    def is_array_parameters(_):
+        return {'spike_times'}
+
+    def __init__(self, bag_of_neurons, label="SpikeSourceArray",
+                 constraints=None):
+
+        AbstractGroupable.__init__(self)
+
+        # assume all atoms have the same parameters, so can look at first
+        # determine ip address
+        ip_address = bag_of_neurons[0].get_population_parameter('ip_address')
         self._ip_address = ip_address
         if ip_address is None:
             self._ip_address = config.get("Buffers", "receive_buffer_host")
-        self._port = port
-        if port is None:
+            for atom in bag_of_neurons:
+                atom.set_population_parameter('ip_address', self._ip_address)
+
+        # determine port
+        self._port = bag_of_neurons[0].get_population_parameter('port')
+        if self._port is None:
             self._port = config.getint("Buffers", "receive_buffer_port")
-        if spike_times is None:
-            spike_times = []
+            for atom in bag_of_neurons:
+                atom.set_population_parameter('port', self._port)
+
+        # determine space_before_notification
+        space_before_notification = bag_of_neurons[0].get_population_parameter(
+            'space_before_notification')
+        if space_before_notification is None:
+            space_before_notification = self.SPACE_BEFORE_NOTIFICATION
+            for atom in bag_of_neurons:
+                atom.set_population_parameter(
+                    'space_before_notification', space_before_notification)
+
+        # determine spike_recorder_buffer_size
+        spike_recorder_buffer_size = bag_of_neurons[0].\
+            get_population_parameter('spike_recorder_buffer_size')
+        if spike_recorder_buffer_size is None:
+            spike_recorder_buffer_size = \
+                (constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT)
+            for atom in bag_of_neurons:
+                atom.set_population_parameter(
+                    'spike_recorder_buffer_size', spike_recorder_buffer_size)
+
+        # determine max_on_chip_memory_usage_for_spikes_in_bytes
+        max_on_chip_memory_usage_for_spikes_in_bytes = bag_of_neurons[0].\
+            get_population_parameter(
+            'max_on_chip_memory_usage_for_spikes_in_bytes')
+        if max_on_chip_memory_usage_for_spikes_in_bytes is None:
+            max_on_chip_memory_usage_for_spikes_in_bytes = \
+                (constants.SPIKE_BUFFER_SIZE_BUFFERING_IN)
+            for atom in bag_of_neurons:
+                atom.set_population_parameter(
+                    'max_on_chip_memory_usage_for_spikes_in_bytes',
+                    max_on_chip_memory_usage_for_spikes_in_bytes)
+
+        # determine buffer_size_before_receive
+        buffer_size_before_receive = bag_of_neurons[0].\
+            get_population_parameter('buffer_size_before_receive')
+        if buffer_size_before_receive is None:
+            buffer_size_before_receive = \
+                (constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)
+            for atom in bag_of_neurons:
+                atom.set_population_parameter(
+                    'buffer_size_before_receive', buffer_size_before_receive)
+
+        # determine board address
+        board_address = \
+            bag_of_neurons[0].get_population_parameter('board_address')
+
+        # determine tag
+        tag = bag_of_neurons[0].get_population_parameter('tag')
+
+        # determine machine time step
+        machine_time_step = \
+            bag_of_neurons[0].get_population_parameter('machine_time_step')
+
+        # determine time scale factor
+        time_scale_factor = \
+            bag_of_neurons[0].get_population_parameter('time_scale_factor')
+
+        # hard code this for the time being
+        spike_times = []
+
+        # store the atoms for future processing
+        self._atoms = bag_of_neurons
+        self._mapping = None
+
+        # get hard coded values
         self._minimum_sdram_for_buffering = config.getint(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
             "Buffers", "use_auto_pause_and_resume")
 
         ReverseIpTagMultiCastSource.__init__(
-            self, n_keys=n_neurons, machine_time_step=machine_time_step,
-            timescale_factor=timescale_factor, label=label,
+            self, n_keys=len(bag_of_neurons),
+            machine_time_step=machine_time_step,
+            timescale_factor=time_scale_factor, label=label,
             constraints=constraints,
             max_atoms_per_core=(SpikeSourceArray.
                                 _model_based_max_atoms_per_core),
@@ -86,7 +179,6 @@ class SpikeSourceArray(
 
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        SimplePopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         AbstractHasFirstMachineTimeStep.__init__(self)
 
@@ -125,12 +217,51 @@ class SpikeSourceArray(
             self._space_before_notification =\
                 self._max_on_chip_memory_usage_for_spikes
 
+        # check for recording requirements
+        is_recording_spikes = False
+        is_writing_to_file = False
+        for atom in bag_of_neurons:
+            if atom.record_spikes:
+                is_recording_spikes = True
+                if atom.record_spikes_to_file_flag is not None:
+                    is_writing_to_file = atom.record_spikes_to_file_flag
+        if is_recording_spikes:
+            self.set_recording_spikes(is_writing_to_file)
+
+
+    @staticmethod
+    def create_vertex(bag_of_neurons, population_parameters):
+        params = dict(population_parameters)
+        params['bag_of_neurons'] = bag_of_neurons
+        vertex = SpikeSourceArray(**params)
+        return vertex
+
+    def set_mapping(self, mapping):
+        total_spikes_times = list()
+        mapping = mapping[self]
+        for (pop, start, end) in mapping:
+            for atom_id in range(start, end):
+                total_spikes_times.append(
+                    self._atoms[atom_id].get("spike_times"))
+        self.spike_times = total_spikes_times
+        self._mapping = mapping
+
+    @property
+    def vertex_to_pop_mapping(self):
+        return self._mapping
+
     @property
     def requires_mapping(self):
         return self._requires_mapping
 
     def mark_no_changes(self):
         self._requires_mapping = False
+
+    def requires_remapping_for_change(self, parameter, old_value, new_value):
+        if parameter == "spike_times":
+            return False
+        else:
+            return True
 
     @property
     def spike_times(self):
@@ -153,7 +284,7 @@ class SpikeSourceArray(
         return self._spike_recorder.record
 
     # @implements AbstractSpikeRecordable.set_recording_spikes
-    def set_recording_spikes(self):
+    def set_recording_spikes(self, to_file_flag, neuron_filter=None):
         self.enable_recording(
             self._ip_address, self._port, self._board_address,
             self._send_buffer_notification_tag,
@@ -161,11 +292,19 @@ class SpikeSourceArray(
             self._buffer_size_before_receive,
             self._minimum_sdram_for_buffering,
             self._using_auto_pause_and_resume)
+
+        # update bag of atoms accordingly
+        if neuron_filter is not None:
+            for (atom, filtered) in zip(self._atoms, neuron_filter):
+                if filtered:
+                    atom.record_spikes = True
+                    atom.record_spikes_to_file_flag = to_file_flag
+
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
-
+    def get_spikes(self, placements, graph_mapper, buffer_manager,
+                   start_neuron, end_neuron):
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager,
             (ReverseIPTagMulticastSourcePartitionedVertex.
@@ -175,11 +314,8 @@ class SpikeSourceArray(
             placements, graph_mapper, self,
             lambda subvertex:
                 subvertex.virtual_key if subvertex.virtual_key is not None
-                else 0)
-
-    @property
-    def model_name(self):
-        return "SpikeSourceArray"
+                else 0, 
+            start_neuron, end_neuron)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):

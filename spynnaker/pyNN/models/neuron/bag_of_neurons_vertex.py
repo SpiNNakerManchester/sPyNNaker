@@ -22,6 +22,8 @@ from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
     import AbstractDataSpecableVertex
 
 # spynnaker imports
+from spynnaker.pyNN.models.abstract_models.abstract_groupable import \
+    AbstractGroupable
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.common import recording_utils
@@ -42,15 +44,13 @@ from spynnaker.pyNN.models.common.v_recorder import VRecorder
 from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.neuron.population_partitioned_vertex \
-    import PopulationPartitionedVertex
+from spynnaker.pyNN.models.neuron.bag_of_neurons_partitioned_vertex \
+    import BagOfNeuronsPartitionedVertex
 
 # dsg imports
 from data_specification.data_specification_generator \
     import DataSpecificationGenerator
 
-from abc import ABCMeta
-from six import add_metaclass
 import logging
 import os
 
@@ -68,28 +68,91 @@ _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 
-@add_metaclass(ABCMeta)
-class AbstractPopulationVertex(
+class BagOfNeuronsVertex(
         AbstractPartitionableVertex, AbstractDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
-        AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
+        AbstractChangableAfterRun, AbstractGroupable):
     """ Underlying vertex model for Neural Populations.
     """
 
+    is_array_parameters = {}
+    fixed_parameters = {}
+    population_parameters = {
+        'spikes_per_second', 'ring_buffer_sigma',
+        'incoming_spike_buffer_size', 'machine_time_step',
+        'time_scale_factor'}
+
+    @staticmethod
+    def default_parameters(class_object):
+        parameters = dict()
+        parameters.update(class_object.neuron_model.default_parameters())
+        parameters.update(class_object.synapse_type.default_parameters())
+        parameters.update(class_object.input_type.default_parameters())
+        parameters.update(class_object.threshold_type.default_parameters())
+        if hasattr(class_object, "additional_input"):
+            parameters.update(
+                class_object.additional_input.default_parameters())
+        return parameters
+
+    @staticmethod
+    def fixed_parameters(class_object):
+        parameters = dict()
+        parameters.update(class_object.neuron_model.fixed_parameters())
+        parameters.update(class_object.synapse_type.fixed_parameters())
+        parameters.update(class_object.input_type.fixed_parameters())
+        parameters.update(class_object.threshold_type.fixed_parameters())
+        if hasattr(class_object, "additional_input"):
+            parameters.update(
+                class_object.additional_input.fixed_parameters())
+        return parameters
+
+    @staticmethod
+    def state_variables(class_object):
+        parameters = list()
+        parameters.extend(class_object.neuron_model.state_variables())
+        parameters.extend(class_object.synapse_type.state_variables())
+        parameters.extend(class_object.input_type.state_variables())
+        parameters.extend(class_object.threshold_type.state_variables())
+        if hasattr(class_object, "additional_input"):
+            parameters.extend(
+                class_object.additional_input.state_variables())
+        return parameters
+
+    @staticmethod
+    def is_array_parameters(class_object):
+        parameters = dict()
+        parameters.update(class_object.neuron_model.is_array_parameters())
+        parameters.update(class_object.synapse_type.is_array_parameters())
+        parameters.update(class_object.input_type.is_array_parameters())
+        parameters.update(class_object.threshold_type.is_array_parameters())
+        if hasattr(class_object, "additional_input"):
+            parameters.update(
+                class_object.additional_input.is_array_parameters())
+        return parameters
+
+
     def __init__(
-            self, n_neurons, binary, label, max_atoms_per_core,
-            machine_time_step, timescale_factor, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size, model_name,
-            neuron_model, input_type, synapse_type, threshold_type,
-            additional_input=None, constraints=None):
+            self, bag_of_neurons, label, model_class, constraints=None):
 
         AbstractPartitionableVertex.__init__(
-            self, n_neurons, label, max_atoms_per_core, constraints)
+            self, len(bag_of_neurons), label,
+            model_class.model_based_max_atoms_per_core, constraints)
+
+        machine_time_step = bag_of_neurons[0].population_parameters[
+            'machine_time_step']
+        time_scale_factor = bag_of_neurons[0].population_parameters[
+            'time_scale_factor']
+        spikes_per_second = bag_of_neurons[0].population_parameters[
+            'spikes_per_second']
+        ring_buffer_sigma = bag_of_neurons[0].population_parameters[
+            'ring_buffer_sigma']
+        incoming_spike_buffer_size = bag_of_neurons[0].population_parameters[
+            'incoming_spike_buffer_size']
+
         AbstractDataSpecableVertex.__init__(
-            self, machine_time_step, timescale_factor)
+            self, machine_time_step, time_scale_factor)
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
@@ -98,26 +161,50 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
+        AbstractGroupable.__init__(self)
 
-        self._binary = binary
+        self._binary = model_class.binary_name
         self._label = label
         self._machine_time_step = machine_time_step
-        self._timescale_factor = timescale_factor
+        self._timescale_factor = time_scale_factor
         self._incoming_spike_buffer_size = incoming_spike_buffer_size
         if incoming_spike_buffer_size is None:
             self._incoming_spike_buffer_size = config.getint(
                 "Simulation", "incoming_spike_buffer_size")
 
-        self._model_name = model_name
-        self._neuron_model = neuron_model
-        self._input_type = input_type
-        self._threshold_type = threshold_type
-        self._additional_input = additional_input
+        self._model_name = model_class.model_name
+        self._neuron_model = model_class.neuron_model(bag_of_neurons)
+        self._input_type = model_class.input_type(bag_of_neurons)
+        self._threshold_type = model_class.threshold_type(bag_of_neurons)
+        synapse_type = model_class.synapse_type(bag_of_neurons)
+
+        self._additional_input = None
+        if hasattr(model_class, "additional_input"):
+            self._additional_input = \
+                model_class.additional_input(bag_of_neurons)
+
+        # storage of atoms for usage during sets and records
+        self._atoms = bag_of_neurons
+        self._vertex_to_pop_mapping = None
 
         # Set up for recording
         self._spike_recorder = SpikeRecorder(machine_time_step)
         self._v_recorder = VRecorder(machine_time_step)
         self._gsyn_recorder = GsynRecorder(machine_time_step)
+
+        # check the bag of neurons for recording states
+        for atom in bag_of_neurons:
+            if atom.record_spikes:
+                self._change_requires_mapping = not self._spike_recorder.record
+                self._spike_recorder.record = True
+            if atom.record_v:
+                self._change_requires_mapping = not self._v_recorder.record_v
+                self._v_recorder.record_v = True
+            if atom.record_gsyn:
+                self._change_requires_mapping = \
+                    not self._gsyn_recorder.record_gsyn
+                self._gsyn_recorder.record_gsyn = True
+
         self._spike_buffer_max_size = config.getint(
             "Buffers", "spike_buffer_size")
         self._v_buffer_max_size = config.getint(
@@ -147,12 +234,35 @@ class AbstractPopulationVertex(
         # bool for if state has changed.
         self._change_requires_mapping = True
 
+    def set_mapping(self, vertex_mapping):
+        self._synapse_manager.set_mapping(vertex_mapping)
+
+    @property
+    def vertex_to_pop_mapping(self):
+        return self._synapse_manager.vertex_to_pop_mapping
+
     @property
     def requires_mapping(self):
         return self._change_requires_mapping
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
+
+    def requires_remapping_for_change(self, parameter, old_value, new_value):
+        return True
+
+    @staticmethod
+    def create_vertex(bag_of_neurons, population_parameters):
+        """
+
+        :param bag_of_neurons:
+        :param population_parameters:
+        :return:
+        """
+        params = dict(population_parameters)
+        params['bag_of_neurons'] = bag_of_neurons
+        vertex = BagOfNeuronsVertex(**params)
+        return vertex
 
     def create_subvertex(
             self, vertex_slice, resources_required, label=None,
@@ -162,7 +272,7 @@ class AbstractPopulationVertex(
             self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
             self._spike_recorder.record
         )
-        subvertex = PopulationPartitionedVertex(
+        subvertex = BagOfNeuronsPartitionedVertex(
             resources_required, label, is_recording, constraints)
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
@@ -202,7 +312,7 @@ class AbstractPopulationVertex(
     def maximum_delay_supported_in_ms(self):
         return self._synapse_manager.maximum_delay_supported_in_ms
 
-    # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
+    # @implements BagOfNeuronsVertex.get_cpu_usage_for_atoms
     def get_cpu_usage_for_atoms(self, vertex_slice, graph):
         per_neuron_cycles = (
             _NEURON_BASE_N_CPU_CYCLES_PER_NEURON +
@@ -221,7 +331,7 @@ class AbstractPopulationVertex(
                 self._gsyn_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
                 self._synapse_manager.get_n_cpu_cycles(vertex_slice, graph))
 
-    # @implements AbstractPopulationVertex.get_dtcm_usage_for_atoms
+    # @implements BagOfNeuronsVertex.get_dtcm_usage_for_atoms
     def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
         per_neuron_usage = (
             self._neuron_model.get_dtcm_usage_per_neuron_in_bytes() +
@@ -256,8 +366,8 @@ class AbstractPopulationVertex(
         sdram_requirement = (
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(3) +
-            PopulationPartitionedVertex.get_provenance_data_size(
-                PopulationPartitionedVertex
+            BagOfNeuronsPartitionedVertex.get_provenance_data_size(
+                BagOfNeuronsPartitionedVertex
                 .N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, graph.incoming_edges_to_vertex(self)) +
@@ -287,7 +397,7 @@ class AbstractPopulationVertex(
 
         return sdram_requirement
 
-    # @implements AbstractPopulationVertex.model_name
+    # @implements BagOfNeuronsVertex.model_name
     def model_name(self):
         return self._model_name
 
@@ -388,21 +498,21 @@ class AbstractPopulationVertex(
 
         # Write the neuron parameters
         utility_calls.write_parameters_per_neuron(
-            spec, vertex_slice, self._neuron_model.get_neural_parameters())
+            spec, vertex_slice, self._neuron_model.get_neural_parameters)
 
         # Write the input type parameters
         utility_calls.write_parameters_per_neuron(
-            spec, vertex_slice, self._input_type.get_input_type_parameters())
+            spec, vertex_slice, self._input_type.get_input_type_parameters)
 
         # Write the additional input parameters
         if self._additional_input is not None:
             utility_calls.write_parameters_per_neuron(
-                spec, vertex_slice, self._additional_input.get_parameters())
+                spec, vertex_slice, self._additional_input.get_parameters)
 
         # Write the threshold type parameters
         utility_calls.write_parameters_per_neuron(
             spec, vertex_slice,
-            self._threshold_type.get_threshold_parameters())
+            self._threshold_type.get_threshold_parameters)
 
     # @implements AbstractDataSpecableVertex.generate_data_spec
     def generate_data_spec(
@@ -509,62 +619,75 @@ class AbstractPopulationVertex(
         return self._spike_recorder.record
 
     # @implements AbstractSpikeRecordable.set_recording_spikes
-    def set_recording_spikes(self):
+    def set_recording_spikes(self, to_file_flag, neuron_filter=None):
         self._change_requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 
+        # update bag of atoms accordingly
+        if neuron_filter is not None:
+            for (atom, filtered) in zip(self._atoms, neuron_filter):
+                if filtered:
+                    atom.record_spikes = True
+                    atom.record_spikes_to_file_flag = to_file_flag
+
     # @implements AbstractSpikeRecordable.get_spikes
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
+    def get_spikes(self, placements, graph_mapper, buffer_manager,
+                   start_atoms, end_atoms):
         return self._spike_recorder.get_spikes(
             self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            placements, graph_mapper, self)
+            placements, graph_mapper, self, start_atoms, end_atoms)
 
     # @implements AbstractVRecordable.is_recording_v
     def is_recording_v(self):
         return self._v_recorder.record_v
 
     # @implements AbstractVRecordable.set_recording_v
-    def set_recording_v(self):
+    def set_recording_v(self, to_file_flag, neuron_filter=None):
         self._change_requires_mapping = not self._v_recorder.record_v
         self._v_recorder.record_v = True
 
+        # update bag of atoms accordingly
+        if neuron_filter is not None:
+            for (atom, filtered) in zip(self._atoms, neuron_filter):
+                if filtered:
+                    atom.record_v = True
+                    atom.record_v_to_file_flag = to_file_flag
+
     # @implements AbstractVRecordable.get_v
     def get_v(self, n_machine_time_steps, placements, graph_mapper,
-              buffer_manager):
+              buffer_manager, start_atoms, end_atoms):
         return self._v_recorder.get_v(
             self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            placements, graph_mapper, self)
+            placements, graph_mapper, self, start_atoms, end_atoms)
 
     # @implements AbstractGSynRecordable.is_recording_gsyn
     def is_recording_gsyn(self):
         return self._gsyn_recorder.record_gsyn
 
     # @implements AbstractGSynRecordable.set_recording_gsyn
-    def set_recording_gsyn(self):
+    def set_recording_gsyn(self, to_file_flag, neuron_filter=None):
         self._change_requires_mapping = not self._gsyn_recorder.record_gsyn
         self._gsyn_recorder.record_gsyn = True
 
+        # update bag of atoms accordingly
+        if neuron_filter is not None:
+            for (atom, filtered) in zip(self._atoms, neuron_filter):
+                if filtered:
+                    atom.record_gsyn = True
+                    atom.record_gsyn_to_file_flag = to_file_flag
+
     # @implements AbstractGSynRecordable.get_gsyn
     def get_gsyn(self, n_machine_time_steps, placements, graph_mapper,
-                 buffer_manager):
+                 buffer_manager, start_atoms, end_atoms):
         return self._gsyn_recorder.get_gsyn(
             self._label, buffer_manager,
             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            placements, graph_mapper, self)
-
-    def initialize(self, variable, value):
-        initialize_attr = getattr(
-            self._neuron_model, "initialize_%s" % variable, None)
-        if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialisation of"
-                            " parameter {}".format(variable))
-        initialize_attr(value)
-        self._change_requires_mapping = True
+            placements, graph_mapper, self, start_atoms, end_atoms)
 
     @property
     def synapse_type(self):
@@ -573,30 +696,6 @@ class AbstractPopulationVertex(
     @property
     def input_type(self):
         return self._input_type
-
-    def get_value(self, key):
-        """ Get a property of the overall model
-        """
-        for obj in [self._neuron_model, self._input_type,
-                    self._threshold_type, self._synapse_manager.synapse_type,
-                    self._additional_input]:
-            if hasattr(obj, key):
-                return getattr(obj, key)
-        raise Exception("Population {} does not have parameter {}".format(
-            self.vertex, key))
-
-    def set_value(self, key, value):
-        """ Set a property of the overall model
-        """
-        for obj in [self._neuron_model, self._input_type,
-                    self._threshold_type, self._synapse_manager.synapse_type,
-                    self._additional_input]:
-            if hasattr(obj, key):
-                setattr(obj, key, value)
-                self._change_requires_mapping = True
-                return
-        raise Exception("Type {} does not have parameter {}".format(
-            self._model_name, key))
 
     @property
     def weight_scale(self):

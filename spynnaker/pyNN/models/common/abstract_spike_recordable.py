@@ -17,12 +17,13 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_spikes(self):
+    def set_recording_spikes(self, to_file_flag, filter=None):
         """ Sets spikes to being recorded
         """
 
     @abstractmethod
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
+    def get_spikes(self, placements, graph_mapper, buffer_manager,
+                   start_atoms, end_atoms):
         """ Get the recorded spikes from the object
         :param placements: the placements object
         :param graph_mapper: the graph mapper object

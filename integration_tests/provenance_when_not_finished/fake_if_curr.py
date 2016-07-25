@@ -7,11 +7,11 @@ from spynnaker.pyNN.models.neuron.input_types.input_type_current \
     import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
-from spynnaker.pyNN.models.neuron.abstract_population_vertex \
-    import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex \
+    import BagOfNeuronsVertex
 
 
-class FakeIFCurrExp(AbstractPopulationVertex):
+class FakeIFCurrExp(BagOfNeuronsVertex):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input
     """
@@ -44,7 +44,7 @@ class FakeIFCurrExp(AbstractPopulationVertex):
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
-        AbstractPopulationVertex.__init__(
+        BagOfNeuronsVertex.__init__(
             self, n_neurons=n_neurons, binary="IF_curr_exp.aplx", label=label,
             max_atoms_per_core=FakeIFCurrExp._model_based_max_atoms_per_core,
             machine_time_step=machine_time_step,
@@ -60,5 +60,5 @@ class FakeIFCurrExp(AbstractPopulationVertex):
         FakeIFCurrExp._model_based_max_atoms_per_core = new_value
 
     def set_no_machine_time_steps(self, new_no_machine_time_steps):
-        AbstractPopulationVertex.set_no_machine_time_steps(
+        BagOfNeuronsVertex.set_no_machine_time_steps(
             self, new_no_machine_time_steps * 2)

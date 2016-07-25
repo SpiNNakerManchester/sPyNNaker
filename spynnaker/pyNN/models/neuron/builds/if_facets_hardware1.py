@@ -1,9 +1,9 @@
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.neuron.abstract_population_vertex \
-    import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron.bag_of_neurons_vertex \
+    import BagOfNeuronsVertex
 
 
-class IFFacetsConductancePopulation(AbstractPopulationVertex):
+class IFFacetsConductancePopulation(BagOfNeuronsVertex):
     """ Leaky integrate and fire neuron with conductance-based synapses and\
         fixed threshold as it is resembled by the FACETS Hardware Stage 1
     """

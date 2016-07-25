@@ -4,6 +4,8 @@ from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
     import MultiCastPartitionableEdge
 
 # common front end imports
+from pacman.model.partitioned_graph.partitioned_graph import PartitionedGraph
+from pacman.operations.pacman_algorithm_executor import PACMANAlgorithmExecutor
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
@@ -11,8 +13,12 @@ from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
-# local front end imports
-from spynnaker.pyNN.models.pynn_population import Population
+# add pops pop view and assembly from the bloody same class.
+from spynnaker.pyNN.models.abstract_models.abstract_groupable import \
+    AbstractGroupable
+from spynnaker.pyNN.models.population_based_objects import \
+    Assembly, PopulationView, Population
+
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
@@ -52,8 +58,21 @@ class Spinnaker(SpinnakerMainInterface):
         # population holders
         self._populations = list()
         self._projections = list()
+
+        # none labelled objects special to spynnaker
+        self._none_labelled_pop_view_count = 0
+        self._none_labelled_assembly_count = 0
+
+        # atom holders for pop views and assemblers
+        self._pop_atom_mappings = dict()
+        self._pop_view_atom_mapping = dict()
+        self._assemble_atom_mapping = dict()
+        self._extra_edges = list()
+
+        # command sender vertex
         self._multi_cast_vertex = None
-        self._edge_count = 0
+
+        # set of LPG's used by the external device plugin module
         self._live_spike_recorder = dict()
 
         # create xml path for where to locate spynnaker related functions when
@@ -234,6 +253,19 @@ class Spinnaker(SpinnakerMainInterface):
                     dependant_edge,
                     vertex_to_add.edge_partition_identifier_for_dependent_edge)
 
+    def get_pop_atom_mapping(self):
+        """
+        supports getting the atom mappings needed for pop views and assemblers
+        :return:
+        """
+        return self._pop_atom_mappings
+
+    def get_pop_view_atom_mapping(self):
+        return self._pop_view_atom_mapping
+
+    def get_assembly_atom_mapping(self):
+        return self._assemble_atom_mapping
+
     def create_population(self, size, cellclass, cellparams, structure, label):
         """
 
@@ -244,9 +276,48 @@ class Spinnaker(SpinnakerMainInterface):
         :param label:
         :return:
         """
-        return Population(
+        # build a population object
+        population = Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
+        self._add_population(population)
+        return population
+
+    def create_population_vew(
+            self, population_to_view, neuron_selector, label):
+        """
+
+        :param population_to_view: population to filter over
+        :param neuron_selector:
+
+        neuron_selector -
+        a slice or numpy mask array. The mask array should either be
+           a boolean array of the same size as the parent, or an
+           integer array containing cell indices, i.e. if p.size == 5,
+             !PopulationView(p, array([False, False, True, False, True]))
+             !PopulationView(p, array([2,4]))
+             !PopulationView(p, slice(2,5,2))
+           will all create the same view.
+        :param label: the label of this pop view
+        :return: a population view object
+        """
+
+        # build pop view
+        population_view = PopulationView(
+            population_to_view, neuron_selector, label, self)
+
+        return population_view
+
+    def create_assembly(self, populations, label):
+        """
+
+        :param populations: populations or pop views to be added to a assembly
+        :param label: the label for this assembly
+        :return: a assembly
+        """
+        # create assembler
+        assembler = Assembly(populations, label, self)
+        return assembler
 
     def _add_population(self, population):
         """ Called by each population to add itself to the list
@@ -257,6 +328,28 @@ class Spinnaker(SpinnakerMainInterface):
         """ Called by each projection to add itself to the list
         """
         self._projections.append(projection)
+
+    @property
+    def none_labelled_pop_view_count(self):
+        """ The number of times pop views have not been labelled.
+        """
+        return self._none_labelled_pop_view_count
+
+    def increment_none_labelled_pop_view_count(self):
+        """ Increment the number of new pop views which have not been labelled.
+        """
+        self._none_labelled_pop_view_count += 1
+
+    @property
+    def none_labelled_assembly_count(self):
+        """ The number of times assembly have not been labelled.
+        """
+        return self._none_labelled_assembly_count
+
+    def increment_none_labelled_assembly_count(self):
+        """ Increment the number of new assemblies which have not been labelled.
+        """
+        self._none_labelled_assembly_count += 1
 
     def create_projection(
             self, presynaptic_population, postsynaptic_population, connector,
@@ -273,17 +366,13 @@ class Spinnaker(SpinnakerMainInterface):
         :param rng: the random number generator to use on this projection
         :return:
         """
-        if label is None:
-            label = "Projection {}".format(self._edge_count)
-            self._edge_count += 1
         return Projection(
             presynaptic_population=presynaptic_population, label=label,
             postsynaptic_population=postsynaptic_population, rng=rng,
             connector=connector, source=source, target=target,
             synapse_dynamics=synapse_dynamics, spinnaker_control=self,
             machine_time_step=self._machine_time_step,
-            timescale_factor=self._time_scale_factor,
-            user_max_delay=self.max_supported_delay)
+            timescale_factor=self._time_scale_factor)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None, extract_provenance_data=True,
@@ -322,4 +411,77 @@ class Spinnaker(SpinnakerMainInterface):
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
+
+        # run grouper again if changes requires mapping
+        if self._detect_if_graph_has_changed(reset_flags=False):
+            self._execute_grouper_algorithm()
+            self._partitioned_graph = PartitionedGraph(
+                label=self._partitioned_graph.label)
+            self._graph_mapper = None
+
+        # run basic spinnaker
         SpinnakerMainInterface.run(self, run_time)
+
+    def _execute_grouper_algorithm(self):
+        """
+        execute the grouper algorithm.
+        :return: None
+        """
+
+        # build executor
+        inputs = dict()
+        inputs['PopulationAtomMapping'] = self._pop_atom_mappings
+        inputs['PopulationViewAtomMapping'] = self._pop_view_atom_mapping
+        inputs['AssemblyAtomMapping'] = self._assemble_atom_mapping
+        inputs['Projections'] = self._projections
+        inputs['MachineTimeStep'] = self._machine_time_step
+        inputs['TimeScaleFactor'] = self._time_scale_factor
+        inputs['UserMaxDelay'] = self.max_supported_delay
+        inputs['VirtualBoardFlag'] = self._use_virtual_board
+
+        outputs = ["MemoryPartitionableGraph", "PopToVertexMapping"]
+        algorithms = list()
+        algorithms.append(config.get("Mapping", "grouper"))
+        xml_paths = list()
+        xml_paths.append(os.path.join(
+            os.path.dirname(overridden_pacman_functions.__file__),
+            "algorithms_metadata.xml"))
+        pacman_executor = PACMANAlgorithmExecutor(
+            algorithms=algorithms, inputs=inputs, required_outputs=outputs,
+            optional_algorithms=[], xml_paths=xml_paths)
+        pacman_executor.execute_mapping()
+
+        # get partitionable graph
+        self._partitionable_graph = \
+            pacman_executor.get_item("MemoryPartitionableGraph")
+        pop_to_vertex_mapping = pacman_executor.get_item("PopToVertexMapping")
+        vertex_to_pop_mapping = pacman_executor.get_item("VertexToPopMapping")
+
+        # update each population with their own mapping
+        for pop in self._populations:
+            pop.set_mapping(pop_to_vertex_mapping[pop])
+
+        for vertex in vertex_to_pop_mapping:
+            if isinstance(vertex, AbstractGroupable):
+                vertex.set_mapping(vertex_to_pop_mapping)
+
+        # add extra edges needed from external device plugin to allow none
+        # synaptic edges to utility models or external devices.
+        for edge_data in self._extra_edges:
+            self._partitionable_graph.add_edge(
+                MultiCastPartitionableEdge(
+                    pre_vertex=pop_to_vertex_mapping[edge_data[0]][0],
+                    post_vertex=pop_to_vertex_mapping[edge_data[1]][0],
+                    label="recorder_edge"),
+                partition_id=edge_data[2])
+
+    def add_extra_edge(self, pre_population, post_population, partition_id):
+        """
+        supports adding extra edges into the graph after grouping has occured
+        :param pre_population:
+        :param post_population:
+        :param partition_id:
+        :return:
+        """
+        self._extra_edges.append(
+            [pre_population, post_population, partition_id])

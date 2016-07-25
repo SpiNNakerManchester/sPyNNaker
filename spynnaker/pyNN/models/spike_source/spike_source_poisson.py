@@ -3,11 +3,11 @@ from pacman.model.partitionable_graph.abstract_partitionable_vertex \
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
+from spynnaker.pyNN.models.common.bag_of_neuron_settable import \
+    BagOfNeuronSettable
 
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
-    import PopulationSettableChangeRequiresMapping
 from spynnaker.pyNN.models.common.multi_spike_recorder \
     import MultiSpikeRecorder
 from spynnaker.pyNN.utilities.conf import config
@@ -47,10 +47,9 @@ RANDOM_SEED_WORDS = 4
 
 
 class SpikeSourcePoisson(
-        AbstractPartitionableVertex,
+        AbstractPartitionableVertex, BagOfNeuronSettable,
         AbstractDataSpecableVertex, AbstractSpikeRecordable,
-        AbstractProvidesOutgoingPartitionConstraints,
-        PopulationSettableChangeRequiresMapping):
+        AbstractProvidesOutgoingPartitionConstraints):
     """ A Poisson Spike source object
     """
 
@@ -68,32 +67,58 @@ class SpikeSourcePoisson(
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
     # in terms of CPU (2900 at 10 times slow down is fine, but not at
     # real-time)
-    _model_based_max_atoms_per_core = 500
+    model_based_max_atoms_per_core = 500
 
     # A count of the number of poisson subvertices, to work out the random
     # back off range
     _n_poisson_subvertices = 0
 
+    population_parameters = {'machine_time_step', 'time_scale_factor'}
+
+    model_name = "SpikeSourcePoisson"
+
+    @staticmethod
+    def default_parameters(_):
+        return {'rate': 1.0, 'start': 0.0, 'duration': None}
+
+    @staticmethod
+    def fixed_parameters(_):
+        return {}
+
+    @staticmethod
+    def state_variables(_):
+        return list(['seed'])
+
+    @staticmethod
+    def is_array_parameters(_):
+        return {}
+
     def __init__(
-            self, n_neurons, machine_time_step, timescale_factor,
-            constraints=None, label="SpikeSourcePoisson", rate=1.0, start=0.0,
-            duration=None, seed=None):
-        AbstractPartitionableVertex.__init__(
-            self, n_neurons, label, self._model_based_max_atoms_per_core,
-            constraints)
-        AbstractDataSpecableVertex.__init__(
-            self, machine_time_step=machine_time_step,
-            timescale_factor=timescale_factor)
-        AbstractSpikeRecordable.__init__(self)
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        PopulationSettableChangeRequiresMapping.__init__(self)
+            self, bag_of_neurons,
+            constraints=None, label="SpikeSourcePoisson"):
+
+        # determine machine time step
+        machine_time_step = \
+            bag_of_neurons[0].get_population_parameter('machine_time_step')
+
+        # determine time scale factor
+        time_scale_factor = \
+            bag_of_neurons[0].get_population_parameter('time_scale_factor')
 
         # Store the parameters
-        self._rate = utility_calls.convert_param_to_numpy(rate, n_neurons)
-        self._start = utility_calls.convert_param_to_numpy(start, n_neurons)
-        self._duration = utility_calls.convert_param_to_numpy(
-            duration, n_neurons)
-        self._rng = numpy.random.RandomState(seed)
+        self._rng = numpy.random.RandomState(
+            bag_of_neurons[0].get_population_parameter('seed'))
+        self._atoms = bag_of_neurons
+
+        AbstractPartitionableVertex.__init__(
+            self, len(bag_of_neurons), label,
+            self.model_based_max_atoms_per_core, constraints)
+        AbstractDataSpecableVertex.__init__(
+            self, machine_time_step=machine_time_step,
+            timescale_factor=time_scale_factor)
+        AbstractSpikeRecordable.__init__(self)
+        BagOfNeuronSettable.__init__(self)
+        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
 
         # Prepare for recording, and to get spikes
         self._spike_recorder = MultiSpikeRecorder(machine_time_step)
@@ -114,6 +139,13 @@ class SpikeSourcePoisson(
         self._using_auto_pause_and_resume = config.getboolean(
             "Buffers", "use_auto_pause_and_resume")
 
+    @staticmethod
+    def create_vertex(bag_of_neurons, population_parameters):
+        params = dict(population_parameters)
+        params['bag_of_neurons'] = bag_of_neurons
+        vertex = SpikeSourcePoisson(**params)
+        return vertex
+    
     def _max_spikes_per_ts(self, vertex_slice):
         max_rate = numpy.amax(
             self._rate[vertex_slice.lo_atom:vertex_slice.hi_atom + 1])
@@ -152,45 +184,40 @@ class SpikeSourcePoisson(
 
     @property
     def rate(self):
-        return self._rate
+        return self._get_param('rate', self._atoms)
 
     @rate.setter
     def rate(self, rate):
-        self._rate = rate
+        self._set_param('rate', rate, self._atoms)
 
     @property
     def start(self):
-        return self._start
+        return self._get_param('start', self._atoms)
 
     @start.setter
     def start(self, start):
-        self._start = start
+        self._set_param('start', start, self._atoms)
 
     @property
     def duration(self):
-        return self._duration
+        return self._get_param('duration', self._atoms)
 
     @duration.setter
     def duration(self, duration):
+        self._set_param('duration', duration, self._atoms)
         self._duration = duration
 
     @property
     def seed(self):
-        return self._seed
+        return self._get_state_variable('seed', self._atoms)
 
     @seed.setter
     def seed(self, seed):
-        self._seed = seed
-
-    @property
-    def model_name(self):
-        """ Return a string representing a label for this class.
-        """
-        return "SpikeSourcePoisson"
+        self._set_state_variable('seed', seed, self._atoms)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        SpikeSourcePoisson._model_based_max_atoms_per_core = new_value
+        SpikeSourcePoisson.model_based_max_atoms_per_core = new_value
 
     @staticmethod
     def get_params_bytes(vertex_slice):
@@ -312,11 +339,11 @@ class SpikeSourcePoisson(
             atom_id = vertex_slice.lo_atom + i
 
             # Get the parameter values for source i:
-            rate_val = self._rate[atom_id]
-            start_val = self._start[atom_id]
+            rate_val = self._atoms[atom_id].get('rate')
+            start_val = self._atoms[atom_id].get('start')
             end_val = None
-            if self._duration[atom_id] is not None:
-                end_val = self._duration[atom_id] + start_val
+            if self._atoms[atom_id].get("duration") is not None:
+                end_val = self._atoms[atom_id].get("duration") + start_val
 
             # Decide if it is a fast or slow source and
             spikes_per_tick = \
@@ -489,14 +516,15 @@ class SpikeSourcePoisson(
     def get_binary_file_name(self):
         return "spike_source_poisson.aplx"
 
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
+    def get_spikes(self, placements, graph_mapper, buffer_manager,
+                   start_neuron, end_neuron):
         return self._spike_recorder.get_spikes(
             self._label, buffer_manager,
             (SpikeSourcePoissonPartitionedVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value),
             (SpikeSourcePoissonPartitionedVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value),
-            placements, graph_mapper, self)
+            placements, graph_mapper, self, start_neuron, end_neuron)
 
     def get_outgoing_partition_constraints(self, partition, graph_mapper):
         return [KeyAllocatorContiguousRangeContraint()]
