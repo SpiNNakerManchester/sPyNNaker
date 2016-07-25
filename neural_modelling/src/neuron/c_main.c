@@ -95,10 +95,23 @@ static bool initialise_recording(){
 
     bool success = recording_initialize(
         n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region,
-        TIMER_AND_BUFFERING, &recording_flags);
+        recording_flags_from_system_conf, state_region, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
     return success;
+}
+
+void c_main_store_provenance_data(address_t provenance_region){
+    log_debug("writing other provenance data");
+
+    // store the data into the provenance data region
+    provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
+        synapses_get_pre_synaptic_events();
+    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
+        synapses_get_saturation_count();
+    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
+        spike_processing_get_buffer_overflows();
+    provenance_region[CURRENT_TIMER_TICK] = time;
+    log_debug("finished other provenance data");
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -117,11 +130,12 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
-    // Get the timing details
-    address_t system_region = data_specification_get_region(
-        SYSTEM_REGION, address);
-    if (!simulation_read_timing_details(
-            system_region, APPLICATION_NAME_HASH, timer_period)) {
+    // Get the timing details and set up the simulation interface
+    if (!simulation_initialise(
+            data_specification_get_region(SYSTEM_REGION, address),
+            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
+            &infinite_run, SDP_AND_DMA_AND_USER, c_main_store_provenance_data,
+            data_specification_get_region(PROVENANCE_DATA_REGION, address))) {
         return false;
     }
 
@@ -142,10 +156,14 @@ static bool initialise(uint32_t *timer_period) {
     // Set up the synapses
     input_t *input_buffers;
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
+    address_t indirect_synapses_address;
+    address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
+            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
             n_neurons, &input_buffers,
-            &ring_buffer_to_input_buffer_left_shifts)) {
+            &ring_buffer_to_input_buffer_left_shifts,
+            &indirect_synapses_address, &direct_synapses_address)) {
         return false;
     }
     neuron_set_input_buffers(input_buffers);
@@ -154,7 +172,7 @@ static bool initialise(uint32_t *timer_period) {
     uint32_t row_max_n_words;
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, address),
-            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
+            indirect_synapses_address, direct_synapses_address,
             &row_max_n_words)) {
         return false;
     }
@@ -173,20 +191,6 @@ static bool initialise(uint32_t *timer_period) {
     }
     log_info("Initialise: finished");
     return true;
-}
-
-void c_main_store_provenance_data(address_t provenance_region){
-    log_debug("writing other provenance data");
-
-    // store the data into the provenance data region
-    provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
-        synapses_get_pre_synaptic_events();
-    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-        synapses_get_saturation_count();
-    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
-        spike_processing_get_buffer_overflows();
-    provenance_region[CURRENT_TIMER_TICK] = time;
-    log_debug("finished other provenance data");
 }
 
 void resume_callback() {
@@ -260,14 +264,6 @@ void c_main(void) {
 
     // Set up the timer tick callback (others are handled elsewhere)
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER_AND_BUFFERING);
-
-    // Set up callback listening to SDP messages
-    simulation_register_simulation_sdp_callback(
-        &simulation_ticks, &infinite_run, SDP_AND_DMA_AND_USER);
-
-    // set up provenance registration
-    simulation_register_provenance_callback(
-        c_main_store_provenance_data, PROVENANCE_DATA_REGION);
 
     simulation_run();
 }

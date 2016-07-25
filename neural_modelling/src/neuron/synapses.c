@@ -90,8 +90,8 @@ static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
 
 static inline void _print_ring_buffers(uint32_t time) {
 #if LOG_LEVEL >= LOG_DEBUG
-    log_debug("Ring Buffer\n");
-    log_debug("----------------------------------------\n");
+    io_printf(IO_BUF, "Ring Buffer at %u\n", time);
+    io_printf(IO_BUF, "----------------------------------------\n");
     for (uint32_t n = 0; n < n_neurons; n++) {
         for (uint32_t t = 0; t < SYNAPSE_TYPE_COUNT; t++) {
             const char *type_string = synapse_types_get_type_char(t);
@@ -101,7 +101,7 @@ static inline void _print_ring_buffers(uint32_t time) {
                     synapses_get_ring_buffer_index(d + time, t, n)] == 0);
             }
             if (!empty) {
-                log_debug("%3d(%s):", n, type_string);
+                io_printf(IO_BUF, "%3d(%s):", n, type_string);
                 for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
                     log_debug(" ");
                     uint32_t ring_buffer_index =
@@ -109,11 +109,11 @@ static inline void _print_ring_buffers(uint32_t time) {
                     synapses_print_weight(ring_buffers[ring_buffer_index],
                                           ring_buffer_to_input_left_shifts[t]);
                 }
-                log_debug("\n");
+                io_printf(IO_BUF, "\n");
             }
         }
     }
-    log_debug("----------------------------------------\n");
+    io_printf(IO_BUF, "----------------------------------------\n");
 #else
     use(time);
 #endif // LOG_LEVEL >= LOG_DEBUG
@@ -215,9 +215,12 @@ static inline void _print_synapse_parameters() {
 
 /* INTERFACE FUNCTIONS */
 
-bool synapses_initialise(address_t address, uint32_t n_neurons_value,
-                         input_t **input_buffers_value,
-                         uint32_t **ring_buffer_to_input_buffer_left_shifts) {
+bool synapses_initialise(
+        address_t synapse_params_address, address_t synaptic_matrix_address,
+        uint32_t n_neurons_value, input_t **input_buffers_value,
+        uint32_t **ring_buffer_to_input_buffer_left_shifts,
+        address_t *indirect_synapses_address,
+        address_t *direct_synapses_address) {
 
     log_info("synapses_initialise: starting");
     n_neurons = n_neurons_value;
@@ -250,8 +253,9 @@ bool synapses_initialise(address_t address, uint32_t n_neurons_value,
 
         log_debug(
             "\tCopying %u bytes from %u", n_neurons * sizeof(synapse_param_t),
-            address + ((n_neurons * sizeof(synapse_param_t)) / 4));
-        memcpy(neuron_synapse_shaping_params, address,
+            synapse_params_address +
+            ((n_neurons * sizeof(synapse_param_t)) / 4));
+        memcpy(neuron_synapse_shaping_params, synapse_params_address,
                n_neurons * sizeof(synapse_param_t));
     }
 
@@ -261,12 +265,32 @@ bool synapses_initialise(address_t address, uint32_t n_neurons_value,
     for (index_t synapse_index = 0; synapse_index < SYNAPSE_TYPE_COUNT;
             synapse_index++) {
         ring_buffer_to_input_left_shifts[synapse_index] =
-            address[ring_buffer_input_left_shifts_base + synapse_index];
+            synapse_params_address[
+                ring_buffer_input_left_shifts_base + synapse_index];
         log_info("synapse type %s, ring buffer to input left shift %u",
                  synapse_types_get_type_char(synapse_index),
                  ring_buffer_to_input_left_shifts[synapse_index]);
     }
     *ring_buffer_to_input_buffer_left_shifts = ring_buffer_to_input_left_shifts;
+
+    // Work out the positions of the direct and indirect synaptic matrices
+    // and copy the direct matrix to DTCM
+    uint32_t direct_matrix_offset = (synaptic_matrix_address[0] >> 2) + 1;
+    log_info("Indirect matrix is %u words in size", direct_matrix_offset - 1);
+    uint32_t direct_matrix_size = synaptic_matrix_address[direct_matrix_offset];
+    *direct_synapses_address = (address_t) spin1_malloc(direct_matrix_size);
+    if (direct_synapses_address == NULL) {
+        log_error("Not enough memory to allocate direct matrix");
+        return false;
+    }
+    log_info(
+        "Copying %u bytes of direct synapses to 0x%08x",
+        direct_matrix_size, *direct_synapses_address);
+    spin1_memcpy(
+        *direct_synapses_address,
+        &(synaptic_matrix_address[direct_matrix_offset + 1]),
+        direct_matrix_size);
+    *indirect_synapses_address = &(synaptic_matrix_address[1]);
 
     log_info("synapses_initialise: completed successfully");
     _print_synapse_parameters();

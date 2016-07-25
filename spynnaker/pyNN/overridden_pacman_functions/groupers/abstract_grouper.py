@@ -1,16 +1,17 @@
 from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint import \
-    PartitionerSameSizeAsVertexConstraint
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge import \
-    MultiCastPartitionableEdge
+    partitioner_same_size_as_vertex_constraint \
+    import PartitionerSameSizeAsVertexConstraint
 
 from spinn_front_end_common.utilities import exceptions
 from spinn_machine.utilities.progress_bar import ProgressBar
 
-from spynnaker.pyNN import ProjectionPartitionableEdge, DelayExtensionVertex, \
-    DelayAfferentPartitionableEdge
-from spynnaker.pyNN.models.neural_projections.synapse_information import \
-    SynapseInformation
+from spynnaker.pyNN import ProjectionPartitionableEdge
+from spynnaker.pyNN import DelayExtensionVertex
+from spynnaker.pyNN import DelayAfferentPartitionableEdge
+from spynnaker.pyNN.models.neural_projections.delayed_partitionable_edge \
+    import DelayedPartitionableEdge
+from spynnaker.pyNN.models.neural_projections.synapse_information \
+    import SynapseInformation
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 from spynnaker.pyNN.utilities import constants
 
@@ -28,8 +29,8 @@ class AbstractGrouper(object):
         pass
 
     def handle_projections(
-        self, projections, population_atom_mapping, pop_to_vertex_mapping,
-        user_max_delay, partitionable_graph, using_virtual_board):
+            self, projections, population_atom_mapping, pop_to_vertex_mapping,
+            user_max_delay, partitionable_graph, using_virtual_board):
         """
         function to handle the addition of projections (seems common to all
         groupers, so kept here)
@@ -211,7 +212,7 @@ class AbstractGrouper(object):
                 pre_pop_vertex, post_pop_vertex,
                 max_delay, post_vertex_max_supported_delay_ms,
                 machine_time_step, time_scale_factor, partitionable_graph,
-                projection, delay_to_vertex_mapping)
+                projection, delay_to_vertex_mapping, synapse_information)
             projection_edge.delay_edge = delay_edge
 
         # If there is a virtual board, we need to hold the data in case the
@@ -233,7 +234,8 @@ class AbstractGrouper(object):
             self,
             pre_pop_vertex, post_pop_vertex, max_delay_for_projection,
             max_delay_per_neuron, machine_time_step, timescale_factor,
-            partitionable_graph, projection, delay_to_vertex_mapping):
+            partitionable_graph, projection, delay_to_vertex_mapping,
+            synapse_information):
         """
         Instantiate delay extension component of this edge.
         :param pre_pop_vertex: The destination vertex of this edge
@@ -291,8 +293,9 @@ class AbstractGrouper(object):
         delay_edge = self._find_existing_edge(
             delay_vertex, post_pop_vertex, partitionable_graph)
         if delay_edge is None:
-            delay_edge = MultiCastPartitionableEdge(
-                delay_vertex, post_pop_vertex, label="{}_delayed_to_{}".format(
+            delay_edge = DelayedPartitionableEdge(
+                delay_vertex, post_pop_vertex, synapse_information,
+                label="{}_delayed_to_{}".format(
                     pre_pop_vertex.label, post_pop_vertex.label))
             partitionable_graph.add_edge(
                 delay_edge, projection.EDGE_PARTITION_ID)
