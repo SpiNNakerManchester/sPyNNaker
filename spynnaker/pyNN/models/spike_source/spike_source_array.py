@@ -1,5 +1,5 @@
 # spynnaker imports
-from pacman.executor.injection_decorator import inject
+from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
@@ -122,9 +122,11 @@ class SpikeSourceArray(
                 self._max_on_chip_memory_usage_for_spikes
 
     @property
+    @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
         return self._requires_mapping
 
+    @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self._requires_mapping = False
 
@@ -144,11 +146,11 @@ class SpikeSourceArray(
         """
         self.send_buffer_times = spike_times
 
-    # @implements AbstractSpikeRecordable.is_recording_spikes
+    @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
         return self._spike_recorder.record
 
-    # @implements AbstractSpikeRecordable.set_recording_spikes
+    @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(self):
         self.enable_recording(
             self._ip_address, self._port, self._board_address,
@@ -160,6 +162,7 @@ class SpikeSourceArray(
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 
+    @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, graph_mapper, buffer_manager):
 
         return self._spike_recorder.get_spikes(
@@ -174,6 +177,7 @@ class SpikeSourceArray(
                 else 0)
 
     @property
+    @overrides(ReverseIpTagMultiCastSource.model_name)
     def model_name(self):
         return "SpikeSourceArray"
 
