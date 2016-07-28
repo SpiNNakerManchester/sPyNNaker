@@ -2,8 +2,8 @@
 # spynnaker imports
 import struct
 
-from pacman.model.graph.abstract_classes.abstract_application_vertex \
-    import AbstractApplicationVertex
+from pacman.model.graphs.application.abstract_application_vertex import \
+    AbstractApplicationVertex
 from spynnaker.pyNN.models.neural_projections.projection_application_edge \
     import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neural_projections.projection_machine_edge \

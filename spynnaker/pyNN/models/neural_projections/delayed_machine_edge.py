@@ -1,19 +1,20 @@
-from pacman.model.graph.machine.simple_machine_edge \
-    import SimpleMachineEdge
+from pacman.model.decorators.overrides import overrides
+from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
 
 
-class DelayedMachineEdge(SimpleMachineEdge, AbstractFilterableEdge):
+class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex,
-            label=None):
-        SimpleMachineEdge.__init__(
-            self, pre_vertex, post_vertex, label=label)
+            label=None, weight=1):
+        MachineEdge.__init__(
+            self, pre_vertex, post_vertex, label=label, traffic_weight=weight)
         AbstractFilterableEdge.__init__(self)
         self._synapse_information = synapse_information
 
+    @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
         pre_vertex = graph_mapper.get_application_vertex(
             self.pre_vertex)
@@ -40,3 +41,8 @@ class DelayedMachineEdge(SimpleMachineEdge, AbstractFilterableEdge):
                 return False
 
         return n_connections == 0
+
+    @property
+    @overrides(MachineEdge.model_name)
+    def model_name(self):
+        return "DelayedMachineEdge"

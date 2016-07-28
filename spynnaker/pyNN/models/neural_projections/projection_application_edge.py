@@ -1,5 +1,6 @@
-from pacman.model.graph.application.simple_application_edge\
-    import SimpleApplicationEdge
+from pacman.model.decorators.overrides import overrides
+from pacman.model.graphs.application.impl.application_edge import \
+    ApplicationEdge
 
 from spynnaker.pyNN.models.neural_projections.projection_machine_edge \
     import ProjectionMachineEdge
@@ -9,13 +10,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ProjectionApplicationEdge(SimpleApplicationEdge):
+class ProjectionApplicationEdge(ApplicationEdge):
     """ An edge which terminates on an AbstractPopulationVertex
     """
 
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, label=None):
-        SimpleApplicationEdge.__init__(
+        ApplicationEdge.__init__(
             self, pre_vertex, post_vertex, label=label)
 
         # A list of all synapse information for all the projections that are
@@ -50,6 +51,7 @@ class ProjectionApplicationEdge(SimpleApplicationEdge):
             return 0
         return self._delay_edge.pre_vertex.n_delay_stages
 
+    @overrides(ApplicationEdge.create_machine_edge)
     def create_machine_edge(
             self, pre_vertex, post_vertex, label=None):
         return ProjectionMachineEdge(

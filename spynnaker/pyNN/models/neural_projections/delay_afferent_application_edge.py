@@ -1,14 +1,20 @@
-from pacman.model.graph.application.simple_application_edge import \
-    SimpleApplicationEdge
+from pacman.model.decorators.overrides import overrides
+from pacman.model.graphs.application.impl.application_edge import  \
+    ApplicationEdge
 from spynnaker.pyNN.models.neural_projections.delay_afferent_machine_edge \
     import DelayAfferentMachineEdge
 
 
-class DelayAfferentApplicationEdge(SimpleApplicationEdge):
+class DelayAfferentApplicationEdge(ApplicationEdge):
 
     def __init__(self, prevertex, delayvertex, label=None):
-        SimpleApplicationEdge.__init__(
+        ApplicationEdge.__init__(
             self, prevertex, delayvertex, label=label)
 
     def create_machine_edge(self, pre_vertex, post_vertex):
         return DelayAfferentMachineEdge(pre_vertex, post_vertex)
+
+    @property
+    @overrides(ApplicationEdge.model_name)
+    def model_name(self):
+        return "DelayAfferentApplicationEdge"

@@ -145,12 +145,12 @@ class SynapticManager(object):
         self._pre_run_connection_holders[(edge, synapse_info)].append(
             connection_holder)
 
-    def get_n_cpu_cycles(self, vertex_slice, graph):
+    def get_n_cpu_cycles(self):
 
         # TODO: Calculate this correctly
         return 0
 
-    def get_dtcm_usage_in_bytes(self, vertex_slice, graph):
+    def get_dtcm_usage_in_bytes(self):
 
         # TODO: Calculate this correctly
         return 0

@@ -1,10 +1,18 @@
 
 # pacman imports
+from pacman.executor.injection_decorator import requires_injection, inject, \
+    supports_injection
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
-from pacman.model.graph.abstract_classes.abstract_application_vertex \
-    import AbstractApplicationVertex
+from pacman.model.decorators.overrides import overrides
+from pacman.model.graphs.application.impl.application_vertex \
+    import ApplicationVertex
+from pacman.model.resources.cpu_cycles_per_tick_resource import \
+    CPUCyclesPerTickResource
+from pacman.model.resources.dtcm_resource import DTCMResource
+from pacman.model.resources.resource_container import ResourceContainer
+from pacman.model.resources.sdram_resource import SDRAMResource
 
 # front end common imports
 from spinn_front_end_common.abstract_models.\
@@ -18,8 +26,12 @@ from spinn_front_end_common.utilities import constants as \
 from spinn_front_end_common.interface.buffer_management\
     .buffer_models.receives_buffers_to_host_basic_impl \
     import ReceiveBuffersToHostBasicImpl
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
+from spinn_front_end_common.abstract_models.impl.data_specable_vertex import \
+    DataSpecableVertex
+from spinn_front_end_common.interface.simulation.impl.\
+    uses_simulation_impl import UsesSimulationImpl
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -29,8 +41,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
@@ -44,10 +54,6 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
-
-# dsg imports
-from data_specification.data_specification_generator \
-    import DataSpecificationGenerator
 
 from abc import ABCMeta
 from six import add_metaclass
@@ -69,15 +75,18 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 
 @add_metaclass(ABCMeta)
+@supports_injection
 class AbstractPopulationVertex(
-        AbstractApplicationVertex, AbstractDataSpecableVertex,
+        ApplicationVertex, DataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
+        AbstractChangableAfterRun, UsesSimulationImpl):
     """ Underlying vertex model for Neural Populations.
     """
+
+    BASIC_MALLOC_USAGE = 2
 
     def __init__(
             self, n_neurons, binary, label, max_atoms_per_core,
@@ -86,10 +95,9 @@ class AbstractPopulationVertex(
             neuron_model, input_type, synapse_type, threshold_type,
             additional_input=None, constraints=None):
 
-        AbstractApplicationVertex.__init__(
-            self, n_neurons, label, max_atoms_per_core, constraints)
-        AbstractDataSpecableVertex.__init__(
-            self, machine_time_step, timescale_factor)
+        ApplicationVertex.__init__(
+            self, label, constraints, max_atoms_per_core)
+        DataSpecableVertex.__init__(self)
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
@@ -100,9 +108,20 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun.__init__(self)
 
         self._binary = binary
-        self._label = label
+        self._n_atoms = n_neurons
+
+        # sim parameters
         self._machine_time_step = machine_time_step
         self._timescale_factor = timescale_factor
+
+        # storage objects
+        self._application_graph = None
+        self._graph_mapper = None
+        self._machine_graph = None
+        self._routing_info = None
+        self._iptags = None
+
+        # buffer data
         self._incoming_spike_buffer_size = incoming_spike_buffer_size
         if incoming_spike_buffer_size is None:
             self._incoming_spike_buffer_size = config.getint(
@@ -148,13 +167,29 @@ class AbstractPopulationVertex(
         self._change_requires_mapping = True
 
     @property
+    @overrides(ApplicationVertex.n_atoms)
+    def n_atoms(self):
+        return self._n_atoms
+
+    @overrides(ApplicationVertex.get_resources_used_by_atoms)
+    def get_resources_used_by_atoms(self, vertex_slice):
+        return ResourceContainer(
+            sdram=SDRAMResource(
+                self.get_sdram_usage_for_atoms(vertex_slice)),
+            dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
+            cpu_cycles=CPUCyclesPerTickResource(
+                self.get_cpu_usage_for_atoms(vertex_slice)))
+
+    @property
+    @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
         return self._change_requires_mapping
 
+    @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self._change_requires_mapping = False
 
-
+    @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -203,8 +238,7 @@ class AbstractPopulationVertex(
     def maximum_delay_supported_in_ms(self):
         return self._synapse_manager.maximum_delay_supported_in_ms
 
-    # @implements AbstractPopulationVertex.get_cpu_usage_for_atoms
-    def get_cpu_usage_for_atoms(self, vertex_slice, graph):
+    def get_cpu_usage_for_atoms(self, vertex_slice):
         per_neuron_cycles = (
             _NEURON_BASE_N_CPU_CYCLES_PER_NEURON +
             self._neuron_model.get_n_cpu_cycles_per_neuron() +
@@ -220,10 +254,9 @@ class AbstractPopulationVertex(
                 self._spike_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
                 self._v_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
                 self._gsyn_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
-                self._synapse_manager.get_n_cpu_cycles(vertex_slice, graph))
+                self._synapse_manager.get_n_cpu_cycles())
 
-    # @implements AbstractPopulationVertex.get_dtcm_usage_for_atoms
-    def get_dtcm_usage_for_atoms(self, vertex_slice, graph):
+    def get_dtcm_usage_for_atoms(self, vertex_slice):
         per_neuron_usage = (
             self._neuron_model.get_dtcm_usage_per_neuron_in_bytes() +
             self._input_type.get_dtcm_usage_per_neuron_in_bytes() +
@@ -236,9 +269,9 @@ class AbstractPopulationVertex(
                 self._spike_recorder.get_dtcm_usage_in_bytes() +
                 self._v_recorder.get_dtcm_usage_in_bytes() +
                 self._gsyn_recorder.get_dtcm_usage_in_bytes() +
-                self._synapse_manager.get_dtcm_usage_in_bytes(
-                    vertex_slice, graph))
+                self._synapse_manager.get_dtcm_usage_in_bytes())
 
+    @requires_injection(["MemoryApplicationGraph"])
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
         per_neuron_usage = (
             self._input_type.get_sdram_usage_per_neuron_in_bytes() +
@@ -252,8 +285,8 @@ class AbstractPopulationVertex(
                 self._neuron_model.get_sdram_usage_in_bytes(
                     vertex_slice.n_atoms))
 
-    # @implements AbstractApplicationVertex.get_sdram_usage_for_atoms
-    def get_sdram_usage_for_atoms(self, vertex_slice, graph):
+    @requires_injection(["MemoryApplicationGraph"])
+    def get_sdram_usage_for_atoms(self, vertex_slice):
         sdram_requirement = (
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(3) +
@@ -261,9 +294,9 @@ class AbstractPopulationVertex(
                 PopulationMachineVertex
                 .N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph.get_edges_ending_at_vertex(self)) +
-            (self._get_number_of_mallocs_used_by_dsg(
-                vertex_slice, graph.get_edges_ending_at_vertex(self)) *
+                vertex_slice,
+                self._application_graph.get_edges_ending_at_vertex(self)) +
+            (self._get_number_of_mallocs_used_by_dsg() *
              common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
 
         # add recording SDRAM if not automatically calculated
@@ -288,11 +321,11 @@ class AbstractPopulationVertex(
 
         return sdram_requirement
 
-    # @implements AbstractPopulationVertex.model_name
+    @overrides(ApplicationVertex.model_name)
     def model_name(self):
         return self._model_name
 
-    def _get_number_of_mallocs_used_by_dsg(self, vertex_slice, in_edges):
+    def _get_number_of_mallocs_used_by_dsg(self):
         extra_mallocs = 0
         if self._gsyn_recorder.record_gsyn:
             extra_mallocs += 1
@@ -301,13 +334,9 @@ class AbstractPopulationVertex(
         if self._spike_recorder.record:
             extra_mallocs += 1
         return (
-            2 + self._synapse_manager.get_number_of_mallocs_used_by_dsg() +
+            self.BASIC_MALLOC_USAGE +
+            self._synapse_manager.get_number_of_mallocs_used_by_dsg() +
             extra_mallocs)
-
-    def _get_number_of_mallocs_from_basic_model(self):
-
-        # one for system, one for neuron params
-        return 2
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, spike_history_region_sz,
@@ -346,9 +375,12 @@ class AbstractPopulationVertex(
             results.
         """
 
-        # Write this to the system region (to be picked up by the simulation):
-        self._write_basic_setup_info(
-            spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value)
+        # Write the data needed by the simulation interface
+        spec.switch_write_focus(constants.POPULATION_BASED_REGIONS.SYSTEM.value)
+        spec.write_array(self.data_for_simulation_data(
+            self._machine_time_step, self._timescale_factor))
+
+        # Write the data needed for the buffered regions
         vertex.write_recording_data(
             spec, ip_tags,
             [spike_history_region_sz, neuron_potential_region_sz,
@@ -405,20 +437,16 @@ class AbstractPopulationVertex(
             spec, vertex_slice,
             self._threshold_type.get_threshold_parameters())
 
-    # @implements AbstractDataSpecableVertex.generate_data_spec
-    def generate_data_spec(
-            self, vertex, placement, machine_graph, graph, routing_info,
-            hostname, graph_mapper, report_folder, ip_tags,
-            reverse_ip_tags, write_text_specs, application_run_time_folder):
+    @overrides(DataSpecableVertex.generate_data_specification)
+    @requires_injection([
+        "MemoryIptags", "MemoryMachineGraph", "MemoryApplicationGraph",
+        "MemoryRoutingInfo", "MemoryGraphMapper"])
+    def generate_data_specification(self, spec, placement):
+        vertex = placement.vertex
 
-        # Create new DataSpec for this processor:
-        data_writer, report_writer = self.get_data_spec_file_writers(
-            placement.x, placement.y, placement.p, hostname, report_folder,
-            write_text_specs, application_run_time_folder)
-        spec = DataSpecificationGenerator(data_writer, report_writer)
         spec.comment("\n*** Spec for block of {} neurons ***\n".format(
             self.model_name))
-        vertex_slice = graph_mapper.get_slice(vertex)
+        vertex_slice = self._graph_mapper.get_slice(vertex)
 
         # Get recording sizes - the order is important here as spikes will
         # require less space than voltage and voltage less than gsyn.  This
@@ -465,27 +493,26 @@ class AbstractPopulationVertex(
         # self.write_random_distribution_declarations(spec)
 
         # Get the key
-        key = routing_info.get_first_key_from_pre_vertex(
+        key = self._routing_info.get_first_key_from_pre_vertex(
             vertex, constants.SPIKE_PARTITION_ID)
 
         # Write the regions
         self._write_setup_info(
-            spec, spike_history_sz, v_history_sz, gsyn_history_sz, ip_tags,
-            buffer_size_before_receive, self._time_between_requests, vertex)
+            spec, spike_history_sz, v_history_sz, gsyn_history_sz,
+            self._ip_tags, buffer_size_before_receive,
+            self._time_between_requests, vertex)
         self._write_neuron_parameters(spec, key, vertex_slice)
 
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
-            spec, self, vertex_slice, vertex, placement, machine_graph,
-            graph, routing_info, graph_mapper, self._input_type)
+            spec, self, vertex_slice, vertex, placement, self._machine_graph,
+            self._graph, self._routing_info, self._graph_mapper,
+            self._input_type)
 
         # End the writing of this specification:
         spec.end_specification()
-        data_writer.close()
 
-        return data_writer.filename
-
-    # @implements AbstractDataSpecableVertex.get_binary_file_name
+    @overrides(DataSpecableVertex.get_binary_file_name)
     def get_binary_file_name(self):
 
         # Split binary name into title and extension
@@ -495,16 +522,16 @@ class AbstractPopulationVertex(
         return (binary_title + self._synapse_manager.vertex_executable_suffix +
                 binary_extension)
 
-    # @implements AbstractSpikeRecordable.is_recording_spikes
+    @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
         return self._spike_recorder.record
 
-    # @implements AbstractSpikeRecordable.set_recording_spikes
+    @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(self):
         self._change_requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 
-    # @implements AbstractSpikeRecordable.get_spikes
+    @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, graph_mapper, buffer_manager):
         return self._spike_recorder.get_spikes(
             self._label, buffer_manager,
@@ -512,16 +539,16 @@ class AbstractPopulationVertex(
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)
 
-    # @implements AbstractVRecordable.is_recording_v
+    @overrides(AbstractVRecordable.is_recording_v)
     def is_recording_v(self):
         return self._v_recorder.record_v
 
-    # @implements AbstractVRecordable.set_recording_v
+    @overrides(AbstractVRecordable.set_recording_v)
     def set_recording_v(self):
         self._change_requires_mapping = not self._v_recorder.record_v
         self._v_recorder.record_v = True
 
-    # @implements AbstractVRecordable.get_v
+    @overrides(AbstractVRecordable.get_v)
     def get_v(self, n_machine_time_steps, placements, graph_mapper,
               buffer_manager):
         return self._v_recorder.get_v(
@@ -530,16 +557,16 @@ class AbstractPopulationVertex(
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)
 
-    # @implements AbstractGSynRecordable.is_recording_gsyn
+    @overrides(AbstractGSynRecordable.is_recording_gsyn)
     def is_recording_gsyn(self):
         return self._gsyn_recorder.record_gsyn
 
-    # @implements AbstractGSynRecordable.set_recording_gsyn
+    @overrides(AbstractGSynRecordable.set_recording_gsyn)
     def set_recording_gsyn(self):
         self._change_requires_mapping = not self._gsyn_recorder.record_gsyn
         self._gsyn_recorder.record_gsyn = True
 
-    # @implements AbstractGSynRecordable.get_gsyn
+    @overrides(AbstractGSynRecordable.get_gsyn)
     def get_gsyn(self, n_machine_time_steps, placements, graph_mapper,
                  buffer_manager):
         return self._gsyn_recorder.get_gsyn(
@@ -548,6 +575,7 @@ class AbstractPopulationVertex(
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self)
 
+    @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
         initialize_attr = getattr(
             self._neuron_model, "initialize_%s" % variable, None)
@@ -562,9 +590,11 @@ class AbstractPopulationVertex(
         return self._synapse_manager.synapse_type
 
     @property
+    @overrides(AbstractPopulationSettable.set_value)
     def input_type(self):
         return self._input_type
 
+    @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):
         """ Get a property of the overall model
         """
@@ -629,9 +659,8 @@ class AbstractPopulationVertex(
             transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info, machine_graph)
 
-    def is_data_specable(self):
-        return True
-
+    @overrides(AbstractProvidesIncomingPartitionConstraints.
+               get_incoming_partition_constraints)
     def get_incoming_partition_constraints(self, partition):
         """ Gets the constraints for partitions going into this vertex
 
@@ -640,12 +669,34 @@ class AbstractPopulationVertex(
         """
         return self._synapse_manager.get_incoming_partition_constraints()
 
+    @overrides(AbstractProvidesOutgoingPartitionConstraints.
+               get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
         """ Gets the constraints for partitions going out of this vertex
         :param partition: the partition that leaves this vertex
         :return: list of constraints
         """
         return [KeyAllocatorContiguousRangeContraint()]
+
+    @inject("MemoryApplicationGraph")
+    def set_application_graph(self, application_graph):
+        self._application_graph = application_graph
+
+    @inject("MemoryMachineGraph")
+    def set_machine_graph(self, machine_graph):
+        self._machine_graph = machine_graph
+
+    @inject("MemoryGraphMapper")
+    def set_graph_mapper(self, graph_mapper):
+        self._graph_mapper = graph_mapper
+
+    @inject("MemoryRoutingInfo")
+    def set_routing_info(self, routing_info):
+        self._routing_info = routing_info
+
+    @inject("MemoryIptags")
+    def set_iptags(self, iptags):
+        self._iptags = iptags
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

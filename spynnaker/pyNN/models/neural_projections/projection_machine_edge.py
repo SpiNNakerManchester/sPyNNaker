@@ -1,30 +1,32 @@
 from pyNN.random import RandomDistribution
+
+from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from spinn_front_end_common.interface.provenance\
     .abstract_provides_local_provenance_data \
     import AbstractProvidesLocalProvenanceData
 from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
     import AbstractWeightUpdatable
-from pacman.model.graph.machine.simple_machine_edge \
-    import SimpleMachineEdge
+from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
 
 
 class ProjectionMachineEdge(
-        SimpleMachineEdge, AbstractFilterableEdge,
+        MachineEdge, AbstractFilterableEdge,
         AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex,
-            label=None):
-        SimpleMachineEdge.__init__(
-            self, pre_vertex, post_vertex, label=label)
+            label=None, traffic_weight=1):
+        MachineEdge.__init__(self, pre_vertex, post_vertex, label=label,
+                             traffic_weight=traffic_weight)
         AbstractFilterableEdge.__init__(self)
         AbstractWeightUpdatable.__init__(self)
 
         self._synapse_information = synapse_information
 
+    @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
         pre_vertex = graph_mapper.get_application_vertex(
             self.pre_vertex)
@@ -52,6 +54,7 @@ class ProjectionMachineEdge(
 
         return n_connections == 0
 
+    @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):
         pre_vertex = graph_mapper.get_application_vertex(
             self.pre_vertex)
@@ -87,8 +90,9 @@ class ProjectionMachineEdge(
                 new_weight *= pre_vertex.spikes_per_second
             weight += new_weight
 
-        self._weight = weight
+        self._traffic_weight = weight
 
+    @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
         prov_items = list()
         for synapse_info in self._synapse_information:
@@ -101,3 +105,8 @@ class ProjectionMachineEdge(
 
     def __repr__(self):
         return "{}:{}".format(self.pre_vertex, self.post_vertex)
+
+    @property
+    @overrides(MachineEdge.model_name)
+    def model_name(self):
+        return "ProjectionMachineEdge"
