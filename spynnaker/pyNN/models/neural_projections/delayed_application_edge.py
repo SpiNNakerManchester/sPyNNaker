@@ -17,7 +17,7 @@ class DelayedApplicationEdge(ApplicationEdge):
         self._synapse_information.append(synapse_information)
 
     @overrides(ApplicationEdge.create_machine_edge)
-    def create_machine_edge(self, pre_vertex, post_vertex, label=None):
+    def create_machine_edge(self, pre_vertex, post_vertex, label):
         return DelayedMachineEdge(
             self._synapse_information, pre_vertex, post_vertex, label)
 

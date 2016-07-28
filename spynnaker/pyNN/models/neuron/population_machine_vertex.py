@@ -35,7 +35,7 @@ class PopulationMachineVertex(
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = 4
 
     def __init__(
-            self, resources_required, label, is_recording, constraints=None):
+            self, resources_required, is_recording, label, constraints=None):
         MachineVertex.__init__(
             self, resources_required, label, constraints)
         ReceiveBuffersToHostBasicImpl.__init__(self)

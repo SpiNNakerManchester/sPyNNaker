@@ -26,7 +26,8 @@ class SpikeSourcePoissonMachineVertex(
                ('PROVENANCE_REGION', 4)])
 
     def __init__(
-            self, resources_required, label, is_recording, constraints=None):
+            self, resources_required, is_recording, constraints=None,
+            label=None):
         MachineVertex.__init__(
             self, resources_required, label, constraints=constraints)
         ReceiveBuffersToHostBasicImpl.__init__(self)

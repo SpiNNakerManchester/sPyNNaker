@@ -1,6 +1,6 @@
 # pacman imports
-from pacman.model.graph.machine.simple_machine_vertex \
-    import SimpleMachineVertex
+from pacman.model.decorators.overrides import overrides
+from pacman.model.graphs.machine.impl.machine_vertex import MachineVertex
 
 # front end common imports
 from spinn_front_end_common.interface.provenance\
@@ -14,7 +14,7 @@ from enum import Enum
 
 
 class DelayExtensionMachineVertex(
-        SimpleMachineVertex, ProvidesProvenanceDataFromMachineImpl):
+        MachineVertex, ProvidesProvenanceDataFromMachineImpl):
 
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
@@ -32,11 +32,13 @@ class DelayExtensionMachineVertex(
                ("N_DELAYS", 5)])
 
     def __init__(self, resources_required, label, constraints=None):
-        SimpleMachineVertex.__init__(
+        MachineVertex.__init__(
             self, resources_required, label, constraints=constraints)
         ProvidesProvenanceDataFromMachineImpl.__init__(
             self, self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value, 6)
 
+    @overrides(ProvidesProvenanceDataFromMachineImpl.
+               get_provenance_data_from_machine)
     def get_provenance_data_from_machine(self, transceiver, placement):
         provenance_data = self._read_provenance_data(transceiver, placement)
         provenance_items = self._read_basic_provenance_items(
@@ -98,3 +100,8 @@ class DelayExtensionMachineVertex(
             self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
             n_delays))
         return provenance_items
+
+
+    @property
+    def model_name(self):
+        return "DelayExtensionMachineVertex"

@@ -159,8 +159,8 @@ class SpikeSourcePoisson(
             constraints=None):
         SpikeSourcePoisson._n_poisson_vertices += 1
         vertex = SpikeSourcePoissonMachineVertex(
-            resources_required, label, self._spike_recorder.record,
-            constraints)
+            resources_required, self._spike_recorder.record,
+            label, constraints)
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
@@ -459,9 +459,9 @@ class SpikeSourcePoisson(
     def get_cpu_usage_for_atoms(self):
         return 0
 
-    @overrides(DataSpecableVertex.generate_data_specification)
     @requires_injection([
         "MemoryIptags", "MemoryRoutingInfo", "MemoryGraphMapper"])
+    @overrides(DataSpecableVertex.generate_data_specification)
     def generate_data_specification(self, spec, placement):
         vertex = placement.vertex
         vertex_slice = self._graph_mapper.get_slice(vertex)

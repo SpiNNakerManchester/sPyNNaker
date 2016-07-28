@@ -53,6 +53,6 @@ class ProjectionApplicationEdge(ApplicationEdge):
 
     @overrides(ApplicationEdge.create_machine_edge)
     def create_machine_edge(
-            self, pre_vertex, post_vertex, label=None):
+            self, pre_vertex, post_vertex, label):
         return ProjectionMachineEdge(
             self._synapse_information, pre_vertex, post_vertex, label)

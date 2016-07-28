@@ -199,7 +199,7 @@ class AbstractPopulationVertex(
             self._spike_recorder.record
         )
         vertex = PopulationMachineVertex(
-            resources_required, label, is_recording, constraints)
+            resources_required, is_recording, label, constraints)
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._no_machine_time_steps)
@@ -437,10 +437,10 @@ class AbstractPopulationVertex(
             spec, vertex_slice,
             self._threshold_type.get_threshold_parameters())
 
-    @overrides(DataSpecableVertex.generate_data_specification)
     @requires_injection([
         "MemoryIptags", "MemoryMachineGraph", "MemoryApplicationGraph",
         "MemoryRoutingInfo", "MemoryGraphMapper"])
+    @overrides(DataSpecableVertex.generate_data_specification)
     def generate_data_specification(self, spec, placement):
         vertex = placement.vertex
 
@@ -590,7 +590,6 @@ class AbstractPopulationVertex(
         return self._synapse_manager.synapse_type
 
     @property
-    @overrides(AbstractPopulationSettable.set_value)
     def input_type(self):
         return self._input_type
 
@@ -606,6 +605,7 @@ class AbstractPopulationVertex(
         raise Exception("Population {} does not have parameter {}".format(
             self.vertex, key))
 
+    @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
         """ Set a property of the overall model
         """
