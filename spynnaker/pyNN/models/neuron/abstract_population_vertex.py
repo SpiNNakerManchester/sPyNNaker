@@ -657,7 +657,7 @@ class AbstractPopulationVertex(
             routing_infos, synapse_info, machine_graph):
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_info, machine_graph)
+            routing_infos, synapse_info)
 
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)

@@ -10,9 +10,9 @@ from pyNN.random import RandomDistribution
 from spinn_front_end_common.utilities import helpful_functions
 
 from data_specification.enums.data_type import DataType
-from pacman.model.graph.abstract_classes.abstract_application_vertex \
+from pacman.model.graphs.application.abstract_application_vertex\
     import AbstractApplicationVertex
-from pacman.model.graph.slice import Slice
+from pacman.model.graphs.common.slice import Slice
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
@@ -268,7 +268,7 @@ class SynapticManager(object):
             memory_size += delayed_size
         return memory_size
 
-    def _get_synapse_dynamics_parameter_size(self, vertex_slice, in_edges):
+    def _get_synapse_dynamics_parameter_size(self, vertex_slice):
         """ Get the size of the synapse dynamics region
         """
         return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
@@ -277,24 +277,25 @@ class SynapticManager(object):
     def get_sdram_usage_in_bytes(self, vertex_slice, in_edges):
         return (
             self._get_synapse_params_size(vertex_slice) +
-            self._get_synapse_dynamics_parameter_size(vertex_slice, in_edges) +
+            self._get_synapse_dynamics_parameter_size(vertex_slice) +
             self._get_estimate_synaptic_blocks_size(vertex_slice, in_edges) +
             self._population_table_type.get_master_population_table_size(
                 vertex_slice, in_edges))
 
     def _reserve_memory_regions(
-            self, spec, vertex, vertex, vertex_slice, graph, machine_graph,
-            all_syn_block_sz, graph_mapper):
+            self, spec, application_vertex, machine_vertex, vertex_slice,
+            application_graph, machine_graph, all_syn_block_sz, graph_mapper):
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=self._get_synapse_params_size(vertex_slice),
             label='SynapseParams')
 
-        in_edges = graph.get_edges_ending_at_vertex(vertex)
+        in_edges = \
+            application_graph.get_edges_ending_at_vertex(application_vertex)
         master_pop_table_sz = \
             self._population_table_type.get_exact_master_population_table_size(
-                vertex, machine_graph, graph_mapper)
+                machine_vertex, machine_graph, graph_mapper)
         if master_pop_table_sz > 0:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.POPULATION_TABLE
@@ -727,12 +728,12 @@ class SynapticManager(object):
         spec.write_value(next_block_start_address)
 
     def write_data_spec(
-            self, spec, vertex, post_vertex_slice, vertex, placement,
-            machine_graph, graph, routing_info, graph_mapper, input_type):
+            self, spec, application_vertex, post_vertex_slice, machine_vertex,
+            placement, machine_graph, graph, routing_info, graph_mapper,
+            input_type):
 
         # Create an index of delay keys into this vertex
-        for edge in machine_graph.get_edges_ending_at_vertex(
-                vertex):
+        for edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = graph_mapper.get_application_edge(edge)
             if isinstance(app_edge.pre_vertex, DelayExtensionVertex):
                 pre_vertex_slice = graph_mapper.get_slice(edge.pre_vertex)
@@ -742,25 +743,26 @@ class SynapticManager(object):
                      pre_vertex_slice.hi_atom)] = \
                     routing_info.get_routing_info_for_edge(edge)
 
-        post_slices = graph_mapper.get_slices(vertex)
-        post_slice_index = graph_mapper.get_machine_vertex_index(vertex)
+        post_slices = graph_mapper.get_slices(application_vertex)
+        post_slice_index = \
+            graph_mapper.get_machine_vertex_index(application_vertex)
 
         # Reserve the memory
-        in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
+        in_edges = machine_graph.get_edges_ending_at_vertex(machine_vertex)
         all_syn_block_sz = self._get_exact_synaptic_blocks_size(
             post_slices, post_slice_index, post_vertex_slice, graph_mapper,
             in_edges)
         self._reserve_memory_regions(
-            spec, vertex, vertex, post_vertex_slice, graph,
+            spec, application_vertex, machine_vertex, post_vertex_slice, graph,
             machine_graph, all_syn_block_sz, graph_mapper)
 
         weight_scales = self._write_synapse_parameters(
-            spec, vertex, machine_graph, graph_mapper, post_slices,
+            spec, machine_vertex, machine_graph, graph_mapper, post_slices,
             post_slice_index, post_vertex_slice, input_type)
 
         self._write_synaptic_matrix_and_master_population_table(
-            spec, post_slices, post_slice_index, vertex, post_vertex_slice,
-            all_syn_block_sz, weight_scales,
+            spec, post_slices, post_slice_index, machine_vertex,
+            post_vertex_slice, all_syn_block_sz, weight_scales,
             constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             routing_info, graph_mapper, machine_graph)
@@ -773,7 +775,7 @@ class SynapticManager(object):
 
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_info, machine_graph):
+            routing_infos, synapse_info):
 
         edge = graph_mapper.get_application_edge(
             edge)
