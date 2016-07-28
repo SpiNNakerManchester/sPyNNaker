@@ -1,32 +1,31 @@
-from data_specification.data_specification_generator import \
-    DataSpecificationGenerator
-from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
-    import DelayExtensionMachineVertex
-
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_partition_constraints import \
-    AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utilities import constants as common_constants
-from spinn_front_end_common.abstract_models\
-    .abstract_provides_n_keys_for_partition \
-    import AbstractProvidesNKeysForPartition
-from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
-    import AbstractDataSpecableVertex
-
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
-    import PartitionerSameSizeAsVertexConstraint
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
-    import KeyAllocatorContiguousRangeContraint
-from pacman.model.graph.application.abstract_application_vertex \
-    import AbstractApplicationVertex
-
 import logging
 import math
 import random
+
+from spinn_front_end_common.utilities import constants as common_constants
+
+from data_specification.data_specification_generator import \
+    DataSpecificationGenerator
+from pacman.model.constraints.key_allocator_constraints\
+    .key_allocator_contiguous_range_constraint \
+    import KeyAllocatorContiguousRangeContraint
+from pacman.model.constraints.partitioner_constraints.\
+    partitioner_same_size_as_vertex_constraint \
+    import PartitionerSameSizeAsVertexConstraint
+from pacman.model.graph.abstract_classes.abstract_application_vertex \
+    import AbstractApplicationVertex
+from spinn_front_end_common.abstract_models.abstract_data_specable_vertex \
+    import AbstractDataSpecableVertex
+from spinn_front_end_common.abstract_models\
+    .abstract_provides_n_keys_for_partition \
+    import AbstractProvidesNKeysForPartition
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
+from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
+from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
+    import DelayExtensionMachineVertex
+from spynnaker.pyNN.utilities import constants
 
 logger = logging.getLogger(__name__)
 

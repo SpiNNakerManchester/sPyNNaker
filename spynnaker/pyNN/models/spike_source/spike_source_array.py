@@ -1,4 +1,5 @@
 # spynnaker imports
+from pacman.executor.injection_decorator import inject
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
@@ -9,9 +10,6 @@ from spynnaker.pyNN.models.common.eieio_spike_recorder \
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.utilities.conf import config
-from spinn_front_end_common.abstract_models\
-    .abstract_has_first_machine_time_step \
-    import AbstractHasFirstMachineTimeStep
 
 
 # spinn front end common imports
@@ -37,8 +35,7 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractChangableAfterRun,
-        AbstractHasFirstMachineTimeStep):
+        SimplePopulationSettable, AbstractChangableAfterRun):
     """ Model for play back of spikes
     """
 
@@ -89,7 +86,6 @@ class SpikeSourceArray(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
-        AbstractHasFirstMachineTimeStep.__init__(self)
 
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
@@ -184,6 +180,3 @@ class SpikeSourceArray(
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
         SpikeSourceArray._model_based_max_atoms_per_core = new_value
-
-    def set_first_machine_time_step(self, first_machine_time_step):
-        self.first_machine_time_step = first_machine_time_step

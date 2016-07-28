@@ -1,42 +1,40 @@
-from spynnaker.pyNN.utilities import constants
-from pacman.model.graph.application.abstract_application_vertex \
-    import AbstractApplicationVertex
+import logging
+import math
+import random
+import scipy.stats
+
+import numpy
+from enum import Enum
+from spinn_front_end_common.utilities import constants as\
+    front_end_common_constants
+
+from data_specification.data_specification_generator\
+    import DataSpecificationGenerator
+from data_specification.enums.data_type import DataType
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
-
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
-    import PopulationSettableChangeRequiresMapping
-from spynnaker.pyNN.models.common.multi_spike_recorder \
-    import MultiSpikeRecorder
-from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.common import recording_utils
-from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
-    import SpikeSourcePoissonMachineVertex
-from spynnaker.pyNN.utilities import utility_calls
-
+from pacman.model.graph.abstract_classes.abstract_application_vertex \
+    import AbstractApplicationVertex
 from spinn_front_end_common.abstract_models.abstract_data_specable_vertex\
     import AbstractDataSpecableVertex
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utilities import constants as\
-    front_end_common_constants
 from spinn_front_end_common.interface.buffer_management.buffer_models\
     .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
-
-from data_specification.data_specification_generator\
-    import DataSpecificationGenerator
-from data_specification.enums.data_type import DataType
-
-from enum import Enum
-import math
-import numpy
-import logging
-import random
-import scipy.stats
+from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.models.common.abstract_spike_recordable \
+    import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common.multi_spike_recorder \
+    import MultiSpikeRecorder
+from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
+    import PopulationSettableChangeRequiresMapping
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
+    import SpikeSourcePoissonMachineVertex
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.conf import config
 
 logger = logging.getLogger(__name__)
 

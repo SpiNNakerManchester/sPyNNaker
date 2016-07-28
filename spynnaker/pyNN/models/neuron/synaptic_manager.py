@@ -1,38 +1,36 @@
-from spynnaker.pyNN.utilities import conf
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities import utility_calls
+import math
+import scipy.stats
+import struct
+import sys
+from collections import defaultdict
+from scipy import special
+
+import numpy
+from pyNN.random import RandomDistribution
+from spinn_front_end_common.utilities import helpful_functions
+
+from data_specification.enums.data_type import DataType
+from pacman.model.graph.abstract_classes.abstract_application_vertex \
+    import AbstractApplicationVertex
+from pacman.model.graph.slice import Slice
 from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.neuron import master_pop_table_generators
-from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
+from spynnaker.pyNN.models.neural_projections.projection_application_edge \
+    import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neuron import master_pop_table_generators
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
+    import SynapseDynamicsStatic
+from spynnaker.pyNN.models.neuron.synapse_io.synapse_io_row_based \
+    import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source.spike_source_poisson \
     import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-from spynnaker.pyNN.models.neuron.synapse_io.synapse_io_row_based \
-    import SynapseIORowBased
-from spynnaker.pyNN.models.neural_projections.projection_application_edge \
-    import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
-    import SynapseDynamicsStatic
-
-from pacman.model.graph.application.abstract_application_vertex \
-    import AbstractApplicationVertex
-from pacman.model.graph.slice import Slice
-
-from data_specification.enums.data_type import DataType
-
-from spinn_front_end_common.utilities import helpful_functions
-
-from scipy import special
-import scipy.stats
-from collections import defaultdict
-from pyNN.random import RandomDistribution
-import math
-import sys
-import numpy
-import struct
+from spynnaker.pyNN.utilities import conf
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.running_stats import RunningStats
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28

@@ -1,10 +1,10 @@
 
 # pacman imports
-from pacman.model.graph.application.abstract_application_vertex \
-    import AbstractApplicationVertex
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
+from pacman.model.graph.abstract_classes.abstract_application_vertex \
+    import AbstractApplicationVertex
 
 # front end common imports
 from spinn_front_end_common.abstract_models.\
@@ -153,6 +153,7 @@ class AbstractPopulationVertex(
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
+
 
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
@@ -631,19 +632,17 @@ class AbstractPopulationVertex(
     def is_data_specable(self):
         return True
 
-    def get_incoming_partition_constraints(self, partition, graph_mapper):
+    def get_incoming_partition_constraints(self, partition):
         """ Gets the constraints for partitions going into this vertex
 
         :param partition: partition that goes into this vertex
-        :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
         return self._synapse_manager.get_incoming_partition_constraints()
 
-    def get_outgoing_partition_constraints(self, partition, graph_mapper):
+    def get_outgoing_partition_constraints(self, partition):
         """ Gets the constraints for partitions going out of this vertex
         :param partition: the partition that leaves this vertex
-        :param graph_mapper: the graph mapper object
         :return: list of constraints
         """
         return [KeyAllocatorContiguousRangeContraint()]
