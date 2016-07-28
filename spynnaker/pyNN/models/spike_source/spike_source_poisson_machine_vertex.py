@@ -1,5 +1,6 @@
-from pacman.model.graph.machine.simple_machine_vertex \
-    import SimpleMachineVertex
+from pacman.model.decorators.overrides import overrides
+from pacman.model.graphs.machine.impl.machine_vertex \
+    import MachineVertex
 from spinn_front_end_common.interface.buffer_management\
     .buffer_models.receives_buffers_to_host_basic_impl \
     import ReceiveBuffersToHostBasicImpl
@@ -13,7 +14,7 @@ from enum import Enum
 
 
 class SpikeSourcePoissonMachineVertex(
-        SimpleMachineVertex, ReceiveBuffersToHostBasicImpl,
+        MachineVertex, ReceiveBuffersToHostBasicImpl,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable):
 
     _POISSON_SPIKE_SOURCE_REGIONS = Enum(
@@ -26,7 +27,7 @@ class SpikeSourcePoissonMachineVertex(
 
     def __init__(
             self, resources_required, label, is_recording, constraints=None):
-        SimpleMachineVertex.__init__(
+        MachineVertex.__init__(
             self, resources_required, label, constraints=constraints)
         ReceiveBuffersToHostBasicImpl.__init__(self)
         ProvidesProvenanceDataFromMachineImpl.__init__(
@@ -35,5 +36,10 @@ class SpikeSourcePoissonMachineVertex(
         AbstractRecordable.__init__(self)
         self._is_recording = is_recording
 
+    @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
         return self._is_recording
+
+    @property
+    def model_name(self):
+        return "SpikeSourcePoissonMachineVertex"

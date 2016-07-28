@@ -1,7 +1,7 @@
 
 # pacman imports
-from pacman.model.graph.application.simple_application_edge\
-    import SimpleApplicationEdge
+from pacman.model.graphs.application.impl.application_edge import \
+    ApplicationEdge
 
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
@@ -216,9 +216,10 @@ class Spinnaker(SpinnakerMainInterface):
         if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
             if self._multi_cast_vertex is None:
                 self._multi_cast_vertex = CommandSender(
-                    self._machine_time_step, self._time_scale_factor)
+                    self._machine_time_step, self._time_scale_factor, None,
+                    "auto_added_command_sender")
                 self.add_application_vertex(self._multi_cast_vertex)
-            edge = SimpleApplicationEdge(
+            edge = ApplicationEdge(
                 self._multi_cast_vertex, vertex_to_add)
             self._multi_cast_vertex.add_commands(vertex_to_add.commands, edge)
             self.add_application_edge(edge, "COMMANDS")
@@ -228,7 +229,7 @@ class Spinnaker(SpinnakerMainInterface):
                       AbstractVertexWithEdgeToDependentVertices):
             for dependant_vertex in vertex_to_add.dependent_vertices:
                 self.add_application_vertex(dependant_vertex)
-                dependant_edge = SimpleApplicationEdge(
+                dependant_edge = ApplicationEdge(
                     pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
                 self.add_application_edge(
                     dependant_edge,
