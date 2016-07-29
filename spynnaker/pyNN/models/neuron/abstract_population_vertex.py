@@ -74,8 +74,8 @@ _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 
-@add_metaclass(ABCMeta)
 @supports_injection
+@add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
         ApplicationVertex, DataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
@@ -87,7 +87,6 @@ class AbstractPopulationVertex(
     """
 
     BASIC_MALLOC_USAGE = 2
-
     def __init__(
             self, n_neurons, binary, label, max_atoms_per_core,
             machine_time_step, timescale_factor, spikes_per_second,
