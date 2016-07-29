@@ -225,6 +225,10 @@ class SpikeSourcePoisson(
         SpikeSourcePoisson._model_based_max_atoms_per_core = new_value
 
     @staticmethod
+    def get_max_atoms_per_core():
+        return SpikeSourcePoisson._model_based_max_atoms_per_core
+
+    @staticmethod
     def get_params_bytes(vertex_slice):
         """ Gets the size of the poisson parameters in bytes
         :param vertex_slice:

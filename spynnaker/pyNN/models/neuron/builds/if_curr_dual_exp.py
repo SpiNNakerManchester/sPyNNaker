@@ -62,3 +62,7 @@ class IFCurrDualExp(AbstractPopulationVertex):
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
         IFCurrDualExp._model_based_max_atoms_per_core = new_value
+
+    @staticmethod
+    def get_max_atoms_per_core():
+        return IFCurrDualExp._model_based_max_atoms_per_core

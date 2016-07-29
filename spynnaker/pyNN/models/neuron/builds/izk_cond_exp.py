@@ -58,3 +58,7 @@ class IzkCondExp(AbstractPopulationVertex):
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
         IzkCondExp._model_based_max_atoms_per_core = new_value
+
+    @staticmethod
+    def get_max_atoms_per_core():
+        return IzkCondExp._model_based_max_atoms_per_core

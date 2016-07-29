@@ -62,3 +62,7 @@ class IFCondExp(AbstractPopulationVertex):
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
         IFCondExp._model_based_max_atoms_per_core = new_value
+
+    @staticmethod
+    def get_max_atoms_per_core():
+        return IFCondExp._model_based_max_atoms_per_core
