@@ -14,9 +14,9 @@ class DelayAfferentMachineEdge(
         MachineEdge, AbstractFilterableEdge,
         AbstractWeightUpdatable):
 
-    def __init__(self, pre_vertex, post_vertex, weight=1):
+    def __init__(self, pre_vertex, post_vertex, label, weight=1):
         MachineEdge.__init__(
-            self, pre_vertex, post_vertex, traffic_weight=weight)
+            self, pre_vertex, post_vertex, label=label, traffic_weight=weight)
         AbstractFilterableEdge.__init__(self)
         AbstractWeightUpdatable.__init__(self)
 
