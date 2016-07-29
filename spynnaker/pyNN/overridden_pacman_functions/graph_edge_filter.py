@@ -1,9 +1,8 @@
 # pacman imports
-from pacman.model.graph.application.simple_application_edge \
-    import SimpleApplicationEdge
-from pacman.model.graph.machine.machine_graph import MachineGraph
-from pacman.model.graph.graph_mapper \
-    import GraphMapper
+from pacman.model.graphs.application.impl.application_edge \
+    import ApplicationEdge
+from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
+from pacman.model.graphs.common.graph_mapper import GraphMapper
 from spinn_machine.utilities.progress_bar import ProgressBar
 
 # spynnaker imports
@@ -26,8 +25,7 @@ class GraphEdgeFilter(object):
         :return: a new graph mapper and machine graph
         """
         new_machine_graph = MachineGraph(label=machine_graph.label)
-        new_graph_mapper = GraphMapper(graph_mapper.first_graph_label,
-                                       machine_graph.label)
+        new_graph_mapper = GraphMapper()
 
         # create progress bar
         progress_bar = ProgressBar(
@@ -40,8 +38,8 @@ class GraphEdgeFilter(object):
             associated_vertex = graph_mapper.get_application_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
             new_graph_mapper.add_vertex_mapping(
-                vertex=vertex, vertex_slice=vertex_slice,
-                vertex=associated_vertex)
+                machine_vertex=vertex, vertex_slice=vertex_slice,
+                application_vertex=associated_vertex)
             progress_bar.update()
 
         # start checking edges to decide which ones need pruning....
@@ -72,7 +70,7 @@ class GraphEdgeFilter(object):
         app_edge = graph_mapper.get_application_edge(edge)
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
-        elif isinstance(app_edge, SimpleApplicationEdge):
+        elif isinstance(app_edge, ApplicationEdge):
             return False
         else:
             raise exceptions.FilterableException(

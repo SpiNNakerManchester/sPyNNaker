@@ -4,7 +4,7 @@
         <python_class>GraphEdgeFilter</python_class>
         <input_definitions>
             <parameter>
-                <param_name>subgraph</param_name>
+                <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
@@ -13,7 +13,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>subgraph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>graph_mapper</param_name>
         </required_inputs>
         <outputs>
@@ -26,7 +26,7 @@
         <python_class>GraphEdgeWeightUpdater</python_class>
         <input_definitions>
             <parameter>
-                <param_name>subgraph</param_name>
+                <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
@@ -35,7 +35,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>subgraph</param_name>
+            <param_name>machine_graph</param_name>
             <param_name>graph_mapper</param_name>
         </required_inputs>
         <outputs>
