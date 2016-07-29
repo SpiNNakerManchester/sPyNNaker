@@ -55,24 +55,13 @@
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
             <parameter>
-                <param_name>tags</param_name>
-                <param_type>MemoryTags</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
+                <param_name>graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>partitionable_graph</param_name>
                 <param_type>MemoryApplicationGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>hostname</param_name>
@@ -93,17 +82,16 @@
         </input_definitions>
         <required_inputs>
             <param_name>placements</param_name>
-            <param_name>graph_mapper</param_name>
-            <param_name>tags</param_name>
             <param_name>executable_finder</param_name>
-            <param_name>partitioned_graph</param_name>
-            <param_name>partitionable_graph</param_name>
-            <param_name>routing_infos</param_name>
+            <param_name>graph</param_name>
             <param_name>hostname</param_name>
             <param_name>report_default_directory</param_name>
             <param_name>write_text_specs</param_name>
             <param_name>app_data_runtime_folder</param_name>
         </required_inputs>
+        <optional_inputs>
+            <param_name>graph_mapper</param_name>
+        </optional_inputs>
         <outputs>
             <param_type>ExecutableTargets</param_type>
             <param_type>DataSpecificationTargets</param_type>

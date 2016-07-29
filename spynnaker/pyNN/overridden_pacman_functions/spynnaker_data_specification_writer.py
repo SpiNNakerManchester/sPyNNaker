@@ -1,8 +1,8 @@
 from spinn_machine.utilities.progress_bar import ProgressBar
 
 from spinn_front_end_common.interface.interface_functions.\
-    front_end_common_application_graph_data_specification_writer \
-    import FrontEndCommonApplicationGraphDataSpecificationWriter
+    front_end_common_graph_data_specification_writer import \
+    FrontEndCommonGraphDataSpecificationWriter
 from spinn_front_end_common.utilities.utility_objs.executable_targets \
     import ExecutableTargets
 
@@ -11,15 +11,14 @@ from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
 
 
 class SpynnakerDataSpecificationWriter(
-        FrontEndCommonApplicationGraphDataSpecificationWriter):
+        FrontEndCommonGraphDataSpecificationWriter):
     """ Executes data specification generation for sPyNNaker
     """
 
     def __call__(
-            self, placements, graph_mapper, tags, executable_finder,
-            machine_graph, application_graph, routing_infos, hostname,
+            self, placements, graph, hostname, executable_finder,
             report_default_directory, write_text_specs,
-            app_data_runtime_folder):
+            app_data_runtime_folder, graph_mapper=None):
 
         # Keep the results
         executable_targets = ExecutableTargets()
@@ -41,18 +40,16 @@ class SpynnakerDataSpecificationWriter(
             else:
                 self._generate_data_spec_for_vertices(
                     placement, associated_vertex, executable_targets,
-                    dsg_targets, graph_mapper, tags, executable_finder,
-                    machine_graph, application_graph, routing_infos,
-                    hostname, report_default_directory, write_text_specs,
+                    dsg_targets, executable_finder, hostname,
+                    report_default_directory, write_text_specs,
                     app_data_runtime_folder)
                 progress_bar.update()
 
         for placement, associated_vertex in delay_extension_placements:
             self._generate_data_spec_for_vertices(
                 placement, associated_vertex, executable_targets,
-                dsg_targets, graph_mapper, tags, executable_finder,
-                machine_graph, application_graph, routing_infos,
-                hostname, report_default_directory, write_text_specs,
+                dsg_targets, executable_finder, hostname,
+                report_default_directory, write_text_specs,
                 app_data_runtime_folder)
             progress_bar.update()
 
