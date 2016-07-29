@@ -62,8 +62,7 @@ class GraphEdgeFilter(object):
         progress_bar.end()
 
         # returned the pruned graph and graph_mapper
-        return {'new_machine_graph': new_machine_graph,
-                'new_graph_mapper': new_graph_mapper}
+        return new_machine_graph, new_graph_mapper
 
     @staticmethod
     def _is_filterable(edge, graph_mapper):

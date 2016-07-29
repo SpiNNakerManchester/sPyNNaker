@@ -56,5 +56,4 @@ class SpynnakerDataSpecificationWriter(
         # finish the progress bar
         progress_bar.end()
 
-        return {'executable_targets': executable_targets,
-                'dsg_targets': dsg_targets}
+        return executable_targets, dsg_targets
