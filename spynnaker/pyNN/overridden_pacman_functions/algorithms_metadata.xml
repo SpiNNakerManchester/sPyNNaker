@@ -2,7 +2,7 @@
     <algorithm name="GraphEdgeFilter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter</python_module>
         <python_class>GraphEdgeFilter</python_class>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>subgraph</param_name>
                 <param_type>MemoryPartitionedGraph</param_type>
@@ -11,24 +11,20 @@
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>subgraph</param_name>
+            <param_name>graph_mapper</param_name>
         </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>new_sub_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>new_graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-        </produces_outputs>
+        <outputs>
+            <param_type>MemoryPartitionedGraph</param_type>
+            <param_type>MemoryGraphMapper</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="GraphEdgeWeightUpdater">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater</python_module>
         <python_class>GraphEdgeWeightUpdater</python_class>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>subgraph</param_name>
                 <param_type>MemoryPartitionedGraph</param_type>
@@ -37,20 +33,19 @@
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>subgraph</param_name>
+            <param_name>graph_mapper</param_name>
         </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
-            </parameter>
-        </produces_outputs>
+        <outputs>
+            <param_type>MemoryPartitionedGraph</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="SpynnakerDataSpecificationWriter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_data_specification_writer</python_module>
         <python_class>SpynnakerDataSpecificationWriter</python_class>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
@@ -95,16 +90,23 @@
                 <param_name>app_data_runtime_folder</param_name>
                 <param_type>ApplicationDataFolder</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>placements</param_name>
+            <param_name>graph_mapper</param_name>
+            <param_name>tags</param_name>
+            <param_name>executable_finder</param_name>
+            <param_name>partitioned_graph</param_name>
+            <param_name>partitionable_graph</param_name>
+            <param_name>routing_infos</param_name>
+            <param_name>hostname</param_name>
+            <param_name>report_default_directory</param_name>
+            <param_name>write_text_specs</param_name>
+            <param_name>app_data_runtime_folder</param_name>
         </required_inputs>
-        <produces_outputs>
-            <parameter>
-                <param_name>executable_targets</param_name>
-                <param_type>ExecutableTargets</param_type>
-            </parameter>
-            <parameter>
-                <param_name>dsg_targets</param_name>
-                <param_type>DataSpecificationTargets</param_type>
-            </parameter>
-        </produces_outputs>
+        <outputs>
+            <param_type>ExecutableTargets</param_type>
+            <param_type>DataSpecificationTargets</param_type>
+        </outputs>
     </algorithm>
 </algorithms>
