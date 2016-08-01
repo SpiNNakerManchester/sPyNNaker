@@ -177,23 +177,25 @@ class SynapticManager(object):
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
 
         # Go through the edges and add up the memory
-        for edge in in_edges:
+        for machine_edge in in_edges:
 
-            edge = graph_mapper.get_application_edge(
-                edge)
-            if isinstance(edge, ProjectionApplicationEdge):
+            application_edge = graph_mapper.get_application_edge(
+                machine_edge)
+            if isinstance(application_edge, ProjectionApplicationEdge):
 
                 # Add on the size of the tables to be generated
                 pre_vertex_slice = graph_mapper.get_slice(
-                    edge.pre_vertex)
-                pre_slices = graph_mapper.get_slices(edge.pre_vertex)
+                    machine_edge.pre_vertex)
+                pre_slices = \
+                    graph_mapper.get_slices(application_edge.pre_vertex)
                 pre_slice_index = graph_mapper.get_machine_vertex_index(
-                    edge.pre_vertex)
+                    machine_edge.pre_vertex)
 
                 memory_size += self._get_size_of_synapse_information(
-                    edge.synapse_information, pre_slices, pre_slice_index,
-                    post_slices, post_slice_index, pre_vertex_slice,
-                    post_vertex_slice, edge.n_delay_stages)
+                    application_edge.synapse_information, pre_slices,
+                    pre_slice_index, post_slices, post_slice_index,
+                    pre_vertex_slice, post_vertex_slice,
+                    application_edge.n_delay_stages)
 
         return memory_size
 
@@ -307,8 +309,8 @@ class SynapticManager(object):
                                                          .value,
                 size=all_syn_block_sz, label='SynBlocks')
 
-        synapse_dynamics_sz = self._get_synapse_dynamics_parameter_size(
-            vertex_slice, in_edges)
+        synapse_dynamics_sz = \
+            self._get_synapse_dynamics_parameter_size(vertex_slice)
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS
@@ -745,7 +747,7 @@ class SynapticManager(object):
 
         post_slices = graph_mapper.get_slices(application_vertex)
         post_slice_index = \
-            graph_mapper.get_machine_vertex_index(application_vertex)
+            graph_mapper.get_machine_vertex_index(machine_vertex)
 
         # Reserve the memory
         in_edges = machine_graph.get_edges_ending_at_vertex(machine_vertex)

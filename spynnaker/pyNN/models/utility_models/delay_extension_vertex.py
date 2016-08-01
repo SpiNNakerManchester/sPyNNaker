@@ -71,7 +71,7 @@ class DelayExtensionVertex(
 
         # simulation params
         self._machine_time_step = machine_time_step
-        self._timescale_factor = timescale_factor
+        self._time_scale_factor = timescale_factor
 
         # storage params
         self._graph_mapper = None
@@ -140,7 +140,7 @@ class DelayExtensionVertex(
             for (source_id, stage) in zip(source_ids, stages)]
 
     @requires_injection([
-        "MemoryMachineGraph", "MemoryRoutingInfo", "MemoryGraphMapper"])
+        "MemoryMachineGraph", "MemoryRoutingInfos", "MemoryGraphMapper"])
     @overrides(DataSpecableVertex.generate_data_specification)
     def generate_data_specification(self, spec, placement):
 
@@ -245,7 +245,7 @@ class DelayExtensionVertex(
         # Write the time between spikes
         spikes_per_timestep = self._n_delay_stages * vertex_slice.n_atoms
         time_between_spikes = (
-            (self._machine_time_step * self._timescale_factor) /
+            (self._machine_time_step * self._time_scale_factor) /
             (spikes_per_timestep * 2.0))
         spec.write_value(data=int(time_between_spikes))
 
@@ -293,7 +293,7 @@ class DelayExtensionVertex(
     def set_machine_graph(self, machine_graph):
         self._machine_graph = machine_graph
 
-    @inject("MemoryRoutingInfo")
+    @inject("MemoryRoutingInfos")
     def set_routing_info(self, routing_info):
         self._routing_info = routing_info
 

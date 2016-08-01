@@ -464,7 +464,7 @@ class SpikeSourcePoisson(
         return 0
 
     @requires_injection([
-        "MemoryIptags", "MemoryRoutingInfo", "MemoryGraphMapper"])
+        "MemoryIpTags", "MemoryRoutingInfos", "MemoryGraphMapper"])
     @overrides(DataSpecableVertex.generate_data_specification)
     def generate_data_specification(self, spec, placement):
         vertex = placement.vertex
@@ -531,10 +531,10 @@ class SpikeSourcePoisson(
     def set_graph_mapper(self, graph_mapper):
         self._graph_mapper = graph_mapper
 
-    @inject("MemoryIptags")
+    @inject("MemoryIpTags")
     def set_iptags(self, iptags):
         self._iptags = iptags
 
-    @inject("MemoryRoutingInfo")
+    @inject("MemoryRoutingInfos")
     def set_routing_info(self, routing_info):
         self._routing_info = routing_info

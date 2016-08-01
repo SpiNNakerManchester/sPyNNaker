@@ -437,8 +437,8 @@ class AbstractPopulationVertex(
             self._threshold_type.get_threshold_parameters())
 
     @requires_injection([
-        "MemoryIptags", "MemoryMachineGraph", "MemoryApplicationGraph",
-        "MemoryRoutingInfo", "MemoryGraphMapper"])
+        "MemoryIpTags", "MemoryMachineGraph", "MemoryApplicationGraph",
+        "MemoryRoutingInfos", "MemoryGraphMapper"])
     @overrides(DataSpecableVertex.generate_data_specification)
     def generate_data_specification(self, spec, placement):
         vertex = placement.vertex
@@ -498,14 +498,14 @@ class AbstractPopulationVertex(
         # Write the regions
         self._write_setup_info(
             spec, spike_history_sz, v_history_sz, gsyn_history_sz,
-            self._ip_tags, buffer_size_before_receive,
+            self._iptags, buffer_size_before_receive,
             self._time_between_requests, vertex)
         self._write_neuron_parameters(spec, key, vertex_slice)
 
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, self._machine_graph,
-            self._graph, self._routing_info, self._graph_mapper,
+            self._application_graph, self._routing_info, self._graph_mapper,
             self._input_type)
 
         # End the writing of this specification:
@@ -689,13 +689,17 @@ class AbstractPopulationVertex(
     def set_graph_mapper(self, graph_mapper):
         self._graph_mapper = graph_mapper
 
-    @inject("MemoryRoutingInfo")
+    @inject("MemoryRoutingInfos")
     def set_routing_info(self, routing_info):
         self._routing_info = routing_info
 
-    @inject("MemoryIptags")
+    @inject("MemoryIpTags")
     def set_iptags(self, iptags):
         self._iptags = iptags
+
+    @inject("MemoryNoMachineTimeSteps")
+    def set_no_machine_time_steps(self, new_no_machine_time_steps):
+        self._no_machine_time_steps = new_no_machine_time_steps
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)
