@@ -23,13 +23,13 @@ from spinn_front_end_common.abstract_models.\
     AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utilities import constants as \
     common_constants
+
+from spinn_front_end_common.abstract_models.impl.\
+    uses_simulation_needs_total_runtime_data_specable_vertex import \
+    UsesSimulationNeedsTotalRuntimeDataSpecableVertex
 from spinn_front_end_common.interface.buffer_management\
     .buffer_models.receives_buffers_to_host_basic_impl \
     import ReceiveBuffersToHostBasicImpl
-from spinn_front_end_common.abstract_models.impl.data_specable_vertex import \
-    DataSpecableVertex
-from spinn_front_end_common.interface.simulation.impl.\
-    uses_simulation_impl import UsesSimulationImpl
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
 
@@ -77,12 +77,12 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 @supports_injection
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
-        ApplicationVertex, DataSpecableVertex,
+        ApplicationVertex, UsesSimulationNeedsTotalRuntimeDataSpecableVertex,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, UsesSimulationImpl):
+        AbstractChangableAfterRun):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -96,7 +96,8 @@ class AbstractPopulationVertex(
 
         ApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
-        DataSpecableVertex.__init__(self)
+        UsesSimulationNeedsTotalRuntimeDataSpecableVertex.__init__(
+            self, machine_time_step, timescale_factor)
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
         AbstractGSynRecordable.__init__(self)
@@ -108,10 +109,6 @@ class AbstractPopulationVertex(
 
         self._binary = binary
         self._n_atoms = n_neurons
-
-        # sim parameters
-        self._machine_time_step = machine_time_step
-        self._timescale_factor = timescale_factor
 
         # storage objects
         self._application_graph = None
@@ -376,8 +373,7 @@ class AbstractPopulationVertex(
 
         # Write the data needed by the simulation interface
         spec.switch_write_focus(constants.POPULATION_BASED_REGIONS.SYSTEM.value)
-        spec.write_array(self.data_for_simulation_data(
-            self._machine_time_step, self._timescale_factor))
+        spec.write_array(self.data_for_simulation_data())
 
         # Write the data needed for the buffered regions
         vertex.write_recording_data(
@@ -439,7 +435,8 @@ class AbstractPopulationVertex(
     @requires_injection([
         "MemoryIpTags", "MemoryMachineGraph", "MemoryApplicationGraph",
         "MemoryRoutingInfos", "MemoryGraphMapper"])
-    @overrides(DataSpecableVertex.generate_data_specification)
+    @overrides(UsesSimulationNeedsTotalRuntimeDataSpecableVertex.
+               generate_data_specification)
     def generate_data_specification(self, spec, placement):
         vertex = placement.vertex
 
@@ -511,7 +508,8 @@ class AbstractPopulationVertex(
         # End the writing of this specification:
         spec.end_specification()
 
-    @overrides(DataSpecableVertex.get_binary_file_name)
+    @overrides(UsesSimulationNeedsTotalRuntimeDataSpecableVertex.
+               get_binary_file_name)
     def get_binary_file_name(self):
 
         # Split binary name into title and extension
@@ -696,10 +694,6 @@ class AbstractPopulationVertex(
     @inject("MemoryIpTags")
     def set_iptags(self, iptags):
         self._iptags = iptags
-
-    @inject("MemoryNoMachineTimeSteps")
-    def set_no_machine_time_steps(self, new_no_machine_time_steps):
-        self._no_machine_time_steps = new_no_machine_time_steps
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

@@ -21,16 +21,14 @@ from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
 
-from spinn_front_end_common.abstract_models.impl.data_specable_vertex \
-    import DataSpecableVertex
 from spinn_front_end_common.abstract_models\
     .abstract_provides_n_keys_for_partition \
     import AbstractProvidesNKeysForPartition
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.interface.simulation.impl.\
-    uses_simulation_impl import UsesSimulationImpl
+from spinn_front_end_common.abstract_models.impl.uses_simulation_data_specable_vertex import \
+    UsesSimulationDataSpecableVertex
 
 from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
 from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
@@ -45,9 +43,9 @@ _DEFAULT_MALLOCS_USED = 2
 
 @supports_injection
 class DelayExtensionVertex(
-        ApplicationVertex, DataSpecableVertex,
+        ApplicationVertex, UsesSimulationDataSpecableVertex,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesNKeysForPartition, UsesSimulationImpl):
+        AbstractProvidesNKeysForPartition):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -61,17 +59,14 @@ class DelayExtensionVertex(
         Creates a new DelayExtension Object.
         """
         ApplicationVertex.__init__(self, label, constraints, 256)
-        DataSpecableVertex.__init__(self)
+        UsesSimulationDataSpecableVertex.__init__(
+            self, machine_time_step, timescale_factor)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractProvidesNKeysForPartition.__init__(self)
 
         self._source_vertex = source_vertex
         self._n_delay_stages = 0
         self._delay_per_stage = delay_per_stage
-
-        # simulation params
-        self._machine_time_step = machine_time_step
-        self._time_scale_factor = timescale_factor
 
         # storage params
         self._graph_mapper = None
@@ -141,7 +136,7 @@ class DelayExtensionVertex(
 
     @requires_injection([
         "MemoryMachineGraph", "MemoryRoutingInfos", "MemoryGraphMapper"])
-    @overrides(DataSpecableVertex.generate_data_specification)
+    @overrides(UsesSimulationDataSpecableVertex.generate_data_specification)
     def generate_data_specification(self, spec, placement):
 
         vertex = placement.vertex
@@ -207,8 +202,7 @@ class DelayExtensionVertex(
         spec.switch_write_focus(
             DelayExtensionMachineVertex.
                 _DELAY_EXTENSION_REGIONS.SYSTEM.value)
-        spec.write_array(self.data_for_simulation_data(
-            self._machine_time_step, self._time_scale_factor))
+        spec.write_array(self.data_for_simulation_data())
 
 
     def write_delay_parameters(
@@ -269,7 +263,7 @@ class DelayExtensionVertex(
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms
 
-    @overrides(DataSpecableVertex.get_binary_file_name)
+    @overrides(UsesSimulationDataSpecableVertex.get_binary_file_name)
     def get_binary_file_name(self):
         return "delay_extension.aplx"
 
