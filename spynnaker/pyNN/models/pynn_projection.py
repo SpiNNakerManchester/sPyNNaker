@@ -302,7 +302,7 @@ class Projection(object):
                 edge.post_vertex)
             connections = post_vertex.get_connections_from_machine(
                 transceiver, placement, edge, graph_mapper, routing_infos,
-                self._synapse_information, machine_graph)
+                self._synapse_information)
             if connections is not None:
                 connection_holder.add_connections(connections)
             progress.update()

@@ -287,8 +287,7 @@ class AbstractPopulationVertex(
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(3) +
             PopulationMachineVertex.get_provenance_data_size(
-                PopulationMachineVertex
-                .N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
+                PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice,
                 self._application_graph.get_edges_ending_at_vertex(self)) +
@@ -651,7 +650,7 @@ class AbstractPopulationVertex(
 
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_info, machine_graph):
+            routing_infos, synapse_info):
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info)

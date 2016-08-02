@@ -123,19 +123,17 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             8)
 
     def get_exact_master_population_table_size(
-            self, vertex, graph, graph_mapper):
+            self, vertex, machine_graph, graph_mapper):
         """
         :return: the size the master pop table will take in SDRAM (in bytes)
         """
-        in_edges = graph.get_edges_ending_at_vertex(
-            vertex)
+        in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
 
         n_vertices = len(in_edges)
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionMachineEdge):
-                edge = graph_mapper.\
-                    get_application_edge(in_edge)
+                edge = graph_mapper.get_application_edge(in_edge)
                 n_entries += len(edge.synapse_information)
 
         # Multiply by 2 to get an upper bound
