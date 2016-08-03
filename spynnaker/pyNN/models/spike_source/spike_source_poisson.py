@@ -56,7 +56,7 @@ RANDOM_SEED_WORDS = 4
 class SpikeSourcePoisson(
         ApplicationVertex, UsesSimulationNeedsTotalRuntimeDataSpecableVertex,
         AbstractSpikeRecordable, AbstractProvidesOutgoingPartitionConstraints,
-        PopulationSettableChangeRequiresMapping):
+        PopulationSettableChangeRequiresMapping, ReceiveBuffersToHostBasicImpl):
     """ A Poisson Spike source object
     """
 
@@ -91,6 +91,7 @@ class SpikeSourcePoisson(
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
+        ReceiveBuffersToHostBasicImpl.__init__(self)
 
         # atoms params
         self._n_atoms = n_neurons
@@ -138,12 +139,45 @@ class SpikeSourcePoisson(
         return int(math.ceil(max_spikes_per_ts))
 
     def get_resources_used_by_atoms(self, vertex_slice):
-        return ResourceContainer(
+
+        # veirfy if needing the buffered out functionality
+        self._check_for_activating_auto_pause_and_resume(vertex_slice, self)
+
+        # build resoruces as i currently know
+        container = ResourceContainer(
             sdram=SDRAMResource(
                 self.get_sdram_usage_for_atoms(vertex_slice)),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms()),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms()))
+
+        # extend resoruces with whatever the extra functionality requires
+        container.extend(self.get_extra_resources(
+            self._receive_buffer_host, self._receive_buffer_port))
+        return container
+
+    def _check_for_activating_auto_pause_and_resume(
+            self, vertex_slice, object_to_set):
+
+        # veirfy if needing the buffered out functionality
+        if not self._using_auto_pause_and_resume:
+            spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
+                self._n_machine_time_steps)
+            spike_buffering_needed = recording_utils.needs_buffering(
+                self._spike_buffer_max_size, spike_buffer_size,
+                self._enable_buffered_recording)
+            if spike_buffering_needed:
+                object_to_set.activate_buffering_output(
+                    buffering_ip_address=self._receive_buffer_host,
+                    buffering_port=self._receive_buffer_port)
+        else:
+            sdram_per_ts = self._spike_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice), 1)
+            object_to_set.activate_buffering_output(
+                minimum_sdram_for_buffering=self._minimum_buffer_sdram,
+                buffered_sdram_per_timestep=sdram_per_ts)
+
 
     @property
     def n_atoms(self):
@@ -157,24 +191,11 @@ class SpikeSourcePoisson(
         vertex = SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
             constraints, label)
-        if not self._using_auto_pause_and_resume:
-            spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
-                self._n_machine_time_steps)
-            spike_buffering_needed = recording_utils.needs_buffering(
-                self._spike_buffer_max_size, spike_buffer_size,
-                self._enable_buffered_recording)
-            if spike_buffering_needed:
-                vertex.activate_buffering_output(
-                    buffering_ip_address=self._receive_buffer_host,
-                    buffering_port=self._receive_buffer_port)
-        else:
-            sdram_per_ts = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice), 1)
-            vertex.activate_buffering_output(
-                minimum_sdram_for_buffering=self._minimum_buffer_sdram,
-                buffered_sdram_per_timestep=sdram_per_ts)
 
+        # set up auto pause and resume stuff
+        self._check_for_activating_auto_pause_and_resume(vertex_slice, vertex)
+
+        # return the machine vertex
         return vertex
 
     @property

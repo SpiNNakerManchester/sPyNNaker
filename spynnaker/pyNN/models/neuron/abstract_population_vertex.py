@@ -82,7 +82,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
+        AbstractChangableAfterRun, ReceiveBuffersToHostBasicImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -106,6 +106,7 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
+        ReceiveBuffersToHostBasicImpl.__init__(self)
 
         self._binary = binary
         self._n_atoms = n_neurons
@@ -169,12 +170,24 @@ class AbstractPopulationVertex(
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
-        return ResourceContainer(
+
+        # set resoruces reuqired from this object
+        container = ResourceContainer(
             sdram=SDRAMResource(
                 self.get_sdram_usage_for_atoms(vertex_slice)),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
+
+        # set up any reosurces config needed for the auto pasue and resume
+        self._check_for_auto_pause_and_resume_functionality(vertex_slice, self)
+
+        # add extra resources from the extra funcitonality.
+        container.extend(self.get_extra_resources(
+            self._receive_buffer_host, self._receive_buffer_port))
+
+        # return the total resources.
+        return container
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -185,17 +198,8 @@ class AbstractPopulationVertex(
     def mark_no_changes(self):
         self._change_requires_mapping = False
 
-    @overrides(ApplicationVertex.create_machine_vertex)
-    def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-
-        is_recording = (
-            self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
-            self._spike_recorder.record
-        )
-        vertex = PopulationMachineVertex(
-            resources_required, is_recording, label, constraints)
+    def _check_for_auto_pause_and_resume_functionality(
+            self, vertex_slice, object_to_set):
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._no_machine_time_steps)
@@ -214,7 +218,7 @@ class AbstractPopulationVertex(
                 self._enable_buffered_recording)
             if (spike_buffering_needed or v_buffering_needed or
                     gsyn_buffering_needed):
-                vertex.activate_buffering_output(
+                object_to_set.activate_buffering_output(
                     buffering_ip_address=self._receive_buffer_host,
                     buffering_port=self._receive_buffer_port)
         else:
@@ -225,9 +229,32 @@ class AbstractPopulationVertex(
                 vertex_slice.n_atoms, 1)
             sdram_per_ts += self._gsyn_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1)
-            vertex.activate_buffering_output(
+            object_to_set.activate_buffering_output(
                 minimum_sdram_for_buffering=self._minimum_buffer_sdram,
                 buffered_sdram_per_timestep=sdram_per_ts)
+
+    @overrides(ApplicationVertex.create_machine_vertex)
+    def create_machine_vertex(
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
+
+        is_recording = (
+            self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
+            self._spike_recorder.record
+        )
+
+        # handle any new resources from the interfaces
+        resources_required.extend(self.get_extra_resources(
+            self._receive_buffer_host, self._receive_buffer_port))
+
+        vertex = PopulationMachineVertex(
+            resources_required, is_recording, label, constraints)
+
+        # check for auto pause and resume setting
+        self._check_for_auto_pause_and_resume_functionality(
+            vertex_slice, vertex)
+
+        # return machine vertex
         return vertex
 
     @property
