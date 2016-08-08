@@ -67,13 +67,19 @@ class Spinnaker(SpinnakerMainInterface):
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
 
+        extra_algorithms_pre_run = list()
+        if config.getboolean("Reports", "ReportsEnabled"):
+            if config.getboolean("Reports", "writeSynapticReport"):
+                extra_algorithms_pre_run.append("SynapticMatrixReport")
+
         SpinnakerMainInterface.__init__(
             self, config, graph_label=graph_label,
             executable_finder=executable_finder,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             extra_mapping_inputs=extra_mapping_inputs,
-            n_chips_required=n_chips_required)
+            n_chips_required=n_chips_required,
+            extra_pre_run_algorithms=extra_algorithms_pre_run)
 
         # timing parameters
         self._min_supported_delay = None
