@@ -731,7 +731,6 @@ class SynapticManager(object):
         spec.set_write_pointer(0)
         spec.write_value(next_block_start_address)
 
-
     def write_data_spec(
             self, spec, vertex, post_vertex_slice, subvertex, placement,
             partitioned_graph, graph, routing_info, graph_mapper, input_type):
