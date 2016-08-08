@@ -97,4 +97,42 @@
             <param_type>DataSpecificationTargets</param_type>
         </outputs>
     </algorithm>
+    <algorithm name="SynapticMatrixReport">
+        <python_module>spynnaker.pyNN.utilities.reports</python_module>
+        <python_function>generate_synaptic_matrix_reports</python_function>
+        <required_inputs>
+            <parameter>
+                <param_name>common_report_directory</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>partitioned_graph</param_name>
+                <param_type>MemoryPartitionedGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>partitionable_graph</param_name>
+                <param_type>MemoryPartitionableGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>txrx</param_name>
+                <param_type>MemoryTransceiver</param_type>
+            </parameter>
+            <parameter>
+                <param_name>loaded_application_data_token</param_name>
+                <param_type>LoadedApplicationDataToken</param_type>
+            </parameter>
+        </required_inputs>
+    </algorithm>
 </algorithms>
