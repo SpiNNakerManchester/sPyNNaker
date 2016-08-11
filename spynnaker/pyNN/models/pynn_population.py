@@ -2,6 +2,10 @@ from pacman.model.constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from spinn_front_end_common.interface.simulation.abstract_uses_simulation import \
+    AbstractUsesSimulation
+from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source import \
+    ReverseIpTagMultiCastSource
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
@@ -66,8 +70,12 @@ class Population(object):
         # set spinnaker targeted parameters
         internal_cellparams['label'] = cell_label
         internal_cellparams['n_neurons'] = size
-        internal_cellparams['machine_time_step'] = spinnaker.machine_time_step
-        internal_cellparams['timescale_factor'] = spinnaker.timescale_factor
+
+        if issubclass(cellclass, AbstractUsesSimulation):
+            internal_cellparams['machine_time_step'] = \
+                spinnaker.machine_time_step
+            internal_cellparams['timescale_factor'] = \
+                spinnaker.timescale_factor
 
         # create population vertex.
         self._vertex = cellclass(**internal_cellparams)

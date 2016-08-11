@@ -22,7 +22,3 @@ class AbstractSendMeMulticastCommandsVertex(object):
     @property
     def commands(self):
         return self._commands
-
-    @abstractmethod
-    def recieves_multicast_commands(self):
-        pass
