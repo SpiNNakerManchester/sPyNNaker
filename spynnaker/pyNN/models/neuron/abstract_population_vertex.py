@@ -2,6 +2,8 @@
 # pacman imports
 from pacman.executor.injection_decorator import requires_injection, inject, \
     supports_injection
+from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
+    AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -82,7 +84,8 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, ReceiveBuffersToHostBasicImpl):
+        AbstractChangableAfterRun, ReceiveBuffersToHostBasicImpl,
+        AbstractHasGlobalMaxAtoms):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -107,6 +110,7 @@ class AbstractPopulationVertex(
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         ReceiveBuffersToHostBasicImpl.__init__(self)
+        AbstractHasGlobalMaxAtoms.__init__(self)
 
         self._binary = binary
         self._n_atoms = n_neurons

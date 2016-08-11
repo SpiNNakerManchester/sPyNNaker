@@ -6,6 +6,8 @@ from collections import defaultdict
 from scipy import special
 
 import numpy
+from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
+    AbstractHasGlobalMaxAtoms
 from pyNN.random import RandomDistribution
 from spinn_front_end_common.utilities import helpful_functions
 
@@ -225,7 +227,10 @@ class SynapticManager(object):
                 # this will not be correct if the SDRAM usage is high!
                 # TODO: Can be removed once we move to population-based keys
                 n_atoms_per_machine_vertex = sys.maxint
-                if isinstance(in_edge.pre_vertex, AbstractApplicationVertex):
+                if (isinstance(in_edge.pre_vertex, AbstractApplicationVertex)
+                    and isinstance(in_edge.pre_vertex,
+                                   AbstractHasGlobalMaxAtoms)):
+
                     n_atoms_per_machine_vertex = \
                         in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < n_atoms_per_machine_vertex:
