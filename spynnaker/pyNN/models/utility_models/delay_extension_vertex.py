@@ -156,7 +156,7 @@ class DelayExtensionVertex(
             region=(
                 DelayExtensionMachineVertex.
                 _DELAY_EXTENSION_REGIONS.SYSTEM.value),
-            size=common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4,
+            size=common_constants.SYSTEM_BYTES_REQUIREMENT,
             label='setup')
 
         spec.reserve_memory_region(
@@ -256,7 +256,7 @@ class DelayExtensionVertex(
             _DEFAULT_MALLOCS_USED *
             common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
         return (
-            size_of_mallocs +
+            size_of_mallocs + common_constants.SYSTEM_BYTES_REQUIREMENT +
             DelayExtensionMachineVertex.get_provenance_data_size(0))
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):

@@ -446,8 +446,7 @@ class SpikeSourcePoisson(
     def get_sdram_usage_for_atoms(self, vertex_slice):
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         total_size = \
-            ((front_end_common_constants.
-              DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+            (front_end_common_constants.SYSTEM_BYTES_REQUIREMENT +
              ReceiveBuffersToHostBasicImpl.get_recording_data_size(1) +
              ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(1) +
              SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
@@ -504,8 +503,7 @@ class SpikeSourcePoisson(
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
         # Basic setup plus 8 bytes for recording flags and recording size
-        setup_sz = ((front_end_common_constants.
-                     DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+        setup_sz = (front_end_common_constants.SYSTEM_BYTES_REQUIREMENT +
                     vertex.get_recording_data_size(1))
 
         poisson_params_sz = self.get_params_bytes(vertex_slice)

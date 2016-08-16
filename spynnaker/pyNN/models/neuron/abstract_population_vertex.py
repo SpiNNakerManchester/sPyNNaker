@@ -306,7 +306,7 @@ class AbstractPopulationVertex(
         if self._additional_input is not None:
             per_neuron_usage += \
                 self._additional_input.get_sdram_usage_per_neuron_in_bytes()
-        return ((common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+        return (common_constants.SYSTEM_BYTES_REQUIREMENT +
                 ReceiveBuffersToHostBasicImpl.get_recording_data_size(3) +
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._neuron_model.get_sdram_usage_in_bytes(
@@ -373,8 +373,8 @@ class AbstractPopulationVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=((
-                common_constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS * 4) +
+            size=(
+                common_constants.SYSTEM_BYTES_REQUIREMENT +
                 vertex.get_recording_data_size(3)), label='System')
 
         spec.reserve_memory_region(
