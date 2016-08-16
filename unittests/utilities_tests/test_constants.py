@@ -4,7 +4,6 @@ import spynnaker.pyNN.utilities.constants as constants
 
 class TestConstants(unittest.TestCase):
     def test_free_floating_constants(self):
-        self.assertEqual(constants.DATA_SPECABLE_BASIC_SETUP_INFO_N_WORDS, 3)
         self.assertEqual(constants.BLOCK_INDEX_HEADER_WORDS, 3)
         self.assertEqual(constants.BLOCK_INDEX_ROW_WORDS, 2)
 
