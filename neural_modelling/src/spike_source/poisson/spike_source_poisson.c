@@ -367,17 +367,18 @@ void resume_callback() {
     address_t address = data_specification_get_data_address();
     address_t system_region = data_specification_get_region(
         SYSTEM, address);
-    uint8_t regions_to_record[] = {
-        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    address_t regions_to_record[] = {
+        data_specification_get_region(
+            BUFFERING_OUT_SPIKE_RECORDING_REGION, address)
     };
     uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
     uint32_t *recording_flags_from_system_conf =
         &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
+    address_t state_region_address = BUFFERING_OUT_CONTROL_REGION;
 
     recording_initialize(
         n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region,
+        recording_flags_from_system_conf, state_region_address,
         &recording_flags);
 }
 
