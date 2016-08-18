@@ -42,7 +42,7 @@ class SpikeSourceArray(
     _model_based_max_atoms_per_core = sys.maxint
 
     def __init__(
-            self, n_neurons, machine_time_step, timescale_factor,
+            self, n_neurons,
             spike_times=None, port=None, tag=None, ip_address=None,
             board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
                 constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
@@ -66,8 +66,7 @@ class SpikeSourceArray(
             "Buffers", "use_auto_pause_and_resume")
 
         ReverseIpTagMultiCastSource.__init__(
-            self, n_keys=n_neurons, machine_time_step=machine_time_step,
-            timescale_factor=timescale_factor, label=label,
+            self, n_keys=n_neurons, label=label,
             constraints=constraints,
             max_atoms_per_core=(SpikeSourceArray.
                                 _model_based_max_atoms_per_core),
@@ -88,7 +87,7 @@ class SpikeSourceArray(
         AbstractChangableAfterRun.__init__(self)
 
         # handle recording
-        self._spike_recorder = EIEIOSpikeRecorder(machine_time_step)
+        self._spike_recorder = EIEIOSpikeRecorder()
         self._spike_recorder_buffer_size = spike_recorder_buffer_size
         self._buffer_size_before_receive = buffer_size_before_receive
 
@@ -163,7 +162,8 @@ class SpikeSourceArray(
         self._spike_recorder.record = True
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
+    def get_spikes(
+            self, placements, graph_mapper, buffer_manager, machine_time_step):
 
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager,
@@ -174,12 +174,8 @@ class SpikeSourceArray(
             placements, graph_mapper, self,
             lambda vertex:
                 vertex.virtual_key if vertex.virtual_key is not None
-                else 0)
-
-    @property
-    @overrides(ReverseIpTagMultiCastSource.model_name)
-    def model_name(self):
-        return "SpikeSourceArray"
+                else 0,
+            machine_time_step)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):

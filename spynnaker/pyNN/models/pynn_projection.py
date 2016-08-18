@@ -90,7 +90,8 @@ class Projection(object):
             constants.MAX_DELAY_BLOCKS *
             constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
         post_vertex_max_supported_delay_ms = \
-            postsynaptic_population._get_vertex.maximum_delay_supported_in_ms
+            postsynaptic_population._get_vertex\
+            .get_maximum_delay_supported_in_ms(machine_time_step)
 
         if max_delay > (post_vertex_max_supported_delay_ms +
                         delay_extension_max_supported_delay):
@@ -290,7 +291,7 @@ class Projection(object):
         placements = self._spinnaker.placements
         transceiver = self._spinnaker.transceiver
         routing_infos = self._spinnaker.routing_infos
-        machine_graph = self._spinnaker.machine_graph
+        machine_time_step = self._spinnaker.machine_time_step
         edges = graph_mapper.get_machine_edges(
             self._projection_edge)
         progress = ProgressBar(
@@ -302,7 +303,7 @@ class Projection(object):
                 edge.post_vertex)
             connections = post_vertex.get_connections_from_machine(
                 transceiver, placement, edge, graph_mapper, routing_infos,
-                self._synapse_information)
+                self._synapse_information, machine_time_step)
             if connections is not None:
                 connection_holder.add_connections(connections)
             progress.update()

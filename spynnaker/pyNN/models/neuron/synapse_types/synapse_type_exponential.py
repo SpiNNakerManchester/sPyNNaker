@@ -1,4 +1,5 @@
 from spynnaker.pyNN.utilities import utility_calls
+from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type \
@@ -22,10 +23,9 @@ def get_exponential_decay_and_init(tau, machine_time_step):
 
 class SynapseTypeExponential(AbstractSynapseType):
 
-    def __init__(self, n_neurons, machine_time_step, tau_syn_E, tau_syn_I):
+    def __init__(self, n_neurons, tau_syn_E, tau_syn_I):
         AbstractSynapseType.__init__(self)
         self._n_neurons = n_neurons
-        self._machine_time_step = machine_time_step
         self._tau_syn_E = utility_calls.convert_param_to_numpy(
             tau_syn_E, n_neurons)
         self._tau_syn_I = utility_calls.convert_param_to_numpy(
@@ -65,11 +65,12 @@ class SynapseTypeExponential(AbstractSynapseType):
     def get_n_synapse_type_parameters(self):
         return 4
 
-    def get_synapse_type_parameters(self):
+    @inject_items({"machine_time_step": "MachineTimeStep"})
+    def get_synapse_type_parameters(self, machine_time_step):
         e_decay, e_init = get_exponential_decay_and_init(
-            self._tau_syn_E, self._machine_time_step)
+            self._tau_syn_E, machine_time_step)
         i_decay, i_init = get_exponential_decay_and_init(
-            self._tau_syn_I, self._machine_time_step)
+            self._tau_syn_I, machine_time_step)
 
         return [
             NeuronParameter(e_decay, DataType.UINT32),

@@ -56,8 +56,3 @@ class ProjectionApplicationEdge(ApplicationEdge):
             self, pre_vertex, post_vertex, label):
         return ProjectionMachineEdge(
             self._synapse_information, pre_vertex, post_vertex, label)
-
-    @property
-    @overrides(ApplicationEdge.model_name)
-    def model_name(self):
-        return "ProjectionApplicationEdge"

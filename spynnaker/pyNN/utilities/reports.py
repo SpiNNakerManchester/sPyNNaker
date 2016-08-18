@@ -11,11 +11,11 @@ logger = logging.getLogger(__name__)
 def generate_synaptic_matrix_reports(
         common_report_directory, application_graph, machine_graph,
         placements, txrx, routing_infos, graph_mapper,
-        loaded_application_data_token):
+        loaded_application_data_token, machine_time_step):
     """converts synaptic matrix for every partitionable edge.
 
     :param loaded_application_data_token: needs to be done after loaded
-    :param routing_infos: routing infos
+    :param routing_infos: routing information
     :param placements: placements
     :param txrx: the spinnman instance
     :param application_graph: the application graph
@@ -64,7 +64,8 @@ def generate_synaptic_matrix_reports(
                 connections = application_edge.post_vertex.\
                     get_connections_from_machine(
                         txrx, placement, machine_edge, graph_mapper,
-                        routing_infos, application_edge.synapse_information[0])
+                        routing_infos, application_edge.synapse_information[0],
+                        machine_time_step)
                 if connections is not None:
                     connection_holder.add_connections(connections)
                 progress.update()

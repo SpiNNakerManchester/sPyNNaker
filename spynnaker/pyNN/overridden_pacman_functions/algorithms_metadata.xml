@@ -133,6 +133,10 @@
                 <param_name>loaded_application_data_token</param_name>
                 <param_type>LoadedApplicationDataToken</param_type>
             </parameter>
+            <parameter>
+                <param_name>machine_time_step</param_name>
+                <param_type>MachineTimeStep</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>common_report_directory</param_name>
@@ -143,6 +147,7 @@
             <param_name>application_graph</param_name>
             <param_name>txrx</param_name>
             <param_name>loaded_application_data_token</param_name>
+            <param_name>machine_time_step</param_name>
         </required_inputs>
     </algorithm>
 </algorithms>

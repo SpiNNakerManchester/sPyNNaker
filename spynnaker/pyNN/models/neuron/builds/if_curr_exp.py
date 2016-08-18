@@ -24,8 +24,7 @@ class IFCurrExp(AbstractPopulationVertex):
         'tau_refrac': 0.1, 'i_offset': 0}
 
     def __init__(
-            self, n_neurons, machine_time_step, timescale_factor,
-            spikes_per_second=None, ring_buffer_sigma=None,
+            self, n_neurons, spikes_per_second=None, ring_buffer_sigma=None,
             incoming_spike_buffer_size=None, constraints=None, label=None,
             tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
@@ -37,18 +36,16 @@ class IFCurrExp(AbstractPopulationVertex):
             i_offset=default_parameters['i_offset'], v_init=None):
 
         neuron_model = NeuronModelLeakyIntegrateAndFire(
-            n_neurons, machine_time_step, v_init, v_rest, tau_m, cm, i_offset,
+            n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
-            n_neurons, machine_time_step, tau_syn_E, tau_syn_I)
+            n_neurons, tau_syn_E, tau_syn_I)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IF_curr_exp.aplx", label=label,
             max_atoms_per_core=IFCurrExp._model_based_max_atoms_per_core,
-            machine_time_step=machine_time_step,
-            timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
