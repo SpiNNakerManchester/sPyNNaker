@@ -222,7 +222,6 @@ class Spinnaker(SpinnakerMainInterface):
         if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
             if self._multi_cast_vertex is None:
                 self._multi_cast_vertex = CommandSender(
-                    self._machine_time_step, self._time_scale_factor,
                     "auto_added_command_sender", None)
                 self.add_application_vertex(self._multi_cast_vertex)
             edge = ApplicationEdge(
@@ -245,7 +244,7 @@ class Spinnaker(SpinnakerMainInterface):
                 self.add_application_edge(
                     dependant_edge,
                     vertex_to_add.
-                    edge_partition_identifier_for_dependent_edge())
+                    edge_partition_identifier_for_dependent_edge)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         """
