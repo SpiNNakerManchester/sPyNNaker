@@ -659,7 +659,7 @@ class SynapticManager(object):
                                     spec, next_single_start_position, 1,
                                     keys_and_masks, master_pop_table_region,
                                     is_single=True)
-                            next_single_start_position += len(single_rows)
+                            next_single_start_position += len(single_rows) * 4
                         else:
                             next_block_start_address = self._write_padding(
                                 spec, synaptic_matrix_region,
@@ -693,7 +693,7 @@ class SynapticManager(object):
                                     spec, next_single_start_position, 1,
                                     keys_and_masks, master_pop_table_region,
                                     is_single=True)
-                            next_single_start_position += len(single_rows)
+                            next_single_start_position += len(single_rows) * 4
                         else:
                             next_block_start_address = self._write_padding(
                                 spec, synaptic_matrix_region,
