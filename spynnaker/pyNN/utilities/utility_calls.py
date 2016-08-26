@@ -226,3 +226,15 @@ def get_variance(dist):
     """
     stats = _distribution_to_stats[dist.name]
     return stats.var(dist)
+
+
+def validate_mars_kiss_64_seed(seed):
+    """ Update the seed to make it compatible with the rng algorithm
+    """
+    if seed[1] == 0:
+
+        # y (<- seed[1]) can't be zero so set to arbitrary non-zero if so
+        seed[1] = 13031301
+
+    # avoid z=c=0 and make < 698769069
+    seed[3] = seed[3] % 698769068 + 1
