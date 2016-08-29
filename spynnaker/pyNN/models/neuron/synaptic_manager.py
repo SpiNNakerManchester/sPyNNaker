@@ -829,8 +829,8 @@ class SynapticManager(object):
         direct_synapses_address = (
             self._get_static_synaptic_matrix_sdram_requirements() +
             synaptic_matrix_address + struct.unpack_from(
-                "<I", transceiver.read_memory(
-                    placement.x, placement.y, synaptic_matrix_address, 4))[0])
+                "<I", str(transceiver.read_memory(
+                    placement.x, placement.y, synaptic_matrix_address, 4)))[0])
         indirect_synapses_address = synaptic_matrix_address + 4
         data, max_row_length = self._retrieve_synaptic_block(
             transceiver, placement, master_pop_table_address,
