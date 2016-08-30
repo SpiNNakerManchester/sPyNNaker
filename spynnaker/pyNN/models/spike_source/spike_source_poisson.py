@@ -31,8 +31,8 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models.abstract_chip_runtime_updatable \
-    import AbstractChipRuntimeUpdatable
+from spinn_front_end_common.abstract_models.abstract_binary_uses_simulation_run \
+    import AbstractBinaryUsesSimulationRun
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
 
@@ -62,7 +62,7 @@ class SpikeSourcePoisson(
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping,
-        ReceiveBuffersToHostBasicImpl, AbstractChipRuntimeUpdatable):
+        ReceiveBuffersToHostBasicImpl, AbstractBinaryUsesSimulationRun):
     """ A Poisson Spike source object
     """
 

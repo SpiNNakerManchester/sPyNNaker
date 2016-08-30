@@ -32,8 +32,8 @@ from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models.abstract_chip_runtime_updatable \
-    import AbstractChipRuntimeUpdatable
+from spinn_front_end_common.abstract_models.abstract_binary_uses_simulation_run \
+    import AbstractBinaryUsesSimulationRun
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
 from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
@@ -50,7 +50,7 @@ class DelayExtensionVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesNKeysForPartition, AbstractChipRuntimeUpdatable):
+        AbstractProvidesNKeysForPartition, AbstractBinaryUsesSimulationRun):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
