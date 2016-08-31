@@ -16,8 +16,8 @@ from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
 
 # front end common imports
-from spinn_front_end_common.abstract_models.abstract_chip_runtime_updatable\
-    import AbstractChipRuntimeUpdatable
+from spinn_front_end_common.abstract_models.abstract_binary_uses_simulation_run\
+    import AbstractBinaryUsesSimulationRun
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_partition_constraints import \
     AbstractProvidesIncomingPartitionConstraints
@@ -83,7 +83,7 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary, AbstractChipRuntimeUpdatable,
+        AbstractHasAssociatedBinary, AbstractBinaryUsesSimulationRun,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
