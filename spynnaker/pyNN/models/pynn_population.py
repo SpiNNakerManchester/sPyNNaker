@@ -195,7 +195,7 @@ class Population(object):
         """
         spikes = self.getSpikes(True, gather)
         n_spikes = {}
-        counts = numpy.bincount(spikes[:, 0].astype(dtype="uint32"),
+        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=self._vertex.n_atoms)
         for i in range(self._vertex.n_atoms):
             n_spikes[i] = counts[i]

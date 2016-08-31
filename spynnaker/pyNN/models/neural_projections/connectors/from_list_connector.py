@@ -74,7 +74,7 @@ class FromListConnector(AbstractConnector):
         sources = self._conn_list["source"][mask]
         if sources.size == 0:
             return 0
-        return numpy.max(numpy.bincount(sources))
+        return numpy.max(numpy.bincount(sources.view('int32')))
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
@@ -86,7 +86,7 @@ class FromListConnector(AbstractConnector):
         targets = self._conn_list["target"][mask]
         if targets.size == 0:
             return 0
-        return numpy.max(numpy.bincount(targets))
+        return numpy.max(numpy.bincount(targets.view('int32')))
 
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
