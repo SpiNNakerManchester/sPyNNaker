@@ -52,7 +52,7 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
         params = NeuronModelLeakyIntegrate.get_neural_parameters(self)
         params.extend([
 
-            # countdown to end of next refractory period [timesteps]
+            # count down to end of next refractory period [timesteps]
             # int32_t  refract_timer;
             NeuronParameter(0, DataType.INT32),
 

@@ -106,9 +106,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 # Get the number of atoms per core incoming
                 max_atoms = sys.maxint
                 edge_pre_vertex = in_edge.pre_vertex
-                if (isinstance(edge_pre_vertex, AbstractApplicationVertex)
-                        and isinstance(edge_pre_vertex,
-                                       AbstractHasGlobalMaxAtoms)):
+                if (isinstance(edge_pre_vertex, AbstractApplicationVertex) and
+                        isinstance(
+                            edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
 
                     max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < max_atoms:

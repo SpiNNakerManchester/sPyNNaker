@@ -280,7 +280,7 @@ bool synapses_initialise(
     uint32_t direct_matrix_size = synaptic_matrix_address[direct_matrix_offset];
     log_info("Direct matrix malloc size is %d", direct_matrix_size);
 
-    if(direct_matrix_size != 0) {
+    if (direct_matrix_size != 0) {
         *direct_synapses_address = (address_t) spin1_malloc(direct_matrix_size);
 
         if (*direct_synapses_address == NULL) {
