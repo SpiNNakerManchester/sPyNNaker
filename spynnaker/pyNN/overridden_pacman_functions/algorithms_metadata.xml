@@ -2,55 +2,50 @@
     <algorithm name="GraphEdgeFilter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter</python_module>
         <python_class>GraphEdgeFilter</python_class>
-        <required_inputs>
+        <input_definitions>
             <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>graph_mapper</param_name>
         </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>new_sub_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>new_graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-        </produces_outputs>
+        <outputs>
+            <param_type>MemoryMachineGraph</param_type>
+            <param_type>MemoryGraphMapper</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="GraphEdgeWeightUpdater">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater</python_module>
         <python_class>GraphEdgeWeightUpdater</python_class>
-        <required_inputs>
+        <input_definitions>
             <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>graph_mapper</param_name>
         </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
-            </parameter>
-        </produces_outputs>
+        <outputs>
+            <param_type>MemoryMachineGraph</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="SpynnakerDataSpecificationWriter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_data_specification_writer</python_module>
         <python_class>SpynnakerDataSpecificationWriter</python_class>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
@@ -60,24 +55,9 @@
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
             <parameter>
-                <param_name>tags</param_name>
-                <param_type>MemoryTags</param_type>
-            </parameter>
-            <parameter>
-                <param_name>executable_finder</param_name>
-                <param_type>ExecutableFinder</param_type>
-            </parameter>
-            <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>partitionable_graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_name>graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>hostname</param_name>
@@ -95,29 +75,33 @@
                 <param_name>app_data_runtime_folder</param_name>
                 <param_type>ApplicationDataFolder</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>placements</param_name>
+            <param_name>graph</param_name>
+            <param_name>hostname</param_name>
+            <param_name>report_default_directory</param_name>
+            <param_name>write_text_specs</param_name>
+            <param_name>app_data_runtime_folder</param_name>
         </required_inputs>
-        <produces_outputs>
-            <parameter>
-                <param_name>executable_targets</param_name>
-                <param_type>ExecutableTargets</param_type>
-            </parameter>
-            <parameter>
-                <param_name>dsg_targets</param_name>
-                <param_type>DataSpecificationTargets</param_type>
-            </parameter>
-        </produces_outputs>
+        <optional_inputs>
+            <param_name>graph_mapper</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>DataSpecificationTargets</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="SynapticMatrixReport">
         <python_module>spynnaker.pyNN.utilities.reports</python_module>
         <python_function>generate_synaptic_matrix_reports</python_function>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>common_report_directory</param_name>
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
@@ -132,8 +116,8 @@
                 <param_type>MemoryPlacements</param_type>
             </parameter>
             <parameter>
-                <param_name>partitionable_graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>txrx</param_name>
@@ -143,6 +127,21 @@
                 <param_name>loaded_application_data_token</param_name>
                 <param_type>LoadedApplicationDataToken</param_type>
             </parameter>
+            <parameter>
+                <param_name>machine_time_step</param_name>
+                <param_type>MachineTimeStep</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>common_report_directory</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>graph_mapper</param_name>
+            <param_name>routing_infos</param_name>
+            <param_name>placements</param_name>
+            <param_name>application_graph</param_name>
+            <param_name>txrx</param_name>
+            <param_name>loaded_application_data_token</param_name>
+            <param_name>machine_time_step</param_name>
         </required_inputs>
     </algorithm>
 </algorithms>

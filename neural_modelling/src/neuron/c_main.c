@@ -218,6 +218,8 @@ void timer_callback(uint timer_count, uint unused) {
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
+        log_info("Completed a run");
+        
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 

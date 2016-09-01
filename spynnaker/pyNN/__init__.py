@@ -41,11 +41,11 @@ from spynnaker.pyNN.models.neuron.builds.izk_cond_exp \
 
 # neural projections
 from spynnaker.pyNN.models.neural_projections\
-    .delay_afferent_partitionable_edge import DelayAfferentPartitionableEdge
+    .delay_afferent_application_edge import DelayAfferentApplicationEdge
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
-    import ProjectionPartitionableEdge
+from spynnaker.pyNN.models.neural_projections.projection_application_edge \
+    import ProjectionApplicationEdge
 
 # spike sources
 from spynnaker.pyNN.models.spike_source.spike_source_poisson\

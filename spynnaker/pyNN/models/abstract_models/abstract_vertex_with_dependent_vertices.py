@@ -1,7 +1,6 @@
 # general imports
 from six import add_metaclass
 from abc import ABCMeta
-from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
@@ -34,9 +33,3 @@ class AbstractVertexWithEdgeToDependentVertices(object):
         """ Return the dependent edge identifier
         """
         return self._edge_partition_identifier
-
-    @abstractmethod
-    def has_dependent_vertices(self):
-        """ Helper method for isinstance
-        :return:
-        """

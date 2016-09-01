@@ -1,15 +1,17 @@
 
 # spynnaker imports
-from spynnaker.pyNN.models.neural_projections.projection_partitioned_edge \
-    import ProjectionPartitionedEdge
+import struct
+from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
+    AbstractHasGlobalMaxAtoms
+
+from pacman.model.graphs.application.abstract_application_vertex import \
+    AbstractApplicationVertex
+from spynnaker.pyNN.models.neural_projections.projection_application_edge \
+    import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections.projection_machine_edge \
+    import ProjectionMachineEdge
 from spynnaker.pyNN.models.neuron.master_pop_table_generators\
     .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
-import struct
-from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
-    import ProjectionPartitionableEdge
-
-from pacman.model.partitionable_graph.abstract_partitionable_vertex\
-    import AbstractPartitionableVertex
 
 # general imports
 import logging
@@ -73,7 +75,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     ADDRESS_LIST_DTYPE = "<u4"
 
-    SINGLE_BIT_FLAG_BIT = 0x80000000 # top bit of the 32 bit number
+    # top bit of the 32 bit number
+    SINGLE_BIT_FLAG_BIT = 0x80000000
     ROW_LENGTH_MASK = 0xFF
     ADDRESS_MASK = 0x7FFFFF00
 
@@ -85,63 +88,62 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def get_master_population_table_size(self, vertex_slice, in_edges):
         """
 
-        :param vertex_slice:the slice of the partitionable vertex that the\
-                partitioned vertex will be holding
-        :param in_edges: the in coming edges for the partitioned vertex this\
-                master pop is associated with.
+        :param vertex_slice: the slice of the vertex
+        :param in_edges: the in coming edges
         :return: the size the master pop table will take in SDRAM (in bytes)
         """
 
-        # Entry for each sub-edge - but don't know the subedges yet, so
+        # Entry for each edge - but don't know the edges yet, so
         # assume multiple entries for each edge
-        n_subvertices = 0
+        n_vertices = 0
         n_entries = 0
         for in_edge in in_edges:
 
-            if isinstance(in_edge, ProjectionPartitionableEdge):
+            if isinstance(in_edge, ProjectionApplicationEdge):
 
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
                 max_atoms = sys.maxint
                 edge_pre_vertex = in_edge.pre_vertex
-                if isinstance(edge_pre_vertex, AbstractPartitionableVertex):
+                if (isinstance(edge_pre_vertex, AbstractApplicationVertex) and
+                        isinstance(
+                            edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
+
                     max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < max_atoms:
                     max_atoms = in_edge.pre_vertex.n_atoms
 
-                # Get the number of likely subvertices
-                n_edge_subvertices = int(math.ceil(
+                # Get the number of likely vertices
+                n_edge_vertices = int(math.ceil(
                     float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
-                n_subvertices += n_edge_subvertices
+                n_vertices += n_edge_vertices
                 n_entries += (
-                    n_edge_subvertices * len(in_edge.synapse_information))
+                    n_edge_vertices * len(in_edge.synapse_information))
 
         # Multiply by 2 to get an upper bound
         return (
-            (n_subvertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_vertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +
             8)
 
     def get_exact_master_population_table_size(
-            self, subvertex, partitioned_graph, graph_mapper):
+            self, vertex, machine_graph, graph_mapper):
         """
         :return: the size the master pop table will take in SDRAM (in bytes)
         """
-        in_edges = partitioned_graph.incoming_subedges_from_subvertex(
-            subvertex)
+        in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
 
-        n_subvertices = len(in_edges)
+        n_vertices = len(in_edges)
         n_entries = 0
         for in_edge in in_edges:
-            if isinstance(in_edge, ProjectionPartitionedEdge):
-                edge = graph_mapper.\
-                    get_partitionable_edge_from_partitioned_edge(in_edge)
+            if isinstance(in_edge, ProjectionMachineEdge):
+                edge = graph_mapper.get_application_edge(in_edge)
                 n_entries += len(edge.synapse_information)
 
         # Multiply by 2 to get an upper bound
         return (
-            (n_subvertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_vertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +
             8)
 
@@ -176,25 +178,25 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._n_single_entries = 0
 
     def update_master_population_table(
-            self, spec, block_start_addr, row_length, keys_and_masks,
+            self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
         """ Adds a entry in the binary search to deal with the synaptic matrix
 
         :param spec: the writer for dsg
         :param block_start_addr: where the synaptic matrix block starts
         :param row_length: how long in bytes each synaptic entry is
-        :param keys_and_masks: the keys and masks for this master pop entry
+        :param key_and_mask: the key and mask for this master pop entry
         :param master_pop_table_region: the region id for the master pop
         :param is_single: flag that states if the entry is a direct entry for
         a single row.
         :return: None
         """
-        key_and_mask = keys_and_masks[0]
         if key_and_mask.key not in self._entries:
             self._entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask)
         start_addr = block_start_addr
-        # if single, dont add to start address as its going in its own block
+
+        # if single, don' t add to start address as its going in its own block
         if not is_single:
             start_addr = block_start_addr / 4
         self._entries[key_and_mask.key].append(

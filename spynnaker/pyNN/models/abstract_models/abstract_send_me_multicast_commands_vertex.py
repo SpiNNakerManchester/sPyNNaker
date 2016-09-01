@@ -1,6 +1,5 @@
 from six import add_metaclass
 from abc import ABCMeta
-from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
@@ -22,7 +21,3 @@ class AbstractSendMeMulticastCommandsVertex(object):
     @property
     def commands(self):
         return self._commands
-
-    @abstractmethod
-    def recieves_multicast_commands(self):
-        pass

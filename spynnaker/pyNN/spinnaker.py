@@ -1,7 +1,7 @@
 
 # pacman imports
-from pacman.model.partitionable_graph.multi_cast_partitionable_edge\
-    import MultiCastPartitionableEdge
+from pacman.model.graphs.application.impl.application_edge import \
+    ApplicationEdge
 
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
@@ -208,7 +208,7 @@ class Spinnaker(SpinnakerMainInterface):
         """
         return self._max_supported_delay
 
-    def add_partitionable_vertex(self, vertex_to_add):
+    def add_application_vertex(self, vertex_to_add):
         """
 
         :param vertex_to_add:
@@ -217,28 +217,34 @@ class Spinnaker(SpinnakerMainInterface):
         if isinstance(vertex_to_add, CommandSender):
             self._multi_cast_vertex = vertex_to_add
 
-        self._partitionable_graph.add_vertex(vertex_to_add)
+        self._application_graph.add_vertex(vertex_to_add)
 
         if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
             if self._multi_cast_vertex is None:
                 self._multi_cast_vertex = CommandSender(
-                    self._machine_time_step, self._time_scale_factor)
-                self.add_partitionable_vertex(self._multi_cast_vertex)
-            edge = MultiCastPartitionableEdge(
+                    "auto_added_command_sender", None)
+                self.add_application_vertex(self._multi_cast_vertex)
+            edge = ApplicationEdge(
                 self._multi_cast_vertex, vertex_to_add)
-            self._multi_cast_vertex.add_commands(vertex_to_add.commands, edge)
-            self.add_partitionable_edge(edge)
+            self.add_application_edge(edge, "COMMANDS")
+
+            self._multi_cast_vertex.add_commands(
+                vertex_to_add.commands, edge,
+                self._application_graph.
+                get_outgoing_edge_partition_starting_at_vertex(
+                    self._multi_cast_vertex, "COMMANDS"))
 
         # add any dependent edges and vertices if needed
         if isinstance(vertex_to_add,
                       AbstractVertexWithEdgeToDependentVertices):
             for dependant_vertex in vertex_to_add.dependent_vertices:
-                self.add_partitionable_vertex(dependant_vertex)
-                dependant_edge = MultiCastPartitionableEdge(
+                self.add_application_vertex(dependant_vertex)
+                dependant_edge = ApplicationEdge(
                     pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
-                self.add_partitionable_edge(
+                self.add_application_edge(
                     dependant_edge,
-                    vertex_to_add.edge_partition_identifier_for_dependent_edge)
+                    vertex_to_add.
+                    edge_partition_identifier_for_dependent_edge)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         """

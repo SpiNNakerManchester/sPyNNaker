@@ -1,8 +1,8 @@
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from spynnaker.pyNN.models.neural_projections.delayed_partitionable_edge \
-    import DelayedPartitionableEdge
+from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
+    import DelayedApplicationEdge
 
 from spynnaker.pyNN.models.neural_projections.synapse_information \
     import SynapseInformation
@@ -13,11 +13,10 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex \
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_projections.projection_partitionable_edge \
-    import ProjectionPartitionableEdge
-from spynnaker.pyNN.models.neural_projections\
-    .delay_afferent_partitionable_edge \
-    import DelayAfferentPartitionableEdge
+from spynnaker.pyNN.models.neural_projections.projection_application_edge \
+    import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge \
+    import DelayAfferentApplicationEdge
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
@@ -31,7 +30,6 @@ import logging
 import math
 
 logger = logging.getLogger(__name__)
-EDGE_PARTITION_ID = "SPIKE"
 
 
 # noinspection PyProtectedMember
@@ -92,7 +90,8 @@ class Projection(object):
             constants.MAX_DELAY_BLOCKS *
             constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
         post_vertex_max_supported_delay_ms = \
-            postsynaptic_population._get_vertex.maximum_delay_supported_in_ms
+            postsynaptic_population._get_vertex\
+            .get_maximum_delay_supported_in_ms(machine_time_step)
 
         if max_delay > (post_vertex_max_supported_delay_ms +
                         delay_extension_max_supported_delay):
@@ -123,14 +122,14 @@ class Projection(object):
         else:
 
             # If there isn't an existing edge, create a new one
-            self._projection_edge = ProjectionPartitionableEdge(
+            self._projection_edge = ProjectionApplicationEdge(
                 presynaptic_population._get_vertex,
                 postsynaptic_population._get_vertex,
                 self._synapse_information, label=label)
 
             # add edge to the graph
-            spinnaker_control.add_partitionable_edge(
-                self._projection_edge, EDGE_PARTITION_ID)
+            spinnaker_control.add_application_edge(
+                self._projection_edge, constants.SPIKE_PARTITION_ID)
 
         # If the delay exceeds the post vertex delay, add a delay extension
         if max_delay > post_vertex_max_supported_delay_ms:
@@ -168,20 +167,18 @@ class Projection(object):
             self._projection_edge.mark_no_changes()
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
-        """ Searches though the partitionable graph's edges to locate any\
+        """ Searches though the graph's edges to locate any\
             edge which has the same post and pre vertex
 
-        :param presynaptic_vertex: the source partitionable vertex of the\
-                multapse
+        :param presynaptic_vertex: the source vertex of the multapse
         :type presynaptic_vertex: instance of\
-                pacman.model.partitionable_graph.abstract_partitionable_vertex
-        :param postsynaptic_vertex: The destination partitionable vertex of\
-                the multapse
+                pacman.model.graph.application.abstract_application_vertex
+        :param postsynaptic_vertex: The destination vertex of the multapse
         :type postsynaptic_vertex: instance of\
-                pacman.model.partitionable_graph.abstract_partitionable_vertex
+                pacman.model.graph.application.abstract_application_vertex
         :return: None or the edge going to these vertices.
         """
-        graph_edges = self._spinnaker.partitionable_graph.edges
+        graph_edges = self._spinnaker.application_graph.edges
         for edge in graph_edges:
             if ((edge.pre_vertex == presynaptic_vertex) and
                     (edge.post_vertex == postsynaptic_vertex)):
@@ -206,14 +203,14 @@ class Projection(object):
             presynaptic_population._internal_delay_vertex = delay_vertex
             pre_vertex.add_constraint(
                 PartitionerSameSizeAsVertexConstraint(delay_vertex))
-            self._spinnaker.add_partitionable_vertex(delay_vertex)
+            self._spinnaker.add_application_vertex(delay_vertex)
 
             # Add the edge
-            delay_afferent_edge = DelayAfferentPartitionableEdge(
+            delay_afferent_edge = DelayAfferentApplicationEdge(
                 pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
                     pre_vertex.label))
-            self._spinnaker.add_partitionable_edge(
-                delay_afferent_edge, EDGE_PARTITION_ID)
+            self._spinnaker.add_application_edge(
+                delay_afferent_edge, constants.SPIKE_PARTITION_ID)
 
         # Ensure that the delay extension knows how many states it will support
         n_stages = int(math.ceil(
@@ -226,12 +223,12 @@ class Projection(object):
         post_vertex = postsynaptic_population._get_vertex
         delay_edge = self._find_existing_edge(delay_vertex, post_vertex)
         if delay_edge is None:
-            delay_edge = DelayedPartitionableEdge(
+            delay_edge = DelayedApplicationEdge(
                 delay_vertex, post_vertex, self._synapse_information,
                 label="{}_delayed_to_{}".format(
                     pre_vertex.label, post_vertex.label))
-            self._spinnaker.add_partitionable_edge(
-                delay_edge, EDGE_PARTITION_ID)
+            self._spinnaker.add_application_edge(
+                delay_edge, constants.SPIKE_PARTITION_ID)
         else:
             delay_edge.add_synapse_information(self._synapse_information)
         return delay_edge
@@ -294,19 +291,19 @@ class Projection(object):
         placements = self._spinnaker.placements
         transceiver = self._spinnaker.transceiver
         routing_infos = self._spinnaker.routing_infos
-        partitioned_graph = self._spinnaker.partitioned_graph
-        subedges = graph_mapper.get_partitioned_edges_from_partitionable_edge(
+        machine_time_step = self._spinnaker.machine_time_step
+        edges = graph_mapper.get_machine_edges(
             self._projection_edge)
         progress = ProgressBar(
-            len(subedges),
+            len(edges),
             "Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))
-        for subedge in subedges:
-            placement = placements.get_placement_of_subvertex(
-                subedge.post_subvertex)
+        for edge in edges:
+            placement = placements.get_placement_of_vertex(
+                edge.post_vertex)
             connections = post_vertex.get_connections_from_machine(
-                transceiver, placement, subedge, graph_mapper, routing_infos,
-                self._synapse_information, partitioned_graph)
+                transceiver, placement, edge, graph_mapper, routing_infos,
+                self._synapse_information, machine_time_step)
             if connections is not None:
                 connection_holder.add_connections(connections)
             progress.update()

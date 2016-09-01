@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 
 class SpikeRecorder(object):
 
-    def __init__(self, machine_time_step):
-        self._machine_time_step = machine_time_step
+    def __init__(self):
         self._record = False
 
     @property
@@ -41,32 +40,33 @@ class SpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, buffer_manager, region, state_region,
-                   placements, graph_mapper, partitionable_vertex):
+    def get_spikes(
+            self, label, buffer_manager, region, state_region,
+            placements, graph_mapper, application_vertex, machine_time_step):
 
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = self._machine_time_step / 1000.0
+        ms_per_tick = machine_time_step / 1000.0
 
-        subvertices = \
-            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
+        vertices = \
+            graph_mapper.get_machine_vertices(application_vertex)
 
         missing_str = ""
 
-        progress_bar = ProgressBar(len(subvertices),
+        progress_bar = ProgressBar(len(vertices),
                                    "Getting spikes for {}".format(label))
-        for subvertex in subvertices:
+        for vertex in vertices:
 
-            placement = placements.get_placement_of_subvertex(subvertex)
-            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            placement = placements.get_placement_of_vertex(vertex)
+            vertex_slice = graph_mapper.get_slice(vertex)
 
             x = placement.x
             y = placement.y
             p = placement.p
-            lo_atom = subvertex_slice.lo_atom
+            lo_atom = vertex_slice.lo_atom
 
             # Read the spikes
-            n_words = int(math.ceil(subvertex_slice.n_atoms / 32.0))
+            n_words = int(math.ceil(vertex_slice.n_atoms / 32.0))
             n_bytes = n_words * 4
             n_words_with_timestamp = n_words + 1
 

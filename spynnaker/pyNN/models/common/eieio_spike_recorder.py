@@ -13,8 +13,7 @@ class EIEIOSpikeRecorder(object):
     """ Records spikes using EIEIO format
     """
 
-    def __init__(self, machine_time_step):
-        self._machine_time_step = machine_time_step
+    def __init__(self):
         self._record = False
 
     @property
@@ -36,21 +35,21 @@ class EIEIOSpikeRecorder(object):
         return n_neurons * 4
 
     def get_spikes(self, label, buffer_manager, region, state_region,
-                   placements, graph_mapper, partitionable_vertex,
-                   base_key_function):
+                   placements, graph_mapper, application_vertex,
+                   base_key_function, machine_time_step):
 
         results = list()
         missing_str = ""
-        ms_per_tick = self._machine_time_step / 1000.0
-        subvertices = \
-            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
-        progress_bar = ProgressBar(len(subvertices),
+        ms_per_tick = machine_time_step / 1000.0
+        vertices = \
+            graph_mapper.get_machine_vertices(application_vertex)
+        progress_bar = ProgressBar(len(vertices),
                                    "Getting spikes for {}".format(label))
 
-        for subvertex in subvertices:
+        for vertex in vertices:
 
-            placement = placements.get_placement_of_subvertex(subvertex)
-            subvertex_slice = graph_mapper.get_subvertex_slice(subvertex)
+            placement = placements.get_placement_of_vertex(vertex)
+            vertex_slice = graph_mapper.get_slice(vertex)
 
             x = placement.x
             y = placement.y
@@ -75,8 +74,8 @@ class EIEIOSpikeRecorder(object):
                 keys = numpy.frombuffer(
                     spike_data, dtype="<u4", count=eieio_header.count,
                     offset=offset)
-                neuron_ids = ((keys - base_key_function(subvertex)) +
-                              subvertex_slice.lo_atom)
+                neuron_ids = ((keys - base_key_function(vertex)) +
+                              vertex_slice.lo_atom)
                 offset += eieio_header.count * 4
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
             progress_bar.update()
