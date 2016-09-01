@@ -503,19 +503,19 @@ class SpikeSourcePoisson(
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
-        "iptags": "MemoryIpTags",
+        "tags": "MemoryTags",
         "n_machine_time_steps": "TotalMachineTimeSteps"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "iptags", "n_machine_time_steps"
+            "routing_info", "tags", "n_machine_time_steps"
         }
     )
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, iptags, n_machine_time_steps):
+            graph_mapper, routing_info, tags, n_machine_time_steps):
         vertex = placement.vertex
         vertex_slice = graph_mapper.get_slice(vertex)
 
@@ -545,6 +545,7 @@ class SpikeSourcePoisson(
         self.reserve_memory_regions(
             spec, setup_sz, poisson_params_sz, spike_history_sz, vertex)
 
+        iptags = tags.get_ip_tags_for_vertex(vertex)
         self._write_setup_info(
             spec, spike_history_sz, iptags, buffer_size_before_receive,
             vertex, machine_time_step, time_scale_factor)

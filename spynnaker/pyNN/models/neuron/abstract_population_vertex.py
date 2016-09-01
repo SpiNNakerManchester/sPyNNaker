@@ -481,20 +481,20 @@ class AbstractPopulationVertex(
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
-        "iptags": "MemoryIpTags",
+        "tags": "MemoryTags",
         "n_machine_time_steps": "TotalMachineTimeSteps"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "application_graph", "machine_graph", "routing_info", "iptags",
+            "application_graph", "machine_graph", "routing_info", "tags",
             "n_machine_time_steps"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            iptags, n_machine_time_steps):
+            tags, n_machine_time_steps):
         vertex = placement.vertex
 
         spec.comment("\n*** Spec for block of {} neurons ***\n".format(
@@ -550,6 +550,7 @@ class AbstractPopulationVertex(
             vertex, constants.SPIKE_PARTITION_ID)
 
         # Write the regions
+        iptags = tags.get_ip_tags_for_vertex(vertex)
         self._write_setup_info(
             spec, spike_history_sz, v_history_sz, gsyn_history_sz,
             iptags, buffer_size_before_receive, self._time_between_requests,
