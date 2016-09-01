@@ -1,6 +1,4 @@
 import unittest
-from spynnaker.pyNN.models.neural_projections.delay_partitioned_edge \
-    import DelayPartitionedEdge
 
 
 class MyTestCase(unittest.TestCase):

@@ -225,7 +225,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         return (p + (18 * y) + (18 * 8 * x)) * 2
 
     def update_master_population_table(
-            self, spec, block_start_addr, row_length, keys_and_masks,
+            self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
         """
         Writes an entry in the Master Population Table for the newly
@@ -243,14 +243,14 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         :param spec:
         :param block_start_addr:
         :param row_length:
-        :param keys_and_masks:
+        :param key_and_mask:
         :param mask:
         :param master_pop_table_region:
         :param is_single True if this is a single synapse, False otherwise
         :return:
         """
         # Which core has this projection arrived from?
-        key = keys_and_masks[0].key
+        key = key_and_mask.key
         x = get_x_from_key(key)
         y = get_y_from_key(key)
         p = get_p_from_key(key)

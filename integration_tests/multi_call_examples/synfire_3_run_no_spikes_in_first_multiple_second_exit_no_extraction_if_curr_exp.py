@@ -1,7 +1,10 @@
 """
 Synfirechain-like example
 """
-import spynnaker.pyNN as p
+try:
+    import pyNN.spiNNaker as p
+except Exception as e:
+    import spynnaker.pyNN as p
 import pylab
 import numpy
 
