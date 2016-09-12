@@ -167,10 +167,11 @@ class SpikeSourceArray(
 
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager,
-            (ReverseIPTagMulticastSourceMachineVertex.
-             _REGIONS.RECORDING_BUFFER.value),
-            (ReverseIPTagMulticastSourceMachineVertex.
-             _REGIONS.RECORDING_BUFFER_STATE.value),
+            self.get_recording_region_id_for_dsg_region(
+                ReverseIPTagMulticastSourceMachineVertex._REGIONS.
+                    RECORDING_BUFFER.value),
+            ReverseIPTagMulticastSourceMachineVertex.
+             _REGIONS.RECORDING_BUFFER_STATE.value,
             placements, graph_mapper, self,
             lambda vertex:
                 vertex.virtual_key if vertex.virtual_key is not None

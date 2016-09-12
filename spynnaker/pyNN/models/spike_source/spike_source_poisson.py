@@ -568,10 +568,11 @@ class SpikeSourcePoisson(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self._spike_recorder.get_spikes(
             self._label, buffer_manager,
-            (SpikeSourcePoissonMachineVertex.
-                _POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value),
-            (SpikeSourcePoissonMachineVertex.
-                _POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value),
+            self.get_recording_region_id_for_dsg_region(
+                SpikeSourcePoissonMachineVertex._POISSON_SPIKE_SOURCE_REGIONS.
+                    SPIKE_HISTORY_REGION.value),
+            SpikeSourcePoissonMachineVertex.
+                _POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.

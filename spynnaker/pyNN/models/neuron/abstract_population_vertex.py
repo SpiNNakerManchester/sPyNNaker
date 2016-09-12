@@ -590,7 +590,8 @@ class AbstractPopulationVertex(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self._spike_recorder.get_spikes(
             self._label, buffer_manager,
-            constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
+            self.get_recording_region_id_for_dsg_region(
+                constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value),
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self, machine_time_step)
 
@@ -608,7 +609,8 @@ class AbstractPopulationVertex(
               buffer_manager, machine_time_step):
         return self._v_recorder.get_v(
             self._label, buffer_manager,
-            constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
+            self.get_recording_region_id_for_dsg_region(
+                constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value),
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self, machine_time_step)
 
@@ -627,7 +629,8 @@ class AbstractPopulationVertex(
             buffer_manager, machine_time_step):
         return self._gsyn_recorder.get_gsyn(
             self._label, buffer_manager,
-            constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
+            self.get_recording_region_id_for_dsg_region(
+                constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value),
             constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             placements, graph_mapper, self, machine_time_step)
 
