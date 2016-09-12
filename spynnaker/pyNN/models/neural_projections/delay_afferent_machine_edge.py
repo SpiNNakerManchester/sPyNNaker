@@ -34,8 +34,3 @@ class DelayAfferentMachineEdge(
     def update_weight(self, graph_mapper):
         pre_vertex_slice = graph_mapper.get_slice(self.pre_vertex)
         self._traffic_weight = pre_vertex_slice.n_atoms
-
-    @property
-    @overrides(MachineEdge.model_name)
-    def model_name(self):
-        return "DelayAfferentMachineEdge"

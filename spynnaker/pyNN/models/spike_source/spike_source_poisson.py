@@ -10,8 +10,7 @@ from spinn_front_end_common.utilities import constants as\
 
 from data_specification.enums.data_type import DataType
 
-from pacman.executor.injection_decorator import requires_injection, \
-    supports_injection, inject
+from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -26,11 +25,17 @@ from pacman.model.resources.sdram_resource import SDRAMResource
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models.impl.\
-    uses_simulation_needs_total_runtime_data_specable_vertex import \
-    UsesSimulationNeedsTotalRuntimeDataSpecableVertex
 from spinn_front_end_common.interface.buffer_management.buffer_models\
     .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.abstract_models\
+    .abstract_generates_data_specification \
+    import AbstractGeneratesDataSpecification
+from spinn_front_end_common.abstract_models\
+    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
+from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
+    import AbstractHasAssociatedBinary
+
 from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
@@ -52,11 +57,12 @@ PARAMS_WORDS_PER_NEURON = 5
 RANDOM_SEED_WORDS = 4
 
 
-@supports_injection
 class SpikeSourcePoisson(
-        ApplicationVertex, UsesSimulationNeedsTotalRuntimeDataSpecableVertex,
-        AbstractSpikeRecordable, AbstractProvidesOutgoingPartitionConstraints,
-        PopulationSettableChangeRequiresMapping, ReceiveBuffersToHostBasicImpl):
+        ApplicationVertex, AbstractGeneratesDataSpecification,
+        AbstractHasAssociatedBinary, AbstractSpikeRecordable,
+        AbstractProvidesOutgoingPartitionConstraints,
+        PopulationSettableChangeRequiresMapping,
+        ReceiveBuffersToHostBasicImpl, AbstractBinaryUsesSimulationRun):
     """ A Poisson Spike source object
     """
 
@@ -81,13 +87,10 @@ class SpikeSourcePoisson(
     _n_poisson_vertices = 0
 
     def __init__(
-            self, n_neurons, machine_time_step, timescale_factor,
-            constraints=None, label="SpikeSourcePoisson", rate=1.0, start=0.0,
-            duration=None, seed=None):
+            self, n_neurons, constraints=None, label="SpikeSourcePoisson",
+            rate=1.0, start=0.0, duration=None, seed=None):
         ApplicationVertex.__init__(
             self, label, constraints, self._model_based_max_atoms_per_core)
-        UsesSimulationNeedsTotalRuntimeDataSpecableVertex.__init__(
-            self, machine_time_step, timescale_factor)
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
@@ -97,11 +100,6 @@ class SpikeSourcePoisson(
         self._n_atoms = n_neurons
         self._seed = None
 
-        # storage params
-        self._graph_mapper = None
-        self._iptags = None
-        self._routing_info = None
-
         # Store the parameters
         self._rate = utility_calls.convert_param_to_numpy(rate, n_neurons)
         self._start = utility_calls.convert_param_to_numpy(start, n_neurons)
@@ -110,7 +108,7 @@ class SpikeSourcePoisson(
         self._rng = numpy.random.RandomState(seed)
 
         # Prepare for recording, and to get spikes
-        self._spike_recorder = MultiSpikeRecorder(machine_time_step)
+        self._spike_recorder = MultiSpikeRecorder()
         self._spike_buffer_max_size = config.getint(
             "Buffers", "spike_buffer_size")
         self._buffer_size_before_receive = config.getint(
@@ -128,42 +126,55 @@ class SpikeSourcePoisson(
         self._using_auto_pause_and_resume = config.getboolean(
             "Buffers", "use_auto_pause_and_resume")
 
-    @requires_injection(["MemoryNoMachineTimeSteps"])
-    def _max_spikes_per_ts(self, vertex_slice):
+    def _max_spikes_per_ts(
+            self, vertex_slice, n_machine_time_steps, machine_time_step):
         max_rate = numpy.amax(
             self._rate[vertex_slice.lo_atom:vertex_slice.hi_atom + 1])
-        ts_per_second = 1000000.0 / self._machine_time_step
+        ts_per_second = 1000000.0 / machine_time_step
         max_spikes_per_ts = scipy.stats.poisson.ppf(
-            1.0 - (1.0 / self._no_machine_time_steps),
+            1.0 - (1.0 / n_machine_time_steps),
             max_rate / ts_per_second)
         return int(math.ceil(max_spikes_per_ts))
 
-    def get_resources_used_by_atoms(self, vertex_slice):
+    @inject_items({
+        "n_machine_time_steps": "TotalMachineTimeSteps",
+        "machine_time_step": "MachineTimeStep"
+    })
+    @overrides(
+        ApplicationVertex.get_resources_used_by_atoms,
+        additional_arguments={"n_machine_time_steps", "machine_time_step"}
+    )
+    def get_resources_used_by_atoms(
+            self, vertex_slice, n_machine_time_steps, machine_time_step):
 
-        # veirfy if needing the buffered out functionality
-        self._check_for_activating_auto_pause_and_resume(vertex_slice, self)
+        # verify if needing the buffered out functionality
+        self._check_for_activating_auto_pause_and_resume(
+            vertex_slice, self, n_machine_time_steps, machine_time_step)
 
-        # build resoruces as i currently know
+        # build resources as i currently know
         container = ResourceContainer(
             sdram=SDRAMResource(
-                self.get_sdram_usage_for_atoms(vertex_slice)),
+                self.get_sdram_usage_for_atoms(
+                    vertex_slice, n_machine_time_steps, machine_time_step)),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms()),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms()))
 
-        # extend resoruces with whatever the extra functionality requires
+        # extend resources with whatever the extra functionality requires
         container.extend(self.get_extra_resources(
             self._receive_buffer_host, self._receive_buffer_port))
         return container
 
     def _check_for_activating_auto_pause_and_resume(
-            self, vertex_slice, object_to_set):
+            self, vertex_slice, object_to_set, n_machine_time_steps,
+            machine_time_step):
 
-        # veirfy if needing the buffered out functionality
+        # verify if needing the buffered out functionality
         if not self._using_auto_pause_and_resume:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
-                self._n_machine_time_steps)
+                vertex_slice.n_atoms, self._max_spikes_per_ts(
+                    vertex_slice, n_machine_time_steps, machine_time_step),
+                n_machine_time_steps)
             spike_buffering_needed = recording_utils.needs_buffering(
                 self._spike_buffer_max_size, spike_buffer_size,
                 self._enable_buffered_recording)
@@ -173,27 +184,35 @@ class SpikeSourcePoisson(
                     buffering_port=self._receive_buffer_port)
         else:
             sdram_per_ts = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice), 1)
+                vertex_slice.n_atoms, self._max_spikes_per_ts(
+                    vertex_slice, n_machine_time_steps, machine_time_step), 1)
             object_to_set.activate_buffering_output(
                 minimum_sdram_for_buffering=self._minimum_buffer_sdram,
                 buffered_sdram_per_timestep=sdram_per_ts)
-
 
     @property
     def n_atoms(self):
         return self._n_atoms
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @inject_items({
+        "n_machine_time_steps": "TotalMachineTimeSteps",
+        "machine_time_step": "MachineTimeStep"
+    })
+    @overrides(
+        ApplicationVertex.create_machine_vertex,
+        additional_arguments={"n_machine_time_steps", "machine_time_step"}
+    )
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
+            self, vertex_slice, resources_required, n_machine_time_steps,
+            machine_time_step, label=None, constraints=None):
         SpikeSourcePoisson._n_poisson_vertices += 1
         vertex = SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
             constraints, label)
 
         # set up auto pause and resume stuff
-        self._check_for_activating_auto_pause_and_resume(vertex_slice, vertex)
+        self._check_for_activating_auto_pause_and_resume(
+            vertex_slice, vertex, n_machine_time_steps, machine_time_step)
 
         # return the machine vertex
         return vertex
@@ -229,13 +248,6 @@ class SpikeSourcePoisson(
     @seed.setter
     def seed(self, seed):
         self._seed = seed
-
-    @property
-    @overrides(ApplicationVertex.model_name)
-    def model_name(self):
-        """ Return a string representing a label for this class.
-        """
-        return "SpikeSourcePoisson"
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
@@ -289,7 +301,8 @@ class SpikeSourcePoisson(
 
     def _write_setup_info(
             self, spec, spike_history_region_sz, iptags,
-            buffer_size_before_receive, vertex):
+            buffer_size_before_receive, vertex, machine_time_step,
+            time_scale_factor):
         """ Write information used to control the simulation and gathering of\
             results.
 
@@ -298,17 +311,22 @@ class SpikeSourcePoisson(
         :param ip_rags
         :return:
         """
-        # write sim data
-        spec.switch_write_focus(SpikeSourcePoissonMachineVertex.
-                _POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
-        spec.write_array(self.data_for_simulation_data())
+        # write simulation data
+        spec.switch_write_focus(
+            SpikeSourcePoissonMachineVertex.
+            _POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+        spec.write_array(simulation_utilities.get_simulation_header_array(
+            self.get_binary_file_name(), machine_time_step,
+            time_scale_factor))
 
         # write recording data
         vertex.write_recording_data(
             spec, iptags, [spike_history_region_sz],
             buffer_size_before_receive, self._time_between_requests)
 
-    def _write_poisson_parameters(self, spec, key, vertex_slice):
+    def _write_poisson_parameters(
+            self, spec, key, vertex_slice, machine_time_step,
+            time_scale_factor):
         """ Generate Neuron Parameter data for Poisson spike sources
 
         :param spec:
@@ -346,9 +364,9 @@ class SpikeSourcePoisson(
         max_spikes = scipy.stats.poisson.ppf(
             1.0 - (1.0 / total_mean_rate), total_mean_rate)
         spikes_per_timestep = (
-            max_spikes / (1000000.0 / self._machine_time_step))
+            max_spikes / (1000000.0 / machine_time_step))
         time_between_spikes = (
-            (self._machine_time_step * self._time_scale_factor) /
+            (machine_time_step * time_scale_factor) /
             (spikes_per_timestep * 2.0))
         spec.write_value(data=int(time_between_spikes))
 
@@ -375,7 +393,7 @@ class SpikeSourcePoisson(
 
             # Decide if it is a fast or slow source and
             spikes_per_tick = \
-                (float(rate_val) * (self._machine_time_step / 1000000.0))
+                (float(rate_val) * (machine_time_step / 1000000.0))
             if spikes_per_tick <= SLOW_RATE_PER_TICK_CUTOFF:
                 slow_sources.append([i, rate_val, start_val, end_val])
             else:
@@ -401,11 +419,11 @@ class SpikeSourcePoisson(
                 isi_val = 0
             else:
                 isi_val = float(1000000.0 /
-                                (rate_val * self._machine_time_step))
-            start_scaled = int(start_val * 1000.0 / self._machine_time_step)
+                                (rate_val * machine_time_step))
+            start_scaled = int(start_val * 1000.0 / machine_time_step)
             end_scaled = 0xFFFFFFFF
             if end_val is not None and not math.isnan(end_val):
-                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
+                end_scaled = int(end_val * 1000.0 / machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
@@ -426,10 +444,10 @@ class SpikeSourcePoisson(
                 exp_minus_lamda = 0
             else:
                 exp_minus_lamda = math.exp(-1.0 * spikes_per_tick)
-            start_scaled = int(start_val * 1000.0 / self._machine_time_step)
+            start_scaled = int(start_val * 1000.0 / machine_time_step)
             end_scaled = 0xFFFFFFFF
             if end_val is not None and not math.isnan(end_val):
-                end_scaled = int(end_val * 1000.0 / self._machine_time_step)
+                end_scaled = int(end_val * 1000.0 / machine_time_step)
             spec.write_value(data=neuron_id, data_type=DataType.UINT32)
             spec.write_value(data=start_scaled, data_type=DataType.UINT32)
             spec.write_value(data=end_scaled, data_type=DataType.UINT32)
@@ -443,7 +461,8 @@ class SpikeSourcePoisson(
     def set_recording_spikes(self):
         self._spike_recorder.record = True
 
-    def get_sdram_usage_for_atoms(self, vertex_slice):
+    def get_sdram_usage_for_atoms(
+            self, vertex_slice, n_machine_time_steps, machine_time_step):
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         total_size = \
             (front_end_common_constants.SYSTEM_BYTES_REQUIREMENT +
@@ -458,8 +477,9 @@ class SpikeSourcePoisson(
             total_size += self._minimum_buffer_sdram
         else:
             spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
-                self._n_machine_time_steps)
+                vertex_slice.n_atoms, self._max_spikes_per_ts(
+                    vertex_slice, n_machine_time_steps, machine_time_step),
+                n_machine_time_steps)
             total_size += recording_utils.get_buffer_sizes(
                 self._spike_buffer_max_size, spike_buffer_size,
                 self._enable_buffered_recording)
@@ -478,18 +498,31 @@ class SpikeSourcePoisson(
     def get_cpu_usage_for_atoms(self):
         return 0
 
-    @requires_injection([
-        "MemoryIpTags", "MemoryRoutingInfos", "MemoryGraphMapper",
-        "MemoryNoMachineTimeSteps"])
-    @overrides(UsesSimulationNeedsTotalRuntimeDataSpecableVertex.
-               generate_data_specification)
-    def generate_data_specification(self, spec, placement):
+    @inject_items({
+        "machine_time_step": "MachineTimeStep",
+        "time_scale_factor": "TimeScaleFactor",
+        "graph_mapper": "MemoryGraphMapper",
+        "routing_info": "MemoryRoutingInfos",
+        "tags": "MemoryTags",
+        "n_machine_time_steps": "TotalMachineTimeSteps"
+    })
+    @overrides(
+        AbstractGeneratesDataSpecification.generate_data_specification,
+        additional_arguments={
+            "machine_time_step", "time_scale_factor", "graph_mapper",
+            "routing_info", "tags", "n_machine_time_steps"
+        }
+    )
+    def generate_data_specification(
+            self, spec, placement, machine_time_step, time_scale_factor,
+            graph_mapper, routing_info, tags, n_machine_time_steps):
         vertex = placement.vertex
-        vertex_slice = self._graph_mapper.get_slice(vertex)
+        vertex_slice = graph_mapper.get_slice(vertex)
 
         spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._max_spikes_per_ts(vertex_slice),
-            self._no_machine_time_steps)
+            vertex_slice.n_atoms, self._max_spikes_per_ts(
+                vertex_slice, n_machine_time_steps, machine_time_step),
+            n_machine_time_steps)
         spike_history_sz = recording_utils.get_buffer_sizes(
             self._spike_buffer_max_size, spike_buffer_size,
             self._enable_buffered_recording)
@@ -512,46 +545,36 @@ class SpikeSourcePoisson(
         self.reserve_memory_regions(
             spec, setup_sz, poisson_params_sz, spike_history_sz, vertex)
 
+        iptags = tags.get_ip_tags_for_vertex(vertex)
         self._write_setup_info(
-            spec, spike_history_sz, self._iptags, buffer_size_before_receive,
-            vertex)
+            spec, spike_history_sz, iptags, buffer_size_before_receive,
+            vertex, machine_time_step, time_scale_factor)
 
-        key = self._routing_info.get_first_key_from_pre_vertex(
+        key = routing_info.get_first_key_from_pre_vertex(
             vertex, constants.SPIKE_PARTITION_ID)
 
-        self._write_poisson_parameters(spec, key, vertex_slice)
+        self._write_poisson_parameters(
+            spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
         # End-of-Spec:
         spec.end_specification()
 
-    @overrides(UsesSimulationNeedsTotalRuntimeDataSpecableVertex.
-               get_binary_file_name)
+    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
         return "spike_source_poisson.aplx"
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, graph_mapper, buffer_manager):
+    def get_spikes(
+            self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self._spike_recorder.get_spikes(
             self._label, buffer_manager,
             (SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value),
             (SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value),
-            placements, graph_mapper, self)
+            placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
         return [KeyAllocatorContiguousRangeContraint()]
-
-    @inject("MemoryGraphMapper")
-    def set_graph_mapper(self, graph_mapper):
-        self._graph_mapper = graph_mapper
-
-    @inject("MemoryIpTags")
-    def set_iptags(self, iptags):
-        self._iptags = iptags
-
-    @inject("MemoryRoutingInfos")
-    def set_routing_info(self, routing_info):
-        self._routing_info = routing_info

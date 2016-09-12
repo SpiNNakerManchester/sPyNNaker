@@ -98,8 +98,3 @@ class PopulationMachineVertex(
             self._add_name(names, "Last_timer_tic_the_core_ran_to"),
             last_timer_tick))
         return provenance_items
-
-    @property
-    @overrides(MachineVertex.model_name)
-    def model_name(self):
-        return "PopulationMachineVertex"

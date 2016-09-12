@@ -100,8 +100,3 @@ class DelayExtensionMachineVertex(
             self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
             n_delays))
         return provenance_items
-
-
-    @property
-    def model_name(self):
-        return "DelayExtensionMachineVertex"

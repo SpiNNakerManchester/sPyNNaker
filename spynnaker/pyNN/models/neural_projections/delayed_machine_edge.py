@@ -41,8 +41,3 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
                 return False
 
         return n_connections == 0
-
-    @property
-    @overrides(MachineEdge.model_name)
-    def model_name(self):
-        return "DelayedMachineEdge"

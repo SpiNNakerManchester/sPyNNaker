@@ -40,7 +40,3 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
         return self._is_recording
-
-    @property
-    def model_name(self):
-        return "SpikeSourcePoissonMachineVertex"

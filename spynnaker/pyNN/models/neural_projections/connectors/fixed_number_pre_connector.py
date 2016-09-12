@@ -85,11 +85,9 @@ class FixedNumberPreConnector(AbstractConnector):
         if min_delay is None or max_delay is None:
             return post_vertex_slice.n_atoms
 
-        pre_neurons = self._pre_neurons_in_slice(pre_vertex_slice)
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             self._delays, self._n_pre * self._n_post_neurons,
-            len(pre_neurons) * post_vertex_slice.n_atoms, None,
-            min_delay, max_delay)
+            post_vertex_slice.n_atoms, None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,

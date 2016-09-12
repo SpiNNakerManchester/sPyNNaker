@@ -12,8 +12,7 @@ logger = logging.getLogger(__name__)
 
 class MultiSpikeRecorder(object):
 
-    def __init__(self, machine_time_step):
-        self._machine_time_step = machine_time_step
+    def __init__(self):
         self._record = False
 
     @property
@@ -43,12 +42,13 @@ class MultiSpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, buffer_manager, region, state_region,
-                   placements, graph_mapper, application_vertex):
+    def get_spikes(
+            self, label, buffer_manager, region, state_region,
+            placements, graph_mapper, application_vertex, machine_time_step):
 
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = self._machine_time_step / 1000.0
+        ms_per_tick = machine_time_step / 1000.0
 
         vertices = \
             graph_mapper.get_machine_vertices(application_vertex)

@@ -81,8 +81,7 @@ class FixedNumberPostConnector(AbstractConnector):
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             self._delays, self._n_post * self._n_post_neurons,
-            pre_vertex_slice.n_atoms * len(post_neurons), None,
-            min_delay, max_delay)
+            len(post_neurons), None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,

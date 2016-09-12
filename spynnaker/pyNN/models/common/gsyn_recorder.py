@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 
 class GsynRecorder(object):
 
-    def __init__(self, machine_time_step):
-        self._machine_time_step = machine_time_step
+    def __init__(self):
         self._record_gsyn = False
 
     @property
@@ -40,10 +39,11 @@ class GsynRecorder(object):
             return 0
         return n_neurons * 8
 
-    def get_gsyn(self, label, buffer_manager, region, state_region,
-                 placements, graph_mapper, application_vertex):
+    def get_gsyn(
+            self, label, buffer_manager, region, state_region,
+            placements, graph_mapper, application_vertex, machine_time_step):
 
-        ms_per_tick = self._machine_time_step / 1000.0
+        ms_per_tick = machine_time_step / 1000.0
 
         vertices = \
             graph_mapper.get_machine_vertices(application_vertex)

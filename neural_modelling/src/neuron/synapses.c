@@ -278,18 +278,23 @@ bool synapses_initialise(
     uint32_t direct_matrix_offset = (synaptic_matrix_address[0] >> 2) + 1;
     log_info("Indirect matrix is %u words in size", direct_matrix_offset - 1);
     uint32_t direct_matrix_size = synaptic_matrix_address[direct_matrix_offset];
-    *direct_synapses_address = (address_t) spin1_malloc(direct_matrix_size);
-    if (direct_synapses_address == NULL) {
-        log_error("Not enough memory to allocate direct matrix");
-        return false;
+    log_info("Direct matrix malloc size is %d", direct_matrix_size);
+
+    if (direct_matrix_size != 0) {
+        *direct_synapses_address = (address_t) spin1_malloc(direct_matrix_size);
+
+        if (*direct_synapses_address == NULL) {
+            log_error("Not enough memory to allocate direct matrix");
+            return false;
+        }
+        log_info(
+            "Copying %u bytes of direct synapses to 0x%08x",
+            direct_matrix_size, *direct_synapses_address);
+        spin1_memcpy(
+            *direct_synapses_address,
+            &(synaptic_matrix_address[direct_matrix_offset + 1]),
+            direct_matrix_size);
     }
-    log_info(
-        "Copying %u bytes of direct synapses to 0x%08x",
-        direct_matrix_size, *direct_synapses_address);
-    spin1_memcpy(
-        *direct_synapses_address,
-        &(synaptic_matrix_address[direct_matrix_offset + 1]),
-        direct_matrix_size);
     *indirect_synapses_address = &(synaptic_matrix_address[1]);
 
     log_info("synapses_initialise: completed successfully");

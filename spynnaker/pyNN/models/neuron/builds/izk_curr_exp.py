@@ -22,8 +22,7 @@ class IzkCurrExp(AbstractPopulationVertex):
 
     # noinspection PyPep8Naming
     def __init__(
-            self, n_neurons, machine_time_step, timescale_factor,
-            spikes_per_second=None, ring_buffer_sigma=None,
+            self, n_neurons, spikes_per_second=None, ring_buffer_sigma=None,
             incoming_spike_buffer_size=None, constraints=None, label=None,
             a=default_parameters['a'], b=default_parameters['b'],
             c=default_parameters['c'], d=default_parameters['d'],
@@ -34,17 +33,15 @@ class IzkCurrExp(AbstractPopulationVertex):
             tau_syn_I=default_parameters['tau_syn_I']):
 
         neuron_model = NeuronModelIzh(
-            n_neurons, machine_time_step, a, b, c, d, v_init, u_init, i_offset)
+            n_neurons, a, b, c, d, v_init, u_init, i_offset)
         synapse_type = SynapseTypeExponential(
-            n_neurons, machine_time_step, tau_syn_E, tau_syn_I)
+            n_neurons, tau_syn_E, tau_syn_I)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, _IZK_THRESHOLD)
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IZK_curr_exp.aplx", label=label,
             max_atoms_per_core=IzkCurrExp._model_based_max_atoms_per_core,
-            machine_time_step=machine_time_step,
-            timescale_factor=timescale_factor,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,

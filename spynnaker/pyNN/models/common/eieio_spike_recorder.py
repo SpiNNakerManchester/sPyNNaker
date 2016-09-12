@@ -13,8 +13,7 @@ class EIEIOSpikeRecorder(object):
     """ Records spikes using EIEIO format
     """
 
-    def __init__(self, machine_time_step):
-        self._machine_time_step = machine_time_step
+    def __init__(self):
         self._record = False
 
     @property
@@ -37,11 +36,11 @@ class EIEIOSpikeRecorder(object):
 
     def get_spikes(self, label, buffer_manager, region, state_region,
                    placements, graph_mapper, application_vertex,
-                   base_key_function):
+                   base_key_function, machine_time_step):
 
         results = list()
         missing_str = ""
-        ms_per_tick = self._machine_time_step / 1000.0
+        ms_per_tick = machine_time_step / 1000.0
         vertices = \
             graph_mapper.get_machine_vertices(application_vertex)
         progress_bar = ProgressBar(len(vertices),

@@ -3,8 +3,6 @@ from spinn_machine.utilities.progress_bar import ProgressBar
 from spinn_front_end_common.interface.interface_functions.\
     front_end_common_graph_data_specification_writer import \
     FrontEndCommonGraphDataSpecificationWriter
-from spinn_front_end_common.utilities.utility_objs.executable_targets \
-    import ExecutableTargets
 
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
@@ -16,12 +14,11 @@ class SpynnakerDataSpecificationWriter(
     """
 
     def __call__(
-            self, placements, graph, hostname, executable_finder,
+            self, placements, graph, hostname,
             report_default_directory, write_text_specs,
             app_data_runtime_folder, graph_mapper=None):
 
         # Keep the results
-        executable_targets = ExecutableTargets()
         dsg_targets = dict()
 
         # Keep delay extensions until the end
@@ -39,16 +36,14 @@ class SpynnakerDataSpecificationWriter(
                     (placement, associated_vertex))
             else:
                 self._generate_data_spec_for_vertices(
-                    placement, associated_vertex, executable_targets,
-                    dsg_targets, executable_finder, hostname,
+                    placement, associated_vertex, dsg_targets, hostname,
                     report_default_directory, write_text_specs,
                     app_data_runtime_folder)
                 progress_bar.update()
 
         for placement, associated_vertex in delay_extension_placements:
             self._generate_data_spec_for_vertices(
-                placement, associated_vertex, executable_targets,
-                dsg_targets, executable_finder, hostname,
+                placement, associated_vertex, dsg_targets, hostname,
                 report_default_directory, write_text_specs,
                 app_data_runtime_folder)
             progress_bar.update()
@@ -56,4 +51,4 @@ class SpynnakerDataSpecificationWriter(
         # finish the progress bar
         progress_bar.end()
 
-        return executable_targets, dsg_targets
+        return dsg_targets

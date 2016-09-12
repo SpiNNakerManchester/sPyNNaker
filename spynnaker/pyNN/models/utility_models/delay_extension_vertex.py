@@ -4,8 +4,7 @@ import random
 
 from spinn_front_end_common.utilities import constants as common_constants
 
-from pacman.executor.injection_decorator import requires_injection, inject, \
-    supports_injection
+from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
@@ -27,10 +26,16 @@ from spinn_front_end_common.abstract_models\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models.impl.uses_simulation_data_specable_vertex import \
-    UsesSimulationDataSpecableVertex
+from spinn_front_end_common.interface.simulation import simulation_utilities
 
 from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
+from spinn_front_end_common.abstract_models\
+    .abstract_generates_data_specification \
+    import AbstractGeneratesDataSpecification
+from spinn_front_end_common.abstract_models\
+    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
+from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
+    import AbstractHasAssociatedBinary
 from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
     import DelayExtensionMachineVertex
 from spynnaker.pyNN.utilities import constants
@@ -41,11 +46,11 @@ _DELAY_PARAM_HEADER_WORDS = 7
 _DEFAULT_MALLOCS_USED = 2
 
 
-@supports_injection
 class DelayExtensionVertex(
-        ApplicationVertex, UsesSimulationDataSpecableVertex,
+        ApplicationVertex, AbstractGeneratesDataSpecification,
+        AbstractHasAssociatedBinary,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesNKeysForPartition):
+        AbstractProvidesNKeysForPartition, AbstractBinaryUsesSimulationRun):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -59,19 +64,12 @@ class DelayExtensionVertex(
         Creates a new DelayExtension Object.
         """
         ApplicationVertex.__init__(self, label, constraints, 256)
-        UsesSimulationDataSpecableVertex.__init__(
-            self, machine_time_step, timescale_factor)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractProvidesNKeysForPartition.__init__(self)
 
         self._source_vertex = source_vertex
         self._n_delay_stages = 0
         self._delay_per_stage = delay_per_stage
-
-        # storage params
-        self._graph_mapper = None
-        self._machine_graph = None
-        self._routing_info = None
 
         # atom store
         self._n_atoms = n_neurons
@@ -105,11 +103,6 @@ class DelayExtensionVertex(
         return self._n_atoms
 
     @property
-    @overrides(ApplicationVertex.model_name)
-    def model_name(self):
-        return "DelayExtension"
-
-    @property
     def n_delay_stages(self):
         """ The maximum number of delay stages required by any connection
             out of this delay extension vertex
@@ -134,10 +127,22 @@ class DelayExtensionVertex(
         [self._delay_blocks[key].add_delay(source_id, stage)
             for (source_id, stage) in zip(source_ids, stages)]
 
-    @requires_injection([
-        "MemoryMachineGraph", "MemoryRoutingInfos", "MemoryGraphMapper"])
-    @overrides(UsesSimulationDataSpecableVertex.generate_data_specification)
-    def generate_data_specification(self, spec, placement):
+    @inject_items({
+        "machine_time_step": "MachineTimeStep",
+        "time_scale_factor": "TimeScaleFactor",
+        "machine_graph": "MemoryMachineGraph",
+        "graph_mapper": "MemoryGraphMapper",
+        "routing_infos": "MemoryRoutingInfos"
+    })
+    @overrides(
+        AbstractGeneratesDataSpecification.generate_data_specification,
+        additional_arguments={
+            "machine_time_step", "time_scale_factor", "machine_graph",
+            "graph_mapper", "routing_infos"
+        })
+    def generate_data_specification(
+            self, spec, placement, machine_time_step, time_scale_factor,
+            machine_graph, graph_mapper, routing_infos):
 
         vertex = placement.vertex
 
@@ -146,7 +151,7 @@ class DelayExtensionVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        vertex_slice = self._graph_mapper.get_slice(vertex)
+        vertex_slice = graph_mapper.get_slice(vertex)
         n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
         delay_params_sz = \
             4 * (_DELAY_PARAM_HEADER_WORDS +
@@ -167,47 +172,46 @@ class DelayExtensionVertex(
 
         vertex.reserve_provenance_data_region(spec)
 
-        self.write_setup_info(spec)
+        self.write_setup_info(spec, machine_time_step, time_scale_factor)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
-        key = self._routing_info.get_first_key_from_pre_vertex(
+        key = routing_infos.get_first_key_from_pre_vertex(
             vertex, constants.SPIKE_PARTITION_ID)
 
         incoming_key = None
         incoming_mask = None
-        incoming_edges = self._machine_graph.get_edges_ending_at_vertex(
+        incoming_edges = machine_graph.get_edges_ending_at_vertex(
             vertex)
 
         for incoming_edge in incoming_edges:
-            incoming_slice = self._graph_mapper.get_slice(
+            incoming_slice = graph_mapper.get_slice(
                 incoming_edge.pre_vertex)
             if (incoming_slice.lo_atom == vertex_slice.lo_atom and
                     incoming_slice.hi_atom == vertex_slice.hi_atom):
-                r_info = \
-                    self._routing_info.get_routing_info_for_edge(incoming_edge)
+                r_info = routing_infos.get_routing_info_for_edge(incoming_edge)
                 incoming_key = r_info.first_key
                 incoming_mask = r_info.first_mask
 
         self.write_delay_parameters(
             spec, vertex_slice, key, incoming_key, incoming_mask,
-            self._n_vertices)
+            self._n_vertices, machine_time_step, time_scale_factor)
 
         # End-of-Spec:
         spec.end_specification()
 
-    def write_setup_info(self, spec):
+    def write_setup_info(self, spec, machine_time_step, time_scale_factor):
 
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(
-            DelayExtensionMachineVertex.
-                _DELAY_EXTENSION_REGIONS.SYSTEM.value)
-        spec.write_array(self.data_for_simulation_data())
-
+            DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS.SYSTEM.value)
+        spec.write_array(simulation_utilities.get_simulation_header_array(
+            self.get_binary_file_name(), machine_time_step,
+            time_scale_factor))
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask,
-            n_vertices):
+            n_vertices, machine_time_step, time_scale_factor):
         """ Generate Delay Parameter data
         """
 
@@ -239,7 +243,7 @@ class DelayExtensionVertex(
         # Write the time between spikes
         spikes_per_timestep = self._n_delay_stages * vertex_slice.n_atoms
         time_between_spikes = (
-            (self._machine_time_step * self._time_scale_factor) /
+            (machine_time_step * time_scale_factor) /
             (spikes_per_timestep * 2.0))
         spec.write_value(data=int(time_between_spikes))
 
@@ -263,7 +267,7 @@ class DelayExtensionVertex(
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         return (44 + (16 * 4)) * n_atoms
 
-    @overrides(UsesSimulationDataSpecableVertex.get_binary_file_name)
+    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
         return "delay_extension.aplx"
 
@@ -278,16 +282,3 @@ class DelayExtensionVertex(
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
         return [KeyAllocatorContiguousRangeContraint()]
-
-    @inject("MemoryGraphMapper")
-    def set_graph_mapper(self, graph_mapper):
-        self._graph_mapper = graph_mapper
-
-    @inject("MemoryMachineGraph")
-    def set_machine_graph(self, machine_graph):
-        self._machine_graph = machine_graph
-
-    @inject("MemoryRoutingInfos")
-    def set_routing_info(self, routing_info):
-        self._routing_info = routing_info
-

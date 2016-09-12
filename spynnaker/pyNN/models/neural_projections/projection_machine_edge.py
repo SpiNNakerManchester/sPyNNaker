@@ -105,8 +105,3 @@ class ProjectionMachineEdge(
 
     def __repr__(self):
         return "{}:{}".format(self.pre_vertex, self.post_vertex)
-
-    @property
-    @overrides(MachineEdge.model_name)
-    def model_name(self):
-        return "ProjectionMachineEdge"

@@ -22,8 +22,9 @@ class AbstractVRecordable(object):
         """
 
     @abstractmethod
-    def get_v(self, n_machine_time_steps, placements, graph_mapper,
-              buffer_manager):
+    def get_v(
+            self, n_machine_time_steps, placements, graph_mapper,
+            buffer_manager, machine_time_step):
         """ Get the recorded v from the object
 
         :param n_machine_time_steps: the number of timer ticks that will\
@@ -31,6 +32,7 @@ class AbstractVRecordable(object):
         :param placements: The placements of the graph
         :param graph_mapper: The mapper between vertices and vertices
         :param buffer_manager: the buffer manager object
+        :param machine_time_step: the time step of the simulation
         :return: A numpy array of 3-element arrays of (neuron_id, time, v)\
                 ordered by time
         """

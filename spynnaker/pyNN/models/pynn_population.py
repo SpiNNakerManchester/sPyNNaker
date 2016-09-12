@@ -2,10 +2,6 @@ from pacman.model.constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from spinn_front_end_common.interface.simulation.abstract_uses_simulation import \
-    AbstractUsesSimulation
-from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source import \
-    ReverseIpTagMultiCastSource
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
@@ -70,12 +66,6 @@ class Population(object):
         # set spinnaker targeted parameters
         internal_cellparams['label'] = cell_label
         internal_cellparams['n_neurons'] = size
-
-        if issubclass(cellclass, AbstractUsesSimulation):
-            internal_cellparams['machine_time_step'] = \
-                spinnaker.machine_time_step
-            internal_cellparams['timescale_factor'] = \
-                spinnaker.timescale_factor
 
         # create population vertex.
         self._vertex = cellclass(**internal_cellparams)
@@ -196,7 +186,7 @@ class Population(object):
 
         spikes = self._vertex.get_spikes(
             self._spinnaker.placements, self._spinnaker.graph_mapper,
-            self._spinnaker.buffer_manager)
+            self._spinnaker.buffer_manager, self._spinnaker.machine_time_step)
 
         return spikes
 
@@ -205,7 +195,7 @@ class Population(object):
         """
         spikes = self.getSpikes(True, gather)
         n_spikes = {}
-        counts = numpy.bincount(spikes[:, 0].astype(dtype="uint32"),
+        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=self._vertex.n_atoms)
         for i in range(self._vertex.n_atoms):
             n_spikes[i] = counts[i]
@@ -246,7 +236,8 @@ class Population(object):
 
         return self._vertex.get_gsyn(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
-            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
+            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager,
+            self._spinnaker.machine_time_step)
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -283,7 +274,8 @@ class Population(object):
 
         return self._vertex.get_v(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
-            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
+            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager,
+            self._spinnaker.machine_time_step)
 
     def id_to_index(self, cell_id):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
