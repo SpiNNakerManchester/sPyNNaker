@@ -43,7 +43,7 @@ class MultiSpikeRecorder(object):
         return n_neurons * 4
 
     def get_spikes(
-            self, label, buffer_manager, region, state_region,
+            self, label, buffer_manager, region,
             placements, graph_mapper, application_vertex, machine_time_step):
 
         spike_times = list()
@@ -74,7 +74,7 @@ class MultiSpikeRecorder(object):
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, data_missing = \
                 buffer_manager.get_data_for_vertex(
-                    placement, region, state_region)
+                    placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             raw_data = neuron_param_region_data_pointer.read_all()

@@ -59,12 +59,5 @@ POPULATION_BASED_REGIONS = Enum(
            ('BUFFERING_OUT_STATE', 9),
            ('PROVENANCE_DATA', 10)])
 
-# Recording regions ids
-POPULATION_RECORDING_REGION_IDS = Enum(
-    value="POPULATION_RECORDING_REGION_IDS",
-    names=[('SPIKE_HISTORY', 0),
-           ('POTENTIAL_HISTORY', 1),
-           ('GSYN_HISTORY', 2)])
-
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"

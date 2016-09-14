@@ -293,20 +293,26 @@ static bool initialise_recording(){
 
     // Get the system region
     address_t system_region = data_specification_get_region(
-            SYSTEM, address);
+        SYSTEM, address);
 
     // Get the recording information
-    uint8_t regions_to_record[] = {
-        BUFFERING_OUT_SPIKE_RECORDING_REGION,
+    address_t region_addresses_to_record[] = {
+        data_specification_get_region(
+            BUFFERING_OUT_SPIKE_RECORDING_REGION, address)
     };
+
+    // get the recording buffer state region address
+    address_t state_region_address = data_specification_get_region(
+        BUFFERING_OUT_CONTROL_REGION, address);
+
     uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
     uint32_t *recording_flags_from_system_conf =
         &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
 
     bool success = recording_initialize(
-        n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, &recording_flags);
+        n_regions_to_record, region_addresses_to_record,
+        recording_flags_from_system_conf, state_region_address,
+        &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
 
     return success;
@@ -367,17 +373,18 @@ void resume_callback() {
     address_t address = data_specification_get_data_address();
     address_t system_region = data_specification_get_region(
         SYSTEM, address);
-    address_t regions_to_record[] = {
+    address_t region_addresses_to_record[] = {
         data_specification_get_region(
             BUFFERING_OUT_SPIKE_RECORDING_REGION, address)
     };
     uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
     uint32_t *recording_flags_from_system_conf =
         &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    address_t state_region_address = BUFFERING_OUT_CONTROL_REGION;
+    address_t state_region_address =
+        data_specification_get_region(BUFFERING_OUT_CONTROL_REGION, address);
 
     recording_initialize(
-        n_regions_to_record, regions_to_record,
+        n_regions_to_record, region_addresses_to_record,
         recording_flags_from_system_conf, state_region_address,
         &recording_flags);
 }
