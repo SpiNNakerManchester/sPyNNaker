@@ -28,14 +28,18 @@ class SpikeSourcePoissonMachineVertex(
     def __init__(
             self, resources_required, is_recording, constraints=None,
             label=None):
-        MachineVertex.__init__(
-            self, resources_required, label, constraints=constraints)
+        MachineVertex.__init__(self, label, constraints=constraints)
         ReceiveBuffersToHostBasicImpl.__init__(self)
         ProvidesProvenanceDataFromMachineImpl.__init__(
             self, self._POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value,
             0)
         AbstractRecordable.__init__(self)
         self._is_recording = is_recording
+        self._resources = resources_required
+
+    @overrides(MachineVertex.resources_required)
+    def resources_required(self):
+        return self._resources
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):

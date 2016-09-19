@@ -36,14 +36,18 @@ class PopulationMachineVertex(
 
     def __init__(
             self, resources_required, is_recording, label, constraints=None):
-        MachineVertex.__init__(
-            self, resources_required, label, constraints)
+        MachineVertex.__init__(self, label, constraints)
         ReceiveBuffersToHostBasicImpl.__init__(self)
         ProvidesProvenanceDataFromMachineImpl.__init__(
             self, constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value,
             self.N_ADDITIONAL_PROVENANCE_DATA_ITEMS)
         AbstractRecordable.__init__(self)
         self._is_recording = is_recording
+        self._resources = resources_required
+
+    @overrides(MachineVertex.resources_required)
+    def resources_required(self):
+        return self._resources
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):

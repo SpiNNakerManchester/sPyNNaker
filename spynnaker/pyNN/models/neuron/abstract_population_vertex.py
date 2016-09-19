@@ -328,7 +328,6 @@ class AbstractPopulationVertex(
             machine_time_step):
         sdram_requirement = (
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
-            ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(3) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
