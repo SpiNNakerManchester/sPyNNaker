@@ -66,14 +66,6 @@ class SpikeSourcePoisson(
     """ A Poisson Spike source object
     """
 
-    _POISSON_SPIKE_SOURCE_REGIONS = Enum(
-        value="_POISSON_SPIKE_SOURCE_REGIONS",
-        names=[('SYSTEM_REGION', 0),
-               ('POISSON_PARAMS_REGION', 1),
-               ('SPIKE_HISTORY_REGION', 2),
-               ('BUFFERING_OUT_STATE', 3),
-               ('PROVENANCE_REGION', 4)])
-
     _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
 
@@ -292,8 +284,6 @@ class SpikeSourcePoisson(
             size=poisson_params_sz, label='PoissonParams')
         vertex.reserve_buffer_regions(
             spec,
-            (SpikeSourcePoissonMachineVertex.
-                _POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value),
             [SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value],
             [spike_hist_buff_sz])
@@ -466,8 +456,6 @@ class SpikeSourcePoisson(
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         total_size = \
             (front_end_common_constants.SYSTEM_BYTES_REQUIREMENT +
-             ReceiveBuffersToHostBasicImpl.get_recording_data_size(1) +
-             ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(1) +
              SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
              poisson_params_sz)
         total_size += self._get_number_of_mallocs_used_by_dsg() * \

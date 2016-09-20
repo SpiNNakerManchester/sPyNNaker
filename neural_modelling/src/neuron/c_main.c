@@ -43,7 +43,6 @@ typedef enum regions_e{
     BUFFERING_OUT_SPIKE_RECORDING_REGION,
     BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
     BUFFERING_OUT_GSYN_RECORDING_REGION,
-    BUFFERING_OUT_CONTROL_REGION,
     PROVENANCE_DATA_REGION
 } regions_e;
 
@@ -94,19 +93,17 @@ static bool initialise_recording(){
     };
 
     for (uint32_t counter =0; counter < 3; counter++){
-        log_info("address %d is 0x%08x", counter, region_addresses_to_record[counter]);
+        log_info("address %d is 0x%08x", counter,
+                 region_addresses_to_record[counter]);
     }
 
     uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
     uint32_t *recording_flags_from_system_conf =
         &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    address_t state_region_address =
-        data_specification_get_region(BUFFERING_OUT_CONTROL_REGION, address);
 
     bool success = recording_initialize(
         n_regions_to_record, region_addresses_to_record,
-        recording_flags_from_system_conf, state_region_address,
-        &recording_flags);
+        recording_flags_from_system_conf, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
     return success;
 }

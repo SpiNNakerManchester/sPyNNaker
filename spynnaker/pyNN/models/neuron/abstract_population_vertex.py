@@ -391,7 +391,6 @@ class AbstractPopulationVertex(
 
         vertex.reserve_buffer_regions(
             spec,
-            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
             [constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
              constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
              constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value],

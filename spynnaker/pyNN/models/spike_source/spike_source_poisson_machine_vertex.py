@@ -22,8 +22,7 @@ class SpikeSourcePoissonMachineVertex(
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
                ('SPIKE_HISTORY_REGION', 2),
-               ('BUFFERING_OUT_STATE', 3),
-               ('PROVENANCE_REGION', 4)])
+               ('PROVENANCE_REGION', 3)])
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
@@ -37,6 +36,7 @@ class SpikeSourcePoissonMachineVertex(
         self._is_recording = is_recording
         self._resources = resources_required
 
+    @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return self._resources

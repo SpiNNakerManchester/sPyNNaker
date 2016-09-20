@@ -45,6 +45,7 @@ class PopulationMachineVertex(
         self._is_recording = is_recording
         self._resources = resources_required
 
+    @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return self._resources

@@ -56,8 +56,7 @@ POPULATION_BASED_REGIONS = Enum(
            ('SPIKE_HISTORY', 6),
            ('POTENTIAL_HISTORY', 7),
            ('GSYN_HISTORY', 8),
-           ('BUFFERING_OUT_STATE', 9),
-           ('PROVENANCE_DATA', 10)])
+           ('PROVENANCE_DATA', 9)])
 
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"

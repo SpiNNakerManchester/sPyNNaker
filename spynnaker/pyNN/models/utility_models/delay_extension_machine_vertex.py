@@ -38,6 +38,7 @@ class DelayExtensionMachineVertex(
             self, self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value, 6)
         self._resources = resources_required
 
+    @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return self._resources
