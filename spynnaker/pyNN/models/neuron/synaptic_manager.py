@@ -485,8 +485,6 @@ class SynapticManager(object):
                             prob, spikes_per_tick)
                     rate_stats[synapse_type].add_items(
                         spikes_per_second, 0, n_connections)
-
-                    print machine_edge.pre_vertex.label, synapse_type, weight_max, n_connections
                     total_weights[synapse_type] += spikes_per_tick * (
                         weight_max * n_connections)
 
@@ -508,8 +506,6 @@ class SynapticManager(object):
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
                     max_weights[synapse_type], biggest_weight[synapse_type])
-
-        print machine_vertex.label, max_weights
 
         # Convert these to powers
         max_weight_powers = [0 if w <= 0
