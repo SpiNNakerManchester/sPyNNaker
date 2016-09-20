@@ -54,6 +54,10 @@ class Spinnaker(SpinnakerMainInterface):
         self._projections = list()
         self._multi_cast_vertex = None
         self._edge_count = 0
+
+        # the number of edges that are associated with commands being sent to
+        # a vertex
+        self._command_edge_count = 0
         self._live_spike_recorder = dict()
 
         # create xml path for where to locate spynnaker related functions when
@@ -220,19 +224,37 @@ class Spinnaker(SpinnakerMainInterface):
         self._application_graph.add_vertex(vertex_to_add)
 
         if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
+
+            # if there's no command sender yet, build one
             if self._multi_cast_vertex is None:
                 self._multi_cast_vertex = CommandSender(
                     "auto_added_command_sender", None)
                 self.add_application_vertex(self._multi_cast_vertex)
+
+            # get the vertex is going to send and verify how many partitions
+            # it'll need based off the commands keys.
+
+            n_partitions = self._deduce_partitions_from_command_keys(
+                vertex_to_add.commands)
+
+
+
+
             edge = ApplicationEdge(
                 self._multi_cast_vertex, vertex_to_add)
-            self.add_application_edge(edge, "COMMANDS")
+            self.add_application_edge(
+                edge, "COMMANDS{}".format(self._command_edge_count))
 
             self._multi_cast_vertex.add_commands(
                 vertex_to_add.commands, edge,
                 self._application_graph.
                 get_outgoing_edge_partition_starting_at_vertex(
-                    self._multi_cast_vertex, "COMMANDS"))
+                    self._multi_cast_vertex,
+                    "COMMANDS{}".format(self._command_edge_count)))
+
+            # add to the command count, so that each set of commands is in
+            # its own partition
+            self._command_edge_count += 1
 
         # add any dependent edges and vertices if needed
         if isinstance(vertex_to_add,
@@ -245,6 +267,13 @@ class Spinnaker(SpinnakerMainInterface):
                     dependant_edge,
                     vertex_to_add.
                     edge_partition_identifier_for_dependent_edge)
+
+    def _deduce_partitions_from_command_keys(self, commands):
+        unique_keys = list()
+        for command in commands:
+            if command.key not in unique_keys:
+                unique_keys.append(command.key)
+        return len(unique_keys)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         """
