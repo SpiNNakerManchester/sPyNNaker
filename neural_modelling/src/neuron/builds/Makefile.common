@@ -1,5 +1,3 @@
-SYNAPSE_BENCHMARK = NO_SYNAPSE_BENCHMARKS
-
 ifeq ($(SPYNNAKER_DEBUG), DEBUG)
     NEURON_DEBUG = LOG_DEBUG
     SYNAPSE_DEBUG = LOG_DEBUG
@@ -80,8 +78,6 @@ ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_sta
     STDP += $(SYNAPSE_DYNAMICS) \
             $(SOURCE_DIR)/neuron/plasticity/common/post_events.c
 endif
-
-CFLAGS += -D$(SYNAPSE_BENCHMARK)
 
 include ../../../Makefile.common
 
