@@ -12,9 +12,7 @@
                                 + SYNAPSE_INDEX_BITS))
 
 // Globals required for synapse benchmarking to work.
-#ifdef SYNAPSE_BENCHMARK
-    uint32_t  num_fixed_pre_synaptic_events = 0;
-#endif  // SYNAPSE_BENCHMARK
+uint32_t  num_fixed_pre_synaptic_events = 0;
 
 // The number of neurons
 static uint32_t n_neurons;
@@ -160,9 +158,7 @@ static inline void _process_fixed_synapses(
     register uint32_t fixed_synapse = synapse_row_num_fixed_synapses(
         fixed_region_address);
 
-#ifdef SYNAPSE_BENCHMARK
     num_fixed_pre_synaptic_events += fixed_synapse;
-#endif // SYNAPSE_BENCHMARK
 
     for (; fixed_synapse > 0; fixed_synapse--) {
 
@@ -395,10 +391,6 @@ uint32_t synapses_get_saturation_count() {
 //! returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events() {
-#ifdef SYNAPSE_BENCHMARK
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
-#else
-    return 0;
-#endif // SYNAPSE_BENCHMARK
 }
