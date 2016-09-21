@@ -237,24 +237,33 @@ class Spinnaker(SpinnakerMainInterface):
             n_partitions = self._deduce_partitions_from_command_keys(
                 vertex_to_add.commands)
 
+            # build the number of edges accordingly and then add them to the
+            # graph.
+            partitions = list()
+            for _ in range(0, n_partitions):
+                edge = ApplicationEdge(
+                    self._multi_cast_vertex, vertex_to_add)
+                partition_id = "COMMANDS{}".format(self._command_edge_count)
 
+                # add to the command count, so that each set of commands is in
+                # its own partition
+                self._command_edge_count += 1
 
+                # add edge with new partition id to graph
+                self.add_application_edge(edge, partition_id)
 
-            edge = ApplicationEdge(
-                self._multi_cast_vertex, vertex_to_add)
-            self.add_application_edge(
-                edge, "COMMANDS{}".format(self._command_edge_count))
+                # locate the partition object for the edge we just added
+                partition = self._application_graph.\
+                    get_outgoing_edge_partition_starting_at_vertex(
+                        self._multi_cast_vertex, partition_id)
 
+                # store the partition for the command sender to use for its
+                # key map
+                partitions.append(partition)
+
+            # allow the command sender to create key to partition map
             self._multi_cast_vertex.add_commands(
-                vertex_to_add.commands, edge,
-                self._application_graph.
-                get_outgoing_edge_partition_starting_at_vertex(
-                    self._multi_cast_vertex,
-                    "COMMANDS{}".format(self._command_edge_count)))
-
-            # add to the command count, so that each set of commands is in
-            # its own partition
-            self._command_edge_count += 1
+                vertex_to_add.commands, partitions)
 
         # add any dependent edges and vertices if needed
         if isinstance(vertex_to_add,
