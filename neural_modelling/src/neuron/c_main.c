@@ -135,7 +135,8 @@ static bool initialise(uint32_t *timer_period) {
             data_specification_get_region(SYSTEM_REGION, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
             &infinite_run, SDP_AND_DMA_AND_USER, c_main_store_provenance_data,
-            data_specification_get_region(PROVENANCE_DATA_REGION, address))) {
+            data_specification_get_region(PROVENANCE_DATA_REGION, address),
+            NULL)) {
         return false;
     }
 

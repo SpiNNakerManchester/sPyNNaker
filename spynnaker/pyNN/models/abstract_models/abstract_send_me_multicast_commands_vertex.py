@@ -8,16 +8,36 @@ class AbstractSendMeMulticastCommandsVertex(object):
         at fixed points in the simulation
     """
 
-    def __init__(self, commands):
+    def __init__(self, start_resume_commands, pause_stop_commands,
+                 timed_commands):
         """
 
-        :param commands: The commands that the vertex expects to be transmitted
-        :type commands: iterable of \
+        :param start_resume_commands: The commands that the vertex expects
+        to be transmitted at the start or during a resume
+        :param pause_stop_commands: The commands that the vertex expects
+        to be transmitted at the pause or stop of a simulation
+        :param timed_commands: The commands that the vertex expects
+        to be transmitted at times other than start/stop/pause/resume
+        :type start_resume_commands: iterable of \
+                    py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
+        :type pause_stop_commands: iterable of \
+                    py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
+        :type timed_commands: iterable of \
                     py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
         :raise None: does not raise any known exceptions
         """
-        self._commands = commands
+        self._start_resume_commands = start_resume_commands
+        self._pause_stop_commands = pause_stop_commands
+        self._timed_commands = timed_commands
 
     @property
-    def commands(self):
-        return self._commands
+    def start_resume_commands(self):
+        return self._start_resume_commands
+
+    @property
+    def pause_stop_commands(self):
+        return self._pause_stop_commands
+
+    @property
+    def timed_commands(self):
+        return self._timed_commands

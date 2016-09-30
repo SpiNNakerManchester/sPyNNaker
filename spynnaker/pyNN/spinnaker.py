@@ -1,5 +1,8 @@
 
 # pacman imports
+import struct
+
+from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
 from pacman.model.graphs.application.impl.application_edge import \
     ApplicationEdge
 
@@ -7,15 +10,20 @@ from pacman.model.graphs.application.impl.application_edge import \
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
+from spinn_front_end_common.utilities import constants as common_constants
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
 # local front end imports
+from spinnman.messages.sdp.sdp_flag import SDPFlag
+from spinnman.messages.sdp.sdp_header import SDPHeader
+from spinnman.messages.sdp.sdp_message import SDPMessage
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN import exceptions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.models.abstract_models\
     .abstract_send_me_multicast_commands_vertex \
@@ -225,45 +233,7 @@ class Spinnaker(SpinnakerMainInterface):
 
         if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
 
-            # if there's no command sender yet, build one
-            if self._multi_cast_vertex is None:
-                self._multi_cast_vertex = CommandSender(
-                    "auto_added_command_sender", None)
-                self.add_application_vertex(self._multi_cast_vertex)
-
-            # get the vertex is going to send and verify how many partitions
-            # it'll need based off the commands keys.
-
-            n_partitions = self._deduce_partitions_from_command_keys(
-                vertex_to_add.commands)
-
-            # build the number of edges accordingly and then add them to the
-            # graph.
-            partitions = list()
-            for _ in range(0, n_partitions):
-                edge = ApplicationEdge(
-                    self._multi_cast_vertex, vertex_to_add)
-                partition_id = "COMMANDS{}".format(self._command_edge_count)
-
-                # add to the command count, so that each set of commands is in
-                # its own partition
-                self._command_edge_count += 1
-
-                # add edge with new partition id to graph
-                self.add_application_edge(edge, partition_id)
-
-                # locate the partition object for the edge we just added
-                partition = self._application_graph.\
-                    get_outgoing_edge_partition_starting_at_vertex(
-                        self._multi_cast_vertex, partition_id)
-
-                # store the partition for the command sender to use for its
-                # key map
-                partitions.append(partition)
-
-            # allow the command sender to create key to partition map
-            self._multi_cast_vertex.add_commands(
-                vertex_to_add.commands, partitions)
+            self._handle_commands(vertex_to_add)
 
         # add any dependent edges and vertices if needed
         if isinstance(vertex_to_add,
@@ -277,7 +247,54 @@ class Spinnaker(SpinnakerMainInterface):
                     vertex_to_add.
                     edge_partition_identifier_for_dependent_edge)
 
-    def _deduce_partitions_from_command_keys(self, commands):
+    def _handle_commands(self, vertex_to_add):
+
+        # if there's no command sender yet, build one
+        if self._multi_cast_vertex is None:
+            self._multi_cast_vertex = CommandSender(
+                "auto_added_command_sender", None)
+            self.add_application_vertex(self._multi_cast_vertex)
+
+        # get all the commands possible to be sent by the vertex
+        commands = list(vertex_to_add.start_resume_commands)
+        commands.extend(vertex_to_add.pause_stop_commands)
+        commands.extend(vertex_to_add.timed_commands)
+
+        # verify how many partitions the commands need
+        # based off the commands keys.
+        n_partitions = self._deduce_partitions_from_command_keys(commands)
+
+        # build the number of edges accordingly and then add them to the
+        # graph.
+        partitions = list()
+        for _ in range(0, n_partitions):
+            edge = ApplicationEdge(self._multi_cast_vertex, vertex_to_add)
+            partition_id = "COMMANDS{}".format(self._command_edge_count)
+
+            # add to the command count, so that each set of commands is in
+            # its own partition
+            self._command_edge_count += 1
+
+            # add edge with new partition id to graph
+            self.add_application_edge(edge, partition_id)
+
+            # locate the partition object for the edge we just added
+            partition = self._application_graph. \
+                get_outgoing_edge_partition_starting_at_vertex(
+                    self._multi_cast_vertex, partition_id)
+
+            # store the partition for the command sender to use for its
+            # key map
+            partitions.append(partition)
+
+        # allow the command sender to create key to partition map
+        self._multi_cast_vertex.add_commands(
+            vertex_to_add.start_resume_commands,
+            vertex_to_add.pause_stop_commands,
+            vertex_to_add.timed_commands, partitions)
+
+    @staticmethod
+    def _deduce_partitions_from_command_keys(commands):
         unique_keys = list()
         for command in commands:
             if command.key not in unique_keys:
@@ -369,6 +386,15 @@ class Spinnaker(SpinnakerMainInterface):
 
         :param run_time: the time in ms to run the simulation for
         """
+
+        if config.getboolean("Buffers", "use_auto_pause_and_resume"):
+            for vertex in self._application_graph.vertices:
+                if isinstance(vertex, AbstractVirtualVertex):
+                    raise exceptions.SynapticConfigurationException(
+                        "External devices do not currently operate within the "
+                        "auto pause and resume functionality. Turn off the "
+                        "auto pause functionality in your cfg file by adding"
+                        "\n [Buffers] \n use_auto_pause_and_resume = False\n\n")
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
