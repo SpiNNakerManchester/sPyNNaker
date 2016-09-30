@@ -235,6 +235,14 @@ void timer_callback(uint timer_count, uint unused) {
         time -= 1;
         return;
     }
+
+    //TODO
+    /* 
+        1. Count timesteps
+        2. Once the desired period has elapsed trigger rewiring attempt
+            - Select 
+    */
+
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time);

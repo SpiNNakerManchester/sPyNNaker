@@ -4,11 +4,12 @@ class SynapseInformation(object):
         and synapse dynamics
     """
 
-    def __init__(self, connector, synapse_dynamics, synapse_type):
+    def __init__(self, connector, synapse_dynamics, synapse_type, structural_dynamics=None):
         self._connector = connector
         self._synapse_dynamics = synapse_dynamics
         self._synapse_type = synapse_type
         self._index = 0
+        self._structural_dynamics = structural_dynamics
 
     @property
     def connector(self):
@@ -29,3 +30,7 @@ class SynapseInformation(object):
     @index.setter
     def index(self, index):
         self._index = index
+
+    @property
+    def structural_dynamics(self):
+        return self._structural_dynamics

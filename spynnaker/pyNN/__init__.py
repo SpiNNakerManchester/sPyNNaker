@@ -79,6 +79,9 @@ from spynnaker.pyNN.models.neural_projections.connectors.\
 # Mechanisms for synapse dynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.pynn_synapse_dynamics\
     import PyNNSynapseDynamics as SynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics.structural_dynamics\
+    import StructuralDynamics as StructuralDynamics
+
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp\
     import SynapseDynamicsSTDP as STDPMechanism
 

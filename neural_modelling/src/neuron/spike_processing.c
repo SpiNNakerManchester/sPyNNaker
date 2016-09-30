@@ -12,6 +12,7 @@
 // DMA tags
 #define DMA_TAG_READ_SYNAPTIC_ROW 0
 #define DMA_TAG_WRITE_PLASTIC_REGION 1
+#define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 2
 
 // DMA buffer structure combines the row read from SDRAM with
 typedef struct dma_buffer {
@@ -243,6 +244,14 @@ void _dma_complete_callback(uint unused, uint tag) {
 
         // Do Nothing
 
+    } else if (tag == DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING) {
+        // TODO:
+        /*
+            1. Select random postsynaptic neuron
+            2. Check if it exists
+            3. Probabilistically create or remove it
+            4. Write back the synaptic row
+        */
     } else {
 
         // Otherwise, if it ISN'T the result of a plastic region write
