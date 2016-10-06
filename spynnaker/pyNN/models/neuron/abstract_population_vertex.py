@@ -40,7 +40,9 @@ from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
 
 # spynnaker imports
-from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_contains_a_synaptic_manager import \
+    AbstractContainsASynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
@@ -89,7 +91,7 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, ReceiveBuffersToHostBasicImpl,
-        AbstractHasGlobalMaxAtoms):
+        AbstractHasGlobalMaxAtoms, AbstractContainsASynapticManager):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -113,6 +115,8 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun.__init__(self)
         ReceiveBuffersToHostBasicImpl.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
+        AbstractContainsASynapticManager.__init__(
+            self, synapse_type, ring_buffer_sigma, spikes_per_second)
 
         self._binary = binary
         self._n_atoms = n_neurons
@@ -153,10 +157,6 @@ class AbstractPopulationVertex(
             "Buffers", "receive_buffer_port")
         self._enable_buffered_recording = config.getboolean(
             "Buffers", "enable_buffered_recording")
-
-        # Set up synapse handling
-        self._synapse_manager = SynapticManager(
-            synapse_type, ring_buffer_sigma, spikes_per_second)
 
         # bool for if state has changed.
         self._change_requires_mapping = True
@@ -272,10 +272,6 @@ class AbstractPopulationVertex(
 
         # return machine vertex
         return vertex
-
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        return self._synapse_manager.get_maximum_delay_supported_in_ms(
-            machine_time_step)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         per_neuron_cycles = (
@@ -642,10 +638,6 @@ class AbstractPopulationVertex(
         self._change_requires_mapping = True
 
     @property
-    def synapse_type(self):
-        return self._synapse_manager.synapse_type
-
-    @property
     def input_type(self):
         return self._input_type
 
@@ -678,42 +670,6 @@ class AbstractPopulationVertex(
     @property
     def weight_scale(self):
         return self._input_type.get_global_weight_scale()
-
-    @property
-    def ring_buffer_sigma(self):
-        return self._synapse_manager.ring_buffer_sigma
-
-    @ring_buffer_sigma.setter
-    def ring_buffer_sigma(self, ring_buffer_sigma):
-        self._synapse_manager.ring_buffer_sigma = ring_buffer_sigma
-
-    @property
-    def spikes_per_second(self):
-        return self._synapse_manager.spikes_per_second
-
-    @spikes_per_second.setter
-    def spikes_per_second(self, spikes_per_second):
-        self._synapse_manager.spikes_per_second = spikes_per_second
-
-    @property
-    def synapse_dynamics(self):
-        return self._synapse_manager.synapse_dynamics
-
-    @synapse_dynamics.setter
-    def synapse_dynamics(self, synapse_dynamics):
-        self._synapse_manager.synapse_dynamics = synapse_dynamics
-
-    def add_pre_run_connection_holder(
-            self, connection_holder, edge, synapse_info):
-        self._synapse_manager.add_pre_run_connection_holder(
-            connection_holder, edge, synapse_info)
-
-    def get_connections_from_machine(
-            self, transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_info, machine_time_step):
-        return self._synapse_manager.get_connections_from_machine(
-            transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_info, machine_time_step)
 
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)

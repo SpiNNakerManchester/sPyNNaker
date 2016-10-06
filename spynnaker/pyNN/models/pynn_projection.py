@@ -1,6 +1,8 @@
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
+from spynnaker.pyNN.models.abstract_models.abstract_contains_a_synaptic_manager import \
+    AbstractContainsASynapticManager
 from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
     import DelayedApplicationEdge
 
@@ -52,7 +54,7 @@ class Projection(object):
         self._has_retrieved_synaptic_list_from_machine = False
 
         if not isinstance(postsynaptic_population._get_vertex,
-                          AbstractPopulationVertex):
+                          AbstractContainsASynapticManager):
 
             raise exceptions.ConfigurationException(
                 "postsynaptic population is not designed to receive"
