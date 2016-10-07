@@ -21,10 +21,17 @@ from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
 
+from spynnaker.pyNN.models.neuron.synapse_dynamics.structural_dynamics\
+    import StructuralDynamics as StructuralDynamics
+
 from spinn_front_end_common.utilities import exceptions
 
 from spinn_machine.utilities.progress_bar import ProgressBar
 
+
+# FixedNumberPreConnector for Structural Plasticity
+from spynnaker.pyNN.models.neural_projections.connectors.fixed_number_pre_connector\
+    import FixedNumberPreConnector
 
 import logging
 import math
@@ -76,6 +83,7 @@ class Projection(object):
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(
             connector, synapse_dynamics_stdp, synapse_type)
+
         connector.set_projection_information(
             presynaptic_population, postsynaptic_population, rng,
             machine_time_step)
