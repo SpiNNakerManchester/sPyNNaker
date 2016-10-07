@@ -103,7 +103,10 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         return self.super.get_n_words_for_plastic_connections(n_connections)
 
     def get_n_synapses_in_rows(self, pp_size, fp_size):
-        return self.super.get_n_synapses_in_rows(pp_size, fp_size)
+        try:
+            return self.super.get_n_synapses_in_rows(pp_size, fp_size)
+        except TypeError:
+            return self.super.get_n_synapses_in_rows(pp_size)
 
     def read_plastic_synaptic_data(self, post_vertex_slice, n_synapse_types, pp_size, pp_data, fp_size, fp_data):
         return self.super.read_plastic_synaptic_data(post_vertex_slice, n_synapse_types, pp_size, pp_data, fp_size, fp_data)
