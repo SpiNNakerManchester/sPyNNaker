@@ -42,7 +42,6 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         return self._p_rew
 
     def write_parameters(self, spec, region, machine_time_step, weight_scales, application_graph, machine_graph):
-        # TODO write pre population information data structure
         self.super.write_parameters(spec, region, machine_time_step, weight_scales)
         spec.comment("Writing structural plasticity parameters")
 
@@ -66,6 +65,11 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
 
+        # TODO write pre population information data structure
+        # This is done by creating a lookup table from
+        # population -> subpopulations.
+        # subpopulation information of note: keys, number of atoms (hi, lo)
+
     def get_vertex_executable_suffix(self):
         name = self.super.get_vertex_executable_suffix()
         name += "_structural"
@@ -84,6 +88,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         )
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
+        # TODO approximate the size of the pop -> subpop table
         structure_size = 8 * 4 + 4 * 4 # parameters + rng seed
         initial_size = self.super.get_parameters_sdram_usage_in_bytes(n_neurons, n_synapse_types)
         return structure_size + initial_size
