@@ -23,7 +23,6 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         else:
             self.super = SynapseDynamicsStatic()
 
-        self.synapse_dynamics = self.super
         self._f_rew = f_rew  # Hz
         self._p_rew = 1. / self._f_rew  # ms
         self._s_max = s_max  # maximum number of presynaptic neurons
@@ -42,11 +41,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
     def p_rew(self):
         return self._p_rew
 
-    @property
-    def synapse_dynamics(self):
-        return self.synapse_dynamics
-
-    def write_parameters(self, spec, region, machine_time_step, weight_scales):
+    def write_parameters(self, spec, region, machine_time_step, weight_scales, application_graph, machine_graph):
         # TODO write pre population information data structure
         self.super.write_parameters(spec, region, machine_time_step, weight_scales)
         spec.comment("Writing structural plasticity parameters")
