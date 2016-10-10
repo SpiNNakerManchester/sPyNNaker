@@ -783,9 +783,15 @@ class SynapticManager(object):
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             routing_info, graph_mapper, machine_graph, machine_time_step)
 
-        self._synapse_dynamics.write_parameters(
-            spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-            machine_time_step, weight_scales)
+        # Easier to beg forgiveness than to ask permission
+        try:
+            self._synapse_dynamics.write_parameters(
+                spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                machine_time_step, weight_scales, application_graph, machine_graph)
+        except TypeError:
+            self._synapse_dynamics.write_parameters(
+                spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                machine_time_step, weight_scales)
 
         self._weight_scales[placement] = weight_scales
 
