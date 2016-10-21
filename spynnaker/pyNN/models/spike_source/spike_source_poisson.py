@@ -5,6 +5,7 @@ import scipy.stats
 
 import numpy
 from enum import Enum
+
 from spinn_front_end_common.utilities import constants as\
     front_end_common_constants
 
@@ -43,6 +44,8 @@ from spynnaker.pyNN.models.common.multi_spike_recorder \
     import MultiSpikeRecorder
 from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
     import PopulationSettableChangeRequiresMapping
+from spynnaker.pyNN.models.common.provides_key_to_atom_mapping_impl import \
+    ProvidesKeyToAtomMappingImpl
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
@@ -62,7 +65,8 @@ class SpikeSourcePoisson(
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping,
-        ReceiveBuffersToHostBasicImpl, AbstractBinaryUsesSimulationRun):
+        ReceiveBuffersToHostBasicImpl, AbstractBinaryUsesSimulationRun,
+        ProvidesKeyToAtomMappingImpl):
     """ A Poisson Spike source object
     """
 
@@ -95,6 +99,7 @@ class SpikeSourcePoisson(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
         ReceiveBuffersToHostBasicImpl.__init__(self)
+        ProvidesKeyToAtomMappingImpl.__init__(self)
 
         # atoms params
         self._n_atoms = n_neurons

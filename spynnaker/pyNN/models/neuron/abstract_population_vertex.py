@@ -5,6 +5,7 @@ from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
+from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application.impl.application_vertex \
@@ -21,6 +22,9 @@ from spinn_front_end_common.abstract_models\
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_partition_constraints import \
     AbstractProvidesIncomingPartitionConstraints
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_key_to_atom_mapping import \
+    AbstractProvidesKeyToAtomMapping
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
@@ -43,6 +47,8 @@ from spinn_front_end_common.abstract_models.abstract_changable_after_run \
 from spynnaker.pyNN.models.abstract_models.\
     abstract_contains_a_synaptic_manager import \
     AbstractContainsASynapticManager
+from spynnaker.pyNN.models.common.provides_key_to_atom_mapping_impl import \
+    ProvidesKeyToAtomMappingImpl
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
@@ -91,7 +97,8 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, ReceiveBuffersToHostBasicImpl,
-        AbstractHasGlobalMaxAtoms, AbstractContainsASynapticManager):
+        AbstractHasGlobalMaxAtoms, AbstractContainsASynapticManager,
+        ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -117,6 +124,7 @@ class AbstractPopulationVertex(
         AbstractHasGlobalMaxAtoms.__init__(self)
         AbstractContainsASynapticManager.__init__(
             self, synapse_type, ring_buffer_sigma, spikes_per_second)
+        ProvidesKeyToAtomMappingImpl.__init__(self)
 
         self._binary = binary
         self._n_atoms = n_neurons

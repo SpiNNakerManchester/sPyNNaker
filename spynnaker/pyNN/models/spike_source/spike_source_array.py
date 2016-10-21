@@ -1,5 +1,10 @@
 # spynnaker imports
+from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
+from spinn_front_end_common.abstract_models.abstract_provides_key_to_atom_mapping import \
+    AbstractProvidesKeyToAtomMapping
+from spynnaker.pyNN.models.common.provides_key_to_atom_mapping_impl import \
+    ProvidesKeyToAtomMappingImpl
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
@@ -35,7 +40,8 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractChangableAfterRun):
+        SimplePopulationSettable, AbstractChangableAfterRun,
+        ProvidesKeyToAtomMappingImpl):
     """ Model for play back of spikes
     """
 
@@ -85,6 +91,7 @@ class SpikeSourceArray(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
+        ProvidesKeyToAtomMappingImpl.__init__(self)
 
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder()
