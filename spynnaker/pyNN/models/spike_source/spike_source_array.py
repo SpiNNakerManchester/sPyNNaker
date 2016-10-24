@@ -1,39 +1,31 @@
 # spynnaker imports
-from pacman.model.decorators.delegates_to import delegates_to
+import logging
+import sys
+
 from pacman.model.decorators.overrides import overrides
-from spinn_front_end_common.abstract_models.abstract_provides_key_to_atom_mapping import \
-    AbstractProvidesKeyToAtomMapping
-from spynnaker.pyNN.models.common.provides_key_to_atom_mapping_impl import \
-    ProvidesKeyToAtomMappingImpl
-from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
-from spynnaker.pyNN.models.common.simple_population_settable \
-    import SimplePopulationSettable
-from spynnaker.pyNN.models.common.eieio_spike_recorder \
-    import EIEIOSpikeRecorder
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.utilities.conf import config
-
-
-# spinn front end common imports
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
-    import ReverseIpTagMultiCastSource
+from spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl import \
+    ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
 from spinn_front_end_common.utilities import exceptions
+from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
+    import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utility_models\
     .reverse_ip_tag_multicast_source_machine_vertex \
     import ReverseIPTagMulticastSourceMachineVertex
-
-
-# general imports
-import logging
-import sys
+from spynnaker.pyNN.models.common.abstract_spike_recordable \
+    import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common.eieio_spike_recorder \
+    import EIEIOSpikeRecorder
+from spynnaker.pyNN.models.common.simple_population_settable \
+    import SimplePopulationSettable
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.conf import config
 
 logger = logging.getLogger(__name__)
 

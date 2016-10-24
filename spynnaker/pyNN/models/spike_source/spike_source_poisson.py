@@ -1,16 +1,11 @@
 import logging
 import math
+import numpy
 import random
 import scipy.stats
-
-import numpy
 from enum import Enum
 
-from spinn_front_end_common.utilities import constants as\
-    front_end_common_constants
-
 from data_specification.enums.data_type import DataType
-
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
@@ -23,20 +18,23 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_partition_constraints import \
-    AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.interface.buffer_management.buffer_models\
-    .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
-from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.abstract_models\
+    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models\
-    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
-
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
+from spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl import \
+    ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.interface.buffer_management.buffer_models\
+    .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities import constants as\
+    front_end_common_constants
 from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
@@ -44,8 +42,6 @@ from spynnaker.pyNN.models.common.multi_spike_recorder \
     import MultiSpikeRecorder
 from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
     import PopulationSettableChangeRequiresMapping
-from spynnaker.pyNN.models.common.provides_key_to_atom_mapping_impl import \
-    ProvidesKeyToAtomMappingImpl
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants

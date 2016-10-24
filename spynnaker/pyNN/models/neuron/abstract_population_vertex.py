@@ -1,13 +1,17 @@
 
 # pacman imports
+import logging
+import os
+from abc import ABCMeta
+from six import add_metaclass
+
+from pacman.executor.injection_decorator import inject_items
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
-from pacman.model.decorators.delegates_to import delegates_to
 from pacman.model.decorators.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application.impl.application_vertex \
     import ApplicationVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
@@ -15,64 +19,51 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-
-# front end common imports
 from spinn_front_end_common.abstract_models\
     .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_incoming_partition_constraints import \
-    AbstractProvidesIncomingPartitionConstraints
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_key_to_atom_mapping import \
-    AbstractProvidesKeyToAtomMapping
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_partition_constraints import \
-    AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utilities import constants as \
-    common_constants
-from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
-
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_incoming_partition_constraints import \
+    AbstractProvidesIncomingPartitionConstraints
+from spinn_front_end_common.abstract_models.\
+    abstract_provides_outgoing_partition_constraints import \
+    AbstractProvidesOutgoingPartitionConstraints
+from spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl import \
+    ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.interface.buffer_management\
     .buffer_models.receives_buffers_to_host_basic_impl \
     import ReceiveBuffersToHostBasicImpl
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
-
-# spynnaker imports
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities import constants as \
+    common_constants
 from spynnaker.pyNN.models.abstract_models.\
     abstract_contains_a_synaptic_manager import \
     AbstractContainsASynapticManager
-from spynnaker.pyNN.models.common.provides_key_to_atom_mapping_impl import \
-    ProvidesKeyToAtomMappingImpl
-from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
+from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
+    import AbstractGSynRecordable
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
     import AbstractVRecordable
-from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
-    import AbstractGSynRecordable
+from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
 from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spynnaker.pyNN.models.common.v_recorder import VRecorder
-from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
-
-from abc import ABCMeta
-from six import add_metaclass
-import logging
-import os
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.conf import config
 
 logger = logging.getLogger(__name__)
 
