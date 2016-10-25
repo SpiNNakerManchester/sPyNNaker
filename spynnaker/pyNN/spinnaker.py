@@ -286,15 +286,6 @@ class Spinnaker(SpinnakerMainInterface):
         :param run_time: the time in ms to run the simulation for
         """
 
-        if config.getboolean("Buffers", "use_auto_pause_and_resume"):
-            for vertex in self._application_graph.vertices:
-                if isinstance(vertex, AbstractVirtualVertex):
-                    raise exceptions.SynapticConfigurationException(
-                        "External devices do not currently operate within the "
-                        "auto pause and resume functionality. Turn off the "
-                        "auto pause functionality in your cfg file by adding"
-                        "\n [Buffers] \n use_auto_pause_and_resume = False\n\n")
-
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         SpinnakerMainInterface.run(self, run_time)

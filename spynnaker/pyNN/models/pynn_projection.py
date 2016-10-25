@@ -1,7 +1,8 @@
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from spynnaker.pyNN.models.abstract_models.abstract_contains_a_synaptic_manager import \
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_contains_a_synaptic_manager import \
     AbstractContainsASynapticManager
 from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
     import DelayedApplicationEdge

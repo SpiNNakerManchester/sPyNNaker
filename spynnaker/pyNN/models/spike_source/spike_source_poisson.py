@@ -28,7 +28,8 @@ from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl import \
+from spinn_front_end_common.abstract_models.impl.\
+    provides_key_to_atom_mapping_impl import \
     ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.interface.buffer_management.buffer_models\
     .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl

@@ -8,7 +8,8 @@ from spinn_front_end_common.abstract_models.abstract_changable_after_run \
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl import \
+from spinn_front_end_common.abstract_models.impl.\
+    provides_key_to_atom_mapping_impl import \
     ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
