@@ -7,6 +7,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp \
     import SynapseDynamicsSTDP
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
     import SynapseDynamicsStatic
+from spynnaker.pyNN.utilities import constants
 
 
 class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
@@ -74,29 +75,46 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
             spec.write_value(data=seed)
 
         # Compute the max number of presynaptic subpopulations
-        number_of_subpopulations = dict()
-        for app_edge in application_graph.get_edges_ending_at_vertex(app_vertex):
-            relevant_edge = False
-            for synapse_info in app_edge.synapse_information:
-                if synapse_info.synapse_dynamics is self:
-                    relevant_edge = True
-            if relevant_edge:
-                number_of_subpopulations[app_edge.pre_vertex] = 0
+        population_to_subpopulation_information = {}
 
-        for machine_edge in \
-                machine_graph.get_edges_ending_at_vertex(machine_vertex):
-            app_edge = graph_mapper.get_application_edge(machine_edge)
-            relevant_edge = False
+        # Can figure out the presynaptic subvertices (machine vertices) for the current machine vertex
+        # by calling graph_mapper.get_machine_edges for the relevant application edges (i.e. the structural ones)
+        # This allows me to find the partition (?) which then plugged into routing_info can give me the keys
+        presynaptic_machine_vertices = []
+        structural_application_edges = []
+        structural_machine_edges = []
+        partition_routing_info = []
+
+        no_pre_populations = 0
+        max_subpartitions = 0
+
+        for app_edge in application_graph.get_edges_ending_at_vertex(app_vertex):
             for synapse_info in app_edge.synapse_information:
                 if synapse_info.synapse_dynamics is self:
-                    relevant_edge = True
-            if relevant_edge:
-                number_of_subpopulations[app_edge.pre_vertex] += 1
+                    structural_application_edges.append(app_edge)
+                    population_to_subpopulation_information[app_edge.pre_vertex] = []
+                    break
+
+        no_pre_populations = len(structural_application_edges)
+        # For each structurally plastic APPLICATION edge find the corresponding machine edges
+        for machine_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
+            for synapse_info in machine_edge._synapse_information:
+                if synapse_info.synapse_dynamics is self:
+                    structural_machine_edges.append(machine_edge)
+                    # For each structurally plastic MACHINE edge find the corresponding presynaptic subvertices
+                    presynaptic_machine_vertices.append(machine_edge.pre_vertex)
+
+        # For each presynaptic subvertex figure out the partition (?) to retrieve the key and n_atoms
+        for vertex in presynaptic_machine_vertices:
+            population_to_subpopulation_information[graph_mapper.get_application_vertex(vertex)].append(
+                (routing_info.get_routing_info_from_pre_vertex(
+                    vertex, constants.SPIKE_PARTITION_ID).first_key, graph_mapper.get_slice(vertex)[2]))
+
+        for population in population_to_subpopulation_information.itervalues():
+            max_subpartitions = np.maximum(max_subpartitions, len(population))
+
         pass
         # TODO write pre population information data structure
-        # This is done by creating a lookup table from
-        # population -> subpopulations.
-        # subpopulation information of note: keys, number of atoms (hi, lo)
 
     def get_extra_sdram_usage_in_bytes(self, machine_in_edges):
         return 1 + 9 * len(machine_in_edges)
@@ -145,7 +163,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
 
     def get_vertex_executable_suffix(self):
         name = self.super.get_vertex_executable_suffix()
-        name += "_structural"
+        # name += "_structural"
         return name
 
     def is_same_as(self, synapse_dynamics):
