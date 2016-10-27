@@ -193,13 +193,6 @@ class SynapticManager(object):
                     pre_vertex_slice, post_vertex_slice,
                     application_edge.n_delay_stages, machine_time_step)
 
-            try:
-                for synapse_info in machine_edge._synapse_information:
-                    memory_size += synapse_info.synapse_dynamics.\
-                        get_extra_sdram_usage_in_bytes(machine_in_edges=in_edges)
-            except AttributeError:
-                memory_size += 0
-
         return memory_size
 
     def _get_estimate_synaptic_blocks_size(
@@ -326,7 +319,8 @@ class SynapticManager(object):
                 size=all_syn_block_sz, label='SynBlocks')
 
         synapse_dynamics_sz = \
-            self._get_synapse_dynamics_parameter_size(vertex_slice)
+            self._get_synapse_dynamics_parameter_size(
+                vertex_slice, machine_graph.get_edges_ending_at_vertex(machine_vertex))
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS

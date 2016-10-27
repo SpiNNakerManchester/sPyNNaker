@@ -1,6 +1,9 @@
 import numpy as np
 
 from data_specification.enums.data_type import DataType
+
+from spynnaker.pyNN import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections.projection_machine_edge import ProjectionMachineEdge
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics \
     import AbstractPlasticSynapseDynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp \
@@ -41,9 +44,20 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         for _ in range(4):
             self._seeds.append(self._rng.randint(0x7FFFFFFF))
 
+        # Addition information -- used for SDRAM usage
+        self._actual_sdram_usage = {}
+
     @property
     def p_rew(self):
         return self._p_rew
+
+    @property
+    def actual_sdram_usage(self):
+        return self._actual_sdram_usage
+
+    @property
+    def approximate_sdram_usage(self):
+        return self._approximate_sdram_usage
 
     def write_parameters(self, spec, region, machine_time_step, weight_scales, application_graph, machine_graph,
                          app_vertex, post_slice, machine_vertex, graph_mapper, routing_info):
@@ -83,8 +97,6 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         presynaptic_machine_vertices = []
         structural_application_edges = []
         structural_machine_edges = []
-        partition_routing_info = []
-
         no_pre_populations = 0
         max_subpartitions = 0
 
@@ -110,28 +122,63 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
                 (routing_info.get_routing_info_from_pre_vertex(
                     vertex, constants.SPIKE_PARTITION_ID).first_key, graph_mapper.get_slice(vertex)[2]))
 
-        for population in population_to_subpopulation_information.itervalues():
-            max_subpartitions = np.maximum(max_subpartitions, len(population))
+        for subpopulation_list in population_to_subpopulation_information.itervalues():
+            max_subpartitions = np.maximum(max_subpartitions, len(subpopulation_list))
+        # Table header
+        spec.write_value(data=(no_pre_populations << 16) + (max_subpartitions & 0xFFFF), data_type=DataType.INT32)
 
-        pass
-        # TODO write pre population information data structure
+        words_needed_to_be_written = max_subpartitions * 2
+        total_words_written = 0
+        for subpopulation_list in population_to_subpopulation_information.itervalues():
+            # Population header(s)
+            spec.write_value(data=len(subpopulation_list), data_type=DataType.INT32)
+            words_written = 0
+            for subpopulation_info in subpopulation_list:
+                # Subpopulation information (i.e. key and number of atoms)
+                # Key
+                spec.write_value(data=subpopulation_info[0], data_type=DataType.INT32)
+                # n_atoms
+                spec.write_value(data=subpopulation_info[1], data_type=DataType.INT32)
+
+                words_written += 2
+            # If we didn't write enough to ensure equal sized blocks, add padding
+            if words_written < words_needed_to_be_written:
+                for _ in xrange(words_needed_to_be_written - words_written):
+                    spec.write_value(data=-1, data_type=DataType.INT32)
+            total_words_written += words_written + 4
+
+        self.actual_sdram_usage[machine_vertex] = 4 * 16 + 4 * total_words_written
 
     def get_extra_sdram_usage_in_bytes(self, machine_in_edges):
-        return 1 + 9 * len(machine_in_edges)
+        #
+        relevant_edges = []
+        for edge in machine_in_edges:
+            for synapse_info in edge._synapse_information:
+                if synapse_info.synapse_dynamics is self:
+                    relevant_edges.append(edge)
+        return 4 * (12 * len(relevant_edges))
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types, in_edges=None):
-        # TODO modify parameter size when adding information about the lo and hi
         structure_size = 12 * 4 + 4 * 4  # parameters + rng seed
+        self.structure_size = structure_size
         initial_size = self.super.get_parameters_sdram_usage_in_bytes(n_neurons, n_synapse_types)
         total_size = structure_size + initial_size
+        pop_size = 0
         # approximate the size of the pop -> subpop table
-        if in_edges is not None:
+        if in_edges is not None and isinstance(in_edges[0], ProjectionApplicationEdge):
             # Approximation gets computed here based on number of afferent edges
+            # How many afferent application vertices?
+            # How large are they?
             no_pre_vertices_estimate = 0
             for edge in in_edges:
-                no_pre_vertices_estimate += np.ceil(edge.pre_vertex.n_atoms / 128.)
-            total_size += int(4 * (no_pre_vertices_estimate + len(in_edges)) + no_pre_vertices_estimate)
-        return total_size  # bytes
+                for synapse_info in edge.synapse_information:
+                    if synapse_info.synapse_dynamics is self:
+                        no_pre_vertices_estimate += 1 * np.ceil(edge.pre_vertex.n_atoms / 32.)
+            no_pre_vertices_estimate *= 4
+            pop_size += int(40 * (no_pre_vertices_estimate + len(in_edges)))
+        elif in_edges is not None and isinstance(in_edges[0], ProjectionMachineEdge):
+            pop_size += self.get_extra_sdram_usage_in_bytes(in_edges)
+        return total_size + pop_size # bytes
 
     def get_plastic_synaptic_data(self, connections, connection_row_indices, n_rows, post_vertex_slice,
                                   n_synapse_types):
@@ -163,7 +210,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
 
     def get_vertex_executable_suffix(self):
         name = self.super.get_vertex_executable_suffix()
-        # name += "_structural"
+        name += "_structural"
         return name
 
     def is_same_as(self, synapse_dynamics):
