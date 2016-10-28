@@ -4,7 +4,7 @@
 #include "../../common/neuron-typedefs.h"
 #include "../synapse_row.h"
 
-bool synapse_dynamics_initialise(
+address_t synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,
     uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
