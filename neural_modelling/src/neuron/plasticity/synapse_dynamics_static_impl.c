@@ -7,7 +7,7 @@ address_t synapse_dynamics_initialise(
     use(address);
     use(n_neurons);
     use(ring_buffer_to_input_buffer_left_shifts);
-    return true;
+    return address;
 }
 
 //---------------------------------------
