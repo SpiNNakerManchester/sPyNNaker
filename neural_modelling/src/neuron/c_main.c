@@ -20,6 +20,7 @@
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -176,11 +177,18 @@ static bool initialise(uint32_t *timer_period) {
             &row_max_n_words)) {
         return false;
     }
-
     // Set up the synapse dynamics
-    if (!synapse_dynamics_initialise(
-            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address),
-            n_neurons, ring_buffer_to_input_buffer_left_shifts)) {
+    address_t synapse_dynamics_region_address = data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
+    address_t syn_dyn_end_address = synapse_dynamics_initialise(
+            synapse_dynamics_region_address,
+            n_neurons, ring_buffer_to_input_buffer_left_shifts);
+
+    if (synapse_dynamics_region_address && !syn_dyn_end_address) {
+        return false;
+    }
+
+    // Set up structural plasticity dynamics
+    if (synapse_dynamics_region_address && !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
         return false;
     }
 
