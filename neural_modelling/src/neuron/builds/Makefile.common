@@ -59,6 +59,15 @@ ifdef TIMING_DEPENDENCE
     TIMING_DEPENDENCE_O = $(call build_dir, $(TIMING_DEPENDENCE))
 endif
 
+ifndef SYNAPTOGENESIS_DYNAMICS_H
+    SYNAPTOGENESIS_DYNAMICS_H = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics.h
+endif
+
+ifndef SYNAPTOGENESIS_DYNAMICS
+    # $(error SYNAPTOGENESIS_DYNAMICS is not set.  Please select a synaptogenesis implementation)
+    SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
+endif
+
 NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
 
 SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
@@ -67,7 +76,7 @@ SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
 	      $(SOURCE_DIR)/neuron/spike_processing.c \
 	      $(SOURCE_DIR)/neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
 	      $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
-	      $(TIMING_DEPENDENCE) $(OTHER_SOURCES)
+	      $(TIMING_DEPENDENCE) $(OTHER_SOURCES) $(SYNAPTOGENESIS_DYNAMICS)
 
 SYNAPSE_TYPE_SOURCES += $(SOURCE_DIR)/neuron/c_main.c \
                         $(SOURCE_DIR)/neuron/synapses.c \
