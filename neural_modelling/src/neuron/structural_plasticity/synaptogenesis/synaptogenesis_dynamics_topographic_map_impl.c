@@ -1,6 +1,21 @@
 #include "../synaptogenesis_dynamics.h"
 #include <debug.h>
 
+
+//---------------------------------------
+// Structures
+//---------------------------------------
+typedef struct {
+    uint32_t no_vertices;
+    uint32_t[2*no_vertices] key_atom_info;
+} pre_pop_t;
+
+typedef struct {
+    uint16_t no_pre_pops, max_subpartitions;
+
+} pre_pop_info_table_t;
+
+
 address_t synaptogenesis_dynamics_initialise(
     address_t afferent_populations){
     use(afferent_populations);

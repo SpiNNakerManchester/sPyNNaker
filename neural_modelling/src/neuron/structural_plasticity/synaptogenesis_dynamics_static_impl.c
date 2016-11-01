@@ -3,7 +3,6 @@
 
 address_t synaptogenesis_dynamics_initialise(
 	address_t afferent_populations){
-	log_error("~~~~~~~~~~~~~~~~~~~~~~~~WAT~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 	use(afferent_populations);
     return afferent_populations;
 }
