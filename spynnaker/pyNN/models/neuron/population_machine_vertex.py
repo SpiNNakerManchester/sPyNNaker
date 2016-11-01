@@ -4,6 +4,7 @@ from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.machine.impl.machine_vertex import MachineVertex
 
 # spinn front end common imports
+from pacman.model.resources.resource_container import ResourceContainer
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 from spinn_front_end_common.interface.provenance\
@@ -35,10 +36,12 @@ class PopulationMachineVertex(
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = 4
 
     def __init__(
-            self, resources_required, is_recording, label, constraints=None):
+            self, resources_required, is_recording, label,
+            buffered_out_ip_address, constraints=None):
         MachineVertex.__init__(
             self, resources_required, label, constraints)
         ReceiveBuffersToHostBasicImpl.__init__(self)
+        self._buffering_ip_address = buffered_out_ip_address
         ProvidesProvenanceDataFromMachineImpl.__init__(
             self, constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value,
             self.N_ADDITIONAL_PROVENANCE_DATA_ITEMS)
@@ -48,6 +51,14 @@ class PopulationMachineVertex(
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
         return self._is_recording
+
+    @property
+    @overrides(MachineVertex.resources_required)
+    def resources_required(self):
+        resources = ResourceContainer()
+        resources.extend(self.get_extra_resources())
+        resources.extend(self._resources_required)
+        return resources
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)

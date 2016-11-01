@@ -77,7 +77,8 @@ class SpikeSourceArray(
             send_buffer_space_before_notify=space_before_notification,
             send_buffer_notification_ip_address=self._ip_address,
             send_buffer_notification_port=self._port,
-            send_buffer_notification_tag=tag)
+            send_buffer_notification_tag=tag,
+            buffered_out_ip_address=self._ip_address)
 
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
