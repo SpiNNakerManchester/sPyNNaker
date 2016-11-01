@@ -89,8 +89,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, ReceiveBuffersToHostBasicImpl,
-        AbstractHasGlobalMaxAtoms):
+        AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -114,7 +113,6 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
-        ReceiveBuffersToHostBasicImpl.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
 
         self._binary = binary
@@ -150,8 +148,6 @@ class AbstractPopulationVertex(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
             "Buffers", "use_auto_pause_and_resume")
-        self._receive_buffer_host = config.get(
-            "Buffers", "receive_buffer_host")
         self._receive_buffer_port = config.getint(
             "Buffers", "receive_buffer_port")
         self._enable_buffered_recording = config.getboolean(
@@ -194,14 +190,6 @@ class AbstractPopulationVertex(
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
 
-        # set up any resources config needed for the auto pause and resume
-        self._check_for_auto_pause_and_resume_functionality(
-            vertex_slice, self, n_machine_time_steps)
-
-        # add extra resources from the extra functionality
-        container.extend(self.get_extra_resources(
-            self._receive_buffer_host, self._receive_buffer_port))
-
         # return the total resources.
         return container
 
@@ -213,41 +201,6 @@ class AbstractPopulationVertex(
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self._change_requires_mapping = False
-
-    def _check_for_auto_pause_and_resume_functionality(
-            self, vertex_slice, object_to_set, n_machine_time_steps):
-        if not self._using_auto_pause_and_resume:
-            spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, n_machine_time_steps)
-            v_buffer_size = self._v_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, n_machine_time_steps)
-            gsyn_buffer_size = self._gsyn_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, n_machine_time_steps)
-            spike_buffering_needed = recording_utils.needs_buffering(
-                self._spike_buffer_max_size, spike_buffer_size,
-                self._enable_buffered_recording)
-            v_buffering_needed = recording_utils.needs_buffering(
-                self._v_buffer_max_size, v_buffer_size,
-                self._enable_buffered_recording)
-            gsyn_buffering_needed = recording_utils.needs_buffering(
-                self._gsyn_buffer_max_size, gsyn_buffer_size,
-                self._enable_buffered_recording)
-            if (spike_buffering_needed or v_buffering_needed or
-                    gsyn_buffering_needed):
-                object_to_set.activate_buffering_output(
-                    buffering_ip_address=self._receive_buffer_host,
-                    buffering_port=self._receive_buffer_port)
-        else:
-            sdram_per_ts = 0
-            sdram_per_ts += self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, 1)
-            sdram_per_ts += self._v_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, 1)
-            sdram_per_ts += self._gsyn_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, 1)
-            object_to_set.activate_buffering_output(
-                minimum_sdram_for_buffering=self._minimum_buffer_sdram,
-                buffered_sdram_per_timestep=sdram_per_ts)
 
     @inject_items({"n_machine_time_steps": "TotalMachineTimeSteps"})
     @overrides(
@@ -262,16 +215,8 @@ class AbstractPopulationVertex(
             self._spike_recorder.record
         )
 
-        # handle any new resources from the interfaces
-        resources_required.extend(self.get_extra_resources(
-            self._receive_buffer_host, self._receive_buffer_port))
-
         vertex = PopulationMachineVertex(
             resources_required, is_recording, label, constraints)
-
-        # check for auto pause and resume setting
-        self._check_for_auto_pause_and_resume_functionality(
-            vertex_slice, vertex, n_machine_time_steps)
 
         self._n_vertices += 1
 

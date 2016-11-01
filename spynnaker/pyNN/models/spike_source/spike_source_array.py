@@ -56,8 +56,6 @@ class SpikeSourceArray(
         if ip_address is None:
             self._ip_address = config.get("Buffers", "receive_buffer_host")
         self._port = port
-        if port is None:
-            self._port = config.getint("Buffers", "receive_buffer_port")
         if spike_times is None:
             spike_times = []
         self._minimum_sdram_for_buffering = config.getint(
