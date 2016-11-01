@@ -183,12 +183,12 @@ static bool initialise(uint32_t *timer_period) {
             synapse_dynamics_region_address,
             n_neurons, ring_buffer_to_input_buffer_left_shifts);
 
-    if (synapse_dynamics_region_address && !syn_dyn_end_address) {
+    if (!synapse_dynamics_region_address && syn_dyn_end_address) {
         return false;
     }
 
     // Set up structural plasticity dynamics
-    if (synapse_dynamics_region_address && !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
+    if (!synapse_dynamics_region_address && synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
         return false;
     }
 
