@@ -1,6 +1,7 @@
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.machine.impl.machine_vertex \
     import MachineVertex
+from pacman.model.resources.resource_container import ResourceContainer
 from spinn_front_end_common.interface.buffer_management\
     .buffer_models.receives_buffers_to_host_basic_impl \
     import ReceiveBuffersToHostBasicImpl
@@ -26,11 +27,12 @@ class SpikeSourcePoissonMachineVertex(
                ('PROVENANCE_REGION', 4)])
 
     def __init__(
-            self, resources_required, is_recording, constraints=None,
-            label=None):
+            self, resources_required, is_recording, buffering_ip_address,
+            constraints=None, label=None):
         MachineVertex.__init__(
             self, resources_required, label, constraints=constraints)
         ReceiveBuffersToHostBasicImpl.__init__(self)
+        self._buffering_ip_address = buffering_ip_address
         ProvidesProvenanceDataFromMachineImpl.__init__(
             self, self._POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value,
             0)
@@ -40,3 +42,11 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
         return self._is_recording
+
+    @property
+    @overrides(MachineVertex.resources_required)
+    def resources_required(self):
+        resources = ResourceContainer()
+        resources.extend(self._resources_required)
+        resources.extend(self.get_extra_resources())
+        return resources

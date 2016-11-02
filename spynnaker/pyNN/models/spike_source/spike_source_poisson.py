@@ -62,7 +62,7 @@ class SpikeSourcePoisson(
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping,
-        ReceiveBuffersToHostBasicImpl, AbstractBinaryUsesSimulationRun):
+        AbstractBinaryUsesSimulationRun):
     """ A Poisson Spike source object
     """
 
@@ -94,7 +94,6 @@ class SpikeSourcePoisson(
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
-        ReceiveBuffersToHostBasicImpl.__init__(self)
 
         # atoms params
         self._n_atoms = n_neurons
@@ -119,8 +118,6 @@ class SpikeSourcePoisson(
             "Buffers", "enable_buffered_recording")
         self._receive_buffer_host = config.get(
             "Buffers", "receive_buffer_host")
-        self._receive_buffer_port = config.getint(
-            "Buffers", "receive_buffer_port")
         self._minimum_buffer_sdram = config.getint(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
@@ -147,10 +144,6 @@ class SpikeSourcePoisson(
     def get_resources_used_by_atoms(
             self, vertex_slice, n_machine_time_steps, machine_time_step):
 
-        # verify if needing the buffered out functionality
-        self._check_for_activating_auto_pause_and_resume(
-            vertex_slice, self, n_machine_time_steps, machine_time_step)
-
         # build resources as i currently know
         container = ResourceContainer(
             sdram=SDRAMResource(
@@ -160,8 +153,6 @@ class SpikeSourcePoisson(
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms()))
 
-        # extend resources with whatever the extra functionality requires
-        container.extend(self.get_extra_resources())
         return container
 
     def _check_for_activating_auto_pause_and_resume(
@@ -207,7 +198,7 @@ class SpikeSourcePoisson(
         SpikeSourcePoisson._n_poisson_vertices += 1
         vertex = SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
-            constraints, label)
+            self._receive_buffer_host, constraints, label)
 
         # set up auto pause and resume stuff
         self._check_for_activating_auto_pause_and_resume(
