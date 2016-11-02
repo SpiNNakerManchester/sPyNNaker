@@ -20,3 +20,7 @@ address_t synaptogenesis_dynamics_elimination_rule(address_t synaptic_row_addres
     use(synaptic_row_address);
     return NULL;
 }
+
+int32_t get_p_rew() {
+    return -1;
+}

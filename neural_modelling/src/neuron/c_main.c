@@ -78,6 +78,19 @@ static uint32_t infinite_run;
 //! The recording flags
 static uint32_t recording_flags = 0;
 
+//! Timer callbacks since last rewiring
+int32_t last_rewiring_time = 0;
+
+//! Rewiring period represented as an integer
+int32_t rewiring_period = 0;
+
+//! Flag representing whether rewiring is enabled
+bool rewiring = false;
+
+// FOR DEBUGGING!
+uint32_t count_rewires = 0;
+
+
 //! \brief Initialises the recording parts of the model
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(){
@@ -191,6 +204,8 @@ static bool initialise(uint32_t *timer_period) {
     if (!synapse_dynamics_region_address && synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
         return false;
     }
+    rewiring_period = get_p_rew();
+    rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
             row_max_n_words, MC, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER,
@@ -219,6 +234,7 @@ void timer_callback(uint timer_count, uint unused) {
     use(unused);
 
     time++;
+    last_rewiring_time++;
 
     log_debug("Timer tick %u \n", time);
 
@@ -244,12 +260,20 @@ void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
+    if (rewiring && last_rewiring_time > rewiring_period)
+    {
+        last_rewiring_time = 0;
+        synaptogenesis_dynamics_rewire();
+        count_rewires++;
+        log_error("rewires atm -> %d", count_rewires);
+    }
     //TODO
     /* 
         1. Count timesteps
         2. Once the desired period has elapsed trigger rewiring attempt
             - Select 
     */
+
 
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);

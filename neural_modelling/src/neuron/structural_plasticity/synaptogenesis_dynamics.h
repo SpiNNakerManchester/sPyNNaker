@@ -9,5 +9,6 @@ void synaptogenesis_dynamics_rewire();
 address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address);
 address_t synaptogenesis_dynamics_elimination_rule(address_t synaptic_row_address);
 
+int32_t get_p_rew();
 
 #endif // _SYNAPTOGENESIS_DYNAMICS_H_

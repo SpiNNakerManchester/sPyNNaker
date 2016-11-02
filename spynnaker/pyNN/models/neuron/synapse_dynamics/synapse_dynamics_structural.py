@@ -64,8 +64,8 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         self.super.write_parameters(spec, region, machine_time_step, weight_scales)
         spec.comment("Writing structural plasticity parameters")
 
-        # Switch focus to the region:
-        spec.switch_write_focus(region)
+        # # Switch focus to the region:
+        # spec.switch_write_focus(region)
         #
         # # Word aligned for convenience
         #
@@ -210,7 +210,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
 
     def get_vertex_executable_suffix(self):
         name = self.super.get_vertex_executable_suffix()
-        name += "_structural"
+        # name += "_structural"
         return name
 
     def is_same_as(self, synapse_dynamics):
