@@ -161,8 +161,7 @@ class SpikeSourcePoisson(
                 self.get_cpu_usage_for_atoms()))
 
         # extend resources with whatever the extra functionality requires
-        container.extend(self.get_extra_resources(
-            self._receive_buffer_host, self._receive_buffer_port))
+        container.extend(self.get_extra_resources())
         return container
 
     def _check_for_activating_auto_pause_and_resume(
