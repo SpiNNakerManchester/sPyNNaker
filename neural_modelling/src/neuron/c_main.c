@@ -92,11 +92,6 @@ static bool initialise_recording(){
             BUFFERING_OUT_GSYN_RECORDING_REGION, address)
     };
 
-    for (uint32_t counter =0; counter < 3; counter++){
-        log_info("address %d is 0x%08x", counter,
-                 region_addresses_to_record[counter]);
-    }
-
     uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
     uint32_t *recording_flags_from_system_conf =
         &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];

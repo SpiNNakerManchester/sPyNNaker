@@ -51,10 +51,8 @@ void out_spikes_record(uint8_t channel, uint32_t time) {
     // copy out-spikes to the appropriate recording channel
     if (!out_spikes_is_empty()) {
         spikes->time = time;
-        log_debug("recording spikes");
         recording_record(
             channel, spikes, (out_spikes_size + 1) * sizeof(uint32_t));
-        log_debug("finished recording spikes");
     }
 }
 

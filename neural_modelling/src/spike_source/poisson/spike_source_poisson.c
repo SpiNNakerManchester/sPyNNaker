@@ -223,7 +223,6 @@ bool read_poisson_parameters(address_t address) {
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
     memcpy(spike_source_seed, &address[PARAMETER_SEED_START_POSITION],
         seed_size * sizeof(uint32_t));
-
     validate_mars_kiss64_seed(spike_source_seed);
 
     log_info("\tSeed (%u) = %u %u %u %u", seed_size, spike_source_seed[0],
@@ -300,10 +299,6 @@ static bool initialise_recording(){
         data_specification_get_region(
             BUFFERING_OUT_SPIKE_RECORDING_REGION, address)
     };
-
-    log_info("address %d is 0x%08x", 0, region_addresses_to_record[0]);
-    log_info("address %d is 0x%08x", 0,  data_specification_get_region(
-            BUFFERING_OUT_SPIKE_RECORDING_REGION, address));
 
     uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
     uint32_t *recording_flags_from_system_conf =

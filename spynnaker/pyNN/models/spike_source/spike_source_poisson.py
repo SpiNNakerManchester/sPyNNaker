@@ -4,7 +4,6 @@ import random
 import scipy.stats
 
 import numpy
-from enum import Enum
 from spinn_front_end_common.utilities import constants as\
     front_end_common_constants
 
@@ -557,11 +556,11 @@ class SpikeSourcePoisson(
 
         # extract the recording region id from a machine vertex
         recording_region_id = \
-            list(graph_mapper.get_machine_vertices(self))[0]. \
-                recording_region_id_from_dsg_region(
-                    SpikeSourcePoissonMachineVertex.
-                        _POISSON_SPIKE_SOURCE_REGIONS.
-                        SPIKE_HISTORY_REGION.value)
+            list(graph_mapper.get_machine_vertices(self))[0].\
+            recording_region_id_from_dsg_region(
+                SpikeSourcePoissonMachineVertex.
+                _POISSON_SPIKE_SOURCE_REGIONS.
+                SPIKE_HISTORY_REGION.value)
 
         return self._spike_recorder.get_spikes(
             self._label, buffer_manager, recording_region_id,
