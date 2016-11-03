@@ -165,12 +165,15 @@ class SpikeSourceArray(
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
 
+        # extract the recording region id from a machine vertex
+        recording_region_id = \
+            list(graph_mapper.get_machine_vertices(self))[0].\
+            recording_region_id_from_dsg_region(
+                ReverseIPTagMulticastSourceMachineVertex.
+                _REGIONS.RECORDING_BUFFER.value)
+
         return self._spike_recorder.get_spikes(
-            self.label, buffer_manager,
-            (ReverseIPTagMulticastSourceMachineVertex.
-             _REGIONS.RECORDING_BUFFER.value),
-            (ReverseIPTagMulticastSourceMachineVertex.
-             _REGIONS.RECORDING_BUFFER_STATE.value),
+            self.label, buffer_manager, recording_region_id,
             placements, graph_mapper, self,
             lambda vertex:
                 vertex.virtual_key if vertex.virtual_key is not None

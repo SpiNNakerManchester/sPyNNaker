@@ -604,10 +604,15 @@ class AbstractPopulationVertex(
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
+
+        # extract the recording region id from a machine vertex
+        recording_region_id = \
+            list(graph_mapper.get_machine_vertices(self))[0].\
+            recording_region_id_from_dsg_region(
+                constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value)
+
         return self._spike_recorder.get_spikes(
-            self._label, buffer_manager,
-            constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
+            self._label, buffer_manager, recording_region_id,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractVRecordable.is_recording_v)
@@ -622,10 +627,15 @@ class AbstractPopulationVertex(
     @overrides(AbstractVRecordable.get_v)
     def get_v(self, n_machine_time_steps, placements, graph_mapper,
               buffer_manager, machine_time_step):
+
+        # extract the recording region id from a machine vertex
+        recording_region_id = \
+            list(graph_mapper.get_machine_vertices(self))[0].\
+            recording_region_id_from_dsg_region(
+                constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value)
+
         return self._v_recorder.get_v(
-            self._label, buffer_manager,
-            constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
-            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
+            self._label, buffer_manager, recording_region_id,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractGSynRecordable.is_recording_gsyn)
@@ -641,10 +651,15 @@ class AbstractPopulationVertex(
     def get_gsyn(
             self, n_machine_time_steps, placements, graph_mapper,
             buffer_manager, machine_time_step):
+
+        # extract the recording region id from a machine vertex
+        recording_region_id = \
+            list(graph_mapper.get_machine_vertices(self))[0].\
+            recording_region_id_from_dsg_region(
+                constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value)
+
         return self._gsyn_recorder.get_gsyn(
-            self._label, buffer_manager,
-            constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
-            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
+            self._label, buffer_manager, recording_region_id,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractPopulationInitializable.initialize)
