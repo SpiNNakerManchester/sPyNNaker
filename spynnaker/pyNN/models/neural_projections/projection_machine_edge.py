@@ -26,6 +26,10 @@ class ProjectionMachineEdge(
 
         self._synapse_information = synapse_information
 
+    @property
+    def synapse_information(self):
+        return self._synapse_information
+
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
         pre_vertex = graph_mapper.get_application_vertex(

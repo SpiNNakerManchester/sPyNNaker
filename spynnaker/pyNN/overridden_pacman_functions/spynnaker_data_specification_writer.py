@@ -13,10 +13,15 @@ class SpynnakerDataSpecificationWriter(
     """ Executes data specification generation for sPyNNaker
     """
 
+    __slots__ = ()
+
+    def __init__(self):
+        FrontEndCommonGraphDataSpecificationWriter.__init__(self)
+
     def __call__(
             self, placements, graph, hostname,
             report_default_directory, write_text_specs,
-            app_data_runtime_folder, graph_mapper=None):
+            app_data_runtime_folder, machine, graph_mapper=None):
 
         # Keep the results
         dsg_targets = dict()
@@ -38,14 +43,14 @@ class SpynnakerDataSpecificationWriter(
                 self._generate_data_spec_for_vertices(
                     placement, associated_vertex, dsg_targets, hostname,
                     report_default_directory, write_text_specs,
-                    app_data_runtime_folder)
+                    app_data_runtime_folder, machine)
                 progress_bar.update()
 
         for placement, associated_vertex in delay_extension_placements:
             self._generate_data_spec_for_vertices(
                 placement, associated_vertex, dsg_targets, hostname,
                 report_default_directory, write_text_specs,
-                app_data_runtime_folder)
+                app_data_runtime_folder, machine)
             progress_bar.update()
 
         # finish the progress bar
