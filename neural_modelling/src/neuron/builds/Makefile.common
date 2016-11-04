@@ -68,6 +68,10 @@ ifndef SYNAPTOGENESIS_DYNAMICS
     SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
 endif
 
+ifdef CHECK_MY_SHIT
+    $(error SYNAPTOGENESIS_DYNAMICS is $(SYNAPTOGENESIS_DYNAMICS))
+endif
+
 NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
 
 SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
@@ -76,7 +80,7 @@ SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
 	      $(SOURCE_DIR)/neuron/spike_processing.c \
 	      $(SOURCE_DIR)/neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
 	      $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
-	      $(TIMING_DEPENDENCE) $(OTHER_SOURCES) $(SYNAPTOGENESIS_DYNAMICS)
+	      $(TIMING_DEPENDENCE) $(OTHER_SOURCES)
 
 SYNAPSE_TYPE_SOURCES += $(SOURCE_DIR)/neuron/c_main.c \
                         $(SOURCE_DIR)/neuron/synapses.c \
@@ -141,4 +145,6 @@ $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
 	      -include $(INPUT_TYPE_H) \
 	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) -o $@ $<
+	      -include $(ADDITIONAL_INPUT_H) \
+	      -include $(SYNAPTOGENESIS_DYNAMICS) \
+	      -include $(SYNAPTOGENESIS_DYNAMICS_H) -o $@ $<

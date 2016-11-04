@@ -4,6 +4,7 @@
 address_t synaptogenesis_dynamics_initialise(
 	address_t afferent_populations){
 	use(afferent_populations);
+	log_info("Non-structurally plastic implementation.");
     return afferent_populations;
 }
 

@@ -69,7 +69,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         #
         # # Word aligned for convenience
         #
-        spec.write_value(data=int(self._p_rew / (machine_time_step * 1000)), data_type=DataType.INT32)
+        spec.write_value(data=int(self._p_rew / machine_time_step), data_type=DataType.INT32)
         spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
         spec.write_value(data=self._sigma_form_forward, data_type=DataType.FLOAT_32)
         spec.write_value(data=self._sigma_form_lateral, data_type=DataType.FLOAT_32)
@@ -210,7 +210,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
 
     def get_vertex_executable_suffix(self):
         name = self.super.get_vertex_executable_suffix()
-        # name += "_structural"
+        name += "_structural"
         return name
 
     def is_same_as(self, synapse_dynamics):

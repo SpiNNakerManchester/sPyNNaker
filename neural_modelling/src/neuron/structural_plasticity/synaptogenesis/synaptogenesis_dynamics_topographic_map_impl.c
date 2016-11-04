@@ -42,7 +42,9 @@ rewiring_data_t rewiring_data;
 address_t synaptogenesis_dynamics_initialise(
     address_t afferent_populations){
     // Read in all of the parameters from SDRAM
-    
+
+    rewiring_data.p_rew = &afferent_populations[0];
+    log_error("P_REW ->> %d", rewiring_data.p_rew);
     return afferent_populations;
 }
 
@@ -51,7 +53,7 @@ address_t synaptogenesis_dynamics_initialise(
 // and one to be called by the dma callback and then call formation or elimination
 
 void synaptogenesis_dynamics_rewire(){
-    log_error("There should be no structurally plastic synapses!");
+    log_error("Error you piece of shit!");
 }
 
 address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address){

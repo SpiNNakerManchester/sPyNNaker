@@ -1,7 +1,7 @@
 #ifndef _SYNAPTOGENESIS_DYNAMICS_H_
 #define _SYNAPTOGENESIS_DYNAMICS_H_
 #include "../../common/neuron-typedefs.h"
-//#include "../synapse_row.h"
+#include "../synapse_row.h"
 
 address_t synaptogenesis_dynamics_initialise(
 	address_t afferent_populations);
