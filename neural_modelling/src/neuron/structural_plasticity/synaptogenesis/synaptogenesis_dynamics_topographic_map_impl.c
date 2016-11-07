@@ -41,10 +41,31 @@ rewiring_data_t rewiring_data;
 
 address_t synaptogenesis_dynamics_initialise(
     address_t afferent_populations){
+    log_info("Structurally plastic implementation.");
     // Read in all of the parameters from SDRAM
+    int32_t *sp_word = (int32_t*) afferent_populations;
+//    int32_t offset = 0;
+//    rewiring_data.p_rew = (int32_t)&afferent_populations[offset];
+//    offset += 4;
+//    rewiring_data.s_max = (int32_t)&afferent_populations[offset];
+    rewiring_data.p_rew = *sp_word++;
+    rewiring_data.s_max = *sp_word++;
+    rewiring_data.sigma_form_forward = *(REAL*)sp_word++;
+    rewiring_data.sigma_form_lateral = *(REAL*)sp_word++;
+    rewiring_data.p_form_forward = *(REAL*)sp_word++;
+    rewiring_data.p_form_lateral = *(REAL*)sp_word++;
+    rewiring_data.p_elim_dep = *(REAL*)sp_word++;
+    rewiring_data.p_elim_pot = *(REAL*)sp_word++;
 
-    rewiring_data.p_rew = &afferent_populations[0];
     log_error("P_REW ->> %d", rewiring_data.p_rew);
+    log_error("S_MAX ->> %d", rewiring_data.s_max);
+    log_error("sigma_form_forward ->> %k", rewiring_data.sigma_form_forward);
+    log_error("sigma_form_lateral ->> %k", rewiring_data.sigma_form_lateral);
+    log_error("p_form_forward ->> %k", rewiring_data.p_form_forward);
+    log_error("p_form_lateral ->> %k", rewiring_data.p_form_lateral);
+    log_error("p_elim_dep ->> %k", rewiring_data.p_elim_dep);
+    log_error("p_elim_pot ->> %k", rewiring_data.p_elim_pot);
+//    rt_error(RTE_SWERR);
     return afferent_populations;
 }
 
@@ -53,7 +74,7 @@ address_t synaptogenesis_dynamics_initialise(
 // and one to be called by the dma callback and then call formation or elimination
 
 void synaptogenesis_dynamics_rewire(){
-    log_error("Error you piece of shit!");
+//    log_error("Error you piece of shit!");
 }
 
 address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address){

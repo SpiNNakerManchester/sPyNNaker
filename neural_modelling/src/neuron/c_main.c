@@ -197,21 +197,19 @@ static bool initialise(uint32_t *timer_period) {
             n_neurons, ring_buffer_to_input_buffer_left_shifts);
 
     log_error("heloo----------");
-    if (!synapse_dynamics_region_address && syn_dyn_end_address) {
+    if (synapse_dynamics_region_address && !syn_dyn_end_address) {
         return false;
     }
 
     // Set up structural plasticity dynamics
-    if (!synapse_dynamics_region_address && synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
+    if (synapse_dynamics_region_address && !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
         return false;
     }
 
 
     rewiring_period = get_p_rew();
     rewiring = rewiring_period != -1;
-
-    log_error("P_REW ->> %d", rewiring_period);
-    log_error("P_REW ->> %d", rewiring_period);
+    log_error("Rewiring period -- %d", rewiring_period);
 
     if (!spike_processing_initialise(
             row_max_n_words, MC, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER,
@@ -271,7 +269,7 @@ void timer_callback(uint timer_count, uint unused) {
         last_rewiring_time = 0;
         synaptogenesis_dynamics_rewire();
         count_rewires++;
-        log_error("rewires atm -> %d", count_rewires);
+//        log_error("rewires atm -> %d", count_rewires);
     }
     //TODO
     /* 

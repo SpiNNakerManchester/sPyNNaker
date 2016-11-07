@@ -69,14 +69,14 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         #
         # # Word aligned for convenience
         #
-        spec.write_value(data=int(self._p_rew / machine_time_step), data_type=DataType.INT32)
+        spec.write_value(data=int(self._p_rew * machine_time_step), data_type=DataType.INT32)
         spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
-        spec.write_value(data=self._sigma_form_forward, data_type=DataType.FLOAT_32)
-        spec.write_value(data=self._sigma_form_lateral, data_type=DataType.FLOAT_32)
-        spec.write_value(data=self._p_form_forward, data_type=DataType.FLOAT_32)
-        spec.write_value(data=self._p_form_lateral, data_type=DataType.FLOAT_32)
-        spec.write_value(data=self._p_elim_dep, data_type=DataType.FLOAT_32)
-        spec.write_value(data=self._p_elim_pot, data_type=DataType.FLOAT_32)
+        spec.write_value(data=self._sigma_form_forward, data_type=DataType.S1615)
+        spec.write_value(data=self._sigma_form_lateral, data_type=DataType.S1615)
+        spec.write_value(data=self._p_form_forward, data_type=DataType.S1615)
+        spec.write_value(data=self._p_form_lateral, data_type=DataType.S1615)
+        spec.write_value(data=self._p_elim_dep, data_type=DataType.S1615)
+        spec.write_value(data=self._p_elim_pot, data_type=DataType.S1615)
         # write total number of atoms in the application vertex
         spec.write_value(data=app_vertex.n_atoms, data_type=DataType.INT32)
         # write local low, high and number of atoms
