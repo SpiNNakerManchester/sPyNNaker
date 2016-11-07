@@ -1,9 +1,5 @@
 
 # pacman imports
-import logging
-import os
-from abc import ABCMeta
-from six import add_metaclass
 
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
@@ -66,6 +62,12 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.conf import config
 
+import random
+import logging
+import os
+from abc import ABCMeta
+from six import add_metaclass
+
 logger = logging.getLogger(__name__)
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
@@ -95,6 +97,8 @@ class AbstractPopulationVertex(
     """
 
     BASIC_MALLOC_USAGE = 2
+
+    _n_vertices = 0
 
     def __init__(
             self, n_neurons, binary, label, max_atoms_per_core,
@@ -270,6 +274,8 @@ class AbstractPopulationVertex(
         self._check_for_auto_pause_and_resume_functionality(
             vertex_slice, vertex, n_machine_time_steps)
 
+        self._n_vertices += 1
+
         # return machine vertex
         return vertex
 
@@ -421,7 +427,8 @@ class AbstractPopulationVertex(
             time_between_requests)
 
     def _write_neuron_parameters(
-            self, spec, key, vertex_slice):
+            self, spec, key, vertex_slice, machine_time_step,
+            time_scale_factor):
 
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
@@ -430,6 +437,15 @@ class AbstractPopulationVertex(
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
+
+        # Write the random back off value
+        spec.write_value(random.randint(0, self._n_vertices))
+
+        # Write the number of microseconds between sending spikes
+        time_between_spikes = (
+            (machine_time_step * time_scale_factor) /
+            (n_atoms * 2.0))
+        spec.write_value(data=int(time_between_spikes))
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
@@ -551,7 +567,8 @@ class AbstractPopulationVertex(
             spec, spike_history_sz, v_history_sz, gsyn_history_sz,
             iptags, buffer_size_before_receive, self._time_between_requests,
             vertex, machine_time_step, time_scale_factor)
-        self._write_neuron_parameters(spec, key, vertex_slice)
+        self._write_neuron_parameters(
+            spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
