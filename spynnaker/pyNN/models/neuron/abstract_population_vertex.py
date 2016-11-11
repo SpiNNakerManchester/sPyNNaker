@@ -32,17 +32,14 @@ from spinn_front_end_common.abstract_models\
     import AbstractGeneratesDataSpecification
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
-
-from spinn_front_end_common.interface.buffer_management\
-    .buffer_models.receives_buffers_to_host_basic_impl \
-    import ReceiveBuffersToHostBasicImpl
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
+from spinn_front_end_common.interface.buffer_management\
+    import recording_utilities
 
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
@@ -89,12 +86,14 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, ReceiveBuffersToHostBasicImpl,
-        AbstractHasGlobalMaxAtoms):
+        AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms):
     """ Underlying vertex model for Neural Populations.
     """
 
     BASIC_MALLOC_USAGE = 2
+    SPIKE_RECORDING_REGION = 0
+    V_RECORDING_REGION = 1
+    GSYN_RECORDING_REGION = 2
 
     _n_vertices = 0
 
@@ -114,7 +113,6 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
-        ReceiveBuffersToHostBasicImpl.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
 
         self._binary = binary
@@ -136,14 +134,6 @@ class AbstractPopulationVertex(
         self._spike_recorder = SpikeRecorder()
         self._v_recorder = VRecorder()
         self._gsyn_recorder = GsynRecorder()
-        self._spike_buffer_max_size = config.getint(
-            "Buffers", "spike_buffer_size")
-        self._v_buffer_max_size = config.getint(
-            "Buffers", "v_buffer_size")
-        self._gsyn_buffer_max_size = config.getint(
-            "Buffers", "gsyn_buffer_size")
-        self._buffer_size_before_receive = config.getint(
-            "Buffers", "buffer_size_before_receive")
         self._time_between_requests = config.getint(
             "Buffers", "time_between_requests")
         self._minimum_buffer_sdram = config.getint(
@@ -154,8 +144,25 @@ class AbstractPopulationVertex(
             "Buffers", "receive_buffer_host")
         self._receive_buffer_port = config.getint(
             "Buffers", "receive_buffer_port")
-        self._enable_buffered_recording = config.getboolean(
-            "Buffers", "enable_buffered_recording")
+
+        # If live buffering is enabled, set a maximum on the buffer sizes
+        spike_buffer_max_size = 0
+        v_buffer_max_size = 0
+        gsyn_buffer_max_size = 0
+        self._buffer_size_before_receive = None
+        if config.getboolean("Buffers", "enable_buffered_recording"):
+            spike_buffer_max_size = config.getint(
+                "Buffers", "spike_buffer_size")
+            v_buffer_max_size = config.getint(
+                "Buffers", "v_buffer_size")
+            gsyn_buffer_max_size = config.getint(
+                "Buffers", "gsyn_buffer_size")
+            self._buffer_size_before_receive = config.getint(
+                "Buffers", "buffer_size_before_receive")
+
+        self._maximum_sdram_for_buffering = [
+            spike_buffer_max_size, v_buffer_max_size, gsyn_buffer_max_size
+        ]
 
         # Set up synapse handling
         self._synapse_manager = SynapticManager(
@@ -194,13 +201,14 @@ class AbstractPopulationVertex(
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
 
-        # set up any resources config needed for the auto pause and resume
-        self._check_for_auto_pause_and_resume_functionality(
-            vertex_slice, self, n_machine_time_steps)
-
-        # add extra resources from the extra functionality
-        container.extend(self.get_extra_resources(
-            self._receive_buffer_host, self._receive_buffer_port))
+        recording_sizes = recording_utilities.get_recording_region_sizes(
+            self._get_buffered_sdram_per_timestep(vertex_slice),
+            n_machine_time_steps, self._minimum_buffer_sdram,
+            self._maximum_sdram_for_buffering,
+            self._using_auto_pause_and_resume)
+        container.extend(recording_utilities.get_recording_resources(
+            recording_sizes, self._receive_buffer_host,
+            self._receive_buffer_port))
 
         # return the total resources.
         return container
@@ -214,40 +222,15 @@ class AbstractPopulationVertex(
     def mark_no_changes(self):
         self._change_requires_mapping = False
 
-    def _check_for_auto_pause_and_resume_functionality(
-            self, vertex_slice, object_to_set, n_machine_time_steps):
-        if not self._using_auto_pause_and_resume:
-            spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, n_machine_time_steps)
-            v_buffer_size = self._v_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, n_machine_time_steps)
-            gsyn_buffer_size = self._gsyn_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, n_machine_time_steps)
-            spike_buffering_needed = recording_utils.needs_buffering(
-                self._spike_buffer_max_size, spike_buffer_size,
-                self._enable_buffered_recording)
-            v_buffering_needed = recording_utils.needs_buffering(
-                self._v_buffer_max_size, v_buffer_size,
-                self._enable_buffered_recording)
-            gsyn_buffering_needed = recording_utils.needs_buffering(
-                self._gsyn_buffer_max_size, gsyn_buffer_size,
-                self._enable_buffered_recording)
-            if (spike_buffering_needed or v_buffering_needed or
-                    gsyn_buffering_needed):
-                object_to_set.activate_buffering_output(
-                    buffering_ip_address=self._receive_buffer_host,
-                    buffering_port=self._receive_buffer_port)
-        else:
-            sdram_per_ts = 0
-            sdram_per_ts += self._spike_recorder.get_sdram_usage_in_bytes(
+    def _get_buffered_sdram_per_timestep(self, vertex_slice):
+        return [
+            self._spike_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, 1),
+            self._v_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, 1),
+            self._gsyn_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1)
-            sdram_per_ts += self._v_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, 1)
-            sdram_per_ts += self._gsyn_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, 1)
-            object_to_set.activate_buffering_output(
-                minimum_sdram_for_buffering=self._minimum_buffer_sdram,
-                buffered_sdram_per_timestep=sdram_per_ts)
+        ]
 
     @inject_items({"n_machine_time_steps": "TotalMachineTimeSteps"})
     @overrides(
@@ -261,17 +244,14 @@ class AbstractPopulationVertex(
             self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
             self._spike_recorder.record
         )
-
-        # handle any new resources from the interfaces
-        resources_required.extend(self.get_extra_resources(
-            self._receive_buffer_host, self._receive_buffer_port))
-
+        buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
+            vertex_slice)
+        minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
+            buffered_sdram_per_timestep, n_machine_time_steps,
+            self._minimum_buffer_sdram)
         vertex = PopulationMachineVertex(
-            resources_required, is_recording, label, constraints)
-
-        # check for auto pause and resume setting
-        self._check_for_auto_pause_and_resume_functionality(
-            vertex_slice, vertex, n_machine_time_steps)
+            resources_required, is_recording, minimum_buffer_sdram,
+            buffered_sdram_per_timestep, label, constraints)
 
         self._n_vertices += 1
 
@@ -322,18 +302,18 @@ class AbstractPopulationVertex(
         if self._additional_input is not None:
             per_neuron_usage += \
                 self._additional_input.get_sdram_usage_per_neuron_in_bytes()
-        return (common_constants.SYSTEM_BYTES_REQUIREMENT +
-                ReceiveBuffersToHostBasicImpl.get_recording_data_size(3) +
-                (per_neuron_usage * vertex_slice.n_atoms) +
-                self._neuron_model.get_sdram_usage_in_bytes(
-                    vertex_slice.n_atoms))
+        params_size = self._neuron_model.get_sdram_usage_in_bytes(
+            vertex_slice.n_atoms)
+        return ((6 * 4) + (per_neuron_usage * vertex_slice.n_atoms) +
+                params_size)
 
     def get_sdram_usage_for_atoms(
             self, vertex_slice, graph, n_machine_time_steps,
             machine_time_step):
         sdram_requirement = (
+            common_constants.SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
-            ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(3) +
+            recording_utilities.get_recording_header_size(3) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
@@ -341,26 +321,6 @@ class AbstractPopulationVertex(
                 machine_time_step) +
             (self._get_number_of_mallocs_used_by_dsg() *
              common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
-
-        # add recording SDRAM if not automatically calculated
-        if not self._using_auto_pause_and_resume:
-            spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, n_machine_time_steps)
-            v_buffer_size = self._v_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, n_machine_time_steps)
-            gsyn_buffer_size = self._gsyn_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, n_machine_time_steps)
-            sdram_requirement += recording_utils.get_buffer_sizes(
-                self._spike_buffer_max_size, spike_buffer_size,
-                self._enable_buffered_recording)
-            sdram_requirement += recording_utils.get_buffer_sizes(
-                self._v_buffer_max_size, v_buffer_size,
-                self._enable_buffered_recording)
-            sdram_requirement += recording_utils.get_buffer_sizes(
-                self._gsyn_buffer_max_size, gsyn_buffer_size,
-                self._enable_buffered_recording)
-        else:
-            sdram_requirement += self._minimum_buffer_sdram
 
         return sdram_requirement
 
@@ -377,57 +337,26 @@ class AbstractPopulationVertex(
             self._synapse_manager.get_number_of_mallocs_used_by_dsg() +
             extra_mallocs)
 
-    def _reserve_memory_regions(
-            self, spec, vertex_slice, spike_history_region_sz,
-            v_history_region_sz, gsyn_history_region_sz, vertex):
+    def _reserve_memory_regions(self, spec, vertex_slice, vertex):
 
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=(
-                common_constants.SYSTEM_BYTES_REQUIREMENT +
-                vertex.get_recording_data_size(3)), label='System')
+            size=common_constants.SYSTEM_BYTES_REQUIREMENT, label='System')
 
+        params_size = self._get_sdram_usage_for_neuron_params(vertex_slice)
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
-            size=self._get_sdram_usage_for_neuron_params(vertex_slice),
+            size=params_size,
             label='NeuronParams')
 
-        vertex.reserve_buffer_regions(
-            spec,
-            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
-            [constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-             constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
-             constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value],
-            [spike_history_region_sz, v_history_region_sz,
-             gsyn_history_region_sz])
+        spec.reserve_memory_region(
+            region=constants.POPULATION_BASED_REGIONS.RECORDING.value,
+            size=recording_utilities.get_recording_header_size(3))
 
         vertex.reserve_provenance_data_region(spec)
-
-    def _write_setup_info(
-            self, spec, spike_history_region_sz, neuron_potential_region_sz,
-            gsyn_region_sz, ip_tags, buffer_size_before_receive,
-            time_between_requests, vertex, machine_time_step,
-            time_scale_factor):
-        """ Write information used to control the simulation and gathering of\
-            results.
-        """
-
-        # Write the data needed by the simulation interface
-        spec.switch_write_focus(
-            constants.POPULATION_BASED_REGIONS.SYSTEM.value)
-        spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
-            time_scale_factor))
-
-        # Write the data needed for the buffered regions
-        vertex.write_recording_data(
-            spec, ip_tags,
-            [spike_history_region_sz, neuron_potential_region_sz,
-             gsyn_region_sz], buffer_size_before_receive,
-            time_between_requests)
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
@@ -516,45 +445,8 @@ class AbstractPopulationVertex(
             self._model_name))
         vertex_slice = graph_mapper.get_slice(vertex)
 
-        # Get recording sizes - the order is important here as spikes will
-        # require less space than voltage and voltage less than gsyn.  This
-        # order ensures that the buffer size before receive is optimum for
-        # all recording channels
-        # TODO: Maybe split the buffer size before receive by channel?
-        spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, n_machine_time_steps)
-        v_buffer_size = self._v_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, n_machine_time_steps)
-        gsyn_buffer_size = self._gsyn_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, n_machine_time_steps)
-        spike_history_sz = recording_utils.get_buffer_sizes(
-            self._spike_buffer_max_size, spike_buffer_size,
-            self._enable_buffered_recording)
-        v_history_sz = recording_utils.get_buffer_sizes(
-            self._v_buffer_max_size, v_buffer_size,
-            self._enable_buffered_recording)
-        gsyn_history_sz = recording_utils.get_buffer_sizes(
-            self._gsyn_buffer_max_size, gsyn_buffer_size,
-            self._enable_buffered_recording)
-        spike_buffering_needed = recording_utils.needs_buffering(
-            self._spike_buffer_max_size, spike_buffer_size,
-            self._enable_buffered_recording)
-        v_buffering_needed = recording_utils.needs_buffering(
-            self._v_buffer_max_size, v_buffer_size,
-            self._enable_buffered_recording)
-        gsyn_buffering_needed = recording_utils.needs_buffering(
-            self._gsyn_buffer_max_size, gsyn_buffer_size,
-            self._enable_buffered_recording)
-        buffer_size_before_receive = self._buffer_size_before_receive
-        if (not spike_buffering_needed and not v_buffering_needed and
-                not gsyn_buffering_needed):
-            buffer_size_before_receive = max((
-                spike_history_sz, v_history_sz, gsyn_history_sz)) + 256
-
         # Reserve memory regions
-        self._reserve_memory_regions(
-            spec, vertex_slice, spike_history_sz, v_history_sz,
-            gsyn_history_sz, vertex)
+        self._reserve_memory_regions(spec, vertex_slice, vertex)
 
         # Declare random number generators and distributions:
         # TODO add random distribution stuff
@@ -564,12 +456,27 @@ class AbstractPopulationVertex(
         key = routing_info.get_first_key_from_pre_vertex(
             vertex, constants.SPIKE_PARTITION_ID)
 
-        # Write the regions
-        iptags = tags.get_ip_tags_for_vertex(vertex)
-        self._write_setup_info(
-            spec, spike_history_sz, v_history_sz, gsyn_history_sz,
-            iptags, buffer_size_before_receive, self._time_between_requests,
-            vertex, machine_time_step, time_scale_factor)
+        # Write the setup region
+        spec.switch_write_focus(
+            constants.POPULATION_BASED_REGIONS.SYSTEM.value)
+        spec.write_array(simulation_utilities.get_simulation_header_array(
+            self.get_binary_file_name(), machine_time_step,
+            time_scale_factor))
+
+        # Write the recording region
+        spec.switch_write_focus(
+            constants.POPULATION_BASED_REGIONS.RECORDING.value)
+        ip_tags = tags.get_ip_tags_for_vertex(vertex)
+        recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
+            n_machine_time_steps,
+            self._get_buffered_sdram_per_timestep(vertex_slice),
+            self._maximum_sdram_for_buffering)
+        spec.write_array(recording_utilities.get_recording_header_array(
+            recorded_region_sizes, self._time_between_requests,
+            self._buffer_size_before_receive, ip_tags,
+            self._receive_buffer_host, self._receive_buffer_port))
+
+        # Write the neuron parameters
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
@@ -605,9 +512,7 @@ class AbstractPopulationVertex(
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self._spike_recorder.get_spikes(
-            self._label, buffer_manager,
-            constants.POPULATION_BASED_REGIONS.SPIKE_HISTORY.value,
-            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
+            self._label, buffer_manager, self.SPIKE_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractVRecordable.is_recording_v)
@@ -623,9 +528,7 @@ class AbstractPopulationVertex(
     def get_v(self, n_machine_time_steps, placements, graph_mapper,
               buffer_manager, machine_time_step):
         return self._v_recorder.get_v(
-            self._label, buffer_manager,
-            constants.POPULATION_BASED_REGIONS.POTENTIAL_HISTORY.value,
-            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
+            self._label, buffer_manager, self.V_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractGSynRecordable.is_recording_gsyn)
@@ -642,9 +545,7 @@ class AbstractPopulationVertex(
             self, n_machine_time_steps, placements, graph_mapper,
             buffer_manager, machine_time_step):
         return self._gsyn_recorder.get_gsyn(
-            self._label, buffer_manager,
-            constants.POPULATION_BASED_REGIONS.GSYN_HISTORY.value,
-            constants.POPULATION_BASED_REGIONS.BUFFERING_OUT_STATE.value,
+            self._label, buffer_manager, self.GSYN_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractPopulationInitializable.initialize)
