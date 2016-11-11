@@ -58,7 +58,7 @@ class AbstractNeuronModel(object):
         :rtype: int
         """
         return ((self.get_n_neural_parameters() * 4 * n_neurons) +
-                self.get_n_global_parameters())
+                self.get_n_global_parameters() * 4)
 
     def get_dtcm_usage_per_neuron_in_bytes(self):
         """ Get the DTCM usage of this neuron model in bytes
