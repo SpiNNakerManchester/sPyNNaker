@@ -52,7 +52,7 @@ class Spinnaker(SpinnakerMainInterface):
         # population holders
         self._populations = list()
         self._projections = list()
-        self._multi_cast_vertex = None
+        self._command_sender = None
         self._edge_count = 0
 
         # the number of edges that are associated with commands being sent to
@@ -219,30 +219,26 @@ class Spinnaker(SpinnakerMainInterface):
         :return:
         """
         if isinstance(vertex_to_add, CommandSender):
-            self._multi_cast_vertex = vertex_to_add
+            self._command_sender = vertex_to_add
 
         self._application_graph.add_vertex(vertex_to_add)
 
         if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
 
             # if there's no command sender yet, build one
-            if self._multi_cast_vertex is None:
-                self._multi_cast_vertex = CommandSender(
+            if self._command_sender is None:
+                self._command_sender = CommandSender(
                     "auto_added_command_sender", None)
-                self.add_application_vertex(self._multi_cast_vertex)
+                self.add_application_vertex(self._command_sender)
 
-            # get the vertex is going to send and verify how many partitions
-            # it'll need based off the commands keys.
-
-            n_partitions = self._deduce_partitions_from_command_keys(
-                vertex_to_add.commands)
+            # Count the number of unique keys
+            n_partitions = self._count_unique_keys(vertex_to_add.commands)
 
             # build the number of edges accordingly and then add them to the
             # graph.
             partitions = list()
             for _ in range(0, n_partitions):
-                edge = ApplicationEdge(
-                    self._multi_cast_vertex, vertex_to_add)
+                edge = ApplicationEdge(self._command_sender, vertex_to_add)
                 partition_id = "COMMANDS{}".format(self._command_edge_count)
 
                 # add to the command count, so that each set of commands is in
@@ -255,14 +251,14 @@ class Spinnaker(SpinnakerMainInterface):
                 # locate the partition object for the edge we just added
                 partition = self._application_graph.\
                     get_outgoing_edge_partition_starting_at_vertex(
-                        self._multi_cast_vertex, partition_id)
+                        self._command_sender, partition_id)
 
                 # store the partition for the command sender to use for its
                 # key map
                 partitions.append(partition)
 
             # allow the command sender to create key to partition map
-            self._multi_cast_vertex.add_commands(
+            self._command_sender.add_commands(
                 vertex_to_add.commands, partitions)
 
         # add any dependent edges and vertices if needed
@@ -277,11 +273,8 @@ class Spinnaker(SpinnakerMainInterface):
                     vertex_to_add.
                     edge_partition_identifier_for_dependent_edge)
 
-    def _deduce_partitions_from_command_keys(self, commands):
-        unique_keys = list()
-        for command in commands:
-            if command.key not in unique_keys:
-                unique_keys.append(command.key)
+    def _count_unique_keys(self, commands):
+        unique_keys = {command.key for command in commands}
         return len(unique_keys)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
