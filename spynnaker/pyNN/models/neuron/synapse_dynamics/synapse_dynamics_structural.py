@@ -125,7 +125,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         for subpopulation_list in population_to_subpopulation_information.itervalues():
             max_subpartitions = np.maximum(max_subpartitions, len(subpopulation_list))
         # Table header
-        spec.write_value(data=(no_pre_populations << 16) + (max_subpartitions & 0xFFFF), data_type=DataType.INT32)
+        spec.write_value(data=no_pre_populations, data_type=DataType.INT32)
 
         words_needed_to_be_written = max_subpartitions * 2
         total_words_written = 0
