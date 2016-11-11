@@ -98,7 +98,7 @@ static inline final_state_t _plasticity_update_synapse(
         current_state = timing_apply_post_spike(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state);
+            current_state, (uint32_t) 0);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -112,7 +112,7 @@ static inline final_state_t _plasticity_update_synapse(
     // **NOTE** dendritic delay is subtracted
     current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-        post_window.prev_time, post_window.prev_trace, current_state);
+        post_window.prev_time, post_window.prev_trace, current_state, (uint32_t) 0);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
@@ -250,7 +250,7 @@ bool synapse_dynamics_process_plastic_synapses(
         // Extract control-word components
         // **NOTE** cunningly, control word is just the same as lower
         // 16-bits of 32-bit fixed synapse so same functions can be used
-        uint32_t delay_axonal = 0;    //_sparse_axonal_delay(control_word);
+        uint32_t delay_axonal = _sparse_axonal_delay(control_word);
         uint32_t delay_dendritic = synapse_row_sparse_delay(control_word);
         uint32_t type = synapse_row_sparse_type(control_word);
         uint32_t index = synapse_row_sparse_index(control_word);

@@ -30,7 +30,7 @@ static input_type_pointer_t input_type_array;
 static additional_input_pointer_t additional_input_array;
 
 //! Threshold states array
-static threshold_type_pointer_t threshold_type_array;
+threshold_type_pointer_t threshold_type_array;
 
 //! Global parameters for the neurons
 static global_neuron_params_pointer_t global_parameters;
@@ -58,6 +58,12 @@ uint32_t voltages_size;
 //! storage for neuron input with timestamp
 static timed_input_t *inputs;
 uint32_t input_size;
+
+//! SD: back-ups of neuron potentials, from last time step and the timestep when it last spiked:
+accum *last_voltage;
+uint32_t last_voltage_sz;
+accum *voltage_before_last_spike;
+uint32_t voltage_before_last_spike_sz;
 
 //! The number of clock ticks to back off before starting the timer, in an
 //! attempt to avoid overloading the network
@@ -235,6 +241,20 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     _print_neuron_parameters();
 
+    //! SD: Reserve memory for neuron potentials and potential at last spike:
+    last_voltage_sz = sizeof(accum) * n_neurons;
+    last_voltage = (accum *) spin1_malloc(last_voltage_sz);
+    voltage_before_last_spike_sz = sizeof(accum) * n_neurons;
+    voltage_before_last_spike = (accum *) spin1_malloc(voltage_before_last_spike_sz);
+    for(index_t neuron_index=0; neuron_index<n_neurons; neuron_index++) {
+       last_voltage[neuron_index] = 0.0;
+       voltage_before_last_spike[neuron_index] = 0.0;
+    }
+    log_info(" value: %u", threshold_type_array[0]);
+
+    log_info(
+        "\t neurons = %u, last_v addr = 0x%08x, v_before_last_spike_addr = 0x%08x",
+         n_neurons, last_voltage, voltage_before_last_spike);
     return true;
 }
 
@@ -270,6 +290,9 @@ void neuron_do_timestep_update(timer_t time) {
         additional_input_pointer_t additional_input =
             &additional_input_array[neuron_index];
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
+
+        //! SD: Back this value up in case the neuron is force to spike now:
+        last_voltage[neuron_index] = voltage;
 
         // If we should be recording potential, record this neuron parameter
         voltages->states[neuron_index] = voltage;
@@ -315,6 +338,8 @@ void neuron_do_timestep_update(timer_t time) {
             additional_input_has_spiked(additional_input);
 
             // Do any required synapse processing
+            //! SD: capture the last voltage for use in determining weight increment:
+            voltage_before_last_spike[neuron_index] = last_voltage[neuron_index];
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             // Record the spike
