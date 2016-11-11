@@ -127,7 +127,6 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         # Table header
         spec.write_value(data=no_pre_populations, data_type=DataType.INT32)
 
-        words_needed_to_be_written = max_subpartitions * 2
         total_words_written = 0
         for subpopulation_list in population_to_subpopulation_information.itervalues():
             # Population header(s)
@@ -139,12 +138,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
                 spec.write_value(data=subpopulation_info[0], data_type=DataType.INT32)
                 # n_atoms
                 spec.write_value(data=subpopulation_info[1], data_type=DataType.INT32)
-
                 words_written += 2
-            # If we didn't write enough to ensure equal sized blocks, add padding
-            if words_written < words_needed_to_be_written:
-                for _ in xrange(words_needed_to_be_written - words_written):
-                    spec.write_value(data=-1, data_type=DataType.INT32)
             total_words_written += words_written + 4
 
         self.actual_sdram_usage[machine_vertex] = 4 * 16 + 4 * total_words_written
