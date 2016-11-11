@@ -181,13 +181,12 @@ class SpikeSourcePoisson(
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step), 1)
-        minimum_buffer_sdram = (
-            self._minimum_buffer_sdram if buffered_sdram_per_timestep > 0
-            else 0
-        )
+        minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
+            [buffered_sdram_per_timestep], n_machine_time_steps,
+            self._minimum_buffer_sdram)
         vertex = SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
-            minimum_buffer_sdram, buffered_sdram_per_timestep,
+            minimum_buffer_sdram[0], buffered_sdram_per_timestep,
             constraints, label)
 
         # return the machine vertex

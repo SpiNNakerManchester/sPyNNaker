@@ -246,11 +246,9 @@ class AbstractPopulationVertex(
         )
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
             vertex_slice)
-        minimum_buffer_sdram = [
-            self._minimum_buffer_sdram
-            if buffered_sdram_per_timestep[i] > 0 else 0
-            for i in range(len(buffered_sdram_per_timestep))
-        ]
+        minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
+            buffered_sdram_per_timestep, n_machine_time_steps,
+            self._minimum_buffer_sdram)
         vertex = PopulationMachineVertex(
             resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, label, constraints)
