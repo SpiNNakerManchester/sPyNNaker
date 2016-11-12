@@ -33,9 +33,15 @@ class DelayExtensionMachineVertex(
 
     def __init__(self, resources_required, label, constraints=None):
         MachineVertex.__init__(
-            self, resources_required, label, constraints=constraints)
+            self, label, constraints=constraints)
         ProvidesProvenanceDataFromMachineImpl.__init__(
             self, self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value, 6)
+        self._resources = resources_required
+
+    @property
+    @overrides(MachineVertex.resources_required)
+    def resources_required(self):
+        return self._resources
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)

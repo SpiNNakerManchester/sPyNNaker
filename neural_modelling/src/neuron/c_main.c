@@ -28,6 +28,7 @@
 /* validates that the model being compiled does indeed contain a application
    magic number*/
 #ifndef APPLICATION_NAME_HASH
+#define APPLICATION_NAME_HASH 0
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
        constant
 #endif
@@ -40,10 +41,7 @@ typedef enum regions_e{
     POPULATION_TABLE_REGION,
     SYNAPTIC_MATRIX_REGION,
     SYNAPSE_DYNAMICS_REGION,
-    BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
-    BUFFERING_OUT_GSYN_RECORDING_REGION,
-    BUFFERING_OUT_CONTROL_REGION,
+    RECORDING_REGION,
     PROVENANCE_DATA_REGION
 } regions_e;
 
@@ -81,21 +79,10 @@ static uint32_t recording_flags = 0;
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(){
     address_t address = data_specification_get_data_address();
-    address_t system_region = data_specification_get_region(
-        SYSTEM_REGION, address);
-    regions_e regions_to_record[] = {
-        BUFFERING_OUT_SPIKE_RECORDING_REGION,
-        BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
-        BUFFERING_OUT_GSYN_RECORDING_REGION
-    };
-    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-    uint32_t *recording_flags_from_system_conf =
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
+    address_t recording_region = data_specification_get_region(
+        RECORDING_REGION, address);
 
-    bool success = recording_initialize(
-        n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, &recording_flags);
+    bool success = recording_initialize(recording_region, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
     return success;
 }
@@ -219,7 +206,7 @@ void timer_callback(uint timer_count, uint unused) {
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
         log_info("Completed a run");
-        
+
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
@@ -235,6 +222,7 @@ void timer_callback(uint timer_count, uint unused) {
         time -= 1;
         return;
     }
+
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time);

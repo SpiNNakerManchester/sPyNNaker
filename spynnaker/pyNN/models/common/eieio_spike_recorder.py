@@ -34,7 +34,7 @@ class EIEIOSpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, buffer_manager, region, state_region,
+    def get_spikes(self, label, buffer_manager, region,
                    placements, graph_mapper, application_vertex,
                    base_key_function, machine_time_step):
 
@@ -57,8 +57,7 @@ class EIEIOSpikeRecorder(object):
 
             # Read the spikes
             raw_spike_data, data_missing = \
-                buffer_manager.get_data_for_vertex(
-                    placement, region, state_region)
+                buffer_manager.get_data_for_vertex(placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             spike_data = str(raw_spike_data.read_all())
