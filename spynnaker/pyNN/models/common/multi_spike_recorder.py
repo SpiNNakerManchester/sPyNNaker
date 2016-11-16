@@ -43,7 +43,7 @@ class MultiSpikeRecorder(object):
         return n_neurons * 4
 
     def get_spikes(
-            self, label, buffer_manager, region, state_region,
+            self, label, buffer_manager, region,
             placements, graph_mapper, application_vertex, machine_time_step):
 
         spike_times = list()
@@ -74,7 +74,7 @@ class MultiSpikeRecorder(object):
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, data_missing = \
                 buffer_manager.get_data_for_vertex(
-                    placement, region, state_region)
+                    placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             raw_data = neuron_param_region_data_pointer.read_all()
@@ -102,7 +102,10 @@ class MultiSpikeRecorder(object):
                 "Population {} is missing spike data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
 
-        spike_ids = numpy.hstack(spike_ids)
-        spike_times = numpy.hstack(spike_times)
-        result = numpy.dstack((spike_ids, spike_times))[0]
-        return result[numpy.lexsort((spike_times, spike_ids))]
+        if len(spike_ids) > 0:
+            spike_ids = numpy.hstack(spike_ids)
+            spike_times = numpy.hstack(spike_times)
+            result = numpy.dstack((spike_ids, spike_times))[0]
+            return result[numpy.lexsort((spike_times, spike_ids))]
+
+        return numpy.zeros((0, 2))
