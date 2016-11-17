@@ -13,7 +13,7 @@ class AbstractSendMeMulticastCommandsVertex(object):
 
         :param commands: The commands that the vertex expects to be transmitted
         :type commands: iterable of \
-                    py:class:`pacman.utility.multicastcommand.MultiCastCommand`
+                    py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
         :raise None: does not raise any known exceptions
         """
         self._commands = commands

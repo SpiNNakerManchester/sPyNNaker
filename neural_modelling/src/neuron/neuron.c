@@ -59,11 +59,22 @@ uint32_t voltages_size;
 static timed_input_t *inputs;
 uint32_t input_size;
 
+//! The number of clock ticks to back off before starting the timer, in an
+//! attempt to avoid overloading the network
+static uint32_t random_backoff;
+
+//! The number of clock ticks between sending each spike
+static uint32_t time_between_spikes;
+
+//! The expected current clock tick of timer_1 when the next spike can be sent
+static uint32_t expected_time;
+
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parmeters_in_neuron_parameter_data_region {
-    HAS_KEY, TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE,
-    INCOMING_SPIKE_BUFFER_SIZE, START_OF_GLOBAL_PARAMETERS,
+    RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, HAS_KEY, TRANSMISSION_KEY,
+    N_NEURONS_TO_SIMULATE, INCOMING_SPIKE_BUFFER_SIZE,
+    START_OF_GLOBAL_PARAMETERS,
 } parmeters_in_neuron_parameter_data_region;
 
 
@@ -107,6 +118,12 @@ static inline void _print_neuron_parameters() {
 bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         uint32_t *n_neurons_value, uint32_t *incoming_spike_buffer_size) {
     log_info("neuron_initialise: starting");
+
+    random_backoff = address[RANDOM_BACKOFF];
+    time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
+    log_info(
+        "\t back off = %u, time between spikes %u",
+        random_backoff, time_between_spikes);
 
     // Check if there is a key to use
     use_key = address[HAS_KEY];
@@ -232,6 +249,16 @@ void neuron_set_input_buffers(input_t *input_buffers_value) {
 //! \param[in] time the timer tick  value currently being executed
 void neuron_do_timestep_update(timer_t time) {
 
+    // Wait a random number of clock cycles
+    uint32_t random_backoff_time = tc[T1_COUNT] - random_backoff;
+    while (tc[T1_COUNT] > random_backoff_time) {
+
+        // Do Nothing
+    }
+
+    // Set the next expected time to wait for between spike sending
+    expected_time = tc[T1_COUNT] - time_between_spikes;
+
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
@@ -293,11 +320,23 @@ void neuron_do_timestep_update(timer_t time) {
             // Record the spike
             out_spikes_set_spike(neuron_index);
 
-            // Send the spike
-            while (use_key &&
-                   !spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
-                spin1_delay_us(1);
+            if (use_key) {
+
+                // Wait until the expected time to send
+                while (tc[T1_COUNT] > expected_time) {
+
+                    // Do Nothing
+                }
+                expected_time -= time_between_spikes;
+
+                // Send the spike
+                while (!spin1_send_mc_packet(
+                        key | neuron_index, 0, NO_PAYLOAD)) {
+                    spin1_delay_us(1);
+                }
             }
+
+
         } else {
             log_debug("the neuron %d has been determined to not spike",
                       neuron_index);
