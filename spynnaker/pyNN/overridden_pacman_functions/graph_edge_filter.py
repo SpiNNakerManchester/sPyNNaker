@@ -55,6 +55,15 @@ class GraphEdgeFilter(object):
                         new_machine_graph.add_edge(edge, partition.identifier)
                         app_edge = graph_mapper.get_application_edge(edge)
                         new_graph_mapper.add_edge_mapping(edge, app_edge)
+
+                        # add partition constraints from the original graph to
+                        # the new graph
+                        # add constraints from the application partition
+                        new_machine_graph_partition = new_machine_graph.\
+                            get_outgoing_edge_partition_starting_at_vertex(
+                                edge.pre_vertex, partition.identifier)
+                        new_machine_graph_partition.add_constraints(
+                            partition.constraints)
                     else:
                         logger.debug(
                             "this edge was pruned {}".format(edge))

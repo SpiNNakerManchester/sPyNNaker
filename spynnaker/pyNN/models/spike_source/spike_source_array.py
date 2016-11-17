@@ -21,9 +21,6 @@ from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
 from spinn_front_end_common.utilities import exceptions
-from spinn_front_end_common.utility_models\
-    .reverse_ip_tag_multicast_source_machine_vertex \
-    import ReverseIPTagMulticastSourceMachineVertex
 
 
 # general imports
@@ -56,12 +53,10 @@ class SpikeSourceArray(
         if ip_address is None:
             self._ip_address = config.get("Buffers", "receive_buffer_host")
         self._port = port
+        if port is None:
+            self._port = config.getint("Buffers", "receive_buffer_port")
         if spike_times is None:
             spike_times = []
-        self._minimum_sdram_for_buffering = config.getint(
-            "Buffers", "minimum_buffer_sdram")
-        self._using_auto_pause_and_resume = config.getboolean(
-            "Buffers", "use_auto_pause_and_resume")
 
         ReverseIpTagMultiCastSource.__init__(
             self, n_keys=n_neurons, label=label,
@@ -75,9 +70,9 @@ class SpikeSourceArray(
             send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
             send_buffer_max_space=max_on_chip_memory_usage_for_spikes_in_bytes,
             send_buffer_space_before_notify=space_before_notification,
-            send_buffer_notification_ip_address=self._ip_address,
-            send_buffer_notification_port=self._port,
-            send_buffer_notification_tag=tag,
+            buffer_notification_ip_address=self._ip_address,
+            buffer_notification_port=self._port,
+            buffer_notification_tag=tag,
             buffered_out_ip_address=self._ip_address)
 
         AbstractSpikeRecordable.__init__(self)
@@ -151,12 +146,8 @@ class SpikeSourceArray(
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(self):
         self.enable_recording(
-            self._ip_address, self._port, self._board_address,
-            self._send_buffer_notification_tag,
             self._spike_recorder_buffer_size,
-            self._buffer_size_before_receive,
-            self._minimum_sdram_for_buffering,
-            self._using_auto_pause_and_resume)
+            self._buffer_size_before_receive)
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = True
 
@@ -165,14 +156,11 @@ class SpikeSourceArray(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
 
         return self._spike_recorder.get_spikes(
-            self.label, buffer_manager,
-            (ReverseIPTagMulticastSourceMachineVertex.
-             _REGIONS.RECORDING_BUFFER.value),
-            (ReverseIPTagMulticastSourceMachineVertex.
-             _REGIONS.RECORDING_BUFFER_STATE.value),
+            self.label, buffer_manager, 0,
             placements, graph_mapper, self,
             lambda vertex:
-                vertex.virtual_key if vertex.virtual_key is not None
+                vertex.virtual_key
+                if vertex.virtual_key is not None
                 else 0,
             machine_time_step)
 

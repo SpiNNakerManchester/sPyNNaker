@@ -40,8 +40,8 @@ class GsynRecorder(object):
         return n_neurons * 8
 
     def get_gsyn(
-            self, label, buffer_manager, region, state_region,
-            placements, graph_mapper, application_vertex, machine_time_step):
+            self, label, buffer_manager, region, placements, graph_mapper,
+            application_vertex, machine_time_step):
 
         ms_per_tick = machine_time_step / 1000.0
 
@@ -65,7 +65,7 @@ class GsynRecorder(object):
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, data_missing =\
                 buffer_manager.get_data_for_vertex(
-                    placement, region, state_region)
+                    placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             record_raw = neuron_param_region_data_pointer.read_all()

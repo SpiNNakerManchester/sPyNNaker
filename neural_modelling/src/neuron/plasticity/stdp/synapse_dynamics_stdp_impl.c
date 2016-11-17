@@ -13,9 +13,7 @@
 #include <string.h>
 #include <debug.h>
 
-#ifdef SYNAPSE_BENCHMARK
 uint32_t num_plastic_pre_synaptic_events;
-#endif  // SYNAPSE_BENCHMARK
 
 post_event_history_t *post_event_history;
 
@@ -154,9 +152,7 @@ bool synapse_dynamics_process_plastic_synapses(
     size_t plastic_synapse = synapse_row_num_plastic_controls(
         fixed_region_address);
 
-#ifdef SYNAPSE_BENCHMARK
     num_plastic_pre_synaptic_events += plastic_synapse;
-#endif  // SYNAPSE_BENCHMARK
 
     // Get event history from synaptic row
     pre_event_history_t *event_history = _plastic_event_history(
@@ -283,9 +279,5 @@ void synapse_dynamics_print_plastic_synapses(
 //!        returns 0
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
-#ifdef SYNAPSE_BENCHMARK
     return num_plastic_pre_synaptic_events;
-#else
-    return 0;
-#endif  // SYNAPSE_BENCHMARK
 }
