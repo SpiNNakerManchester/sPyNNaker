@@ -26,13 +26,12 @@ class SpYNNakerConnectionHolderGenerator(object):
 
             # add pre run generators so that reports can extract without
             # going to machine.
-            edge.post_vertex.add_pre_run_connection_holder(
-                connection_holder,
-                graph_mapper.get_application_edge(edge),
-                edge.synapse_information)
+            for synapse_information in edge.synapse_information:
+                edge.post_vertex.add_pre_run_connection_holder(
+                    connection_holder, edge, synapse_information)
 
-            # store for the report generations
-            data_holders[edge] = connection_holder
+                # store for the report generations
+                data_holders[(edge, synapse_information)] = connection_holder
 
         # return the two holders
         return data_holders
