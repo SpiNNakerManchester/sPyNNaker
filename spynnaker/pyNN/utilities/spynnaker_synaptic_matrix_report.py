@@ -9,10 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 def generate_synaptic_matrix_reports(
-        common_report_directory, application_graph, machine_graph,
+        common_report_directory, application_graph,
         placements, txrx, routing_infos, graph_mapper,
         loaded_application_data_token, machine_time_step):
-    """converts synaptic matrix for every partitionable edge.
+
+    """converts synaptic matrix for every application edge.
 
     :param loaded_application_data_token: needs to be done after loaded
     :param routing_infos: routing information
@@ -36,7 +37,8 @@ def generate_synaptic_matrix_reports(
 
         if isinstance(application_edge, ProjectionApplicationEdge):
             file_name = os.path.join(
-                top_level_folder, "synaptic_matrix_for_partitionable_edge_{}"
+                top_level_folder,
+                "synaptic_matrix_for_application_edge_{}"
                                   .format(application_edge))
             output = None
             try:
