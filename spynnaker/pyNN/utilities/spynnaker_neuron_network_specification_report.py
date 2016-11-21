@@ -50,4 +50,4 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
                         "{}_{}".format(dest_vertex_id, destination))
 
         file_to_output = os.path.join(report_folder, "visual_graph.gv")
-        dot_diagram.render(file_to_output, view=True)
+        dot_diagram.render(file_to_output, view=False)
