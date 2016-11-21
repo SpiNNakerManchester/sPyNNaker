@@ -1,4 +1,5 @@
 import logging
+from spinn_machine.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 
 logger = logging.getLogger(__name__)
@@ -9,12 +10,15 @@ class SpYNNakerConnectionHolderGenerator(object):
     method that sets up connection holders for reports to use.
     """
 
-    def __call__(self, application_graph, graph_mapper):
+    def __call__(self, application_graph):
         """
-        :param application_graph:
-        :param graph_mapper:
-        :return:
+        :param application_graph: app graph
+        :return: the set of connection holders for after dsg generation
         """
+
+        progress_bar = ProgressBar(
+            len(application_graph.edges),
+            "Generating connection holders for reporting connection data.")
 
         data_holders = dict()
         for edge in application_graph.edges:
@@ -32,6 +36,8 @@ class SpYNNakerConnectionHolderGenerator(object):
 
                 # store for the report generations
                 data_holders[(edge, synapse_information)] = connection_holder
+            progress_bar.update()
+        progress_bar.end()
 
         # return the two holders
         return data_holders

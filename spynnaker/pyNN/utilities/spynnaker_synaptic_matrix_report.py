@@ -3,48 +3,50 @@ import os
 from spinn_machine.utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN import exceptions, ProjectionApplicationEdge
-from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 
 logger = logging.getLogger(__name__)
 
 
 class SpYNNakerSynapticMatrixReport(object):
     """
-    generates the synmaptic matrix for reporting purposes
+    generates the synaptic matrix for reporting purposes
     """
 
-    def __call__(
-            self, common_report_directory, application_graph,
-            placements, txrx, routing_infos, graph_mapper,
-            loaded_application_data_token, machine_time_step):
+    def __call__(self, report_folder, connection_holder, dsg_targets):
 
         """converts synaptic matrix for every application edge.
 
-        :param loaded_application_data_token: needs to be done after loaded
-        :param routing_infos: routing information
-        :param placements: placements
-        :param txrx: the spinnman instance
-        :param application_graph: the application graph
-        :param common_report_directory: the location for these reports
-        :param machine_graph: the machine graph
-        :param graph_mapper: the mapping between app and machine graphs.
-        :return: None
         """
 
-        if not loaded_application_data_token:
-            raise exceptions.SpynnakerException("Haven't loaded the app data yet.")
+        if dsg_targets is None:
+            raise exceptions.SynapticConfigurationException(
+                "dsg targets should not be none, used as a check for "
+                "connection holder data to be generated")
 
-        top_level_folder = os.path.join(common_report_directory,
-                                        "synaptic_matrix_reports")
+        # generate folder for synaptic reports
+        top_level_folder = os.path.join(
+            report_folder, "synaptic_matrix_reports")
         if not os.path.exists(top_level_folder):
             os.mkdir(top_level_folder)
-        for application_edge in application_graph.edges:
 
+        # create progress bar
+        progress = ProgressBar(
+            len(connection_holder.keys()),
+            "Generating synaptic matrix reports")
+
+        # for each application edge, write matrix in new file
+        for application_edge, synapse_information in connection_holder.keys():
+
+            # only write matrix's for edges which have matrix's
             if isinstance(application_edge, ProjectionApplicationEdge):
+
+                # figure new file name
                 file_name = os.path.join(
                     top_level_folder,
                     "synaptic_matrix_for_application_edge_{}"
-                                      .format(application_edge))
+                    .format(application_edge.label))
+
+                # open writer
                 output = None
                 try:
                     output = open(file_name, "w")
@@ -52,34 +54,12 @@ class SpYNNakerSynapticMatrixReport(object):
                     logger.error("Generate_placement_reports: Can't open file"
                                  " {} for writing.".format(file_name))
 
-                connection_holder = ConnectionHolder(
-                    None, True, application_edge.pre_vertex.n_atoms,
-                    application_edge.post_vertex.n_atoms)
-
-                machine_edges = graph_mapper.get_machine_edges(application_edge)
-
-                progress = ProgressBar(
-                    len(machine_edges),
-                    "Getting synaptic matrix for projection between {} and {}"
-                    .format(
-                        application_edge.pre_vertex.label,
-                        application_edge.post_vertex.label))
-
-                for machine_edge in machine_edges:
-                    placement = placements.get_placement_of_vertex(
-                        machine_edge.post_vertex)
-                    connections = application_edge.post_vertex.\
-                        get_connections_from_machine(
-                            txrx, placement, machine_edge, graph_mapper,
-                            routing_infos, application_edge.synapse_information[0],
-                            machine_time_step)
-                    if connections is not None:
-                        connection_holder.add_connections(connections)
-                    progress.update()
-                progress.end()
-                connection_holder.finish()
-
-                output.write("{}".format(connection_holder))
-
+                # write all data for all synapse_information's in same file
+                for info in application_edge.synapse_information:
+                    this_connection_holder = connection_holder[(
+                        application_edge, info)]
+                    output.write("{}".format(this_connection_holder))
                 output.flush()
                 output.close()
+            progress.update()
+        progress.end()
