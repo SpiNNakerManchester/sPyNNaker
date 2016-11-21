@@ -42,5 +42,6 @@ setup(
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template'],
                   'spynnaker.pyNN.overridden_pacman_functions': ['*.xml']},
     install_requires=['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
-                      'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
+                      'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six',
+                      'graphviz']
 )
