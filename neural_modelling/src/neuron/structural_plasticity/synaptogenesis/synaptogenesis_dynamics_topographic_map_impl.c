@@ -11,6 +11,7 @@
 #include <random.h>
 #include <spin1_api.h>
 #include <debug.h>
+#include <stdfix-full-iso.h>
 
 
 //---------------------------------------
@@ -29,56 +30,11 @@ typedef struct {
 typedef struct {
     int32_t p_rew, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom;
     REAL sigma_form_forward, sigma_form_lateral, p_form_forward, p_form_lateral, p_elim_dep, p_elim_pot;
-    mars_kiss64_seed_t seed;
+    mars_kiss64_seed_t shared_seed, my_seed;
     pre_pop_info_table_t pre_pop_info_table;
 } rewiring_data_t;
 
 rewiring_data_t rewiring_data;
-
-//---------------------------------------
-// Logging params
-//---------------------------------------
-
-void log_params(){
-    log_info("P_REW ->> %d", rewiring_data.p_rew);
-    log_info("S_MAX ->> %d", rewiring_data.s_max);
-    log_info("sigma_form_forward ->> %k", rewiring_data.sigma_form_forward);
-    log_info("sigma_form_lateral ->> %k", rewiring_data.sigma_form_lateral);
-    log_info("p_form_forward ->> %k", rewiring_data.p_form_forward);
-    log_info("p_form_lateral ->> %k", rewiring_data.p_form_lateral);
-    log_info("p_elim_dep ->> %k", rewiring_data.p_elim_dep);
-    log_info("p_elim_pot ->> %k", rewiring_data.p_elim_pot);
-    log_info("app_no_atoms ->> %d", rewiring_data.app_no_atoms);
-    log_info("low_atom ->> %d", rewiring_data.low_atom);
-    log_info("high_atom ->> %d", rewiring_data.high_atom);
-    log_info("machine_no_atoms ->> %d", rewiring_data.machine_no_atoms);
-
-    log_info("seed[0] ->> %d", rewiring_data.seed[0]);
-    log_info("seed[1] ->> %d", rewiring_data.seed[1]);
-    log_info("seed[2] ->> %d", rewiring_data.seed[2]);
-    log_info("seed[3] ->> %d", rewiring_data.seed[3]);
-
-    log_info("no_pre_pops ->> %d", rewiring_data.pre_pop_info_table.no_pre_pops);
-
-    int32_t index;
-    for (index = 0; index < rewiring_data.pre_pop_info_table.no_pre_pops; index ++) {
-        // Read the actual number of presynaptic subpopulations
-        log_info("subpop_info[%d].no_pre_vertices ->> %d", index,\
-            rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices);
-        int32_t subpop_index;
-        for (subpop_index = 0; subpop_index < 2 * rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices; subpop_index++) {
-            // key
-            log_info("subpop_info[%d].key_atom_info[%d] (key) ->> %d", index, subpop_index,\
-                rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info[subpop_index]);
-            subpop_index++;
-            // n_atoms
-            log_info("subpop_info[%d].key_atom_info[%d] (n_atoms) ->> %d", index, subpop_index,\
-                rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info[subpop_index]);
-        }
-
-    }
-
-}
 
 //---------------------------------------
 // Initialisation
@@ -86,7 +42,7 @@ void log_params(){
 
 address_t synaptogenesis_dynamics_initialise(
     address_t afferent_populations){
-    log_info("Structurally plastic implementation.");
+    log_info("SP implementation");
     // Read in all of the parameters from SDRAM
     int32_t *sp_word = (int32_t*) afferent_populations;
 //    int32_t offset = 0;
@@ -107,10 +63,10 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.high_atom = *sp_word++;
     rewiring_data.machine_no_atoms = *sp_word++;
 
-    rewiring_data.seed[0] = *sp_word++;
-    rewiring_data.seed[1] = *sp_word++;
-    rewiring_data.seed[2] = *sp_word++;
-    rewiring_data.seed[3] = *sp_word++;
+    rewiring_data.shared_seed[0] = *sp_word++;
+    rewiring_data.shared_seed[1] = *sp_word++;
+    rewiring_data.shared_seed[2] = *sp_word++;
+    rewiring_data.shared_seed[3] = *sp_word++;
 
     rewiring_data.pre_pop_info_table.no_pre_pops = *sp_word++;
 
@@ -129,16 +85,14 @@ address_t synaptogenesis_dynamics_initialise(
         int32_t subpop_index;
         for (subpop_index = 0; subpop_index < 2 * rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices; subpop_index++) {
             // key
-            rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info[subpop_index] = *sp_word++;
-            subpop_index++;
+            rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info[subpop_index++] = *sp_word++;
             // n_atoms
             rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info[subpop_index] = *sp_word++;
         }
-
     }
-//    rewiring_date.pre_pop_info_table.subpop_info[index].key_atom_info = sark_alloc();
 
-    log_params();
+    // Setting up RNG
+    validate_mars_kiss64_seed(rewiring_data.shared_seed);
     return (address_t)sp_word;
 }
 
@@ -147,7 +101,20 @@ address_t synaptogenesis_dynamics_initialise(
 // and one to be called by the dma callback and then call formation or elimination
 
 void synaptogenesis_dynamics_rewire(){
-//    log_error("Error you piece of shit!");
+    // Randomly choose a postsynaptic (application neuron)
+    int32_t id;
+    id = lrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
+    // Check if neuron is in the current machine vertex
+    if (id < rewiring_data.low_atom || id > rewiring_data.high_atom) {
+        return;
+    }
+    // If it is, select a presynaptic population
+    // I SHOULDN'T USE THE SAME SEED AS THE OTHER POPULATIONS HERE AS IT WILL MESS UP
+    // RN GENERATION ON DIFFERENT CORES
+    uint32_t pre_app_pop = ulrbits(mars_kiss64_seed(rewiring_data.my_seed)) * rewiring_data.pre_pop_info_table.no_pre_pops;
+    // TODO Select presynaptic subpopulation
+    // TODO Select a presynaptic neuron id
+    // TODO Trigger DMA_read of the row corresponding to that synaptic row
 }
 
 address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address){
