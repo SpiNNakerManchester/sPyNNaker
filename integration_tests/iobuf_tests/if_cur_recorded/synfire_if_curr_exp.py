@@ -46,53 +46,5 @@ projections.append(p.Projection(populations[0], populations[0],
 projections.append(p.Projection(populations[1], populations[0],
                    p.FromListConnector(injectionConnection)))
 
-populations[0].record_v()
-populations[0].record_gsyn()
-populations[0].record()
-
 p.run(5000)
-
-v = None
-gsyn = None
-spikes = None
-
-v = populations[0].get_v(compatible_output=True)
-gsyn = populations[0].get_gsyn(compatible_output=True)
-spikes = populations[0].getSpikes(compatible_output=True)
-
-if spikes is not None:
-    print spikes
-    pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('spikes')
-    pylab.title('spikes')
-    pylab.show()
-else:
-    print "No spikes received"
-
-# Make some graphs
-
-if v is not None:
-    ticks = len(v) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('v')
-    pylab.title('v')
-    for pos in range(0, nNeurons, 20):
-        v_for_neuron = v[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[2] for i in v_for_neuron])
-    pylab.show()
-
-if gsyn is not None:
-    ticks = len(gsyn) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('gsyn')
-    pylab.title('gsyn')
-    for pos in range(0, nNeurons, 20):
-        gsyn_for_neuron = gsyn[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[2] for i in gsyn_for_neuron])
-    pylab.show()
-
 p.end()
