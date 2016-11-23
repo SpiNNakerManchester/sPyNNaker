@@ -131,6 +131,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         for subpopulation_list in population_to_subpopulation_information.itervalues():
             # Population header(s)
             spec.write_value(data=len(subpopulation_list), data_type=DataType.INT32)
+            spec.write_value(data=np.sum(np.asarray(subpopulation_list)[:, 1]), data_type=DataType.INT32)
             words_written = 0
             for subpopulation_info in subpopulation_list:
                 # Subpopulation information (i.e. key and number of atoms)

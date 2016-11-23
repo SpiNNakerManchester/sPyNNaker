@@ -18,7 +18,7 @@
 // Structures and global data
 //---------------------------------------
 typedef struct {
-    int32_t no_pre_vertices;
+    int32_t no_pre_vertices, total_no_atoms;
     int32_t *key_atom_info;
 } subpopulation_info_t;
 
@@ -30,7 +30,7 @@ typedef struct {
 typedef struct {
     int32_t p_rew, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom;
     REAL sigma_form_forward, sigma_form_lateral, p_form_forward, p_form_lateral, p_elim_dep, p_elim_pot;
-    mars_kiss64_seed_t shared_seed, my_seed;
+    mars_kiss64_seed_t shared_seed, local_seed;
     pre_pop_info_table_t pre_pop_info_table;
 } rewiring_data_t;
 
@@ -42,7 +42,7 @@ rewiring_data_t rewiring_data;
 
 address_t synaptogenesis_dynamics_initialise(
     address_t afferent_populations){
-    log_info("SP implementation");
+//    log_info("SP impl");
     // Read in all of the parameters from SDRAM
     int32_t *sp_word = (int32_t*) afferent_populations;
 //    int32_t offset = 0;
@@ -80,6 +80,7 @@ address_t synaptogenesis_dynamics_initialise(
     for (index = 0; index < rewiring_data.pre_pop_info_table.no_pre_pops; index ++) {
         // Read the actual number of presynaptic subpopulations
         rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices = *sp_word++;
+        rewiring_data.pre_pop_info_table.subpop_info[index].total_no_atoms = *sp_word++;
         rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info =  (int32_t*) sark_alloc(\
             2 * rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices, sizeof(int32_t));
         int32_t subpop_index;
@@ -102,17 +103,30 @@ address_t synaptogenesis_dynamics_initialise(
 
 void synaptogenesis_dynamics_rewire(){
     // Randomly choose a postsynaptic (application neuron)
-    int32_t id;
-    id = lrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
-    // Check if neuron is in the current machine vertex
-    if (id < rewiring_data.low_atom || id > rewiring_data.high_atom) {
-        return;
-    }
+//    int32_t post_id;
+//    post_id = lrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
+//    // Check if neuron is in the current machine vertex
+//    if (post_id < rewiring_data.low_atom || post_id > rewiring_data.high_atom) {
+//        return;
+//    }
+//    post_id -= rewiring_data.low_atom;
     // If it is, select a presynaptic population
     // I SHOULDN'T USE THE SAME SEED AS THE OTHER POPULATIONS HERE AS IT WILL MESS UP
     // RN GENERATION ON DIFFERENT CORES
-    uint32_t pre_app_pop = ulrbits(mars_kiss64_seed(rewiring_data.my_seed)) * rewiring_data.pre_pop_info_table.no_pre_pops;
+    uint32_t pre_app_pop = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * rewiring_data.pre_pop_info_table.no_pre_pops;
     // TODO Select presynaptic subpopulation
+    u032 choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed));
+    int32_t i;
+    u032 sum=0;
+    for(i=0;i<rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].no_pre_vertices; i++) {
+        sum += ulrdivi(rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i + 1],
+            rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].total_no_atoms);
+        if (sum > choice)
+            log_info("pp %d", i);
+            break;
+    }
+
+
     // TODO Select a presynaptic neuron id
     // TODO Trigger DMA_read of the row corresponding to that synaptic row
 }
