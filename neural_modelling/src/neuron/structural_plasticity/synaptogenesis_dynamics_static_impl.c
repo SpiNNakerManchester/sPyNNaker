@@ -2,10 +2,10 @@
 #include <debug.h>
 
 address_t synaptogenesis_dynamics_initialise(
-	address_t afferent_populations){
-	use(afferent_populations);
+	address_t sdram_sp_address){
+	use(sdram_sp_address);
 	log_info("Non-structurally plastic implementation.");
-    return afferent_populations;
+    return sdram_sp_address;
 }
 
 void synaptogenesis_dynamics_rewire(){

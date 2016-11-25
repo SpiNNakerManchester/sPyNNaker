@@ -121,7 +121,7 @@ void c_main_store_provenance_data(address_t provenance_region){
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(uint32_t *timer_period) {
-//    log_info("Initialise: started");
+    log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();

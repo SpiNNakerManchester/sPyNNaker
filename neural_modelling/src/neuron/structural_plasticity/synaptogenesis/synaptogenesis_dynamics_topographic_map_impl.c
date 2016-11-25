@@ -4,19 +4,19 @@
  *  i.e. probabilistic synaptogenesis.
  *
  */
-
 #include "../synaptogenesis_dynamics.h"
-#include "../../../common/maths-util.h"
+//#include "../../../common/maths-util.h"
+#include "../../population_table/population_table.h"
 
 #include <random.h>
 #include <spin1_api.h>
 #include <debug.h>
 #include <stdfix-full-iso.h>
 
-
 //---------------------------------------
 // Structures and global data
 //---------------------------------------
+
 typedef struct {
     int32_t no_pre_vertices, total_no_atoms;
     int32_t *key_atom_info;
@@ -39,16 +39,17 @@ rewiring_data_t rewiring_data;
 //---------------------------------------
 // Initialisation
 //---------------------------------------
+//! \brief Initialisation of synaptic rewiring (synaptogenesis)
+//! parameters (random seed, spread of receptive field etc.)
+//! \param[in] sdram_sp_address Address of the start of the SDRAM region
+//! which contains synaptic rewiring params.
+//! \return address_t Address after the final word read from SDRAM.
 
 address_t synaptogenesis_dynamics_initialise(
-    address_t afferent_populations){
-//    log_info("SP impl");
+    address_t sdram_sp_address){
+    log_info("Synaptogenesis (Topographic map) implementation.");
     // Read in all of the parameters from SDRAM
-    int32_t *sp_word = (int32_t*) afferent_populations;
-//    int32_t offset = 0;
-//    rewiring_data.p_rew = (int32_t)&afferent_populations[offset];
-//    offset += 4;
-//    rewiring_data.s_max = (int32_t)&afferent_populations[offset];
+    int32_t *sp_word = (int32_t*) sdram_sp_address;
     rewiring_data.p_rew = *sp_word++;
     rewiring_data.s_max = *sp_word++;
     rewiring_data.sigma_form_forward = *(REAL*)sp_word++;
@@ -101,36 +102,62 @@ address_t synaptogenesis_dynamics_initialise(
 // a fake spike and trigger a dma callback
 // and one to be called by the dma callback and then call formation or elimination
 
+//! \brief Function called (usually on a timer from c_main) to
+//! trigger the process of synaptic rewiring
+//! \param[in] None
+//! \return None
+
+
 void synaptogenesis_dynamics_rewire(){
     // Randomly choose a postsynaptic (application neuron)
-//    int32_t post_id;
-//    post_id = lrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
-//    // Check if neuron is in the current machine vertex
-//    if (post_id < rewiring_data.low_atom || post_id > rewiring_data.high_atom) {
-//        return;
-//    }
-//    post_id -= rewiring_data.low_atom;
+    int32_t post_id;
+    post_id = lrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
+    // Check if neuron is in the current machine vertex
+    if (post_id < rewiring_data.low_atom || post_id > rewiring_data.high_atom) {
+        return;
+    }
+    post_id -= rewiring_data.low_atom;
     // If it is, select a presynaptic population
     // I SHOULDN'T USE THE SAME SEED AS THE OTHER POPULATIONS HERE AS IT WILL MESS UP
     // RN GENERATION ON DIFFERENT CORES
     uint32_t pre_app_pop = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * rewiring_data.pre_pop_info_table.no_pre_pops;
-    // TODO Select presynaptic subpopulation
-    u032 choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed));
+    // Select presynaptic subpopulation
+    int32_t choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].total_no_atoms;
     int32_t i;
-    u032 sum=0;
+    int32_t sum=0;
     for(i=0;i<rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].no_pre_vertices; i++) {
-        sum += ulrdivi(rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i + 1],
-            rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].total_no_atoms);
-        if (sum > choice)
-            log_info("pp %d", i);
+        sum += rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i + 1];
+        if (sum >= choice){
             break;
+          }
     }
 
+    // Select a presynaptic neuron id
+    choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *\
+     rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i + 1];
 
-    // TODO Select a presynaptic neuron id
+    // population_table_get_first_address() returns the address (in SDRAM) of the selected synaptic row
+
+    address_t synaptic_row_address;
+    spike_t fake_spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i] | choice;
+    size_t n_bytes;
+
+    if(!population_table_get_first_address(fake_spike, &synaptic_row_address, &n_bytes)) {
+        log_error("Failed to retrieve synaptic row address for key %d", fake_spike);
+    }
+
     // TODO Trigger DMA_read of the row corresponding to that synaptic row
+
 }
 
+ /*
+    TODO:
+    Formation and elimination are structurally agnostic, i.e. they don't care how
+    synaptic rows are organised in physical memory.
+
+    As such, they need to call functions that have a knowledge of how the memory is
+    physically organised to be able to modify Plastic-Plastic synaptic regions.
+ */
 address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address){
     use(synaptic_row_address);
     return NULL;
