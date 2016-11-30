@@ -63,6 +63,8 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
                          app_vertex, post_slice, machine_vertex, graph_mapper, routing_info):
         self.super.write_parameters(spec, region, machine_time_step, weight_scales)
         spec.comment("Writing structural plasticity parameters")
+        if spec.current_region != constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value:
+            spec.switch_write_focus(region)
 
         # # Switch focus to the region:
         # spec.switch_write_focus(region)
@@ -173,26 +175,40 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
             pop_size += int(40 * (no_pre_vertices_estimate + len(in_edges)))
         elif in_edges is not None and isinstance(in_edges[0], ProjectionMachineEdge):
             pop_size += self.get_extra_sdram_usage_in_bytes(in_edges)
-        return total_size + pop_size # bytes
+        return total_size + pop_size  # bytes
 
     def get_plastic_synaptic_data(self, connections, connection_row_indices, n_rows, post_vertex_slice,
                                   n_synapse_types):
+        try:
+            return self.super.get_plastic_synaptic_data(connections, connection_row_indices, n_rows, post_vertex_slice,
+                                                        n_synapse_types)
+        except:
+            return self.super.get_static_synaptic_data(connections, connection_row_indices, n_rows, post_vertex_slice,
+                                                       n_synapse_types)
 
-        return self.super.get_plastic_synaptic_data(connections, connection_row_indices, n_rows, post_vertex_slice,
-                                                    n_synapse_types)
+    def get_static_synaptic_data(self, connections, connection_row_indices, n_rows, post_vertex_slice,
+                                 n_synapse_types):
+        return self.super.get_static_synaptic_data(connections, connection_row_indices, n_rows, post_vertex_slice,
+                                            n_synapse_types)
 
     def get_n_words_for_plastic_connections(self, n_connections):
-        return self.super.get_n_words_for_plastic_connections(n_connections)
-
-    def get_n_synapses_in_rows(self, pp_size, fp_size):
         try:
+            return self.super.get_n_words_for_plastic_connections(n_connections)
+        except:
+            return self.super.get_n_words_for_static_connections(n_connections)
+
+    def get_n_synapses_in_rows(self, pp_size, fp_size=None):
+        if not fp_size:
             return self.super.get_n_synapses_in_rows(pp_size, fp_size)
-        except TypeError:
+        else:
             return self.super.get_n_synapses_in_rows(pp_size)
 
     def read_plastic_synaptic_data(self, post_vertex_slice, n_synapse_types, pp_size, pp_data, fp_size, fp_data):
         return self.super.read_plastic_synaptic_data(post_vertex_slice, n_synapse_types, pp_size, pp_data, fp_size,
                                                      fp_data)
+
+    def read_static_synaptic_data(self, post_vertex_slice, n_synapse_types, ff_size, ff_data):
+        return self.super.read_static_synaptic_data(post_vertex_slice, n_synapse_types, ff_size, ff_data)
 
     def get_n_fixed_plastic_words_per_row(self, fp_size):
         return self.super.get_n_fixed_plastic_words_per_row(fp_size)
@@ -208,6 +224,9 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         name += "_structural"
         return name
 
+    def get_n_static_words_per_row(self, ff_size):
+        return self.super.get_n_static_words_per_row(ff_size)
+
     def is_same_as(self, synapse_dynamics):
         return (
             self._f_rew == synapse_dynamics._f_rew and
@@ -219,3 +238,4 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
             np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
             np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot)
         )
+

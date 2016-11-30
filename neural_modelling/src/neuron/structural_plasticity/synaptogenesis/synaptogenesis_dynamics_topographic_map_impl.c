@@ -47,7 +47,7 @@ rewiring_data_t rewiring_data;
 
 address_t synaptogenesis_dynamics_initialise(
     address_t sdram_sp_address){
-    log_info("Synaptogenesis (Topographic map) implementation.");
+    log_info("Synaptogenesis (Topographic map) initialisation.");
     // Read in all of the parameters from SDRAM
     int32_t *sp_word = (int32_t*) sdram_sp_address;
     rewiring_data.p_rew = *sp_word++;
@@ -95,6 +95,7 @@ address_t synaptogenesis_dynamics_initialise(
 
     // Setting up RNG
     validate_mars_kiss64_seed(rewiring_data.shared_seed);
+    log_info("Synaptogenesis init complete.");
     return (address_t)sp_word;
 }
 
@@ -145,8 +146,8 @@ void synaptogenesis_dynamics_rewire(){
     if(!population_table_get_first_address(fake_spike, &synaptic_row_address, &n_bytes)) {
         log_error("Failed to retrieve synaptic row address for key %d", fake_spike);
     }
-
     // TODO Trigger DMA_read of the row corresponding to that synaptic row
+
 
 }
 

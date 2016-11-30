@@ -107,7 +107,7 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         ff_data, ff_size = None, None
         fp_data, pp_data, fp_size, pp_size = None, None, None, None
-        if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
+        try:
 
             # Get the static data
             ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
@@ -119,7 +119,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             pp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
             fp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
-        else:
+        except:
 
             # Blank the static data
             ff_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
@@ -288,7 +288,7 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         dynamics = synapse_info.synapse_dynamics
         connections = list()
-        if isinstance(dynamics, AbstractStaticSynapseDynamics):
+        try:
 
             # Read static data
             if row_data is not None and len(row_data) > 0:
@@ -322,7 +322,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 delayed_connections["delay"] += connection_min_delay
                 connections.append(delayed_connections)
 
-        else:
+        except:
 
             # Read plastic data
             if row_data is not None:
