@@ -30,6 +30,7 @@ from spinn_front_end_common.abstract_models\
     import AbstractGeneratesDataSpecification
 from spinn_front_end_common.abstract_models\
     .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
+from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
@@ -102,8 +103,8 @@ class SpikeSourcePoisson(
             "Buffers", "time_between_requests")
         self._receive_buffer_host = config.get(
             "Buffers", "receive_buffer_host")
-        self._receive_buffer_port = config.getint(
-            "Buffers", "receive_buffer_port")
+        self._receive_buffer_port = helpful_functions.read_config_int(
+            config, "Buffers", "receive_buffer_port")
         self._minimum_buffer_sdram = config.getint(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
@@ -187,7 +188,7 @@ class SpikeSourcePoisson(
         vertex = SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
             minimum_buffer_sdram[0], buffered_sdram_per_timestep,
-            self._receive_buffer_host, constraints, label)
+            constraints, label)
 
         # return the machine vertex
         return vertex
@@ -482,8 +483,7 @@ class SpikeSourcePoisson(
             self._maximum_sdram_for_buffering)
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes, self._time_between_requests,
-            self._buffer_size_before_receive, ip_tags,
-            self._receive_buffer_host, self._receive_buffer_port))
+            self._buffer_size_before_receive, ip_tags))
 
         # write parameters
         key = routing_info.get_first_key_from_pre_vertex(

@@ -39,10 +39,8 @@ class PopulationMachineVertex(
 
     def __init__(
             self, resources_required, is_recording, minimum_buffer_sdram_usage,
-            buffered_sdram_per_timestep, buffered_out_ip_address, label,
-            constraints=None):
+            buffered_sdram_per_timestep, label, constraints=None):
         MachineVertex.__init__(self, label, constraints)
-        self._buffering_ip_address = buffered_out_ip_address
         ProvidesProvenanceDataFromMachineImpl.__init__(
             self, constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value,
             self.N_ADDITIONAL_PROVENANCE_DATA_ITEMS)

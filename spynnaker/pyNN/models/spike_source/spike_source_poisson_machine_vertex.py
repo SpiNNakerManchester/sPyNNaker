@@ -28,10 +28,8 @@ class SpikeSourcePoissonMachineVertex(
 
     def __init__(
             self, resources_required, is_recording, minimum_buffer_sdram,
-            buffered_sdram_per_timestep, buffering_ip_address,
-            constraints=None, label=None):
+            buffered_sdram_per_timestep, constraints=None, label=None):
         MachineVertex.__init__(self, label, constraints=constraints)
-        self._buffering_ip_address = buffering_ip_address
         ProvidesProvenanceDataFromMachineImpl.__init__(
             self, self._POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value,
             0)
