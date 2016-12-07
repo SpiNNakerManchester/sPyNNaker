@@ -5,9 +5,14 @@
 
 address_t synaptogenesis_dynamics_initialise(
 	address_t sdram_sp_address);
+
 void synaptogenesis_dynamics_rewire();
+
 address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address);
+
 address_t synaptogenesis_dynamics_elimination_rule(address_t synaptic_row_address);
+
+void synapse_check();
 
 int32_t get_p_rew();
 

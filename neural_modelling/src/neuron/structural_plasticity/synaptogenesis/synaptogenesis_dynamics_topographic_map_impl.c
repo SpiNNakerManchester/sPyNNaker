@@ -13,9 +13,17 @@
 #include <debug.h>
 #include <stdfix-full-iso.h>
 
+#include "../../synapse_row.h"
+#include "../../synapses.h"
+
 //---------------------------------------
 // Structures and global data
 //---------------------------------------
+// DMA tags
+#define DMA_TAG_READ_SYNAPTIC_ROW 0
+#define DMA_TAG_WRITE_PLASTIC_REGION 1
+#define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 2
+
 
 typedef struct {
     int32_t no_pre_vertices, total_no_atoms;
@@ -36,6 +44,30 @@ typedef struct {
 
 rewiring_data_t rewiring_data;
 
+typedef struct {
+
+    // Address in SDRAM to write back plastic region to
+    address_t sdram_writeback_address;
+
+    // Key of originating spike
+    // (used to allow row data to be re-used for multiple spikes)
+    spike_t originating_spike;
+
+    uint32_t n_bytes_transferred;
+
+    // Row data
+    uint32_t *row;
+
+} dma_buffer_t;
+
+dma_buffer_t dma_buffer;
+
+typedef struct {
+    address_t sdram_synaptic_row;
+    int32_t pre_syn_id, post_syn_id;
+} current_state_t;
+
+current_state_t current_state;
 //---------------------------------------
 // Initialisation
 //---------------------------------------
@@ -47,7 +79,7 @@ rewiring_data_t rewiring_data;
 
 address_t synaptogenesis_dynamics_initialise(
     address_t sdram_sp_address){
-    log_info("Synaptogenesis (Topographic map) initialisation.");
+    log_info("Synaptogenesis (Topographic map) init.");
     // Read in all of the parameters from SDRAM
     int32_t *sp_word = (int32_t*) sdram_sp_address;
     rewiring_data.p_rew = *sp_word++;
@@ -99,10 +131,6 @@ address_t synaptogenesis_dynamics_initialise(
     return (address_t)sp_word;
 }
 
-// Might need to function for rewiring. One to be called by the timer to generate
-// a fake spike and trigger a dma callback
-// and one to be called by the dma callback and then call formation or elimination
-
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
 //! \param[in] None
@@ -144,11 +172,23 @@ void synaptogenesis_dynamics_rewire(){
     size_t n_bytes;
 
     if(!population_table_get_first_address(fake_spike, &synaptic_row_address, &n_bytes)) {
-        log_error("Failed to retrieve synaptic row address for key %d", fake_spike);
+        log_error("Failed find synaptic row address@key %d", fake_spike);
     }
-    // TODO Trigger DMA_read of the row corresponding to that synaptic row
+    // Saving current state
+    current_state.sdram_synaptic_row = synaptic_row_address;
+    current_state.pre_syn_id = choice;
+    current_state.post_syn_id = post_id;
 
+    spin1_dma_transfer(
+        DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, dma_buffer.row, DMA_READ,
+        n_bytes);
+}
 
+// Might need to function for rewiring. One to be called by the timer to generate
+// a fake spike and trigger a dma callback
+// and one to be called by the dma callback and then call formation or elimination
+void synapse_check(){
+    log_error("There should be no structurally plastic synapses!");
 }
 
  /*

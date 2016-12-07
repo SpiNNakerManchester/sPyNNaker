@@ -12,6 +12,10 @@ void synaptogenesis_dynamics_rewire(){
     log_error("There should be no structurally plastic synapses!");
 }
 
+void synapse_check(){
+    log_error("There should be no structurally plastic synapses!");
+}
+
 address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address){
     use(synaptic_row_address);
     return NULL;
