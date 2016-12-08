@@ -4,8 +4,11 @@
 //---------------------------------------
 // Structures
 //---------------------------------------
-// Plastic synapse types are just weights;
-typedef weight_t plastic_synapse_t;
+// Plastic synapse types have weights and eligibility traces
+typedef struct Plastic_synapses {
+    weight_t weight;
+    uint16_t eligibility_trace;
+ plastic_synapse_t;
 
 // The update state is purely a weight state
 typedef weight_state_t update_state_t;
