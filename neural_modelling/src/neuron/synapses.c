@@ -172,8 +172,10 @@ static inline void _process_fixed_synapses(
         if(SYNAPSE_INPUT_TYPE_COUNT != SYNAPSE_TYPE_COUNT
           && synapse_row_sparse_type(synaptic_word) >= SYNAPSE_INPUT_TYPE_COUNT)
         {
-          synapse_dynamics_process_supervise_event(time, synapse_row_sparse_type(synaptic_word),
-                                                   synapse_row_sparse_index(synaptic_word));
+          // Dopaminergic neurons send some amount of neuromodulator
+          // concentration so this can actually be a weight as usual.
+          uint32_t concentration = synapse_row_sparse_weight(synaptic_word);
+          synapse_dynamics_process_neuromodulator_event(time, concentration);
         }
         else
         {

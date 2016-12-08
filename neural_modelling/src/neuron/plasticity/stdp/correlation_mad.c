@@ -62,7 +62,13 @@ typedef struct
   uint32_t prev_time;
 } pre_event_history_t;
 
-//---------------------------------------
+typedef struct
+{
+  int16_t stdp_post_trace;
+  int16_t dopamine;
+} post_trace_t
+
+
 // Synapse update loop
 //---------------------------------------
 static inline final_state_t plasticity_update_synapse(
@@ -197,18 +203,28 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 }
 
 //---------------------------------------
-void plasticity_process_post_synaptic_event(uint32_t j) {
-#ifdef DEBUG
-    plastic_runtime_log_enabled = true;
-#endif  // DEBUG
-
-    log_info("Adding post-synaptic event to trace at time:%u", time);
+void synapse_dynamics_process_post_synaptic_event(
+        uint32_t time, index_t neuron_index) {
+    log_debug("Adding post-synaptic event to trace at time:%u", time);
 
     // Add post-event
-    post_event_history_t *history = &post_event_history[j];
-    const uint32_t last_post_time = history->times[history->count_minus_one];
-    const post_trace_t last_post_trace = history->traces[history->count_minus_one];
-    post_add(history, correlation_add_post_spike(last_post_time, last_post_trace));
+    post_event_history_t *history = &post_event_history[neuron_index];
+    post_trace_t new_trace;
+    post_events_add(time, history, new_trace);
+}
+
+//--------------------------------------
+void synapse_dynamics_process_neuromodulator_event(
+        uint32_t time, int16_t concentration) {
+    log_debug("Adding neuromodulation event to trace at time:%u", time);
+
+    // Get post event history of this neuron
+    post_event_history_t *history = &post_event_history[neuron_index];
+
+    // Add neuromodulator trace
+    post_trace_t new_trace;
+    new_trace.neuromdulator = concentration;
+    post_events_add(time, history, new_trace);
 }
 
 //---------------------------------------
