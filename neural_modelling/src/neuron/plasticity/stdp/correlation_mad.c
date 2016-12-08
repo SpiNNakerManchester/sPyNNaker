@@ -68,6 +68,7 @@ typedef struct
   int16_t dopamine;
 } post_trace_t
 
+int16_t *neuromodulator_levels;
 
 // Synapse update loop
 //---------------------------------------
@@ -168,16 +169,36 @@ static inline final_state_t plasticity_update_synapse(
     return final;
 }
 
-//---------------------------------------
-// PACMAN memory region reading
-//---------------------------------------
-void initialise_plasticity_buffers() {
-    log_info("initialise_plasticity_buffers: starting");
+bool synapse_dynamics_initialise(
+        address_t address, uint32_t n_neurons,
+        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
-    // Initialise memory for post-synaptic events
-    post_init_buffers();
+    // Load timing dependence data
+    address_t weight_region_address = timing_initialise(address);
+    if (address == NULL) {
+        return false;
+    }
 
-    log_info("initialise_plasticity_buffers: completed successfully");
+    // Load weight dependence data
+    address_t weight_result = weight_initialise(
+        weight_region_address, ring_buffer_to_input_buffer_left_shifts);
+    if (weight_result == NULL) {
+        return false;
+    }
+
+    post_event_history = post_events_init_buffers(n_neurons);
+    if (post_event_history == NULL) {
+        return false;
+    }
+
+    // Create a buffer for dopamine concentration levels in neurons
+    neuromodulator_levels =
+        spin1_malloc(n_neurons * sizeof(int16_t));
+    if (neuromodulator_levels == NULL) {
+        return false;
+    }
+
+    return true;
 }
 
 //---------------------------------------
