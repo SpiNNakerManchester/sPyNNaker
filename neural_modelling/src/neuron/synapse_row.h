@@ -32,6 +32,11 @@
 #define SYNAPSE_WEIGHT_BITS 16
 #endif
 
+//! how many bits the synapse eligibility trace will take
+#ifndef SYNAPSE_ELIGIBILITY_TRACE_BITS
+#define SYNAPSE_ELIGIBILITY_TRACE_BITS 16
+#endif
+
 //! how many bits the synapse delay will take
 #ifndef SYNAPSE_DELAY_BITS
 #define SYNAPSE_DELAY_BITS 4

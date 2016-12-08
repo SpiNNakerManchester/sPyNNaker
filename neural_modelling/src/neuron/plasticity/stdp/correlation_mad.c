@@ -68,7 +68,7 @@ typedef struct
 static inline final_state_t plasticity_update_synapse(
     const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
     const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
-    const uint32_t delay_axonal, update_state_t current_state,
+    const uint32_t delay_axonal, plastic_synapse_t *current_state,
     const post_event_history_t *post_event_history) {
 
     // Apply axonal delay to time of last presynaptic spike
@@ -263,8 +263,8 @@ void process_plastic_synapses (address_t plastic, address_t fixed,
             uint32_t type = sparse_type(control_word);
             uint32_t index = sparse_index(control_word);
 
-           // Create update state from the plastic synaptic word
-           update_state_t current_state = synapse_init(*plastic_words, type);
+           // Get state of synapse - weight and eligibility trace.
+           plastic_synapse_t* current_state = plastic_words;
 
            // Update the synapse state
            final_state_t final_state = plasticity_update_synapse(last_pre_time, last_pre_trace,
