@@ -30,7 +30,6 @@ from spinn_front_end_common.abstract_models\
     import AbstractGeneratesDataSpecification
 from spinn_front_end_common.abstract_models\
     .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
-from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
@@ -103,8 +102,6 @@ class SpikeSourcePoisson(
             "Buffers", "time_between_requests")
         self._receive_buffer_host = config.get(
             "Buffers", "receive_buffer_host")
-        self._receive_buffer_port = helpful_functions.read_config_int(
-            config, "Buffers", "receive_buffer_port")
         self._minimum_buffer_sdram = config.getint(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
@@ -158,8 +155,7 @@ class SpikeSourcePoisson(
             self._maximum_sdram_for_buffering,
             self._using_auto_pause_and_resume)
         container.extend(recording_utilities.get_recording_resources(
-            recording_sizes, self._receive_buffer_host,
-            self._receive_buffer_port))
+            recording_sizes, self._receive_buffer_host))
         return container
 
     @property
