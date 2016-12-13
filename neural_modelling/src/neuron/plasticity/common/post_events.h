@@ -21,6 +21,7 @@ typedef struct {
 
     uint32_t times[MAX_POST_SYNAPTIC_EVENTS];
     post_trace_t traces[MAX_POST_SYNAPTIC_EVENTS];
+    int16_t neuromodulator_level;
 } post_event_history_t;
 
 typedef struct {
@@ -55,6 +56,7 @@ static inline post_event_history_t *post_events_init_buffers(
         post_event_history[n].times[0] = 0;
         post_event_history[n].traces[0] = timing_get_initial_post_trace();
         post_event_history[n].count_minus_one = 0;
+        post_event_history[n].neuromodulator_level = 0;
     }
 
     return post_event_history;

@@ -68,7 +68,7 @@ typedef struct
   int16_t dopamine;
 } post_trace_t
 
-int16_t *neuromodulator_levels;
+post_event_history_t *post_event_history;
 
 // Synapse update loop
 //---------------------------------------
@@ -132,7 +132,7 @@ static inline final_state_t plasticity_update_synapse(
         prev_corr_time = delayed_post_time;
 
         // Go onto next event
-        post_window = post_next_delayed(post_window, delayed_post_time);
+        post_window = post_next_events_delayed(post_window, delayed_post_time);
     }
 
     const uint32_t delayed_pre_time = time + delay_axonal;
