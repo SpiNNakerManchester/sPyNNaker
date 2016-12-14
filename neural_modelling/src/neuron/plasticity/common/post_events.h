@@ -21,6 +21,7 @@ typedef struct {
 
     uint32_t times[MAX_POST_SYNAPTIC_EVENTS];
     post_trace_t traces[MAX_POST_SYNAPTIC_EVENTS];
+    uint32_t last_dopamine_spike_time;
     int16_t neuromodulator_level;
 } post_event_history_t;
 

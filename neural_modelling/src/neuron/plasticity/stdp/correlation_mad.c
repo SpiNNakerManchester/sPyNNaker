@@ -70,6 +70,30 @@ typedef struct
 
 post_event_history_t *post_event_history;
 
+
+//---------------------------------------
+// Dopamine trace is a simple decaying trace similarly implemented as pre and
+// post trace.
+static inline post_trace_t add_dopamine_spike(
+        uint32_t time, uint32_t last_time, int16_t dopamine_trace,
+        int16_t concentration) {
+
+    // Get time since last dopamine spike
+    uint32_t delta_time = time - last_time;
+
+    // Apply exponential decay to get the current value
+    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(dopamine_trace,
+            DECAY_LOOKUP_TAU_MINUS(delta_time));
+
+    // Increase dopamine level due to new spike
+    int16_t new_o1_trace = decayed_o1_trace + concentration;
+
+    log_debug("\tdelta_time=%d, o1=%d\n", delta_time, decayed_o1_trace);
+
+    // Return decayed dopamine trace
+    return (post_trace_t) new_o1_trace;
+}
+
 // Synapse update loop
 //---------------------------------------
 static inline final_state_t plasticity_update_synapse(
@@ -230,8 +254,11 @@ void synapse_dynamics_process_post_synaptic_event(
 
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
-    post_trace_t new_trace;
-    post_events_add(time, history, new_trace);
+    const uint32_t last_post_time = history->times[history->count_minus_one];
+    const post_trace_t last_post_trace =
+        history->traces[history->count_minus_one];
+    post_events_add(time, history, timing_add_post_spike(time, last_post_time,
+                                                         last_post_trace));
 }
 
 //--------------------------------------
@@ -242,10 +269,12 @@ void synapse_dynamics_process_neuromodulator_event(
     // Get post event history of this neuron
     post_event_history_t *history = &post_event_history[neuron_index];
 
-    // Add neuromodulator trace
-    post_trace_t new_trace;
-    new_trace.neuromdulator = concentration;
-    post_events_add(time, history, new_trace);
+    // Update neuromodulator level reaching this post synaptic neuron
+    int16_t new_neuromodulator_level = add_dopamine_spike(time,
+        history-> last_dopamine_spike_time,
+        history -> neuromodulator_level, concentration);
+    history -> neuromodulator_level = new_neuromodulator_level;
+    history -> last_dopamine_spike = time;
 }
 
 //---------------------------------------
