@@ -127,6 +127,13 @@ static inline final_state_t plasticity_update_synapse(
             "\tApplying post-synaptic event at delayed time:%u\n",
             delayed_post_time);
 
+        // If current spike is from dopaminergic neuron, update last processed
+        // spike trace
+        post_event_history -> last_neuromodulator_level =
+            post_window.next_trace -> dopamine;
+        post_event_history -> last_dopamine_spike_time = delayed_post_time;
+
+
         // Depending on whether the last correlation was calculated on a pre or post-synaptic 
         // Event, update correlation from last correlation time to next event time
         if(prev_corr_pre_not_post) {
@@ -272,9 +279,10 @@ void synapse_dynamics_process_neuromodulator_event(
     // Update neuromodulator level reaching this post synaptic neuron
     int16_t new_neuromodulator_level = add_dopamine_spike(time,
         history-> last_dopamine_spike_time,
-        history -> neuromodulator_level, concentration);
-    history -> neuromodulator_level = new_neuromodulator_level;
-    history -> last_dopamine_spike = time;
+        history -> last_neuromodulator_level, concentration);
+    post_trace_t new_trace;
+    new_trace.dopamine = new_neuromodulator_level;
+    post_events_add(time, history, new_trace);
 }
 
 //---------------------------------------
