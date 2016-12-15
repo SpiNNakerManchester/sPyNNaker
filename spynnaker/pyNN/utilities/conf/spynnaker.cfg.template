@@ -65,6 +65,7 @@ version           = None
 
 [Buffers]
 # Host and port on which to receive buffer requests
+#receive_buffer_port = None
 #receive_buffer_host = 0.0.0.0
 
 # Buffered recording can be enabled below.  Note that spike source array

@@ -211,14 +211,15 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Get the data for the delayed connections
         delayed_row_data = numpy.zeros(0, dtype="uint32")
         max_delayed_row_length = 0
-        stages = numpy.zeros(0, dtype=int)
-        delayed_source_ids = numpy.zeros(0, dtype=int)
+        stages = numpy.zeros(0, dtype="uint32")
+        delayed_source_ids = numpy.zeros(0, dtype="uint32")
         if len(delayed_connections) > 0:
 
             # Get the delay stages and which row each delayed connection will
             # go into
             stages = numpy.floor((numpy.round(
-                delayed_connections["delay"] - 1.0)) / max_delay).astype(int)
+                delayed_connections["delay"] - 1.0)) / max_delay).astype(
+                    "uint32")
             delayed_row_indices = (
                 (delayed_connections["source"] - pre_vertex_slice.lo_atom) +
                 ((stages - 1) * pre_vertex_slice.n_atoms))
