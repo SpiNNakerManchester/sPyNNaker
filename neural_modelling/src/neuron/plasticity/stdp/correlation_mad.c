@@ -94,6 +94,51 @@ static inline post_trace_t add_dopamine_spike(
     return (post_trace_t) new_o1_trace;
 }
 
+static inline update_state_t correlation_apply_post_spike(
+        uint32_t time, post_trace_t trace, uint32_t last_pre_time,
+        pre_trace_t last_pre_trace, uint32_t last_post_time,
+        post_trace_t last_post_trace, update_state_t previous_state) {
+
+    // Decay eligibility trace
+    uint32_t time_since_last_update = time - last_post_time;
+    if (time_since_last_post > 0) {
+        int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
+            previous_state.eligibility_trace,
+            DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+        // If STDP post spike (Not dopamine) apply depression to eligibility
+        // trace
+        if (trace.dopamine == 0) {
+            uint32_t time_since_last_pre = time - last_pre_time;
+            int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
+                last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+            // Add decayed pre trace value to eligibility trace
+            decayed_eligibility_trace += decayed_r1;
+        }
+        // Evaluate weight function
+}
+
+static inline update_state_t correlation_apply_pre_spike(
+        uint32_t time, post_trace_t trace, uint32_t last_pre_time,
+        pre_trace_t last_pre_trace, uint32_t last_post_time,
+        post_trace_t last_post_trace, update_state_t previous_state) {
+
+    // Decay eligibility trace
+    uint32_t time_since_last_update = time - last_post_time;
+    if (time_since_last_post > 0) {
+        int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
+            previous_state.eligibility_trace,
+            DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+        // If STDP post spike (Not dopamine) apply depression to eligibility
+        // trace
+        if (trace.dopamine == 0) {
+            int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
+                last_post_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_update));
+            // Decrease eligibility trace by decayed post trace
+            decayed_eligibility_trace -= decayed_r1;
+        }
+        // Evaluate weight function
+}
+
 // Synapse update loop
 //---------------------------------------
 static inline final_state_t plasticity_update_synapse(
@@ -133,14 +178,13 @@ static inline final_state_t plasticity_update_synapse(
             post_window.next_trace -> dopamine;
         post_event_history -> last_dopamine_spike_time = delayed_post_time;
 
-
         // Depending on whether the last correlation was calculated on a pre or post-synaptic 
         // Event, update correlation from last correlation time to next event time
         if(prev_corr_pre_not_post) {
             log_info("\t\tUpdating correlation from last pre-synaptic event at time %u to %u\n",
                 prev_corr_time, delayed_post_time);
 
-            current_state = correlation_apply_deferred_spike(
+            current_state = correlation_apply_post_spike(
                 delayed_post_time, prev_corr_time,
                 delayed_last_pre_time, last_pre_trace,
                 post_window.prev_time, post_window.prev_trace,
@@ -151,7 +195,7 @@ static inline final_state_t plasticity_update_synapse(
           log_info("\t\tUpdating correlation from last post-synaptic event at time %u to %u\n",
               prev_corr_time, delayed_post_time);
 
-          current_state = correlation_apply_deferred_spike(
+          current_state = correlation_apply_post_spike(
               delayed_post_time, prev_corr_time,
               post_window.prev_time, post_window.prev_trace,
               delayed_last_pre_time, last_pre_trace,
@@ -174,7 +218,7 @@ static inline final_state_t plasticity_update_synapse(
         log_info("\t\tUpdating correlation from last pre-synaptic event at time %u to %u\n",
             prev_corr_time, delayed_pre_time);
 
-        current_state = correlation_apply_deferred_spike(
+        current_state = correlation_apply_pre_spike(
             delayed_pre_time, prev_corr_time,
             delayed_last_pre_time, last_pre_trace,
             post_window.prev_time, post_window.prev_trace,
@@ -184,7 +228,7 @@ static inline final_state_t plasticity_update_synapse(
         log_info("\t\tUpdating correlation from last post-synaptic event at time %u to %u\n",
             prev_corr_time, delayed_pre_time);
 
-        current_state = correlation_apply_deferred_spike(
+        current_state = correlation_apply_pre_spike(
             delayed_pre_time, prev_corr_time,
             post_window.prev_time, post_window.prev_trace,
             delayed_last_pre_time, last_pre_trace,
@@ -313,8 +357,8 @@ void process_plastic_synapses (address_t plastic, address_t fixed,
     // Update pre-synaptic trace
     log_info("Adding pre-synaptic event to trace at time:%u", time);
     event_history->prev_time = time;
-    event_history->prev_trace = correlation_add_pre_spike(
-        last_pre_time, last_pre_trace);
+    event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
+                                                     last_pre_trace);
 
     // Loop through plastic synapses
     for ( ; plastic_synapse > 0; plastic_synapse--)

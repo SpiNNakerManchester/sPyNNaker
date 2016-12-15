@@ -7,7 +7,7 @@
 // Plastic synapse types have weights and eligibility traces
 typedef struct Plastic_synapses {
     weight_t weight;
-    uint16_t eligibility_trace;
+    int16_t eligibility_trace;
  plastic_synapse_t;
 
 // The update state is purely a weight state
