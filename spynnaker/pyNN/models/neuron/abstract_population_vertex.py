@@ -38,6 +38,7 @@ from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
 
 # spynnaker imports
+from spinnman.model.enums.executable_start_type import ExecutableStartType
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
@@ -498,6 +499,10 @@ class AbstractPopulationVertex(
         # Reunite title and extension and return
         return (binary_title + self._synapse_manager.vertex_executable_suffix +
                 binary_extension)
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_mode_enum)
+    def get_binary_start_mode_enum(self):
+        return ExecutableStartType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):

@@ -34,6 +34,7 @@ from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
+from spinnman.model.enums.executable_start_type import ExecutableStartType
 
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
@@ -497,6 +498,10 @@ class SpikeSourcePoisson(
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
         return "spike_source_poisson.aplx"
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_mode_enum)
+    def get_binary_start_mode_enum(self):
+        return ExecutableStartType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
