@@ -1,8 +1,7 @@
-# spynnaker imports
 from pacman.model.decorators.overrides import overrides
+
+# spynnaker imports
 from spynnaker.pyNN.utilities import constants
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
 from spynnaker.pyNN.models.common.eieio_spike_recorder \
@@ -21,6 +20,9 @@ from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
 from spinn_front_end_common.utilities import exceptions
+from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
 
 
 # general imports
@@ -54,7 +56,8 @@ class SpikeSourceArray(
             self._ip_address = config.get("Buffers", "receive_buffer_host")
         self._port = port
         if port is None:
-            self._port = config.getint("Buffers", "receive_buffer_port")
+            self._port = helpful_functions.read_config_int(
+                config, "Buffers", "receive_buffer_port")
         if spike_times is None:
             spike_times = []
 
@@ -64,7 +67,7 @@ class SpikeSourceArray(
             max_atoms_per_core=(SpikeSourceArray.
                                 _model_based_max_atoms_per_core),
             board_address=board_address,
-            receive_port=None, receive_sdp_port=None, receive_tag=None,
+            receive_port=None, receive_tag=None,
             virtual_key=None, prefix=None, prefix_type=None, check_keys=False,
             send_buffer_times=spike_times,
             send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
