@@ -103,18 +103,16 @@ static inline update_state_t correlation_apply_post_spike(
     // Decay dopamine trace
     uint32_t time_since_last_neuromodulator =
         time - post_event_history -> last_dopamine_spike_time;
-    // TODO: This must be decayed with a different time constant than STDP
-    // traces. For now decay using STDP exp look up table.
     int32_t decayed_dopamine_trace =  STDP_FIXED_MUL_16X16(
         previous_state.eligibility_trace,
-        DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+        DECAY_LOOKUP_TAU_D(time_since_last_pre));
 
     // Decay eligibility trace
     uint32_t time_since_last_update = time - last_post_time;
     if (time_since_last_post > 0) {
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
             previous_state.eligibility_trace,
-            DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+            DECAY_LOOKUP_TAU_C(time_since_last_pre));
         // If STDP post spike (Not dopamine) apply potentiation to eligibility
         // trace
         if (trace.dopamine == 0) {
@@ -140,19 +138,19 @@ static inline update_state_t correlation_apply_pre_spike(
     // traces. For now decay using STDP exp look up table.
     int32_t decayed_dopamine_trace =  STDP_FIXED_MUL_16X16(
         previous_state.eligibility_trace,
-        DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+        DECAY_LOOKUP_TAU_D(time_since_last_pre));
 
     // Decay eligibility trace
     uint32_t time_since_last_update = time - last_post_time;
     if (time_since_last_post > 0) {
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
             previous_state.eligibility_trace,
-            DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+            DECAY_LOOKUP_TAU_C(time_since_last_pre));
         // If STDP post spike (Not dopamine) apply depression to eligibility
         // trace
         if (trace.dopamine == 0) {
             int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
-                last_post_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_update));
+                last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_update));
             decayed_eligibility_trace -= decayed_r1;
         }
         // Evaluate weight function
