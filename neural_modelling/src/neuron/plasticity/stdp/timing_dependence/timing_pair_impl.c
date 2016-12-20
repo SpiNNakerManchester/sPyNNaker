@@ -6,6 +6,8 @@
 // Exponential lookup-tables
 int16_t tau_plus_lookup[TAU_PLUS_SIZE];
 int16_t tau_minus_lookup[TAU_MINUS_SIZE];
+int16_t tau_c_lookup[TAU_PLUS_SIZE];
+int16_t tau_d_lookup[TAU_PLUS_SIZE];
 
 //---------------------------------------
 // Functions
