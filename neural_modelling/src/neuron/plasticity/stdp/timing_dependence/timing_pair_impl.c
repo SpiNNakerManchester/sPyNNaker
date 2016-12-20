@@ -21,6 +21,11 @@ address_t timing_initialise(address_t address) {
                                                  &tau_plus_lookup[0]);
     lut_address = maths_copy_int16_lut(lut_address, TAU_MINUS_SIZE,
                                        &tau_minus_lookup[0]);
+    lut_address = maths_copy_int16_lut(lut_address, TAU_PLUS_SIZE,
+                                       &tau_c_lookup[0]);
+    lut_address = maths_copy_int16_lut(lut_address, TAU_PLUS_SIZE,
+                                       &tau_d_lookup[0]);
+
 
     log_info("timing_initialise: completed successfully");
 
