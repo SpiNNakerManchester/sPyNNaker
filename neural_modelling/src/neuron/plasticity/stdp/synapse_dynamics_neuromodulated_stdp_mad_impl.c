@@ -101,29 +101,44 @@ static inline update_state_t correlation_apply_post_spike(
         post_trace_t last_post_trace, update_state_t previous_state,
         post_event_history_t *post_event_history) {
 
+    // Apply potentiation to eligibility trace
+    int16_t decay_eligibility_trace;
+    if (trace.dopamine == 0) {
+        // Decay eligibility trace
+        uint32_t time_since_last_update = time - last_post_time;
+        decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_pre);
+        int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
+            previous_state.eligibility_trace, decay_eligibility_trace);
+
+        // Apply STDP
+        uint32_t time_since_last_pre = time - last_pre_time;
+        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
+            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+        decayed_eligibility_trace += decayed_r1;
+        previous_state.eligibility_trace = decayed_eligibility_trace;
+    }
+    else {
+         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_pre);
+    }
+
     // Decay dopamine trace
     uint32_t time_since_last_neuromodulator =
         time - post_event_history -> last_dopamine_spike_time;
-    int32_t decayed_dopamine_trace =  STDP_FIXED_MUL_16X16(
-        previous_state.eligibility_trace,
-        DECAY_LOOKUP_TAU_D(time_since_last_pre));
+    int16_t decay_dopamine_trace =
+        DECAY_LOOKUP_TAU_D(time_since_last_neuromodulator);
 
-    // Decay eligibility trace
-    uint32_t time_since_last_update = time - last_post_time;
-    if (time_since_last_post > 0) {
-        int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
-            previous_state.eligibility_trace,
-            DECAY_LOOKUP_TAU_C(time_since_last_pre));
-        // If STDP post spike (Not dopamine) apply potentiation to eligibility
-        // trace
-        if (trace.dopamine == 0) {
-            uint32_t time_since_last_pre = time - last_pre_time;
-            int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
-                last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
-            decayed_eligibility_trace += decayed_r1;
-        }
-        // Evaluate weight function
-     }
+    // Calculate third exp equation in weight update rule
+    uint32_t time_between_updates =
+        post_event_history -> last_dopamine_spike_time - last_post_time;
+    int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
+
+    // Evaluate weight function
+    previous_state.weight += post_event_history -> last_neuromodulator_level
+                             * previous_state.eligibility_trace
+                             * weight_update_constant_component
+                             * (decay_eligibility_trace * decay_dopamine_trace
+                                - third_exp_component);
+
 }
 
 static inline update_state_t correlation_apply_pre_spike(
@@ -132,30 +147,44 @@ static inline update_state_t correlation_apply_pre_spike(
         post_trace_t last_post_trace, update_state_t previous_state,
         post_event_history_t *post_event_history) {
 
+    // Apply depression to eligibility trace
+    int16_t decay_eligibility_trace;
+    if (trace.dopamine == 0) {
+        // Decay eligibility trace
+        uint32_t time_since_last_update = time - last_post_time;
+        decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_pre);
+        int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
+            previous_state.eligibility_trace, decay_eligibility_trace);
+
+        // Apply STDP
+        uint32_t time_since_last_pre = time - last_pre_time;
+        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
+            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+        decayed_eligibility_trace -= decayed_r1;
+        previous_state.eligibility_trace = decayed_eligibility_trace;
+    }
+    else {
+         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_pre);
+    }
+
     // Decay dopamine trace
     uint32_t time_since_last_neuromodulator =
         time - post_event_history -> last_dopamine_spike_time;
-    // TODO: This must be decayed with a different time constant than STDP
-    // traces. For now decay using STDP exp look up table.
-    int32_t decayed_dopamine_trace =  STDP_FIXED_MUL_16X16(
-        previous_state.eligibility_trace,
-        DECAY_LOOKUP_TAU_D(time_since_last_pre));
+    int16_t decay_dopamine_trace =
+        DECAY_LOOKUP_TAU_D(time_since_last_neuromodulator);
 
-    // Decay eligibility trace
-    uint32_t time_since_last_update = time - last_post_time;
-    if (time_since_last_post > 0) {
-        int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
-            previous_state.eligibility_trace,
-            DECAY_LOOKUP_TAU_C(time_since_last_pre));
-        // If STDP post spike (Not dopamine) apply depression to eligibility
-        // trace
-        if (trace.dopamine == 0) {
-            int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
-                last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_update));
-            decayed_eligibility_trace -= decayed_r1;
-        }
-        // Evaluate weight function
-    }
+    // Calculate third exp equation in weight update rule
+    uint32_t time_between_updates = last_post_time
+        - post_event_history -> last_dopamine_spike_time;
+    int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
+
+    // Evaluate weight function
+    previous_state.weight += post_event_history -> last_neuromodulator_level
+                             * previous_state.eligibility_trace
+                             * weight_update_constant_component
+                             * (decay_eligibility_trace * decay_dopamine_trace
+                                - third_exp_component);
+
 }
 
 // Synapse update loop
