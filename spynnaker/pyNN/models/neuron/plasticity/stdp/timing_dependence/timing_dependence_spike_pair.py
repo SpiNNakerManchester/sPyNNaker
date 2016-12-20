@@ -79,12 +79,22 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
             spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
             LOOKUP_TAU_MINUS_SHIFT)
 
+        # Write Izhikevich model exp look up tables
         self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
             spec, self._tau_c, LOOKUP_TAU_PLUS_SIZE,
             LOOKUP_TAU_PLUS_SHIFT)
         self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
             spec, self._tau_d, LOOKUP_TAU_PLUS_SIZE,
             LOOKUP_TAU_PLUS_SHIFT)
+
+        # Calculate constant component in Izhikevich's model weight update
+        # function and write to SDRAM.
+        weight_update_component = 1 / (-((1/self._tau_c) + (1/self._tau_d)))
+        weight_update_component = \
+            plasticity_helpers.float_to_fixed(weight_update_component,
+                                              (1 << 11))
+        spec.write_value(data=weight_update_component,
+                         data_type=DataType.INT32)
 
     @property
     def synaptic_structure(self):
