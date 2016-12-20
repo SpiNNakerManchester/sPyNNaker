@@ -17,10 +17,14 @@ LOOKUP_TAU_MINUS_SHIFT = 0
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
 
-    def __init__(self, tau_plus=20.0, tau_minus=20.0):
+    def __init__(self, tau_plus=20.0, tau_minus=20.0, tau_c=1000, tau_d=200,
+                 nearest=False):
         AbstractTimingDependence.__init__(self)
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
+        self._tau_c = tau_c
+        self._taU_d = tau_d
+        self._nearest = nearest
 
         self._synapse_structure = SynapseStructureWeightOnly()
 
@@ -74,6 +78,13 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self._tau_minus_last_entry = plasticity_helpers.write_exp_lut(
             spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
             LOOKUP_TAU_MINUS_SHIFT)
+
+        self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
+            spec, self._tau_c, LOOKUP_TAU_PLUS_SIZE,
+            LOOKUP_TAU_PLUS_SHIFT)
+        self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
+            spec, self._tau_d, LOOKUP_TAU_PLUS_SIZE,
+            LOOKUP_TAU_PLUS_SHIFT)
 
     @property
     def synaptic_structure(self):
