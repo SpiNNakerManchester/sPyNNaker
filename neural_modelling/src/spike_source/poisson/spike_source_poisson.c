@@ -41,8 +41,7 @@ typedef struct fast_spike_source_t {
 //! spike source array region ids in human readable form
 typedef enum region {
     SYSTEM, POISSON_PARAMS,
-    BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    BUFFERING_OUT_CONTROL_REGION,
+    SPIKE_HISTORY_REGION,
     PROVENANCE_REGION
 } region;
 
@@ -292,21 +291,10 @@ static bool initialise_recording(){
     address_t address = data_specification_get_data_address();
 
     // Get the system region
-    address_t system_region = data_specification_get_region(
-            SYSTEM, address);
+    address_t recording_region = data_specification_get_region(
+        SPIKE_HISTORY_REGION, address);
 
-    // Get the recording information
-    uint8_t regions_to_record[] = {
-        BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    };
-    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-    uint32_t *recording_flags_from_system_conf =
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
-
-    bool success = recording_initialize(
-        n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region, &recording_flags);
+    bool success = recording_initialize(recording_region, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
 
     return success;
@@ -362,24 +350,7 @@ static bool initialize(uint32_t *timer_period) {
 }
 
 void resume_callback() {
-
-    // handle resetting the recording state
-    // Get the recording information
-    address_t address = data_specification_get_data_address();
-    address_t system_region = data_specification_get_region(
-        SYSTEM, address);
-    uint8_t regions_to_record[] = {
-        BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    };
-    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-    uint32_t *recording_flags_from_system_conf =
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS];
-    uint8_t state_region = BUFFERING_OUT_CONTROL_REGION;
-
-    recording_initialize(
-        n_regions_to_record, regions_to_record,
-        recording_flags_from_system_conf, state_region,
-        &recording_flags);
+    initialise_recording();
 }
 
 void _send_spike(uint spike_key) {

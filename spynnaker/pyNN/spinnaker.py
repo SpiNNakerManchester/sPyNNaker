@@ -1,23 +1,23 @@
 
-# pacman imports
-
-import logging
-import math
-import os
-
-from pacman.model.graphs.abstract_virtual_vertex import AbstractVirtualVertex
+# common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN import overridden_pacman_functions
+
+# local front end imports
 from spynnaker.pyNN.models.pynn_population import Population
 from spynnaker.pyNN.models.pynn_projection import Projection
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
+from spynnaker.pyNN import model_binaries
+from spynnaker.pyNN.utilities import constants
+
+# general imports
+import logging
+import math
+import os
 
 # global objects
 logger = logging.getLogger(__name__)
