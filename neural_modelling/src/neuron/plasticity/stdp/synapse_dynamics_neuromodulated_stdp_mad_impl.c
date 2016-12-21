@@ -106,7 +106,7 @@ static inline update_state_t correlation_apply_post_spike(
     if (trace.dopamine == 0) {
         // Decay eligibility trace
         uint32_t time_since_last_update = time - last_post_time;
-        decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_pre);
+        decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
             previous_state.eligibility_trace, decay_eligibility_trace);
 
@@ -118,7 +118,7 @@ static inline update_state_t correlation_apply_post_spike(
         previous_state.eligibility_trace = decayed_eligibility_trace;
     }
     else {
-         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_pre);
+         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
     }
 
     // Decay dopamine trace
@@ -128,8 +128,13 @@ static inline update_state_t correlation_apply_post_spike(
         DECAY_LOOKUP_TAU_D(time_since_last_neuromodulator);
 
     // Calculate third exp equation in weight update rule
-    uint32_t time_between_updates =
-        post_event_history -> last_dopamine_spike_time - last_post_time;
+    uint32_t time_between_updates;
+    if (post_event_history -> last_dopamine_spike_time == last_post_time)
+        time_between_updates = post_event_history -> last_dopamine_spike_time
+            - last_post_time;
+    else
+        time_between_updates = last_post_time
+            - post_event_history -> last_dopamine_spike_time;
     int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
 
     // Evaluate weight function
@@ -152,7 +157,7 @@ static inline update_state_t correlation_apply_pre_spike(
     if (trace.dopamine == 0) {
         // Decay eligibility trace
         uint32_t time_since_last_update = time - last_post_time;
-        decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_pre);
+        decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
             previous_state.eligibility_trace, decay_eligibility_trace);
 
@@ -164,7 +169,7 @@ static inline update_state_t correlation_apply_pre_spike(
         previous_state.eligibility_trace = decayed_eligibility_trace;
     }
     else {
-         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_pre);
+         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
     }
 
     // Decay dopamine trace
@@ -174,8 +179,13 @@ static inline update_state_t correlation_apply_pre_spike(
         DECAY_LOOKUP_TAU_D(time_since_last_neuromodulator);
 
     // Calculate third exp equation in weight update rule
-    uint32_t time_between_updates = last_post_time
-        - post_event_history -> last_dopamine_spike_time;
+    uint32_t time_between_updates;
+    if (post_event_history -> last_dopamine_spike_time == last_post_time)
+        time_between_updates = post_event_history -> last_dopamine_spike_time
+            - last_post_time;
+    else
+        time_between_updates = last_post_time
+            - post_event_history -> last_dopamine_spike_time;
     int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
 
     // Evaluate weight function
@@ -222,9 +232,11 @@ static inline final_state_t plasticity_update_synapse(
 
         // If current spike is from dopaminergic neuron, update last processed
         // spike trace
-        post_event_history -> last_neuromodulator_level =
-            post_window.next_trace -> dopamine;
-        post_event_history -> last_dopamine_spike_time = delayed_post_time;
+        if (post_window.next_trace -> dopamine != 0) {
+            post_event_history -> last_neuromodulator_level =
+                post_window.next_trace -> dopamine;
+            post_event_history -> last_dopamine_spike_time = delayed_post_time;
+        }
 
         // Depending on whether the last correlation was calculated on a pre or post-synaptic 
         // Event, update correlation from last correlation time to next event time
