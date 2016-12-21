@@ -1,18 +1,15 @@
 from pacman.model.constraints.partitioner_constraints.\
     partitioner_same_size_as_vertex_constraint \
     import PartitionerSameSizeAsVertexConstraint
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_contains_a_synaptic_manager import \
-    AbstractContainsASynapticManager
+
+from spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses \
+    import AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
     import DelayedApplicationEdge
-
 from spynnaker.pyNN.models.neural_projections.synapse_information \
     import SynapseInformation
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
     import SynapseDynamicsStatic
-from spynnaker.pyNN.models.neuron.abstract_population_vertex \
-    import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
@@ -55,7 +52,7 @@ class Projection(object):
         self._has_retrieved_synaptic_list_from_machine = False
 
         if not isinstance(postsynaptic_population._get_vertex,
-                          AbstractContainsASynapticManager):
+                          AbstractAcceptsIncomingSynapses):
 
             raise exceptions.ConfigurationException(
                 "postsynaptic population is not designed to receive"
@@ -73,8 +70,8 @@ class Projection(object):
             synapse_dynamics_stdp = SynapseDynamicsStatic()
         else:
             synapse_dynamics_stdp = synapse_dynamics.slow
-        postsynaptic_population._get_vertex.synapse_dynamics = \
-            synapse_dynamics_stdp
+        postsynaptic_population._get_vertex.set_synapse_dynamics(
+            synapse_dynamics_stdp)
 
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(

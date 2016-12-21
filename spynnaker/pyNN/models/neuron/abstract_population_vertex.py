@@ -41,6 +41,7 @@ from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
 
 # spynnaker imports
+from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
@@ -59,10 +60,8 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_contains_a_synaptic_manager\
-    import AbstractContainsASynapticManager
-
+from spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses\
+    import AbstractAcceptsIncomingSynapses
 
 from abc import ABCMeta
 from six import add_metaclass
@@ -93,7 +92,7 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms,
-        AbstractContainsASynapticManager, ProvidesKeyToAtomMappingImpl):
+        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -121,7 +120,7 @@ class AbstractPopulationVertex(
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
-        AbstractContainsASynapticManager.__init__(
+        AbstractAcceptsIncomingSynapses.__init__(
             self, synapse_type, ring_buffer_sigma, spikes_per_second)
         ProvidesKeyToAtomMappingImpl.__init__(self)
 
@@ -173,6 +172,10 @@ class AbstractPopulationVertex(
         self._maximum_sdram_for_buffering = [
             spike_buffer_max_size, v_buffer_max_size, gsyn_buffer_max_size
         ]
+
+        # Set up synapse handling
+        self._synapse_manager = SynapticManager(
+            synapse_type, ring_buffer_sigma, spikes_per_second)
 
         # bool for if state has changed.
         self._change_requires_mapping = True
@@ -592,6 +595,49 @@ class AbstractPopulationVertex(
     @property
     def weight_scale(self):
         return self._input_type.get_global_weight_scale()
+
+    @property
+    def ring_buffer_sigma(self):
+        return self._synapse_manager.ring_buffer_sigma
+
+    @ring_buffer_sigma.setter
+    def ring_buffer_sigma(self, ring_buffer_sigma):
+        self._synapse_manager.ring_buffer_sigma = ring_buffer_sigma
+
+    @property
+    def spikes_per_second(self):
+        return self._synapse_manager.spikes_per_second
+
+    @spikes_per_second.setter
+    def spikes_per_second(self, spikes_per_second):
+        self._synapse_manager.spikes_per_second = spikes_per_second
+
+    @property
+    def synapse_dynamics(self):
+        return self._synapse_manager.synapse_dynamics
+
+    def set_synapse_dynamics(self, synapse_dynamics):
+        self._synapse_manager.synapse_dynamics = synapse_dynamics
+
+    def add_pre_run_connection_holder(
+            self, connection_holder, edge, synapse_info):
+        self._synapse_manager.add_pre_run_connection_holder(
+            connection_holder, edge, synapse_info)
+
+    def get_connections_from_machine(
+            self, transceiver, placement, edge, graph_mapper,
+            routing_infos, synapse_info, machine_time_step):
+        return self._synapse_manager.get_connections_from_machine(
+            transceiver, placement, edge, graph_mapper,
+            routing_infos, synapse_info, machine_time_step)
+
+    @property
+    def synapse_type(self):
+        return self._synapse_manager.synapse_type
+
+    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+        return self._synapse_manager.get_maximum_delay_supported_in_ms(
+            machine_time_step)
 
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
