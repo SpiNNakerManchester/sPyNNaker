@@ -97,15 +97,16 @@ static inline post_trace_t add_dopamine_spike(
 
 static inline update_state_t correlation_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state,
+        pre_trace_t last_pre_trace, uint32_t last_non_dopamine_spike_time,
+        uint32_t last_update_time, update_state_t previous_state,
         post_event_history_t *post_event_history) {
 
-    // Apply potentiation to eligibility trace
+    // Apply potentiation to eligibility trace if this spike is non-dopamine
+    // spike
     int16_t decay_eligibility_trace;
+    uint32_t time_since_last_update = time - last_non_dopamine_time;
     if (trace.dopamine == 0) {
         // Decay eligibility trace
-        uint32_t time_since_last_update = time - last_post_time;
         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
             previous_state.eligibility_trace, decay_eligibility_trace);
@@ -127,9 +128,9 @@ static inline update_state_t correlation_apply_post_spike(
     int16_t decay_dopamine_trace =
         DECAY_LOOKUP_TAU_D(time_since_last_neuromodulator);
 
-    // Calculate third exp equation in weight update rule
+    // Calculate third exp component in weight update rule
     uint32_t time_between_updates;
-    if (post_event_history -> last_dopamine_spike_time == last_post_time)
+    if (post_event_history -> last_dopamine_spike_time == last_update_time)
         time_between_updates = post_event_history -> last_dopamine_spike_time
             - last_post_time;
     else
@@ -147,24 +148,26 @@ static inline update_state_t correlation_apply_post_spike(
 }
 
 static inline update_state_t correlation_apply_pre_spike(
-        uint32_t time, post_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state,
+        uint32_t time, pre_trace_t trace, uint32_t last_post_time,
+        pre_trace_t last_post_trace, uint32_t last_non_dopamine_spike_time,
+        uint32_t last_update_time, update_state_t previous_state,
         post_event_history_t *post_event_history) {
 
-    // Apply depression to eligibility trace
+    use(&trace);
+    // Apply depression to eligibility trace if this spike is non-dopamine
+    // spike
     int16_t decay_eligibility_trace;
-    if (trace.dopamine == 0) {
+    uint32_t time_since_last_update = time - last_non_dopamine_time;
+    if (last_post_trace.dopamine == 0) {
         // Decay eligibility trace
-        uint32_t time_since_last_update = time - last_post_time;
         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
             previous_state.eligibility_trace, decay_eligibility_trace);
 
         // Apply STDP
-        uint32_t time_since_last_pre = time - last_pre_time;
+        uint32_t time_since_last_post = time - last_post_time;
         int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
-            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_post));
         decayed_eligibility_trace -= decayed_r1;
         previous_state.eligibility_trace = decayed_eligibility_trace;
     }
@@ -178,9 +181,9 @@ static inline update_state_t correlation_apply_pre_spike(
     int16_t decay_dopamine_trace =
         DECAY_LOOKUP_TAU_D(time_since_last_neuromodulator);
 
-    // Calculate third exp equation in weight update rule
+    // Calculate third exp component in weight update rule
     uint32_t time_between_updates;
-    if (post_event_history -> last_dopamine_spike_time == last_post_time)
+    if (post_event_history -> last_dopamine_spike_time == last_update_time)
         time_between_updates = post_event_history -> last_dopamine_spike_time
             - last_post_time;
     else
@@ -221,6 +224,7 @@ static inline final_state_t plasticity_update_synapse(
 
     // Process events in post-synaptic window
     uint32_t prev_corr_time = delayed_last_pre_time;
+    uint32_t last_non_dopamine_spike_time = delayed_last_pre_time;
     bool prev_corr_pre_not_post = true;
 
     while(post_window.num_events > 0) {
@@ -231,40 +235,27 @@ static inline final_state_t plasticity_update_synapse(
             delayed_post_time);
 
         // If current spike is from dopaminergic neuron, update last processed
-        // spike trace
+        // dopamine spike trace
         if (post_window.next_trace -> dopamine != 0) {
             post_event_history -> last_neuromodulator_level =
                 post_window.next_trace -> dopamine;
             post_event_history -> last_dopamine_spike_time = delayed_post_time;
         }
 
-        // Depending on whether the last correlation was calculated on a pre or post-synaptic 
-        // Event, update correlation from last correlation time to next event time
-        if(prev_corr_pre_not_post) {
-            log_info("\t\tUpdating correlation from last pre-synaptic event at time %u to %u\n",
-                prev_corr_time, delayed_post_time);
+        log_info("\t\tUpdating correlation from last synaptic event at time %u to %u\n",
+            prev_corr_time, delayed_post_time);
 
-            current_state = correlation_apply_post_spike(
-                delayed_post_time, prev_corr_time,
-                delayed_last_pre_time, last_pre_trace,
-                post_window.prev_time, post_window.prev_trace,
-                current_state, post_event_history);
-        }
-        else
-        {
-          log_info("\t\tUpdating correlation from last post-synaptic event at time %u to %u\n",
-              prev_corr_time, delayed_post_time);
-
-          current_state = correlation_apply_post_spike(
-              delayed_post_time, prev_corr_time,
-              post_window.prev_time, post_window.prev_trace,
-              delayed_last_pre_time, last_pre_trace,
-              current_state, post_event_history);
-        }
+        current_state = correlation_apply_post_spike(
+            delayed_post_time, post_window.next_trace,
+            delayed_last_pre_time, last_pre_trace,
+            last_non_dopamine_spike_time, prev_corr_time,
+            current_state, post_event_history);
 
         // Update previous correlation to point to this post-event
-        prev_corr_pre_not_post = false;
         prev_corr_time = delayed_post_time;
+
+        if (post_window.next_trace -> dopamine == 0)
+            last_non_dopamine_spike_time = delayed_post_time;
 
         // Go onto next event
         post_window = post_next_events_delayed(post_window, delayed_post_time);
@@ -274,34 +265,13 @@ static inline final_state_t plasticity_update_synapse(
     log_info("\tApplying pre-synaptic event at time:%u last post time:%u\n",
         delayed_pre_time, post_window.prev_time);
 
-    if(prev_corr_pre_not_post) {
-        log_info("\t\tUpdating correlation from last pre-synaptic event at time %u to %u\n",
-            prev_corr_time, delayed_pre_time);
-
-        current_state = correlation_apply_pre_spike(
-            delayed_pre_time, prev_corr_time,
-            delayed_last_pre_time, last_pre_trace,
-            post_window.prev_time, post_window.prev_trace,
-            current_state, post_event_history);
-    }
-    else {
-        log_info("\t\tUpdating correlation from last post-synaptic event at time %u to %u\n",
-            prev_corr_time, delayed_pre_time);
-
-        current_state = correlation_apply_pre_spike(
-            delayed_pre_time, prev_corr_time,
-            post_window.prev_time, post_window.prev_trace,
-            delayed_last_pre_time, last_pre_trace,
-            current_state, post_event_history);
-    }
-
-    // Get final state from correlation rule
-    // **NOTE** this relies on the compiler optimising out the if delayed_pre_time == delayed_pre_time
-    final_state_t final = correlation_get_final(current_state, delayed_pre_time,
+    current_state = correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
-        post_window.prev_time, post_window.prev_trace);
+        post_window.prev_time, post_window.prev_trace,
+        last_non_dopamine_spike_time, pre_corr_time,
+        current_state, post_event_history);
 
-    return final;
+    return current_state;
 }
 
 bool synapse_dynamics_initialise(
