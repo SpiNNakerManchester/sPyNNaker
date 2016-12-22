@@ -175,7 +175,9 @@ static inline void _process_fixed_synapses(
           // Dopaminergic neurons send some amount of neuromodulator
           // concentration so this can actually be a weight as usual.
           uint32_t concentration = synapse_row_sparse_weight(synaptic_word);
-          synapse_dynamics_process_neuromodulator_event(time, concentration);
+          uint32_t index = synapse_row_sparse_index(synaptic_word);
+          synapse_dynamics_process_neuromodulator_event(time, concentration,
+              index);
         }
         else
         {

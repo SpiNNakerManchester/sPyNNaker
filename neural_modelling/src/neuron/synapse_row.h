@@ -39,7 +39,7 @@
 
 //! how many bits the synapse delay will take
 #ifndef SYNAPSE_DELAY_BITS
-#define SYNAPSE_DELAY_BITS 4
+#define SYNAPSE_DELAY_BITS 3
 #endif
 
 #ifndef SYNAPSE_TYPE_BITS
