@@ -4,12 +4,16 @@
 //---------------------------------------
 // Typedefines
 //---------------------------------------
-typedef int16_t post_trace_t;
+typedef struct
+{
+  int16_t stdp_post_trace;
+  int16_t dopamine;
+} post_trace_t;
 typedef int16_t pre_trace_t;
 
 #include "../synapse_structure/synapse_structure_weight_impl.h"
 #include "timing.h"
-#include "../weight_dependence/weight_one_term.h"
+//#include "../weight_dependence/weight_one_term.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
@@ -32,6 +36,9 @@ typedef int16_t pre_trace_t;
 #define DECAY_LOOKUP_TAU_PLUS(time) \
     maths_lut_exponential_decay( \
         time, TAU_PLUS_TIME_SHIFT, TAU_PLUS_SIZE, tau_plus_lookup)
+#define DECAY_LOOKUP_TAU_MINUS(time) \
+    maths_lut_exponential_decay( \
+        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
 #define DECAY_LOOKUP_TAU_C(time) \
     maths_lut_exponential_decay( \
         time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_c_lookup)
@@ -51,7 +58,7 @@ extern int16_t tau_d_lookup[TAU_PLUS_SIZE];
 // Timing dependence inline functions
 //---------------------------------------
 static inline post_trace_t timing_get_initial_post_trace() {
-    return 0;
+    return (post_trace_t) {.stdp_post_trace = 0, .dopamine = 0};
 }
 
 //---------------------------------------
@@ -62,7 +69,7 @@ static inline post_trace_t timing_add_post_spike(
     uint32_t delta_time = time - last_time;
 
     // Decay previous o1 and o2 traces
-    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(last_trace,
+    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(last_trace.stdp_post_trace,
             DECAY_LOOKUP_TAU_MINUS(delta_time));
 
     // Add energy caused by new spike to trace
@@ -73,7 +80,7 @@ static inline post_trace_t timing_add_post_spike(
 
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added
-    return (post_trace_t) new_o1_trace;
+    return (post_trace_t) { .stdp_post_trace = new_o1_trace, .dopamine = 0 };
 }
 
 //---------------------------------------
@@ -97,6 +104,7 @@ static inline pre_trace_t timing_add_pre_spike(
     return (pre_trace_t) new_r1_trace;
 }
 
+/*
 //---------------------------------------
 static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
@@ -146,5 +154,5 @@ static inline update_state_t timing_apply_post_spike(
         return previous_state;
     }
 }
-
+*/
 #endif // _TIMING_PAIR_IMPL_H_

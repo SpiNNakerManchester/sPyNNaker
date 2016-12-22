@@ -13,7 +13,7 @@
 #define _SYNAPSE_TYPES_EXP_SUPERVISION_H_
 
 // This is currently used for decaying the neuron input
-#include <neuron/decay.h>
+#include "../decay.h"
 
 #include <debug.h>
 
@@ -48,7 +48,7 @@ typedef struct synapse_param_t {
 } synapse_param_t;
 
 // Include this here after defining the above items
-#include <neuron/synapse_types/synapse_types.h>
+#include "synapse_types.h"
 
 // This makes it easy to keep track of which is which
 typedef enum input_buffer_regions {

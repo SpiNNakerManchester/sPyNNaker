@@ -13,13 +13,7 @@
 #include <string.h>
 #include <debug.h>
 
-#ifdef DEBUG
-  bool plastic_runtime_log_enabled = false;
-#endif  // DEBUG
-
-#ifdef SYNAPSE_BENCHMARK
-  extern uint32_t num_plastic_pre_synaptic_events;
-#endif  // SYNAPSE_BENCHMARK
+uint32_t num_plastic_pre_synaptic_events = 0;
 
 //---------------------------------------
 // Macros
@@ -62,12 +56,6 @@ typedef struct
   uint32_t prev_time;
 } pre_event_history_t;
 
-typedef struct
-{
-  int16_t stdp_post_trace;
-  int16_t dopamine;
-} post_trace_t
-
 post_event_history_t *post_event_history;
 int16_t weight_update_constant_component;
 
@@ -83,40 +71,42 @@ static inline post_trace_t add_dopamine_spike(
     uint32_t delta_time = time - last_time;
 
     // Apply exponential decay to get the current value
-    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(dopamine_trace,
+    int32_t decayed_trace = STDP_FIXED_MUL_16X16(dopamine_trace,
             DECAY_LOOKUP_TAU_MINUS(delta_time));
 
     // Increase dopamine level due to new spike
-    int16_t new_o1_trace = decayed_o1_trace + concentration;
+    int16_t new_trace = decayed_trace + concentration;
 
-    log_debug("\tdelta_time=%d, o1=%d\n", delta_time, decayed_o1_trace);
+    log_debug("\tdelta_time=%d, o1=%d\n", delta_time, decayed_trace);
 
     // Return decayed dopamine trace
-    return (post_trace_t) new_o1_trace;
+    return (post_trace_t) { .stdp_post_trace = 0, .dopamine = new_trace };
 }
 
-static inline update_state_t correlation_apply_post_spike(
+static inline void correlation_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_non_dopamine_spike_time,
-        uint32_t last_update_time, update_state_t previous_state,
+        uint32_t last_update_time, plastic_synapse_t *previous_state,
         post_event_history_t *post_event_history) {
 
+    use(&trace);
+    use(&previous_state);
     // Apply potentiation to eligibility trace if this spike is non-dopamine
     // spike
     int16_t decay_eligibility_trace;
-    uint32_t time_since_last_update = time - last_non_dopamine_time;
+    uint32_t time_since_last_update = time - last_non_dopamine_spike_time;
     if (trace.dopamine == 0) {
         // Decay eligibility trace
         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
-            previous_state.eligibility_trace, decay_eligibility_trace);
+            previous_state -> eligibility_trace, decay_eligibility_trace);
 
         // Apply STDP
         uint32_t time_since_last_pre = time - last_pre_time;
         int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
             last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
         decayed_eligibility_trace += decayed_r1;
-        previous_state.eligibility_trace = decayed_eligibility_trace;
+        previous_state -> eligibility_trace = decayed_eligibility_trace;
     }
     else {
          decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
@@ -132,44 +122,46 @@ static inline update_state_t correlation_apply_post_spike(
     uint32_t time_between_updates;
     if (post_event_history -> last_dopamine_spike_time == last_update_time)
         time_between_updates = post_event_history -> last_dopamine_spike_time
-            - last_post_time;
+            - last_non_dopamine_spike_time;
     else
-        time_between_updates = last_post_time
+        time_between_updates = last_non_dopamine_spike_time
             - post_event_history -> last_dopamine_spike_time;
     int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
 
     // Evaluate weight function
-    previous_state.weight += post_event_history -> last_neuromodulator_level
-                             * previous_state.eligibility_trace
-                             * weight_update_constant_component
-                             * (decay_eligibility_trace * decay_dopamine_trace
-                                - third_exp_component);
+    previous_state -> weight += post_event_history -> last_neuromodulator_level
+                                * previous_state -> eligibility_trace
+                                * weight_update_constant_component
+                                * (decay_eligibility_trace * decay_dopamine_trace
+                                   - third_exp_component);
 
 }
 
-static inline update_state_t correlation_apply_pre_spike(
+static inline void correlation_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_post_time,
-        pre_trace_t last_post_trace, uint32_t last_non_dopamine_spike_time,
-        uint32_t last_update_time, update_state_t previous_state,
+        post_trace_t last_post_trace, uint32_t last_non_dopamine_spike_time,
+        uint32_t last_update_time, plastic_synapse_t *previous_state,
         post_event_history_t *post_event_history) {
 
     use(&trace);
+    use(&last_post_trace);
     // Apply depression to eligibility trace if this spike is non-dopamine
     // spike
     int16_t decay_eligibility_trace;
-    uint32_t time_since_last_update = time - last_non_dopamine_time;
+    uint32_t time_since_last_update = time - last_non_dopamine_spike_time;
     if (last_post_trace.dopamine == 0) {
         // Decay eligibility trace
         decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
-            previous_state.eligibility_trace, decay_eligibility_trace);
+            previous_state -> eligibility_trace, decay_eligibility_trace);
 
         // Apply STDP
         uint32_t time_since_last_post = time - last_post_time;
         int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
-            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_post));
+            last_post_trace.stdp_post_trace,
+            DECAY_LOOKUP_TAU_PLUS(time_since_last_post));
         decayed_eligibility_trace -= decayed_r1;
-        previous_state.eligibility_trace = decayed_eligibility_trace;
+        previous_state -> eligibility_trace = decayed_eligibility_trace;
     }
     else {
          decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
@@ -185,28 +177,29 @@ static inline update_state_t correlation_apply_pre_spike(
     uint32_t time_between_updates;
     if (post_event_history -> last_dopamine_spike_time == last_update_time)
         time_between_updates = post_event_history -> last_dopamine_spike_time
-            - last_post_time;
+            - last_non_dopamine_spike_time;
     else
-        time_between_updates = last_post_time
+        time_between_updates = last_non_dopamine_spike_time
             - post_event_history -> last_dopamine_spike_time;
     int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
 
     // Evaluate weight function
-    previous_state.weight += post_event_history -> last_neuromodulator_level
-                             * previous_state.eligibility_trace
-                             * weight_update_constant_component
-                             * (decay_eligibility_trace * decay_dopamine_trace
-                                - third_exp_component);
+    previous_state -> weight += post_event_history -> last_neuromodulator_level
+                                * previous_state -> eligibility_trace
+                                * weight_update_constant_component
+                                * (decay_eligibility_trace * decay_dopamine_trace
+                                   - third_exp_component);
 
 }
 
 // Synapse update loop
 //---------------------------------------
-static inline final_state_t plasticity_update_synapse(
+static inline plastic_synapse_t plasticity_update_synapse(
+    uint32_t time,
     const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
     const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
     const uint32_t delay_axonal, plastic_synapse_t *current_state,
-    const post_event_history_t *post_event_history) {
+    post_event_history_t *post_event_history) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -214,7 +207,7 @@ static inline final_state_t plasticity_update_synapse(
     // Get the post-synaptic window of events to be processed
     const uint32_t window_begin_time = delayed_last_pre_time - delay_dendritic;
     const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
-    post_event_window_t post_window = post_get_window_delayed(
+    post_event_window_t post_window = post_events_get_window_delayed(
         post_event_history, window_begin_time, window_end_time);
 
     log_info("\tPerforming deferred synapse update at time:%u", time);
@@ -225,12 +218,11 @@ static inline final_state_t plasticity_update_synapse(
     // Process events in post-synaptic window
     uint32_t prev_corr_time = delayed_last_pre_time;
     uint32_t last_non_dopamine_spike_time = delayed_last_pre_time;
-    bool prev_corr_pre_not_post = true;
 
     while(post_window.num_events > 0) {
         const uint32_t delayed_post_time =
             *post_window.next_time + delay_dendritic;
-        plastic_runtime_log_info(
+        log_info(
             "\tApplying post-synaptic event at delayed time:%u\n",
             delayed_post_time);
 
@@ -245,8 +237,8 @@ static inline final_state_t plasticity_update_synapse(
         log_info("\t\tUpdating correlation from last synaptic event at time %u to %u\n",
             prev_corr_time, delayed_post_time);
 
-        current_state = correlation_apply_post_spike(
-            delayed_post_time, post_window.next_trace,
+        correlation_apply_post_spike(
+            delayed_post_time, *post_window.next_trace,
             delayed_last_pre_time, last_pre_trace,
             last_non_dopamine_spike_time, prev_corr_time,
             current_state, post_event_history);
@@ -258,20 +250,20 @@ static inline final_state_t plasticity_update_synapse(
             last_non_dopamine_spike_time = delayed_post_time;
 
         // Go onto next event
-        post_window = post_next_events_delayed(post_window, delayed_post_time);
+        post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
 
     const uint32_t delayed_pre_time = time + delay_axonal;
     log_info("\tApplying pre-synaptic event at time:%u last post time:%u\n",
         delayed_pre_time, post_window.prev_time);
 
-    current_state = correlation_apply_pre_spike(
+    correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
         post_window.prev_time, post_window.prev_trace,
-        last_non_dopamine_spike_time, pre_corr_time,
+        last_non_dopamine_spike_time, prev_corr_time,
         current_state, post_event_history);
 
-    return current_state;
+    return *current_state;
 }
 
 bool synapse_dynamics_initialise(
@@ -286,7 +278,9 @@ bool synapse_dynamics_initialise(
 
     // Read Izhikevich weight update equation constant component
     weight_update_constant_component = (int16_t) *weight_region_address;
-    weight_region_address = (address_t)((int16_t*) weight_region_address++);
+    int16_t *ptr = (int16_t*) weight_region_address;
+    ++ptr;
+    weight_region_address = (address_t) ptr;
 
     // Load weight dependence data
     address_t weight_result = weight_initialise(
@@ -297,13 +291,6 @@ bool synapse_dynamics_initialise(
 
     post_event_history = post_events_init_buffers(n_neurons);
     if (post_event_history == NULL) {
-        return false;
-    }
-
-    // Create a buffer for dopamine concentration levels in neurons
-    neuromodulator_levels =
-        spin1_malloc(n_neurons * sizeof(int16_t));
-    if (neuromodulator_levels == NULL) {
         return false;
     }
 
@@ -348,38 +335,29 @@ void synapse_dynamics_process_post_synaptic_event(
 
 //--------------------------------------
 void synapse_dynamics_process_neuromodulator_event(
-        uint32_t time, int16_t concentration) {
+        uint32_t time, int16_t concentration, uint32_t neuron_index) {
     log_debug("Adding neuromodulation event to trace at time:%u", time);
 
     // Get post event history of this neuron
     post_event_history_t *history = &post_event_history[neuron_index];
 
     // Update neuromodulator level reaching this post synaptic neuron
-    int16_t new_neuromodulator_level = add_dopamine_spike(time,
+    post_events_add(time, history, add_dopamine_spike(time,
         history-> last_dopamine_spike_time,
-        history -> last_neuromodulator_level, concentration);
-    post_trace_t new_trace;
-    new_trace.dopamine = new_neuromodulator_level;
-    post_events_add(time, history, new_trace);
+        history -> last_neuromodulator_level, concentration));
 }
 
 //---------------------------------------
-void process_plastic_synapses (address_t plastic, address_t fixed,
-    ring_entry_t *ring_buffer) {
-
-#ifdef DEBUG
-    plastic_runtime_log_enabled = true;
-#endif  // DEBUG
+void synapse_dynamics_process_plastic_synapses(address_t plastic,
+         address_t fixed, weight_t *ring_buffer, uint32_t time) {
 
     // Extract seperate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words = plastic_synapses(plastic);
-    const control_t *control_words = plastic_controls(fixed);
-    size_t plastic_synapse  = num_plastic_controls(fixed);
+    const control_t *control_words = synapse_row_plastic_controls(fixed);
+    size_t plastic_synapse  = synapse_row_num_plastic_controls(fixed);
 
-#ifdef SYNAPSE_BENCHMARK
     num_plastic_pre_synaptic_events += plastic_synapse;
-#endif  // SYNAPSE_BENCHMARK
 
     // Get event history from synaptic row
     pre_event_history_t *event_history = plastic_event_history(plastic);
@@ -403,37 +381,44 @@ void process_plastic_synapses (address_t plastic, address_t fixed,
         // Extract control-word components
         // **NOTE** cunningly, control word is just the same as lower
         // 16-bits of 32-bit fixed synapse so same functions can be used
-        uint32_t delay_dendritic = sparse_delay(control_word);
+        uint32_t delay_dendritic = synapse_row_sparse_delay(control_word);
         uint32_t delay_axonal = 0;//sparse_axonal_delay(control_word);
-        uint32_t type_index = sparse_type_index(control_word);
+        uint32_t type_index = synapse_row_sparse_type_index(control_word);
 
         // Convert into ring buffer offset
-        uint32_t offset = offset_sparse(delay_axonal + delay_dendritic + time, type_index);
+        uint32_t offset = synapses_get_ring_buffer_index_combined(
+            delay_axonal + delay_dendritic + time, type_index);
 
-        // If plasticity is enabled
-        if(plasticity_region_data.mode & PLASTICITY_ENABLED) {
-            uint32_t type = sparse_type(control_word);
-            uint32_t index = sparse_index(control_word);
+        uint32_t type = synapse_row_sparse_type(control_word);
+        uint32_t index = synapse_row_sparse_index(control_word);
 
-           // Get state of synapse - weight and eligibility trace.
-           plastic_synapse_t* current_state = plastic_words;
+       // Get state of synapse - weight and eligibility trace.
+       plastic_synapse_t* current_state = plastic_words;
 
-           // Update the synapse state
-           final_state_t final_state = plasticity_update_synapse(last_pre_time, last_pre_trace,
-               event_history->prev_trace, delay_dendritic, delay_axonal,
-               current_state, &post_event_history[index]);
+       // Update the synapse state
+       plastic_synapse_t final_state = plasticity_update_synapse(time,
+           last_pre_time, last_pre_trace,
+           event_history->prev_trace, delay_dendritic, delay_axonal,
+           current_state, &post_event_history[index]);
 
-           // Add weight to ring-buffer entry
-           // **NOTE** Dave suspects that this could be a potential location for overflow
-           ring_buffer[offset] += synapse_get_final_weight(final_state);
+       // Add weight to ring-buffer entry
+       ring_buffer[offset] += final_state.weight;
 
-           // Write back updated synaptic word to plastic region
-           *plastic_words++ = synapse_get_final_synaptic_word(final_state);
-        }
-        else {
-            ring_buffer[offset] += synapse_get_initial_weight(*plastic_words++);
-        }
+       // Write back updated synaptic word to plastic region
+       *plastic_words++ = final_state;
     }
+    return true;
+}
+
+uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
+    return num_plastic_pre_synaptic_events;
+}
+
+
+input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index) {
+    use(time);
+    use(neuron_index);
+    return 0.0k;
 }
 
 //---------------------------------------
