@@ -60,7 +60,7 @@ typedef struct {
 
 } dma_buffer_t;
 
-dma_buffer_t dma_buffer;
+dma_buffer_t rewiring_dma_buffer;
 
 typedef struct {
     address_t sdram_synaptic_row;
@@ -127,6 +127,17 @@ address_t synaptogenesis_dynamics_initialise(
 
     // Setting up RNG
     validate_mars_kiss64_seed(rewiring_data.shared_seed);
+
+    // Setting up DMA buffers
+    rewiring_dma_buffer.row = (uint32_t*) spin1_malloc(
+                rewiring_data.s_max * sizeof(uint32_t));
+    if (rewiring_dma_buffer.row == NULL) {
+        log_error("Could not initialise DMA buffers");
+        rte_error(RTE_SWERR);
+    }
+    log_info(
+        "REWIRING DMA buffer %u allocated at 0x%08x", i, rewiring_dma_buffer.row);
+
     log_info("Synaptogenesis init complete.");
     return (address_t)sp_word;
 }
@@ -179,16 +190,20 @@ void synaptogenesis_dynamics_rewire(){
     current_state.pre_syn_id = choice;
     current_state.post_syn_id = post_id;
 
-    spin1_dma_transfer(
-        DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, dma_buffer.row, DMA_READ,
-        n_bytes);
+    log_info("Reading %d bytes from %d -- saved to %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
+//
+//    spin1_dma_transfer(
+//        DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
+//        n_bytes);
 }
 
 // Might need to function for rewiring. One to be called by the timer to generate
 // a fake spike and trigger a dma callback
 // and one to be called by the dma callback and then call formation or elimination
 void synapse_check(){
-    log_error("There should be no structurally plastic synapses!");
+    log_info("Check the synapse and do rewiring!");
+    rt_error(RTE_SWERR);
+
 }
 
  /*
