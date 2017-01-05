@@ -120,8 +120,7 @@ class AbstractPopulationVertex(
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
-        AbstractAcceptsIncomingSynapses.__init__(
-            self, synapse_type, ring_buffer_sigma, spikes_per_second)
+        AbstractAcceptsIncomingSynapses.__init__(self)
         ProvidesKeyToAtomMappingImpl.__init__(self)
 
         self._binary = binary
