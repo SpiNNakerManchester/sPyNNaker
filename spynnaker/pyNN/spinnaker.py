@@ -70,6 +70,13 @@ class Spinnaker(SpinnakerMainInterface):
         extra_mapping_inputs = dict()
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
+        extra_mapping_inputs['RecordIOBufOnChipRouterCompressorFlag'] = \
+            config.getboolean("OnChipRouterCompressor",
+                              "record_iobuf_from_on_chip_router_compressor")
+        extra_mapping_inputs['RouterCompressorOnlyCompressWhenNeededFlag'] = \
+            config.getboolean(
+                "OnChipRouterCompressor",
+                "on_chip_router_compressor_compress_only_when_needed")
 
         extra_algorithms_pre_run = list()
         if config.getboolean("Reports", "ReportsEnabled"):
