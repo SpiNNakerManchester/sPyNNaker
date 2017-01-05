@@ -133,10 +133,8 @@ address_t synaptogenesis_dynamics_initialise(
                 rewiring_data.s_max * sizeof(uint32_t));
     if (rewiring_dma_buffer.row == NULL) {
         log_error("Could not initialise DMA buffers");
-        rte_error(RTE_SWERR);
+        rt_error(RTE_SWERR);
     }
-    log_info(
-        "REWIRING DMA buffer %u allocated at 0x%08x", i, rewiring_dma_buffer.row);
 
     log_info("Synaptogenesis init complete.");
     return (address_t)sp_word;
