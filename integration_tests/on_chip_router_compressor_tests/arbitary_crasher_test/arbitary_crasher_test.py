@@ -24,7 +24,7 @@ routing_table = MulticastRoutingTable(1, 1)
 random.seed(12345)
 
 # build 4000 random entries
-for entry in range(0, 2000):
+for entry in range(0, 4000):
 
     # figure links
     links = set()
