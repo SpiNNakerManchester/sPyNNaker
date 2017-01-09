@@ -1,3 +1,4 @@
+import os
 from pacman.model.routing_tables.multicast_routing_table import \
     MulticastRoutingTable
 from pacman.model.routing_tables.multicast_routing_tables import \
@@ -49,10 +50,8 @@ for n_entries_this_run in n_entries:
         # build entry
         multicast_routing_entry = MulticastRoutingEntry(
             routing_entry_key=random.randint(0, math.pow(2, 32)),
-            defaultable=defaultable,
-            mask=0xFFFFFFFF,
-            link_ids=list(links),
-            processor_ids=list(processors))
+            defaultable=defaultable, mask=0xFFFFFFFF,
+            link_ids=list(links), processor_ids=list(processors))
 
         # add router entry to router table
         routing_table.add_mutlicast_routing_entry(
@@ -77,9 +76,7 @@ for n_entries_this_run in n_entries:
     # try running compressor
     try:
         _, prov_items = mundy_compressor(
-            routing_tables, transceiver, machine, 17, 16, provenance_file_path)
-
-        raise Exception("bloody thing didnt crash")
+            routing_tables, transceiver, machine, 17, 17, provenance_file_path)
+        time_frame[n_entries_this_run] = prov_items[0].message
     except SpinnFrontEndException as e:
-        print "passed test"
-        pass
+        reader = open(os.path.join(provenance_file_path, ))
