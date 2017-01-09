@@ -1,8 +1,11 @@
 import os
+from rig.routing_table import MinimisationFailedError
 from pacman.model.routing_tables.multicast_routing_table import \
     MulticastRoutingTable
 from pacman.model.routing_tables.multicast_routing_tables import \
     MulticastRoutingTables
+from pacman.operations.router_compressors.mundys_router_compressor. \
+    routing_table_condenser import MundyRouterCompressor
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 
@@ -19,9 +22,21 @@ from spynnaker.pyNN.utilities.conf import config
 
 import random
 import math
+import time
 
 n_entries = [100, 200, 400, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
 time_frame = dict()
+time_frame_host = dict()
+
+# set main interface
+executable_finder = ExecutableFinder()
+spinnaker = SpinnakerMainInterface(config, executable_finder)
+spinnaker.set_up_machine_specifics(None)
+
+# build transceiver and spinnaker machine
+machine = spinnaker.machine
+transceiver = spinnaker.transceiver
+provenance_file_path = spinnaker._provenance_file_path
 
 for n_entries_this_run in n_entries:
     routing_tables = MulticastRoutingTables()
@@ -37,15 +52,15 @@ for n_entries_this_run in n_entries:
         for n_link in range(0, n_links):
             links.add(random.randint(0, 5))
 
-        defaultable = False
-        if n_links == 1:
-            defaultable = bool(random.randint(0, 1))
-
         # figure processors
         processors = set()
-        n_processors = random.randint(0, 16)
+        n_processors = random.randint(0, 15)
         for n_processor in range(0, n_processors):
-            processors.add(random.randint(0, 16))
+            processors.add(random.randint(0, 15))
+
+        defaultable = False
+        if n_links == 1 and n_processors == 0:
+            defaultable = bool(random.randint(0, 1))
 
         # build entry
         multicast_routing_entry = MulticastRoutingEntry(
@@ -63,20 +78,32 @@ for n_entries_this_run in n_entries:
     # build compressor
     mundy_compressor = MundyOnChipRouterCompression()
 
-    # set main interface
-    executable_finder = ExecutableFinder()
-    spinnaker = SpinnakerMainInterface(config, executable_finder)
-    spinnaker.set_up_machine_specifics(None)
-
-    # build transceiver and spinnaker machine
-    machine = spinnaker.machine
-    transceiver = spinnaker.transceiver
-    provenance_file_path = spinnaker._provenance_file_path
-
-    # try running compressor
+    # try running on chip compressor
     try:
         _, prov_items = mundy_compressor(
-            routing_tables, transceiver, machine, 17, 17, provenance_file_path)
+            routing_tables, transceiver, machine, 16, 16, provenance_file_path)
         time_frame[n_entries_this_run] = prov_items[0].message
     except SpinnFrontEndException as e:
-        reader = open(os.path.join(provenance_file_path, ))
+        reader = open(os.path.join(
+            provenance_file_path,
+            "on_chip_routing_table_compressor_run_time.xml"))
+        reader.readline()
+        data = reader.readline()
+        bits = data.split(">")
+        time_frame[n_entries_this_run] = float(bits[1])
+
+    # try running host compressor
+    on_host = MundyRouterCompressor()
+    start_time = time.time()
+    try:
+        on_host(routing_tables)
+        end_time = time.time()
+        time_frame_host[n_entries_this_run] = end_time - start_time
+    except MinimisationFailedError:
+        end_time = time.time()
+        time_frame_host[n_entries_this_run] = end_time - start_time
+
+# print entries to the terminal for recording
+for entry in n_entries:
+    print "host = [{}]      chip = [{}] \n".format(time_frame_host[entry],
+                                                   time_frame[entry])
