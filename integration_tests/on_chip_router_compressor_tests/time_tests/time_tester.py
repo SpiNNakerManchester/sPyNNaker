@@ -1,5 +1,6 @@
-import os
 from rig.routing_table import MinimisationFailedError
+
+from pacman.exceptions import PacmanElementAllocationException
 from pacman.model.routing_tables.multicast_routing_table import \
     MulticastRoutingTable
 from pacman.model.routing_tables.multicast_routing_tables import \
@@ -23,6 +24,8 @@ from spynnaker.pyNN.utilities.conf import config
 import random
 import math
 import time
+import os
+
 
 n_entries = [100, 200, 400, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
 time_frame = dict()
@@ -84,13 +87,17 @@ for n_entries_this_run in n_entries:
             routing_tables, transceiver, machine, 16, 16, provenance_file_path)
         time_frame[n_entries_this_run] = prov_items[0].message
     except SpinnFrontEndException as e:
+
+        # this block is a well hack, but cant be bothered doing it properly
+        # for a little test
         reader = open(os.path.join(
             provenance_file_path,
             "on_chip_routing_table_compressor_run_time.xml"))
         reader.readline()
         data = reader.readline()
         bits = data.split(">")
-        time_frame[n_entries_this_run] = float(bits[1])
+        bit = bits[1].split("<")
+        time_frame[n_entries_this_run] = float(bit[0])
 
     # try running host compressor
     on_host = MundyRouterCompressor()
@@ -100,6 +107,9 @@ for n_entries_this_run in n_entries:
         end_time = time.time()
         time_frame_host[n_entries_this_run] = end_time - start_time
     except MinimisationFailedError:
+        end_time = time.time()
+        time_frame_host[n_entries_this_run] = end_time - start_time
+    except PacmanElementAllocationException:
         end_time = time.time()
         time_frame_host[n_entries_this_run] = end_time - start_time
 
