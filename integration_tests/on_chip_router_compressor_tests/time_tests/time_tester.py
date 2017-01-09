@@ -27,7 +27,8 @@ import time
 import os
 
 
-n_entries = [100, 200, 400, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
+# n_entries = [100, 200, 400, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
+n_entries = [100, 200, 400, 500]
 time_frame = dict()
 time_frame_host = dict()
 
@@ -40,6 +41,7 @@ spinnaker.set_up_machine_specifics(None)
 machine = spinnaker.machine
 transceiver = spinnaker.transceiver
 provenance_file_path = spinnaker._provenance_file_path
+counter = 0
 
 for n_entries_this_run in n_entries:
     routing_tables = MulticastRoutingTables()
@@ -85,14 +87,22 @@ for n_entries_this_run in n_entries:
     try:
         _, prov_items = mundy_compressor(
             routing_tables, transceiver, machine, 16, 16, provenance_file_path)
-        time_frame[n_entries_this_run] = prov_items[0].message
+        time_frame[n_entries_this_run] = prov_items[0].value
     except SpinnFrontEndException as e:
 
         # this block is a well hack, but cant be bothered doing it properly
         # for a little test
-        reader = open(os.path.join(
-            provenance_file_path,
-            "on_chip_routing_table_compressor_run_time.xml"))
+        reader = None
+        if counter == 0:
+            reader = open(os.path.join(
+                provenance_file_path,
+                "on_chip_routing_table_compressor_run_time.xml"))
+        else:
+            reader = open(os.path.join(
+                provenance_file_path,
+                "on_chip_routing_table_compressor_run_time_{}.xml".format(
+                    counter)))
+            counter += 1
         reader.readline()
         data = reader.readline()
         bits = data.split(">")
