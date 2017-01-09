@@ -26,9 +26,7 @@ import math
 import time
 import os
 
-
-# n_entries = [100, 200, 400, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
-n_entries = [100, 200, 400, 500]
+n_entries = [100, 200, 400, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
 time_frame = dict()
 time_frame_host = dict()
 
