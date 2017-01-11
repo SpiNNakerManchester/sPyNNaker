@@ -48,5 +48,9 @@ class InputTypeConductance(AbstractInputType):
             NeuronParameter(self._e_rev_I, DataType.S1615)
         ]
 
+    def set_parameters(self, parameters, atom):
+        self._e_rev_E[atom] = parameters[0]
+        self._e_rev_I[atom] = parameters[1]
+
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         return 10

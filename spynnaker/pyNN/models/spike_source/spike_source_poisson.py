@@ -1,4 +1,5 @@
 from data_specification.enums.data_type import DataType
+from data_specification import utility_calls as dsg_utilities
 
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints\
@@ -12,20 +13,22 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-from spinn_front_end_common.abstract_models.abstract_changable_after_run import \
-    AbstractChangableAfterRun
 
-from spinn_front_end_common.abstract_models.\
+from spinn_front_end_common.abstract_models. \
+    abstract_changable_after_run import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models. \
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models.abstract_rewriting_data_regions import \
-    AbstractRewriteingDataRegions
+from spinn_front_end_common.abstract_models. \
+    abstract_requires_rewriting_data_regions_application_vertex import \
+    AbstractRequiresRewriteDataRegionsApplicationVertex
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models\
-    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
+from spinn_front_end_common.abstract_models \
+    .abstract_binary_uses_simulation_run \
+    import AbstractBinaryUsesSimulationRun
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
@@ -65,7 +68,8 @@ class SpikeSourcePoisson(
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
     AbstractChangableAfterRun, SimplePopulationSettable,
-    AbstractBinaryUsesSimulationRun, AbstractRewriteingDataRegions):
+    AbstractBinaryUsesSimulationRun,
+    AbstractRequiresRewriteDataRegionsApplicationVertex):
     """ A Poisson Spike source object
     """
 
@@ -90,7 +94,7 @@ class SpikeSourcePoisson(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         SimplePopulationSettable.__init__(self)
-        AbstractRewriteingDataRegions.__init__(self)
+        AbstractRequiresRewriteDataRegionsApplicationVertex.__init__(self)
 
         # atoms params
         self._n_atoms = n_neurons
@@ -266,14 +270,13 @@ class SpikeSourcePoisson(
                 (((vertex_slice.hi_atom - vertex_slice.lo_atom) + 1) *
                  PARAMS_WORDS_PER_NEURON)) * 4
 
-    @staticmethod
-    def reserve_memory_regions(spec, poisson_params_sz, vertex):
+    def reserve_memory_regions(self, spec, placement, graph_mapper):
         """ Reserve memory regions for poisson source parameters and output\
             buffer.
-        :param spec:
-        :param setup_sz:
-        :param poisson_params_sz:
-        :return:
+        :param spec: the data specifciation writer
+        :param placement: the location this vertex resides on in the machine
+        :param graph_mapper: the mapping between app and machine graphs
+        :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
@@ -284,18 +287,25 @@ class SpikeSourcePoisson(
                 _POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value),
             size=front_end_common_constants.SYSTEM_BYTES_REQUIREMENT,
             label='setup')
-        spec.reserve_memory_region(
-            region=(
-                SpikeSourcePoissonMachineVertex.
-                _POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value),
-            size=poisson_params_sz, label='PoissonParams')
+
+        # reserve poisson params dsg region
+        self._reserve_poisson_params_region(placement, graph_mapper, spec)
+
         spec.reserve_memory_region(
             region=(
                 SpikeSourcePoissonMachineVertex._POISSON_SPIKE_SOURCE_REGIONS
                 .SPIKE_HISTORY_REGION.value),
             size=recording_utilities.get_recording_header_size(1),
             label="Recording")
-        vertex.reserve_provenance_data_region(spec)
+        placement.vertex.reserve_provenance_data_region(spec)
+
+    def _reserve_poisson_params_region(self, placement, graph_mapper, spec):
+        spec.reserve_memory_region(
+            region=(
+                SpikeSourcePoissonMachineVertex.
+                    _POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value),
+            size=self.get_params_bytes(graph_mapper.get_slice(
+                placement.vertex)), label='PoissonParams')
 
     def _write_poisson_parameters(
             self, spec, key, vertex_slice, machine_time_step,
@@ -460,6 +470,75 @@ class SpikeSourcePoisson(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
+        "routing_info": "MemoryRoutingInfos"})
+    @overrides(
+        AbstractRequiresRewriteDataRegionsApplicationVertex.
+            regions_and_data_spec_to_rewrite,
+        additional_arguments={
+            "machine_time_step", "time_scale_factor", "routing_info"})
+    def regions_and_data_spec_to_rewrite(
+            self, placement, hostname, report_directory, write_text_specs,
+            reload_application_data_file_path, graph_mapper,
+            machine_time_step, time_scale_factor, routing_info):
+        """ returns the data region and its data that needs loading
+
+        :return: dict of data region id and the byte array to load there.
+        """
+
+        # store for more regions as needed
+        regions_and_data = dict()
+
+        # if the neuron parameters need changing, generate dsg for neuron
+        # params
+        if self._change_requires_neuron_parameters_reload:
+            # get new dsg writer
+            file_path, spec = \
+                dsg_utilities.get_data_spec_and_file_writer_filename(
+                    placement.x, placement.y, placement.p,
+                    hostname, report_directory, write_text_specs,
+                    reload_application_data_file_path)
+
+            # reserve the neuron parameters data region
+            self._reverse_neuron_params_data_region(
+                placement, graph_mapper, spec)
+
+            # allocate parameters
+            self._write_poisson_parameters(
+                key=routing_info.get_first_key_from_pre_vertex(
+                    placement.vertex, constants.SPIKE_PARTITION_ID),
+                machine_time_step=machine_time_step, spec=spec,
+                time_scale_factor=time_scale_factor,
+                vertex_slice=graph_mapper.get_slice(placement.vertex))
+
+            # end spec
+            spec.end_specification()
+
+            # store dsg region to spec data mapping
+            regions_and_data[
+                constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value] = \
+                file_path
+
+        # return mappings
+        return regions_and_data
+
+    def read_neuron_parameters_from_machine(
+            self, transceiver, placement, vertex_slice):
+        """ reads in the poisson parameters from the machine and stores them
+        in the neuron components.
+
+        :param transceiver: the spinnman interface
+        :param placement: the placement of the vertex
+        :return: None
+        """
+
+    @overrides(AbstractRequiresRewriteDataRegionsApplicationVertex.
+               requires_memory_regions_to_be_reloaded)
+    def requires_memory_regions_to_be_reloaded(self):
+        return self._change_requires_neuron_parameters_reload
+
+    @inject_items({
+        "machine_time_step": "MachineTimeStep",
+        "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
         "tags": "MemoryTags",
@@ -480,10 +559,8 @@ class SpikeSourcePoisson(
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
-        poisson_params_sz = self.get_params_bytes(vertex_slice)
-
         # Reserve SDRAM space for memory areas:
-        self.reserve_memory_regions(spec, poisson_params_sz, vertex)
+        self.reserve_memory_regions(spec, placement, graph_mapper)
 
         # write setup data
         spec.switch_write_focus(

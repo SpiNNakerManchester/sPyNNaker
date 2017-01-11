@@ -2,6 +2,8 @@ from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
 
+from spynnaker.pyNN.utilities import utility_calls
+
 
 @add_metaclass(ABCMeta)
 class AbstractNeuronModel(object):
@@ -51,13 +53,13 @@ class AbstractNeuronModel(object):
         :rtype: int
         """
 
-    def get_sdram_usage_in_bytes(self, n_neurons):
+    def get_sdram_usage_per_neuron_in_bytes(self):
         """ Get the total sdram usage in bytes
 
         :return: The SDRAM usage
         :rtype: int
         """
-        return ((self.get_n_neural_parameters() * 4 * n_neurons) +
+        return ((self.get_n_neural_parameters() * 4) +
                 self.get_n_global_parameters() * 4)
 
     def get_dtcm_usage_per_neuron_in_bytes(self):
@@ -67,3 +69,41 @@ class AbstractNeuronModel(object):
         :rtype: int
         """
         return self.get_n_neural_parameters() * 4
+
+    def translate_into_global_params(self, byte_array, position_in_byte_array):
+        """
+
+        :param byte_array:
+        :param position_in_byte_array:
+        :return:
+        """
+        global_parameters = self.get_global_parameters()
+        return utility_calls.translate_parameters(
+            global_parameters, byte_array, position_in_byte_array)
+
+    def translate_into_parameters(self, byte_array, position_in_byte_array):
+        """
+
+        :param byte_array:
+        :param position_in_byte_array:
+        :return:
+        """
+        neural_parameters = self.get_neural_parameters()
+        return utility_calls.translate_parameters(
+            neural_parameters, byte_array, position_in_byte_array)
+
+    def global_param_memory_size_in_bytes(self):
+        """
+
+        :return:
+        """
+        global_parameters = self.get_global_parameters()
+        return utility_calls.get_parameters_size_in_bytes(global_parameters)
+
+    def neural_param_memory_size_in_bytes(self):
+        """
+
+        :return:
+        """
+        neural_parameters = self.get_neural_parameters()
+        return utility_calls.get_parameters_size_in_bytes(neural_parameters)

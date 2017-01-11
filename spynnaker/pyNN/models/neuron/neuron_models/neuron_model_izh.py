@@ -123,6 +123,20 @@ class NeuronModelIzh(AbstractNeuronModel):
             NeuronParameter(machine_time_step / 1000.0, DataType.S1615)
         ]
 
+    def set_global_parameters(self, parameters):
+        # this one is not really required, as its not a internal value.
+        pass
+
+    def set_neural_parameters(self, neural_parameters, atom):
+        self._a[atom] = neural_parameters[0]
+        self._b[atom] = neural_parameters[1]
+        self._c[atom] = neural_parameters[2]
+        self._d[atom] = neural_parameters[3]
+        self._v_init[atom] = neural_parameters[4]
+        self._u_init[atom] = neural_parameters[5]
+        self._i_offset[atom] = neural_parameters[6]
+        # last one is not really required, as its not a internal value.
+
     def get_n_cpu_cycles_per_neuron(self):
 
         # A bit of a guess

@@ -1,6 +1,7 @@
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
+from spynnaker.pyNN.utilities import utility_calls
 
 
 @add_metaclass(ABCMeta)
@@ -47,3 +48,22 @@ class AbstractAdditionalInput(object):
         :rtype: int
         """
         return self.get_n_parameters() * 4
+
+    def translate_into_parameters(self, byte_array, position_in_byte_array):
+        """
+
+        :param byte_array:
+        :param position_in_byte_array:
+        :return:
+        """
+        parameters = self.get_parameters()
+        return utility_calls.translate_parameters(
+            parameters, byte_array, position_in_byte_array)
+
+    def params_memory_size_in_bytes(self):
+        """
+
+        :return:
+        """
+        parameters = self.get_parameters()
+        return utility_calls.get_parameters_size_in_bytes(parameters)

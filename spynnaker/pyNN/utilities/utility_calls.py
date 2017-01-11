@@ -1,6 +1,7 @@
 """
 utility class containing simple helper methods
 """
+import struct
 from spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl \
     import RandomStatsScipyImpl
 from spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl \
@@ -66,6 +67,34 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
 
             spec.write_value(data=value,
                              data_type=param.get_dataspec_datatype())
+
+
+def translate_parameters(parameters, byte_array, position_in_byte_array):
+    """
+
+    :param parameters:
+    :param byte_array:
+    :param position_in_byte_array:
+    :return:
+    """
+    data_format = "<"
+    for parameter in parameters:
+        data_format += parameter.get_dataspec_datatype.struct_encoding
+    translated_parameters = struct.unpack_from(
+        data_format, byte_array, position_in_byte_array)
+    return translated_parameters
+
+
+def get_parameters_size_in_bytes(parameters):
+    """
+
+    :param parameters:
+    :return:
+    """
+    total = 0
+    for parameter in parameters:
+        total += parameter.get_dataspec_datatype.size
+    return total
 
 
 def read_in_data_from_file(

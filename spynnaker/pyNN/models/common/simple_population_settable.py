@@ -1,14 +1,14 @@
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
-    import AbstractPopulationSettable
+    import AbstractPopulationSettableApplicationVertex
 
 
-class SimplePopulationSettable(AbstractPopulationSettable):
+class SimplePopulationSettable(AbstractPopulationSettableApplicationVertex):
     """ An object all of whose properties can be accessed from a PyNN\
         Population i.e. no properties are hidden
     """
 
     def __init__(self):
-        AbstractPopulationSettable.__init__(self)
+        AbstractPopulationSettableApplicationVertex.__init__(self)
 
     def get_value(self, key):
         """ Get a property of the overall model

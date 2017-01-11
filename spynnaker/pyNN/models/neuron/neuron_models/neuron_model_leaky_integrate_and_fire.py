@@ -21,6 +21,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
             v_reset, n_neurons)
         self._tau_refrac = utility_calls.convert_param_to_numpy(
             tau_refrac, n_neurons)
+        self._countdown_to_refactory_period = \
+            utility_calls.convert_param_to_numpy(0, n_neurons)
 
     @property
     def v_reset(self):
@@ -54,7 +56,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
             # count down to end of next refractory period [timesteps]
             # int32_t  refract_timer;
-            NeuronParameter(0, DataType.INT32),
+            NeuronParameter(
+                self._countdown_to_refactory_period, DataType.INT32),
 
             # post-spike reset membrane voltage [mV]
             # REAL     V_reset;
@@ -66,6 +69,15 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
                 self._tau_refrac_timesteps(machine_time_step), DataType.INT32)
         ])
         return params
+
+    def set_neural_parameters(self, neural_parameters, atom):
+        NeuronModelLeakyIntegrate.set_neural_parameters(
+            self, neural_parameters, atom)
+        offset = NeuronModelLeakyIntegrate.get_n_neural_parameters()
+        self._countdown_to_refactory_period[atom] = \
+            neural_parameters[offset + 1]
+        self._v_reset[atom] = neural_parameters[offset + 2]
+        # last one is not really required, as its not a internal value.
 
     def get_n_cpu_cycles_per_neuron(self):
 

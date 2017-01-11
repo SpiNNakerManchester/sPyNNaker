@@ -5,7 +5,7 @@ from pacman.model.constraints.placer_constraints\
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
-    import AbstractPopulationSettable
+    import AbstractPopulationSettableApplicationVertex
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
@@ -151,7 +151,8 @@ class Population(object):
         """ Get the values of a parameter for every local cell in the\
             population.
         """
-        if isinstance(self._vertex, AbstractPopulationSettable):
+        if isinstance(self._vertex,
+                      AbstractPopulationSettableApplicationVertex):
             return self._vertex.get_value(parameter_name)
         raise KeyError("Population does not have a property {}".format(
             parameter_name))
@@ -588,7 +589,8 @@ class Population(object):
         :param parameter: the parameter to set
         :param value: the value of the parameter to set.
         """
-        if not isinstance(self._vertex, AbstractPopulationSettable):
+        if not isinstance(self._vertex,
+                          AbstractPopulationSettableApplicationVertex):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 

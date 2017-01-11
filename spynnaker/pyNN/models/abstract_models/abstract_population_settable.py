@@ -2,12 +2,13 @@ from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
 from spinn_front_end_common.abstract_models. \
-    abstract_rewriting_data_regions import \
-    AbstractRewriteingDataRegions
+    abstract_requires_rewriting_data_regions_application_vertex import \
+    AbstractRequiresRewriteDataRegionsApplicationVertex
 
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationSettable(AbstractRewriteingDataRegions):
+class AbstractPopulationSettableApplicationVertex(
+        AbstractRequiresRewriteDataRegionsApplicationVertex):
     """ Indicates that some properties of this object can be accessed from\
         the PyNN population set and get methods
     """
