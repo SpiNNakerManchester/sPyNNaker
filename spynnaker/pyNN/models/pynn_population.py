@@ -92,6 +92,7 @@ class Population(object):
 
         # parameter
         self._change_requires_mapping = True
+        self._has_read_neuron_parameters_this_run = False
 
     @property
     def requires_mapping(self):
@@ -101,6 +102,7 @@ class Population(object):
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
+        self._has_read_neuron_parameters_this_run = False
         if isinstance(self._vertex, AbstractChangableAfterRun):
             self._vertex.mark_no_changes()
 
@@ -304,7 +306,6 @@ class Population(object):
                     variable))
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
             value, self._vertex.n_atoms))
-        self._change_requires_mapping = True
 
     @staticmethod
     def is_local(cell_id):
@@ -398,7 +399,6 @@ class Population(object):
 
         """
         self.initialize('v', distribution)
-        self._change_requires_mapping = True
 
     def record(self, to_file=None):
         """ Record spikes from all cells in the Population.
@@ -557,9 +557,6 @@ class Population(object):
         """
         self.set(parametername, rand_distr)
 
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
-
     def sample(self, n, rng=None):
         """ Return a random selection of neurons from a population in the form\
             of a population view
@@ -607,12 +604,28 @@ class Population(object):
                                 "set() function for population parameter."
                                 " Exiting.")
 
-        # Add a dictionary-structured set of new parameters to the current set:
+        # if not read, but tools have run before,
+        if self._spinnaker.has_ran and self._spinnaker.has_reset_last and \
+                not self._has_read_neuron_parameters_this_run:
+
+            # locate machine vertices from the application vertices
+            machine_vertices = \
+                self._spinnaker.graph_mapper.get_machine_vertices(
+                    self._vertex)
+
+            # go through each machine vertex and read the neuron parameters
+            # it contains
+            for machine_vertex in machine_vertices:
+                self._vertex.read_neuron_parameters_from_machine(
+                    self._spinnaker.transceiver,
+                    self._spinnaker.placements.get_placement_of_vertex(
+                        self._vertex),
+                    self._spinnaker.graph_mapper.get_slice(machine_vertex))
+            self._has_read_neuron_parameters_this_run = True
+
+        # set new parameters
         for (key, value) in parameter.iteritems():
             self._vertex.set_value(key, value)
-
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
 
     @property
     def structure(self):
@@ -699,9 +712,6 @@ class Population(object):
                 "the size of the population. Please change this and try "
                 "again, or alternatively, use set()")
         self.set(parametername, value_array)
-
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
 
     def _end(self):
         """ Do final steps at the end of the simulation

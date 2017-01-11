@@ -1,12 +1,3 @@
-import logging
-import math
-import random
-import scipy.stats
-
-import numpy
-from spinn_front_end_common.utilities import constants as\
-    front_end_common_constants
-
 from data_specification.enums.data_type import DataType
 
 from pacman.executor.injection_decorator import inject_items
@@ -21,9 +12,14 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
+from spinn_front_end_common.abstract_models.abstract_changable_after_run import \
+    AbstractChangableAfterRun
+
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
+from spinn_front_end_common.abstract_models.abstract_rewriting_data_regions import \
+    AbstractRewriteingDataRegions
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
@@ -35,18 +31,26 @@ from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
+from spinn_front_end_common.utilities import constants as \
+    front_end_common_constants
 
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.multi_spike_recorder \
     import MultiSpikeRecorder
-from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
-    import PopulationSettableChangeRequiresMapping
+from spynnaker.pyNN.models.common.simple_population_settable import \
+    SimplePopulationSettable
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.conf import config
+
+import logging
+import math
+import random
+import scipy.stats
+import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +64,8 @@ class SpikeSourcePoisson(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
-        PopulationSettableChangeRequiresMapping,
-        AbstractBinaryUsesSimulationRun):
+    AbstractChangableAfterRun, SimplePopulationSettable,
+    AbstractBinaryUsesSimulationRun, AbstractRewriteingDataRegions):
     """ A Poisson Spike source object
     """
 
@@ -84,11 +88,17 @@ class SpikeSourcePoisson(
             self, label, constraints, self._model_based_max_atoms_per_core)
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        PopulationSettableChangeRequiresMapping.__init__(self)
+        AbstractChangableAfterRun.__init__(self)
+        SimplePopulationSettable.__init__(self)
+        AbstractRewriteingDataRegions.__init__(self)
 
         # atoms params
         self._n_atoms = n_neurons
         self._seed = None
+
+        # check for changes parameters
+        self._change_requires_mapping = True
+        self._change_requires_neuron_parameters_reload = False
 
         # Store the parameters
         self._rate = utility_calls.convert_param_to_numpy(rate, n_neurons)
@@ -118,6 +128,20 @@ class SpikeSourcePoisson(
             self._buffer_size_before_receive = config.getint(
                 "Buffers", "buffer_size_before_receive")
         self._maximum_sdram_for_buffering = [spike_buffer_max_size]
+
+    @property
+    @overrides(AbstractChangableAfterRun.requires_mapping)
+    def requires_mapping(self):
+        return self._change_requires_mapping
+
+    @overrides(AbstractChangableAfterRun.mark_no_changes)
+    def mark_no_changes(self):
+        self._change_requires_mapping = False
+        self._change_requires_neuron_parameters_reload = False
+
+    def set_value(self, key, value):
+        SimplePopulationSettable.set_value(self, key, value)
+        self._change_requires_neuron_parameters_reload = True
 
     def _max_spikes_per_ts(
             self, vertex_slice, n_machine_time_steps, machine_time_step):
