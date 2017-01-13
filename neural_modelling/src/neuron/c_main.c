@@ -149,6 +149,8 @@ bool initialise_runtime_command_listener(address_t top_address){
 
     address_t sdp_port_region =
         data_specification_get_region(RUNTIME_SDP_PORT, top_address);
+    uint32_t port = sdp_port_region[0];
+    log_info("sdp port for simulation commands is %d", port);
     simulation_sdp_callback_on(
         sdp_port_region[0], host_neuron_commands_callback);
     return true;
