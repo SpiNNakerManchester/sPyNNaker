@@ -281,7 +281,6 @@ bool synapse_dynamics_process_plastic_synapses(
 
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {
-#ifndef POST_EVENTS_ARE_SUPERVISION
     log_debug("Adding post-synaptic event to trace at time:%u", time);
 
     // Add post-event
@@ -291,22 +290,6 @@ void synapse_dynamics_process_post_synaptic_event(
         history->traces[history->count_minus_one];
     post_events_add(time, history, timing_add_post_spike(time, last_post_time,
                                                          last_post_trace));
-#endif
-}
-
-void synapse_dynamics_process_supervise_event(
-        uint32_t time, uint32_t synapse_type, index_t neuron_index) {
-#ifdef POST_EVENTS_ARE_SUPERVISION
-    log_debug("Adding post-synaptic event to trace at time:%u", time);
-
-    // Add post-event
-    post_event_history_t *history = &post_event_history[neuron_index];
-    const uint32_t last_post_time = history->times[history->count_minus_one];
-    const post_trace_t last_post_trace =
-        history->traces[history->count_minus_one];
-    post_events_add(time, history, timing_add_post_spike(time, last_post_time,
-                                                         last_post_trace));
-#endif
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index) {
