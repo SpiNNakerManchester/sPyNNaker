@@ -48,12 +48,12 @@ from spinn_front_end_common.utilities import helpful_functions
 
 # spynnaker imports
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.common.complicated_population_settable import \
+    ComplicatedPopulationSettable
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
-from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
-    import AbstractPopulationSettableApplicationVertex
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
@@ -95,8 +95,7 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
-    AbstractPopulationInitializable,
-    AbstractPopulationSettableApplicationVertex,
+    AbstractPopulationInitializable, ComplicatedPopulationSettable,
     AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms,
     AbstractRequiresRewriteDataRegionsApplicationVertex):
     """ Underlying vertex model for Neural Populations.
@@ -125,7 +124,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
-        AbstractPopulationSettableApplicationVertex.__init__(self)
+        ComplicatedPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
         AbstractRequiresRewriteDataRegionsApplicationVertex.__init__(self)
@@ -675,7 +674,7 @@ class AbstractPopulationVertex(
     def input_type(self):
         return self._input_type
 
-    @overrides(AbstractPopulationSettableApplicationVertex.get_value)
+    @overrides(ComplicatedPopulationSettable.get_value)
     def get_value(self, key):
         """ Get a property of the overall model
         """
@@ -687,7 +686,7 @@ class AbstractPopulationVertex(
         raise Exception("Population {} does not have parameter {}".format(
             self.vertex, key))
 
-    @overrides(AbstractPopulationSettableApplicationVertex.set_value)
+    @overrides(ComplicatedPopulationSettable.set_value)
     def set_value(self, key, value):
         """ Set a property of the overall model
         """
@@ -701,7 +700,7 @@ class AbstractPopulationVertex(
         raise Exception("Type {} does not have parameter {}".format(
             self._model_name, key))
 
-    @overrides(AbstractPopulationSettableApplicationVertex.
+    @overrides(ComplicatedPopulationSettable.
                read_neuron_parameters_from_machine)
     def read_neuron_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
