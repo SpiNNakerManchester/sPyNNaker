@@ -16,12 +16,13 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None,
-            dendritic_delay_fraction=1.0, mad=True):
+            dendritic_delay_fraction=1.0, mad=True, neuromodulation=False):
         AbstractPlasticSynapseDynamics.__init__(self)
         self._timing_dependence = timing_dependence
         self._weight_dependence = weight_dependence
         self._dendritic_delay_fraction = float(dendritic_delay_fraction)
         self._mad = mad
+        self._neuromodulation = neuromodulation
 
         if (self._dendritic_delay_fraction < 0.5 or
                 self._dendritic_delay_fraction > 1.0):
@@ -66,6 +67,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
 
     def get_vertex_executable_suffix(self):
         name = "_stdp_mad" if self._mad else "_stdp"
+        name += "_neuromodulated" if self._neuromodulation
         name += "_" + self._timing_dependence.vertex_executable_suffix
         name += "_" + self._weight_dependence.vertex_executable_suffix
         return name
