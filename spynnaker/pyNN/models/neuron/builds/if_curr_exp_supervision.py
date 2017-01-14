@@ -69,10 +69,10 @@ class IFCurrExpSupervision(AbstractPopulationVertex):
             additional_input=additional_input,
 
             # the model a name (shown in reports)
-            model_name="IFCurrExpSupervision",
+            model_name="IF_curr_exp_supervision",
 
             # the matching binary name
-            binary="if_curr_exp_supervision.aplx")
+            binary="IF_curr_exp_supervision.aplx")
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
