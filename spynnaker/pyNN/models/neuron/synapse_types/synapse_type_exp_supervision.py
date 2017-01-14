@@ -23,13 +23,12 @@ def get_exponential_decay_and_init(tau, machine_time_step):
 
 class ExpSupervision(AbstractSynapseType):
 
-    def __init__(self, n_neurons, machine_time_step, tau_syn_E, tau_syn_I):
+    def __init__(self, n_neurons, tau_syn_E, tau_syn_I):
 
         AbstractSynapseType.__init__(self)
         self._n_neurons = n_neurons
 
         # TODO: Store the parameters
-        self._machine_time_step = machine_time_step
         self._tau_syn_E = utility_calls.convert_param_to_numpy(
             tau_syn_E, n_neurons)
         self._tau_syn_I = utility_calls.convert_param_to_numpy(
