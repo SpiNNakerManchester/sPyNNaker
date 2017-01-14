@@ -6,7 +6,8 @@ from spynnaker.pyNN.models.neuron.input_types.input_type_current \
     import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire \
     import NeuronModelLeakyIntegrateAndFire
-from exp_supervision import ExpSupervision
+from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exp_supervision \
+    import ExpSupervision
 from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 

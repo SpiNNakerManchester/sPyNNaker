@@ -39,7 +39,7 @@ from spynnaker.pyNN.models.neuron.builds.izk_curr_exp \
 from spynnaker.pyNN.models.neuron.builds.izk_cond_exp \
     import IzkCondExp as IZK_cond_exp
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_supervision \
-    import IfCurrExpSupervision as IF_curr_exp_supervision
+    import IFCurrExpSupervision as IF_curr_exp_supervision
 
 # neural projections
 from spynnaker.pyNN.models.neural_projections\
