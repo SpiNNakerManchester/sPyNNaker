@@ -3,6 +3,7 @@ from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type import \
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
+from pacman.executor.injection_decorator import inject_items
 
 from data_specification.enums.data_type import DataType
 
@@ -53,11 +54,12 @@ class ExpSupervision(AbstractSynapseType):
     def get_n_synapse_type_parameters(self):
         return 4
 
-    def get_synapse_type_parameters(self):
+    @inject_items({"machine_time_step": "MachineTimeStep"})
+    def get_synapse_type_parameters(self, machine_time_step):
         e_decay, e_init = get_exponential_decay_and_init(
-            self._tau_syn_E, self._machine_time_step)
+            self._tau_syn_E, machine_time_step)
         i_decay, i_init = get_exponential_decay_and_init(
-            self._tau_syn_I, self._machine_time_step)
+            self._tau_syn_I, machine_time_step)
 
         return [
             NeuronParameter(e_decay, DataType.UINT32),
