@@ -96,7 +96,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
         # Calculate constant component in Izhikevich's model weight update
         # function and write to SDRAM.
-        weight_update_component = 1 / (-((1/self._tau_c) + (1/self._tau_d)))
+        weight_update_component = 1 / (-((1.0/self._tau_c) + (1.0/self._tau_d)))
         weight_update_component = \
             plasticity_helpers.float_to_fixed(weight_update_component,
                                               (1 << 11))
