@@ -23,7 +23,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
         self._tau_c = tau_c
-        self._taU_d = tau_d
+        self._tau_d = tau_d
         self._nearest = nearest
 
         self._synapse_structure = SynapseStructureWeightOnly()
