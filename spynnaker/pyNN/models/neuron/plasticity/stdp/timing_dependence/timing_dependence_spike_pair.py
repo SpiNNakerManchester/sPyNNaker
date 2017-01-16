@@ -5,7 +5,6 @@ from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
     import SynapseStructureWeightOnly
 
-
 import logging
 logger = logging.getLogger(__name__)
 
