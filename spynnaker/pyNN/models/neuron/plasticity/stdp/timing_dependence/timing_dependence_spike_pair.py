@@ -5,6 +5,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
     .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
     .synapse_structure_weight_only import SynapseStructureWeightOnly
+from data_specification.enums.data_type import DataType
 
 
 import logging
