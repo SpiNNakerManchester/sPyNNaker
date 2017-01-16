@@ -69,6 +69,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         name = "_stdp_mad" if self._mad else "_stdp"
         if self._neuromodulation:
             name += "_neuromodulated"
+            return name
         name += "_" + self._timing_dependence.vertex_executable_suffix
         name += "_" + self._weight_dependence.vertex_executable_suffix
         return name
