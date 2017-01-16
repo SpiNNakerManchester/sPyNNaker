@@ -66,7 +66,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return 0 if self._nearest else 2
 
     def get_parameters_sdram_usage_in_bytes(self):
-        return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
+        return 4 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE) + 4
 
     @property
     def n_weight_terms(self):
