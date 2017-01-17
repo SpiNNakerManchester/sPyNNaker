@@ -57,7 +57,7 @@ typedef struct
 } pre_event_history_t;
 
 post_event_history_t *post_event_history;
-int16_t weight_update_constant_component;
+int32_t weight_update_constant_component;
 
 
 //---------------------------------------
@@ -277,10 +277,7 @@ bool synapse_dynamics_initialise(
     }
 
     // Read Izhikevich weight update equation constant component
-    weight_update_constant_component = (int16_t) *weight_region_address;
-    int16_t *ptr = (int16_t*) weight_region_address;
-    ++ptr;
-    weight_region_address = (address_t) ptr;
+    weight_update_constant_component = *weight_region_address++;
 
     // Load weight dependence data
     address_t weight_result = weight_initialise(
