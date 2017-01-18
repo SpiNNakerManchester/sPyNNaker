@@ -21,5 +21,5 @@ class InputTypeCurrent(AbstractInputType):
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         return 0
 
-    def set_parameters(self, parameters, atom):
+    def set_parameters(self, parameters, vertex_slice):
         pass  # there are no parameters

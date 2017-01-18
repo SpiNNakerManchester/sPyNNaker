@@ -23,7 +23,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
             i_offset, n_neurons)
 
         if v_init is None:
-            self._v_init = v_rest
+            self._v_init = self._v_rest
 
     def initialize_v(self, v_init):
         self._v_init = utility_calls.convert_param_to_numpy(
@@ -121,12 +121,15 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
         # don't have any
         pass
 
-    def set_neural_parameters(self, neural_parameters, atom):
-        self._v_init[atom] = neural_parameters[0]
-        self._v_rest[atom] = neural_parameters[1]
-        self._r_membrane[atom] = neural_parameters[2]
-        # exp_tc is a calculated value from a none state variable, so ignore
-        self._i_offset[atom] = neural_parameters[4]
+    def set_neural_parameters(self, neural_parameters, vertex_slice):
+        position_in_data = 0
+        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
+            self._v_init[atom] = neural_parameters[position_in_data]
+            self._v_rest[atom] = neural_parameters[position_in_data + 1]
+            self._r_membrane[atom] = neural_parameters[position_in_data + 2]
+            # exp_tc is a calculated value from a none state variable, so ignore
+            self._i_offset[atom] = neural_parameters[position_in_data + 4]
+            position_in_data += self.get_n_neural_parameters()
 
     def get_n_cpu_cycles_per_neuron(self):
 

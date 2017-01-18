@@ -49,7 +49,8 @@ class AbstractAdditionalInput(object):
         """
         return self.get_n_parameters() * 4
 
-    def translate_into_parameters(self, byte_array, position_in_byte_array):
+    def translate_into_parameters(
+            self, byte_array, position_in_byte_array, vertex_slice):
         """
 
         :param byte_array:
@@ -58,7 +59,7 @@ class AbstractAdditionalInput(object):
         """
         parameters = self.get_parameters()
         return utility_calls.translate_parameters(
-            parameters, byte_array, position_in_byte_array)
+            parameters, byte_array, position_in_byte_array, vertex_slice)
 
     def params_memory_size_in_bytes(self):
         """

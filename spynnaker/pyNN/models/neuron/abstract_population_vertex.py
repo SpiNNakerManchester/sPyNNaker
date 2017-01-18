@@ -106,7 +106,7 @@ class AbstractPopulationVertex(
     V_RECORDING_REGION = 1
     GSYN_RECORDING_REGION = 2
     RUNTIME_SDP_PORT_SIZE = 4  # the size of the runtime sdp port data region
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 24
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 24  # 6 elements
 
     _n_vertices = 0
 
@@ -235,6 +235,10 @@ class AbstractPopulationVertex(
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self._change_requires_mapping = False
+
+    @overrides(AbstractRequiresRewriteDataRegionsApplicationVertex.
+               mark_regions_reloaded)
+    def mark_regions_reloaded(self):
         self._change_requires_neuron_parameters_reload = False
 
     def _get_buffered_sdram_per_timestep(self, vertex_slice):
@@ -370,11 +374,6 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.RECORDING.value,
             size=recording_utilities.get_recording_header_size(3))
 
-        # reserve runtime sdp command port region
-        spec.reserve_memory_region(
-            region=constants.POPULATION_BASED_REGIONS.RUNTIME_SDP_PORT.value,
-            size=self.RUNTIME_SDP_PORT_SIZE)
-
         vertex.reserve_provenance_data_region(spec)
 
     def _reverse_neuron_params_data_region(self, spec, vertex_slice):
@@ -389,7 +388,6 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
             size=params_size,
             label='NeuronParams')
-
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
@@ -450,19 +448,6 @@ class AbstractPopulationVertex(
         utility_calls.write_parameters_per_neuron(
             spec, vertex_slice,
             self._threshold_type.get_threshold_parameters())
-
-    @staticmethod
-    def _write_neuron_sdp_commands_port(spec):
-        """
-
-        :param spec: the data specification spec object
-        :return: None
-        """
-        # Set the focus to the memory region 8 (RUNTIME_SDP_PORT):
-        spec.switch_write_focus(
-            region=constants.POPULATION_BASED_REGIONS.RUNTIME_SDP_PORT.value)
-        spec.write_value(constants.SDP_PORTS.NEURON_COMMANDS_SDP_PORT.value,
-                         data_type=DataType.UINT32)
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
@@ -590,10 +575,6 @@ class AbstractPopulationVertex(
             application_graph, routing_info, graph_mapper,
             self._input_type, machine_time_step)
 
-        # write the sdp port number expected to be received for the neuron
-        # sdp commands
-        self._write_neuron_sdp_commands_port(spec)
-
         # End the writing of this specification:
         spec.end_specification()
 
@@ -719,10 +700,13 @@ class AbstractPopulationVertex(
                 constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
                 transceiver)
 
+        # shift past the extra stuff before neuron parameters that we don't
+        # need to read
         neuron_parameters_sdram_address = \
             (neuron_region_sdram_address +
              self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
 
+        # get size of neuron params
         size_of_region = self._get_sdram_usage_for_neuron_params(vertex_slice)
         size_of_region -= self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS
 
@@ -734,48 +718,54 @@ class AbstractPopulationVertex(
         # update python neuron parameters with the data
         position_in_byte_array = 0
 
-        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
-            # handle global params for a neuron
-            global_params = self._neuron_model.translate_into_global_params(
-                byte_array, position_in_byte_array)
-            self._neuron_model.set_global_parameters(global_params, atom)
-            position_in_byte_array += \
-                self._neuron_model.global_param_memory_size_in_bytes()
+        # handle global params (only need read this once)
+        global_params = self._neuron_model.translate_into_global_params(
+            byte_array, position_in_byte_array)
+        self._neuron_model.set_global_parameters(global_params)
+        position_in_byte_array += \
+            self._neuron_model.global_param_memory_size_in_bytes()
 
-            # handle state params for a neuron
-            state_params = self._neuron_model.translate_into_neural_params(
-                byte_array, position_in_byte_array)
-            self._neuron_model.set_neural_parameters(state_params, atom)
-            position_in_byte_array += \
-                self._neuron_model.neural_param_memory_size_in_bytes()
+        # handle state params for a neuron
+        state_params = self._neuron_model.translate_into_parameters(
+            byte_array, position_in_byte_array, vertex_slice)
+        self._neuron_model.set_neural_parameters(state_params, vertex_slice)
+        position_in_byte_array += \
+            self._neuron_model.neural_param_memory_size_in_bytes() * \
+            vertex_slice.n_atoms
 
-            # handle input params
-            input_params = self._input_type.translate_into_parameters(
-                byte_array, position_in_byte_array)
-            self._input_type.set_parameters(input_params, atom)
-            position_in_byte_array += \
-                self._input_type.params_memory_size_in_bytes()
+        # handle input params
+        input_params = self._input_type.translate_into_parameters(
+            byte_array, position_in_byte_array, vertex_slice)
+        self._input_type.set_parameters(input_params, vertex_slice)
+        position_in_byte_array += \
+            self._input_type.params_memory_size_in_bytes() * \
+            vertex_slice.n_atoms
 
-            # handle additional input params
+        # handle additional input params, if they exist
+        if self._additional_input is not None:
             additional_input_params = \
                 self._additional_input.translate_into_parameters(
-                    byte_array, position_in_byte_array)
+                    byte_array, position_in_byte_array, vertex_slice)
             self._additional_input.set_parameters(
-                additional_input_params, atom)
+                additional_input_params, vertex_slice)
             position_in_byte_array += \
-                self._additional_input.params_memory_size_in_bytes()
+                self._additional_input.params_memory_size_in_bytes() * \
+                vertex_slice.n_atoms
 
-            # handle threshold type params
-            threshold_params = self._threshold_type.translate_into_parameters(
-                byte_array, position_in_byte_array)
-            self._threshold_type.set_parameters(threshold_params, atom)
-            position_in_byte_array += \
-                self._threshold_type.params_memory_size_in_bytes()
+        # handle threshold type params
+        threshold_params = self._threshold_type.translate_into_parameters(
+            byte_array, position_in_byte_array, vertex_slice)
+        self._threshold_type.set_parameters(threshold_params, vertex_slice)
+        position_in_byte_array += \
+            self._threshold_type.params_memory_size_in_bytes() * \
+            vertex_slice.n_atoms
 
         if len(byte_array) != position_in_byte_array:
             raise exceptions.MemReadException(
                 "Ive not read enough data for translating neuron params from"
-                " the machine")
+                " the machine. Ive read {} elements, whereas i should have "
+                "read {} elements".format(
+                    position_in_byte_array, len(byte_array)))
 
     @property
     def weight_scale(self):

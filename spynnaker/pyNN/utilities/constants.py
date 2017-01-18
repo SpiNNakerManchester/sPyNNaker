@@ -54,17 +54,14 @@ POPULATION_BASED_REGIONS = Enum(
            ('SYNAPTIC_MATRIX', 4),
            ('SYNAPSE_DYNAMICS', 5),
            ('RECORDING', 6),
-           ('PROVENANCE_DATA', 7),
-           ('RUNTIME_SDP_PORT', 8)])
+           ('PROVENANCE_DATA', 7)])
 
-# SDP port handling neuron commands
-SDP_PORTS = Enum(
-    value="SDP_PORTS",
+# SDP messages specific for neurons
+SDP_MESSAGE_CODES = Enum(
+    value="NEURON_SDP_MESSAGE_CODES",
     names=[
-
-        # command port for the neuron commands functionality
-        # (reload neuron params etc)
-        ("NEURON_COMMANDS_SDP_PORT", 4)]
+        ("REREAD_NEURON_PARAMETERS_FROM_SDRAM", 0)
+    ]
 )
 
 # The partition ID used for spike data

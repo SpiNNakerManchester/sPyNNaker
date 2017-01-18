@@ -69,20 +69,43 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
                              data_type=param.get_dataspec_datatype())
 
 
-def translate_parameters(parameters, byte_array, position_in_byte_array):
+def translate_parameters(
+        parameters, byte_array, position_in_byte_array, vertex_slice):
     """
 
     :param parameters:
     :param byte_array:
     :param position_in_byte_array:
+    :param vertex_slice:
     :return:
     """
-    data_format = "<"
+    data_format = ""
+    if len(parameters) == 0:
+        return []
+
     for parameter in parameters:
-        data_format += parameter.get_dataspec_datatype.struct_encoding
+        data_format += parameter.get_dataspec_datatype().struct_encoding
+
+    # read for all atoms considered
+    all_atom_translation = "<"
+    extended_parameters = list()
+    for _ in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
+        all_atom_translation += data_format
+        extended_parameters.extend(parameters)
+
+    # unpack the params from the byte array
     translated_parameters = struct.unpack_from(
-        data_format, byte_array, position_in_byte_array)
-    return translated_parameters
+        all_atom_translation, byte_array, position_in_byte_array)
+
+    # scale values with required scaling factor
+    scaled_translated_params = list()
+    for translated_parameter, parameter in zip(translated_parameters,
+                                               extended_parameters):
+        scaled_translated_params.append(
+            translated_parameter / parameter.get_dataspec_datatype().scale)
+
+    # return correct values
+    return scaled_translated_params
 
 
 def get_parameters_size_in_bytes(parameters):
@@ -93,7 +116,7 @@ def get_parameters_size_in_bytes(parameters):
     """
     total = 0
     for parameter in parameters:
-        total += parameter.get_dataspec_datatype.size
+        total += parameter.get_dataspec_datatype().size
     return total
 
 

@@ -3,6 +3,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 
 from spynnaker.pyNN.utilities import utility_calls
+from pacman.model.graphs.common.slice import Slice
 
 
 @add_metaclass(ABCMeta)
@@ -78,19 +79,26 @@ class AbstractNeuronModel(object):
         :return:
         """
         global_parameters = self.get_global_parameters()
-        return utility_calls.translate_parameters(
-            global_parameters, byte_array, position_in_byte_array)
 
-    def translate_into_parameters(self, byte_array, position_in_byte_array):
+        # as global parameters are not per atom, make a slice of 1 atom
+        # for the reader to work correctly
+        return utility_calls.translate_parameters(
+            global_parameters, byte_array, position_in_byte_array,
+            Slice(0, 1))
+
+    def translate_into_parameters(
+            self, byte_array, position_in_byte_array, vertex_slice):
         """
 
         :param byte_array:
         :param position_in_byte_array:
+        :param vertex_slice:
         :return:
         """
         neural_parameters = self.get_neural_parameters()
         return utility_calls.translate_parameters(
-            neural_parameters, byte_array, position_in_byte_array)
+            neural_parameters, byte_array, position_in_byte_array,
+            vertex_slice)
 
     def global_param_memory_size_in_bytes(self):
         """

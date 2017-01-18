@@ -33,8 +33,11 @@ class ThresholdTypeStatic(AbstractThresholdType):
             NeuronParameter(self._v_thresh, DataType.S1615)
         ]
 
-    def set_parameters(self, parameters, atom):
-        self._v_thresh[atom] = parameters[0]
+    def set_parameters(self, parameters, vertex_slice):
+        position_in_data = 0
+        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
+            self._v_thresh[atom] = parameters[position_in_data]
+            position_in_data += 1
 
     def get_n_cpu_cycles_per_neuron(self):
 

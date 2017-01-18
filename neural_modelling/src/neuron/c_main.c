@@ -42,8 +42,7 @@ typedef enum regions_e{
     SYNAPTIC_MATRIX_REGION,
     SYNAPSE_DYNAMICS_REGION,
     RECORDING_REGION,
-    PROVENANCE_DATA_REGION,
-    RUNTIME_SDP_PORT
+    PROVENANCE_DATA_REGION
 } regions_e;
 
 typedef enum extra_provenance_data_region_entries{
@@ -102,60 +101,6 @@ void c_main_store_provenance_data(address_t provenance_region){
     log_debug("finished other provenance data");
 }
 
-//! \brief handles sdp commands sent from the neuron runtime controller.
-//! \param[in] mailbox: the pointer to the memory where the message is being
-//!  held
-//! \param[in] port: the port to which this sdp message was received.
-void host_neuron_commands_callback(uint mailbox, uint port) {
-    use(port);
-    sdp_msg_t *msg = (sdp_msg_t *) mailbox;
-
-    switch (msg->cmd_rc) {
-        case RELOAD_NEURON_PARAMS:
-            log_info("received reloading neuron parameter command");
-
-            // locate top region address table
-            address_t address = data_specification_get_data_address();
-
-            // try reloading neuron parameters
-            if(!neuron_reload_neuron_parameters(
-                    data_specification_get_region(
-                        NEURON_PARAMS_REGION, address))){
-                log_error("failed to reload the neuron parameters.");
-                spin1_msg_free(msg);
-                rt_error(RTE_SWERR);
-            }
-
-            log_info("successfully reloaded the neuron parameters");
-
-            // free the message to stop overload
-            spin1_msg_free(msg);
-            break;
-
-        default:
-
-            // should never get here
-            log_error(
-                "neuron commands callback received packet with unknown"
-                "command code %d", msg->cmd_rc);
-            spin1_msg_free(msg);
-            rt_error(RTE_SWERR);
-    }
-}
-
-//! \brief sets up the listener for runtime commands.
-bool initialise_runtime_command_listener(address_t top_address){
-    log_info("setting up runtime_command_listener");
-
-    address_t sdp_port_region =
-        data_specification_get_region(RUNTIME_SDP_PORT, top_address);
-    uint32_t port = sdp_port_region[0];
-    log_info("sdp port for simulation commands is %d", port);
-    simulation_sdp_callback_on(
-        sdp_port_region[0], host_neuron_commands_callback);
-    return true;
-}
-
 //! \brief Initialises the model by reading in the regions and checking
 //!        recording data.
 //! \param[in] timer_period a pointer for the memory address where the timer
@@ -178,10 +123,6 @@ static bool initialise(uint32_t *timer_period) {
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
             &infinite_run, SDP_AND_DMA_AND_USER, c_main_store_provenance_data,
             data_specification_get_region(PROVENANCE_DATA_REGION, address))) {
-        return false;
-    }
-
-    if(!initialise_runtime_command_listener(address)){
         return false;
     }
 
@@ -248,6 +189,18 @@ void resume_callback() {
         log_error("Error setting up recording");
         rt_error(RTE_SWERR);
     }
+    // reread neuron parameters
+    log_info("received reloading neuron parameter command");
+
+    // try reloading neuron parameters
+    if(!neuron_reload_neuron_parameters(
+            data_specification_get_region(
+                NEURON_PARAMS_REGION, address))){
+        log_error("failed to reload the neuron parameters.");
+        rt_error(RTE_SWERR);
+    }
+
+    log_info("successfully reloaded the neuron parameters");
 }
 
 //! \brief Timer interrupt callback

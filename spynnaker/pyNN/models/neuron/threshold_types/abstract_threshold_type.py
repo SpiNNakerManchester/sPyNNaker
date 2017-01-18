@@ -51,16 +51,18 @@ class AbstractThresholdType(object):
         """
         return self.get_n_threshold_parameters() * 4
 
-    def translate_into_parameters(self, byte_array, position_in_byte_array):
+    def translate_into_parameters(
+            self, byte_array, position_in_byte_array, vertex_slice):
         """
 
         :param byte_array:
         :param position_in_byte_array:
+        :param vertex_slice:
         :return:
         """
         parameters = self.get_threshold_parameters()
         return utility_calls.translate_parameters(
-            parameters, byte_array, position_in_byte_array)
+            parameters, byte_array, position_in_byte_array, vertex_slice)
 
     def params_memory_size_in_bytes(self):
         """

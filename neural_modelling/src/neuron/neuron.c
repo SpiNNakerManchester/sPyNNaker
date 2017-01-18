@@ -98,14 +98,14 @@ static inline void _print_neuron_parameters() {
 
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
-#if LOG_LEVEL >= LOG_DEBUG
-    log_debug("-------------------------------------\n");
+//#if LOG_LEVEL >= LOG_DEBUG
+    log_info("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_parameters(&(neuron_array[n]));
     }
-    log_debug("-------------------------------------\n");
+    log_info("-------------------------------------\n");
     //}
-#endif // LOG_LEVEL >= LOG_DEBUG
+//#endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 //! \brief does the memory copy for the neuron parameters
@@ -294,13 +294,11 @@ void neuron_store_neuron_parameters(address_t address){
     next += sizeof(global_neuron_params_t) / 4;
 
     log_info("writing neuron local parameters");
-    memcpy(&address[next], neuron_array, n_neurons * sizeof
-    (neuron_t));
+    memcpy(&address[next], neuron_array, n_neurons * sizeof(neuron_t));
     next += (n_neurons * sizeof(neuron_t)) / 4;
 
     log_info("writing input type parameters");
-    memcpy(&address[next], input_type_array, n_neurons *
-    sizeof(input_type_t));
+    memcpy(&address[next], input_type_array, n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
 
     log_info("writing additional input type parameters");

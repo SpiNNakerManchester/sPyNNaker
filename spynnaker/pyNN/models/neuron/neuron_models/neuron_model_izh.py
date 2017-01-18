@@ -127,15 +127,18 @@ class NeuronModelIzh(AbstractNeuronModel):
         # this one is not really required, as its not a internal value.
         pass
 
-    def set_neural_parameters(self, neural_parameters, atom):
-        self._a[atom] = neural_parameters[0]
-        self._b[atom] = neural_parameters[1]
-        self._c[atom] = neural_parameters[2]
-        self._d[atom] = neural_parameters[3]
-        self._v_init[atom] = neural_parameters[4]
-        self._u_init[atom] = neural_parameters[5]
-        self._i_offset[atom] = neural_parameters[6]
-        # last one is not really required, as its not a internal value.
+    def set_neural_parameters(self, neural_parameters, vertex_slice):
+        position_in_data = 0
+        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
+            self._a[atom] = neural_parameters[position_in_data]
+            self._b[atom] = neural_parameters[position_in_data + 1]
+            self._c[atom] = neural_parameters[position_in_data + 2]
+            self._d[atom] = neural_parameters[position_in_data + 3]
+            self._v_init[atom] = neural_parameters[position_in_data + 4]
+            self._u_init[atom] = neural_parameters[position_in_data + 5]
+            self._i_offset[atom] = neural_parameters[position_in_data + 6]
+            position_in_data += self.get_n_neural_parameters()
+            # last one is not really required, as its not a internal value.
 
     def get_n_cpu_cycles_per_neuron(self):
 

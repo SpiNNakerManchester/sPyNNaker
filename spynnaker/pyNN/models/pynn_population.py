@@ -1,7 +1,15 @@
+import struct
+
 from pacman.model.constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from spinnman.messages.sdp.sdp_header import SDPHeader
+from spinnman.messages.sdp.sdp_message import SDPMessage
+from spynnaker.pyNN.models.common.complicated_population_settable import \
+    ComplicatedPopulationSettable
+from pacman.executor import injection_decorator
+from spynnaker.pyNN.utilities import constants
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
@@ -151,8 +159,8 @@ class Population(object):
         """ Get the values of a parameter for every local cell in the\
             population.
         """
-        if isinstance(self._vertex,
-                      AbstractPopulationSettableApplicationVertex):
+        if isinstance(
+                self._vertex, AbstractPopulationSettableApplicationVertex):
             return self._vertex.get_value(parameter_name)
         raise KeyError("Population does not have a property {}".format(
             parameter_name))
@@ -598,6 +606,7 @@ class Population(object):
             if value is None:
                 raise Exception("Error: No value given in set() function for "
                                 "population parameter. Exiting.")
+            self._handle_complicated_setters()
             self._vertex.set_value(parameter, value)
             return
 
@@ -606,28 +615,51 @@ class Population(object):
                                 "set() function for population parameter."
                                 " Exiting.")
 
-        # if not read, but tools have run before,
-        if self._spinnaker.has_ran and self._spinnaker.has_reset_last and \
-                not self._has_read_neuron_parameters_this_run:
-
-            # locate machine vertices from the application vertices
-            machine_vertices = \
-                self._spinnaker.graph_mapper.get_machine_vertices(
-                    self._vertex)
-
-            # go through each machine vertex and read the neuron parameters
-            # it contains
-            for machine_vertex in machine_vertices:
-                self._vertex.read_neuron_parameters_from_machine(
-                    self._spinnaker.transceiver,
-                    self._spinnaker.placements.get_placement_of_vertex(
-                        self._vertex),
-                    self._spinnaker.graph_mapper.get_slice(machine_vertex))
-            self._has_read_neuron_parameters_this_run = True
+        self._handle_complicated_setters()
 
         # set new parameters
         for (key, value) in parameter.iteritems():
             self._vertex.set_value(key, value)
+
+    def _handle_complicated_setters(self):
+
+        # update injectables so that the parameters needed are stored
+        inputs = dict()
+        inputs["MachineTimeStep"] = self._spinnaker.machine_time_step
+        injection_decorator.provide_injectables(inputs)
+
+        # if not read, but tools have run before,
+        if self._spinnaker.has_ran and not \
+                self._has_read_neuron_parameters_this_run:
+
+            if isinstance(self._vertex, ComplicatedPopulationSettable):
+                # locate machine vertices from the application vertices
+                machine_vertices = \
+                    self._spinnaker.graph_mapper.get_machine_vertices(
+                        self._vertex)
+
+                if self._spinnaker.has_reset_last:
+                    self._spinnaker.do_load()
+
+                # go through each machine vertex and read the neuron parameters
+                # it contains
+                for machine_vertex in machine_vertices:
+                    # tell the core to rewrite neuron params back to the
+                    # sdram space.
+                    placement = self._spinnaker.placements. \
+                        get_placement_of_vertex(machine_vertex)
+
+                    self._vertex.read_neuron_parameters_from_machine(
+                        self._spinnaker.transceiver, placement,
+                        self._spinnaker.graph_mapper.get_slice(machine_vertex))
+
+                self._has_read_neuron_parameters_this_run = True
+            else:
+                raise exceptions.ConfigurationException(
+                    "Only vertices which are complicated vertices (")
+
+        # clear injectionables as required by the interface
+        injection_decorator.clear_injectables()
 
     @property
     def structure(self):
