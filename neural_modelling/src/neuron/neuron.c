@@ -98,14 +98,14 @@ static inline void _print_neuron_parameters() {
 
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
-//#if LOG_LEVEL >= LOG_DEBUG
-    log_info("-------------------------------------\n");
+#if LOG_LEVEL >= LOG_DEBUG
+    log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_parameters(&(neuron_array[n]));
     }
-    log_info("-------------------------------------\n");
+    log_debug("-------------------------------------\n");
     //}
-//#endif // LOG_LEVEL >= LOG_DEBUG
+#endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 //! \brief does the memory copy for the neuron parameters
@@ -196,8 +196,6 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = address[INCOMING_SPIKE_BUFFER_SIZE];
-
-    uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     // allocate DTCM for the global parameter details
     if (sizeof(global_neuron_params_t) > 0) {

@@ -1,4 +1,5 @@
 from enum import Enum
+from spinn_front_end_common.utilities import constants as fec_constants
 
 POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 

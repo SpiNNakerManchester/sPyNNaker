@@ -656,7 +656,12 @@ class Population(object):
                 self._has_read_neuron_parameters_this_run = True
             else:
                 raise exceptions.ConfigurationException(
-                    "Only vertices which are complicated vertices (")
+                    "Only vertices which are complicated vertices can have"
+                    " their variables changed between runs without a reset."
+                    "Currently the only model that support this are:\n"
+                    "    1. IfCurExp \n    2. IfCondExp\n"
+                    "    3. IFCurrDualExp\n     4. IzkCurrExp\n"
+                    "    5. IzkCondExp\n     6. SpikeSourcePoisson")
 
         # clear injectionables as required by the interface
         injection_decorator.clear_injectables()

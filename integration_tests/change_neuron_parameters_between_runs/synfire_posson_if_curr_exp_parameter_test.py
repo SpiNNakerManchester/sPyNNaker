@@ -28,6 +28,11 @@ projections = list()
 weight_to_spike = 2.0
 delay = 17
 
+stim_dur = 50.0
+rate = 100.0
+rate_2 = 200.0
+stim_dur_2 = 200.0
+
 loopConnections = list()
 for i in range(0, nNeurons):
     singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
@@ -37,8 +42,10 @@ injectionConnection = [(0, 0, weight_to_spike, 1)]
 
 populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
                                 label='pop_1'))
-populations.append(p.Population(1, p.SpikeSourcePoisson,
-                                label='inputSpikes_1'))
+
+populations.append(p.Population(
+    1, p.SpikeSourcePoisson,
+    {'rate': rate, 'duration': stim_dur}, label='inputSpikes_1'))
 
 projections.append(p.Projection(populations[0], populations[0],
                                 p.FromListConnector(loopConnections)))
@@ -51,7 +58,8 @@ populations[0].record()
 
 p.run(5000)
 
-populations[0].set('i_offset', 30)
+populations[1].set('rate', rate_2)
+populations[1].set('duration', stim_dur_2)
 
 p.run(5000)
 

@@ -18,8 +18,7 @@ from enum import Enum
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable):
-
-    _POISSON_SPIKE_SOURCE_REGIONS = Enum(
+    POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="_POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
@@ -31,7 +30,7 @@ class SpikeSourcePoissonMachineVertex(
             buffered_sdram_per_timestep, constraints=None, label=None):
         MachineVertex.__init__(self, label, constraints=constraints)
         ProvidesProvenanceDataFromMachineImpl.__init__(
-            self, self._POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value,
+            self, self.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value,
             0)
         AbstractRecordable.__init__(self)
         self._is_recording = is_recording
@@ -66,5 +65,5 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):
         return helpful_functions.locate_memory_region_for_placement(
-            placement, self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+            placement, self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
             txrx)
