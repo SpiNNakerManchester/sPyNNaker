@@ -28,10 +28,10 @@ projections = list()
 weight_to_spike = 2.0
 delay = 17
 
-stim_dur = 50.0
-rate = 100.0
+stim_dur = 5000.0
+rate = 2.0
 rate_2 = 200.0
-stim_dur_2 = 200.0
+stim_dur_2 = 2000.0
 
 loopConnections = list()
 for i in range(0, nNeurons):
@@ -56,12 +56,28 @@ populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record()
 
+populations[1].record()
+
 p.run(5000)
+
+ps = populations[1].getSpikes()
+if ps is not None:
+    print ps
+    pylab.figure()
+    pylab.plot([i[1] for i in ps], [i[0] for i in ps], ".")
+    pylab.xlabel('Time/ms')
+    pylab.ylabel('ps spikes')
+    pylab.title('ps spikes')
+    pylab.show()
+else:
+    print "No ps received"
 
 populations[1].set('rate', rate_2)
 populations[1].set('duration', stim_dur_2)
 
 p.run(5000)
+
+ps2 = populations[1].getSpikes()
 
 v = None
 gsyn = None
@@ -70,6 +86,17 @@ spikes = None
 v = populations[0].get_v(compatible_output=True)
 gsyn = populations[0].get_gsyn(compatible_output=True)
 spikes = populations[0].getSpikes(compatible_output=True)
+
+if ps2 is not None:
+    print ps2
+    pylab.figure()
+    pylab.plot([i[1] for i in ps2], [i[0] for i in ps2], ".")
+    pylab.xlabel('Time/ms')
+    pylab.ylabel('ps2 spikes')
+    pylab.title('ps2 spikes')
+    pylab.show()
+else:
+    print "No ps2 spikes received"
 
 if spikes is not None:
     print spikes
