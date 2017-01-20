@@ -63,9 +63,9 @@ import numpy
 
 logger = logging.getLogger(__name__)
 
-# has key, key, random backoff, n_sources, seconds_per_timestep,
-# timesteps_per_second, slow_rate_tick_cutoff
-PARAMS_BASE_WORDS = 7
+# has key, key, random backoff, time_between_spikes, n_sources,
+# seconds_per_timestep, timesteps_per_second, slow_rate_tick_cutoff
+PARAMS_BASE_WORDS = 8
 
 # start_scaled, end_scaled, is_fast_source, exp_minus_lambda, isi_val,
 # time_to_spike
@@ -111,7 +111,7 @@ class SpikeSourcePoisson(
         DATA_POSITIONS_IN_STRUCT.IS_FAST_SOURCE.value: DataType.UINT32,
         DATA_POSITIONS_IN_STRUCT.EXP_MINUS_LAMDA.value: DataType.U032,
         DATA_POSITIONS_IN_STRUCT.ISI_VAL.value: DataType.S1615,
-        DATA_POSITIONS_IN_STRUCT.TIME_TO_SPIKE.value: DataType.UINT32
+        DATA_POSITIONS_IN_STRUCT.TIME_TO_SPIKE.value: DataType.S1615
     }
 
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
@@ -269,7 +269,7 @@ class SpikeSourcePoisson(
 
     @rate.setter
     def rate(self, rate):
-        self._rate = rate
+        self._rate = utility_calls.convert_param_to_numpy(rate, self._n_atoms)
 
     @property
     def start(self):
@@ -277,7 +277,8 @@ class SpikeSourcePoisson(
 
     @start.setter
     def start(self, start):
-        self._start = start
+        self._start = utility_calls.convert_param_to_numpy(
+            start, self._n_atoms)
 
     @property
     def duration(self):
@@ -285,7 +286,8 @@ class SpikeSourcePoisson(
 
     @duration.setter
     def duration(self, duration):
-        self._duration = duration
+        self._duration = utility_calls.convert_param_to_numpy(
+            duration, self._n_atoms)
 
     @property
     def seed(self):
@@ -357,14 +359,17 @@ class SpikeSourcePoisson(
                 placement.vertex)), label='PoissonParams')
 
     def _write_poisson_parameters(
-            self, spec, key, vertex_slice, machine_time_step):
+            self, spec, key, vertex_slice, machine_time_step,
+            time_scale_factor):
         """ Generate Neuron Parameter data for Poisson spike sources
 
         :param spec: the data specification writer
         :param key: the routing key for this vertex
         :param vertex_slice: the slice of atoms this machine vertex holds
-        from its applciation vertex
+        from its application vertex
         :param machine_time_step: the time between timer tick updates.
+        :param time_scale_factor: the scaling between machine time step and
+        real time
         :return: None
         """
         spec.comment("\nWriting Neuron Parameters for {} poisson sources:\n"
@@ -391,6 +396,17 @@ class SpikeSourcePoisson(
         # Write the random back off value
         spec.write_value(random.randint(0, self._n_poisson_machine_vertices))
 
+        # Write the number of microseconds between sending spikes
+        total_mean_rate = numpy.sum(self._rate)
+        max_spikes = scipy.stats.poisson.ppf(
+            1.0 - (1.0 / total_mean_rate), total_mean_rate)
+        spikes_per_timestep = (
+            max_spikes / (MICROSECONDS_PER_SECOND / machine_time_step))
+        time_between_spikes = (
+            (machine_time_step * time_scale_factor) /
+            (spikes_per_timestep * 2.0))
+        spec.write_value(data=int(time_between_spikes))
+
         # Write the random seed (4 words), generated randomly!
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
@@ -402,17 +418,17 @@ class SpikeSourcePoisson(
 
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(
-            data=(float(machine_time_step) / MICROSECONDS_PER_SECOND),
+            data=float(machine_time_step) / MICROSECONDS_PER_SECOND,
             data_type=DataType.U032)
 
         # Write the number of timesteps per second (accum)
         spec.write_value(
-            data=(MICROSECONDS_PER_SECOND / float(machine_time_step)),
+            data=MICROSECONDS_PER_SECOND / float(machine_time_step),
             data_type=DataType.S1615)
 
         # Write the slow-rate-per-tick-cutoff (accum)
-        spec.write_value(
-            data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
+        spec.write_value(data=SLOW_RATE_PER_TICK_CUTOFF,
+                         data_type=DataType.S1615)
 
         # For each neuron, get the rate to work out if it is a slow
         # or fast source
@@ -426,7 +442,8 @@ class SpikeSourcePoisson(
             start_scaled = self._convert_ms_to_n_timesteps(
                 start_val, machine_time_step)
             end_scaled = 0xFFFFFFFF
-            if self._duration is not None:
+            if (self._duration[atom_id] is not None and
+                    not math.isnan(self._duration[atom_id])):
                 end_val = generate_parameter(
                     self._duration, atom_id) + start_val
                 end_scaled = self._convert_ms_to_n_timesteps(
@@ -448,8 +465,9 @@ class SpikeSourcePoisson(
             if rate_val == 0:
                 isi_val = 0
             else:
-                isi_val = float(MICROSECONDS_PER_MILLISECOND /
+                isi_val = float(MICROSECONDS_PER_SECOND /
                                 (rate_val * machine_time_step))
+
             spec.write_value(
                 data=start_scaled,
                 data_type=self.DATA_FORMATS_IN_STRUCT[
@@ -551,7 +569,8 @@ class SpikeSourcePoisson(
                     placement.vertex, constants.SPIKE_PARTITION_ID),
                 spec=spec,
                 vertex_slice=graph_mapper.get_slice(placement.vertex),
-                machine_time_step=machine_time_step)
+                machine_time_step=machine_time_step,
+                time_scale_factor=time_scale_factor)
 
             # end spec
             spec.end_specification()
@@ -681,7 +700,7 @@ class SpikeSourcePoisson(
         key = routing_info.get_first_key_from_pre_vertex(
             vertex, constants.SPIKE_PARTITION_ID)
         self._write_poisson_parameters(
-            spec, key, vertex_slice, machine_time_step)
+            spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
         # End-of-Spec:
         spec.end_specification()
