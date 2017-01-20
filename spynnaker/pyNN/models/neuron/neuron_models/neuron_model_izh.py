@@ -55,6 +55,15 @@ class NeuronModelIzh(AbstractNeuronModel):
         self._d = utility_calls.convert_param_to_numpy(d, self._n_neurons)
 
     @property
+    def i_offset(self):
+        return self._i_offset
+
+    @i_offset.setter
+    def i_offset(self, i_offset):
+        self._i_offset = utility_calls.convert_param_to_numpy(
+            i_offset, self._n_neurons)
+
+    @property
     def v_init(self):
         return self._v_init
 

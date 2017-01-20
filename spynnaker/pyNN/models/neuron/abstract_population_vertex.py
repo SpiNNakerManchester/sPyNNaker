@@ -327,8 +327,9 @@ class AbstractPopulationVertex(
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
         per_neuron_usage = \
             self._get_sdram_usage_for_neuron_params_per_neuron()
-        return (self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS + (
-            per_neuron_usage * vertex_slice.n_atoms))
+        return (self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+                self._neuron_model.global_param_memory_size_in_bytes() +
+                (per_neuron_usage * vertex_slice.n_atoms))
 
     def get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):

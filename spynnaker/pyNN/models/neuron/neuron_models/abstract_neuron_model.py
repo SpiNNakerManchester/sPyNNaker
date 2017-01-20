@@ -60,8 +60,7 @@ class AbstractNeuronModel(object):
         :return: The SDRAM usage
         :rtype: int
         """
-        return ((self.get_n_neural_parameters() * 4) +
-                self.get_n_global_parameters() * 4)
+        return self.get_n_neural_parameters() * 4
 
     def get_dtcm_usage_per_neuron_in_bytes(self):
         """ Get the DTCM usage of this neuron model in bytes
