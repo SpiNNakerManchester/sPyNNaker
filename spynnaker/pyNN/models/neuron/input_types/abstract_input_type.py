@@ -82,7 +82,7 @@ class AbstractInputType(object):
             parameters, byte_array, position_in_byte_array, vertex_slice)
 
     def params_memory_size_in_bytes(self):
-        """ how many bytes the paramters use up
+        """ how many bytes the parameters use up
 
         :return: int
         """

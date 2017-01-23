@@ -33,6 +33,15 @@ class AbstractAdditionalInput(object):
             additional_input_has_spiked
         """
 
+    @abstractmethod
+    def set_parameters(self, parameters, vertex_slice):
+        """ sets the parameters from a list into the internal data items
+
+        :param parameters: the parameters to set
+        :param vertex_slice: which atoms to set
+        :return: None
+        """
+
     def get_sdram_usage_per_neuron_in_bytes(self):
         """ Get the SDRAM usage of this additional input in bytes
 
