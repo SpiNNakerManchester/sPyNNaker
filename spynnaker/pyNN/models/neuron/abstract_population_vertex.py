@@ -1,7 +1,5 @@
 # dsg imports
-import struct
 from data_specification import utility_calls as dsg_utilities
-from data_specification.enums.data_type import DataType
 
 # pacman imports
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
@@ -325,6 +323,11 @@ class AbstractPopulationVertex(
         return per_neuron_usage
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
+        """ calculates the sdram usage for just the neuron parameters region
+
+        :param vertex_slice: the slice of atoms.
+        :return:  The sdram required for the neuron region
+        """
         per_neuron_usage = \
             self._get_sdram_usage_for_neuron_params_per_neuron()
         return (self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
@@ -378,11 +381,11 @@ class AbstractPopulationVertex(
         vertex.reserve_provenance_data_region(spec)
 
     def _reverse_neuron_params_data_region(self, spec, vertex_slice):
-        """
+        """ reserve the neuron parameter data region
         
-        :param spec:
-        :param vertex_slice:
-        :return:
+        :param spec: the spec to write the dsg region to
+        :param vertex_slice: the slice of atoms from the application vertex
+        :return: None
         """
         params_size = self._get_sdram_usage_for_neuron_params(vertex_slice)
         spec.reserve_memory_region(

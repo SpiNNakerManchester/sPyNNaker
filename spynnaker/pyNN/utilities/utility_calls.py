@@ -71,13 +71,14 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
 
 def translate_parameters(
         parameters, byte_array, position_in_byte_array, vertex_slice):
-    """
+    """ converts between a byte array and different types of parameters for
+    a given set of atoms
 
-    :param parameters:
-    :param byte_array:
-    :param position_in_byte_array:
-    :param vertex_slice:
-    :return:
+    :param parameters: the parameters to change to
+    :param byte_array: the byte aray to read parameters out of
+    :param position_in_byte_array: where in the byte aray to start reading from
+    :param vertex_slice: the map of atoms from a application vertex
+    :return: list of parameters for all atoms within the vertex slice
     """
     data_format = ""
     if len(parameters) == 0:
@@ -109,10 +110,10 @@ def translate_parameters(
 
 
 def get_parameters_size_in_bytes(parameters):
-    """
+    """ gets the size of the parameters in bytes
 
-    :param parameters:
-    :return:
+    :param parameters: the parameters tro figure sizes of.
+    :return: size of params in bytes (int)
     """
     total = 0
     for parameter in parameters:

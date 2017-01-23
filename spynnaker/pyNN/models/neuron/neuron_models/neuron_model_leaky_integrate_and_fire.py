@@ -1,4 +1,5 @@
 from pacman.executor.injection_decorator import inject_items
+from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate \
@@ -42,6 +43,7 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
         self._tau_refrac = utility_calls.convert_param_to_numpy(
             tau_refrac, self._n_neurons)
 
+    @overrides(NeuronModelLeakyIntegrate.get_n_neural_parameters)
     def get_n_neural_parameters(self):
         return NeuronModelLeakyIntegrate.get_n_neural_parameters(self) + 3
 
@@ -70,6 +72,7 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
         ])
         return params
 
+    @overrides(NeuronModelLeakyIntegrate.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
         position_in_data = 0
         for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):

@@ -1,9 +1,6 @@
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
-from spinn_front_end_common.abstract_models. \
-    abstract_requires_rewriting_data_regions_application_vertex import \
-    AbstractRequiresRewriteDataRegionsApplicationVertex
 
 
 @add_metaclass(ABCMeta)

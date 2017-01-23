@@ -187,6 +187,7 @@ class SpikeSourcePoisson(
     def mark_no_changes(self):
         self._change_requires_mapping = False
 
+    @overrides(ComplicatedPopulationSettable.set_value)
     def set_value(self, key, value):
         ComplicatedPopulationSettable.set_value(self, key, value)
         self._change_requires_neuron_parameters_reload = True
@@ -506,6 +507,11 @@ class SpikeSourcePoisson(
         self._spike_recorder.record = True
 
     def get_sdram_usage_for_atoms(self, vertex_slice):
+        """ calculates total sdram usage for a set of atoms
+
+        :param vertex_slice: the atoms to calculate sdram usage for
+        :return: sdram usage as a number of bytes
+        """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         total_size = \
             (front_end_common_constants.SYSTEM_BYTES_REQUIREMENT +
@@ -516,6 +522,10 @@ class SpikeSourcePoisson(
         return total_size
 
     def _get_number_of_mallocs_used_by_dsg(self):
+        """ figures the number of mallocs used by the tools.
+
+        :return: the number of mallocs
+        """
         standard_mallocs = self._DEFAULT_MALLOCS_USED
         if self._spike_recorder.record:
             standard_mallocs += 1
@@ -640,6 +650,11 @@ class SpikeSourcePoisson(
         return self._change_requires_neuron_parameters_reload
 
     def _translate_isi_value_to_rate(self, isi_value):
+        """ converts between isi value and the pynn rate value.
+
+        :param isi_value: the isi value to convert
+        :return: the pynn rate value.
+        """
         if isi_value == 0:
             return 0
         else:

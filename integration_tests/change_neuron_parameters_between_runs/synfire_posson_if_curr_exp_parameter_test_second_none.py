@@ -34,7 +34,7 @@ rate_2 = 200.0
 stim_dur_2 = 2000.0
 
 loopConnections = list()
-for i in range(0, nNeurons):
+for i in range(0, nNeurons - 1):
     singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
     loopConnections.append(singleConnection)
 
@@ -60,9 +60,7 @@ populations[1].record()
 
 p.run(5000)
 
-populations[1].set('start', 5000)
-populations[1].set('rate', rate_2)
-populations[1].set('duration', stim_dur_2)
+populations[1].set('duration', 0)
 
 p.run(5000)
 

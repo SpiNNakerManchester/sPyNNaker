@@ -280,6 +280,8 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     return true;
 }
 
+//! \brief stores neuron parameter back into sdram
+//! \param[in] address: the address in sdram to start the store
 void neuron_store_neuron_parameters(address_t address){
 
     uint32_t next = START_OF_GLOBAL_PARAMETERS;

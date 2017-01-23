@@ -1,5 +1,4 @@
 from enum import Enum
-from spinn_front_end_common.utilities import constants as fec_constants
 
 POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 
@@ -56,14 +55,6 @@ POPULATION_BASED_REGIONS = Enum(
            ('SYNAPSE_DYNAMICS', 5),
            ('RECORDING', 6),
            ('PROVENANCE_DATA', 7)])
-
-# SDP messages specific for neurons
-SDP_MESSAGE_CODES = Enum(
-    value="NEURON_SDP_MESSAGE_CODES",
-    names=[
-        ("REREAD_NEURON_PARAMETERS_FROM_SDRAM", 0)
-    ]
-)
 
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"

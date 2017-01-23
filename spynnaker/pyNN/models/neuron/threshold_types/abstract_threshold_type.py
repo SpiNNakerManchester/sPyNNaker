@@ -71,3 +71,12 @@ class AbstractThresholdType(object):
         """
         parameters = self.get_threshold_parameters()
         return utility_calls.get_parameters_size_in_bytes(parameters)
+
+    @abstractmethod
+    def set_parameters(self, parameters, vertex_slice):
+        """ sets the parameters for this set of atoms
+
+        :param parameters: the parameters to set as a list
+        :param vertex_slice: the atom slice
+        :return: None
+        """

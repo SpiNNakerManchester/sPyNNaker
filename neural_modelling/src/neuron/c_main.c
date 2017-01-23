@@ -80,6 +80,8 @@ static uint32_t infinite_run;
 static uint32_t recording_flags = 0;
 
 //! \brief Initialises the recording parts of the model
+//! \param[in] recording_address: the address in sdram where to store
+//! recordings
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(address_t recording_address){
     bool success = recording_initialize(recording_address, &recording_flags);
@@ -181,6 +183,8 @@ static bool initialise(uint32_t *timer_period) {
     return true;
 }
 
+//! \brief the function to call when resuming a simulation
+//! return None
 void resume_callback() {
     // restart the recording status
     address_t address = data_specification_get_data_address();

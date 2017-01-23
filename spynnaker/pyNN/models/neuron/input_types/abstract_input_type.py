@@ -35,6 +35,15 @@ class AbstractInputType(object):
         """
 
     @abstractmethod
+    def set_parameters(self, parameters, vertex_slice):
+        """ sets the parameters from a list into the interal data items
+
+        :param parameters: the parameters to set
+        :param vertex_slice: which atoms to set
+        :return: None
+        """
+
+    @abstractmethod
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         """ Get the number of CPU cycles executed by\
             input_type_get_input_value once per synapse, \
@@ -60,21 +69,22 @@ class AbstractInputType(object):
 
     def translate_into_parameters(
             self, byte_array, position_in_byte_array, vertex_slice):
-        """
+        """ transaltes a byte array into input parameters
 
-        :param byte_array:
-        :param position_in_byte_array:
-        :param vertex_slice:
-        :return:
+        :param byte_array: the data array to trnaslate
+        :param position_in_byte_array: the position in the byte array to do
+        translation from
+        :param vertex_slice: the vertex slice
+        :return: the translated parameters as a list
         """
         parameters = self.get_input_type_parameters()
         return utility_calls.translate_parameters(
             parameters, byte_array, position_in_byte_array, vertex_slice)
 
     def params_memory_size_in_bytes(self):
-        """
+        """ how many bytes the paramters use up
 
-        :return:
+        :return: int
         """
         parameters = self.get_input_type_parameters()
         return utility_calls.get_parameters_size_in_bytes(parameters)

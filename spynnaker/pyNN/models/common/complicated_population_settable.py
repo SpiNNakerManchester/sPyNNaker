@@ -9,6 +9,7 @@ from abc import abstractmethod
 class ComplicatedPopulationSettable(
     SimplePopulationSettable,
     AbstractRequiresRewriteDataRegionsApplicationVertex):
+
     def __init__(self):
         SimplePopulationSettable.__init__(self)
         AbstractRequiresRewriteDataRegionsApplicationVertex.__init__(self)

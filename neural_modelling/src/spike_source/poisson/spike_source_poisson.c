@@ -166,10 +166,13 @@ void print_spike_sources(){
             log_info("atom %d", s);
             log_info("scaled_start = %u", spike_source_array[s].start_ticks);
             log_info("scaled end = %u", spike_source_array[s].end_ticks);
-            log_info("is_fast_source = %d", spike_source_array[s].is_fast_source);
-            log_info("exp_minus_lamda = %k", (REAL)(spike_source_array[s].exp_minus_lambda));
+            log_info("is_fast_source = %d",
+                     spike_source_array[s].is_fast_source);
+            log_info("exp_minus_lamda = %k",
+                     (REAL)(spike_source_array[s].exp_minus_lambda));
             log_info("isi_val = %k", spike_source_array[s].mean_isi_ticks);
-            log_info("time_to_spike = %k", spike_source_array[s].time_to_spike_ticks);
+            log_info("time_to_spike = %k",
+                     spike_source_array[s].time_to_spike_ticks);
         }
     }
 }

@@ -114,3 +114,20 @@ class AbstractNeuronModel(object):
         """
         neural_parameters = self.get_neural_parameters()
         return utility_calls.get_parameters_size_in_bytes(neural_parameters)
+
+    @abstractmethod
+    def set_global_parameters(self, parameters):
+        """ sets any global parameters
+
+        :param parameters: the parameters in a list.
+        :return: None
+        """
+
+    @abstractmethod
+    def set_neural_parameters(self, neural_parameters, vertex_slice):
+        """ sets the neural parameters
+
+        :param neural_parameters: the neural parameters in a list
+        :param vertex_slice: the slice of atoms for this vertex
+        :return: None
+        """

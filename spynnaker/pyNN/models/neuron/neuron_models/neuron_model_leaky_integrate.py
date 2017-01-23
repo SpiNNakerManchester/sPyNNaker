@@ -1,4 +1,5 @@
 from pacman.executor.injection_decorator import inject_items
+from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
@@ -81,10 +82,13 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
         return numpy.exp(float(-machine_time_step) /
                          (1000.0 * self._tau_m))
 
+    @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
         return 5
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_neural_parameters,
+               additional_arguments={'machine_time_step'})
     def get_neural_parameters(self, machine_time_step):
         return [
 
@@ -111,16 +115,20 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
             NeuronParameter(self._i_offset, DataType.S1615)
         ]
 
+    @overrides(AbstractNeuronModel.get_n_global_parameters)
     def get_n_global_parameters(self):
         return 0
 
+    @overrides(AbstractNeuronModel.get_global_parameters)
     def get_global_parameters(self):
         return []
 
+    @overrides(AbstractNeuronModel.set_global_parameters)
     def set_global_parameters(self, parameters):
         # don't have any
         pass
 
+    @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
         position_in_data = 0
         for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):

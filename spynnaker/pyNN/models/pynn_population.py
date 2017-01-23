@@ -1,15 +1,8 @@
-import struct
-
 from pacman.model.constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from spinnman.messages.sdp.sdp_header import SDPHeader
-from spinnman.messages.sdp.sdp_message import SDPMessage
-from spynnaker.pyNN.models.common.complicated_population_settable import \
-    ComplicatedPopulationSettable
 from pacman.executor import injection_decorator
-from spynnaker.pyNN.utilities import constants
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
@@ -24,6 +17,8 @@ from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
     import AbstractGSynRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
     import AbstractVRecordable
+from spynnaker.pyNN.models.common.complicated_population_settable import \
+    ComplicatedPopulationSettable
 
 from spinn_front_end_common.utilities import exceptions
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
@@ -622,6 +617,10 @@ class Population(object):
             self._vertex.set_value(key, value)
 
     def _handle_complicated_setters(self):
+        """ reads and stores neuron parameters from the machine.
+
+        :return: None
+        """
 
         # update injectables so that the parameters needed are stored
         inputs = dict()

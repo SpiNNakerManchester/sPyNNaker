@@ -1,4 +1,5 @@
 from pacman.executor.injection_decorator import inject_items
+from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
@@ -89,10 +90,13 @@ class NeuronModelIzh(AbstractNeuronModel):
         self._u_init = utility_calls.convert_param_to_numpy(
             u_init, self._n_neurons)
 
+    @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
         return 8
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_neural_parameters,
+               additional_arguments={'machine_time_step'})
     def get_neural_parameters(self, machine_time_step):
         return [
 
@@ -123,19 +127,24 @@ class NeuronModelIzh(AbstractNeuronModel):
             NeuronParameter(machine_time_step / 1000.0, DataType.S1615)
         ]
 
+    @overrides(AbstractNeuronModel.get_n_global_parameters)
     def get_n_global_parameters(self):
         return 1
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_global_parameters,
+               additional_arguments={'machine_time_step'})
     def get_global_parameters(self, machine_time_step):
         return [
             NeuronParameter(machine_time_step / 1000.0, DataType.S1615)
         ]
 
+    @overrides(AbstractNeuronModel.set_global_parameters)
     def set_global_parameters(self, parameters):
         # this one is not really required, as its not a internal value.
         pass
 
+    @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
         position_in_data = 0
         for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
