@@ -28,7 +28,7 @@ projections = list()
 weight_to_spike = 2.0
 delay = 17
 
-stim_dur = 5000.0
+stim_dur = 10000.0
 rate = 2.0
 rate_2 = 200.0
 stim_dur_2 = 2000.0
