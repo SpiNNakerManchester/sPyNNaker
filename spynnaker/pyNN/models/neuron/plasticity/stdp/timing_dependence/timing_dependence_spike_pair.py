@@ -5,6 +5,9 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
     .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
     .synapse_structure_weight_only import SynapseStructureWeightOnly
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
+    .synapse_structure_weight_eligibility_trace import\
+    SynapseStructureWeightEligibilityTrace
 from data_specification.enums.data_type import DataType
 
 
@@ -28,7 +31,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self._tau_d = tau_d
         self._nearest = nearest
 
-        self._synapse_structure = SynapseStructureWeightOnly()
+        self._synapse_structure = SynapseStructureWeightEligibilityTrace()
 
         # provenance data
         self._tau_plus_last_entry = None
