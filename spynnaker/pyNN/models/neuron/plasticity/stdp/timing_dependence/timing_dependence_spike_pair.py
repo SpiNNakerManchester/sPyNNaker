@@ -25,7 +25,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self._tau_d = tau_d
         self._nearest = nearest
 
-        self._synapse_structure = SynapseStructureWeightOnly()
+        self._synapse_structure = SynapseStructureWeightEligibilityTrace()
 
         # provenance data
         self._tau_plus_last_entry = None
