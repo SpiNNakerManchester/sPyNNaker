@@ -253,7 +253,7 @@ void _dma_complete_callback(uint unused, uint tag) {
             3. Probabilistically create or remove it
             4. Write back the synaptic row
         */
-        synapse_check();
+        synaptic_row_restructure();
     } else {
 
         // Otherwise, if it ISN'T the result of a plastic region write
