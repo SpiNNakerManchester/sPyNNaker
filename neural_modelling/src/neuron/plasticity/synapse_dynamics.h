@@ -27,4 +27,8 @@ void synapse_dynamics_print_plastic_synapses(
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
 
+bool check_plastic_neuron_id(uint32_t id, uint32_t *row);
+bool remove_plastic_neuron_with_id(uint32_t id, uint32_t *row);
+bool add_plastic_neuron_with_id(uint32_t id, uint32_t *row, uint32_t weight, uint32_t delay);
+
 #endif // _SYNAPSE_DYNAMICS_H_

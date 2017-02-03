@@ -20,6 +20,7 @@
 
 #include "../../../common/neuron-typedefs.h"
 
+#include "../../plasticity/synapse_dynamics.h"
 
 //---------------------------------------
 // Structures and global data
