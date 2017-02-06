@@ -13,9 +13,7 @@
 #include <string.h>
 #include <debug.h>
 
-#ifdef SYNAPSE_BENCHMARK
-  uint32_t num_plastic_pre_synaptic_events = 0;
-#endif  // SYNAPSE_BENCHMARK
+uint32_t num_plastic_pre_synaptic_events = 0;
 
 //---------------------------------------
 // Macros
@@ -223,9 +221,7 @@ bool synapse_dynamics_process_plastic_synapses(
     size_t plastic_synapse = synapse_row_num_plastic_controls(
         fixed_region_address);
 
-#ifdef SYNAPSE_BENCHMARK
     num_plastic_pre_synaptic_events += plastic_synapse;
-#endif  // SYNAPSE_BENCHMARK
 
     // Get event history from synaptic row
     pre_event_history_t *event_history = _plastic_event_history(
@@ -303,9 +299,5 @@ input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index)
 }
 
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
-#ifdef SYNAPSE_BENCHMARK
     return num_plastic_pre_synaptic_events;
-#else
-    return 0;
-#endif  // SYNAPSE_BENCHMARK
 }
