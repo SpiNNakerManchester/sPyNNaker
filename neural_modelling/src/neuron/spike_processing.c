@@ -198,7 +198,7 @@ void _user_event_callback(uint unused0, uint unused1) {
 void _dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
-    log_info("DMA transfer complete with tag %u", tag);
+    log_debug("DMA transfer complete with tag %u", tag);
 
     // If this DMA is the result of a read
     if (tag == DMA_TAG_READ_SYNAPTIC_ROW) {
@@ -253,7 +253,7 @@ void _dma_complete_callback(uint unused, uint tag) {
             3. Probabilistically create or remove it
             4. Write back the synaptic row
         */
-        synapse_check();
+        synaptic_row_restructure();
     } else {
 
         // Otherwise, if it ISN'T the result of a plastic region write

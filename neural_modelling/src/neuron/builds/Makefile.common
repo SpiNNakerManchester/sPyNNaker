@@ -83,10 +83,12 @@ SYNAPSE_TYPE_SOURCES += $(SOURCE_DIR)/neuron/c_main.c \
                         $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c \
                         $(SYNAPTOGENESIS_DYNAMICS)
 
-
+STDP_ENABLED = 0
 ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c)             
     STDP += $(SYNAPSE_DYNAMICS) \
-            $(SOURCE_DIR)/neuron/plasticity/common/post_events.c
+            $(SOURCE_DIR)/neuron/plasticity/common/post_events.c \
+            $(SYNAPTOGENESIS_DYNAMICS)
+    STDP_ENABLED = 1
 endif
 
 include ../../../Makefile.common
@@ -96,6 +98,7 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
 	        $$(CFLAGS) \
+	        -DSTDP_ENABLED=$(STDP_ENABLED) \
 	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
 endef
 
@@ -105,6 +108,7 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
 	      $$(CFLAGS) \
+	      -DSTDP_ENABLED=$(STDP_ENABLED) \
 	      -include $$(SYNAPSE_TYPE_H) \
 	      -include $$(WEIGHT_DEPENDENCE_H) \
 	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<

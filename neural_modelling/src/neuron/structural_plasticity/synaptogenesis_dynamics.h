@@ -12,7 +12,7 @@ address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address)
 
 address_t synaptogenesis_dynamics_elimination_rule(address_t synaptic_row_address);
 
-void synapse_check();
+void synaptic_row_restructure();
 
 int32_t get_p_rew();
 

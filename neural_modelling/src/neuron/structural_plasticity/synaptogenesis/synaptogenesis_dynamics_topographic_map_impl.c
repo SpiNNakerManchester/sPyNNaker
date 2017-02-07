@@ -8,6 +8,7 @@
 //#include "../../../common/maths-util.h"
 #include "../../population_table/population_table.h"
 
+
 #include <random.h>
 #include <spin1_api.h>
 #include <debug.h>
@@ -15,6 +16,11 @@
 
 #include "../../synapse_row.h"
 #include "../../synapses.h"
+
+
+#include "../../../common/neuron-typedefs.h"
+
+#include "../../plasticity/synapse_dynamics.h"
 
 //---------------------------------------
 // Structures and global data
@@ -68,6 +74,12 @@ typedef struct {
 } current_state_t;
 
 current_state_t current_state;
+
+//typedef struct {
+//
+//} synaptic_row_pointers_t;
+//synaptic_row_pointers_t synaptic_row_pointers
+
 //---------------------------------------
 // Initialisation
 //---------------------------------------
@@ -133,10 +145,8 @@ address_t synaptogenesis_dynamics_initialise(
                 rewiring_data.s_max * sizeof(uint32_t));
     if (rewiring_dma_buffer.row == NULL) {
         log_error("Could not initialise DMA buffers");
-        rte_error(RTE_SWERR);
+        rt_error(RTE_SWERR);
     }
-    log_info(
-        "REWIRING DMA buffer %u allocated at 0x%08x", i, rewiring_dma_buffer.row);
 
     log_info("Synaptogenesis init complete.");
     return (address_t)sp_word;
@@ -190,20 +200,56 @@ void synaptogenesis_dynamics_rewire(){
     current_state.pre_syn_id = choice;
     current_state.post_syn_id = post_id;
 
-    log_info("Reading %d bytes from %d -- saved to %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
-//
-//    spin1_dma_transfer(
-//        DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
-//        n_bytes);
+    log_debug("Reading %d bytes from %d -- saved to %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
+
+    spin1_dma_transfer(
+        DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
+        n_bytes);
 }
 
-// Might need to function for rewiring. One to be called by the timer to generate
+// Might need a function for rewiring. One to be called by the timer to generate
 // a fake spike and trigger a dma callback
 // and one to be called by the dma callback and then call formation or elimination
-void synapse_check(){
-    log_info("Check the synapse and do rewiring!");
-    rt_error(RTE_SWERR);
+void synaptic_row_restructure(){
+    /*
+        I need to know the structure of the row, know where to look for the postsynaptic neuron id.
+            -- I need to use synapse_row_fixed_region(row) to retrieve the fixed region within the row  ✓
+            -- then, synapse_row_plastic_controls(fixed) to retrieve the "controls" ✓
+            -- also, figure out what type of weight struct is being used, to reclaim the sizeof(weights) ✓
+        Then
+            if this neuron id exists
+                remove it
+                update count values (how many neurons etc)
+                    // Within the fixed-region extracted using the above API, fixed[0]
+                    // Contains the number of 32-bit fixed synaptic words, fixed[1]
+                    // Contains the number of 16-bit plastic synapse control words
+                remove weight
+                shift data around so it is contiguous
+            else
+                add the id to the structure storing ids (presumably at the end of the structure)
+                add its weight to the structure storing the weight
+                update count values
+                    // Within the fixed-region extracted using the above API, fixed[0]
+                    // Contains the number of 32-bit fixed synaptic words, fixed[1]
+                    // Contains the number of 16-bit plastic synapse control words
 
+         There could be some timing related issues, i.e. I need to remove the trace information for the specific
+         neuron I'm removing / add specific timing info for new neurons.
+
+    */
+    // If I am here, then the DMA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
+    // the selected pre and postsynaptic ids are in current_state
+    // typedef uint32_t size_t;
+    address_t fixed_region = synapse_row_fixed_region(rewiring_dma_buffer.row);
+    address_t plastic_region = synapse_row_plastic_region(rewiring_dma_buffer.row);
+    control_t* plastic_controls = synapse_row_plastic_controls(fixed_region);
+//    weight_state_t weight_state;
+//    log_info("SIZEOF(weight_state) = %d", sizeof(weight_state));
+    #if STDP_ENABLED == 1
+//    weight_state_t weight_state;
+//    log_info("a2 = %d", weight_state.a2_plus);
+    log_info("plastic_synapse_t = %d", sizeof(plastic_synapse_t));
+    #endif
 }
 
  /*
