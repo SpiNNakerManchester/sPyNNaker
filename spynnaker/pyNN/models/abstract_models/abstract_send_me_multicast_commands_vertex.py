@@ -6,16 +6,15 @@ from abc import ABCMeta
 class AbstractSendMeMulticastCommandsVertex(object):
     """ A vertex which wants to commands to be sent to it as multicast packets
         at fixed points in the simulation
+
+        :param commands: The commands that the vertex expects to be transmitted
+
+            iterable of\
+                    py:class:`spinn_front_end_common.utility_models.\
+                    multi_cast_command.MultiCastCommand`
     """
 
     def __init__(self, commands):
-        """
-
-        :param commands: The commands that the vertex expects to be transmitted
-        :type commands: iterable of \
-                    py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
-        :raise None: does not raise any known exceptions
-        """
         self._commands = commands
 
     @property

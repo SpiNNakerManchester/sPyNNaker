@@ -7,17 +7,11 @@ from abc import ABCMeta
 class AbstractVertexWithEdgeToDependentVertices(object):
     """ A vertex with a dependent vertices, which should be connected to this\
         vertex by an edge directly to each of them
+
+        :param dependent_vertices: The vertex which this vertex depends upon
     """
 
     def __init__(self, dependent_vertices, edge_partition_identifier):
-        """
-
-        :param dependent_vertices: The vertex which this vertex depends upon
-        :type dependent_vertices: iterable of vertices
-        :return: None
-        :rtype: None
-        :raise None: this method does not raise any known exception
-        """
         self._dependent_vertices = dependent_vertices
         self._edge_partition_identifier = edge_partition_identifier
 
