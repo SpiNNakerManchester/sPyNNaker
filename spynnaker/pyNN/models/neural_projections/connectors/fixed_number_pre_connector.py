@@ -10,6 +10,11 @@ logger = logging.getLogger(__file__)
 class FixedNumberPreConnector(AbstractConnector):
     """ Connects a fixed number of pre-synaptic neurons selected at random,
         to all post-synaptic neurons
+    """
+    def __init__(
+            self, n, weights=0.0, delays=1, allow_self_connections=True,
+            space=None, safe=True, verbose=False):
+        """
 
         :param `int` n:
             number of random pre-synaptic neurons connected to output
@@ -28,10 +33,7 @@ class FixedNumberPreConnector(AbstractConnector):
         :param `pyNN.Space` space:
             a Space object, needed if you wish to specify distance-
             dependent weights or delays - not implemented
-    """
-    def __init__(
-            self, n, weights=0.0, delays=1, allow_self_connections=True,
-            space=None, safe=True, verbose=False):
+        """
         AbstractConnector.__init__(self, safe, space, verbose)
         self._n_pre = n
         self._weights = weights

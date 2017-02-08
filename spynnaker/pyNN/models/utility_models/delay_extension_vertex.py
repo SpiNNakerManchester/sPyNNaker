@@ -60,6 +60,9 @@ class DelayExtensionVertex(
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
                  label="DelayExtension"):
+        """
+        Creates a new DelayExtension Object.
+        """
         ApplicationVertex.__init__(self, label, constraints, 256)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractProvidesNKeysForPartition.__init__(self)

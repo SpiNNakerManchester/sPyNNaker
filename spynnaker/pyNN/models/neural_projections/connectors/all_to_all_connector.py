@@ -10,6 +10,12 @@ logger = logging.getLogger(__file__)
 class AllToAllConnector(AbstractConnector):
     """ Connects all cells in the presynaptic population to all cells in \
         the postsynaptic population
+    """
+
+    def __init__(
+            self, weights=0.0, delays=1, allow_self_connections=True,
+            space=None, safe=True, verbose=None):
+        """
 
         :param `bool` allow_self_connections:
             if the connector is used to connect a
@@ -23,10 +29,6 @@ class AllToAllConnector(AbstractConnector):
         :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
             will be set to the global minimum delay.
     """
-
-    def __init__(
-            self, weights=0.0, delays=1, allow_self_connections=True,
-            space=None, safe=True, verbose=None):
         AbstractConnector.__init__(self, safe, space, verbose)
         self._weights = weights
         self._delays = delays

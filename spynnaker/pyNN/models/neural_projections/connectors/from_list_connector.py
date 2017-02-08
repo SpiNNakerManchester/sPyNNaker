@@ -25,6 +25,9 @@ class FromListConnector(AbstractConnector):
         ("weight", "float64"), ("delay", "float64")]
 
     def __init__(self, conn_list, safe=True, verbose=False):
+        """
+        Creates a new FromListConnector.
+        """
         AbstractConnector.__init__(self, safe, None, verbose)
         if conn_list is None or len(conn_list) == 0:
             self._conn_list = numpy.zeros(0, dtype=self.CONN_LIST_DTYPE)

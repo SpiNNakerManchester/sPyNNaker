@@ -9,18 +9,20 @@ class OneToOneConnector(AbstractConnector):
     Where the pre- and postsynaptic populations have the same size, connect
     cell i in the presynaptic pynn_population.py to cell i in the postsynaptic
     pynn_population.py for all i.
-
-    :param weights:
-        may either be a float, a !RandomDistribution object, a list/
-        1D array with at least as many items as connections to be
-        created. Units nA.
-    :param delays:
-        as `weights`. If `None`, all synaptic delays will be set
-        to the global minimum delay.
     """
 
     def __init__(
             self, weights=0.0, delays=1, space=None, safe=True, verbose=False):
+        """
+        :param weights:
+            may either be a float, a !RandomDistribution object, a list/
+            1D array with at least as many items as connections to be
+            created. Units nA.
+        :param delays:
+            as `weights`. If `None`, all synaptic delays will be set
+            to the global minimum delay.
+
+        """
         AbstractConnector.__init__(self, safe, space, verbose)
         self._weights = weights
         self._delays = delays

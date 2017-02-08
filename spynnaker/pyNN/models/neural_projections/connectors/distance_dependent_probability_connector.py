@@ -28,6 +28,12 @@ logger = logging.getLogger(__name__)
 
 class DistanceDependentProbabilityConnector(AbstractConnector):
     """ Make connections using a distribution which varies with distance.
+    """
+
+    def __init__(self, d_expression, allow_self_connections=True,
+                 weights=0.0, delays=1, space=Space(), safe=True,
+                 verbose=False, n_connections=None):
+        """
 
         :param `string` d_expression:
             the right-hand side of a valid python expression for
@@ -50,11 +56,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             dependent weights or delays
         :param `int` n_connections:
             The number of efferent synaptic connections per neuron.
-    """
-
-    def __init__(self, d_expression, allow_self_connections=True,
-                 weights=0.0, delays=1, space=Space(), safe=True,
-                 verbose=False, n_connections=None):
+        """
         AbstractConnector.__init__(self, safe, space, verbose)
         self._d_expression = d_expression
         self._allow_self_connections = allow_self_connections

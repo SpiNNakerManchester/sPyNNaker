@@ -27,6 +27,9 @@ class MultapseConnector(AbstractConnector):
     def __init__(
             self, num_synapses, weights=0.0, delays=1,
             safe=True, verbose=False):
+        """
+        Creates a new connector.
+        """
         AbstractConnector.__init__(self, safe, None, verbose)
         self._num_synapses = num_synapses
         self._weights = weights
