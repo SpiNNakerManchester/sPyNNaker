@@ -49,7 +49,7 @@ class AbstractMasterPopTableFactory(object):
                     :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
         :param master_pop_table_region: the region to which the master pop\
                     table is being stored
-        :param is_single True if this is a single synapse, False otherwise
+        :param is_single: True if this is a single synapse, False otherwise
         :return:
         """
 

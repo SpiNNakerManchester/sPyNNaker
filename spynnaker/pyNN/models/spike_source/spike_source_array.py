@@ -136,6 +136,7 @@ class SpikeSourceArray(
     def spike_times(self, spike_times):
         """ Set the spike source array's spike times. Not an extend, but an\
             actual change
+
         :param spike_times:
         :return:
         """

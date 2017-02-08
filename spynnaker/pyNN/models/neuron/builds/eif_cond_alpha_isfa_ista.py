@@ -4,7 +4,6 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex \
 
 
 class EIFConductanceAlphaPopulation(AbstractPopulationVertex):
-
     """ Exponential integrate and fire neuron with spike triggered and \
         sub-threshold adaptation currents (isfa, ista reps.)
     """

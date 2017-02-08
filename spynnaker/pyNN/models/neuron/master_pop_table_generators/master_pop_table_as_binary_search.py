@@ -57,7 +57,7 @@ class _MasterPopEntry(object):
     @property
     def addresses_and_row_lengths(self):
         """
-        :return: the memory address that this master pop entry points at
+        :return: the memory address that this master pop entry points at\
         (synaptic matrix)
         """
         return self._addresses_and_row_lengths
@@ -187,7 +187,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param row_length: how long in bytes each synaptic entry is
         :param key_and_mask: the key and mask for this master pop entry
         :param master_pop_table_region: the region id for the master pop
-        :param is_single: flag that states if the entry is a direct entry for
+        :param is_single: flag that states if the entry is a direct entry for\
         a single row.
         :return: None
         """
@@ -205,6 +205,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Completes any operations required after all entries have been added
+
         :param spec: the writer for the dsg
         :param master_pop_table_region: the region to which the master pop\
                 resides in
@@ -309,7 +310,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         """ searches the binary tree structure for the correct entry.
 
         :param key: the key to search the master pop table for a given entry
-        :return the entry for this given key
+        :return: the entry for this given key
         :rtype: _MasterPopEntry
         """
         imin = 0

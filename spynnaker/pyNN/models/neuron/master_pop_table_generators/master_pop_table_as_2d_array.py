@@ -106,7 +106,6 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
         :param spec:
         :param master_population_table_region:
-        :return:
         """
         # Zero all entries in the Master Population Table so that all unused
         # entries are assumed empty:
@@ -230,23 +229,25 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         """
         Writes an entry in the Master Population Table for the newly
         created synaptic block.
+
         An entry in the table is a 16-bit value, with the following structure:
-        Bits [2:0]  Row length information. This value (from 0->7)
-                    indicates the maximum number of synapses in this
-                    block. It is translated in the row length translation
-                    table by the executing code each time the table is
-                    accessed, to calculate offsets.
-        Bits [15:3] Address within the synaptic matrix region of the
-                    start of the block. This is 1K bytes aligned, so
-                    the true value is found by shifting left by 7 bits
-                    then adding the start address of the memory region.
+        * Bits [2:0]  Row length information. This value (from 0->7)\
+            indicates the maximum number of synapses in this\
+            block. It is translated in the row length translation\
+            table by the executing code each time the table is\
+            accessed, to calculate offsets.
+        * Bits [15:3] Address within the synaptic matrix region of the\
+            start of the block. This is 1K bytes aligned, so\
+            the true value is found by shifting left by 7 bits\
+            then adding the start address of the memory region.
+
         :param spec:
         :param block_start_addr:
         :param row_length:
         :param key_and_mask:
         :param mask:
         :param master_pop_table_region:
-        :param is_single True if this is a single synapse, False otherwise
+        :param is_single: True if this is a single synapse, False otherwise
         :return:
         """
         # Which core has this projection arrived from?

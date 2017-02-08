@@ -117,12 +117,9 @@ _binary_search_paths = []
 
 
 def register_binary_search_path(search_path):
-    """
-    :param search_path:
-    Registers an additional binary search path for
-        for executables
+    """Registers an additional binary search path for executables
 
-    absolute search path for binaries
+    :param search_path: absolute search path for binaries
     """
     executable_finder.add_path(search_path)
 
@@ -224,6 +221,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
     """ Sets a ceiling on the number of neurons of a given type that can be\
         placed on a single core.
+
     :param neuron_type:
     :param max_permitted:
     """
@@ -294,6 +292,7 @@ def Projection(presynaptic_population, postsynaptic_population,
 
 def NativeRNG(seed_value):
     """ Fixes the random number generator's seed
+
     :param seed_value:
     :return:
     """

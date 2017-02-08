@@ -42,7 +42,6 @@ class Population(object):
         a spatial structure
     :param string label:
         a label identifying the Population
-    :returns a list of vertexes and edges
     """
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
@@ -204,13 +203,12 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids, time and synaptic
+        Return a 3-column numpy array containing cell ids, time and synaptic\
         conductances for recorded cells.
-        :param gather:
-            not used - inserted to match PyNN specs
+
+        :param gather: not used - inserted to match PyNN specs
         :type gather: bool
-        :param compatible_output:
-            not used - inserted to match PyNN specs
+        :param compatible_output: not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
 
@@ -242,14 +240,12 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids, time, and V_m for
+        Return a 3-column numpy array containing cell ids, time, and V_m for\
         recorded cells.
 
-        :param gather:
-            not used - inserted to match PyNN specs
+        :param gather: not used - inserted to match PyNN specs
         :type gather: bool
-        :param compatible_output:
-            not used - inserted to match PyNN specs
+        :param compatible_output: not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
         if isinstance(self._vertex, AbstractVRecordable):
@@ -310,6 +306,7 @@ class Population(object):
     def is_local(cell_id):
         """ Determine whether the cell with the given ID exists on the local \
             MPI node.
+
         :param cell_id:
         """
 
@@ -393,7 +390,7 @@ class Population(object):
         """ Set initial membrane potentials for all the cells in the\
             population to random values.
 
-        :param `pyNN.random.RandomDistribution` distribution:
+        :param `pyNN.random.RandomDistribution` distribution:\
             the distribution used to draw random values.
 
         """
@@ -477,6 +474,7 @@ class Population(object):
     # noinspection PyPep8Naming
     def printSpikes(self, filename, gather=True):
         """ Write spike time information from the population to a given file.
+
         :param filename: the absolute file path for where the spikes are to\
                     be printed in
         :param gather: Supported from the PyNN language, but ignored here
@@ -502,6 +500,7 @@ class Population(object):
 
     def print_gsyn(self, filename, gather=True):
         """ Write conductance information from the population to a given file.
+
         :param filename: the absolute file path for where the gsyn are to be\
                     printed in
         :param gather: Supported from the PyNN language, but ignored here
@@ -527,6 +526,7 @@ class Population(object):
     def print_v(self, filename, gather=True):
         """ Write membrane potential information from the population to a\
             given file.
+
         :param filename: the absolute file path for where the voltage are to\
                      be printed in
         :param gather: Supported from the PyNN language, but ignored here
@@ -563,6 +563,7 @@ class Population(object):
     def sample(self, n, rng=None):
         """ Return a random selection of neurons from a population in the form\
             of a population view
+
         :param n: the number of neurons to sample
         :param rng: the random number generator to use.
         """
@@ -572,6 +573,7 @@ class Population(object):
 
     def save_positions(self, file):  # @ReservedAssignment
         """ Save positions to file.
+
             :param file: the file to write the positions to.
         """
         file_handle = open(file, "w")
@@ -588,6 +590,7 @@ class Population(object):
 
           p.set("tau_m", 20.0).
           p.set({'tau_m':20, 'v_rest':-65})
+
         :param parameter: the parameter to set
         :param value: the value of the parameter to set.
         """
@@ -689,6 +692,7 @@ class Population(object):
     def tset(self, parametername, value_array):
         """ 'Topographic' set. Set the value of parametername to the values in\
             value_array, which must have the same dimensions as the Population.
+
         :param parametername: the name of the parameter
         :param value_array: the array of values which must have the correct\
                 number of elements.

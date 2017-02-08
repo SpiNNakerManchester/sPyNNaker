@@ -236,6 +236,7 @@ class SpikeSourcePoisson(
     @staticmethod
     def get_params_bytes(vertex_slice):
         """ Gets the size of the poisson parameters in bytes
+
         :param vertex_slice:
         """
         return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS +
@@ -246,6 +247,7 @@ class SpikeSourcePoisson(
     def reserve_memory_regions(spec, poisson_params_sz, vertex):
         """ Reserve memory regions for poisson source parameters and output\
             buffer.
+
         :param spec:
         :param setup_sz:
         :param poisson_params_sz:
