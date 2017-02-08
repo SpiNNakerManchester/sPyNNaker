@@ -186,13 +186,8 @@ static bool initialise(uint32_t *timer_period) {
 //! \brief the function to call when resuming a simulation
 //! return None
 void resume_callback() {
-    // restart the recording status
-    address_t address = data_specification_get_data_address();
-    if (!initialise_recording(
-            data_specification_get_region(RECORDING_REGION, address))) {
-        log_error("Error setting up recording");
-        rt_error(RTE_SWERR);
-    }
+    recording_reset();
+
     // reread neuron parameters
     log_info("received reloading neuron parameter command");
 
@@ -205,6 +200,7 @@ void resume_callback() {
     }
 
     log_info("successfully reloaded the neuron parameters");
+
 }
 
 //! \brief Timer interrupt callback

@@ -329,7 +329,7 @@ static bool initialize(uint32_t *timer_period) {
 //! \brief runs any functions needed at resume time.
 //! \return None
 void resume_callback() {
-    initialise_recording();
+    recording_reset();
 
     address_t address = data_specification_get_data_address();
 
