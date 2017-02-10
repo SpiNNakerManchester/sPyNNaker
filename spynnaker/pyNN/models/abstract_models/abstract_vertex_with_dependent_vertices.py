@@ -14,9 +14,6 @@ class AbstractVertexWithEdgeToDependentVertices(object):
 
         :param dependent_vertices: The vertex which this vertex depends upon
         :type dependent_vertices: iterable of vertices
-        :return: None
-        :rtype: None
-        :raise None: this method does not raise any known exception
         """
         self._dependent_vertices = dependent_vertices
         self._edge_partition_identifier = edge_partition_identifier
@@ -24,7 +21,6 @@ class AbstractVertexWithEdgeToDependentVertices(object):
     @property
     def dependent_vertices(self):
         """ Return the vertices which this vertex depends upon
-        :return:
         """
         return self._dependent_vertices
 

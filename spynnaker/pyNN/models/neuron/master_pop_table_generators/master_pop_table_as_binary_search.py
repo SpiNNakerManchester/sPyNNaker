@@ -171,7 +171,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param spec: the dsg writer
         :param master_population_table_region: the region in memory that the\
                 master pop table will be written in
-        :return:
+        :rtype: None
         """
         self._entries = dict()
         self._n_addresses = 0
@@ -189,7 +189,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param master_pop_table_region: the region id for the master pop
         :param is_single: flag that states if the entry is a direct entry for\
         a single row.
-        :return: None
+        :rtype: None
         """
         if key_and_mask.key not in self._entries:
             self._entries[key_and_mask.key] = _MasterPopEntry(
@@ -209,7 +209,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param spec: the writer for the dsg
         :param master_pop_table_region: the region to which the master pop\
                 resides in
-        :return: None
+        :rtype: None
         """
 
         spec.switch_write_focus(region=master_pop_table_region)
@@ -330,6 +330,5 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def get_edge_constraints(self):
         """ Returns any constraints placed on the edges because of having this\
             master pop table implemented in the cores.
-        :return:
         """
         return list()

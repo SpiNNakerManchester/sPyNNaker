@@ -139,7 +139,6 @@ def end():
 def get_spynnaker():
     """helper method for other plugins to add stuff to the graph
 
-    :return:
     """
     global _spinnaker
     return _spinnaker
@@ -192,7 +191,6 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     :param database_socket_addresses:
     :param n_chips_required: The number of chips required for the simulation
     :param extra_params:
-    :return:
     """
     global _spinnaker
     global _binary_search_paths
@@ -222,8 +220,6 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     """ Sets a ceiling on the number of neurons of a given type that can be\
         placed on a single core.
 
-    :param neuron_type:
-    :param max_permitted:
     """
     if not inspect.isclass(neuron_type):
         if neuron_type in globals():
@@ -242,10 +238,6 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
 def register_database_notification_request(hostname, notify_port, ack_port):
     """ Adds a socket system which is registered with the notification protocol
 
-    :param hostname:
-    :param notify_port:
-    :param ack_report:
-    :return:
     """
     _spinnaker._add_socket_address(
         SocketAddress(hostname, notify_port, ack_port))
@@ -253,15 +245,6 @@ def register_database_notification_request(hostname, notify_port, ack_port):
 
 # noinspection PyPep8Naming
 def Population(size, cellclass, cellparams, structure=None, label=None):
-    """
-
-    :param size:
-    :param cellclass:
-    :param cellparams:
-    :param structure:
-    :param label:
-    :return:
-    """
     global _spinnaker
     return _spinnaker.create_population(size, cellclass, cellparams,
                                         structure, label)
@@ -271,18 +254,6 @@ def Population(size, cellclass, cellparams, structure=None, label=None):
 def Projection(presynaptic_population, postsynaptic_population,
                connector, source=None, target='excitatory',
                synapse_dynamics=None, label=None, rng=None):
-    """
-
-    :param presynaptic_population:
-    :param postsynaptic_population:
-    :param connector:
-    :param source:
-    :param target:
-    :param synapse_dynamics:
-    :param label:
-    :param rng:
-    :return:
-    """
     global _spinnaker
 
     return _spinnaker.create_projection(
@@ -293,8 +264,6 @@ def Projection(presynaptic_population, postsynaptic_population,
 def NativeRNG(seed_value):
     """ Fixes the random number generator's seed
 
-    :param seed_value:
-    :return:
     """
     numpy.random.seed(seed_value)
 
@@ -302,7 +271,6 @@ def NativeRNG(seed_value):
 def get_current_time():
     """
     returns the machine time step defined in setup
-    :return:
     """
     global _spinnaker
     if _spinnaker is None:
@@ -344,7 +312,6 @@ def connect(source, target, weight=0.0, delay=None, synapse_type="excitatory",
 
 def get_time_step():
     """ The timestep requested
-    :return:
     """
     global _spinnaker
     if _spinnaker is None:
@@ -357,7 +324,6 @@ def get_time_step():
 
 def get_min_delay():
     """ The minimum allowed synaptic delay.
-    :return:
     """
     global _spinnaker
     if _spinnaker is None:
@@ -370,7 +336,6 @@ def get_min_delay():
 
 def get_max_delay():
     """ The maximum allowed synaptic delay.
-    :return:
     """
     global _spinnaker
     if _spinnaker is None:

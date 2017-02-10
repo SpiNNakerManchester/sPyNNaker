@@ -124,7 +124,6 @@ class Population(object):
     @property
     def default_parameters(self):
         """ The default parameters of the vertex from this population
-        :return:
         """
         return self._vertex.default_parameters
 
@@ -685,7 +684,6 @@ class Population(object):
     @property
     def size(self):
         """ The number of neurons in the population
-        :return:
         """
         return self._vertex.n_atoms
 

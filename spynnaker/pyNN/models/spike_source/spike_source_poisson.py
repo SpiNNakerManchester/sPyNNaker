@@ -248,11 +248,7 @@ class SpikeSourcePoisson(
         """ Reserve memory regions for poisson source parameters and output\
             buffer.
 
-        :param spec:
-        :param setup_sz:
-        :param poisson_params_sz:
-        :return:
-        """
+         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
@@ -280,10 +276,6 @@ class SpikeSourcePoisson(
             time_scale_factor):
         """ Generate Neuron Parameter data for Poisson spike sources
 
-        :param spec:
-        :param key:
-        :param num_neurons:
-        :return:
         """
         spec.comment("\nWriting Neuron Parameters for {} poisson sources:\n"
                      .format(vertex_slice.n_atoms))
