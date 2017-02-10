@@ -22,7 +22,7 @@ def generate_synaptic_matrix_reports(
     :param common_report_directory: the location for these reports
     :param machine_graph: the machine graph
     :param graph_mapper: the mapping between app and machine graphs.
-    :return: None
+    :rtype: None
     """
 
     if not loaded_application_data_token:

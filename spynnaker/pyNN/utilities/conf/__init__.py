@@ -71,8 +71,6 @@ if machine_spec_file_path != "None":
 def create_directory(directory):
     """
 
-    :param directory:
-    :return:
     """
     if not os.path.exists(directory):
         os.makedirs(directory)
