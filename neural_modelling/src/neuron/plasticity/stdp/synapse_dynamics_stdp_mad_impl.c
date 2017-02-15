@@ -302,3 +302,24 @@ input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index)
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
+
+// TODO Implement these
+int32_t find_plastic_neuron_with_id(uint32_t id, address_t fixed_region){
+    use(id);
+    use(fixed_region);
+    return -1;
+}
+
+bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
+    use(offset);
+    use(row);
+    return false;
+}
+
+bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){
+    use(id);
+    use(row);
+    use(weight);
+    use(delay);
+    return false;
+}

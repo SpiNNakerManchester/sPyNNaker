@@ -394,3 +394,23 @@ uint32_t synapses_get_pre_synaptic_events() {
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
+
+int32_t find_static_neuron_with_id(uint32_t id, address_t fixed_region){
+    use(id);
+    use(fixed_region);
+    return -1;
+}
+
+bool remove_static_neuron_at_offset(uint32_t offset, address_t row){
+    use(offset);
+    use(row);
+    return false;
+}
+
+bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){
+    use(id);
+    use(row);
+    use(weight);
+    use(delay);
+    return false;
+}

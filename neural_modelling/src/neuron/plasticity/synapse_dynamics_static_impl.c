@@ -48,19 +48,19 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
     return 0;
 }
 
-bool check_plastic_neuron_id(uint32_t id, uint32_t *row){
+int32_t find_plastic_neuron_with_id(uint32_t id, address_t fixed_region){
     use(id);
+    use(fixed_region);
+    return -1;
+}
+
+bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
+    use(offset);
     use(row);
     return false;
 }
 
-bool remove_plastic_neuron_with_id(uint32_t id, uint32_t *row){
-    use(id);
-    use(row);
-    return false;
-}
-
-bool add_plastic_neuron_with_id(uint32_t id, uint32_t *row, uint32_t weight, uint32_t delay){
+bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){
     use(id);
     use(row);
     use(weight);
