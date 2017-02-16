@@ -15,7 +15,7 @@ from data_specification.enums.data_type import DataType
 from pacman.model.graphs.application.abstract_application_vertex\
     import AbstractApplicationVertex
 from pacman.model.graphs.common.slice import Slice
-import spynnaker.pyNN.exceptions.SynapticConfigurationException
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
 from spynnaker.pyNN.models.neural_projections.projection_application_edge \
