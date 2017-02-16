@@ -2,7 +2,8 @@ import logging
 import os
 from spinn_machine.utilities.progress_bar import ProgressBar
 
-from spynnaker.pyNN import exceptions, ProjectionApplicationEdge
+from spynnaker.pyNN import ProjectionApplicationEdge
+from spynnaker.pyNN.exceptions import SpynnakerException(
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 
 logger = logging.getLogger(__name__)
@@ -26,7 +27,7 @@ def generate_synaptic_matrix_reports(
     """
 
     if not loaded_application_data_token:
-        raise exceptions.SpynnakerException("Haven't loaded the app data yet.")
+        raise SpynnakerException("Haven't loaded the app data yet.")
 
     top_level_folder = os.path.join(common_report_directory,
                                     "synaptic_matrix_reports")
