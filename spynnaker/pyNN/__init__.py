@@ -105,6 +105,7 @@ import spynnaker
 from pyNN.random import *
 from pyNN.space import *
 import os
+import logging
 
 # traditional logger
 logger = logging.getLogger(__name__)
