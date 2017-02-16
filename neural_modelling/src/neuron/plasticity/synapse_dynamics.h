@@ -3,6 +3,7 @@
 
 #include "../../common/neuron-typedefs.h"
 #include "../synapse_row.h"
+#include "../../common/sp_structs.h"
 
 address_t synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,
@@ -36,7 +37,7 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
 //!         specified postsynaptic id
 //! \return int32 representing the offset of the connection within the
 //!         fixed region (this can be used to when removing the connection)
-int32_t find_plastic_neuron_with_id(uint32_t id, address_t fixed_region);
+bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
 bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row);
 bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay);
 

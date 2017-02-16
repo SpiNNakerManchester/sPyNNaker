@@ -2,6 +2,7 @@
 #define _SYNAPSES_H_
 
 #include "../common/neuron-typedefs.h"
+#include "../common/sp_structs.h"
 #include "synapse_row.h"
 
 // Get the index of the ring buffer for a given timestep, synapse type and
@@ -76,7 +77,7 @@ uint32_t synapses_get_pre_synaptic_events();
 //!         specified postsynaptic id
 //! \return int32 representing the offset of the connection within the
 //!         fixed region (this can be used to when removing the connection)
-int32_t find_static_neuron_with_id(uint32_t id, address_t fixed_region);
+bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
 bool remove_static_neuron_at_offset(uint32_t offset, address_t row);
 bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay);
 

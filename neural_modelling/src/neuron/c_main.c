@@ -245,6 +245,9 @@ void timer_callback(uint timer_count, uint unused) {
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time -= 1;
+
+        log_info("Rewire tries = %d", count_rewires);
+
         return;
     }
 

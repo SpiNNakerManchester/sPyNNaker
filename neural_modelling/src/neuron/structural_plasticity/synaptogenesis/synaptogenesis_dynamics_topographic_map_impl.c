@@ -15,12 +15,16 @@
 #include <stdfix-full-iso.h>
 
 #include "../../synapse_row.h"
-#include "../../synapses.h"
 
+#include "../../synapses.h"
+#include "../../plasticity/synapse_dynamics.h"
 
 #include "../../../common/neuron-typedefs.h"
+#include "../../../common/sp_structs.h"
 
-#include "../../plasticity/synapse_dynamics.h"
+
+
+
 
 //---------------------------------------
 // Structures and global data
@@ -71,6 +75,7 @@ dma_buffer_t rewiring_dma_buffer;
 typedef struct {
     address_t sdram_synaptic_row;
     int32_t pre_syn_id, post_syn_id;
+    structural_plasticity_data_t sp_data;
 } current_state_t;
 
 current_state_t current_state;
@@ -160,10 +165,11 @@ address_t synaptogenesis_dynamics_initialise(
 
 void synaptogenesis_dynamics_rewire(){
     // Randomly choose a postsynaptic (application neuron)
-    int32_t post_id;
-    post_id = lrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
+    uint32_t post_id;
+    post_id = ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom || post_id > rewiring_data.high_atom) {
+        log_debug("Selected neuron is not my problem (%d)", post_id);
         return;
     }
     post_id -= rewiring_data.low_atom;
@@ -200,11 +206,15 @@ void synaptogenesis_dynamics_rewire(){
     current_state.pre_syn_id = choice;
     current_state.post_syn_id = post_id;
 
-    log_debug("Reading %d bytes from %d -- saved to %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
+    log_debug("Reading %d bytes from %d -- saved @ %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
 
-    spin1_dma_transfer(
+    uint dma_id;
+    dma_id = spin1_dma_transfer(
         DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
         n_bytes);
+    if(!dma_id){
+        log_info("DMA Queue full. Synaptic rewiring request failed!");
+    }
 }
 
 // Might need a function for rewiring. One to be called by the timer to generate
@@ -240,15 +250,20 @@ void synaptic_row_restructure(){
     // If I am here, then the DMA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
     // the selected pre and postsynaptic ids are in current_state
     // typedef uint32_t size_t;
-    address_t fixed_region = synapse_row_fixed_region(rewiring_dma_buffer.row);
-    address_t plastic_region = synapse_row_plastic_region(rewiring_dma_buffer.row);
-    control_t* plastic_controls = synapse_row_plastic_controls(fixed_region);
-//    weight_state_t weight_state;
-//    log_info("SIZEOF(weight_state) = %d", sizeof(weight_state));
+//    address_t fixed_region = synapse_row_fixed_region(rewiring_dma_buffer.row);
+//    address_t plastic_region = synapse_row_plastic_region(rewiring_dma_buffer.row);
+//    control_t* plastic_controls = synapse_row_plastic_controls(fixed_region);
+
     #if STDP_ENABLED == 1
-//    weight_state_t weight_state;
-//    log_info("a2 = %d", weight_state.a2_plus);
-    log_info("plastic_synapse_t = %d", sizeof(plastic_synapse_t));
+    bool hit = find_plastic_neuron_with_id(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data));
+    if (hit) {
+        log_info("HIT - %d", current_state.sp_data.offset);
+    }
+    else {
+        log_info("MISS - %d", current_state.sp_data.offset);
+    }
+    #else
+
     #endif
 }
 
@@ -260,14 +275,14 @@ void synaptic_row_restructure(){
     As such, they need to call functions that have a knowledge of how the memory is
     physically organised to be able to modify Plastic-Plastic synaptic regions.
  */
-address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address){
-    use(synaptic_row_address);
-    return NULL;
+bool synaptogenesis_dynamics_formation_rule(){
+    return false;
 }
 
-address_t synaptogenesis_dynamics_elimination_rule(address_t synaptic_row_address){
-    use(synaptic_row_address);
-    return NULL;
+bool synaptogenesis_dynamics_elimination_rule(uint32_t row_position, uint32_t weight){
+    use(row_position);
+    use(weight);
+    return false;
 }
 
 int32_t get_p_rew() {

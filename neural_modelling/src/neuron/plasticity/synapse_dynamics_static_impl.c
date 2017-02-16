@@ -48,10 +48,11 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
     return 0;
 }
 
-int32_t find_plastic_neuron_with_id(uint32_t id, address_t fixed_region){
+bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
     use(id);
-    use(fixed_region);
-    return -1;
+    use(row);
+    use(sp_data);
+    return false;
 }
 
 bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
