@@ -89,8 +89,8 @@ try:
         logging.basicConfig(level=0)
 
     for handler in logging.root.handlers:
-        handler.addFilter(log.ConfiguredFilter(config))
-        handler.setFormatter(log.ConfiguredFormatter(config))
+        handler.addFilter(ConfiguredFilter(config))
+        handler.setFormatter(ConfiguredFormatter(config))
 except ConfigParser.NoSectionError:
     pass
 except ConfigParser.NoOptionError:
