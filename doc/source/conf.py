@@ -12,9 +12,10 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-# import sys
+import mock
 import os
 from sphinx import apidoc
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -354,6 +355,10 @@ epub_exclude_files = ['search.html']
 # epub_use_index = True
 
 autoclass_content = 'both'
+
+MOCK_MODULES = ['scipy']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock.Mock()
 
 # Do the rst generation
 for f in os.listdir("."):

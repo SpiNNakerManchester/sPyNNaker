@@ -1,5 +1,15 @@
 from setuptools import setup
+import os
+
 exec(open("spynnaker/pyNN/_version.py").read())
+
+if os.environ.get('READTHEDOCS', None) == 'True':
+    #conf.py will add a mock of scipy
+    requirements=['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
+                  'pyNN >= 0.7, < 0.8', 'numpy', 'lxml', 'six']
+else:
+    requirements=['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
+                  'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
 
 setup(
     name="sPyNNaker",
@@ -41,6 +51,5 @@ setup(
                   'spynnaker': ['spynnaker.cfg'],
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template'],
                   'spynnaker.pyNN.overridden_pacman_functions': ['*.xml']},
-    install_requires=['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
-                      'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
+    install_requires=requirements
 )
