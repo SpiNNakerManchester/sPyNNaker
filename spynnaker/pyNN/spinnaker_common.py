@@ -123,12 +123,12 @@ class SpiNNakerCommon(SpinnakerMainInterface):
         logger.info("Setting machine time step to {} micro-seconds."
                     .format(self._machine_time_step))
 
-    def _add_population(self, population):
+    def add_population(self, population):
         """ Called by each population to add itself to the list
         """
         self._populations.append(population)
 
-    def _add_projection(self, projection):
+    def add_projection(self, projection):
         """ Called by each projection to add itself to the list
         """
         self._projections.append(projection)

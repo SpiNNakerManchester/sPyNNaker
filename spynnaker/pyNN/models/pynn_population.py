@@ -2,6 +2,7 @@ from pacman.model.constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
@@ -27,7 +28,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Population(object):
+class Population(PyNNPopulationCommon):
     """ A collection neuron of the same types. It encapsulates a type of\
         vertex used with Spiking Neural Networks, comprising n cells (atoms)\
         of the same model type.
@@ -47,30 +48,10 @@ class Population(object):
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
                  structure=None):
-        if size is not None and size <= 0:
-            raise exceptions.ConfigurationException(
-                "A population cannot have a negative or zero size.")
 
-        # Create a graph vertex for the population and add it
-        # to PACMAN
-        cell_label = label
-        if label is None:
-            cell_label = "Population {}".format(
-                spinnaker.none_labelled_vertex_count)
-            spinnaker.increment_none_labelled_vertex_count()
-
-        # copy the parameters so that the end users are not exposed to the
-        # additions placed by spinnaker.
-        internal_cellparams = dict(cellparams)
-
-        # set spinnaker targeted parameters
-        internal_cellparams['label'] = cell_label
-        internal_cellparams['n_neurons'] = size
-
-        # create population vertex.
-        self._vertex = cellclass(**internal_cellparams)
-        self._spinnaker = spinnaker
-        self._delay_vertex = None
+        PyNNPopulationCommon.__init__(
+            self, spinnaker_control=spinnaker, size=size,
+            cellparams=cellparams, cellclass=cellclass, label=label)
 
         # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
@@ -81,8 +62,8 @@ class Population(object):
         else:
             self._structure = None
 
-        self._spinnaker._add_population(self)
-        self._spinnaker.add_application_vertex(self._vertex)
+        self._spinnaker_control._add_population(self)
+        self._spinnaker_control.add_application_vertex(self._vertex)
 
         # initialise common stuff
         self._size = size
@@ -92,17 +73,6 @@ class Population(object):
 
         # parameter
         self._change_requires_mapping = True
-
-    @property
-    def requires_mapping(self):
-        if isinstance(self._vertex, AbstractChangableAfterRun):
-            return self._vertex.requires_mapping
-        return self._change_requires_mapping
-
-    def mark_no_changes(self):
-        self._change_requires_mapping = False
-        if isinstance(self._vertex, AbstractChangableAfterRun):
-            self._vertex.mark_no_changes()
 
     def __add__(self, other):
         """ Merges populations
@@ -172,21 +142,23 @@ class Population(object):
             raise exceptions.ConfigurationException(
                 "This population has not got the capability to record spikes")
 
-        if not self._spinnaker.has_ran:
+        if not self._spinnaker_control.has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore spikes cannot"
                 " be retrieved, hence the list will be empty")
             return numpy.zeros((0, 2))
 
-        if self._spinnaker.use_virtual_board:
+        if self._spinnaker_control.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 2))
 
         spikes = self._vertex.get_spikes(
-            self._spinnaker.placements, self._spinnaker.graph_mapper,
-            self._spinnaker.buffer_manager, self._spinnaker.machine_time_step)
+            self._spinnaker_control.placements,
+            self._spinnaker_control.graph_mapper,
+            self._spinnaker_control.buffer_manager,
+            self._spinnaker_control.machine_time_step)
 
         return spikes
 
@@ -222,22 +194,24 @@ class Population(object):
             raise exceptions.ConfigurationException(
                 "This population has not got the capability to record gsyn")
 
-        if not self._spinnaker.has_ran:
+        if not self._spinnaker_control.has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore gsyn cannot"
                 " be retrieved, hence the list will be empty")
             return numpy.zeros((0, 4))
 
-        if self._spinnaker.use_virtual_board:
+        if self._spinnaker_control.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 4))
 
         return self._vertex.get_gsyn(
-            self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
-            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager,
-            self._spinnaker.machine_time_step)
+            self._spinnaker_control.no_machine_time_steps,
+            self._spinnaker_control.placements,
+            self._spinnaker_control.graph_mapper,
+            self._spinnaker_control.buffer_manager,
+            self._spinnaker_control.machine_time_step)
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -260,22 +234,24 @@ class Population(object):
             raise exceptions.ConfigurationException(
                 "This population has not got the capability to record v")
 
-        if not self._spinnaker.has_ran:
+        if not self._spinnaker_control.has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore v cannot"
                 " be retrieved, hence the list will be empty")
             return numpy.zeros((0, 3))
 
-        if self._spinnaker.use_virtual_board:
+        if self._spinnaker_control.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 3))
 
         return self._vertex.get_v(
-            self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
-            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager,
-            self._spinnaker.machine_time_step)
+            self._spinnaker_control.no_machine_time_steps,
+            self._spinnaker_control.placements,
+            self._spinnaker_control.graph_mapper,
+            self._spinnaker_control.buffer_manager,
+            self._spinnaker_control.machine_time_step)
 
     def id_to_index(self, cell_id):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
@@ -506,7 +482,7 @@ class Population(object):
                     printed in
         :param gather: Supported from the PyNN language, but ignored here
         """
-        time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
+        time_step = (self._spinnaker_control.machine_time_step * 1.0) / 1000.0
         gsyn = self.get_gsyn(gather, compatible_output=True)
         first_id = 0
         num_neurons = self._vertex.n_atoms
@@ -531,7 +507,7 @@ class Population(object):
                      be printed in
         :param gather: Supported from the PyNN language, but ignored here
         """
-        time_step = (self._spinnaker.machine_time_step * 1.0) / 1000.0
+        time_step = (self._spinnaker_control.machine_time_step * 1.0) / 1000.0
         v = self.get_v(gather, compatible_output=True)
         utility_calls.check_directory_exists_and_create_if_not(filename)
         file_handle = open(filename, "w")
