@@ -10,7 +10,6 @@ virtualenv:
 install:
   - pip install -r requirements-test.txt
   - python ./setup.py install
-  - pip install flake8
 script:
   - py.test unittests
   - py.test integration_tests
