@@ -38,8 +38,6 @@ setup(
               'spynnaker.pyNN.utilities.conf',
               'spynnaker.pyNN.utilities.random_stats',],
     package_data={'spynnaker.pyNN.model_binaries': ['*.aplx'],
-                  'spynnaker': ['spynnaker.cfg'],
-                  'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template'],
                   'spynnaker.pyNN.overridden_pacman_functions': ['*.xml']},
     install_requires=[
         'SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
