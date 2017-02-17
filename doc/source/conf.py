@@ -356,7 +356,7 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
-MOCK_MODULES = ['scipy','scipy.stats']
+MOCK_MODULES = ['scipy', 'scipy.stats']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
