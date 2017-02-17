@@ -3,6 +3,7 @@ from pacman.model.constraints.abstract_constraint\
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
 from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
+from spynnaker.pyNN.models.recording_common import RecordingCommon
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
@@ -11,16 +12,8 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
     import InputTypeConductance
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
-    import AbstractGSynRecordable
-from spynnaker.pyNN.models.common.abstract_v_recordable \
-    import AbstractVRecordable
 
 from spinn_front_end_common.utilities import exceptions
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
 
 import numpy
 import logging
@@ -28,7 +21,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Population(PyNNPopulationCommon):
+class Population(PyNNPopulationCommon, RecordingCommon):
     """ A collection neuron of the same types. It encapsulates a type of\
         vertex used with Spiking Neural Networks, comprising n cells (atoms)\
         of the same model type.
@@ -52,6 +45,7 @@ class Population(PyNNPopulationCommon):
         PyNNPopulationCommon.__init__(
             self, spinnaker_control=spinnaker, size=size,
             cellparams=cellparams, cellclass=cellclass, label=label)
+        RecordingCommon.__init__(self, self, spinnaker)
 
         # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
@@ -61,18 +55,6 @@ class Population(PyNNPopulationCommon):
             self._positions = None
         else:
             self._structure = None
-
-        self._spinnaker_control._add_population(self)
-        self._spinnaker_control.add_application_vertex(self._vertex)
-
-        # initialise common stuff
-        self._size = size
-        self._record_spike_file = None
-        self._record_v_file = None
-        self._record_gsyn_file = None
-
-        # parameter
-        self._change_requires_mapping = True
 
     def __add__(self, other):
         """ Merges populations
@@ -130,37 +112,9 @@ class Population(PyNNPopulationCommon):
         Return a 2-column numpy array containing cell ids and spike times for\
         recorded cells.
         """
-        if not gather:
-            logger.warn("Spynnaker only supports gather = true, will "
-                        " execute as if gather was true anyhow")
 
-        if isinstance(self._vertex, AbstractSpikeRecordable):
-            if not self._vertex.is_recording_spikes():
-                raise exceptions.ConfigurationException(
-                    "This population has not been set to record spikes")
-        else:
-            raise exceptions.ConfigurationException(
-                "This population has not got the capability to record spikes")
-
-        if not self._spinnaker_control.has_ran:
-            logger.warn(
-                "The simulation has not yet run, therefore spikes cannot"
-                " be retrieved, hence the list will be empty")
-            return numpy.zeros((0, 2))
-
-        if self._spinnaker_control.use_virtual_board:
-            logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
-            return numpy.zeros((0, 2))
-
-        spikes = self._vertex.get_spikes(
-            self._spinnaker_control.placements,
-            self._spinnaker_control.graph_mapper,
-            self._spinnaker_control.buffer_manager,
-            self._spinnaker_control.machine_time_step)
-
-        return spikes
+        self._compatible_output_and_gather_warnings(compatible_output, gather)
+        return self._get_recorded_variable("spikes")
 
     def get_spike_counts(self, gather=True):
         """ Return the number of spikes for each neuron.
@@ -186,32 +140,11 @@ class Population(PyNNPopulationCommon):
         :type compatible_output: bool
         """
 
-        if isinstance(self._vertex, AbstractGSynRecordable):
-            if not self._vertex.is_recording_gsyn():
-                raise exceptions.ConfigurationException(
-                    "This population has not been set to record gsyn")
-        else:
-            raise exceptions.ConfigurationException(
-                "This population has not got the capability to record gsyn")
-
-        if not self._spinnaker_control.has_ran:
-            logger.warn(
-                "The simulation has not yet run, therefore gsyn cannot"
-                " be retrieved, hence the list will be empty")
-            return numpy.zeros((0, 4))
-
-        if self._spinnaker_control.use_virtual_board:
-            logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
-            return numpy.zeros((0, 4))
-
-        return self._vertex.get_gsyn(
-            self._spinnaker_control.no_machine_time_steps,
-            self._spinnaker_control.placements,
-            self._spinnaker_control.graph_mapper,
-            self._spinnaker_control.buffer_manager,
-            self._spinnaker_control.machine_time_step)
+        self._compatible_output_and_gather_warnings(compatible_output, gather)
+        excit = self._get_recorded_variable("gsyn_exc")
+        inhib = self._get_recorded_variable("gsyn_inh")
+        # TODO join them together and then return the joined up thingy
+        return None
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
@@ -226,32 +159,26 @@ class Population(PyNNPopulationCommon):
             not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
-        if isinstance(self._vertex, AbstractVRecordable):
-            if not self._vertex.is_recording_v():
-                raise exceptions.ConfigurationException(
-                    "This population has not been set to record v")
-        else:
-            raise exceptions.ConfigurationException(
-                "This population has not got the capability to record v")
+        self._compatible_output_and_gather_warnings(compatible_output, gather)
+        return self._get_recorded_variable("v")
 
-        if not self._spinnaker_control.has_ran:
+    @staticmethod
+    def _compatible_output_and_gather_warnings(compatible_output, gather):
+        """ checks the values for compatible out and gather warnings
+
+        :param compatible_output: if compatible with pynn
+        :param gather: if gathering from pynn
+        :return: None
+        """
+        if not gather:
             logger.warn(
-                "The simulation has not yet run, therefore v cannot"
-                " be retrieved, hence the list will be empty")
-            return numpy.zeros((0, 3))
+                "Spynnaker 0.7 only supports gather = true, will  execute "
+                "as if gather was true anyhow")
 
-        if self._spinnaker_control.use_virtual_board:
+        if compatible_output:
             logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
-            return numpy.zeros((0, 3))
-
-        return self._vertex.get_v(
-            self._spinnaker_control.no_machine_time_steps,
-            self._spinnaker_control.placements,
-            self._spinnaker_control.graph_mapper,
-            self._spinnaker_control.buffer_manager,
-            self._spinnaker_control.machine_time_step)
+                "Spynnaker 0.7 only supports compatible_output = false, will"
+                " execute as if compatible_output was false anyhow")
 
     def id_to_index(self, cell_id):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
@@ -382,15 +309,8 @@ class Population(PyNNPopulationCommon):
         :param to_file: file to write the spike data to
         """
 
-        if not isinstance(self._vertex, AbstractSpikeRecordable):
-            raise Exception(
-                "This population does not support the recording of spikes!")
-
-        # Tell the vertex to record spikes
-        self._vertex.set_recording_spikes()
-
-        # set the file to store the spikes in once retrieved
-        self._record_spike_file = to_file
+        RecordingCommon._record(
+            self, 'spikes', self._create_full_filter_list(1), 1)
 
         # state that something has changed in the population,
         self._change_requires_mapping = True
@@ -400,16 +320,15 @@ class Population(PyNNPopulationCommon):
 
         :param to_file: the file to write the recorded gsyn to.
         """
-        if not isinstance(self._vertex, AbstractGSynRecordable):
-            raise Exception(
-                "This population does not support the recording of gsyn")
-        if not isinstance(self._vertex.input_type, InputTypeConductance):
-            logger.warn(
-                "You are trying to record the conductance from a model which "
-                "does not use conductance input.  You will receive "
-                "current measurements instead.")
-        self._vertex.set_recording_gsyn()
-        self._record_gsyn_file = to_file
+
+        # have to set each to record and set the file at that point, otherwise
+        # itll not work due to pynn bug
+        self._vertex.record(
+            self, 'gsyn_exc', self._create_full_filter_list(1), 1)
+        self.file = to_file
+        self._vertex.set_recording_gsyn_inh(
+            self, 'gsyn_inh', self._create_full_filter_list(1), 1)
+        self.file = to_file
 
         # state that something has changed in the population,
         self._change_requires_mapping = True
@@ -419,12 +338,10 @@ class Population(PyNNPopulationCommon):
 
         :param to_file: the file to write the recorded v to.
         """
-        if not isinstance(self._vertex, AbstractVRecordable):
-            raise Exception(
-                "This population does not support the recording of v")
 
-        self._vertex.set_recording_v()
-        self._record_v_file = to_file
+        self._vertex.record(
+            self, 'v', self._create_full_filter_list(1), 1)
+        self.file = to_file
 
         # state that something has changed in the population,
         self._change_requires_mapping = True
@@ -460,7 +377,7 @@ class Population(PyNNPopulationCommon):
         if not gather:
             logger.warn("Spynnaker only supports gather = true, will execute"
                         " as if gather was true anyhow")
-        spikes = self.getSpikes(compatible_output=True)
+        spikes = self._get_recorded_variable('spikes')
         if spikes is not None:
             first_id = 0
             num_neurons = self._vertex.n_atoms
@@ -483,7 +400,9 @@ class Population(PyNNPopulationCommon):
         :param gather: Supported from the PyNN language, but ignored here
         """
         time_step = (self._spinnaker_control.machine_time_step * 1.0) / 1000.0
-        gsyn = self.get_gsyn(gather, compatible_output=True)
+        gsyn_exc = self._get_recorded_variable('gsyn_exc')
+        gsyn_inh = self._get_recorded_variable('gsyn_inh')
+
         first_id = 0
         num_neurons = self._vertex.n_atoms
         dimensions = self._vertex.n_atoms
@@ -495,7 +414,8 @@ class Population(PyNNPopulationCommon):
         file_handle.write("# dimensions = [{}]\n".format(dimensions))
         file_handle.write("# last_id = {{}}\n".format(num_neurons - 1))
         file_handle = open(filename, "w")
-        for (neuronId, time, value_e, value_i) in gsyn:
+        for (neuronId, time, value_e, _, _, value_i) in zip(
+                gsyn_exc, gsyn_inh):
             file_handle.write("{}\t{}\t{}\t{}\n".format(
                 time, neuronId, value_e, value_i))
         file_handle.close()
@@ -508,7 +428,7 @@ class Population(PyNNPopulationCommon):
         :param gather: Supported from the PyNN language, but ignored here
         """
         time_step = (self._spinnaker_control.machine_time_step * 1.0) / 1000.0
-        v = self.get_v(gather, compatible_output=True)
+        v = self._get_recorded_variable("v")
         utility_calls.check_directory_exists_and_create_if_not(filename)
         file_handle = open(filename, "w")
         first_id = 0

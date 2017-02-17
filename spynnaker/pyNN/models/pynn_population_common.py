@@ -10,6 +10,15 @@ class PyNNPopulationCommon(object):
         self._vertex = None
         self._delay_vertex = None
 
+        # initialise common stuff
+        self._size = size
+        self._record_spike_file = None
+        self._record_v_file = None
+        self._record_gsyn_file = None
+
+        # parameter
+        self._change_requires_mapping = True
+
         if size is not None and size <= 0:
             raise exceptions.ConfigurationException(
                 "A population cannot have a negative or zero size.")
@@ -33,11 +42,19 @@ class PyNNPopulationCommon(object):
         # create population vertex.
         self._vertex = cellclass(**internal_cellparams)
 
+        # add objects to the spinnaker control class
+        self._spinnaker_control.add_population(self)
+        self._spinnaker_control.add_application_vertex(self._vertex)
+
     @property
     def requires_mapping(self):
         if isinstance(self._vertex, AbstractChangableAfterRun):
             return self._vertex.requires_mapping
         return self._change_requires_mapping
+
+    @requires_mapping.setter
+    def requires_mapping(self, new_value):
+        self._change_requires_mapping = new_value
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
