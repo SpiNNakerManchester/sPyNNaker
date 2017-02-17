@@ -3,21 +3,15 @@ import os
 
 exec(open("spynnaker/pyNN/_version.py").read())
 
-
-# This setup no longer does requirements.
-# They should now be covered requirements files.
-
-# For most installs use requirements.txt which should include
-# SpiNNFrontEndCommon >= 3.0.0, < 4.0.0'
-# pyNN >= 0.7, < 0.8',
-# numpy
-# scipy
-# lxml
-# six
-
-# readthedocs uses doc/doc_requirements.txt
-# Except DO NOT include scipy
-# conf.py needs to bring scipy in as a mock
+if os.environ.get('READTHEDOCS', None) == 'True':
+    # conf.py will need to add a mock of scipy
+    # This because scipy which depends on C code
+    # so will not install on readthedocs
+    requirements=['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
+                  'pyNN >= 0.7, < 0.8', 'numpy', 'lxml', 'six']
+else:
+    requirements=['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
+                  'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
 
 setup(
     name="sPyNNaker",
@@ -59,4 +53,5 @@ setup(
                   'spynnaker': ['spynnaker.cfg'],
                   'spynnaker.pyNN.utilities.conf': ['spynnaker.cfg.template'],
                   'spynnaker.pyNN.overridden_pacman_functions': ['*.xml']},
+    install_requires=requirements
 )
