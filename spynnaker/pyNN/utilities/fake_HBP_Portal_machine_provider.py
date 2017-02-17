@@ -1,5 +1,5 @@
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 class FakeHBPPortalMachineProvider(object):
 
@@ -9,7 +9,7 @@ class FakeHBPPortalMachineProvider(object):
         self._width = 8
         self._height = 8
         if n_boards != 1:
-            raise exceptions.InvalidParameterType("Not enough machine size")
+            raise InvalidParameterType("Not enough machine size")
 
     def create(self):
         return

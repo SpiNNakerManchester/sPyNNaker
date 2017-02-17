@@ -17,7 +17,6 @@ from spynnaker.pyNN.utilities import utility_calls
 # pynn centric classes
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN.spinnaker import executable_finder
-from spynnaker.pyNN import exceptions
 
 # notification protocol classes (stored in front end common)
 from spinn_front_end_common.utilities.notification_protocol.\

@@ -10,7 +10,7 @@ from pacman.utilities.utility_objs.field import Field
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.master_pop_table_generators.\
     abstract_master_pop_table_factory import AbstractMasterPopTableFactory
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import SynapticBlockGenerationException
 
 # spinn front end common imports
 from spinn_front_end_common.utilities import helpful_functions
@@ -176,7 +176,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
         # Can even the largest valid entry accommodate the given synaptic row?
         if row_length > ROW_LEN_TABLE_ENTRIES[-1]:
-            raise exceptions.SynapticBlockGenerationException(
+            raise SynapticBlockGenerationException(
                 "Max row length too long -"
                 " wanted length %d, but max length permitted is %d."
                 % (row_length, ROW_LEN_TABLE_ENTRIES[-1])
@@ -267,7 +267,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         # Process start address (align to 1K boundary then shift right by 10
         # and left by 3 (i.e. 7) to make it the top 13-bits of the field):
         if (block_start_addr & 0x3FF) != 0:
-            raise exceptions.SynapticBlockGenerationException(
+            raise SynapticBlockGenerationException(
                 "Synaptic Block start address is not aligned to a 1K boundary")
         assert(block_start_addr < math.pow(2, 32))
 
