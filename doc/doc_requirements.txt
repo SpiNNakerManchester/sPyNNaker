@@ -1,6 +1,8 @@
 six
 enum34
 lxml
+pyNN >= 0.7, < 0.8
+numpy
 -e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@master#egg=SpiNNMachine
 -e git+https://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master#egg=spinn_storage_handlers
 -e git+https://github.com/SpiNNakerManchester/SpiNNMan.git@master#egg=spinnman
