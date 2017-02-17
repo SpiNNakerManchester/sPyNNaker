@@ -16,7 +16,8 @@ import sys
 
 import spynnaker
 from spinn_front_end_common.utilities import exceptions
-from spynnaker.pyNN.utilities.conf import log
+from spynnaker.pyNN.utilities.conf.log import ConfiguredFilter
+from spynnaker.pyNN.utilities.conf.log import ConfiguredFormatter
 
 
 def _install_cfg():
@@ -86,8 +87,8 @@ try:
         logging.basicConfig(level=0)
 
     for handler in logging.root.handlers:
-        handler.addFilter(log.ConfiguredFilter(config))
-        handler.setFormatter(log.ConfiguredFormatter(config))
+        handler.addFilter(ConfiguredFilter(config))
+        handler.setFormatter(ConfiguredFormatter(config))
 except ConfigParser.NoSectionError:
     pass
 except ConfigParser.NoOptionError:

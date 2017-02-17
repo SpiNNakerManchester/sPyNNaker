@@ -15,7 +15,7 @@ from data_specification.enums.data_type import DataType
 from pacman.model.graphs.application.abstract_application_vertex\
     import AbstractApplicationVertex
 from pacman.model.graphs.common.slice import Slice
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
 from spynnaker.pyNN.models.neural_projections.projection_application_edge \
@@ -105,7 +105,7 @@ class SynapticManager(object):
 
         # Otherwise, the dynamics must be equal
         elif not synapse_dynamics.is_same_as(self._synapse_dynamics):
-            raise exceptions.SynapticConfigurationException(
+            raise SynapticConfigurationException(
                 "Synapse dynamics must match exactly when using multiple edges"
                 "to the same population")
 
