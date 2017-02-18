@@ -18,14 +18,14 @@ void synaptic_row_restructure(){
     log_error("%s", sp_error_message);
 }
 
-address_t synaptogenesis_dynamics_formation_rule(address_t synaptic_row_address){
-    use(synaptic_row_address);
-    return NULL;
+bool synaptogenesis_dynamics_formation_rule(){
+    return false;
 }
 
-address_t synaptogenesis_dynamics_elimination_rule(address_t synaptic_row_address){
-    use(synaptic_row_address);
-    return NULL;
+bool synaptogenesis_dynamics_elimination_rule(uint32_t row_position, uint32_t weight){
+    use(row_position);
+    use(weight);
+    return false;
 }
 
 int32_t get_p_rew() {

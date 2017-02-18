@@ -302,3 +302,42 @@ input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index)
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
+
+// TODO Implement these
+bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
+    address_t fixed_region = synapse_row_fixed_region(row);
+     weight_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
+    control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
+    uint32_t weight;
+    // Loop through plastic synapses
+    for (; plastic_synapse > 0; plastic_synapse--) {
+        // Get next control word (auto incrementing)
+        weight = *plastic_words++;
+        uint32_t control_word = *control_words++;
+        // Check if index is the one I'm looking for
+        if (synapse_row_sparse_index(control_word)==id)
+            break;
+    }
+    sp_data -> weight = weight;
+    sp_data -> offset = plastic_synapse - 1;
+
+    if (plastic_synapse - 1 >= 0)
+        return true;
+    else
+        return false;
+}
+
+bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
+    use(offset);
+    use(row);
+    return false;
+}
+
+bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){
+    use(id);
+    use(row);
+    use(weight);
+    use(delay);
+    return false;
+}
