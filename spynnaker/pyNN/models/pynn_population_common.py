@@ -38,6 +38,7 @@ class PyNNPopulationCommon(object):
         # set spinnaker targeted parameters
         internal_cellparams['label'] = cell_label
         internal_cellparams['n_neurons'] = size
+        internal_cellparams['config'] = spinnaker_control.config
 
         # create population vertex.
         self._vertex = cellclass(**internal_cellparams)

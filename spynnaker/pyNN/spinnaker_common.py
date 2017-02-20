@@ -5,6 +5,8 @@ from pacman.model.graphs.application.impl.application_edge import \
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
+from spinn_front_end_common.utilities.utility_objs.executable_finder import \
+    ExecutableFinder
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 
 from spynnaker.pyNN import overridden_pacman_functions
@@ -22,6 +24,8 @@ import math
 
 # global objects
 logger = logging.getLogger(__name__)
+
+executable_finder = ExecutableFinder()
 
 
 class SpiNNakerCommon(SpinnakerMainInterface):
@@ -252,6 +256,15 @@ class SpiNNakerCommon(SpinnakerMainInterface):
         """ The maximum supported delay based in milliseconds
         """
         return self._max_supported_delay
+
+    @property
+    def time_scale_factor(self):
+        """ the multiplicative scaling from application time to real
+        execution time
+
+        :return: the time scale factor
+        """
+        return self._time_scale_factor
 
     def add_application_vertex(self, vertex_to_add):
         """

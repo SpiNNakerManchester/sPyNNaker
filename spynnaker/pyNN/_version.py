@@ -1,4 +1,4 @@
-__version__ = "3.0.0"
-__version_month__ = "September"
-__version_year__ = "2016"
+__version__ = "4.0.0"
+__version_month__ = "February"
+__version_year__ = "2017"
 __version_name__ = ""

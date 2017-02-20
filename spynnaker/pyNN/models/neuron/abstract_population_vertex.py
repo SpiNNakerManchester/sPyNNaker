@@ -1,12 +1,19 @@
 
 # pacman imports
+import logging
+import os
+import random
+from abc import ABCMeta
+
+from six import add_metaclass
+
+from pacman.executor.injection_decorator import inject_items
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints\
     .key_allocator_contiguous_range_constraint \
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.decorators.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application.impl.application_vertex \
     import ApplicationVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
@@ -14,56 +21,50 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
-
-# front end common imports
 from spinn_front_end_common.abstract_models\
     .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
+from spinn_front_end_common.abstract_models.abstract_changable_after_run \
+    import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models \
+    .abstract_generates_data_specification \
+    import AbstractGeneratesDataSpecification
+from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
+    import AbstractHasAssociatedBinary
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_partition_constraints import \
     AbstractProvidesIncomingPartitionConstraints
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utilities import constants as \
-    common_constants
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.abstract_models\
-    .abstract_generates_data_specification \
-    import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
-    import AbstractHasAssociatedBinary
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities import constants as \
+    common_constants
 from spinn_front_end_common.utilities import helpful_functions
-
-# spynnaker imports
-from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
+from spynnaker.pyNN.models.common.abstract_gsyn_excitatory_recordable import \
+    AbstractGSynExcitatoryRecordable
+from spynnaker.pyNN.models.common.abstract_gsyn_inhibitory_recordable import \
+    AbstractGSynInhibitoryRecordable
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
     import AbstractVRecordable
-from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
-    import AbstractGSynRecordable
+from spynnaker.pyNN.models.common.gsyn_excitatory_recorder import \
+    GsynExcitatoryRecorder
+from spynnaker.pyNN.models.common.gsyn_inhibitory_recorder import \
+    GsynInhibitoryRecorder
 from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
 from spynnaker.pyNN.models.common.v_recorder import VRecorder
-from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
-
-from abc import ABCMeta
-from six import add_metaclass
-import logging
-import os
-import random
+from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import utility_calls
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +84,9 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractBinaryUsesSimulationRun,
-        AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
+    AbstractSpikeRecordable, AbstractVRecordable,
+    AbstractGSynExcitatoryRecordable,
+    AbstractGSynInhibitoryRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
@@ -94,7 +97,10 @@ class AbstractPopulationVertex(
     BASIC_MALLOC_USAGE = 2
     SPIKE_RECORDING_REGION = 0
     V_RECORDING_REGION = 1
-    GSYN_RECORDING_REGION = 2
+    GSYN_EXCITATORY_RECORDING_REGION = 2
+    GSYN_INHIBITORY_RECORDING_REGION = 3
+
+    N_RECORDING_REGIONS = 4
 
     _n_vertices = 0
 
@@ -102,13 +108,14 @@ class AbstractPopulationVertex(
             self, n_neurons, binary, label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             model_name, neuron_model, input_type, synapse_type, threshold_type,
-            additional_input=None, constraints=None):
+            config, additional_input=None, constraints=None):
 
         ApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
         AbstractSpikeRecordable.__init__(self)
         AbstractVRecordable.__init__(self)
-        AbstractGSynRecordable.__init__(self)
+        AbstractGSynInhibitoryRecordable.__init__(self)
+        AbstractGSynExcitatoryRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
@@ -134,7 +141,9 @@ class AbstractPopulationVertex(
         # Set up for recording
         self._spike_recorder = SpikeRecorder()
         self._v_recorder = VRecorder()
-        self._gsyn_recorder = GsynRecorder()
+        self._gsyn_excitatory_recorder = GsynExcitatoryRecorder()
+        self._gsyn_inhibitory_recorder = GsynInhibitoryRecorder()
+
         self._time_between_requests = config.getint(
             "Buffers", "time_between_requests")
         self._minimum_buffer_sdram = config.getint(
@@ -162,12 +171,13 @@ class AbstractPopulationVertex(
                 "Buffers", "buffer_size_before_receive")
 
         self._maximum_sdram_for_buffering = [
-            spike_buffer_max_size, v_buffer_max_size, gsyn_buffer_max_size
+            spike_buffer_max_size, v_buffer_max_size, gsyn_buffer_max_size,
+            gsyn_buffer_max_size
         ]
 
         # Set up synapse handling
         self._synapse_manager = SynapticManager(
-            synapse_type, ring_buffer_sigma, spikes_per_second)
+            synapse_type, ring_buffer_sigma, spikes_per_second, config)
 
         # bool for if state has changed.
         self._change_requires_mapping = True
@@ -229,7 +239,9 @@ class AbstractPopulationVertex(
                 vertex_slice.n_atoms, 1),
             self._v_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1),
-            self._gsyn_recorder.get_sdram_usage_in_bytes(
+            self._gsyn_excitatory_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, 1),
+            self._gsyn_inhibitory_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1)
         ]
 
@@ -242,7 +254,9 @@ class AbstractPopulationVertex(
             label=None, constraints=None):
 
         is_recording = (
-            self._gsyn_recorder.record_gsyn or self._v_recorder.record_v or
+            self._gsyn_excitatory_recorder.record_gsyn_excitatory or
+            self._v_recorder.record_v or
+            self._gsyn_inhibitory_recorder.record_gsyn_inhibitory or
             self._spike_recorder.record
         )
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
@@ -278,7 +292,10 @@ class AbstractPopulationVertex(
                 (per_neuron_cycles * vertex_slice.n_atoms) +
                 self._spike_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
                 self._v_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
-                self._gsyn_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
+                self._gsyn_excitatory_recorder.get_n_cpu_cycles(
+                    vertex_slice.n_atoms) +
+                self._gsyn_inhibitory_recorder.get_n_cpu_cycles(
+                    vertex_slice.n_atoms) +
                 self._synapse_manager.get_n_cpu_cycles())
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
@@ -293,7 +310,8 @@ class AbstractPopulationVertex(
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._spike_recorder.get_dtcm_usage_in_bytes() +
                 self._v_recorder.get_dtcm_usage_in_bytes() +
-                self._gsyn_recorder.get_dtcm_usage_in_bytes() +
+                self._gsyn_excitatory_recorder.get_dtcm_usage_in_bytes() +
+                self._gsyn_inhibitory_recorder.get_dtcm_usage_in_bytes() +
                 self._synapse_manager.get_dtcm_usage_in_bytes())
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
@@ -314,7 +332,8 @@ class AbstractPopulationVertex(
         sdram_requirement = (
             common_constants.SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
-            recording_utilities.get_recording_header_size(3) +
+            recording_utilities.get_recording_header_size(
+                self.N_RECORDING_REGIONS) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
@@ -327,7 +346,9 @@ class AbstractPopulationVertex(
 
     def _get_number_of_mallocs_used_by_dsg(self):
         extra_mallocs = 0
-        if self._gsyn_recorder.record_gsyn:
+        if self._gsyn_excitatory_recorder.record_gsyn_excitatory:
+            extra_mallocs += 1
+        if self._gsyn_inhibitory_recorder.record_gsyn_inhibitory:
             extra_mallocs += 1
         if self._v_recorder.record_v:
             extra_mallocs += 1
@@ -355,7 +376,8 @@ class AbstractPopulationVertex(
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.RECORDING.value,
-            size=recording_utilities.get_recording_header_size(3))
+            size=recording_utilities.get_recording_header_size(
+                self.N_RECORDING_REGIONS))
 
         vertex.reserve_provenance_data_region(spec)
 
@@ -531,21 +553,42 @@ class AbstractPopulationVertex(
             self._label, buffer_manager, self.V_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
-    @overrides(AbstractGSynRecordable.is_recording_gsyn)
-    def is_recording_gsyn(self):
-        return self._gsyn_recorder.record_gsyn
+    @overrides(AbstractGSynExcitatoryRecordable.is_recording_gsyn_excitatory)
+    def is_recording_gsyn_excitatory(self):
+        return self._gsyn_excitatory_recorder.record_gsyn_excitatory
 
-    @overrides(AbstractGSynRecordable.set_recording_gsyn)
-    def set_recording_gsyn(self):
-        self._change_requires_mapping = not self._gsyn_recorder.record_gsyn
-        self._gsyn_recorder.record_gsyn = True
+    @overrides(AbstractGSynExcitatoryRecordable.set_recording_gsyn_excitatory)
+    def set_recording_gsyn_excitatory(self):
+        self._change_requires_mapping = \
+            not self._gsyn_excitatory_recorder.record_gsyn_excitatory
+        self._gsyn_excitatory_recorder.record_gsyn_excitatory = True
 
-    @overrides(AbstractGSynRecordable.get_gsyn)
-    def get_gsyn(
+    @overrides(AbstractGSynExcitatoryRecordable.get_gsyn_excitatory)
+    def get_gsyn_excitatory(
             self, n_machine_time_steps, placements, graph_mapper,
             buffer_manager, machine_time_step):
-        return self._gsyn_recorder.get_gsyn(
-            self._label, buffer_manager, self.GSYN_RECORDING_REGION,
+        return self._gsyn_excitatory_recorder.get_gsyn_excitatory(
+            self._label, buffer_manager,
+            self.GSYN_EXCITATORY_RECORDING_REGION,
+            placements, graph_mapper, self, machine_time_step)
+
+    @overrides(AbstractGSynInhibitoryRecordable.is_recording_gsyn_inhibitory)
+    def is_recording_gsyn_inhibitory(self):
+        return self._gsyn_inhibitory_recorder.record_gsyn_inhibitory
+
+    @overrides(AbstractGSynInhibitoryRecordable.set_recording_gsyn_inhibitory)
+    def set_recording_gsyn_inhibitory(self):
+        self._change_requires_mapping = \
+            not self._gsyn_inhibitory_recorder.record_gsyn_inhibitory
+        self._gsyn_inhibitory_recorder.record_gsyn_inhibitory = True
+
+    @overrides(AbstractGSynInhibitoryRecordable.get_gsyn_inhibitory)
+    def get_gsyn_inhibitory(
+            self, n_machine_time_steps, placements, graph_mapper,
+            buffer_manager, machine_time_step):
+        return self._gsyn_inhibitory_recorder.get_gsyn_inhibitory(
+            self._label, buffer_manager,
+            self.GSYN_EXCITATORY_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractPopulationInitializable.initialize)

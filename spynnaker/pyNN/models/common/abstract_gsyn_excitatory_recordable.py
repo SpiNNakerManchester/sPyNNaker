@@ -9,7 +9,7 @@ class AbstractGSynExcitatoryRecordable(object):
     """
 
     @abstractmethod
-    def is_recording_gsyn_exc(self):
+    def is_recording_gsyn_excitatory(self):
         """ Determines if gsyn us being recorded
 
         :return: True if gsyn is being recorded, False otherwise
@@ -22,7 +22,7 @@ class AbstractGSynExcitatoryRecordable(object):
         """
 
     @abstractmethod
-    def get_gsyn_exc(
+    def get_gsyn_excitatory(
             self, n_machine_time_steps, placements, graph_mapper,
             buffer_manager, machine_time_step):
         """ Get the recorded gsyn from the object

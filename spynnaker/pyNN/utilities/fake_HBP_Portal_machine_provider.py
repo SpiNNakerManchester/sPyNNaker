@@ -1,9 +1,8 @@
-from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 
-class FakeHBPPortalMachineProvider(object):
 
-    def __init__(self, n_boards):
+class FakeHBPPortalMachineProvider(object):
+    def __init__(self, n_boards, config):
         self._ip_addresses = config.get("Machine", "machineName")
         self._bmp_details = config.get("Machine", "bmp_names")
         self._width = 8

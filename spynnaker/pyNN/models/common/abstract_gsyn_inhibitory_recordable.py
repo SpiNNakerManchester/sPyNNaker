@@ -4,12 +4,12 @@ from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
-class AbstractGSynRecordable(object):
+class AbstractGSynInhibitoryRecordable(object):
     """ Indicates that conductance can be recorded from this object
     """
 
     @abstractmethod
-    def is_recording_gsyn(self):
+    def is_recording_gsyn_inhibitory(self):
         """ Determines if gsyn us being recorded
 
         :return: True if gsyn is being recorded, False otherwise
@@ -17,12 +17,12 @@ class AbstractGSynRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_gsyn(self):
+    def set_recording_gsyn_inhibitory(self):
         """ Sets gsyn to being recorded
         """
 
     @abstractmethod
-    def get_gsyn(
+    def get_gsyn_inhibitory(
             self, n_machine_time_steps, placements, graph_mapper,
             buffer_manager, machine_time_step):
         """ Get the recorded gsyn from the object

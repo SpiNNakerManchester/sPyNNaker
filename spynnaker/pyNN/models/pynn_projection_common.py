@@ -5,10 +5,14 @@ from spinn_front_end_common.abstract_models. \
     abstract_changable_after_run import AbstractChangableAfterRun
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_machine.utilities.progress_bar import ProgressBar
-from spynnaker.pyNN import DelayAfferentApplicationEdge
-from spynnaker.pyNN import DelayExtensionVertex
 
-from spynnaker.pyNN import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge \
+    import DelayAfferentApplicationEdge
+from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
+    import DelayExtensionVertex
+
+from spynnaker.pyNN.models.neural_projections.projection_application_edge \
+    import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neural_projections. \
     delayed_application_edge import DelayedApplicationEdge
 from spynnaker.pyNN.models.neural_projections.synapse_information import \

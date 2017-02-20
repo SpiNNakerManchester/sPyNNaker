@@ -1,8 +1,8 @@
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
 
-from spynnaker.pyNN.models.common.abstract_gsyn_exc_recordable import \
+from spynnaker.pyNN.models.common.abstract_gsyn_excitatory_recordable import \
     AbstractGSynExcitatoryRecordable
-from spynnaker.pyNN.models.common.abstract_gsyn_inh_recordable import \
+from spynnaker.pyNN.models.common.abstract_gsyn_inhibitory_recordable import \
     AbstractGSynInhibitoryRecordable
 from spynnaker.pyNN.models.common.abstract_spike_recordable import \
     AbstractSpikeRecordable
