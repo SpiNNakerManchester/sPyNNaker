@@ -10,6 +10,12 @@ virtualenv:
 install:
   - pip install numpy
   - sudo pip install scipy
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master
   - pip install -r requirements-test.txt
   - python ./setup.py install
 script:
