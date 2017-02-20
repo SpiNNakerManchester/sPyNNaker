@@ -350,7 +350,7 @@ static bool initialize(uint32_t *timer_period) {
 }
 
 void resume_callback() {
-    initialise_recording();
+    recording_reset();
 }
 
 void _send_spike(uint spike_key) {

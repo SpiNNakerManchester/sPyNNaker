@@ -1,0 +1,19 @@
+language: python
+matrix:
+  include:
+    - python: "2.7"
+    - pytest
+
+virtualenv:
+  system_site_packages: true
+
+install:
+  - pip install numpy
+  - sudo pip install scipy
+  - pip install -r requirements-test.txt
+  - python ./setup.py install
+script:
+  - py.test unittests
+  - py.test integration_tests
+  - flake8 examples spynnaker pyNN-spiNNaker-src
+  - flake8 unittests integration_tests

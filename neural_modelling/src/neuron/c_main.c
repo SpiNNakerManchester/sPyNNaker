@@ -183,11 +183,7 @@ static bool initialise(uint32_t *timer_period) {
 }
 
 void resume_callback() {
-    // restart the recording status
-    if (!initialise_recording()) {
-        log_error("Error setting up recording");
-        rt_error(RTE_SWERR);
-    }
+    recording_reset();
 }
 
 //! \brief Timer interrupt callback
