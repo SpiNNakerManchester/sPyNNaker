@@ -111,7 +111,7 @@ class TestProjection(unittest.TestCase):
     def test_weights(self):
         # print projections[1].getWeights()
         for p in projections:
-            self.assertEqual(p.getWeights(), [2] * no_neurons)
+            self.assertEqual(list(p.getWeights()), [2] * no_neurons)
 
     def test_projection_params(self):
         populations = list()

@@ -82,8 +82,8 @@ class TestingOneToOneConnector(unittest.TestCase):
                              label="pop 1")
         p2 = pyNN.Population(5, pyNN.IF_curr_exp, cell_params_lif,
                              label="pop 2")
-        with self.assertRaises(ConfigurationException):
-            pyNN.Projection(p1, p2, pyNN.OneToOneConnector(weight, delay))
+        j = pyNN.Projection(p1, p2, pyNN.OneToOneConnector(weight, delay))
+        self.assertIsNotNone(j)
 
 
 if __name__ == "__main__":
