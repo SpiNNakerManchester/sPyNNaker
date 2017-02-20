@@ -20,7 +20,7 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(
             constants.OUT_SPIKE_BYTES, constants.OUT_SPIKE_SIZE * 4)
         self.assertEqual(constants.V_BUFFER_SIZE_PER_TICK_PER_NEURON, 4)
-        self.assertEqual(constants.GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON, 4)
+        self.assertEqual(constants.GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON, 8)
 
         self.assertEqual(constants.INFINITE_SIMULATION, 4294967295)
 
