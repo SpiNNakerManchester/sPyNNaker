@@ -7,6 +7,8 @@ matrix:
 virtualenv:
   system_site_packages: true
 
+cache: pip
+
 install:
   - pip install numpy
   - sudo pip install scipy
@@ -18,7 +20,7 @@ install:
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master
   - pip install -r requirements-test.txt
   - python ./setup.py install
-before-script:
+before_script:
   - echo '[Machine]' > ~/.spynnaker.cfg
   - echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
   - echo "version = ${SPINNAKER_BOARD_VERSION:-5}" >> ~/.spynnaker.cfg
