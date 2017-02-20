@@ -4,17 +4,6 @@ from spynnaker.pyNN.models.neuron.builds.if_cond_exp import IFCondExp
 
 class TestIFCondExpModel(unittest.TestCase):
     def test_new_if_cond_exp_model(self):
-        cell_params_lif = {'cm': 0.25,
-                           'i_offset': 0.0,
-                           'tau_m': 20.0,
-                           'tau_refrac': 0.1,
-                           'tau_syn_E': 5.0,
-                           'tau_syn_I': 5.0,
-                           'v_reset': -65.0,
-                           'v_rest': -65.0,
-                           'v_thresh': -50.0,
-                           'e_rev_E': 0.0,
-                           'e_rev_I': -70.0}
         cell_params_lif = {
             'tau_m': 20,
             'cm': 1.0,
