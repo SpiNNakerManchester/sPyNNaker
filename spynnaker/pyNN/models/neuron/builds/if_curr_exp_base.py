@@ -11,7 +11,7 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 
 
-class IFCurrExp(AbstractPopulationVertex):
+class IFCurrExpBase(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input
     """
@@ -24,7 +24,8 @@ class IFCurrExp(AbstractPopulationVertex):
         'tau_refrac': 0.1, 'i_offset': 0}
 
     def __init__(
-            self, n_neurons, spikes_per_second=None, ring_buffer_sigma=None,
+            self, n_neurons, config, spikes_per_second=None,
+            ring_buffer_sigma=None,
             incoming_spike_buffer_size=None, constraints=None, label=None,
             tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
@@ -45,8 +46,8 @@ class IFCurrExp(AbstractPopulationVertex):
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IF_curr_exp.aplx", label=label,
-            max_atoms_per_core=IFCurrExp._model_based_max_atoms_per_core,
-            spikes_per_second=spikes_per_second,
+            max_atoms_per_core=IFCurrExpBase._model_based_max_atoms_per_core,
+            spikes_per_second=spikes_per_second, config=config,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="IF_curr_exp", neuron_model=neuron_model,
@@ -55,8 +56,8 @@ class IFCurrExp(AbstractPopulationVertex):
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        IFCurrExp._model_based_max_atoms_per_core = new_value
+        IFCurrExpBase._model_based_max_atoms_per_core = new_value
 
     @staticmethod
     def get_max_atoms_per_core():
-        return IFCurrExp._model_based_max_atoms_per_core
+        return IFCurrExpBase._model_based_max_atoms_per_core
