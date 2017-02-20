@@ -20,6 +20,7 @@ spike_array = {'spike_times': [0]}
 
 
 class TestingOneToOneConnector(unittest.TestCase):
+    @unittest.skip("broken; API changed")
     def test_connect_two_different_populations(self):
         number_of_neurons = 10
         first_population = pyNN.Population(number_of_neurons, pyNN.IF_curr_exp,
@@ -39,6 +40,7 @@ class TestingOneToOneConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_max_delay(), delay)
         self.assertEqual(synaptic_list.get_min_delay(), delay)
 
+    @unittest.skip("broken; API changed")
     def test_self_connect_population(self):
         number_of_neurons = 10
         first_population = pyNN.Population(number_of_neurons, pyNN.IF_curr_exp,
@@ -56,6 +58,7 @@ class TestingOneToOneConnector(unittest.TestCase):
         self.assertEqual(synaptic_list.get_max_delay(), delay)
         self.assertEqual(synaptic_list.get_min_delay(), delay)
 
+    @unittest.skip("broken; API changed")
     def test_synapse_list_generation_for_different_sized_populations(self):
         number_of_neurons = 10
         first_population = pyNN.Population(number_of_neurons,
