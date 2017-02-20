@@ -21,7 +21,7 @@ class TestIFCurrDualExpModel(unittest.TestCase):
         n_neurons = 10
         if_curr_dual_exp = IFCurrDualExp(
             n_neurons, 1000, 1.0, **cell_params_lif)
-        self.assertEqual(if_curr_dual_exp.model_name, "IF_curr_dual_exp")
+        self.assertEqual(if_curr_dual_exp._model_name, "IF_curr_dual_exp")
         self.assertEqual(len(if_curr_dual_exp.get_parameters()), 10)
         self.assertEqual(if_curr_dual_exp._v_thresh,
                          cell_params_lif['v_thresh'])

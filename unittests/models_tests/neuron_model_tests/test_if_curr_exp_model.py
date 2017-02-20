@@ -16,7 +16,7 @@ class TestIFCurrExpModel(unittest.TestCase):
         n_neurons = 10
         if_curr_exp = IFCurrExp(
             n_neurons, 1000, 1.0, **cell_params_lif)
-        self.assertEqual(if_curr_exp.model_name, "IF_curr_exp")
+        self.assertEqual(if_curr_exp._model_name, "IF_curr_exp")
         self.assertEqual(len(if_curr_exp.get_parameters()), 10)
         self.assertEqual(if_curr_exp._v_thresh, cell_params_lif['v_thresh'])
         self.assertEqual(if_curr_exp._v_reset, cell_params_lif['v_reset'])

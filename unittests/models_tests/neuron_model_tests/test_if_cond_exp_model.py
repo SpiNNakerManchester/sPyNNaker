@@ -29,7 +29,7 @@ class TestIFCondExpModel(unittest.TestCase):
             'i_offset': 0}
         n_neurons = 10
         if_cond_exp = IFCondExp(n_neurons, 1000, 1.0)
-        self.assertEqual(if_cond_exp.model_name(), "IF_cond_exp")
+        self.assertEqual(if_cond_exp._model_name, "IF_cond_exp")
         self.assertEqual(len(if_cond_exp.get_parameters()), 12)
         self.assertEqual(if_cond_exp._v_thresh, cell_params_lif['v_thresh'])
         self.assertEqual(if_cond_exp._v_reset, [cell_params_lif['v_reset']])
