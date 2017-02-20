@@ -10,7 +10,7 @@ virtualenv:
 cache: pip
 
 install:
-  - pip install 'numpy>=1.10.2'
+  - pip install 'numpy>=1.12'
   - sudo pip install scipy
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@master
