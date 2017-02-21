@@ -1,8 +1,10 @@
 import logging
-import graphviz
 import os
+
 from spinn_machine.utilities.progress_bar import ProgressBar
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.models.neural_projections.projection_application_edge \
+    import ProjectionApplicationEdge
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +23,14 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         :param dsg_targets: the dsg to ensure dsg has been executed
         :return: None
         """
+        try:
+            import graphviz
+        except:
+            raise exceptions.SpynnakerException(
+                "graphviz is required to use this report.  Please install"
+                " graphviz if you want to use this report.")
 
-        # verify that the dsg has been exeucted
+        # verify that the dsg has been executed
         if dsg_targets is None:
             raise exceptions.SynapticConfigurationException(
                 "dsg targets should not be none, used as a check for "
@@ -33,7 +41,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         dot_diagram = graphviz.Digraph(
             comment="The graph of the network in graphical form")
 
-        # build prgress bar for the vertices, edges, and rendering
+        # build progress bar for the vertices, edges, and rendering
         progress_bar = ProgressBar(
             len(application_graph.vertices) +
             len(connection_holder.keys()) + 1,
@@ -42,28 +50,31 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         # write vertices into dot diagram
         vertex_counter = 0
         for vertex in application_graph.vertices:
-            for atom in range(0, vertex.n_atoms):
-                dot_diagram.node(
-                    "{}_{}".format(vertex_counter, atom),
-                    "atom {} of {}".format(atom, vertex.label))
-                vertex_holders[vertex] = vertex_counter
+            dot_diagram.node(
+                "{}".format(vertex_counter),
+                "{} ({} neurons)".format(vertex.label, vertex.n_atoms))
+            vertex_holders[vertex] = vertex_counter
             vertex_counter += 1
             progress_bar.update()
 
         # write edges into dot diagram
-        for edge, synapse_information in connection_holder.keys():
-                this_connection_holder = \
-                    connection_holder[(edge, synapse_information)]
-                for (source, destination, _, _) in this_connection_holder:
-                    source_vertex_id = vertex_holders[edge.pre_vertex]
-                    dest_vertex_id = vertex_holders[edge.post_vertex]
+        for edge in application_graph.edges:
+                source_vertex_id = vertex_holders[edge.pre_vertex]
+                dest_vertex_id = vertex_holders[edge.post_vertex]
+                if isinstance(edge, ProjectionApplicationEdge):
+                    for synapse_info in edge.synapse_information:
+                        dot_diagram.edge(
+                            "{}".format(source_vertex_id),
+                            "{}".format(dest_vertex_id),
+                            "{}".format(synapse_info.connector))
+                else:
                     dot_diagram.edge(
-                        "{}_{}".format(source_vertex_id, source),
-                        "{}_{}".format(dest_vertex_id, destination))
+                        "{}".format(source_vertex_id),
+                        "{}".format(dest_vertex_id))
                 progress_bar.update()
 
         # write dot file and generate pdf
-        file_to_output = os.path.join(report_folder, "visual_graph.gv")
+        file_to_output = os.path.join(report_folder, "network_graph.gv")
         dot_diagram.render(file_to_output, view=False)
         progress_bar.update()
         progress_bar.end()

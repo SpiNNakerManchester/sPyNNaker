@@ -13,10 +13,13 @@ class SpYNNakerSynapticMatrixReport(object):
     """
 
     def __call__(self, report_folder, connection_holder, dsg_targets):
-
-        """converts synaptic matrix for every application edge.
-
+        """ converts synaptic matrix for every application edge.
         """
+
+        # Update the print options to display everything
+        import numpy
+        print_opts = numpy.get_printoptions()
+        numpy.set_printoptions(threshold=numpy.nan)
 
         if dsg_targets is None:
             raise exceptions.SynapticConfigurationException(
@@ -35,7 +38,7 @@ class SpYNNakerSynapticMatrixReport(object):
             "Generating synaptic matrix reports")
 
         # for each application edge, write matrix in new file
-        for application_edge, synapse_information in connection_holder.keys():
+        for application_edge, _ in connection_holder.keys():
 
             # only write matrix's for edges which have matrix's
             if isinstance(application_edge, ProjectionApplicationEdge):
@@ -61,5 +64,9 @@ class SpYNNakerSynapticMatrixReport(object):
                     output.write("{}".format(this_connection_holder))
                 output.flush()
                 output.close()
+
             progress.update()
         progress.end()
+
+        # Reset the print options
+        numpy.set_printoptions(**print_opts)
