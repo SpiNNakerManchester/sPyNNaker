@@ -173,3 +173,19 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
+
+    @property
+    def allow_self_connections(self):
+        return self._allow_self_connections
+
+    @allow_self_connections.setter
+    def allow_self_connections(self, new_value):
+        self._allow_self_connections = new_value
+
+    @property
+    def d_expression(self):
+        return self._d_expression
+
+    @d_expression.setter
+    def d_expression(self, new_value):
+        self._d_expression = new_value

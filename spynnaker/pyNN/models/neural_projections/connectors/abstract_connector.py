@@ -366,3 +366,27 @@ class AbstractConnector(object):
                     self._post_population.label, self._min_delay,
                     self._n_clipped_delays))))
         return data_items
+
+    @property
+    def safe(self):
+        return self._safe
+
+    @safe.setter
+    def safe(self, new_value):
+        self._safe = new_value
+
+    @property
+    def space(self):
+        return self._space
+
+    @space.setter
+    def space(self, new_value):
+        self._space = new_value
+
+    @property
+    def verbose(self):
+        return self._verbose
+
+    @verbose.setter
+    def verbose(self, new_value):
+        self._verbose = new_value
