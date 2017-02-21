@@ -36,6 +36,7 @@ from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
+from spinn_front_end_common.utilities import helpful_functions
 
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -142,8 +143,8 @@ class AbstractPopulationVertex(
             "Buffers", "use_auto_pause_and_resume")
         self._receive_buffer_host = config.get(
             "Buffers", "receive_buffer_host")
-        self._receive_buffer_port = config.getint(
-            "Buffers", "receive_buffer_port")
+        self._receive_buffer_port = helpful_functions.read_config_int(
+            config, "Buffers", "receive_buffer_port")
 
         # If live buffering is enabled, set a maximum on the buffer sizes
         spike_buffer_max_size = 0
@@ -473,8 +474,7 @@ class AbstractPopulationVertex(
             self._maximum_sdram_for_buffering)
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes, self._time_between_requests,
-            self._buffer_size_before_receive, ip_tags,
-            self._receive_buffer_host, self._receive_buffer_port))
+            self._buffer_size_before_receive, ip_tags))
 
         # Write the neuron parameters
         self._write_neuron_parameters(
