@@ -49,11 +49,12 @@ def create_directory(directory):
         os.makedirs(directory)
 
 
+# Create a config, read global defaults and then read in additional files
+config = ConfigParser.RawConfigParser()
+
 if os.environ.get('READTHEDOCS', None) == 'True':
     print "config loading prevented as in readthedocs"
 else:
-    # Create a config, read global defaults and then read in additional files
-    config = ConfigParser.RawConfigParser()
     default = os.path.join(os.path.dirname(spynnaker.__file__),
                            "spynnaker.cfg")
     spynnaker_user = os.path.expanduser("~/.spynnaker.cfg")
