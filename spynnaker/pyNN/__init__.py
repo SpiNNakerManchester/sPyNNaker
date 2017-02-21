@@ -101,7 +101,7 @@ import spynnaker
 # constraints
 
 # note importing star is a bad thing to do.
-from pyNN.random import NumpyRNG, RandomDistribution 
+from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.space import \
     distance, Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure
 import os as __os
@@ -134,7 +134,7 @@ __all__ = [
     'NumpyRNG', 'RandomDistribution',
     # Stuff from pyNN.space
     'distance', 'Space', 'Line', 'Grid2D', 'Grid3D', 'Cuboid', 'Sphere',
-    'RandomStructure'
+    'RandomStructure',
     # Stuff that we define
     'register_binary_search_path', 'end', 'setup', 'run', 'get_spynnaker',
     'num_processes', 'rank', 'reset', 'set_number_of_neurons_per_core',

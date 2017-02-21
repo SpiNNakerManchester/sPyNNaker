@@ -77,7 +77,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
         # d is apparently unused, but is in fact expected by d_expression
         # so is used when eval is called
-        d = self._space.distances(  # @UnusedVariable
+        d = self._space.distances(  # @UnusedVariable # noqa: F841
             pre_positions, post_positions, expand_distances)
         self._probs = eval(self._d_expression)
 
