@@ -166,7 +166,6 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         :param block_start_addr:
         :param row_length:
         :param key_and_mask:
-        :param mask:
         :param master_pop_table_region:
         :param is_single: True if this is a single synapse, False otherwise
          """
