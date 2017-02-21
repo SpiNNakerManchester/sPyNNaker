@@ -11,6 +11,7 @@ cache: pip
 
 install:
   - pip install 'numpy>=1.12'
+  - pip install lxml
   - sudo pip install scipy
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@master
