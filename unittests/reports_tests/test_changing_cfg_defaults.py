@@ -28,13 +28,13 @@ class TestCFGs(unittest.TestCase):
         spinn = Spinnaker(timestep=1, min_delay=1, max_delay=10)
 
         if 'reports' in os.listdir(current_path):
-            shutil.rmtree(os.path.join(current_path,'reports'))
+            shutil.rmtree(os.path.join(current_path, 'reports'))
         spinn._set_up_report_specifics()
 
         self.assertEqual(spinn._report_default_directory,
-                os.path.join(current_path,'reports', 'latest'))
-        if 'reports' not in os.listdir(current_path):
-            raise AssertionError("File reports should be in the new location")
+                         os.path.join(current_path, 'reports', 'latest'))
+        # File reports should be in the new location
+        self.assertIn('reports', os.listdir(current_path))
 
     def test_set_up_main_objects(self):
         spinn = Spinnaker(timestep=1, min_delay=1, max_delay=10)

@@ -27,5 +27,5 @@ class TestPyNNSetup(unittest.TestCase):
     #     self.assertEqual(pynn._spinnaker, None)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main()

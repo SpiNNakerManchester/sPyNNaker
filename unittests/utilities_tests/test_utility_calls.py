@@ -13,7 +13,7 @@ class TestUtilityCalls(unittest.TestCase):
 
     def test_check_directory_not_exists(self):
         test_dir = os.path.join(os.path.dirname(__file__),
-                                 "test_utility_call")
+                                "test_utility_call")
         test_file = os.path.join(test_dir, "test")
         if os.path.exists(test_dir):
             shutil.rmtree(test_dir)

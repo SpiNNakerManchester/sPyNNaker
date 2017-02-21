@@ -54,5 +54,6 @@ class TestConstants(unittest.TestCase):
         self.assertEqual(
             constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value, 7)
 
+
 if __name__ == '__main__':
     unittest.main()
