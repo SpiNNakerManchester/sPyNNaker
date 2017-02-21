@@ -15,16 +15,11 @@ import string
 import sys
 
 import spynnaker
-from spinn_front_end_common.utilities import exceptions
 from spynnaker.pyNN.utilities.conf.log import ConfiguredFilter
 from spynnaker.pyNN.utilities.conf.log import ConfiguredFormatter
 
 
 def _install_cfg():
-    if os.environ.get('READTHEDOCS', None) == 'True':
-        print "config file creation prevented as in readthedocs"
-        return
-
     template_cfg = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                 "spynnaker.cfg.template")
     home_cfg = os.path.expanduser("~/.spynnaker.cfg")
@@ -41,36 +36,6 @@ def _install_cfg():
     print "************************************"
     sys.exit(0)
 
-# Create a config, read global defaults and then read in additional files
-config = ConfigParser.RawConfigParser()
-default = os.path.join(os.path.dirname(spynnaker.__file__), "spynnaker.cfg")
-spynnaker_user = os.path.expanduser("~/.spynnaker.cfg")
-spynnaker_others = (spynnaker_user, "spynnaker.cfg")
-located_spynnaker = list()
-
-found_spynnakers = False
-for possible_spynnaker_file in spynnaker_others:
-    if os.path.isfile(possible_spynnaker_file):
-        found_spynnakers = True
-        located_spynnaker.append(os.path.abspath(possible_spynnaker_file))
-
-
-with open(default) as f:
-    config.readfp(f)
-if found_spynnakers:
-    read = config.read(spynnaker_others)
-else:
-    # Create a default spynnaker.cfg in the user home directory and get them
-    # to update it.
-    _install_cfg()
-
-read.append(default)
-
-machine_spec_file_path = config.get("Machine", "machine_spec_file")
-if machine_spec_file_path != "None":
-    config.read(machine_spec_file_path)
-    read.append(machine_spec_file_path)
-
 
 # creates a directory if needed, or deletes it and rebuilds it
 def create_directory(directory):
@@ -84,20 +49,54 @@ def create_directory(directory):
         os.makedirs(directory)
 
 
-# Create the root logger with the given level
-# Create filters based on logging levels
-try:
-    if config.getboolean("Logging", "instantiate"):
-        logging.basicConfig(level=0)
+if os.environ.get('READTHEDOCS', None) == 'True':
+    print "config loading prevented as in readthedocs"
+else:
+    # Create a config, read global defaults and then read in additional files
+    config = ConfigParser.RawConfigParser()
+    default = os.path.join(os.path.dirname(spynnaker.__file__),
+                           "spynnaker.cfg")
+    spynnaker_user = os.path.expanduser("~/.spynnaker.cfg")
+    spynnaker_others = (spynnaker_user, "spynnaker.cfg")
+    located_spynnaker = list()
 
-    for handler in logging.root.handlers:
-        handler.addFilter(ConfiguredFilter(config))
-        handler.setFormatter(ConfiguredFormatter(config))
-except ConfigParser.NoSectionError:
-    pass
-except ConfigParser.NoOptionError:
-    pass
+    found_spynnakers = False
+    for possible_spynnaker_file in spynnaker_others:
+        if os.path.isfile(possible_spynnaker_file):
+            found_spynnakers = True
+            located_spynnaker.append(os.path.abspath(possible_spynnaker_file))
 
-# Log which config files we read
-logger = logging.getLogger(__name__)
-logger.info("Read config files: %s" % string.join(read, ", "))
+    with open(default) as f:
+        config.readfp(f)
+    if found_spynnakers:
+        read = config.read(spynnaker_others)
+    else:
+        # Create a default spynnaker.cfg in the user home directory and
+        # get them to update it.
+        _install_cfg()
+
+    read.append(default)
+
+    machine_spec_file_path = config.get("Machine", "machine_spec_file")
+    if machine_spec_file_path != "None":
+        config.read(machine_spec_file_path)
+        read.append(machine_spec_file_path)
+
+    # Create the root logger with the given level
+    # Create filters based on logging levels
+    try:
+        if config.getboolean("Logging", "instantiate"):
+            logging.basicConfig(level=0)
+
+        for handler in logging.root.handlers:
+            handler.addFilter(ConfiguredFilter(config))
+            handler.setFormatter(ConfiguredFormatter(config))
+    except ConfigParser.NoSectionError:
+        pass
+    except ConfigParser.NoOptionError:
+        pass
+
+    # Log which config files we read
+    logger = logging.getLogger(__name__)
+    logger.info("Read config files: %s" % string.join(read, ", "))
+
