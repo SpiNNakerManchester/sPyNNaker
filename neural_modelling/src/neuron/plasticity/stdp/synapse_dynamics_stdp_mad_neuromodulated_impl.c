@@ -57,9 +57,10 @@ typedef struct
 } pre_event_history_t;
 
 post_event_history_t *post_event_history;
-int32_t weight_update_constant_component;
+int16_t weight_update_constant_component;
 int16_t last_dopamine_level = 0;
 uint32_t last_dopamine_spike_time = 0;
+weight_state_t weight_state;
 
 
 //---------------------------------------
@@ -135,13 +136,19 @@ static inline void correlation_apply_post_spike(
     int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
 
     // Evaluate weight function
-    previous_state -> weight += STDP_FIXED_MUL_16X16(
+    uint16_t weight_change = STDP_FIXED_MUL_16X16(
         STDP_FIXED_MUL_16X16(
             STDP_FIXED_MUL_16X16(post_event_history -> last_neuromodulator_level,
                 previous_state -> eligibility_trace),
             weight_update_constant_component),
         STDP_FIXED_MUL_16X16(decay_eligibility_trace, decay_dopamine_trace)
             - third_exp_component);
+    // Scale weight change
+    previous_state -> weight += weight_change;
+    // Clamp new weight
+    previous_state -> weight= MIN(weight_state.weight_region->max_weight,
+                                  MAX(previous_state -> weight,
+                                  weight_state.weight_region->min_weight));
 }
 
 static inline void correlation_apply_pre_spike(
@@ -196,13 +203,20 @@ static inline void correlation_apply_pre_spike(
     int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
 
     // Evaluate weight function
-    previous_state -> weight += STDP_FIXED_MUL_16X16(
+    int16_t weight_change = STDP_FIXED_MUL_16X16(
         STDP_FIXED_MUL_16X16(
             STDP_FIXED_MUL_16X16(post_event_history -> last_neuromodulator_level,
                 previous_state -> eligibility_trace),
             weight_update_constant_component),
         STDP_FIXED_MUL_16X16(decay_eligibility_trace, decay_dopamine_trace)
             - third_exp_component);
+    // Scale weight change and add to weight
+    previous_state -> weight += weight_change;
+    // Clamp new weight
+    previous_state -> weight= MIN(weight_state.weight_region->max_weight,
+                                  MAX(previous_state -> weight,
+                                  weight_state.weight_region->min_weight));
+
 
 }
 
@@ -246,7 +260,6 @@ static inline plastic_synapse_t plasticity_update_synapse(
         if (post_window.next_trace -> dopamine != 0) {
             post_event_history -> last_neuromodulator_level =
                 post_window.next_trace -> dopamine;
-            post_event_history -> last_dopamine_spike_time = delayed_post_time;
         }
 
         log_debug("\t\tUpdating correlation from last synaptic event at time %u to %u\n",
@@ -405,6 +418,7 @@ void synapse_dynamics_process_plastic_synapses(address_t plastic,
 
        // Get state of synapse - weight and eligibility trace.
        plastic_synapse_t* current_state = plastic_words;
+       weight_state = weight_get_initial(current_state -> weight, type);
        log_debug("Synapse state %x, weight %f", *current_state, current_state -> weight);
        log_debug("Eligibility trace %f", current_state -> eligibility_trace);
 
