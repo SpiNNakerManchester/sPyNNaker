@@ -57,6 +57,7 @@ static inline post_event_history_t *post_events_init_buffers(
         post_event_history[n].times[0] = 0;
         post_event_history[n].traces[0] = timing_get_initial_post_trace();
         post_event_history[n].count_minus_one = 0;
+        post_event_history[n].last_dopamine_spike_time = 0;
         post_event_history[n].last_neuromodulator_level = 0;
     }
 
