@@ -11,13 +11,9 @@ from ._version import __version__, __version_name__, __version_month__,\
     __version_year__
 
 
-# utility functions
-from .utilities import utility_calls
-
 # pynn centric classes
 from .spinnaker import Spinnaker as __Spinnaker
 from .spinnaker import executable_finder as __exec_finder
-from spynnaker.pyNN import exceptions
 
 # notification protocol classes (stored in front end common)
 from spinn_front_end_common.utilities.notification_protocol.\
@@ -102,8 +98,9 @@ import spynnaker
 # constraints
 
 # note importing star is a bad thing to do.
-from pyNN.random import *
-from pyNN.space import *
+from pyNN.random import NumpyRNG, RandomDistribution 
+from pyNN.space import \
+    distance, Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure
 import os as __os
 import numpy as __numpy
 
@@ -126,7 +123,7 @@ __all__ = [
     'FixedProbabilityConnector', 'FromListConnector', 'FromFileConnector',
     'MultapseConnector', 'OneToOneConnector', 'FixedNumberPostConnector',
     'DistanceDependentProbabilityConnector', 'SynapseDynamics',
-    'STDPMechanism', 'AdditiveWeightDependence', 'SpikePairRule'
+    'STDPMechanism', 'AdditiveWeightDependence', 'SpikePairRule',
     'MultiplicativeWeightDependence', 'PfisterSpikeTripletRule',
     # Stuff from pyNN.random
     'NumpyRNG', 'RandomDistribution',
