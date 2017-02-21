@@ -1,6 +1,6 @@
 import unittest
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
-import os, time
+import os
 import shutil
 
 

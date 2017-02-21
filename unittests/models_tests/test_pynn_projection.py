@@ -55,10 +55,15 @@ cell_params_cochlea = {}
 cell_params_retina = {}
 cell_params_motor = {}
 cell_params_multicast = {}
-pyNN.setup(timestep=1, min_delay=1, max_delay=15.0)
 
 
 class TestProjection(unittest.TestCase):
+    def setUp(self):
+        pyNN.setup(timestep=1, min_delay=1, max_delay=15.0)
+
+    def tearDown(self):
+        pyNN.end()
+
     """
     Test the Projection class
     """

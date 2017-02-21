@@ -4,9 +4,6 @@ import spynnaker.pyNN as pyNN
 from pprint import pprint as pp
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
-if pyNN._spinnaker is None:
-    pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
-
 cell_params_lif = {'cm': 0.25,
                    'i_offset': 0.0,
                    'tau_m': 20.0,
@@ -20,6 +17,12 @@ spike_array = {'spike_times': [0]}
 
 
 class TestingFixedNumberPreConnector(unittest.TestCase):
+    def setUp(self):
+        pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
+
+    def tearDown(self):
+        pyNN.end()
+
     @unittest.skip("broken; API changed")
     def test_generate_synapse_list_pre_0(self):
         number_of_neurons = 5

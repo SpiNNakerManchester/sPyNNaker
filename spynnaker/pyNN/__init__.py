@@ -119,7 +119,7 @@ _binary_search_paths = []
 
 __all__ = [
     # Ugly, but tests expect it
-    'utility_calls'
+    'utility_calls',
     # Implementations of the neuroscience models
     'IF_cond_exp', 'IF_curr_dual_exp', 'IF_curr_exp', 'IZK_curr_exp',
     'IZK_cond_exp', 'DelayAfferentApplicationEdge', 'DelayExtensionVertex',

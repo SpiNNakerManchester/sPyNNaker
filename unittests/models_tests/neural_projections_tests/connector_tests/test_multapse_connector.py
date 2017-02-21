@@ -2,6 +2,7 @@
 import unittest
 import spynnaker.pyNN as pyNN
 from pprint import pprint as pp
+
 cell_params_lif = {
     'cm': 0.25,
     'i_offset': 0.0,
@@ -13,11 +14,15 @@ cell_params_lif = {
     'v_rest': -65.0,
     'v_thresh': -50.0
 }
-if pyNN._spinnaker is None:
-    pyNN.setup(timestep=1, min_delay=1, max_delay=10)
 
 
 class MultapseConnectorTest(unittest.TestCase):
+    def setUp(self):
+        pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
+
+    def tearDown(self):
+        pyNN.end()
+
     def test_a(self):
         weight = 2
         delay = 1

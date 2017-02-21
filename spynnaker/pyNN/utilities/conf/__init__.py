@@ -72,7 +72,7 @@ def _load_config(filename, config_parsers=[]):
         _install_cfg(filename)
         sys.exit(2)
 
-    for (section,parser) in config_parsers:
+    for (section, parser) in config_parsers:
         if config.has_section(section):
             result = parser(config)
             if result is not None:

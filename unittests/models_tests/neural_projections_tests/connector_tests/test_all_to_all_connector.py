@@ -3,8 +3,6 @@ import unittest
 import spynnaker.pyNN as pyNN
 from pprint import pprint as pp
 
-if pyNN._spinnaker is None:
-    pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
 nNeurons = 10
 cell_params_lif = {'cm': 0.25,
                    'i_offset': 0.0,
@@ -19,6 +17,12 @@ spike_array = {'spike_times': [0]}
 
 
 class TestingAllToAllConnector(unittest.TestCase):
+    def setUp(self):
+        pyNN.setup(timestep=1, min_delay=1, max_delay=10.0)
+
+    def tearDown(self):
+        pyNN.end()
+
     @unittest.skip("broken; API changed")
     def test_generate_synapse_list(self):
         number_of_neurons = 5
