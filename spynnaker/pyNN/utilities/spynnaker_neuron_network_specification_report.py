@@ -13,14 +13,12 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     """
     """
 
-    def __call__(self, report_folder, application_graph, connection_holder,
-                 dsg_targets):
+    def __call__(self, report_folder, application_graph):
         """
 
         :param report_folder: the report folder to put figure into
         :param application_graph: the app graph
         :param connection_holder: the set of connection holders
-        :param dsg_targets: the dsg to ensure dsg has been executed
         :return: None
         """
         try:
@@ -30,12 +28,6 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
                 "graphviz is required to use this report.  Please install"
                 " graphviz if you want to use this report.")
 
-        # verify that the dsg has been executed
-        if dsg_targets is None:
-            raise exceptions.SynapticConfigurationException(
-                "dsg targets should not be none, used as a check for "
-                "connection holder data to be generated")
-
         # create holders for data
         vertex_holders = dict()
         dot_diagram = graphviz.Digraph(
@@ -44,7 +36,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         # build progress bar for the vertices, edges, and rendering
         progress_bar = ProgressBar(
             len(application_graph.vertices) +
-            len(connection_holder.keys()) + 1,
+            len(application_graph.edges) + 1,
             "generating the graphical representation of the neural network")
 
         # write vertices into dot diagram
@@ -59,19 +51,19 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
 
         # write edges into dot diagram
         for edge in application_graph.edges:
-                source_vertex_id = vertex_holders[edge.pre_vertex]
-                dest_vertex_id = vertex_holders[edge.post_vertex]
-                if isinstance(edge, ProjectionApplicationEdge):
-                    for synapse_info in edge.synapse_information:
-                        dot_diagram.edge(
-                            "{}".format(source_vertex_id),
-                            "{}".format(dest_vertex_id),
-                            "{}".format(synapse_info.connector))
-                else:
+            source_vertex_id = vertex_holders[edge.pre_vertex]
+            dest_vertex_id = vertex_holders[edge.post_vertex]
+            if isinstance(edge, ProjectionApplicationEdge):
+                for synapse_info in edge.synapse_information:
                     dot_diagram.edge(
                         "{}".format(source_vertex_id),
-                        "{}".format(dest_vertex_id))
-                progress_bar.update()
+                        "{}".format(dest_vertex_id),
+                        "{}".format(synapse_info.connector))
+            else:
+                dot_diagram.edge(
+                    "{}".format(source_vertex_id),
+                    "{}".format(dest_vertex_id))
+            progress_bar.update()
 
         # write dot file and generate pdf
         file_to_output = os.path.join(report_folder, "network_graph.gv")
