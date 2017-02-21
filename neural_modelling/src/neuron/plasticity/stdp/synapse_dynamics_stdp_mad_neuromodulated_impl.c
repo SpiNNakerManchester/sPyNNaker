@@ -72,12 +72,10 @@ static inline post_trace_t add_dopamine_spike(
 
     // Apply exponential decay to get the current value
     int32_t decayed_trace = STDP_FIXED_MUL_16X16(dopamine_trace,
-            DECAY_LOOKUP_TAU_MINUS(delta_time));
+            DECAY_LOOKUP_TAU_D(delta_time));
 
     // Increase dopamine level due to new spike
     int16_t new_trace = decayed_trace + concentration;
-
-    log_debug("\tdelta_time=%d, o1=%d\n", delta_time, decayed_trace);
 
     // Return decayed dopamine trace
     return (post_trace_t) { .stdp_post_trace = 0, .dopamine = new_trace };
@@ -117,7 +115,7 @@ static inline void correlation_apply_post_spike(
          decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
     }
 
-    // Decay dopamine trace
+    // Find how much dopamine trace needs to be decayed
     uint32_t time_since_last_neuromodulator =
         time - post_event_history -> last_dopamine_spike_time;
     int16_t decay_dopamine_trace =
@@ -179,7 +177,7 @@ static inline void correlation_apply_pre_spike(
          decay_eligibility_trace = DECAY_LOOKUP_TAU_C(time_since_last_update);
     }
 
-    // Decay dopamine trace
+    // Find how much dopamine trace needs to be decayed
     uint32_t time_since_last_neuromodulator =
         time - post_event_history -> last_dopamine_spike_time;
     int16_t decay_dopamine_trace =
@@ -348,7 +346,7 @@ void synapse_dynamics_process_post_synaptic_event(
 //--------------------------------------
 void synapse_dynamics_process_neuromodulator_event(
         uint32_t time, int16_t concentration, uint32_t neuron_index) {
-    log_debug("Adding neuromodulation event to trace at time:%u", time);
+    log_debug("Adding neuromodulation event to trace at time:%u concentration: %d", time, concentration);
 
     // Get post event history of this neuron
     post_event_history_t *history = &post_event_history[neuron_index];
