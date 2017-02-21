@@ -70,15 +70,14 @@ for t in delta_t:
     pre_times = [i for i in range(pre_phase, sim_time, time_between_pairs)]
     post_times = [i for i in range(post_phase, sim_time, time_between_pairs)]
     pre_stim = sim.Population(1, sim.SpikeSourceArray,
-                              {'spike_times': [pre_times,]})
+                              {'spike_times': [pre_times, ]})
     post_stim = sim.Population(1, sim.SpikeSourceArray,
-                               {'spike_times': [post_times,]})
+                               {'spike_times': [post_times, ]})
 
     # Connections between spike sources and neuron populations
     ee_connector = sim.OneToOneConnector(weights=2)
     sim.Projection(pre_stim, pre_pop, ee_connector, target='excitatory')
     sim.Projection(post_stim, post_pop, ee_connector, target='excitatory')
-
 
     # Plastic Connection between pre_pop and post_pop
     stdp_model = sim.STDPMechanism(

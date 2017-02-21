@@ -1,9 +1,8 @@
+#!/usr/bin/python
 """
 Synfirechain-like example
 """
-#!/usr/bin/python
 import pylab
-
 import spynnaker.pyNN as p
 
 

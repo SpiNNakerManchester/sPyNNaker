@@ -3,12 +3,12 @@
 Synfirechain-like example
 """
 import spynnaker.pyNN as p
-#import pyNN.spiNNaker as p
+# import pyNN.spiNNaker as p
 import pylab
 
 # p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
 p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-nNeurons = 10 # number of neurons in each population
+nNeurons = 10  # number of neurons in each population
 max_delay = 50
 # p.set_number_of_neurons_per_core("IF_curr_exp", n_neurons / 2)
 # p.set_number_of_neurons_per_core("DelayExtension", n_neurons / 2)
@@ -86,7 +86,7 @@ gsyn = populations[0].get_gsyn(compatible_output=True)
 spikes = populations[0].getSpikes(compatible_output=True)
 
 if spikes is not None:
-    #print spikes
+    # print spikes
     pylab.figure()
     pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
     pylab.xlabel('neuron id')

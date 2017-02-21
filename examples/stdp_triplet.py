@@ -22,7 +22,7 @@ delta_t = [-10, 10]
 def generate_fixed_frequency_test_data(frequency, first_spike_time,
                                        num_spikes):
     # Calculate interspike delays in ms
-    interspike_delay = int(1000.0 / float(frequency));
+    interspike_delay = int(1000.0 / float(frequency))
 
     # Generate spikes
     return [first_spike_time + (s * interspike_delay)
@@ -63,9 +63,9 @@ for t in delta_t:
         post_times = generate_fixed_frequency_test_data(f, start_time + t,
                                                         num_pairs)
         pre_stim = sim.Population(1, sim.SpikeSourceArray,
-                                  {'spike_times': [pre_times,]})
+                                  {'spike_times': [pre_times, ]})
         post_stim = sim.Population(1, sim.SpikeSourceArray,
-                                   {'spike_times': [post_times,]})
+                                   {'spike_times': [post_times, ]})
 
         # Update simulation time
         sim_time = max(sim_time, max(max(pre_times), max(post_times)) + 100)
