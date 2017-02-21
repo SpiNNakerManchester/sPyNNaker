@@ -11,6 +11,9 @@ from ._version import __version__, __version_name__, __version_month__,\
     __version_year__
 
 
+# utility functions
+from .utilities import utility_calls
+
 # pynn centric classes
 from .spinnaker import Spinnaker as __Spinnaker
 from .spinnaker import executable_finder as __exec_finder
@@ -115,6 +118,8 @@ _spinnaker = None
 _binary_search_paths = []
 
 __all__ = [
+    # Ugly, but tests expect it
+    'utility_calls'
     # Implementations of the neuroscience models
     'IF_cond_exp', 'IF_curr_dual_exp', 'IF_curr_exp', 'IZK_curr_exp',
     'IZK_cond_exp', 'DelayAfferentApplicationEdge', 'DelayExtensionVertex',
