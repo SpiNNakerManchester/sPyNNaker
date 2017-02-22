@@ -164,3 +164,6 @@ class AllToAllConnector(AbstractConnector):
             self._delays, n_connections, connection_slices)
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "AllToAllConnector()"

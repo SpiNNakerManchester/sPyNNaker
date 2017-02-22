@@ -71,7 +71,16 @@ class Spinnaker(SpinnakerMainInterface):
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
 
+        extra_mapping_algorithms = list()
+        extra_load_algorithms = list()
         extra_algorithms_pre_run = list()
+
+        if config.getboolean("Reports", "draw_network_graph"):
+            extra_mapping_algorithms.append(
+                "SpYNNakerConnectionHolderGenerator")
+            extra_load_algorithms.append(
+                "SpYNNakerNeuronGraphNetworkSpecificationReport")
+
         if config.getboolean("Reports", "ReportsEnabled"):
             if config.getboolean("Reports", "writeSynapticReport"):
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
@@ -82,6 +91,8 @@ class Spinnaker(SpinnakerMainInterface):
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             extra_mapping_inputs=extra_mapping_inputs,
+            extra_mapping_algorithms=extra_mapping_algorithms,
+            extra_load_algorithms=extra_load_algorithms,
             n_chips_required=n_chips_required,
             extra_pre_run_algorithms=extra_algorithms_pre_run)
 
