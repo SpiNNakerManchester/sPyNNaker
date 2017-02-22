@@ -137,3 +137,9 @@ To install as a development version for only yourself, run:
     python setup.py develop --user
 
 If you also want pyNN.spiNNaker support, please install this as described above.
+
+Documentation
+=============
+[sPyNNaker Python documentation](http://spynnaker.readthedocs.io)
+
+[Combined python documentation](http://spinnakermanchester.readthedocs.io)
