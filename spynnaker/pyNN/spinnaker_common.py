@@ -102,7 +102,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
             extra_mapping_inputs.update(user_extra_mapping_inputs)
 
         extra_algorithms_pre_run = list()
-        if config.getboolean("Reports", "ReportsEnabled"):
+        if config.getboolean("Reports", "reportsEnabled"):
             if config.getboolean("Reports", "writeSynapticReport"):
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
         if user_extra_algorithms_pre_run is not None:
