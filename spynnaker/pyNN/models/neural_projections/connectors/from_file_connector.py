@@ -17,7 +17,6 @@ class FromFileConnector(FromListConnector):
             real_file = files.StandardTextFile(file, mode="r")
             opened_file = True
 
-        conn_list = None
         if distributed:
             directory = os.path.dirname(real_file.file)
             filename = "{}.".format(os.path.basename(real_file.file))
