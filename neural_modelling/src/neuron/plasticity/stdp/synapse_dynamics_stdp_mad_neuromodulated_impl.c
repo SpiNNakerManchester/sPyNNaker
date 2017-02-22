@@ -57,7 +57,7 @@ typedef struct
 } pre_event_history_t;
 
 post_event_history_t *post_event_history;
-int16_t weight_update_constant_component;
+uint32_t weight_update_constant_component;
 int16_t last_dopamine_level = 0;
 uint32_t last_dopamine_spike_time = 0;
 weight_state_t weight_state;
@@ -136,15 +136,16 @@ static inline void correlation_apply_post_spike(
     int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
 
     // Evaluate weight function
-    uint16_t weight_change = STDP_FIXED_MUL_16X16(
-        STDP_FIXED_MUL_16X16(
+    uint32_t weight_change = STDP_FIXED_MUL_16X16(
             STDP_FIXED_MUL_16X16(post_event_history -> last_neuromodulator_level,
                 previous_state -> eligibility_trace),
-            weight_update_constant_component),
+            STDP_FIXED_MUL_16X16(weight_update_constant_component,
         STDP_FIXED_MUL_16X16(decay_eligibility_trace, decay_dopamine_trace)
-            - third_exp_component);
+            - third_exp_component));
+
     // Scale weight change
     previous_state -> weight += weight_change;
+
     // Clamp new weight
     previous_state -> weight= MIN(weight_state.weight_region->max_weight,
                                   MAX(previous_state -> weight,
@@ -203,15 +204,16 @@ static inline void correlation_apply_pre_spike(
     int16_t third_exp_component = DECAY_LOOKUP_TAU_D(time_between_updates);
 
     // Evaluate weight function
-    int16_t weight_change = STDP_FIXED_MUL_16X16(
-        STDP_FIXED_MUL_16X16(
+    uint32_t weight_change = STDP_FIXED_MUL_16X16(
             STDP_FIXED_MUL_16X16(post_event_history -> last_neuromodulator_level,
                 previous_state -> eligibility_trace),
-            weight_update_constant_component),
+            STDP_FIXED_MUL_16X16(weight_update_constant_component,
         STDP_FIXED_MUL_16X16(decay_eligibility_trace, decay_dopamine_trace)
-            - third_exp_component);
+            - third_exp_component));
+
     // Scale weight change and add to weight
     previous_state -> weight += weight_change;
+
     // Clamp new weight
     previous_state -> weight= MIN(weight_state.weight_region->max_weight,
                                   MAX(previous_state -> weight,
