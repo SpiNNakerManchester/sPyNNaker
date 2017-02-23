@@ -8,6 +8,7 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
+from spynnaker.pyNN.utilities import globals_variables
 
 _IZK_THRESHOLD = 30.0
 
@@ -23,7 +24,7 @@ class IzkCondExpBase(AbstractPopulationVertex):
 
     # noinspection PyPep8Naming
     def __init__(
-            self, n_neurons, config, spikes_per_second=None,
+            self, n_neurons, spikes_per_second=None,
             ring_buffer_sigma=None,
             incoming_spike_buffer_size=None, constraints=None, label=None,
             a=default_parameters['a'], b=default_parameters['b'],
@@ -50,7 +51,8 @@ class IzkCondExpBase(AbstractPopulationVertex):
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="IZK_cond_exp", neuron_model=neuron_model,
-            input_type=input_type, synapse_type=synapse_type, config=config,
+            input_type=input_type, synapse_type=synapse_type,
+            config=globals_variables.get_simulator().config,
             threshold_type=threshold_type, constraints=constraints)
 
     @staticmethod

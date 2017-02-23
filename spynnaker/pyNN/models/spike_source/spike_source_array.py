@@ -23,6 +23,8 @@ from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
 from spynnaker.pyNN.utilities import constants
 
+from spynnaker.pyNN.utilities import globals_variables
+
 logger = logging.getLogger(__name__)
 
 
@@ -35,7 +37,7 @@ class SpikeSourceArray(
     _model_based_max_atoms_per_core = sys.maxint
 
     def __init__(
-            self, n_neurons, config,
+            self, n_neurons,
             spike_times=None, port=None, tag=None, ip_address=None,
             board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
                 constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
@@ -45,6 +47,8 @@ class SpikeSourceArray(
                 constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
             buffer_size_before_receive=(
                 constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)):
+
+        config = globals_variables.get_simulator().config
         self._ip_address = ip_address
         if ip_address is None:
             self._ip_address = config.get("Buffers", "receive_buffer_host")
