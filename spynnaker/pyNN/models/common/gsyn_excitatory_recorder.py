@@ -42,6 +42,6 @@ class GsynExcitatoryRecorder(AbstractUInt32Recorder):
     def get_gsyn_excitatory(
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, machine_time_step):
-        self.get_gsyn(
+        self.get_data(
             label, buffer_manager, region, placements, graph_mapper,
             application_vertex, machine_time_step, "gsyn_excitatory")
