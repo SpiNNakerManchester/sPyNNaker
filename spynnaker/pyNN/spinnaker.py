@@ -224,6 +224,11 @@ class Spinnaker(SpinnakerMainInterface):
         return self._max_supported_delay
 
     def add_application_vertex(self, vertex_to_add):
+        """
+
+        :param vertex_to_add:
+        :return:
+        """
         if isinstance(vertex_to_add, CommandSender):
             self._command_sender = vertex_to_add
 
@@ -284,6 +289,15 @@ class Spinnaker(SpinnakerMainInterface):
         return len(unique_keys)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
+        """
+
+        :param size:
+        :param cellclass:
+        :param cellparams:
+        :param structure:
+        :param label:
+        :return:
+        """
         return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
@@ -311,7 +325,7 @@ class Spinnaker(SpinnakerMainInterface):
         :param synapse_dynamics: plasticity object
         :param label: human readable version of the projection
         :param rng: the random number generator to use on this projection
-        :return Projection:
+        :return:
         """
         if label is None:
             label = "Projection {}".format(self._edge_count)
@@ -326,8 +340,7 @@ class Spinnaker(SpinnakerMainInterface):
             user_max_delay=self.max_supported_delay)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
-             clear_tags=None, extract_provenance_data=True,
-             extract_iobuf=True):
+             clear_tags=None):
         """
         :param turn_off_machine: decides if the machine should be powered down\
             after running the execution. Note that this powers down all boards\
@@ -339,20 +352,13 @@ class Spinnaker(SpinnakerMainInterface):
         :param clear_tags: informs the tool chain if it should clear the tags\
             off the machine at stop
         :type clear_tags: boolean
-        :param extract_provenance_data: informs the tools if it should \
-            try to extract provenance data.
-        :type extract_provenance_data: bool
-        :param extract_iobuf: tells the tools if it should try to \
-            extract iobuf
-        :type extract_iobuf: bool
-        :return None:
+        :return: None
         """
         for population in self._populations:
             population._end()
 
         SpinnakerMainInterface.stop(
-            self, turn_off_machine, clear_routing_tables, clear_tags,
-            extract_provenance_data, extract_iobuf)
+            self, turn_off_machine, clear_routing_tables, clear_tags)
 
     def run(self, run_time):
         """ Run the model created
