@@ -5,6 +5,8 @@ from spinn_front_end_common.abstract_models. \
     abstract_changable_after_run import AbstractChangableAfterRun
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_machine.utilities.progress_bar import ProgressBar
+from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector import \
+    FromListConnector
 
 from spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge \
     import DelayAfferentApplicationEdge
@@ -41,6 +43,9 @@ class PyNNProjectionCommon(object):
         # control flags
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
+
+        if isinstance(connector, FromListConnector):
+            connector.convert_into_numpy()
 
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(
