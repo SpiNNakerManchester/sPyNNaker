@@ -40,7 +40,7 @@ class IzkCondExpBase(AbstractPopulationVertex):
         neuron_model = NeuronModelIzh(
             n_neurons, a, b, c, d, v_init, u_init, i_offset)
         synapse_type = SynapseTypeExponential(
-            n_neurons, tau_syn_E, tau_syn_I)
+            n_neurons, tau_syn_E, tau_syn_I, 0, 0)
         input_type = InputTypeConductance(n_neurons, e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(n_neurons, _IZK_THRESHOLD)
 

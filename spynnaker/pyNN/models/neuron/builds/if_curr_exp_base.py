@@ -22,7 +22,7 @@ class IFCurrExpBase(AbstractPopulationVertex):
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
         'v_thresh': -50.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
-        'tau_refrac': 0.1, 'i_offset': 0}
+        'tau_refrac': 0.1, 'i_offset': 0, 'isyn_exc': 0.0, 'isyn_inh': 0.0}
 
     def __init__(
             self, n_neurons, spikes_per_second=None,
@@ -35,13 +35,15 @@ class IFCurrExpBase(AbstractPopulationVertex):
             tau_syn_E=default_parameters['tau_syn_E'],
             tau_syn_I=default_parameters['tau_syn_I'],
             tau_refrac=default_parameters['tau_refrac'],
-            i_offset=default_parameters['i_offset'], v_init=None):
+            i_offset=default_parameters['i_offset'], v_init=None,
+            isyn_exc=default_parameters['isyn_exc'],
+            isyn_inh=default_parameters['isyn_inh']):
 
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
-            n_neurons, tau_syn_E, tau_syn_I)
+            n_neurons, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
@@ -63,3 +65,19 @@ class IFCurrExpBase(AbstractPopulationVertex):
     @staticmethod
     def get_max_atoms_per_core():
         return IFCurrExpBase._model_based_max_atoms_per_core
+
+    @property
+    def isyn_exc(self):
+        return self.synapse_type.initial_value_exc
+
+    @property
+    def isyn_inh(self):
+        return self.synapse_type.initial_value_inh
+
+    @isyn_exc.setter
+    def isyn_exc(self, new_value):
+        self.synapse_type.initial_value_exc = new_value
+
+    @isyn_inh.setter
+    def isyn_inh(self, new_value):
+        self.synapse_type.initial_value_inh = new_value

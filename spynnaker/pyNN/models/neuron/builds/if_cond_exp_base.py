@@ -23,7 +23,7 @@ class IFCondExpBase(AbstractPopulationVertex):
         'tau_m': 20.0, 'cm': 1.0, 'e_rev_E': 0.0, 'e_rev_I': -70.0,
         'v_rest': -65.0, 'v_reset': -65.0, 'v_thresh': -50.0,
         'tau_syn_E': 5.0, 'tau_syn_I': 5.0, 'tau_refrac': 0.1,
-        'i_offset': 0}
+        'i_offset': 0, 'gsyn_exc': 0.0, 'gsyn_inh': 0.0}
 
     def __init__(
             self, n_neurons, spikes_per_second=None,
@@ -37,13 +37,15 @@ class IFCondExpBase(AbstractPopulationVertex):
             tau_refrac=default_parameters['tau_refrac'],
             i_offset=default_parameters['i_offset'],
             e_rev_E=default_parameters['e_rev_E'],
-            e_rev_I=default_parameters['e_rev_I'], v_init=None):
+            e_rev_I=default_parameters['e_rev_I'], v_init=None,
+            gsyn_exc=default_parameters['gsyn_exc'],
+            gsyn_inh=default_parameters['gsyn_inh']):
 
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
-            n_neurons, tau_syn_E, tau_syn_I)
+            n_neurons, tau_syn_E, tau_syn_I, gsyn_exc, gsyn_inh)
         input_type = InputTypeConductance(n_neurons, e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
@@ -57,6 +59,22 @@ class IFCondExpBase(AbstractPopulationVertex):
             input_type=input_type, synapse_type=synapse_type,
             threshold_type=threshold_type, constraints=constraints,
             config=globals_variables.get_simulator().config)
+
+    @property
+    def gsyn_exc(self):
+        return self.synapse_type.initial_value_exc
+
+    @property
+    def gsyn_inh(self):
+        return self.synapse_type.initial_value_inh
+
+    @gsyn_exc.setter
+    def gsyn_exc(self, new_value):
+        self.synapse_type.initial_value_exc = new_value
+
+    @gsyn_inh.setter
+    def gsyn_inh(self, new_value):
+        self.synapse_type.initial_value_inh = new_value
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
