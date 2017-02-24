@@ -127,3 +127,19 @@ class FixedProbabilityConnector(AbstractConnector):
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
+
+    @property
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, new_value):
+        self._weights = new_value
+
+    @property
+    def delays(self):
+        return self._delays
+
+    @delays.setter
+    def delays(self, new_value):
+        self._delays = new_value

@@ -189,3 +189,19 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @d_expression.setter
     def d_expression(self, new_value):
         self._d_expression = new_value
+
+    @property
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, new_value):
+        self._weights = new_value
+
+    @property
+    def delays(self):
+        return self._delays
+
+    @delays.setter
+    def delays(self, new_value):
+        self._delays = new_value

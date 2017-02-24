@@ -172,3 +172,19 @@ class AllToAllConnector(AbstractConnector):
     @allow_self_connections.setter
     def allow_self_connections(self, new_value):
         self._allow_self_connections = new_value
+
+    @property
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, new_value):
+        self._weights = new_value
+
+    @property
+    def delays(self):
+        return self._delays
+
+    @delays.setter
+    def delays(self, new_value):
+        self._delays = new_value
