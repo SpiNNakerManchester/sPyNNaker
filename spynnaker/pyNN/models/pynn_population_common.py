@@ -71,3 +71,22 @@ class PyNNPopulationCommon(object):
             globals_variables.get_simulator(). \
                 increment_none_labelled_vertex_count()
         return cell_label
+
+    @property
+    def size(self):
+        """ The number of neurons in the population
+        :return:
+        """
+        return self._vertex.n_atoms
+
+    @property
+    def _get_vertex(self):
+        return self._vertex
+
+    @property
+    def _internal_delay_vertex(self):
+        return self._delay_vertex
+
+    @_internal_delay_vertex.setter
+    def _internal_delay_vertex(self, delay_vertex):
+        self._delay_vertex = delay_vertex
