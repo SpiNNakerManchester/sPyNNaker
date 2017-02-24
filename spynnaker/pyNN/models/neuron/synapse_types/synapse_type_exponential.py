@@ -22,14 +22,18 @@ def get_exponential_decay_and_init(tau, machine_time_step):
 
 
 class SynapseTypeExponential(AbstractSynapseType):
-
-    def __init__(self, n_neurons, tau_syn_E, tau_syn_I):
+    def __init__(self, n_neurons, tau_syn_E, tau_syn_I,
+                 initial_input_exc, initial_input_inh):
         AbstractSynapseType.__init__(self)
         self._n_neurons = n_neurons
         self._tau_syn_E = utility_calls.convert_param_to_numpy(
             tau_syn_E, n_neurons)
         self._tau_syn_I = utility_calls.convert_param_to_numpy(
             tau_syn_I, n_neurons)
+        self._initial_input_exc = utility_calls.convert_param_to_numpy(
+            initial_input_exc, n_neurons)
+        self._initial_input_inh = utility_calls.convert_param_to_numpy(
+            initial_input_inh, n_neurons)
 
     @property
     def tau_syn_E(self):
@@ -49,6 +53,22 @@ class SynapseTypeExponential(AbstractSynapseType):
         self._tau_syn_I = utility_calls.convert_param_to_numpy(
             tau_syn_I, self._n_neurons)
 
+    @property
+    def initial_value_exc(self):
+        return self._initial_input_exc
+
+    @initial_value_exc.setter
+    def initial_value_exc(self, new_value):
+        self._initial_input_exc = new_value
+
+    @property
+    def initial_value_inh(self):
+        return self._initial_input_inh
+
+    @initial_value_inh.setter
+    def initial_value_inh(self, new_value):
+        self._initial_input_inh = new_value
+
     def get_n_synapse_types(self):
         return 2
 
@@ -63,7 +83,7 @@ class SynapseTypeExponential(AbstractSynapseType):
         return "excitatory", "inhibitory"
 
     def get_n_synapse_type_parameters(self):
-        return 4
+        return 6
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
@@ -76,7 +96,9 @@ class SynapseTypeExponential(AbstractSynapseType):
             NeuronParameter(e_decay, DataType.UINT32),
             NeuronParameter(e_init, DataType.UINT32),
             NeuronParameter(i_decay, DataType.UINT32),
-            NeuronParameter(i_init, DataType.UINT32)
+            NeuronParameter(i_init, DataType.UINT32),
+            NeuronParameter(self._initial_input_exc, DataType.UINT32),
+            NeuronParameter(self._initial_input_inh, DataType.UINT32)
         ]
 
     def get_n_cpu_cycles_per_neuron(self):
