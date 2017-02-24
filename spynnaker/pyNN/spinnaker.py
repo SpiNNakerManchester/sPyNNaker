@@ -224,11 +224,6 @@ class Spinnaker(SpinnakerMainInterface):
         return self._max_supported_delay
 
     def add_application_vertex(self, vertex_to_add):
-        """
-
-        :param vertex_to_add:
-        :return:
-        """
         if isinstance(vertex_to_add, CommandSender):
             self._command_sender = vertex_to_add
 
@@ -289,15 +284,6 @@ class Spinnaker(SpinnakerMainInterface):
         return len(unique_keys)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
-        """
-
-        :param size:
-        :param cellclass:
-        :param cellparams:
-        :param structure:
-        :param label:
-        :return:
-        """
         return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
@@ -325,7 +311,6 @@ class Spinnaker(SpinnakerMainInterface):
         :param synapse_dynamics: plasticity object
         :param label: human readable version of the projection
         :param rng: the random number generator to use on this projection
-        :return:
         """
         if label is None:
             label = "Projection {}".format(self._edge_count)
@@ -352,7 +337,7 @@ class Spinnaker(SpinnakerMainInterface):
         :param clear_tags: informs the tool chain if it should clear the tags\
             off the machine at stop
         :type clear_tags: boolean
-        :return: None
+        :rtype: None
         """
         for population in self._populations:
             population._end()
