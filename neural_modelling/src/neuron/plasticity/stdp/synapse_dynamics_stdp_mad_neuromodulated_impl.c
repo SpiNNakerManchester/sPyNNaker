@@ -262,6 +262,7 @@ static inline plastic_synapse_t plasticity_update_synapse(
         if (post_window.next_trace -> dopamine != 0) {
             post_event_history -> last_neuromodulator_level =
                 post_window.next_trace -> dopamine;
+            post_event_history -> last_dopamine_spike_time = delayed_post_time;
         }
 
         log_debug("\t\tUpdating correlation from last synaptic event at time %u to %u\n",
