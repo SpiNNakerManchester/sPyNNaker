@@ -35,20 +35,22 @@ class ExpSupervision(AbstractSynapseType):
             tau_syn_I, n_neurons)
 
     def get_n_synapse_types(self):
-        return 3
+        return 4
 
     def get_synapse_id_by_target(self, target):
         if target == "excitatory":
             return 0
         elif target == "inhibitory":
             return 1
-        elif target == "supervision":
+        elif target == "reward":
             return 2
+        elif target == "punishment":
+            return 3
 
         return None
 
     def get_synapse_targets(self):
-        return "excitatory", "inhibitory", "supervision"
+        return "excitatory", "inhibitory", "reward", "punishment"
 
     def get_n_synapse_type_parameters(self):
         return 4

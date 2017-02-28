@@ -16,7 +16,7 @@
 // Macros
 //---------------------------------------
 #define SYNAPSE_TYPE_BITS 2
-#define SYNAPSE_TYPE_COUNT 3
+#define SYNAPSE_TYPE_COUNT 4
 #define SYNAPSE_INPUT_TYPE_COUNT 2
 
 #include "../decay.h"
@@ -35,7 +35,7 @@ typedef struct synapse_param_t {
 #include "synapse_types.h"
 
 typedef enum input_buffer_regions {
-    EXCITATORY, INHIBITORY, SUPERVISION
+    EXCITATORY, INHIBITORY, REWARD, PUNISHMENT
 } input_buffer_regions;
 
 //---------------------------------------
@@ -166,8 +166,10 @@ static inline const char *synapse_types_get_type_char(
         return "X";
     } else if (synapse_type_index == INHIBITORY)  {
         return "I";
-    } else if (synapse_type_index == SUPERVISION) {
-        return "S";
+    } else if (synapse_type_index == REWARD) {
+        return "R";
+    } else if (synapse_type_index == PUNISHMENT) {
+        return "P";
     } else {
         log_debug("did not recognise synapse type %i", synapse_type_index);
         return "?";
