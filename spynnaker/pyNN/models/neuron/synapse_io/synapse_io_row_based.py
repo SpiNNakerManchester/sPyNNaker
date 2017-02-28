@@ -219,7 +219,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             # go into
             stages = numpy.floor((numpy.round(
                 delayed_connections["delay"] - 1.0)) / max_delay).astype(
-                "uint32")
+                    "uint32")
             delayed_row_indices = (
                 (delayed_connections["source"] - pre_vertex_slice.lo_atom) +
                 ((stages - 1) * pre_vertex_slice.n_atoms))
