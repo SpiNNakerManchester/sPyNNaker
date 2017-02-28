@@ -7,10 +7,13 @@ from pyNN.random import NumpyRNG
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 from spynnaker.pyNN.utilities import utility_calls
+import logging
 import numpy
 import math
 import re
 
+# global objects
+logger = logging.getLogger(__name__)
 
 @add_metaclass(ABCMeta)
 class AbstractConnector(object):
@@ -284,12 +287,15 @@ class AbstractConnector(object):
         weights = self._generate_values(
             values, n_connections, connection_slices)
         if self._safe:
-            if numpy.amin(weights) < 0 < numpy.amax(weights):
-                raise Exception(
-                    "Weights must be either all positive or all negative"
-                    " in projection {}->{}".format(
-                        self._pre_population.label,
-                        self._post_population.label))
+            if len(weights) ==0:
+                logger.warning("No connection in " + str(self))
+            else:
+                if numpy.amin(weights) < 0 < numpy.amax(weights):
+                    raise Exception(
+                        "Weights must be either all positive or all negative"
+                        " in projection {}->{}".format(
+                            self._pre_population.label,
+                            self._post_population.label))
         return numpy.abs(weights)
 
     def _clip_delays(self, delays):
