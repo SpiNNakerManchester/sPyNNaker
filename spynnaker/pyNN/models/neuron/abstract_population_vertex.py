@@ -16,8 +16,8 @@ from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
 
 # front end common imports
-from spinn_front_end_common.abstract_models\
-    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
+from spinn_front_end_common.utilities.utility_objs.executable_start_type \
+    import ExecutableStartType
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_partition_constraints import \
     AbstractProvidesIncomingPartitionConstraints
@@ -39,7 +39,6 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.utilities import helpful_functions
 
 # spynnaker imports
-from spinnman.model.enums.executable_start_type import ExecutableStartType
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
@@ -83,7 +82,7 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary, AbstractBinaryUsesSimulationRun,
+        AbstractHasAssociatedBinary,
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
@@ -500,8 +499,8 @@ class AbstractPopulationVertex(
         return (binary_title + self._synapse_manager.vertex_executable_suffix +
                 binary_extension)
 
-    @overrides(AbstractHasAssociatedBinary.get_binary_start_mode_enum)
-    def get_binary_start_mode_enum(self):
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
         return ExecutableStartType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
