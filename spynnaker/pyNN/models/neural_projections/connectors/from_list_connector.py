@@ -29,16 +29,12 @@ class FromListConnector(AbstractConnector):
         Creates a new FromListConnector.
         """
         AbstractConnector.__init__(self, safe, None, verbose)
-
-        self._conn_list = conn_list
-
-    def convert_into_numpy(self):
-        if self._conn_list is None or len(self._conn_list) == 0:
+        if conn_list is None or len(conn_list) == 0:
             self._conn_list = numpy.zeros(0, dtype=self.CONN_LIST_DTYPE)
         else:
-            temp_conn_list = self._conn_list
-            if not isinstance(self._conn_list[0], tuple):
-                temp_conn_list = [tuple(items) for items in self._conn_list]
+            temp_conn_list = conn_list
+            if not isinstance(conn_list[0], tuple):
+                temp_conn_list = [tuple(items) for items in conn_list]
             self._conn_list = numpy.array(
                 temp_conn_list, dtype=self.CONN_LIST_DTYPE)
 

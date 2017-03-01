@@ -408,8 +408,8 @@ class SpikeSourcePoisson(
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self):
-        self._spike_recorder.record = True
+    def set_recording_spikes(self, new_state=True):
+        self._spike_recorder.record = new_state
 
     def get_sdram_usage_for_atoms(
             self, vertex_slice, n_machine_time_steps, machine_time_step):

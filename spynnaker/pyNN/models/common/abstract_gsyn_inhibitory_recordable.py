@@ -17,7 +17,7 @@ class AbstractGSynInhibitoryRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_gsyn_inhibitory(self):
+    def set_recording_gsyn_inhibitory(self, new_state=True):
         """ Sets gsyn to being recorded
         """
 

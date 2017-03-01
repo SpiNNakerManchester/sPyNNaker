@@ -526,9 +526,9 @@ class AbstractPopulationVertex(
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self):
+    def set_recording_spikes(self, new_state=True):
         self._change_requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = True
+        self._spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
@@ -542,9 +542,9 @@ class AbstractPopulationVertex(
         return self._v_recorder.record_v
 
     @overrides(AbstractVRecordable.set_recording_v)
-    def set_recording_v(self):
+    def set_recording_v(self, state=True):
         self._change_requires_mapping = not self._v_recorder.record_v
-        self._v_recorder.record_v = True
+        self._v_recorder.record_v = state
 
     @overrides(AbstractVRecordable.get_v)
     def get_v(self, n_machine_time_steps, placements, graph_mapper,
@@ -558,10 +558,10 @@ class AbstractPopulationVertex(
         return self._gsyn_excitatory_recorder.record_gsyn_excitatory
 
     @overrides(AbstractGSynExcitatoryRecordable.set_recording_gsyn_excitatory)
-    def set_recording_gsyn_excitatory(self):
+    def set_recording_gsyn_excitatory(self, new_state=True):
         self._change_requires_mapping = \
             not self._gsyn_excitatory_recorder.record_gsyn_excitatory
-        self._gsyn_excitatory_recorder.record_gsyn_excitatory = True
+        self._gsyn_excitatory_recorder.record_gsyn_excitatory = new_state
 
     @overrides(AbstractGSynExcitatoryRecordable.get_gsyn_excitatory)
     def get_gsyn_excitatory(
@@ -577,10 +577,10 @@ class AbstractPopulationVertex(
         return self._gsyn_inhibitory_recorder.record_gsyn_inhibitory
 
     @overrides(AbstractGSynInhibitoryRecordable.set_recording_gsyn_inhibitory)
-    def set_recording_gsyn_inhibitory(self):
+    def set_recording_gsyn_inhibitory(self, new_state=True):
         self._change_requires_mapping = \
             not self._gsyn_inhibitory_recorder.record_gsyn_inhibitory
-        self._gsyn_inhibitory_recorder.record_gsyn_inhibitory = True
+        self._gsyn_inhibitory_recorder.record_gsyn_inhibitory = new_state
 
     @overrides(AbstractGSynInhibitoryRecordable.get_gsyn_inhibitory)
     def get_gsyn_inhibitory(

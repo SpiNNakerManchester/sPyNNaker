@@ -17,7 +17,7 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_spikes(self):
+    def set_recording_spikes(self, new_state=True):
         """ Sets spikes to being recorded
         """
 

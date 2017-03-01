@@ -17,7 +17,7 @@ class AbstractGSynExcitatoryRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_gsyn_excitatory(self):
+    def set_recording_gsyn_excitatory(self, new_state=True):
         """ Sets gsyn to being recorded
         """
 

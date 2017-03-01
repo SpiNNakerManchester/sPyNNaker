@@ -144,12 +144,12 @@ class SpikeSourceArray(
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self):
+    def set_recording_spikes(self, new_state=True):
         self.enable_recording(
             self._spike_recorder_buffer_size,
             self._buffer_size_before_receive)
         self._requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = True
+        self._spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(

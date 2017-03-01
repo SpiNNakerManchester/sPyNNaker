@@ -10,6 +10,7 @@ from spynnaker.pyNN.models.common.abstract_v_recordable import \
     AbstractVRecordable
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance import \
     InputTypeConductance
+from spynnaker.pyNN.utilities import globals_variables
 
 from collections import defaultdict
 import itertools
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class RecordingCommon(object):
-    def __init__(self, population, simulator):
+    def __init__(self, population):
         """ object to hold recording behaviour
 
         :param population: the population to record for
@@ -29,7 +30,6 @@ class RecordingCommon(object):
         """
 
         self._population = population
-        self._spinnaker_control = simulator
         self._sampling_interval = None
 
         # file flags, allows separate files for the recorded variables
@@ -39,14 +39,10 @@ class RecordingCommon(object):
             'gsyn_inh': None,
             'v': None}
 
-        # needed to support multiple output files for the recorder (one per
-        # potential recorded variable)
-        self._internal_variable_flag_to_bypass_pynn_bug = None
-
         # Create default dictionary of population-size bitarrays
         self._indices_to_record = self._create_full_filter_list(0)
 
-    def _record(self, variable, new_ids, sampling_interval):
+    def _record(self, variable, new_ids, sampling_interval, to_file):
         """ tells the vertex to record data
 
         :param variable: the variable to record, valued variables to record
@@ -55,8 +51,6 @@ class RecordingCommon(object):
         :param sampling_interval: the interval to record them
         :return:  None
         """
-
-        self._internal_variable_flag_to_bypass_pynn_bug = variable
 
         # tell vertex its recording
         if variable == "gsyn_exc":
@@ -72,6 +66,9 @@ class RecordingCommon(object):
                 "The variable {} is not supported by the record method. "
                 "Currently supported variables are: "
                 "'gsyn_exc', 'gsyn_inh', 'v', 'spikes'".format(variable))
+
+        # update file writer
+        self._write_to_files_indicators[variable] = to_file
 
         # Get bit array of indices to record for this variable
         indices = self._indices_to_record[variable]
@@ -204,13 +201,13 @@ class RecordingCommon(object):
             raise fec_excceptions.ConfigurationException(
                 "This population has not got the capability to record spikes")
 
-        if not self._spinnaker_control.has_ran:
+        if not globals_variables.get_simulator().has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore spikes cannot"
                 " be retrieved, hence the list will be empty")
             return numpy.zeros((0, 2))
 
-        if self._spinnaker_control.use_virtual_board:
+        if globals_variables.get_simulator().use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
@@ -219,10 +216,10 @@ class RecordingCommon(object):
         # assuming we got here, everything is ok, so we should go get the
         # spikes
         return self._population._vertex.get_spikes(
-            self._spinnaker_control.placements,
-            self._spinnaker_control.graph_mapper,
-            self._spinnaker_control.buffer_manager,
-            self._spinnaker_control.machine_time_step)
+            globals_variables.get_simulator().placements,
+            globals_variables.get_simulator().graph_mapper,
+            globals_variables.get_simulator().buffer_manager,
+            globals_variables.get_simulator().machine_time_step)
 
     def _get_v(self):
         """ get the voltage from the vertex
@@ -239,13 +236,13 @@ class RecordingCommon(object):
             raise fec_excceptions.ConfigurationException(
                 "This population has not got the capability to record v")
 
-        if not self._spinnaker_control.has_ran:
+        if not globals_variables.get_simulator().has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore v cannot"
                 " be retrieved, hence the list will be empty")
             return numpy.zeros((0, 3))
 
-        if self._spinnaker_control.use_virtual_board:
+        if globals_variables.get_simulator().use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
@@ -254,11 +251,11 @@ class RecordingCommon(object):
             # assuming we got here, everything is ok, so we should go get the
             # voltages
         return self._population._vertex.get_v(
-            self._spinnaker_control.no_machine_time_steps,
-            self._spinnaker_control.placements,
-            self._spinnaker_control.graph_mapper,
-            self._spinnaker_control.buffer_manager,
-            self._spinnaker_control.machine_time_step)
+            globals_variables.get_simulator().no_machine_time_steps,
+            globals_variables.get_simulator().placements,
+            globals_variables.get_simulator().graph_mapper,
+            globals_variables.get_simulator().buffer_manager,
+            globals_variables.get_simulator().machine_time_step)
 
     def _get_gsyn_excitatory(self):
         """ get the gsyn inh values from the vertex
@@ -276,24 +273,24 @@ class RecordingCommon(object):
                 "This population has not got the capability to record gsyn "
                 "excitatory")
 
-        if not self._spinnaker_control.has_ran:
+        if not globals_variables.get_simulator().has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore gsyn excitatory "
                 "cannot be retrieved, hence the list will be empty")
             return numpy.zeros((0, 4))
 
-        if self._spinnaker_control.use_virtual_board:
+        if globals_variables.get_simulator().use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 4))
 
         return self._population._vertex.get_gsyn_excitatory(
-            self._spinnaker_control.no_machine_time_steps,
-            self._spinnaker_control.placements,
-            self._spinnaker_control.graph_mapper,
-            self._spinnaker_control.buffer_manager,
-            self._spinnaker_control.machine_time_step)
+            globals_variables.get_simulator().no_machine_time_steps,
+            globals_variables.get_simulator().placements,
+            globals_variables.get_simulator().graph_mapper,
+            globals_variables.get_simulator().buffer_manager,
+            globals_variables.get_simulator().machine_time_step)
 
     def _get_gsyn_inhibitory(self):
         """ get the gsyn inhibitory values from the vertex
@@ -311,53 +308,33 @@ class RecordingCommon(object):
                 "This population has not got the capability to record gsyn "
                 "inhibitory")
 
-        if not self._spinnaker_control.has_ran:
+        if not globals_variables.get_simulator().has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore gsyn inhibitory "
                 "cannot be retrieved, hence the list will be empty")
             return numpy.zeros((0, 4))
 
-        if self._spinnaker_control.use_virtual_board:
+        if globals_variables.get_simulator().use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 4))
 
         return self._population._vertex.get_gsyn_inhibitory(
-            self._spinnaker_control.no_machine_time_steps,
-            self._spinnaker_control.placements,
-            self._spinnaker_control.graph_mapper,
-            self._spinnaker_control.buffer_manager,
-            self._spinnaker_control.machine_time_step)
-
-    @property
-    def file(self):
-        """ getter for the file parameter expected from pynn.
-
-        :return: the
-        """
-        return self._write_to_files_indicators
-
-    @file.setter
-    def file(self, new_value):
-        """ setter of file parameter from PyNN's perspective.
-
-        :param new_value: the filename for the recorded parameter
-        :return: None
-        """
-        if self._internal_variable_flag_to_bypass_pynn_bug is None:
-            raise fec_excceptions.ConfigurationException(
-                "This should never happen, as PyNN should be calling this"
-                " straight after a call to record, and so "
-                "_internal_variable_flag_to_bypass_pynn_bug should be set"
-                " to the variable that is being recorded now")
-
-        self._write_to_files_indicators[
-            self._internal_variable_flag_to_bypass_pynn_bug] = new_value
-        self._internal_variable_flag_to_bypass_pynn_bug = None
+            globals_variables.get_simulator().no_machine_time_steps,
+            globals_variables.get_simulator().placements,
+            globals_variables.get_simulator().graph_mapper,
+            globals_variables.get_simulator().buffer_manager,
+            globals_variables.get_simulator().machine_time_step)
 
     def _create_full_filter_list(self, filter_value):
         # Create default dictionary of population-size bitarrays
         return defaultdict(
             lambda: bitarray(itertools.repeat(
                 filter_value, self._population.size), endian="little"))
+
+    def _reset(self):
+        self._population._vertex.set_recording_gsyn_excitatory(False)
+        self._population._vertex.set_recording_gsyn_inhibitory(False)
+        self._population._vertex.set_recording_spikes(False)
+        self._population._vertex.set_recording_v(False)
