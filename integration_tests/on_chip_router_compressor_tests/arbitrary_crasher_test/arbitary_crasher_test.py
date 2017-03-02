@@ -24,7 +24,7 @@ routing_table = MulticastRoutingTable(1, 1)
 random.seed(12345)
 
 # build 4000 random entries
-for entry in range(0, 4000):
+for entry in range(0, 1500):
 
     # figure links
     links = set()
@@ -73,8 +73,8 @@ provenance_file_path = spinnaker._provenance_file_path
 # try running compressor
 try:
     mundy_compressor(
-        routing_tables, transceiver, machine, 17, 16, provenance_file_path)
-    raise Exception("bloody thing didnt crash")
+        routing_tables, transceiver, machine, 16, provenance_file_path)
+    raise Exception("Compressor should have crashed but didn't")
 except SpinnFrontEndException as e:
     print "passed test"
     pass

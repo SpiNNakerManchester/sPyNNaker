@@ -1,6 +1,3 @@
-from rig.routing_table import MinimisationFailedError
-
-from pacman.exceptions import PacmanElementAllocationException
 from pacman.model.routing_tables.multicast_routing_table import \
     MulticastRoutingTable
 from pacman.model.routing_tables.multicast_routing_tables import \
@@ -13,7 +10,6 @@ from spinn_front_end_common.interface.spinnaker_main_interface import \
 from spinn_front_end_common.mapping_algorithms. \
     on_chip_router_table_compression.mundy_on_chip_router_compression import \
     MundyOnChipRouterCompression
-from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
 from spinn_front_end_common.utilities.utility_objs.executable_finder import \
     ExecutableFinder
 
@@ -24,11 +20,8 @@ from spynnaker.pyNN.utilities.conf import config
 import random
 import math
 import time
-import os
 
 n_entries = [100, 200, 400, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
-time_frame = dict()
-time_frame_host = dict()
 
 # set main interface
 executable_finder = ExecutableFinder()
@@ -41,7 +34,10 @@ transceiver = spinnaker.transceiver
 provenance_file_path = spinnaker._provenance_file_path
 counter = 0
 
+summary = ""
+
 for n_entries_this_run in n_entries:
+    transceiver.clear_multicast_routes(1, 1)
     routing_tables = MulticastRoutingTables()
     routing_table = MulticastRoutingTable(1, 1)
     random.seed(12345)
@@ -82,46 +78,30 @@ for n_entries_this_run in n_entries:
     mundy_compressor = MundyOnChipRouterCompression()
 
     # try running on chip compressor
+    start_time = time.time()
+    on_chip_failed = False
     try:
-        _, prov_items = mundy_compressor(
-            routing_tables, transceiver, machine, 16, 16, provenance_file_path)
-        time_frame[n_entries_this_run] = prov_items[0].value
-    except SpinnFrontEndException as e:
-
-        # this block is a well hack, but cant be bothered doing it properly
-        # for a little test
-        reader = None
-        if counter == 0:
-            reader = open(os.path.join(
-                provenance_file_path,
-                "on_chip_routing_table_compressor_run_time.xml"))
-        else:
-            reader = open(os.path.join(
-                provenance_file_path,
-                "on_chip_routing_table_compressor_run_time_{}.xml".format(
-                    counter)))
-            counter += 1
-        reader.readline()
-        data = reader.readline()
-        bits = data.split(">")
-        bit = bits[1].split("<")
-        time_frame[n_entries_this_run] = float(bit[0])
+        mundy_compressor(
+            routing_tables, transceiver, machine, 16, provenance_file_path)
+    except Exception as e:
+        print e
+        on_chip_failed = True
+    on_chip_time = time.time() - start_time
 
     # try running host compressor
+    on_host_failed = False
     on_host = MundyRouterCompressor()
     start_time = time.time()
     try:
         on_host(routing_tables)
-        end_time = time.time()
-        time_frame_host[n_entries_this_run] = end_time - start_time
-    except MinimisationFailedError:
-        end_time = time.time()
-        time_frame_host[n_entries_this_run] = end_time - start_time
-    except PacmanElementAllocationException:
-        end_time = time.time()
-        time_frame_host[n_entries_this_run] = end_time - start_time
+    except Exception as e:
+        print e
+        on_host_failed = True
+    on_host_time = time.time() - start_time
+    summary += "{:d}: host = {:f} chip = {:f}\n".format(
+        n_entries_this_run, on_host_time, on_chip_time)
+    print summary
 
-# print entries to the terminal for recording
-for entry in n_entries:
-    print "host = [{}]      chip = [{}] \n".format(time_frame_host[entry],
-                                                   time_frame[entry])
+    if on_chip_failed and on_host_failed:
+        print "Stopping after {}".format(n_entries_this_run)
+        break
