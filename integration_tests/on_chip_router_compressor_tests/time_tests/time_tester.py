@@ -21,7 +21,31 @@ import random
 import math
 import time
 
-n_entries = [100, 200, 400, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
+
+def random_route():
+
+    # figure links
+    links = set()
+    n_links = random.randint(0, 5)
+    for _ in range(0, n_links):
+        links.add(random.randint(0, 5))
+
+    # figure processors
+    processors = set()
+    n_processors = random.randint(0, 15)
+    for _ in range(0, n_processors):
+        processors.add(random.randint(0, 15))
+
+    defaultable = False
+    if n_links == 1 and n_processors == 0:
+        defaultable = bool(random.randint(0, 1))
+
+    return links, processors, defaultable
+
+n_entries = [1200, 1400, 1600, 1800, 2000]
+masks = [0xFFFFFFFF & ~((1 << i) - 1) for i in range(4, 17)]
+chips = [(0, 0), (0, 1), (1, 0), (1, 1)]
+routes = [random_route() for _ in range(5)]
 
 # set main interface
 executable_finder = ExecutableFinder()
@@ -33,49 +57,39 @@ machine = spinnaker.machine
 transceiver = spinnaker.transceiver
 provenance_file_path = spinnaker._provenance_file_path
 counter = 0
+random.seed(12345)
 
 summary = ""
 
 for n_entries_this_run in n_entries:
-    transceiver.clear_multicast_routes(1, 1)
+    for (x, y) in chips:
+        transceiver.clear_multicast_routes(x, y)
+
     routing_tables = MulticastRoutingTables()
-    routing_table = MulticastRoutingTable(1, 1)
-    random.seed(12345)
 
-    # figure links
-    links = set()
-    n_links = random.randint(0, 5)
-    for n_link in range(0, n_links):
-        links.add(random.randint(0, 5))
+    for (x, y) in chips:
+        routing_table = MulticastRoutingTable(x, y)
 
-    # figure processors
-    processors = set()
-    n_processors = random.randint(0, 15)
-    for n_processor in range(0, n_processors):
-        processors.add(random.randint(0, 15))
+        # build random entries
+        while routing_table.number_of_entries < n_entries_this_run:
+            mask = masks[random.randint(0, len(masks) - 1)]
+            key = random.randint(0, math.pow(2, 32) - 1) & mask
+            (links, processors, defaultable) = routes[
+                random.randint(0, len(routes) - 1)]
 
-    defaultable = False
-    if n_links == 1 and n_processors == 0:
-        defaultable = bool(random.randint(0, 1))
+            # add router entry to router table
+            if (routing_table.get_multicast_routing_entry_by_routing_entry_key(
+                    key, mask) is None):
 
-    # build random entries
-    while routing_table.number_of_entries < n_entries_this_run:
+                multicast_routing_entry = MulticastRoutingEntry(
+                    routing_entry_key=key,
+                    defaultable=defaultable, mask=mask,
+                    link_ids=list(links), processor_ids=list(processors))
+                routing_table.add_mutlicast_routing_entry(
+                    multicast_routing_entry)
 
-        # build entry
-        multicast_routing_entry = MulticastRoutingEntry(
-            routing_entry_key=random.randint(0, math.pow(2, 16)) << 16,
-            defaultable=defaultable, mask=0xFFFF0000,
-            link_ids=list(links), processor_ids=list(processors))
-
-        # add router entry to router table
-        if (routing_table.get_multicast_routing_entry_by_routing_entry_key(
-                multicast_routing_entry.routing_entry_key,
-                multicast_routing_entry.mask) is None):
-            routing_table.add_mutlicast_routing_entry(
-                multicast_routing_entry)
-
-    # add to routing tables
-    routing_tables.add_routing_table(routing_table)
+        # add to routing tables
+        routing_tables.add_routing_table(routing_table)
 
     # build compressor
     mundy_compressor = MundyOnChipRouterCompression()
@@ -86,7 +100,7 @@ for n_entries_this_run in n_entries:
     try:
         mundy_compressor(
             routing_tables, transceiver, machine, 16, provenance_file_path,
-            compress_only_when_needed=False, compress_as_much_as_possible=True)
+            compress_only_when_needed=True, compress_as_much_as_possible=False)
     except Exception as e:
         print e
         on_chip_failed = True
@@ -97,7 +111,7 @@ for n_entries_this_run in n_entries:
     on_host = MundyRouterCompressor()
     start_time = time.time()
     try:
-        on_host(routing_tables, target_length=None)
+        on_host(routing_tables, target_length=1023)
     except Exception as e:
         print e
         on_host_failed = True
