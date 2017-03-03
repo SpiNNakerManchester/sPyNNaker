@@ -1,8 +1,9 @@
 import unittest
-from spynnaker.pyNN.models.neural_properties.synaptic_list import SynapticList
+# from spynnaker.pyNN.models.neural_properties.synaptic_list \
+#     import SynapticList
 
 
-class MyTestCase(unittest.TestCase):
+class TestSynapticList(unittest.TestCase):
 
     @unittest.skip("Not implemented")
     def test_something(self):
