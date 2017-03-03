@@ -29,7 +29,8 @@ class GraphEdgeFilter(object):
 
         # create progress bar
         progress_bar = ProgressBar(
-            len(machine_graph.vertices) + len(machine_graph.edges),
+            machine_graph.n_vertices +
+            machine_graph.n_outgoing_edge_partitions,
             "Filtering edges")
 
         # add the vertices directly, as they wont be pruned.
@@ -43,31 +44,25 @@ class GraphEdgeFilter(object):
             progress_bar.update()
 
         # start checking edges to decide which ones need pruning....
-        for vertex in machine_graph.vertices:
-            out_going_partitions = \
-                machine_graph.get_outgoing_edge_partitions_starting_at_vertex(
-                    vertex)
-            for partition in out_going_partitions:
-                for edge in partition.edges:
-                    if not self._is_filterable(edge, graph_mapper):
-                        logger.debug(
-                            "this edge was not pruned {}".format(edge))
-                        new_machine_graph.add_edge(edge, partition.identifier)
-                        app_edge = graph_mapper.get_application_edge(edge)
-                        new_graph_mapper.add_edge_mapping(edge, app_edge)
+        for partition in machine_graph.out_going_partitions:
+            for edge in partition.edges:
+                if not self._is_filterable(edge, graph_mapper):
+                    logger.debug("this edge was not pruned {}".format(edge))
+                    new_machine_graph.add_edge(edge, partition.identifier)
+                    app_edge = graph_mapper.get_application_edge(edge)
+                    new_graph_mapper.add_edge_mapping(edge, app_edge)
 
-                        # add partition constraints from the original graph to
-                        # the new graph
-                        # add constraints from the application partition
-                        new_machine_graph_partition = new_machine_graph.\
-                            get_outgoing_edge_partition_starting_at_vertex(
-                                edge.pre_vertex, partition.identifier)
-                        new_machine_graph_partition.add_constraints(
-                            partition.constraints)
-                    else:
-                        logger.debug(
-                            "this edge was pruned {}".format(edge))
-                    progress_bar.update()
+                    # add partition constraints from the original graph to
+                    # the new graph
+                    # add constraints from the application partition
+                    new_machine_graph_partition = new_machine_graph.\
+                        get_outgoing_edge_partition_starting_at_vertex(
+                            edge.pre_vertex, partition.identifier)
+                    new_machine_graph_partition.add_constraints(
+                        partition.constraints)
+                else:
+                    logger.debug("this edge was pruned {}".format(edge))
+            progress_bar.update()
         progress_bar.end()
 
         # returned the pruned graph and graph_mapper
