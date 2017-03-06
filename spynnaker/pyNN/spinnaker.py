@@ -338,14 +338,7 @@ class Spinnaker(SpinnakerMainInterface):
         :param clear_tags: informs the tool chain if it should clear the tags\
             off the machine at stop
         :type clear_tags: boolean
-        :param extract_provenance_data: informs the tools if it should \
-            try to extract provenance data.
-        :type extract_provenance_data: bool
-        :param extract_iobuf: tells the tools if it should try to \
-            extract iobuf
-        :type extract_iobuf: bool
-        :return None:
-        :return: None
+        :rtype: None
         """
         for population in self._populations:
             population._end()

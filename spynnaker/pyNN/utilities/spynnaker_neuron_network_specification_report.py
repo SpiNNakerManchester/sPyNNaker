@@ -18,8 +18,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
 
         :param report_folder: the report folder to put figure into
         :param application_graph: the app graph
-        :param connection_holder: the set of connection holders
-        :return: None
+        :rtype: None
         """
         try:
             import graphviz
