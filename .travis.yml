@@ -1,0 +1,36 @@
+language: python
+matrix:
+  include:
+    - python: "2.7"
+    - pytest
+
+virtualenv:
+  system_site_packages: true
+
+cache: pip
+
+install:
+  - pip install 'numpy>=1.12'
+  - pip install lxml
+  - sudo pip install scipy
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master
+  - pip install -r requirements-test.txt
+  - python ./setup.py install
+before_script:
+  - echo '[Machine]' > ~/.spynnaker.cfg
+  - echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
+  - echo "version = ${SPINNAKER_BOARD_VERSION:-5}" >> ~/.spynnaker.cfg
+  - echo '[Database]' >> ~/.spynnaker.cfg
+  - echo '[Simulation]' >> ~/.spynnaker.cfg
+  - echo '[Buffers]' >> ~/.spynnaker.cfg
+script:
+  - py.test unittests
+  - flake8 examples spynnaker pyNN-spiNNaker-src
+  - flake8 unittests
+  # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
+  # - flake8 integration_tests

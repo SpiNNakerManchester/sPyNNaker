@@ -134,12 +134,13 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         """
         in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
 
-        n_vertices = len(in_edges)
+        n_vertices = 0
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionMachineEdge):
                 edge = graph_mapper.get_application_edge(in_edge)
                 n_entries += len(edge.synapse_information)
+            n_vertices += 1
 
         # Multiply by 2 to get an upper bound
         return (

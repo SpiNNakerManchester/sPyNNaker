@@ -1,5 +1,5 @@
-import pyNN.spiNNaker as p
-from matplotlib import pylab
+import spynnaker.pyNN as p
+
 p.setup(timestep=1.0)
 input_pop = p.Population(1, p.SpikeSourceArray, cellparams={"spike_times": [0]},
         label="input")

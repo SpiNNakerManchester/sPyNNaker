@@ -200,3 +200,6 @@ class MultapseConnector(AbstractConnector):
             self._delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "MultapseConnector({})".format(self._num_synapses)

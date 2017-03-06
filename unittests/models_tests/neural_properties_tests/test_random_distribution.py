@@ -1,8 +1,8 @@
 import unittest
-import spynnaker.pyNN.models.neural_properties.randomDistributions
+# import spynnaker.pyNN.models.neural_properties.randomDistributions
 
 
-class MyTestCase(unittest.TestCase):
+class TestRandomDistributions(unittest.TestCase):
 
     @unittest.skip("Not implemented")
     def test_something(self):

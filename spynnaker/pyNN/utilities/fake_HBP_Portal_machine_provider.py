@@ -1,6 +1,7 @@
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import exceptions
 
+
 class FakeHBPPortalMachineProvider(object):
 
     def __init__(self, n_boards):
@@ -18,8 +19,7 @@ class FakeHBPPortalMachineProvider(object):
         return
 
     def get_machine_info(self):
-        connections = {
-            "(0, 0)": self._ip_addresses}
+        connections = {"(0, 0)": self._ip_addresses}
         return {'connections': connections,
                 'width': self._width,
                 'height': self._height,
