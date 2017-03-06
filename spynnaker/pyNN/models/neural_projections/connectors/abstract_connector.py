@@ -15,6 +15,7 @@ import re
 # global objects
 logger = logging.getLogger(__name__)
 
+
 @add_metaclass(ABCMeta)
 class AbstractConnector(object):
     """ Abstract class which PyNN Connectors extend
@@ -287,7 +288,7 @@ class AbstractConnector(object):
         weights = self._generate_values(
             values, n_connections, connection_slices)
         if self._safe:
-            if len(weights) ==0:
+            if len(weights) == 0:
                 logger.warning("No connection in " + str(self))
             else:
                 if numpy.amin(weights) < 0 < numpy.amax(weights):
