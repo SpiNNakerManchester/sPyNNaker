@@ -34,7 +34,7 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
 
     def get_threshold_parameters(self):
         return [
-            NeuronParameter(self._v_thresh, DataType.S1615)
+            NeuronParameter(self._v_thresh, DataType.S1615, "v_thresh")
         ]
 
     def get_n_cpu_cycles_per_neuron(self):

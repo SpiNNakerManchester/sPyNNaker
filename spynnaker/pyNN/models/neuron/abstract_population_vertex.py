@@ -732,11 +732,62 @@ class AbstractPopulationVertex(
         return AbstractContainsUnits.units(self, variable)
 
     def describe(self):
-        """ supports describing a neuron model
-
-        :return:
         """
-        pass
+        Returns a human-readable description of the cell or synapse type.
+
+        The output may be customized by specifying a different template
+        togther with an associated template engine (see ``pyNN.descriptions``).
+
+        If template is None, then a dictionary containing the template context
+        will be returned.
+        """
+        context = {
+            "name": self._model_name,
+            "default_parameters": self.default_parameters,
+            "default_initial_values": self.default_initial_values,
+            "parameters": self._generate_parameters(),
+        }
+        return context
+
+    def _generate_parameters(self):
+        parameters = dict()
+        # Write the global parameters
+        global_params = self._neuron_model.get_global_parameters()
+        for param in global_params:
+            parameters[param.name] = param.get_value()
+
+        # Write the neuron parameters
+        for param in self._neuron_model.get_neural_parameters():
+            values = self._expand_parameter(param)
+            parameters[param.name] = values
+
+        # Write the neuron parameters
+        for param in self._input_type.get_input_type_parameters():
+            values = self._expand_parameter(param)
+            parameters[param.name] = values
+
+        # Write the neuron parameters
+        for param in self._additional_input.get_parameters():
+            values = self._expand_parameter(param)
+            parameters[param.name] = values
+
+        # Write the neuron parameters
+        for param in self._threshold_type.get_threshold_parameters():
+            values = self._expand_parameter(param)
+            parameters[param.name] = values
+        return parameters
+
+    def _expand_parameter(self, param):
+        values = list()
+        for atom in range(0, self._n_atoms):
+            value = param.get_value()
+            if hasattr(value, "__len__"):
+                if len(value) > 1:
+                    value = value[atom]
+                else:
+                    value = value[0]
+            values.append(value)
+        return values
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

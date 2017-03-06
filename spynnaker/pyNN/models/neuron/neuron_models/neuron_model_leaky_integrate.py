@@ -95,25 +95,26 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
             # membrane voltage [mV]
             # REAL     V_membrane;
-            NeuronParameter(self._v_init, DataType.S1615),
+            NeuronParameter(self._v_init, DataType.S1615, "v_init"),
 
             # membrane resting voltage [mV]
             # REAL     V_rest;
-            NeuronParameter(self._v_rest, DataType.S1615),
+            NeuronParameter(self._v_rest, DataType.S1615, "v_rest"),
 
             # membrane resistance [MOhm]
             # REAL     R_membrane;
-            NeuronParameter(self._r_membrane, DataType.S1615),
+            NeuronParameter(self._r_membrane, DataType.S1615, "r_membrane"),
 
             # 'fixed' computation parameter - time constant multiplier for
             # closed-form solution
             # exp( -(machine time step in ms)/(R * C) ) [.]
             # REAL     exp_TC;
-            NeuronParameter(self._exp_tc(machine_time_step), DataType.S1615),
+            NeuronParameter(self._exp_tc(machine_time_step), DataType.S1615,
+                            "exp_tc"),
 
             # offset current [nA]
             # REAL     I_offset;
-            NeuronParameter(self._i_offset, DataType.S1615)
+            NeuronParameter(self._i_offset, DataType.S1615, "i_offset")
         ]
 
     def get_n_global_parameters(self):

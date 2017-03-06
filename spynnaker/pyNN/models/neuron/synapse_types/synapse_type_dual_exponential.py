@@ -104,14 +104,16 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             self._tau_syn_I, machine_time_step)
 
         return [
-            NeuronParameter(e_decay, DataType.UINT32),
-            NeuronParameter(e_init, DataType.UINT32),
-            NeuronParameter(e_decay2, DataType.UINT32),
-            NeuronParameter(e_init2, DataType.UINT32),
-            NeuronParameter(i_decay, DataType.UINT32),
-            NeuronParameter(i_init, DataType.UINT32),
-            NeuronParameter(self._initial_input_exc, DataType.UINT32),
-            NeuronParameter(self._initial_input_inh, DataType.UINT32)
+            NeuronParameter(e_decay, DataType.UINT32, "e_decay"),
+            NeuronParameter(e_init, DataType.UINT32, "e_init"),
+            NeuronParameter(e_decay2, DataType.UINT32, "e_decay2"),
+            NeuronParameter(e_init2, DataType.UINT32, "e_init2"),
+            NeuronParameter(i_decay, DataType.UINT32, "i_decay"),
+            NeuronParameter(i_init, DataType.UINT32, "i_init"),
+            NeuronParameter(self._initial_input_exc, DataType.UINT32,
+                            "gsyn_exc"),
+            NeuronParameter(self._initial_input_inh, DataType.UINT32,
+                            "gsyn_inh")
         ]
 
     def get_n_cpu_cycles_per_neuron(self):
