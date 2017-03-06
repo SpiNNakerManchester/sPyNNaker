@@ -58,7 +58,7 @@ typedef enum callback_priorities{
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
-#define NUMBER_OF_REGIONS_TO_RECORD 3
+#define NUMBER_OF_REGIONS_TO_RECORD 4
 
 // Globals
 
