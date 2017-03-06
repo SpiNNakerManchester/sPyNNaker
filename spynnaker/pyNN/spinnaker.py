@@ -59,7 +59,16 @@ class Spinnaker(SpinnakerMainInterface):
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
 
+        extra_mapping_algorithms = list()
+        extra_load_algorithms = list()
         extra_algorithms_pre_run = list()
+
+        if config.getboolean("Reports", "draw_network_graph"):
+            extra_mapping_algorithms.append(
+                "SpYNNakerConnectionHolderGenerator")
+            extra_load_algorithms.append(
+                "SpYNNakerNeuronGraphNetworkSpecificationReport")
+
         if config.getboolean("Reports", "ReportsEnabled"):
             if config.getboolean("Reports", "writeSynapticReport"):
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
@@ -70,6 +79,8 @@ class Spinnaker(SpinnakerMainInterface):
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             extra_mapping_inputs=extra_mapping_inputs,
+            extra_mapping_algorithms=extra_mapping_algorithms,
+            extra_load_algorithms=extra_load_algorithms,
             n_chips_required=n_chips_required,
             extra_pre_run_algorithms=extra_algorithms_pre_run)
 
@@ -252,8 +263,7 @@ class Spinnaker(SpinnakerMainInterface):
             user_max_delay=self.max_supported_delay)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
-             clear_tags=None, extract_provenance_data=True,
-             extract_iobuf=True):
+             clear_tags=None):
         """
         :param turn_off_machine: decides if the machine should be powered down\
             after running the execution. Note that this powers down all boards\
@@ -265,20 +275,13 @@ class Spinnaker(SpinnakerMainInterface):
         :param clear_tags: informs the tool chain if it should clear the tags\
             off the machine at stop
         :type clear_tags: boolean
-        :param extract_provenance_data: informs the tools if it should \
-            try to extract provenance data.
-        :type extract_provenance_data: bool
-        :param extract_iobuf: tells the tools if it should try to \
-            extract iobuf
-        :type extract_iobuf: bool
         :return: None
         """
         for population in self._populations:
             population._end()
 
         SpinnakerMainInterface.stop(
-            self, turn_off_machine, clear_routing_tables, clear_tags,
-            extract_provenance_data, extract_iobuf)
+            self, turn_off_machine, clear_routing_tables, clear_tags)
 
     def run(self, run_time):
         """ Run the model created

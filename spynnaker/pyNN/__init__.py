@@ -5,96 +5,95 @@ and implementation for the PyNN High-level API
 (http://neuralensemble.org/trac/PyNN)
 """
 
-import inspect
+import inspect as __inspect
 
 from ._version import __version__, __version_name__, __version_month__,\
     __version_year__
 
 
 # utility functions
-from spynnaker.pyNN.utilities import utility_calls
+from .utilities import utility_calls
 
 # pynn centric classes
-from spynnaker.pyNN.spinnaker import Spinnaker
-from spynnaker.pyNN.spinnaker import executable_finder
-from spynnaker.pyNN import exceptions
+from .spinnaker import Spinnaker as __Spinnaker
+from .spinnaker import executable_finder as __exec_finder
 
 # notification protocol classes (stored in front end common)
 from spinn_front_end_common.utilities.notification_protocol.\
-    socket_address import SocketAddress
+    socket_address import SocketAddress as __SockAddr
 
 # front end common exceptions
 from spinn_front_end_common.utilities import exceptions as \
     front_end_common_exceptions
 
 # neural models
-from spynnaker.pyNN.models.neuron.builds.if_cond_exp \
+from .models.neuron.builds.if_cond_exp \
     import IFCondExp as IF_cond_exp
-from spynnaker.pyNN.models.neuron.builds.if_curr_dual_exp \
+from .models.neuron.builds.if_curr_dual_exp \
     import IFCurrDualExp as IF_curr_dual_exp
-from spynnaker.pyNN.models.neuron.builds.if_curr_exp \
+from .models.neuron.builds.if_curr_exp \
     import IFCurrExp as IF_curr_exp
-from spynnaker.pyNN.models.neuron.builds.izk_curr_exp \
+from .models.neuron.builds.izk_curr_exp \
     import IzkCurrExp as IZK_curr_exp
-from spynnaker.pyNN.models.neuron.builds.izk_cond_exp \
+from .models.neuron.builds.izk_cond_exp \
     import IzkCondExp as IZK_cond_exp
 
 # neural projections
-from spynnaker.pyNN.models.neural_projections\
-    .delay_afferent_application_edge import DelayAfferentApplicationEdge
-from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
+from .models.neural_projections.delay_afferent_application_edge \
+    import DelayAfferentApplicationEdge
+from .models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-from spynnaker.pyNN.models.neural_projections.projection_application_edge \
+from .models.neural_projections.projection_application_edge \
     import ProjectionApplicationEdge
 
 # spike sources
-from spynnaker.pyNN.models.spike_source.spike_source_poisson\
+from .models.spike_source.spike_source_poisson \
     import SpikeSourcePoisson
-from spynnaker.pyNN.models.spike_source.spike_source_array \
+from .models.spike_source.spike_source_array \
     import SpikeSourceArray
-from spynnaker.pyNN.models.spike_source.spike_source_from_file \
+from .models.spike_source.spike_source_from_file \
     import SpikeSourceFromFile
 
 # connections
-from spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector\
+from .models.neural_projections.connectors.all_to_all_connector \
     import AllToAllConnector
-from spynnaker.pyNN.models.neural_projections.connectors.\
-    fixed_number_pre_connector import FixedNumberPreConnector
-from spynnaker.pyNN.models.neural_projections.connectors.\
-    fixed_probability_connector import FixedProbabilityConnector
-from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
+from .models.neural_projections.connectors.fixed_number_pre_connector \
+    import FixedNumberPreConnector
+from .models.neural_projections.connectors.fixed_probability_connector \
+    import FixedProbabilityConnector
+from .models.neural_projections.connectors.from_list_connector \
     import FromListConnector
-from spynnaker.pyNN.models.neural_projections.connectors.from_file_connector \
+from .models.neural_projections.connectors.from_file_connector \
     import FromFileConnector
-from spynnaker.pyNN.models.neural_projections.connectors.multapse_connector \
+from .models.neural_projections.connectors.multapse_connector \
     import MultapseConnector
-from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
+from .models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
-from spynnaker.pyNN.models.neural_projections.connectors.\
-    distance_dependent_probability_connector import \
-    DistanceDependentProbabilityConnector
-from spynnaker.pyNN.models.neural_projections.connectors.\
-    fixed_number_post_connector import FixedNumberPostConnector
+from .models.neural_projections.connectors.\
+    distance_dependent_probability_connector \
+    import DistanceDependentProbabilityConnector
+from .models.neural_projections.connectors.fixed_number_post_connector \
+    import FixedNumberPostConnector
 
 # Mechanisms for synapse dynamics
-from spynnaker.pyNN.models.neuron.synapse_dynamics.pynn_synapse_dynamics\
+from .models.neuron.synapse_dynamics.pynn_synapse_dynamics \
     import PyNNSynapseDynamics as SynapseDynamics
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp\
+from .models.neuron.synapse_dynamics.synapse_dynamics_stdp \
     import SynapseDynamicsSTDP as STDPMechanism
 
 # STDP weight dependences
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
-    .weight_dependence_additive\
+from .models.neuron.plasticity.stdp.weight_dependence\
+    .weight_dependence_additive \
     import WeightDependenceAdditive as AdditiveWeightDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
+from .models.neuron.plasticity.stdp.weight_dependence\
     .weight_dependence_multiplicative\
     import WeightDependenceMultiplicative as MultiplicativeWeightDependence
 
 # STDP timing dependences
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
+from .models.neuron.plasticity.stdp.timing_dependence\
     .timing_dependence_spike_pair \
     import TimingDependenceSpikePair as SpikePairRule
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
+from .models.neuron.plasticity.stdp.timing_dependence\
     .timing_dependence_pfister_spike_triplet\
     import TimingDependencePfisterSpikeTriplet as PfisterSpikeTripletRule
 
@@ -102,18 +101,47 @@ import spynnaker
 # constraints
 
 # note importing star is a bad thing to do.
-from pyNN.random import *
-from pyNN.space import *
-import os
+from pyNN.random import NumpyRNG, RandomDistribution
+from pyNN.space import \
+    distance, Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure
+import os as __os
+import numpy as __numpy
 
 # traditional logger
-logger = logging.getLogger(__name__)
+import logging as __logging
+logger = __logging.getLogger(__name__)
 
 # global controller / spinnaker object that does everything
 _spinnaker = None
 
 # List of binary search paths
 _binary_search_paths = []
+
+__all__ = [
+    # Ugly, but tests expect it
+    'utility_calls',
+    # Implementations of the neuroscience models
+    'IF_cond_exp', 'IF_curr_dual_exp', 'IF_curr_exp', 'IZK_curr_exp',
+    'IZK_cond_exp', 'DelayAfferentApplicationEdge', 'DelayExtensionVertex',
+    'ProjectionApplicationEdge', 'SpikeSourcePoisson', 'SpikeSourceArray',
+    'SpikeSourceFromFile', 'AllToAllConnector', 'FixedNumberPreConnector',
+    'FixedProbabilityConnector', 'FromListConnector', 'FromFileConnector',
+    'MultapseConnector', 'OneToOneConnector', 'FixedNumberPostConnector',
+    'DistanceDependentProbabilityConnector', 'SynapseDynamics',
+    'STDPMechanism', 'AdditiveWeightDependence', 'SpikePairRule',
+    'MultiplicativeWeightDependence', 'PfisterSpikeTripletRule',
+    # Stuff from pyNN.random
+    'NumpyRNG', 'RandomDistribution',
+    # Stuff from pyNN.space
+    'distance', 'Space', 'Line', 'Grid2D', 'Grid3D', 'Cuboid', 'Sphere',
+    'RandomStructure',
+    # Stuff that we define
+    'register_binary_search_path', 'end', 'setup', 'run', 'get_spynnaker',
+    'num_processes', 'rank', 'reset', 'set_number_of_neurons_per_core',
+    'register_database_notification_request', 'Population', 'Projection',
+    'NativeRNG', 'get_current_time', 'create', 'connect', 'get_time_step',
+    'get_min_delay', 'get_max_delay', 'set', 'initialize', 'record',
+    'record_v', 'record_gsyn', 'get_machine']
 
 
 def register_binary_search_path(search_path):
@@ -124,7 +152,7 @@ def register_binary_search_path(search_path):
 
     absolute search path for binaries
     """
-    executable_finder.add_path(search_path)
+    __exec_finder.add_path(search_path)
 
 
 def end():
@@ -135,6 +163,10 @@ def end():
     prints any data recorded using the low-level API
     """
     global _spinnaker
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "end")
     _spinnaker.stop()
     _spinnaker = None
 
@@ -142,7 +174,7 @@ def end():
 def get_spynnaker():
     """helper method for other plugins to add stuff to the graph
 
-    :return:
+    :return: The current spinnaker API, or None if before setup or after end.
     """
     global _spinnaker
     return _spinnaker
@@ -167,6 +199,10 @@ def reset():
     """ Reset the time to zero, and start the clock.
     """
     global _spinnaker
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "reset")
     _spinnaker.reset()
 
 
@@ -176,6 +212,10 @@ def run(run_time=None):
     :param run_time: simulation length (in ms)
     """
     global _spinnaker
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "run")
     _spinnaker.run(run_time)
     return None
 
@@ -203,7 +243,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     logger.info(
         "sPyNNaker (c) {} APT Group, University of Manchester".format(
             __version_year__))
-    parent_dir = os.path.split(os.path.split(spynnaker.__file__)[0])[0]
+    parent_dir = __os.path.split(__os.path.split(spynnaker.__file__)[0])[0]
     logger.info(
         "Release version {}({}) - {} {}. Installed in folder {}".format(
             __version__, __version_name__, __version_month__, __version_year__,
@@ -212,7 +252,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
     if len(extra_params) > 1:
         logger.warn("Extra params has been applied to the setup command which "
                     "we do not consider")
-    _spinnaker = Spinnaker(
+    _spinnaker = __Spinnaker(
         host_name=machine, timestep=timestep, min_delay=min_delay,
         max_delay=max_delay,
         database_socket_addresses=database_socket_addresses,
@@ -227,18 +267,14 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
     :param neuron_type:
     :param max_permitted:
     """
-    if not inspect.isclass(neuron_type):
-        if neuron_type in globals():
-            neuron_type = globals()[neuron_type]
-        else:
-            raise Exception("Unknown Vertex Type {}"
-                            .format(neuron_type))
+    if not __inspect.isclass(neuron_type):
+        if neuron_type not in globals():
+            raise Exception("Unknown Vertex Type {}".format(neuron_type))
+        neuron_type = globals()[neuron_type]
 
-    if hasattr(neuron_type, "set_model_max_atoms_per_core"):
-        neuron_type.set_model_max_atoms_per_core(max_permitted)
-    else:
-        raise Exception("{} is not a Vertex type"
-                        .format(neuron_type))
+    if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
+        raise Exception("{} is not a Vertex type".format(neuron_type))
+    neuron_type.set_model_max_atoms_per_core(max_permitted)
 
 
 def register_database_notification_request(hostname, notify_port, ack_port):
@@ -249,8 +285,12 @@ def register_database_notification_request(hostname, notify_port, ack_port):
     :param ack_report:
     :return:
     """
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "register_database_notification_request")
     _spinnaker._add_socket_address(
-        SocketAddress(hostname, notify_port, ack_port))
+        __SockAddr(hostname, notify_port, ack_port))
 
 
 # noinspection PyPep8Naming
@@ -265,8 +305,12 @@ def Population(size, cellclass, cellparams, structure=None, label=None):
     :return:
     """
     global _spinnaker
-    return _spinnaker.create_population(size, cellclass, cellparams,
-                                        structure, label)
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "Population")
+    return _spinnaker.create_population(
+        size, cellclass, cellparams, structure, label)
 
 
 # noinspection PyPep8Naming
@@ -286,7 +330,10 @@ def Projection(presynaptic_population, postsynaptic_population,
     :return:
     """
     global _spinnaker
-
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "Projection")
     return _spinnaker.create_projection(
         presynaptic_population, postsynaptic_population, connector, source,
         target, synapse_dynamics, label, rng)
@@ -297,7 +344,7 @@ def NativeRNG(seed_value):
     :param seed_value:
     :return:
     """
-    numpy.random.seed(seed_value)
+    __numpy.random.seed(seed_value)
 
 
 def get_current_time():
@@ -310,8 +357,7 @@ def get_current_time():
         raise front_end_common_exceptions.ConfigurationException(
             "You currently have not ran setup, please do so before calling "
             "get_current_time")
-    else:
-        return _spinnaker.get_current_time()
+    return _spinnaker.get_current_time()
 
 
 # =============================================================================
@@ -338,8 +384,8 @@ def connect(source, target, weight=0.0, delay=None, synapse_type="excitatory",
     either the random number generator supplied, or the default rng
     otherwise. Weights should be in nA or µS.
     """
-    connector = FixedProbabilityConnector(p_connect=p, weights=weight,
-                                          delays=delay)
+    connector = FixedProbabilityConnector(
+        p_connect=p, weights=weight, delays=delay)
     return Projection(source, target, connector, target=synapse_type, rng=rng)
 
 
@@ -352,8 +398,7 @@ def get_time_step():
         raise front_end_common_exceptions.ConfigurationException(
             "You currently have not ran setup, please do so before calling "
             "get_time_step")
-    else:
-        return _spinnaker.machine_time_step
+    return _spinnaker.machine_time_step
 
 
 def get_min_delay():
@@ -365,8 +410,7 @@ def get_min_delay():
         raise front_end_common_exceptions.ConfigurationException(
             "You currently have not ran setup, please do so before calling "
             "get_min_delay")
-    else:
-        return _spinnaker.min_supported_delay
+    return _spinnaker.min_supported_delay
 
 
 def get_max_delay():
@@ -378,8 +422,7 @@ def get_max_delay():
         raise front_end_common_exceptions.ConfigurationException(
             "You currently have not ran setup, please do so before calling "
             "get_max_delay")
-    else:
-        return _spinnaker.max_supported_delay
+    return _spinnaker.max_supported_delay
 
 
 def set(cells, param, val=None):  # @ReservedAssignment
@@ -417,4 +460,8 @@ def record_gsyn(source, filename):
 def get_machine():
     """ Get the spinnaker machine in use
     """
+    if _spinnaker is None:
+        raise front_end_common_exceptions.ConfigurationException(
+            "You currently have not ran setup, please do so before calling "
+            "get_machine")
     return _spinnaker.machine

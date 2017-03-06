@@ -14,7 +14,7 @@ class ConnectionHolder(object):
         self._n_post_atoms = n_post_atoms
         self._connections = connections
         self._merged_connections = None
-        self._filename = None
+        self._filename = filename
 
     def add_connections(self, connections):
         if self._connections is None:
