@@ -17,6 +17,13 @@ class AbstractGSynInhibitoryRecordable(object):
         """
 
     @abstractmethod
+    def get_gsyn_inhibitory_recording_region_id(self):
+        """ returns the recording region id for gsyn inhibitory recording
+
+        :return:
+        """
+
+    @abstractmethod
     def set_recording_gsyn_inhibitory(self, new_state=True):
         """ Sets gsyn to being recorded
         """

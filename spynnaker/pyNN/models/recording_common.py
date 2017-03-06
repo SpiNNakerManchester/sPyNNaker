@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class RecordingCommon(object):
-    def __init__(self, population):
+    def __init__(self, population, sampling_interval=None):
         """ object to hold recording behaviour
 
         :param population: the population to record for
@@ -30,7 +30,10 @@ class RecordingCommon(object):
         """
 
         self._population = population
+
         self._sampling_interval = None
+        if sampling_interval is not None:
+            self._sampling_interval = sampling_interval
 
         # file flags, allows separate files for the recorded variables
         self._write_to_files_indicators = {
@@ -61,11 +64,16 @@ class RecordingCommon(object):
             self._set_v_recording()
         elif variable == "spikes":
             self._set_spikes_recording()
+        elif variable == "all":
+            self._set_gsyn_excitatory_recording()
+            self._set_gsyn_inh_recording()
+            self._set_v_recording()
+            self._set_spikes_recording()
         else:
             raise fec_excceptions.ConfigurationException(
                 "The variable {} is not supported by the record method. "
-                "Currently supported variables are: "
-                "'gsyn_exc', 'gsyn_inh', 'v', 'spikes'".format(variable))
+                "Currently supported variables are: 'gsyn_exc', 'gsyn_inh',"
+                " 'v', 'spikes', 'all'".format(variable))
 
         # update file writer
         self._write_to_files_indicators[variable] = to_file

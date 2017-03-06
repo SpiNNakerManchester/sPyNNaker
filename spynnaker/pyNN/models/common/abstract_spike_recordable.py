@@ -22,6 +22,13 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
+    def get_spikes_recording_region_id(self):
+        """ returns the recording region id for spikes recording
+
+        :return:
+        """
+
+    @abstractmethod
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         """ Get the recorded spikes from the object

@@ -22,6 +22,13 @@ class AbstractVRecordable(object):
         """
 
     @abstractmethod
+    def get_v_recording_region_id(self):
+        """ returns the recording region id for voltage recording
+
+        :return:
+        """
+
+    @abstractmethod
     def get_v(
             self, n_machine_time_steps, placements, graph_mapper,
             buffer_manager, machine_time_step):

@@ -22,6 +22,13 @@ class AbstractGSynExcitatoryRecordable(object):
         """
 
     @abstractmethod
+    def get_gsyn_excitatory_recording_region_id(self):
+        """ returns the recording region id for gsyn excitatory recording
+
+        :return:
+        """
+
+    @abstractmethod
     def get_gsyn_excitatory(
             self, n_machine_time_steps, placements, graph_mapper,
             buffer_manager, machine_time_step):

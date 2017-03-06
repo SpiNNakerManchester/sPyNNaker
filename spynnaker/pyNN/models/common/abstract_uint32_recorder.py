@@ -36,8 +36,7 @@ class AbstractUInt32Recorder(object):
         :return:
         """
 
-        vertices = \
-            graph_mapper.get_machine_vertices(application_vertex)
+        vertices = graph_mapper.get_machine_vertices(application_vertex)
 
         ms_per_tick = machine_time_step / 1000.0
 
