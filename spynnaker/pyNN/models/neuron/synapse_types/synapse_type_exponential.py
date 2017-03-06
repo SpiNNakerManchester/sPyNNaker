@@ -1,3 +1,5 @@
+from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
+    AbstractContainsUnits
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
@@ -21,10 +23,13 @@ def get_exponential_decay_and_init(tau, machine_time_step):
     return decay_scaled, init_scaled
 
 
-class SynapseTypeExponential(AbstractSynapseType):
+class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
     def __init__(self, n_neurons, tau_syn_E, tau_syn_I,
                  initial_input_exc, initial_input_inh):
         AbstractSynapseType.__init__(self)
+        AbstractContainsUnits.__init__(
+            self, {'tau_syn_E': "mV", 'tau_syn_I': 'mV',
+                   'gsyn_exc': "uS", 'gsyn_inh': "uS"})
         self._n_neurons = n_neurons
         self._tau_syn_E = utility_calls.convert_param_to_numpy(
             tau_syn_E, n_neurons)

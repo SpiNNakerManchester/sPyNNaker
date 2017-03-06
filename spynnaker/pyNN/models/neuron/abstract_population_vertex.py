@@ -42,6 +42,8 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities import constants as \
     common_constants
 from spinn_front_end_common.utilities import helpful_functions
+from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
+    AbstractContainsUnits
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
@@ -85,7 +87,7 @@ class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractBinaryUsesSimulationRun,
     AbstractSpikeRecordable, AbstractVRecordable,
-    AbstractGSynExcitatoryRecordable,
+    AbstractGSynExcitatoryRecordable, AbstractContainsUnits,
     AbstractGSynInhibitoryRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
@@ -95,6 +97,8 @@ class AbstractPopulationVertex(
     """
 
     BASIC_MALLOC_USAGE = 2
+
+    # recording region ids
     SPIKE_RECORDING_REGION = 0
     V_RECORDING_REGION = 1
     GSYN_EXCITATORY_RECORDING_REGION = 2
@@ -122,6 +126,9 @@ class AbstractPopulationVertex(
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
+        AbstractContainsUnits.__init__(
+            self, {'spikes': 'spikes', 'v': 'mV', 'gsyn_exc': "uS",
+                   'gsyn_inh': "uS"})
 
         self._binary = binary
         self._n_atoms = n_neurons
@@ -693,6 +700,43 @@ class AbstractPopulationVertex(
         :return: list of constraints
         """
         return [KeyAllocatorContiguousRangeContraint()]
+
+    @overrides(AbstractGSynInhibitoryRecordable.
+               get_gsyn_inhibitory_recording_region_id)
+    def get_gsyn_inhibitory_recording_region_id(self):
+        return self.GSYN_INHIBITORY_RECORDING_REGION
+
+    @overrides(AbstractVRecordable.get_v_recording_region_id)
+    def get_v_recording_region_id(self):
+        return self.V_RECORDING_REGION
+
+    @overrides(AbstractGSynExcitatoryRecordable.
+               get_gsyn_excitatory_recording_region_id)
+    def get_gsyn_excitatory_recording_region_id(self):
+        return self.GSYN_EXCITATORY_RECORDING_REGION
+
+    @overrides(AbstractSpikeRecordable.get_spikes_recording_region_id)
+    def get_spikes_recording_region_id(self):
+        return self.SPIKE_RECORDING_REGION
+
+    @overrides(AbstractContainsUnits.units)
+    def units(self, variable):
+        # search the model components for the variable
+        for obj in [self._neuron_model, self._input_type,
+                    self._threshold_type, self._synapse_manager.synapse_type,
+                    self._additional_input]:
+            if (hasattr(obj, variable) and
+                    isinstance(obj, AbstractContainsUnits)):
+                return obj.unit(variable)
+        # if not in the components, must be within myself, so call my own units
+        return AbstractContainsUnits.units(self, variable)
+
+    def describe(self):
+        """ supports describing a neuron model
+
+        :return:
+        """
+        pass
 
     def __str__(self):
         return "{} with {} atoms".format(self._label, self.n_atoms)

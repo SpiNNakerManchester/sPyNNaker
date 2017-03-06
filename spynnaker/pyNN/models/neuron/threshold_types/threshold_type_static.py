@@ -1,3 +1,5 @@
+from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
+    AbstractContainsUnits
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
@@ -6,12 +8,14 @@ from spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type \
     import AbstractThresholdType
 
 
-class ThresholdTypeStatic(AbstractThresholdType):
+class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
+
     """ A threshold that is a static value
     """
 
     def __init__(self, n_neurons, v_thresh):
         AbstractThresholdType.__init__(self)
+        AbstractContainsUnits.__init__(self, {'v_thresh': "mV"})
         self._n_neurons = n_neurons
         self._v_thresh = utility_calls.convert_param_to_numpy(
             v_thresh, n_neurons)

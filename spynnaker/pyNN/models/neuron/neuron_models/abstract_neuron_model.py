@@ -51,6 +51,14 @@ class AbstractNeuronModel(object):
         :rtype: int
         """
 
+    @abstractmethod
+    def units(self, variable):
+        """ return the units of a variable
+
+        :param variable: the variable to get the units of
+        :return: string for the units
+        """
+
     def get_sdram_usage_in_bytes(self, n_neurons):
         """ Get the total sdram usage in bytes
 

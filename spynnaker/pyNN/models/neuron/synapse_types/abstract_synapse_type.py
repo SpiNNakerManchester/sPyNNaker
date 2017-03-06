@@ -63,6 +63,14 @@ class AbstractSynapseType(object):
         :rtype: int
         """
 
+    @abstractmethod
+    def units(self, variable):
+        """ return the units of a variable
+
+        :param variable: the variable to get the units of
+        :return: string for the units
+        """
+
     def get_n_synapse_type_bits(self):
         """ Get the number of bits required to represent the synapse types
 

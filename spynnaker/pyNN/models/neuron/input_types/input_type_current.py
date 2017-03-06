@@ -1,13 +1,16 @@
+from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
+    AbstractContainsUnits
 from spynnaker.pyNN.models.neuron.input_types.abstract_input_type \
     import AbstractInputType
 
 
-class InputTypeCurrent(AbstractInputType):
+class InputTypeCurrent(AbstractInputType, AbstractContainsUnits):
     """ The current input type
     """
 
     def __init__(self):
         AbstractInputType.__init__(self)
+        AbstractContainsUnits.__init__(self, {})
 
     def get_global_weight_scale(self):
         return 1.0

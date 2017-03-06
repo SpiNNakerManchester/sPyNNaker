@@ -1,4 +1,6 @@
 from pacman.executor.injection_decorator import inject_items
+from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
+    AbstractContainsUnits
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
@@ -11,11 +13,14 @@ from spynnaker.pyNN.utilities import utility_calls
 from data_specification.enums.data_type import DataType
 
 
-class SynapseTypeDualExponential(AbstractSynapseType):
+class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     def __init__(self, n_neurons, tau_syn_E, tau_syn_E2,
                  tau_syn_I, initial_input_exc, initial_input_inh):
         AbstractSynapseType.__init__(self)
+        AbstractContainsUnits.__init__(
+            self, {'tau_syn_E': "mV", 'tau_syn_E2': "mV", 'tau_syn_I': 'mV',
+                   'gsyn_exc': "uS", 'gsyn_inh': "uS"})
         self._n_neurons = n_neurons
         self._tau_syn_E = utility_calls.convert_param_to_numpy(
             tau_syn_E, n_neurons)

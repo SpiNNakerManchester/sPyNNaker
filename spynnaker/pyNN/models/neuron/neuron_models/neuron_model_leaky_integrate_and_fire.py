@@ -1,4 +1,6 @@
 from pacman.executor.injection_decorator import inject_items
+from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
+    AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate \
@@ -10,11 +12,15 @@ from data_specification.enums.data_type import DataType
 import numpy
 
 
-class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
+class NeuronModelLeakyIntegrateAndFire(
+    NeuronModelLeakyIntegrate, AbstractContainsUnits):
 
     def __init__(
             self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
             tau_refrac):
+        AbstractContainsUnits.__init__(
+            self, {'v_init': "mV", 'v_rest': "mV", 'tau_m': "ms", "cm": "nF",
+                   "i_offset": "nA", 'v_reset': "mV", 'tau_refac': 'ms'})
         NeuronModelLeakyIntegrate.__init__(
             self, n_neurons, v_init, v_rest, tau_m, cm, i_offset)
         self._v_reset = utility_calls.convert_param_to_numpy(

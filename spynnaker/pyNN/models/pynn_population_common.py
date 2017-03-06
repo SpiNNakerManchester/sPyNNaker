@@ -1,6 +1,10 @@
 from spinn_front_end_common.abstract_models. \
     abstract_changable_after_run import AbstractChangableAfterRun
 from spinn_front_end_common.utilities import exceptions
+from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
+    AbstractContainsUnits
+from spynnaker.pyNN.models.abstract_models.abstract_population_settable import \
+    AbstractPopulationSettable
 from spynnaker.pyNN.utilities import globals_variables
 
 
@@ -71,6 +75,24 @@ class PyNNPopulationCommon(object):
             globals_variables.get_simulator(). \
                 increment_none_labelled_vertex_count()
         return cell_label
+
+    def get(self, parameter_name, gather=False):
+        """ Get the values of a parameter for every local cell in the\
+            population.
+        """
+        if isinstance(self._vertex, AbstractPopulationSettable):
+            return self._vertex.get_value(parameter_name)
+        raise KeyError("Population does not have a property {}".format(
+            parameter_name))
+
+    def _get_variable_unit(self, parameter_name):
+        """ helper method for getting units from a parameter used by the vertex
+
+        :param parameter_name: the parameter name to find the units for
+        :return: the units in string form
+        """
+        if isinstance(self._vertex, AbstractContainsUnits):
+            return self._vertex.units(parameter_name)
 
     @property
     def size(self):

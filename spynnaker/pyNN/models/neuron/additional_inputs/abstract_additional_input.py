@@ -32,6 +32,14 @@ class AbstractAdditionalInput(object):
             additional_input_has_spiked
         """
 
+    @abstractmethod
+    def units(self, variable):
+        """ return the units of a variable
+
+        :param variable: the variable to get the units of
+        :return: string for the units
+        """
+
     def get_sdram_usage_per_neuron_in_bytes(self):
         """ Get the SDRAM usage of this additional input in bytes
 

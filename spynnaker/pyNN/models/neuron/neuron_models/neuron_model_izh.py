@@ -1,4 +1,6 @@
 from pacman.executor.injection_decorator import inject_items
+from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
+    AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
@@ -8,10 +10,13 @@ from spynnaker.pyNN.utilities import utility_calls
 from data_specification.enums.data_type import DataType
 
 
-class NeuronModelIzh(AbstractNeuronModel):
+class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     def __init__(self, n_neurons, a, b, c, d, v_init, u_init, i_offset):
         AbstractNeuronModel.__init__(self)
+        AbstractContainsUnits.__init__(
+            self, {'a': "ms", 'b': "ms", 'c': "mV", 'd': "mV/ms",
+                   'v_init': "mV", 'u_init': "mV/ms", 'i_offset': "nA"})
         self._n_neurons = n_neurons
         self._a = utility_calls.convert_param_to_numpy(a, n_neurons)
         self._b = utility_calls.convert_param_to_numpy(b, n_neurons)

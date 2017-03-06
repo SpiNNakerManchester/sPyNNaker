@@ -1,4 +1,6 @@
 from data_specification.enums.data_type import DataType
+from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
+    AbstractContainsUnits
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
@@ -6,12 +8,14 @@ from spynnaker.pyNN.models.neuron.input_types.abstract_input_type \
     import AbstractInputType
 
 
-class InputTypeConductance(AbstractInputType):
+class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     """ The conductance input type
     """
 
     def __init__(self, n_neurons, e_rev_E, e_rev_I):
         AbstractInputType.__init__(self)
+        AbstractContainsUnits.__init__(
+            self, {"e_rev_I": "mV", "e_rev_E": "mV"})
         self._n_neurons = n_neurons
         self._e_rev_E = utility_calls.convert_param_to_numpy(
             e_rev_E, n_neurons)
