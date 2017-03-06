@@ -44,7 +44,7 @@ class GraphEdgeFilter(object):
             progress_bar.update()
 
         # start checking edges to decide which ones need pruning....
-        for partition in machine_graph.out_going_partitions:
+        for partition in machine_graph.outgoing_edge_partitions:
             for edge in partition.edges:
                 if not self._is_filterable(edge, graph_mapper):
                     logger.debug("this edge was not pruned {}".format(edge))
