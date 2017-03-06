@@ -10,6 +10,7 @@ class FromFileConnector(FromListConnector):
     def __init__(
             self, file,  # @ReservedAssignment
             distributed=False, safe=True, verbose=False):
+        self._file = file
 
         real_file = file
         opened_file = False
@@ -36,3 +37,6 @@ class FromFileConnector(FromListConnector):
             real_file.close()
 
         FromListConnector.__init__(self, conn_list, safe, verbose)
+
+    def __repr__(self):
+        return "FromFileConnector({})".format(self._file)

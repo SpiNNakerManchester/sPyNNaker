@@ -66,5 +66,5 @@ class SpikeSourcePoissonMachineVertex(
     def get_recording_region_base_address(self, txrx, placement):
         return helpful_functions.locate_memory_region_for_placement(
             placement,
-            self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)

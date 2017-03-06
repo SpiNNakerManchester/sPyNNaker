@@ -144,3 +144,7 @@ class FromListConnector(AbstractConnector):
         block["delay"] = self._clip_delays(items["delay"])
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "FromListConnector(n_connections={})".format(
+            len(self._conn_list))
