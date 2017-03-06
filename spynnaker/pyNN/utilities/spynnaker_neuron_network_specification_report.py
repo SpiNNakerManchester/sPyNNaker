@@ -35,8 +35,8 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
 
         # build progress bar for the vertices, edges, and rendering
         progress_bar = ProgressBar(
-            len(application_graph.vertices) +
-            len(application_graph.edges) + 1,
+            application_graph.n_vertices +
+            application_graph.n_outgoing_edge_partitions + 1,
             "generating the graphical representation of the neural network")
 
         # write vertices into dot diagram
@@ -50,19 +50,20 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
             progress_bar.update()
 
         # write edges into dot diagram
-        for edge in application_graph.edges:
-            source_vertex_id = vertex_holders[edge.pre_vertex]
-            dest_vertex_id = vertex_holders[edge.post_vertex]
-            if isinstance(edge, ProjectionApplicationEdge):
-                for synapse_info in edge.synapse_information:
+        for partition in application_graph.outgoing_edge_partitions:
+            for edge in partition.edges:
+                source_vertex_id = vertex_holders[edge.pre_vertex]
+                dest_vertex_id = vertex_holders[edge.post_vertex]
+                if isinstance(edge, ProjectionApplicationEdge):
+                    for synapse_info in edge.synapse_information:
+                        dot_diagram.edge(
+                            "{}".format(source_vertex_id),
+                            "{}".format(dest_vertex_id),
+                            "{}".format(synapse_info.connector))
+                else:
                     dot_diagram.edge(
                         "{}".format(source_vertex_id),
-                        "{}".format(dest_vertex_id),
-                        "{}".format(synapse_info.connector))
-            else:
-                dot_diagram.edge(
-                    "{}".format(source_vertex_id),
-                    "{}".format(dest_vertex_id))
+                        "{}".format(dest_vertex_id))
             progress_bar.update()
 
         # write dot file and generate pdf

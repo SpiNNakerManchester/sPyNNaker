@@ -276,8 +276,7 @@ class DelayExtensionVertex(
         return ExecutableStartType.USES_SIMULATION_INTERFACE
 
     def get_n_keys_for_partition(self, partition, graph_mapper):
-        vertex_slice = graph_mapper.get_slice(
-            partition.edges[0].pre_vertex)
+        vertex_slice = graph_mapper.get_slice(partition.pre_vertex)
         if self._n_delay_stages == 0:
             return 1
         return vertex_slice.n_atoms * self._n_delay_stages

@@ -19,28 +19,29 @@ class SpYNNakerConnectionHolderGenerator(object):
         """
 
         progress_bar = ProgressBar(
-            len(application_graph.edges),
+            application_graph.n_outgoing_edge_partitions,
             "Generating connection holders for reporting connection data.")
 
         data_holders = dict()
-        for edge in application_graph.edges:
+        for partition in application_graph.outgoing_edge_partitions:
+            for edge in partition.edges:
 
-            # add pre run generators so that reports can extract without
-            # going to machine.
-            if isinstance(edge, ProjectionApplicationEdge):
+                # add pre run generators so that reports can extract without
+                # going to machine.
+                if isinstance(edge, ProjectionApplicationEdge):
 
-                # build connection holders
-                connection_holder = ConnectionHolder(
-                    None, True, edge.pre_vertex.n_atoms,
-                    edge.post_vertex.n_atoms)
+                    # build connection holders
+                    connection_holder = ConnectionHolder(
+                        None, True, edge.pre_vertex.n_atoms,
+                        edge.post_vertex.n_atoms)
 
-                for synapse_information in edge.synapse_information:
-                    edge.post_vertex.add_pre_run_connection_holder(
-                        connection_holder, edge, synapse_information)
+                    for synapse_information in edge.synapse_information:
+                        edge.post_vertex.add_pre_run_connection_holder(
+                            connection_holder, edge, synapse_information)
 
-                    # store for the report generations
-                    data_holders[(edge, synapse_information)] = \
-                        connection_holder
+                        # store for the report generations
+                        data_holders[(edge, synapse_information)] = \
+                            connection_holder
             progress_bar.update()
         progress_bar.end()
 
