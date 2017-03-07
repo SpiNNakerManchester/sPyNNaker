@@ -36,6 +36,8 @@ class SpikeSourceArray(
 
     _model_based_max_atoms_per_core = sys.maxint
 
+    SPIKE_RECORDING_REGION_ID = 0
+
     def __init__(
             self, n_neurons,
             spike_times=None, port=None, tag=None, ip_address=None,
@@ -163,6 +165,9 @@ class SpikeSourceArray(
                 if vertex.virtual_key is not None
                 else 0,
             machine_time_step)
+
+    def get_spikes_recording_region_id(self):
+        return self.SPIKE_RECORDING_REGION_ID
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):

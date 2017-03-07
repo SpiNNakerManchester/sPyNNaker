@@ -67,6 +67,7 @@ class SpikeSourcePoisson(
 
     _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
+    SPIKE_RECORDING_REGION_ID = 0
 
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
     # in terms of CPU (2900 at 10 times slow down is fine, but not at
@@ -510,3 +511,6 @@ class SpikeSourcePoisson(
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
         return [KeyAllocatorContiguousRangeContraint()]
+
+    def get_spikes_recording_region_id(self):
+        return self.SPIKE_RECORDING_REGION_ID
