@@ -42,6 +42,6 @@ class GsynInhibitoryRecorder(AbstractUInt32Recorder):
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, machine_time_step):
 
-        self.get_data(
+        return self.get_data(
             label, buffer_manager, region, placements, graph_mapper,
             application_vertex, machine_time_step, "gsyn_inhibitory")
