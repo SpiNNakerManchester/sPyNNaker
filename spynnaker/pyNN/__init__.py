@@ -220,7 +220,7 @@ def run(run_time=None):
     return None
 
 
-def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
+def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
           database_socket_addresses=None, n_chips_required=None,
           **extra_params):
     """ Should be called at the very beginning of a script.
