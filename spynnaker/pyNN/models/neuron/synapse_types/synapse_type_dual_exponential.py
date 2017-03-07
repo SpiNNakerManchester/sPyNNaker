@@ -110,9 +110,9 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             NeuronParameter(e_init2, DataType.UINT32, "e_init2"),
             NeuronParameter(i_decay, DataType.UINT32, "i_decay"),
             NeuronParameter(i_init, DataType.UINT32, "i_init"),
-            NeuronParameter(self._initial_input_exc, DataType.UINT32,
+            NeuronParameter(self._initial_input_exc, DataType.S1615,
                             "gsyn_exc"),
-            NeuronParameter(self._initial_input_inh, DataType.UINT32,
+            NeuronParameter(self._initial_input_inh, DataType.S1615,
                             "gsyn_inh")
         ]
 

@@ -220,15 +220,6 @@ bool synapses_initialise(
 
     log_info("synapses_initialise: starting");
     n_neurons = n_neurons_value;
-    *input_buffers_value = input_buffers;
-
-    // Set the initial values to 0
-    for (uint32_t i = 0; i < INPUT_BUFFER_SIZE; i++) {
-        input_buffers[i] = 0;
-    }
-    for (uint32_t i = 0; i < RING_BUFFER_SIZE; i++) {
-        ring_buffers[i] = 0;
-    }
 
     // Get the synapse shaping data
     if (sizeof(synapse_param_t) > 0) {
@@ -295,6 +286,18 @@ bool synapses_initialise(
 
     log_info("synapses_initialise: completed successfully");
     _print_synapse_parameters();
+
+    // build input buffers with initial values dictated from the synapses
+    *input_buffers_value = input_buffers;
+
+    // Set the initial values to 0
+    for (uint32_t i = 0; i < INPUT_BUFFER_SIZE; i++) {
+        input_buffers[i] = 0;
+    }
+    for (uint32_t i = 0; i < RING_BUFFER_SIZE; i++) {
+        ring_buffers[i] = 0;
+    }
+
     return true;
 }
 

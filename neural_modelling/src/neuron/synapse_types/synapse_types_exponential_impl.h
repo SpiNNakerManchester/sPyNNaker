@@ -29,6 +29,8 @@ typedef struct synapse_param_t {
     decay_t exc_init;
     decay_t inh_decay;
     decay_t inh_init;
+    input_t gsyn_excitatory_initial_value;
+    input_t gsyn_inhibitory_initial_value;
 } synapse_param_t;
 
 #include "synapse_types.h"
@@ -184,11 +186,28 @@ static inline void synapse_types_print_input(
               input_buffers[_in_offset(neuron_index)]);
 }
 
-static inline void synapse_types_print_parameters(synapse_param_t *parameters) {
+static inline void synapse_types_print_parameters(
+        synapse_param_t *parameters) {
     log_debug("exc_decay = %R\n", (unsigned fract) parameters->exc_decay);
     log_debug("exc_init  = %R\n", (unsigned fract) parameters->exc_init);
     log_debug("inh_decay = %R\n", (unsigned fract) parameters->inh_decay);
     log_debug("inh_init  = %R\n", (unsigned fract) parameters->inh_init);
+    log_debug("gsyn_excitatory_initial_value = %11.4k\n",
+              parameters->gsyn_excitatory_initial_value);
+    log_debug("gsyn_inhibitory_initial_value = %11.4k\n",
+              parameters->gsyn_inhibitory_initial_value);
+}
+
+static input_t get_gsyn_excitatory_initial_values(synapse_param_t *parameters){
+    return parameters->gsyn_excitatory_initial_value;
+}
+
+//! \brief provides the gsyn inhibitory initial value used within the
+//! excitatory input buffer
+//! \return the initial value as a input_t value for the inhibitory input
+//! buffer
+static input_t get_gsyn_inhibitory_initial_values(synapse_param_t *parameters){
+    return parameters->gsyn_inhibitory_initial_value;
 }
 
 #endif  // _SYNAPSE_TYPES_EXPONENTIAL_IMPL_H_

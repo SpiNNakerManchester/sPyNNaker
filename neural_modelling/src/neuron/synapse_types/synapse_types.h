@@ -119,4 +119,16 @@ static void synapse_types_print_parameters(synapse_param_t *parameters);
 static void synapse_types_print_input(
         input_t *input_buffers,  index_t neuron_index);
 
+//! \brief provides the gsyn excitatory initial value used within the
+//! excitatory input buffer
+//! \return the initial value as a input_t value for the excitatory input
+//! buffer
+static input_t get_gsyn_excitatory_initial_values(synapse_param_t *parameters);
+
+//! \brief provides the gsyn inhibitory initial value used within the
+//! excitatory input buffer
+//! \return the initial value as a input_t value for the inhibitory input
+//! buffer
+static input_t get_gsyn_inhibitory_initial_values(synapse_param_t *parameters);
+
 #endif // _SYNAPSE_TYPES_H_
