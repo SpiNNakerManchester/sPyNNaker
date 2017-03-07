@@ -117,15 +117,14 @@ class Spinnaker(SpinnakerMainInterface):
 
         # deal with params allowed via the setup options
         if timestep is not None:
-            # convert into milliseconds from microseconds
+            # convert from milliseconds into microseconds
             try:
                 if timestep <= 0:
-                    msg = "timestamp parameter must greater than zero"
+                    msg = "timestamp parameter {} must greater than zero"\
+                        .format(timestep)
                     raise InvalidParameterType(msg)
                 timestep *= 1000
-                if (type(timestep) != int) and (not timestep.is_integer()):
-                    msg = "timestamp parameter * 1000 must be an integer"
-                    raise InvalidParameterType(msg)
+                timestep = math.ceil(timestep)
             except (TypeError, AttributeError):
                 msg = "timestamp parameter must numerical"
                 raise InvalidParameterType(msg)
