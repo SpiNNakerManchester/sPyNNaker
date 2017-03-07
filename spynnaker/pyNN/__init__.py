@@ -249,9 +249,9 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
             __version__, __version_name__, __version_month__, __version_year__,
             parent_dir))
 
-    if len(extra_params) > 1:
-        logger.warn("Extra params has been applied to the setup command which "
-                    "we do not consider")
+    if len(extra_params) > 0:
+        logger.warn("Extra params {} have been applied to the setup "
+                    "command which we do not consider".format(extra_params))
     _spinnaker = __Spinnaker(
         host_name=machine, timestep=timestep, min_delay=min_delay,
         max_delay=max_delay,
