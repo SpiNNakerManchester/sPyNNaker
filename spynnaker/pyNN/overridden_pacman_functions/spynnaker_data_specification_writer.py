@@ -1,4 +1,4 @@
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_front_end_common.interface.interface_functions.\
     front_end_common_graph_data_specification_writer import \
@@ -22,15 +22,13 @@ class SpynnakerDataSpecificationWriter(
             self, placements, graph, hostname,
             report_default_directory, write_text_specs,
             app_data_runtime_folder, machine, graph_mapper=None):
-
         # Keep the results
         dsg_targets = dict()
-
         # Keep delay extensions until the end
         delay_extension_placements = list()
 
         # create a progress bar for end users
-        progress_bar = ProgressBar(len(list(placements.placements)),
+        progress_bar = ProgressBar(placements.placements,
                                    "Generating sPyNNaker data specifications")
         for placement in placements.placements:
             associated_vertex = graph_mapper.get_application_vertex(

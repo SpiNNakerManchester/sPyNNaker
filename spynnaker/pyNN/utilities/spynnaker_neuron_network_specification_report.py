@@ -1,7 +1,7 @@
 import logging
 import os
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.projection_application_edge \
     import ProjectionApplicationEdge
@@ -13,6 +13,15 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     """
     """
 
+    def _get_diagram(self, label):
+        try:
+            import graphviz  # @UnresolvedImport
+        except:
+            raise exceptions.SpynnakerException(
+                "graphviz is required to use this report.  Please install"
+                " graphviz if you want to use this report.")
+        return graphviz.Digraph(comment=label)
+
     def __call__(self, report_folder, application_graph):
         """
 
@@ -21,17 +30,10 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         :param connection_holder: the set of connection holders
         :return: None
         """
-        try:
-            import graphviz
-        except:
-            raise exceptions.SpynnakerException(
-                "graphviz is required to use this report.  Please install"
-                " graphviz if you want to use this report.")
-
         # create holders for data
         vertex_holders = dict()
-        dot_diagram = graphviz.Digraph(
-            comment="The graph of the network in graphical form")
+        dot_diagram = self._get_diagram(
+            "The graph of the network in graphical form")
 
         # build progress bar for the vertices, edges, and rendering
         progress_bar = ProgressBar(

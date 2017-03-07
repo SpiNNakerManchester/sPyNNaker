@@ -1,5 +1,5 @@
 import logging
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
 from spynnaker.pyNN.models.neural_projections.projection_application_edge \
     import ProjectionApplicationEdge
@@ -25,11 +25,9 @@ class SpYNNakerConnectionHolderGenerator(object):
         data_holders = dict()
         for partition in application_graph.outgoing_edge_partitions:
             for edge in partition.edges:
-
                 # add pre run generators so that reports can extract without
                 # going to machine.
                 if isinstance(edge, ProjectionApplicationEdge):
-
                     # build connection holders
                     connection_holder = ConnectionHolder(
                         None, True, edge.pre_vertex.n_atoms,

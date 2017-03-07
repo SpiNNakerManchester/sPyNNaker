@@ -23,7 +23,7 @@ from spinn_front_end_common.abstract_models.abstract_changable_after_run \
 
 from spinn_front_end_common.utilities import exceptions
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 
 import logging
@@ -53,7 +53,6 @@ class Projection(object):
 
         if not isinstance(postsynaptic_population._get_vertex,
                           AbstractPopulationVertex):
-
             raise exceptions.ConfigurationException(
                 "postsynaptic population is not designed to receive"
                 " synaptic projections")
@@ -115,18 +114,15 @@ class Projection(object):
             presynaptic_population._get_vertex,
             postsynaptic_population._get_vertex)
         if edge_to_merge is not None:
-
             # If there is an existing edge, add the connector
             edge_to_merge.add_synapse_information(self._synapse_information)
             self._projection_edge = edge_to_merge
         else:
-
             # If there isn't an existing edge, create a new one
             self._projection_edge = ProjectionApplicationEdge(
                 presynaptic_population._get_vertex,
                 postsynaptic_population._get_vertex,
                 self._synapse_information, label=label)
-
             # add edge to the graph
             spinnaker_control.add_application_edge(
                 self._projection_edge, constants.SPIKE_PARTITION_ID)
@@ -150,17 +146,14 @@ class Projection(object):
             connection_holder = ConnectionHolder(
                 None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
                 self._virtual_connection_list)
-
             post_vertex.add_pre_run_connection_holder(
                 connection_holder, self._projection_edge,
                 self._synapse_information)
 
     @property
     def requires_mapping(self):
-        if (isinstance(self._projection_edge, AbstractChangableAfterRun) and
-                self._projection_edge.requires_mapping):
-            return True
-        return False
+        return (isinstance(self._projection_edge, AbstractChangableAfterRun)
+                and self._projection_edge.requires_mapping)
 
     def mark_no_changes(self):
         if isinstance(self._projection_edge, AbstractChangableAfterRun):
@@ -180,8 +173,8 @@ class Projection(object):
         """
         graph_edges = self._spinnaker.application_graph.edges
         for edge in graph_edges:
-            if ((edge.pre_vertex == presynaptic_vertex) and
-                    (edge.post_vertex == postsynaptic_vertex)):
+            if (edge.pre_vertex == presynaptic_vertex and
+                    edge.post_vertex == postsynaptic_vertex):
                 return edge
         return None
 
@@ -196,21 +189,9 @@ class Projection(object):
         delay_vertex = presynaptic_population._internal_delay_vertex
         pre_vertex = presynaptic_population._get_vertex
         if delay_vertex is None:
-            delay_name = "{}_delayed".format(pre_vertex.label)
-            delay_vertex = DelayExtensionVertex(
-                pre_vertex.n_atoms, max_delay_per_neuron, pre_vertex,
-                machine_time_step, timescale_factor, label=delay_name)
-            presynaptic_population._internal_delay_vertex = delay_vertex
-            pre_vertex.add_constraint(
-                PartitionerSameSizeAsVertexConstraint(delay_vertex))
-            self._spinnaker.add_application_vertex(delay_vertex)
-
-            # Add the edge
-            delay_afferent_edge = DelayAfferentApplicationEdge(
-                pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
-                    pre_vertex.label))
-            self._spinnaker.add_application_edge(
-                delay_afferent_edge, constants.SPIKE_PARTITION_ID)
+            delay_vertex = self._create_delay_vertex(
+                pre_vertex, max_delay_per_neuron, machine_time_step,
+                timescale_factor, presynaptic_population)
 
         # Ensure that the delay extension knows how many states it will support
         n_stages = int(math.ceil(
@@ -232,6 +213,28 @@ class Projection(object):
         else:
             delay_edge.add_synapse_information(self._synapse_information)
         return delay_edge
+
+    def _create_delay_vertex(self, pre_vertex, max_delay_per_neuron,
+                             machine_time_step, timescale_factor,
+                             presynaptic_population):
+        # Make the vertex
+        delay_name = "{}_delayed".format(pre_vertex.label)
+        delay_vertex = DelayExtensionVertex(
+            pre_vertex.n_atoms, max_delay_per_neuron, pre_vertex,
+            machine_time_step, timescale_factor, label=delay_name)
+        presynaptic_population._internal_delay_vertex = delay_vertex
+        pre_vertex.add_constraint(
+            PartitionerSameSizeAsVertexConstraint(delay_vertex))
+        self._spinnaker.add_application_vertex(delay_vertex)
+
+        # Add the edge
+        delay_afferent_edge = DelayAfferentApplicationEdge(
+            pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
+                pre_vertex.label))
+        self._spinnaker.add_application_edge(
+            delay_afferent_edge, constants.SPIKE_PARTITION_ID)
+
+        return delay_vertex
 
     def describe(self, template='projection_default.txt', engine='default'):
         """ Return a human-readable description of the projection.
@@ -280,7 +283,6 @@ class Projection(object):
 
         # If we haven't run, add the holder to get connections, and return it
         if not self._spinnaker.has_ran:
-
             post_vertex.add_pre_run_connection_holder(
                 connection_holder, self._projection_edge,
                 self._synapse_information)
@@ -295,7 +297,7 @@ class Projection(object):
         edges = graph_mapper.get_machine_edges(
             self._projection_edge)
         progress = ProgressBar(
-            len(edges),
+            edges,
             "Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))
         for edge in edges:
@@ -308,6 +310,7 @@ class Projection(object):
                 connection_holder.add_connections(connections)
             progress.update()
         progress.end()
+
         connection_holder.finish()
         return connection_holder
 

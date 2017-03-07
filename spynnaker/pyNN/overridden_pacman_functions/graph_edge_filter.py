@@ -1,9 +1,10 @@
+from spinn_utilities.progress_bar import ProgressBar
+
 # pacman imports
 from pacman.model.graphs.application.impl.application_edge \
     import ApplicationEdge
 from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
 from pacman.model.graphs.common.graph_mapper import GraphMapper
-from spinn_machine.utilities.progress_bar import ProgressBar
 
 # spynnaker imports
 from spynnaker.pyNN import exceptions
@@ -35,12 +36,8 @@ class GraphEdgeFilter(object):
 
         # add the vertices directly, as they wont be pruned.
         for vertex in machine_graph.vertices:
-            new_machine_graph.add_vertex(vertex)
-            associated_vertex = graph_mapper.get_application_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
-            new_graph_mapper.add_vertex_mapping(
-                machine_vertex=vertex, vertex_slice=vertex_slice,
-                application_vertex=associated_vertex)
+            self._add_vertex(vertex, graph_mapper, new_machine_graph,
+                             new_graph_mapper)
             progress_bar.update()
 
         # start checking edges to decide which ones need pruning....
@@ -48,18 +45,8 @@ class GraphEdgeFilter(object):
             for edge in partition.edges:
                 if not self._is_filterable(edge, graph_mapper):
                     logger.debug("this edge was not pruned {}".format(edge))
-                    new_machine_graph.add_edge(edge, partition.identifier)
-                    app_edge = graph_mapper.get_application_edge(edge)
-                    new_graph_mapper.add_edge_mapping(edge, app_edge)
-
-                    # add partition constraints from the original graph to
-                    # the new graph
-                    # add constraints from the application partition
-                    new_machine_graph_partition = new_machine_graph.\
-                        get_outgoing_edge_partition_starting_at_vertex(
-                            edge.pre_vertex, partition.identifier)
-                    new_machine_graph_partition.add_constraints(
-                        partition.constraints)
+                    self._add_edge(edge, partition, graph_mapper,
+                                   new_machine_graph, new_graph_mapper)
                 else:
                     logger.debug("this edge was pruned {}".format(edge))
             progress_bar.update()
@@ -69,12 +56,35 @@ class GraphEdgeFilter(object):
         return new_machine_graph, new_graph_mapper
 
     @staticmethod
+    def _add_vertex(vertex, mapper, new_graph, new_mapper):
+        new_graph.add_vertex(vertex)
+        associated_vertex = mapper.get_application_vertex(vertex)
+        vertex_slice = mapper.get_slice(vertex)
+        new_mapper.add_vertex_mapping(
+            machine_vertex=vertex, vertex_slice=vertex_slice,
+            application_vertex=associated_vertex)
+
+    @staticmethod
+    def _add_edge(edge, partition, mapper, new_graph, new_mapper):
+        new_graph.add_edge(edge, partition.identifier)
+        app_edge = mapper.get_application_edge(edge)
+        new_mapper.add_edge_mapping(edge, app_edge)
+
+        # add partition constraints from the original graph to the new graph
+        # add constraints from the application partition
+        new_machine_graph_partition = new_graph.\
+            get_outgoing_edge_partition_starting_at_vertex(
+                edge.pre_vertex, partition.identifier)
+        new_machine_graph_partition.add_constraints(
+            partition.constraints)
+
+    @staticmethod
     def _is_filterable(edge, graph_mapper):
         app_edge = graph_mapper.get_application_edge(edge)
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
         elif isinstance(app_edge, ApplicationEdge):
             return False
-        else:
-            raise exceptions.FilterableException(
-                "cannot figure out if edge {} is prunable or not".format(edge))
+
+        raise exceptions.FilterableException(
+            "cannot figure out if edge {} is prunable or not".format(edge))

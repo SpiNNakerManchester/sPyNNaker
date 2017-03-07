@@ -1,4 +1,4 @@
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.models.common import recording_utils
 
@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 class MultiSpikeRecorder(object):
-
     def __init__(self):
         self._record = False
 
@@ -45,20 +44,16 @@ class MultiSpikeRecorder(object):
     def get_spikes(
             self, label, buffer_manager, region,
             placements, graph_mapper, application_vertex, machine_time_step):
-
         spike_times = list()
         spike_ids = list()
         ms_per_tick = machine_time_step / 1000.0
 
-        vertices = \
-            graph_mapper.get_machine_vertices(application_vertex)
-
+        vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing_str = ""
 
-        progress_bar = ProgressBar(len(vertices),
+        progress_bar = ProgressBar(vertices,
                                    "Getting spikes for {}".format(label))
         for vertex in vertices:
-
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
 

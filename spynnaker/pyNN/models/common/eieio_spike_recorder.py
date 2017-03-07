@@ -1,9 +1,8 @@
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from spinnman.messages.eieio.data_messages.eieio_data_header \
     import EIEIODataHeader
 
 import numpy
-
 import logging
 
 logger = logging.getLogger(__name__)
@@ -37,28 +36,24 @@ class EIEIOSpikeRecorder(object):
     def get_spikes(self, label, buffer_manager, region,
                    placements, graph_mapper, application_vertex,
                    base_key_function, machine_time_step):
-
         results = list()
         missing_str = ""
         ms_per_tick = machine_time_step / 1000.0
-        vertices = \
-            graph_mapper.get_machine_vertices(application_vertex)
-        progress_bar = ProgressBar(len(vertices),
+        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        progress_bar = ProgressBar(vertices,
                                    "Getting spikes for {}".format(label))
 
         for vertex in vertices:
-
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
-
-            x = placement.x
-            y = placement.y
-            p = placement.p
 
             # Read the spikes
             raw_spike_data, data_missing = \
                 buffer_manager.get_data_for_vertex(placement, region)
             if data_missing:
+                x = placement.x
+                y = placement.y
+                p = placement.p
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             spike_data = str(raw_spike_data.read_all())
             number_of_bytes_written = len(spike_data)
@@ -78,15 +73,14 @@ class EIEIOSpikeRecorder(object):
                 offset += eieio_header.count * 4
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
             progress_bar.update()
-
         progress_bar.end()
+
         if len(missing_str) > 0:
             logger.warn(
                 "Population {} is missing spike data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
-        if len(results) != 0:
-            result = numpy.vstack(results)
-            result = result[numpy.lexsort((result[:, 1], result[:, 0]))]
-        else:
-            result = []
-        return result
+        if not results:
+            return []
+
+        result = numpy.vstack(results)
+        return result[numpy.lexsort((result[:, 1], result[:, 0]))]
