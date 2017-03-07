@@ -220,7 +220,7 @@ def run(run_time=None):
     return None
 
 
-def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
+def setup(timestep=1.0, min_delay=None, max_delay=None, machine=None,
           database_socket_addresses=None, n_chips_required=None,
           **extra_params):
     """ Should be called at the very beginning of a script.
@@ -228,7 +228,10 @@ def setup(timestep=None, min_delay=None, max_delay=None, machine=None,
         given simulator but not by others.
 
     :param machine: A SpiNNaker machine used to run the simulation.
-    :param timestep:
+    :param timestep: The timestep in milleseconds.
+       Value will be rounded up to whole microseconds
+       Set to None to use the value from the config file
+    :rtype: float or None
     :param min_delay:
     :param max_delay:
     :param machine:
