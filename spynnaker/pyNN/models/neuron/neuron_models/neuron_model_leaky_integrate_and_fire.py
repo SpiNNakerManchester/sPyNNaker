@@ -12,21 +12,19 @@ from data_specification.enums.data_type import DataType
 import numpy
 
 
-class NeuronModelLeakyIntegrateAndFire(
-    NeuronModelLeakyIntegrate, AbstractContainsUnits):
+class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
     def __init__(
             self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
             tau_refrac):
-        AbstractContainsUnits.__init__(
-            self, {'v_init': "mV", 'v_rest': "mV", 'tau_m': "ms", "cm": "nF",
-                   "i_offset": "nA", 'v_reset': "mV", 'tau_refac': 'ms'})
         NeuronModelLeakyIntegrate.__init__(
             self, n_neurons, v_init, v_rest, tau_m, cm, i_offset)
         self._v_reset = utility_calls.convert_param_to_numpy(
             v_reset, n_neurons)
         self._tau_refrac = utility_calls.convert_param_to_numpy(
             tau_refrac, n_neurons)
+        self._units['v_reset'] = 'mV'
+        self._units['tau_refac'] = 'ms'
 
     @property
     def v_reset(self):
