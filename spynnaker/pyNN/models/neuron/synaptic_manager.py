@@ -10,6 +10,7 @@ from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
 from pyNN.random import RandomDistribution
 from spinn_front_end_common.utilities import helpful_functions
+from spinn_utilities.helpful_functions import get_valid_components
 
 from data_specification.enums.data_type import DataType
 from pacman.model.graphs.application.abstract_application_vertex\
@@ -58,7 +59,7 @@ class SynapticManager(object):
         if population_table_type is None:
             population_table_type = ("MasterPopTableAs" + conf.config.get(
                 "MasterPopTable", "generator"))
-            algorithms = helpful_functions.get_valid_components(
+            algorithms = get_valid_components(
                 master_pop_table_generators, "master_pop_table_as")
             self._population_table_type = algorithms[population_table_type]()
 

@@ -4,6 +4,7 @@ import shutil
 
 from spynnaker.pyNN.spinnaker import Spinnaker
 from spynnaker.pyNN.utilities import conf
+from spinn_utilities.helpful_functions import set_up_report_specifics
 
 
 class TestCFGs(unittest.TestCase):
@@ -29,7 +30,7 @@ class TestCFGs(unittest.TestCase):
 
         if 'reports' in os.listdir(current_path):
             shutil.rmtree(os.path.join(current_path, 'reports'))
-        spinn._set_up_report_specifics()
+        set_up_report_specifics()
 
         self.assertEqual(spinn._report_default_directory,
                          os.path.join(current_path, 'reports', 'latest'))
