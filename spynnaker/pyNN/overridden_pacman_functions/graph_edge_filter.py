@@ -29,7 +29,7 @@ class GraphEdgeFilter(object):
         new_graph_mapper = GraphMapper()
 
         # create progress bar
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             machine_graph.n_vertices +
             machine_graph.n_outgoing_edge_partitions,
             "Filtering edges")
@@ -38,7 +38,7 @@ class GraphEdgeFilter(object):
         for vertex in machine_graph.vertices:
             self._add_vertex(vertex, graph_mapper, new_machine_graph,
                              new_graph_mapper)
-            progress_bar.update()
+            progress.update()
 
         # start checking edges to decide which ones need pruning....
         for partition in machine_graph.outgoing_edge_partitions:
@@ -49,8 +49,8 @@ class GraphEdgeFilter(object):
                                    new_machine_graph, new_graph_mapper)
                 else:
                     logger.debug("this edge was pruned {}".format(edge))
-            progress_bar.update()
-        progress_bar.end()
+            progress.update()
+        progress.end()
 
         # returned the pruned graph and graph_mapper
         return new_machine_graph, new_graph_mapper

@@ -43,10 +43,10 @@ class VRecorder(object):
         data = list()
         missing_str = ""
 
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             vertices, "Getting membrane voltage for {}".format(label))
 
-        for vertex in vertices:
+        for vertex in progress.over(vertices):
             vertex_slice = graph_mapper.get_slice(vertex)
             placement = placements.get_placement_of_vertex(vertex)
 
@@ -77,9 +77,7 @@ class VRecorder(object):
                 [record_ids, record_time, record_membrane_potential])
             part_data = numpy.reshape(part_data, [-1, 3])
             data.append(part_data)
-            progress_bar.update()
 
-        progress_bar.end()
         if len(missing_str) > 0:
             logger.warn(
                 "Population {} is missing membrane voltage data in region {}"

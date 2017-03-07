@@ -19,8 +19,7 @@ from .spinnaker import Spinnaker as __Spinnaker
 from .spinnaker import executable_finder as __exec_finder
 
 # notification protocol classes (stored in front end common)
-from spinn_front_end_common.utilities.notification_protocol.\
-    socket_address import SocketAddress as __SockAddr
+from spinn_utilities.socket_address import SocketAddress as __SockAddr
 
 # front end common exceptions
 from spinn_front_end_common.utilities import exceptions as \

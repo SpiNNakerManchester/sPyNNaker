@@ -47,14 +47,12 @@ class GsynRecorder(object):
         data = list()
         self._missing_str = ""
 
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             vertices, "Getting conductance for {}".format(label))
-        for vertex in vertices:
+        for vertex in progress.over(vertices):
             data.append(self._get_gsyn_for_vertex(
                 vertex, graph_mapper, placements, buffer_manager, region,
                 ms_per_tick))
-            progress_bar.update()
-        progress_bar.end()
 
         if len(self._missing_str) > 0:
             logger.warn(

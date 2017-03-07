@@ -33,17 +33,15 @@ class SpYNNakerSynapticMatrixReport(object):
 
         # Update the print options to display everything
         print_opts = numpy.get_printoptions()
-        numpy.set_printoptions(threshold=numpy.nan)
         try:
+            numpy.set_printoptions(threshold=numpy.nan)
             # for each application edge, write matrix in new file
-            for application_edge, _ in connection_holder.keys():
+            for application_edge, _ in progress.over(connection_holder.keys()):
                 # only write matrix's for edges which have matrix's
                 if isinstance(application_edge, ProjectionApplicationEdge):
                     self._write_matrix_for_application_edge(
                         top_level_folder, application_edge, connection_holder)
-                progress.update()
         finally:
-            progress.end()
             # Reset the print options
             numpy.set_printoptions(**print_opts)
 

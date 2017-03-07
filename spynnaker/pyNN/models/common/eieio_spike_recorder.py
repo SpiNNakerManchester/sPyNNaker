@@ -40,10 +40,10 @@ class EIEIOSpikeRecorder(object):
         missing_str = ""
         ms_per_tick = machine_time_step / 1000.0
         vertices = graph_mapper.get_machine_vertices(application_vertex)
-        progress_bar = ProgressBar(vertices,
+        progress = ProgressBar(vertices,
                                    "Getting spikes for {}".format(label))
 
-        for vertex in vertices:
+        for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
 
@@ -72,8 +72,6 @@ class EIEIOSpikeRecorder(object):
                               vertex_slice.lo_atom)
                 offset += eieio_header.count * 4
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
-            progress_bar.update()
-        progress_bar.end()
 
         if len(missing_str) > 0:
             logger.warn(

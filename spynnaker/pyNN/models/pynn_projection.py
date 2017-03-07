@@ -266,7 +266,6 @@ class Projection(object):
         raise NotImplementedError
 
     def _get_synaptic_data(self, as_list, data_to_get):
-
         post_vertex = self._projection_edge.post_vertex
         pre_vertex = self._projection_edge.pre_vertex
 
@@ -294,13 +293,12 @@ class Projection(object):
         transceiver = self._spinnaker.transceiver
         routing_infos = self._spinnaker.routing_infos
         machine_time_step = self._spinnaker.machine_time_step
-        edges = graph_mapper.get_machine_edges(
-            self._projection_edge)
+        edges = graph_mapper.get_machine_edges(self._projection_edge)
         progress = ProgressBar(
             edges,
             "Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))
-        for edge in edges:
+        for edge in progress.over(edges):
             placement = placements.get_placement_of_vertex(
                 edge.post_vertex)
             connections = post_vertex.get_connections_from_machine(
@@ -308,8 +306,6 @@ class Projection(object):
                 self._synapse_information, machine_time_step)
             if connections is not None:
                 connection_holder.add_connections(connections)
-            progress.update()
-        progress.end()
 
         connection_holder.finish()
         return connection_holder

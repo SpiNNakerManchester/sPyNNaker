@@ -18,12 +18,13 @@ class SpYNNakerConnectionHolderGenerator(object):
         :return: the set of connection holders for after dsg generation
         """
 
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             application_graph.n_outgoing_edge_partitions,
             "Generating connection holders for reporting connection data.")
 
         data_holders = dict()
-        for partition in application_graph.outgoing_edge_partitions:
+        for partition in progress.over(
+                application_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 # add pre run generators so that reports can extract without
                 # going to machine.
@@ -40,8 +41,6 @@ class SpYNNakerConnectionHolderGenerator(object):
                         # store for the report generations
                         data_holders[(edge, synapse_information)] = \
                             connection_holder
-            progress_bar.update()
-        progress_bar.end()
 
         # return the two holders
         return data_holders
