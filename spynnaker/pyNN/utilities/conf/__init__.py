@@ -15,7 +15,7 @@ import string
 import sys
 
 import spynnaker
-import spynnaker.pyNN.utilities.conf.log as log
+import log
 
 
 def _install_cfg(filename):
