@@ -34,14 +34,6 @@ class AbstractThresholdType(object):
         :rtype: int
         """
 
-    @abstractmethod
-    def units(self, variable):
-        """ return the units of a variable
-
-        :param variable: the variable to get the units of
-        :return: string for the units
-        """
-
     def get_sdram_usage_per_neuron_in_bytes(self):
         """ Get the amount of SDRAM used per neuron in bytes
 
