@@ -1,3 +1,9 @@
+SpiNNUtilities >= 3.0.0
+SpiNNMachine >= 3.0.0, < 4.0.0
+SpiNNStorageHandlers >= 3.0.0, < 4.0.0
+SpiNNaker_PACMAN >= 3.0.0, < 4.0.0
+SpiNNaker_DataSpecification >= 3.0.0, < 4.0.0
+spalloc >= v0.2.2, < v1.0.0
 SpiNNFrontEndCommon >= 3.0.0, < 4.0.0
 pyNN >= 0.7, < 0.8
 numpy
