@@ -306,10 +306,15 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
 // TODO Implement these
 bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
     address_t fixed_region = synapse_row_fixed_region(row);
-     weight_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
+    plastic_synapse_t plastic_region_address = synapse_row_plastic_region(row);
+    plastic_synapse_t *plastic_words = _plastic_synapses(plastic_region_address);
+//    weight_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
+//    log_info("find-synapse_row_num_fixed_synapse_row_plastic_size=%u", sizeof(plastic_region)-2);
+//    log_info("find-synapse_row_num_plastic_controls=%u", (size_t)synapse_row_num_plastic_controls(fixed_region));
+//    log_info("find-synapses=%u", (size_t)synapse_row_num_fixed_synapses(fixed_region));
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
-    uint32_t weight;
+    plastic_synapse_t weight;
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
         // Get next control word (auto incrementing)
@@ -328,10 +333,38 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
         return false;
 }
 
+/*
+ * 1.Swap the elements marked for deletion with the last elements in the row
+ * use spin1_memcpy to shift the rest of the row
+ * (from #FF to the second to last element of the row)
+ * on top of the last element of the PP region
+ * 2. Decrement counters (#PP, #FP)
+ * 3. Decrement number of bytes in row by appropriate amount for writing back to SDRAM
+ */
 bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
-    use(offset);
-    use(row);
-    return false;
+    address_t fixed_region = synapse_row_fixed_region(row);
+//    plastic_synapse_t plastic_region = synapse_row_plastic_region(row);
+    plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
+//    log_info("start-synapse_row_plastic_size=%u", sizeof(plastic_words)-2);
+    log_info("start-synapse_row_num_plastic_controls=%u", (size_t)synapse_row_num_plastic_controls(fixed_region));
+//    log_info("start-synapse_row_num_fixed_synapses=%u", (size_t)synapse_row_num_fixed_synapses(fixed_region));
+    control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
+    // Delete weight at offset
+    plastic_synapse_t last_weight = plastic_words[plastic_synapse-1];
+    plastic_words[offset] = last_weight;
+    // Delete control word at offset
+    control_t last_control = control_words[plastic_synapse-1];
+    control_words[offset] = last_control;
+
+    // Decrement FP
+    fixed_region[1]--;
+
+
+//    log_info("end-synapse_row_plastic_size=%u", sizeof(plastic_words)-2);
+    log_info("end-synapse_row_num_plastic_controls=%u", (size_t)synapse_row_num_plastic_controls(fixed_region));
+//    log_info("end-synapse_row_num_fixed_synapses=%u", (size_t)synapse_row_num_fixed_synapses(fixed_region));
+    return true;
 }
 
 bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){

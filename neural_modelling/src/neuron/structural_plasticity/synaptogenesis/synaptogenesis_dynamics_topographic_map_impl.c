@@ -271,10 +271,12 @@ void synaptic_row_restructure(){
 //    address_t plastic_region = synapse_row_plastic_region(rewiring_dma_buffer.row);
 //    control_t* plastic_controls = synapse_row_plastic_controls(fixed_region);
     if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data))) {
-        synaptogenesis_dynamics_formation_rule();
+        synaptogenesis_dynamics_elimination_rule();
+        // TODO check status of operation and save provenance (statistics)
     }
     else {
-        synaptogenesis_dynamics_elimination_rule();
+        synaptogenesis_dynamics_formation_rule();
+        // TODO check status of operation and save provenance (statistics)
     }
 
 }
@@ -288,23 +290,31 @@ void synaptic_row_restructure(){
     physically organised to be able to modify Plastic-Plastic synaptic regions.
  */
 bool synaptogenesis_dynamics_elimination_rule(){
+    log_info("HIT - %d", current_state.sp_data.offset);
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
         // TODO - SAVE THE ROW BACK IN SDRAM
-        ;
+        // Check it's correct -- JUST FOR DEBUGGING
+        // TODO REMOVE NEXT LINE (CHECK)
+        log_info("after_deletion-synapse_row_num_plastic_controls=%u",
+        (size_t)synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
+        if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
+           log_info("NEURON NOT DELETED PROPERLY");
+        else
+           log_info("NEURON GONE!");
         return true;
     }
-    log_info("HIT - %d", current_state.sp_data.offset);
+
     return false;
 }
 
 bool synaptogenesis_dynamics_formation_rule(){
+    log_info("MISS - %d", current_state.sp_data.offset);
     // TODO Don't forget about these hardcoded values, which might not be sensible
     if(add_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row, 0, 1)){
         // TODO - SAVE THE ROW BACK IN SDRAM
         ;
         return true;
     }
-    log_info("MISS - %d", current_state.sp_data.offset);
     return false;
 }
 

@@ -123,7 +123,7 @@ static inline address_t synapse_row_fixed_region(address_t row) {
 // (The weights for the plastic synapses are assumed to be stored
 // In some learning-rule-specific format in the plastic region)
 //   0:           [ F = Num fixed synapses                                    ]
-//   1:           [ P = Size of plastic region in words                       ]
+//   1:           [ P = Size of plastic region in WORDS                       ]
 //   2:           [ First fixed synaptic word                                 ]
 //   ...
 // F+1:           [ Last fixed synaptic word                                  ]
