@@ -8,7 +8,7 @@ void synaptogenesis_dynamics_rewire();
 
 bool synaptogenesis_dynamics_formation_rule();
 
-bool synaptogenesis_dynamics_elimination_rule(uint32_t row_position, uint32_t weight);
+bool synaptogenesis_dynamics_elimination_rule();
 
 void synaptic_row_restructure();
 

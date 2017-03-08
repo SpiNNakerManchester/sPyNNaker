@@ -22,9 +22,7 @@ bool synaptogenesis_dynamics_formation_rule(){
     return false;
 }
 
-bool synaptogenesis_dynamics_elimination_rule(uint32_t row_position, uint32_t weight){
-    use(row_position);
-    use(weight);
+bool synaptogenesis_dynamics_elimination_rule(){
     return false;
 }
 
