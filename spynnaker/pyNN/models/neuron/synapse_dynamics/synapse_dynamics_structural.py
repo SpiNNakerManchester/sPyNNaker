@@ -37,6 +37,8 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         self._p_elim_dep = p_elim_dep
         self._p_elim_pot = p_elim_pot
 
+        self.fudge_factor = 1.1
+
         # Generate a seed for the RNG on chip that should be the same for all
         # of the cores that have my learning rule
         self._rng = np.random.RandomState(seed)
@@ -153,7 +155,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
             for synapse_info in edge._synapse_information:
                 if synapse_info.synapse_dynamics is self:
                     relevant_edges.append(edge)
-        return 4 * (12 * len(relevant_edges))
+        return int(self.fudge_factor * (4 * (12 * len(relevant_edges))))
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types, in_edges=None):
         structure_size = 12 * 4 + 4 * 4  # parameters + rng seed
@@ -175,7 +177,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
             pop_size += int(40 * (no_pre_vertices_estimate + len(in_edges)))
         elif in_edges is not None and isinstance(in_edges[0], ProjectionMachineEdge):
             pop_size += self.get_extra_sdram_usage_in_bytes(in_edges)
-        return total_size + pop_size  # bytes
+        return int(self.fudge_factor * (total_size + pop_size))  # bytes
 
     def get_plastic_synaptic_data(self, connections, connection_row_indices, n_rows, post_vertex_slice,
                                   n_synapse_types):
