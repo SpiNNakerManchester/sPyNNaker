@@ -254,17 +254,48 @@ void synaptic_row_restructure(){
 //    address_t plastic_region = synapse_row_plastic_region(rewiring_dma_buffer.row);
 //    control_t* plastic_controls = synapse_row_plastic_controls(fixed_region);
 
+//    #if STDP_ENABLED == 1
+//    bool hit = find_plastic_neuron_with_id(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data));
+//    if (hit) {
+//        log_info("HIT - %d", current_state.sp_data.offset);
+//    }
+//    else {
+//        log_info("MISS - %d", current_state.sp_data.offset);
+//    }
+//    #else
+//
+//    #endif
+    bool (*search_for_neuron)(uint32_t, address_t, structural_plasticity_data_t *);
+    bool (*remove_neuron)(uint32_t, address_t);
+    bool (*add_neuron)(uint32_t, address_t, uint32_t, uint32_t);
+
     #if STDP_ENABLED == 1
-    bool hit = find_plastic_neuron_with_id(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data));
+        search_for_neuron = &find_plastic_neuron_with_id;
+        remove_neuron = &remove_plastic_neuron_at_offset;
+        add_neuron = &add_plastic_neuron_with_id;
+    #else
+        search_for_neuron = &find_static_neuron_with_id;
+        remove_neuron = &remove_static_neuron_at_offset;
+        add_neuron = &add_static_neuron_with_id;
+    #endif
+
+    bool hit= search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data));
     if (hit) {
+        if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
+            // TODO - SAVE THE ROW BACK IN SDRAM
+            ;
+        }
         log_info("HIT - %d", current_state.sp_data.offset);
     }
     else {
+        // TODO Don't forget about these hardcoded values, which might not be sensible
+        if(add_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row, 0, 1)){
+            // TODO - SAVE THE ROW BACK IN SDRAM
+            ;
+        }
         log_info("MISS - %d", current_state.sp_data.offset);
     }
-    #else
 
-    #endif
 }
 
  /*
