@@ -72,26 +72,6 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
         ])
         return params
 
-    @overrides(NeuronModelLeakyIntegrate.set_neural_parameters)
-    def set_neural_parameters(self, neural_parameters, vertex_slice):
-        position_in_data = 0
-        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
-            self._v_init[atom] = neural_parameters[position_in_data]
-            self._v_rest[atom] = neural_parameters[position_in_data + 1]
-            self._r_membrane[atom] = neural_parameters[position_in_data + 2]
-
-            # exp_tc is a calculated value from a none state variable,
-            # so ignore
-
-            self._i_offset[atom] = neural_parameters[position_in_data + 4]
-            self._countdown_to_refactory_period[atom] = \
-                neural_parameters[position_in_data + 5]
-            self._v_reset[atom] = neural_parameters[position_in_data + 6]
-
-            # last one is not really required, as its not a internal value.
-
-            position_in_data += self.get_n_neural_parameters()
-
     def get_n_cpu_cycles_per_neuron(self):
 
         # A guess - 20 for the reset procedure

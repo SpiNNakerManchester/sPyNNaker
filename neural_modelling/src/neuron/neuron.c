@@ -83,14 +83,14 @@ static inline void _print_neurons() {
 
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
-#if LOG_LEVEL >= LOG_DEBUG
+//#if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_state_variables(&(neuron_array[n]));
     }
     log_debug("-------------------------------------\n");
     //}
-#endif // LOG_LEVEL >= LOG_DEBUG
+//#endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 //! private method for doing output debug data on the neurons
@@ -111,13 +111,12 @@ static inline void _print_neuron_parameters() {
 //! \brief does the memory copy for the neuron parameters
 //! \param[in] address: the address where the neuron parameters are stored
 //! in SDRAM
-//! \return bool which is true if the mem copy's worked, flase otherwise
+//! \return bool which is true if the mem copy's worked, false otherwise
 bool _neuron_load_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     log_info("loading neuron global parameters");
-    memcpy(
-        global_parameters, &address[next], sizeof(global_neuron_params_t));
+    memcpy(global_parameters, &address[next], sizeof(global_neuron_params_t));
     next += sizeof(global_neuron_params_t) / 4;
 
     log_info("loading neuron local parameters");
@@ -137,6 +136,8 @@ bool _neuron_load_neuron_parameters(address_t address){
     memcpy(threshold_type_array, &address[next],
            n_neurons * sizeof(threshold_type_t));
 
+    neuron_model_set_global_neuron_params(global_parameters);
+
     return true;
 }
 
@@ -150,9 +151,6 @@ bool neuron_reload_neuron_parameters(address_t address){
     if (!_neuron_load_neuron_parameters(address)){
         return false;
     }
-
-    // Set up the neuron model for its global parameters
-    neuron_model_set_global_neuron_params(global_parameters);
 
     // for debug purposes, print the neuron parameters
     _print_neuron_parameters();
@@ -197,6 +195,13 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = address[INCOMING_SPIKE_BUFFER_SIZE];
 
+    // log message for debug purposes
+    log_info(
+        "\t neurons = %u, spike buffer size = %u, params size = %u,"
+        "input type size = %u, threshold size = %u", n_neurons,
+        *incoming_spike_buffer_size, sizeof(neuron_t),
+        sizeof(input_type_t), sizeof(threshold_type_t));
+
     // allocate DTCM for the global parameter details
     if (sizeof(global_neuron_params_t) > 0) {
         global_parameters = (global_neuron_params_t *) spin1_malloc(
@@ -207,13 +212,6 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
             return false;
         }
     }
-
-    // log message for debug purposes
-    log_info(
-        "\t neurons = %u, spike buffer size = %u, params size = %u,"
-        "input type size = %u, threshold size = %u", n_neurons,
-        *incoming_spike_buffer_size, sizeof(neuron_t),
-        sizeof(input_type_t), sizeof(threshold_type_t));
 
     // Allocate DTCM for neuron array
     if (sizeof(neuron_t) != 0) {
@@ -265,9 +263,6 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         return false;
     }
 
-    // Set up the neuron model
-    neuron_model_set_global_neuron_params(global_parameters);
-
     recording_flags = recording_flags_param;
 
     voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
@@ -288,9 +283,7 @@ void neuron_store_neuron_parameters(address_t address){
 
 
     log_info("writing neuron global parameters");
-    memcpy(
-        &address[next], global_parameters, sizeof
-        (global_neuron_params_t));
+    memcpy(&address[next], global_parameters, sizeof(global_neuron_params_t));
     next += sizeof(global_neuron_params_t) / 4;
 
     log_info("writing neuron local parameters");
@@ -379,7 +372,7 @@ void neuron_do_timestep_update(timer_t time) {
 
         // If the neuron has spiked
         if (spike) {
-            log_debug("neuron %u spiked at time %u", neuron_index, time);
+            log_info("neuron %u spiked at time %u", neuron_index, time);
 
             // Tell the neuron model
             neuron_model_has_spiked(neuron);

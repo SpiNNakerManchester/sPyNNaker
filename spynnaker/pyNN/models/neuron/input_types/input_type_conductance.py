@@ -48,18 +48,5 @@ class InputTypeConductance(AbstractInputType):
             NeuronParameter(self._e_rev_I, DataType.S1615)
         ]
 
-    def set_parameters(self, parameters, vertex_slice):
-        """ sets the parameters from a list into the interal data items
-
-        :param parameters: the parameters to set
-        :param vertex_slice: which atoms to set
-        :return: None
-        """
-        position_in_data = 0
-        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
-            self._e_rev_E[atom] = parameters[position_in_data]
-            self._e_rev_I[atom] = parameters[position_in_data + 1]
-            position_in_data += self.get_n_input_type_parameters()
-
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         return 10

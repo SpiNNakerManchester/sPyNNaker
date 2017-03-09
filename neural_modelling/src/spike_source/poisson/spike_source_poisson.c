@@ -244,18 +244,6 @@ bool read_poisson_parameters(address_t address) {
         memcpy(
             spike_source_array, &address[spikes_offset],
             num_spike_sources * sizeof(spike_source_t));
-
-        // print spike sources for debug purposes
-        print_spike_sources();
-
-        // Loop through slow spike sources and initialise 1st time to spike
-        for (index_t s = 0; s < num_spike_sources; s++) {
-            if (!spike_source_array[s].is_fast_source) {
-                spike_source_array[s].time_to_spike_ticks =
-                    slow_spike_source_get_time_to_spike(
-                        spike_source_array[s].mean_isi_ticks);
-            }
-        }
     }
 
     log_info("read_parameters: completed successfully");
@@ -316,6 +304,18 @@ static bool initialize(uint32_t *timer_period) {
         return false;
     }
 
+    // Loop through slow spike sources and initialise 1st time to spike
+    for (index_t s = 0; s < num_spike_sources; s++) {
+        if (!spike_source_array[s].is_fast_source) {
+            spike_source_array[s].time_to_spike_ticks =
+                slow_spike_source_get_time_to_spike(
+                    spike_source_array[s].mean_isi_ticks);
+        }
+    }
+
+    // print spike sources for debug purposes
+    // print_spike_sources();
+
     // Set up recording buffer
     n_spike_buffers_allocated = 0;
     n_spike_buffer_words = get_bit_field_size(num_spike_sources);
@@ -338,6 +338,9 @@ void resume_callback() {
         log_error("failed to reread the poisson parameters from SDRAM")   ;
         rt_error(RTE_SWERR);
     }
+
+    // print spike sources for debug purposes
+    // print_spike_sources();
 }
 
 //! \brief stores the poisson parameters back into sdram for reading by the
@@ -510,7 +513,8 @@ void timer_callback(uint timer_count, uint unused) {
                     }
                 }
             }
-        } else {  // handle slow sources
+        } else {
+            // handle slow sources
             if ((time >= spike_source->start_ticks)
                     && (time < spike_source->end_ticks)
                     && (spike_source->mean_isi_ticks != 0)) {
@@ -538,6 +542,7 @@ void timer_callback(uint timer_count, uint unused) {
 
                 // Subtract tick
                 spike_source->time_to_spike_ticks -= REAL_CONST(1.0);
+
             }
         }
     }

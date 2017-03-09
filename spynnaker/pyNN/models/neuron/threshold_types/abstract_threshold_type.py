@@ -1,7 +1,6 @@
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
-from spynnaker.pyNN.utilities import utility_calls
 
 
 @add_metaclass(ABCMeta)
@@ -51,32 +50,13 @@ class AbstractThresholdType(object):
         """
         return self.get_n_threshold_parameters() * 4
 
-    def translate_into_parameters(
-            self, byte_array, position_in_byte_array, vertex_slice):
-        """
+    def set_threshold_parameters(self, parameters, vertex_slice):
+        """ Sets the threshold type parameters.  Override if there are any\
+            variables that change.
 
-        :param byte_array:
-        :param position_in_byte_array:
-        :param vertex_slice:
-        :return:
+        :param parameters:\
+            the parameter values in a list of numpy arrays, ordered the same\
+            as get_threshold_type_parameters
+        :param vertex_slice: The neurons to which the parameters apply
         """
-        parameters = self.get_threshold_parameters()
-        return utility_calls.translate_parameters(
-            parameters, byte_array, position_in_byte_array, vertex_slice)
-
-    def params_memory_size_in_bytes(self):
-        """
-
-        :return:
-        """
-        parameters = self.get_threshold_parameters()
-        return utility_calls.get_parameters_size_in_bytes(parameters)
-
-    @abstractmethod
-    def set_parameters(self, parameters, vertex_slice):
-        """ sets the parameters for this set of atoms
-
-        :param parameters: the parameters to set as a list
-        :param vertex_slice: the atom slice
-        :return: None
-        """
+        pass

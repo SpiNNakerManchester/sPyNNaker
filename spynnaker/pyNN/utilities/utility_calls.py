@@ -1,17 +1,19 @@
 """
 utility class containing simple helper methods
 """
-import struct
+from pyNN.random import RandomDistribution
+
 from spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl \
     import RandomStatsScipyImpl
 from spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl \
     import RandomStatsUniformImpl
-from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import RandomDistribution
+
 from spinn_front_end_common.utilities import exceptions
+
 import numpy
 import os
 import logging
+import struct
 
 from scipy.stats import binom
 
@@ -36,23 +38,30 @@ def convert_param_to_numpy(param, no_atoms):
     :param no_atoms: the number of atoms available for conversion of param
     :return the converted param in whatever format it was given
     """
-    if RandomDistribution is None:
-        raise exceptions.ConfigurationException(
-            "Missing PyNN. Please install version 0.7.5 from "
-            "http://neuralensemble.org/PyNN/")
+
+    # Deal with random distributions by generating values
     if isinstance(param, RandomDistribution):
+
         if no_atoms > 1:
             return numpy.asarray(param.next(n=no_atoms), dtype="float")
-        else:
-            return numpy.array([param.next(n=no_atoms)], dtype="float")
-    elif not hasattr(param, '__iter__'):
+
+        # numpy reduces a single valued array to a single value, so enforce
+        # that it is an array
+        return numpy.array([param.next(n=no_atoms)], dtype="float")
+
+    # Deal with a single value by exploding to multiple values
+    if not hasattr(param, '__iter__'):
         return numpy.array([param] * no_atoms, dtype="float")
-    elif len(param) != no_atoms:
-        raise exceptions.ConfigurationException("The number of params does"
-                                                " not equal with the number"
-                                                " of atoms in the vertex ")
-    else:
-        return numpy.array(param, dtype="float")
+
+    # Deal with multiple values, but not the correct number of them
+    if len(param) != no_atoms:
+
+        raise exceptions.ConfigurationException(
+            "The number of params does not equal with the number of atoms in"
+            " the vertex")
+
+    # Deal with the correct number of multiple values
+    return numpy.array(param, dtype="float")
 
 
 def write_parameters_per_neuron(spec, vertex_slice, parameters):
@@ -69,56 +78,73 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
                              data_type=param.get_dataspec_datatype())
 
 
-def translate_parameters(
-        parameters, byte_array, position_in_byte_array, vertex_slice):
-    """ converts between a byte array and different types of parameters for
-    a given set of atoms
+def translate_parameters(parameters, byte_array, offset, vertex_slice):
+    """ Translate an array of data into a set of parameters
 
     :param parameters: the parameters to change to
-    :param byte_array: the byte aray to read parameters out of
-    :param position_in_byte_array: where in the byte aray to start reading from
+    :param byte_array: the byte array to read parameters out of
+    :param offset: where in the byte array to start reading from
     :param vertex_slice: the map of atoms from a application vertex
-    :return: list of parameters for all atoms within the vertex slice
+    :return: An array of arrays of parameter values, and the new offset
     """
-    data_format = ""
+
+    # If there are no parameters, return an empty list
     if len(parameters) == 0:
         return []
 
+    # Get the single-struct format
+    struct_data_format = ""
     for parameter in parameters:
-        data_format += parameter.get_dataspec_datatype().struct_encoding
+        struct_data_format += parameter.get_dataspec_datatype().struct_encoding
 
-    # read for all atoms considered
-    all_atom_translation = "<"
-    extended_parameters = list()
-    for _ in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
-        all_atom_translation += data_format
-        extended_parameters.extend(parameters)
+    # Get the struct-array format, consisting of repeating the struct
+    struct_array_format = "<" + (struct_data_format * vertex_slice.n_atoms)
 
     # unpack the params from the byte array
-    translated_parameters = struct.unpack_from(
-        all_atom_translation, byte_array, position_in_byte_array)
+    translated_parameters = numpy.asarray(
+        struct.unpack_from(struct_array_format, byte_array, offset),
+        dtype="float")
 
     # scale values with required scaling factor
-    scaled_translated_params = list()
-    for translated_parameter, parameter in zip(translated_parameters,
-                                               extended_parameters):
-        scaled_translated_params.append(
-            translated_parameter / parameter.get_dataspec_datatype().scale)
+    scales = numpy.tile(
+        [float(parameter.get_dataspec_datatype().scale)
+         for parameter in parameters],
+        vertex_slice.n_atoms)
+    scaled_parameters = translated_parameters / scales
 
-    # return correct values
-    return scaled_translated_params
+    # sort the parameters into arrays of values, one array per parameter
+    sorted_parameters = scaled_parameters.reshape(
+        (vertex_slice.n_atoms, len(parameters))).swapaxes(0, 1)
+
+    # Get the size of the parameters read
+    parameter_size = sum(
+        [parameter.get_dataspec_datatype().size for parameter in parameters])
+
+    return sorted_parameters, offset + (parameter_size * vertex_slice.n_atoms)
 
 
 def get_parameters_size_in_bytes(parameters):
-    """ gets the size of the parameters in bytes
+    """ Get the total size of a list of parameters in bytes
 
-    :param parameters: the parameters tro figure sizes of.
-    :return: size of params in bytes (int)
+    :param parameters: the parameters to compute the total size of
+    :return: size of all the parameters in bytes
+    :rtype: int
     """
     total = 0
     for parameter in parameters:
         total += parameter.get_dataspec_datatype().size
     return total
+
+
+def set_slice_values(arrays, values, vertex_slice):
+    """ Set a vertex slice of atoms in a set of arrays to the given values
+
+    :param array: The array of arrays to set the values in
+    :param value: The array of arrays of values to set
+    :param vertex_slice: The slice of parameters to set
+    """
+    for i, array in enumerate(arrays):
+        array[vertex_slice.as_slice] = values[i]
 
 
 def read_in_data_from_file(

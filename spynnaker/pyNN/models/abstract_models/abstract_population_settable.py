@@ -4,7 +4,7 @@ from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
-class AbstractPopulationSettableApplicationVertex(object):
+class AbstractPopulationSettable(object):
     """ Indicates that some properties of this object can be accessed from\
         the PyNN population set and get methods
     """
@@ -21,5 +21,3 @@ class AbstractPopulationSettableApplicationVertex(object):
         :param key: the name of the parameter to change
         :param value: the new value of the parameter to assign
         """
-
-

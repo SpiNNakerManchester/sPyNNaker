@@ -1,5 +1,3 @@
-# dsg imports
-from data_specification import utility_calls as dsg_utilities
 
 # pacman imports
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
@@ -9,6 +7,7 @@ from pacman.model.constraints.key_allocator_constraints\
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.decorators.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
+from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.application.impl.application_vertex \
     import ApplicationVertex
 from pacman.model.resources.cpu_cycles_per_tick_resource import \
@@ -29,9 +28,6 @@ from spinn_front_end_common.abstract_models. \
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models. \
-    abstract_requires_rewriting_data_regions_application_vertex \
-    import AbstractRequiresRewriteDataRegionsApplicationVertex
 from spinn_front_end_common.utilities import constants as \
     common_constants
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -43,11 +39,11 @@ from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
 from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.abstract_models\
+    .abstract_rewrites_data_specification\
+    import AbstractRewritesDataSpecification
 
 # spynnaker imports
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.models.common.complicated_population_settable import \
-    ComplicatedPopulationSettable
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
@@ -65,6 +61,11 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
+from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
+    import AbstractPopulationSettable
+from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
+    import AbstractReadParametersBeforeSet
+
 
 from abc import ABCMeta
 from six import add_metaclass
@@ -93,9 +94,9 @@ class AbstractPopulationVertex(
         AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
-    AbstractPopulationInitializable, ComplicatedPopulationSettable,
-    AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms,
-    AbstractRequiresRewriteDataRegionsApplicationVertex):
+        AbstractPopulationInitializable, AbstractPopulationSettable,
+        AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms,
+        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -103,8 +104,12 @@ class AbstractPopulationVertex(
     SPIKE_RECORDING_REGION = 0
     V_RECORDING_REGION = 1
     GSYN_RECORDING_REGION = 2
-    RUNTIME_SDP_PORT_SIZE = 4  # the size of the runtime sdp port data region
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 24  # 6 elements
+
+    # the size of the runtime SDP port data region
+    RUNTIME_SDP_PORT_SIZE = 4
+
+    # 6 elements before the start of global parameters
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 24
 
     _n_vertices = 0
 
@@ -122,10 +127,8 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
-        ComplicatedPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
-        AbstractRequiresRewriteDataRegionsApplicationVertex.__init__(self)
 
         self._binary = binary
         self._n_atoms = n_neurons
@@ -234,11 +237,6 @@ class AbstractPopulationVertex(
     def mark_no_changes(self):
         self._change_requires_mapping = False
 
-    @overrides(AbstractRequiresRewriteDataRegionsApplicationVertex.
-               mark_regions_reloaded)
-    def mark_regions_reloaded(self):
-        self._change_requires_neuron_parameters_reload = False
-
     def _get_buffered_sdram_per_timestep(self, vertex_slice):
         return [
             self._spike_recorder.get_sdram_usage_in_bytes(
@@ -331,7 +329,8 @@ class AbstractPopulationVertex(
         per_neuron_usage = \
             self._get_sdram_usage_for_neuron_params_per_neuron()
         return (self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-                self._neuron_model.global_param_memory_size_in_bytes() +
+                self._neuron_model
+                    .get_sdram_usage_for_global_parameters_in_bytes() +
                 (per_neuron_usage * vertex_slice.n_atoms))
 
     def get_sdram_usage_for_atoms(
@@ -372,7 +371,7 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
             size=common_constants.SYSTEM_BYTES_REQUIREMENT, label='System')
 
-        self._reverse_neuron_params_data_region(spec, vertex_slice)
+        self._reserve_neuron_params_data_region(spec, vertex_slice)
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.RECORDING.value,
@@ -380,9 +379,9 @@ class AbstractPopulationVertex(
 
         vertex.reserve_provenance_data_region(spec)
 
-    def _reverse_neuron_params_data_region(self, spec, vertex_slice):
+    def _reserve_neuron_params_data_region(self, spec, vertex_slice):
         """ reserve the neuron parameter data region
-        
+
         :param spec: the spec to write the dsg region to
         :param vertex_slice: the slice of atoms from the application vertex
         :return: None
@@ -456,61 +455,40 @@ class AbstractPopulationVertex(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
+        "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos"})
     @overrides(
-        AbstractRequiresRewriteDataRegionsApplicationVertex.
-            regions_and_data_spec_to_rewrite,
+        AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "routing_info"})
-    def regions_and_data_spec_to_rewrite(
-            self, placement, hostname, report_directory, write_text_specs,
-            reload_application_data_file_path, graph_mapper,
-            machine_time_step, time_scale_factor, routing_info):
-        """ returns the data region and its data that needs re loading
+            "machine_time_step", "time_scale_factor", "graph_mapper",
+            "routing_info"})
+    def regenerate_data_specification(
+            self, spec, placement, machine_time_step, time_scale_factor,
+            graph_mapper, routing_info):
 
-        :return: dict of data region id and the byte array to load there.
-        """
+        # reserve the neuron parameters data region
+        self._reserve_neuron_params_data_region(
+            spec, graph_mapper.get_slice(placement.vertex))
 
-        # store for more regions as needed
-        regions_and_data = dict()
+        # write the neuron params into the new dsg region
+        self._write_neuron_parameters(
+            key=routing_info.get_first_key_from_pre_vertex(
+                placement.vertex, constants.SPIKE_PARTITION_ID),
+            machine_time_step=machine_time_step, spec=spec,
+            time_scale_factor=time_scale_factor,
+            vertex_slice=graph_mapper.get_slice(placement.vertex))
 
-        # if the neuron parameters need changing, generate dsg for neuron
-        # params
-        if self._change_requires_neuron_parameters_reload:
-            # get new dsg writer
-            filepath, spec = \
-                dsg_utilities.get_data_spec_and_file_writer_filename(
-                    placement.x, placement.y, placement.p,
-                    hostname, report_directory, write_text_specs,
-                    reload_application_data_file_path)
+        # close spec
+        spec.end_specification()
 
-            # reserve the neuron parmas data region
-            self._reverse_neuron_params_data_region(
-                spec, graph_mapper.get_slice(placement.vertex))
-
-            # write the neuron params into the new dsg region
-            self._write_neuron_parameters(
-                key=routing_info.get_first_key_from_pre_vertex(
-                    placement.vertex, constants.SPIKE_PARTITION_ID),
-                machine_time_step=machine_time_step, spec=spec,
-                time_scale_factor=time_scale_factor,
-                vertex_slice=graph_mapper.get_slice(placement.vertex))
-
-            # close spec
-            spec.end_specification()
-
-            # store dsg region to spec data mapping
-            regions_and_data[
-                constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value] = \
-                filepath
-
-        # return mappings
-        return regions_and_data
-
-    @overrides(AbstractRequiresRewriteDataRegionsApplicationVertex.
-               requires_memory_regions_to_be_reloaded)
+    @overrides(AbstractRewritesDataSpecification
+               .requires_memory_regions_to_be_reloaded)
     def requires_memory_regions_to_be_reloaded(self):
         return self._change_requires_neuron_parameters_reload
+
+    @overrides(AbstractRewritesDataSpecification.mark_regions_reloaded)
+    def mark_regions_reloaded(self):
+        self._change_requires_neuron_parameters_reload = False
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
@@ -659,7 +637,7 @@ class AbstractPopulationVertex(
     def input_type(self):
         return self._input_type
 
-    @overrides(ComplicatedPopulationSettable.get_value)
+    @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):
         """ Get a property of the overall model
         """
@@ -671,7 +649,7 @@ class AbstractPopulationVertex(
         raise Exception("Population {} does not have parameter {}".format(
             self.vertex, key))
 
-    @overrides(ComplicatedPopulationSettable.set_value)
+    @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
         """ Set a property of the overall model
         """
@@ -685,17 +663,9 @@ class AbstractPopulationVertex(
         raise Exception("Type {} does not have parameter {}".format(
             self._model_name, key))
 
-    @overrides(ComplicatedPopulationSettable.
-               read_neuron_parameters_from_machine)
-    def read_neuron_parameters_from_machine(
+    @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
+    def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
-        """ reads in the neuron parameters from the machine and stores them
-        in the neuron components.
-
-        :param transceiver: the spinnman interface
-        :param placement: the placement of the vertex
-        :return: None
-        """
 
         # locate sdram address to where the neuron parameters are stored
         neuron_region_sdram_address = \
@@ -706,9 +676,9 @@ class AbstractPopulationVertex(
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
-        neuron_parameters_sdram_address = \
-            (neuron_region_sdram_address +
-             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
+        neuron_parameters_sdram_address = (
+            neuron_region_sdram_address +
+            self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
 
         # get size of neuron params
         size_of_region = self._get_sdram_usage_for_neuron_params(vertex_slice)
@@ -720,56 +690,44 @@ class AbstractPopulationVertex(
             size_of_region)
 
         # update python neuron parameters with the data
-        position_in_byte_array = 0
+        offset = 0
 
-        # handle global params (only need read this once)
-        global_params = self._neuron_model.translate_into_global_params(
-            byte_array, position_in_byte_array)
+        # handle global params (only once, so given a slice of 0 to 0)
+        global_params, offset = utility_calls.translate_parameters(
+            self._neuron_model.get_global_parameters(),
+            byte_array, offset, Slice(0, 0))
         self._neuron_model.set_global_parameters(global_params)
-        position_in_byte_array += \
-            self._neuron_model.global_param_memory_size_in_bytes()
 
         # handle state params for a neuron
-        state_params = self._neuron_model.translate_into_parameters(
-            byte_array, position_in_byte_array, vertex_slice)
-        self._neuron_model.set_neural_parameters(state_params, vertex_slice)
-        position_in_byte_array += \
-            self._neuron_model.neural_param_memory_size_in_bytes() * \
-            vertex_slice.n_atoms
+        neuron_params, offset = utility_calls.translate_parameters(
+            self._neuron_model.get_neuron_parameters(),
+            byte_array, offset, vertex_slice)
+        self._neuron_model.set_neural_parameters(neuron_params, vertex_slice)
 
         # handle input params
-        input_params = self._input_type.translate_into_parameters(
-            byte_array, position_in_byte_array, vertex_slice)
-        self._input_type.set_parameters(input_params, vertex_slice)
-        position_in_byte_array += \
-            self._input_type.params_memory_size_in_bytes() * \
-            vertex_slice.n_atoms
+        input_params, offset = utility_calls.translate_parameters(
+            self._input_type.get_input_type_parameters(),
+            byte_array, offset, vertex_slice)
+        self._input_type.set_input_type_parameters(input_params, vertex_slice)
 
         # handle additional input params, if they exist
         if self._additional_input is not None:
-            additional_input_params = \
-                self._additional_input.translate_into_parameters(
-                    byte_array, position_in_byte_array, vertex_slice)
+            additional_params, offset = utility_calls.translate_parameters(
+                self._additional_input.get_parameters(),
+                byte_array, offset, vertex_slice)
             self._additional_input.set_parameters(
-                additional_input_params, vertex_slice)
-            position_in_byte_array += \
-                self._additional_input.params_memory_size_in_bytes() * \
-                vertex_slice.n_atoms
+                additional_params, vertex_slice)
 
         # handle threshold type params
-        threshold_params = self._threshold_type.translate_into_parameters(
-            byte_array, position_in_byte_array, vertex_slice)
-        self._threshold_type.set_parameters(threshold_params, vertex_slice)
-        position_in_byte_array += \
-            self._threshold_type.params_memory_size_in_bytes() * \
-            vertex_slice.n_atoms
+        threshold_params, offset = utility_calls.translate_parameters(
+            self._threshold_type.get_threshold_parameters(),
+            byte_array, offset, vertex_slice)
+        self._threshold_type.set_threshold_parameters(
+            threshold_params, vertex_slice)
 
-        if len(byte_array) != position_in_byte_array:
-            raise exceptions.MemReadException(
-                "Ive not read enough data for translating neuron params from"
-                " the machine. Ive read {} elements, whereas i should have "
-                "read {} elements".format(
-                    position_in_byte_array, len(byte_array)))
+        # TODO: Technically, this should also handle the synapse parameters,
+        # but as we don't currently have any synapses with state variables,
+        # we can ignore it for now...
 
     @property
     def weight_scale(self):

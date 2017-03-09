@@ -3,7 +3,6 @@ from abc import ABCMeta
 from abc import abstractmethod
 
 from spynnaker.pyNN.utilities import utility_calls
-from pacman.model.graphs.common.slice import Slice
 
 
 @add_metaclass(ABCMeta)
@@ -70,64 +69,32 @@ class AbstractNeuronModel(object):
         """
         return self.get_n_neural_parameters() * 4
 
-    def translate_into_global_params(self, byte_array, position_in_byte_array):
-        """
+    def get_sdram_usage_for_global_parameters_in_bytes(self):
+        """ Get the SDRAM usage of the global parameters in bytes
 
-        :param byte_array:
-        :param position_in_byte_array:
-        :return:
-        """
-        global_parameters = self.get_global_parameters()
-
-        # as global parameters are not per atom, make a slice of 1 atom
-        # for the reader to work correctly
-        return utility_calls.translate_parameters(
-            global_parameters, byte_array, position_in_byte_array,
-            Slice(0, 1))
-
-    def translate_into_parameters(
-            self, byte_array, position_in_byte_array, vertex_slice):
-        """
-
-        :param byte_array:
-        :param position_in_byte_array:
-        :param vertex_slice:
-        :return:
-        """
-        neural_parameters = self.get_neural_parameters()
-        return utility_calls.translate_parameters(
-            neural_parameters, byte_array, position_in_byte_array,
-            vertex_slice)
-
-    def global_param_memory_size_in_bytes(self):
-        """
-
-        :return:
+        :return: The SDRAM usage
+        :rtype: int
         """
         global_parameters = self.get_global_parameters()
         return utility_calls.get_parameters_size_in_bytes(global_parameters)
 
-    def neural_param_memory_size_in_bytes(self):
-        """
-
-        :return:
-        """
-        neural_parameters = self.get_neural_parameters()
-        return utility_calls.get_parameters_size_in_bytes(neural_parameters)
-
-    @abstractmethod
     def set_global_parameters(self, parameters):
-        """ sets any global parameters
+        """ Sets any global parameters.  Override if there are changing\
+            variables in the global parameters
 
-        :param parameters: the parameters in a list.
-        :return: None
+        :param parameters:\
+            the parameter values as a list, ordered the same as\
+            get_global_parameters
         """
+        pass
 
-    @abstractmethod
     def set_neural_parameters(self, neural_parameters, vertex_slice):
-        """ sets the neural parameters
+        """ Sets any neural parameters.  Override if there are changing\
+            variables in the neural parameters
 
-        :param neural_parameters: the neural parameters in a list
-        :param vertex_slice: the slice of atoms for this vertex
-        :return: None
+        :param neural_parameters:\
+            the parameter values in a list of numpy arrays, ordered the same\
+            as get_neural_parameters
+        :param vertex_slice: The neurons to which the parameters apply
         """
+        pass

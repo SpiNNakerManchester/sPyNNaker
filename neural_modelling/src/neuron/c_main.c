@@ -57,10 +57,6 @@ typedef enum callback_priorities{
     MC = -1, SDP_AND_DMA_AND_USER = 0, TIMER_AND_BUFFERING = 2
 } callback_priorities;
 
-typedef enum neuron_runtime_sdp_commands{
-    RELOAD_NEURON_PARAMS = 0,
-} neuron_runtime_sdp_commands;
-
 //! The number of regions that are to be used for recording
 #define NUMBER_OF_REGIONS_TO_RECORD 3
 
@@ -188,19 +184,14 @@ static bool initialise(uint32_t *timer_period) {
 void resume_callback() {
     recording_reset();
 
-    // reread neuron parameters
-    log_info("received reloading neuron parameter command");
-
     // try reloading neuron parameters
+    address_t address = data_specification_get_data_address();
     if(!neuron_reload_neuron_parameters(
             data_specification_get_region(
                 NEURON_PARAMS_REGION, address))){
         log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }
-
-    log_info("successfully reloaded the neuron parameters");
-
 }
 
 //! \brief Timer interrupt callback

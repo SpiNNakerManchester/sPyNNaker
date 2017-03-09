@@ -123,21 +123,9 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
     def get_global_parameters(self):
         return []
 
-    @overrides(AbstractNeuronModel.set_global_parameters)
-    def set_global_parameters(self, parameters):
-        # don't have any
-        pass
-
     @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
-        position_in_data = 0
-        for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom):
-            self._v_init[atom] = neural_parameters[position_in_data]
-            self._v_rest[atom] = neural_parameters[position_in_data + 1]
-            self._r_membrane[atom] = neural_parameters[position_in_data + 2]
-            # exp_tc is a calculated value from a none state variable, so ignore
-            self._i_offset[atom] = neural_parameters[position_in_data + 4]
-            position_in_data += self.get_n_neural_parameters()
+        self._v_init[vertex_slice.as_slice] = neural_parameters[0]
 
     def get_n_cpu_cycles_per_neuron(self):
 

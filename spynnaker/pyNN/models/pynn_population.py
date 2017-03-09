@@ -2,11 +2,12 @@ from pacman.model.constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
-from pacman.executor import injection_decorator
 
 from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
+    import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
-    import AbstractPopulationSettableApplicationVertex
+    import AbstractPopulationSettable
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
@@ -17,8 +18,6 @@ from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
     import AbstractGSynRecordable
 from spynnaker.pyNN.models.common.abstract_v_recordable \
     import AbstractVRecordable
-from spynnaker.pyNN.models.common.complicated_population_settable import \
-    ComplicatedPopulationSettable
 
 from spinn_front_end_common.utilities import exceptions
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
@@ -99,15 +98,11 @@ class Population(object):
 
     @property
     def requires_mapping(self):
-        if isinstance(self._vertex, AbstractChangableAfterRun):
-            return self._vertex.requires_mapping
         return self._change_requires_mapping
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
         self._has_read_neuron_parameters_this_run = False
-        if isinstance(self._vertex, AbstractChangableAfterRun):
-            self._vertex.mark_no_changes()
 
     def __add__(self, other):
         """ Merges populations
@@ -154,8 +149,7 @@ class Population(object):
         """ Get the values of a parameter for every local cell in the\
             population.
         """
-        if isinstance(
-                self._vertex, AbstractPopulationSettableApplicationVertex):
+        if isinstance(self._vertex, AbstractPopulationSettable):
             return self._vertex.get_value(parameter_name)
         raise KeyError("Population does not have a property {}".format(
             parameter_name))
@@ -308,6 +302,9 @@ class Population(object):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
+        if self._spinnaker.has_ran and not isinstance(
+                self._vertex, AbstractChangableAfterRun):
+            raise Exception("Population does not support changes after run")
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
             value, self._vertex.n_atoms))
 
@@ -412,16 +409,19 @@ class Population(object):
 
         if not isinstance(self._vertex, AbstractSpikeRecordable):
             raise Exception(
-                "This population does not support the recording of spikes!")
+                "This population does not support the recording of spikes")
 
         # Tell the vertex to record spikes
-        self._vertex.set_recording_spikes()
+        if not self._vertex.is_recording_spikes():
+            if self._spinnaker.has_ran and not isinstance(
+                    self._vertex, AbstractChangableAfterRun):
+                raise Exception(
+                    "This population does not support changes to settings"
+                    " after run has been called")
+            self._vertex.set_recording_spikes()
 
         # set the file to store the spikes in once retrieved
         self._record_spike_file = to_file
-
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
 
     def record_gsyn(self, to_file=None):
         """ Record the synaptic conductance for all cells in the Population.
@@ -431,16 +431,22 @@ class Population(object):
         if not isinstance(self._vertex, AbstractGSynRecordable):
             raise Exception(
                 "This population does not support the recording of gsyn")
+
         if not isinstance(self._vertex.input_type, InputTypeConductance):
             logger.warn(
                 "You are trying to record the conductance from a model which "
                 "does not use conductance input.  You will receive "
                 "current measurements instead.")
-        self._vertex.set_recording_gsyn()
-        self._record_gsyn_file = to_file
 
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
+        if not self._vertex.is_recording_gsyn():
+            if self._spinnaker.has_ran and not isinstance(
+                    self._vertex, AbstractChangableAfterRun):
+                raise Exception(
+                    "This population does not support changes to settings"
+                    " after run has been called")
+            self._vertex.set_recording_gsyn()
+
+        self._record_gsyn_file = to_file
 
     def record_v(self, to_file=None):
         """ Record the membrane potential for all cells in the Population.
@@ -451,11 +457,15 @@ class Population(object):
             raise Exception(
                 "This population does not support the recording of v")
 
-        self._vertex.set_recording_v()
-        self._record_v_file = to_file
+        if not self._vertex.is_recording_v():
+            if self._spinnaker.has_ran and not isinstance(
+                    self._vertex, AbstractChangableAfterRun):
+                raise Exception(
+                    "This population does not support changes to settings"
+                    " after run has been called")
+            self._vertex.set_recording_v()
 
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
+        self._record_v_file = to_file
 
     @property
     def positions(self):
@@ -467,6 +477,7 @@ class Population(object):
                                  "for an unstructured population")
             self._positions = self._structure.generate_positions(
                 self._vertex.n_atoms)
+            self._change_requires_mapping = True
         return self._positions
 
     @positions.setter
@@ -474,8 +485,6 @@ class Population(object):
         """ Sets all the positions in the population.
         """
         self._positions = positions
-
-        # state that something has changed in the population,
         self._change_requires_mapping = True
 
     # noinspection PyPep8Naming
@@ -592,78 +601,64 @@ class Population(object):
         :param parameter: the parameter to set
         :param value: the value of the parameter to set.
         """
-        if not isinstance(self._vertex,
-                          AbstractPopulationSettableApplicationVertex):
+        if not isinstance(self._vertex, AbstractPopulationSettable):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
+        if self._spinnaker.has_ran and not isinstance(
+                self._vertex, AbstractChangableAfterRun):
+            raise Exception(
+                "This population does not support changes to settings after"
+                " run has been called")
+
         if type(parameter) is str:
             if value is None:
-                raise Exception("Error: No value given in set() function for "
-                                "population parameter. Exiting.")
-            self._handle_complicated_setters()
+                raise Exception("A value (not None) must be specified")
+            self._read_parameters_before_set()
             self._vertex.set_value(parameter, value)
             return
 
         if type(parameter) is not dict:
-                raise Exception("Error: invalid parameter type for "
-                                "set() function for population parameter."
-                                " Exiting.")
-
-        self._handle_complicated_setters()
+            raise Exception(
+                "Parameter must either be the name of a single parameter to"
+                " set, or a dict of parameter: value items to set")
 
         # set new parameters
+        self._read_parameters_before_set()
         for (key, value) in parameter.iteritems():
             self._vertex.set_value(key, value)
 
-    def _handle_complicated_setters(self):
-        """ reads and stores neuron parameters from the machine.
+    def _read_parameters_before_set(self):
+        """ Reads parameters from the machine before "set" completes
 
         :return: None
         """
 
-        # update injectables so that the parameters needed are stored
-        inputs = dict()
-        inputs["MachineTimeStep"] = self._spinnaker.machine_time_step
-        injection_decorator.provide_injectables(inputs)
+        # If the tools have run before, and not reset, and the read
+        # hasn't already been done, read back the data
+        if (self._spinnaker.has_ran and not self._spinnaker.has_reset_last and
+                isinstance(self._vertex, AbstractReadParametersBeforeSet) and
+                not self._has_read_neuron_parameters_this_run):
 
-        # if not read, but tools have run before,
-        if self._spinnaker.has_ran and not \
-                self._has_read_neuron_parameters_this_run:
+            # locate machine vertices from the application vertices
+            machine_vertices = \
+                self._spinnaker.graph_mapper.get_machine_vertices(
+                    self._vertex)
 
-            if isinstance(self._vertex, ComplicatedPopulationSettable):
-                # locate machine vertices from the application vertices
-                machine_vertices = \
-                    self._spinnaker.graph_mapper.get_machine_vertices(
-                        self._vertex)
+            # go through each machine vertex and read the neuron parameters
+            # it contains
+            for machine_vertex in machine_vertices:
 
-                if self._spinnaker.has_reset_last:
-                    self._spinnaker.do_load()
+                # tell the core to rewrite neuron params back to the
+                # sdram space.
+                placement = self._spinnaker.placements.\
+                    get_placement_of_vertex(machine_vertex)
 
-                # go through each machine vertex and read the neuron parameters
-                # it contains
-                for machine_vertex in machine_vertices:
-                    # tell the core to rewrite neuron params back to the
-                    # sdram space.
-                    placement = self._spinnaker.placements. \
-                        get_placement_of_vertex(machine_vertex)
+                self._vertex.read_parameters_from_machine(
+                    self._spinnaker.transceiver, placement,
+                    self._spinnaker.graph_mapper.get_slice(machine_vertex))
 
-                    self._vertex.read_neuron_parameters_from_machine(
-                        self._spinnaker.transceiver, placement,
-                        self._spinnaker.graph_mapper.get_slice(machine_vertex))
-
-                self._has_read_neuron_parameters_this_run = True
-            else:
-                raise exceptions.ConfigurationException(
-                    "Only vertices which are complicated vertices can have"
-                    " their variables changed between runs without a reset."
-                    "Currently the only model that support this are:\n"
-                    "    1. IfCurExp \n    2. IfCondExp\n"
-                    "    3. IFCurrDualExp\n     4. IzkCurrExp\n"
-                    "    5. IzkCondExp\n     6. SpikeSourcePoisson")
-
-        # clear injectionables as required by the interface
-        injection_decorator.clear_injectables()
+            self._has_read_neuron_parameters_this_run = True
 
     @property
     def structure(self):
@@ -772,3 +767,4 @@ class Population(object):
     @_internal_delay_vertex.setter
     def _internal_delay_vertex(self, delay_vertex):
         self._delay_vertex = delay_vertex
+        self._change_requires_mapping = True

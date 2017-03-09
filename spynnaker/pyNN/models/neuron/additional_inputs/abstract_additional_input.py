@@ -1,7 +1,6 @@
 from six import add_metaclass
 from abc import ABCMeta
 from abc import abstractmethod
-from spynnaker.pyNN.utilities import utility_calls
 
 
 @add_metaclass(ABCMeta)
@@ -33,15 +32,6 @@ class AbstractAdditionalInput(object):
             additional_input_has_spiked
         """
 
-    @abstractmethod
-    def set_parameters(self, parameters, vertex_slice):
-        """ sets the parameters from a list into the internal data items
-
-        :param parameters: the parameters to set
-        :param vertex_slice: which atoms to set
-        :return: None
-        """
-
     def get_sdram_usage_per_neuron_in_bytes(self):
         """ Get the SDRAM usage of this additional input in bytes
 
@@ -58,23 +48,15 @@ class AbstractAdditionalInput(object):
         """
         return self.get_n_parameters() * 4
 
-    def translate_into_parameters(
-            self, byte_array, position_in_byte_array, vertex_slice):
-        """ takes a byte array and translates them into additional imput
-        parameters
+    def set_parameters(self, parameters, vertex_slice):
+        """ Set the parameters for a given subset of neurons.
 
-        :param byte_array: data
-        :param position_in_byte_array: where in data to start trnaslation from
-        :return: trnaslated paramerters as list
+            To be overridden only when there is a changing variable to
+            extract
+
+        :param parameters:\
+            the parameter values in a list of numpy arrays, ordered the same\
+            as get_neural_parameters
+        :param vertex_slice: The neurons to which the parameters apply
         """
-        parameters = self.get_parameters()
-        return utility_calls.translate_parameters(
-            parameters, byte_array, position_in_byte_array, vertex_slice)
-
-    def params_memory_size_in_bytes(self):
-        """ returns the size of parameters in bytes
-
-        :return: size of additional inputs as bytes
-        """
-        parameters = self.get_parameters()
-        return utility_calls.get_parameters_size_in_bytes(parameters)
+        pass

@@ -19,7 +19,7 @@ class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable):
     POISSON_SPIKE_SOURCE_REGIONS = Enum(
-        value="_POISSON_SPIKE_SOURCE_REGIONS",
+        value="POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
                ('SPIKE_HISTORY_REGION', 2),
@@ -66,5 +66,5 @@ class SpikeSourcePoissonMachineVertex(
     def get_recording_region_base_address(self, txrx, placement):
         return helpful_functions.locate_memory_region_for_placement(
             placement,
-            self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
+            self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
