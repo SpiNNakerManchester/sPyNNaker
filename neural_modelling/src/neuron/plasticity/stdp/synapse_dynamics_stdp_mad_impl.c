@@ -324,13 +324,18 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
         if (synapse_row_sparse_index(control_word)==id)
             break;
     }
-    sp_data -> weight = weight;
-    sp_data -> offset = plastic_synapse - 1;
 
-    if (plastic_synapse - 1 >= 0)
+
+    if (plastic_synapse > 0){
+        sp_data -> weight = weight;
+        sp_data -> offset = synapse_row_num_plastic_controls(fixed_region) - plastic_synapse;
         return true;
-    else
+        }
+    else{
+        sp_data -> weight = -1;
+        sp_data -> offset = - 1;
         return false;
+        }
 }
 
 /*
@@ -343,27 +348,19 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
  */
 bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
     address_t fixed_region = synapse_row_fixed_region(row);
-//    plastic_synapse_t plastic_region = synapse_row_plastic_region(row);
     plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
-//    log_info("start-synapse_row_plastic_size=%u", sizeof(plastic_words)-2);
     log_info("start-synapse_row_num_plastic_controls=%u", (size_t)synapse_row_num_plastic_controls(fixed_region));
-//    log_info("start-synapse_row_num_fixed_synapses=%u", (size_t)synapse_row_num_fixed_synapses(fixed_region));
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
     // Delete weight at offset
-    plastic_synapse_t last_weight = plastic_words[plastic_synapse-1];
-    plastic_words[offset] = last_weight;
+    spin1_memcpy(&plastic_words[offset], & plastic_words[plastic_synapse-1], sizeof(plastic_synapse_t));
     // Delete control word at offset
-    control_t last_control = control_words[plastic_synapse-1];
-    control_words[offset] = last_control;
+    spin1_memcpy(&control_words[offset], & control_words[plastic_synapse-1], sizeof(control_t));
 
     // Decrement FP
     fixed_region[1]--;
 
-
-//    log_info("end-synapse_row_plastic_size=%u", sizeof(plastic_words)-2);
     log_info("end-synapse_row_num_plastic_controls=%u", (size_t)synapse_row_num_plastic_controls(fixed_region));
-//    log_info("end-synapse_row_num_fixed_synapses=%u", (size_t)synapse_row_num_fixed_synapses(fixed_region));
     return true;
 }
 
