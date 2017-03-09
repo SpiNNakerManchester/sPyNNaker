@@ -39,6 +39,7 @@ bool (*add_neuron)(uint32_t, address_t, uint32_t, uint32_t);
 #define DMA_TAG_READ_SYNAPTIC_ROW 0
 #define DMA_TAG_WRITE_PLASTIC_REGION 1
 #define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 2
+#define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 3
 
 
 typedef struct {
@@ -52,7 +53,7 @@ typedef struct {
 } pre_pop_info_table_t;
 
 typedef struct {
-    int32_t p_rew, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom;
+    uint32_t p_rew, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom;
     REAL sigma_form_forward, sigma_form_lateral, p_form_forward, p_form_lateral, p_elim_dep, p_elim_pot;
     mars_kiss64_seed_t shared_seed, local_seed;
     pre_pop_info_table_t pre_pop_info_table;
@@ -69,7 +70,7 @@ typedef struct {
     // (used to allow row data to be re-used for multiple spikes)
     spike_t originating_spike;
 
-    uint32_t n_bytes_transferred;
+    size_t n_bytes_transferred;
 
     // Row data
     uint32_t *row;
@@ -229,6 +230,8 @@ void synaptogenesis_dynamics_rewire(){
     dma_id = spin1_dma_transfer(
         DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
         n_bytes);
+    rewiring_dma_buffer.n_bytes_transferred = n_bytes;
+    rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
     if(!dma_id){
         log_info("DMA Queue full. Synaptic rewiring request failed!");
     }
@@ -266,10 +269,7 @@ void synaptic_row_restructure(){
     */
     // If I am here, then the DMA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
     // the selected pre and postsynaptic ids are in current_state
-    // typedef uint32_t size_t;
-//    address_t fixed_region = synapse_row_fixed_region(rewiring_dma_buffer.row);
-//    address_t plastic_region = synapse_row_plastic_region(rewiring_dma_buffer.row);
-//    control_t* plastic_controls = synapse_row_plastic_controls(fixed_region);
+
     if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data))) {
         synaptogenesis_dynamics_elimination_rule();
         // TODO check status of operation and save provenance (statistics)
@@ -282,7 +282,6 @@ void synaptic_row_restructure(){
 }
 
  /*
-    TODO:
     Formation and elimination are structurally agnostic, i.e. they don't care how
     synaptic rows are organised in physical memory.
 
@@ -292,23 +291,16 @@ void synaptic_row_restructure(){
 bool synaptogenesis_dynamics_elimination_rule(){
     log_info("HIT - %d", current_state.sp_data.offset);
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        // TODO - SAVE THE ROW BACK IN SDRAM
-        // Check it's correct -- JUST FOR DEBUGGING
-        // TODO REMOVE NEXT LINE (CHECK)
-        log_info("after_deletion-synapse_row_num_plastic_controls=%u",
-        (size_t)synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
-        if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
-        {
-           log_info("NEURON NOT DELETED PROPERLY");
-           log_info("FOUND @ %d", current_state.sp_data.offset);
+        uint dma_id = spin1_dma_transfer(
+        DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
+        rewiring_dma_buffer.row, DMA_WRITE,
+        rewiring_dma_buffer.n_bytes_transferred);
+        if(!dma_id){
+            log_info("DMA Queue full. Could not write back synaptic row after deletion!");
+            return false;
         }
-        else
-           log_info("NEURON GONE!");
-
-
         return true;
     }
-
     return false;
 }
 
@@ -322,6 +314,17 @@ bool synaptogenesis_dynamics_formation_rule(){
     }
     return false;
 }
+
+//bool check_element_modified(){
+//        (size_t)synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
+//        if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
+//        {
+//           log_info("NEURON NOT DELETED PROPERLY");
+//           log_info("FOUND @ %d", current_state.sp_data.offset);
+//        }
+//        else
+//           log_info("NEURON GONE!");
+//}
 
 int32_t get_p_rew() {
     return rewiring_data.p_rew;

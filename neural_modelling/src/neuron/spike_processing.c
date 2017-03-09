@@ -14,6 +14,7 @@
 #define DMA_TAG_READ_SYNAPTIC_ROW 0
 #define DMA_TAG_WRITE_PLASTIC_REGION 1
 #define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 2
+#define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 3
 
 // DMA buffer structure combines the row read from SDRAM with
 typedef struct dma_buffer {
@@ -248,6 +249,10 @@ void _dma_complete_callback(uint unused, uint tag) {
     } else if (tag == DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING) {
 
         synaptic_row_restructure();
+
+    } else if (tag == DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING){
+
+        // Do Nothing
 
     } else {
 
