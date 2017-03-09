@@ -83,14 +83,14 @@ static inline void _print_neurons() {
 
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
-//#if LOG_LEVEL >= LOG_DEBUG
+#if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_state_variables(&(neuron_array[n]));
     }
     log_debug("-------------------------------------\n");
     //}
-//#endif // LOG_LEVEL >= LOG_DEBUG
+#endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 //! private method for doing output debug data on the neurons
@@ -372,7 +372,7 @@ void neuron_do_timestep_update(timer_t time) {
 
         // If the neuron has spiked
         if (spike) {
-            log_info("neuron %u spiked at time %u", neuron_index, time);
+            log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Tell the neuron model
             neuron_model_has_spiked(neuron);
