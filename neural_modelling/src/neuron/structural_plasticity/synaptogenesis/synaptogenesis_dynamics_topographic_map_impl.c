@@ -298,9 +298,14 @@ bool synaptogenesis_dynamics_elimination_rule(){
         log_info("after_deletion-synapse_row_num_plastic_controls=%u",
         (size_t)synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
         if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
+        {
            log_info("NEURON NOT DELETED PROPERLY");
+           log_info("FOUND @ %d", current_state.sp_data.offset);
+        }
         else
            log_info("NEURON GONE!");
+
+
         return true;
     }
 
