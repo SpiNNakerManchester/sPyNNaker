@@ -8,6 +8,22 @@ from spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type \
 
 from data_specification.enums.data_type import DataType
 
+from enum import Enum
+
+
+class _STATIC_TYPES(Enum):
+    V_THRESH = (1, DataType.S1615)
+
+    def __new__(cls, value, data_type):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj._data_type = data_type
+        return obj
+
+    @property
+    def data_type(self):
+        return self._data_type
+
 
 class ThresholdTypeStatic(AbstractThresholdType):
     """ A threshold that is a static value
@@ -35,8 +51,12 @@ class ThresholdTypeStatic(AbstractThresholdType):
     @overrides(AbstractThresholdType.get_threshold_parameters)
     def get_threshold_parameters(self):
         return [
-            NeuronParameter(self._v_thresh, DataType.S1615)
+            NeuronParameter(self._v_thresh, _STATIC_TYPES.V_THRESH.data_type)
         ]
+
+    @overrides(AbstractThresholdType.get_threshold_parameter_types)
+    def get_threshold_parameter_types(self):
+        return [item.data_type for item in _STATIC_TYPES]
 
     def get_n_cpu_cycles_per_neuron(self):
 

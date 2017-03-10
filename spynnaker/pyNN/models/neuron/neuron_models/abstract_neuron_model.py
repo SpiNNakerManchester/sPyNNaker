@@ -28,11 +28,27 @@ class AbstractNeuronModel(object):
         """
 
     @abstractmethod
+    def get_neural_parameter_types(self):
+        """ Get the types of the neural parameters
+
+        :return: A list of DataType objects, in the order of the parameters
+        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        """
+
+    @abstractmethod
     def get_n_global_parameters(self):
         """ Get the number of global parameters
 
         :return: The number of global parameters
         :rtype: int
+        """
+
+    @abstractmethod
+    def get_global_parameter_types(self):
+        """ Get the types of the global parameters
+
+        :return: A list of DataType objects, in the order of the parameters
+        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
         """
 
     @abstractmethod

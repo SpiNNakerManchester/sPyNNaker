@@ -78,10 +78,10 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
                              data_type=param.get_dataspec_datatype())
 
 
-def translate_parameters(parameters, byte_array, offset, vertex_slice):
+def translate_parameters(types, byte_array, offset, vertex_slice):
     """ Translate an array of data into a set of parameters
 
-    :param parameters: the parameters to change to
+    :param types: the DataType of each of the parameters to translate
     :param byte_array: the byte array to read parameters out of
     :param offset: where in the byte array to start reading from
     :param vertex_slice: the map of atoms from a application vertex
@@ -89,13 +89,13 @@ def translate_parameters(parameters, byte_array, offset, vertex_slice):
     """
 
     # If there are no parameters, return an empty list
-    if len(parameters) == 0:
-        return []
+    if len(types) == 0:
+        return numpy.zeros((0, 0), dtype="float"), offset
 
     # Get the single-struct format
     struct_data_format = ""
-    for parameter in parameters:
-        struct_data_format += parameter.get_dataspec_datatype().struct_encoding
+    for param_type in types:
+        struct_data_format += param_type.struct_encoding
 
     # Get the struct-array format, consisting of repeating the struct
     struct_array_format = "<" + (struct_data_format * vertex_slice.n_atoms)
@@ -107,18 +107,18 @@ def translate_parameters(parameters, byte_array, offset, vertex_slice):
 
     # scale values with required scaling factor
     scales = numpy.tile(
-        [float(parameter.get_dataspec_datatype().scale)
-         for parameter in parameters],
+        [float(param_type.scale) for param_type in types],
         vertex_slice.n_atoms)
     scaled_parameters = translated_parameters / scales
 
+    print scaled_parameters
+
     # sort the parameters into arrays of values, one array per parameter
     sorted_parameters = scaled_parameters.reshape(
-        (vertex_slice.n_atoms, len(parameters))).swapaxes(0, 1)
+        (vertex_slice.n_atoms, len(types))).swapaxes(0, 1)
 
     # Get the size of the parameters read
-    parameter_size = sum(
-        [parameter.get_dataspec_datatype().size for parameter in parameters])
+    parameter_size = sum([param_type.size for param_type in types])
 
     return sorted_parameters, offset + (parameter_size * vertex_slice.n_atoms)
 

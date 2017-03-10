@@ -8,6 +8,43 @@ from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums.data_type import DataType
 
+from enum import Enum
+
+
+class _IZH_TYPES(Enum):
+    A = (1, DataType.S1615)
+    B = (2, DataType.S1615)
+    C = (3, DataType.S1615)
+    D = (4, DataType.S1615)
+    V_INIT = (5, DataType.S1615)
+    U_INIT = (6, DataType.S1615)
+    I_OFFSET = (7, DataType.S1615)
+    THIS_H = (8, DataType.S1615)
+
+    def __new__(cls, value, data_type):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj._data_type = data_type
+        return obj
+
+    @property
+    def data_type(self):
+        return self._data_type
+
+
+class _IZH_GLOBAL_TYPES(Enum):
+    TIMESTEP = (1, DataType.S1615)
+
+    def __new__(cls, value, data_type):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj._data_type = data_type
+        return obj
+
+    @property
+    def data_type(self):
+        return self._data_type
+
 
 class NeuronModelIzh(AbstractNeuronModel):
 
@@ -101,31 +138,36 @@ class NeuronModelIzh(AbstractNeuronModel):
         return [
 
             # REAL A
-            NeuronParameter(self._a, DataType.S1615),
+            NeuronParameter(self._a, _IZH_TYPES.A.data_type),
 
             # REAL B
-            NeuronParameter(self._b, DataType.S1615),
+            NeuronParameter(self._b, _IZH_TYPES.B.data_type),
 
             # REAL C
-            NeuronParameter(self._c, DataType.S1615),
+            NeuronParameter(self._c, _IZH_TYPES.C.data_type),
 
             # REAL D
-            NeuronParameter(self._d, DataType.S1615),
+            NeuronParameter(self._d, _IZH_TYPES.D.data_type),
 
             # REAL V
-            NeuronParameter(self._v_init, DataType.S1615),
+            NeuronParameter(self._v_init, _IZH_TYPES.V_INIT.data_type),
 
             # REAL U
-            NeuronParameter(self._u_init, DataType.S1615),
+            NeuronParameter(self._u_init, _IZH_TYPES.U_INIT.data_type),
 
             # offset current [nA]
             # REAL I_offset;
-            NeuronParameter(self._i_offset, DataType.S1615),
+            NeuronParameter(self._i_offset, _IZH_TYPES.I_OFFSET.data_type),
 
             # current timestep - simple correction for threshold
             # REAL this_h;
-            NeuronParameter(machine_time_step / 1000.0, DataType.S1615)
+            NeuronParameter(
+                machine_time_step / 1000.0, _IZH_TYPES.THIS_H.data_type)
         ]
+
+    @overrides(AbstractNeuronModel.get_neural_parameter_types)
+    def get_neural_parameter_types(self):
+        return [item.data_type for item in _IZH_TYPES]
 
     @overrides(AbstractNeuronModel.get_n_global_parameters)
     def get_n_global_parameters(self):
@@ -136,8 +178,14 @@ class NeuronModelIzh(AbstractNeuronModel):
                additional_arguments={'machine_time_step'})
     def get_global_parameters(self, machine_time_step):
         return [
-            NeuronParameter(machine_time_step / 1000.0, DataType.S1615)
+            NeuronParameter(
+                machine_time_step / 1000.0,
+                _IZH_GLOBAL_TYPES.TIMESTEP.data_type)
         ]
+
+    @overrides(AbstractNeuronModel.get_global_parameter_types)
+    def get_global_parameter_types(self):
+        return [item.data_type for item in _IZH_GLOBAL_TYPES]
 
     @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):

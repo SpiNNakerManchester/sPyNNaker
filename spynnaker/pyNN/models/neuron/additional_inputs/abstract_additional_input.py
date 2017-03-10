@@ -26,6 +26,14 @@ class AbstractAdditionalInput(object):
         """
 
     @abstractmethod
+    def get_parameter_types(self):
+        """ Get the types of the parameters
+
+        :return: A list of DataType objects, in the order of the parameters
+        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        """
+
+    @abstractmethod
     def get_n_cpu_cycles_per_neuron(self):
         """ Get the number of CPU cycles executed by\
             additional_input_get_input_value_as_current and\

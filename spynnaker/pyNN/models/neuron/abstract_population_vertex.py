@@ -466,6 +466,8 @@ class AbstractPopulationVertex(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, routing_info):
 
+        vertex_slice = graph_mapper.get_slice(placement.vertex)
+
         # reserve the neuron parameters data region
         self._reserve_neuron_params_data_region(
             spec, graph_mapper.get_slice(placement.vertex))
@@ -476,7 +478,11 @@ class AbstractPopulationVertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
             machine_time_step=machine_time_step, spec=spec,
             time_scale_factor=time_scale_factor,
-            vertex_slice=graph_mapper.get_slice(placement.vertex))
+            vertex_slice=vertex_slice)
+
+        self._synapse_manager.regenerate_data_specification(
+            spec, placement, machine_time_step, time_scale_factor,
+            vertex_slice)
 
         # close spec
         spec.end_specification()
@@ -694,40 +700,40 @@ class AbstractPopulationVertex(
 
         # handle global params (only once, so given a slice of 0 to 0)
         global_params, offset = utility_calls.translate_parameters(
-            self._neuron_model.get_global_parameters(),
+            self._neuron_model.get_global_parameter_types(),
             byte_array, offset, Slice(0, 0))
         self._neuron_model.set_global_parameters(global_params)
 
         # handle state params for a neuron
         neuron_params, offset = utility_calls.translate_parameters(
-            self._neuron_model.get_neuron_parameters(),
+            self._neuron_model.get_neural_parameter_types(),
             byte_array, offset, vertex_slice)
         self._neuron_model.set_neural_parameters(neuron_params, vertex_slice)
 
         # handle input params
         input_params, offset = utility_calls.translate_parameters(
-            self._input_type.get_input_type_parameters(),
+            self._input_type.get_input_type_parameter_types(),
             byte_array, offset, vertex_slice)
         self._input_type.set_input_type_parameters(input_params, vertex_slice)
 
         # handle additional input params, if they exist
         if self._additional_input is not None:
             additional_params, offset = utility_calls.translate_parameters(
-                self._additional_input.get_parameters(),
+                self._additional_input.get_parameter_types(),
                 byte_array, offset, vertex_slice)
             self._additional_input.set_parameters(
                 additional_params, vertex_slice)
 
         # handle threshold type params
         threshold_params, offset = utility_calls.translate_parameters(
-            self._threshold_type.get_threshold_parameters(),
+            self._threshold_type.get_threshold_parameter_types(),
             byte_array, offset, vertex_slice)
         self._threshold_type.set_threshold_parameters(
             threshold_params, vertex_slice)
 
-        # TODO: Technically, this should also handle the synapse parameters,
-        # but as we don't currently have any synapses with state variables,
-        # we can ignore it for now...
+        # Read synapse parameters
+        self._synapse_manager.read_parameters_from_machine(
+            transceiver, placement, vertex_slice)
 
     @property
     def weight_scale(self):

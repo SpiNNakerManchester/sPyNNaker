@@ -17,9 +17,9 @@ inp.record()
 p.run(100)
 
 inp.set("rate", 10)
-# pop.set("cm", 10)
-# pop.set("tau_syn_E", 100)
-#
+# pop.set("cm", 0.25)
+pop.set("tau_syn_E", 1)
+
 p.run(100)
 
 pop_spikes = pop.getSpikes()
@@ -34,6 +34,8 @@ pylab.show()
 p.reset()
 
 inp.set("rate", 0)
+pop.set("i_offset", 1.0)
+pop.initialize("v", p.RandomDistribution("uniform", [-65.0, -55.0]))
 
 p.run(100)
 

@@ -50,8 +50,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
     import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
 
 
 import logging
@@ -606,12 +604,9 @@ class SpikeSourcePoisson(
             poisson_parameter_parameters_sdram_address, size_of_region)
 
         # Convert the data to parameter values
-        params = [
-            NeuronParameter(None, item.data_type())
-            for item in _PoissonStruct
-        ]
+        param_types = [item.data_type() for item in _PoissonStruct]
         values, _ = utility_calls.translate_parameters(
-            params, byte_array, 0, vertex_slice)
+            param_types, byte_array, 0, vertex_slice)
 
         # Convert start values as timesteps into milliseconds
         self._start[vertex_slice.as_slice] = self._convert_n_timesteps_to_ms(

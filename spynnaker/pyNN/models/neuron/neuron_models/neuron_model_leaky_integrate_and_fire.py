@@ -9,6 +9,23 @@ from spynnaker.pyNN.utilities import utility_calls
 from data_specification.enums.data_type import DataType
 
 import numpy
+from enum import Enum
+
+
+class _LIF_TYPES(Enum):
+    REFRACT_COUNT = (1, DataType.INT32)
+    V_RESET = (2, DataType.S1615)
+    TAU_REFRACT = (3, DataType.INT32)
+
+    def __new__(cls, value, data_type):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj._data_type = data_type
+        return obj
+
+    @property
+    def data_type(self):
+        return self._data_type
 
 
 class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
@@ -59,18 +76,26 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
             # count down to end of next refractory period [timesteps]
             # int32_t  refract_timer;
             NeuronParameter(
-                self._countdown_to_refactory_period, DataType.INT32),
+                self._countdown_to_refactory_period,
+                _LIF_TYPES.REFRACT_COUNT.data_type),
 
             # post-spike reset membrane voltage [mV]
             # REAL     V_reset;
-            NeuronParameter(self._v_reset, DataType.S1615),
+            NeuronParameter(self._v_reset, _LIF_TYPES.V_RESET.data_type),
 
             # refractory time of neuron [timesteps]
             # int32_t  T_refract;
             NeuronParameter(
-                self._tau_refrac_timesteps(machine_time_step), DataType.INT32)
+                self._tau_refrac_timesteps(machine_time_step),
+                _LIF_TYPES.TAU_REFRACT.data_type)
         ])
         return params
+
+    @overrides(NeuronModelLeakyIntegrate.get_neural_parameter_types)
+    def get_neural_parameter_types(self):
+        if_types = NeuronModelLeakyIntegrate.get_neural_parameter_types(self)
+        if_types.extend([item.data_type for item in _LIF_TYPES])
+        return if_types
 
     def get_n_cpu_cycles_per_neuron(self):
 
