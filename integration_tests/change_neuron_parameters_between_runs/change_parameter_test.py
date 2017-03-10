@@ -37,6 +37,13 @@ inp.set("rate", 0)
 
 p.run(100)
 
-print pop.getSpikes()
+pop_spikes = pop.getSpikes()
+inp_spikes = inp.getSpikes()
+
+pylab.subplot(2, 1, 1)
+pylab.plot(inp_spikes[:, 1], inp_spikes[:, 0], "r.")
+pylab.subplot(2, 1, 2)
+pylab.plot(pop_spikes[:, 1], pop_spikes[:, 0], "b.")
+pylab.show()
 
 p.end()
