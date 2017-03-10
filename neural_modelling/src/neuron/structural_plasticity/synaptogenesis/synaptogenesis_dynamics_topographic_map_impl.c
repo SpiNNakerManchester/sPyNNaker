@@ -278,6 +278,9 @@ void synaptic_row_restructure(){
         synaptogenesis_dynamics_formation_rule();
         // TODO check status of operation and save provenance (statistics)
     }
+    else {
+        log_info("Something went wrong with rewiring!");
+    }
 
 }
 
@@ -324,9 +327,17 @@ bool synaptogenesis_dynamics_formation_rule(){
     // TODO Don't forget about these hardcoded values, which might not be sensible
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, 2, 1)){
         // TODO - SAVE THE ROW BACK IN SDRAM
-        _check_element_exists();
-        ;
-        return true;
+        if (_check_element_exists()){
+            uint dma_id = spin1_dma_transfer(
+            DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
+            rewiring_dma_buffer.row, DMA_WRITE,
+            rewiring_dma_buffer.n_bytes_transferred);
+            if(!dma_id){
+                log_info("DMA Queue full. Could not write back synaptic row after deletion!");
+                return false;
+            }
+            return true;
+        }
     }
     return false;
 }

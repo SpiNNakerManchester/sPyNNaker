@@ -367,8 +367,9 @@ static inline plastic_synapse_t _weight_conversion(uint32_t weight){
 }
 
 static inline control_t _control_conversion(uint32_t id, uint32_t delay){
-    return (control_t)(((delay & SYNAPSE_DELAY_MASK) << SYNAPSE_TYPE_INDEX_BITS)
-        & (id & SYNAPSE_INDEX_MASK));
+    control_t new_control = ((delay & SYNAPSE_AXONAL_DELAY_MASK) << SYNAPSE_TYPE_INDEX_BITS);
+    new_control |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
+    return new_control;
 }
 
 /*
@@ -378,8 +379,16 @@ static inline control_t _control_conversion(uint32_t id, uint32_t delay){
  * return: true iff the addition and expansion have succeeded
  */
 bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){
+//    log_info("neuron info as they are passed in: id:%d, weight:%d, delay:%d",
+//        id,
+//        weight,
+//        delay);
     plastic_synapse_t new_weight = _weight_conversion(weight);
     control_t new_control = _control_conversion(id, delay);
+
+//    log_info("neuron info as they are converted be w/ weight:%d, id+delay:%d",
+//        new_weight,
+//        new_control);
 
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
@@ -394,10 +403,10 @@ bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uin
     // Increment FP
     fixed_region[1]++;
 
-    log_info("Added neuron w/ id:%d, weight:%d, delay:%d",
-        synapse_row_sparse_index(control_words[plastic_synapse]),
-        plastic_words[plastic_synapse],
-        synapse_row_sparse_delay(control_words[plastic_synapse])
-        );
+//    log_info("Added neuron w/ id:%d, weight:%d, delay:%d",
+//        synapse_row_sparse_index(control_words[plastic_synapse]),
+//        plastic_words[plastic_synapse],
+//        synapse_row_sparse_delay(control_words[plastic_synapse])
+//        );
     return true;
 }
