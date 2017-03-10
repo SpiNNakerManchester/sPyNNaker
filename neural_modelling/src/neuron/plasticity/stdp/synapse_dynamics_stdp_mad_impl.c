@@ -303,6 +303,13 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
 
+/*
+ * Function that searches the synaptic row for the existence
+ * of the neuron with the required id. If such a synapse
+ * exists, then its information (offset, delay, weight)
+ * are recorded in sp_data.
+ * returns: true iff neuron with id is in synaptic row
+ */
 bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t plastic_region_address = synapse_row_plastic_region(row);
@@ -332,6 +339,13 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
         }
 }
 
+/*
+ * Function that removes a synapse from the synaptic row, specified
+ * as an offset from the beginning of the respective region of the row.
+ * Additionally, this method compresses the row so that the memory
+ * region representing the row is continuous.
+ * return: true iff the deletion and compression have succeeded
+ */
 bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
@@ -348,10 +362,42 @@ bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
     return true;
 }
 
+static inline plastic_synapse_t _weight_conversion(uint32_t weight){
+    return (plastic_synapse_t)(0xFFFF & weight);
+}
+
+static inline control_t _control_conversion(uint32_t id, uint32_t delay){
+    return (control_t)(((delay & SYNAPSE_DELAY_MASK) << SYNAPSE_TYPE_INDEX_BITS)
+        & (id & SYNAPSE_INDEX_MASK));
+}
+
+/*
+ * Function that adds a new synapse at the end of the respective region
+ * in the synaptic row. This process involves the expansion of the row
+ * in order to make space for the extra information.
+ * return: true iff the addition and expansion have succeeded
+ */
 bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){
-    use(id);
-    use(row);
-    use(weight);
-    use(delay);
-    return false;
+    plastic_synapse_t new_weight = _weight_conversion(weight);
+    control_t new_control = _control_conversion(id, delay);
+
+    address_t fixed_region = synapse_row_fixed_region(row);
+    plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
+    control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
+    // Add weight at offset
+    spin1_memcpy(&plastic_words[plastic_synapse], &new_weight, sizeof(plastic_synapse_t));
+//    plastic_words[plastic_synapse] = new_weight;
+    // Add control word at offset
+    spin1_memcpy(& control_words[plastic_synapse], &new_control, sizeof(control_t));
+//    control_words[plastic_synapse] = new_control;
+    // Increment FP
+    fixed_region[1]++;
+
+    log_info("Added neuron w/ id:%d, weight:%d, delay:%d",
+        synapse_row_sparse_index(control_words[plastic_synapse]),
+        plastic_words[plastic_synapse],
+        synapse_row_sparse_delay(control_words[plastic_synapse])
+        );
+    return true;
 }

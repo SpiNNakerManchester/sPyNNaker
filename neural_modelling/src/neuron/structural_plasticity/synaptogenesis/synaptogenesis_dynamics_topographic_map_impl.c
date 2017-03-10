@@ -274,11 +274,26 @@ void synaptic_row_restructure(){
         synaptogenesis_dynamics_elimination_rule();
         // TODO check status of operation and save provenance (statistics)
     }
-    else {
+    else if(synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row))<rewiring_data.s_max){
         synaptogenesis_dynamics_formation_rule();
         // TODO check status of operation and save provenance (statistics)
     }
 
+}
+
+
+bool _check_element_exists(){
+//        size_t num_controls = (size_t)synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row));
+        if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
+        {
+           log_info("NEURON STILL HERE");
+           log_info("FOUND @ %d", current_state.sp_data.offset);
+           return true;
+        }
+        else
+           log_info("NEURON NOT FOUND!");
+
+        return false;
 }
 
  /*
@@ -307,24 +322,15 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(){
     log_info("MISS - %d", current_state.sp_data.offset);
     // TODO Don't forget about these hardcoded values, which might not be sensible
-    if(add_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row, 0, 1)){
+    if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, 2, 1)){
         // TODO - SAVE THE ROW BACK IN SDRAM
+        _check_element_exists();
         ;
         return true;
     }
     return false;
 }
 
-//bool check_element_modified(){
-//        (size_t)synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
-//        if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
-//        {
-//           log_info("NEURON NOT DELETED PROPERLY");
-//           log_info("FOUND @ %d", current_state.sp_data.offset);
-//        }
-//        else
-//           log_info("NEURON GONE!");
-//}
 
 int32_t get_p_rew() {
     return rewiring_data.p_rew;
