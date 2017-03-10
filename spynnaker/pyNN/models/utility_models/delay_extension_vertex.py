@@ -5,20 +5,14 @@ import random
 from spinn_front_end_common.utilities import constants as common_constants
 
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
+from pacman.model.constraints.key_allocator_constraints \
     import KeyAllocatorContiguousRangeContraint
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.application.impl.application_vertex import \
-    ApplicationVertex
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
+from pacman.model.resources import ResourceContainer, SDRAMResource
 
 from spinn_front_end_common.abstract_models\
     .abstract_provides_n_keys_for_partition \

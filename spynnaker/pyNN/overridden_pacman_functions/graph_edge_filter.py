@@ -1,7 +1,6 @@
 # pacman imports
-from pacman.model.graphs.application.impl.application_edge \
-    import ApplicationEdge
-from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
+from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.graphs.machine import MachineGraph
 from pacman.model.graphs.common.graph_mapper import GraphMapper
 from spinn_machine.utilities.progress_bar import ProgressBar
 

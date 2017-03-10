@@ -1,7 +1,6 @@
 from pacman.model.decorators.overrides import overrides
 from spinn_front_end_common.utilities import helpful_functions
-from pacman.model.graphs.machine.impl.machine_vertex \
-    import MachineVertex
+from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models.abstract_recordable \
     import AbstractRecordable
 from spinn_front_end_common.interface.provenance\

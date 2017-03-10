@@ -1,7 +1,6 @@
 
 # pacman imports
-from pacman.model.graphs.application.impl.application_edge import \
-    ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge
 
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \

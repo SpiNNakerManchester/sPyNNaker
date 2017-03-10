@@ -6,8 +6,7 @@ import pylab
 
 import spynnaker.pyNN as p
 # This is a constraint that really knows about SpiNNaker...
-from pacman.model.constraints.placer_constraints\
-    .placer_radial_placement_from_chip_constraint \
+from pacman.model.constraints.placer_constraints \
     import PlacerRadialPlacementFromChipConstraint
 
 p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)

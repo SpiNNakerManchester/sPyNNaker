@@ -1,7 +1,7 @@
 import logging
 import math
 import random
-import scipy.stats
+import scipy.stats  # @UnresolvedImport
 
 import numpy
 from spinn_front_end_common.utilities import constants as\
@@ -10,17 +10,12 @@ from spinn_front_end_common.utilities import constants as\
 from data_specification.enums.data_type import DataType
 
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
+from pacman.model.constraints.key_allocator_constraints \
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.application.impl.application_vertex import \
-    ApplicationVertex
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
+from pacman.model.resources import ResourceContainer, SDRAMResource
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
@@ -185,13 +180,10 @@ class SpikeSourcePoisson(
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
             [buffered_sdram_per_timestep], n_machine_time_steps,
             self._minimum_buffer_sdram)
-        vertex = SpikeSourcePoissonMachineVertex(
+        return SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
             minimum_buffer_sdram[0], buffered_sdram_per_timestep,
             constraints, label)
-
-        # return the machine vertex
-        return vertex
 
     @property
     def rate(self):
@@ -330,7 +322,6 @@ class SpikeSourcePoisson(
         slow_sources = list()
         fast_sources = list()
         for i in range(vertex_slice.n_atoms):
-
             atom_id = vertex_slice.lo_atom + i
 
             # Get the parameter values for source i:
@@ -502,7 +493,7 @@ class SpikeSourcePoisson(
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self._spike_recorder.get_spikes(
-            self._label, buffer_manager, 0,
+            self.label, buffer_manager, 0,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.

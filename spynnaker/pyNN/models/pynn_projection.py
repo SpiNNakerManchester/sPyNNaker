@@ -1,5 +1,4 @@
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
 from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
     import DelayedApplicationEdge
