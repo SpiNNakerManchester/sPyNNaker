@@ -396,14 +396,21 @@ class SpikeSourcePoisson(
 
         # Write the number of microseconds between sending spikes
         total_mean_rate = numpy.sum(self._rate)
-        max_spikes = scipy.stats.poisson.ppf(
-            1.0 - (1.0 / total_mean_rate), total_mean_rate)
-        spikes_per_timestep = (
-            max_spikes / (MICROSECONDS_PER_SECOND / machine_time_step))
-        time_between_spikes = (
-            (machine_time_step * time_scale_factor) /
-            (spikes_per_timestep * 2.0))
-        spec.write_value(data=int(time_between_spikes))
+        if total_mean_rate > 0:
+            max_spikes = scipy.stats.poisson.ppf(
+                1.0 - (1.0 / total_mean_rate), total_mean_rate)
+            spikes_per_timestep = (
+                max_spikes / (MICROSECONDS_PER_SECOND / machine_time_step))
+            time_between_spikes = (
+                (machine_time_step * time_scale_factor) /
+                (spikes_per_timestep * 2.0))
+            spec.write_value(data=int(time_between_spikes))
+        else:
+
+            # If the rate is 0 or less, set a "time between spikes" of 1
+            # to ensure that some time is put between spikes in event
+            # of a rate change later on
+            spec.write_value(data=1)
 
         # Write the random seed (4 words), generated randomly!
         spec.write_value(data=self._rng.randint(0x7FFFFFFF))
