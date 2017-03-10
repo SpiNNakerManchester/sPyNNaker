@@ -9,18 +9,21 @@ virtualenv:
 
 cache: pip
 
-install:
-  - pip install 'numpy>=1.12'
-  - pip install lxml
-  - sudo pip install scipy
+before_install:
+  - pip install --upgrade pip setuptools wheel
+  - pip install --only-binary=numpy,scipy numpy scipy
+  # SpiNNakerManchester internal dependencies; development mode
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master
+
+install:
   - pip install -r requirements-test.txt
   - python ./setup.py install
+
 before_script:
   - echo '[Machine]' > ~/.spynnaker.cfg
   - echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
@@ -28,6 +31,7 @@ before_script:
   - echo '[Database]' >> ~/.spynnaker.cfg
   - echo '[Simulation]' >> ~/.spynnaker.cfg
   - echo '[Buffers]' >> ~/.spynnaker.cfg
+
 script:
   - py.test unittests
   - flake8 examples spynnaker pyNN-spiNNaker-src
