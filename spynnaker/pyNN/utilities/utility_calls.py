@@ -111,8 +111,6 @@ def translate_parameters(types, byte_array, offset, vertex_slice):
         vertex_slice.n_atoms)
     scaled_parameters = translated_parameters / scales
 
-    print scaled_parameters
-
     # sort the parameters into arrays of values, one array per parameter
     sorted_parameters = scaled_parameters.reshape(
         (vertex_slice.n_atoms, len(types))).swapaxes(0, 1)
