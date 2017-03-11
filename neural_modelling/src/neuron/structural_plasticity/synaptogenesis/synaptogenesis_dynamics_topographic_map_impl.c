@@ -75,6 +75,9 @@ typedef struct {
     // Row data
     uint32_t *row;
 
+    // DMA Tag
+    uint dma_id;
+
 } dma_buffer_t;
 
 dma_buffer_t rewiring_dma_buffer;
@@ -226,13 +229,12 @@ void synaptogenesis_dynamics_rewire(){
 
     log_debug("Reading %d bytes from %d -- saved @ %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
 
-    uint dma_id;
-    dma_id = spin1_dma_transfer(
+    rewiring_dma_buffer.dma_id = spin1_dma_transfer(
         DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
         n_bytes);
     rewiring_dma_buffer.n_bytes_transferred = n_bytes;
     rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
-    if(!dma_id){
+    if(!rewiring_dma_buffer.dma_id){
         log_info("DMA Queue full. Synaptic rewiring request failed!");
     }
 }
@@ -240,64 +242,69 @@ void synaptogenesis_dynamics_rewire(){
 // Might need a function for rewiring. One to be called by the timer to generate
 // a fake spike and trigger a dma callback
 // and one to be called by the dma callback and then call formation or elimination
-void synaptic_row_restructure(){
-    /*
-        I need to know the structure of the row, know where to look for the postsynaptic neuron id.
-            -- I need to use synapse_row_fixed_region(row) to retrieve the fixed region within the row  ✓
-            -- then, synapse_row_plastic_controls(fixed) to retrieve the "controls" ✓
-            -- also, figure out what type of weight struct is being used, to reclaim the sizeof(weights) ✓
-        Then
-            if this neuron id exists
-                remove it
-                update count values (how many neurons etc)
-                    // Within the fixed-region extracted using the above API, fixed[0]
-                    // Contains the number of 32-bit fixed synaptic words, fixed[1]
-                    // Contains the number of 16-bit plastic synapse control words
-                remove weight
-                shift data around so it is contiguous
-            else
-                add the id to the structure storing ids (presumably at the end of the structure)
-                add its weight to the structure storing the weight
-                update count values
-                    // Within the fixed-region extracted using the above API, fixed[0]
-                    // Contains the number of 32-bit fixed synaptic words, fixed[1]
-                    // Contains the number of 16-bit plastic synapse control words
-
-         There could be some timing related issues, i.e. I need to remove the trace information for the specific
-         neuron I'm removing / add specific timing info for new neurons.
-
-    */
+void synaptic_row_restructure(uint dma_id){
     // If I am here, then the DMA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
     // the selected pre and postsynaptic ids are in current_state
 
-    if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data))) {
+    // Check that I'm actually servicing the correct row by checking
+    // the current dma id with the one I received when I made the dma request
+    if (dma_id != rewiring_dma_buffer.dma_id)
+        log_error("Servicing invalid synaptic row!");
+
+
+    // Is the row zero in length?
+    bool zero_elements = synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)) == 0;
+    // TODO figure out what is causing the bug that requires the following checks
+    bool zero_double_check;
+    if (zero_elements)
+        zero_double_check = synapse_row_plastic_size(rewiring_dma_buffer.row) <= 2;
+
+    if (zero_double_check){
+        log_error("What are you doing here?!");
+        log_info("plastic size %d -- num fixed %d -- num controls %d ",
+            synapse_row_plastic_size(rewiring_dma_buffer.row),
+            synapse_row_num_fixed_synapses(synapse_row_fixed_region(rewiring_dma_buffer.row)),
+            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
+        }
+
+    // Does the neuron exist in the row?
+    bool search_hit = search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data));
+
+
+    if (!zero_elements && search_hit) {
+
         synaptogenesis_dynamics_elimination_rule();
         // TODO check status of operation and save provenance (statistics)
     }
-    else if(synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row))<rewiring_data.s_max){
+    else if(!search_hit && !zero_double_check &&
+            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row))<rewiring_data.s_max){
+
         synaptogenesis_dynamics_formation_rule();
         // TODO check status of operation and save provenance (statistics)
     }
     else {
-        log_info("Something went wrong with rewiring!");
+        log_info("No rewiring this turn");
     }
 
 }
 
 
-bool _check_element_exists(){
-//        size_t num_controls = (size_t)synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row));
-        if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
-        {
-           log_info("NEURON STILL HERE");
-           log_info("FOUND @ %d", current_state.sp_data.offset);
-           return true;
-        }
-        else
-           log_info("NEURON NOT FOUND!");
-
-        return false;
-}
+//bool _check_element_exists(){
+//        if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
+//        {
+//           log_info("NEURON STILL HERE");
+//           log_info("FOUND @ %d", current_state.sp_data.offset);
+//           return true;
+//        }
+//        else
+//           log_info("NEURON NOT FOUND!");
+//
+//        log_info("num elements %d, bytes read %d, ",
+//            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)),
+//            rewiring_dma_buffer.n_bytes_transferred);
+//
+//        return false;
+//}
 
  /*
     Formation and elimination are structurally agnostic, i.e. they don't care how
@@ -307,7 +314,7 @@ bool _check_element_exists(){
     physically organised to be able to modify Plastic-Plastic synaptic regions.
  */
 bool synaptogenesis_dynamics_elimination_rule(){
-    log_info("HIT - %d", current_state.sp_data.offset);
+    log_debug("HIT @ %d", current_state.sp_data.offset);
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
         uint dma_id = spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
@@ -323,21 +330,18 @@ bool synaptogenesis_dynamics_elimination_rule(){
 }
 
 bool synaptogenesis_dynamics_formation_rule(){
-    log_info("MISS - %d", current_state.sp_data.offset);
+    log_debug("MISS @ %d", current_state.sp_data.offset);
     // TODO Don't forget about these hardcoded values, which might not be sensible
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, 2, 1)){
-        // TODO - SAVE THE ROW BACK IN SDRAM
-        if (_check_element_exists()){
-            uint dma_id = spin1_dma_transfer(
-            DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
-            rewiring_dma_buffer.row, DMA_WRITE,
-            rewiring_dma_buffer.n_bytes_transferred);
-            if(!dma_id){
-                log_info("DMA Queue full. Could not write back synaptic row after deletion!");
-                return false;
-            }
-            return true;
+        uint dma_id = spin1_dma_transfer(
+        DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
+        rewiring_dma_buffer.row, DMA_WRITE,
+        rewiring_dma_buffer.n_bytes_transferred);
+        if(!dma_id){
+            log_info("DMA Queue full. Could not write back synaptic row after deletion!");
+            return false;
         }
+        return true;
     }
     return false;
 }

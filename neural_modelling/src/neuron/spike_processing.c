@@ -196,10 +196,8 @@ void _user_event_callback(uint unused0, uint unused1) {
 }
 
 // Called when a DMA completes
-void _dma_complete_callback(uint unused, uint tag) {
-    use(unused);
-
-    log_debug("DMA transfer complete with tag %u", tag);
+void _dma_complete_callback(uint id, uint tag) {
+    log_debug("DMA transfer complete with tag %u for id %d", tag, id);
 
     // If this DMA is the result of a read
     if (tag == DMA_TAG_READ_SYNAPTIC_ROW) {
@@ -248,7 +246,7 @@ void _dma_complete_callback(uint unused, uint tag) {
 
     } else if (tag == DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING) {
 
-        synaptic_row_restructure();
+        synaptic_row_restructure(id);
 
     } else if (tag == DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING){
 
