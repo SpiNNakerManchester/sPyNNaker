@@ -14,7 +14,7 @@ from spynnaker.pyNN.utilities import constants
 
 
 class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
-    def __init__(self, stdp_model=None, f_rew=10 ** 4, s_max=32,
+    def __init__(self, stdp_model=None, f_rew=10 ** 4, weight=0, delay=1, s_max=32,
                  sigma_form_forward=2.5, sigma_form_lateral=1,
                  p_form_forward=0.16, p_form_lateral=1,
                  p_elim_dep=0.0245, p_elim_pot=1.36 * np.e ** -4, seed=None):
@@ -29,6 +29,8 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
 
         self._f_rew = f_rew  # Hz
         self._p_rew = 1. / self._f_rew  # ms
+        self._weight = weight
+        self._delay = delay
         self._s_max = s_max  # maximum number of presynaptic neurons
         self._sigma_form_forward = sigma_form_forward
         self._sigma_form_lateral = sigma_form_lateral
@@ -74,6 +76,8 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         # # Word aligned for convenience
         #
         spec.write_value(data=int(self._p_rew * machine_time_step), data_type=DataType.INT32)
+        spec.write_value(data=self._weight, data_type=DataType.UINT32)
+        spec.write_value(data=self._delay, data_type=DataType.INT32)
         spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
         spec.write_value(data=self._sigma_form_forward, data_type=DataType.S1615)
         spec.write_value(data=self._sigma_form_lateral, data_type=DataType.S1615)
@@ -158,7 +162,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         return int(self.fudge_factor * (4 * (12 * len(relevant_edges))))
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types, in_edges=None):
-        structure_size = 12 * 4 + 4 * 4  # parameters + rng seed
+        structure_size = 14 * 4 + 4 * 4  # parameters + rng seed
         self.structure_size = structure_size
         initial_size = self.super.get_parameters_sdram_usage_in_bytes(n_neurons, n_synapse_types)
         total_size = structure_size + initial_size

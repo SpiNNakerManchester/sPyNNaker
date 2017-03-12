@@ -53,7 +53,7 @@ typedef struct {
 } pre_pop_info_table_t;
 
 typedef struct {
-    uint32_t p_rew, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom;
+    uint32_t p_rew, weight, delay, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom;
     REAL sigma_form_forward, sigma_form_lateral, p_form_forward, p_form_lateral, p_elim_dep, p_elim_pot;
     mars_kiss64_seed_t shared_seed, local_seed;
     pre_pop_info_table_t pre_pop_info_table;
@@ -110,6 +110,8 @@ address_t synaptogenesis_dynamics_initialise(
     // Read in all of the parameters from SDRAM
     int32_t *sp_word = (int32_t*) sdram_sp_address;
     rewiring_data.p_rew = *sp_word++;
+    rewiring_data.weight = *sp_word++;
+    rewiring_data.delay = *sp_word++;
     rewiring_data.s_max = *sp_word++;
     rewiring_data.sigma_form_forward = *(REAL*)sp_word++;
     rewiring_data.sigma_form_lateral = *(REAL*)sp_word++;
@@ -211,7 +213,7 @@ void synaptogenesis_dynamics_rewire(){
 
     // Select a presynaptic neuron id
     choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *\
-     rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i + 1];
+        rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i + 1];
 
     // population_table_get_first_address() returns the address (in SDRAM) of the selected synaptic row
 
@@ -314,8 +316,9 @@ void synaptic_row_restructure(uint dma_id){
     physically organised to be able to modify Plastic-Plastic synaptic regions.
  */
 bool synaptogenesis_dynamics_elimination_rule(){
-    log_debug("HIT @ %d", current_state.sp_data.offset);
+
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
+        log_info("HIT @ %d id %d", current_state.sp_data.offset, current_state.post_syn_id);
         uint dma_id = spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
@@ -330,9 +333,10 @@ bool synaptogenesis_dynamics_elimination_rule(){
 }
 
 bool synaptogenesis_dynamics_formation_rule(){
-    log_debug("MISS @ %d", current_state.sp_data.offset);
+    log_info("MISS @ %d id %d", current_state.sp_data.offset, current_state.post_syn_id);
     // TODO Don't forget about these hardcoded values, which might not be sensible
-    if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, 2, 1)){
+    if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
+            rewiring_data.weight, rewiring_data.delay)){
         uint dma_id = spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
