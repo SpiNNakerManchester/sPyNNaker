@@ -744,7 +744,7 @@ class AbstractPopulationVertex(
         context = {
             "name": self._model_name,
             "default_parameters": self.default_parameters,
-            "default_initial_values": self.default_initial_values,
+            "default_initial_values": self.default_parameters,
             "parameters": self._generate_parameters(),
         }
         return context
