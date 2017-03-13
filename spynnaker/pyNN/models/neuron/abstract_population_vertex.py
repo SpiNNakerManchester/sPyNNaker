@@ -21,6 +21,8 @@ from pacman.model.resources.cpu_cycles_per_tick_resource import \
 from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.executor.injection_decorator import provide_injectables
+
 from spinn_front_end_common.abstract_models\
     .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
@@ -42,6 +44,7 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities import constants as \
     common_constants
 from spinn_front_end_common.utilities import helpful_functions
+
 from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
     AbstractContainsUnits
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
@@ -750,6 +753,7 @@ class AbstractPopulationVertex(
         return context
 
     def _generate_parameters(self):
+        provide_injectables
         parameters = dict()
         # Write the global parameters
         global_params = self._neuron_model.get_global_parameters()
