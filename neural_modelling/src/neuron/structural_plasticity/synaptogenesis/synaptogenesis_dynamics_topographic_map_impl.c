@@ -257,14 +257,16 @@ void synaptic_row_restructure(uint dma_id){
     // Is the row zero in length?
     bool zero_elements = synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)) == 0;
     // TODO figure out what is causing the bug that requires the following checks
-    bool zero_double_check;
+    uint num_plastic = synapse_row_plastic_size(rewiring_dma_buffer.row);
+
+    bool zero_double_check=false;
     if (zero_elements)
-        zero_double_check = synapse_row_plastic_size(rewiring_dma_buffer.row) <= 2;
+        zero_double_check = num_plastic <= 1;
 
     if (zero_double_check){
         log_error("What are you doing here?!");
         log_info("plastic size %d -- num fixed %d -- num controls %d ",
-            synapse_row_plastic_size(rewiring_dma_buffer.row),
+            num_plastic,
             synapse_row_num_fixed_synapses(synapse_row_fixed_region(rewiring_dma_buffer.row)),
             synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
         }
