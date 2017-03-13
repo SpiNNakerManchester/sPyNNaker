@@ -76,7 +76,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         # # Word aligned for convenience
         #
         spec.write_value(data=int(self._p_rew * machine_time_step), data_type=DataType.INT32)
-        spec.write_value(data=self._weight, data_type=DataType.UINT32)
+        spec.write_value(data=int(round(self._weight * weight_scales[0])), data_type=DataType.INT32)
         spec.write_value(data=self._delay, data_type=DataType.INT32)
         spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
         spec.write_value(data=self._sigma_form_forward, data_type=DataType.S1615)
