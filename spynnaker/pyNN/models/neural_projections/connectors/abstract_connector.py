@@ -11,9 +11,16 @@ import logging
 import numpy
 import math
 import re
+from spinn_utilities.safe_eval import SafeEval
 
 # global objects
 logger = logging.getLogger(__name__)
+_expr_context = SafeEval(
+    math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
+    numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
+    numpy.fmod, numpy.hypot, numpy.ldexp, numpy.log, numpy.log10, numpy.modf,
+    numpy.power, numpy.sin, numpy.sinh, numpy.sqrt, numpy.tan, numpy.tanh,
+    numpy.maximum, numpy.minimum, numpy.e, numpy.pi)
 
 
 @add_metaclass(ABCMeta)
@@ -279,7 +286,7 @@ class AbstractConnector(object):
                 expand_distances)
 
             if isinstance(values, basestring):
-                return eval(values)
+                return _expr_context.eval(values)
             return values(d)
 
     def _generate_weights(self, values, n_connections, connection_slices):

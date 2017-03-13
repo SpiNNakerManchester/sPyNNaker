@@ -1,6 +1,7 @@
 """
 utility class containing simple helper methods
 """
+from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl \
     import RandomStatsScipyImpl
 from spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl \
@@ -40,16 +41,17 @@ def convert_param_to_numpy(param, no_atoms):
             "Missing PyNN. Please install version 0.7.5 from "
             "http://neuralensemble.org/PyNN/")
     if isinstance(param, RandomDistribution):
+        next_val = param.next(n=no_atoms)
         if no_atoms > 1:
-            return numpy.asarray(param.next(n=no_atoms), dtype="float")
+            return numpy.asarray(next_val, dtype="float")
         else:
-            return numpy.array([param.next(n=no_atoms)], dtype="float")
+            return numpy.array([next_val], dtype="float")
     elif not hasattr(param, '__iter__'):
         return numpy.array([param] * no_atoms, dtype="float")
     elif len(param) != no_atoms:
-        raise exceptions.ConfigurationException("The number of params does"
-                                                " not equal with the number"
-                                                " of atoms in the vertex ")
+        raise exceptions.ConfigurationException(
+            "The number of params does not equal with the number of atoms in"
+            " the vertex")
     else:
         return numpy.array(param, dtype="float")
 
@@ -59,11 +61,7 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
         for param in parameters:
             value = param.get_value()
             if hasattr(value, "__len__"):
-                if len(value) > 1:
-                    value = value[atom]
-                else:
-                    value = value[0]
-
+                value = value[atom] if len(value) > 1 else value[0]
             spec.write_value(data=value,
                              data_type=param.get_dataspec_datatype())
 
@@ -85,20 +83,20 @@ def read_in_data_from_file(
     data_items = list()
 
     with open(file_path, 'r') as fsource:
-            read_data = fsource.readlines()
+        read_data = fsource.readlines()
 
+    evaluator = SafeEval()
     for line in read_data:
         if not line.startswith('#'):
             values = line.split("\t")
-            neuron_id = int(eval(values[1]))
-            time = float(eval(values[0]))
-            data_value = float(eval(values[2]))
+            neuron_id = int(evaluator.eval(values[1]))
+            time = float(evaluator.eval(values[0]))
+            data_value = float(evaluator.eval(values[2]))
             if (min_atom <= neuron_id < max_atom and
                     min_time <= time < max_time):
                 times.append(time)
                 atom_ids.append(neuron_id)
                 data_items.append(data_value)
-
             else:
                 print "failed to enter {}:{}".format(neuron_id, time)
 
@@ -123,15 +121,16 @@ def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time,
         spike times.
     """
     with open(file_path, 'r') as fsource:
-            read_data = fsource.readlines()
+        read_data = fsource.readlines()
 
+    evaluator = SafeEval()
     data = dict()
     max_atom_found = 0
     for line in read_data:
         if not line.startswith('#'):
             values = line.split(split_value)
-            time = float(eval(values[0]))
-            neuron_id = int(eval(values[1]))
+            time = float(evaluator.eval(values[0]))
+            neuron_id = int(evaluator.eval(values[1]))
             if ((min_atom is None or min_atom <= neuron_id) and
                     (max_atom is None or neuron_id < max_atom) and
                     (min_time is None or min_time <= time) and
@@ -147,10 +146,7 @@ def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time,
     else:
         result = numpy.ndarray(shape=max_atom, dtype=object)
     for neuron_id in range(0, max_atom):
-        if neuron_id in data:
-            result[neuron_id] = data[neuron_id]
-        else:
-            result[neuron_id] = list()
+        result[neuron_id] = data[neuron_id] if neuron_id in data else list()
     return result
 
 
