@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 class PyNNProjectionCommon(object):
     def __init__(
             self, spinnaker_control, connector, synapse_dynamics_stdp,
-            synapse_type, pre_synaptic_population, post_synaptic_population,
+            target, pre_synaptic_population, post_synaptic_population,
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
 
         # spinnaker control
@@ -41,6 +41,13 @@ class PyNNProjectionCommon(object):
         # control flags
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
+
+        synapse_type = post_synaptic_population._get_vertex \
+            .synapse_type.get_synapse_id_by_target(target)
+        if synapse_type is None:
+            raise common_exceptions.ConfigurationException(
+                "Synapse target {} not found in {}".format(
+                    target, post_synaptic_population.label))
 
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(
