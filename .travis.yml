@@ -42,6 +42,7 @@ script:
   - flake8 unittests
   # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
   # - flake8 integration_tests
+  - cd doc/source
   - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
   - sphinx-build -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
