@@ -12,6 +12,8 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
     AbstractStaticSynapseDynamics: dynamics which don't change over time.
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def get_n_words_for_static_connections(self, n_connections):
         """ Get the number of 32-bit words for n_connections in a single row

@@ -8,6 +8,8 @@ class AbstractSpikeRecordable(object):
     """ Indicates that spikes can be recorded from this object
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def is_recording_spikes(self):
         """ Determines if spikes are being recorded

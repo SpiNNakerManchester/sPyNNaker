@@ -9,6 +9,8 @@ import math
 @add_metaclass(ABCMeta)
 class AbstractSynapseDynamics(object):
 
+    __slots__ = ()
+
     NUMPY_CONNECTORS_DTYPE = [("source", "uint32"), ("target", "uint32"),
                               ("weight", "float64"), ("delay", "float64")]
 

@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 @add_metaclass(ABCMeta)
 class AbstractMasterPopTableFactory(object):
 
-    def __init__(self):
-        pass
+    __slots__ = ()
 
     @abstractmethod
     def extract_synaptic_matrix_data_location(

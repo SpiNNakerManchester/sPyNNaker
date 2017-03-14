@@ -8,6 +8,8 @@ class AbstractThresholdType(object):
     """ Represents types of threshold for a neuron (e.g. stochastic)
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def get_n_threshold_parameters(self):
         """ Get the number of threshold parameters

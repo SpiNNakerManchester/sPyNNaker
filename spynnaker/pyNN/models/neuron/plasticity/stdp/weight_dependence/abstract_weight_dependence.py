@@ -7,6 +7,8 @@ from abc import abstractproperty
 @add_metaclass(ABCMeta)
 class AbstractWeightDependence(object):
 
+    __slots__ = ()
+
     @abstractmethod
     def is_same_as(self, weight_dependence):
         """ Determine if this weight dependence is the same as another
