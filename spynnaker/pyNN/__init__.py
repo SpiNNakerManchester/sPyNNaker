@@ -145,7 +145,7 @@ __all__ = [
 
 
 def register_binary_search_path(search_path):
-    """Registers an additional binary search path for executables
+    """ Registers an additional binary search path for executables
 
     :param search_path: absolute search path for binaries
     """

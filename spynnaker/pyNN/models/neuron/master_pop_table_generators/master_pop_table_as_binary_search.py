@@ -189,7 +189,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param key_and_mask: the key and mask for this master pop entry
         :param master_pop_table_region: the region id for the master pop
         :param is_single: flag that states if the entry is a direct entry for\
-        a single row.
+                a single row.
         :rtype: None
         """
         if key_and_mask.key not in self._entries:
