@@ -1,7 +1,7 @@
 import math
-import numpy
+import numpy as np
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics\
+from spynnaker.pyNN.models.neuron.synapse_dynamics \
     .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 
 # How large are the time-stamps stored with each event
@@ -12,19 +12,19 @@ NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
 class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
-
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None,
-            dendritic_delay_fraction=1.0, mad=True):
+            dendritic_delay_fraction=1.0, mad=True, pad_to_length=None):
         AbstractPlasticSynapseDynamics.__init__(self)
         self._timing_dependence = timing_dependence
         self._weight_dependence = weight_dependence
         self._dendritic_delay_fraction = float(dendritic_delay_fraction)
         self._mad = mad
+        self._pad_to_length = pad_to_length
 
         if (self._dendritic_delay_fraction < 0.5 or
-                self._dendritic_delay_fraction > 1.0):
+                    self._dendritic_delay_fraction > 1.0):
             raise NotImplementedError(
                 "dendritic_delay_fraction must be in the interval [0.5, 1.0]")
 
@@ -119,6 +119,9 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
 
     def get_n_words_for_plastic_connections(self, n_connections):
         synapse_structure = self._timing_dependence.synaptic_structure
+        if self._pad_to_length is not None and n_connections < self._pad_to_length:
+            n_connections = self._pad_to_length
+
         fp_size_words = \
             n_connections if n_connections % 2 == 0 else n_connections + 1
         pp_size_bytes = (
@@ -150,23 +153,43 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype="uint8").reshape((-1, 2)))
         fp_size = self.get_n_items(fixed_plastic_rows, 2)
+        if self._pad_to_length is not None:
+            # Pad the data
+            fixed_plastic_rows = self._pad_row(fixed_plastic_rows, 2)
         fp_data = self.get_words(fixed_plastic_rows)
 
         # Get the plastic data
         synapse_structure = self._timing_dependence.synaptic_structure
         plastic_plastic = synapse_structure.get_synaptic_data(connections)
-        plastic_headers = numpy.zeros(
+        plastic_headers = np.zeros(
             (n_rows, self._n_header_bytes), dtype="uint8")
         plastic_plastic_row_data = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows, plastic_plastic)
+
+        # pp_size = fp_size in words => fp_size * no_bytes / 4 (bytes)
+        if self._pad_to_length is not None:
+            # Pad the data
+            plastic_plastic_row_data = self._pad_row(plastic_plastic_row_data,
+                                                     synapse_structure.get_n_bytes_per_connection())
         plastic_plastic_rows = [
-            numpy.concatenate((
+            np.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))
             for i in range(n_rows)]
-        pp_size = self.get_n_items(plastic_plastic_rows, 4)
+        pp_size = self.get_n_items(plastic_plastic_rows, 4)  # s_max
         pp_data = self.get_words(plastic_plastic_rows)
 
         return (fp_data, pp_data, fp_size, pp_size)
+
+    def _pad_row(self, rows, no_bytes_per_connection):
+        padded_rows = []
+        for row in rows:  # Row elements are (individual) bytes
+            padded_rows.append(
+                np.pad(row,
+                       np.clip(self._pad_to_length - (row.size // no_bytes_per_connection), 0, None),
+                       mode='constant').view(dtype="uint8")
+            )
+
+        return padded_rows
 
     def get_n_plastic_plastic_words_per_row(self, pp_size):
 
@@ -176,7 +199,7 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
     def get_n_fixed_plastic_words_per_row(self, fp_size):
 
         # fp_size is in half-words
-        return numpy.ceil(fp_size / 2.0).astype(dtype="uint32")
+        return np.ceil(fp_size / 2.0).astype(dtype="uint32")
 
     def get_n_synapses_in_rows(self, pp_size, fp_size):
 
@@ -189,17 +212,17 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
             fp_size, fp_data):
         n_rows = len(fp_size)
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
-        data_fixed = numpy.concatenate([
-            fp_data[i].view(dtype="uint16")[0:fp_size[i]]
-            for i in range(n_rows)])
+        data_fixed = np.concatenate([
+                                        fp_data[i].view(dtype="uint16")[0:fp_size[i]]
+                                        for i in range(n_rows)])
         pp_without_headers = [
             row.view(dtype="uint8")[self._n_header_bytes:] for row in pp_data]
         synapse_structure = self._timing_dependence.synaptic_structure
 
-        connections = numpy.zeros(
+        connections = np.zeros(
             data_fixed.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
-        connections["source"] = numpy.concatenate(
-            [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
+        connections["source"] = np.concatenate(
+            [np.repeat(i, fp_size[i]) for i in range(len(fp_size))])
         connections["target"] = (data_fixed & 0xFF) + post_vertex_slice.lo_atom
         connections["weight"] = synapse_structure.read_synaptic_data(
             fp_size, pp_without_headers)

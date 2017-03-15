@@ -19,14 +19,6 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
                  p_form_forward=0.16, p_form_lateral=1,
                  p_elim_dep=0.0245, p_elim_pot=1.36 * np.e ** -4, seed=None):
 
-        if stdp_model is not None:
-            self.super = SynapseDynamicsSTDP(timing_dependence=stdp_model.timing_dependence,
-                                             weight_dependence=stdp_model.weight_dependence,
-                                             dendritic_delay_fraction=stdp_model._dendritic_delay_fraction,
-                                             mad=stdp_model._mad)
-        else:
-            self.super = SynapseDynamicsStatic()
-
         self._f_rew = f_rew  # Hz
         self._p_rew = 1. / self._f_rew  # ms
         self._weight = weight
@@ -40,6 +32,15 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         self._p_elim_pot = p_elim_pot
 
         self.fudge_factor = 1.1
+
+        if stdp_model is not None:
+            self.super = SynapseDynamicsSTDP(timing_dependence=stdp_model.timing_dependence,
+                                             weight_dependence=stdp_model.weight_dependence,
+                                             dendritic_delay_fraction=stdp_model._dendritic_delay_fraction,
+                                             mad=stdp_model._mad,
+                                             pad_to_length=self._s_max)
+        else:
+            self.super = SynapseDynamicsStatic()
 
         # Generate a seed for the RNG on chip that should be the same for all
         # of the cores that have my learning rule
@@ -70,11 +71,6 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         if spec.current_region != constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value:
             spec.switch_write_focus(region)
 
-        # # Switch focus to the region:
-        # spec.switch_write_focus(region)
-        #
-        # # Word aligned for convenience
-        #
         spec.write_value(data=int(self._p_rew * machine_time_step), data_type=DataType.INT32)
         spec.write_value(data=int(round(self._weight * weight_scales[0])), data_type=DataType.INT32)
         spec.write_value(data=self._delay, data_type=DataType.INT32)
@@ -185,17 +181,17 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
 
     def get_plastic_synaptic_data(self, connections, connection_row_indices, n_rows, post_vertex_slice,
                                   n_synapse_types):
-        try:
+        if isinstance(self.super, AbstractPlasticSynapseDynamics):
             return self.super.get_plastic_synaptic_data(connections, connection_row_indices, n_rows, post_vertex_slice,
                                                         n_synapse_types)
-        except:
+        else:
             return self.super.get_static_synaptic_data(connections, connection_row_indices, n_rows, post_vertex_slice,
                                                        n_synapse_types)
 
     def get_static_synaptic_data(self, connections, connection_row_indices, n_rows, post_vertex_slice,
                                  n_synapse_types):
         return self.super.get_static_synaptic_data(connections, connection_row_indices, n_rows, post_vertex_slice,
-                                            n_synapse_types)
+                                                   n_synapse_types)
 
     def get_n_words_for_plastic_connections(self, n_connections):
         try:
@@ -244,4 +240,3 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
             np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
             np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot)
         )
-

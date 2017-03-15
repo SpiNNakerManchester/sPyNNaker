@@ -320,7 +320,10 @@ void synaptic_row_restructure(uint dma_id){
 bool synaptogenesis_dynamics_elimination_rule(){
 
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        log_info("HIT @ %d id %d", current_state.sp_data.offset, current_state.post_syn_id);
+        log_info("HIT @ %d id %d. Number of controls=%d",
+            current_state.sp_data.offset,
+            current_state.post_syn_id,
+            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
         uint dma_id = spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
@@ -335,10 +338,12 @@ bool synaptogenesis_dynamics_elimination_rule(){
 }
 
 bool synaptogenesis_dynamics_formation_rule(){
-    log_info("MISS @ %d id %d", current_state.sp_data.offset, current_state.post_syn_id);
-    // TODO Don't forget about these hardcoded values, which might not be sensible
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
+        log_info("MISS @ %d id %d. Number of controls=%d",
+            current_state.sp_data.offset,
+            current_state.post_syn_id,
+            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
         uint dma_id = spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
