@@ -641,6 +641,7 @@ class AbstractPopulationVertex(
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
         """ Gets the constraints for partitions going out of this vertex
+
         :param partition: the partition that leaves this vertex
         :return: list of constraints
         """

@@ -15,7 +15,7 @@ import string
 import sys
 
 import spynnaker
-from spynnaker.pyNN.utilities.conf import log
+import log
 
 
 def _install_cfg(filename):
@@ -38,8 +38,6 @@ def _install_cfg(filename):
 def create_directory(directory):
     """creates a directory if needed, or deletes it and rebuilds it
 
-    :param directory:
-    :return:
     """
     if not os.path.exists(directory):
         os.makedirs(directory)

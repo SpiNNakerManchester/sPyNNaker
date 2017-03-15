@@ -49,8 +49,7 @@ class AbstractMasterPopTableFactory(object):
                     :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
         :param master_pop_table_region: the region to which the master pop\
                     table is being stored
-        :param is_single True if this is a single synapse, False otherwise
-        :return:
+        :param is_single: True if this is a single synapse, False otherwise
         """
 
     @abstractmethod
@@ -60,7 +59,6 @@ class AbstractMasterPopTableFactory(object):
         :param spec: the spec to write the master pop entry to
         :param master_pop_table_region: the region to which the master pop\
                     table is being stored
-        :return:
         """
 
     @abstractmethod
@@ -71,7 +69,6 @@ class AbstractMasterPopTableFactory(object):
         :return: a list of constraints
         :rtype: list of\
                     :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-        :raise None: this method does not raise any known exceptions
         """
 
     @abstractmethod
