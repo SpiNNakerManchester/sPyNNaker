@@ -4,7 +4,6 @@ import random
 import scipy.stats
 
 import numpy
-from enum import Enum
 from spinn_front_end_common.utilities import constants as\
     front_end_common_constants
 
@@ -25,18 +24,18 @@ from pacman.model.resources.sdram_resource import SDRAMResource
 from spinn_front_end_common.abstract_models.\
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.interface.buffer_management.buffer_models\
-    .receives_buffers_to_host_basic_impl import ReceiveBuffersToHostBasicImpl
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
 from spinn_front_end_common.abstract_models\
     .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
+from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.interface.buffer_management \
+    import recording_utilities
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
 
-from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common.multi_spike_recorder \
@@ -62,17 +61,9 @@ class SpikeSourcePoisson(
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         PopulationSettableChangeRequiresMapping,
-        ReceiveBuffersToHostBasicImpl, AbstractBinaryUsesSimulationRun):
+        AbstractBinaryUsesSimulationRun):
     """ A Poisson Spike source object
     """
-
-    _POISSON_SPIKE_SOURCE_REGIONS = Enum(
-        value="_POISSON_SPIKE_SOURCE_REGIONS",
-        names=[('SYSTEM_REGION', 0),
-               ('POISSON_PARAMS_REGION', 1),
-               ('SPIKE_HISTORY_REGION', 2),
-               ('BUFFERING_OUT_STATE', 3),
-               ('PROVENANCE_REGION', 4)])
 
     _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
@@ -94,7 +85,6 @@ class SpikeSourcePoisson(
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
-        ReceiveBuffersToHostBasicImpl.__init__(self)
 
         # atoms params
         self._n_atoms = n_neurons
@@ -109,22 +99,25 @@ class SpikeSourcePoisson(
 
         # Prepare for recording, and to get spikes
         self._spike_recorder = MultiSpikeRecorder()
-        self._spike_buffer_max_size = config.getint(
-            "Buffers", "spike_buffer_size")
-        self._buffer_size_before_receive = config.getint(
-            "Buffers", "buffer_size_before_receive")
         self._time_between_requests = config.getint(
             "Buffers", "time_between_requests")
-        self._enable_buffered_recording = config.getboolean(
-            "Buffers", "enable_buffered_recording")
         self._receive_buffer_host = config.get(
             "Buffers", "receive_buffer_host")
-        self._receive_buffer_port = config.getint(
-            "Buffers", "receive_buffer_port")
+        self._receive_buffer_port = helpful_functions.read_config_int(
+            config, "Buffers", "receive_buffer_port")
         self._minimum_buffer_sdram = config.getint(
             "Buffers", "minimum_buffer_sdram")
         self._using_auto_pause_and_resume = config.getboolean(
             "Buffers", "use_auto_pause_and_resume")
+
+        spike_buffer_max_size = 0
+        self._buffer_size_before_receive = 0
+        if config.getboolean("Buffers", "enable_buffered_recording"):
+            spike_buffer_max_size = config.getint(
+                "Buffers", "spike_buffer_size")
+            self._buffer_size_before_receive = config.getint(
+                "Buffers", "buffer_size_before_receive")
+        self._maximum_sdram_for_buffering = [spike_buffer_max_size]
 
     def _max_spikes_per_ts(
             self, vertex_slice, n_machine_time_steps, machine_time_step):
@@ -147,10 +140,6 @@ class SpikeSourcePoisson(
     def get_resources_used_by_atoms(
             self, vertex_slice, n_machine_time_steps, machine_time_step):
 
-        # verify if needing the buffered out functionality
-        self._check_for_activating_auto_pause_and_resume(
-            vertex_slice, self, n_machine_time_steps, machine_time_step)
-
         # build resources as i currently know
         container = ResourceContainer(
             sdram=SDRAMResource(
@@ -160,35 +149,18 @@ class SpikeSourcePoisson(
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms()))
 
-        # extend resources with whatever the extra functionality requires
-        container.extend(self.get_extra_resources(
-            self._receive_buffer_host, self._receive_buffer_port))
-        return container
-
-    def _check_for_activating_auto_pause_and_resume(
-            self, vertex_slice, object_to_set, n_machine_time_steps,
-            machine_time_step):
-
-        # verify if needing the buffered out functionality
-        if not self._using_auto_pause_and_resume:
-            spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
+        recording_sizes = recording_utilities.get_recording_region_sizes(
+            [self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step),
-                n_machine_time_steps)
-            spike_buffering_needed = recording_utils.needs_buffering(
-                self._spike_buffer_max_size, spike_buffer_size,
-                self._enable_buffered_recording)
-            if spike_buffering_needed:
-                object_to_set.activate_buffering_output(
-                    buffering_ip_address=self._receive_buffer_host,
-                    buffering_port=self._receive_buffer_port)
-        else:
-            sdram_per_ts = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._max_spikes_per_ts(
-                    vertex_slice, n_machine_time_steps, machine_time_step), 1)
-            object_to_set.activate_buffering_output(
-                minimum_sdram_for_buffering=self._minimum_buffer_sdram,
-                buffered_sdram_per_timestep=sdram_per_ts)
+                1)],
+            n_machine_time_steps, self._minimum_buffer_sdram,
+            self._maximum_sdram_for_buffering,
+            self._using_auto_pause_and_resume)
+        container.extend(recording_utilities.get_recording_resources(
+            recording_sizes, self._receive_buffer_host,
+            self._receive_buffer_port))
+        return container
 
     @property
     def n_atoms(self):
@@ -206,13 +178,17 @@ class SpikeSourcePoisson(
             self, vertex_slice, resources_required, n_machine_time_steps,
             machine_time_step, label=None, constraints=None):
         SpikeSourcePoisson._n_poisson_vertices += 1
+        buffered_sdram_per_timestep =\
+            self._spike_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self._max_spikes_per_ts(
+                    vertex_slice, n_machine_time_steps, machine_time_step), 1)
+        minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
+            [buffered_sdram_per_timestep], n_machine_time_steps,
+            self._minimum_buffer_sdram)
         vertex = SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
+            minimum_buffer_sdram[0], buffered_sdram_per_timestep,
             constraints, label)
-
-        # set up auto pause and resume stuff
-        self._check_for_activating_auto_pause_and_resume(
-            vertex_slice, vertex, n_machine_time_steps, machine_time_step)
 
         # return the machine vertex
         return vertex
@@ -260,6 +236,7 @@ class SpikeSourcePoisson(
     @staticmethod
     def get_params_bytes(vertex_slice):
         """ Gets the size of the poisson parameters in bytes
+
         :param vertex_slice:
         """
         return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS +
@@ -267,16 +244,11 @@ class SpikeSourcePoisson(
                  PARAMS_WORDS_PER_NEURON)) * 4
 
     @staticmethod
-    def reserve_memory_regions(spec, setup_sz, poisson_params_sz,
-                               spike_hist_buff_sz, vertex):
+    def reserve_memory_regions(spec, poisson_params_sz, vertex):
         """ Reserve memory regions for poisson source parameters and output\
             buffer.
-        :param spec:
-        :param setup_sz:
-        :param poisson_params_sz:
-        :param spike_hist_buff_sz:
-        :return:
-        """
+
+         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
@@ -284,55 +256,26 @@ class SpikeSourcePoisson(
             region=(
                 SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value),
-            size=setup_sz, label='setup')
+            size=front_end_common_constants.SYSTEM_BYTES_REQUIREMENT,
+            label='setup')
         spec.reserve_memory_region(
             region=(
                 SpikeSourcePoissonMachineVertex.
                 _POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value),
             size=poisson_params_sz, label='PoissonParams')
-        vertex.reserve_buffer_regions(
-            spec,
-            (SpikeSourcePoissonMachineVertex.
-                _POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value),
-            [SpikeSourcePoissonMachineVertex.
-                _POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value],
-            [spike_hist_buff_sz])
+        spec.reserve_memory_region(
+            region=(
+                SpikeSourcePoissonMachineVertex._POISSON_SPIKE_SOURCE_REGIONS
+                .SPIKE_HISTORY_REGION.value),
+            size=recording_utilities.get_recording_header_size(1),
+            label="Recording")
         vertex.reserve_provenance_data_region(spec)
-
-    def _write_setup_info(
-            self, spec, spike_history_region_sz, iptags,
-            buffer_size_before_receive, vertex, machine_time_step,
-            time_scale_factor):
-        """ Write information used to control the simulation and gathering of\
-            results.
-
-        :param spec:
-        :param spike_history_region_sz:
-        :param ip_rags
-        :return:
-        """
-        # write simulation data
-        spec.switch_write_focus(
-            SpikeSourcePoissonMachineVertex.
-            _POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
-        spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
-            time_scale_factor))
-
-        # write recording data
-        vertex.write_recording_data(
-            spec, iptags, [spike_history_region_sz],
-            buffer_size_before_receive, self._time_between_requests)
 
     def _write_poisson_parameters(
             self, spec, key, vertex_slice, machine_time_step,
             time_scale_factor):
         """ Generate Neuron Parameter data for Poisson spike sources
 
-        :param spec:
-        :param key:
-        :param num_neurons:
-        :return:
         """
         spec.comment("\nWriting Neuron Parameters for {} poisson sources:\n"
                      .format(vertex_slice.n_atoms))
@@ -466,24 +409,10 @@ class SpikeSourcePoisson(
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         total_size = \
             (front_end_common_constants.SYSTEM_BYTES_REQUIREMENT +
-             ReceiveBuffersToHostBasicImpl.get_recording_data_size(1) +
-             ReceiveBuffersToHostBasicImpl.get_buffer_state_region_size(1) +
              SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
              poisson_params_sz)
         total_size += self._get_number_of_mallocs_used_by_dsg() * \
             front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
-
-        if self._using_auto_pause_and_resume:
-            total_size += self._minimum_buffer_sdram
-        else:
-            spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._max_spikes_per_ts(
-                    vertex_slice, n_machine_time_steps, machine_time_step),
-                n_machine_time_steps)
-            total_size += recording_utils.get_buffer_sizes(
-                self._spike_buffer_max_size, spike_buffer_size,
-                self._enable_buffered_recording)
-
         return total_size
 
     def _get_number_of_mallocs_used_by_dsg(self):
@@ -519,40 +448,40 @@ class SpikeSourcePoisson(
         vertex = placement.vertex
         vertex_slice = graph_mapper.get_slice(vertex)
 
-        spike_buffer_size = self._spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._max_spikes_per_ts(
-                vertex_slice, n_machine_time_steps, machine_time_step),
-            n_machine_time_steps)
-        spike_history_sz = recording_utils.get_buffer_sizes(
-            self._spike_buffer_max_size, spike_buffer_size,
-            self._enable_buffered_recording)
-        spike_buffering_needed = recording_utils.needs_buffering(
-            self._spike_buffer_max_size, spike_buffer_size,
-            self._enable_buffered_recording)
-        buffer_size_before_receive = self._buffer_size_before_receive
-        if not spike_buffering_needed:
-            buffer_size_before_receive = spike_history_sz + 256
-
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
-
-        # Basic setup plus 8 bytes for recording flags and recording size
-        setup_sz = (front_end_common_constants.SYSTEM_BYTES_REQUIREMENT +
-                    vertex.get_recording_data_size(1))
 
         poisson_params_sz = self.get_params_bytes(vertex_slice)
 
         # Reserve SDRAM space for memory areas:
-        self.reserve_memory_regions(
-            spec, setup_sz, poisson_params_sz, spike_history_sz, vertex)
+        self.reserve_memory_regions(spec, poisson_params_sz, vertex)
 
-        iptags = tags.get_ip_tags_for_vertex(vertex)
-        self._write_setup_info(
-            spec, spike_history_sz, iptags, buffer_size_before_receive,
-            vertex, machine_time_step, time_scale_factor)
+        # write setup data
+        spec.switch_write_focus(
+            SpikeSourcePoissonMachineVertex.
+            _POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+        spec.write_array(simulation_utilities.get_simulation_header_array(
+            self.get_binary_file_name(), machine_time_step,
+            time_scale_factor))
 
+        # write recording data
+        ip_tags = tags.get_ip_tags_for_vertex(vertex)
+        spec.switch_write_focus(
+            SpikeSourcePoissonMachineVertex._POISSON_SPIKE_SOURCE_REGIONS
+            .SPIKE_HISTORY_REGION.value)
+        recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
+            n_machine_time_steps,
+            [self._spike_recorder.get_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self._max_spikes_per_ts(
+                    vertex_slice, n_machine_time_steps, machine_time_step),
+                1)],
+            self._maximum_sdram_for_buffering)
+        spec.write_array(recording_utilities.get_recording_header_array(
+            recorded_region_sizes, self._time_between_requests,
+            self._buffer_size_before_receive, ip_tags))
+
+        # write parameters
         key = routing_info.get_first_key_from_pre_vertex(
             vertex, constants.SPIKE_PARTITION_ID)
-
         self._write_poisson_parameters(
             spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
@@ -567,11 +496,7 @@ class SpikeSourcePoisson(
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self._spike_recorder.get_spikes(
-            self._label, buffer_manager,
-            (SpikeSourcePoissonMachineVertex.
-                _POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value),
-            (SpikeSourcePoissonMachineVertex.
-                _POISSON_SPIKE_SOURCE_REGIONS.BUFFERING_OUT_STATE.value),
+            self._label, buffer_manager, 0,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.

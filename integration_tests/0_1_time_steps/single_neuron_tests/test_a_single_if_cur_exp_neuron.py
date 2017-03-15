@@ -9,6 +9,17 @@ import pylab
 import unittest
 import spynnaker.pyNN as p
 
+# Cell parameters
+cell_params = {'cm': 0.25,
+               'i_offset': 0.0,
+               'tau_m': 20.0,
+               'tau_refrac': 2.0,
+               'tau_syn_E': 2.0,
+               'tau_syn_I': 2.0,
+               'v_reset': -60.0,
+               'v_rest': -60.0,
+               'v_thresh': -40.0}
+
 
 class TestIfCurExpSingleNeuron(unittest.TestCase):
     """
@@ -20,10 +31,10 @@ class TestIfCurExpSingleNeuron(unittest.TestCase):
     def poisson_generator(self, rate, t_start, t_stop):
         """
         Generate poisson noise of given rate between start and stop times
-:param rate:
-:param t_start:
-:param t_stop:
-:return:
+        :param rate:
+        :param t_start:
+        :param t_stop:
+        :return:
         """
         n = (t_stop - t_start) / 1000.0 * rate
         number = numpy.ceil(n + 3 * numpy.sqrt(n))
@@ -62,19 +73,6 @@ class TestIfCurExpSingleNeuron(unittest.TestCase):
 
     def simulate(self, spinnaker, input_spike_times):
 
-        # Cell parameters
-        cell_params = {
-            'tau_m': 20.0,
-            'v_rest': -60.0,
-            'v_reset': -60.0,
-            'v_thresh': -40.0,
-            'tau_syn_E': 2.0,
-            'tau_syn_I': 2.0,
-            'tau_refrac': 2.0,
-            'cm': 0.25,
-            'i_offset': 0.0,
-        }
-
         rng = p.NumpyRNG(seed=28375)
         v_init = p.RandomDistribution('uniform', [-60, -40], rng)
 
@@ -102,7 +100,8 @@ class TestIfCurExpSingleNeuron(unittest.TestCase):
 
     def plot_trace(self, trace, axis, label, colour):
         trace_unzipped = zip(*trace)
-        axis.plot(trace_unzipped[1], trace_unzipped[2], color=colour, label=label)
+        axis.plot(trace_unzipped[1], trace_unzipped[2], color=colour,
+                  label=label)
 
     def plot_noise(self, noise, axis, label, colour):
         axis.scatter(noise, [0] * len(noise), color=colour, label=label, s=4)
@@ -118,18 +117,18 @@ class TestIfCurExpSingleNeuron(unittest.TestCase):
         # Generate poisson noise
         # **YUCK** remove duplicates as SpiNNaker implementation of spike
         # source array can only send one spike/neuron/ms
-        noise_spike_times = self.poisson_generator(self.noise_rate, 0,
-                                                   self.simtime)
-        noise_spike_times = \
-            list(collections.OrderedDict.fromkeys(noise_spike_times))
+        noise_spike_times = self.poisson_generator(
+            self.noise_rate, 0, self.simtime)
+        noise_spike_times = list(
+            collections.OrderedDict.fromkeys(noise_spike_times))
 
         # Simulate using both simulators
-        s_pop_voltages, s_pop_spikes = self.simulate(True,
-                                                     noise_spike_times)
-        n_pop_voltages, n_pop_spikes = self.simulate(False,
-                                                     noise_spike_times)
+        s_pop_voltages, s_pop_spikes = self.simulate(
+            True, noise_spike_times)
+        n_pop_voltages, n_pop_spikes = self.simulate(
+            False, noise_spike_times)
 
-        figure, axes = pylab.subplots(3, sharex=True)
+        _, axes = pylab.subplots(3, sharex=True)
 
         self.plot_noise(noise_spike_times, axes[0], "black", None)
         axes[0].set_title("Input spikes")

@@ -37,7 +37,7 @@ class VRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_v(self, label, buffer_manager, region, state_region, placements,
+    def get_v(self, label, buffer_manager, region, placements,
               graph_mapper, application_vertex, machine_time_step):
 
         vertices = \
@@ -64,7 +64,7 @@ class VRecorder(object):
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, missing_data =\
                 buffer_manager.get_data_for_vertex(
-                    placement, region, state_region)
+                    placement, region)
             if missing_data:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             record_raw = neuron_param_region_data_pointer.read_all()

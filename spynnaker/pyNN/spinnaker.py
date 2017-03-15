@@ -52,8 +52,12 @@ class Spinnaker(SpinnakerMainInterface):
         # population holders
         self._populations = list()
         self._projections = list()
-        self._multi_cast_vertex = None
+        self._command_sender = None
         self._edge_count = 0
+
+        # the number of edges that are associated with commands being sent to
+        # a vertex
+        self._command_edge_count = 0
         self._live_spike_recorder = dict()
 
         # create xml path for where to locate spynnaker related functions when
@@ -67,7 +71,16 @@ class Spinnaker(SpinnakerMainInterface):
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
 
+        extra_mapping_algorithms = list()
+        extra_load_algorithms = list()
         extra_algorithms_pre_run = list()
+
+        if config.getboolean("Reports", "draw_network_graph"):
+            extra_mapping_algorithms.append(
+                "SpYNNakerConnectionHolderGenerator")
+            extra_load_algorithms.append(
+                "SpYNNakerNeuronGraphNetworkSpecificationReport")
+
         if config.getboolean("Reports", "ReportsEnabled"):
             if config.getboolean("Reports", "writeSynapticReport"):
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
@@ -78,6 +91,8 @@ class Spinnaker(SpinnakerMainInterface):
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             extra_mapping_inputs=extra_mapping_inputs,
+            extra_mapping_algorithms=extra_mapping_algorithms,
+            extra_load_algorithms=extra_load_algorithms,
             n_chips_required=n_chips_required,
             extra_pre_run_algorithms=extra_algorithms_pre_run)
 
@@ -209,30 +224,48 @@ class Spinnaker(SpinnakerMainInterface):
         return self._max_supported_delay
 
     def add_application_vertex(self, vertex_to_add):
-        """
-
-        :param vertex_to_add:
-        :return:
-        """
         if isinstance(vertex_to_add, CommandSender):
-            self._multi_cast_vertex = vertex_to_add
+            self._command_sender = vertex_to_add
 
         self._application_graph.add_vertex(vertex_to_add)
 
         if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
-            if self._multi_cast_vertex is None:
-                self._multi_cast_vertex = CommandSender(
-                    "auto_added_command_sender", None)
-                self.add_application_vertex(self._multi_cast_vertex)
-            edge = ApplicationEdge(
-                self._multi_cast_vertex, vertex_to_add)
-            self.add_application_edge(edge, "COMMANDS")
 
-            self._multi_cast_vertex.add_commands(
-                vertex_to_add.commands, edge,
-                self._application_graph.
-                get_outgoing_edge_partition_starting_at_vertex(
-                    self._multi_cast_vertex, "COMMANDS"))
+            # if there's no command sender yet, build one
+            if self._command_sender is None:
+                self._command_sender = CommandSender(
+                    "auto_added_command_sender", None)
+                self.add_application_vertex(self._command_sender)
+
+            # Count the number of unique keys
+            n_partitions = self._count_unique_keys(vertex_to_add.commands)
+
+            # build the number of edges accordingly and then add them to the
+            # graph.
+            partitions = list()
+            for _ in range(0, n_partitions):
+                edge = ApplicationEdge(self._command_sender, vertex_to_add)
+                partition_id = "COMMANDS{}".format(self._command_edge_count)
+
+                # add to the command count, so that each set of commands is in
+                # its own partition
+                self._command_edge_count += 1
+
+                # add edge with new partition id to graph
+                self.add_application_edge(edge, partition_id)
+
+                # locate the partition object for the edge we just added
+                partition = self._application_graph.\
+                    get_outgoing_edge_partition_starting_at_vertex(
+                        self._command_sender, partition_id)
+
+                # store the partition for the command sender to use for its
+                # key map
+                partitions.append(partition)
+
+            # allow the command sender to create key to partition map
+            self._command_sender.add_commands(
+                vertex_to_add.commands, partitions)
 
         # add any dependent edges and vertices if needed
         if isinstance(vertex_to_add,
@@ -246,16 +279,11 @@ class Spinnaker(SpinnakerMainInterface):
                     vertex_to_add.
                     edge_partition_identifier_for_dependent_edge)
 
-    def create_population(self, size, cellclass, cellparams, structure, label):
-        """
+    def _count_unique_keys(self, commands):
+        unique_keys = {command.key for command in commands}
+        return len(unique_keys)
 
-        :param size:
-        :param cellclass:
-        :param cellparams:
-        :param structure:
-        :param label:
-        :return:
-        """
+    def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
@@ -283,7 +311,7 @@ class Spinnaker(SpinnakerMainInterface):
         :param synapse_dynamics: plasticity object
         :param label: human readable version of the projection
         :param rng: the random number generator to use on this projection
-        :return:
+        :return Projection:
         """
         if label is None:
             label = "Projection {}".format(self._edge_count)
@@ -298,8 +326,7 @@ class Spinnaker(SpinnakerMainInterface):
             user_max_delay=self.max_supported_delay)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
-             clear_tags=None, extract_provenance_data=True,
-             extract_iobuf=True):
+             clear_tags=None):
         """
         :param turn_off_machine: decides if the machine should be powered down\
             after running the execution. Note that this powers down all boards\
@@ -311,20 +338,13 @@ class Spinnaker(SpinnakerMainInterface):
         :param clear_tags: informs the tool chain if it should clear the tags\
             off the machine at stop
         :type clear_tags: boolean
-        :param extract_provenance_data: informs the tools if it should \
-            try to extract provenance data.
-        :type extract_provenance_data: bool
-        :param extract_iobuf: tells the tools if it should try to \
-            extract iobuf
-        :type extract_iobuf: bool
-        :return: None
+        :rtype: None
         """
         for population in self._populations:
             population._end()
 
         SpinnakerMainInterface.stop(
-            self, turn_off_machine, clear_routing_tables, clear_tags,
-            extract_provenance_data, extract_iobuf)
+            self, turn_off_machine, clear_routing_tables, clear_tags)
 
     def run(self, run_time):
         """ Run the model created
