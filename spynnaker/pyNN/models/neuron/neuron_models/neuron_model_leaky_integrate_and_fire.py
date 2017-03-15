@@ -1,6 +1,4 @@
 from pacman.executor.injection_decorator import inject_items
-from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
-    AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate \
@@ -58,17 +56,16 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
             # count down to end of next refractory period [timesteps]
             # int32_t  refract_timer;
-            NeuronParameter(0, DataType.INT32, "refact_timer"),
+            NeuronParameter(0, DataType.INT32),
 
             # post-spike reset membrane voltage [mV]
             # REAL     V_reset;
-            NeuronParameter(self._v_reset, DataType.S1615, "v_reset"),
+            NeuronParameter(self._v_reset, DataType.S1615),
 
             # refractory time of neuron [timesteps]
             # int32_t  T_refract;
             NeuronParameter(
-                self._tau_refrac_timesteps(machine_time_step),
-                DataType.INT32, "tau_refac_time_steps")
+                self._tau_refrac_timesteps(machine_time_step), DataType.INT32)
         ])
         return params
 

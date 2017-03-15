@@ -61,19 +61,19 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             tau_syn_I, self._n_neurons)
 
     @property
-    def inital_value_exc(self):
+    def isyn_exc(self):
         return self._initial_input_exc
 
-    @inital_value_exc.setter
-    def inital_value_exc(self, new_value):
+    @isyn_exc.setter
+    def isyn_exc(self, new_value):
         self._initial_input_exc = new_value
 
     @property
-    def inital_value_inh(self):
+    def isyn_inh(self):
         return self._initial_input_inh
 
-    @inital_value_inh.setter
-    def inital_value_inh(self, new_value):
+    @isyn_inh.setter
+    def isyn_inh(self, new_value):
         self._initial_input_inh = new_value
 
     def get_n_synapse_types(self):
@@ -104,16 +104,14 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             self._tau_syn_I, machine_time_step)
 
         return [
-            NeuronParameter(e_decay, DataType.UINT32, "e_decay"),
-            NeuronParameter(e_init, DataType.UINT32, "e_init"),
-            NeuronParameter(e_decay2, DataType.UINT32, "e_decay2"),
-            NeuronParameter(e_init2, DataType.UINT32, "e_init2"),
-            NeuronParameter(i_decay, DataType.UINT32, "i_decay"),
-            NeuronParameter(i_init, DataType.UINT32, "i_init"),
-            NeuronParameter(self._initial_input_exc, DataType.S1615,
-                            "gsyn_exc"),
-            NeuronParameter(self._initial_input_inh, DataType.S1615,
-                            "gsyn_inh")
+            NeuronParameter(e_decay, DataType.UINT32),
+            NeuronParameter(e_init, DataType.UINT32),
+            NeuronParameter(e_decay2, DataType.UINT32),
+            NeuronParameter(e_init2, DataType.UINT32),
+            NeuronParameter(i_decay, DataType.UINT32),
+            NeuronParameter(i_init, DataType.UINT32),
+            NeuronParameter(self._initial_input_exc, DataType.S1615),
+            NeuronParameter(self._initial_input_inh, DataType.S1615)
         ]
 
     def get_n_cpu_cycles_per_neuron(self):

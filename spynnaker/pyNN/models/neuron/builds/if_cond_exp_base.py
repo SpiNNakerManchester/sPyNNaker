@@ -60,22 +60,6 @@ class IFCondExpBase(AbstractPopulationVertex):
             threshold_type=threshold_type, constraints=constraints,
             config=globals_variables.get_simulator().config)
 
-    @property
-    def gsyn_exc(self):
-        return self.synapse_type.initial_value_exc
-
-    @property
-    def gsyn_inh(self):
-        return self.synapse_type.initial_value_inh
-
-    @gsyn_exc.setter
-    def gsyn_exc(self, new_value):
-        self.synapse_type.initial_value_exc = new_value
-
-    @gsyn_inh.setter
-    def gsyn_inh(self, new_value):
-        self.synapse_type.initial_value_inh = new_value
-
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
         IFCondExpBase._model_based_max_atoms_per_core = new_value

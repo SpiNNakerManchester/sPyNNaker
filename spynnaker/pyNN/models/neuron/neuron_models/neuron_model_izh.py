@@ -93,31 +93,30 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
         return [
 
             # REAL A
-            NeuronParameter(self._a, DataType.S1615, "a"),
+            NeuronParameter(self._a, DataType.S1615),
 
             # REAL B
-            NeuronParameter(self._b, DataType.S1615, "b"),
+            NeuronParameter(self._b, DataType.S1615),
 
             # REAL C
-            NeuronParameter(self._c, DataType.S1615, "c"),
+            NeuronParameter(self._c, DataType.S1615),
 
             # REAL D
-            NeuronParameter(self._d, DataType.S1615, "d"),
+            NeuronParameter(self._d, DataType.S1615),
 
             # REAL V
-            NeuronParameter(self._v_init, DataType.S1615, "v_init"),
+            NeuronParameter(self._v_init, DataType.S1615),
 
             # REAL U
-            NeuronParameter(self._u_init, DataType.S1615, "u_init"),
+            NeuronParameter(self._u_init, DataType.S1615),
 
             # offset current [nA]
             # REAL I_offset;
-            NeuronParameter(self._i_offset, DataType.S1615, "i_offset"),
+            NeuronParameter(self._i_offset, DataType.S1615),
 
             # current timestep - simple correction for threshold
             # REAL this_h;
-            NeuronParameter(machine_time_step / 1000.0, DataType.S1615,
-                            "this_h")
+            NeuronParameter(machine_time_step / 1000.0, DataType.S1615)
         ]
 
     def get_n_global_parameters(self):
@@ -126,8 +125,7 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_global_parameters(self, machine_time_step):
         return [
-            NeuronParameter(machine_time_step / 1000.0, DataType.S1615,
-                            "machine_time_step")
+            NeuronParameter(machine_time_step / 1000.0, DataType.S1615)
         ]
 
     def get_n_cpu_cycles_per_neuron(self):
