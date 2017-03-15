@@ -1,10 +1,9 @@
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 
 
 class EIFConductanceAlphaPopulation(AbstractPopulationVertex):
-
     """ Exponential integrate and fire neuron with spike triggered and \
         sub-threshold adaptation currents (isfa, ista reps.)
     """
@@ -19,7 +18,7 @@ class EIFConductanceAlphaPopulation(AbstractPopulationVertex):
                  tau_w=144.0, e_rev_E=0.0, e_rev_I=-80.0, delta_T=2.0,
                  v_init=None):
 
-        raise exceptions.SpynnakerException(
+        raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")
 
     @staticmethod
