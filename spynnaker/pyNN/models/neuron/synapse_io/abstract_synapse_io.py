@@ -6,6 +6,8 @@ from abc import abstractmethod
 @add_metaclass(ABCMeta)
 class AbstractSynapseIO(object):
 
+    __slots__ = ()
+
     @abstractmethod
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         """ Get the maximum delay supported by the synapse representation \

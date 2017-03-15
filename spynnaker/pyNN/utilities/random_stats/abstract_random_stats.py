@@ -7,6 +7,7 @@ from abc import abstractmethod
 class AbstractRandomStats(object):
     """ Statistics about PyNN RandomDistribution objects
     """
+    __slots__ = ()
 
     @abstractmethod
     def cdf(self, dist, v):

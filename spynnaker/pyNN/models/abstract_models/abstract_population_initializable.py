@@ -9,6 +9,8 @@ class AbstractPopulationInitializable(object):
         PyNN Population
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\

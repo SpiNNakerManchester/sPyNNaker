@@ -9,6 +9,8 @@ class AbstractSynapseType(object):
     """ Represents the synapse types supported
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def get_n_synapse_types(self):
         """ Get the number of synapse types supported

@@ -8,6 +8,8 @@ class AbstractVRecordable(object):
     """ Indicates that membrane voltage can be recorded from this object
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def is_recording_v(self):
         """ Determines if v is being recorded

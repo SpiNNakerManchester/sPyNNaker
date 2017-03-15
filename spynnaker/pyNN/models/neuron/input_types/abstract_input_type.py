@@ -7,6 +7,7 @@ from abc import abstractmethod
 class AbstractInputType(object):
     """ Represents a possible input type for a neuron model (e.g. current)
     """
+    __slots__ = ()
 
     @abstractmethod
     def get_global_weight_scale(self):

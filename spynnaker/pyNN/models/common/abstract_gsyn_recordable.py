@@ -8,6 +8,8 @@ class AbstractGSynRecordable(object):
     """ Indicates that conductance can be recorded from this object
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def is_recording_gsyn(self):
         """ Determines if gsyn us being recorded

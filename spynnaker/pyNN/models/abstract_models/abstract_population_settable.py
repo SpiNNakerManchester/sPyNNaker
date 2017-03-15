@@ -9,6 +9,8 @@ class AbstractPopulationSettable(object):
         the PyNN population set and get methods
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def get_value(self, key):
         """ Get a property

@@ -8,6 +8,8 @@ class AbstractAdditionalInput(object):
     """ Represents a possible additional independent input for a model
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def get_n_parameters(self):
         """ Get the number of parameters for the additional input

@@ -6,6 +6,8 @@ from abc import abstractmethod
 @add_metaclass(ABCMeta)
 class AbstractSynapseStructure(object):
 
+    __slots__ = ()
+
     @abstractmethod
     def get_n_bytes_per_connection(self):
         """ Get the number of bytes for each connection

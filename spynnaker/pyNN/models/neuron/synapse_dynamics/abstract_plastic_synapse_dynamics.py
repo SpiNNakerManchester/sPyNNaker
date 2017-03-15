@@ -12,6 +12,8 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
     AbstractPlasticSynapseDynamics : synapses which change over time
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def get_n_words_for_plastic_connections(self, n_connections):
         """ Get the number of 32-bit words for n_connections in a single row

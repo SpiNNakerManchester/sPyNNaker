@@ -8,6 +8,8 @@ class AbstractWeightUpdatable(object):
     """ An object the weight of which can be updated
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def update_weight(self, graph_mapper):
         """ Update the weight

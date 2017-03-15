@@ -25,6 +25,8 @@ class AbstractConnector(object):
                             ("weight", "float64"), ("delay", "float64"),
                             ("synapse_type", "uint8")]
 
+    __slots__ = ()
+
     def __init__(self, safe=True, space=None, verbose=False):
         self._safe = safe
         self._space = space

@@ -7,6 +7,8 @@ from abc import abstractproperty
 @add_metaclass(ABCMeta)
 class AbstractTimingDependence(object):
 
+    __slots__ = ()
+
     @abstractmethod
     def is_same_as(self, timing_dependence):
         """ Determine if this timing dependence is the same as another

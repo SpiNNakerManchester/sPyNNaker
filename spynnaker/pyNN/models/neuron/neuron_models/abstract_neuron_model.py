@@ -8,6 +8,8 @@ class AbstractNeuronModel(object):
     """ Represents a neuron model
     """
 
+    __slots__ = ()
+
     @abstractmethod
     def get_n_neural_parameters(self):
         """ Get the number of neural parameters
