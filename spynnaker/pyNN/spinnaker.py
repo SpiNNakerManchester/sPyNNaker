@@ -23,6 +23,7 @@ from spynnaker.pyNN.models.abstract_models\
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 # general imports
 import logging
@@ -112,52 +113,66 @@ class Spinnaker(SpinnakerMainInterface):
                     .format(self._machine_time_step))
 
     def _set_up_timings(self, timestep, min_delay, max_delay):
-        self._machine_time_step = config.getint("Machine", "machineTimeStep")
 
         # deal with params allowed via the setup options
         if timestep is not None:
 
-            # convert into milliseconds from microseconds
-            timestep *= 1000
+            # convert from milliseconds into microseconds
+            try:
+                if timestep <= 0:
+                    raise InvalidParameterType(
+                        "invalid timestamp {}: must greater than zero".format(
+                            timestep))
+                timestep *= 1000.0
+                timestep = math.ceil(timestep)
+            except (TypeError, AttributeError):
+                raise InvalidParameterType(
+                    "timestamp parameter must numerical")
             self._machine_time_step = timestep
+        else:
+            self._machine_time_step = config.getint(
+                "Machine", "machineTimeStep")
 
-        if min_delay is not None and float(min_delay * 1000) < 1.0 * timestep:
+        if (min_delay is not None and
+                float(min_delay * 1000) < self._machine_time_step):
             raise common_exceptions.ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
-                "current machine time step"
-                .format(constants.MIN_SUPPORTED_DELAY * timestep))
+                "current machine time step".format(
+                    constants.MIN_SUPPORTED_DELAY * self._machine_time_step))
 
         natively_supported_delay_for_models = \
             constants.MAX_SUPPORTED_DELAY_TICS
-        delay_extension_max_supported_delay = \
-            constants.MAX_DELAY_BLOCKS \
-            * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
+        delay_extension_max_supported_delay = (
+            constants.MAX_DELAY_BLOCKS *
+            constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
 
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
 
-        if max_delay is not None\
-           and float(max_delay * 1000) > max_delay_tics_supported * timestep:
+        if (max_delay is not None and
+                float(max_delay * 1000.0) >
+                (max_delay_tics_supported * self._machine_time_step)):
             raise common_exceptions.ConfigurationException(
                 "Pacman does not support max delays above {} ms with the "
-                "current machine time step".format(0.144 * timestep))
+                "current machine time step".format(
+                    0.144 * self._machine_time_step))
         if min_delay is not None:
             self._min_supported_delay = min_delay
         else:
-            self._min_supported_delay = timestep / 1000.0
+            self._min_supported_delay = self._machine_time_step / 1000.0
 
         if max_delay is not None:
             self._max_supported_delay = max_delay
         else:
-            self._max_supported_delay = (max_delay_tics_supported *
-                                         (timestep / 1000.0))
+            self._max_supported_delay = (
+                max_delay_tics_supported * (self._machine_time_step / 1000.0))
 
         if (config.has_option("Machine", "timeScaleFactor") and
                 config.get("Machine", "timeScaleFactor") != "None"):
             self._time_scale_factor = \
                 config.getint("Machine", "timeScaleFactor")
-            if timestep * self._time_scale_factor < 1000:
+            if self._machine_time_step * self._time_scale_factor < 1000:
                 if config.getboolean(
                         "Mode", "violate_1ms_wall_clock_restriction"):
                     logger.warn(
@@ -182,8 +197,8 @@ class Spinnaker(SpinnakerMainInterface):
                         "add violate_1ms_wall_clock_restriction = True to the "
                         "[Mode] section of your .spynnaker.cfg file")
         else:
-            self._time_scale_factor = max(1,
-                                          math.ceil(1000.0 / float(timestep)))
+            self._time_scale_factor = max(
+                1, math.ceil(1000.0 / self._machine_time_step))
             if self._time_scale_factor > 1:
                 logger.warn("A timestep was entered that has forced sPyNNaker "
                             "to automatically slow the simulation down from "
