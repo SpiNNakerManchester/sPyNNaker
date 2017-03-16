@@ -86,6 +86,7 @@ typedef struct {
     address_t sdram_synaptic_row;
     int32_t pre_syn_id, post_syn_id;
     structural_plasticity_data_t sp_data;
+    uint32_t current_time;
 } current_state_t;
 
 current_state_t current_state;
@@ -186,7 +187,8 @@ address_t synaptogenesis_dynamics_initialise(
 //! \return None
 
 
-void synaptogenesis_dynamics_rewire(){
+void synaptogenesis_dynamics_rewire(uint32_t time){
+    current_state.current_time = time;
     // Randomly choose a postsynaptic (application neuron)
     uint32_t post_id;
     post_id = ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;

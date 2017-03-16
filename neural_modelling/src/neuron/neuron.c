@@ -11,6 +11,7 @@
 #include "threshold_types/threshold_type.h"
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "../common/out_spikes.h"
 #include "recording.h"
 #include <debug.h>
@@ -19,6 +20,7 @@
 #define SPIKE_RECORDING_CHANNEL 0
 #define V_RECORDING_CHANNEL 1
 #define GSYN_RECORDING_CHANNEL 2
+#define REWIRING_RECORDING_CHANNEL 4
 
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
@@ -366,4 +368,9 @@ void neuron_do_timestep_update(timer_t time) {
         out_spikes_record(SPIKE_RECORDING_CHANNEL, time);
     }
     out_spikes_reset();
+
+//    if (recording_is_channel_enabled(
+//            recording_flags, REWIRING_RECORDING_CHANNEL)) {
+//        record_rewiring(REWIRING_RECORDING_CHANNEL);
+//    }
 }

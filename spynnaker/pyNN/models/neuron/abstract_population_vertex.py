@@ -95,6 +95,7 @@ class AbstractPopulationVertex(
     SPIKE_RECORDING_REGION = 0
     V_RECORDING_REGION = 1
     GSYN_RECORDING_REGION = 2
+    REWIRING_RECORDING_REGION = 4
 
     _n_vertices = 0
 

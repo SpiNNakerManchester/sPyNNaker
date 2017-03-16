@@ -10,7 +10,8 @@ address_t synaptogenesis_dynamics_initialise(
     return sdram_sp_address;
 }
 
-void synaptogenesis_dynamics_rewire(){
+void synaptogenesis_dynamics_rewire(uint32_t time){
+    use(time);
     log_error("%s", sp_error_message);
 }
 
