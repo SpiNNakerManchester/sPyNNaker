@@ -1,10 +1,9 @@
-from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
 import math
+from six import add_metaclass
 
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractSynapseType(object):
     """ Represents the synapse types supported
     """

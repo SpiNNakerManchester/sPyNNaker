@@ -1,12 +1,10 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
-
 import numpy
 import math
 
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractSynapseDynamics(object):
 
     __slots__ = ()
