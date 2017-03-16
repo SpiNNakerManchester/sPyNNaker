@@ -1,11 +1,10 @@
-from abc import ABCMeta
 from six import add_metaclass
-from abc import abstractmethod
 from pyNN.random import RandomDistribution
 from pyNN.random import NumpyRNG
 
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy
@@ -15,8 +14,7 @@ import re
 # global objects
 logger = logging.getLogger(__name__)
 
-
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractConnector(object):
     """ Abstract class which PyNN Connectors extend
     """

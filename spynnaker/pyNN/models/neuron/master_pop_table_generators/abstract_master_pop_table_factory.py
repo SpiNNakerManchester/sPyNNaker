@@ -1,14 +1,13 @@
-
 # general imports
-from abc import ABCMeta
-from six import add_metaclass
-from abc import abstractmethod
 import logging
+from six import add_metaclass
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 logger = logging.getLogger(__name__)
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractMasterPopTableFactory(object):
 
     __slots__ = ()
