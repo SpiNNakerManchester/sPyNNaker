@@ -92,3 +92,8 @@ class FailedState(object):
                annotations=None):
         raise exceptions.ConfigurationException(
             "You cannot call record until you have called setup. durrrr!")
+
+    @staticmethod
+    def min_delay():
+        raise exceptions.ConfigurationException(
+            "You cannot call min_delay until you have called setup. durrrr!")

@@ -42,6 +42,7 @@ class PyNNProjectionCommon(object):
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
 
+        # sort out synapse type
         synapse_type = post_synaptic_population._get_vertex \
             .synapse_type.get_synapse_id_by_target(target)
         if synapse_type is None:

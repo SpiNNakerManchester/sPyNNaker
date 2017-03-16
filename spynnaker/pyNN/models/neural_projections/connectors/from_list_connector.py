@@ -1,5 +1,6 @@
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
+from spynnaker.pyNN import exceptions
 import logging
 import numpy
 
@@ -20,9 +21,9 @@ class FromListConnector(AbstractConnector):
         the index of the postsynaptic neuron.
     """
 
-    CONN_LIST_DTYPE = [
-        ("source", "uint32"), ("target", "uint32"),
-        ("weight", "float64"), ("delay", "float64")]
+    CONN_LIST_DTYPE = numpy.dtype([
+        ("source", numpy.uint32), ("target", numpy.uint32),
+        ("weight", numpy.float64), ("delay", numpy.float64)])
 
     def __init__(self, conn_list, safe=True, verbose=False):
         """
@@ -30,13 +31,92 @@ class FromListConnector(AbstractConnector):
         """
         AbstractConnector.__init__(self, safe, None, verbose)
         if conn_list is None or len(conn_list) == 0:
-            self._conn_list = numpy.zeros(0, dtype=self.CONN_LIST_DTYPE)
-        else:
-            temp_conn_list = conn_list
-            if not isinstance(conn_list[0], tuple):
-                temp_conn_list = [tuple(items) for items in conn_list]
-            self._conn_list = numpy.array(
-                temp_conn_list, dtype=self.CONN_LIST_DTYPE)
+            raise exceptions.InvalidParameterType(
+                "The connection list for the FromListConnector must contain"
+                " at least a list of tuples, each of which should contain:"
+                " (pre_idx, post_idx)")
+        self._conn_list = conn_list
+
+        # supports setting these at different times
+        self._weights = None
+        self._delays = None
+        self._converted_weights_and_delays = False
+
+    @staticmethod
+    def _split_conn_list(conn_list, column_names):
+        """ takes the conn list and separates them into the blocks needed
+
+        :param conn_list: the original conn list
+        :param column_names: the column names if exist
+        :return: source dest list, weights list, delays list, extra list
+        """
+
+        # weights and delay index
+        weight_index = None
+        delay_index = None
+
+        # conn lists
+        weights = None
+        delays = None
+
+        # locate weights and delay index in the listings
+        if "weight" in column_names:
+            weight_index = column_names.index("weight")
+        if "delay" in column_names:
+            delay_index = column_names.index("delay")
+        element_index = range(2, len(column_names))
+
+        # figure out where other stuff is
+        conn_list = numpy.array(conn_list)
+        source_destination_conn_list = conn_list[:, [0, 1]]
+
+        if weight_index is not None:
+            element_index.remove(weight_index)
+            weights = conn_list[:, weight_index]
+        if delay_index is not None:
+            element_index.remove(delay_index)
+            delays = conn_list[:, delay_index]
+
+        # build other data element conn list (with source and destination)
+        other_conn_list = None
+        if len(element_index) != 0:
+            other_conn_list = conn_list[:, element_index]
+
+        # hand over splitted data
+        return source_destination_conn_list, weights, delays, other_conn_list
+
+    def _set_weights_and_delays(self, weights, delays):
+        """ allows setting of the weights and delays at seperate times to the
+        init, also sets the dtypes correctly.....
+
+        :param weights:
+        :param delays:
+        :return:
+        """
+        # set the data if not already set (supports none overriding via
+        # synapse data)
+        if self._weights is None:
+            self._weights = weights
+        if self._delays is None:
+            self._delays = delays
+
+        # if got data, build connlist with correct dtypes
+        if (self._weights is not None and self._delays is not None and not
+                self._converted_weights_and_delays):
+            # add weights and delays to the conn list
+            temp_conn_list = numpy.dstack(
+                (self._conn_list[:, 0], self._conn_list[:, 1],
+                 self._weights, self._delays))[0]
+
+            self._conn_list = list()
+            for element in temp_conn_list:
+                self._conn_list.append((element[0], element[1], element[2],
+                                        element[3]))
+
+            # set dtypes (cant we just set them within the array?)
+            self._conn_list = numpy.asarray(self._conn_list,
+                                            dtype=self.CONN_LIST_DTYPE)
+            self._converted_weights_and_delays = True
 
     def get_delay_maximum(self):
         return numpy.max(self._conn_list["delay"])
