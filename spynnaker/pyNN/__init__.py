@@ -225,8 +225,8 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
         given simulator but not by others.
 
     :param machine: A SpiNNaker machine used to run the simulation.
-    :param timestep: The timestep in milleseconds.
-       Value will be rounded up to whole microseconds
+    :param timestep: The timestep in milleseconds.\
+       Value will be rounded up to whole microseconds.\
        Set to None to use the value from the config file
     :rtype: float or None
     :param min_delay:
