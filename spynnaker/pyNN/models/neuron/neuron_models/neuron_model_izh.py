@@ -45,7 +45,7 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @property
     def c(self):
-        return self.c
+        return self._c
 
     @c.setter
     def c(self, c):
@@ -76,6 +76,14 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
     def u_init(self, u_init):
         self._u_init = utility_calls.convert_param_to_numpy(
             u_init, self._n_neurons)
+
+    @property
+    def i_offset(self):
+        return self._i_offset
+
+    @i_offset.setter
+    def i_offset(self, new_value):
+        self._i_offset = new_value
 
     def initialize_v(self, v_init):
         self._v_init = utility_calls.convert_param_to_numpy(

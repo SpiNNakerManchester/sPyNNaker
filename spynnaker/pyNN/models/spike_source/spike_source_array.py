@@ -27,7 +27,6 @@ from spynnaker.pyNN.utilities import globals_variables
 
 logger = logging.getLogger(__name__)
 
-
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
         SimplePopulationSettable, AbstractChangableAfterRun):
@@ -36,19 +35,42 @@ class SpikeSourceArray(
 
     _model_based_max_atoms_per_core = sys.maxint
 
+    # parameters expected by pynn
+    default_parameters = {
+        'spike_times': None
+    }
+
+    # parameters expected by spinnaker
+    none_pynn_default_parameters = {
+        'port': None, 'tag': None, 'ip_address': None, 'board_address': None,
+        'max_on_chip_memory_usage_for_spikes_in_bytes': (
+            constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
+        'space_before_notification': 640, 'constraints': None, 'label': None,
+        'spike_recorder_buffer_size': (
+            constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
+        'buffer_size_before_receive': (
+            constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)}
+
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
             self, n_neurons,
-            spike_times=None, port=None, tag=None, ip_address=None,
-            board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
-                constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
-            space_before_notification=640,
-            constraints=None, label="SpikeSourceArray",
-            spike_recorder_buffer_size=(
-                constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
-            buffer_size_before_receive=(
-                constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)):
+            spike_times=default_parameters['spike_times'],
+            port=none_pynn_default_parameters['port'],
+            tag=none_pynn_default_parameters['tag'],
+            ip_address=none_pynn_default_parameters['ip_address'],
+            board_address=none_pynn_default_parameters['board_address'],
+            max_on_chip_memory_usage_for_spikes_in_bytes=
+            none_pynn_default_parameters[
+                'max_on_chip_memory_usage_for_spikes_in_bytes'],
+            space_before_notification=
+            none_pynn_default_parameters['space_before_notification'],
+            constraints=none_pynn_default_parameters['constraints'],
+            label=none_pynn_default_parameters['label'],
+            spike_recorder_buffer_size=none_pynn_default_parameters[
+                'spike_recorder_buffer_size'],
+            buffer_size_before_receive=none_pynn_default_parameters[
+                'buffer_size_before_receive']):
 
         config = globals_variables.get_simulator().config
         self._ip_address = ip_address

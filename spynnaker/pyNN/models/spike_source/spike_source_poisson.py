@@ -46,6 +46,7 @@ from spynnaker.pyNN.models.common.population_settable_change_requires_mapping \
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import globals_variables
 from spynnaker.pyNN.utilities import utility_calls
 
 logger = logging.getLogger(__name__)
@@ -78,15 +79,29 @@ class SpikeSourcePoisson(
     # back off range
     _n_poisson_vertices = 0
 
+    # parameters expected by PyNN
+    default_parameters = {
+        'start': 0.0, 'duration': None, 'rate': 1.0}
+
+    # parameters expected by spinnaker
+    none_pynn_default_parameters = {
+        'constraints': None, 'seed': None, 'label': None}
+
     def __init__(
-            self, n_neurons, config, constraints=None,
-            label="SpikeSourcePoisson", rate=1.0, start=0.0, duration=None,
-            seed=None):
+            self, n_neurons,
+            constraints=none_pynn_default_parameters['constraints'],
+            label=none_pynn_default_parameters['label'],
+            rate=default_parameters['rate'],
+            start=default_parameters['start'],
+            duration=default_parameters['duration'],
+            seed=none_pynn_default_parameters['seed']):
         ApplicationVertex.__init__(
             self, label, constraints, self._model_based_max_atoms_per_core)
         AbstractSpikeRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         PopulationSettableChangeRequiresMapping.__init__(self)
+
+        config = globals_variables.get_simulator().config
 
         # atoms params
         self._n_atoms = n_neurons
