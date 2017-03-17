@@ -28,13 +28,13 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models\
-    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
+from spinn_front_end_common.utilities.utility_objs.executable_start_type \
+    import ExecutableStartType
 
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
@@ -60,8 +60,7 @@ class SpikeSourcePoisson(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
-        PopulationSettableChangeRequiresMapping,
-        AbstractBinaryUsesSimulationRun):
+        PopulationSettableChangeRequiresMapping):
     """ A Poisson Spike source object
     """
 
@@ -491,6 +490,10 @@ class SpikeSourcePoisson(
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
         return "spike_source_poisson.aplx"
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableStartType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
