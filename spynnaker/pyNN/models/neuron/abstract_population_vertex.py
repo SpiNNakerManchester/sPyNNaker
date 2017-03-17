@@ -649,5 +649,3 @@ class AbstractPopulationVertex(
 
     def __repr__(self):
         return self.__str__()
-
-print "OK"
