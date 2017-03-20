@@ -1,5 +1,3 @@
-from pyNN.space import Space
-
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
@@ -30,9 +28,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     """ Make connections using a distribution which varies with distance.
     """
 
-    def __init__(self, d_expression, allow_self_connections=True,
-                 weights=0.0, delays=1, space=Space(), safe=True,
-                 verbose=False, n_connections=None):
+    def __init__(
+            self, d_expression, allow_self_connections=True, safe=True,
+            verbose=False, n_connections=None):
         """
 
         :param `string` d_expression:
@@ -45,25 +43,16 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
-        :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list/
-            1D array with at least as many items as connections to be
-            created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
-            will be set to the global minimum delay.
         :param `pyNN.Space` space:
             a Space object, needed if you wish to specify distance-
             dependent weights or delays
         :param `int` n_connections:
             The number of efferent synaptic connections per neuron.
         """
-        AbstractConnector.__init__(self, safe, space, verbose)
+        AbstractConnector.__init__(self, safe, verbose)
         self._d_expression = d_expression
         self._allow_self_connections = allow_self_connections
-        self._weights = weights
-        self._delays = delays
 
-        self._check_parameters(weights, delays, allow_lists=False)
         if n_connections is not None:
             raise NotImplementedError(
                 "n_connections is not implemented for"
@@ -189,19 +178,3 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @d_expression.setter
     def d_expression(self, new_value):
         self._d_expression = new_value
-
-    @property
-    def weights(self):
-        return self._weights
-
-    @weights.setter
-    def weights(self, new_value):
-        self._weights = new_value
-
-    @property
-    def delays(self):
-        return self._delays
-
-    @delays.setter
-    def delays(self, new_value):
-        self._delays = new_value

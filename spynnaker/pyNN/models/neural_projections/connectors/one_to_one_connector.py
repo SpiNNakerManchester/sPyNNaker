@@ -1,5 +1,4 @@
 import numpy
-from pyNN.random import RandomDistribution
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 
@@ -12,22 +11,28 @@ class OneToOneConnector(AbstractConnector):
     """
 
     def __init__(
-            self, weights=0.0, delays=1, space=None, safe=True, verbose=False):
+            self, random_number_class, safe=True, verbose=False):
         """
-        :param weights:
+        """
+        self._random_number_class = random_number_class
+        AbstractConnector.__init__(self, safe, verbose)
+
+    def set_weights_and_delays(self, weights, delays):
+        """ sets the weights and delays as needed
+
+        :param `float` weights:
             may either be a float, a !RandomDistribution object, a list/
             1D array with at least as many items as connections to be
-            created. Units nA.
-        :param delays:
-            as `weights`. If `None`, all synaptic delays will be set
-            to the global minimum delay.
-
+            created, or a distance dependence as per a d_expression. Units nA.
+        :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
+            will be set to the global minimum delay.
+        :raises Exception: when not a standard interface of list, scaler,
+        or random number generator
+        :raises NotImplementedError: when lists are not supported and entered
         """
-        AbstractConnector.__init__(self, safe, space, verbose)
         self._weights = weights
         self._delays = delays
-
-        self._check_parameters(weights, delays)
+        self._check_parameters(weights, delays, allow_lists=True)
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -57,7 +62,7 @@ class OneToOneConnector(AbstractConnector):
             return 0
         if min_delay is None or max_delay is None:
             return 1
-        if isinstance(self._delays, RandomDistribution):
+        if isinstance(self._delays, self._random_number_class):
             return 1
         elif numpy.isscalar(self._delays):
             if self._delays >= min_delay and self._delays <= max_delay:

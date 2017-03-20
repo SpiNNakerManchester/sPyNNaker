@@ -12,9 +12,7 @@ class AllToAllConnector(AbstractConnector):
         the postsynaptic population
     """
 
-    def __init__(
-            self, weights=0.0, delays=1, allow_self_connections=True,
-            space=None, safe=True, verbose=None):
+    def __init__(self, allow_self_connections=True, safe=True, verbose=None):
         """
 
         :param `bool` allow_self_connections:
@@ -22,19 +20,30 @@ class AllToAllConnector(AbstractConnector):
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
+    """
+        AbstractConnector.__init__(self, safe, verbose)
+        self._allow_self_connections = allow_self_connections
+        self._weights = None
+        self._delays = None
+
+
+
+    def set_weights_and_delays(self, weights, delays):
+        """ sets the weights and delays as needed
+
         :param `float` weights:
             may either be a float, a !RandomDistribution object, a list/
             1D array with at least as many items as connections to be
-            created. Units nA.
+            created, or a distance dependence as per a d_expression. Units nA.
         :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
             will be set to the global minimum delay.
-    """
-        AbstractConnector.__init__(self, safe, space, verbose)
+        :raises Exception: when not a standard interface of list, scaler,
+        or random number generator
+        :raises NotImplementedError: when lists are not supported and entered
+        """
         self._weights = weights
         self._delays = delays
-        self._allow_self_connections = allow_self_connections
-
-        self._check_parameters(weights, delays)
+        self._check_parameters(weights, delays, allow_lists=True)
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
         """ Get a slice of the overall set of connections
@@ -172,19 +181,3 @@ class AllToAllConnector(AbstractConnector):
     @allow_self_connections.setter
     def allow_self_connections(self, new_value):
         self._allow_self_connections = new_value
-
-    @property
-    def weights(self):
-        return self._weights
-
-    @weights.setter
-    def weights(self, new_value):
-        self._weights = new_value
-
-    @property
-    def delays(self):
-        return self._delays
-
-    @delays.setter
-    def delays(self, new_value):
-        self._delays = new_value

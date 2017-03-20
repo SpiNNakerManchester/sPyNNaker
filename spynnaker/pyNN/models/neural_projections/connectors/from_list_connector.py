@@ -1,6 +1,7 @@
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy
 
@@ -85,7 +86,7 @@ class FromListConnector(AbstractConnector):
         # hand over splitted data
         return source_destination_conn_list, weights, delays, other_conn_list
 
-    def _set_weights_and_delays(self, weights, delays):
+    def set_weights_and_delays(self, weights, delays):
         """ allows setting of the weights and delays at seperate times to the
         init, also sets the dtypes correctly.....
 
@@ -96,9 +97,11 @@ class FromListConnector(AbstractConnector):
         # set the data if not already set (supports none overriding via
         # synapse data)
         if self._weights is None:
-            self._weights = weights
+            self._weights = utility_calls.convert_param_to_numpy(
+                weights, len(self._conn_list))
         if self._delays is None:
-            self._delays = delays
+            self._delays = utility_calls.convert_param_to_numpy(
+                delays, len(self._conn_list))
 
         # if got data, build connlist with correct dtypes
         if (self._weights is not None and self._delays is not None and not

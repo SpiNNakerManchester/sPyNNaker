@@ -1,4 +1,3 @@
-from pyNN.random import RandomDistribution
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 import numpy
@@ -12,8 +11,7 @@ class FixedNumberPreConnector(AbstractConnector):
         to all post-synaptic neurons
     """
     def __init__(
-            self, n, weights=0.0, delays=1, allow_self_connections=True,
-            space=None, safe=True, verbose=False):
+            self, n, allow_self_connections=True, safe=True, verbose=False):
         """
 
         :param `int` n:
@@ -23,29 +21,14 @@ class FixedNumberPreConnector(AbstractConnector):
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
-        :param weights:
-            may either be a float, a !RandomDistribution object, a list/
-            1D array with at least as many items as connections to be
-            created. Units nA.
-        :param delays:
-            If `None`, all synaptic delays will be set
-            to the global minimum delay.
         :param `pyNN.Space` space:
             a Space object, needed if you wish to specify distance-
             dependent weights or delays - not implemented
         """
-        AbstractConnector.__init__(self, safe, space, verbose)
+        AbstractConnector.__init__(self, safe, verbose)
         self._n_pre = n
-        self._weights = weights
-        self._delays = delays
         self._allow_self_connections = allow_self_connections
         self._pre_neurons = None
-
-        self._check_parameters(weights, delays, allow_lists=False)
-        if isinstance(n, RandomDistribution):
-            raise NotImplementedError(
-                "RandomDistribution is not supported for n in the"
-                " implementation of FixedNumberPreConnector on this platform")
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(

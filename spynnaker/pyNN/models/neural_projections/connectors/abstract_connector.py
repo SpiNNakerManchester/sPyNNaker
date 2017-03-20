@@ -21,9 +21,9 @@ class AbstractConnector(object):
                             ("weight", "float64"), ("delay", "float64"),
                             ("synapse_type", "uint8")]
 
-    def __init__(self, safe=True, space=None, verbose=False):
+    def __init__(self, safe=True, verbose=False):
         self._safe = safe
-        self._space = space
+        self._space = None
         self._verbose = verbose
 
         self._pre_population = None
@@ -34,6 +34,33 @@ class AbstractConnector(object):
 
         self._n_clipped_delays = 0
         self._min_delay = 0
+        self._weights = None
+        self._delays = None
+
+    def set_space(self, space):
+        """ allows setting of the space object after instantiation
+
+        :param space:
+        :return:
+        """
+        self._space = space
+
+    def set_weights_and_delays(self, weights, delays):
+        """ sets the weights and delays as needed
+
+        :param `float` weights:
+            may either be a float, a !RandomDistribution object, a list/
+            1D array with at least as many items as connections to be
+            created, or a distance dependence as per a d_expression. Units nA.
+        :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
+            will be set to the global minimum delay.
+        :raises Exception: when not a standard interface of list, scaler,
+        or random number generator
+        :raises NotImplementedError: when lists are not supported and entered
+        """
+        self._weights = weights
+        self._delays = delays
+        self._check_parameters(weights, delays, allow_lists=False)
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -58,7 +85,7 @@ class AbstractConnector(object):
                 "Lists of {} are not supported the implementation of"
                 " {} on this platform".format(self.__class__))
 
-    def _check_parameters(self, weights, delays, allow_lists=True):
+    def _check_parameters(self, weights, delays, allow_lists=False):
         """ Check the types of the weights and delays are supported; lists can\
             be disallowed if desired
         """
