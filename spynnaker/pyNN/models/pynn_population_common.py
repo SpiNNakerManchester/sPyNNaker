@@ -3,9 +3,14 @@ from spinn_front_end_common.abstract_models. \
 from spinn_front_end_common.utilities import exceptions
 from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
     AbstractContainsUnits
-from spynnaker.pyNN.models.abstract_models.abstract_population_settable import \
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_population_initializable import \
+    AbstractPopulationInitializable
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_population_settable import \
     AbstractPopulationSettable
 from spynnaker.pyNN.utilities import globals_variables
+from spynnaker.pyNN.utilities import utility_calls
 
 
 class PyNNPopulationCommon(object):
@@ -147,4 +152,17 @@ class PyNNPopulationCommon(object):
             self._vertex.set_value(key, value)
 
         # state that something has changed in the population,
+        self._change_requires_mapping = True
+
+    def initialize(self, variable, value):
+        """ Set the initial value of one of the state variables of the neurons\
+            in this population.
+
+        """
+        if not isinstance(self._vertex, AbstractPopulationInitializable):
+            raise KeyError(
+                "Population does not support the initialisation of {}".format(
+                    variable))
+        self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
+            value, self._vertex.n_atoms))
         self._change_requires_mapping = True
