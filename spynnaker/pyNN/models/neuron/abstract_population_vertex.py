@@ -43,6 +43,7 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities import constants as \
     common_constants
 from spinn_front_end_common.utilities import helpful_functions
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
     AbstractContainsUnits
@@ -646,8 +647,8 @@ class AbstractPopulationVertex(
                 setattr(obj, key, value)
                 self._change_requires_mapping = True
                 return
-        raise Exception("Type {} does not have parameter {}".format(
-            self._model_name, key))
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(self._model_name, key))
 
     @property
     def weight_scale(self):
