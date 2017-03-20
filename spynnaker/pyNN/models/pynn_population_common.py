@@ -112,3 +112,39 @@ class PyNNPopulationCommon(object):
     @_internal_delay_vertex.setter
     def _internal_delay_vertex(self, delay_vertex):
         self._delay_vertex = delay_vertex
+
+    def set(self, parameter, value=None):
+        """ Set one or more parameters for every cell in the population.
+
+        param can be a dict, in which case value should not be supplied, or a
+        string giving the parameter name, in which case value is the parameter
+        value. value can be a numeric value, or list of such
+        (e.g. for setting spike times)::
+
+          p.set("tau_m", 20.0).
+          p.set({'tau_m':20, 'v_rest':-65})
+        :param parameter: the parameter to set
+        :param value: the value of the parameter to set.
+        """
+        if not isinstance(self._vertex, AbstractPopulationSettable):
+            raise KeyError("Population does not have property {}".format(
+                parameter))
+
+        if type(parameter) is str:
+            if value is None:
+                raise Exception("Error: No value given in set() function for "
+                                "population parameter. Exiting.")
+            self._vertex.set_value(parameter, value)
+            return
+
+        if type(parameter) is not dict:
+            raise Exception("Error: invalid parameter type for "
+                            "set() function for population parameter."
+                            " Exiting.")
+
+        # Add a dictionary-structured set of new parameters to the current set:
+        for (key, value) in parameter.iteritems():
+            self._vertex.set_value(key, value)
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
