@@ -255,6 +255,7 @@ class Projection(object):
                            gather=True):
         """ Get parameters of the dynamic synapses for all connections in this\
             Projection.
+
         :param parameter_name:
         :param list_format:
         :param gather:
@@ -321,6 +322,7 @@ class Projection(object):
         non-existent connections). Note that for the array format, if there is
         more than connection between two cells, the summed weight will be
         given.
+
         :param format: the type of format to be returned (only support "list")
         :param gather: gather the weights from stuff. currently has no meaning\
                 in spinnaker when set to false. Therefore is always true

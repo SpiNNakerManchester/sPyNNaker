@@ -16,7 +16,5 @@ class AbstractFilterableEdge(object):
         """ method to allow edges to determine if a edge is filter-able
 
         :param graph_mapper: the mapper between graphs
-        :return: true or false
-        :rtype: boolean
-        :raise none: this method does not raise any known exceptions
+        :rtype: bool
         """

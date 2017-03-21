@@ -290,13 +290,12 @@ class AbstractConnector(object):
         if self._safe:
             if len(weights) == 0:
                 logger.warning("No connection in " + str(self))
-            else:
-                if numpy.amin(weights) < 0 < numpy.amax(weights):
-                    raise Exception(
-                        "Weights must be either all positive or all negative"
-                        " in projection {}->{}".format(
-                            self._pre_population.label,
-                            self._post_population.label))
+            elif numpy.amin(weights) < 0 < numpy.amax(weights):
+                raise Exception(
+                    "Weights must be either all positive or all negative"
+                    " in projection {}->{}".format(
+                        self._pre_population.label,
+                        self._post_population.label))
         return numpy.abs(weights)
 
     def _clip_delays(self, delays):
