@@ -2,7 +2,8 @@ import logging
 import os
 from spinn_machine.utilities.progress_bar import ProgressBar
 
-from spynnaker.pyNN import exceptions, ProjectionApplicationEdge
+from spynnaker.pyNN import ProjectionApplicationEdge
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,7 @@ class SpYNNakerSynapticMatrixReport(object):
         numpy.set_printoptions(threshold=numpy.nan)
 
         if dsg_targets is None:
-            raise exceptions.SynapticConfigurationException(
+            raise SynapticConfigurationException(
                 "dsg targets should not be none, used as a check for "
                 "connection holder data to be generated")
 
