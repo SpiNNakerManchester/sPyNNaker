@@ -398,10 +398,6 @@ uint32_t synapses_get_pre_synaptic_events() {
 bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-
-    log_info("Plastic size = %d", synapse_row_plastic_size(row));
-    assert( synapse_row_num_plastic_controls(fixed_region) == 0 );
-
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
         fixed_region);
 
@@ -417,7 +413,9 @@ bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticit
         if (synapse_row_sparse_index(synaptic_words)==id)
             break;
     }
-    use(id);
+
+    // Making assumptions explicit
+    assert( synapse_row_num_plastic_controls(fixed_region) == 0 );
 
     if (fixed_synapse > 0){
         sp_data -> weight = weight;
