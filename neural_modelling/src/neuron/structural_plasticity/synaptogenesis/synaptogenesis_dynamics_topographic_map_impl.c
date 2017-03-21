@@ -255,20 +255,21 @@ void synaptic_row_restructure(uint dma_id){
     if (dma_id != rewiring_dma_buffer.dma_id)
         log_error("Servicing invalid synaptic row!");
 
-
+    uint plastic_size = synapse_row_plastic_size(rewiring_dma_buffer.row);
+    uint num_plastic = synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row));
+    uint num_static = synapse_row_num_fixed_synapses(synapse_row_fixed_region(rewiring_dma_buffer.row));
     // Is the row zero in length?
-    bool zero_elements = synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)) == 0;
-    // TODO figure out what is causing the bug that requires the following checks
-    uint num_plastic = synapse_row_plastic_size(rewiring_dma_buffer.row);
+    bool zero_elements = num_plastic == 0 && num_static == 0;
+
 
     bool zero_double_check=false;
     if (zero_elements)
-        zero_double_check = num_plastic <= 1;
+        zero_double_check = plastic_size <= 1;
 
     if (zero_double_check){
         log_error("What are you doing here?!");
         log_info("plastic size %d -- num fixed %d -- num controls %d ",
-            num_plastic,
+            plastic_size,
             synapse_row_num_fixed_synapses(synapse_row_fixed_region(rewiring_dma_buffer.row)),
             synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
         }
@@ -322,7 +323,7 @@ void synaptic_row_restructure(uint dma_id){
 bool synaptogenesis_dynamics_elimination_rule(){
 
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        log_info("HIT @ %d id %d. Number of controls=%d",
+        log_info("\t| HIT @ %d id %d. Number of controls=%d",
             current_state.sp_data.offset,
             current_state.post_syn_id,
             synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
@@ -342,7 +343,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(){
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
-        log_info("MISS @ %d id %d. Number of controls=%d",
+        log_info("\t| MISS @ %d id %d. Number of controls=%d",
             current_state.sp_data.offset,
             current_state.post_syn_id,
             synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
