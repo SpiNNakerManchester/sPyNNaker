@@ -430,8 +430,18 @@ bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticit
 }
 
 bool remove_static_neuron_at_offset(uint32_t offset, address_t row){
-    use(offset);
-    use(row);
+    address_t fixed_region = synapse_row_fixed_region(row);
+    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
+        fixed_region);
+
+    // Delete weight at offset
+//    spin1_memcpy(&synaptic_words[offset], &synaptic_words[fixed_synapse-1], sizeof(uint32_t));
+    // Delete control word at offset
+    spin1_memcpy(&synaptic_words[offset], &synaptic_words[fixed_synapse-1], sizeof(uint32_t));
+
+    // Decrement FF
+    fixed_region[0]--;
     return true;
 }
 
