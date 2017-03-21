@@ -1,9 +1,9 @@
 import unittest
-from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
-    import GraphEdgeFilter
+# from spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter \
+#     import GraphEdgeFilter
 
 
-class MyTestCase(unittest.TestCase):
+class TestGraphEdgeFilter(unittest.TestCase):
 
     @unittest.skip("Not implemented")
     def test_something(self):

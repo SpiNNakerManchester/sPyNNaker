@@ -28,13 +28,13 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models\
-    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
+from spinn_front_end_common.utilities.utility_objs.executable_start_type \
+    import ExecutableStartType
 
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
@@ -60,8 +60,7 @@ class SpikeSourcePoisson(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
-        PopulationSettableChangeRequiresMapping,
-        AbstractBinaryUsesSimulationRun):
+        PopulationSettableChangeRequiresMapping):
     """ A Poisson Spike source object
     """
 
@@ -236,6 +235,7 @@ class SpikeSourcePoisson(
     @staticmethod
     def get_params_bytes(vertex_slice):
         """ Gets the size of the poisson parameters in bytes
+
         :param vertex_slice:
         """
         return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS +
@@ -246,11 +246,8 @@ class SpikeSourcePoisson(
     def reserve_memory_regions(spec, poisson_params_sz, vertex):
         """ Reserve memory regions for poisson source parameters and output\
             buffer.
-        :param spec:
-        :param setup_sz:
-        :param poisson_params_sz:
-        :return:
-        """
+
+         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
@@ -278,10 +275,6 @@ class SpikeSourcePoisson(
             time_scale_factor):
         """ Generate Neuron Parameter data for Poisson spike sources
 
-        :param spec:
-        :param key:
-        :param num_neurons:
-        :return:
         """
         spec.comment("\nWriting Neuron Parameters for {} poisson sources:\n"
                      .format(vertex_slice.n_atoms))
@@ -497,6 +490,10 @@ class SpikeSourcePoisson(
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
         return "spike_source_poisson.aplx"
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableStartType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(

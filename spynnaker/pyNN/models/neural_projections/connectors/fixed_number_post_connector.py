@@ -43,9 +43,9 @@ class FixedNumberPostConnector(AbstractConnector):
             while (n < self._post_n):
                 permutation = numpy.arange(self._n_post_neurons)
                 for i in range(0, self._n_post_neurons - 1):
-                    j = self._rng.next(
+                    j = int(self._rng.next(
                         n=1, distribution="uniform",
-                        parameters=[0, self._n_post_neurons])
+                        parameters=[0, self._n_post_neurons]))
                     (permutation[i], permutation[j]) = (
                         permutation[j], permutation[i])
                 n += self._n_post_neurons
@@ -80,7 +80,7 @@ class FixedNumberPostConnector(AbstractConnector):
             return len(post_neurons)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._n_post * self._n_post_neurons,
+            self._delays, self._post_n * self._n_post_neurons,
             len(post_neurons), None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
@@ -158,3 +158,6 @@ class FixedNumberPostConnector(AbstractConnector):
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "FixedNumberPostConnector({})".format(self._post_n)

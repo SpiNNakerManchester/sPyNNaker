@@ -10,10 +10,13 @@ class TestPyNNSetup(unittest.TestCase):
         import spynnaker.pyNN as pynn
         self.assertEqual(pynn.setup(timestep=1, min_delay=1, max_delay=15.0),
                          0)
-        self.assertEqual(conf.config.getint("Machine", "machineTimeStep"),
-                         1 * 1000)
-        self.assertEqual(pynn.get_min_delay(), 1)
-        self.assertEqual(pynn.get_max_delay(), 15.0)
+        try:
+            self.assertEqual(conf.config.getint("Machine", "machineTimeStep"),
+                             1 * 1000)
+            self.assertEqual(pynn.get_min_delay(), 1)
+            self.assertEqual(pynn.get_max_delay(), 15.0)
+        finally:
+            pynn.end()
 
     # def test_setting_up_again(self):
     #     import spynnaker.pyNN as pynn
@@ -24,5 +27,5 @@ class TestPyNNSetup(unittest.TestCase):
     #     self.assertEqual(pynn._spinnaker, None)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     unittest.main()

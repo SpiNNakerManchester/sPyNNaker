@@ -1,9 +1,9 @@
 import unittest
-from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
-    .plastic_weight_synapse_row_io import PlasticWeightSynapseRowIo
+# from spynnaker.pyNN.models.neural_properties.synapse_dynamics\
+#     .plastic_weight_synapse_row_io import PlasticWeightSynapseRowIo
 
 
-class MyTestCase(unittest.TestCase):
+class TestPlasticWeightSynapseRowIo(unittest.TestCase):
 
     @unittest.skip("Not implemented")
     def test_something(self):
