@@ -31,7 +31,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         self._p_elim_dep = p_elim_dep
         self._p_elim_pot = p_elim_pot
 
-        self.fudge_factor = 1.1
+        self.fudge_factor = 1.3
 
         if stdp_model is not None:
             self.super = SynapseDynamicsSTDP(timing_dependence=stdp_model.timing_dependence,
