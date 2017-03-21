@@ -396,6 +396,10 @@ uint32_t synapses_get_pre_synaptic_events() {
 }
 
 bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
+    address_t fixed_region = synapse_row_fixed_region(row);
+    int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
+
+    log_info("The number of plastic synapses should be zero -- %d",plastic_synapse);
     use(id);
     use(row);
     use(sp_data);
