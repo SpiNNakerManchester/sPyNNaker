@@ -2,6 +2,7 @@ from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
+
 @add_metaclass(AbstractBase)
 class AbstractInputType(object):
     """ Represents a possible input type for a neuron model (e.g. current)

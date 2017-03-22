@@ -2,6 +2,7 @@ from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
+
 @add_metaclass(AbstractBase)
 class AbstractVRecordable(object):
     """ Indicates that membrane voltage can be recorded from this object

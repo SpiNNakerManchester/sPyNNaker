@@ -1,6 +1,8 @@
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod, abstractproperty
+from spinn_utilities.abstract_base import \
+    AbstractBase, abstractmethod, abstractproperty
+
 
 @add_metaclass(AbstractBase)
 class AbstractTimingDependence(object):

@@ -43,7 +43,7 @@ class SpikeSourcePoissonMachineVertex(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self):
-        return  self._POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value
+        return self._POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value
 
     @property
     @overrides(

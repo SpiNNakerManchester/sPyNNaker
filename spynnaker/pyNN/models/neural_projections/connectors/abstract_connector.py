@@ -14,6 +14,7 @@ import re
 # global objects
 logger = logging.getLogger(__name__)
 
+
 @add_metaclass(AbstractBase)
 class AbstractConnector(object):
     """ Abstract class which PyNN Connectors extend

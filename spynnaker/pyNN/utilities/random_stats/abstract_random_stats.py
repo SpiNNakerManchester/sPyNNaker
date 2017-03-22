@@ -2,6 +2,7 @@ from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
+
 @add_metaclass(AbstractBase)
 class AbstractRandomStats(object):
     """ Statistics about PyNN RandomDistribution objects
