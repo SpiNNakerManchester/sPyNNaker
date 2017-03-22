@@ -13,7 +13,6 @@ from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
 from pacman.model.graphs.application.abstract_application_vertex\
     import AbstractApplicationVertex
 from pacman.model.graphs.common.slice import Slice
-from pyNN.random import RandomDistribution
 from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
@@ -32,6 +31,7 @@ from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.running_stats import RunningStats
+from spynnaker.pyNN.utilities import globals_variables
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
@@ -471,7 +471,10 @@ class SynapticManager(object):
                         spikes_per_second = app_edge.pre_vertex.rate
                         if hasattr(spikes_per_second, "__getitem__"):
                             spikes_per_second = max(spikes_per_second)
-                        elif isinstance(spikes_per_second, RandomDistribution):
+                        elif isinstance(
+                                spikes_per_second,
+                                globals_variables.get_simulator().
+                                get_random_distribution()):
                             spikes_per_second = \
                                 utility_calls.get_maximum_probable_value(
                                     spikes_per_second,
